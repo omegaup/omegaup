@@ -27,7 +27,7 @@ class Validators {
         $parameter,
         string $parameterName
     ): void {
-        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+        if (!self::isPresent($parameter, $parameterName, required: true)) {
             return;
         }
         if (!filter_var($parameter, FILTER_VALIDATE_EMAIL)) {
@@ -49,7 +49,7 @@ class Validators {
         $parameter,
         string $parameterName
     ): void {
-        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+        if (!self::isPresent($parameter, $parameterName, required: true)) {
             return;
         }
 
@@ -160,15 +160,15 @@ class Validators {
         if (!is_null($minLength) && strlen($parameter) < $minLength) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterStringTooShort',
-                /*$parameter=*/null,
-                ['min_length' => strval($minLength)]
+                parameter: null,
+                additionalParameters: ['min_length' => strval($minLength)],
             );
         }
         if (!is_null($maxLength) && strlen($parameter) > $maxLength) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterStringTooLong',
-                /*$parameter=*/null,
-                ['max_length' => strval($maxLength)]
+                parameter: null,
+                additionalParameters: ['max_length' => strval($maxLength)],
             );
         }
         return true;
@@ -312,8 +312,8 @@ class Validators {
             $parameter,
             $parameterName,
             2,
-            null, /*required=*/
-            true
+            null,
+            required: true,
         );
 
         if (preg_match('/[^a-zA-Z0-9_.-]/', $parameter)) {
@@ -362,7 +362,7 @@ class Validators {
         $parameter,
         string $parameterName
     ): void {
-        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+        if (!self::isPresent($parameter, $parameterName, required: true)) {
             return;
         }
         self::validateStringOfLengthInRange(
@@ -370,7 +370,7 @@ class Validators {
             $parameterName,
             2,
             null,
-            /*required=*/true
+            required: true
         );
 
         /** @psalm-suppress RedundantConditionGivenDocblockType not sure why Psalm is complaining here. */
@@ -394,15 +394,15 @@ class Validators {
         $parameter,
         string $parameterName
     ): void {
-        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+        if (!self::isPresent($parameter, $parameterName, required: true)) {
             return;
         }
         self::validateStringOfLengthInRange(
             $parameter,
             $parameterName,
-            /*$minLength=*/ 2,
-            /*$maxLength=*/ null,
-            /*required=*/true
+            minLength: 2,
+            maxLength: null,
+            required: true
         );
 
         /** @psalm-suppress RedundantConditionGivenDocblockType not sure why Psalm is complaining here. */
@@ -429,7 +429,7 @@ class Validators {
         $parameter,
         string $parameterName
     ): void {
-        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+        if (!self::isPresent($parameter, $parameterName, required: true)) {
             return;
         }
 
@@ -567,7 +567,7 @@ class Validators {
         $parameter,
         string $parameterName
     ): void {
-        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+        if (!self::isPresent($parameter, $parameterName, required: true)) {
             return;
         }
         if (!is_numeric($parameter)) {
@@ -610,7 +610,7 @@ class Validators {
         string $parameterName,
         array $enum
     ): void {
-        if (!self::isPresent($parameter, $parameterName, /*$required=*/true)) {
+        if (!self::isPresent($parameter, $parameterName, required: true)) {
             return;
         }
         if (!in_array($parameter, $enum)) {

@@ -410,6 +410,42 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
+     * Returns the list of contests created by a certain identity
+     *
+     * @return list<Contest>
+     */
+    final public static function getContestsCreatedByIdentity(
+        int $identityId
+    ) {
+        $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
+        $sql = "
+            SELECT
+                $columns,
+                p.scoreboard_url,
+                p.scoreboard_url_admin
+            FROM
+                Contests
+            INNER JOIN
+                ACLs a ON a.acl_id = Contests.acl_id
+            INNER JOIN
+                Users u ON u.user_id = a.owner_id
+            INNER JOIN
+                Problemsets p ON p.problemset_id = Contests.problemset_id
+            WHERE
+                u.main_identity_id = ?
+                AND archived = false
+            ORDER BY
+                Contests.contest_id DESC;";
+
+        $params = [
+            $identityId,
+        ];
+
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+    }
+
+    /**
      * Returns all contests where a user is participating in.
      *
      * @return list<Contestv2>
@@ -440,55 +476,45 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 p.scoreboard_url,
                 p.scoreboard_url_admin,
                 COUNT(contestants.identity_id) AS `contestants`,
-                organizer.username AS `organizer`,
-                (pi.identity_id IS NOT NULL) AS `participating`
+                organizer.username AS `organizer`
             FROM
+                (SELECT
+                    pi.problemset_id
+                FROM
+                    Problemset_Identities pi
+                WHERE
+                    pi.identity_id = ?
+                UNION DISTINCT
+                SELECT
+                    p.problemset_id
+                FROM
+                    Groups_Identities gi
+                INNER JOIN
+                    Group_Roles gr ON gi.group_id = gr.group_id
+                INNER JOIN
+                    Problemsets p ON gr.acl_id = p.acl_id
+                WHERE
+                    gi.identity_id = ? AND gr.role_id = ?
+                UNION DISTINCT
+                SELECT
+                    p.problemset_id
+                FROM
+                    Teams t
+                INNER JOIN
+                    Teams_Group_Roles tgr ON t.team_group_id = tgr.team_group_id
+                INNER JOIN
+                    Problemsets p ON tgr.acl_id = p.acl_id
+                WHERE
+                    t.identity_id = ? AND tgr.role_id = ?
+                ) pps
+            INNER JOIN
                 Contests
+            ON
+                Contests.problemset_id = pps.problemset_id
             INNER JOIN
                 Problemsets p
             ON
                 p.problemset_id = Contests.problemset_id
-            INNER JOIN
-                (
-                    SELECT
-                        pi.identity_id,
-                        pi.problemset_id
-                    FROM
-                        Problemset_Identities pi
-                    UNION DISTINCT
-                    SELECT
-                        gi.identity_id,
-                        p.problemset_id
-                    FROM
-                        Problemsets p
-                    INNER JOIN
-                        Group_Roles gr
-                    ON
-                        gr.acl_id = p.acl_id AND
-                        gr.role_id = ?
-                    INNER JOIN
-                        Groups_Identities gi
-                    ON
-                        gi.group_id = gr.group_id
-                    UNION DISTINCT
-                    SELECT
-                        t.identity_id,
-                        p.problemset_id
-                    FROM
-                        Problemsets p
-                    INNER JOIN
-                        Teams_Group_Roles tgr
-                    ON
-                        tgr.acl_id = p.acl_id AND
-                        tgr.role_id = ?
-                    INNER JOIN
-                        Teams t
-                    ON
-                        t.team_group_id = tgr.team_group_id
-                ) pi
-            ON
-                pi.problemset_id = p.problemset_id AND
-                pi.identity_id = ?
             LEFT JOIN
                 Problemset_Identities AS contestants
             ON
@@ -509,9 +535,14 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             GROUP BY Contests.contest_id, organizer.identity_id
         ";
         $params = [
-            \OmegaUp\Authorization::CONTESTANT_ROLE,
-            \OmegaUp\Authorization::CONTESTANT_ROLE,
+            // Direct participation
             $identityId,
+            // Group participation
+            $identityId,
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
+            // Team participation
+            $identityId,
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
         ];
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
@@ -529,12 +560,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $params[] = intval($offset);
         $params[] = intval($pageSize);
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $contests = [];
         foreach ($rs as $row) {
-            $row['participating'] = boolval($row['participating']);
+            $row['participating'] = true;
             $contests[] = $row;
         }
         return $contests;
@@ -1257,26 +1288,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 NULL AS alias,
                 pal.ip,
                 pal.`time`,
-                IFNULL(
-                    (
-                        SELECT `urc`.classname FROM
-                            `User_Rank_Cutoffs` urc
-                        WHERE
-                            `urc`.score <= (
-                                    SELECT
-                                        `ur`.`score`
-                                    FROM
-                                        `User_Rank` `ur`
-                                    WHERE
-                                        `ur`.user_id = `i`.`user_id`
-                                )
-                        ORDER BY
-                            `urc`.percentile ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) `classname`,
+                IFNULL(ur.classname, "user-rank-unranked") AS classname,
                 "open" AS event_type,
                 NULL AS clone_result,
                 NULL AS clone_token_payload,
@@ -1284,9 +1296,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             FROM
                 Problemset_Access_Log pal
             INNER JOIN
-                Identities i
-            ON
-                i.identity_id = pal.identity_id
+                Identities i ON i.identity_id = pal.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
             WHERE
                 pal.problemset_id = ?
         ) UNION (
@@ -1295,26 +1307,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 p.alias,
                 sl.ip,
                 sl.`time`,
-                IFNULL(
-                    (
-                        SELECT `urc`.classname FROM
-                            `User_Rank_Cutoffs` urc
-                        WHERE
-                            `urc`.score <= (
-                                    SELECT
-                                        `ur`.`score`
-                                    FROM
-                                        `User_Rank` `ur`
-                                    WHERE
-                                        `ur`.user_id = `i`.`user_id`
-                                )
-                        ORDER BY
-                            `urc`.percentile ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) `classname`,
+                IFNULL(ur.classname, "user-rank-unranked") AS classname,
                 "submit" AS event_type,
                 NULL AS clone_result,
                 NULL AS clone_token_payload,
@@ -1322,17 +1315,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             FROM
                 Submission_Log sl
             INNER JOIN
-                Identities i
-            ON
-                i.identity_id = sl.identity_id
+                Identities i ON i.identity_id = sl.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
             INNER JOIN
-                Submissions s
-            ON
-                s.submission_id = sl.submission_id
+                Submissions s ON s.submission_id = sl.submission_id
             INNER JOIN
-                Problems p
-            ON
-                p.problem_id = s.problem_id
+                Problems p ON p.problem_id = s.problem_id
             WHERE
                 sl.problemset_id = ?
         ) ORDER BY

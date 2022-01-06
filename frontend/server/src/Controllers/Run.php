@@ -62,7 +62,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     ];
 
     /** @var int */
-    public static $defaultSubmissionGap = 60; /*seconds*/
+    public static $defaultSubmissionGap = 60; // seconds.
 
     public const VERDICTS = [
         'AC',
@@ -468,6 +468,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             'guid' => md5(uniqid(strval(rand()), true)),
             'language' => $r['language'],
             'time' => \OmegaUp\Time::get(),
+            'status' => 'uploading',
+            'verdict' => 'JE',
             'submit_delay' => $submitDelay, /* based on penalty_type */
             'type' => $type,
         ]);
@@ -532,7 +534,10 @@ class Run extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Submissions::update($submission);
             \OmegaUp\DAO\Runs::delete($run);
             \OmegaUp\DAO\Submissions::delete($submission);
-            self::$log->error('Call to \OmegaUp\Grader::grade() failed', $e);
+            self::$log->error(
+                'Call to \OmegaUp\Grader::grade() failed',
+                ['exception' => $e],
+            );
             throw $e;
         }
         $userId = $r->identity->user_id;
@@ -583,7 +588,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Happy ending
         $response['nextSubmissionTimestamp'] = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
             $contest,
-            /*lastSubmissionTime=*/$submission->time
+            lastSubmissionTime: $submission->time
         );
 
         if (is_null($submission->guid)) {
@@ -773,7 +778,10 @@ class Run extends \OmegaUp\Controllers\Controller {
                 $r['debug'] || false
             );
         } catch (\Exception $e) {
-            self::$log->error('Call to \OmegaUp\Grader::rejudge() failed', $e);
+            self::$log->error(
+                'Call to \OmegaUp\Grader::rejudge() failed',
+                ['exception' => $e],
+            );
         }
 
         self::invalidateCacheOnRejudge($run);
@@ -853,11 +861,10 @@ class Run extends \OmegaUp\Controllers\Controller {
             }
         } catch (\Exception $e) {
             // We did our best effort to invalidate the cache...
-            self::$log->warn(
-                "Failed to invalidate cache on rejudge {$run->run_id}, skipping: ",
-                $e
+            self::$log->warning(
+                "Failed to invalidate cache on rejudge {$run->run_id}, skipping",
+                ['exception' => $e],
             );
-            self::$log->warn($e);
         }
     }
 
@@ -941,7 +948,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             $submission,
             $run,
             $contest,
-            /*$showDetails=*/$showRunDetails !== 'none'
+            showDetails: $showRunDetails !== 'none'
         );
 
         $response['source'] = $details['source'];
@@ -1147,8 +1154,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         return self::getOptionalRunDetails(
             $submission,
             $run,
-            /*$contest*/ null,
-            /*$showDetails=*/ false
+            contest: null,
+            showDetails: false
         );
     }
 
@@ -1239,8 +1246,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             !self::downloadSubmission(
                 $runAlias,
                 $r->identity,
-                /*$passthru=*/true,
-                /*$skipAuthorization=*/$showDiff
+                passthru: true,
+                skipAuthorization: $showDiff
             )
         ) {
             http_response_code(404);
@@ -1305,12 +1312,12 @@ class Run extends \OmegaUp\Controllers\Controller {
         $result = \OmegaUp\Grader::getInstance()->getGraderResource(
             $run,
             $filename,
-            /*missingOk=*/true
+            missingOk: true
         );
         if (is_null($result)) {
             $result = self::downloadResourceFromS3(
                 "{$run->run_id}/{$filename}",
-                /*passthru=*/false
+                passthru: false
             );
         }
         return $result;
@@ -1328,14 +1335,14 @@ class Run extends \OmegaUp\Controllers\Controller {
         $result = \OmegaUp\Grader::getInstance()->getGraderResourcePassthru(
             $run,
             $filename,
-            /*missingOk=*/true,
-            $headers
+            missingOk: true,
+            fileHeaders: $headers,
         );
         if (is_null($result)) {
             $result = self::downloadResourceFromS3(
                 "{$run->run_id}/{$filename}",
-                /*passthru=*/true,
-                $headers
+                passthru: true,
+                httpHeaders: $headers,
             );
         }
         return $result;
@@ -1587,59 +1594,35 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{runs: list<Run>}
      *
-     * @omegaup-request-param mixed $language
+     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null $language
      * @omegaup-request-param int $offset
      * @omegaup-request-param string $problem_alias
      * @omegaup-request-param int $rowcount
-     * @omegaup-request-param mixed $status
+     * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
      * @omegaup-request-param string $username
-     * @omegaup-request-param mixed $verdict
+     * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict
      */
     public static function apiList(\OmegaUp\Request $r): array {
         // Authenticate request
         $r->ensureIdentity();
-
-        // Defaults for offset and rowcount
-        $r->ensureOptionalInt('offset');
-        if (!isset($r['offset'])) {
-            $r['offset'] = 0;
-        }
-        $r->ensureOptionalInt('rowcount');
-        if (!isset($r['rowcount'])) {
-            $r['rowcount'] = 100;
-        }
-
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['status'],
-            'status',
-            self::STATUS
-        );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['verdict'],
-            'verdict',
-            \OmegaUp\Controllers\Run::VERDICTS
-        );
-
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['language'],
-            'language',
-            array_keys(self::SUPPORTED_LANGUAGES)
-        );
 
         [
             'problem' => $problem,
             'identity' => $identity,
         ] = self::validateList($r);
 
-        $runs = \OmegaUp\DAO\Runs::getAllRuns(
+        $languagesKeys = array_keys(self::SUPPORTED_LANGUAGES);
+        [
+            'runs' => $runs,
+        ] = \OmegaUp\DAO\Runs::getAllRuns(
             null,
-            $r['status'],
-            $r['verdict'],
+            $r->ensureOptionalEnum('status', self::STATUS),
+            $r->ensureOptionalEnum('verdict', self::VERDICTS),
             !is_null($problem) ? $problem->problem_id : null,
-            $r['language'],
+            $r->ensureOptionalEnum('language', $languagesKeys),
             !is_null($identity) ? $identity->identity_id : null,
-            intval($r['offset']),
-            intval($r['rowcount'])
+            max($r->ensureOptionalInt('offset') ?? 0, 0),
+            $r->ensureOptionalInt('rowcount') ?? 100
         );
 
         $result = [];

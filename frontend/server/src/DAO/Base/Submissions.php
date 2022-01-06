@@ -39,6 +39,8 @@ abstract class Submissions {
                 `guid` = ?,
                 `language` = ?,
                 `time` = ?,
+                `status` = ?,
+                `verdict` = ?,
                 `submit_delay` = ?,
                 `type` = ?,
                 `school_id` = ?
@@ -72,6 +74,8 @@ abstract class Submissions {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Submissions->time
             ),
+            $Submissions->status,
+            $Submissions->verdict,
             intval($Submissions->submit_delay),
             $Submissions->type,
             (
@@ -108,6 +112,8 @@ abstract class Submissions {
                 `Submissions`.`guid`,
                 `Submissions`.`language`,
                 `Submissions`.`time`,
+                `Submissions`.`status`,
+                `Submissions`.`verdict`,
                 `Submissions`.`submit_delay`,
                 `Submissions`.`type`,
                 `Submissions`.`school_id`
@@ -124,6 +130,35 @@ abstract class Submissions {
             return null;
         }
         return new \OmegaUp\DAO\VO\Submissions($row);
+    }
+
+    /**
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\Submissions} por llave primaria.
+     *
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\Submissions}
+     * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
+     *
+     * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
+     * los campos.
+     *
+     * @return bool Si existe o no tal registro.
+     */
+    final public static function existsByPK(
+        int $submission_id
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `Submissions`
+            WHERE
+                (
+                    `submission_id` = ?
+                );';
+        $params = [$submission_id];
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
     }
 
     /**
@@ -200,6 +235,8 @@ abstract class Submissions {
                 `Submissions`.`guid`,
                 `Submissions`.`language`,
                 `Submissions`.`time`,
+                `Submissions`.`status`,
+                `Submissions`.`verdict`,
                 `Submissions`.`submit_delay`,
                 `Submissions`.`type`,
                 `Submissions`.`school_id`
@@ -260,10 +297,14 @@ abstract class Submissions {
                     `guid`,
                     `language`,
                     `time`,
+                    `status`,
+                    `verdict`,
                     `submit_delay`,
                     `type`,
                     `school_id`
                 ) VALUES (
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -301,6 +342,8 @@ abstract class Submissions {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Submissions->time
             ),
+            $Submissions->status,
+            $Submissions->verdict,
             intval($Submissions->submit_delay),
             $Submissions->type,
             (

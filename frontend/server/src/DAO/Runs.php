@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
-     * Gets an array of the guids of the pending runs
+     * Gets an array of the best solving runs for a problem.
      * @return list<array{classname: string, username: string, language: string, runtime: float, memory: float, time: \OmegaUp\Timestamp}>
      */
     final public static function getBestSolvingRunsForProblem(
@@ -26,67 +26,47 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 r.runtime,
                 r.memory,
                 s.`time`,
-                IFNULL(
-                    (
-                        SELECT `urc`.`classname` FROM
-                            `User_Rank_Cutoffs` `urc`
-                        WHERE
-                            `urc`.`score` <= (
-                                    SELECT
-                                        `ur`.`score`
-                                    FROM
-                                        `User_Rank` `ur`
-                                    WHERE
-                                        `ur`.`user_id` = `i`.`user_id`
-                                )
-                        ORDER BY
-                            `urc`.`percentile` ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) `classname`
+                IFNULL(ur.classname, "user-rank-unranked") `classname`,
+                ROW_NUMBER() OVER(
+                    PARTITION BY i.identity_id ORDER BY r.runtime ASC, s.submission_id ASC
+                ) AS per_identity_rank
             FROM
-                (SELECT
-                    MIN(s.submission_id) submission_id, s.identity_id, r.runtime
-                FROM
-                    Submissions s
-                INNER JOIN
-                    Runs r
-                ON
-                    r.run_id = s.current_run_id
-                INNER JOIN
-                    (
-                        SELECT
-                            ss.identity_id, MIN(rr.runtime) AS runtime
-                        FROM
-                            Submissions ss
-                        INNER JOIN
-                            Runs rr
-                        ON
-                            rr.run_id = ss.current_run_id
-                        WHERE
-                            ss.problem_id = ? AND rr.status = "ready" AND rr.verdict = "AC" AND ss.type = "normal"
-                        GROUP BY
-                            ss.identity_id
-                    ) AS sr ON sr.identity_id = s.identity_id AND sr.runtime = r.runtime
-                WHERE
-                    s.problem_id = ? AND r.status = "ready" AND r.verdict = "AC" AND s.type= "normal"
-                GROUP BY
-                    s.identity_id, r.runtime
-                ORDER BY
-                    r.runtime, submission_id
-                LIMIT 0, 10) as runs
+                Submissions s
             INNER JOIN
-                Identities i ON i.identity_id = runs.identity_id
+                Runs r ON r.run_id = s.current_run_id
             INNER JOIN
-                Submissions s ON s.submission_id = runs.submission_id
-            INNER JOIN
-                Runs r ON r.run_id = s.current_run_id;';
-        $val = [$problemId, $problemId];
+                Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
+            WHERE
+                s.problem_id = ? AND
+                r.status = "ready" AND
+                r.verdict = "AC" AND
+                s.type = "normal"
+            ORDER BY
+                per_identity_rank ASC, r.runtime ASC, s.submission_id ASC
+            LIMIT 0, 10;
+        ';
+        $val = [$problemId];
 
-        /** @var list<array{classname: string, language: string, memory: int, runtime: int, time: \OmegaUp\Timestamp, username: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
+        $result = [];
+        /** @var array{classname: string, language: string, memory: int, per_identity_rank: int, runtime: int, time: \OmegaUp\Timestamp, username: string} $row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $val
+            ) as $row
+        ) {
+            if ($row['per_identity_rank'] != 1) {
+                // This means that there were fewer than 10 distinct identities
+                // that solved this problem, and the rest of the rows are
+                // repeated users.
+                break;
+            }
+            unset($row['per_identity_rank']);
+            $result[] = $row;
+        }
+        return $result;
     }
 
     /**
@@ -125,18 +105,75 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>
+     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>, totalRuns: int}
      */
     final public static function getAllRuns(
-        ?int $problemset_id,
+        ?int $problemsetId,
         ?string $status,
         ?string $verdict,
-        ?int $problem_id,
+        ?int $problemId,
         ?string $language,
-        ?int $identity_id,
-        ?int $offset,
-        ?int $rowcount
+        ?int $identityId,
+        ?int $offset = 0,
+        ?int $rowCount = 100
     ): array {
+        $where = [];
+        $val = [];
+
+        if (!is_null($problemsetId)) {
+            $where[] = 's.problemset_id = ?';
+            $val[] = $problemsetId;
+        }
+        if (!is_null($problemId)) {
+            $where[] = 's.problem_id = ?';
+            $val[] = $problemId;
+        }
+        if (!is_null($language)) {
+            $where[] = 's.language = ?';
+            $val[] = $language;
+        }
+        if (!is_null($identityId)) {
+            $where[] = 's.identity_id = ?';
+            $val[] = $identityId;
+        }
+
+        if (!is_null($status)) {
+            $where[] = 's.status = ?';
+            $val[] = $status;
+        }
+        if (!is_null($verdict)) {
+            if ($verdict === 'NO-AC') {
+                $where[] = 's.verdict <> ?';
+                $val[] = 'AC';
+            } else {
+                $where[] = 's.verdict = ?';
+                $val[] = $verdict;
+            }
+        }
+
+        $sqlCount = '
+            SELECT
+                COUNT(*) AS total
+            FROM
+                Submissions s
+        ';
+        if (!empty($where)) {
+            $sqlCount .= 'WHERE ' . implode(' AND ', $where) . ' ';
+        }
+
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlCount,
+            $val,
+        );
+
+        if (is_null($offset) || $offset < 0) {
+            $offset = 0;
+        }
+        if (is_null($rowCount)) {
+            $rowCount = 100;
+        }
+
         $sql = '
             SELECT
                 `r`.`run_id`,
@@ -164,86 +201,37 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `p`.`alias`,
                 IFNULL(`i`.`country_id`, "xx") `country`,
                 `c`.`alias` AS `contest_alias`,
-                IFNULL(
-                    (
-                        SELECT `urc`.`classname` FROM
-                            `User_Rank_Cutoffs` `urc`
-                        WHERE
-                            `urc`.`score` <= (
-                                    SELECT
-                                        `ur`.`score`
-                                    FROM
-                                        `User_Rank` `ur`
-                                    WHERE
-                                        `ur`.`user_id` = `i`.`user_id`
-                                )
-                        ORDER BY
-                            `urc`.`percentile` ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) `classname`
+                IFNULL(ur.classname, "user-rank-unranked") `classname`
             FROM
                 Submissions s
-            USE INDEX(PRIMARY)
             INNER JOIN
-                Runs r
-            ON
-                r.run_id = s.current_run_id
+                Runs r ON r.run_id = s.current_run_id
             INNER JOIN
                 Problems p ON p.problem_id = s.problem_id
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
             LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
+            LEFT JOIN
                 Contests c ON c.problemset_id = s.problemset_id
         ';
-        $where = [];
-        $val = [];
-
-        if (!is_null($problemset_id)) {
-            $where[] = 's.problemset_id = ?';
-            $val[] = $problemset_id;
-        }
-
-        if (!is_null($status)) {
-            $where[] = 'r.status = ?';
-            $val[] = $status;
-        }
-        if (!is_null($verdict)) {
-            if ($verdict === 'NO-AC') {
-                $where[] = 'r.verdict <> ?';
-                $val[] = 'AC';
-            } else {
-                $where[] = 'r.verdict = ?';
-                $val[] = $verdict;
-            }
-        }
-        if (!is_null($problem_id)) {
-            $where[] = 's.problem_id = ?';
-            $val[] = $problem_id;
-        }
-        if (!is_null($language)) {
-            $where[] = 's.language = ?';
-            $val[] = $language;
-        }
-        if (!is_null($identity_id)) {
-            $where[] = 's.identity_id = ?';
-            $val[] = $identity_id;
-        }
         if (!empty($where)) {
-            $sql .= 'WHERE ' . implode(' AND ', $where) . ' ';
+            $sql .= 'WHERE ' . implode(' AND ', $where);
         }
-
-        $sql .= 'ORDER BY s.submission_id DESC ';
-        if (!is_null($offset)) {
-            $sql .= 'LIMIT ?, ?';
-            $val[] = intval($offset);
-            $val[] = intval($rowcount);
-        }
+        $sql .= '
+            ORDER BY s.submission_id DESC
+            LIMIT ?, ?;
+        ';
+        $val[] = $offset * $rowCount;
+        $val[] = $rowCount;
 
         /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
+        $runs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
+
+        return [
+            'runs' => $runs,
+            'totalRuns' => $totalRows,
+        ];
     }
 
     /**
@@ -412,20 +400,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $classNameQuery = '
             IFNULL(
                 (
-                    SELECT urc.classname
-                    FROM User_Rank_Cutoffs urc
+                    SELECT
+                        ur.classname
+                    FROM
+                        User_Rank ur
                     WHERE
-                        urc.score <= (
-                            SELECT
-                                ur.score
-                            FROM
-                                User_Rank ur
-                            WHERE
-                                ur.user_id = i.user_id
-                        )
-                    ORDER BY
-                        urc.percentile ASC
-                    LIMIT 1
+                        ur.user_id = i.user_id
                 ),
                 "user-rank-unranked"
             ) AS classname';
@@ -875,25 +855,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.submit_delay,
                 i.username, IFNULL(i.country_id, "xx") AS country,
                 c.alias AS contest_alias, IFNULL(s.`type`, "normal") AS `type`,
-                IFNULL(
-                    (
-                        SELECT urc.classname
-                        FROM User_Rank_Cutoffs urc
-                        WHERE
-                            urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = i.user_id
-                            )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT 1
-                    ),
-                    "user-rank-unranked"
-                ) AS classname
+                IFNULL(ur.classname, "user-rank-unranked") AS classname
             FROM
                 Submissions s
             INNER JOIN
@@ -904,6 +866,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 Identities i
             ON
                 i.identity_id = s.identity_id
+            LEFT JOIN
+                User_Rank ur
+            ON
+                ur.user_id = i.user_id
             INNER JOIN
                 Problems p
             ON
@@ -962,20 +928,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 c.alias AS contest_alias, IFNULL(s.`type`, "normal") AS `type`,
                 IFNULL(
                     (
-                        SELECT urc.classname
-                        FROM User_Rank_Cutoffs urc
+                        SELECT
+                            ur.classname
+                        FROM
+                            User_Rank ur
                         WHERE
-                            urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = i.user_id
-                            )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT 1
+                            ur.user_id = i.user_id
                     ),
                     "user-rank-unranked"
                 ) AS classname,
@@ -983,20 +941,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 ii.username as feedback_author,
                 IFNULL(
                     (
-                        SELECT urc.classname
-                        FROM User_Rank_Cutoffs urc
+                        SELECT
+                            ur.classname
+                        FROM
+                            User_Rank ur
                         WHERE
-                            urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = ii.user_id
-                            )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT 1
+                            ur.user_id = ii.user_id
                     ),
                     "user-rank-unranked"
                 ) AS feedback_author_classname,

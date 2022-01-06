@@ -168,7 +168,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testStudentASsignmentProgress() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
-            /*$nAssignments=*/            2
+            nAssignments: 2
         );
         $studentsInCourse = 2;
 
@@ -222,11 +222,9 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'source' => $submissionSource,
             ]));
             \OmegaUp\Test\Factories\Run::gradeRun(
-                /*$runData=*/                null,
-                1,
-                'AC',
-                null,
-                $runResponse['guid']
+                points: 1,
+                verdict: 'AC',
+                runGuid: $runResponse['guid']
             );
 
             // Add one run to the third problem in the second assignment
@@ -238,11 +236,9 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'source' => $submissionSource,
             ]));
             \OmegaUp\Test\Factories\Run::gradeRun(
-                /*$runData=*/                null,
-                1,
-                'AC',
-                null,
-                $runResponse['guid']
+                points: 1,
+                verdict: 'AC',
+                runGuid: $runResponse['guid']
             );
 
             $response = \OmegaUp\Controllers\Course::apiMyProgress(
@@ -342,21 +338,21 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
         // The studen only get 90 points in the first problem,
         // so 90% of progress is expected
         $this->assertEquals(
-            $response['smartyProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[0]['problem']->alias],
+            $response['templateProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[0]['problem']->alias],
             90
         );
 
         // The studen got AC points in the second problem,
         // so 100% of progress is expected
         $this->assertEquals(
-            $response['smartyProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[1]['problem']->alias],
+            $response['templateProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[1]['problem']->alias],
             100
         );
 
         // The studen didn't try third problem,
         // so 0% of progress is expected
         $this->assertEquals(
-            $response['smartyProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[2]['problem']->alias],
+            $response['templateProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[2]['problem']->alias],
             0
         );
     }

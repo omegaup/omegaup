@@ -13,6 +13,7 @@ describe('CardPublic.vue', () => {
     name: 'Test course',
     school_name: 'Test course school',
     studentCount: 2000,
+    alreadyStarted: false,
   };
 
   it('Should render information for public course', () => {

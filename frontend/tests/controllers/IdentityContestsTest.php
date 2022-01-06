@@ -276,7 +276,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testSwitchBetweenAssociatedIdentities() {
         $this->assertUserHasBeenInvitedToContests(
             $this->login,
-            /*$contests=*/['Contest_1', 'Contest_2']
+            contests: ['Contest_1', 'Contest_2']
         );
 
         // User switch the account
@@ -289,8 +289,8 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertUserHasBeenInvitedToContests(
             $this->login,
-            /*$contests=*/['Contest_0'],
-            /*$isMainIdentity=*/false
+            contests: ['Contest_0'],
+            isMainIdentity: false
         );
     }
 
@@ -326,7 +326,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertUserHasBeenInvitedToContests(
             $this->login,
-            /*$contests=*/['Contest_1', 'Contest_2']
+            contests: ['Contest_1', 'Contest_2']
         );
     }
 
@@ -343,8 +343,8 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertUserHasBeenInvitedToContests(
             $this->login,
-            /*$contests=*/['Contest_0'],
-            /*$isMainIdentity=*/false
+            contests: ['Contest_0'],
+            isMainIdentity: false
         );
 
         // User switch the account
@@ -411,11 +411,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($contestData['director']);
 
         $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
-            /*$owner=*/            null,
-            /*$name=*/null,
-            /*$description=*/null,
-            /*$alias=*/null,
-            $login
+            login: $login,
         );
 
         // Add groups to contest for teams is not allowed

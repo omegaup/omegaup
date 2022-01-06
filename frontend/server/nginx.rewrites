@@ -39,14 +39,15 @@ rewrite ^/contest/([a-zA-Z0-9_+-]+)/edit/?$ /contests/edit.php?contest_alias=$1 
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/report/?$ /contests/report.php?contest_alias=$1 last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/stats/?$ /contests/stats.php?contest_alias=$1 last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/virtual/?$ /contests/virtual.php?contest_alias=$1  last;
-rewrite ^/course/?$ /course/list.php last;
+rewrite ^/course/?$ /course/tabs.php last;
 rewrite ^/course/home/?$ /course/home.php last;
-rewrite ^/course/listv2/?$ /course/tabs.php last;
 rewrite ^/course/mine/?$ /course/mine.php last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/activity/?$ /course/activity.php?course=$1 last;
 rewrite ^/course/new/?$ /course/new.php last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/?$ /course/assignment.php?course_alias=$1 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/clarification/?$ /course/clarification.php?course_alias=$1 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/arena/([a-zA-Z0-9_+-]+)/?$ /course/arena.php?course_alias=$1&assignment_alias=$2 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/arena/([a-zA-Z0-9_+-]+)/problem/([a-zA-Z0-9_+-]+)/?$ /course/arena.php?course_alias=$1&assignment_alias=$2&problem_alias=$3 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/?$ /course/assignment.php?course_alias=$1&assignment_alias=$2 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/scoreboard/?$ /course/scoreboard.php?course_alias=$1&assignment_alias=$2 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/scoreboard/([a-zA-Z0-9]+)/?$ /course/scoreboard.php?course_alias=$1&assignment_alias=$2&scoreboard_token=$3 last;
@@ -58,7 +59,6 @@ rewrite ^/course/([a-zA-Z0-9_+-]+)/statistics/?$ /course/statistics.php?course=$
 rewrite ^/course/([a-zA-Z0-9_+-]+)/student/([a-zA-Z0-9_+-]+)/?$ /course/student.php?course=$1&student=$2 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/student/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/?$ /course/studentWithAssignment.php?course=$1&student=$2&assignment_alias=$3 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/students/?$ /course/students.php?course=$1 last;
-rewrite ^/course/list/(student|public)/?$ /course/singlelist.php?course_type=$1 last;
 rewrite ^/group/?$ /group/list.php last;
 rewrite ^/group/new/?$ /group/new.php last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/edit/?$ /group/edit.php?group=$1 last;
@@ -88,7 +88,6 @@ rewrite ^/problem/random/karel/?$ /problems/random/karel.php last;
 rewrite ^/problem/([a-zA-Z0-9_+-]+)/edit/?$ /problems/edit.php?problem=$1 last;
 rewrite ^/problem/([a-zA-Z0-9_+-]+)/stats/?$ /problems/stats.php?problem_alias=$1 last;
 rewrite ^/profile/?$ /profile/index.php last;
-rewrite ^/profile/edit/?$ /profile/edit.php last;
 rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile/index.php?username=$1 last;
 rewrite ^/rank/?$ /rank/users.php last;
 rewrite ^/rank/authors/?$ /rank/authors.php last;
@@ -105,6 +104,7 @@ rewrite ^/teamsgroup/new/?$ /teamsgroup/new.php last;
 rewrite ^/teamsgroup/([a-zA-Z0-9_+:-]+)/edit/?$ /teamsgroup/edit.php?team_group_alias=$1 last;
 rewrite ^/teamsgroup/?$ /teamsgroup/list.php last;
 rewrite ^/user/emailedit/([a-zA-Z0-9_]+)/?$ /users/emailedit.php?username=$1 last;
+rewrite ^/user/emailedit/?$ /users/emailedit.php last;
 rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/?$ /userverifyemail.php?id=$1 last;
 
 # Cache control

@@ -56,35 +56,62 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return list<\OmegaUp\DAO\VO\Identities>
+     * @return list<array{key: string, value: string}>
      */
-    public static function findByUsernameOrName(string $usernameOrName) {
-        $sql = "
-            SELECT
-                i.*
-            FROM
-                Identities i
-            WHERE
-                i.username = ? OR i.name = ?
-            UNION DISTINCT
-            SELECT DISTINCT
-                i.*
-            FROM
-                Identities i
-            WHERE
-                (
-                    i.username LIKE CONCAT('%', ?, '%') OR
-                    i.name LIKE CONCAT('%', ?, '%')
-                ) AND
-                i.username NOT REGEXP 'teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+'
-            LIMIT 100";
-        $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
+    public static function findByUsernameOrName(
+        string $usernameOrName,
+        int $rowcount = 100
+    ) {
+        $sql = "SELECT
+                    sq.name,
+                    sq.username,
+                    SUM(sq.relevance) AS relevance
+                FROM (
+                    SELECT
+                        i.name,
+                        i.username,
+                        IFNULL(MATCH(name, username) AGAINST (? IN BOOLEAN MODE), 0) AS relevance
+                    FROM
+                        Identities i
+                    WHERE
+                        MATCH(name, username) AGAINST (? IN BOOLEAN MODE)
+                    UNION DISTINCT
+                    SELECT DISTINCT
+                        i.name,
+                        i.username,
+                        0 AS relevance
+                    FROM
+                        Identities i
+                    WHERE
+                        (
+                            i.username LIKE CONCAT('%', ?, '%') OR
+                            i.name LIKE CONCAT('%', ?, '%')
+                        ) AND
+                        i.username NOT REGEXP 'teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+'
+                ) AS sq
+            GROUP BY
+                username, name
+            ORDER BY
+                relevance DESC
+            LIMIT
+                ?;";
+        $args = [
+            $usernameOrName,
+            $usernameOrName,
+            $usernameOrName,
+            $usernameOrName,
+            $rowcount,
+        ];
 
-        /** @var list<array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}> $rs */
+        /** @var list<array{name: null|string, relevance: float|null, username: string}> $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         $result = [];
-        foreach ($rs as $identityData) {
-            $result[] = new \OmegaUp\DAO\VO\Identities($identityData);
+        foreach ($rs as $user) {
+            $username = $user['username'];
+            $result[] = [
+                'key' => $username,
+                'value' => $user['name'] ?? $username,
+            ];
         }
         return $result;
     }
@@ -261,7 +288,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null
+     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null
      */
     final public static function getExtendedProfileDataByPk(?int $identityId): ?array {
         if (is_null($identityId)) {
@@ -283,30 +310,13 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     u.`hide_problem_tags`,
                     u.`verified`,
                     i.`gender`,
-                    IFNULL(
-                        (
-                            SELECT urc.classname FROM
-                                User_Rank_Cutoffs urc
-                            WHERE
-                                urc.score <= (
-                                        SELECT
-                                            ur.score
-                                        FROM
-                                            User_Rank ur
-                                        WHERE
-                                            ur.user_id = i.user_id
-                                    )
-                            ORDER BY
-                                urc.percentile ASC
-                            LIMIT
-                                1
-                        ),
-                        \'user-rank-unranked\'
-                    ) AS classname
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
                 FROM
                     Identities i
                 LEFT JOIN
                     Users u ON u.user_id = i.user_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
                 LEFT JOIN
                     Emails e ON u.main_email_id = e.email_id
                 LEFT JOIN
@@ -349,6 +359,9 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         );
         $identity['birth_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
             $identity['birth_date']
+        );
+        $identity['graduation_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $identity['graduation_date']
         );
 
         return $identity;
@@ -394,7 +407,6 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 Identities i
             WHERE
                 i.username = ?
-                AND user_id IS NULL
             LIMIT 1;';
         $args = [$username];
 
@@ -553,40 +565,17 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     ) {
         $sql = 'SELECT
                     ti.*,
-                    IFNULL(
-                        (
-                            SELECT urc.classname FROM
-                                User_Rank_Cutoffs urc
-                            WHERE
-                                urc.score <= (
-                                        SELECT
-                                            ur.score
-                                        FROM
-                                            User_Rank ur
-                                        WHERE
-                                            ur.user_id = i.user_id
-                                    )
-                            ORDER BY
-                                urc.percentile ASC
-                            LIMIT
-                                1
-                        ),
-                        \'user-rank-unranked\'
-                    ) AS classname
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
                 FROM
                     Identities i
                 INNER JOIN
-                    Team_Users tu
-                ON
-                    tu.identity_id = i.identity_id
+                    Team_Users tu ON tu.identity_id = i.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
                 INNER JOIN
-                    Teams t
-                ON
-                    t.team_id = tu.team_id
+                    Teams t ON t.team_id = tu.team_id
                 INNER JOIN
-                    Identities ti
-                ON
-                    ti.identity_id = t.identity_id
+                    Identities ti ON ti.identity_id = t.identity_id
                 WHERE
                     i.identity_id = ?
                 LIMIT 1;';

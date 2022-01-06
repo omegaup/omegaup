@@ -261,7 +261,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' =>  $testData['contestData']['contest']->alias,
             ])
-        )['smartyProperties']['payload']['scoreboard']['ranking'];
+        )['templateProperties']['payload']['scoreboard']['ranking'];
 
         // Validate that we have ranking
         $this->assertEquals(3, count($ranking));
@@ -866,7 +866,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' =>  $testData['contestData']['contest']->alias,
             ])
-        )['smartyProperties']['payload']['scoreboardEvents'];
+        )['templateProperties']['payload']['scoreboardEvents'];
 
         // From the map above, there are 4 meaningful combinations for events
         $this->assertEquals(4, count($events));
@@ -1096,11 +1096,11 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             ],
         ];
         $testData = $this->prepareContestScoreboardData(
-            /*$nUsers=*/            3,
-            $runMap,
-            /*$runForAdmin=*/ true,
-            /*$runForDirector=*/ true,
-            /*$admissionMode=*/ 'private'
+            nUsers: 3,
+            runMap: $runMap,
+            runForAdmin: true,
+            runForDirector: true,
+            admissionMode: 'private'
         );
 
         // Create request
@@ -1184,7 +1184,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
 
         $contests = \OmegaUp\Controllers\Contest::getScoreboardMergeDetailsForTypeScript(
             new \OmegaUp\Request([ 'auth_token' => $login->auth_token ])
-        )['smartyProperties']['payload']['contests'];
+        )['templateProperties']['payload']['contests'];
 
         $this->assertCount(2, $contests);
     }

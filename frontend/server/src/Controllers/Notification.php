@@ -26,7 +26,7 @@ class Notification extends \OmegaUp\Controllers\Controller {
             /** @var NotificationContents */
             $notification['contents'] = json_decode(
                 $notification['contents'],
-                /*$assoc=*/true
+                associative: true,
             );
             $notifications[] = $notification;
         }

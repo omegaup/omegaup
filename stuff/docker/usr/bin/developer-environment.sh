@@ -31,6 +31,7 @@ fi
 ! read -r -d '' config_contents <<EOF
 <?php
 define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
+define('OMEGAUP_CACHE_IMPLEMENTATION', 'redis');
 define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
 define('OMEGAUP_DB_HOST', 'mysql');
 define('OMEGAUP_DB_NAME', 'omegaup');
@@ -39,10 +40,11 @@ define('OMEGAUP_DB_USER', 'omegaup');
 define('OMEGAUP_ENVIRONMENT', 'development');
 define('OMEGAUP_LOG_FILE', '/tmp/omegaup.log');
 define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', false);
-define('SMARTY_CACHE_DIR', '/tmp');
+define('TEMPLATE_CACHE_DIR', '/tmp/templates');
 define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
 define('OMEGAUP_GRADER_URL', 'https://grader:21680');
 define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
+define('OMEGAUP_CSRF_HOSTS', ['frontend', '127.0.0.1']);
 EOF
 ensure_contents "/opt/omegaup/frontend/server/config.php" "${config_contents}"
 

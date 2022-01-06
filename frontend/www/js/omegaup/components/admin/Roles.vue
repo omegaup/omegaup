@@ -1,18 +1,18 @@
 <template>
-  <div class="omegaup-user-roles panel-primary panel">
-    <div class="panel-heading">
-      <h2 class="panel-title">{{ T.omegaupTitleUpdatePrivileges }}</h2>
-    </div>
-    <div class="panel-body">
+  <div class="card">
+    <h2 class="card-header text-white bg-primary">
+      {{ T.omegaupTitleUpdatePrivileges }}
+    </h2>
+    <div class="card-body">
       <h4>{{ T.userRoles }}</h4>
       <table class="table">
         <tbody>
-          <tr v-for="role in roles" :key="role.name">
+          <tr v-for="role in currentRoles" :key="role.name">
             <td>
               <input
                 v-model="role.value"
                 type="checkbox"
-                @change.prevent="onChangeRole($event, role)"
+                @change.prevent="changeRole($event, role)"
               />
             </td>
 
@@ -23,12 +23,12 @@
       <h4>{{ T.userGroups }}</h4>
       <table class="table">
         <tbody>
-          <tr v-for="group in groups" :key="group.alias">
+          <tr v-for="group in currentGroups" :key="group.alias">
             <td>
               <input
                 v-model="group.value"
                 type="checkbox"
-                @change.prevent="onChangeGroup($event, group)"
+                @change.prevent="changeGroup($event, group)"
               />
             </td>
 
@@ -48,18 +48,15 @@ import T from '../../lang';
 
 @Component
 export default class AdminRoles extends Vue {
-  @Prop() initialRoles!: omegaup.Role[];
-  @Prop() initialGroups!: types.Group[];
+  @Prop() roles!: omegaup.Role[];
+  @Prop() groups!: types.Group[];
 
   T = T;
-  roles: omegaup.Role[] = this.initialRoles;
-  groups: types.Group[] = this.initialGroups;
+  currentRoles: omegaup.Role[] = this.roles;
+  currentGroups: types.Group[] = this.groups;
 
   @Emit()
-  onChangeRole(
-    ev: Event,
-    role: omegaup.Role,
-  ): omegaup.Selectable<omegaup.Role> {
+  changeRole(ev: Event, role: omegaup.Role): omegaup.Selectable<omegaup.Role> {
     return {
       value: role,
       selected: (ev.target as HTMLInputElement).checked,
@@ -67,10 +64,7 @@ export default class AdminRoles extends Vue {
   }
 
   @Emit()
-  onChangeGroup(
-    ev: Event,
-    group: types.Group,
-  ): omegaup.Selectable<types.Group> {
+  changeGroup(ev: Event, group: types.Group): omegaup.Selectable<types.Group> {
     return {
       value: group,
       selected: (ev.target as HTMLInputElement).checked,

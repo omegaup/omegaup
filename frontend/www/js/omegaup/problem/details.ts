@@ -121,10 +121,13 @@ OmegaUp.on('ready', async () => {
                 });
               });
           },
-          'apply-filter': (
-            filter: 'verdict' | 'language' | 'username' | 'status',
-            value: string,
-          ) => {
+          'apply-filter': ({
+            filter,
+            value,
+          }: {
+            filter: 'verdict' | 'language' | 'username' | 'status' | 'offset';
+            value: string;
+          }) => {
             if (value) {
               runsStore.commit('applyFilter', {
                 [filter]: value,
@@ -371,6 +374,38 @@ OmegaUp.on('ready', async () => {
       });
     },
   });
+
+  window.addEventListener(
+    'message',
+    (e) => {
+      if (e.origin != window.location.origin || !e.data) return;
+      switch (e.data.method) {
+        case 'submitRun':
+          api.Run.create(e.data.params)
+            .then((response) => {
+              problemDetailsView.nextSubmissionTimestamp =
+                response.nextSubmissionTimestamp;
+              submitRun({
+                guid: response.guid,
+                submitDelay: response.submit_delay,
+                language: e.data.params.language,
+                username: commonPayload.currentUsername,
+                classname: commonPayload.userClassname,
+                problemAlias: payload.problem.alias,
+              });
+            })
+            .catch((run) => {
+              submitRunFailed({
+                error: run.error,
+                errorname: run.errorname,
+                run,
+              });
+            });
+          break;
+      }
+    },
+    false,
+  );
 
   function setNominationStatus({
     runs,

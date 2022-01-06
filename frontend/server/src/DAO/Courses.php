@@ -11,13 +11,14 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  *
- * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, opened: bool, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
  * @psalm-type CourseCardFinished=array{alias: string, name: string}
- * @psalm-type CourseCardPublic=array{alias: string, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}
+ * @psalm-type CourseCardPublic=array{alias: string, alreadyStarted: bool, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}
  * @psalm-type AssignmentsProblemsPoints=array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
  * @psalm-type StudentProgressInCourse=array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}
+ * @psalm-type Course=array{acl_id?: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time?: \OmegaUp\Timestamp|null, group_id?: int, languages?: null|string, level?: null|string, minimum_progress_for_certificate?: int|null, name: string, needs_basic_information: bool, objective?: null|string, requests_user_information: string, school_id?: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
@@ -50,18 +51,38 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      */
     public static function getAllAssignments(
         string $alias,
-        bool $isAdmin
+        bool $isAdmin,
+        ?\OmegaUp\DAO\VO\Identities $identity = null
     ): array {
         // Non-admins should not be able to see assignments that have not
         // started.
         $timeCondition = $isAdmin ? '' : 'AND a.start_time <= CURRENT_TIMESTAMP';
+
+        $openedCondition = 'false AS opened';
+        $args = [];
+        if (!is_null($identity)) {
+            $openedCondition = '
+                EXISTS(
+                    SELECT
+                        1
+                    FROM
+                        `Problemset_Problem_Opened` AS ppo
+                    WHERE
+                        ppo.`problemset_id` = a.`problemset_id`
+                        AND ppo.`identity_id` = ?
+                ) AS opened
+            ';
+            $args[] = $identity->identity_id;
+        }
+
         $sql = "
             SELECT
                 a.*,
-                COUNT(s.submission_id) AS has_runs,
-                COUNT(p.problem_id) AS problem_count,
+                EXISTS(SELECT * FROM Submissions s WHERE s.problemset_id = a.problemset_id) AS has_runs,
+                COUNT(psp.problem_id) AS problem_count,
                 ps.scoreboard_url,
-                ps.scoreboard_url_admin
+                ps.scoreboard_url_admin,
+                $openedCondition
             FROM
                 Courses c
             INNER JOIN
@@ -76,23 +97,19 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 Problemset_Problems psp
             ON
                 psp.problemset_id = ps.problemset_id
-            LEFT JOIN
-                Problems p
-            ON
-                p.problem_id = psp.problem_id
-            LEFT JOIN
-                Submissions s
-            ON
-                ps.problemset_id = s.problemset_id
             WHERE
                 c.alias = ? $timeCondition
             GROUP BY
-                a.assignment_id
+                a.assignment_id, ps.problemset_id, psp.problemset_id
             ORDER BY
-                `order`, start_time;";
+                a.`order`, a.start_time;";
+        $args[] = $alias;
 
-        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problem_count: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);
+        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, opened: int, order: int, problem_count: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $args
+        );
 
         $ar = [];
         foreach ($rs as $row) {
@@ -101,6 +118,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             unset($row['course_id']);
             $row['has_runs'] = $row['has_runs'] > 0;
             $row['problemCount'] = $row['problem_count'];
+            $row['opened'] = boolval($row['opened']);
             unset($row['problem_count']);
             $ar[] = $row;
         }
@@ -235,7 +253,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         foreach ($rs as $row) {
             $row['assignments'] = \OmegaUp\DAO\Courses::getAllAssignments(
                 $row['alias'],
-                /*$isAdmin=*/false
+                isAdmin: false
             );
             $row['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
                 $row['course_id']
@@ -272,7 +290,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             gi.group_id = c.group_id
                     ),
                     0
-                ) AS studentCount,
+                ) AS student_count,
                 IFNULL(
                     (
                         SELECT
@@ -284,7 +302,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             a.assignment_type = ?
                     ),
                     0
-                ) AS lessonCount
+                ) AS lesson_count,
+                0 AS already_started
             FROM
                 Courses c
             LEFT JOIN
@@ -296,7 +315,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 c.name IS NOT NULL AND
                 c.archived = 0;';
 
-        /** @var list<array{alias: null|string, lessonCount: int, level: null|string, name: null|string, school_name: null|string, studentCount: int}> */
+        /** @var list<array{alias: null|string, already_started: int, lesson_count: int, level: null|string, name: null|string, school_name: null|string, student_count: int}> */
         $rs =  \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
@@ -306,10 +325,16 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         );
 
         $results = [];
-        foreach ($rs as $row) {
+        foreach ($rs as &$row) {
             if (is_null($row['alias']) || is_null($row['name'])) {
                 continue;
             }
+            $row['lessonCount'] = $row['lesson_count'];
+            $row['studentCount'] = $row['student_count'];
+            $row['alreadyStarted'] = boolval($row['already_started']);
+            unset($row['lesson_count']);
+            unset($row['student_count']);
+            unset($row['already_started']);
             $results[] = $row;
         }
         return $results;
@@ -459,26 +484,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     pr.problem_title,
                     problem_points,
                     MAX(r.contest_score) AS problem_score,
-                    IFNULL(
-                        (
-                            SELECT urc.classname FROM
-                                User_Rank_Cutoffs urc
-                            WHERE
-                                urc.score <= (
-                                        SELECT
-                                            ur.score
-                                        FROM
-                                            User_Rank ur
-                                        WHERE
-                                            ur.user_id = i.user_id
-                                    )
-                            ORDER BY
-                                urc.percentile ASC
-                            LIMIT
-                                1
-                        ),
-                        \'user-rank-unranked\'
-                    ) AS classname
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
                 FROM
                     Groups_Identities AS gi
                 CROSS JOIN
@@ -504,6 +510,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     ) AS pr
                 INNER JOIN Identities i
                     ON i.identity_id = gi.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
                 LEFT JOIN Submissions s
                     ON s.problem_id = pr.problem_id
                     AND s.identity_id = i.identity_id
@@ -615,7 +623,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             INNER JOIN
                 Problems p ON p.problem_id = psp.problem_id
             WHERE
-                a.course_id = ?
+                a.course_id = ? AND a.assignment_type <> "lesson"
             ORDER BY
                 a.`order`, psp.`order`';
 
@@ -678,30 +686,13 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 i.username,
                 i.name,
                 i.country_id,
-                IFNULL(
-                    (
-                        SELECT urc.classname FROM
-                            User_Rank_Cutoffs urc
-                        WHERE
-                            urc.score <= (
-                                    SELECT
-                                        ur.score
-                                    FROM
-                                        User_Rank ur
-                                    WHERE
-                                        ur.user_id = i.user_id
-                                )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) AS classname
+                IFNULL(ur.classname, "user-rank-unranked") AS classname
             FROM
                 Groups_Identities AS gi
             INNER JOIN
                 Identities i ON i.identity_id = gi.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
             WHERE
                 gi.group_id = ?
             LIMIT ?, ?';
@@ -741,30 +732,13 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                         i.username,
                         i.name,
                         i.country_id,
-                        IFNULL(
-                            (
-                                SELECT urc.classname FROM
-                                    User_Rank_Cutoffs urc
-                                WHERE
-                                    urc.score <= (
-                                            SELECT
-                                                ur.score
-                                            FROM
-                                                User_Rank ur
-                                            WHERE
-                                                ur.user_id = i.user_id
-                                        )
-                                ORDER BY
-                                    urc.percentile ASC
-                                LIMIT
-                                    1
-                            ),
-                            "user-rank-unranked"
-                        ) AS classname
+                        IFNULL(ur.classname, "user-rank-unranked") AS classname
                     FROM
                         Groups_Identities AS gi
                     INNER JOIN
                         Identities i ON i.identity_id = gi.identity_id
+                    LEFT JOIN
+                        User_Rank ur ON ur.user_id = i.user_id
                     WHERE
                         gi.group_id = ?
                     LIMIT ?, ?
@@ -782,7 +756,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             INNER JOIN
                 Assignments a ON a.problemset_id = s.problemset_id
             WHERE
-                a.course_id = ?
+                a.course_id = ? AND a.assignment_type <> "lesson"
             GROUP BY
                 students.identity_id, a.assignment_id, p.problem_id
             HAVING
@@ -1090,7 +1064,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         foreach ($rs as $row) {
             $row['assignments'] = \OmegaUp\DAO\Courses::getAllAssignments(
                 $row['alias'],
-                /*$isAdmin=*/true
+                isAdmin: true
             );
             $row['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
                 $row['course_id']
@@ -1141,6 +1115,36 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             array_push($courses, new \OmegaUp\DAO\VO\Courses($row));
         }
         return $courses;
+    }
+
+    /**
+     * Returns the list of courses created by a certain identity
+     * @return list<Course>
+     */
+    final public static function getCoursesCreatedByIdentity(
+        int $identityId
+    ): array {
+        $sql = '
+            SELECT
+                c.*
+            FROM
+                Courses c
+            INNER JOIN
+                ACLs a ON a.acl_id = c.acl_id
+            INNER JOIN
+                Users u ON u.user_id = a.owner_id
+            WHERE
+                u.main_identity_id = ?
+                AND archived = false
+            ORDER BY
+                c.course_id DESC;';
+
+        $params = [
+            $identityId,
+        ];
+
+        /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     final public static function getByAlias(
@@ -1376,36 +1380,15 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     ): ?array {
         $sql = 'SELECT
                     i.username,
-                    IFNULL(
-                        (
-                            SELECT urc.classname FROM
-                                User_Rank_Cutoffs urc
-                            WHERE
-                                urc.score <= (
-                                        SELECT
-                                            ur.score
-                                        FROM
-                                            User_Rank ur
-                                        WHERE
-                                            ur.user_id = i.user_id
-                                    )
-                            ORDER BY
-                                urc.percentile ASC
-                            LIMIT
-                                1
-                        ),
-                        \'user-rank-unranked\'
-                    ) AS classname
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
                 FROM
                     Users u
                 INNER JOIN
-                    ACLs a
-                ON
-                    u.user_id = a.owner_id
+                    ACLs a ON u.user_id = a.owner_id
                 INNER JOIN
-                    Identities i
-                ON
-                    u.main_identity_id = i.identity_id
+                    Identities i ON u.main_identity_id = i.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
                 WHERE
                     a.acl_id = ?
                 LIMIT
@@ -1433,26 +1416,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 NULL AS alias,
                 pal.ip,
                 pal.`time`,
-                IFNULL(
-                    (
-                        SELECT `urc`.classname FROM
-                            `User_Rank_Cutoffs` urc
-                        WHERE
-                            `urc`.score <= (
-                                    SELECT
-                                        `ur`.`score`
-                                    FROM
-                                        `User_Rank` `ur`
-                                    WHERE
-                                        `ur`.user_id = `i`.`user_id`
-                                )
-                        ORDER BY
-                            `urc`.percentile ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) `classname`,
+                IFNULL(ur.classname, "user-rank-unranked") AS classname,
                 "open" AS event_type,
                 NULL AS clone_result,
                 NULL AS clone_token_payload,
@@ -1460,13 +1424,11 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             FROM
                 Problemset_Access_Log pal
             INNER JOIN
-                Identities i
-            ON
-                i.identity_id = pal.identity_id
+                Identities i ON i.identity_id = pal.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
             INNER JOIN
-                Assignments a
-            ON
-                a.problemset_id = pal.problemset_id
+                Assignments a ON a.problemset_id = pal.problemset_id
             WHERE
                 a.course_id = ?
         ) UNION (
@@ -1475,26 +1437,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 p.alias,
                 sl.ip,
                 sl.`time`,
-                IFNULL(
-                    (
-                        SELECT `urc`.classname FROM
-                            `User_Rank_Cutoffs` urc
-                        WHERE
-                            `urc`.score <= (
-                                    SELECT
-                                        `ur`.`score`
-                                    FROM
-                                        `User_Rank` `ur`
-                                    WHERE
-                                        `ur`.user_id = `i`.`user_id`
-                                )
-                        ORDER BY
-                            `urc`.percentile ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) `classname`,
+                IFNULL(ur.classname, "user-rank-unranked") AS classname,
                 "submit" AS event_type,
                 NULL AS clone_result,
                 NULL AS clone_token_payload,
@@ -1502,21 +1445,15 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             FROM
                 Submission_Log sl
             INNER JOIN
-                Identities i
-            ON
-                i.identity_id = sl.identity_id
+                Identities i ON i.identity_id = sl.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
             INNER JOIN
-                Submissions s
-            ON
-                s.submission_id = sl.submission_id
+                Submissions s ON s.submission_id = sl.submission_id
             INNER JOIN
-                Problems p
-            ON
-                p.problem_id = s.problem_id
+                Problems p ON p.problem_id = s.problem_id
             INNER JOIN
-                Assignments a
-            ON
-                a.problemset_id = sl.problemset_id
+                Assignments a ON a.problemset_id = sl.problemset_id
             WHERE
                 a.course_id = ?
         ) UNION (
@@ -1525,44 +1462,21 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 c.alias,
                 INET_ATON(ccl.ip) AS `ip`,
                 ccl.`timestamp` AS `time`,
-                IFNULL(
-                    (
-                        SELECT `urc`.classname FROM
-                            `User_Rank_Cutoffs` urc
-                        WHERE
-                            `urc`.score <= (
-                                    SELECT
-                                        `ur`.`score`
-                                    FROM
-                                        `User_Rank` `ur`
-                                    WHERE
-                                        `ur`.user_id = `i`.`user_id`
-                                )
-                        ORDER BY
-                            `urc`.percentile ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) `classname`,
+                IFNULL(ur.classname, "user-rank-unranked") AS classname,
                 "clone" AS event_type,
                 ccl.result AS clone_result,
                 ccl.token_payload AS clone_token_payload,
                 c.name
             FROM
-            Course_Clone_Log ccl
+                Course_Clone_Log ccl
             INNER JOIN
-                Users u
-            ON
-                u.user_id = ccl.user_id
+                Users u ON u.user_id = ccl.user_id
             INNER JOIN
-                Identities i
-            ON
-                i.identity_id = u.main_identity_id
+                Identities i ON i.identity_id = u.main_identity_id
             LEFT JOIN
-                Courses c
-            ON
-                c.course_id = ccl.new_course_id
+                User_Rank ur ON ur.user_id = i.user_id
+            LEFT JOIN
+                Courses c ON c.course_id = ccl.new_course_id
             WHERE
                 ccl.course_id = ?
         ) ORDER BY

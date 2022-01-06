@@ -133,7 +133,7 @@ import arena_Clarification from './Clarification.vue';
 import arena_NewClarification from './NewClarificationPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import clarificationsStore from '../../arena/clarificationsStore';
-import common_Paginator from '../common/Paginatorv2.vue';
+import common_Paginator from '../common/Paginator.vue';
 
 export enum PopupDisplayed {
   None,
@@ -237,8 +237,8 @@ export default class ArenaClarificationList extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-// Deep allows child components to inherit the styles (see: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors)
-/deep/ pre {
+// >>> allows child components to inherit the styles (see: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors)
+>>> pre {
   display: block;
   padding: 0.5rem;
   font-size: 0.8rem;

@@ -64,11 +64,11 @@ try_define('INPUTS_PATH', OMEGAUP_TEST_ROOT . '/probleminput/');
 # #########################
 # CACHE CONFIG
 # #########################
-try_define('APC_USER_CACHE_ENABLED', true);
+try_define('OMEGAUP_CACHE_IMPLEMENTATION', 'inprocess');
 try_define('OMEGAUP_SESSION_CACHE_ENABLED', false);
 try_define('OMEGAUP_SESSION_API_HOURLY_LIMIT', 10);
 
 # #########################
-# SMARTY USER CACHE
+# TEMPLATES
 # #########################
-try_define('SMARTY_CACHE_DIR', '/var/tmp/omegaup/');
+try_define('TEMPLATE_CACHE_DIR', '/var/tmp/omegaup/');

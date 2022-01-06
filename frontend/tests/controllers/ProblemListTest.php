@@ -719,6 +719,31 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testListForSysAdmin() {
+        ['user' => $adminUser, 'identity' => $adminUserIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        $n = 3;
+        for ($i = 0; $i < $n; $i++) {
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        $login = self::login($adminUserIdentity);
+        $response = \OmegaUp\Controllers\Problem::apiAdminList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+        $this->assertCount($n, $response['problems']);
+
+        $response = \OmegaUp\Controllers\Problem::apiAdminList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'query' => $problemData[0]['request']['problem_alias'],
+            ])
+        );
+        $this->assertCount(1, $response['problems']);
+    }
+
     /**
      * An author that belongs to an admin group should not see repeated problems.
      */
@@ -771,9 +796,15 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
         ]));
         $this->assertEquals(3, count($response['problems']));
+
+        $response = \OmegaUp\Controllers\Problem::apiMyList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'query' => $problemData[2]['request']['problem_alias'],
+        ]));
+        $this->assertEquals(1, count($response['problems']));
         $this->assertEquals(
             $problemData[2]['request']['problem_alias'],
-            $response['problems'][0]['alias']
+            $response['problems'][0]['title']
         );
     }
 
@@ -1194,7 +1225,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                     'rowcount' => 1000,
                     'page' => $i,
                 ] + $requestParams)
-            )['smartyProperties']['payload'];
+            )['templateProperties']['payload'];
             foreach ($response['problems'] as $problem) {
                 $this->assertArrayHasKey(
                     'problem_id',
@@ -1299,7 +1330,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         foreach ($result as $problem) {
             $this->assertEquals(
@@ -1313,7 +1344,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicKarel',
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertEquals(
             $result[0]['tags'][0]['name'],

@@ -310,7 +310,10 @@ class Grader {
                 return $response;
             }
         } catch (\Exception $e) {
-            \Logger::getLogger('Grader')->error("curl failed for {$url}", $e);
+            \Monolog\Registry::omegaup()->withName('Grader')->error(
+                'curl failed',
+                ['url' => $url, 'exception' => $e],
+            );
             throw $e;
         } finally {
             if (is_resource($curl)) {

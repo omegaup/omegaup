@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 USER root
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
-        curl ca-certificates openjdk-14-jre-headless && \
+        curl ca-certificates openjdk-16-jre-headless && \
     /usr/sbin/update-ca-certificates && \
     apt-get autoremove -y && \
     apt-get clean

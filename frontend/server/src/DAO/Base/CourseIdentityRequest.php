@@ -52,8 +52,12 @@ abstract class CourseIdentityRequest {
                     `request_time`,
                     `last_update`,
                     `accepted`,
-                    `extra_note`
+                    `extra_note`,
+                    `accept_teacher`,
+                    `share_user_information`
                 ) VALUES (
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -76,6 +80,16 @@ abstract class CourseIdentityRequest {
                 null
             ),
             $Course_Identity_Request->extra_note,
+            (
+                !is_null($Course_Identity_Request->accept_teacher) ?
+                intval($Course_Identity_Request->accept_teacher) :
+                null
+            ),
+            (
+                !is_null($Course_Identity_Request->share_user_information) ?
+                intval($Course_Identity_Request->share_user_information) :
+                null
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -98,7 +112,9 @@ abstract class CourseIdentityRequest {
                 `request_time` = ?,
                 `last_update` = ?,
                 `accepted` = ?,
-                `extra_note` = ?
+                `extra_note` = ?,
+                `accept_teacher` = ?,
+                `share_user_information` = ?
             WHERE
                 (
                     `identity_id` = ? AND
@@ -117,6 +133,16 @@ abstract class CourseIdentityRequest {
                 intval($Course_Identity_Request->accepted)
             ),
             $Course_Identity_Request->extra_note,
+            (
+                is_null($Course_Identity_Request->accept_teacher) ?
+                null :
+                intval($Course_Identity_Request->accept_teacher)
+            ),
+            (
+                is_null($Course_Identity_Request->share_user_information) ?
+                null :
+                intval($Course_Identity_Request->share_user_information)
+            ),
             (
                 is_null($Course_Identity_Request->identity_id) ?
                 null :
@@ -153,7 +179,9 @@ abstract class CourseIdentityRequest {
                 `Course_Identity_Request`.`request_time`,
                 `Course_Identity_Request`.`last_update`,
                 `Course_Identity_Request`.`accepted`,
-                `Course_Identity_Request`.`extra_note`
+                `Course_Identity_Request`.`extra_note`,
+                `Course_Identity_Request`.`accept_teacher`,
+                `Course_Identity_Request`.`share_user_information`
             FROM
                 `Course_Identity_Request`
             WHERE
@@ -168,6 +196,37 @@ abstract class CourseIdentityRequest {
             return null;
         }
         return new \OmegaUp\DAO\VO\CourseIdentityRequest($row);
+    }
+
+    /**
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\CourseIdentityRequest} por llave primaria.
+     *
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\CourseIdentityRequest}
+     * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
+     *
+     * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
+     * los campos.
+     *
+     * @return bool Si existe o no tal registro.
+     */
+    final public static function existsByPK(
+        ?int $identity_id,
+        ?int $course_id
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `Course_Identity_Request`
+            WHERE
+                (
+                    `identity_id` = ? AND
+                    `course_id` = ?
+                );';
+        $params = [$identity_id, $course_id];
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
     }
 
     /**
@@ -243,7 +302,9 @@ abstract class CourseIdentityRequest {
                 `Course_Identity_Request`.`request_time`,
                 `Course_Identity_Request`.`last_update`,
                 `Course_Identity_Request`.`accepted`,
-                `Course_Identity_Request`.`extra_note`
+                `Course_Identity_Request`.`extra_note`,
+                `Course_Identity_Request`.`accept_teacher`,
+                `Course_Identity_Request`.`share_user_information`
             FROM
                 `Course_Identity_Request`
         ';
@@ -299,8 +360,12 @@ abstract class CourseIdentityRequest {
                     `request_time`,
                     `last_update`,
                     `accepted`,
-                    `extra_note`
+                    `extra_note`,
+                    `accept_teacher`,
+                    `share_user_information`
                 ) VALUES (
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -331,6 +396,16 @@ abstract class CourseIdentityRequest {
                 intval($Course_Identity_Request->accepted)
             ),
             $Course_Identity_Request->extra_note,
+            (
+                is_null($Course_Identity_Request->accept_teacher) ?
+                null :
+                intval($Course_Identity_Request->accept_teacher)
+            ),
+            (
+                is_null($Course_Identity_Request->share_user_information) ?
+                null :
+                intval($Course_Identity_Request->share_user_information)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

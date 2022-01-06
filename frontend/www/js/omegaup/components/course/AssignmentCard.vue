@@ -26,7 +26,7 @@
         <a
           :href="`/course/${courseAlias}/assignment/${assignment.alias}`"
           class="btn btn-primary d-inline-block text-white"
-          >{{ T.courseCardCourseResume }}</a
+          >{{ T.assignmentCardGoToContent }}</a
         >
       </div>
     </div>
@@ -43,7 +43,10 @@
               })
         }}
       </div>
-      <div class="col-4 p-0 d-flex align-items-center">
+      <div
+        v-if="assignment.assignment_type !== 'lesson'"
+        class="col-4 p-0 d-flex align-items-center"
+      >
         {{ studentProgress.toFixed(0) }}%
         <div class="progress ml-1 w-100">
           <div

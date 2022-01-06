@@ -250,6 +250,8 @@ CREATE TABLE `Course_Identity_Request` (
   `last_update` timestamp NULL DEFAULT NULL COMMENT 'Última fecha de actualización del request',
   `accepted` tinyint(1) DEFAULT NULL COMMENT 'Indica si la respuesta del request fue aceptada',
   `extra_note` mediumtext COMMENT 'Indica una descripción con el motivo de aceptar o rechazar un usuario al curso',
+  `accept_teacher` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.',
+  `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.',
   PRIMARY KEY (`identity_id`,`course_id`),
   KEY `course_id` (`course_id`),
   KEY `identity_id` (`identity_id`),
@@ -426,6 +428,7 @@ CREATE TABLE `Identities` (
   KEY `fk_is_state_id` (`country_id`,`state_id`),
   KEY `language_id` (`language_id`),
   KEY `current_identity_school_id` (`current_identity_school_id`),
+  FULLTEXT KEY `ft_user_username` (`username`,`name`),
   CONSTRAINT `fk_ic_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_iis_current_identity_school_id` FOREIGN KEY (`current_identity_school_id`) REFERENCES `Identities_Schools` (`identity_school_id`),
   CONSTRAINT `fk_il_language_id` FOREIGN KEY (`language_id`) REFERENCES `Languages` (`language_id`),
@@ -607,6 +610,7 @@ CREATE TABLE `Problems` (
   UNIQUE KEY `problems_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
   KEY `idx_problems_visibility` (`visibility`),
+  KEY `idx_quality_seal` (`quality_seal`),
   CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Se crea un registro por cada prob externo.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -994,6 +998,8 @@ CREATE TABLE `Submissions` (
   `guid` char(32) NOT NULL,
   `language` enum('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` enum('new','waiting','compiling','running','ready','uploading') NOT NULL DEFAULT 'new',
+  `verdict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE','VE') NOT NULL,
   `submit_delay` int NOT NULL DEFAULT '0',
   `type` enum('normal','test','disqualified') DEFAULT 'normal',
   `school_id` int DEFAULT NULL,
@@ -1093,6 +1099,7 @@ CREATE TABLE `User_Rank` (
   `school_id` int DEFAULT NULL,
   `author_score` double NOT NULL DEFAULT '0',
   `author_ranking` int DEFAULT NULL,
+  `classname` varchar(50) DEFAULT NULL COMMENT 'Almacena la clase precalculada para no tener que determinarla en tiempo de ejecucion.',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
   KEY `rank` (`ranking`),

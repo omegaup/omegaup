@@ -1,5 +1,9 @@
 <template>
-  <iframe ref="grader" src="/grader/ephemeral/?embedded"></iframe>
+  <iframe
+    ref="grader"
+    class="mt-2 border border-white"
+    src="/grader/ephemeral/?embedded"
+  ></iframe>
 </template>
 
 <script lang="ts">
@@ -10,6 +14,8 @@ import { types } from '../../api_types';
 export default class EphemeralGrader extends Vue {
   @Ref() grader!: HTMLIFrameElement;
   @Prop() problem!: types.ProblemInfo;
+  @Prop({ default: false }) canSubmit!: boolean;
+  @Prop({ default: () => [] }) acceptedLanguages!: string[];
 
   loaded = false;
 
@@ -34,6 +40,8 @@ export default class EphemeralGrader extends Vue {
         params: {
           alias: this.problem.alias,
           settings: this.problem.settings,
+          languages: this.acceptedLanguages,
+          showSubmitButton: this.canSubmit,
         },
       },
       `${window.location.origin}/grader/ephemeral/embedded/`,

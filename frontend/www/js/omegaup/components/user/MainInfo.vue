@@ -6,7 +6,7 @@
       :country="profile.country_id"
     />
     <div class="card-body">
-      <div class="img-thumbnail rounded-circle bottom-margin">
+      <div class="text-center rounded-circle bottom-margin">
         <img class="rounded-circle" :src="profile.gravatar_92" />
       </div>
     </div>
@@ -84,10 +84,10 @@ export default class UserMainInfo extends Vue {
 
   T = T;
   get buttonText(): string {
-    return this.edit ? T.userEditSeeProfile : T.profileEdit;
+    return this.edit ? T.userEditViewProfile : T.profileEdit;
   }
   get buttonUrl(): string {
-    return this.edit ? '/profile/' : '/profile/edit/';
+    return this.edit ? '/profile/' : '/profile/#edit-basic-information';
   }
   get solvedProblems(): Problem[] {
     if (!this.data?.solvedProblems) return [];

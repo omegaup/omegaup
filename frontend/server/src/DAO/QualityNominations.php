@@ -52,7 +52,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             /** @var array{before_ac?: mixed} */
             $suggestionContents = json_decode(
                 $suggestion['contents'],
-                /*assoc=*/true
+                associative: true
             );
             if (
                 isset($suggestionContents['before_ac']) &&
@@ -67,10 +67,6 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                     qnn.contents
                 FROM
                     QualityNominations qnn
-                LEFT JOIN
-                    Identities i
-                ON
-                    qnn.user_id = i.user_id
                 WHERE
                     qnn.problem_id = ? AND
                     qnn.user_id = ? AND
@@ -88,7 +84,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             /** @var array $dismissalContents */
             $dismissalContents = json_decode(
                 $dismissal['contents'],
-                /*assoc=*/true
+                associative: true
             );
             if (
                 isset($dismissalContents['before_ac']) &&
@@ -231,7 +227,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             /** @var array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>} */
             $nomination['contents'] = json_decode(
                 $nomination['contents'],
-                /*assoc=*/true
+                associative: true
             );
         } else {
             unset($nomination['contents']);
@@ -254,7 +250,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      */
     public static function getNominations(
         ?int $nominatorUserId,
-        ?int $asigneeUserId,
+        ?int $assigneeUserId,
         int $page,
         int $rowcount,
         array $types = ['demotion', 'promotion'],
@@ -303,7 +299,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         $params = [];
         $conditions = [];
 
-        if (!is_null($asigneeUserId)) {
+        if (!is_null($assigneeUserId)) {
             $sqlFrom .= '
             INNER JOIN
                 QualityNomination_Reviewers qnr
@@ -311,7 +307,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 qnr.qualitynomination_id = qn.qualitynomination_id';
 
             $conditions[] = ' qnr.user_id = ?';
-            $params[] = $asigneeUserId;
+            $params[] = $assigneeUserId;
         }
 
         if (!empty($types)) {
@@ -486,7 +482,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
 
         foreach ($contents as $nomination) {
             /** @var array{quality?: mixed, difficulty?: mixed, tags?: mixed} */
-            $feedback = json_decode($nomination['contents'], /*assoc=*/true);
+            $feedback = json_decode($nomination['contents'], associative: true);
             if (isset($feedback['quality']) && is_int($feedback['quality'])) {
                 $qualitySum += $feedback['quality'];
                 $qualityN++;
@@ -571,7 +567,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
 
         foreach ($contents as $nomination) {
             /** @var array{quality?: mixed, difficulty?: mixed, tags?: mixed} */
-            $feedback = json_decode($nomination['contents'], /*assoc=*/true);
+            $feedback = json_decode($nomination['contents'], associative: true);
 
             if (isset($feedback['quality']) && is_int($feedback['quality'])) {
                 $problemAggregates['quality_sum'] += intval(

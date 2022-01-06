@@ -177,6 +177,8 @@
           <omegaup-arena-ephemeral-grader
             v-if="!problem.karel_problem"
             :problem="problem"
+            :can-submit="user.loggedIn && !inContestOrCourse"
+            :accepted-languages="filteredLanguages"
           ></omegaup-arena-ephemeral-grader>
           <omegaup-arena-runs
             :problem-alias="problem.alias"
@@ -242,9 +244,7 @@
           @details="(request) => onRunDetails(request, 'runs')"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
-          @filter-changed="
-            (filter, value) => $emit('apply-filter', filter, value)
-          "
+          @filter-changed="(request) => $emit('apply-filter', request)"
           @update-search-result-users-contest="
             (request) => $emit('update-search-result-users-contest', request)
           "
@@ -390,6 +390,7 @@ export default class ProblemDetails extends Vue {
   @Prop() selectedPublicTags!: string[];
   @Prop() selectedPrivateTags!: string[];
   @Prop() hasBeenNominated!: boolean;
+  @Prop({ default: false }) inContestOrCourse!: boolean;
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
@@ -498,6 +499,7 @@ export default class ProblemDetails extends Vue {
       return;
     }
     this.currentPopupDisplayed = PopupDisplayed.RunSubmit;
+    this.$emit('new-submission-popup-displayed');
   }
 
   onRunDetails(request: SubmissionRequest, tab: string): void {

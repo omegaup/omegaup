@@ -1,5 +1,5 @@
 <?php
-require_once('../server/bootstrap_smarty.php');
+require_once('../server/bootstrap.php');
 
 if (
     empty($_SERVER['CONTENT_TYPE']) ||
@@ -9,6 +9,6 @@ if (
     die();
 }
 
-$log = Logger::getLogger('csp');
+$log = \Monolog\Registry::omegaup()->withName('csp');
 $log->error(file_get_contents('php://input'));
 die();

@@ -230,7 +230,9 @@ def test_create_identities_for_course(driver):
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.XPATH, ('//a[@href = "/profile/edit/"]')))).click()
+                    (By.XPATH,
+                     ('//a[@href = "/profile/#edit-basic-information"]')
+                     ))).click()
 
         driver.wait.until(
             EC.visibility_of_element_located(

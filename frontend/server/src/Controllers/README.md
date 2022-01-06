@@ -80,7 +80,6 @@
   - [`/api/course/getProblemUsers/`](#apicoursegetproblemusers)
   - [`/api/course/introDetails/`](#apicourseintrodetails)
   - [`/api/course/listAssignments/`](#apicourselistassignments)
-  - [`/api/course/listCourses/`](#apicourselistcourses)
   - [`/api/course/listSolvedProblems/`](#apicourselistsolvedproblems)
   - [`/api/course/listStudents/`](#apicourseliststudents)
   - [`/api/course/listUnsolvedProblems/`](#apicourselistunsolvedproblems)
@@ -95,6 +94,7 @@
   - [`/api/course/requests/`](#apicourserequests)
   - [`/api/course/runs/`](#apicourseruns)
   - [`/api/course/studentProgress/`](#apicoursestudentprogress)
+  - [`/api/course/studentsProgress/`](#apicoursestudentsprogress)
   - [`/api/course/update/`](#apicourseupdate)
   - [`/api/course/updateAssignment/`](#apicourseupdateassignment)
   - [`/api/course/updateAssignmentsOrder/`](#apicourseupdateassignmentsorder)
@@ -807,6 +807,7 @@ Returns a list of contests
 | `page`           | `int`       |             |
 | `page_size`      | `int`       |             |
 | `query`          | `string`    |             |
+| `tab_name`       | `string`    |             |
 | `active`         | `int\|null` |             |
 | `admission_mode` | `mixed`     |             |
 | `participating`  | `int\|null` |             |
@@ -814,10 +815,10 @@ Returns a list of contests
 
 ### Returns
 
-| Name                | Type                                                                                                                                                                                                                                                                              |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `number_of_results` | `number`                                                                                                                                                                                                                                                                          |
-| `results`           | `{ admission_mode: string; alias: string; contest_id: number; description: string; finish_time: Date; last_updated: Date; original_finish_time: Date; problemset_id: number; recommended: boolean; rerun_id: number; start_time: Date; title: string; window_length: number; }[]` |
+| Name                | Type                      |
+| ------------------- | ------------------------- |
+| `number_of_results` | `number`                  |
+| `results`           | `types.ContestListItem[]` |
 
 ## `/api/contest/listParticipating/`
 
@@ -1119,22 +1120,23 @@ Returns all runs for a contest
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `problem_alias` | `string`       |             |
-| `language`      | `mixed`        |             |
-| `offset`        | `int\|null`    |             |
-| `rowcount`      | `int\|null`    |             |
-| `status`        | `mixed`        |             |
-| `username`      | `null\|string` |             |
-| `verdict`       | `mixed`        |             |
+| Name            | Type                                                                                                                                                            | Description |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `contest_alias` | `string`                                                                                                                                                        |             |
+| `problem_alias` | `string`                                                                                                                                                        |             |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cs'\|'hs'\|'java'\|'kj'\|'kp'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|null` |             |
+| `offset`        | `int\|null`                                                                                                                                                     |             |
+| `rowcount`      | `int\|null`                                                                                                                                                     |             |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                       |             |
+| `username`      | `null\|string`                                                                                                                                                  |             |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                          |             |
 
 ### Returns
 
-| Name   | Type          |
-| ------ | ------------- |
-| `runs` | `types.Run[]` |
+| Name        | Type          |
+| ----------- | ------------- |
+| `runs`      | `types.Run[]` |
+| `totalRuns` | `number`      |
 
 ## `/api/contest/runsDiff/`
 
@@ -1786,28 +1788,6 @@ List course assignments
 | ------------- | -------------------------- |
 | `assignments` | `types.CourseAssignment[]` |
 
-## `/api/course/listCourses/`
-
-### Description
-
-Lists all the courses this user is associated with.
-
-Returns courses for which the current user is an admin and
-for in which the user is a student.
-
-### Parameters
-
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `page`      | `int` |             |
-| `page_size` | `int` |             |
-
-### Returns
-
-```typescript
-types.CoursesList;
-```
-
 ## `/api/course/listSolvedProblems/`
 
 ### Description
@@ -1908,9 +1888,11 @@ Get clarifications of problem in a contest
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
+| Name                     | Type         | Description |
+| ------------------------ | ------------ | ----------- |
+| `course_alias`           | `string`     |             |
+| `accept_teacher`         | `bool\|null` |             |
+| `share_user_information` | `bool\|null` |             |
 
 ### Returns
 
@@ -2034,9 +2016,9 @@ Returns all runs for a course
 | `assignment_alias` | `string`                                                                                                                                                        |             |
 | `course_alias`     | `string`                                                                                                                                                        |             |
 | `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cs'\|'hs'\|'java'\|'kj'\|'kp'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|null` |             |
-| `offset`           | `mixed`                                                                                                                                                         |             |
+| `offset`           | `int\|null`                                                                                                                                                     |             |
 | `problem_alias`    | `null\|string`                                                                                                                                                  |             |
-| `rowcount`         | `mixed`                                                                                                                                                         |             |
+| `rowcount`         | `int\|null`                                                                                                                                                     |             |
 | `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                       |             |
 | `username`         | `null\|string`                                                                                                                                                  |             |
 | `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                          |             |
@@ -2064,6 +2046,25 @@ Returns all runs for a course
 | Name       | Type                    |
 | ---------- | ----------------------- |
 | `problems` | `types.CourseProblem[]` |
+
+## `/api/course/studentsProgress/`
+
+### Description
+
+### Parameters
+
+| Name     | Type     | Description |
+| -------- | -------- | ----------- |
+| `course` | `string` |             |
+| `length` | `int`    |             |
+| `page`   | `int`    |             |
+
+### Returns
+
+| Name       | Type                              |
+| ---------- | --------------------------------- |
+| `nextPage` | `number`                          |
+| `progress` | `types.StudentProgressInCourse[]` |
 
 ## `/api/course/update/`
 
@@ -2652,10 +2653,11 @@ the owner).
 
 ### Parameters
 
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `page`      | `int` |             |
-| `page_size` | `int` |             |
+| Name        | Type           | Description |
+| ----------- | -------------- | ----------- |
+| `page`      | `int`          |             |
+| `page_size` | `int`          |             |
+| `query`     | `null\|string` |             |
 
 ### Returns
 
@@ -2844,10 +2846,11 @@ Gets a list of problems where current user is the owner
 
 ### Parameters
 
-| Name       | Type        | Description |
-| ---------- | ----------- | ----------- |
-| `page`     | `int`       |             |
-| `rowcount` | `int\|null` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `page`     | `int`          |             |
+| `query`    | `null\|string` |             |
+| `rowcount` | `int\|null`    |             |
 
 ### Returns
 
@@ -3648,15 +3651,15 @@ Gets a list of latest runs overall
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `offset`        | `int`    |             |
-| `problem_alias` | `string` |             |
-| `rowcount`      | `int`    |             |
-| `username`      | `string` |             |
-| `language`      | `mixed`  |             |
-| `status`        | `mixed`  |             |
-| `verdict`       | `mixed`  |             |
+| Name            | Type                                                                                                                                                            | Description |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `offset`        | `int`                                                                                                                                                           |             |
+| `problem_alias` | `string`                                                                                                                                                        |             |
+| `rowcount`      | `int`                                                                                                                                                           |             |
+| `username`      | `string`                                                                                                                                                        |             |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cs'\|'hs'\|'java'\|'kj'\|'kp'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|null` |             |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                       |             |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                          |             |
 
 ### Returns
 
@@ -4416,10 +4419,11 @@ Gets a list of users.
 
 ### Parameters
 
-| Name    | Type           | Description |
-| ------- | -------------- | ----------- |
-| `query` | `null\|string` |             |
-| `term`  | `null\|string` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `query`    | `null\|string` |             |
+| `rowcount` | `null\|int`    |             |
+| `term`     | `null\|string` |             |
 
 ### Returns
 

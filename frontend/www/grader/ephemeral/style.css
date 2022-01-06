@@ -1,20 +1,15 @@
 textarea.editor {
 	width: 100%;
 	height: 100%;
-	background: #222222;
+	background: #F8F9Fa;
 	border: 0px;
 	font-family: "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
-	color: #d4d4d4;
 }
 
-button[type="submit"] {
-	width: 7ex;
-}
-
-button[type="submit"]:disabled img, button[type="submit"] span {
+button.ephemeral-button:disabled img, button.ephemeral-button span {
 	display: inline;
 }
-button[type="submit"] img, button[type="submit"]:disabled span {
+button.ephemeral-button img, button.ephemeral-button:disabled span {
 	display: none;
 }
 input[type="file"] {

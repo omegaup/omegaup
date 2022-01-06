@@ -41,6 +41,7 @@
               :guid="guid"
               :problem-alias="problemAlias"
               :contest-alias="contest.alias"
+              :in-contest-or-course="true"
               :run-details-data="currentRunDetailsData"
               @update:activeTab="
                 (selectedTab) =>
@@ -51,6 +52,9 @@
               "
               @submit-run="onRunSubmitted"
               @show-run="onRunDetails"
+              @new-submission-popup-displayed="
+                $emit('new-submission-popup-displayed')
+              "
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -154,6 +158,8 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
+  @Prop({ default: false })
+  shouldShowFirstAssociatedIdentityRunWarning!: boolean;
 
   T = T;
   ui = ui;

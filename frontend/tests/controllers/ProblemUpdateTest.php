@@ -175,7 +175,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
             $problemDistribSettings = json_decode(
                 $problemArtifacts->get('settings.distrib.json'),
-                true /* assoc */
+                associative: true,
             );
 
             // This example comes from the problem statement.
@@ -220,7 +220,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
             $problemDistribSettings = json_decode(
                 $problemArtifacts->get('settings.distrib.json'),
-                true /* assoc */
+                associative: true,
             );
             $this->assertEquals(
                 [
@@ -341,7 +341,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $problemArtifacts->get(
                     'settings.json'
                 ),
-                /*$assoc=*/true
+                associative: true
             );
             $this->assertEquals(
                 ($newTimeLimit / 1000.0) . 's',
@@ -1058,7 +1058,6 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $problemData['author'],
                 $problemData['problem']
             ),
-            /*public=*/ false
         );
         $this->assertEquals($testTags, $privateTags);
 
@@ -1069,7 +1068,6 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $extraIdentity,
                 $problemData['problem']
             ),
-            /*public=*/ false
         );
         $this->assertEmpty($privateTags);
     }
@@ -2092,7 +2090,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'problem' => $problemData['request']['problem_alias'],
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
 
         $this->assertArrayHasKey('statement', $response['payload']);
 
@@ -2118,7 +2116,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'directory' => 'statements',
                 'contents' => $contents,
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
 
         // Getting problem details for preferred user language('es')
         $response = \OmegaUp\Controllers\Problem::apiDetails(
