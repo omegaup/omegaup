@@ -180,10 +180,10 @@ class Group extends \OmegaUp\Controllers\Controller {
         );
 
         if (
-            !is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
+            \OmegaUp\DAO\GroupsIdentities::existsByPK(
                 $group->group_id,
                 $resolvedIdentity->identity_id
-            ))
+            )
         ) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                 'identityInGroup'

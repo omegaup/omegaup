@@ -4290,11 +4290,7 @@ export namespace types {
 
   export interface SubmissionsListPayload {
     includeUser: boolean;
-    length: number;
-    page: number;
-    pagerItems: types.PageItem[];
     submissions: types.Submission[];
-    totalRows: number;
   }
 
   export interface Tag {
