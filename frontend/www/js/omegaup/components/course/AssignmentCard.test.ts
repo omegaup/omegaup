@@ -34,13 +34,16 @@ describe('AssignmentCard.vue', () => {
     });
     expect(wrapper.text()).toContain(assignment.name);
     expect(wrapper.text()).toContain(T.wordsHomework);
-    expect(wrapper.text()).toContain(T.assignmentCardGoToContent);
+    expect(wrapper.text()).toContain(T.wordsStart);
     expect(wrapper.text()).toContain(`${studentProgress}%`);
   });
 
   it('Should handle lesson details', () => {
-    const lecture = assignment;
-    lecture['assignment_type'] = 'lesson';
+    const lecture: types.CourseAssignment = {
+      ...assignment,
+      assignment_type: 'lesson',
+      opened: true,
+    };
     const studentProgress = 50;
     const wrapper = mount(course_AssignmentCard, {
       propsData: {
@@ -51,7 +54,7 @@ describe('AssignmentCard.vue', () => {
     });
     expect(wrapper.text()).toContain(assignment.name);
     expect(wrapper.text()).toContain(T.wordsLesson);
-    expect(wrapper.text()).toContain(T.assignmentCardGoToContent);
+    expect(wrapper.text()).toContain(T.courseCardCourseResume);
     expect(wrapper.text()).not.toContain(`${studentProgress}%`);
   });
 });
