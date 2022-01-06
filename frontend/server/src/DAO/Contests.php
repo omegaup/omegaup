@@ -476,7 +476,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 p.scoreboard_url,
                 p.scoreboard_url_admin,
                 COUNT(contestants.identity_id) AS `contestants`,
-                organizer.username AS `organizer`,
+                organizer.username AS `organizer`
             FROM
                 (SELECT
                     pi.problemset_id
