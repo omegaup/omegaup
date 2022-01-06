@@ -7,8 +7,6 @@ import os
 import argparse
 import logging
 import sys
-import mysql.connector
-import mysql.connector.cursor
 import rabbitmq_connection
 import client_contest
 import test_credentials

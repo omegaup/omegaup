@@ -8,10 +8,11 @@ import logging
 import os
 import sys
 import json
-from typing import List, Optional, Dict
+from typing import List, Optional
 import omegaup.api
 import mysql.connector
 import mysql.connector.cursor
+from mysql.connector import errorcode
 import pika
 from verification_code import generate_code
 import rabbitmq_connection
@@ -43,8 +44,8 @@ def certificate_contests_receive_messages(
     '''Receive contest messages from a queue'''
 
     channel.exchange_declare(exchange='certificates',
-                                durable=True,
-                                exchange_type='direct')
+                             durable=True,
+                             exchange_type='direct')
     channel.queue_declare(queue='contest', durable=True, exclusive=False)
     channel.queue_bind(
         exchange='certificates',
@@ -107,7 +108,7 @@ def certificate_contests_receive_messages(
                 break
             except mysql.connector.Error as err:
                 dbconn.rollback()
-                if err.errno != 1062:
+                if err.errno != errorcode.ER_DUP_ENTRY:
                     raise
                 for certificate in certificates:
                     certificate.verification_code = generate_code()
