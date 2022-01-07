@@ -71,6 +71,7 @@ const translations: { [key: string]: string; } = {
   arenaRunSubmitWaitBetweenUploads: "Voc\u00ea deve esperar %(submissionGap) segundos entre  cada solu\u00e7\u00e3o apresentada",
   assignmentCardLessons: "%(lessonCount) li\u00e7\u00f5es",
   assignmentCardProblems: "%(problemCount) problemas",
+  assignmentCardStart: "Come\u00e7ar",
   assignmentNotFound: "Conte\u00fado n\u00e3o encontrado",
   assignmentNotStarted: "A li\u00e7\u00e3o ainda n\u00e3o tem come\u00e7ado",
   assignmentRemoveAlreadyHasRuns: "Conte\u00fado n\u00e3o pode ser removida depois que uma solu\u00e7\u00e3o \u00e9 julgada.",

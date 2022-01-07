@@ -71,6 +71,7 @@ const translations: { [key: string]: string; } = {
   arenaRunSubmitWaitBetweenUploads: "You must wait %(submissionGap) seconds between submissions for a problem",
   assignmentCardLessons: "%(lessonCount) lessons",
   assignmentCardProblems: "%(problemCount) problems",
+  assignmentCardStart: "Start",
   assignmentNotFound: "Content not found",
   assignmentNotStarted: "The assignment has not started yet",
   assignmentRemoveAlreadyHasRuns: "Content can't be removed once a solution has been judged.",

@@ -34,7 +34,7 @@ describe('AssignmentCard.vue', () => {
     });
     expect(wrapper.text()).toContain(assignment.name);
     expect(wrapper.text()).toContain(T.wordsHomework);
-    expect(wrapper.text()).toContain(T.wordsStart);
+    expect(wrapper.text()).toContain(T.assignmentCardStart);
     expect(wrapper.text()).toContain(`${studentProgress}%`);
   });
 

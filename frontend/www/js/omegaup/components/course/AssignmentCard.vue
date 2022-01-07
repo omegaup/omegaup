@@ -26,7 +26,7 @@
         <a
           :href="`/course/${courseAlias}/assignment/${assignment.alias}`"
           class="btn btn-primary d-inline-block text-white"
-          >{{ assignment.opened ? T.courseCardCourseResume : T.wordsStart }}</a
+          >{{ assignment.opened ? T.courseCardCourseResume : T.assignmentCardStart }}</a
         >
       </div>
     </div>
