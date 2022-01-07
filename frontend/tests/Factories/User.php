@@ -76,8 +76,8 @@ class User {
                 'email' => $params->email,
                 'is_private' => strval($params->isPrivate),
             ]),
-            /*ignorePassword=*/false,
-            /*forceVerification=*/true
+            ignorePassword: false,
+            forceVerification: true
         );
 
         // Get user from db

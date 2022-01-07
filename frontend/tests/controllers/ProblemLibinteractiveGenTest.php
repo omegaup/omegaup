@@ -12,7 +12,6 @@ class ProblemLibinteractiveGenTest extends \OmegaUp\Test\ControllerTestCase {
         return [
             [true, [], []],
             [false, [], ['name' => 'wrong name']],
-            [false, [], []],
             [false, ['name'], []],
             [false, ['os'], []],
             [false, ['idl'], []],
@@ -54,7 +53,7 @@ class ProblemLibinteractiveGenTest extends \OmegaUp\Test\ControllerTestCase {
         }
         $response = \OmegaUp\Controllers\Problem::getLibinteractiveGenForTypeScript(
             new \OmegaUp\Request($parameters)
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         if ($isEmptyRequest) {
             $defaultValuesParameters['name'] = null;

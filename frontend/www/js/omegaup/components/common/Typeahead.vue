@@ -75,4 +75,8 @@ export default class Typeahead extends Vue {
 .tags-input-typeahead-item-highlighted-default {
   background-color: $omegaup-primary--darker;
 }
+
+.tags-input-wrapper-default {
+  height: 38px;
+}
 </style>

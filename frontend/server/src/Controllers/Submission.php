@@ -7,7 +7,7 @@ namespace OmegaUp\Controllers;
  *
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type Submission=array{time: \OmegaUp\Timestamp, username: string, school_id: int|null, school_name: string|null, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}
- * @psalm-type SubmissionsListPayload=array{page: int, length: int, includeUser: bool, pagerItems: list<PageItem>, submissions: list<Submission>, totalRows: int}
+ * @psalm-type SubmissionsListPayload=array{includeUser: bool, submissions: list<Submission>}
  */
 class Submission extends \OmegaUp\Controllers\Controller {
     public static function getSource(string $guid): string {
@@ -15,41 +15,16 @@ class Submission extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Gets the details for the latest submissions with pagination
+     * Gets the details for the latest submissions.
      *
-     * @return array{smartyProperties: array{payload: SubmissionsListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
-     *
-     * @omegaup-request-param int $length
-     * @omegaup-request-param int $page
+     * @return array{templateProperties: array{payload: SubmissionsListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getLatestSubmissionsForTypeScript(\OmegaUp\Request $r): array {
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('length');
-
-        $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null($r['length']) ? 100 : intval($r['length']);
-
-        $latestSubmissions = \OmegaUp\DAO\Submissions::getLatestSubmissions(
-            $page,
-            $length,
-            null
-        );
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
-                    'page' => $page,
-                    'length' => $length,
                     'includeUser' => true,
-                    'submissions' => $latestSubmissions['submissions'],
-                    'totalRows' => $latestSubmissions['totalRows'],
-                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
-                        $latestSubmissions['totalRows'],
-                        $length,
-                        $page,
-                        '/submissions/',
-                        2,
-                        []
-                    ),
+                    'submissions' => \OmegaUp\DAO\Submissions::getLatestSubmissions(),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleLatestSubmissions'
@@ -61,29 +36,21 @@ class Submission extends \OmegaUp\Controllers\Controller {
 
     /**
      * Gets the details for the latest submissions of
-     * a certain user with pagination
+     * a certain user.
      *
-     * @return array{smartyProperties: array{payload: SubmissionsListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: SubmissionsListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
-     * @omegaup-request-param int $length
-     * @omegaup-request-param int $page
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param string $username
      */
     public static function getLatestUserSubmissionsForTypeScript(\OmegaUp\Request $r): array {
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('length');
+        $username = $r->ensureString('username');
 
-        \OmegaUp\Validators::validateValidUsername(
-            $r['username'],
-            'username'
-        );
-
-        $identity = \OmegaUp\DAO\Identities::FindByUsername($r['username']);
+        $identity = \OmegaUp\DAO\Identities::FindByUsername($username);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
-        $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
+        $user = \OmegaUp\DAO\Users::FindByUsername($username);
         if (
             !is_null(
                 $user
@@ -97,29 +64,12 @@ class Submission extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null($r['length']) ? 100 : intval($r['length']);
-
-        $latestSubmissions = \OmegaUp\DAO\Submissions::getLatestSubmissions(
-            $page,
-            $length,
-            $identity->identity_id
-        );
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
-                    'page' => $page,
-                    'length' => $length,
                     'includeUser' => false,
-                    'submissions' => $latestSubmissions['submissions'],
-                    'totalRows' => $latestSubmissions['totalRows'],
-                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
-                        $latestSubmissions['totalRows'],
-                        $length,
-                        $page,
-                        "/submissions/{$identity->username}/",
-                        2,
-                        []
+                    'submissions' => \OmegaUp\DAO\Submissions::getLatestSubmissions(
+                        $identity->identity_id,
                     ),
                 ],
                 'title' => new \OmegaUp\TranslationString(

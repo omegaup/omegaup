@@ -10,6 +10,10 @@ class UrlHelper {
      * @param null|resource $context
      */
     public function fetchUrl(string $url, $context = null): string {
-        return file_get_contents($url, /*use_include_path=*/false, $context);
+        return file_get_contents(
+            $url,
+            use_include_path: false,
+            context: $context,
+        );
     }
 }

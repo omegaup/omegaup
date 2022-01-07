@@ -103,9 +103,97 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ArenaCoursePayload {
       return ((x) => {
-        if (x.scoreboard)
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
+        x.course = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          return x;
+        })(x.course);
+        if (
+          typeof x.currentProblem !== 'undefined' &&
+          x.currentProblem !== null
+        )
+          x.currentProblem = ((x) => {
+            x.creation_date = ((x: number) => new Date(x * 1000))(
+              x.creation_date,
+            );
+            if (
+              typeof x.nextSubmissionTimestamp !== 'undefined' &&
+              x.nextSubmissionTimestamp !== null
+            )
+              x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
+                x.nextSubmissionTimestamp,
+              );
+            if (
+              typeof x.problemsetter !== 'undefined' &&
+              x.problemsetter !== null
+            )
+              x.problemsetter = ((x) => {
+                if (
+                  typeof x.creation_date !== 'undefined' &&
+                  x.creation_date !== null
+                )
+                  x.creation_date = ((x: number) => new Date(x * 1000))(
+                    x.creation_date,
+                  );
+                return x;
+              })(x.problemsetter);
+            if (typeof x.runs !== 'undefined' && x.runs !== null)
+              x.runs = ((x) => {
+                if (!Array.isArray(x)) {
+                  return x;
+                }
+                return x.map((x) => {
+                  x.time = ((x: number) => new Date(x * 1000))(x.time);
+                  return x;
+                });
+              })(x.runs);
+            if (typeof x.solvers !== 'undefined' && x.solvers !== null)
+              x.solvers = ((x) => {
+                if (!Array.isArray(x)) {
+                  return x;
+                }
+                return x.map((x) => {
+                  x.time = ((x: number) => new Date(x * 1000))(x.time);
+                  return x;
+                });
+              })(x.solvers);
+            return x;
+          })(x.currentProblem);
+        x.runs = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.runs);
+        if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
           x.scoreboard = ((x) => {
-            if (x.finish_time)
+            if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
               x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
@@ -131,7 +219,10 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time)
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
                 );
@@ -148,13 +239,13 @@ export namespace types {
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.courseDetails);
         x.currentAssignment = ((x) => {
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.runs = ((x) => {
             if (!Array.isArray(x)) {
@@ -169,7 +260,7 @@ export namespace types {
           return x;
         })(x.currentAssignment);
         x.scoreboard = ((x) => {
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           x.time = ((x: number) => new Date(x * 1000))(x.time);
@@ -196,11 +287,17 @@ export namespace types {
     ): types.BadgeDetailsPayload {
       return ((x) => {
         x.badge = ((x) => {
-          if (x.assignation_time)
+          if (
+            typeof x.assignation_time !== 'undefined' &&
+            x.assignation_time !== null
+          )
             x.assignation_time = ((x: number) => new Date(x * 1000))(
               x.assignation_time,
             );
-          if (x.first_assignation)
+          if (
+            typeof x.first_assignation !== 'undefined' &&
+            x.first_assignation !== null
+          )
             x.first_assignation = ((x: number) => new Date(x * 1000))(
               x.first_assignation,
             );
@@ -223,11 +320,17 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            if (x.assignation_time)
+            if (
+              typeof x.assignation_time !== 'undefined' &&
+              x.assignation_time !== null
+            )
               x.assignation_time = ((x: number) => new Date(x * 1000))(
                 x.assignation_time,
               );
-            if (x.first_assignation)
+            if (
+              typeof x.first_assignation !== 'undefined' &&
+              x.first_assignation !== null
+            )
               x.first_assignation = ((x: number) => new Date(x * 1000))(
                 x.first_assignation,
               );
@@ -286,7 +389,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ContestDetailsPayload {
       return ((x) => {
-        if (x.adminPayload)
+        if (typeof x.adminPayload !== 'undefined' && x.adminPayload !== null)
           x.adminPayload = ((x) => {
             x.allRuns = ((x) => {
               if (!Array.isArray(x)) {
@@ -302,11 +405,14 @@ export namespace types {
                 return x;
               }
               return x.map((x) => {
-                if (x.access_time)
+                if (
+                  typeof x.access_time !== 'undefined' &&
+                  x.access_time !== null
+                )
                   x.access_time = ((x: number) => new Date(x * 1000))(
                     x.access_time,
                   );
-                if (x.end_time)
+                if (typeof x.end_time !== 'undefined' && x.end_time !== null)
                   x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
                 return x;
               });
@@ -327,11 +433,14 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
-        if (x.original)
+        if (typeof x.original !== 'undefined' && x.original !== null)
           x.original = ((x) => {
-            if (x.scoreboard)
+            if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
               x.scoreboard = ((x) => {
-                if (x.finish_time)
+                if (
+                  typeof x.finish_time !== 'undefined' &&
+                  x.finish_time !== null
+                )
                   x.finish_time = ((x: number) => new Date(x * 1000))(
                     x.finish_time,
                   );
@@ -344,13 +453,16 @@ export namespace types {
             return x;
           })(x.original);
         x.scoreboard = ((x) => {
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           x.time = ((x: number) => new Date(x * 1000))(x.time);
           return x;
         })(x.scoreboard);
-        if (x.submissionDeadline)
+        if (
+          typeof x.submissionDeadline !== 'undefined' &&
+          x.submissionDeadline !== null
+        )
           x.submissionDeadline = ((x: number) => new Date(x * 1000))(
             x.submissionDeadline,
           );
@@ -369,7 +481,10 @@ export namespace types {
         x.details = ((x) => {
           x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          if (x.submission_deadline)
+          if (
+            typeof x.submission_deadline !== 'undefined' &&
+            x.submission_deadline !== null
+          )
             x.submission_deadline = ((x: number) => new Date(x * 1000))(
               x.submission_deadline,
             );
@@ -407,7 +522,7 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            if (x.last_update)
+            if (typeof x.last_update !== 'undefined' && x.last_update !== null)
               x.last_update = ((x: number) => new Date(x * 1000))(
                 x.last_update,
               );
@@ -422,11 +537,11 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            if (x.access_time)
+            if (typeof x.access_time !== 'undefined' && x.access_time !== null)
               x.access_time = ((x: number) => new Date(x * 1000))(
                 x.access_time,
               );
-            if (x.end_time)
+            if (typeof x.end_time !== 'undefined' && x.end_time !== null)
               x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
             return x;
           });
@@ -469,7 +584,10 @@ export namespace types {
             x.last_updated = ((x: number) => new Date(x * 1000))(
               x.last_updated,
             );
-            if (x.original_finish_time)
+            if (
+              typeof x.original_finish_time !== 'undefined' &&
+              x.original_finish_time !== null
+            )
               x.original_finish_time = ((x: number) => new Date(x * 1000))(
                 x.original_finish_time,
               );
@@ -605,7 +723,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ContestPracticeDetailsPayload {
       return ((x) => {
-        if (x.adminPayload)
+        if (typeof x.adminPayload !== 'undefined' && x.adminPayload !== null)
           x.adminPayload = ((x) => {
             x.allRuns = ((x) => {
               if (!Array.isArray(x)) {
@@ -621,11 +739,14 @@ export namespace types {
                 return x;
               }
               return x.map((x) => {
-                if (x.access_time)
+                if (
+                  typeof x.access_time !== 'undefined' &&
+                  x.access_time !== null
+                )
                   x.access_time = ((x: number) => new Date(x * 1000))(
                     x.access_time,
                   );
-                if (x.end_time)
+                if (typeof x.end_time !== 'undefined' && x.end_time !== null)
                   x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
                 return x;
               });
@@ -646,11 +767,14 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
-        if (x.original)
+        if (typeof x.original !== 'undefined' && x.original !== null)
           x.original = ((x) => {
-            if (x.scoreboard)
+            if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
               x.scoreboard = ((x) => {
-                if (x.finish_time)
+                if (
+                  typeof x.finish_time !== 'undefined' &&
+                  x.finish_time !== null
+                )
                   x.finish_time = ((x: number) => new Date(x * 1000))(
                     x.finish_time,
                   );
@@ -662,7 +786,10 @@ export namespace types {
               })(x.scoreboard);
             return x;
           })(x.original);
-        if (x.submissionDeadline)
+        if (
+          typeof x.submissionDeadline !== 'undefined' &&
+          x.submissionDeadline !== null
+        )
           x.submissionDeadline = ((x: number) => new Date(x * 1000))(
             x.submissionDeadline,
           );
@@ -686,18 +813,27 @@ export namespace types {
                   x.creation_date = ((x: number) => new Date(x * 1000))(
                     x.creation_date,
                   );
-                  if (x.nextSubmissionTimestamp)
+                  if (
+                    typeof x.nextSubmissionTimestamp !== 'undefined' &&
+                    x.nextSubmissionTimestamp !== null
+                  )
                     x.nextSubmissionTimestamp = ((x: number) =>
                       new Date(x * 1000))(x.nextSubmissionTimestamp);
-                  if (x.problemsetter)
+                  if (
+                    typeof x.problemsetter !== 'undefined' &&
+                    x.problemsetter !== null
+                  )
                     x.problemsetter = ((x) => {
-                      if (x.creation_date)
+                      if (
+                        typeof x.creation_date !== 'undefined' &&
+                        x.creation_date !== null
+                      )
                         x.creation_date = ((x: number) => new Date(x * 1000))(
                           x.creation_date,
                         );
                       return x;
                     })(x.problemsetter);
-                  if (x.runs)
+                  if (typeof x.runs !== 'undefined' && x.runs !== null)
                     x.runs = ((x) => {
                       if (!Array.isArray(x)) {
                         return x;
@@ -707,7 +843,7 @@ export namespace types {
                         return x;
                       });
                     })(x.runs);
-                  if (x.solvers)
+                  if (typeof x.solvers !== 'undefined' && x.solvers !== null)
                     x.solvers = ((x) => {
                       if (!Array.isArray(x)) {
                         return x;
@@ -746,14 +882,17 @@ export namespace types {
         x.contest = ((x) => {
           x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          if (x.submission_deadline)
+          if (
+            typeof x.submission_deadline !== 'undefined' &&
+            x.submission_deadline !== null
+          )
             x.submission_deadline = ((x: number) => new Date(x * 1000))(
               x.submission_deadline,
             );
           return x;
         })(x.contest);
         x.scoreboard = ((x) => {
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           x.time = ((x: number) => new Date(x * 1000))(x.time);
@@ -815,7 +954,10 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time)
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
                 );
@@ -832,7 +974,7 @@ export namespace types {
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
@@ -855,7 +997,10 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time)
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
                 );
@@ -872,7 +1017,7 @@ export namespace types {
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
@@ -895,7 +1040,10 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time)
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
                 );
@@ -912,7 +1060,7 @@ export namespace types {
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
@@ -922,7 +1070,7 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            if (x.last_update)
+            if (typeof x.last_update !== 'undefined' && x.last_update !== null)
               x.last_update = ((x: number) => new Date(x * 1000))(
                 x.last_update,
               );
@@ -932,9 +1080,12 @@ export namespace types {
             return x;
           });
         })(x.identityRequests);
-        if (x.selectedAssignment)
+        if (
+          typeof x.selectedAssignment !== 'undefined' &&
+          x.selectedAssignment !== null
+        )
           x.selectedAssignment = ((x) => {
-            if (x.finish_time)
+            if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
               x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
@@ -967,7 +1118,10 @@ export namespace types {
                         return x;
                       }
                       return x.map((x) => {
-                        if (x.finish_time)
+                        if (
+                          typeof x.finish_time !== 'undefined' &&
+                          x.finish_time !== null
+                        )
                           x.finish_time = ((x: number) => new Date(x * 1000))(
                             x.finish_time,
                           );
@@ -977,7 +1131,10 @@ export namespace types {
                         return x;
                       });
                     })(x.assignments);
-                    if (x.finish_time)
+                    if (
+                      typeof x.finish_time !== 'undefined' &&
+                      x.finish_time !== null
+                    )
                       x.finish_time = ((x: number) => new Date(x * 1000))(
                         x.finish_time,
                       );
@@ -1000,7 +1157,10 @@ export namespace types {
                         return x;
                       }
                       return x.map((x) => {
-                        if (x.finish_time)
+                        if (
+                          typeof x.finish_time !== 'undefined' &&
+                          x.finish_time !== null
+                        )
                           x.finish_time = ((x: number) => new Date(x * 1000))(
                             x.finish_time,
                           );
@@ -1010,7 +1170,10 @@ export namespace types {
                         return x;
                       });
                     })(x.assignments);
-                    if (x.finish_time)
+                    if (
+                      typeof x.finish_time !== 'undefined' &&
+                      x.finish_time !== null
+                    )
                       x.finish_time = ((x: number) => new Date(x * 1000))(
                         x.finish_time,
                       );
@@ -1033,7 +1196,10 @@ export namespace types {
                         return x;
                       }
                       return x.map((x) => {
-                        if (x.finish_time)
+                        if (
+                          typeof x.finish_time !== 'undefined' &&
+                          x.finish_time !== null
+                        )
                           x.finish_time = ((x: number) => new Date(x * 1000))(
                             x.finish_time,
                           );
@@ -1043,7 +1209,10 @@ export namespace types {
                         return x;
                       });
                     })(x.assignments);
-                    if (x.finish_time)
+                    if (
+                      typeof x.finish_time !== 'undefined' &&
+                      x.finish_time !== null
+                    )
                       x.finish_time = ((x: number) => new Date(x * 1000))(
                         x.finish_time,
                       );
@@ -1087,7 +1256,10 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time)
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
                 );
@@ -1095,13 +1267,13 @@ export namespace types {
               return x;
             });
           })(x.courseAssignments);
-          if (x.finishTime)
+          if (typeof x.finishTime !== 'undefined' && x.finishTime !== null)
             x.finishTime = ((x: number) => new Date(x * 1000))(x.finishTime);
           x.startTime = ((x: number) => new Date(x * 1000))(x.startTime);
           return x;
         })(x.assignment);
         x.scoreboard = ((x) => {
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           x.time = ((x: number) => new Date(x * 1000))(x.time);
@@ -1125,7 +1297,10 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time)
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
                 );
@@ -1142,7 +1317,7 @@ export namespace types {
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
@@ -1175,11 +1350,14 @@ export namespace types {
       elementId: string = 'payload',
     ): types.EmailEditDetailsPayload {
       return ((x) => {
-        if (x.profile)
+        if (typeof x.profile !== 'undefined' && x.profile !== null)
           x.profile = ((x) => {
-            if (x.birth_date)
+            if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
               x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-            if (x.graduation_date)
+            if (
+              typeof x.graduation_date !== 'undefined' &&
+              x.graduation_date !== null
+            )
               x.graduation_date = ((x: number) => new Date(x * 1000))(
                 x.graduation_date,
               );
@@ -1292,25 +1470,31 @@ export namespace types {
     ): types.IndexPayload {
       return ((x) => {
         x.coderOfTheMonthData = ((x) => {
-          if (x.all)
+          if (typeof x.all !== 'undefined' && x.all !== null)
             x.all = ((x) => {
-              if (x.birth_date)
+              if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
                 x.birth_date = ((x: number) => new Date(x * 1000))(
                   x.birth_date,
                 );
-              if (x.graduation_date)
+              if (
+                typeof x.graduation_date !== 'undefined' &&
+                x.graduation_date !== null
+              )
                 x.graduation_date = ((x: number) => new Date(x * 1000))(
                   x.graduation_date,
                 );
               return x;
             })(x.all);
-          if (x.female)
+          if (typeof x.female !== 'undefined' && x.female !== null)
             x.female = ((x) => {
-              if (x.birth_date)
+              if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
                 x.birth_date = ((x: number) => new Date(x * 1000))(
                   x.birth_date,
                 );
-              if (x.graduation_date)
+              if (
+                typeof x.graduation_date !== 'undefined' &&
+                x.graduation_date !== null
+              )
                 x.graduation_date = ((x: number) => new Date(x * 1000))(
                   x.graduation_date,
                 );
@@ -1336,7 +1520,10 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time)
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
                 );
@@ -1353,7 +1540,7 @@ export namespace types {
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
@@ -1394,7 +1581,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ProblemDetailsPayload {
       return ((x) => {
-        if (x.allRuns)
+        if (typeof x.allRuns !== 'undefined' && x.allRuns !== null)
           x.allRuns = ((x) => {
             if (!Array.isArray(x)) {
               return x;
@@ -1404,7 +1591,10 @@ export namespace types {
               return x;
             });
           })(x.allRuns);
-        if (x.clarifications)
+        if (
+          typeof x.clarifications !== 'undefined' &&
+          x.clarifications !== null
+        )
           x.clarifications = ((x) => {
             if (!Array.isArray(x)) {
               return x;
@@ -1415,13 +1605,22 @@ export namespace types {
             });
           })(x.clarifications);
         x.problem = ((x) => {
-          if (x.nextSubmissionTimestamp)
+          if (
+            typeof x.nextSubmissionTimestamp !== 'undefined' &&
+            x.nextSubmissionTimestamp !== null
+          )
             x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
               x.nextSubmissionTimestamp,
             );
-          if (x.problemsetter)
+          if (
+            typeof x.problemsetter !== 'undefined' &&
+            x.problemsetter !== null
+          )
             x.problemsetter = ((x) => {
-              if (x.creation_date)
+              if (
+                typeof x.creation_date !== 'undefined' &&
+                x.creation_date !== null
+              )
                 x.creation_date = ((x: number) => new Date(x * 1000))(
                   x.creation_date,
                 );
@@ -1429,7 +1628,7 @@ export namespace types {
             })(x.problemsetter);
           return x;
         })(x.problem);
-        if (x.runs)
+        if (typeof x.runs !== 'undefined' && x.runs !== null)
           x.runs = ((x) => {
             if (!Array.isArray(x)) {
               return x;
@@ -1476,15 +1675,21 @@ export namespace types {
             return x;
           });
         })(x.log);
-        if (x.problemsetter)
+        if (typeof x.problemsetter !== 'undefined' && x.problemsetter !== null)
           x.problemsetter = ((x) => {
-            if (x.creation_date)
+            if (
+              typeof x.creation_date !== 'undefined' &&
+              x.creation_date !== null
+            )
               x.creation_date = ((x: number) => new Date(x * 1000))(
                 x.creation_date,
               );
             return x;
           })(x.problemsetter);
-        if (x.publishedRevision)
+        if (
+          typeof x.publishedRevision !== 'undefined' &&
+          x.publishedRevision !== null
+        )
           x.publishedRevision = ((x) => {
             x.author = ((x) => {
               x.time = ((x: number) => new Date(x * 1000))(x.time);
@@ -1536,19 +1741,28 @@ export namespace types {
           x.creation_date = ((x: number) => new Date(x * 1000))(
             x.creation_date,
           );
-          if (x.nextSubmissionTimestamp)
+          if (
+            typeof x.nextSubmissionTimestamp !== 'undefined' &&
+            x.nextSubmissionTimestamp !== null
+          )
             x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
               x.nextSubmissionTimestamp,
             );
-          if (x.problemsetter)
+          if (
+            typeof x.problemsetter !== 'undefined' &&
+            x.problemsetter !== null
+          )
             x.problemsetter = ((x) => {
-              if (x.creation_date)
+              if (
+                typeof x.creation_date !== 'undefined' &&
+                x.creation_date !== null
+              )
                 x.creation_date = ((x: number) => new Date(x * 1000))(
                   x.creation_date,
                 );
               return x;
             })(x.problemsetter);
-          if (x.runs)
+          if (typeof x.runs !== 'undefined' && x.runs !== null)
             x.runs = ((x) => {
               if (!Array.isArray(x)) {
                 return x;
@@ -1558,7 +1772,7 @@ export namespace types {
                 return x;
               });
             })(x.runs);
-          if (x.solvers)
+          if (typeof x.solvers !== 'undefined' && x.solvers !== null)
             x.solvers = ((x) => {
               if (!Array.isArray(x)) {
                 return x;
@@ -1650,7 +1864,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.StatsPayload {
       return ((x) => {
-        if (x.max_wait_time)
+        if (typeof x.max_wait_time !== 'undefined' && x.max_wait_time !== null)
           x.max_wait_time = ((x: number) => new Date(x * 1000))(
             x.max_wait_time,
           );
@@ -1672,7 +1886,10 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time)
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
                 );
@@ -1689,7 +1906,7 @@ export namespace types {
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
@@ -1704,7 +1921,7 @@ export namespace types {
                 return x;
               }
               return x.map((x) => {
-                if (x.feedback)
+                if (typeof x.feedback !== 'undefined' && x.feedback !== null)
                   x.feedback = ((x) => {
                     x.date = ((x: number) => new Date(x * 1000))(x.date);
                     return x;
@@ -1734,7 +1951,10 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time)
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
                 );
@@ -1751,7 +1971,7 @@ export namespace types {
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
@@ -1774,7 +1994,10 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time)
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
                 );
@@ -1791,7 +2014,7 @@ export namespace types {
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
@@ -1874,7 +2097,10 @@ export namespace types {
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
       return ((x) => {
-        if (x.extraProfileDetails)
+        if (
+          typeof x.extraProfileDetails !== 'undefined' &&
+          x.extraProfileDetails !== null
+        )
           x.extraProfileDetails = ((x) => {
             x.contests = ((x) => {
               if (x instanceof Object) {
@@ -1910,7 +2136,10 @@ export namespace types {
                 x.last_updated = ((x: number) => new Date(x * 1000))(
                   x.last_updated,
                 );
-                if (x.original_finish_time)
+                if (
+                  typeof x.original_finish_time !== 'undefined' &&
+                  x.original_finish_time !== null
+                )
                   x.original_finish_time = ((x: number) => new Date(x * 1000))(
                     x.original_finish_time,
                   );
@@ -1925,7 +2154,10 @@ export namespace types {
                 return x;
               }
               return x.map((x) => {
-                if (x.finish_time)
+                if (
+                  typeof x.finish_time !== 'undefined' &&
+                  x.finish_time !== null
+                )
                   x.finish_time = ((x: number) => new Date(x * 1000))(
                     x.finish_time,
                   );
@@ -1940,11 +2172,17 @@ export namespace types {
                 return x;
               }
               return x.map((x) => {
-                if (x.assignation_time)
+                if (
+                  typeof x.assignation_time !== 'undefined' &&
+                  x.assignation_time !== null
+                )
                   x.assignation_time = ((x: number) => new Date(x * 1000))(
                     x.assignation_time,
                   );
-                if (x.first_assignation)
+                if (
+                  typeof x.first_assignation !== 'undefined' &&
+                  x.first_assignation !== null
+                )
                   x.first_assignation = ((x: number) => new Date(x * 1000))(
                     x.first_assignation,
                   );
@@ -1954,9 +2192,12 @@ export namespace types {
             return x;
           })(x.extraProfileDetails);
         x.profile = ((x) => {
-          if (x.birth_date)
+          if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
             x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-          if (x.graduation_date)
+          if (
+            typeof x.graduation_date !== 'undefined' &&
+            x.graduation_date !== null
+          )
             x.graduation_date = ((x: number) => new Date(x * 1000))(
               x.graduation_date,
             );
@@ -2050,23 +2291,23 @@ export namespace types {
     alias: string;
     description: string;
     name: string;
-  }
-
-  export interface ArenaCourseCurrentProblem {
-    alias: string;
-    title: string;
+    problemset_id: number;
   }
 
   export interface ArenaCourseDetails {
     alias: string;
+    assignments: types.CourseAssignment[];
+    languages?: string[];
     name: string;
   }
 
   export interface ArenaCoursePayload {
     assignment: types.ArenaCourseAssignment;
+    clarifications: types.Clarification[];
     course: types.ArenaCourseDetails;
-    currentProblem?: types.ArenaCourseCurrentProblem;
+    currentProblem?: types.ProblemDetails;
     problems: types.ArenaCourseProblem[];
+    runs: types.Run[];
     scoreboard?: types.Scoreboard;
   }
 
@@ -2342,7 +2583,6 @@ export namespace types {
 
   export interface CommonPayload {
     associatedIdentities: types.AssociatedIdentity[];
-    bootstrap4: boolean;
     currentEmail: string;
     currentName?: string;
     currentUsername: string;
@@ -2721,6 +2961,7 @@ export namespace types {
     has_runs: boolean;
     max_points: number;
     name: string;
+    opened: boolean;
     order: number;
     problemCount: number;
     problemset_id: number;
@@ -4059,11 +4300,7 @@ export namespace types {
 
   export interface SubmissionsListPayload {
     includeUser: boolean;
-    length: number;
-    page: number;
-    pagerItems: types.PageItem[];
     submissions: types.Submission[];
-    totalRows: number;
   }
 
   export interface Tag {

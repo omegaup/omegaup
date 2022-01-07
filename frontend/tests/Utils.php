@@ -71,13 +71,15 @@ class Utils {
         $run->contest_score = $points * $problemsetPoints;
         $run->status = 'ready';
         $run->judged_by = 'J1';
+        $submission->status = $run->status;
+        $submission->verdict = $run->verdict;
 
         if (!is_null($submitDelay)) {
             $submission->submit_delay = $submitDelay;
-            \OmegaUp\DAO\Submissions::update($submission);
             $run->penalty = $submitDelay;
         }
 
+        \OmegaUp\DAO\Submissions::update($submission);
         \OmegaUp\DAO\Runs::update($run);
 
         \OmegaUp\Grader::getInstance()->setGraderResourceForTesting(
@@ -313,7 +315,9 @@ class Utils {
     }
 
     private static function shellExec(string $command): void {
-        $log = \Logger::getLogger('\\OmegaUp\\Test\\Utils::shellExec()');
+        $log = \Monolog\Registry::omegaup()->withName(
+            '\\OmegaUp\\Test\\Utils::shellExec()'
+        );
         $log->info("========== Starting {$command}");
         $pipes = [];
         /** @psalm-suppress ForbiddenCode this only runs in tests. */

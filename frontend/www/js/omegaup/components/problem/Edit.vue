@@ -174,17 +174,10 @@
 
       <div v-if="showTab === 'admins'" class="tab-pane active">
         <omegaup-problem-admins
-          :initial-admins="initialAdmins"
-          :has-parent-component="true"
+          :admins="initialAdmins"
           :search-result-users="searchResultUsers"
-          @emit-add-admin="
-            (addAdminComponent) =>
-              $emit('add-admin', addAdminComponent.username)
-          "
-          @emit-remove-admin="
-            (addAdminComponent) =>
-              $emit('remove-admin', addAdminComponent.selected.username)
-          "
+          @add-admin="(username) => $emit('add-admin', username)"
+          @remove-admin="(username) => $emit('remove-admin', username)"
           @update-search-result-users="
             (query) => $emit('update-search-result-users', query)
           "
@@ -277,7 +270,7 @@ import problem_Form from './Form.vue';
 import problem_Tags from './Tags.vue';
 import problem_Versions from './Versions.vue';
 import problem_StatementEdit from './StatementEdit.vue';
-import problem_Admins from '../common/Admins.vue';
+import problem_Admins from '../common/Adminsv2.vue';
 import problem_GroupAdmins from '../common/GroupAdmins.vue';
 import T from '../../lang';
 import { types } from '../../api_types';

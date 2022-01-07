@@ -105,3 +105,7 @@ omegaup.db
 
 # Ignore backend stuff
 stuff/docker/go/*/
+
+# Ignore cypress media
+cypress/videos/*
+cypress/screenshots/*

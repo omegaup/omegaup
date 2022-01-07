@@ -8,6 +8,7 @@ type SetSettingsMessage = {
   params: {
     alias: string;
     settings: types.ProblemSettingsDistrib;
+    languages: string[];
   };
 };
 
@@ -143,11 +144,15 @@ Here we can add code.
     const settingsMessage = await postPromise;
     expect({
       method: settingsMessage.method,
-      params: { alias: settingsMessage.params.alias },
+      params: {
+        alias: settingsMessage.params.alias,
+        languages: settingsMessage.params.languages,
+      },
     }).toEqual({
       method: 'setSettings',
       params: {
         alias: newAlias,
+        languages: [],
       },
     });
 

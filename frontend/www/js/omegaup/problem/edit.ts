@@ -287,14 +287,14 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'update-search-result-users': (query: string) => {
-            api.User.list({ query })
+            api.User.list({ query, rowcount: 10 })
               .then(({ results }) => {
                 this.searchResultUsers = results.map(
-                  ({ key, value }: types.ListItem) => ({
+                  ({ key, value }: types.ListItem, index) => ({
                     key,
-                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                    value: `${String(index + 1).padStart(2, '0')}.- ${ui.escape(
                       value,
-                    )}</strong>)`,
+                    )} (<strong>${ui.escape(key)}</strong>)`,
                   }),
                 );
               })

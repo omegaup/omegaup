@@ -46,6 +46,9 @@ class MySQLConnection {
      */
     private static $_instance = null;
 
+    /** @var \Monolog\Logger|null */
+    private static $_typesLogger = null;
+
     /**
      * Returns the singleton instance of this class. It also registers a
      * shutdown function to flush any outstanding queries upon script
@@ -319,7 +322,7 @@ class MySQLConnection {
             $fieldTypes[] = "{$field->name}: " . self::PsalmType($field);
         }
         sort($fieldTypes);
-        \Logger::getLogger('mysqltypes')->info(
+        MySQLConnection::getTypesLogger()->info(
             "{$caller['file']}:{$caller['line']} array{" .
             join(', ', $fieldTypes) .
             '}'
@@ -328,10 +331,27 @@ class MySQLConnection {
 
     private function DumpMySQLQueryResultTypeSingleField(\mysqli_result $result): void {
         $caller = debug_backtrace()[1];
-        \Logger::getLogger('mysqltypes')->info(
+        MySQLConnection::getTypesLogger()->info(
             "{$caller['file']}:{$caller['line']} " .
             self::PsalmType($result->fetch_field_direct(0))
         );
+    }
+
+    private static function getTypesLogger(): \Monolog\Logger {
+        if (is_null(MySQLConnection::$_typesLogger)) {
+            MySQLConnection::$_typesLogger = new \Monolog\Logger('mysqltypes');
+            MySQLConnection::$_typesLogger->pushHandler(
+                (new \Monolog\Handler\StreamHandler(
+                    OMEGAUP_MYSQL_TYPES_LOG_FILE
+                ))->
+                    setFormatter(
+                        new \Monolog\Formatter\LineFormatter(
+                            "%message%\n"
+                        )
+                    )
+            );
+        }
+        return MySQLConnection::$_typesLogger;
     }
 
     /**
@@ -356,7 +376,11 @@ class MySQLConnection {
         }
         if ($result === false) {
             $errorMessage = "Failed to query MySQL ({$this->_connection->errno}): {$this->_connection->error}";
-            \Logger::getLogger('mysql')->debug($errorMessage);
+            \Monolog\Registry::omegaup()->withName(
+                'mysql'
+            )->debug(
+                $errorMessage
+            );
             throw new \OmegaUp\Exceptions\DatabaseOperationException(
                 $errorMessage,
                 intval($this->_connection->errno)

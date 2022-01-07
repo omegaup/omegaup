@@ -16,151 +16,378 @@
       </p>
     </div>
     <div class="card-body">
-      <form method="POST" class="form" enctype="multipart/form-data">
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label class="control-label">{{ T.wordsTitle }}</label>
-            <input
-              v-model="title"
-              required
-              name="title"
-              type="text"
-              class="form-control"
-              :class="{ 'is-invalid': errors.includes('title') }"
-              @blur="onGenerateAlias"
-            />
-          </div>
-
-          <div class="form-group col-md-6">
-            <label class="control-label">{{ T.wordsAlias }}</label>
-            <input
-              ref="alias"
-              v-model="alias"
-              required
-              name="problem_alias"
-              type="text"
-              class="form-control"
-              :class="{ 'is-invalid': errors.includes('problem_alias') }"
-              :disabled="isUpdate"
-            />
-          </div>
-        </div>
-
-        <omegaup-problem-settings
-          :errors="errors"
-          :time-limit="timeLimit"
-          :extra-wall-time="extraWallTime"
-          :memory-limit="memoryLimit"
-          :output-limit="outputLimit"
-          :input-limit="inputLimit"
-          :initial-validator="validator"
-          :overall-wall-time-limit="overallWallTimeLimit"
-          :validator-time-limit="validatorTimeLimit"
-          :valid-languages="data.validLanguages"
-          :validator-types="data.validatorTypes"
-          :languages.sync="languages"
-        ></omegaup-problem-settings>
-
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label>{{ T.problemEditEmailClarifications }}</label>
-            <div class="form-control">
-              <label class="radio-inline">
-                <input
-                  v-model="emailClarifications"
-                  type="radio"
-                  name="email_clarifications"
-                  :value="true"
-                />
-                {{ T.wordsYes }}
-              </label>
-              <label class="radio-inline">
-                <input
-                  v-model="emailClarifications"
-                  type="radio"
-                  name="email_clarifications"
-                  :value="false"
-                />
-                {{ T.wordsNo }}
-              </label>
+      <form ref="form" method="POST" class="form" enctype="multipart/form-data">
+        <div class="accordion mb-3">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="mb-0">
+                <button
+                  ref="basic-info"
+                  class="btn btn-link btn-block text-left"
+                  type="button"
+                  data-toggle="collapse"
+                  data-target=".basic-info"
+                  aria-expanded="true"
+                  aria-controls="problem-form-problem"
+                >
+                  {{ T.problemEditBasicInfo }}
+                </button>
+              </h2>
+            </div>
+            <div class="collapse show card-body basic-info">
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label class="control-label">{{ T.wordsTitle }}</label>
+                  <input
+                    v-model="title"
+                    required
+                    name="title"
+                    type="text"
+                    class="form-control"
+                    :class="{ 'is-invalid': errors.includes('title') }"
+                    @blur="onGenerateAlias"
+                  />
+                </div>
+                <div class="form-group col-md-6">
+                  <label class="control-label">{{ T.wordsAlias }}</label>
+                  <input
+                    ref="alias"
+                    v-model="alias"
+                    required
+                    name="problem_alias"
+                    type="text"
+                    class="form-control"
+                    :class="{
+                      'is-invalid': errors.includes('problem_alias'),
+                    }"
+                    :disabled="isUpdate"
+                  />
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label class="control-label">{{ T.problemEditSource }}</label>
+                  <input
+                    v-model="source"
+                    required
+                    name="source"
+                    type="text"
+                    class="form-control"
+                    :class="{ 'is-invalid': errors.includes('source') }"
+                  />
+                </div>
+                <div class="form-group col-md-6">
+                  <label class="control-label">{{
+                    T.problemEditFormFile
+                  }}</label>
+                  <a :href="howToWriteProblemLink" target="_blank">
+                    <span>{{ T.problemEditFormHowToWriteProblems }}</span>
+                  </a>
+                  <input
+                    :required="!isUpdate"
+                    name="problem_contents"
+                    type="file"
+                    class="form-control"
+                    :class="{
+                      'is-invalid': errors.includes('problem_contents'),
+                    }"
+                    @change="onUploadFile"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="form-group col-md-6">
-            <label>{{ T.problemEditFormAppearsAsPublic }}</label>
-            <div class="form-control">
-              <label class="radio-inline">
+          <template v-if="!isUpdate">
+            <div class="card">
+              <div class="card-header">
+                <h2 class="mb-0">
+                  <button
+                    ref="tags"
+                    class="btn btn-link btn-block text-left"
+                    type="button"
+                    data-toggle="collapse"
+                    data-target=".tags"
+                    aria-expanded="true"
+                    aria-controls="problem-form-problem"
+                  >
+                    {{ T.problemEditTags }}
+                  </button>
+                </h2>
+              </div>
+              <div class="collapse show card-body tags">
+                <div
+                  v-show="selectedTags.length === 0"
+                  class="alert alert-info"
+                >
+                  {{ T.problemEditTagPublicRequired }}
+                </div>
+                <omegaup-problem-tags
+                  :public-tags="data.publicTags"
+                  :level-tags="data.levelTags"
+                  :alias="data.alias"
+                  :is-create="true"
+                  :problem-level="problemLevel"
+                  :selected-private-tags="selectedPrivateTags"
+                  :selected-public-tags="selectedPublicTags"
+                  :can-add-new-tags="true"
+                  :errors="errors"
+                  @emit-add-tag="addTag"
+                  @emit-remove-tag="removeTag"
+                  @select-problem-level="selectProblemLevel"
+                ></omegaup-problem-tags>
                 <input
-                  v-model="isPublic"
-                  type="radio"
-                  name="visibility"
-                  :disabled="!isEditable"
-                  :value="true"
+                  name="selected_tags"
+                  :value="selectedTagsList"
+                  type="hidden"
                 />
-                {{ T.wordsYes }}
-              </label>
-              <label class="radio-inline">
                 <input
-                  v-model="isPublic"
-                  type="radio"
-                  name="visibility"
-                  :disabled="!isEditable"
-                  :value="false"
+                  name="problem_level"
+                  :value="problemLevel"
+                  type="hidden"
                 />
-                {{ T.wordsNo }}
-              </label>
+              </div>
+            </div>
+          </template>
+          <div class="card">
+            <div class="card-header">
+              <h2 class="mb-0">
+                <button
+                  ref="limits"
+                  class="btn btn-link btn-block text-left collapsed"
+                  type="button"
+                  data-toggle="collapse"
+                  data-target=".limits"
+                  aria-expanded="true"
+                  aria-controls="problem-form-problem"
+                >
+                  {{ T.problemEditLimits }}
+                </button>
+              </h2>
+            </div>
+            <div class="collapse card-body limits">
+              <omegaup-problem-settings
+                :errors="errors"
+                :time-limit="timeLimit"
+                :extra-wall-time="extraWallTime"
+                :memory-limit="memoryLimit"
+                :output-limit="outputLimit"
+                :input-limit="inputLimit"
+                :initial-validator="validator"
+                :overall-wall-time-limit="overallWallTimeLimit"
+                :validator-time-limit="validatorTimeLimit"
+              ></omegaup-problem-settings>
             </div>
           </div>
-        </div>
-
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label class="control-label">{{ T.problemEditSource }}</label>
-            <input
-              v-model="source"
-              required
-              name="source"
-              type="text"
-              class="form-control"
-              :class="{ 'is-invalid': errors.includes('source') }"
-            />
+          <div class="card">
+            <div class="card-header">
+              <h2 class="mb-0">
+                <button
+                  class="btn btn-link btn-block text-left collapsed"
+                  type="button"
+                  data-toggle="collapse"
+                  data-target=".validation"
+                  aria-expanded="true"
+                  aria-controls="problem-form-problem"
+                >
+                  {{ T.problemEditValidation }}
+                </button>
+              </h2>
+            </div>
+            <div class="collapse card-body validation">
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label>{{ T.problemEditFormLanguages }}</label>
+                  <select
+                    v-model="currentLanguages"
+                    name="languages"
+                    class="form-control"
+                    :class="{ 'is-invalid': errors.includes('languages') }"
+                    required
+                  >
+                    <option
+                      v-for="(languageText, languageName) in validLanguages"
+                      :key="languageName"
+                      :value="languageName"
+                    >
+                      {{ languageText }}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>{{ T.problemEditFormValidatorType }}</label>
+                  <select
+                    v-model="validator"
+                    name="validator"
+                    class="form-control"
+                    :class="{ 'is-invalid': errors.includes('validator') }"
+                    :disabled="currentLanguages === ''"
+                    required
+                  >
+                    <option
+                      v-for="(validatorText, validatorIndex) in validatorTypes"
+                      :key="validatorIndex"
+                      :value="validatorIndex"
+                    >
+                      {{ validatorText }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <div class="form-group col-md-6">
-            <label class="control-label">{{ T.problemEditFormFile }}</label>
-            <a :href="howToWriteProblemLink" target="_blank">
-              <span>{{ T.problemEditFormHowToWriteProblems }}</span>
-            </a>
-            <input
-              :required="!isUpdate"
-              name="problem_contents"
-              type="file"
-              class="form-control"
-              :class="{
-                'is-invalid': errors.includes('problem_contents'),
-              }"
-              @change="onUploadFile"
-            />
+          <div class="card">
+            <div class="card-header">
+              <h2 class="mb-0">
+                <button
+                  class="btn btn-link btn-block text-left collapsed"
+                  type="button"
+                  data-toggle="collapse"
+                  data-target=".access"
+                  aria-expanded="true"
+                  aria-controls="problem-form-problem"
+                >
+                  {{ T.problemEditAccess }}
+                </button>
+              </h2>
+            </div>
+            <div class="collapse card-body access">
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label>{{ T.problemEditEmailClarifications }}</label>
+                  <div class="form-control">
+                    <div class="form-check form-check-inline">
+                      <input
+                        v-model="emailClarifications"
+                        type="radio"
+                        name="email_clarifications"
+                        class="form-check-input"
+                        :value="true"
+                      />
+                      <label class="form-check-label">
+                        {{ T.wordsYes }}
+                      </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input
+                        v-model="emailClarifications"
+                        type="radio"
+                        name="email_clarifications"
+                        class="form-check-input"
+                        :value="false"
+                      />
+                      <label class="form-check-label">
+                        {{ T.wordsNo }}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>{{ T.problemEditFormAppearsAsPublic }}</label>
+                  <div class="form-control">
+                    <label class="form-check form-check-inline">
+                      <input
+                        v-model="isPublic"
+                        type="radio"
+                        name="visibility"
+                        class="form-check-input"
+                        :disabled="!isEditable"
+                        :value="true"
+                      />
+                      <span class="form-check-label">{{ T.wordsYes }}</span>
+                    </label>
+                    <label class="form-check form-check-inline">
+                      <input
+                        v-model="isPublic"
+                        type="radio"
+                        name="visibility"
+                        class="form-check-input"
+                        :disabled="!isEditable"
+                        :value="false"
+                      />
+                      <span class="form-check-label">{{ T.wordsNo }}</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+          <template v-if="!isUpdate">
+            <div class="card">
+              <div class="card-header">
+                <h2 class="mb-0">
+                  <button
+                    class="btn btn-link btn-block text-left collapsed"
+                    type="button"
+                    data-toggle="collapse"
+                    data-target=".evaluation"
+                    aria-expanded="true"
+                    aria-controls="problem-form-problem"
+                  >
+                    {{ T.problemEditEvaluation }}
+                  </button>
+                </h2>
+              </div>
+              <div class="collapse card-body evaluation">
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label>{{ T.wordsShowCasesDiff }}</label>
+                    <select
+                      v-model="showDiff"
+                      name="show_diff"
+                      class="form-control"
+                      :class="{ 'is-invalid': errors.includes('show_diff') }"
+                      :disabled="languages === ''"
+                    >
+                      <option value="none">
+                        {{ T.problemVersionDiffModeNone }}
+                      </option>
+                      <option value="examples">
+                        {{ T.wordsOnlyExamples }}
+                      </option>
+                      <option value="all">{{ T.wordsAll }}</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>{{ T.problemEditGroupScorePolicy }}</label>
+                    <select
+                      v-model="groupScorePolicy"
+                      name="group_score_policy"
+                      class="form-control"
+                      :class="{
+                        'is-invalid': errors.includes('group_score_policy'),
+                      }"
+                      :disabled="languages === ''"
+                    >
+                      <option value="sum-if-not-zero">
+                        {{ T.problemEditGroupScorePolicySumIfNotZero }}
+                      </option>
+                      <option value="min">
+                        {{ T.problemEditGroupScorePolicyMin }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
         </div>
-
-        <template v-if="!isUpdate">
-          <div class="row">
-            <div class="form-group col-md-6">
+        <template v-if="isUpdate">
+          <div class="mt-8 row">
+            <div class="form-group col-md-4">
               <label>{{ T.wordsShowCasesDiff }}</label>
               <select
                 v-model="showDiff"
                 name="show_diff"
                 class="form-control"
                 :class="{ 'is-invalid': errors.includes('show_diff') }"
-                :disabled="languages === ''"
               >
                 <option value="none">{{ T.problemVersionDiffModeNone }}</option>
                 <option value="examples">{{ T.wordsOnlyExamples }}</option>
                 <option value="all">{{ T.wordsAll }}</option>
               </select>
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
               <label>{{ T.problemEditGroupScorePolicy }}</label>
               <select
                 v-model="groupScorePolicy"
@@ -177,72 +404,21 @@
                 </option>
               </select>
             </div>
+            <div class="form-group col-md-4">
+              <label class="control-label">{{
+                T.problemEditCommitMessage
+              }}</label>
+              <input
+                v-model="message"
+                required
+                class="form-control"
+                :class="{ 'is-invalid': errors.includes('message') }"
+                name="message"
+                type="text"
+              />
+            </div>
           </div>
-
-          <omegaup-problem-tags
-            :public-tags="data.publicTags"
-            :level-tags="data.levelTags"
-            :alias="data.alias"
-            :is-create="true"
-            :problem-level="problemLevel"
-            :selected-private-tags="selectedPrivateTags"
-            :selected-public-tags="selectedPublicTags"
-            :can-add-new-tags="true"
-            :errors="errors"
-            @emit-add-tag="addTag"
-            @emit-remove-tag="removeTag"
-            @select-problem-level="selectProblemLevel"
-          ></omegaup-problem-tags>
-          <input name="selected_tags" :value="selectedTagsList" type="hidden" />
-          <input name="problem_level" :value="problemLevel" type="hidden" />
         </template>
-
-        <div v-else class="row">
-          <div class="form-group col-md-4">
-            <label>{{ T.wordsShowCasesDiff }}</label>
-            <select
-              v-model="showDiff"
-              name="show_diff"
-              class="form-control"
-              :class="{ 'is-invalid': errors.includes('show_diff') }"
-            >
-              <option value="none">{{ T.problemVersionDiffModeNone }}</option>
-              <option value="examples">{{ T.wordsOnlyExamples }}</option>
-              <option value="all">{{ T.wordsAll }}</option>
-            </select>
-          </div>
-          <div class="form-group col-md-4">
-            <label>{{ T.problemEditGroupScorePolicy }}</label>
-            <select
-              v-model="groupScorePolicy"
-              name="group_score_policy"
-              class="form-control"
-              :class="{ 'is-invalid': errors.includes('group_score_policy') }"
-              :disabled="languages === ''"
-            >
-              <option value="sum-if-not-zero">
-                {{ T.problemEditGroupScorePolicySumIfNotZero }}
-              </option>
-              <option value="min">
-                {{ T.problemEditGroupScorePolicyMin }}
-              </option>
-            </select>
-          </div>
-          <div class="form-group col-md-4">
-            <label class="control-label">{{
-              T.problemEditCommitMessage
-            }}</label>
-            <input
-              v-model="message"
-              required
-              class="form-control"
-              :class="{ 'is-invalid': errors.includes('message') }"
-              name="message"
-              type="text"
-            />
-          </div>
-        </div>
-
         <input
           v-if="isEditable"
           type="hidden"
@@ -250,7 +426,6 @@
           :value="visibility"
         />
         <input name="request" value="submit" type="hidden" />
-
         <div class="row">
           <div class="form-group col-md-6 no-bottom-margin">
             <button
@@ -259,6 +434,7 @@
               :title="
                 !problemLevel && !isUpdate ? T.selectProblemLevelDesc : ''
               "
+              @click="openCollapsedIfRequired()"
             >
               {{ buttonText }}
             </button>
@@ -270,7 +446,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import problem_Settings from './Settings.vue';
 import problem_Tags from './Tags.vue';
 import T from '../../lang';
@@ -288,6 +464,11 @@ export default class ProblemForm extends Vue {
   @Prop({ default: () => [] }) errors!: string[];
   @Prop({ default: false }) isUpdate!: boolean;
   @Prop({ default: 0 }) originalVisibility!: number;
+
+  @Ref('basic-info') basicInfoRef!: HTMLDivElement;
+  @Ref('tags') tagsRef!: HTMLDivElement;
+  @Ref('limits') limitsRef!: HTMLDivElement;
+  @Ref('form') formRef!: HTMLFormElement;
 
   T = T;
   title = this.data.title;
@@ -313,6 +494,9 @@ export default class ProblemForm extends Vue {
   message = '';
   hasFile = false;
   public = false;
+  validLanguages = this.data.validLanguages;
+  validatorTypes = this.data.validatorTypes;
+  currentLanguages = this.data.languages;
 
   get howToWriteProblemLink(): string {
     return 'https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup';
@@ -417,6 +601,55 @@ export default class ProblemForm extends Vue {
     generatedAlias = generatedAlias.substring(0, 32);
 
     this.alias = generatedAlias;
+  }
+
+  openCollapsedIfRequired() {
+    const formData = new FormData(this.formRef);
+
+    let basicInfoCollapsed = this.basicInfoRef.classList.contains('collapsed');
+    let limitsCollapsed = this.limitsRef.classList.contains('collapsed');
+    let tagsCollapsed = !this.isUpdate
+      ? this.tagsRef.classList.contains('collapsed')
+      : false;
+
+    for (const [key, value] of formData.entries()) {
+      const isEmpty = value === '';
+      if (isEmpty) {
+        if (
+          basicInfoCollapsed &&
+          (key === 'title' || key === 'alias' || key === 'source')
+        ) {
+          this.basicInfoRef.click();
+          basicInfoCollapsed = false;
+          continue;
+        }
+        // To avoid making a complex logic check
+        if (basicInfoCollapsed && !this.isUpdate && !this.hasFile) {
+          this.basicInfoRef.click();
+          basicInfoCollapsed = false;
+          continue;
+        }
+
+        if (tagsCollapsed && key === 'problem_level') {
+          this.tagsRef.click();
+          tagsCollapsed = false;
+          continue;
+        }
+        if (
+          limitsCollapsed &&
+          (key === 'time_limit' ||
+            key === 'overall_wall_time_limit' ||
+            key === 'extra_wall_time' ||
+            key === 'memory_limit' ||
+            key === 'output_limit' ||
+            key === 'input_limit')
+        ) {
+          this.limitsRef.click();
+          limitsCollapsed = false;
+          continue;
+        }
+      }
+    }
   }
 
   @Watch('alias')

@@ -238,11 +238,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         {
             $login = self::login($contestData['director']);
             $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
-                /*$owner=*/                null,
-                /*$name=*/null,
-                /*$description=*/null,
-                /*$alias=*/null,
-                $login
+                login: $login
             );
             \OmegaUp\Test\Factories\Groups::addUserToGroup(
                 $groupData,
@@ -761,7 +757,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                     'auth_token' => $login->auth_token,
                     'contest_alias' => $contestData['request']['alias'],
                 ])
-            )['smartyProperties']['payload']['contestReport'];
+            )['templateProperties']['payload']['contestReport'];
             unset($login);
 
             foreach ($identities as $contestant) {
@@ -911,7 +907,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
             // Create a mock that stores the file name-contents mapping into an associative array.
             $files = [];
-            include_once 'libs/third_party/ZipStream.php';
+            include_once __DIR__ . '/../../server/libs/third_party/ZipStream.php';
             $zip = $this->createMock(ZipStream::class);
             $zip->method('add_file')
                 ->will($this->returnCallback(function (
@@ -968,7 +964,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEquals([
             'alias' => $teamGroup->alias,
@@ -988,7 +984,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEquals([
             'alias' => $otherTeamGroup->alias,
@@ -1061,8 +1057,8 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
-                    /*$password=*/ null,
-                    /*$forTeams=*/ true
+                    password: null,
+                    forTeams: true
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -1171,7 +1167,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'alias' => $contestData['request']['alias'],
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
         $problems = $response['payload']['problems'];
 
         $this->assertTrue($response['hideFooterAndHeader']);

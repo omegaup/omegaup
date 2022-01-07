@@ -324,6 +324,11 @@ def create_problem(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
                  'a[data-nav-problems-create]'))).click()
+    driver.screenshot()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'button[data-target=".access"]'))
+    ).click()
 
     with assert_js_errors(
             driver,
@@ -337,12 +342,7 @@ def create_problem(
             EC.visibility_of_element_located(
                 (By.XPATH,
                  '//input[@name = "title"]'))).send_keys(problem_alias)
-    input_limit = driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//input[@name = "input_limit"]')))
-    input_limit.clear()
-    input_limit.send_keys('1024')
+
     # Alias should be set automatically
     driver.browser.find_element_by_name('source').send_keys('test')
 
@@ -368,6 +368,7 @@ def create_problem(
             )
         )
     ).select_by_value('problemLevelBasicKarel')
+    driver.screenshot()
     contents_element = driver.browser.find_element_by_name(
         'problem_contents')
     contents_element.send_keys(os.path.join(OMEGAUP_ROOT, resource_path))

@@ -132,25 +132,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         $sql = '
         SELECT
             IFNULL(i.username, "") AS `username`,
-            IFNULL(
-                (
-                    SELECT urc.classname
-                    FROM User_Rank_Cutoffs urc
-                    WHERE
-                        urc.score <= (
-                            SELECT
-                                ur.score
-                            FROM
-                                User_Rank ur
-                            WHERE
-                                ur.user_id = i.user_id
-                        )
-                    ORDER BY
-                        urc.percentile ASC
-                    LIMIT 1
-                ),
-                "user-rank-unranked"
-            ) AS classname,
+            IFNULL(ur.classname, "user-rank-unranked") AS classname,
             IFNULL(
                 (
                     SELECT
@@ -207,6 +189,8 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             Identities_Schools isc ON isc.school_id = sc.school_id
         INNER JOIN
             Identities i ON i.current_identity_school_id = isc.identity_school_id
+        LEFT JOIN
+            User_Rank ur ON ur.user_id = i.user_id
         WHERE
             sc.school_id = ?;';
 

@@ -5,6 +5,7 @@
         <label class="font-weight-bold">{{ T.wordsPublicTags }}</label>
         <vue-typeahead-bootstrap
           v-if="canAddNewTags"
+          data-tags-input
           :data="publicTags"
           :serializer="publicTagsSerializer"
           :auto-close="true"
@@ -115,7 +116,11 @@
             name="problem-level"
             @change="onSelectProblemLevel"
           >
-            <option v-for="levelTag in levelTags" :value="levelTag">
+            <option
+              v-for="levelTag in levelTags"
+              :key="levelTag"
+              :value="levelTag"
+            >
               {{ T[levelTag] }}
             </option>
           </select>

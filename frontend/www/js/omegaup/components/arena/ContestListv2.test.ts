@@ -245,7 +245,6 @@ describe('ContestListv2.vue', () => {
     wrapper.vm.loadMoreContests();
 
     expect(wrapper.emitted('get-chunk')).toBeTruthy();
-    expect(wrapper.vm.currentPageSize).toBe(20);
     expect(wrapper.vm.contestList.map((contest) => contest.alias)).toEqual([
       'Contest-1',
       'Contest-3',

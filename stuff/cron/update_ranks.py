@@ -9,8 +9,8 @@ import os
 import sys
 from typing import Sequence, NamedTuple
 
-import MySQLdb
-import MySQLdb.cursors
+import mysql.connector
+import mysql.connector.cursor
 
 sys.path.insert(
     0,
@@ -36,7 +36,9 @@ def _parse_date(s: str) -> datetime.date:
     return today.replace(day=1)
 
 
-def update_problem_accepted_stats(cur: MySQLdb.cursors.BaseCursor) -> None:
+def update_problem_accepted_stats(
+        cur: mysql.connector.cursor.MySQLCursorDict,
+) -> None:
     '''Updates the problem accepted stats'''
 
     logging.info('Updating accepted stats for problems...')
@@ -57,10 +59,6 @@ def update_problem_accepted_stats(cur: MySQLdb.cursors.BaseCursor) -> None:
                     `Identities` AS `i`
                 ON
                     `i`.`identity_id` = `s`.`identity_id`
-                INNER JOIN
-                    `Users` AS `u`
-                ON
-                    `u`.`user_id` = `i`.`user_id`
                 WHERE
                     `s`.`problem_id` = `p`.`problem_id` AND `r`.verdict = 'AC'
                     AND NOT EXISTS (
@@ -70,7 +68,7 @@ def update_problem_accepted_stats(cur: MySQLdb.cursors.BaseCursor) -> None:
                             `Problems_Forfeited` AS `pf`
                         WHERE
                             `pf`.`problem_id` = `p`.`problem_id` AND
-                            `pf`.`user_id` = `u`.`user_id`
+                            `pf`.`user_id` = `i`.`user_id`
                     )
                     AND NOT EXISTS (
                         SELECT
@@ -79,13 +77,15 @@ def update_problem_accepted_stats(cur: MySQLdb.cursors.BaseCursor) -> None:
                             `ACLs` AS `a`
                         WHERE
                             `a`.`acl_id` = `p`.`acl_id` AND
-                            `a`.`owner_id` = `u`.`user_id`
+                            `a`.`owner_id` = `i`.`user_id`
                     )
             );
     ''')
 
 
-def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
+def update_user_rank(
+        cur: mysql.connector.cursor.MySQLCursorDict,
+) -> Sequence[float]:
     '''Updates the user ranking.'''
 
     cur.execute('DELETE FROM `User_Rank`;')
@@ -164,7 +164,7 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
     # MySQL has no good way of obtaining percentiles, so we'll store the sorted
     # list of scores in order to calculate the cutoff scores later.
     scores = []
-    for index, row in enumerate(cur):
+    for index, row in enumerate(cur.fetchall()):
         if row['score'] != prev_score:
             rank = index + 1
         scores.append(row['score'])
@@ -182,7 +182,7 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
     return scores
 
 
-def update_author_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
+def update_author_rank(cur: mysql.connector.cursor.MySQLCursorDict) -> None:
     '''Updates the author's ranking'''
     logging.info('Updating authors ranking...')
     cur.execute('''
@@ -216,7 +216,7 @@ def update_author_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
 
     prev_score = None
     rank = 0
-    for index, row in enumerate(cur):
+    for index, row in enumerate(cur.fetchall()):
         if row['author_score'] != prev_score:
             rank = index + 1
         prev_score = row['author_score']
@@ -235,7 +235,7 @@ def update_author_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
                      row['school_id'], rank, row['author_score']))
 
 
-def update_user_rank_cutoffs(cur: MySQLdb.cursors.BaseCursor,
+def update_user_rank_cutoffs(cur: mysql.connector.cursor.MySQLCursorDict,
                              scores: Sequence[float]) -> None:
     '''Updates the user ranking cutoff table.'''
 
@@ -262,7 +262,38 @@ def update_user_rank_cutoffs(cur: MySQLdb.cursors.BaseCursor,
                      cutoff.percentile, cutoff.classname))
 
 
-def update_schools_solved_problems(cur: MySQLdb.cursors.BaseCursor) -> None:
+def update_user_rank_classname(
+        cur: mysql.connector.cursor.MySQLCursorDict
+) -> None:
+    '''Updates the user ranking classname.
+
+    This requires having updated both user scores and rank cutoffs.'''
+    cur.execute('''
+    UPDATE User_Rank ur
+    SET classname = (
+        SELECT
+                IFNULL(
+                    (
+                        SELECT
+                            urc.classname
+                        FROM
+                            User_Rank_Cutoffs urc
+                        WHERE
+                            urc.score <= ur.score
+                        ORDER BY
+                            urc.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    'user-rank-unranked'
+                )
+        );
+    ''')
+
+
+def update_schools_solved_problems(
+        cur: mysql.connector.cursor.MySQLCursorDict,
+) -> None:
     '''Updates the solved problems count by each school the last 6 months'''
 
     logging.info('Updating schools solved problems...')
@@ -282,7 +313,7 @@ def update_schools_solved_problems(cur: MySQLdb.cursors.BaseCursor) -> None:
                 CONCAT (
                     YEAR(`su`.`time`), '-', MONTH(`su`.`time`), '-01'
                 ),
-                "%%Y-%%m-%%d"
+                "%Y-%m-%d"
             ) AS `time`,
             COUNT(DISTINCT `su`.`problem_id`) AS `problems_solved`
         FROM
@@ -294,7 +325,7 @@ def update_schools_solved_problems(cur: MySQLdb.cursors.BaseCursor) -> None:
         INNER JOIN
             `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
         WHERE
-            `su`.`time` >= CURDATE() - INTERVAL %s MONTH
+            `su`.`time` >= CURDATE() - INTERVAL %(months)s MONTH
             AND `r`.`verdict` = "AC" AND `p`.`visibility` >= 1
             AND NOT EXISTS (
                 SELECT
@@ -314,10 +345,10 @@ def update_schools_solved_problems(cur: MySQLdb.cursors.BaseCursor) -> None:
             `time`
         ORDER BY
             `time` ASC;
-    ''', (months,))
+    ''', {'months': months})
 
 
-def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
+def update_school_rank(cur: mysql.connector.cursor.MySQLCursorDict) -> None:
     '''Updates the school rank'''
 
     logging.info('Updating school rank...')
@@ -358,7 +389,7 @@ def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
     prev_score = None
     rank = 0
 
-    for index, row in enumerate(cur):
+    for index, row in enumerate(cur.fetchall()):
         if row['score'] != prev_score:
             rank = index + 1
         prev_score = row['score']
@@ -375,7 +406,7 @@ def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
 
 
 def update_school_of_the_month_candidates(
-        cur: MySQLdb.cursors.BaseCursor,
+        cur: mysql.connector.cursor.MySQLCursorDict,
         first_day_of_current_month: datetime.date) -> None:
     '''Updates the list of candidates to school of the current month'''
 
@@ -403,7 +434,7 @@ def update_school_of_the_month_candidates(
                 ''',
                 (first_day_of_next_month,))
 
-    for row in cur:
+    for row in cur.fetchall():
         if row['count'] > 0:
             logging.info('Skipping because already exist selected schools.')
             return
@@ -485,7 +516,7 @@ def update_school_of_the_month_candidates(
             first_day_of_next_month
         ))
 
-    for index, row in enumerate(cur):
+    for index, row in enumerate(cur.fetchall()):
         cur.execute('''
                     INSERT INTO
                         `School_Of_The_Month` (
@@ -510,7 +541,7 @@ def update_school_of_the_month_candidates(
 
 
 def update_coder_of_the_month_candidates(
-        cur: MySQLdb.cursors.BaseCursor,
+        cur: mysql.connector.cursor.MySQLCursorDict,
         first_day_of_current_month: datetime.date,
         category: str) -> None:
     '''Updates the list of candidates to coder of the current month'''
@@ -527,7 +558,7 @@ def update_coder_of_the_month_candidates(
             first_day_of_current_month.month + 1,
             1)
 
-    # First make sure there are not already selected coder of the month
+        # First make sure there are not already selected coder of the month
         cur.execute('''
                 SELECT
                     COUNT(*) AS `count`
@@ -538,10 +569,10 @@ def update_coder_of_the_month_candidates(
                     `selected_by` IS NOT NULL AND
                     `category` = %s;
                 ''', (first_day_of_next_month, category))
-    for row in cur:
-        if row['count'] > 0:
-            logging.info('Skipping because already exist selected coder')
-            return
+        for row in cur.fetchall():
+            if row['count'] > 0:
+                logging.info('Skipping because already exist selected coder')
+                return
     cur.execute('''
                 DELETE FROM
                     `Coder_Of_The_Month`
@@ -646,7 +677,7 @@ def update_coder_of_the_month_candidates(
             first_day_of_next_month,
         ))
 
-    for index, row in enumerate(cur):
+    for index, row in enumerate(cur.fetchall()):
         cur.execute('''
                     INSERT INTO
                         `Coder_Of_The_Month` (
@@ -680,8 +711,8 @@ def update_coder_of_the_month_candidates(
 
 
 def update_users_stats(
-        cur: MySQLdb.cursors.BaseCursor,
-        dbconn: MySQLdb.connections.Connection,
+        cur: mysql.connector.cursor.MySQLCursorDict,
+        dbconn: mysql.connector.MySQLConnection,
         date: datetime.date) -> None:
     '''Updates all the information and ranks related to users'''
     logging.info('Updating users stats...')
@@ -689,6 +720,7 @@ def update_users_stats(
         try:
             scores = update_user_rank(cur)
             update_user_rank_cutoffs(cur, scores)
+            update_user_rank_classname(cur)
         except:  # noqa: bare-except
             logging.exception('Failed to update user ranking')
             raise
@@ -723,8 +755,8 @@ def update_users_stats(
 
 
 def update_schools_stats(
-        cur: MySQLdb.cursors.BaseCursor,
-        dbconn: MySQLdb.connections.Connection,
+        cur: mysql.connector.cursor.MySQLCursorDict,
+        dbconn: mysql.connector.MySQLConnection,
         date: datetime.date) -> None:
     '''Updates all the information and ranks related to schools'''
     logging.info('Updating schools stats...')
@@ -772,12 +804,12 @@ def main() -> None:
     logging.info('Started')
     dbconn = lib.db.connect(args)
     try:
-        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
+        with dbconn.cursor(buffered=True, dictionary=True) as cur:
             update_problem_accepted_stats(cur)
-            update_users_stats(cur, dbconn, args.date)
-            update_schools_stats(cur, dbconn, args.date)
+            update_users_stats(cur, dbconn.conn, args.date)
+            update_schools_stats(cur, dbconn.conn, args.date)
     finally:
-        dbconn.close()
+        dbconn.conn.close()
         logging.info('Done')
 
 
