@@ -49,6 +49,29 @@
               }}</b-nav-item
             >
           </b-nav>
+          <hr />
+          <div>
+            <b-button
+              v-if="previousAssignment"
+              block
+              variant="info"
+              :href="`/course/${encodeURIComponent(
+                course.alias,
+              )}/arena/${encodeURIComponent(previousAssignment.alias)}/`"
+              ><b-icon-arrow-left-circle-fill></b-icon-arrow-left-circle-fill>
+              {{ previousAssignment.name }}
+            </b-button>
+            <b-button
+              v-if="nextAssignment"
+              block
+              variant="info"
+              :href="`/course/${encodeURIComponent(
+                course.alias,
+              )}/arena/${encodeURIComponent(nextAssignment.alias)}/`"
+              >{{ nextAssignment.name }}
+              <b-icon-arrow-right-circle-fill></b-icon-arrow-right-circle-fill>
+            </b-button>
+          </div>
         </b-card-header>
       </b-card>
 
@@ -97,7 +120,12 @@ import omegaup_Markdown from '../Markdown.vue';
 import arena_Scoreboard from './Scoreboard.vue';
 import problem_Details from '../problem/Detailsv2.vue';
 
-import { BIconChevronLeft, BootstrapVue } from 'bootstrap-vue';
+import {
+  BIconChevronLeft,
+  BIconArrowLeftCircleFill,
+  BIconArrowRightCircleFill,
+  BootstrapVue,
+} from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 Vue.use(BootstrapVue);
@@ -110,6 +138,8 @@ export enum Tabs {
 @Component({
   components: {
     BIconChevronLeft,
+    BIconArrowLeftCircleFill,
+    BIconArrowRightCircleFill,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-arena-scoreboard': arena_Scoreboard,
     'omegaup-problem-details': problem_Details,
@@ -130,6 +160,26 @@ export default class ArenaCourse extends Vue {
   ui = ui;
   Tabs = Tabs;
   currentSelectedTab: string | null = this.selectedTab;
+
+  private get currentAssignmentIndex(): number {
+    return this.course.assignments.findIndex(
+      (assignment) => assignment.alias === this.assignment.alias,
+    );
+  }
+
+  get previousAssignment(): types.CourseAssignment | null {
+    if (this.currentAssignmentIndex === 0) {
+      return null;
+    }
+    return this.course.assignments[this.currentAssignmentIndex - 1];
+  }
+
+  get nextAssignment(): types.CourseAssignment | null {
+    if (this.currentAssignmentIndex === this.course.assignments.length - 1) {
+      return null;
+    }
+    return this.course.assignments[this.currentAssignmentIndex + 1];
+  }
 
   @Watch('selectedTab')
   onSelectedTabChanged(newValue: string | null) {
