@@ -46,8 +46,8 @@ describe('Coursev2.vue', () => {
   };
   const assignment: types.ArenaCourseAssignment = {
     alias: 'test-assignment-A',
-    name: 'Test Assignment A',
     description: 'Test assignment description',
+    name: 'Test Assignment A',
     problemset_id: 1,
   };
   const problems: types.ArenaCourseProblem[] = [
@@ -126,6 +126,34 @@ describe('Coursev2.vue', () => {
       verdict: 'AC',
     },
   ];
+
+  it('Should show the assignment navigation buttons', () => {
+    let wrapper = shallowMount(arena_Course, {
+      propsData: {
+        allRuns: runs,
+        course,
+        assignment,
+        problems,
+        currentProblem: null,
+        scoreboard,
+        userRuns: runs,
+      },
+    });
+    expect(wrapper.text()).toContain(course.assignments[1].name);
+
+    wrapper = shallowMount(arena_Course, {
+      propsData: {
+        allRuns: runs,
+        course,
+        assignment: course.assignments[1],
+        problems,
+        currentProblem: null,
+        scoreboard,
+        userRuns: runs,
+      },
+    });
+    expect(wrapper.text()).toContain(course.assignments[0].name);
+  });
 
   it('Should show the course summary', () => {
     const wrapper = shallowMount(arena_Course, {
