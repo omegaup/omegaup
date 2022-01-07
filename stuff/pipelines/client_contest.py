@@ -14,7 +14,7 @@ import mysql.connector
 import mysql.connector.cursor
 from mysql.connector import errorcode
 import pika
-from verification_code import generate_code
+from verification_code import generate_code, regenerate_code
 import rabbitmq_connection
 
 sys.path.insert(
@@ -72,6 +72,7 @@ def certificate_contests_receive_messages(
                     and user['place'] <= data['certificate_cutoff']):
                 contest_place = user['place']
             verification_code = generate_code()
+            print(verification_code)
             certificates.append(Certificate(
                 certificate_type='contest',
                 contest_id=int(data['contest_id']),
@@ -111,10 +112,11 @@ def certificate_contests_receive_messages(
                 if err.errno != errorcode.ER_DUP_ENTRY:
                     raise
                 for certificate in certificates:
-                    certificate.verification_code = generate_code()
+                    certificate.verification_code = regenerate_code()
                 logging.exception(
                     'At least one of the verification codes had a conflict'
                 )
+        channel.close()
     channel.basic_consume(
         queue='contest',
         on_message_callback=certificate_contests_callback,
@@ -123,13 +125,6 @@ def certificate_contests_receive_messages(
         channel.start_consuming()
     except KeyboardInterrupt:
         channel.stop_consuming()
-
-
-def close_channel(
-        channel: pika.adapters.blocking_connection.BlockingChannel
-) -> None:
-    ''' Function to close channel '''
-    channel.close()
 
 
 def main() -> None:
@@ -159,7 +154,6 @@ def main() -> None:
                                                   args.url)
     finally:
         dbconn.conn.close()
-        close_channel(channel)
         logging.info('Done')
 
 

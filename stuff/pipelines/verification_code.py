@@ -34,3 +34,19 @@ def generate_code(generated_code: Optional[List[int]] = None) -> str:
         checksum += i * xdigit
     generated_code.append(checksum % 20)
     return ''.join(_ALPHABET[digit] for digit in generated_code)
+
+
+def regenerate_code() -> str:
+    '''Function to create a 10-digit verification code.
+
+    To create a 10-digit code, the alphabet "23456789CFGHJMPQRVWX" is used.
+    A digit is added at the end which serves as a checksum to easily
+    distinguish badly copied codes using the Noid Check Digit
+    Algorithm (NCDA).
+    '''
+    generated_code = random.choices(range(len(_ALPHABET)), k=9)
+    checksum = 0
+    for i, xdigit in enumerate(generated_code, start=1):
+        checksum += i * xdigit
+    generated_code.append(checksum % 20)
+    return ''.join(_ALPHABET[digit] for digit in generated_code)
