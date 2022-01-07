@@ -1,16 +1,16 @@
-export interface LoginInfo {
+export interface LoginOptions {
   username: string;
   password: string;
 }
 
-export interface ProblemInfo {
+export interface ProblemOptions {
   problemAlias: string;
   tag: string;
   autoCompleteTextTag: string;
   problemLevelIndex: number;
 }
 
-export interface CourseInfo {
+export interface CourseOptions {
   courseAlias: string;
   showScoreboard?: boolean;
   startDate?: Date;

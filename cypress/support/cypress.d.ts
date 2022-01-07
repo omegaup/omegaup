@@ -1,6 +1,6 @@
 // <reference types="cypress"/>
 
-import { CourseInfo, LoginInfo, ProblemInfo } from './types';
+import { CourseOptions, LoginOptions, ProblemOptions } from './types';
 
 declare global {
   namespace Cypress {
@@ -10,10 +10,10 @@ declare global {
     }
 
     interface Chainable {
-      login(loginInfo: LoginInfo): void;
-      register(loginInfo: LoginInfo): void;
-      createProblem(problemInfo: ProblemInfo): void;
-      createCourse(courseInfo: CourseInfo): void;
+      login(loginOptions: LoginOptions): void;
+      register(loginOptions: LoginOptions): void;
+      createProblem(problemOptions: ProblemOptions): void;
+      createCourse(courseOptions: CourseOptions): void;
     }
   }
 }

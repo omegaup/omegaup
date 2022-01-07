@@ -77,13 +77,13 @@ Cypress.Commands.add(
     cy.get('[name="show-scoreboard"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
       .eq(showScoreboard ? 0 : 1)
       .click();
-    cy.get('[name="start-date"]').type(parseDateToCypressString(startDate));
+    cy.get('[name="start-date"]').type(getISODate(startDate));
     cy.get('[name="unlimited-duration"]')
       .eq(unlimitedDuration ? 0 : 1)
       .click();
     // only if unlimited duration is false we should change the end date
     if (!unlimitedDuration) {
-      cy.get('[name="end-date"]').type(parseDateToCypressString(endDate));
+      cy.get('[name="end-date"]').type(getISODate(endDate));
     } else {
       // the end date input should be disabled
       cy.get('[name="end-date"]').should('be.disabled');
@@ -102,6 +102,11 @@ Cypress.Commands.add(
   },
 );
 
-export const parseDateToCypressString = (date: Date) => {
+/**
+ *
+ * @param date Date object to convert
+ * @returns ISO date required to type on a date input inside cypress
+ */
+export const getISODate = (date: Date) => {
   return date.toISOString().split('T')[0];
 };

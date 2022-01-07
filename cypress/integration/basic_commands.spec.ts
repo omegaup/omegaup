@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
-import { parseDateToCypressString } from '../support/commands';
+import { getISODate } from '../support/commands';
+import { CourseOptions, LoginOptions, ProblemOptions } from '../support/types';
 
 describe('Basic Commands Test', () => {
   beforeEach(() => {
@@ -9,136 +10,149 @@ describe('Basic Commands Test', () => {
   });
 
   it('Should create a course with unlimited duration', () => {
-    const username = uuid();
-    const password = uuid();
+    const loginOptions: LoginOptions = {
+      username: uuid(),
+      password: uuid(),
+    };
 
-    const courseAlias = uuid().slice(0, 10);
-    const showScoreboard = true;
-    const startDate = new Date(2022, 2, 2);
-    const unlimitedDuration = true;
-    const school = 'omegaup';
-    const basicInformation = false;
-    const requestParticipantInformation: 'no' | 'optional' | 'required' =
-      'optional';
-    const problemLevel: 'introductory' | 'intermediate' | 'advanced' =
-      'intermediate';
-    const objective = 'This is the objective';
-    const description = 'This is the description';
+    const courseOptions: CourseOptions = {
+      courseAlias: uuid().slice(0, 10),
+      showScoreboard: true,
+      startDate: new Date(2022, 2, 2),
+      unlimitedDuration: true,
+      school: 'omegaup',
+      basicInformation: false,
+      requestParticipantInformation: 'optional',
+      problemLevel: 'intermediate',
+      objective: 'This is the objective',
+      description: 'This is the description',
+    };
 
-    cy.register({ username, password });
-    cy.createCourse({
-      courseAlias,
-      showScoreboard,
-      startDate,
-      unlimitedDuration,
-      school,
-      basicInformation,
-      requestParticipantInformation,
-      problemLevel,
-      objective,
-      description,
-    });
+    cy.register(loginOptions);
+    cy.createCourse(courseOptions);
 
     // Assert
-    cy.location('href').should('include', courseAlias); // Url
-    cy.get('[data-course-name]').contains(courseAlias);
+    cy.location('href').should('include', courseOptions.courseAlias); // Url
+    cy.get('[data-course-name]').contains(courseOptions.courseAlias);
     cy.get('[data-tab-course').click();
-    cy.get('[data-course-new-name]').should('have.value', courseAlias);
-    cy.get('[data-course-new-alias]').should('have.value', courseAlias);
+    cy.get('[data-course-new-name]').should(
+      'have.value',
+      courseOptions.courseAlias,
+    );
+    cy.get('[data-course-new-alias]').should(
+      'have.value',
+      courseOptions.courseAlias,
+    );
     cy.get('[name="show-scoreboard"]')
-      .eq(showScoreboard ? 0 : 1)
+      .eq(courseOptions.showScoreboard ? 0 : 1)
       .should('be.checked');
     cy.get('[name="start-date"]').should(
       'have.value',
-      parseDateToCypressString(startDate),
+      getISODate(courseOptions.startDate ?? new Date()),
     );
     cy.get('[name="unlimited-duration"]')
-      .eq(unlimitedDuration ? 0 : 1)
+      .eq(courseOptions.unlimitedDuration ? 0 : 1)
       .should('be.checked');
-    cy.get('.tt-input').first().should('have.value', school);
+    cy.get('.tt-input').first().should('have.value', courseOptions.school);
     cy.get('[name="basic-information"]')
-      .eq(basicInformation ? 0 : 1)
+      .eq(courseOptions.basicInformation ? 0 : 1)
       .should('be.checked');
     cy.get('[data-course-participant-information]').should(
       'have.value',
-      requestParticipantInformation,
+      courseOptions.requestParticipantInformation,
     );
-    cy.get('[data-course-problem-level]').should('have.value', problemLevel);
-    cy.get('[data-course-objective]').should('have.value', objective);
-    cy.get('[data-course-new-description]').should('have.value', description);
+    cy.get('[data-course-problem-level]').should(
+      'have.value',
+      courseOptions.problemLevel,
+    );
+    cy.get('[data-course-objective]').should(
+      'have.value',
+      courseOptions.objective,
+    );
+    cy.get('[data-course-new-description]').should(
+      'have.value',
+      courseOptions.description,
+    );
   });
 
   it('Should create a course with end date', () => {
-    const username = uuid();
-    const password = uuid();
+    const loginOptions: LoginOptions = {
+      username: uuid(),
+      password: uuid(),
+    };
 
-    const courseAlias = uuid().slice(0, 10);
-    const showScoreboard = true;
-    const startDate = new Date(2022, 2, 2);
-    const unlimitedDuration = false;
-    const endDate = new Date(2022, 3, 3);
-    const school = 'omegaup';
-    const basicInformation = false;
-    const requestParticipantInformation: 'no' | 'optional' | 'required' =
-      'optional';
-    const problemLevel: 'introductory' | 'intermediate' | 'advanced' =
-      'intermediate';
-    const objective = 'This is the objective';
-    const description = 'This is the description';
+    const courseOptions: CourseOptions = {
+      courseAlias: uuid().slice(0, 10),
+      showScoreboard: true,
+      startDate: new Date(2022, 2, 2),
+      unlimitedDuration: false,
+      endDate: new Date(2022, 3, 3),
+      school: 'omegaup',
+      basicInformation: false,
+      requestParticipantInformation: 'optional',
+      problemLevel: 'intermediate',
+      objective: 'This is the objective',
+      description: 'This is the description',
+    };
 
-    cy.register({ username, password });
-    cy.createCourse({
-      courseAlias,
-      showScoreboard,
-      startDate,
-      unlimitedDuration,
-      endDate,
-      school,
-      basicInformation,
-      requestParticipantInformation,
-      problemLevel,
-      objective,
-      description,
-    });
+    cy.register(loginOptions);
+    cy.createCourse(courseOptions);
 
     // Assert
-    cy.location('href').should('include', courseAlias); // Url
-    cy.get('[data-course-name]').contains(courseAlias);
+    cy.location('href').should('include', courseOptions.courseAlias); // Url
+    cy.get('[data-course-name]').contains(courseOptions.courseAlias);
     cy.get('[data-tab-course').click();
-    cy.get('[data-course-new-name]').should('have.value', courseAlias);
-    cy.get('[data-course-new-alias]').should('have.value', courseAlias);
+    cy.get('[data-course-new-name]').should(
+      'have.value',
+      courseOptions.courseAlias,
+    );
+    cy.get('[data-course-new-alias]').should(
+      'have.value',
+      courseOptions.courseAlias,
+    );
     cy.get('[name="show-scoreboard"]')
-      .eq(showScoreboard ? 0 : 1)
+      .eq(courseOptions.showScoreboard ? 0 : 1)
       .should('be.checked');
     cy.get('[name="start-date"]').should(
       'have.value',
-      parseDateToCypressString(startDate),
+      getISODate(courseOptions.startDate ?? new Date()),
     );
     cy.get('[name="unlimited-duration"]')
-      .eq(unlimitedDuration ? 0 : 1)
+      .eq(courseOptions.unlimitedDuration ? 0 : 1)
       .should('be.checked');
     cy.get('[name="end-date"]').should(
       'have.value',
-      parseDateToCypressString(endDate),
+      getISODate(courseOptions.endDate ?? new Date()),
     );
-    cy.get('.tt-input').first().should('have.value', school); //
+    cy.get('.tt-input').first().should('have.value', courseOptions.school); //
     cy.get('[name="basic-information"]')
-      .eq(basicInformation ? 0 : 1)
+      .eq(courseOptions.basicInformation ? 0 : 1)
       .should('be.checked');
     cy.get('[data-course-participant-information]').should(
       'have.value',
-      requestParticipantInformation,
+      courseOptions.requestParticipantInformation,
     );
-    cy.get('[data-course-problem-level]').should('have.value', problemLevel);
-    cy.get('[data-course-objective]').should('have.value', objective);
-    cy.get('[data-course-new-description]').should('have.value', description);
+    cy.get('[data-course-problem-level]').should(
+      'have.value',
+      courseOptions.problemLevel,
+    );
+    cy.get('[data-course-objective]').should(
+      'have.value',
+      courseOptions.objective,
+    );
+    cy.get('[data-course-new-description]').should(
+      'have.value',
+      courseOptions.description,
+    );
   });
 
   it('Should register a user using the API', () => {
-    const username = uuid();
-    const password = uuid();
-    cy.register({ username, password });
-    cy.get('header .username').should('have.text', username);
+    const loginOptions: LoginOptions = {
+      username: uuid(),
+      password: uuid(),
+    };
+    cy.register(loginOptions);
+    cy.get('header .username').should('have.text', loginOptions.username);
   });
 
   it('Should register a user', () => {
@@ -156,10 +170,12 @@ describe('Basic Commands Test', () => {
   });
 
   it('Should login a user using the API', () => {
-    const username = 'user';
-    const password = 'user';
-    cy.login({ username, password });
-    cy.get('header .username').should('have.text', username);
+    const loginOptions: LoginOptions = {
+      username: 'user',
+      password: 'user',
+    };
+    cy.login(loginOptions);
+    cy.get('header .username').should('have.text', loginOptions.username);
   });
 
   it('Should login a user', () => {
@@ -175,25 +191,28 @@ describe('Basic Commands Test', () => {
   });
 
   it('Should create a problem', () => {
-    const username = uuid();
-    const password = uuid();
-    const problemAlias = uuid().slice(0, 10); // Too large for the alias
-    const tag = 'Recursion';
-    const autoCompleteTextTag = 'recur';
-    const problemLevelIndex = 0;
+    const loginOptions: LoginOptions = {
+      username: uuid(),
+      password: uuid(),
+    };
 
-    cy.register({ username, password });
-    cy.createProblem({
-      problemAlias,
-      tag,
-      autoCompleteTextTag,
-      problemLevelIndex,
-    });
+    const problemOptions: ProblemOptions = {
+      problemAlias: uuid().slice(0, 10), // Too large for the alias,
+      tag: 'Recursion',
+      autoCompleteTextTag: 'recur',
+      problemLevelIndex: 0,
+    };
+
+    cy.register(loginOptions);
+    cy.createProblem(problemOptions);
 
     // Assert problem has been created
-    cy.location('href').should('include', problemAlias); // Url
-    cy.get('[name="title"]').should('have.value', problemAlias); // Title
-    cy.get('[name="problem_alias"]').should('have.value', problemAlias);
-    cy.get('[name="source"]').should('have.value', problemAlias);
+    cy.location('href').should('include', problemOptions.problemAlias); // Url
+    cy.get('[name="title"]').should('have.value', problemOptions.problemAlias); // Title
+    cy.get('[name="problem_alias"]').should(
+      'have.value',
+      problemOptions.problemAlias,
+    );
+    cy.get('[name="source"]').should('have.value', problemOptions.problemAlias);
   });
 });
