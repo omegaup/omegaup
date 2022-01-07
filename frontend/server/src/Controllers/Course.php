@@ -79,7 +79,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ArenaCourseDetails=array{alias: string, assignments: list<CourseAssignment>, name: string, languages: list<string>|null}
  * @psalm-type ArenaCourseAssignment=array{alias: string, name: string, description: string, problemset_id: int}
  * @psalm-type ArenaCourseProblem=array{alias: string, letter: string, title: string}
- * @psalm-type ArenaCoursePayload=array{course: ArenaCourseDetails, assignment: ArenaCourseAssignment, problems: list<ArenaCourseProblem>, currentProblem: null|ProblemDetails, runs: list<Run>, scoreboard: null|Scoreboard}
+ * @psalm-type ArenaCoursePayload=array{course: ArenaCourseDetails, assignment: ArenaCourseAssignment, clarifications: list<Clarification>, problems: list<ArenaCourseProblem>, currentProblem: null|ProblemDetails, runs: list<Run>, scoreboard: null|Scoreboard}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -4280,6 +4280,14 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'description' => strval($assignment->description),
                         'problemset_id' => intval($assignment->problemset_id),
                     ],
+                    'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
+                        contest: null,
+                        course: $course,
+                        isAdmin: $isAdmin,
+                        currentIdentity: $r->identity,
+                        offset: null,
+                        rowcount: 100,
+                    )['clarifications'],
                     'problems' => $problemsResponseArray,
                     'runs' => [],
                     'currentProblem' => null,
