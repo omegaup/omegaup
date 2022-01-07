@@ -121,6 +121,7 @@ export default class ArenaCourse extends Vue {
   @Prop() course!: types.ArenaCourseDetails;
   @Prop() currentProblem!: types.ProblemDetails;
   @Prop() problems!: types.ArenaCourseProblem[];
+  @Prop({ default: null }) problemSelectedTab!: string | null;
   @Prop() scoreboard!: types.Scoreboard;
   @Prop({ default: Tabs.Summary }) selectedTab!: string | null;
   @Prop() user!: types.UserInfoForProblem;
