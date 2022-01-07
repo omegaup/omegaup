@@ -4290,21 +4290,13 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @param list<array{country_id: string, email: null|string, rank?: int, time: string, user_id?: int, username: string}> $coders
+     * @param list<array{classname: string, country_id: string, email: null|string, rank?: int, time: string, user_id?: int, username: string}> $coders
      *
      * @return CoderOfTheMonthList
      */
     private static function processCodersList(array $coders): array {
         $response = [];
-        /** @var array{time: string, username: string, country_id: string, email: ?string} $coder */
         foreach ($coders as $coder) {
-            $userInfo = \OmegaUp\DAO\Users::FindByUsername($coder['username']);
-            if (is_null($userInfo)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-            }
-            $classname = \OmegaUp\DAO\Users::getRankingClassName(
-                $userInfo->user_id
-            );
             $hashEmail = md5($coder['email'] ?? '');
             $avatar = "https://secure.gravatar.com/avatar/{$hashEmail}?s=32";
             $response[] = [
@@ -4312,7 +4304,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'country_id' => $coder['country_id'],
                 'gravatar_32' => $avatar,
                 'date' => $coder['time'],
-                'classname' => $classname,
+                'classname' => $coder['classname'],
             ];
         }
         return $response;

@@ -2087,10 +2087,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r['usernameOrEmail']
         );
         if (
-            is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
+            !\OmegaUp\DAO\GroupsIdentities::existsByPK(
                 $course->group_id,
                 $resolvedIdentity->identity_id
-            ))
+            )
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseStudentNotInCourse'
@@ -2490,10 +2490,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         if (
-            is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
+            !\OmegaUp\DAO\GroupsIdentities::existsByPK(
                 $course->group_id,
                 $resolvedIdentity->identity_id
-            ))
+            )
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseStudentNotInCourse'
@@ -3502,10 +3502,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         if (
-            is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
+            !\OmegaUp\DAO\GroupsIdentities::existsByPK(
                 $course->group_id,
                 $resolvedIdentity->identity_id
-            ))
+            )
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseStudentNotInCourse'
