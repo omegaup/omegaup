@@ -103,6 +103,15 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ArenaCoursePayload {
       return ((x) => {
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
         x.course = ((x) => {
           x.assignments = ((x) => {
             if (!Array.isArray(x)) {
@@ -2294,6 +2303,7 @@ export namespace types {
 
   export interface ArenaCoursePayload {
     assignment: types.ArenaCourseAssignment;
+    clarifications: types.Clarification[];
     course: types.ArenaCourseDetails;
     currentProblem?: types.ProblemDetails;
     problems: types.ArenaCourseProblem[];
