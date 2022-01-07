@@ -30,6 +30,7 @@ OmegaUp.on('ready', async () => {
     render: function (createElement) {
       return createElement('omegaup-arena-course', {
         props: {
+          allRuns: runsStore.state.runs,
           assignment: payload.assignment,
           course: payload.course,
           currentProblem: payload.currentProblem,
@@ -38,7 +39,6 @@ OmegaUp.on('ready', async () => {
           problemSelectedTab: this.problemSelectedTab,
           scoreboard: payload.scoreboard,
           userRuns: myRunsStore.state.runs,
-          allRuns: runsStore.state.runs,
           user: {
             admin: commonPayload.isAdmin,
             loggedIn: commonPayload.isLoggedIn,
