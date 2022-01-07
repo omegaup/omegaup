@@ -69,7 +69,9 @@ a {
   }
 }
 
-a[role='button'] {
+a[role='button'],
+a.btn.btn-primary,
+a.btn.btn-info {
   color: $omegaup-white;
 }
 

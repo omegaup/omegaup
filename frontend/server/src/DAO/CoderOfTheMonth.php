@@ -50,7 +50,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
     /**
      * Get all first coders of the month
-     * @return list<array{time: string, username: string, country_id: string, email: string|null}>
+     * @return list<array{time: string, username: string, country_id: string, email: string|null, classname: string}>
      */
     final public static function getCodersOfTheMonth(string $category = 'all'): array {
         $date = date('Y-m-01', \OmegaUp\Time::get());
@@ -59,7 +59,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
               cm.time,
               i.username,
               IFNULL(i.country_id, 'xx') AS country_id,
-              e.email
+              e.email,
+              IFNULL(ur.classname, 'user-rank-unranked') AS classname
           FROM
               Coder_Of_The_Month cm
           INNER JOIN
@@ -68,6 +69,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
               Identities i ON i.identity_id = u.main_identity_id
           LEFT JOIN
               Emails e ON e.user_id = u.user_id
+          LEFT JOIN
+              User_Rank ur ON ur.user_id = cm.user_id
           WHERE
               (cm.selected_by IS NOT NULL
               OR (
@@ -89,7 +92,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
               cm.time DESC;
       ";
 
-      /** @var list<array{country_id: string, email: null|string, time: string, username: string}> */
+      /** @var list<array{classname: string, country_id: string, email: null|string, time: string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$category, $category, $date]
@@ -135,7 +138,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
     /**
      * Get all coder of the months based on month
-     * @return list<array{country_id: string, email: null|string, ranking: int, time: string, user_id: int, username: string}>
+     * @return list<array{classname: string, country_id: string, email: null|string, ranking: int, time: string, user_id: int, username: string}>
      */
     final public static function getMonthlyList(
         string $firstDay,
@@ -149,7 +152,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             i.username,
             IFNULL(i.country_id, 'xx') AS country_id,
             e.email,
-            u.user_id
+            u.user_id,
+            IFNULL(ur.classname, 'user-rank-unranked') AS classname
           FROM
             Coder_Of_The_Month cm
           INNER JOIN
@@ -158,6 +162,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             Identities i ON u.main_identity_id = i.identity_id
           LEFT JOIN
             Emails e ON e.email_id = u.main_email_id
+          LEFT JOIN
+            User_Rank ur ON ur.user_id = cm.user_id
           WHERE
             cm.time = ? AND
             cm.category = ?
@@ -166,7 +172,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             cm.`ranking` ASC
           LIMIT 100
         ";
-        /** @var list<array{country_id: string, email: null|string, ranking: int, time: string, user_id: int, username: string}> */
+        /** @var list<array{classname: string, country_id: string, email: null|string, ranking: int, time: string, user_id: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->getAll(
             $sql,
             [$date, $category]

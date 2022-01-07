@@ -344,6 +344,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             $payload['problems'][1]['alias']
         );
         $this->assertNull($payload['currentProblem']);
+        $this->assertEmpty($payload['clarifications']);
 
         $students = [];
         for ($i = 0; $i < 3; $i++) {
@@ -392,6 +393,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             $payload['currentProblem']['alias']
         );
         $this->assertCount(3, $payload['runs']);
+        $this->assertEmpty($payload['clarifications']);
 
         $studentLogin = self::login($students[0]['identity']);
         $payload = \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
@@ -424,6 +426,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             $payload['currentProblem']['alias']
         );
         $this->assertCount(1, $payload['runs']);
+        $this->assertEmpty($payload['clarifications']);
     }
 
     public function testAssignmentOpened() {
