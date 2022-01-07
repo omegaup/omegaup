@@ -19,7 +19,7 @@ describe('CaseInput.vue', () => {
       T.problemCreatorCaseName,
       T.problemCreatorGroupName,
       T.problemCreatorPoints,
-      T.problemCreatorAutomaticPoints,
+      T.problemCreatorAutomaticPointsRecommended,
     ];
 
     await Vue.nextTick();
