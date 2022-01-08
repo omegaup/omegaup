@@ -4,7 +4,7 @@ import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
 import { types } from '../../api_types';
 import T from '../../lang';
 import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
-import problem_Details, { PopupDisplayed } from './Detailsv2.vue';
+import problem_Details from './Detailsv2.vue';
 
 import BootstrapVue, { BTab } from 'bootstrap-vue';
 
@@ -206,9 +206,7 @@ describe('Detailsv2.vue', () => {
     });
 
     expect(wrapper.find('table.runs tbody').text()).toContain(runs[0].guid);
-
-    await wrapper.find('table.runs tfoot button').trigger('click');
-    expect(wrapper.vm.currentPopupDisplayed).toBe(PopupDisplayed.RunSubmit);
+    // TODO: Add new submission tests when the component is ready
   });
 
   it('Should handle the runs tab', async () => {

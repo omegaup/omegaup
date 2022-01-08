@@ -1247,6 +1247,7 @@ const translations: { [key: string]: string; } = {
   reviewerNominationFormTitle: "Califica este problema.",
   reviewerNominationQuality: "\u00bfEs un problema de calidad?",
   runDisqualifyConfirm: "Realmente desea descalificar este env\u00edo?",
+  runGUID: "GUID",
   runNotEvenOpened: "Debes abrir el problema antes de intentar enviar una soluci\u00f3n.",
   runNotFound: "run no encontrado",
   runNotInsideContest: "El concurso ya termin\u00f3 o a\u00fan no empieza.",
