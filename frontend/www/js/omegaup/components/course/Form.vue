@@ -58,7 +58,10 @@
               <font-awesome-icon
                 :title="T.courseNewFormStartDateDesc"
                 icon="info-circle" />
-              <omegaup-datepicker v-model="startTime"></omegaup-datepicker
+              <omegaup-datepicker
+                v-model="startTime"
+                name="start-date"
+              ></omegaup-datepicker
             ></label>
           </div>
           <div class="form-group col-md-4">
@@ -72,6 +75,7 @@
             <omegaup-radio-switch
               :value.sync="unlimitedDuration"
               :selected-value="unlimitedDuration"
+              name="unlimited-duration"
             ></omegaup-radio-switch>
           </div>
           <div class="form-group col-md-4">
@@ -82,6 +86,7 @@
                 icon="info-circle" />
               <omegaup-datepicker
                 v-model="finishTime"
+                name="end-date"
                 :enabled="!unlimitedDuration"
                 :is-invalid="invalidParameterName === 'finish_time'"
               ></omegaup-datepicker
@@ -112,6 +117,7 @@
               />
             </span>
             <omegaup-radio-switch
+              name="basic-information"
               :value.sync="needsBasicInformation"
               :selected-value="needsBasicInformation"
             ></omegaup-radio-switch>
@@ -124,7 +130,11 @@
                 icon="info-circle"
               />
             </span>
-            <select v-model="requests_user_information" class="form-control">
+            <select
+              v-model="requests_user_information"
+              data-course-participant-information
+              class="form-control"
+            >
               <option value="no">
                 {{ T.wordsNo }}
               </option>
@@ -146,7 +156,11 @@
                 icon="info-circle"
               />
             </label>
-            <select v-model="level" class="form-control">
+            <select
+              v-model="level"
+              data-course-problem-level
+              class="form-control"
+            >
               <option
                 v-for="levelOption in levelOptions"
                 :key="levelOption.value"
@@ -179,6 +193,7 @@
               />
               <textarea
                 v-model="objective"
+                data-course-objective
                 class="form-control"
                 :class="{
                   'is-invalid': invalidParameterName === 'objective',
