@@ -13,7 +13,10 @@ declare global {
       login(loginOptions: LoginOptions): void;
       register(loginOptions: LoginOptions): void;
       createProblem(problemOptions: ProblemOptions): void;
-      createCourse(courseOptions: CourseOptions): void;
+      createCourse(
+        courseOptions: Partial<CourseOptions> &
+          Pick<CourseOptions, 'courseAlias'>,
+      ): void;
     }
   }
 }
