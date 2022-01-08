@@ -476,55 +476,45 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 p.scoreboard_url,
                 p.scoreboard_url_admin,
                 COUNT(contestants.identity_id) AS `contestants`,
-                organizer.username AS `organizer`,
-                (pi.identity_id IS NOT NULL) AS `participating`
+                organizer.username AS `organizer`
             FROM
+                (SELECT
+                    pi.problemset_id
+                FROM
+                    Problemset_Identities pi
+                WHERE
+                    pi.identity_id = ?
+                UNION DISTINCT
+                SELECT
+                    p.problemset_id
+                FROM
+                    Groups_Identities gi
+                INNER JOIN
+                    Group_Roles gr ON gi.group_id = gr.group_id
+                INNER JOIN
+                    Problemsets p ON gr.acl_id = p.acl_id
+                WHERE
+                    gi.identity_id = ? AND gr.role_id = ?
+                UNION DISTINCT
+                SELECT
+                    p.problemset_id
+                FROM
+                    Teams t
+                INNER JOIN
+                    Teams_Group_Roles tgr ON t.team_group_id = tgr.team_group_id
+                INNER JOIN
+                    Problemsets p ON tgr.acl_id = p.acl_id
+                WHERE
+                    t.identity_id = ? AND tgr.role_id = ?
+                ) pps
+            INNER JOIN
                 Contests
+            ON
+                Contests.problemset_id = pps.problemset_id
             INNER JOIN
                 Problemsets p
             ON
                 p.problemset_id = Contests.problemset_id
-            INNER JOIN
-                (
-                    SELECT
-                        pi.identity_id,
-                        pi.problemset_id
-                    FROM
-                        Problemset_Identities pi
-                    UNION DISTINCT
-                    SELECT
-                        gi.identity_id,
-                        p.problemset_id
-                    FROM
-                        Problemsets p
-                    INNER JOIN
-                        Group_Roles gr
-                    ON
-                        gr.acl_id = p.acl_id AND
-                        gr.role_id = ?
-                    INNER JOIN
-                        Groups_Identities gi
-                    ON
-                        gi.group_id = gr.group_id
-                    UNION DISTINCT
-                    SELECT
-                        t.identity_id,
-                        p.problemset_id
-                    FROM
-                        Problemsets p
-                    INNER JOIN
-                        Teams_Group_Roles tgr
-                    ON
-                        tgr.acl_id = p.acl_id AND
-                        tgr.role_id = ?
-                    INNER JOIN
-                        Teams t
-                    ON
-                        t.team_group_id = tgr.team_group_id
-                ) pi
-            ON
-                pi.problemset_id = p.problemset_id AND
-                pi.identity_id = ?
             LEFT JOIN
                 Problemset_Identities AS contestants
             ON
@@ -545,9 +535,14 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             GROUP BY Contests.contest_id, organizer.identity_id
         ";
         $params = [
-            \OmegaUp\Authorization::CONTESTANT_ROLE,
-            \OmegaUp\Authorization::CONTESTANT_ROLE,
+            // Direct participation
             $identityId,
+            // Group participation
+            $identityId,
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
+            // Team participation
+            $identityId,
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
         ];
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
@@ -565,12 +560,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $params[] = intval($offset);
         $params[] = intval($pageSize);
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $contests = [];
         foreach ($rs as $row) {
-            $row['participating'] = boolval($row['participating']);
+            $row['participating'] = true;
             $contests[] = $row;
         }
         return $contests;
