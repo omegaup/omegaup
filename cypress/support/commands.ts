@@ -2,9 +2,10 @@
 import 'cypress-wait-until';
 import 'cypress-file-upload';
 import { buildURLQuery } from '@/js/omegaup/ui';
+import { CourseOptions, LoginOptions, ProblemOptions } from './types';
 
 // Logins the user given a username and password
-Cypress.Commands.add('login', ({ username, password }) => {
+Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
   const URL =
     '/api/user/login?' + buildURLQuery({ usernameOrEmail: username, password });
   cy.request(URL).then((response) => {
@@ -14,7 +15,7 @@ Cypress.Commands.add('login', ({ username, password }) => {
 });
 
 // Registers and logs in a new user given a username and password.
-Cypress.Commands.add('register', ({ username, password }) => {
+Cypress.Commands.add('register', ({ username, password }: LoginOptions) => {
   const URL =
     '/api/user/create?' +
     buildURLQuery({ username, password, email: username + '@omegaup.com' });
@@ -26,7 +27,12 @@ Cypress.Commands.add('register', ({ username, password }) => {
 
 Cypress.Commands.add(
   'createProblem',
-  ({ problemAlias, tag, autoCompleteTextTag, problemLevelIndex }) => {
+  ({
+    problemAlias,
+    tag,
+    autoCompleteTextTag,
+    problemLevelIndex,
+  }: ProblemOptions) => {
     cy.visit('/');
     // Select problem nav
     cy.get('[data-nav-problems]').click();
@@ -69,7 +75,7 @@ Cypress.Commands.add(
     problemLevel = 'introductory',
     description = 'This is the description',
     objective = 'This is an objective',
-  }) => {
+  }: Partial<CourseOptions> & Pick<CourseOptions, 'courseAlias'>) => {
     cy.get('[data-nav-courses]').click();
     cy.get('[data-nav-courses-create]').click();
     cy.get('[data-course-new-name]').type(courseAlias);
