@@ -1,6 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 
-import CaseInput from './CaseInput.vue';
+import GroupInput from './GroupInput.vue';
 import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../../lang';
 import Vue from 'vue';
@@ -9,17 +9,16 @@ const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 localVue.use(IconsPlugin);
 
-describe('CaseInput.vue', () => {
-  it('Should contain all 4 inputs', async () => {
-    const wrapper = shallowMount(CaseInput, {
+describe('GroupInput.vue', () => {
+  it('Should contain all 3 inputs', async () => {
+    const wrapper = shallowMount(GroupInput, {
       localVue,
     });
 
     const expectedTextInputText = [
-      T.problemCreatorCaseName,
       T.problemCreatorGroupName,
       T.problemCreatorPoints,
-      T.problemCreatorAutomaticPointsRecommended,
+      T.problemCreatorAutomaticPoints,
     ];
 
     await Vue.nextTick();
@@ -32,8 +31,9 @@ describe('CaseInput.vue', () => {
       expect(element.attributes('label')).toBe(expectedTextInputText[index]); // We need to make it like this because that's how Vue-Bootstrap input element works
     });
   });
+
   it('Should handle autoformatting', () => {
-    const wrapper = shallowMount(CaseInput, {
+    const wrapper = shallowMount(GroupInput, {
       localVue,
     });
 
