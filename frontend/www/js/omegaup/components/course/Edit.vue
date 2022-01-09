@@ -3,9 +3,11 @@
     <div class="page-header">
       <h1>
         {{ T.wordsEditCourse }}
-        <span :class="{ 'text-secondary': data.course.archived }">{{
-          data.course.name
-        }}</span>
+        <span
+          data-course-name
+          :class="{ 'text-secondary': data.course.archived }"
+          >{{ data.course.name }}</span
+        >
         <small>
           &ndash;
           <a :href="courseURL">
@@ -321,6 +323,7 @@ const emptyAssignment: types.CourseAssignment = {
   max_points: 0,
   start_time: defaultStartTime,
   finish_time: defaultFinishTime,
+  opened: false,
   order: 1,
   scoreboard_url: '',
   scoreboard_url_admin: '',

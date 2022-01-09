@@ -27,6 +27,7 @@ describe('Edit.vue', () => {
                 max_points: 0,
                 start_time: new Date(),
                 finish_time: new Date(),
+                opened: false,
                 order: 1,
                 scoreboard_url: 'sb_url',
                 scoreboard_url_admin: 'sc_url_admin',

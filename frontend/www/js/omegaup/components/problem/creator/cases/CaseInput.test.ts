@@ -9,7 +9,7 @@ const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 localVue.use(IconsPlugin);
 
-describe('AddPanel.vue', () => {
+describe('CaseInput.vue', () => {
   it('Should contain all 4 inputs', async () => {
     const wrapper = shallowMount(CaseInput, {
       localVue,
@@ -19,7 +19,7 @@ describe('AddPanel.vue', () => {
       T.problemCreatorCaseName,
       T.problemCreatorGroupName,
       T.problemCreatorPoints,
-      T.problemCreatorAutomaticPoints,
+      T.problemCreatorAutomaticPointsRecommended,
     ];
 
     await Vue.nextTick();

@@ -4,7 +4,7 @@ import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
 import { types } from '../../api_types';
 import T from '../../lang';
 import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
-import problem_Details, { PopupDisplayed } from './Detailsv2.vue';
+import problem_Details from './Detailsv2.vue';
 
 import BootstrapVue, { BTab } from 'bootstrap-vue';
 
@@ -206,8 +206,29 @@ describe('Detailsv2.vue', () => {
     });
 
     expect(wrapper.find('table.runs tbody').text()).toContain(runs[0].guid);
+    // TODO: Add new submission tests when the component is ready
+  });
 
-    await wrapper.find('table.runs tfoot button').trigger('click');
-    expect(wrapper.vm.currentPopupDisplayed).toBe(PopupDisplayed.RunSubmit);
+  it('Should handle the runs tab', async () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        allRuns: runs,
+        problem,
+        user: {
+          loggedIn: true,
+          admin: true,
+          reviewer: true,
+        },
+        userRuns: runs,
+      },
+      localVue,
+    });
+
+    const tabsItems = wrapper.findAllComponents(BTab);
+    const runsTab = tabsItems.at(1);
+    expect(runsTab.text()).toContain(T.wordsSubmissions);
+    expect(runsTab.text()).toContain(T.wordsVerdict);
+    expect(runsTab.text()).toContain(T.wordsStatus);
+    expect(runsTab.text()).toContain(T.wordsLanguage);
   });
 });

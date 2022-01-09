@@ -32,8 +32,8 @@
       />
     </b-form-group>
     <b-form-group
-      :label="T.problemCreatorAutomaticPoints"
-      :description="T.problemCreatorAutomaticPointsHelper"
+      :label="T.problemCreatorAutomaticPointsRecommended"
+      :description="T.problemCreatorAutomaticPointsHelperCase"
     >
       <b-form-checkbox
         :checked="casePoints === null"

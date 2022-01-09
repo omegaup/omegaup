@@ -67,10 +67,6 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                     qnn.contents
                 FROM
                     QualityNominations qnn
-                LEFT JOIN
-                    Identities i
-                ON
-                    qnn.user_id = i.user_id
                 WHERE
                     qnn.problem_id = ? AND
                     qnn.user_id = ? AND

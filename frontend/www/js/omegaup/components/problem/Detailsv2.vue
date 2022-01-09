@@ -84,21 +84,31 @@
             :can-submit="false"
             :accepted-languages="filteredLanguages"
           ></omegaup-arena-ephemeral-grader>
-          <omegaup-arena-runs
+          <omegaup-arena-runs-v2
             :problem-alias="problem.alias"
             :runs="userRuns"
-            :show-details="true"
-            :problemset-problems="[]"
-            :is-contest-finished="false"
-            :use-new-submission-button="true"
-            @new-submission="onNewSubmission"
           >
             <template #title><div></div></template>
             <template #runs><div></div></template>
-          </omegaup-arena-runs>
+          </omegaup-arena-runs-v2>
         </template>
       </b-tab>
-      <b-tab :title="T.wordsRuns">a</b-tab>
+      <b-tab v-if="user.admin" :title="T.wordsRuns" data-runs-tab>
+        <omegaup-arena-runs
+          :runs="allRuns"
+          :show-all-runs="true"
+          :show-problem="false"
+          :show-details="true"
+          :show-disqualify="true"
+          :show-pager="true"
+          :show-rejudge="true"
+          :show-user="true"
+          :problemset-problems="[]"
+        >
+          <template #title><div></div></template>
+          <template #runs><div></div></template>
+        </omegaup-arena-runs>
+      </b-tab>
       <b-tab :title="T.wordsClarifications">a</b-tab>
     </b-tabs>
   </b-container>
@@ -114,6 +124,7 @@ import * as time from '../../time';
 import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
 import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
 import arena_Runs from '../arena/Runs.vue';
+import arena_Runsv2 from '../arena/Runsv2.vue';
 import problem_SettingsSummary from './SettingsSummary.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
@@ -143,6 +154,7 @@ export enum PopupDisplayed {
     'omegaup-arena-ephemeral-grader': arena_EphemeralGrader,
     'omegaup-arena-runsubmit-popup': arena_RunSubmitPopup,
     'omegaup-arena-runs': arena_Runs,
+    'omegaup-arena-runs-v2': arena_Runsv2,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-problem-settings-summary': problem_SettingsSummary,

@@ -14,7 +14,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseAdmin=array{role: string, username: string}
  * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
- * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, opened: bool, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, description: string, objective: string|null, level: string|null, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, languages: list<string>|null, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
@@ -76,10 +76,10 @@ namespace OmegaUp\Controllers;
  * @psalm-type BestSolvers=array{classname: string, language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ProblemStatement=array{images: array<string, string>, sources: array<string, string>, language: string, markdown: string}
  * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
- * @psalm-type ArenaCourseDetails=array{alias: string, name: string, languages: list<string>|null}
+ * @psalm-type ArenaCourseDetails=array{alias: string, assignments: list<CourseAssignment>, name: string, languages: list<string>|null}
  * @psalm-type ArenaCourseAssignment=array{alias: string, name: string, description: string, problemset_id: int}
  * @psalm-type ArenaCourseProblem=array{alias: string, letter: string, title: string}
- * @psalm-type ArenaCoursePayload=array{course: ArenaCourseDetails, assignment: ArenaCourseAssignment, problems: list<ArenaCourseProblem>, currentProblem: null|ProblemDetails, runs: list<Run>, scoreboard: null|Scoreboard}
+ * @psalm-type ArenaCoursePayload=array{course: ArenaCourseDetails, assignment: ArenaCourseAssignment, clarifications: list<Clarification>, problems: list<ArenaCourseProblem>, currentProblem: null|ProblemDetails, runs: list<Run>, scoreboard: null|Scoreboard}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -2087,10 +2087,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r['usernameOrEmail']
         );
         if (
-            is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
+            !\OmegaUp\DAO\GroupsIdentities::existsByPK(
                 $course->group_id,
                 $resolvedIdentity->identity_id
-            ))
+            )
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseStudentNotInCourse'
@@ -2490,10 +2490,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         if (
-            is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
+            !\OmegaUp\DAO\GroupsIdentities::existsByPK(
                 $course->group_id,
                 $resolvedIdentity->identity_id
-            ))
+            )
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseStudentNotInCourse'
@@ -2987,16 +2987,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $acl = \OmegaUp\DAO\ACLs::getByPK(
+        $director = \OmegaUp\DAO\UserRoles::getOwner(
             $tokenAuthenticationResult['course']->acl_id
-        );
-        if (is_null($acl) || is_null($acl->owner_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException();
-        }
-        $director = \OmegaUp\DAO\Identities::findByUserId(
-            intval(
-                $acl->owner_id
-            )
         );
         if (is_null($director)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -3063,7 +3055,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                             $courseAlias,
                             $tokenAuthenticationResult['courseAdmin']
                         ),
-                        'director' => strval($director->username),
+                        'director' => $director,
                         'problemsetId' => $tokenAuthenticationResult['assignment']->problemset_id,
                         'admin' => $tokenAuthenticationResult['courseAdmin'],
                     ],
@@ -3510,10 +3502,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         if (
-            is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
+            !\OmegaUp\DAO\GroupsIdentities::existsByPK(
                 $course->group_id,
                 $resolvedIdentity->identity_id
-            ))
+            )
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseStudentNotInCourse'
@@ -4276,6 +4268,11 @@ class Course extends \OmegaUp\Controllers\Controller {
                             ',',
                             $course->languages
                         ) : null,
+                        'assignments' => \OmegaUp\DAO\Courses::getAllAssignments(
+                            strval($course->alias),
+                            $isAdmin,
+                            $r->identity
+                        ),
                     ],
                     'assignment' => [
                         'alias' => strval($assignment->alias),
@@ -4283,6 +4280,14 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'description' => strval($assignment->description),
                         'problemset_id' => intval($assignment->problemset_id),
                     ],
+                    'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
+                        contest: null,
+                        course: $course,
+                        isAdmin: $isAdmin,
+                        currentIdentity: $r->identity,
+                        offset: null,
+                        rowcount: 100,
+                    )['clarifications'],
                     'problems' => $problemsResponseArray,
                     'runs' => [],
                     'currentProblem' => null,
@@ -4622,7 +4627,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         $result = [
             'assignments' => \OmegaUp\DAO\Courses::getAllAssignments(
                 strval($course->alias),
-                $isAdmin
+                $isAdmin,
+                $identity
             ),
             'clarifications' => (
                 is_null($identity)
@@ -4965,16 +4971,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $acl = \OmegaUp\DAO\ACLs::getByPK(
+        $director = \OmegaUp\DAO\UserRoles::getOwner(
             $tokenAuthenticationResult['course']->acl_id
-        );
-        if (is_null($acl) || is_null($acl->owner_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException();
-        }
-        $director = \OmegaUp\DAO\Identities::findByUserId(
-            intval(
-                $acl->owner_id
-            )
         );
         if (is_null($director)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -5010,7 +5008,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $courseAlias,
                 $tokenAuthenticationResult['courseAdmin']
             ),
-            'director' => strval($director->username),
+            'director' => $director,
             'problemset_id' => $tokenAuthenticationResult['assignment']->problemset_id,
             'admin' => $tokenAuthenticationResult['courseAdmin'],
         ];
