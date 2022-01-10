@@ -810,6 +810,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorAutomaticPointsHelperCase: "The program will calculate the points of this case with the next formula: (group points - (sum of cases inside the group that have explicitly defined points)) / (number of cases inside the group that do not have explicitly defined points)",
   problemCreatorAutomaticPointsHelperGroup: "The program will calculate the points of this group with the next formula: (100 - (sum of groups that have explicitly defined points)) / (number of groups that do not have explicitly defined points)",
   problemCreatorAutomaticPointsRecommended: "Automatically calculate points (recommended)",
+  problemCreatorCannotHaveSameName: "You cannot have two cases/groups with the same name",
   problemCreatorCase: "Case",
   problemCreatorCaseGroupNameHelper: "Lowercase and without whitespaces",
   problemCreatorCaseName: "Case Name",
