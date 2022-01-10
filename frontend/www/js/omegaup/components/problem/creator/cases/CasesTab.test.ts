@@ -21,7 +21,7 @@ describe('Tabs.vue', () => {
     const wrapper = shallowMount(CasesTab, { localVue });
 
     const addWindow = wrapper.findComponent(AddPanel);
-    expect(addWindow.element).not.toBeVisible();
+    expect(addWindow.element).toBeUndefined();
 
     wrapper.setData({ shouldShowAddWindow: true });
 
