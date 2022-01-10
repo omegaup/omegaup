@@ -3,7 +3,7 @@
     "strict": true,
     "baseUrl": "../node_modules",
     "target": "es6",
-    "lib": ["ES5", "DOM"],
+    "lib": ["ES5", "DOM", "es2015"],
     "types": ["cypress", "cypress-wait-until", "cypress-file-upload"],
     "moduleResolution": "node",
     "paths": {

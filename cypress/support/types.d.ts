@@ -24,6 +24,13 @@ export interface CourseOptions {
   description?: string;
 }
 
+export interface CaseOptions {
+  caseName: string;
+  groupName: string;
+  points: number | null;
+  autoPoints: boolean;
+}
+
 export type RequestParticipantInformation = 'no' | 'optional' | 'required';
 
 export type ProblemLevel = 'introductory' | 'intermediate' | 'advanced';
