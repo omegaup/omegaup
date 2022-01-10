@@ -10,7 +10,7 @@
               class="mt-2"
               dismissible
             >
-              {{ T.problemCreatorAutomaticPointsHelperCase }}</b-alert
+              {{ T.problemCreatorCannotHaveSameName }}</b-alert
             >
             <case-input />
           </b-tab>
