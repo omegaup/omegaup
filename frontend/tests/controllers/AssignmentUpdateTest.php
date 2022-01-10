@@ -420,4 +420,69 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
     }
+
+    public function testUpdateAssignmentAlreadyHasRuns() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $courseAlias = $courseData['course_alias'];
+        $assignmentAlias = $courseData['assignment_alias'];
+
+        $login = self::login($courseData['admin']);
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignmentAlias,
+            [$problemData]
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $courseData['admin']
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Should not throw any exception
+        \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias,
+            'finish_time' => $courseData['request']['finish_time']->time + 1,
+        ]));
+
+        // Create a participant and a run
+        ['user' => $_, 'identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $participant
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $participant
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Should not throw any exception
+        $studentLogin = self::login($participant);
+        try {
+            \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'assignment' => $assignmentAlias,
+                'course' => $courseAlias,
+                'finish_time' => $courseData['request']['finish_time']->time - 1,
+            ]));
+            $this->fail(
+                'Updating assignment should have failed due to assignment already has student runs'
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'courseUpdateAlreadyHasRuns',
+                $e->getMessage()
+            );
+        }
+    }
 }

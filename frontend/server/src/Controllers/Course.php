@@ -1181,12 +1181,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        // Prevent date changes if a course already has runs
+        // Prevent date changes if a course already has runs from students
         if ($startTime->time !== $assignment->start_time->time) {
-            $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
-                intval($assignment->problemset_id)
+            $runCount = \OmegaUp\DAO\Submissions::countTotalStudentsSubmissionsOfProblemset(
+                intval($assignment->problemset_id),
+                \OmegaUp\DAO\UserRoles::getCourseAdmins(
+                    $course
+                )
             );
-
             if ($runCount > 0) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'courseUpdateAlreadyHasRuns'
@@ -1728,10 +1730,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
-            intval($problemset->problemset_id)
+        $runCount = \OmegaUp\DAO\Submissions::countTotalStudentsSubmissionsOfProblemset(
+            intval($assignment->problemset_id),
+            \OmegaUp\DAO\UserRoles::getCourseAdmins(
+                $course
+            )
         );
-
         if ($runCount > 0) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseUpdateAlreadyHasRuns'

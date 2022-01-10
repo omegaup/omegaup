@@ -104,6 +104,38 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     }
 
     /**
+     * Gets the count of total runs sent by students (non-admins) to a given problemset
+     *
+     * @param list<array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string}> $admins
+     */
+    final public static function countTotalStudentsSubmissionsOfProblemset(
+        int $problemsetId,
+        array $admins
+    ): int {
+        $adminsQuery = '(';
+        foreach ($admins as $admin) {
+            $adminsQuery .= "'{$admin['username']}',";
+        }
+        $adminsQuery = rtrim($adminsQuery, ',') . ')';
+        $sql = "
+            SELECT
+                COUNT(*)
+            FROM
+                Submissions s
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            WHERE
+                s.problemset_id = ? AND
+                s.`type` = 'normal' AND
+                i.username NOT IN $adminsQuery;
+        ";
+        $val = [$problemsetId];
+
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
+    }
+
+    /**
      * Get whether the to-be-created submission is within the allowed
      * submission gap.
      */
