@@ -23,8 +23,8 @@ OmegaUp.on('ready', async () => {
     },
     data: () => {
       return {
-        selectedTab: null as Tabs | string,
-        problemSelectedTab: null as ProblemTabs | string,
+        selectedTab: null as null | Tabs,
+        problemSelectedTab: null as null | ProblemTabs,
       };
     },
     render: function (createElement) {
