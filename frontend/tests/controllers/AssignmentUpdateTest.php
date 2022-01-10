@@ -444,11 +444,22 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Should not throw any exception
+        $login = self::login($courseData['admin']);
         \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'assignment' => $assignmentAlias,
             'course' => $courseAlias,
-            'finish_time' => $courseData['request']['finish_time']->time + 1,
+            'start_time' => $courseData['request']['start_time']->time + 1,
+            'finish_time' => $courseData['request']['finish_time'],
+        ]));
+
+        // Take back to normal date
+        \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias,
+            'start_time' => $courseData['request']['start_time']->time,
+            'finish_time' => $courseData['request']['finish_time'],
         ]));
 
         // Create a participant and a run
@@ -466,14 +477,15 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        // Should not throw any exception
-        $studentLogin = self::login($participant);
+        // Should throw a exception
+        $login = self::login($courseData['admin']);
         try {
             \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
-                'auth_token' => $studentLogin->auth_token,
+                'auth_token' => $login->auth_token,
                 'assignment' => $assignmentAlias,
                 'course' => $courseAlias,
-                'finish_time' => $courseData['request']['finish_time']->time - 1,
+                'start_time' => $courseData['request']['start_time']->time + 2,
+                'finish_time' => $courseData['request']['finish_time'],
             ]));
             $this->fail(
                 'Updating assignment should have failed due to assignment already has student runs'
