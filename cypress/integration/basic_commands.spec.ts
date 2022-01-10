@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { getISODate } from '../support/commands';
+import { getISODate } from '../support/basic_commands';
 import { CourseOptions, LoginOptions, ProblemOptions } from '../support/types';
 
 describe('Basic Commands Test', () => {
