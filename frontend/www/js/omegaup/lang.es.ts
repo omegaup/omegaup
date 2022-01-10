@@ -822,6 +822,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorMultipleCases: "M\u00faltiples casos",
   problemCreatorName: "Nombre",
   problemCreatorNewProblem: "Nuevo Problema",
+  problemCreatorNoGroup: "Sin grupo",
   problemCreatorNumberOfCases: "N\u00famero de casos",
   problemCreatorNumberOfCasesHelper: "Los casos tendr\u00e1n el nombre:",
   problemCreatorPoints: "Puntaje",
