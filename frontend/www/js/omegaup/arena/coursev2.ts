@@ -9,7 +9,7 @@ import * as time from '../time';
 
 import Vue from 'vue';
 import arena_Course, { Tabs } from '../components/arena/Coursev2.vue';
-import { Tabs as problemTabs } from '../components/problem/Detailsv2.vue';
+import { Tabs as ProblemTabs } from '../components/problem/Detailsv2.vue';
 
 OmegaUp.on('ready', async () => {
   const payload = types.payloadParsers.ArenaCoursePayload();
@@ -23,8 +23,8 @@ OmegaUp.on('ready', async () => {
     },
     data: () => {
       return {
-        selectedTab: null as null | string,
-        problemSelectedTab: null as null | string,
+        selectedTab: null as Tabs | string,
+        problemSelectedTab: null as ProblemTabs | string,
       };
     },
     render: function (createElement) {
@@ -93,11 +93,12 @@ OmegaUp.on('ready', async () => {
     const tab = window.location.hash.substring(1);
     if (payload.currentProblem) {
       arenaCourse.selectedTab = null;
-      if (Object.values<string>(problemTabs).includes(tab)) {
+      if (Object.values<string>(ProblemTabs).includes(tab)) {
         arenaCourse.problemSelectedTab = tab;
         return;
       }
-      arenaCourse.problemSelectedTab = problemTabs.Details;
+      setLocationHash('');
+      arenaCourse.problemSelectedTab = ProblemTabs.Details;
       return;
     }
     if (tab === Tabs.Ranking && payload.scoreboard === null) {

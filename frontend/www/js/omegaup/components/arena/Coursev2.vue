@@ -118,7 +118,7 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import omegaup_Markdown from '../Markdown.vue';
 import arena_Scoreboard from './Scoreboard.vue';
-import problem_Details from '../problem/Detailsv2.vue';
+import problem_Details, { Tabs as ProblemTabs } from '../problem/Detailsv2.vue';
 
 import {
   BIconChevronLeft,
@@ -151,9 +151,9 @@ export default class ArenaCourse extends Vue {
   @Prop() course!: types.ArenaCourseDetails;
   @Prop() currentProblem!: types.ProblemDetails;
   @Prop() problems!: types.ArenaCourseProblem[];
-  @Prop({ default: null }) problemSelectedTab!: string | null;
+  @Prop({ default: null }) problemSelectedTab!: ProblemTabs | null;
   @Prop() scoreboard!: types.Scoreboard;
-  @Prop({ default: Tabs.Summary }) selectedTab!: string | null;
+  @Prop({ default: Tabs.Summary }) selectedTab!: Tabs | null;
   @Prop() user!: types.UserInfoForProblem;
   @Prop() userRuns!: types.Run[];
 
