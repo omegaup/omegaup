@@ -3,26 +3,26 @@
     <b-tab>
       <template #title>
         <BIconPencil class="mr-1" />
-        <span name="tab"> {{ T.problemCreatorStatement }}</span>
+        <span name="writing"> {{ T.problemCreatorStatement }}</span>
       </template>
     </b-tab>
     <b-tab>
       <template #title>
         <BIconFileCode class="mr-1" />
-        <span name="tab"> {{ T.problemCreatorCode }}</span>
+        <span name="code"> {{ T.problemCreatorCode }}</span>
       </template>
     </b-tab>
     <b-tab>
       <template #title>
         <BIconCheckCircle class="mr-1" />
-        <span name="tab"> {{ T.problemCreatorTestCases }}</span>
+        <span name="testcases"> {{ T.problemCreatorTestCases }}</span>
       </template>
       <cases-tab />
     </b-tab>
     <b-tab>
       <template #title>
         <BIconArrowUpRight class="mr-1" />
-        <span name="tab"> {{ T.problemCreatorSolution }}</span>
+        <span name="solution"> {{ T.problemCreatorSolution }}</span>
       </template>
     </b-tab>
   </b-tabs>
