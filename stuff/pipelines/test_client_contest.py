@@ -8,6 +8,7 @@ import argparse
 import logging
 import sys
 import rabbitmq_connection
+import ContestsCallback
 import client_contest
 from pytest_mock import MockerFixture
 import test_credentials
@@ -42,12 +43,16 @@ def test_client_contest() -> None:
         count = cur.fetchone()
         assert count['count'] == 0
 
-        client_contest.certificate_contests_receive_messages(
-            cur,
-            dbconn.conn,
-            channel,
-            test_credentials.API_TOKEN,
-            test_credentials.OMEGAUP_API_ENDPOINT)
+        client_contest.process_queue(
+            channel=channel,
+            exchange_name='certificates',
+            queue_name='contest',
+            routing_key='ContestQueue',
+            callback=ContestsCallback.ContestsCallback(
+                dbconn.conn,
+                test_credentials.API_TOKEN,
+                test_credentials.OMEGAUP_API_ENDPOINT
+            ))
         cur.execute('SELECT COUNT(*) AS count FROM `Certificates`;')
         count = cur.fetchone()
         assert count['count'] > 0
@@ -65,12 +70,23 @@ def test_client_contest_with_duplicated_codes(mocker: MockerFixture) -> None:
     logging.info('Started')
     dbconn = lib.db.connect(args)
     os.system('python3 send_messages_contest_queue.py')
-    with dbconn.cursor(buffered=True, dictionary=True) as cur, \
-        rabbitmq_connection.connect(args) as channel:
-        mocker.patch('client_contest.generate_code', return_value='XMCF384X8X')
-        client_contest.certificate_contests_receive_messages(
-            cur,
-            dbconn.conn,
-            channel,
-            test_credentials.API_TOKEN,
-            test_credentials.OMEGAUP_API_ENDPOINT)
+    with rabbitmq_connection.connect(args) as channel:
+        mocker.patch('client_contest.generate_code',
+                     side_effect=iter(['XMCF384X8X',
+                                       'XMCF384X8X',
+                                       'XMCF384X8X',
+                                       'XMCF384X8X',
+                                       'XMCF384X8X',
+                                       'XMCF384X8M',
+                                       ]))
+        client_contest.process_queue(
+            channel=channel,
+            exchange_name='certificates',
+            queue_name='contest',
+            routing_key='ContestQueue',
+            callback=ContestsCallback.ContestsCallback(
+                dbconn.conn,
+                test_credentials.API_TOKEN,
+                test_credentials.OMEGAUP_API_ENDPOINT
+            ))
+        mocker.call_count(6)
