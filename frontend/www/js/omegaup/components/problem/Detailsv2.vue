@@ -87,6 +87,7 @@
           <omegaup-arena-runs-v2
             :problem-alias="problem.alias"
             :runs="userRuns"
+            :current-run-details="currentRunDetails"
           >
             <template #title><div></div></template>
             <template #runs><div></div></template>
@@ -163,6 +164,7 @@ export enum PopupDisplayed {
 })
 export default class ProblemDetails extends Vue {
   @Prop() allRuns!: types.Run[];
+  @Prop() currentRunDetails!: types.RunDetails | null;
   @Prop({ default: null }) languages!: null | string[];
   @Prop() problem!: types.ProblemDetails;
   @Prop() user!: types.UserInfoForProblem;
