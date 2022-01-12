@@ -169,6 +169,25 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return $user;
     }
 
+    public static function getPreferredLanguage(?int $userId): ?string {
+        if (is_null($userId)) {
+            return null;
+        }
+        $sql = 'SELECT
+                    preferred_language
+                FROM
+                    Users u
+                WHERE
+                    u.user_id = ?;';
+        $params = [$userId];
+        /** @var null|string */
+        $preferredLanguage = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            $params
+        );
+        return $preferredLanguage;
+    }
+
     public static function getHideTags(?int $identityId): bool {
         if (is_null($identityId)) {
             return false;
