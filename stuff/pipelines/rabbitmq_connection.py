@@ -18,19 +18,17 @@ def connect(
     '''Connects to rabbitmq with the arguments provided.'''
     username = args.rabbitmq_username
     password = args.rabbitmq_password
-    credentials = pika.PlainCredentials(username, password)
-    parameters = pika.ConnectionParameters(
-        'rabbitmq',
-        5672,
-        '/',
-        credentials,
+    connection = pika.BlockingConnection(pika.ConnectionParameters(
+        host='rabbitmq',
+        port=5672,
+        virtual_host='/',
+        credentials=pika.PlainCredentials(username, password),
         heartbeat=600,
         # mypy does not support structural typing yet
         # https://github.com/python/mypy/issues/3186
         blocked_connection_timeout=300.0,  # type: ignore
-    )
+    ))
 
-    connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
 
     channel.exchange_declare(exchange='certificates',

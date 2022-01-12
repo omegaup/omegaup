@@ -3,20 +3,13 @@
 '''Processing course messages.'''
 
 import argparse
-import dataclasses
 import logging
 import os
 import sys
-import json
-from dataclasses import dataclass
-from typing import List
-import omegaup.api
-import MySQLdb
-import MySQLdb.cursors
+from typing import Callable
 import pika
-from verification_code import generate_code
+import CoursesCallback
 import rabbitmq_connection
-
 
 sys.path.insert(
     0,
@@ -26,97 +19,35 @@ import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 
-@dataclass
-class Certificate:
-    '''A dataclass for certificate.'''
-    certificate_type: str
-    course_id: int
-    verification_code: str
-    username: str
-
-
-def certificate_course_receive_messages(
-        cur: MySQLdb.cursors.BaseCursor,
-        dbconn: MySQLdb.connections.Connection,
+def process_queue(
+        *,
         channel: pika.adapters.blocking_connection.BlockingChannel,
-        args: argparse.Namespace) -> None:
-    '''Receive courses messages'''
-
-    result = channel.queue_declare(queue='', exclusive=True)
-    queue_name = result.method.queue
-    assert queue_name is not None
+        exchange_name: str,
+        queue_name: str,
+        routing_key: str,
+        callback: Callable[
+            [
+                pika.adapters.blocking_connection.BlockingChannel,
+                pika.spec.Basic.Deliver,
+                pika.spec.BasicProperties,
+            ], None],
+) -> None:
+    '''Receive course messages from a queue'''
+    channel.exchange_declare(exchange=exchange_name,
+                             durable=True,
+                             exchange_type='direct')
+    channel.queue_declare(queue=queue_name,
+                          durable=True,
+                          exclusive=False)
     channel.queue_bind(
-        exchange='certificates',
+        exchange=exchange_name,
         queue=queue_name,
-        routing_key='CourseQueue')
-    logging.info('[*] waiting for the messages')
-
-    def certificate_course_callback(
-            _channel: pika.adapters.blocking_connection.BlockingChannel,
-            _method: pika.spec.Basic.Deliver,
-            _properties: pika.spec.BasicProperties,
-            body: bytes) -> None:
-        '''Function to receive messages'''
-        data = json.loads(body.decode())
-        client = omegaup.api.Client(api_token=args.api_token, url=args.url)
-        login = client.user.login(
-            password=args.password,
-            usernameOrEmail=args.username,
-        )
-        result = client.course.studentsProgress(
-            auth_token=login['auth_token'],
-            course=data['alias'],
-        )
-        progress = result['progress']
-
-        certificates: List[Certificate] = []
-
-        for user in progress:
-            minimum_progress = data['minimum_progress_for_certificate']
-            if user['courseProgress'] < minimum_progress:
-                continue
-            verification_code = generate_code()
-            certificates.append(Certificate(
-                certificate_type='course',
-                course_id=int(data['course_id']),
-                verification_code=verification_code,
-                username=str(user['username']),
-            ))
-        while True:
-            try:
-                cur.execute('''
-                    INSERT INTO
-                        `Certificates` (
-                            `identity_id`,
-                            `certificate_type`,
-                            `course_id`,
-                            `verification_code`)
-                    SELECT
-                        `identity_id`,
-                        %s,
-                        %s,
-                        %s
-                    FROM
-                        `Identities`
-                    WHERE
-                        `username` = %s;
-                    ''',
-                            [
-                                dataclasses.astuple(
-                                    certificate
-                                ) for certificate in certificates])
-                dbconn.commit()
-                break
-            except:  # noqa: bare-except
-                for certificate in certificates:
-                    certificate.verification_code = generate_code()
-                logging.exception(
-                    'At least one of the verification codes had a conflict')
-                dbconn.rollback()
+        routing_key=routing_key)
+    logging.info('waiting for the messages')
     channel.basic_consume(
         queue=queue_name,
-        on_message_callback=certificate_course_callback,
-        auto_ack=True)
+        on_message_callback=callback,
+        auto_ack=False)
     try:
         channel.start_consuming()
     except KeyboardInterrupt:
@@ -125,14 +56,13 @@ def certificate_course_receive_messages(
 
 def main() -> None:
     '''Main entrypoint.'''
-
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
     rabbitmq_connection.configure_parser(parser)
 
-    parser.add_argument('--username', type=str, help='omegaup username')
-    parser.add_argument('--password', type=str, help='omegaup password')
+    parser.add_argument('--user-username', type=str, help='omegaup username')
+    parser.add_argument('--user-password', type=str, help='omegaup password')
     parser.add_argument('--api-token', type=str, help='omegaup api token')
     parser.add_argument('--url',
                         type=str,
@@ -144,11 +74,20 @@ def main() -> None:
     logging.info('Started')
     dbconn = lib.db.connect(args)
     try:
-        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur, \
-            rabbitmq_connection.connect(args) as channel:
-            certificate_course_receive_messages(cur, dbconn, channel, args)
+        with rabbitmq_connection.connect(args) as channel:
+            process_queue(channel=channel,
+                          exchange_name='certificates',
+                          queue_name='courses',
+                          routing_key='CourseQueue',
+                          callback=CoursesCallback.CoursesCallback(
+                              dbconn.conn,
+                              args.api_token,
+                              args.url,
+                              args.user_password,
+                              args.user_username
+                          ))
     finally:
-        dbconn.close()
+        dbconn.conn.close()
         logging.info('Done')
 
 
