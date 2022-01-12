@@ -377,7 +377,7 @@ class School extends \OmegaUp\Controllers\Controller {
      */
     public static function getSchoolOfTheMonth(string $date = null): array {
         $firstDay = self::getCurrentMonthFirstDay($date);
-        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTime(
+        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTimeAndSelected(
             $firstDay
         );
 
@@ -388,13 +388,6 @@ class School extends \OmegaUp\Controllers\Controller {
         }
 
         $schoolOfTheMonthId = $schoolsOfTheMonth[0]->school_id;
-        foreach ($schoolsOfTheMonth as $school) {
-            if (isset($school->selected_by)) {
-                $schoolOfTheMonthId = $school->school_id;
-                break;
-            }
-        }
-
         if (is_null($schoolOfTheMonthId)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'schoolOfTheMonthNotFound'
