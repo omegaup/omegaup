@@ -476,55 +476,45 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 p.scoreboard_url,
                 p.scoreboard_url_admin,
                 COUNT(contestants.identity_id) AS `contestants`,
-                organizer.username AS `organizer`,
-                (pi.identity_id IS NOT NULL) AS `participating`
+                organizer.username AS `organizer`
             FROM
+                (SELECT
+                    pi.problemset_id
+                FROM
+                    Problemset_Identities pi
+                WHERE
+                    pi.identity_id = ?
+                UNION DISTINCT
+                SELECT
+                    p.problemset_id
+                FROM
+                    Groups_Identities gi
+                INNER JOIN
+                    Group_Roles gr ON gi.group_id = gr.group_id
+                INNER JOIN
+                    Problemsets p ON gr.acl_id = p.acl_id
+                WHERE
+                    gi.identity_id = ? AND gr.role_id = ?
+                UNION DISTINCT
+                SELECT
+                    p.problemset_id
+                FROM
+                    Teams t
+                INNER JOIN
+                    Teams_Group_Roles tgr ON t.team_group_id = tgr.team_group_id
+                INNER JOIN
+                    Problemsets p ON tgr.acl_id = p.acl_id
+                WHERE
+                    t.identity_id = ? AND tgr.role_id = ?
+                ) pps
+            INNER JOIN
                 Contests
+            ON
+                Contests.problemset_id = pps.problemset_id
             INNER JOIN
                 Problemsets p
             ON
                 p.problemset_id = Contests.problemset_id
-            INNER JOIN
-                (
-                    SELECT
-                        pi.identity_id,
-                        pi.problemset_id
-                    FROM
-                        Problemset_Identities pi
-                    UNION DISTINCT
-                    SELECT
-                        gi.identity_id,
-                        p.problemset_id
-                    FROM
-                        Problemsets p
-                    INNER JOIN
-                        Group_Roles gr
-                    ON
-                        gr.acl_id = p.acl_id AND
-                        gr.role_id = ?
-                    INNER JOIN
-                        Groups_Identities gi
-                    ON
-                        gi.group_id = gr.group_id
-                    UNION DISTINCT
-                    SELECT
-                        t.identity_id,
-                        p.problemset_id
-                    FROM
-                        Problemsets p
-                    INNER JOIN
-                        Teams_Group_Roles tgr
-                    ON
-                        tgr.acl_id = p.acl_id AND
-                        tgr.role_id = ?
-                    INNER JOIN
-                        Teams t
-                    ON
-                        t.team_group_id = tgr.team_group_id
-                ) pi
-            ON
-                pi.problemset_id = p.problemset_id AND
-                pi.identity_id = ?
             LEFT JOIN
                 Problemset_Identities AS contestants
             ON
@@ -545,9 +535,14 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             GROUP BY Contests.contest_id, organizer.identity_id
         ";
         $params = [
-            \OmegaUp\Authorization::CONTESTANT_ROLE,
-            \OmegaUp\Authorization::CONTESTANT_ROLE,
+            // Direct participation
             $identityId,
+            // Group participation
+            $identityId,
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
+            // Team participation
+            $identityId,
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
         ];
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
@@ -565,12 +560,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $params[] = intval($offset);
         $params[] = intval($pageSize);
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $contests = [];
         foreach ($rs as $row) {
-            $row['participating'] = boolval($row['participating']);
+            $row['participating'] = true;
             $contests[] = $row;
         }
         return $contests;
@@ -661,7 +656,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      *
      * Explicación:
      *
-     * La estructura de este query optimiza el uso de indíces en mysql.
+     * La estructura de este query optimiza el uso de índices en mysql.
      *
      * El primer SELECT transforma las columnas a como las espera la API.
      * Luego:
@@ -696,279 +691,130 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $filter = self::formatSearch($query);
         $query_check = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
 
-        $sql = "
-                 (
-                    SELECT
-                        $columns,
-                        COUNT(contestants.identity_id) AS `contestants`,
-                        organizer.username AS `organizer`,
-                        (participating.identity_id IS NOT NULL) AS `participating`
-                    FROM
-                        Contests
-                    LEFT JOIN
-                        Problemset_Identities AS contestants
-                    ON
-                        Contests.problemset_id = contestants.problemset_id
-                    INNER JOIN
-                        ACLs AS a
-                    ON
-                        Contests.acl_id = a.acl_id
-                    INNER JOIN
-                        Identities AS organizer
-                    ON
-                        a.owner_id = organizer.user_id
-                    LEFT JOIN
-                        Problemset_Identities participating
-                    ON
-                        Contests.problemset_id = participating.problemset_id AND
-                        participating.identity_id = ?
-                    WHERE
-                        Contests.admission_mode = 'private' AND organizer.identity_id = ? AND
-                        $recommended_check AND $end_check AND $query_check
-                        AND archived = 0
-                    GROUP BY Contests.contest_id, organizer.identity_id
-                 ) ";
-        $params = [$identityId, $identityId];
-        if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
-            $params[] = $filter['query'];
-        } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {
-            $params[] = $filter['query'];
-            $params[] = $filter['query'];
-        }
+        $sql_relevant_contests = "
+        -- Organizer
+        (SELECT
+            c.contest_id,
+            FALSE AS participating
+        FROM
+            Identities organizer
+        INNER JOIN
+            ACLs a ON a.owner_id = organizer.user_id
+        INNER JOIN
+            Contests c ON c.acl_id = a.acl_id
+        WHERE
+            organizer.identity_id = ?
+        )
+        -- Direct participant
+        UNION DISTINCT
+        (SELECT
+            c.contest_id,
+            TRUE AS participating
+        FROM
+            Problemset_Identities pi
+        INNER JOIN
+            Contests c ON c.problemset_id = pi.problemset_id
+        WHERE
+            pi.identity_id = ?
+        )
+        -- Participant via Group
+        UNION DISTINCT
+        (SELECT
+            p.contest_id,
+            TRUE AS participating
+        FROM
+            Groups_Identities gi
+        INNER JOIN
+            Group_Roles gr ON gi.group_id = gr.group_id
+        INNER JOIN
+            Problemsets p ON gr.acl_id = p.acl_id
+        WHERE
+            gi.identity_id = ? AND gr.role_id = ?
+        )
+        -- Admin
+        UNION DISTINCT
+        (SELECT
+            contest_id,
+            FALSE AS participating
+        FROM
+            Identities i
+        INNER JOIN
+            User_Roles ur ON ur.user_id = i.user_id
+        INNER JOIN
+            Contests c ON c.acl_id = ur.acl_id
+        WHERE
+            i.identity_id = ? AND ur.role_id = ?
+        )
+        -- Admin via Group
+        UNION DISTINCT
+        (SELECT
+            contest_id,
+            FALSE AS participating
+        FROM
+            Groups_Identities gi
+        INNER JOIN
+            Group_Roles gr ON gi.group_id = gr.group_id
+        INNER JOIN
+            Contests c ON c.acl_id = gr.acl_id
+        WHERE
+            gi.identity_id = ? AND gr.role_id = ?
+        )
+        -- Public
+        UNION DISTINCT
+        (SELECT
+            contest_id,
+            (participating.identity_id IS NOT NULL) AS participating
+        FROM
+            Contests
+        LEFT JOIN
+            Problemset_Identities participating
+        ON
+            participating.problemset_id = Contests.problemset_id AND
+            participating.identity_id = ?
+        WHERE
+            admission_mode <> 'private'
+        )
+        ";
 
-        $sql .= "
-                 UNION DISTINCT
-                 (
-                    SELECT
-                        $columns,
-                        COUNT(contestants.identity_id) AS `contestants`,
-                        organizer.username AS `organizer`,
-                        (participating.identity_id IS NOT NULL) AS `participating`
-                    FROM
-                        Contests
-                    INNER JOIN
-                        Problemset_Identities participating
-                    ON
-                        Contests.problemset_id = participating.problemset_id
-                    LEFT JOIN
-                        Problemset_Identities AS contestants
-                    ON
-                        Contests.problemset_id = contestants.problemset_id
-                    INNER JOIN
-                        ACLs AS a
-                    ON
-                        Contests.acl_id = a.acl_id
-                    INNER JOIN
-                        Identities AS organizer
-                    ON
-                        a.owner_id = organizer.user_id
-                    WHERE
-                        Contests.admission_mode = 'private' AND participating.identity_id = ? AND
-                        $recommended_check AND $end_check AND $query_check
-                        AND archived = 0
-                    GROUP BY Contests.contest_id, organizer.identity_id
-                 ) ";
-        $params[] = $identityId;
-        if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
-            $params[] = $filter['query'];
-        } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {
-            $params[] = $filter['query'];
-            $params[] = $filter['query'];
-        }
+        $sql = "SELECT
+            $columns,
+            COUNT(pi.identity_id) AS contestants,
+            ANY_VALUE(organizer.username) AS organizer,
+            BIT_OR(rc.participating) AS participating
+        FROM
+            ($sql_relevant_contests) rc
+        INNER JOIN
+            Contests ON Contests.contest_id = rc.contest_id
+        LEFT JOIN
+            Problemset_Identities pi ON pi.problemset_id = Contests.problemset_id
+        INNER JOIN
+            ACLs a ON a.acl_id = Contests.acl_id
+        INNER JOIN
+            Identities organizer ON organizer.user_id = a.owner_id
+        WHERE
+            $recommended_check AND $end_check AND $query_check
+            AND archived = 0
+        GROUP BY
+            Contests.contest_id
+        ORDER BY
+            CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
+            recommended DESC,
+            original_finish_time DESC
+        LIMIT ?, ?
+        ";
 
-        $sql .= "
-                 UNION DISTINCT
-                 (
-                    SELECT
-                        $columns,
-                        COUNT(contestants.identity_id) AS `contestants`,
-                        organizer.username AS `organizer`,
-                        (gi.identity_id IS NOT NULL) AS `participating`
-                    FROM
-                        Contests
-                    INNER JOIN
-                        Problemsets
-                    ON
-                        Problemsets.problemset_id = Contests.problemset_id
-                    LEFT JOIN
-                        Problemset_Identities AS contestants
-                    ON
-                        Contests.problemset_id = contestants.problemset_id
-                    INNER JOIN
-                        Group_Roles gr
-                    ON
-                        gr.acl_id = Problemsets.acl_id AND
-                        gr.role_id = ?
-                    INNER JOIN
-                        Groups_Identities gi
-                    ON
-                        gi.group_id = gr.group_id
-                    INNER JOIN
-                        ACLs AS a
-                    ON
-                        Contests.acl_id = a.acl_id
-                    INNER JOIN
-                        Identities AS organizer
-                    ON
-                        a.owner_id = organizer.user_id
-                    WHERE
-                        Contests.admission_mode = 'private' AND
-                        gi.identity_id = ? AND
-                        $recommended_check AND $end_check AND $query_check
-                        AND archived = 0
-                    GROUP BY Contests.contest_id, organizer.identity_id
-                 ) ";
-        $params[] = \OmegaUp\Authorization::CONTESTANT_ROLE;
-        $params[] = $identityId;
-        if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
-            $params[] = $filter['query'];
-        } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {
-            $params[] = $filter['query'];
-            $params[] = $filter['query'];
-        }
+        $params = [
+            $identityId,    // Organizer
+            $identityId,    // Direct participant
+            $identityId,    // Participant via Group
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
+            $identityId,    // Admin
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            $identityId,    // Admin via Group
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            $identityId,    // Participant check
+        ];
 
-        $sql .= "
-                 UNION DISTINCT
-                 (
-                     SELECT
-                         $columns,
-                         COUNT(contestants.identity_id) AS `contestants`,
-                         organizer.username AS `organizer`,
-                         (participating.identity_id IS NOT NULL) AS `participating`
-                     FROM
-                         Contests
-                     INNER JOIN
-                         User_Roles
-                     ON
-                         User_Roles.acl_id = Contests.acl_id
-                     INNER JOIN
-                         Identities
-                     ON
-                         Identities.user_id = User_Roles.user_id
-                     LEFT JOIN
-                         Problemset_Identities AS contestants
-                     ON
-                         Contests.problemset_id = contestants.problemset_id
-                     INNER JOIN
-                         ACLs AS a
-                     ON
-                         Contests.acl_id = a.acl_id
-                     INNER JOIN
-                         Identities AS organizer
-                     ON
-                         a.owner_id = organizer.user_id
-                     LEFT JOIN
-                         Problemset_Identities participating
-                     ON
-                         Contests.problemset_id = participating.problemset_id AND
-                         participating.identity_id = ?
-                     WHERE
-                         Contests.admission_mode = 'private' AND
-                         Identities.identity_id = ? AND
-                         User_Roles.role_id = ? AND
-                         $recommended_check AND $end_check AND $query_check
-                        AND archived = 0
-                    GROUP BY Contests.contest_id, organizer.identity_id
-                 ) ";
-        $params[] = $identityId;
-        $params[] = $identityId;
-        $params[] = \OmegaUp\Authorization::ADMIN_ROLE;
-        if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
-            $params[] = $filter['query'];
-        } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {
-            $params[] = $filter['query'];
-            $params[] = $filter['query'];
-        }
-
-        $sql .= "
-                 UNION DISTINCT
-                 (
-                     SELECT
-                         $columns,
-                         COUNT(contestants.identity_id) AS `contestants`,
-                         organizer.username AS `organizer`,
-                         (participating.identity_id IS NOT NULL) AS `participating`
-                     FROM
-                         Contests
-                     INNER JOIN
-                         Group_Roles ON Contests.acl_id = Group_Roles.acl_id
-                     INNER JOIN
-                         Groups_Identities
-                     ON
-                         Groups_Identities.group_id = Group_Roles.group_id
-                     LEFT JOIN
-                         Problemset_Identities AS contestants
-                     ON
-                         Contests.problemset_id = contestants.problemset_id
-                     INNER JOIN
-                         ACLs AS a
-                     ON
-                         Contests.acl_id = a.acl_id
-                     INNER JOIN
-                         Identities AS organizer
-                     ON
-                         a.owner_id = organizer.user_id
-                     LEFT JOIN
-                         Problemset_Identities participating
-                     ON
-                         Contests.problemset_id = participating.problemset_id AND
-                         participating.identity_id = ?
-                     WHERE
-                         Contests.admission_mode = 'private' AND
-                         Groups_Identities.identity_id = ? AND
-                         Group_Roles.role_id = ? AND
-                         $recommended_check AND $end_check AND $query_check
-                        AND archived = 0
-                     GROUP BY Contests.contest_id, organizer.identity_id
-                 ) ";
-        $params[] = $identityId;
-        $params[] = $identityId;
-        $params[] = \OmegaUp\Authorization::ADMIN_ROLE;
-        if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
-            $params[] = $filter['query'];
-        } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {
-            $params[] = $filter['query'];
-            $params[] = $filter['query'];
-        }
-        $sql .= "
-                 UNION DISTINCT
-                 (
-                     SELECT
-                         $columns,
-                         COUNT(contestants.identity_id) AS `contestants`,
-                         organizer.username AS `organizer`,
-                         (participating.identity_id IS NOT NULL) AS `participating`
-                     FROM
-                         Contests
-                     LEFT JOIN
-                         Problemset_Identities AS contestants
-                     ON
-                        Contests.problemset_id = contestants.problemset_id
-                     INNER JOIN
-                         ACLs AS a
-                     ON
-                         Contests.acl_id = a.acl_id
-                     INNER JOIN
-                         Identities AS organizer
-                     ON
-                         a.owner_id = organizer.user_id
-                     LEFT JOIN
-                         Problemset_Identities participating
-                     ON
-                         Contests.problemset_id = participating.problemset_id AND
-                         participating.identity_id = ?
-                     WHERE
-                         admission_mode <> 'private' AND $recommended_check AND $end_check AND $query_check
-                        AND archived = 0
-                     GROUP BY Contests.contest_id, organizer.identity_id
-                 )
-                 ORDER BY
-                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
-                     `recommended` DESC,
-                     `original_finish_time` DESC
-                 LIMIT ?, ?
-                ";
-        $params[] = $identityId;
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {

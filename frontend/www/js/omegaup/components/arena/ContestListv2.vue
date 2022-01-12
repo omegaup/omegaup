@@ -186,6 +186,11 @@
               <div></div>
             </template>
           </omegaup-contest-card>
+          <b-spinner
+            v-if="refreshing"
+            class="spinner mt-4"
+            variant="primary"
+          ></b-spinner>
         </b-tab>
         <b-tab
           ref="futureContestTab"
@@ -229,6 +234,11 @@
               <div></div>
             </template>
           </omegaup-contest-card>
+          <b-spinner
+            v-if="refreshing"
+            class="spinner mt-4"
+            variant="primary"
+          ></b-spinner>
         </b-tab>
         <b-tab
           ref="pastContestTab"
@@ -272,6 +282,11 @@
               <div></div>
             </template>
           </omegaup-contest-card>
+          <b-spinner
+            v-if="refreshing"
+            class="spinner mt-4"
+            variant="primary"
+          ></b-spinner>
         </b-tab>
       </b-tabs>
     </b-card>
@@ -298,12 +313,14 @@ import {
   CardPlugin,
   DropdownPlugin,
   LayoutPlugin,
+  SpinnerPlugin,
 } from 'bootstrap-vue';
 import ContestCard from './ContestCard.vue';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
 Vue.use(LayoutPlugin);
+Vue.use(SpinnerPlugin);
 Vue.use(infiniteScroll);
 library.add(fas);
 
@@ -514,5 +531,13 @@ export default class ArenaContestList extends Vue {
   font-size: 200%;
   margin: 1em;
   color: var(--arena-contest-list-empty-category-font-color);
+}
+
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 </style>

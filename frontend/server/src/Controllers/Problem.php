@@ -2052,10 +2052,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         )
                     ) {
                         if (
-                            is_null(\OmegaUp\DAO\ProblemsetIdentities::getByPK(
+                            !\OmegaUp\DAO\ProblemsetIdentities::existsByPK(
                                 $identity->identity_id,
                                 $problemset['problemset']->problemset_id
-                            ))
+                            )
                         ) {
                             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
                         }
@@ -2434,10 +2434,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             // Is the problem actually in the problemset?
             if (
-                is_null(\OmegaUp\DAO\ProblemsetProblems::getByPK(
+                !\OmegaUp\DAO\ProblemsetProblems::existsByPK(
                     $response['problemset']->problemset_id,
                     $problem->problem_id
-                ))
+                )
             ) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemNotFoundInContest'
@@ -2455,10 +2455,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             // Is the problem actually in the problemset?
             if (
-                is_null(\OmegaUp\DAO\ProblemsetProblems::getByPK(
+                !\OmegaUp\DAO\ProblemsetProblems::existsByPK(
                     $response['problemset']->problemset_id,
                     $problem->problem_id
-                ))
+                )
             ) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemNotFoundInProblemset'
@@ -2619,18 +2619,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         // Add preferred language of the user.
-        if (!is_null($loggedIdentity) && !is_null($loggedIdentity->username)) {
-            $userData = \OmegaUp\Controllers\User::getUserProfile(
-                $loggedIdentity,
-                $loggedIdentity,
-                omitRank: true
+        if (!is_null($loggedIdentity)) {
+            $preferredLanguage = \OmegaUp\DAO\Users::getPreferredLanguage(
+                $loggedIdentity->user_id
             );
-            if (
-                !empty($userData) &&
-                !empty($userData['preferred_language'])
-            ) {
+            if (!empty($preferredLanguage)) {
                 $response['preferred_language'] = strval(
-                    $userData['preferred_language']
+                    $preferredLanguage
                 );
             }
         }
