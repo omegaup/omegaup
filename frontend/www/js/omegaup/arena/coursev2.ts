@@ -2,7 +2,13 @@ import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import { setLocationHash } from '../location';
 import { myRunsStore, runsStore } from './runsStore';
-import { showSubmission, submitRun, trackRun, submitRunFailed, SubmissionRequest } from './submissions';
+import {
+  showSubmission,
+  submitRun,
+  trackRun,
+  submitRunFailed,
+  SubmissionRequest,
+} from './submissions';
 
 import * as api from '../api';
 import * as time from '../time';
@@ -51,7 +57,10 @@ OmegaUp.on('ready', async () => {
             api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
                 console.log(runDetails);
-                this.currentRunDetails = showSubmission({ request, runDetails });
+                this.currentRunDetails = showSubmission({
+                  request,
+                  runDetails,
+                });
               })
               .catch((run) => {
                 this.currentRunDetails = null;

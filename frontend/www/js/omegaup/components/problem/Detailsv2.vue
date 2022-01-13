@@ -88,10 +88,13 @@
             :problem-alias="problem.alias"
             :runs="userRuns"
             :current-run-details="currentRunDetails"
-            @show-run-details="(request) => $emit('show-run-details', {
-              ...request,
-              isAdmin: this.user.admin
-            })"
+            @show-run-details="
+              (request) =>
+                $emit('show-run-details', {
+                  ...request,
+                  isAdmin: user.admin,
+                })
+            "
           >
             <template #title><div></div></template>
             <template #runs><div></div></template>

@@ -3,7 +3,12 @@
     <h5 class="mb-3">{{ T.wordsSubmissions }}</h5>
     <b-table :fields="tableFields" :items="filteredRuns" striped responsive>
       <template #cell(index)="row">
-        <b-button :disabled="!row.detailsShowing && showDetails" variant="link" size="sm" @click="toggleDetails(row)">
+        <b-button
+          :disabled="!row.detailsShowing && showDetails"
+          variant="link"
+          size="sm"
+          @click="toggleDetails(row)"
+        >
           <b-icon-chevron-right v-if="!row.detailsShowing" />
           <b-icon-chevron-down v-else />
         </b-button>
@@ -98,10 +103,7 @@ export default class Runs extends Vue {
   time = time;
   showDetails = false;
 
-  toggleDetails(row: {
-    toggleDetails: () => void;
-    item: TableRunItem;
-  }): void {
+  toggleDetails(row: { toggleDetails: () => void; item: TableRunItem }): void {
     this.showDetails = !this.showDetails;
     if (this.showDetails) {
       this.$emit('show-run-details', { guid: row.item.guid });
