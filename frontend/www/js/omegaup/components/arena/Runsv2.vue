@@ -3,29 +3,14 @@
     <h5 class="mb-3">{{ T.wordsSubmissions }}</h5>
     <b-table :fields="tableFields" :items="filteredRuns" striped responsive>
       <template #cell(index)="row">
-        <!-- TODO: Implement the collapse to show the details -->
         <b-button :disabled="!row.detailsShowing && showDetails" variant="link" size="sm" @click="toggleDetails(row)">
           <b-icon-chevron-right v-if="!row.detailsShowing" />
           <b-icon-chevron-down v-else />
         </b-button>
       </template>
 
-        <!-- TODO: Implement the collapse to show the details -->
-      <template #row-details="row">
-        {{ currentRunDetails + row }}
-        <!-- <b-card>
-          <b-row class="mb-2">
-            <b-col sm="3" class="text-sm-right"><b>Age:</b></b-col>
-            <b-col>{{ row.item.age }}</b-col>
-          </b-row>
-
-          <b-row class="mb-2">
-            <b-col sm="3" class="text-sm-right"><b>Is Active:</b></b-col>
-            <b-col>{{ row.item.isActive }}</b-col>
-          </b-row>
-
-          <b-button size="sm" @click="row.toggleDetails">Hide Details</b-button>
-        </b-card> -->
+      <template #row-details>
+        {{ currentRunDetails }}
       </template>
 
       <template #cell(guid)="data">
@@ -115,12 +100,13 @@ export default class Runs extends Vue {
 
   toggleDetails(row: {
     toggleDetails: () => void;
+    item: TableRunItem;
   }): void {
-    row.toggleDetails();
     this.showDetails = !this.showDetails;
     if (this.showDetails) {
-      // Aquí se deben llamar a las runDetails
+      this.$emit('show-run-details', { guid: row.item.guid });
     }
+    row.toggleDetails();
   }
 
   get filteredRuns(): TableRunItem[] {

@@ -47,12 +47,14 @@ OmegaUp.on('ready', async () => {
         },
         on: {
           'show-run-details': (request: SubmissionRequest) => {
+            console.log(request);
             api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
+                console.log(runDetails);
                 this.currentRunDetails = showSubmission({ request, runDetails });
-                window.location.hash = request.hash;
               })
               .catch((run) => {
+                this.currentRunDetails = null;
                 submitRunFailed({
                   error: run.error,
                   errorname: run.errorname,

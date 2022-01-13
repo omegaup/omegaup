@@ -101,6 +101,11 @@
           :problem="currentProblem"
           :user="user"
           :user-runs="userRuns"
+          @show-run-details="
+            (request) => {
+              $emit('show-run-details', request);
+            }
+          "
           @submit-run="
             (run) => {
               $emit('submit-run', run);
