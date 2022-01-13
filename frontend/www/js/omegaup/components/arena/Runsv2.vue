@@ -15,8 +15,12 @@
 
       <template #cell(verdict)="data">
         <span class="mr-1">{{ status(data.item) }}</span>
-        <!-- TODO: Add the status help button-->
-        {{ statusHelp(data.item) }}
+        <b-button
+          v-if="data.item.status === 'ready' && data.item.verdict !== 'AC'"
+          v-b-tooltip.right="statusHelp(data.item)"
+          size="sm"
+          ><b-icon-question-circle-fill></b-icon-question-circle-fill>
+        </b-button>
       </template>
 
       <!-- TODO: Add the new submission button -->
@@ -30,7 +34,11 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
 
-import { BootstrapVue, BIconChevronRight } from 'bootstrap-vue';
+import {
+  BootstrapVue,
+  BIconChevronRight,
+  BIconQuestionCircleFill,
+} from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 Vue.use(BootstrapVue);
@@ -70,6 +78,7 @@ interface TableRunItem {
 @Component({
   components: {
     BIconChevronRight,
+    BIconQuestionCircleFill,
   },
 })
 export default class Runs extends Vue {
