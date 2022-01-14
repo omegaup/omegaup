@@ -3,7 +3,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import arena_Runs from './Runsv2.vue';
 
-import BootstrapVue, { BTable } from 'bootstrap-vue';
+import BootstrapVue, { BTable, BIconQuestionCircleFill } from 'bootstrap-vue';
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 
@@ -84,6 +84,9 @@ describe('Runsv2.vue', () => {
     const tableComponent = wrapper.findComponent(BTable);
     expect(tableComponent.findAll('table tbody tr').length).toBe(runs.length);
     expect(tableComponent.find('td.table-success').exists()).toBe(true);
+    expect(tableComponent.findComponent(BIconQuestionCircleFill).exists()).toBe(
+      false,
+    );
     for (const run of runs) {
       expect(tableComponent.text()).toContain(run.guid);
       expect(tableComponent.text()).toContain(
@@ -124,6 +127,9 @@ describe('Runsv2.vue', () => {
     const tableComponent = wrapper.findComponent(BTable);
     expect(tableComponent.findAll('table tbody tr').length).toBe(runs.length);
     expect(tableComponent.find('td.table-success').exists()).toBe(false);
+    expect(
+      tableComponent.findAllComponents(BIconQuestionCircleFill).length,
+    ).toBe(runs.length);
 
     // MLE run
     expect(tableComponent.text()).toContain(runs[0].guid);
@@ -163,6 +169,9 @@ describe('Runsv2.vue', () => {
 
     const tableComponent = wrapper.findComponent(BTable);
     expect(tableComponent.findAll('table tbody tr').length).toBe(runs.length);
+    expect(
+      tableComponent.findAllComponents(BIconQuestionCircleFill).length,
+    ).toBe(runs.length);
     expect(tableComponent.find('td.table-warning').exists()).toBe(true);
     expect(tableComponent.find('td.table-danger').exists()).toBe(true);
   });
