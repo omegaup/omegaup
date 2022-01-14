@@ -2,7 +2,12 @@
 import 'cypress-wait-until';
 import 'cypress-file-upload';
 import { buildURLQuery } from '@/js/omegaup/ui';
-import { CourseOptions, LoginOptions, ProblemOptions } from './types';
+import {
+  CourseOptions,
+  LoginOptions,
+  ProblemOptions,
+  RunOptions,
+} from './types';
 
 // Logins the user given a username and password
 Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
@@ -105,6 +110,19 @@ Cypress.Commands.add(
     cy.get('[data-course-objective]').type(objective);
     cy.get('[data-course-new-description]').type(description);
     cy.get('button[type="submit"]').click();
+  },
+);
+
+Cypress.Commands.add(
+  'createRun',
+  ({ problemAlias, fixturePath, language }: RunOptions) => {
+    cy.visit('arena/problem/' + problemAlias);
+    cy.get('[data-new-run]').click();
+    cy.get('[name="language"]').select(language);
+    cy.fixture(fixturePath).then((fileContent) => {
+      cy.get('.CodeMirror-line').type(fileContent);
+      cy.get('[data-submit-run]').click();
+    });
   },
 );
 

@@ -1,6 +1,12 @@
 import { v4 as uuid } from 'uuid';
 import { getISODate } from '../support/commands';
-import { CourseOptions, LoginOptions, ProblemOptions } from '../support/types';
+import {
+  CourseOptions,
+  LoginOptions,
+  ProblemOptions,
+  RunOptions,
+  Status,
+} from '../support/types';
 
 describe('Basic Commands Test', () => {
   beforeEach(() => {
@@ -214,5 +220,31 @@ describe('Basic Commands Test', () => {
       problemOptions.problemAlias,
     );
     cy.get('[name="source"]').should('have.value', problemOptions.problemAlias);
+  });
+
+  it('Should make a run of a problem', () => {
+    const problemOptions: ProblemOptions = {
+      problemAlias: 'problem-' + uuid().slice(0, 8),
+      tag: 'Recursion',
+      autoCompleteTextTag: 'Recur',
+      problemLevelIndex: 1,
+    };
+
+    const runOptions: RunOptions = {
+      problemAlias: problemOptions.problemAlias,
+      fixturePath: 'main.cpp',
+      language: 'cpp11-gcc',
+    };
+
+    const expectedStatus: Status = 'AC';
+
+    cy.login({ username: 'user', password: 'user' });
+    cy.createProblem(problemOptions);
+    cy.createRun(runOptions);
+    cy.get('[data-run-status] > span').first().should('have.text', 'new');
+    cy.wait(10000); // Wait for grader
+    cy.get('[data-run-status] > span')
+      .first()
+      .should('have.text', expectedStatus);
   });
 });
