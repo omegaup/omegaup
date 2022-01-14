@@ -73,15 +73,14 @@ def main() -> None:
     dbconn = lib.db.connect(args)
     try:
         with rabbitmq_connection.connect(args) as channel:
+            callback = ContestsCallback.ContestsCallback(dbconn.conn,
+                                                         args.api_token,
+                                                         args.url)
             process_queue(channel=channel,
                           exchange_name='certificates',
                           queue_name='contest',
                           routing_key='ContestQueue',
-                          callback=ContestsCallback.ContestsCallback(
-                              dbconn.conn,
-                              args.api_token,
-                              args.url
-                          ))
+                          callback=lambda ch, m, p, b: callback(ch, m, p, b))
     finally:
         dbconn.conn.close()
         logging.info('Done')
