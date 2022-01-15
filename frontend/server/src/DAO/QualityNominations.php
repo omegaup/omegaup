@@ -258,7 +258,6 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         ?string $query = null,
         ?string $column = null
     ): array {
-        $offset = ($page - 1) * $rowcount;
         $sqlFrom = '
             FROM
                 QualityNominations qn
@@ -370,7 +369,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $params
         ) ?? 0;
 
-        $params[] = $offset;
+        $params[] = max(0, $page - 1) * $rowcount;
         $params[] = $rowcount;
 
         $nominations = [];
