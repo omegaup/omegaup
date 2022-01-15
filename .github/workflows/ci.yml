@@ -199,7 +199,14 @@ jobs:
 
       - name: Run Psalm
         run: |
-          ./vendor/bin/psalm \
+          find frontend/ \
+            -name *.php \
+            -and -not -wholename 'frontend/server/libs/third_party/*' \
+            -and -not -wholename 'frontend/tests/badges/*' \
+            -and -not -wholename 'frontend/tests/controllers/*' \
+            -and -not -wholename 'frontend/tests/runfiles/*' \
+            -and -not -wholename 'frontend/www/preguntas/*' \
+          | xargs ./vendor/bin/psalm \
             --output-format=github \
             --long-progress \
             --show-info=false

@@ -1133,7 +1133,7 @@ EOD;
         echo "                    f'Username={self.username}',\n";
         echo "                ))\n";
         echo "            else:\n";
-        echo "                headers['Authorization'] = self.api_token\n";
+        echo "                headers['Authorization'] = f'token {self.api_token}'\n";
         echo "        elif self.auth_token is not None:\n";
         echo "            payload['ouat'] = self.auth_token\n";
         echo "\n";
