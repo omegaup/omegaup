@@ -2,7 +2,6 @@
 /** @psalm-suppress MissingFile try_define.php definitely exists... */
 require_once OMEGAUP_ROOT . '/server/try_define.php';
 
-/** @var string */
 $_omegaUpRoot = OMEGAUP_ROOT;
 $_testShard = intval(getenv('TEST_TOKEN') ?: '0');
 

@@ -2360,7 +2360,6 @@ class User extends \OmegaUp\Controllers\Controller {
                 }
             }
         }
-        $newSchoolId = $currentSchoolId;
 
         \OmegaUp\Validators::validateOptionalNumber(
             $r['school_id'],

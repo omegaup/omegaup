@@ -136,7 +136,6 @@ abstract class CacheAdapter {
 
             // Get the value from the function provided
             $log->info('Calling $setFunc');
-            /** @var T */
             $returnValue = call_user_func($setFunc);
             $this->store($key, $returnValue, $timeout);
             $log->info('Committed value');
@@ -342,7 +341,6 @@ class RedisCacheAdapter extends CacheAdapter {
         }
         while (true) {
             $this->redis->watch($key);
-            /** @var false|string */
             $current = $this->redis->get($key);
             if ($current !== false) {
                 if (!is_null($cacheUsed)) {

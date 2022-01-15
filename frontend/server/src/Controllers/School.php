@@ -26,7 +26,6 @@ class School extends \OmegaUp\Controllers\Controller {
     public static function apiList(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
-        $param = '';
         if (is_string($r['term'])) {
             $param = $r['term'];
         } elseif (is_string($r['query'])) {

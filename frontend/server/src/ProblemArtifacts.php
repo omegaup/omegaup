@@ -134,7 +134,6 @@ class ProblemArtifacts {
             );
             return [];
         }
-        /** @var null|list<array{mode: int, type: string, id: string, name: string, size: int}> */
         $entries = $response['entries'];
         if (!is_iterable($entries)) {
             $this->log->error(
@@ -247,7 +246,6 @@ class ProblemArtifacts {
             );
             return [];
         }
-        /** @var null|list<array{commit: string, tree: string, parents: list<string>, author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}> */
         $logEntries = $response['log'];
         if (!is_iterable($logEntries)) {
             $this->log->error(

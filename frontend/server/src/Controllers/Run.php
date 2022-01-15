@@ -192,9 +192,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         /** @var null|int */
-        $problemsetId = null;
         /** @var null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments */
-        $problemsetContainer = null;
         /** @var null|\OmegaUp\DAO\VO\Contests */
         $contest = null;
         if (!empty($r['problemset_id'])) {
@@ -576,7 +574,6 @@ class Run extends \OmegaUp\Controllers\Controller {
             ) {
                 $response['submission_deadline'] = $problemsetIdentity->end_time;
             } elseif (isset($problemsetContainer->finish_time)) {
-                /** @var \OmegaUp\Timestamp $problemsetContainer->finish_time */
                 $response['submission_deadline'] = new \OmegaUp\Timestamp(
                     $problemsetContainer->finish_time
                 );
@@ -993,7 +990,6 @@ class Run extends \OmegaUp\Controllers\Controller {
             $problem->alias,
             $run->commit
         );
-        /** @var int */
         $responseSize = array_reduce(
             $cases,
             /**

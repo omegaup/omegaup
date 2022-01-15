@@ -1303,7 +1303,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 !empty($langParse[1])
             ) {
                 // create a list like "en" => 0.8
-                /** @var array{0: list<string>, 1: list<string>, 2: list<string>} $langParse */
                 [$_, $lang, $q] = $langParse;
                 $langs = array_combine($lang, $q);
 

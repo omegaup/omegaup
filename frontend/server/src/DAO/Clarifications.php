@@ -205,7 +205,6 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         ?int $offset,
         int $rowcount
     ) {
-        $sql = '';
         if ($admin) {
             $sql = '
                 SELECT

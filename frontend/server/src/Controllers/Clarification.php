@@ -66,10 +66,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         );
 
         $contest = null;
-        $problemsetId = null;
-        $admins = [];
         /** @var array{type: string, body: array{localizationString: \OmegaUp\TranslationString, localizationParams: array{problemAlias: string, contestAlias?: string, courseAlias?: string}, url: string, iconUrl: string}}*/
-        $notificationContents = [];
         if (is_null($contestAlias)) {
             // Clarification for course assignment
             $courseAlias = $r->ensureString(

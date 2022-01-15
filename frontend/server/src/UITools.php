@@ -207,7 +207,6 @@ class UITools {
             $entrypoint = $response['entrypoint'];
             $inContest = $response['inContest'] ?? false;
             $navbarSection = $response['navbarSection'] ?? '';
-            /** @var array<string, mixed> */
             $payload = $twigProperties['payload'] ?? [];
         } catch (\OmegaUp\Exceptions\ExitException $e) {
             // The callback explicitly requested to exit.

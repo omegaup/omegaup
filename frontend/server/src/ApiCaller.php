@@ -39,7 +39,6 @@ class ApiCaller {
             // The controller has explicitly requested to exit.
             exit;
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            $apiException = $e;
         } catch (\Exception $e) {
             $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
                 'generalError',
@@ -288,7 +287,6 @@ class ApiCaller {
      * @return no-return
      */
     public static function handleException(\Exception $e): void {
-        $apiException = null;
         if ($e instanceof \OmegaUp\Exceptions\ApiException) {
             $apiException = $e;
         } else {

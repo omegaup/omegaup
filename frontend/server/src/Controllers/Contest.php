@@ -96,7 +96,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         /** @var list<ContestListItem> */
-        $contests = [];
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('page_size');
         \OmegaUp\Validators::validateOptionalNumber($r['active'], 'active');
@@ -299,7 +298,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $showArchived = $r->ensureOptionalBool('show_archived') ?? false;
 
         // Create array of relevant columns
-        $contests = null;
         if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             $contests = \OmegaUp\DAO\Contests::getAllContestsWithScoreboard(
                 $page,
@@ -2838,8 +2836,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             !is_null($startTime) &&
             $startTime->time != $contest->start_time->time
         ) {
-            $runCount = 0;
-
             $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
                 intval($contest->problemset_id)
             );
@@ -4199,7 +4195,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $mergedScoreboard = [];
 
         // Merge
-        /** @var string $contestAlias */
         foreach ($scoreboards as $contestAlias => $scoreboard) {
             foreach ($scoreboard['ranking'] as $userResults) {
                 $username = $userResults['username'];
@@ -4308,10 +4303,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $admins = [];
         $requestsAdmins = [];
-        $result = [
-            'contest_alias' => $contestAlias,
-            'users' => [],
-        ];
         foreach ($resultAdmins as $result) {
             $adminId = $result['admin_id'];
             if (!empty($adminId) && !array_key_exists($adminId, $admins)) {
@@ -5656,7 +5647,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Get contestants info
-        /** @var int $contest->contest_id */
         $contestants = \OmegaUp\DAO\Contests::getContestantsInfo(
             $contest->contest_id
         );

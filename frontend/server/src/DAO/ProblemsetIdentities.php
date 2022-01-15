@@ -64,7 +64,6 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
             $problemsetIdentity->access_time = new \OmegaUp\Timestamp(
                 $currentTime
             );
-            /** @var \OmegaUp\Timestamp|null */
             $finishTime = (
                 empty($container->finish_time) ?
                 null :

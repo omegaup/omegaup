@@ -11,17 +11,14 @@ class Authorization extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $problem_alias
      * @omegaup-request-param string $token
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param string $username
      */
     public static function apiProblem(\OmegaUp\Request $r): array {
         $problemAlias = $r->ensureString(
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateValidUsername(
-            $r['username'],
-            'username'
-        );
+        $username = $r->ensureString('username');
 
         // This is not supposed to be called by end-users, but by the
         // gitserver. Regular sessions cannot be used since they
@@ -35,7 +32,7 @@ class Authorization extends \OmegaUp\Controllers\Controller {
         }
 
         $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
-            $r['username']
+            $username
         );
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);

@@ -1223,8 +1223,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             ) {
                 /**
                  * Pull original problem statements in every language the nominator is trying to override.
-                 * @var string $language
-                 * @var string $_
                  */
                 foreach ($response['contents']['statements'] as $language => $_) {
                     $originalStatements[$language] = \OmegaUp\Controllers\Problem::getProblemStatement(

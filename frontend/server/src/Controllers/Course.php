@@ -140,7 +140,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r,
         \OmegaUp\DAO\VO\Courses $course
     ): array {
-        /** @var \OmegaUp\Timestamp */
         $courseStartTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
             $course->start_time
         );
@@ -473,7 +472,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureOptionalInt('school_id');
 
         if (is_null($r['school_id'])) {
-            $school = null;
         } else {
             $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
             if (is_null($school)) {
@@ -4438,7 +4436,6 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $requestUserInformation = $courseDetails['requests_user_information'];
         $needsBasicInformation = false;
-        $privacyStatementMarkdown = null;
         $statements = [];
         if (!is_null($identity)) {
             $markdown = \OmegaUp\PrivacyStatement::getForConsent(
@@ -4550,7 +4547,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             ])
         );
 
-        /** @var array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string} */
         foreach (
             \OmegaUp\DAO\UserRoles::getCourseAdmins(
                 $course

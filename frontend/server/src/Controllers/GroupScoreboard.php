@@ -266,7 +266,6 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
             // Get merged scoreboard
             /** @var list<string> */
             $contestAliases = [];
-            /** @var ScoreboardContest $contest */
             foreach ($contests as $contest) {
                 $contestAliases[] = $contest['alias'];
             }

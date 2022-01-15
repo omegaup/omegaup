@@ -1145,7 +1145,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         // Call Grader
-        $runs = [];
         try {
             \OmegaUp\DAO\DAO::transBegin();
             $runs = \OmegaUp\DAO\Runs::getByProblem(
@@ -1742,7 +1741,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $updatedFileLanguages = [];
         try {
             $problemDeployer = new \OmegaUp\ProblemDeployer($problem->alias);
             $problemDeployer->commitLooseFiles(
@@ -4271,7 +4269,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $identity
         ) ? $currentLoggedIdentityId : $identity->identity_id);
 
-        $score = 0.0;
         // Add best score info
         $problemset = self::validateProblemset(
             $problem,
@@ -4432,7 +4429,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function getProblemsMineInfoForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
-        $privateProblemsAlert = false;
         {
             $scopedSession = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStart();
             $privateProblemsAlert = (
@@ -5969,8 +5965,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $collectionLevel = $r->ensureString('level');
 
-        $frequentTags = [];
-
         $offset = $r->ensureOptionalInt('offset');
         $pageSize = $r->ensureOptionalInt(
             'rowcount'
@@ -6205,8 +6199,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             // Do nothing, we allow unauthenticated users to use this API
             $r->identity = null;
         }
-
-        $authorsRanking = [];
 
         $offset = $r->ensureOptionalInt('offset');
         $pageSize = $r->ensureOptionalInt(

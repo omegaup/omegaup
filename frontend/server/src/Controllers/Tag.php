@@ -25,7 +25,6 @@ class Tag extends \OmegaUp\Controllers\Controller {
      * @return list<array{name: string}>
      */
     public static function apiList(\OmegaUp\Request $r) {
-        $param = '';
         if (is_string($r['term'])) {
             $param = $r['term'];
         } elseif (is_string($r['query'])) {

@@ -10,7 +10,7 @@ class Schools {
      */
     public static function createSchool($name = null) {
         if (is_null($name)) {
-            $name = \OmegaUp\Test\Utils::createRandomString();
+            \OmegaUp\Test\Utils::createRandomString();
         }
 
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();

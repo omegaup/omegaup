@@ -94,7 +94,6 @@ class RequestParam {
                 continue;
             }
             if (count($matches) == 4) {
-                /** @var array{0: string, 1: string, 2: string, 3: ?string} $matches */
                 [
                     $_,
                     $annotationType,
@@ -102,7 +101,6 @@ class RequestParam {
                     $annotationDescription,
                 ] = $matches;
             } else {
-                /** @var array{0: string, 1: string, 2: string} $matches */
                 [
                     $_,
                     $annotationType,

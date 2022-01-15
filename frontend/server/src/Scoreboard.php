@@ -567,8 +567,7 @@ class Scoreboard {
             $score = $run['score'];
             $isTest = $run['type'] == 'test';
 
-            $problem =&
-                $identitiesInfo[$identityId]['problems'][$problemMapping[$problemId]['order']];
+            $identitiesInfo[$identityId]['problems'][$problemMapping[$problemId]['order']];
 
             if (!array_key_exists($identityId, $testOnly)) {
                 // Hay un usuario en la lista de Runs,
@@ -606,8 +605,6 @@ class Scoreboard {
                 $problem['penalty'] = $totalPenalty;
 
                 if ($withRunDetails === true) {
-                    $runDetails = [];
-
                     $runDetailsRequest = new \OmegaUp\Request([
                         'run_alias' => $run['guid'],
                         'auth_token' => $authToken,
