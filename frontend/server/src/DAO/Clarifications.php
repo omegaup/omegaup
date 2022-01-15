@@ -107,7 +107,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $sqlLimit = '';
         if (!is_null($offset)) {
             $sqlLimit = 'LIMIT ?, ?';
-            $params[] = ($offset - 1) * $rowcount;
+            $params[] = max(0, $offset - 1) * $rowcount;
             $params[] = $rowcount;
         }
 
@@ -203,7 +203,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
 
         if (!is_null($offset)) {
             $sql .= 'LIMIT ?, ?';
-            $params[] = $offset;
+            $params[] = max(0, $offset);
             $params[] = $rowcount;
         }
 
@@ -277,8 +277,8 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $sql .= 'ORDER BY c.answer IS NULL DESC, c.clarification_id DESC ';
         if (!is_null($offset)) {
             $sql .= 'LIMIT ?, ?';
-            $val[] = intval($offset);
-            $val[] = intval($rowcount);
+            $val[] = max(0, $offset);
+            $val[] = $rowcount;
         }
 
         $result = [];
