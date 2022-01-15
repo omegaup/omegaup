@@ -281,7 +281,7 @@ class RequestParamChecker implements
         \Psalm\StatementsSource $statements_source,
         \Psalm\Codebase $codebase,
         array &$file_replacements = []
-    ) {
+    ): ?bool {
         if (
             $context->parent !== 'OmegaUp\\Controllers\\Controller' &&
             $context->self !== 'OmegaUp\\Controllers\\Controller'
@@ -425,7 +425,7 @@ class RequestParamChecker implements
      * @return void
      */
     public static function afterMethodCallAnalysis(
-        $expr,
+        \PhpParser\Node\Expr $expr,
         string $method_id,
         string $appearing_method_id,
         string $declaring_method_id,
@@ -434,7 +434,7 @@ class RequestParamChecker implements
         \Psalm\Codebase $codebase,
         array &$file_replacements = [],
         \Psalm\Type\Union &$return_type_candidate = null
-    ) {
+    ): void {
         if (!is_null($context->calling_function_id)) {
             $functionId = strtolower($context->calling_function_id);
         } elseif (!is_null($context->calling_method_id)) {

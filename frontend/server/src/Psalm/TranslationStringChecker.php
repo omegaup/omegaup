@@ -55,7 +55,7 @@ class TranslationStringChecker implements
         array $issues,
         array $build_info,
         \Psalm\SourceControl\SourceControlInfo $source_control_info = null
-    ) {
+    ): void {
         file_put_contents(
             self::getTranslationStringsDirname() . '/exceptions',
             implode("\n", self::EXCEPTION_MESSAGES) . "\n"
@@ -113,7 +113,7 @@ class TranslationStringChecker implements
         \Psalm\Context $file_context,
         \Psalm\Storage\FileStorage $file_storage,
         \Psalm\Codebase $codebase
-    ) {
+    ): void {
         if (
             !isset(
                 $file_storage->custom_metadata['omegaup-translation-strings']
@@ -182,13 +182,13 @@ class TranslationStringChecker implements
         \Psalm\StatementsSource $statements_source,
         \Psalm\Codebase $codebase,
         array &$file_replacements = []
-    ) {
+    ): ?bool {
         if (!($expr instanceof \PhpParser\Node\Expr\New_)) {
-            return;
+            return true;
         }
         if (!($expr->class instanceof \PhpParser\Node\Name\FullyQualified)) {
             // Not something we can reason about.
-            return;
+            return true;
         }
         if (
             !self::isSupportedConstructor(
@@ -196,11 +196,11 @@ class TranslationStringChecker implements
                 $expr->class->toLowerString()
             )
         ) {
-            return;
+            return true;
         }
         if (empty($expr->args)) {
             // There is no first argument.
-            return;
+            return true;
         }
         if (!($expr->args[0]->value instanceof \PhpParser\Node\Scalar\String_)) {
             if (
@@ -254,7 +254,7 @@ class TranslationStringChecker implements
      * @return void
      */
     public static function afterMethodCallAnalysis(
-        $expr,
+        \PhpParser\Node\Expr $expr,
         string $method_id,
         string $appearing_method_id,
         string $declaring_method_id,
@@ -263,7 +263,7 @@ class TranslationStringChecker implements
         \Psalm\Codebase $codebase,
         array &$file_replacements = [],
         \Psalm\Type\Union &$return_type_candidate = null
-    ) {
+    ): void {
         if ($method_id !== 'OmegaUp\\Translations::get') {
             return;
         }

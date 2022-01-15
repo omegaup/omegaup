@@ -9,7 +9,7 @@
     "process-timeout": 1200
   },
   "require-dev": {
-    "vimeo/psalm": "^3.18.2",
+    "vimeo/psalm": "^4.18.1",
     "jetbrains/phpstorm-stubs": "^2019.3",
     "phpunit/phpunit": "^9",
     "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
