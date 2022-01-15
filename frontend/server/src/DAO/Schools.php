@@ -78,8 +78,6 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         int $page,
         int $rowsPerPage
     ): array {
-        $offset = ($page - 1) * $rowsPerPage;
-
         $sqlFrom = '
             FROM
                 Schools s
@@ -110,7 +108,10 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         /** @var list<array{country_id: null|string, name: string, ranking: int|null, school_id: int, score: float}> */
         $rank = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql . $sqlFrom . $sqlLimit,
-            [$offset, $rowsPerPage]
+            [
+                max(0, $page - 1) * $rowsPerPage,
+                $rowsPerPage,
+            ]
         );
 
         return [

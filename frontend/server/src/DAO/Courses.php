@@ -662,8 +662,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ];
         }
 
-        $offset = ($page - 1) * $rowsPerPage;
-
         // Gets the total count of students in the course.
         $sqlCount = '
             SELECT
@@ -702,7 +700,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $sqlUsers,
             [
                 $groupId,
-                $offset,
+                max(0, $page - 1) * $rowsPerPage,
                 $rowsPerPage,
             ]
         );
@@ -771,7 +769,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $sqlStudentsProgress,
             [
                 $groupId,
-                $offset,
+                max(0, $page - 1) * $rowsPerPage,
                 $rowsPerPage,
                 $courseId,
             ]
@@ -953,7 +951,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         int $page = 1,
         int $pageSize = 1000
     ): array {
-        $offset = ($page - 1) * $pageSize;
         $sql = '
             SELECT
                 c.*
@@ -989,7 +986,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $identityId,
             \OmegaUp\Authorization::ADMIN_ROLE,
             $identityId,
-            $offset,
+            max(0, $page - 1) * $pageSize,
             $pageSize,
         ];
         /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}> */
@@ -1088,7 +1085,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         int $page = 1,
         int $pageSize = 1000
     ): array {
-        $offset = ($page - 1) * $pageSize;
         $sql = '
             SELECT
                 c.*
@@ -1104,7 +1100,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ?, ?';
         $params = [
             $userId,
-            $offset,
+            max(0, $page - 1) * $pageSize,
             $pageSize,
         ];
 
@@ -1408,8 +1404,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         int $page,
         int $rowsPerPage
     ): array {
-        $offset = ($page - 1) * $rowsPerPage;
-
         $sql = '(
             SELECT
                 i.username,
@@ -1499,7 +1493,13 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         /** @var list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int|null, name: null|string, time: \OmegaUp\Timestamp, username: string}> */
         $activity = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql . $sqlLimit,
-            [$course->course_id, $course->course_id, $course->course_id, $offset, $rowsPerPage]
+            [
+                $course->course_id,
+                $course->course_id,
+                $course->course_id,
+                max(0, $page - 1) * $rowsPerPage,
+                $rowsPerPage,
+            ]
         );
 
         return [

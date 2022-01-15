@@ -59,8 +59,6 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
         int $page = 1,
         int $pageSize = 100
     ): array {
-        $offset = ($page - 1) * $pageSize;
-
         $sql = 'SELECT
                     i.username,
                     i.name,
@@ -101,7 +99,11 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
         /** @var list<array{classname: string, isMainUserIdentity: int, name: null|string, team_alias: string, team_name: null|string, username: string}> */
         $teamsUsers = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql . $sqlLimit,
-            [$teamsGroupId, $offset, $pageSize]
+            [
+                $teamsGroupId,
+                max(0, $page - 1) * $pageSize,
+                $pageSize,
+            ]
         );
         $result = [];
         foreach ($teamsUsers as $row) {
