@@ -106,17 +106,13 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     /**
      * Gets the count of total runs sent by students (non-admins) to a given problemset
      *
-     * @param list<array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string}> $admins
+     * @param list<int> $adminsIds
      */
     final public static function countTotalStudentsSubmissionsOfProblemset(
         int $problemsetId,
-        array $admins
+        array $adminsIds
     ): int {
-        $adminsQuery = '(';
-        foreach ($admins as $admin) {
-            $adminsQuery .= "'{$admin['username']}',";
-        }
-        $adminsQuery = rtrim($adminsQuery, ',') . ')';
+        $placeholder = join(',', array_fill(0, count($adminsIds), '?'));
         $sql = "
             SELECT
                 COUNT(*)
@@ -127,12 +123,15 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             WHERE
                 s.problemset_id = ? AND
                 s.`type` = 'normal' AND
-                i.username NOT IN $adminsQuery;
+                i.user_id NOT IN ($placeholder);
         ";
-        $val = [$problemsetId];
+        $args = array_merge(
+            [ $problemsetId ],
+            $adminsIds,
+        );
 
         /** @var int */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $args);
     }
 
     /**

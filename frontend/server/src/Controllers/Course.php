@@ -1183,11 +1183,19 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // Prevent date changes if a course already has runs from students
         if ($startTime->time !== $assignment->start_time->time) {
+            /** @var list<int> $adminsIds */
+            $adminsIds = array_map(
+                fn($admin) => $admin['user_id'],
+                array_filter(
+                    \OmegaUp\DAO\UserRoles::getCourseAdmins(
+                        $course
+                    ),
+                    fn($admin) => !is_null($admin['user_id']),
+                )
+            );
             $runCount = \OmegaUp\DAO\Submissions::countTotalStudentsSubmissionsOfProblemset(
                 intval($assignment->problemset_id),
-                \OmegaUp\DAO\UserRoles::getCourseAdmins(
-                    $course
-                )
+                $adminsIds
             );
             if ($runCount > 0) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -1730,11 +1738,19 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        /** @var list<int> $adminsIds */
+        $adminsIds = array_map(
+            fn($admin) => $admin['user_id'],
+            array_filter(
+                \OmegaUp\DAO\UserRoles::getCourseAdmins(
+                    $course
+                ),
+                fn($admin) => !is_null($admin['user_id']),
+            )
+        );
         $runCount = \OmegaUp\DAO\Submissions::countTotalStudentsSubmissionsOfProblemset(
             intval($assignment->problemset_id),
-            \OmegaUp\DAO\UserRoles::getCourseAdmins(
-                $course
-            )
+            $adminsIds
         );
         if ($runCount > 0) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
