@@ -40,7 +40,13 @@ class UserParams {
     public $verify;
 
     /**
-     * @param array{username?: string, name?: string, password?: string, email?: string, isPrivate?: bool, verify?: bool} $params
+     * @readonly
+     * @var string|null
+     */
+    public $preferredLanguage;
+
+    /**
+     * @param array{username?: string, name?: string, password?: string, email?: string, isPrivate?: bool, verify?: bool, preferredLanguage?: string} $params
      */
     public function __construct(array $params = []) {
         $this->username = $params['username'] ?? \OmegaUp\Test\Utils::CreateRandomString();
@@ -49,6 +55,7 @@ class UserParams {
         $this->email = $params['email'] ?? \OmegaUp\Test\Utils::CreateRandomString() . '@mail.com';
         $this->isPrivate = $params['isPrivate'] ?? false;
         $this->verify = $params['verify'] ?? true;
+        $this->preferredLanguage = $params['preferredLanguage'] ?? null;
     }
 }
 
@@ -90,10 +97,20 @@ class User {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
+        $needsUpdate = false;
         if ($params->verify) {
             $user = self::verifyUser($user);
         } else {
             $user->verified = false;
+            $needsUpdate = true;
+        }
+
+        if (!empty($params->preferredLanguage)) {
+            $user->preferred_language = $params->preferredLanguage;
+            $needsUpdate = true;
+        }
+
+        if ($needsUpdate) {
             \OmegaUp\DAO\Users::update($user);
         }
 

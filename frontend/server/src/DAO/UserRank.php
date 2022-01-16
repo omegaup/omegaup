@@ -62,7 +62,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
             ) . '` ' . ($orderType === 'DESC' ? 'DESC' : 'ASC');
         }
         $paramsLimit = [
-            (($page - 1) * intval($colsPerPage)), // Offset
+            max(0, $page - 1) * intval($colsPerPage), // Offset
             intval($colsPerPage),
         ];
         $sqlLimit = ' LIMIT ?, ?';
@@ -130,7 +130,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$sqlSelect}{$sqlFrom}{$sqlOrderBy}{$sqlLimit}",
             [
-                ($page - 1) * $rowsPerPage,
+                max(0, $page - 1) * $rowsPerPage,
                 $rowsPerPage
             ]
         );
@@ -195,7 +195,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$sqlSelect}{$sqlFrom}{$sqlOrderBy}{$sqlLimit}",
             [
-                ($page - 1) * $rowsPerPage,
+                max(0, $page - 1) * $rowsPerPage,
                 $rowsPerPage
             ]
         );
