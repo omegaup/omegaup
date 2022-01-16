@@ -173,8 +173,6 @@ class TranslationStringChecker implements
      * Called after a statement has been checked
      *
      * @param \Psalm\FileManipulation[] $file_replacements
-     *
-     * @return null|false
      */
     public static function afterExpressionAnalysis(
         \PhpParser\Node\Expr $expr,
@@ -182,7 +180,7 @@ class TranslationStringChecker implements
         \Psalm\StatementsSource $statements_source,
         \Psalm\Codebase $codebase,
         array &$file_replacements = []
-    ): ?bool {
+    ): bool|null {
         if (!($expr instanceof \PhpParser\Node\Expr\New_)) {
             return true;
         }
