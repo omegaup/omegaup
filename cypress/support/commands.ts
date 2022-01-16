@@ -116,7 +116,7 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   'createRun',
   ({ problemAlias, fixturePath, language }: RunOptions) => {
-    cy.visit(`arena/problem/${problemAlias}/`);
+    cy.visit(`arena/problem/${encodeURIComponent(problemAlias)}/`);
     cy.get('[data-new-run]').click();
     cy.get('[name="language"]').select(language);
     cy.fixture(fixturePath).then((fileContent) => {
