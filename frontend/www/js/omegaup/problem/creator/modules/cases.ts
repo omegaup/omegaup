@@ -51,7 +51,7 @@ export const casesStore: Module<CasesState, RootState> = {
       if (groupTarget) {
         groupTarget.points = groupData.points;
         groupTarget.name = groupData.name;
-        groupTarget.pointsDefined = groupData.pointsDefined;
+        groupTarget.autoPoints = groupData.autoPoints;
       }
       state = assignMissingPoints(state);
     },
@@ -67,7 +67,7 @@ export const casesStore: Module<CasesState, RootState> = {
           name: caseRequest.name,
           groupID,
           points: caseRequest.points,
-          pointsDefined: caseRequest.pointsDefined,
+          autoPoints: caseRequest.autoPoints,
           ungroupedCase: true,
           cases: [{ ...newCase, groupID }],
         });
@@ -147,7 +147,7 @@ export const casesStore: Module<CasesState, RootState> = {
             // Update both case and group
             groupTarget.name = editedCase.name;
             groupTarget.points = editedCase.points;
-            groupTarget.pointsDefined = editedCase.pointsDefined;
+            groupTarget.autoPoints = editedCase.autoPoints;
           }
           Vue.set(groupTarget.cases, caseIndex, {
             ...caseTarget,
@@ -268,7 +268,7 @@ export const casesStore: Module<CasesState, RootState> = {
         const caseRequest = generateCaseRequest({
           ...newCase,
           points: 0,
-          pointsDefined: false,
+          autoPoints: false,
         });
         commit('addCase', caseRequest);
       }
@@ -351,7 +351,7 @@ export function assignMissingPoints(state: CasesState): CasesState {
   let notDefinedCount = 0;
 
   for (const group of state.groups) {
-    if (group.pointsDefined) {
+    if (!group.autoPoints) {
       maxPoints -= group?.points ?? 0;
     } else {
       notDefinedCount++;
@@ -362,7 +362,7 @@ export function assignMissingPoints(state: CasesState): CasesState {
     notDefinedCount && Math.max(maxPoints, 0) / notDefinedCount;
 
   state.groups = state.groups.map((element) => {
-    if (!element.pointsDefined) {
+    if (element.autoPoints) {
       element.points = individualPoints;
     }
     return element;
@@ -389,7 +389,7 @@ export function generateCaseRequest(
     caseID: uuid(),
     groupID: UUID_NIL,
     points: 0,
-    pointsDefined: false,
+    autoPoints: false,
     lines: [],
     ...caseParams,
   };
@@ -401,7 +401,7 @@ export function generateGroup(
     groupID: uuid(),
     cases: [],
     points: 0,
-    pointsDefined: false,
+    autoPoints: false,
     ungroupedCase: false,
     ...groupParams,
   };
