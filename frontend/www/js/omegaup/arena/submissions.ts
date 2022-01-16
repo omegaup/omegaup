@@ -24,7 +24,7 @@ interface SubmissionResponse {
 
 export interface SubmissionRequest {
   guid: string;
-  hash: string;
+  hash?: string;
   isAdmin: boolean;
 }
 
