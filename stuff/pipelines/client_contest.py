@@ -8,7 +8,7 @@ import os
 import sys
 from typing import Callable
 import pika
-import ContestsCallback
+import contests_callback
 import rabbitmq_connection
 
 sys.path.insert(
@@ -73,14 +73,14 @@ def main() -> None:
     dbconn = lib.db.connect(args)
     try:
         with rabbitmq_connection.connect(args) as channel:
-            callback = ContestsCallback.ContestsCallback(dbconn.conn,
-                                                         args.api_token,
-                                                         args.url)
+            callback = contests_callback.ContestsCallback(dbconn.conn,
+                                                          args.api_token,
+                                                          args.url)
             process_queue(channel=channel,
                           exchange_name='certificates',
                           queue_name='contest',
                           routing_key='ContestQueue',
-                          callback=lambda ch, m, p, b: callback(ch, m, p, b))
+                          callback=callback)
     finally:
         dbconn.conn.close()
         logging.info('Done')
