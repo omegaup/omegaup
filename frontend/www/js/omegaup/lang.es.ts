@@ -1008,6 +1008,7 @@ const translations: { [key: string]: string; } = {
   problemTagNumberTheory: "Teor\u00eda de n\u00fameros",
   problemTagNumericalMethods: "M\u00e9todos num\u00e9ricos",
   problemTagNumericalSeries: "Series num\u00e9ricas",
+  problemTagOFMI: "OFMI",
   problemTagOMI: "OMI",
   problemTagOMIAguascalientes: "OMI Aguascalientes",
   problemTagOMIBajaCalifornia: "OMI Baja California",

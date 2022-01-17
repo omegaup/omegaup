@@ -42,7 +42,7 @@ OmegaUp.on('ready', function () {
           progress: types.StudentProgressInCourse[];
         } = await api.Course.studentsProgress({
           page: nextPage,
-          length: 1,
+          length: 100,
           course: payload.course.alias,
         });
         completeStudentsProgress = completeStudentsProgress.concat(

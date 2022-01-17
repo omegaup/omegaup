@@ -2,7 +2,13 @@ import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import { setLocationHash } from '../location';
 import { myRunsStore, runsStore } from './runsStore';
-import { submitRun, trackRun, submitRunFailed } from './submissions';
+import {
+  showSubmission,
+  submitRun,
+  trackRun,
+  submitRunFailed,
+  SubmissionRequest,
+} from './submissions';
 
 import * as api from '../api';
 import * as time from '../time';
@@ -23,8 +29,9 @@ OmegaUp.on('ready', async () => {
     },
     data: () => {
       return {
-        selectedTab: null as null | Tabs,
-        problemSelectedTab: null as null | ProblemTabs,
+        selectedTab: null as null | string,
+        problemSelectedTab: null as null | string,
+        currentRunDetails: null as types.RunDetails | null,
       };
     },
     render: function (createElement) {
@@ -34,6 +41,7 @@ OmegaUp.on('ready', async () => {
           assignment: payload.assignment,
           course: payload.course,
           currentProblem: payload.currentProblem,
+          currentRunDetails: this.currentRunDetails,
           problems: payload.problems,
           selectedTab: this.selectedTab,
           problemSelectedTab: this.problemSelectedTab,
@@ -46,6 +54,23 @@ OmegaUp.on('ready', async () => {
           },
         },
         on: {
+          'show-run-details': (request: SubmissionRequest) => {
+            api.Run.details({ run_alias: request.guid })
+              .then((runDetails) => {
+                this.currentRunDetails = showSubmission({
+                  request,
+                  runDetails,
+                });
+              })
+              .catch((run) => {
+                this.currentRunDetails = null;
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
+              });
+          },
           'submit-run': ({
             code,
             language,

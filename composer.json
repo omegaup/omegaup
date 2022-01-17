@@ -4,12 +4,16 @@
   "license": "BSD-3-Clause",
   "config": {
     "platform": {
-      "php": "8.0.13"
+      "php": "8.0.14"
     },
-    "process-timeout": 1200
+    "process-timeout": 1200,
+    "allow-plugins": {
+      "composer/package-versions-deprecated": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   },
   "require-dev": {
-    "vimeo/psalm": "^3.15",
+    "vimeo/psalm": "^3.18",
     "jetbrains/phpstorm-stubs": "^2019.3",
     "phpunit/phpunit": "^9",
     "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
