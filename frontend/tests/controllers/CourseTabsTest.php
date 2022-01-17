@@ -89,6 +89,7 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             courseAlias: 'enrolled-course-1',
             showScoreboard: 'false',
             courseDuration: null,
+            courseName: 'Enrolled course 1',
         );
         $admin = $courseData['admin'];
         [ 'identity' => $identity ] = \OmegaUp\Test\Factories\User::createUser();
@@ -158,7 +159,8 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Finally add the second private course and make the student complete just one assignment
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
-            courseAlias: 'enrolled-course-2'
+            courseAlias: 'enrolled-course-2',
+            courseName: 'Enrolled course 2',
         );
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $courseData,
