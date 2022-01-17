@@ -159,6 +159,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTagHeuristics',
         'problemTagDataCompression',
         'problemTagBigData',
+        'problemTagOFMI',
         'problemTagOMI',
         'problemTagOMIAguascalientes',
         'problemTagOMIBajaCalifornia',
