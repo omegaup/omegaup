@@ -24,7 +24,7 @@ import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 
-class contests_callback_for_testing:
+class ContestsCallbackForTesting:
     '''Contests callback'''
     def __init__(self,
                  dbconn: mysql.connector.MySQLConnection,
@@ -37,14 +37,16 @@ class contests_callback_for_testing:
 
     def __call__(self,
                  channel: pika.adapters.blocking_connection.BlockingChannel,
-                 _method: pika.spec.Basic.Deliver,
-                 _properties: pika.spec.BasicProperties,
-                 _body: bytes) -> None:
+                 method: pika.spec.Basic.Deliver,
+                 properties: pika.spec.BasicProperties,
+                 body: bytes) -> None:
         '''Function to call the original callback'''
-        contests_callback.contests_callback(self.dbconn,
-                                            self.api_token,
-                                            self.url)
+        callback = contests_callback.contests_callback(self.dbconn,
+                                                       self.api_token,
+                                                       self.url)
+        callback(channel, method, properties, body)
         channel.close()
+
 
 def test_client_contest() -> None:
     '''Basic test for client contest queue.'''
@@ -64,9 +66,9 @@ def test_client_contest() -> None:
     os.system('python3 send_messages_contest_queue.py')
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
         rabbitmq_connection.connect(args) as channel:
-        callback = contests_callback_for_testing(dbconn.conn,
-                                                 args.api_token,
-                                                 args.url)
+        callback = ContestsCallbackForTesting(dbconn.conn,
+                                              args.api_token,
+                                              args.url)
         cur.execute('TRUNCATE TABLE `Certificates`;')
         dbconn.conn.commit()
 
@@ -79,7 +81,7 @@ def test_client_contest() -> None:
             exchange_name='certificates',
             queue_name='contest',
             routing_key='ContestQueue',
-            callback=lambda ch, m, p, b: callback(ch, m, p, b))
+            callback=callback)
         cur.execute('SELECT COUNT(*) AS count FROM `Certificates`;')
         count = cur.fetchone()
         assert count['count'] > 0
@@ -101,21 +103,15 @@ def test_client_contest_with_duplicated_codes(mocker: MockerFixture) -> None:
     dbconn = lib.db.connect(args)
     os.system('python3 send_messages_contest_queue.py')
     with rabbitmq_connection.connect(args) as channel:
-        callback = contests_callback_for_testing(dbconn.conn,
-                                                 args.api_token,
-                                                 args.url)
+        callback = ContestsCallbackForTesting(dbconn.conn,
+                                              args.api_token,
+                                              args.url)
+        codes = ['XMCF384X8X', 'XMCF384X8X', 'XMCF384X8X', 'XMCF384X8M']
         mocker.patch('verification_code.generate_code',
-                   side_effect=iter(['XMCF384X8X',
-                                     'XMCF384X8X',
-                                     'XMCF384X8X',
-                                     'XMCF384X8X',
-                                     'XMCF384X8X',
-                                     'XMCF384X8M',
-                                     ]))
+                     side_effect=iter(codes))
         client_contest.process_queue(
             channel=channel,
             exchange_name='certificates',
             queue_name='contest',
             routing_key='ContestQueue',
-            callback=lambda ch, m, p, b: callback(ch, m, p, b))
-        assert mocker.call.count == 6
+            callback=callback)
