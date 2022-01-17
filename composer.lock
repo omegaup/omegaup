@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c763ff33c048309c2e3a93b1a8bd309b",
+    "content-hash": "062048202695a8edd733c6a592b4518f",
     "packages": [
         {
             "name": "google/apiclient",
@@ -5302,7 +5302,7 @@
     "platform": [],
     "platform-dev": [],
     "platform-overrides": {
-        "php": "8.0.13"
+        "php": "8.0.14"
     },
     "plugin-api-version": "2.1.0"
 }

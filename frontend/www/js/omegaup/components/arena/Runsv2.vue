@@ -2,9 +2,20 @@
   <div class="mt-4" data-runs>
     <h5 class="mb-3">{{ T.wordsSubmissions }}</h5>
     <b-table :fields="tableFields" :items="filteredRuns" striped responsive>
-      <template #cell(index)>
-        <!-- TODO: Implement the collapse to show the details -->
-        <b-button variant="link" size="sm"><b-icon-chevron-right /></b-button>
+      <template #cell(index)="row">
+        <b-button
+          :disabled="!row.detailsShowing && showDetails"
+          variant="link"
+          size="sm"
+          @click="toggleDetails(row)"
+        >
+          <b-icon-chevron-right v-if="!row.detailsShowing" />
+          <b-icon-chevron-down v-else />
+        </b-button>
+      </template>
+
+      <template #row-details>
+        {{ currentRunDetails }}
       </template>
 
       <template #cell(guid)="data">
@@ -37,6 +48,7 @@ import * as time from '../../time';
 import {
   BootstrapVue,
   BIconChevronRight,
+  BIconChevronDown,
   BIconQuestionCircleFill,
 } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -78,15 +90,26 @@ interface TableRunItem {
 @Component({
   components: {
     BIconChevronRight,
+    BIconChevronDown,
     BIconQuestionCircleFill,
   },
 })
 export default class Runs extends Vue {
+  @Prop() currentRunDetails!: types.RunDetails | null;
   @Prop({ default: null }) problemAlias!: string | null;
   @Prop() runs!: null | types.Run[];
 
   T = T;
   time = time;
+  showDetails = false;
+
+  toggleDetails(row: { toggleDetails: () => void; item: TableRunItem }): void {
+    this.showDetails = !this.showDetails;
+    if (this.showDetails) {
+      this.$emit('show-run-details', { guid: row.item.guid });
+    }
+    row.toggleDetails();
+  }
 
   get filteredRuns(): TableRunItem[] {
     return this.sortedRuns.map((run) => {

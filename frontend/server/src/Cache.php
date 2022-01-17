@@ -193,6 +193,7 @@ class RedisCacheAdapter extends CacheAdapter {
      * @return T
      */
     public function entry(string $key, $defaultVar, int $ttl = 0) {
+        $flags = ['nx'];
         if ($ttl > 0) {
             $flags['ex'] = $ttl;
         }
@@ -334,6 +335,7 @@ class RedisCacheAdapter extends CacheAdapter {
         // TODO: This does not acquire a global lock to avoid this from being
         // called multiple times. Maybe we should try a Redlock here.
         $defaultVar = call_user_func($setFunc);
+        $flags = ['nx'];
         if ($timeout > 0) {
             $flags['ex'] = $timeout;
         }

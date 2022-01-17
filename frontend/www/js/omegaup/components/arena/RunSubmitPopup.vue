@@ -53,7 +53,12 @@
       </div>
       <div class="form-group row">
         <div class="col-sm-10">
-          <button type="submit" class="btn btn-primary" :disabled="!canSubmit">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            data-submit-run
+            :disabled="!canSubmit"
+          >
             <omegaup-countdown
               v-if="!canSubmit"
               :target-time="nextSubmissionTimestamp"

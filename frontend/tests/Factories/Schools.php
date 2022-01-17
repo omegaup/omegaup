@@ -9,6 +9,7 @@ class Schools {
      * @return array{creator: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{school_id: int}, school: \OmegaUp\DAO\VO\Schools}
      */
     public static function createSchool($name = null) {
+        $name = \OmegaUp\Test\Utils::createRandomString();
         if (is_null($name)) {
             \OmegaUp\Test\Utils::createRandomString();
         }
@@ -17,7 +18,7 @@ class Schools {
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'name' => $name,
         ]);
 
         // Call api
