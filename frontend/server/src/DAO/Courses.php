@@ -386,7 +386,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                                 a.course_id,
                                 a.assignment_id,
                                 psp.problem_id,
-                                s.identity_id,
                                 IFNULL(MAX(r.contest_score), 0.0) AS best_score_of_problem,
                                 a.max_points
                             FROM
@@ -394,13 +393,11 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             INNER JOIN
                                 Problemset_Problems psp ON a.problemset_id = psp.problemset_id
                             LEFT JOIN
-                                Submissions s ON s.problem_id = psp.problem_id AND s.problemset_id = a.problemset_id
+                                Submissions s ON s.problem_id = psp.problem_id AND s.problemset_id = a.problemset_id AND s.identity_id = ?
                             LEFT JOIN
                                 Runs r ON r.run_id = s.current_run_id
-                            WHERE
-                                s.identity_id = ?
                             GROUP BY
-                                a.assignment_id, psp.problem_id, s.identity_id
+                                a.assignment_id, psp.problem_id
                         ) bpr
                         GROUP BY bpr.assignment_id
                     ) cbpr
@@ -426,7 +423,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ]
             ) as $row
         ) {
-            print_r($row);
             // TODO: Define the exact percentage to consider the course as finished.
             if ($row['progress'] == 100) {
                 unset($row['progress']);
