@@ -910,6 +910,7 @@ CREATE TABLE `School_Of_The_Month` (
   KEY `school_of_the_month_id` (`school_of_the_month_id`),
   KEY `school_id` (`school_id`),
   KEY `selected_by` (`selected_by`),
+  KEY `idx_time` (`time`),
   CONSTRAINT `fk_sotmi_identity_id` FOREIGN KEY (`selected_by`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_sotms_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Escuelas del Mes';

@@ -1,0 +1,1 @@
+../../frontend/tests/resources/Main_wrong.cpp17-gcc
