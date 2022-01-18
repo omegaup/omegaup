@@ -2,8 +2,13 @@
   <b-card :title="T.problemCreatorAdd">
     <form ref="form" @submit.prevent="addItemToStore">
       <div class="h-100">
-        <b-tabs v-model="tabIndex" small pills lazy>
-          <b-tab :title="T.problemCreatorCase" name="modal-form">
+        <b-tabs small pills lazy>
+          <b-tab
+            @click="tab = 'case'"
+            :active="tab === 'case'"
+            :title="T.problemCreatorCase"
+            name="modal-form"
+          >
             <b-alert
               v-model="invalidName"
               variant="danger"
@@ -12,12 +17,22 @@
             >
               {{ T.problemCreatorCannotHaveSameName }}</b-alert
             >
-            <case-input />
+            <case-input ref="case-input" />
           </b-tab>
-          <b-tab :title="T.problemCreatorGroup" name="modal-form">
+          <b-tab
+            @click="tab = 'group'"
+            :active="tab === 'group'"
+            :title="T.problemCreatorGroup"
+            name="modal-form"
+          >
             <group-input />
           </b-tab>
-          <b-tab :title="T.problemCreatorMultipleCases" name="modal-form">
+          <b-tab
+            @click="tab = 'multiplecases'"
+            :active="tab === 'multiplecases'"
+            :title="T.problemCreatorMultipleCases"
+            name="modal-form"
+          >
             <multiple-cases-input />
           </b-tab>
         </b-tabs>
@@ -43,7 +58,11 @@ import cases_CaseInput from './CaseInput.vue';
 import cases_MultipleCasesInput from './MultipleCasesInput.vue';
 import cases_GroupInput from './GroupInput.vue';
 import { namespace } from 'vuex-class';
-import { Group, CaseRequest } from '@/js/omegaup/problem/creator/types';
+import {
+  Group,
+  CaseRequest,
+  AddTabTypes,
+} from '@/js/omegaup/problem/creator/types';
 import { NIL, v4 as uuid } from 'uuid';
 
 const casesStore = namespace('casesStore');
@@ -56,25 +75,25 @@ const casesStore = namespace('casesStore');
   },
 })
 export default class AddPanel extends Vue {
-  tabIndex = 0;
+  tab: AddTabTypes = 'case';
 
   invalidName = false;
   T = T;
 
-  @Ref('form') formRef!: HTMLFormElement;
+  @Ref('case-input') caseInputRef!: cases_CaseInput;
+
   @casesStore.Mutation('addCase') addCase!: (caseRequest: CaseRequest) => Group;
   @casesStore.State('groups') groups!: Group[];
 
   addItemToStore() {
     this.invalidName = false;
-    const formData = new FormData(this.formRef);
 
-    if (this.tabIndex === 0) {
+    if (this.tab === 'case') {
       // Case Input
-      const caseName = formData.get('case-name') as string;
-      const caseGroup = formData.get('case-group') as string;
-      const casePointsString = formData.get('case-points') as string; // FormData converts everything to string
-      const autoPointsString = formData.get('auto-points') as string | null; // A Checkbox is an exception, if it is checked it return 'true' otherwise null
+      const caseName = this.caseInputRef.caseName;
+      const caseGroup = this.caseInputRef.caseGroup;
+      const casePoints = this.caseInputRef.casePoints;
+      const caseAutoPoints = casePoints === null;
 
       // Check if there is a group/case with the same name already
       if (caseGroup === NIL) {
@@ -94,16 +113,12 @@ export default class AddPanel extends Vue {
         }
       }
 
-      const casePoints =
-        casePointsString === '' ? null : parseInt(casePointsString, 10);
-      const autoPoints = autoPointsString === 'true';
-
       this.addCase({
         caseID: uuid(),
         groupID: caseGroup,
         name: caseName,
         points: casePoints,
-        autoPoints: autoPoints,
+        autoPoints: caseAutoPoints,
       });
     }
     this.$emit('close-add-window');

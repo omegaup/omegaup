@@ -166,3 +166,5 @@ export interface CaseGroupID {
   groupID: GroupID;
   caseID: GroupID;
 }
+
+export type AddTabTypes = 'case' | 'group' | 'multiplecases';
