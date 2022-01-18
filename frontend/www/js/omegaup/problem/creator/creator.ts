@@ -21,9 +21,4 @@ OmegaUp.on('ready', () => {
       return createElement('creator-main');
     },
   });
-
-  // We need to save the creator object in the global scope, so that it can be accessed from Cypress
-  if ((window as any).Cypress) {
-    (window as any).creator = creator;
-  }
 });
