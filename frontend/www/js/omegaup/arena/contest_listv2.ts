@@ -11,6 +11,20 @@ OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestListv2Payload();
   let tab: ContestTab = ContestTab.Current;
+  const hash = window.location.hash ? window.location.hash.slice(1) : '';
+  if (hash !== '') {
+    switch (hash) {
+      case 'future':
+        tab = ContestTab.Future;
+        break;
+      case 'past':
+        tab = ContestTab.Past;
+        break;
+      default:
+        tab = ContestTab.Current;
+        break;
+    }
+  }
   let page: number = 1;
   let sortOrder: ContestOrder = ContestOrder.None;
   let filterBySignedUp: boolean = false;
