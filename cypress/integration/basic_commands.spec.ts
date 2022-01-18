@@ -249,7 +249,7 @@ describe('Basic Commands Test', () => {
     cy.get('[data-run-status] > span').first().should('have.text', 'new');
 
     cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
-    cy.wait(['@runStatus']);
+    cy.wait(['@runStatus'], { timeout: 10000 });
 
     cy.get('[data-run-status] > span')
       .first()
