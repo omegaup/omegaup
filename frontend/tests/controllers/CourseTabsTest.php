@@ -75,21 +75,18 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             'finished' => [],
         ];
 
-        // Create three public courses and two private course:
+        // Create three public courses and a private course:
         // - First one with 1 student, 1 lesson and unlimited duration => for public and enrolled tabs
         // - Second one is a public course with no students
         // - Third one is an archived course => not listed in tabs
-        // - The first private course, the user completes totally => for finished tab
-        // - The second private course, the user completes just one assignment => for enrolled tab
+        // - The private course, the user completes totally => for finished tab
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
             null,
             null,
             \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
             requestsUserInformation: 'no',
-            courseAlias: 'enrolled-course-1',
             showScoreboard: 'false',
-            courseDuration: null,
-            courseName: 'Enrolled course 1',
+            courseDuration: null
         );
         $admin = $courseData['admin'];
         [ 'identity' => $identity ] = \OmegaUp\Test\Factories\User::createUser();
@@ -157,53 +154,6 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         $coursesAliases['finished'][] = $courseData['course_alias'];
 
-        // Finally add the second private course and make the student complete just one assignment
-        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
-            courseAlias: 'enrolled-course-2',
-            courseName: 'Enrolled course 2',
-        );
-        \OmegaUp\Test\Factories\Course::addStudentToCourse(
-            $courseData,
-            $identity
-        );
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
-            self::login($courseData['admin']),
-            $courseData['course_alias'],
-            $courseData['assignment_alias'],
-            [ $problemData ]
-        );
-        $runData = \OmegaUp\Test\Factories\Run::createAssignmentRun(
-            $courseData['course_alias'],
-            $courseData['assignment_alias'],
-            $problemData,
-            $identity
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        $adminLogin = self::login($courseData['admin']);
-        $extraAssignmentAlias = 'extra_assignment';
-        \OmegaUp\Controllers\Course::apiCreateAssignment(
-            new \OmegaUp\Request([
-                'auth_token' => $adminLogin->auth_token,
-                'name' => \OmegaUp\Test\Utils::createRandomString(),
-                'alias' => $extraAssignmentAlias,
-                'description' => \OmegaUp\Test\Utils::createRandomString(),
-                'start_time' => (\OmegaUp\Time::get()),
-                'finish_time' => (\OmegaUp\Time::get() + 120),
-                'course_alias' => $courseData['course_alias'],
-                'assignment_type' => 'homework'
-            ])
-        );
-        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
-            $adminLogin,
-            $courseData['course_alias'],
-            $extraAssignmentAlias,
-            [ $problemData ]
-        );
-
-        $coursesAliases['enrolled'][] = $courseData['course_alias'];
-
         $response = \OmegaUp\Controllers\Course::getCourseTabsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => self::login($identity)->auth_token,
@@ -228,21 +178,82 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertFalse(
             $response['templateProperties']['payload']['courses']['public'][1]['alreadyStarted']
         );
-        $this->assertCount(
-            2,
-            $response['templateProperties']['payload']['courses']['enrolled']
-        );
         $this->assertEquals(
             $coursesAliases['enrolled'][0],
             $response['templateProperties']['payload']['courses']['enrolled'][0]['alias']
         );
         $this->assertEquals(
-            $coursesAliases['enrolled'][1],
-            $response['templateProperties']['payload']['courses']['enrolled'][1]['alias']
-        );
-        $this->assertEquals(
             $coursesAliases['finished'][0],
             $response['templateProperties']['payload']['courses']['finished'][0]['alias']
+        );
+    }
+
+    public function testEnrolledCourseWithOneFinishedAssignment() {
+        // Create a course with two assignments
+        // Make the student solve one of the assignments and verify
+        // if the course is not marked as finished
+        [ 'identity' => $student ] = \OmegaUp\Test\Factories\User::createUser();
+        // Finally add the second private course and make the student complete just one assignment
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            self::login($courseData['admin']),
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+        $runData = \OmegaUp\Test\Factories\Run::createAssignmentRun(
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            $problemData,
+            $student
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $adminLogin = self::login($courseData['admin']);
+        $extraAssignmentAlias = 'extra_assignment';
+        \OmegaUp\Controllers\Course::apiCreateAssignment(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => $extraAssignmentAlias,
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'start_time' => (\OmegaUp\Time::get()),
+                'finish_time' => (\OmegaUp\Time::get() + 120),
+                'course_alias' => $courseData['course_alias'],
+                'assignment_type' => 'homework'
+            ])
+        );
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $adminLogin,
+            $courseData['course_alias'],
+            $extraAssignmentAlias,
+            [ $problemData ]
+        );
+
+        $response = \OmegaUp\Controllers\Course::getCourseTabsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($student)->auth_token,
+            ])
+        );
+
+        $this->assertEmpty(
+            $response['templateProperties']['payload']['courses']['public']
+        );
+        $this->assertCount(
+            1,
+            $response['templateProperties']['payload']['courses']['enrolled']
+        );
+        $this->assertEmpty(
+            $response['templateProperties']['payload']['courses']['finished']
+        );
+        $this->assertEquals(
+            $courseData['course_alias'],
+            $response['templateProperties']['payload']['courses']['enrolled'][0]['alias']
         );
     }
 }

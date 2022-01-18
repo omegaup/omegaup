@@ -16,8 +16,7 @@ class Course {
         ?int $courseDuration = 120,
         ?string $courseAlias = null,
         ?bool $needsBasicInformation = false,
-        ?array $languages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
-        ?string $courseName = null
+        ?array $languages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
     ): array {
         if (is_null($admin)) {
             ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -40,7 +39,7 @@ class Course {
         }
 
         $courseAlias = $courseAlias ?? \OmegaUp\Test\Utils::createRandomString();
-        $courseName = $courseName ?? \OmegaUp\Test\Utils::createRandomString();
+        $courseName = \OmegaUp\Test\Utils::createRandomString();
         if (is_null($adminLogin)) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
@@ -91,8 +90,7 @@ class Course {
         ?int $courseDuration = 120,
         ?int $assignmentDuration = 120,
         ?string $courseAlias = null,
-        ?bool $needsBasicInformation = false,
-        ?string $courseName = null,
+        ?bool $needsBasicInformation = false
     ): array {
         if (is_null($admin)) {
             ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -108,9 +106,7 @@ class Course {
             $showScoreboard,
             $courseDuration,
             $courseAlias,
-            $needsBasicInformation,
-            languages: \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
-            courseName: $courseName
+            $needsBasicInformation
         );
         $courseAlias = $courseFactoryResult['course_alias'];
         $courseStartTime = intval(
