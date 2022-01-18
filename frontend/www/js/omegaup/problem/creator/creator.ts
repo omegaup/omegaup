@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
   Vue.use(BootstrapVue);
   Vue.use(BootstrapVueIcons);
 
-  const creator = new Vue({
+  new Vue({
     el: '#main-container',
     store,
     components: {

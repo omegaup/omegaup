@@ -4,10 +4,10 @@
       <div class="h-100">
         <b-tabs small pills lazy>
           <b-tab
-            @click="tab = 'case'"
             :active="tab === 'case'"
             :title="T.problemCreatorCase"
             name="modal-form"
+            @click="tab = 'case'"
           >
             <b-alert
               v-model="invalidName"
@@ -20,18 +20,18 @@
             <case-input ref="case-input" />
           </b-tab>
           <b-tab
-            @click="tab = 'group'"
             :active="tab === 'group'"
             :title="T.problemCreatorGroup"
             name="modal-form"
+            @click="tab = 'group'"
           >
             <group-input />
           </b-tab>
           <b-tab
-            @click="tab = 'multiplecases'"
             :active="tab === 'multiplecases'"
             :title="T.problemCreatorMultipleCases"
             name="modal-form"
+            @click="tab = 'multiplecases'"
           >
             <multiple-cases-input />
           </b-tab>
