@@ -41,9 +41,9 @@ class ContestsCallbackForTesting:
                  properties: pika.spec.BasicProperties,
                  body: bytes) -> None:
         '''Function to call the original callback'''
-        callback = contests_callback.contests_callback(self.dbconn,
-                                                       self.api_token,
-                                                       self.url)
+        callback = contests_callback.ContestsCallback(self.dbconn,
+                                                      self.api_token,
+                                                      self.url)
         callback(channel, method, properties, body)
         channel.close()
 

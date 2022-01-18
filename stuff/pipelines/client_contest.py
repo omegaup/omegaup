@@ -74,9 +74,9 @@ def main() -> None:
     dbconn = lib.db.connect(args)
     try:
         with rabbitmq_connection.connect(args) as channel:
-            callback = contests_callback.contests_callback(dbconn.conn,
-                                                           args.api_token,
-                                                           args.url)
+            callback = contests_callback.ContestsCallback(dbconn.conn,
+                                                          args.api_token,
+                                                          args.url)
             process_queue(channel=channel,
                           exchange_name='certificates',
                           queue_name='contest',

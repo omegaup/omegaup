@@ -24,7 +24,7 @@ class Certificate:
     username: str
 
 
-class contests_callback:
+class ContestsCallback:
     '''Contests callback'''
     def __init__(self,
                  dbconn: mysql.connector.MySQLConnection,
