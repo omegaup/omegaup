@@ -48,10 +48,6 @@
         T.problemCreatorAdd
       }}</b-button>
     </form>
-    <pre>
-      {{ JSON.stringify(groups, null, 2) }}
-      </pre
-    >
   </b-card>
 </template>
 
