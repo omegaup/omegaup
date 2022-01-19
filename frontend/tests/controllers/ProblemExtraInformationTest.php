@@ -220,4 +220,33 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
             $result['payload']['solutionStatus']
         );
     }
+
+    /**
+     * Test that users' preferred language is used.
+     */
+    public function testPreferredLanguage() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
+            ])
+        );
+
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
+            'preferredLanguage' => 'py3'
+        ]));
+        $login = self::login($identity);
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        )['templateProperties'];
+        $this->assertEquals(
+            'py3',
+            $result['payload']['problem']['preferred_language']
+        );
+    }
 }

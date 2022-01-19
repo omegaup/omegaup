@@ -2619,18 +2619,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         // Add preferred language of the user.
-        if (!is_null($loggedIdentity) && !is_null($loggedIdentity->username)) {
-            $userData = \OmegaUp\Controllers\User::getUserProfile(
-                $loggedIdentity,
-                $loggedIdentity,
-                omitRank: true
+        if (!is_null($loggedIdentity)) {
+            $preferredLanguage = \OmegaUp\DAO\Users::getPreferredLanguage(
+                $loggedIdentity->user_id
             );
-            if (
-                !empty($userData) &&
-                !empty($userData['preferred_language'])
-            ) {
+            if (!empty($preferredLanguage)) {
                 $response['preferred_language'] = strval(
-                    $userData['preferred_language']
+                    $preferredLanguage
                 );
             }
         }

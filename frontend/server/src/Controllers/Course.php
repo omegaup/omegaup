@@ -1181,12 +1181,22 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        // Prevent date changes if a course already has runs
+        // Prevent date changes if a course already has runs from students
         if ($startTime->time !== $assignment->start_time->time) {
-            $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
-                intval($assignment->problemset_id)
+            /** @var list<int> $adminsIds */
+            $adminsIds = array_map(
+                fn($admin) => $admin['user_id'],
+                array_filter(
+                    \OmegaUp\DAO\UserRoles::getCourseAdmins(
+                        $course
+                    ),
+                    fn($admin) => !is_null($admin['user_id']),
+                )
             );
-
+            $runCount = \OmegaUp\DAO\Submissions::countTotalStudentsSubmissionsOfProblemset(
+                intval($assignment->problemset_id),
+                $adminsIds
+            );
             if ($runCount > 0) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'courseUpdateAlreadyHasRuns'
@@ -1728,10 +1738,20 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
-            intval($problemset->problemset_id)
+        /** @var list<int> $adminsIds */
+        $adminsIds = array_map(
+            fn($admin) => $admin['user_id'],
+            array_filter(
+                \OmegaUp\DAO\UserRoles::getCourseAdmins(
+                    $course
+                ),
+                fn($admin) => !is_null($admin['user_id']),
+            )
         );
-
+        $runCount = \OmegaUp\DAO\Submissions::countTotalStudentsSubmissionsOfProblemset(
+            intval($assignment->problemset_id),
+            $adminsIds
+        );
         if ($runCount > 0) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseUpdateAlreadyHasRuns'
@@ -2131,7 +2151,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
         $rawProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            $assignment->problemset_id
+            $assignment->problemset_id,
+            needSubmissions: false
         );
         $letter = 0;
         $problems = [];
@@ -3008,7 +3029,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            $tokenAuthenticationResult['assignment']->problemset_id
+            $tokenAuthenticationResult['assignment']->problemset_id,
+            needSubmissions: false
         );
 
         $problemsResponseArray = [];
@@ -4048,7 +4070,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            intval($assignment->problemset_id)
+            intval($assignment->problemset_id),
+            needSubmissions: false
         );
 
         $problemsResponseArray = [];
@@ -4217,7 +4240,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            intval($assignment->problemset_id)
+            intval($assignment->problemset_id),
+            needSubmissions: false
         );
 
         $problemsResponseArray = [];
