@@ -8,8 +8,8 @@ import logging
 import os
 import sys
 import json
-import MySQLdb
-import MySQLdb.cursors
+import mysql.connector
+import mysql.connector.cursor
 import pika
 import rabbitmq_connection
 
@@ -21,16 +21,11 @@ import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 
-def send_coder_month(cur: MySQLdb.cursors.BaseCursor,
-                     channel:
-                     pika.adapters.blocking_connection.BlockingChannel,
-                     category: str) -> None:
-    '''Send messages to coder of the month queue'''
+def get_coder_of_the_month(cur: mysql.connector.cursor.MySQLCursorDict,
+                           category: str) -> str:
+    '''Get coder of the month'''
     today = datetime.date.today()
     first_day_of_current_month = today.replace(day=1)
-    channel.queue_declare("coder_month", passive=False, durable=False, exclusive=False, auto_delete=False)
-    channel.exchange_declare(exchange='certificates', auto_delete=False, durable=True, exchange_type='direct')
-    logging.info('Send messages to Coder_Month_Queue')
     if first_day_of_current_month.month == 12:
         first_day_of_next_month = datetime.date(
             first_day_of_current_month.year + 1,
@@ -43,31 +38,49 @@ def send_coder_month(cur: MySQLdb.cursors.BaseCursor,
             1)
     cur.execute(
         '''
-        SELECT
-            user_id, time, category
-        FROM
-            Coder_Of_The_Month
-        WHERE
-            `time` = %s AND
-            `selected_by` IS NOT NULL AND
-            `category` = %s;
+                SELECT
+                    user_id, time, category
+                FROM
+                    Coder_Of_The_Month
+                WHERE
+                    `time` = %s AND
+                    `selected_by` IS NOT NULL AND
+                    `category` = %s;
         ''', (first_day_of_next_month, category))
+    message = ''
     for row in cur:
         data = {"user_id": row['user_id'],
                 "time": row['time'],
                 "category": row['category']}
         message = json.dumps(data)
-        body = message.encode()
-        channel.basic_publish(
-            exchange='certificates',
-            routing_key='CoderOfTheMonthQueue',
-            body=body)
+    return message
+
+
+def send_coder_month(_cur: mysql.connector.cursor.MySQLCursorDict,
+                     channel:
+                     pika.adapters.blocking_connection.BlockingChannel,
+                     _category: str) -> None:
+    '''Send messages to coder of the month queue'''
+    channel.queue_declare("coder_month", passive=False,
+                          durable=False, exclusive=False,
+                          auto_delete=False)
+    channel.exchange_declare(exchange='certificates',
+                             auto_delete=False,
+                             durable=True,
+                             exchange_type='direct')
+    logging.info('Send messages to Coder_Month_Queue')
+    # message = get_coder_of_the_month(cur, category)
+    # print(message)
+    # body = message.encode()
+    # channel.basic_publish(exchange='certificates',
+    #                      routing_key='CoderOfTheMonthQueue',
+    #                      body=body)
     data = "Example"
     message = json.dumps(data)
     body = message.encode()
     channel.basic_publish(exchange='certificates',
-            routing_key='CoderOfTheMonthQueue',
-            body=body)
+                          routing_key='CoderOfTheMonthQueue',
+                          body=body)
 
 
 def main() -> None:
@@ -83,13 +96,14 @@ def main() -> None:
     logging.info('Started')
     dbconn = lib.db.connect(args)
     try:
-        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur, \
+        with dbconn.cursor(buffered=True, dictionary=True) as cur, \
             rabbitmq_connection.connect(args) as channel:
             send_coder_month(cur, channel, 'all')
             send_coder_month(cur, channel, 'female')
     finally:
-        dbconn.close()
+        dbconn.conn.close()
         logging.info('Done')
-    
+
+
 if __name__ == '__main__':
     main()

@@ -2,18 +2,14 @@
 
 '''test verification_code module.'''
 
-import pytest
 import os
-import BasicClient
-import rabbitmq_connection
 import argparse
 import logging
-import os
 import sys
-import json
-import MySQLdb
-import MySQLdb.cursors
-import pika
+from pytest_mock import MockerFixture
+import basic_client
+import rabbitmq_connection
+
 
 sys.path.insert(
     0,
@@ -22,8 +18,11 @@ sys.path.insert(
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
-def test_coder_of_the_month_queue() -> None:
+
+def test_coder_of_the_month_queue(mocker: MockerFixture) -> None:
     '''Test the message send to the coder of the month queue'''
+    mocker.patch('send_messages_coder_of_month_queue.get_coder_of_the_month',
+                 return_value='Example')
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
@@ -36,13 +35,20 @@ def test_coder_of_the_month_queue() -> None:
     dbconn = lib.db.connect(args)
     os.system('python3 send_messages_coder_of_month_queue.py')
     try:
-        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur, \
-            rabbitmq_connection.connect(args) as channel:
-            client = BasicClient.BasicClient('coder_month',
-                                 'certificates',
-                                 'CoderOfTheMonthQueue')
-            client.receive_messages(cur, dbconn, channel)
-            assert client.message == 'Example'
+        with rabbitmq_connection.connect(args) as channel:
+            callback = basic_client.ClientCallback()
+            basic_client.receive_messages('coder_month',
+                                          'certificates',
+                                          'CoderOfTheMonthQueue',
+                                          channel,
+                                          callback)
+            # print(callback.message)
+
+            # client = basic_client.BasicClient('coder_month',
+            #                                  'certificates',
+            #                                  'CoderOfTheMonthQueue')
+            # client.receive_messages(channel)
+            assert callback.message == 'Example'
     finally:
-        dbconn.close()
+        dbconn.conn.close()
         logging.info('Done')
