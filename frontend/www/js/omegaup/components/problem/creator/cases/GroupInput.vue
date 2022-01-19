@@ -11,6 +11,7 @@
         :formatter="formatter"
         required
         autocomplete="off"
+        name="group-name"
       />
     </b-form-group>
     <b-form-group
@@ -19,6 +20,7 @@
       label-for="case-points"
     >
       <b-form-input
+        name="group-points"
         v-model="groupPoints"
         :formatter="pointsFormatter"
         type="number"

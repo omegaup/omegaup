@@ -25,7 +25,7 @@
             name="modal-form"
             @click="tab = 'group'"
           >
-            <group-input />
+            <group-input ref="group-input" />
           </b-tab>
           <b-tab
             :active="tab === 'multiplecases'"
@@ -48,6 +48,10 @@
         T.problemCreatorAdd
       }}</b-button>
     </form>
+    <pre>
+      {{ JSON.stringify(groups, null, 2) }}
+      </pre
+    >
   </b-card>
 </template>
 
@@ -81,8 +85,10 @@ export default class AddPanel extends Vue {
   T = T;
 
   @Ref('case-input') caseInputRef!: cases_CaseInput;
+  @Ref('group-input') groupInputRef!: cases_GroupInput;
 
-  @casesStore.Mutation('addCase') addCase!: (caseRequest: CaseRequest) => Group;
+  @casesStore.Mutation('addCase') addCase!: (caseRequest: CaseRequest) => void;
+  @casesStore.Mutation('addGroup') addGroup!: (groupRequest: Group) => void;
   @casesStore.State('groups') groups!: Group[];
 
   addItemToStore() {
@@ -120,8 +126,28 @@ export default class AddPanel extends Vue {
         points: casePoints,
         autoPoints: caseAutoPoints,
       });
+    } else if (this.tab === 'group') {
+      const groupName = this.groupInputRef.groupName;
+      const groupPoints = this.groupInputRef.groupPoints;
+      const groupAutoPoints = groupPoints === null;
+
+      // Check if there is a group with the same name already
+      const nameAlreadyExists = this.groups.find((g) => g.name === groupName);
+      if (nameAlreadyExists) {
+        this.invalidName = true;
+        return;
+      }
+
+      this.addGroup({
+        groupID: uuid(),
+        name: groupName,
+        points: groupPoints,
+        autoPoints: groupAutoPoints,
+        ungroupedCase: false,
+        cases: [],
+      });
     }
-    this.$emit('close-add-window');
+    // this.$emit('close-add-window');
   }
 }
 </script>
