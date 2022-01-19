@@ -7,6 +7,7 @@
           <BIconLayoutSidebar />
         </b-button>
         <b-button
+          data-add-window
           size="sm"
           variant="success"
           class="mr-2"
