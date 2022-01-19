@@ -40,8 +40,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 User_Rank ur ON ur.user_id = i.user_id
             WHERE
                 s.problem_id = ? AND
-                r.status = "ready" AND
-                r.verdict = "AC" AND
+                s.status = "ready" AND
+                s.verdict = "AC" AND
                 s.type = "normal"
             ORDER BY
                 per_identity_rank ASC, r.runtime ASC, s.submission_id ASC
@@ -603,7 +603,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         \OmegaUp\DAO\VO\Problemsets $problemset,
         bool $onlyAC = false
     ): array {
-        $sql = '
+        $verdictCondition = ($onlyAC ?
+            "s.verdict IN ('AC') " :
+            "s.verdict NOT IN ('CE', 'JE', 'VE') "
+        );
+
+        $sql = "
             SELECT
                 IF(
                     COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
@@ -630,22 +635,16 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.problemset_id = pp.problemset_id AND
                 s.problem_id = pp.problem_id
             INNER JOIN
-                Runs r
-            ON
-                s.current_run_id = r.run_id
+                Runs r ON s.current_run_id = r.run_id
             LEFT JOIN
-                Contests c
-            ON
-                c.problemset_id = pp.problemset_id
+                Contests c ON c.problemset_id = pp.problemset_id
             WHERE
                 pp.problemset_id = ? AND
-                r.status = \'ready\' AND
-                s.type = \'normal\' AND ' .
-                ($onlyAC ?
-                    "r.verdict IN ('AC') " :
-                    "r.verdict NOT IN ('CE', 'JE', 'VE') "
-                ) .
-            ' ORDER BY s.submission_id;';
+                s.status = 'ready' AND
+                s.type = 'normal' AND
+                $verdictCondition
+            ORDER BY
+                s.submission_id;";
 
         /** @var list<array{contest_score: float|null, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
