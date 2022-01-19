@@ -40,8 +40,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 User_Rank ur ON ur.user_id = i.user_id
             WHERE
                 s.problem_id = ? AND
-                r.status = "ready" AND
-                r.verdict = "AC" AND
+                s.status = "ready" AND
+                s.verdict = "AC" AND
                 s.type = "normal"
             ORDER BY
                 per_identity_rank ASC, r.runtime ASC, s.submission_id ASC
