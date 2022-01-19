@@ -20,8 +20,8 @@
       label-for="case-points"
     >
       <b-form-input
-        name="group-points"
         v-model="groupPoints"
+        name="group-points"
         :formatter="pointsFormatter"
         type="number"
         number

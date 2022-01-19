@@ -50,7 +50,7 @@
 <script lang="ts">
 import { NIL } from 'uuid';
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { Getter, namespace } from 'vuex-class';
+import { namespace } from 'vuex-class';
 import T from '../../../../lang';
 
 const casesStore = namespace('casesStore');
