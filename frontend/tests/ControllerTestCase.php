@@ -5,9 +5,10 @@ namespace OmegaUp\Test;
 /**
  * Parent class of all controller test cases for omegaUp.
  * Implements common methods for setUp and asserts
+ * @psalm-suppress PropertyNotSetInConstructor For some reason psalm is complaining about some phpunit statics.
  */
 class ControllerTestCase extends \PHPUnit\Framework\TestCase {
-    /** @var \Logger|null */
+    /** @var \Monolog\Logger|null */
     private static $logObj = null;
 
     public static function setUpBeforeClass(): void {
@@ -450,7 +451,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
 
     public static function log(string $message): void {
         if (is_null(self::$logObj)) {
-            self::$logObj = \Logger::getLogger('tests');
+            self::$logObj = \Monolog\Registry::omegaup()->withName('tests');
         }
 
         self::$logObj->info($message);

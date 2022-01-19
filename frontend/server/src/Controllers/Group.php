@@ -180,10 +180,10 @@ class Group extends \OmegaUp\Controllers\Controller {
         );
 
         if (
-            !is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
+            \OmegaUp\DAO\GroupsIdentities::existsByPK(
                 $group->group_id,
                 $resolvedIdentity->identity_id
-            ))
+            )
         ) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                 'identityInGroup'
@@ -282,8 +282,8 @@ class Group extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['query'],
             'query',
-            /*$minLength=*/2,
-            /*$maxLength=*/null
+            minLength: 2,
+            maxLength: null
         );
 
         $groups = \OmegaUp\DAO\Groups::searchByName($r['query']);
@@ -423,7 +423,7 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: GroupEditPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: GroupEditPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $group
      */
@@ -461,7 +461,7 @@ class Group extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'groupAlias' => $groupAlias,
                     'groupName' => $group->name,
@@ -488,14 +488,14 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: GroupListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: GroupListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getGroupListForTypeScript(\OmegaUp\Request $r): array {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'groups' => \OmegaUp\DAO\Groups::getAllGroupsAdminedByUser(
                         $r->user->user_id,
@@ -514,7 +514,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $group
      * @omegaup-request-param string $scoreboard
      *
-     * @return array{smartyProperties: array{payload: GroupScoreboardContestsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: GroupScoreboardContestsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getGroupScoreboardEditForTypeScript(
         \OmegaUp\Request $r
@@ -539,15 +539,15 @@ class Group extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'availableContests' => \OmegaUp\Controllers\Contest::getContestList(
                         $r->identity,
-                        /*$query=*/ null,
-                        /*$page=*/ 1,
-                        /*$pageSize=*/ 20,
-                        \OmegaUp\DAO\Enum\ActiveStatus::ALL,
-                        \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+                        query: null,
+                        page: 1,
+                        pageSize: 20,
+                        activeContests: \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+                        recommended: \OmegaUp\DAO\Enum\RecommendedStatus::ALL
                     ),
                     'contests' => $contests,
                     'scoreboardAlias' => $scoreboard,

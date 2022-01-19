@@ -23,34 +23,48 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         ?int $offset,
         int $rowcount
     ): array {
-        $sqlFrom = '
+        if (!is_null($contest)) {
+            $sqlProblemsets = '
+            SELECT
+                problemset_id,
+                "" AS assignment_alias
             FROM
-                Clarifications cl
+                Problemsets
+            WHERE
+                contest_id = ?
+            ';
+            $params = [$contest->contest_id];
+        } elseif (!is_null($course)) {
+            $sqlProblemsets = '
+            SELECT
+                problemset_id,
+                alias AS assignment_alias
+            FROM
+                Assignments
+            WHERE
+                course_id = ?
+            ';
+            $params = [$course->course_id];
+        } else {
+            // This shouldn't happen!
+            return [
+                'totalRows' => 0,
+                'clarifications' => [],
+            ];
+        }
+
+        $sqlFrom = "
+            FROM
+                ($sqlProblemsets) ps
+            INNER JOIN
+                Clarifications cl ON cl.problemset_id = ps.problemset_id
             INNER JOIN
                 Identities i ON i.identity_id = cl.author_id
             LEFT JOIN
                 Identities r ON r.identity_id = cl.receiver_id
             INNER JOIN
                 Problems p ON p.problem_id = cl.problem_id
-            INNER JOIN
-                Problemsets ps ON ps.problemset_id = cl.problemset_id
-            LEFT JOIN
-                Contests con ON (
-                    con.contest_id = ps.contest_id AND
-                    con.problemset_id = ps.problemset_id
-                )
-            LEFT JOIN
-                Assignments a ON a.problemset_id = cl.problemset_id
-            WHERE
-                (
-                    con.contest_id = ? OR
-                    a.course_id = ?
-                )';
-
-        $params = [
-            is_null($contest) ? null : $contest->contest_id,
-            is_null($course) ? null : $course->course_id,
-        ];
+            ";
 
         if (!$isAdmin) {
             $sqlFrom .= '
@@ -77,7 +91,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $sql = '
             SELECT
                 cl.clarification_id,
-                a.alias AS assignment_alias,
+                ps.assignment_alias AS assignment_alias,
                 p.alias AS problem_alias,
                 i.username AS author,
                 r.username AS receiver,
@@ -90,26 +104,42 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $query = $sql . $sqlFrom;
         $countQuery = $sqlCount . $sqlFrom;
 
-        /** @var int */
-        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            $countQuery,
-            $params
-        ) ?? 0;
-
         $sqlLimit = '';
         if (!is_null($offset)) {
             $sqlLimit = 'LIMIT ?, ?';
-            $params[] = ($offset - 1) * $rowcount;
+            $params[] = max(0, $offset - 1) * $rowcount;
             $params[] = $rowcount;
         }
 
         $query .= $sqlOrderBy . $sqlLimit;
 
-        /** @var list<array{answer: null|string, assignment_alias: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
+        /** @var list<array{answer: null|string, assignment_alias: string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
         $clarifications = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $query,
             $params
         );
+
+        // If we didn't get an offset, we know the total number of rows
+        // already, no need to query the database for it.
+        $totalRows = count($clarifications);
+        if (!is_null($offset) && $offset != 0) {
+            if ($totalRows != $rowcount) {
+                // If we did get an offset, but the number of rows we got is
+                // less than what we allowed, we've already reached the end
+                // of the list so just bump up the count to account for the
+                // starting position.
+                $totalRows += ($offset - 1) * $rowcount;
+            } else {
+                // If we exhausted the maximum number of rows to fetch it's
+                // possible there are more rows than we know about at this
+                // point, thus we need to actually query the database.
+                /** @var int */
+                $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+                    $countQuery,
+                    $params
+                ) ?? 0;
+            }
+        }
 
         return [
             'totalRows' => $totalRows,
@@ -146,8 +176,6 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 Identities r ON r.identity_id = c.receiver_id
             INNER JOIN
                 Problems p ON p.problem_id = c.problem_id
-            INNER JOIN
-                Problemsets ps ON ps.problemset_id = c.problemset_id
             WHERE
                 c.problemset_id = ?
                 AND p.problem_id = ?
@@ -175,7 +203,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
 
         if (!is_null($offset)) {
             $sql .= 'LIMIT ?, ?';
-            $params[] = $offset;
+            $params[] = max(0, $offset);
             $params[] = $rowcount;
         }
 
@@ -249,8 +277,8 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $sql .= 'ORDER BY c.answer IS NULL DESC, c.clarification_id DESC ';
         if (!is_null($offset)) {
             $sql .= 'LIMIT ?, ?';
-            $val[] = intval($offset);
-            $val[] = intval($rowcount);
+            $val[] = max(0, $offset);
+            $val[] = $rowcount;
         }
 
         $result = [];

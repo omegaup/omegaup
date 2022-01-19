@@ -178,12 +178,19 @@
         </thead>
         <tfoot v-if="problemAlias != null">
           <tr>
-            <td colspan="10">
+            <td colspan="10" data-new-run>
               <a
                 v-if="isContestFinished"
                 :href="`/arena/${contestAlias}/practice/`"
                 >{{ T.arenaContestEndedUsePractice }}</a
               >
+              <button
+                v-else-if="useNewSubmissionButton"
+                class="w-100"
+                @click="$emit('new-submission')"
+              >
+                {{ newSubmissionDescription }}
+              </button>
               <a
                 v-else
                 :href="newSubmissionUrl"
@@ -195,7 +202,7 @@
         </tfoot>
         <tbody>
           <tr v-for="run in filteredRuns" :key="run.guid">
-            <td>{{ time.formatTimestamp(run.time) }}</td>
+            <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
             <td>
               <acronym :title="run.guid" data-run-guid>
                 <tt>{{ run.guid.substring(0, 8) }}</tt>
@@ -404,6 +411,7 @@ export default class Runs extends Vue {
   @Prop({ default: false }) showProblem!: boolean;
   @Prop({ default: false }) showRejudge!: boolean;
   @Prop({ default: false }) showUser!: boolean;
+  @Prop({ default: false }) useNewSubmissionButton!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop({ default: null }) problemAlias!: string | null;
   @Prop({ default: () => [] }) problemsetProblems!: types.ProblemsetProblem[];
@@ -793,17 +801,21 @@ caption {
   text-align: center;
 }
 
-.runs tfoot td a {
-  display: block;
-  padding: 0.5em;
-  text-decoration: none;
-  color: var(--arena-runs-table-tfoot-font-color);
-  background: var(--arena-runs-table-tfoot-background-color);
-  text-align: center;
-}
+.runs tfoot td {
+  a,
+  button {
+    display: block;
+    padding: 0.5em;
+    text-decoration: none;
+    color: var(--arena-runs-table-tfoot-font-color);
+    background: var(--arena-runs-table-tfoot-background-color);
+    text-align: center;
+  }
 
-.runs tfoot td a:hover {
-  background: var(--arena-runs-table-tfoot-background-color--hoover);
+  a:hover,
+  button:hover {
+    background: var(--arena-runs-table-tfoot-background-color--hoover);
+  }
 }
 
 .status-disqualified {

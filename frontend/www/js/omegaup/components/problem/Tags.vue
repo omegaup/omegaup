@@ -5,6 +5,7 @@
         <label class="font-weight-bold">{{ T.wordsPublicTags }}</label>
         <vue-typeahead-bootstrap
           v-if="canAddNewTags"
+          data-tags-input
           :data="publicTags"
           :serializer="publicTagsSerializer"
           :auto-close="true"
@@ -105,8 +106,8 @@
           </tr>
         </tbody>
       </table>
-      <div class="row">
-        <div class="form-group">
+      <div class="row mx-1">
+        <div class="form-group w-100">
           <label class="font-weight-bold">{{ T.wordsLevel }}</label>
           <select
             v-model="problemLevelTag"

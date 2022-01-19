@@ -16,7 +16,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEquals(
             $response['teamGroup'],
@@ -263,11 +263,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
 
         // Users to associate
@@ -291,8 +287,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
-                    /*$password=*/ null,
-                    /*$forTeams=*/ true
+                    forTeams: true,
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -305,7 +300,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertCount(5, $identities);
 
@@ -360,11 +355,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
 
         $teamUsernames = \OmegaUp\Test\Factories\Identity::getUsernamesInCsvFile(
@@ -379,8 +370,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities_with_no_members.csv',
                     $teamGroup->alias,
-                    /*$password=*/ null,
-                    /*$forTeams=*/ true
+                    forTeams: true,
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -393,7 +383,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertCount(5, $identities);
 
@@ -435,11 +425,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
 
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -451,8 +437,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                         'team_identities.csv',
                         $teamGroup->alias,
-                        /*$password=*/ null,
-                        /*$forTeams=*/ true
+                        forTeams: true,
                     ),
                     'team_group_alias' => $teamGroup->alias,
                 ])
@@ -472,11 +457,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
 
         try {
@@ -486,8 +467,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                         'team_identities.csv',
                         $teamGroup->alias,
-                        /*$password=*/ null,
-                        /*$forTeams=*/ true
+                        forTeams: true,
                     ),
                     'team_group_alias' => 'fake_alias',
                 ])
@@ -507,11 +487,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
 
         try {
@@ -521,8 +497,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                         'malformed_team_identities.csv',
                         $teamGroup->alias,
-                        /*$password=*/ null,
-                        /*$forTeams=*/ true
+                        forTeams: true,
                     ),
                     'team_group_alias' => $teamGroup->alias,
                 ])
@@ -542,11 +517,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
 
         try {
@@ -556,8 +527,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                         'duplicated_team_identities.csv',
                         $teamGroup->alias,
-                        /*$password=*/ null,
-                        /*$forTeams=*/ true
+                        forTeams: true,
                     ),
                     'team_group_alias' => $teamGroup->alias,
                 ])
@@ -577,11 +547,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
 
         try {
@@ -591,8 +557,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                         'duplicated_member_identities.csv',
                         $teamGroup->alias,
-                        /*$password=*/ null,
-                        /*$forTeams=*/ true
+                        forTeams: true,
                     ),
                     'team_group_alias' => $teamGroup->alias,
                 ])
@@ -642,7 +607,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertCount($numberOfGroups, $response['teamsGroups']);
     }
@@ -718,11 +683,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
         $numberOfUsers = 10;
 
@@ -747,8 +708,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
-                    /*$password=*/ null,
-                    /*$forTeams=*/ true
+                    forTeams: true,
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -792,11 +752,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $creatorLogin = self::login($creatorIdentity);
         $teamGroup = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            /*$name*/ null,
-            /*$description*/ null,
-            /*$alias*/ null,
-            /*$numberOfContestants*/ null,
-            $creatorLogin
+            login: $creatorLogin,
         )['teamGroup'];
 
         // Call api using identity creator group team
@@ -806,8 +762,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
-                    /*$password=*/ null,
-                    /*$forTeams=*/ true
+                    forTeams: true,
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -820,7 +775,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertCount(5, $teamIdentities);
 
@@ -833,7 +788,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'team_group_alias' => $teamGroup->alias,
                     'auth_token' => $creatorLogin->auth_token,
                 ])
-            )['smartyProperties']['payload'];
+            )['templateProperties']['payload'];
 
             $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
                 $teamIdentity['username']
@@ -871,11 +826,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $creatorLogin = self::login($creatorIdentity);
         $teamGroup = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         )['teamGroup'];
 
         // Call api using identity creator group team
@@ -885,8 +836,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
-                    /*$password=*/ null,
-                    /*$forTeams=*/ true
+                    forTeams: true,
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -899,7 +849,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertCount(5, $teamIdentities);
 
@@ -912,7 +862,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'team_group_alias' => $teamGroup->alias,
                     'auth_token' => $creatorLogin->auth_token,
                 ])
-            )['smartyProperties']['payload'];
+            )['templateProperties']['payload'];
 
             $this->assertCount(5 - $i, $teamIdentities);
 
@@ -930,7 +880,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEmpty($teamIdentities);
     }
@@ -945,11 +895,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
         $numberOfUsers = 2;
 
@@ -977,8 +923,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
-                    /*$password=*/ null,
-                    /*$forTeams=*/ true
+                    forTeams: true,
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -1034,11 +979,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
 
         // Users to associate
@@ -1062,8 +1003,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
-                    /*$password=*/ null,
-                    /*$forTeams=*/ true
+                    forTeams: true,
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -1128,11 +1068,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
 
         // Users to associate
@@ -1156,8 +1092,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
-                    /*$password=*/ null,
-                    /*$forTeams=*/ true
+                    forTeams: true,
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -1219,11 +1154,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
 
         // Users to associate
@@ -1247,8 +1178,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
-                    /*$password=*/ null,
-                    /*$forTeams=*/ true
+                    forTeams: true,
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -1302,11 +1232,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
 
         // Users to associate
@@ -1330,8 +1256,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
-                    /*$password=*/ null,
-                    /*$forTeams=*/ true
+                    forTeams: true,
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -1363,11 +1288,8 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            /*$numberOfContestants=*/ 2,
-            $creatorLogin
+            numberOfContestants: 2,
+            login: $creatorLogin,
         );
 
         // Users to associate
@@ -1387,8 +1309,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                         'team_identities_with_exceeded_number_of_contestants.csv',
                         $teamGroup->alias,
-                        /*$password=*/ null,
-                        /*$forTeams=*/ true
+                        forTeams: true,
                     ),
                     'team_group_alias' => $teamGroup->alias,
                 ])
@@ -1412,11 +1333,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
 
         // Users to associate
@@ -1435,8 +1352,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities_original.csv',
                     $teamGroup->alias,
-                    /*$password=*/ null,
-                    /*$forTeams=*/ true
+                    forTeams: true,
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -1489,8 +1405,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities_updated.csv',
                     $teamGroup->alias,
-                    /*$password=*/ null,
-                    /*$forTeams=*/ true
+                    forTeams: true,
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -1556,11 +1471,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
-            null,
-            null,
-            null,
-            null,
-            $creatorLogin
+            login: $creatorLogin,
         );
 
         // Users to associate
@@ -1580,10 +1491,9 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $teamIdentities = \OmegaUp\Test\Factories\Identity::getCsvData(
             'team_identities_with_no_members.csv',
             $teamGroup->alias,
-            /*$password=*/ null,
-            /*$forTeams=*/ true,
-            $teamGroup->number_of_contestants,
-            /*$autogernerateIdentities=*/ true
+            forTeams: true,
+            numberOfContestants: $teamGroup->number_of_contestants,
+            autogenerateIdentities: true,
         );
 
         // Call api using identity creator group member
@@ -1602,7 +1512,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertCount(5, $identities);
 
@@ -1628,10 +1538,9 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $teamIdentities = \OmegaUp\Test\Factories\Identity::getCsvData(
             'team_identities_with_no_members.csv',
             $teamGroup->alias,
-            /*$password=*/ null,
-            /*$forTeams=*/ true,
-            $teamGroup->number_of_contestants,
-            /*$autogernerateIdentities=*/ true
+            forTeams: true,
+            numberOfContestants: $teamGroup->number_of_contestants,
+            autogenerateIdentities: true,
         );
 
         // Call api using identity creator group member
@@ -1650,7 +1559,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         // The number of identities per group reamin the same
         $this->assertCount(5, $identities);

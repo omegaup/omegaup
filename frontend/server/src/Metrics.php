@@ -38,7 +38,7 @@ class Metrics {
                 'status per API request',
                 ['api', 'status']
             )
-            ->inc([$apiName, $status]);
+            ->inc([$apiName, strval($status)]);
 
         $this
             ->registry

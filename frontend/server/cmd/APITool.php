@@ -3,6 +3,16 @@
 define('OMEGAUP_ROOT', dirname(__DIR__, 2));
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
+$rootLogger = new \Monolog\Logger('omegaup');
+$handler = new \Monolog\Handler\StreamHandler(
+    'php://stderr',
+    \Monolog\Logger::DEBUG,
+);
+$handler->setFormatter(new \Monolog\Formatter\LineFormatter());
+$rootLogger->pushHandler($handler);
+\Monolog\Registry::addLogger($rootLogger);
+\Monolog\ErrorHandler::register($rootLogger);
+
 class ConversionResult {
     /**
      * @var string
@@ -331,7 +341,7 @@ class TypeMapper {
                             );
                             if ($isNullable) {
                                 $conversionStatement = (
-                                    "if (x.{$propertyName}) {$conversionStatement}"
+                                    "if (typeof x.{$propertyName} !== 'undefined' &&  x.{$propertyName} !== null) {$conversionStatement}"
                                 );
                             }
                             $convertedProperties[] = $conversionStatement;
@@ -1123,7 +1133,7 @@ EOD;
         echo "                    f'Username={self.username}',\n";
         echo "                ))\n";
         echo "            else:\n";
-        echo "                headers['Authorization'] = self.api_token\n";
+        echo "                headers['Authorization'] = f'token {self.api_token}'\n";
         echo "        elif self.auth_token is not None:\n";
         echo "            payload['ouat'] = self.auth_token\n";
         echo "\n";

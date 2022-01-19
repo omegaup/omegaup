@@ -1,12 +1,28 @@
 // <reference types="cypress"/>
 
-declare namespace Cypress {
-  // Includes custom omegaup API error types
-  interface Error {
-    error: string;
-  }
+import {
+  CourseOptions,
+  LoginOptions,
+  ProblemOptions,
+  RunOptions,
+} from './types';
 
-  interface Chainable {
-    login(username: string, password: string): void;
+declare global {
+  namespace Cypress {
+    // Includes custom omegaup API error types
+    interface Error {
+      error: string;
+    }
+
+    interface Chainable {
+      login(loginOptions: LoginOptions): void;
+      register(loginOptions: LoginOptions): void;
+      createProblem(problemOptions: ProblemOptions): void;
+      createCourse(
+        courseOptions: Partial<CourseOptions> &
+          Pick<CourseOptions, 'courseAlias'>,
+      ): void;
+      createRun(problemOptions: RunOptions): void;
+    }
   }
 }

@@ -15,9 +15,9 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
-            /* $requestsUserInformation */ 'no',
-            /* $showScoreboard */'false',
-            /* $courseDuration= */ null,
+            requestsUserInformation: 'no',
+            showScoreboard: 'false',
+            courseDuration: null,
         );
         $admin = $courseData['admin'];
         [ 'identity' => $identity ] = \OmegaUp\Test\Factories\User::createUser();
@@ -57,14 +57,14 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertCount(
             1,
-            $response['smartyProperties']['payload']['courses']['public']
+            $response['templateProperties']['payload']['courses']['public']
         );
         $this->assertEquals(
             $coursesAliases['public'][0],
-            $response['smartyProperties']['payload']['courses']['public'][0]['alias']
+            $response['templateProperties']['payload']['courses']['public'][0]['alias']
         );
         $this->assertFalse(
-            $response['smartyProperties']['payload']['courses']['public'][0]['alreadyStarted']
+            $response['templateProperties']['payload']['courses']['public'][0]['alreadyStarted']
         );
     }
 
@@ -84,9 +84,9 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
-            /* $requestsUserInformation */ 'no',
-            /* $showScoreboard */'false',
-            /* $courseDuration= */ null,
+            requestsUserInformation: 'no',
+            showScoreboard: 'false',
+            courseDuration: null,
         );
         $admin = $courseData['admin'];
         [ 'identity' => $identity ] = \OmegaUp\Test\Factories\User::createUser();
@@ -115,9 +115,9 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
-            /* $requestsUserInformation */ 'no',
-            /* $showScoreboard */'false',
-            /* $courseDuration= */ null,
+            requestsUserInformation: 'no',
+            showScoreboard: 'false',
+            courseDuration: null,
         );
         $coursesAliases['public'][] = $courseData['course_alias'];
 
@@ -162,29 +162,29 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(
             2,
-            $response['smartyProperties']['payload']['courses']['public']
+            $response['templateProperties']['payload']['courses']['public']
         );
         $this->assertEquals(
             $coursesAliases['public'][0],
-            $response['smartyProperties']['payload']['courses']['public'][0]['alias']
+            $response['templateProperties']['payload']['courses']['public'][0]['alias']
         );
         $this->assertTrue(
-            $response['smartyProperties']['payload']['courses']['public'][0]['alreadyStarted']
+            $response['templateProperties']['payload']['courses']['public'][0]['alreadyStarted']
         );
         $this->assertEquals(
             $coursesAliases['public'][1],
-            $response['smartyProperties']['payload']['courses']['public'][1]['alias']
+            $response['templateProperties']['payload']['courses']['public'][1]['alias']
         );
         $this->assertFalse(
-            $response['smartyProperties']['payload']['courses']['public'][1]['alreadyStarted']
+            $response['templateProperties']['payload']['courses']['public'][1]['alreadyStarted']
         );
         $this->assertEquals(
             $coursesAliases['enrolled'][0],
-            $response['smartyProperties']['payload']['courses']['enrolled'][0]['alias']
+            $response['templateProperties']['payload']['courses']['enrolled'][0]['alias']
         );
         $this->assertEquals(
             $coursesAliases['finished'][0],
-            $response['smartyProperties']['payload']['courses']['finished'][0]['alias']
+            $response['templateProperties']['payload']['courses']['finished'][0]['alias']
         );
     }
 }

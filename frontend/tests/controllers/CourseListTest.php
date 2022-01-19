@@ -6,9 +6,7 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         parent::setUp();
         foreach (range(0, 1) as $course) {
             $publicCourseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
-                /*$admin=*/                null,
-                /*$adminLogin=*/null,
-                \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+                admissionMode: \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
             );
             $this->courseAliases[] = $publicCourseData['course_alias'];
         }
@@ -52,7 +50,7 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
             ])
-        )['smartyProperties']['payload']['courses']['admin']['filteredCourses']['archived']['courses'];
+        )['templateProperties']['payload']['courses']['admin']['filteredCourses']['archived']['courses'];
         $this->assertCount(1, $archivedCourses);
         $this->assertEquals(
             $this->courseAliases[3],

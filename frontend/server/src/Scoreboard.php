@@ -20,7 +20,7 @@ class Scoreboard {
     /** @var \OmegaUp\ScoreboardParams */
     private $params;
 
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     public $log;
 
     /** @var bool */
@@ -31,7 +31,7 @@ class Scoreboard {
 
     public function __construct(\OmegaUp\ScoreboardParams $params) {
         $this->params = $params;
-        $this->log = \Logger::getLogger('Scoreboard');
+        $this->log = \Monolog\Registry::omegaup()->withName('Scoreboard');
         \OmegaUp\Scoreboard::setIsLastRunFromCacheForTesting(false);
     }
 
@@ -75,10 +75,11 @@ class Scoreboard {
         $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
             $this->params->problemset_id,
             $this->params->acl_id,
-            true /* show all runs */,
-            $filterUsersBy,
-            $this->params->group_id,
-            !$this->params->virtual /* Treat admin as contestant in virtual contest*/
+            showAllRuns: true,
+            filterUsersBy: $filterUsersBy,
+            groupId: $this->params->group_id,
+            // Treat admin as contestant in virtual contest.
+            excludeAdmin: !$this->params->virtual,
         );
 
         // Get all problems given problemset
@@ -183,10 +184,11 @@ class Scoreboard {
         $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
             $this->params->problemset_id,
             $this->params->acl_id,
-            $this->params->admin,
-            null,
-            null,
-            !$this->params->virtual /* Treat admin as contestant */
+            showAllRuns: $this->params->admin,
+            filterUsersBy: null,
+            groupId: null,
+            // Treat admin as contestant.
+            excludeAdmin: !$this->params->virtual,
         );
 
         // Get all problems given problemset
@@ -244,7 +246,7 @@ class Scoreboard {
      * @param \OmegaUp\ScoreboardParams $params
      */
     public static function invalidateScoreboardCache(\OmegaUp\ScoreboardParams $params): void {
-        $log = \Logger::getLogger('Scoreboard');
+        $log = \Monolog\Registry::omegaup()->withName('Scoreboard');
         $log->info('Invalidating scoreboard cache.');
 
         // Invalidar cache del contestant
@@ -284,10 +286,11 @@ class Scoreboard {
         $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
             $params->problemset_id,
             $params->acl_id,
-            true /* show all runs */,
-            null,
-            null,
-            !$params->virtual /* Treat admin as contestant in virtual contest */
+            showAllRuns: true,
+            filterUsersBy: null,
+            groupId: null,
+            // Treat admin as contestant in virtual contest.
+            excludeAdmin: !$params->virtual,
         );
 
         // Get all problems given problemset
@@ -335,7 +338,7 @@ class Scoreboard {
             $params->finish_time,
             $params->admin,
             $params->scoreboard_pct,
-            false  /* sortByName */
+            sortByName: false,
         );
 
         $contestantEventCache = new \OmegaUp\Cache(
@@ -371,7 +374,7 @@ class Scoreboard {
             $params->finish_time,
             $params->admin,
             $params->scoreboard_pct,
-            false /* sortByName */
+            sortByName: false,
         );
         $adminScoreboardCache->set($adminScoreboard, $timeout);
         $params->admin = false;
@@ -388,7 +391,7 @@ class Scoreboard {
         ), $timeout);
 
         // Try to broadcast the updated scoreboards:
-        $log = \Logger::getLogger('Scoreboard');
+        $log = \Monolog\Registry::omegaup()->withName('Scoreboard');
         try {
             $log->debug('Sending updated scoreboards');
             \OmegaUp\Grader::getInstance()->broadcast(
@@ -420,7 +423,7 @@ class Scoreboard {
                 false  // user_only
             );
         } catch (\Exception $e) {
-            $log->error('Error broadcasting scoreboard', $e);
+            $log->error('Error broadcasting scoreboard', ['exception' => $e]);
         }
     }
 
@@ -573,7 +576,9 @@ class Scoreboard {
                 continue;
             }
 
-            $testOnly[$identityId] &= $isTest;
+            if ($testOnly[$identityId]) {
+                $testOnly[$identityId] = $isTest;
+            }
             $noRuns[$identityId] = false;
             if (!$showAllRuns) {
                 if ($isTest || $scoreboardPct === 0) {

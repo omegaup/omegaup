@@ -1,6 +1,7 @@
 <template>
   <input
     v-model="stringValue"
+    :name="name"
     class="form-control"
     :class="{ 'is-invalid': isInvalid }"
     required="required"
@@ -21,6 +22,7 @@ import '../../../third_party/js/bootstrap-datepicker.js';
 export default class DatePicker extends Vue {
   T = T;
 
+  @Prop({ default: '' }) name!: string;
   @Prop() value!: Date;
   @Prop({ default: true }) enabled!: boolean;
   @Prop({ default: T.datePickerFormat }) format!: string;

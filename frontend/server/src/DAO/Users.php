@@ -82,30 +82,13 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     IF(u.`is_private` = 1, NULL, u.`hide_problem_tags`) AS hide_problem_tags,
                     IF(u.`is_private` = 1, NULL, u.`verified`) AS verified,
                     IF(u.`is_private` = 1, NULL, i.`gender`) AS gender,
-                    IFNULL(
-                        (
-                            SELECT urc.classname FROM
-                                User_Rank_Cutoffs urc
-                            WHERE
-                                urc.score <= (
-                                        SELECT
-                                            ur.score
-                                        FROM
-                                            User_Rank ur
-                                        WHERE
-                                            ur.user_id = i.user_id
-                                    )
-                            ORDER BY
-                                urc.percentile ASC
-                            LIMIT
-                                1
-                        ),
-                        \'user-rank-unranked\'
-                    ) AS classname
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
                 FROM
                     Users u
                 INNER JOIN
                     Identities i ON u.main_identity_id = i.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
                 LEFT JOIN
                     Emails e ON u.main_email_id = e.email_id
                 LEFT JOIN
@@ -156,30 +139,13 @@ class Users extends \OmegaUp\DAO\Base\Users {
         $sql = 'SELECT
                     IFNULL(i.`country_id`, "xx") AS country_id,
                     e.`email`,
-                    IFNULL(
-                        (
-                            SELECT urc.classname FROM
-                                User_Rank_Cutoffs urc
-                            WHERE
-                                urc.score <= (
-                                        SELECT
-                                            ur.score
-                                        FROM
-                                            User_Rank ur
-                                        WHERE
-                                            ur.user_id = i.user_id
-                                    )
-                            ORDER BY
-                                urc.percentile ASC
-                            LIMIT
-                                1
-                        ),
-                        \'user-rank-unranked\'
-                    ) AS classname
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
                 FROM
                     Users u
                 INNER JOIN
                     Identities i ON u.main_identity_id = i.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
                 LEFT JOIN
                     Emails e ON u.main_email_id = e.email_id
                 WHERE
@@ -201,6 +167,25 @@ class Users extends \OmegaUp\DAO\Base\Users {
         }
 
         return $user;
+    }
+
+    public static function getPreferredLanguage(?int $userId): ?string {
+        if (is_null($userId)) {
+            return null;
+        }
+        $sql = 'SELECT
+                    preferred_language
+                FROM
+                    Users u
+                WHERE
+                    u.user_id = ?;';
+        $params = [$userId];
+        /** @var null|string */
+        $preferredLanguage = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            $params
+        );
+        return $preferredLanguage;
     }
 
     public static function getHideTags(?int $identityId): bool {
@@ -234,28 +219,18 @@ class Users extends \OmegaUp\DAO\Base\Users {
             return 'user-rank-unranked';
         }
         $sql = 'SELECT
-                    `urc`.`classname`
+                    ur.classname
                 FROM
-                    `User_Rank_Cutoffs` `urc`
+                    User_Rank ur
                 WHERE
-                    `urc`.score <= (
-                        SELECT
-                            `ur`.`score`
-                        FROM
-                            `User_Rank` `ur`
-                        WHERE
-                            `ur`.user_id = ?
-                    )
-                ORDER BY
-                    `urc`.percentile ASC
-                LIMIT
-                    1;';
+                    ur.user_id = ?;';
         $params = [$userId];
-        /** @var string */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+        /** @var null|string */
+        $className = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             $params
-        ) ?? 'user-rank-unranked';
+        );
+        return $className ?? 'user-rank-unranked';
     }
 
     final public static function getByVerification(

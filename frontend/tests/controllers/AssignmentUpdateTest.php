@@ -252,13 +252,11 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create a course with a different courseDuration of 180.
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
-            /*$admin=*/            null,
-            /*$adminLogin=*/ null,
-            /*$accessMode=*/ \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
-            /*$requestsUserInformation=*/ 'no',
-            /*$showScoreboard=*/ 'false',
-            /*$startTimeDelay=*/ 0,
-            /*$courseDuration=*/ 180
+            admissionMode: \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
+            requestsUserInformation: 'no',
+            showScoreboard: 'false',
+            startTimeDelay: 0,
+            courseDuration: 180,
         );
         $courseAlias = $courseData['course_alias'];
         $assignmentAlias = $courseData['assignment_alias'];
@@ -418,6 +416,83 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals(
                 'courseAssignmentEndDateBeforeCourseStartDate',
+                $e->getMessage()
+            );
+        }
+    }
+
+    public function testUpdateAssignmentAlreadyHasRuns() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $courseAlias = $courseData['course_alias'];
+        $assignmentAlias = $courseData['assignment_alias'];
+
+        $login = self::login($courseData['admin']);
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignmentAlias,
+            [$problemData]
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $courseData['admin']
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Should not throw any exception
+        $login = self::login($courseData['admin']);
+        \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias,
+            'start_time' => $courseData['request']['start_time']->time + 1,
+            'finish_time' => $courseData['request']['finish_time'],
+        ]));
+
+        // Take back to normal date
+        \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias,
+            'start_time' => $courseData['request']['start_time']->time,
+            'finish_time' => $courseData['request']['finish_time'],
+        ]));
+
+        // Create a participant and a run
+        ['user' => $_, 'identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $participant
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $participant
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Should throw a exception
+        $login = self::login($courseData['admin']);
+        try {
+            \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'assignment' => $assignmentAlias,
+                'course' => $courseAlias,
+                'start_time' => $courseData['request']['start_time']->time + 2,
+                'finish_time' => $courseData['request']['finish_time'],
+            ]));
+            $this->fail(
+                'Updating assignment should have failed due to assignment already has student runs'
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'courseUpdateAlreadyHasRuns',
                 $e->getMessage()
             );
         }

@@ -132,7 +132,9 @@ OmegaUp.on('ready', async () => {
             api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
                 this.runDetailsData = showSubmission({ request, runDetails });
-                window.location.hash = request.hash;
+                if (request.hash) {
+                  window.location.hash = request.hash;
+                }
               })
               .catch((run) => {
                 submitRunFailed({

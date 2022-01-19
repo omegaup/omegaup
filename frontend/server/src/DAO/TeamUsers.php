@@ -59,52 +59,25 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
         int $page = 1,
         int $pageSize = 100
     ): array {
-        $offset = ($page - 1) * $pageSize;
-
         $sql = 'SELECT
                     i.username,
                     i.name,
                     it.username AS team_alias,
                     it.name AS team_name,
                     CAST(IFNULL(i.user_id, FALSE) AS UNSIGNED) AS isMainUserIdentity,
-                    IFNULL(
-                        (
-                            SELECT urc.classname FROM
-                                User_Rank_Cutoffs urc
-                            WHERE
-                                urc.score <= (
-                                        SELECT
-                                            ur.score
-                                        FROM
-                                            User_Rank ur
-                                        WHERE
-                                            ur.user_id = u.user_id
-                                    )
-                            ORDER BY
-                                urc.percentile ASC
-                            LIMIT
-                                1
-                        ),
-                        \'user-rank-unranked\'
-                    ) AS classname
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
                 FROM
                     Team_Users tu
                 INNER JOIN
-                    Teams t
-                ON
-                    t.team_id = tu.team_id
+                    Teams t ON t.team_id = tu.team_id
                 INNER JOIN
-                    Identities i
-                ON
-                    i.identity_id = tu.identity_id
-                INNER JOIN
-                    Identities it
-                ON
-                    it.identity_id = t.identity_id
+                    Identities i ON i.identity_id = tu.identity_id
                 LEFT JOIN
-                    Users u
-                ON
-                    i.user_id = u.user_id
+                    User_Rank ur ON ur.user_id = i.user_id
+                INNER JOIN
+                    Identities it ON it.identity_id = t.identity_id
+                LEFT JOIN
+                    Users u ON i.user_id = u.user_id
                 WHERE
                     team_group_id = ?
                 ';
@@ -126,7 +99,11 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
         /** @var list<array{classname: string, isMainUserIdentity: int, name: null|string, team_alias: string, team_name: null|string, username: string}> */
         $teamsUsers = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql . $sqlLimit,
-            [$teamsGroupId, $offset, $pageSize]
+            [
+                $teamsGroupId,
+                max(0, $page - 1) * $pageSize,
+                $pageSize,
+            ]
         );
         $result = [];
         foreach ($teamsUsers as $row) {
