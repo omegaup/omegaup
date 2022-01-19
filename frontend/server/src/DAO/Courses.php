@@ -397,7 +397,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             LEFT JOIN
                                 Runs r ON r.run_id = s.current_run_id
                             GROUP BY
-                                a.assignment_id, psp.problem_id
+                                a.assignment_id, psp.problem_id, s.identity_id
                         ) bpr
                         GROUP BY bpr.assignment_id
                     ) cbpr
