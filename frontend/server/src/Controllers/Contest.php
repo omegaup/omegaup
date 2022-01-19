@@ -1302,7 +1302,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
         $problems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            $problemset->problemset_id
+            $problemset->problemset_id,
+            needSubmissions: true
         );
 
         // Requests
@@ -1773,7 +1774,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $result['director'] = $director;
 
                 $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-                    $contest->problemset_id
+                    $contest->problemset_id,
+                    needSubmissions: true
                 );
 
                 // Add info of each problem to the contest
@@ -1793,7 +1795,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                             explode(',', $problem['languages'])
                         ));
                     }
-                    if ($problem['has_submissions'] && !$hasSubmissions) {
+                    if ($problem['has_submissions']) {
                         $hasSubmissions = true;
                     }
 
@@ -2205,7 +2207,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
 
             $problemsetProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-                $originalContest->problemset_id
+                $originalContest->problemset_id,
+                needSubmissions: false
             );
             foreach ($problemsetProblems as $problemsetProblem) {
                 $problem = new \OmegaUp\DAO\VO\Problems([
@@ -2927,7 +2930,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
         $problems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            $problemset->problemset_id
+            $problemset->problemset_id,
+            needSubmissions: true
         );
 
         return [
@@ -4045,7 +4049,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            $problemset->problemset_id
+            $problemset->problemset_id,
+            needSubmissions: false
         );
 
         $problemsResponseArray = [];

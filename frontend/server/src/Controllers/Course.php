@@ -2151,7 +2151,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
         $rawProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            $assignment->problemset_id
+            $assignment->problemset_id,
+            needSubmissions: false
         );
         $letter = 0;
         $problems = [];
@@ -3028,7 +3029,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            $tokenAuthenticationResult['assignment']->problemset_id
+            $tokenAuthenticationResult['assignment']->problemset_id,
+            needSubmissions: false
         );
 
         $problemsResponseArray = [];
@@ -4068,7 +4070,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            intval($assignment->problemset_id)
+            intval($assignment->problemset_id),
+            needSubmissions: false
         );
 
         $problemsResponseArray = [];
@@ -4237,7 +4240,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            intval($assignment->problemset_id)
+            intval($assignment->problemset_id),
+            needSubmissions: false
         );
 
         $problemsResponseArray = [];
