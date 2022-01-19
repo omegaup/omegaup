@@ -96,10 +96,12 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Assert virtual contest problemset problems
         $originalProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            $originalContest->problemset_id
+            $originalContest->problemset_id,
+            needSubmissions: false
         );
         $virtualProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            $virtualContest->problemset_id
+            $virtualContest->problemset_id,
+            needSubmissions: false
         );
         // Number of problems must be equal
         $this->assertEquals(count($originalProblems), count($virtualProblems));

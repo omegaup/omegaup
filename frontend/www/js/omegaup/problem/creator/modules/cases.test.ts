@@ -13,7 +13,7 @@ describe('cases.ts', () => {
     const newCaseRequest: CaseRequest = {
       ...newCase,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);
     const groupID = store.state.casesStore.groups[0].groupID;
@@ -21,7 +21,7 @@ describe('cases.ts', () => {
       name: newCase.name,
       groupID: store.state.casesStore.groups[0].groupID,
       points: 100,
-      pointsDefined: false,
+      autoPoints: true,
       ungroupedCase: true,
       cases: [{ ...newCase, groupID }],
     });
@@ -45,7 +45,7 @@ describe('cases.ts', () => {
     const newCaseRequest: CaseRequest = {
       ...newCase,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);
     expect(store.state.casesStore.groups[0]).toBe(newGroup);
@@ -57,11 +57,11 @@ describe('cases.ts', () => {
     const newCaseRequest: CaseRequest = {
       ...newCase,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);
     expect(store.state.casesStore.groups[0].points).toBe(100);
-    expect(store.state.casesStore.groups[0].pointsDefined).toBe(false);
+    expect(store.state.casesStore.groups[0].autoPoints).toBe(true);
     expect(store.state.casesStore.groups[0].cases[0].name).toBe('case1');
     const groupID = store.state.casesStore.groups[0].groupID;
     const editedCaseRequest: CaseRequest = {
@@ -69,7 +69,7 @@ describe('cases.ts', () => {
       groupID,
       name: 'case2',
       points: 50,
-      pointsDefined: true,
+      autoPoints: false,
     };
     store.commit('casesStore/editCase', {
       oldGroupID: groupID,
@@ -77,7 +77,7 @@ describe('cases.ts', () => {
     });
     expect(store.state.casesStore.groups[0].name).toBe('case2');
     expect(store.state.casesStore.groups[0].points).toBe(50);
-    expect(store.state.casesStore.groups[0].pointsDefined).toBe(true);
+    expect(store.state.casesStore.groups[0].autoPoints).toBe(false);
     expect(store.state.casesStore.groups[0].cases[0].name).toBe('case2');
   });
   it('Should edit a case', () => {
@@ -87,7 +87,7 @@ describe('cases.ts', () => {
     const newCaseRequest: CaseRequest = {
       ...newCase,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);
     expect(store.state.casesStore.groups[0]).toEqual({
@@ -101,7 +101,7 @@ describe('cases.ts', () => {
       groupID,
       name: 'case2',
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/editCase', {
       oldGroupID: groupID,
@@ -115,7 +115,7 @@ describe('cases.ts', () => {
     const newCaseRequest: CaseRequest = {
       ...newCase,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);
     const groupID = store.state.casesStore.groups[0].groupID;
@@ -143,7 +143,7 @@ describe('cases.ts', () => {
     const newCaseRequest: CaseRequest = {
       ...newCase,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     const oldGroupID = store.state.casesStore.groups[0].groupID;
     const newGroupID = store.state.casesStore.groups[1].groupID;
@@ -164,7 +164,7 @@ describe('cases.ts', () => {
     const newCaseRequest: CaseRequest = {
       ...newCase,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);
     const groupID = store.state.casesStore.groups[0].groupID;
@@ -178,7 +178,7 @@ describe('cases.ts', () => {
     const newCaseRequest: CaseRequest = {
       ...newCase,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);
     store.commit('casesStore/deleteCase', {
@@ -192,7 +192,7 @@ describe('cases.ts', () => {
     const editedGroup = generateGroup({
       name: 'group2',
       points: 20,
-      pointsDefined: true,
+      autoPoints: false,
       groupID: newGroup.groupID,
     });
     store.commit('casesStore/addGroup', newGroup);
@@ -211,7 +211,7 @@ describe('cases.ts', () => {
     const newCaseRequest1: CaseRequest = {
       ...newCase1,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest1);
     expect(store.state.casesStore.groups[0].points).toBe(100);
@@ -219,7 +219,7 @@ describe('cases.ts', () => {
     const newCaseRequest2: CaseRequest = {
       ...newCase2,
       points: 20,
-      pointsDefined: true,
+      autoPoints: false,
     };
     store.commit('casesStore/addCase', newCaseRequest2);
     expect(store.state.casesStore.groups[0].points).toBe(80);
@@ -232,7 +232,7 @@ describe('cases.ts', () => {
     const newCaseRequest1: CaseRequest = {
       ...newCase1,
       points: 50,
-      pointsDefined: true,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest1);
     const newCase2 = generateCase({
@@ -241,7 +241,7 @@ describe('cases.ts', () => {
     const newCaseRequest2: CaseRequest = {
       ...newCase2,
       points: 50,
-      pointsDefined: true,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest2);
     expect(store.state.casesStore.groups[0].points).toBe(50);
@@ -254,7 +254,7 @@ describe('cases.ts', () => {
     const newCaseRequest1: CaseRequest = {
       ...newCase1,
       points: 50,
-      pointsDefined: true,
+      autoPoints: false,
     };
     store.commit('casesStore/addCase', newCaseRequest1);
     const newCase2 = generateCase({
@@ -263,7 +263,7 @@ describe('cases.ts', () => {
     const newCaseRequest2: CaseRequest = {
       ...newCase2,
       points: 70,
-      pointsDefined: true,
+      autoPoints: false,
     };
     store.commit('casesStore/addCase', newCaseRequest2);
     const newCase3 = generateCase({
@@ -272,7 +272,7 @@ describe('cases.ts', () => {
     const newCaseRequest3: CaseRequest = {
       ...newCase3,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest3);
     expect(store.state.casesStore.groups[0].points).toBe(50);
@@ -320,7 +320,7 @@ describe('cases.ts', () => {
     const newCaseRequest: CaseRequest = {
       ...newCase,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);
     const multipleCaseRequest: MultipleCaseAddRequest = {
@@ -348,7 +348,7 @@ describe('cases.ts', () => {
     const newCaseRequest: CaseRequest = {
       ...newCase,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);
     const groupID = store.state.casesStore.groups[0].groupID;
@@ -363,7 +363,7 @@ describe('cases.ts', () => {
         label: 'line2',
         data: {
           kind: 'array',
-          distinct: false,
+          distinct: true,
           max: 10,
           min: 1,
           size: 2,
@@ -379,7 +379,7 @@ describe('cases.ts', () => {
     const newCaseRequest: CaseRequest = {
       ...newCase,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);
     const groupID = store.state.casesStore.groups[0].groupID;
@@ -404,7 +404,7 @@ describe('cases.ts', () => {
     const newCaseRequest: CaseRequest = {
       ...newCase,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);
     const groupID = store.state.casesStore.groups[0].groupID;
@@ -418,7 +418,7 @@ describe('cases.ts', () => {
       label: 'UPDATED',
       data: {
         kind: 'array',
-        distinct: false,
+        distinct: true,
         max: 10,
         min: 1,
         size: 2,
@@ -435,7 +435,7 @@ describe('cases.ts', () => {
     const newCaseRequest: CaseRequest = {
       ...newCase,
       points: 0,
-      pointsDefined: false,
+      autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);
     const groupID = store.state.casesStore.groups[0].groupID;

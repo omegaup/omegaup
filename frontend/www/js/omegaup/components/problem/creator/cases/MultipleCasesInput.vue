@@ -43,7 +43,7 @@
       />
     </b-form-group>
     <b-form-group :label="T.problemCreatorGroupName" label-for="case-group">
-      <b-form-select v-model="multipleCasesGroup" :options="options" />
+      <b-form-select v-model="multipleCasesGroup" />
     </b-form-group>
   </div>
 </template>
