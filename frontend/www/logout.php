@@ -7,7 +7,7 @@ if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
 }
 
 \OmegaUp\UITools::render(
-    function (\OmegaUp\Request $r): array {
+    function (\OmegaUp\Request $_): array {
         $scripts = [];
         if (
             defined('OMEGAUP_GOOGLE_CLIENTID') &&

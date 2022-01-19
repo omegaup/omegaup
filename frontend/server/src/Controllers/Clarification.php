@@ -27,19 +27,19 @@ class Clarification extends \OmegaUp\Controllers\Controller {
      *
      * @return Clarification
      *
-     * @omegaup-request-param string|null $contest_alias
-     * @omegaup-request-param string|null $course_alias
-     * @omegaup-request-param string|null $assignment_alias
-     * @omegaup-request-param null|string $username
-     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param null|string $contest_alias
+     * @omegaup-request-param string $course_alias
      * @omegaup-request-param string $message
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param null|string $username
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
         $problemAlias = $r->ensureString(
-            'problem_alias',
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            key: 'problem_alias',
+            validator: fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
@@ -192,7 +192,6 @@ class Clarification extends \OmegaUp\Controllers\Controller {
 
         if (!is_null($contest)) {
             self::clarificationUpdated(
-                $r,
                 $clarification,
                 $r->identity,
                 $problem,
@@ -235,12 +234,10 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Validate request
-        $r->ensureInt('clarification_id');
+        $clarificationId = $r->ensureInt(key: 'clarification_id');
 
         // Check that the clarification actually exists
-        $clarification = \OmegaUp\DAO\Clarifications::getByPK(
-            intval($r['clarification_id'])
-        );
+        $clarification = \OmegaUp\DAO\Clarifications::getByPK($clarificationId);
         if (is_null($clarification)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'clarificationNotFound'
@@ -283,7 +280,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         // Authenticate user
         $r->ensureIdentity();
 
-        $public = $r->ensureOptionalBool('public');
+        $public = $r->ensureOptionalBool(key: 'public');
         $answer = $r->ensureOptionalString(
             key: 'answer',
             required: false,
@@ -297,7 +294,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
 
         // Check that clarification exists
         $clarification = \OmegaUp\DAO\Clarifications::GetByPK(
-            $r->ensureInt('clarification_id')
+            $r->ensureInt(key: 'clarification_id')
         );
         if (is_null($clarification)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -422,7 +419,6 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         }
 
         self::clarificationUpdated(
-            $r,
             $clarification,
             $author,
             $problem,
@@ -435,7 +431,6 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     }
 
     private static function clarificationUpdated(
-        \OmegaUp\Request $r,
         \OmegaUp\DAO\VO\Clarifications $clarification,
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Problems $problem,

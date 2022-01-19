@@ -381,7 +381,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 int $page,
                 int $pageSize,
                 bool $showArchived,
-                ?string $query
+                ?string $_
             ) => \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
                 $identityId,
                 $page,
@@ -409,7 +409,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 int $identityId,
                 int $page,
                 int $pageSize,
-                bool $showArchived,
+                bool $_,
                 ?string $query
             ) => \OmegaUp\DAO\Contests::getContestsParticipating(
                 $identityId,
@@ -591,7 +591,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     private static function getCommonDetails(
         \OmegaUp\DAO\VO\Contests $contest,
-        \OmegaUp\DAO\VO\Problemsets $problemset,
         bool $contestAdmin,
         \OmegaUp\DAO\VO\Identities $identity,
         bool $isPracticeMode = false
@@ -813,7 +812,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 ],
                 self::getCommonDetails(
                     $contest,
-                    $problemset,
                     $contestAdmin,
                     $r->identity
                 ),
@@ -958,14 +956,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
         [
             'contest' => $contest,
             'contest_admin' => $contestAdmin,
-            'problemset' => $problemset,
         ] = self::validateDetails($contestAlias, $r->identity);
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
         $commonDetails = self::getCommonDetails(
             $contest,
-            $problemset,
             $contestAdmin,
             $r->identity,
             isPracticeMode: true
@@ -1217,7 +1213,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 int $page,
                 int $pageSize,
                 bool $showArchived,
-                ?string $query
+                ?string $_
             ) => \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
                 $identityId,
                 $page,

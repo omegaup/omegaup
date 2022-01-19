@@ -7,7 +7,7 @@ if (!isset($_GET['email']) || !isset($_GET['reset_token'])) {
     die();
 }
 \OmegaUp\UITools::render(
-    fn (\OmegaUp\Request $r) => [
+    fn (\OmegaUp\Request $_) => [
         'templateProperties' => [
             'payload' => [
                 'email' => $_GET['email'],

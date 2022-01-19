@@ -23,6 +23,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
             ['..', '.', 'default_icon.svg']
         );
         $results = [];
+        /** @var string $alias */
         foreach ($aliases as $alias) {
             /** @psalm-suppress MixedOperand OMEGAUP_BADGES_ROOT is really a string. */
             if (!is_dir(static::OMEGAUP_BADGES_ROOT . "/${alias}")) {
@@ -59,16 +60,18 @@ class Badge extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of badges owned by a certain user
      *
-     * @omegaup-request-param mixed $target_username
-     *
      * @return array{badges: list<Badge>}
+     *
+     * @omegaup-request-param string $target_username
      */
     public static function apiUserList(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateValidUsername(
-            $r['target_username'],
-            'target_username'
+        $targetUsername = $r->ensureString(
+            'target_username',
+            fn (string $alias) => \OmegaUp\Validators::usernameOrTeamUsernameOrEmail(
+                $alias
+            )
         );
-        $user = \OmegaUp\DAO\Users::FindByUsername($r['target_username']);
+        $user = \OmegaUp\DAO\Users::FindByUsername($targetUsername);
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
@@ -83,7 +86,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
      *
      * @return array{assignation_time: \OmegaUp\Timestamp|null}
      *
-     * @omegaup-request-param null|string $badge_alias
+     * @omegaup-request-param string $badge_alias
      */
     public static function apiMyBadgeAssignationTime(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -111,7 +114,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
      *
      * @return Badge
      *
-     * @omegaup-request-param null|string $badge_alias
+     * @omegaup-request-param string $badge_alias
      */
     public static function apiBadgeDetails(\OmegaUp\Request $r): array {
         $badgeAlias = $r->ensureString(

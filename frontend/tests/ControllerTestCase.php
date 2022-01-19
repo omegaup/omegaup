@@ -161,9 +161,9 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     /**
      * Assert that contest in the request actually exists in the DB
      *
-     * @omegaup-request-param string $title
-     *
      * @param \OmegaUp\Request $r
+     *
+     * @omegaup-request-param string $title
      */
     public function assertContest(\OmegaUp\Request $r): void {
         // Validate that data was written to DB by getting the contest by title
@@ -558,6 +558,9 @@ class NoOpGrader extends \OmegaUp\Grader {
         array_push($this->_runs, $run);
     }
 
+    /**
+     * @param array<string, \OmegaUp\DAO\VO\Runs> $runs
+     */
     public function rejudge(array $runs, bool $debug): void {
         $this->_runs += $runs;
     }

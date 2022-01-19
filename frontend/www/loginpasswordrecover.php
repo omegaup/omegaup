@@ -3,7 +3,7 @@ namespace OmegaUp;
 require_once(dirname(__DIR__, 1) . '/server/bootstrap.php');
 
 \OmegaUp\UITools::render(
-    fn (\OmegaUp\Request $r) => [
+    fn (\OmegaUp\Request $_) => [
         'templateProperties' => [
             'title' => new \OmegaUp\TranslationString(
                 'omegaupTitleRecoverPassword',
