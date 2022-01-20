@@ -7,13 +7,13 @@ import os
 import argparse
 import logging
 import sys
+from unittest.mock import patch, MagicMock
 import rabbitmq_connection
 import contests_callback
 import client_contest
 import mysql.connector
 import mysql.connector.cursor
 import pika
-from pytest_mock import MockerFixture
 import test_credentials
 
 sys.path.insert(
@@ -87,7 +87,10 @@ def test_client_contest() -> None:
         assert count['count'] > 0
 
 
-def test_client_contest_with_duplicated_codes(mocker: MockerFixture) -> None:
+@patch('verification_code.generate_code',
+       MagicMock(side_effect=iter(['XMCF384X8X', 'XMCF384X8X', 'XMCF384X8X',
+                                   'XMCF384X8M'])))
+def test_client_contest_with_duplicated_codes() -> None:
     '''Test client contest queue when a code already exists'''
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
@@ -102,13 +105,17 @@ def test_client_contest_with_duplicated_codes(mocker: MockerFixture) -> None:
     logging.info('Started')
     dbconn = lib.db.connect(args)
     os.system('python3 send_messages_contest_queue.py')
-    with rabbitmq_connection.connect(args) as channel:
+    with dbconn.cursor(buffered=True, dictionary=True) as cur, \
+        rabbitmq_connection.connect(args) as channel:
         callback = ContestsCallbackForTesting(dbconn.conn,
                                               args.api_token,
                                               args.url)
-        codes = ['XMCF384X8X', 'XMCF384X8X', 'XMCF384X8X', 'XMCF384X8M']
-        mocker.patch('verification_code.generate_code',
-                     side_effect=iter(codes))
+        cur.execute('TRUNCATE TABLE `Certificates`;')
+        dbconn.conn.commit()
+
+        cur.execute('SELECT COUNT(*) AS count FROM `Certificates`;')
+        count = cur.fetchone()
+        assert count['count'] == 0
         client_contest.process_queue(
             channel=channel,
             exchange_name='certificates',
