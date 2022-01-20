@@ -7,6 +7,7 @@
   "devDependencies": {
     "@babel/cli": "^7.14",
     "@babel/core": "^7.14",
+    "@babel/helper-environment-visitor": "^7.16.7",
     "@babel/parser": "^7.14",
     "@babel/plugin-proposal-class-properties": "^7.14",
     "@babel/plugin-transform-async-to-generator": "^7.14",
