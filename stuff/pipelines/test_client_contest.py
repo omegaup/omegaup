@@ -7,7 +7,7 @@ import os
 import argparse
 import logging
 import sys
-from unittest.mock import patch, MagicMock
+from unittest import mock
 import rabbitmq_connection
 import contests_callback
 import client_contest
@@ -87,10 +87,10 @@ def test_client_contest() -> None:
         assert count['count'] > 0
 
 
-@patch('verification_code.generate_code',
-       MagicMock(side_effect=iter(['XMCF384X8X', 'XMCF384X8X', 'XMCF384X8X',
-                                   'XMCF384X8M'])))
-def test_client_contest_with_duplicated_codes() -> None:
+@mock.patch('contests_callback.generate_code',
+            side_effect=iter(['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F',
+                              'XMCF384X8M']), autospec=True)
+def test_client_contest_with_mocked_codes(mock_gen_code: mock.Mock) -> None:
     '''Test client contest queue when a code already exists'''
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
@@ -122,3 +122,52 @@ def test_client_contest_with_duplicated_codes() -> None:
             queue_name='contest',
             routing_key='ContestQueue',
             callback=callback)
+
+        mock_gen_code.assert_called()
+        assert mock_gen_code.call_args_list == [(), (), (), ()]
+
+
+@mock.patch('contests_callback.generate_code',
+            side_effect=iter(['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F',
+                              'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
+                              'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
+                              'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
+                              'XMCF384X8X', 'XMCF384X8M']), autospec=True)
+def test_client_contest_with_duplicated_codes(
+        mock_gen_code: mock.Mock
+) -> None:
+    '''Test client contest queue when a code already exists'''
+    parser = argparse.ArgumentParser(description=__doc__)
+    lib.db.configure_parser(parser)
+    lib.logs.configure_parser(parser)
+    rabbitmq_connection.configure_parser(parser)
+
+    parser.add_argument('--api-token', default=test_credentials.API_TOKEN)
+    parser.add_argument('--url', default=test_credentials.OMEGAUP_API_ENDPOINT)
+
+    args = parser.parse_args()
+    lib.logs.init(parser.prog, args)
+    logging.info('Started')
+    dbconn = lib.db.connect(args)
+    os.system('python3 send_messages_contest_queue.py')
+    with dbconn.cursor(buffered=True, dictionary=True) as cur, \
+        rabbitmq_connection.connect(args) as channel:
+        callback = ContestsCallbackForTesting(dbconn.conn,
+                                              args.api_token,
+                                              args.url)
+        cur.execute('TRUNCATE TABLE `Certificates`;')
+        dbconn.conn.commit()
+
+        cur.execute('SELECT COUNT(*) AS count FROM `Certificates`;')
+        count = cur.fetchone()
+        assert count['count'] == 0
+        client_contest.process_queue(
+            channel=channel,
+            exchange_name='certificates',
+            queue_name='contest',
+            routing_key='ContestQueue',
+            callback=callback)
+
+        mock_gen_code.assert_called()
+        assert mock_gen_code.call_args_list == [(), (), (), (), (), (), (),
+                                                (), (), (), (), (), (), ()]
