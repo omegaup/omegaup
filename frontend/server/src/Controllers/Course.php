@@ -4386,9 +4386,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $identityId = $r->identity->identity_id;
         }
 
-        [
-            'runs' => $response['templateProperties']['payload']['runs'],
-        ] = self::getAllRuns(
+        $response['templateProperties']['payload']['runs'] = self::getAllRunsWithDetails(
             problemsetId: $assignment->problemset_id,
             status: null,
             verdict: null,
@@ -4439,6 +4437,43 @@ class Course extends \OmegaUp\Controllers\Controller {
             'runs' => $allRuns,
             'totalRuns' => $totalRuns,
         ];
+    }
+
+    /**
+     * @return list<RunWithDetails>
+     */
+    private static function getAllRunsWithDetails(
+        int $problemsetId,
+        ?string $status = null,
+        ?string $verdict = null,
+        ?int $problemId = null,
+        ?string $language = null,
+        ?int $identityId = null,
+        ?int $offset = 0,
+        ?int $rowCount = 100
+    ): array {
+        [
+            'runs' => $runs,
+        ] = \OmegaUp\DAO\Runs::getAllRuns(
+            $problemsetId,
+            $status,
+            $verdict,
+            $problemId,
+            $language,
+            $identityId,
+            $offset,
+            $rowCount
+        );
+
+        $allRuns = [];
+        foreach ($runs as $run) {
+            unset($run['run_id']);
+            $run['details'] = null;
+            $run['contest_score'] = floatval($run['contest_score']);
+            $allRuns[] = $run;
+        }
+
+        return $allRuns;
     }
 
     /**
