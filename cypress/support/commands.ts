@@ -131,8 +131,8 @@ Cypress.Commands.add(
   ({
     contestAlias,
     description = 'Default Description',
-    startDate = createRelativeDate(0),
-    endDate = createRelativeDate(1),
+    startDate = new Date(),
+    endDate = addDaysToTodaysDate({ days: 1 }),
     showScoreboard = true,
     partialPoints = true,
     basicInformation = false,
@@ -179,7 +179,7 @@ export const getISODateTime = (date: Date) => {
  * @param days number of days to add to today
  * @returns Relative Date Object
  */
-export const createRelativeDate = (days: number): Date => {
+export const addDaysToTodaysDate = ({ days }: { days: number }): Date => {
   if (days == 0) return new Date();
 
   const newDate = new Date();

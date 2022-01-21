@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import {
-  createRelativeDate,
+  addDaysToTodaysDate,
   getISODate,
   getISODateTime,
 } from '../support/commands';
@@ -29,7 +29,7 @@ describe('Basic Commands Test', () => {
     const courseOptions: CourseOptions = {
       courseAlias: uuid().slice(0, 10),
       showScoreboard: true,
-      startDate: createRelativeDate(0),
+      startDate: new Date(),
       unlimitedDuration: true,
       school: 'omegaup',
       basicInformation: false,
@@ -95,9 +95,9 @@ describe('Basic Commands Test', () => {
     const courseOptions: CourseOptions = {
       courseAlias: uuid().slice(0, 10),
       showScoreboard: true,
-      startDate: createRelativeDate(0),
+      startDate: new Date(),
       unlimitedDuration: false,
-      endDate: createRelativeDate(1),
+      endDate: addDaysToTodaysDate({days: 1}),
       school: 'omegaup',
       basicInformation: false,
       requestParticipantInformation: 'optional',
@@ -267,8 +267,8 @@ describe('Basic Commands Test', () => {
     const contestOptions: ContestOptions = {
       contestAlias: 'contest' + uuid().slice(0, 5),
       description: 'Test Description',
-      startDate: createRelativeDate(0),
-      endDate: createRelativeDate(2),
+      startDate: new Date(),
+      endDate: addDaysToTodaysDate({days: 2}),
       showScoreboard: true,
       basicInformation: false,
       partialPoints: true,
