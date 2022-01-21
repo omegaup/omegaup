@@ -3,9 +3,10 @@ import { types } from '../api_types';
 import { setLocationHash } from '../location';
 import { myRunsStore, runsStore } from './runsStore';
 import {
+  addRunDetails,
   showSubmission,
   submitRun,
-  trackRun,
+  trackRunWithDetails,
   submitRunFailed,
   SubmissionRequest,
 } from './submissions';
@@ -129,7 +130,7 @@ OmegaUp.on('ready', async () => {
 
   function trackRuns(): void {
     for (const run of payload.runs) {
-      trackRun({ run });
+      trackRunWithDetails({ run });
     }
   }
 });
