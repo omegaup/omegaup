@@ -80,7 +80,7 @@ describe('Detailsv2.vue', () => {
     visits: 5,
   };
 
-  const runs: types.Run[] = [
+  const runs: types.RunWithDetails[] = [
     {
       alias: 'Hello',
       classname: 'user-rank-unranked',

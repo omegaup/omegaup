@@ -8,7 +8,7 @@
     </b-col>
     <b-col>
       <add-panel
-        v-show="shouldShowAddWindow"
+        v-if="shouldShowAddWindow"
         :show-window="shouldShowAddWindow"
         @close-add-window="closeAddWindow"
       />
