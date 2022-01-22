@@ -71,6 +71,16 @@ class Scoreboard {
             }
         }
 
+        // Ensure the problemset exists.
+        $problemsetExists = \OmegaUp\DAO\Problemsets::existsByPK(
+            $this->params->problemset_id
+        );
+        if (!$problemsetExists) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemsetNotFound'
+            );
+        }
+
         // Get all distinct contestants participating in the given contest
         $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
             $this->params->problemset_id,
@@ -83,19 +93,13 @@ class Scoreboard {
         );
 
         // Get all problems given problemset
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
-            $this->params->problemset_id
-        );
-        if (is_null($problemset)) {
-            throw new \OmegaUp\Exceptions\NotFoundException(
-                'problemsetNotFound'
-            );
-        }
         $rawProblemsetProblems =
-            \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems($problemset);
+            \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
+                $this->params->problemset_id
+            );
 
         $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
-            $problemset,
+            $this->params->problemset_id,
             $this->params->only_ac
         );
 
@@ -180,6 +184,16 @@ class Scoreboard {
             return $result;
         }
 
+        // Ensure the problemset exists.
+        $problemsetExists = \OmegaUp\DAO\Problemsets::existsByPK(
+            $this->params->problemset_id
+        );
+        if (!$problemsetExists) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemsetNotFound'
+            );
+        }
+
         // Get all distinct contestants participating in the given contest
         $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
             $this->params->problemset_id,
@@ -192,18 +206,14 @@ class Scoreboard {
         );
 
         // Get all problems given problemset
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+        $rawProblemsetProblems =
+            \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
+                $this->params->problemset_id
+            );
+
+        $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
             $this->params->problemset_id
         );
-        if (is_null($problemset)) {
-            throw new \OmegaUp\Exceptions\NotFoundException(
-                'problemsetNotFound'
-            );
-        }
-        $rawProblemsetProblems =
-            \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems($problemset);
-
-        $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns($problemset);
 
         $problemMapping = [];
 
@@ -274,13 +284,17 @@ class Scoreboard {
      * Force refresh of Scoreboard caches
      */
     public static function refreshScoreboardCache(\OmegaUp\ScoreboardParams $params): void {
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK($params->problemset_id);
-        if (is_null($problemset)) {
+        $problemsetExists = \OmegaUp\DAO\Problemsets::existsByPK(
+            $params->problemset_id
+        );
+        if (!$problemsetExists) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
             );
         }
-        $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns($problemset);
+        $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
+            $params->problemset_id
+        );
 
         // Get all distinct contestants participating in the contest
         $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
@@ -295,7 +309,9 @@ class Scoreboard {
 
         // Get all problems given problemset
         $rawProblemsetProblems =
-            \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems($problemset);
+            \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
+                $params->problemset_id
+            );
 
         $problemMapping = [];
 
@@ -396,7 +412,7 @@ class Scoreboard {
             $log->debug('Sending updated scoreboards');
             \OmegaUp\Grader::getInstance()->broadcast(
                 $params->alias,
-                intval($problemset->problemset_id),
+                intval($params->problemset_id),
                 null,
                 json_encode([
                     'message' => '/scoreboard/update/',
@@ -410,7 +426,7 @@ class Scoreboard {
             );
             \OmegaUp\Grader::getInstance()->broadcast(
                 $params->alias,
-                intval($problemset->problemset_id),
+                intval($params->problemset_id),
                 null,
                 json_encode([
                     'message' => '/scoreboard/update/',

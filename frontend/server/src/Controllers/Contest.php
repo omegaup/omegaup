@@ -3155,16 +3155,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         if (self::isPublic($contest->admission_mode)) {
             // Check that contest has at least 2 problems
-            $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            $problemsetExists = \OmegaUp\DAO\Problemsets::existsByPK(
                 $contest->problemset_id
             );
-            if (is_null($problemset)) {
+            if (!$problemsetExists) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemsetNotFound'
                 );
             }
             $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::GetRelevantProblems(
-                $problemset
+                $contest->problemset_id
             );
             if (count($problemsInContest) < 2) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -4522,10 +4522,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Enforces rules to avoid having invalid/unactionable public contests
      */
     private static function validateContestCanBePublic(\OmegaUp\DAO\VO\Contests $contest): void {
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+        $problemsetExists = \OmegaUp\DAO\Problemsets::existsByPK(
             intval($contest->problemset_id)
         );
-        if (is_null($problemset)) {
+        if (!$problemsetExists) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
             );
@@ -4538,7 +4538,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
         // Check that contest has some problems at least 1 problem
         $problemsInProblemset = \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
-            $problemset
+            intval($contest->problemset_id)
         );
         if (count($problemsInProblemset) < 1) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
