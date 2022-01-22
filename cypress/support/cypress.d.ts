@@ -1,6 +1,7 @@
 // <reference types="cypress"/>
 
 import {
+  ContestOptions,
   CourseOptions,
   LoginOptions,
   ProblemOptions,
@@ -23,6 +24,10 @@ declare global {
           Pick<CourseOptions, 'courseAlias'>,
       ): void;
       createRun(problemOptions: RunOptions): void;
+      createContest(
+        contestOptions: Partial<ContestOptions> &
+          Pick<ContestOptions, 'contestAlias'>,
+      ): void;
     }
   }
 }
