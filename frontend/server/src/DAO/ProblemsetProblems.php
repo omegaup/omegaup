@@ -304,7 +304,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
      * @return list<\OmegaUp\DAO\VO\Problems>
      */
     final public static function getRelevantProblems(
-        \OmegaUp\DAO\VO\Problemsets $problemset
+        int $problemsetId
     ): array {
         // Build SQL statement
         $sql = '
@@ -317,7 +317,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
             WHERE
                 pp.problemset_id = ?
             ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
-        $val = [$problemset->problemset_id];
+        $val = [$problemsetId];
         $result = [];
         /** @var array{alias: string, current_version: string, problem_id: int} $row */
         foreach (
