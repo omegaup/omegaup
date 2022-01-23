@@ -8,13 +8,14 @@
     >
       <b-form-input
         v-model="caseName"
+        name="case-name"
         :formatter="formatter"
         required
         autocomplete="off"
       />
     </b-form-group>
     <b-form-group :label="T.problemCreatorGroupName" label-for="case-group">
-      <b-form-select v-model="caseGroup" :options="options" />
+      <b-form-select v-model="caseGroup" :options="options" name="case-group" />
     </b-form-group>
 
     <b-form-group
@@ -24,6 +25,7 @@
     >
       <b-form-input
         v-model="casePoints"
+        name="case-points"
         :formatter="pointsFormatter"
         type="number"
         number
@@ -59,6 +61,10 @@ export default class CaseInput extends Vue {
   caseName = this.name;
   caseGroup = this.group;
   casePoints: number | null = this.points;
+
+  options: { value: string; text: string }[] = [
+    { value: NIL, text: T.problemCreatorNoGroup },
+  ];
 
   T = T;
 

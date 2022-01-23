@@ -24,6 +24,17 @@ export interface CourseOptions {
   description?: string;
 }
 
+export interface ContestOptions {
+  contestAlias: string;
+  description?: string;
+  startDate?: Date;
+  endDate?: Date;
+  showScoreboard?: boolean;
+  partialPoints?: boolean;
+  basicInformation?: boolean;
+  requestParticipantInformation?: RequestParticipantInformation;
+}
+
 export interface RunOptions {
   problemAlias: string;
   fixturePath: string;

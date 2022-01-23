@@ -106,8 +106,8 @@
           </tr>
         </tbody>
       </table>
-      <div class="row">
-        <div class="form-group">
+      <div class="row mx-1">
+        <div class="form-group w-100">
           <label class="font-weight-bold">{{ T.wordsLevel }}</label>
           <select
             v-model="problemLevelTag"

@@ -1219,6 +1219,15 @@ export const Problem = {
           return x;
         }
         return x.map((x) => {
+          if (typeof x.details !== 'undefined' && x.details !== null)
+            x.details = ((x) => {
+              if (typeof x.feedback !== 'undefined' && x.feedback !== null)
+                x.feedback = ((x) => {
+                  x.date = ((x: number) => new Date(x * 1000))(x.date);
+                  return x;
+                })(x.feedback);
+              return x;
+            })(x.details);
           x.time = ((x: number) => new Date(x * 1000))(x.time);
           return x;
         });

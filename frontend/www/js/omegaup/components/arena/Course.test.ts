@@ -190,7 +190,7 @@ describe('Course.vue', () => {
     text: 'Problem Test',
   };
 
-  const run: types.Run = {
+  const run: types.RunWithDetails = {
     alias: 'test',
     classname: 'user-rank-unranked',
     contest_score: 100,
