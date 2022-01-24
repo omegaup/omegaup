@@ -6,6 +6,7 @@ import arena_Runs from './Runsv2.vue';
 import BootstrapVue, {
   BTable,
   BIconQuestionCircleFill,
+  BIconDownload,
   BIconChevronRight,
   BIconChevronDown,
 } from 'bootstrap-vue';
@@ -13,7 +14,7 @@ const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 
 describe('Runsv2.vue', () => {
-  const baseRunData: types.Run = {
+  const baseRunData: types.RunWithDetails = {
     alias: 'alias',
     classname: '',
     contest_score: 0,
@@ -32,22 +33,19 @@ describe('Runsv2.vue', () => {
     time: new Date('1/1/2020, 12:30:00 AM'),
   };
 
-  const runDetails: types.RunDetails = {
+  const runDetails: types.RunDetailsV2 = {
     admin: false,
-    alias: 'test',
     cases: {
       statement_001: {
         in: '6\n2 3 2 3 2 4',
         out: '10',
       },
     },
-    guid: '119555',
     source: 'print(3)',
-    language: 'py3',
     show_diff: 'none',
   };
 
-  const runs: types.Run[] = [
+  const runs: types.RunWithDetails[] = [
     {
       ...baseRunData,
       guid: '122000',
@@ -76,6 +74,13 @@ describe('Runsv2.vue', () => {
       time: new Date('1/1/2020, 12:15:00 AM'),
     },
   ];
+
+  const runWithDetails: types.RunWithDetails = {
+    ...baseRunData,
+    guid: '122000',
+    time: new Date('1/1/2020, 12:20:00 AM'),
+    details: runDetails,
+  };
 
   it('Should handle empty runs', () => {
     const wrapper = mount(arena_Runs, {
@@ -196,12 +201,11 @@ describe('Runsv2.vue', () => {
     expect(tableComponent.find('td.table-danger').exists()).toBe(true);
   });
 
-  it('Should handle the run details button', async () => {
+  it('Should handle the show run details button', async () => {
     const wrapper = mount(arena_Runs, {
       propsData: {
-        runs,
+        runs: [runWithDetails],
         problemAlias: 'test-problem-1',
-        currentRunDetails: runDetails,
       },
       localVue,
     });
@@ -217,7 +221,22 @@ describe('Runsv2.vue', () => {
     await tableComponent.findComponent(BIconChevronRight).trigger('click');
 
     // Run details should be shown
-    expect(tableComponent.text()).toContain(runDetails.source);
+    expect(tableComponent.text()).toContain(runWithDetails.details?.source);
     expect(tableComponent.findComponent(BIconChevronDown).exists()).toBe(true);
+  });
+
+  it('Should handle the fetch run details button', async () => {
+    const wrapper = mount(arena_Runs, {
+      propsData: {
+        runs,
+        problemAlias: 'test-problem-1',
+      },
+      localVue,
+    });
+
+    const tableComponent = wrapper.findComponent(BTable);
+    expect(tableComponent.findComponent(BIconDownload).exists()).toBe(true);
+    await tableComponent.findComponent(BIconDownload).trigger('click');
+    expect(wrapper.emitted('fetch-run-details')).toBeDefined();
   });
 });
