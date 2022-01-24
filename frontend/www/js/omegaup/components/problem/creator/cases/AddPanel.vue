@@ -174,7 +174,7 @@ export default class AddPanel extends Vue {
         groupID: multipleCasesGroup,
       });
     }
-    // this.$emit('close-add-window');
+    this.$emit('close-add-window');
   }
 }
 </script>
