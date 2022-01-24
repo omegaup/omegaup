@@ -20,25 +20,26 @@ import lib.logs  # pylint: disable=wrong-import-position
 
 class ClientCallback():
     '''Client callback'''
-    def __init__(self):
+    def __init__(self) -> None:
         self.message = ''
-    
-    def __call__(self,
-        channel: pika.adapters.blocking_connection.BlockingChannel,
-        method: pika.spec.Basic.Deliver,
-        properties: pika.spec.BasicProperties,
-        # pylint: disable=unused-argument,
-        body: bytes):
+
+    def __call__(
+            self,
+            channel: pika.adapters.blocking_connection.BlockingChannel,
+            method: pika.spec.Basic.Deliver,
+            properties: pika.spec.BasicProperties,
+            # pylint: disable=unused-argument,
+            body: bytes) -> None:
         # body = "Example".encode()
         data = json.loads(body.decode())
         self.message = data
         channel.close()
-        
-    
+
+
 def receive_messages(
-    queue: str, exchange: str, routing_key: str,
-    channel: pika.adapters.blocking_connection.BlockingChannel,
-    callback) -> None:
+        queue: str, exchange: str, routing_key: str,
+        channel: pika.adapters.blocking_connection.BlockingChannel,
+        callback) -> None:
     '''Receive messages from a queue'''
 
     channel.exchange_declare(exchange=exchange,
@@ -74,10 +75,6 @@ def main() -> None:
                              'CoderOfTheMonthQueue',
                              channel,
                              callback)
-            """client = BasicClient('coder_month',
-                                 'certificates',
-                                 'CoderOfTheMonthQueue',
-                                 receive_messages)"""
             print(callback.message)
     finally:
         dbconn.conn.close()

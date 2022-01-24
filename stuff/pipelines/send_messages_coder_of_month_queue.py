@@ -8,6 +8,7 @@ import logging
 import os
 import sys
 import json
+from typing import Any, Dict
 import mysql.connector
 import mysql.connector.cursor
 import pika
@@ -22,7 +23,7 @@ import lib.logs  # pylint: disable=wrong-import-position
 
 
 def get_coder_of_the_month(cur: mysql.connector.cursor.MySQLCursorDict,
-                           category: str) -> str:
+                           category: str) -> Dict[str, Any]:
     '''Get coder of the month'''
     today = datetime.date.today()
     first_day_of_current_month = today.replace(day=1)
@@ -47,19 +48,17 @@ def get_coder_of_the_month(cur: mysql.connector.cursor.MySQLCursorDict,
                     `selected_by` IS NOT NULL AND
                     `category` = %s;
         ''', (first_day_of_next_month, category))
-    message = ''
     for row in cur:
         data = {"user_id": row['user_id'],
                 "time": row['time'],
                 "category": row['category']}
-        message = json.dumps(data)
-    return message
+    return data
 
 
-def send_coder_month(_cur: mysql.connector.cursor.MySQLCursorDict,
+def send_coder_month(cur: mysql.connector.cursor.MySQLCursorDict,
                      channel:
                      pika.adapters.blocking_connection.BlockingChannel,
-                     _category: str) -> None:
+                     category: str) -> None:
     '''Send messages to coder of the month queue'''
     channel.queue_declare("coder_month", passive=False,
                           durable=False, exclusive=False,
@@ -69,13 +68,13 @@ def send_coder_month(_cur: mysql.connector.cursor.MySQLCursorDict,
                              durable=True,
                              exchange_type='direct')
     logging.info('Send messages to Coder_Month_Queue')
-    # message = get_coder_of_the_month(cur, category)
+    data = get_coder_of_the_month(cur, category)
     # print(message)
     # body = message.encode()
     # channel.basic_publish(exchange='certificates',
     #                      routing_key='CoderOfTheMonthQueue',
     #                      body=body)
-    data = "Example"
+    # data = "Example"
     message = json.dumps(data)
     body = message.encode()
     channel.basic_publish(exchange='certificates',
