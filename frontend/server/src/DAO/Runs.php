@@ -498,6 +498,13 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 ];
             }
         } else {
+            $val = [$problemsetId];
+            if (is_null($filterUsersBy)) {
+                $sqlUserFilter = '';
+            } else {
+                $sqlUserFilter = ' AND i.username LIKE ?';
+                $val[] = $filterUsersBy . '%';
+            }
             $sql = "
                 SELECT
                     i.identity_id,
@@ -505,30 +512,21 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     i.name,
                     IFNULL(i.country_id, 'xx') AS country_id,
                     FALSE AS is_invited,
-                    $classNameQuery
+                    IFNULL(ur.classname, 'user-rank-unranked') AS classname
                 FROM
-                    Identities i
+                    Submissions s
                 INNER JOIN
-                    (SELECT DISTINCT
-                        s.identity_id
-                    FROM
-                        Submissions s
-                    INNER JOIN
-                        Runs r
-                    ON
-                        r.run_id = s.current_run_id
-                    WHERE
-                        r.verdict NOT IN ('CE', 'JE', 'VE') AND
-                        s.problemset_id = ? AND
-                        r.status = 'ready' AND
-                        s.type = 'normal'
-                    ) rc ON i.identity_id = rc.identity_id";
-            $val = [$problemsetId];
-            if (!is_null($filterUsersBy)) {
-                $sql .= ' WHERE i.username LIKE ?';
-                $val[] = $filterUsersBy . '%';
-            }
-            $sql .= ';';
+                    Identities i ON i.identity_id = s.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
+                WHERE
+                    s.problemset_id = ? AND
+                    s.type = 'normal' AND
+                    s.status = 'ready' AND
+                    s.verdict NOT IN ('CE', 'JE', 'VE')
+                    $sqlUserFilter
+                GROUP BY
+                    s.identity_id;";
         }
 
         $result = [];
@@ -600,7 +598,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      * @return list<array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: \OmegaUp\Timestamp, submit_delay: int, guid: string}>
      */
     final public static function getProblemsetRuns(
-        \OmegaUp\DAO\VO\Problemsets $problemset,
+        int $problemsetId,
         bool $onlyAC = false
     ): array {
         $verdictCondition = ($onlyAC ?
@@ -649,7 +647,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         /** @var list<array{contest_score: float|null, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$problemset->problemset_id]
+            [$problemsetId]
         );
     }
 

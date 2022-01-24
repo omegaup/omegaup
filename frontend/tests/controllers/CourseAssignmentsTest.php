@@ -426,6 +426,9 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             $payload['currentProblem']['alias']
         );
         $this->assertCount(1, $payload['runs']);
+        foreach ($payload['runs'] as $run) {
+            $this->assertNull($run['details']);
+        }
         $this->assertEmpty($payload['clarifications']);
     }
 

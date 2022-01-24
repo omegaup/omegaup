@@ -85,6 +85,7 @@ export interface CaseLine {
  * @property {CaseID} caseID UUID of the case
  * @property {GroupID} groupID UUID referencing to the parent group
  * @property {stirng} name Name of the case
+ * @property {number | null} points Points of the case
  * @property {Array<InLine>} lines Lines containing .IN information of the cases
  */
 export interface Case {
@@ -92,6 +93,7 @@ export interface Case {
   groupID: string;
   name: string;
   lines: CaseLine[];
+  points: number | null;
 }
 
 /**
