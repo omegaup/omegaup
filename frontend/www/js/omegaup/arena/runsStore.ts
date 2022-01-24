@@ -46,13 +46,16 @@ export const runsStoreConfig = {
       Vue.set(state.index, run.guid, state.runs.length);
       state.runs.push(run);
     },
-    addRunDetails(state: RunsState, {
-      runGUID,
-      runDetails,
-    }: {
-      runGUID: string;
-      runDetails: types.RunDetails;
-    }) {
+    addRunDetails(
+      state: RunsState,
+      {
+        runGUID,
+        runDetails,
+      }: {
+        runGUID: string;
+        runDetails: types.RunDetails;
+      },
+    ) {
       if (Object.prototype.hasOwnProperty.call(state.index, runGUID)) {
         const run = state.runs[state.index[runGUID]];
         run.details = runDetails;
@@ -110,13 +113,16 @@ export const myRunsStore = new Vuex.Store<RunsState>({
       Vue.set(state.index, run.guid, state.runs.length);
       state.runs.push(run);
     },
-    addRunDetails(state: RunsState, {
-      runGUID,
-      runDetails,
-    }: {
-      runGUID: string;
-      runDetails: types.RunDetails;
-    }) {
+    addRunDetails(
+      state: RunsState,
+      {
+        runGUID,
+        runDetails,
+      }: {
+        runGUID: string;
+        runDetails: types.RunDetails;
+      },
+    ) {
       if (Object.prototype.hasOwnProperty.call(state.index, runGUID)) {
         const run = state.runs[state.index[runGUID]];
         run.details = runDetails;

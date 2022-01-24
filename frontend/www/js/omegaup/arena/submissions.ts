@@ -235,7 +235,11 @@ export function trackRun({ run }: { run: types.Run }): void {
   myRunsStore.commit('addRun', run);
 }
 
-export function trackRunWithDetails({ run }: { run: types.RunWithDetails }): void {
+export function trackRunWithDetails({
+  run,
+}: {
+  run: types.RunWithDetails;
+}): void {
   runsStore.commit('addRun', run);
   if (run.username !== OmegaUp.username) {
     return;
@@ -243,15 +247,15 @@ export function trackRunWithDetails({ run }: { run: types.RunWithDetails }): voi
   myRunsStore.commit('addRun', run);
 }
 
-export function addRunDetails({ run, runDetails }: {
-  run: types.RunWithDetails;
-  runDetails: types.RunDetails;
+export function addRunDetails({
+  runGUID,
+  runDetails,
+}: {
+  runGUID: string;
+  runDetails: types.RunDetailsV2;
 }): void {
-  runsStore.commit('addRunDetails', { run, runDetails });
-  if (run.username !== OmegaUp.username) {
-    return;
-  }
-  myRunsStore.commit('addRunDetails', { run, runDetails });
+  runsStore.commit('addRunDetails', { runGUID, runDetails });
+  myRunsStore.commit('addRunDetails', { runGUID, runDetails });
 }
 
 export function onSetNominationStatus({
