@@ -236,7 +236,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 r.memory,
                 IFNULL(ur.classname, "user-rank-unranked") AS classname
             FROM
-                Submissions s USE INDEX(PRIMARY)
+                Submissions s
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
             LEFT JOIN
