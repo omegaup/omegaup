@@ -10,8 +10,8 @@
           class="mb-4"
         >
           <b-form-input
-            name="multiple-cases-prefix"
             v-model="multipleCasesPrefix"
+            name="multiple-cases-prefix"
             :formatter="formatter"
             autocomplete="off"
           />
@@ -24,8 +24,8 @@
           class="mb-4"
         >
           <b-form-input
-            name="multiple-cases-suffix"
             v-model="multipleCasesSuffix"
+            name="multiple-cases-suffix"
             :formatter="formatter"
             autocomplete="off"
           />
@@ -38,8 +38,8 @@
       label-for="case-points"
     >
       <b-form-input
-        name="multiple-cases-count"
         v-model="multipleCasesCount"
+        name="multiple-cases-count"
         :formatter="numberFormatter"
         type="number"
         number
@@ -47,8 +47,8 @@
     </b-form-group>
     <b-form-group :label="T.problemCreatorGroupName" label-for="case-group">
       <b-form-select
-        name="multiple-cases-group"
         v-model="multipleCasesGroup"
+        name="multiple-cases-group"
         :options="options"
       />
     </b-form-group>
