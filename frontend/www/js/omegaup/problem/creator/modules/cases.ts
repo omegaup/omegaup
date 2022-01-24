@@ -85,6 +85,7 @@ export const casesStore: Module<CasesState, RootState> = {
             name: caseRequest.name,
             groupID: caseRequest.groupID,
             caseID: caseRequest.caseID,
+            points: caseRequest.points,
           }),
         );
       }
@@ -314,9 +315,20 @@ export const casesStore: Module<CasesState, RootState> = {
       );
     },
     getGroupIdsAndNames: (state) => {
-      return state.groups.map((group) => {
-        return { value: group.groupID, text: group.name };
-      });
+      // We use reduce because we don't want to show the ungrouped cases/groups
+      // Also this way we avoid chaining a map and a filter
+      return state.groups.reduce<{ value: string; text: string }[]>(
+        (groups, currGroup) => {
+          if (!currGroup.ungroupedCase) {
+            return [
+              ...groups,
+              { value: currGroup.groupID, text: currGroup.name },
+            ];
+          }
+          return [...groups];
+        },
+        [],
+      );
     },
     getAllCases: (state) => {
       return state.groups.reduce((cases: Case[], currCase) => {
@@ -378,6 +390,7 @@ export function generateCase(
     caseID: uuid(),
     groupID: UUID_NIL,
     lines: [],
+    points: null,
     ...caseParams,
   };
 }
