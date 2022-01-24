@@ -10,6 +10,7 @@
           class="mb-4"
         >
           <b-form-input
+            name="multiple-cases-prefix"
             v-model="multipleCasesPrefix"
             :formatter="formatter"
             autocomplete="off"
@@ -23,6 +24,7 @@
           class="mb-4"
         >
           <b-form-input
+            name="multiple-cases-suffix"
             v-model="multipleCasesSuffix"
             :formatter="formatter"
             autocomplete="off"
@@ -36,6 +38,7 @@
       label-for="case-points"
     >
       <b-form-input
+        name="multiple-cases-count"
         v-model="multipleCasesCount"
         :formatter="numberFormatter"
         type="number"
@@ -43,7 +46,11 @@
       />
     </b-form-group>
     <b-form-group :label="T.problemCreatorGroupName" label-for="case-group">
-      <b-form-select v-model="multipleCasesGroup" />
+      <b-form-select
+        name="multiple-cases-group"
+        v-model="multipleCasesGroup"
+        :options="options"
+      />
     </b-form-group>
   </div>
 </template>
@@ -53,15 +60,32 @@ import { GroupID } from '../../../../problem/creator/types';
 import { NIL } from 'uuid';
 import { Component, Vue } from 'vue-property-decorator';
 import T from '../../../../lang';
+import { namespace } from 'vuex-class';
+
+const casesStore = namespace('casesStore');
 
 @Component
 export default class MultipleCasesInput extends Vue {
+  @casesStore.Getter('getGroupIdsAndNames') storedGroups!: {
+    value: string;
+    text: string;
+  }[];
+
   multipleCasesPrefix = '';
   multipleCasesSuffix = '';
   multipleCasesCount = 1;
   multipleCasesGroup: GroupID = NIL;
 
   T = T;
+
+  // getGroupIdsAndNames getter is not instant, we need to wait for it to be defined otherwise the app will crash
+  get options() {
+    const noGroup = { value: NIL, text: T.problemCreatorNoGroup };
+    if (!this.storedGroups) {
+      return [noGroup];
+    }
+    return [noGroup, ...this.storedGroups];
+  }
 
   get caseNamePreview() {
     return `${this.multipleCasesPrefix}1${this.multipleCasesSuffix}, ${this.multipleCasesPrefix}2${this.multipleCasesSuffix}...`;
@@ -74,7 +98,7 @@ export default class MultipleCasesInput extends Vue {
 
   // Ensures the numebr is always above 1
   numberFormatter(number: number) {
-    return Math.max(number, 1);
+    return Math.max(number, 0);
   }
 }
 </script>
