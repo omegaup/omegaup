@@ -1,6 +1,17 @@
 import { v4 as uuid } from 'uuid';
-import { getISODate } from '../support/commands';
-import { CourseOptions, LoginOptions, ProblemOptions } from '../support/types';
+import {
+  addDaysToTodaysDate,
+  getISODate,
+  getISODateTime,
+} from '../support/commands';
+import {
+  ContestOptions,
+  CourseOptions,
+  LoginOptions,
+  ProblemOptions,
+  RunOptions,
+  Status,
+} from '../support/types';
 
 describe('Basic Commands Test', () => {
   beforeEach(() => {
@@ -18,7 +29,7 @@ describe('Basic Commands Test', () => {
     const courseOptions: CourseOptions = {
       courseAlias: uuid().slice(0, 10),
       showScoreboard: true,
-      startDate: new Date(2022, 2, 2),
+      startDate: new Date(),
       unlimitedDuration: true,
       school: 'omegaup',
       basicInformation: false,
@@ -84,9 +95,9 @@ describe('Basic Commands Test', () => {
     const courseOptions: CourseOptions = {
       courseAlias: uuid().slice(0, 10),
       showScoreboard: true,
-      startDate: new Date(2022, 2, 2),
+      startDate: new Date(),
       unlimitedDuration: false,
-      endDate: new Date(2022, 3, 3),
+      endDate: addDaysToTodaysDate({days: 1}),
       school: 'omegaup',
       basicInformation: false,
       requestParticipantInformation: 'optional',
@@ -214,5 +225,87 @@ describe('Basic Commands Test', () => {
       problemOptions.problemAlias,
     );
     cy.get('[name="source"]').should('have.value', problemOptions.problemAlias);
+  });
+
+  it('Should make a run of a problem', () => {
+    const problemOptions: ProblemOptions = {
+      problemAlias: 'problem-' + uuid().slice(0, 8),
+      tag: 'Recursion',
+      autoCompleteTextTag: 'Recur',
+      problemLevelIndex: 1,
+    };
+
+    const runOptions: RunOptions = {
+      problemAlias: problemOptions.problemAlias,
+      fixturePath: 'main.cpp',
+      language: 'cpp11-gcc',
+    };
+
+    const expectedStatus: Status = 'AC';
+
+    cy.login({ username: 'user', password: 'user' });
+    cy.createProblem(problemOptions);
+    cy.createRun(runOptions);
+    cy.get('[data-run-status] > span').first().should('have.text', 'new');
+
+    cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
+    cy.wait(['@runStatus'], { timeout: 10000 });
+
+    cy.get('[data-run-status] > span')
+      .first()
+      .should('have.text', expectedStatus);
+  });
+
+  it('Should create a contest', () => {
+    const loginOptions: LoginOptions = {
+      username: 'user',
+      password: 'user',
+    };
+
+    cy.login(loginOptions);
+
+    const contestOptions: ContestOptions = {
+      contestAlias: 'contest' + uuid().slice(0, 5),
+      description: 'Test Description',
+      startDate: new Date(),
+      endDate: addDaysToTodaysDate({days: 2}),
+      showScoreboard: true,
+      basicInformation: false,
+      partialPoints: true,
+      requestParticipantInformation: 'no',
+    };
+
+    cy.createContest(contestOptions);
+    cy.location('href').should('include', contestOptions.contestAlias); // Url
+
+    // Asert
+    cy.get('[name="title"]').should('have.value', contestOptions.contestAlias);
+    cy.get('[name="alias"]').should('have.value', contestOptions.contestAlias);
+    cy.get('[name="description"]').should(
+      'have.value',
+      contestOptions.description,
+    );
+    cy.get('[data-start-date]').should(
+      'have.value',
+      getISODateTime(contestOptions.startDate ?? new Date()),
+    );
+    cy.get('[data-end-date]').type(
+      getISODateTime(contestOptions.endDate ?? new Date()),
+    );
+    cy.get('[data-show-scoreboard-at-end]').should(
+      'have.value',
+      `${contestOptions.showScoreboard}`,
+    );
+    cy.get('[data-partial-points]').should(
+      'have.value',
+      `${contestOptions.partialPoints}`,
+    );
+    cy.get('[data-basic-information-required]').should(
+      contestOptions.basicInformation ? 'be.checked' : 'not.be.checked',
+    );
+    cy.get('[data-request-user-information]').should(
+      'have.value',
+      contestOptions.requestParticipantInformation,
+    );
   });
 });

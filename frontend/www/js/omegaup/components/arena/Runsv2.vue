@@ -2,9 +2,20 @@
   <div class="mt-4" data-runs>
     <h5 class="mb-3">{{ T.wordsSubmissions }}</h5>
     <b-table :fields="tableFields" :items="filteredRuns" striped responsive>
-      <template #cell(index)>
-        <!-- TODO: Implement the collapse to show the details -->
-        <b-button variant="link" size="sm"><b-icon-chevron-right /></b-button>
+      <template #cell(index)="row">
+        <b-button
+          :disabled="!row.detailsShowing && showDetails"
+          variant="link"
+          size="sm"
+          @click="toggleDetails(row)"
+        >
+          <b-icon-chevron-right v-if="!row.detailsShowing" />
+          <b-icon-chevron-down v-else />
+        </b-button>
+      </template>
+
+      <template #row-details>
+        {{ currentRunDetails }}
       </template>
 
       <template #cell(guid)="data">
@@ -15,8 +26,12 @@
 
       <template #cell(verdict)="data">
         <span class="mr-1">{{ status(data.item) }}</span>
-        <!-- TODO: Add the status help button-->
-        {{ statusHelp(data.item) }}
+        <b-button
+          v-if="data.item.status === 'ready' && data.item.verdict !== 'AC'"
+          v-b-tooltip.right="statusHelp(data.item)"
+          size="sm"
+          ><b-icon-question-circle-fill></b-icon-question-circle-fill>
+        </b-button>
       </template>
 
       <!-- TODO: Add the new submission button -->
@@ -30,7 +45,12 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
 
-import { BootstrapVue, BIconChevronRight } from 'bootstrap-vue';
+import {
+  BootstrapVue,
+  BIconChevronRight,
+  BIconChevronDown,
+  BIconQuestionCircleFill,
+} from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 Vue.use(BootstrapVue);
@@ -70,14 +90,26 @@ interface TableRunItem {
 @Component({
   components: {
     BIconChevronRight,
+    BIconChevronDown,
+    BIconQuestionCircleFill,
   },
 })
 export default class Runs extends Vue {
+  @Prop() currentRunDetails!: types.RunDetails | null;
   @Prop({ default: null }) problemAlias!: string | null;
   @Prop() runs!: null | types.Run[];
 
   T = T;
   time = time;
+  showDetails = false;
+
+  toggleDetails(row: { toggleDetails: () => void; item: TableRunItem }): void {
+    this.showDetails = !this.showDetails;
+    if (this.showDetails) {
+      this.$emit('show-run-details', { guid: row.item.guid });
+    }
+    row.toggleDetails();
+  }
 
   get filteredRuns(): TableRunItem[] {
     return this.sortedRuns.map((run) => {

@@ -4,6 +4,7 @@ import CaseInput from './CaseInput.vue';
 import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../../lang';
 import Vue from 'vue';
+import store from '@/js/omegaup/problem/creator/store';
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
@@ -13,6 +14,7 @@ describe('CaseInput.vue', () => {
   it('Should contain all 4 inputs', async () => {
     const wrapper = shallowMount(CaseInput, {
       localVue,
+      store,
     });
 
     const expectedTextInputText = [
@@ -35,6 +37,7 @@ describe('CaseInput.vue', () => {
   it('Should handle autoformatting', () => {
     const wrapper = shallowMount(CaseInput, {
       localVue,
+      store,
     });
 
     // These any are neccesary since wrapper.vm doesn't load the component's methods to typescript, even if they exist

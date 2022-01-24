@@ -97,22 +97,28 @@
                 'is-invalid': invalidParameterName === 'unlimited_duration',
               }"
             >
-              <label class="radio-inline"
-                ><input
-                  v-model="unlimitedDuration"
-                  type="radio"
-                  :value="true"
-                  :disabled="!unlimitedDurationCourse"
-                />{{ T.wordsYes }}</label
-              >
-              <label class="radio-inline ml-3"
-                ><input
-                  v-model="unlimitedDuration"
-                  type="radio"
-                  :value="false"
-                  :disabled="!unlimitedDurationCourse"
-                />{{ T.wordsNo }}</label
-              >
+              <div class="form-check form-check-inline">
+                <label class="form-check-label"
+                  ><input
+                    v-model="unlimitedDuration"
+                    class="form-check-input"
+                    type="radio"
+                    :value="true"
+                    :disabled="!unlimitedDurationCourse"
+                  />{{ T.wordsYes }}</label
+                >
+              </div>
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input
+                    v-model="unlimitedDuration"
+                    class="form-check-input"
+                    type="radio"
+                    :value="false"
+                    :disabled="!unlimitedDurationCourse"
+                  />{{ T.wordsNo }}</label
+                >
+              </div>
             </div>
           </div>
           <div class="form-group col-md-4">

@@ -85,8 +85,7 @@ export interface CaseLine {
  * @property {CaseID} caseID UUID of the case
  * @property {GroupID} groupID UUID referencing to the parent group
  * @property {stirng} name Name of the case
- * @property {number} points Points of the case
- * @property {boolean} pointsDefined Whether the points are defined by the user or not
+ * @property {number | null} points Points of the case
  * @property {Array<InLine>} lines Lines containing .IN information of the cases
  */
 export interface Case {
@@ -94,6 +93,7 @@ export interface Case {
   groupID: string;
   name: string;
   lines: CaseLine[];
+  points: number | null;
 }
 
 /**
@@ -104,15 +104,15 @@ export interface Case {
  * @property {GrouID} groupID UUID of the group
  * @property {string} name Name of the group
  * @property {number} points Points of the group
- * @property {boolean} pointsDefined Whether the points are defined by the user or not
+ * @property {boolean} autoPoints Whether the points are gonna be calculated automatically
  * @property {boolean} ungroupedCase Whether this case belongs to an ungrouped case
  * @property {Array<Case>} cases Cases of the group
  */
 export interface Group {
   groupID: GroupID;
   name: string;
-  points: number;
-  pointsDefined: boolean;
+  points: number | null;
+  autoPoints: boolean;
   ungroupedCase: boolean;
   cases: Case[];
 }
@@ -151,8 +151,8 @@ export interface CaseRequest {
   groupID: GroupID;
   caseID: CaseID;
   name: string;
-  pointsDefined: boolean;
-  points: number;
+  autoPoints: boolean;
+  points: number | null;
   lines?: CaseLine[];
 }
 
@@ -168,3 +168,5 @@ export interface CaseGroupID {
   groupID: GroupID;
   caseID: GroupID;
 }
+
+export type AddTabTypes = 'case' | 'group' | 'multiplecases';

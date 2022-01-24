@@ -24,6 +24,38 @@ export interface CourseOptions {
   description?: string;
 }
 
-export type RequestParticipantInformation = 'no' | 'optional' | 'required';
+export interface ContestOptions {
+  contestAlias: string;
+  description?: string;
+  startDate?: Date;
+  endDate?: Date;
+  showScoreboard?: boolean;
+  partialPoints?: boolean;
+  basicInformation?: boolean;
+  requestParticipantInformation?: RequestParticipantInformation;
+}
 
+export interface RunOptions {
+  problemAlias: string;
+  fixturePath: string;
+  language: Language;
+}
+
+export type RequestParticipantInformation = 'no' | 'optional' | 'required';
 export type ProblemLevel = 'introductory' | 'intermediate' | 'advanced';
+export type Language =
+  | 'c11-gcc'
+  | 'c11-clang'
+  | 'cpp11-gcc'
+  | 'cpp11-clang'
+  | 'cpp17-gcc'
+  | 'cpp17-clang'
+  | 'java'
+  | 'py2'
+  | 'py3'
+  | 'rb'
+  | 'cs'
+  | 'pas'
+  | 'hs'
+  | 'lua';
+export type Status = 'AC' | 'TLE' | 'MLE' | 'PA';

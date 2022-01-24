@@ -166,6 +166,18 @@ export namespace types {
                   return x;
                 }
                 return x.map((x) => {
+                  if (typeof x.details !== 'undefined' && x.details !== null)
+                    x.details = ((x) => {
+                      if (
+                        typeof x.feedback !== 'undefined' &&
+                        x.feedback !== null
+                      )
+                        x.feedback = ((x) => {
+                          x.date = ((x: number) => new Date(x * 1000))(x.date);
+                          return x;
+                        })(x.feedback);
+                      return x;
+                    })(x.details);
                   x.time = ((x: number) => new Date(x * 1000))(x.time);
                   return x;
                 });
@@ -839,6 +851,23 @@ export namespace types {
                         return x;
                       }
                       return x.map((x) => {
+                        if (
+                          typeof x.details !== 'undefined' &&
+                          x.details !== null
+                        )
+                          x.details = ((x) => {
+                            if (
+                              typeof x.feedback !== 'undefined' &&
+                              x.feedback !== null
+                            )
+                              x.feedback = ((x) => {
+                                x.date = ((x: number) => new Date(x * 1000))(
+                                  x.date,
+                                );
+                                return x;
+                              })(x.feedback);
+                            return x;
+                          })(x.details);
                         x.time = ((x: number) => new Date(x * 1000))(x.time);
                         return x;
                       });
@@ -1768,6 +1797,18 @@ export namespace types {
                 return x;
               }
               return x.map((x) => {
+                if (typeof x.details !== 'undefined' && x.details !== null)
+                  x.details = ((x) => {
+                    if (
+                      typeof x.feedback !== 'undefined' &&
+                      x.feedback !== null
+                    )
+                      x.feedback = ((x) => {
+                        x.date = ((x: number) => new Date(x * 1000))(x.date);
+                        return x;
+                      })(x.feedback);
+                    return x;
+                  })(x.details);
                 x.time = ((x: number) => new Date(x * 1000))(x.time);
                 return x;
               });
@@ -3590,7 +3631,7 @@ export namespace types {
     problem_id: number;
     problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
-    runs?: types.Run[];
+    runs?: types.RunWithDetails[];
     score: number;
     settings: types.ProblemSettingsDistrib;
     show_diff: string;
@@ -3998,12 +4039,58 @@ export namespace types {
     verdict?: string;
   }
 
+  export interface RunDetailsV2 {
+    admin: boolean;
+    cases: types.ProblemCasesContents;
+    compile_error?: string;
+    details?: {
+      compile_meta?: { [key: string]: types.RunMetadata };
+      groups?: types.RunDetailsGroup[];
+      judged_by: string;
+      max_score?: number;
+      memory?: number;
+      score: number;
+      time?: number;
+      verdict: string;
+      wall_time?: number;
+    };
+    feedback?: types.SubmissionFeedback;
+    judged_by?: string;
+    logs?: string;
+    show_diff: string;
+    source?: string;
+    source_link?: boolean;
+    source_name?: string;
+    source_url?: string;
+  }
+
   export interface RunMetadata {
     memory: number;
     sys_time: number;
     time: number;
     verdict: string;
     wall_time: number;
+  }
+
+  export interface RunWithDetails {
+    alias: string;
+    classname: string;
+    contest_alias?: string;
+    contest_score?: number;
+    country: string;
+    details?: types.RunDetailsV2;
+    guid: string;
+    language: string;
+    memory: number;
+    penalty: number;
+    runtime: number;
+    score: number;
+    status: string;
+    submit_delay: number;
+    time: Date;
+    type?: string;
+    username: string;
+    verdict: string;
   }
 
   export interface RunsDiff {

@@ -1,6 +1,12 @@
 // <reference types="cypress"/>
 
-import { CourseOptions, LoginOptions, ProblemOptions } from './types';
+import {
+  ContestOptions,
+  CourseOptions,
+  LoginOptions,
+  ProblemOptions,
+  RunOptions,
+} from './types';
 
 declare global {
   namespace Cypress {
@@ -16,6 +22,11 @@ declare global {
       createCourse(
         courseOptions: Partial<CourseOptions> &
           Pick<CourseOptions, 'courseAlias'>,
+      ): void;
+      createRun(problemOptions: RunOptions): void;
+      createContest(
+        contestOptions: Partial<ContestOptions> &
+          Pick<ContestOptions, 'contestAlias'>,
       ): void;
     }
   }

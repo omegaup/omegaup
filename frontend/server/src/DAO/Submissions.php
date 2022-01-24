@@ -104,6 +104,37 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     }
 
     /**
+     * Gets the count of total runs sent by students (non-admins) to a given problemset
+     *
+     * @param list<int> $adminsIds
+     */
+    final public static function countTotalStudentsSubmissionsOfProblemset(
+        int $problemsetId,
+        array $adminsIds
+    ): int {
+        $placeholder = join(',', array_fill(0, count($adminsIds), '?'));
+        $sql = "
+            SELECT
+                COUNT(*)
+            FROM
+                Submissions s
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            WHERE
+                s.problemset_id = ? AND
+                s.`type` = 'normal' AND
+                i.user_id NOT IN ($placeholder);
+        ";
+        $args = array_merge(
+            [ $problemsetId ],
+            $adminsIds,
+        );
+
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $args);
+    }
+
+    /**
      * Get whether the to-be-created submission is within the allowed
      * submission gap.
      */
@@ -191,7 +222,12 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     public static function getLatestSubmissions(
         int $identityId = null,
     ): array {
-        $sql = '
+        if (is_null($identityId)) {
+            $indexHint = 'USE INDEX(PRIMARY)';
+        } else {
+            $indexHint = '';
+        }
+        $sql = "
             SELECT
                 s.`time`,
                 i.username,
@@ -203,9 +239,9 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 r.verdict,
                 r.runtime,
                 r.memory,
-                IFNULL(ur.classname, "user-rank-unranked") AS classname
+                IFNULL(ur.classname, 'user-rank-unranked') AS classname
             FROM
-                Submissions s USE INDEX(PRIMARY)
+                Submissions s $indexHint
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
             LEFT JOIN
@@ -228,13 +264,13 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 AND p.visibility >= ?
                 AND (
                     s.problemset_id IS NULL
-                    OR ps.access_mode = "public"
+                    OR ps.access_mode = 'public'
                 )
                 AND (
                     c.contest_id IS NULL
                     OR c.finish_time < s.time
                 )
-        ';
+        ";
         $params = [
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
         ];

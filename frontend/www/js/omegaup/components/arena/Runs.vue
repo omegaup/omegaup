@@ -178,7 +178,7 @@
         </thead>
         <tfoot v-if="problemAlias != null">
           <tr>
-            <td colspan="10">
+            <td colspan="10" data-new-run>
               <a
                 v-if="isContestFinished"
                 :href="`/arena/${contestAlias}/practice/`"

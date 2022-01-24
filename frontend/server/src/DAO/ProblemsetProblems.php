@@ -114,10 +114,29 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
      * @return list<array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, is_extra_problem: bool, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
      */
     final public static function getProblemsByProblemset(
-        int $problemsetId
+        int $problemsetId,
+        bool $needSubmissions
     ): array {
         // Build SQL statement
-        $sql = 'SELECT
+        if ($needSubmissions) {
+            $sqlSubmissions = '
+            IFNULL(
+                COUNT(s.submission_id),
+                0
+            ) > 0';
+            $sqlSubmissionsJoin = "
+            LEFT JOIN
+                Submissions s
+            ON
+                s.problem_id = p.problem_id AND
+                s.problemset_id = pp.problemset_id AND
+                s.`type` = 'normal'
+            ";
+        } else {
+            $sqlSubmissions = 'FALSE';
+            $sqlSubmissionsJoin = '';
+        }
+        $sql = "SELECT
                     p.title,
                     p.problem_id,
                     p.alias,
@@ -130,10 +149,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     IFNULL(p.difficulty, 0.0) AS difficulty,
                     pp.order,
                     p.languages,
-                    IFNULL(
-                        COUNT(s.submission_id),
-                        0
-                    ) > 0 AS has_submissions,
+                    $sqlSubmissions AS has_submissions,
                     pp.points,
                     pp.commit,
                     pp.version,
@@ -141,22 +157,14 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 FROM
                     Problems p
                 INNER JOIN
-                    Problemset_Problems pp
-                ON
-                    pp.problem_id = p.problem_id
-                LEFT JOIN
-                    Submissions s
-                ON
-                    s.problem_id = p.problem_id AND
-                    s.problemset_id = pp.problemset_id AND
-                    s.`type` = "normal"
+                    Problemset_Problems pp ON pp.problem_id = p.problem_id
+                $sqlSubmissionsJoin
                 WHERE
                     pp.problemset_id = ?
                 GROUP BY
-                    p.problem_id,
-                    pp.problemset_id
+                    p.problem_id
                 ORDER BY
-                    pp.order, pp.problem_id ASC;';
+                    pp.order, pp.problem_id ASC;";
 
         /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, has_submissions: int, input_limit: int, is_extra_problem: bool, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
@@ -296,7 +304,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
      * @return list<\OmegaUp\DAO\VO\Problems>
      */
     final public static function getRelevantProblems(
-        \OmegaUp\DAO\VO\Problemsets $problemset
+        int $problemsetId
     ): array {
         // Build SQL statement
         $sql = '
@@ -309,7 +317,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
             WHERE
                 pp.problemset_id = ?
             ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
-        $val = [$problemset->problemset_id];
+        $val = [$problemsetId];
         $result = [];
         /** @var array{alias: string, current_version: string, problem_id: int} $row */
         foreach (

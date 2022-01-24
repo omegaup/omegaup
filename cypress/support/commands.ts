@@ -2,7 +2,12 @@
 import 'cypress-wait-until';
 import 'cypress-file-upload';
 import { buildURLQuery } from '@/js/omegaup/ui';
-import { CourseOptions, LoginOptions, ProblemOptions } from './types';
+import {
+  CourseOptions,
+  LoginOptions,
+  ProblemOptions,
+  RunOptions,
+} from './types';
 
 // Logins the user given a username and password
 Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
@@ -108,6 +113,49 @@ Cypress.Commands.add(
   },
 );
 
+Cypress.Commands.add(
+  'createRun',
+  ({ problemAlias, fixturePath, language }: RunOptions) => {
+    cy.visit(`arena/problem/${encodeURIComponent(problemAlias)}/`);
+    cy.get('[data-new-run]').click();
+    cy.get('[name="language"]').select(language);
+    cy.fixture(fixturePath).then((fileContent) => {
+      cy.get('.CodeMirror-line').type(fileContent);
+      cy.get('[data-submit-run]').click();
+    });
+  },
+);
+
+Cypress.Commands.add(
+  'createContest',
+  ({
+    contestAlias,
+    description = 'Default Description',
+    startDate = new Date(),
+    endDate = addDaysToTodaysDate({ days: 1 }),
+    showScoreboard = true,
+    partialPoints = true,
+    basicInformation = false,
+    requestParticipantInformation = 'no',
+  }) => {
+    cy.visit('contest/new/');
+    cy.get('[name="title"]').type(contestAlias);
+    cy.get('[name="alias"]').type(contestAlias);
+    cy.get('[name="description"]').type(description);
+    cy.get('[data-start-date]').type(getISODateTime(startDate));
+    cy.get('[data-end-date]').type(getISODateTime(endDate));
+    cy.get('[data-show-scoreboard-at-end]').select(`${showScoreboard}`); // "true" | "false"
+    cy.get('[data-partial-points]').select(`${partialPoints}`);
+    if (basicInformation) {
+      cy.get('[data-basic-information-required]').click();
+    }
+    cy.get('[data-request-user-information]').select(
+      requestParticipantInformation,
+    ); // no | optional | required
+    cy.get('button[type="submit"]').click();
+  },
+);
+
 /**
  *
  * @param date Date object to convert
@@ -115,4 +163,26 @@ Cypress.Commands.add(
  */
 export const getISODate = (date: Date) => {
   return date.toISOString().split('T')[0];
+};
+
+/**
+ *
+ * @param date Date object to convert
+ * @returns ISO datetime required to type on a date input inside cypress
+ */
+export const getISODateTime = (date: Date) => {
+  return date.toISOString().slice(0, 16);
+};
+
+/**
+ * Return a date relative to today
+ * @param days number of days to add to today
+ * @returns Relative Date Object
+ */
+export const addDaysToTodaysDate = ({ days }: { days: number }): Date => {
+  if (days == 0) return new Date();
+
+  const newDate = new Date();
+  newDate.setDate(newDate.getDate() + days);
+  return newDate;
 };
