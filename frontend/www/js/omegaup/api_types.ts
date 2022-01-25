@@ -2523,7 +2523,7 @@ export namespace types {
   export interface Clarification {
     answer?: string;
     assignment_alias?: string;
-    author?: string;
+    author: string;
     clarification_id: number;
     contest_alias?: string;
     message: string;
