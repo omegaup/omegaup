@@ -149,9 +149,6 @@
         </b-card>
         <b-tab
           ref="currentContestTab"
-          v-infinite-scroll="loadMoreContests"
-          infinite-scroll-disabled="refreshing"
-          infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListCurrent"
           :title-link-class="titleLinkClass(ContestTab.Current)"
@@ -194,9 +191,6 @@
         </b-tab>
         <b-tab
           ref="futureContestTab"
-          v-infinite-scroll="loadMoreContests"
-          infinite-scroll-disabled="refreshing"
-          infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListFuture"
           :title-link-class="titleLinkClass(ContestTab.Future)"
@@ -242,9 +236,6 @@
         </b-tab>
         <b-tab
           ref="pastContestTab"
-          v-infinite-scroll="loadMoreContests"
-          infinite-scroll-disabled="refreshing"
-          infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListPast"
           :title-link-class="titleLinkClass(ContestTab.Past)"
@@ -282,13 +273,15 @@
               <div></div>
             </template>
           </omegaup-contest-card>
-          <b-spinner
-            v-if="refreshing"
-            class="spinner mt-4"
-            variant="primary"
-          ></b-spinner>
         </b-tab>
       </b-tabs>
+      <b-pagination-nav
+        v-model="currentPage"
+        size="lg"
+        align="center"
+        :link-gen="linkGen"
+        :number-of-pages="10"
+      ></b-pagination-nav>
     </b-card>
   </div>
 </template>
@@ -307,21 +300,19 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import infiniteScroll from 'vue-infinite-scroll';
 import {
   TabsPlugin,
   CardPlugin,
   DropdownPlugin,
   LayoutPlugin,
-  SpinnerPlugin,
+  PaginationNavPlugin,
 } from 'bootstrap-vue';
 import ContestCard from './ContestCard.vue';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
 Vue.use(LayoutPlugin);
-Vue.use(SpinnerPlugin);
-Vue.use(infiniteScroll);
+Vue.use(PaginationNavPlugin);
 library.add(fas);
 
 export enum ContestTab {
@@ -350,15 +341,20 @@ export default class ArenaContestList extends Vue {
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
   @Prop() tab!: ContestTab;
+  @Prop() sortOrder!: ContestOrder;
+  @Prop() filterBySignedUp!: boolean;
+  @Prop() filterByRecommended!: boolean;
+  @Prop() page!: number;
   T = T;
   ui = ui;
   ContestTab = ContestTab;
   ContestOrder = ContestOrder;
   currentTab: ContestTab = this.tab;
   currentQuery: string = this.query;
-  currentOrder: ContestOrder = ContestOrder.None;
-  currentFilterBySignedUp: boolean = false;
-  currentFilterByRecommended: boolean = false;
+  currentOrder: ContestOrder = this.sortOrder;
+  currentFilterBySignedUp: boolean = this.filterBySignedUp;
+  currentFilterByRecommended: boolean = this.filterByRecommended;
+  currentPage: number = this.page;
   refreshing: boolean = false;
 
   titleLinkClass(tab: ContestTab) {
@@ -373,11 +369,18 @@ export default class ArenaContestList extends Vue {
     return `/arenav2/#${this.currentTab}`;
   }
 
-  loadMoreContests() {
-    this.refreshing = true;
-    let currentPageSize: number = this.filteredContestList.length + 10;
-    this.$emit('get-chunk', 1, currentPageSize, this.query, this.currentTab);
-    this.refreshing = false;
+  linkGen(pageNum: number) {
+    return {
+      path: `/arenav2/`,
+      query: {
+        page: pageNum,
+        tab_name: this.currentTab,
+        query: this.query,
+        sort_order: this.currentOrder,
+        participating: this.currentFilterBySignedUp,
+        recommended: this.currentFilterByRecommended,
+      },
+    };
   }
 
   finishContestDate(contest: types.ContestListItem): string {
@@ -531,13 +534,5 @@ export default class ArenaContestList extends Vue {
   font-size: 200%;
   margin: 1em;
   color: var(--arena-contest-list-empty-category-font-color);
-}
-
-.spinner {
-  width: 3rem;
-  height: 3rem;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
 }
 </style>
