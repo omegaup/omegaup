@@ -8,13 +8,14 @@
     >
       <b-form-input
         v-model="caseName"
+        name="case-name"
         :formatter="formatter"
         required
         autocomplete="off"
       />
     </b-form-group>
     <b-form-group :label="T.problemCreatorGroupName" label-for="case-group">
-      <b-form-select v-model="caseGroup" :options="options" />
+      <b-form-select v-model="caseGroup" :options="options" name="case-group" />
     </b-form-group>
 
     <b-form-group
@@ -24,6 +25,7 @@
     >
       <b-form-input
         v-model="casePoints"
+        name="case-points"
         :formatter="pointsFormatter"
         type="number"
         number
@@ -48,7 +50,10 @@
 <script lang="ts">
 import { NIL } from 'uuid';
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import { namespace } from 'vuex-class';
 import T from '../../../../lang';
+
+const casesStore = namespace('casesStore');
 
 @Component
 export default class CaseInput extends Vue {
@@ -56,11 +61,26 @@ export default class CaseInput extends Vue {
   @Prop({ default: NIL }) group!: string;
   @Prop({ default: null }) points!: number | null;
 
+  // This return the group name, and the group ID of all groups in the store. Matching the required type for the select component./
+  @casesStore.Getter('getGroupIdsAndNames') storedGroups!: {
+    value: string;
+    text: string;
+  }[];
+
   caseName = this.name;
   caseGroup = this.group;
   casePoints: number | null = this.points;
 
   T = T;
+
+  // getGroupIdsAndNames getter is not instant, we need to wait for it to be defined otherwise the app will crash
+  get options() {
+    const noGroup = { value: NIL, text: T.problemCreatorNoGroup };
+    if (!this.storedGroups) {
+      return [noGroup];
+    }
+    return [noGroup, ...this.storedGroups];
+  }
 
   formatter(text: string) {
     return text.toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '');

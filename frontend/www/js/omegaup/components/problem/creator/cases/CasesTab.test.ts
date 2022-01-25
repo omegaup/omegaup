@@ -20,13 +20,14 @@ describe('Tabs.vue', () => {
   it('Should render "AddPanel.vue" conditionally', async () => {
     const wrapper = shallowMount(CasesTab, { localVue });
 
-    const addWindow = wrapper.findComponent(AddPanel);
-    expect(addWindow.element).not.toBeVisible();
+    let addWindow = wrapper.findComponent(AddPanel);
+    expect(addWindow.element).toBeUndefined();
 
     wrapper.setData({ shouldShowAddWindow: true });
 
     await Vue.nextTick();
 
-    expect(addWindow.element).toBeVisible();
+    addWindow = wrapper.findComponent(AddPanel);
+    expect(addWindow.element).not.toBeUndefined();
   });
 });

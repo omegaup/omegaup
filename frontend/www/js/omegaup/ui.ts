@@ -269,6 +269,13 @@ export function reportEvent(
   window.ga('send', 'event', category, action, label);
 }
 
+export function reportPageView(page: string): void {
+  if (typeof window.ga !== 'function') {
+    return;
+  }
+  window.ga('send', 'pageview', page);
+}
+
 export function rankingUsername(
   rank: omegaup.User & { virtual?: boolean },
 ): string {
