@@ -144,6 +144,7 @@ const translations: { [key: string]: string; } = {
   clarificationUpdateAnswer: "(Upda73 an5w3r)",
   clarificationsAskedBy: "(A5k3d by)",
   clarificationsEmpty: "(N0 c1arifica7i0n5 y37)",
+  clarificationsOnBehalf: "(%(author) (0n b3ha1f %(receiver)))",
   clarificationsRangeHeader: "(C1arifica7i0n5 (fr0m %(lowCount) 70 %(highCount)))",
   coderOfTheMonth: "(C0d3r 0f 7h3 M0n7h Ov3ra11)",
   coderOfTheMonthAlreadySelected: "(C0d3r 0f 7h3 m0n7h ha5 b33n pr3vi0u51y 5313c73d)",
