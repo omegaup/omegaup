@@ -3522,9 +3522,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{clarifications: list<Clarification>}
      *
-     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param int|null $offset
      * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param int|null $rowcount
      */
     public static function apiClarifications(\OmegaUp\Request $r): array {
         // Get user
