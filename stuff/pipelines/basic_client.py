@@ -7,7 +7,7 @@ import logging
 import os
 import sys
 import json
-from typing import Callable
+from typing import Callable, Dict
 import pika
 import rabbitmq_connection
 
@@ -22,7 +22,7 @@ import lib.logs  # pylint: disable=wrong-import-position
 class ClientCallback():
     '''Client callback'''
     def __init__(self) -> None:
-        self.message = ''
+        self.message: Dict[str, str] = {}
 
     def __call__(
             self,
