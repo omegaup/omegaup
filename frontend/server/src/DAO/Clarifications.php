@@ -290,7 +290,6 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             ) as $row
         ) {
             if (!$admin) {
-                $row['author'] = null;
                 $row['receiver'] = null;
             }
             $result[] = $row;

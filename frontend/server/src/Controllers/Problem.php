@@ -3534,7 +3534,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
+        $offset = $r->ensureOptionalInt('offset');
+        $rowcount = $r->ensureOptionalInt('rowcount');
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias) ?? 0;
         if (is_null($problem) || is_null($problem->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -3548,8 +3550,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problem->problem_id,
             $isProblemAdmin,
             $r->identity->identity_id,
-            !empty($r['offset']) ? intval($r['offset']) : null,
-            intval($r['rowcount'])
+            $offset,
+            $rowcount
         );
 
         // Add response to array
