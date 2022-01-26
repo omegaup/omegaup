@@ -69,12 +69,6 @@ def send_coder_month(cur: mysql.connector.cursor.MySQLCursorDict,
                              exchange_type='direct')
     logging.info('Send messages to Coder_Month_Queue')
     data = get_coder_of_the_month(cur, category)
-    # print(message)
-    # body = message.encode()
-    # channel.basic_publish(exchange='certificates',
-    #                      routing_key='CoderOfTheMonthQueue',
-    #                      body=body)
-    # data = "Example"
     message = json.dumps(data)
     body = message.encode()
     channel.basic_publish(exchange='certificates',

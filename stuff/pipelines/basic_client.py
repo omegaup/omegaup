@@ -7,6 +7,7 @@ import logging
 import os
 import sys
 import json
+from typing import Callable
 import pika
 import rabbitmq_connection
 
@@ -30,7 +31,6 @@ class ClientCallback():
             properties: pika.spec.BasicProperties,
             # pylint: disable=unused-argument,
             body: bytes) -> None:
-        # body = "Example".encode()
         data = json.loads(body.decode())
         self.message = data
         channel.close()
@@ -39,7 +39,13 @@ class ClientCallback():
 def receive_messages(
         queue: str, exchange: str, routing_key: str,
         channel: pika.adapters.blocking_connection.BlockingChannel,
-        callback) -> None:
+        callback: Callable[
+            [
+                pika.adapters.blocking_connection.BlockingChannel,
+                pika.spec.Basic.Deliver,
+                pika.spec.BasicProperties,
+                bytes,
+            ], None]) -> None:
     '''Receive messages from a queue'''
 
     channel.exchange_declare(exchange=exchange,

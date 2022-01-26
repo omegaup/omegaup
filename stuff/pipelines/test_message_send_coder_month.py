@@ -23,7 +23,8 @@ import lib.logs  # pylint: disable=wrong-import-position
 def test_coder_of_the_month_queue(mocker: MockerFixture) -> None:
     '''Test the message send to the coder of the month queue'''
     mocker.patch('send_messages_coder_of_month_queue.get_coder_of_the_month',
-                 return_value='Example')
+                 return_value={"user_id": 1,
+                               "time": '2022-01-26', "category": 'all'})
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
@@ -32,21 +33,20 @@ def test_coder_of_the_month_queue(mocker: MockerFixture) -> None:
     lib.logs.init(parser.prog, args)
     logging.info('Started')
     dbconn = lib.db.connect(args)
-    # os.system('python3 send_messages_coder_of_month_queue.py')
     try:
         with dbconn.cursor(buffered=True, dictionary=True) as cur, \
             rabbitmq_connection.connect(args) as channel:
             send_messages_coder_of_month_queue.send_coder_month(
                 cur, channel, 'all')
-            # send_messages_coder_of_month_queue.send_coder_month(
-            #    cur, channel, 'female')
             callback = basic_client.ClientCallback()
             basic_client.receive_messages('coder_month',
                                           'certificates',
                                           'CoderOfTheMonthQueue',
                                           channel,
                                           callback)
-            assert callback.message == 'Example'
+            assert callback.message == {"user_id": 1,
+                                        "time": '2022-01-26',
+                                        "category": 'all'}
     finally:
         dbconn.conn.close()
         logging.info('Done')
