@@ -6,6 +6,7 @@ import os
 import argparse
 import logging
 import sys
+import pytest
 from pytest_mock import MockerFixture
 import basic_client
 import rabbitmq_connection
@@ -20,11 +21,25 @@ import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 
-def test_coder_of_the_month_queue(mocker: MockerFixture) -> None:
+# mypy has conflict with pytest decorations
+@pytest.mark.parametrize(
+    "params, expected",
+    [
+        ({"user_id": 1, "time": '2022-01-26',
+          "category": 'all'},
+         {"user_id": 1, "time": '2022-01-26',
+          "category": 'all'}),
+        ({"user_id": 1, "time": '2022-01-26',
+          "category": 'female'},
+         {"user_id": 1, "time": '2022-01-26',
+          "category": 'female'}),
+    ],
+)  # type: ignore
+def test_coder_of_the_month_queue(mocker: MockerFixture,
+                                  params, expected) -> None:
     '''Test the message send to the coder of the month queue'''
     mocker.patch('send_messages_coder_of_month_queue.get_coder_of_the_month',
-                 return_value={"user_id": 1,
-                               "time": '2022-01-26', "category": 'all'})
+                 return_value=params)
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
@@ -44,9 +59,7 @@ def test_coder_of_the_month_queue(mocker: MockerFixture) -> None:
                                           'CoderOfTheMonthQueue',
                                           channel,
                                           callback)
-            assert callback.message == {"user_id": 1,
-                                        "time": '2022-01-26',
-                                        "category": 'all'}
+            assert callback.message == expected
     finally:
         dbconn.conn.close()
         logging.info('Done')
