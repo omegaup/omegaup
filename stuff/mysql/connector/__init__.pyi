@@ -1,8 +1,9 @@
 from typing import overload, Literal, Text
 
 from . import cursor
+from mysql.connector import errors
 
-Error: Any
+Error: errors.IntegrityError
 
 def connect(
     user: Text,
