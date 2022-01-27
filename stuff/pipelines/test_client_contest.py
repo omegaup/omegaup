@@ -14,7 +14,8 @@ import client_contest
 import mysql.connector
 import mysql.connector.cursor
 import pika
-import test_credentials
+import test_constants
+import send_messages_contest_queue
 
 sys.path.insert(
     0,
@@ -55,17 +56,21 @@ def test_client_contest() -> None:
     lib.logs.configure_parser(parser)
     rabbitmq_connection.configure_parser(parser)
 
-    parser.add_argument('--api-token', default=test_credentials.API_TOKEN)
-    parser.add_argument('--url', default=test_credentials.OMEGAUP_API_ENDPOINT)
+    parser.add_argument('--api-token', default=test_constants.API_TOKEN)
+    parser.add_argument('--url', default=test_constants.OMEGAUP_API_ENDPOINT)
 
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
     logging.info('Started')
     dbconn = lib.db.connect(args)
 
-    os.system('python3 send_messages_contest_queue.py')
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
         rabbitmq_connection.connect(args) as channel:
+        send_messages_contest_queue.send_contest(
+            cur,
+            channel,
+            date_lower_limit=test_constants.DATE_LOWER_LIMIT,
+            date_upper_limit=test_constants.DATE_UPPER_LIMIT)
         callback = ContestsCallbackForTesting(dbconn.conn,
                                               args.api_token,
                                               args.url)
@@ -97,16 +102,20 @@ def test_client_contest_with_mocked_codes(mock_gen_code: mock.Mock) -> None:
     lib.logs.configure_parser(parser)
     rabbitmq_connection.configure_parser(parser)
 
-    parser.add_argument('--api-token', default=test_credentials.API_TOKEN)
-    parser.add_argument('--url', default=test_credentials.OMEGAUP_API_ENDPOINT)
+    parser.add_argument('--api-token', default=test_constants.API_TOKEN)
+    parser.add_argument('--url', default=test_constants.OMEGAUP_API_ENDPOINT)
 
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
     logging.info('Started')
     dbconn = lib.db.connect(args)
-    os.system('python3 send_messages_contest_queue.py')
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
         rabbitmq_connection.connect(args) as channel:
+        send_messages_contest_queue.send_contest(
+            cur,
+            channel,
+            date_lower_limit=test_constants.DATE_LOWER_LIMIT,
+            date_upper_limit=test_constants.DATE_UPPER_LIMIT)
         callback = ContestsCallbackForTesting(dbconn.conn,
                                               args.api_token,
                                               args.url)
@@ -142,16 +151,20 @@ def test_client_contest_with_duplicated_codes(
     lib.logs.configure_parser(parser)
     rabbitmq_connection.configure_parser(parser)
 
-    parser.add_argument('--api-token', default=test_credentials.API_TOKEN)
-    parser.add_argument('--url', default=test_credentials.OMEGAUP_API_ENDPOINT)
+    parser.add_argument('--api-token', default=test_constants.API_TOKEN)
+    parser.add_argument('--url', default=test_constants.OMEGAUP_API_ENDPOINT)
 
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
     logging.info('Started')
     dbconn = lib.db.connect(args)
-    os.system('python3 send_messages_contest_queue.py')
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
         rabbitmq_connection.connect(args) as channel:
+        send_messages_contest_queue.send_contest(
+            cur,
+            channel,
+            date_lower_limit=test_constants.DATE_LOWER_LIMIT,
+            date_upper_limit=test_constants.DATE_UPPER_LIMIT)
         callback = ContestsCallbackForTesting(dbconn.conn,
                                               args.api_token,
                                               args.url)
