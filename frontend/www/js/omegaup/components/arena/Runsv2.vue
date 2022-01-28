@@ -4,7 +4,7 @@
     <b-table :fields="tableFields" :items="filteredRuns" striped responsive>
       <template #cell(index)="row">
         <b-button
-          v-if="!('details' in row.item) || row.item.details === null"
+          v-if="row.item.details === null || !('details' in row.item)"
           variant="link"
           size="sm"
           @click="$emit('fetch-run-details', { guid: row.item.guid })"
