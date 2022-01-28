@@ -23,16 +23,16 @@ import lib.logs  # pylint: disable=wrong-import-position
 
 # mypy has conflict with pytest decorations
 @pytest.mark.parametrize(
-    "params, expected",
+    'params, expected',
     [
-        ({"user_id": 1, "time": '2022-01-26',
-          "category": 'all'},
-         {"user_id": 1, "time": '2022-01-26',
-          "category": 'all'}),
-        ({"user_id": 1, "time": '2022-01-26',
-          "category": 'female'},
-         {"user_id": 1, "time": '2022-01-26',
-          "category": 'female'}),
+        ({'user_id': 1, 'time': '2022-01-26',
+          'category': 'all'},
+         {'user_id': 1, 'time': '2022-01-26',
+          'category': 'all'}),
+        ({'user_id': 1, 'time': '2022-01-26',
+          'category': 'female'},
+         {'user_id': 1, 'time': '2022-01-26',
+          'category': 'female'}),
     ],
 )  # type: ignore
 def test_coder_of_the_month_queue(mocker: MockerFixture,
