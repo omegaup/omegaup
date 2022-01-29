@@ -7,10 +7,11 @@ import os
 import argparse
 import logging
 import sys
-from unittest import mock
+from pytest_mock import MockerFixture
 import rabbitmq_connection
 import contests_callback
 import client_contest
+import verification_code
 import mysql.connector
 import mysql.connector.cursor
 import pika
@@ -92,11 +93,11 @@ def test_client_contest() -> None:
         assert count['count'] > 0
 
 
-@mock.patch('contests_callback.generate_code',
-            side_effect=iter(['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F',
-                              'XMCF384X8M']), autospec=True)
-def test_client_contest_with_mocked_codes(mock_gen_code: mock.Mock) -> None:
+def test_client_contest_with_mocked_codes(mocker: MockerFixture) -> None:
     '''Test client contest queue when a code already exists'''
+    mocker.patch('contests_callback.generate_code',
+                 side_effect=iter(['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F',
+                                   'XMCF384X8M']))
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
@@ -132,20 +133,18 @@ def test_client_contest_with_mocked_codes(mock_gen_code: mock.Mock) -> None:
             routing_key='ContestQueue',
             callback=callback)
 
-        mock_gen_code.assert_called()
-        assert mock_gen_code.call_args_list == [(), (), (), ()]
+        spy = mocker.spy(verification_code, 'generate_code')
+        assert spy.call_count == 4
 
 
-@mock.patch('contests_callback.generate_code',
-            side_effect=iter(['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F',
-                              'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
-                              'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
-                              'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
-                              'XMCF384X8X', 'XMCF384X8M']), autospec=True)
-def test_client_contest_with_duplicated_codes(
-        mock_gen_code: mock.Mock
-) -> None:
+def test_client_contest_with_duplicated_codes(mocker: MockerFixture) -> None:
     '''Test client contest queue when a code already exists'''
+    mocker.patch('contests_callback.generate_code',
+                 side_effect=iter(['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F',
+                                   'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
+                                   'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
+                                   'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
+                                   'XMCF384X8X', 'XMCF384X8M']))
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
@@ -181,6 +180,5 @@ def test_client_contest_with_duplicated_codes(
             routing_key='ContestQueue',
             callback=callback)
 
-        mock_gen_code.assert_called()
-        assert mock_gen_code.call_args_list == [(), (), (), (), (), (), (),
-                                                (), (), (), (), (), (), ()]
+        spy = mocker.spy(verification_code, 'generate_code')
+        assert spy.call_count > 4
