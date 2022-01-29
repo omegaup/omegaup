@@ -195,7 +195,7 @@ describe('time', () => {
       const hoursSeconds = 60 * 60 * 1000;
       const minutesSeconds = 60 * 1000;
       const seconds = 1000;
-      const today = new Date();
+      const today = new Date('2021-01-01 00:00:00+00:00');
       const tomorrow = new Date(today.getTime() + daySeconds);
       const millMapping = [
         [
