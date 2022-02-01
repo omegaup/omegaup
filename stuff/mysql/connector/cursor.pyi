@@ -41,4 +41,8 @@ class MySQLCursorDict(BaseCursor):
 
 
 class MySQLCursorBufferedDict(MySQLCursorDict):
-    ...
+    def __enter__(self):
+        ...
+
+    def __exit__(self, *exc_info: bool):
+        ...
