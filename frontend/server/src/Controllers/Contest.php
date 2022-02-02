@@ -2925,16 +2925,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+        $problemsetExists = \OmegaUp\DAO\Problemsets::existsByPK(
             $contest->problemset_id
         );
-        if (is_null($problemset) || is_null($problemset->problemset_id)) {
+        if (!$problemsetExists) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
             );
         }
         $problems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            $problemset->problemset_id,
+            $contest->problemset_id,
             needSubmissions: true
         );
 
@@ -2942,7 +2942,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'problems' => self::addVersionsToProblems(
                 $problems,
                 $r->identity,
-                $problemset->problemset_id
+                $contest->problemset_id
             ),
         ];
     }
