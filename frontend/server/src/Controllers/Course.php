@@ -5826,11 +5826,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Courses $course,
         \OmegaUp\DAO\VO\Groups $group
     ): bool {
-        return \OmegaUp\Authorization::canViewCourse(
+        return $course->show_scoreboard && \OmegaUp\Authorization::canViewCourse(
             $identity,
             $course,
             $group
-        ) &&
-               $course->show_scoreboard;
+        );
     }
 }
