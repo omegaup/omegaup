@@ -1383,7 +1383,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
     ): array {
         $problemsWithVersions = [];
         foreach ($problems as $problem) {
-            unset($problem['problem_id']);
             $problem['versions'] = \OmegaUp\Controllers\Problem::getVersions(
                 new \OmegaUp\DAO\VO\Problems(
                     array_intersect_key(
