@@ -65,6 +65,7 @@ OmegaUp.on('ready', async () => {
       allTokens: 0,
       activeTab: window.location.hash ? locationHash[0] : 'problems',
       nominationStatus: payload.nominationStatus,
+      alreadyReviewedPayload: payload.alreadyReviewedPayload,
       hasBeenNominated:
         payload.nominationStatus?.nominated ||
         (payload.nominationStatus?.nominatedBeforeAc &&
@@ -83,6 +84,7 @@ OmegaUp.on('ready', async () => {
           solvers: payload.solvers,
           user: payload.user,
           nominationStatus: this.nominationStatus,
+          alreadyReviewedPayload: this.alreadyReviewedPayload,
           histogram: payload.histogram,
           clarifications: clarificationStore.state.clarifications,
           solutionStatus: this.solutionStatus,
@@ -188,6 +190,21 @@ OmegaUp.on('ready', async () => {
             api.QualityNomination.create({
               problem_alias: payload.problem.alias,
               nomination: 'quality_tag',
+              contents: JSON.stringify(contents),
+            }).catch(ui.apiError);
+          },
+          'edit-reviewer': (
+            qualitynomination_id: string,
+            tag: string,
+            qualitySeal: boolean,
+          ) => {
+            const contents: { quality_seal?: boolean; tag?: string } = {};
+            if (tag) {
+              contents.tag = tag;
+            }
+            contents.quality_seal = qualitySeal;
+            api.QualityNomination.edit({
+              qualitynomination_id,
               contents: JSON.stringify(contents),
             }).catch(ui.apiError);
           },

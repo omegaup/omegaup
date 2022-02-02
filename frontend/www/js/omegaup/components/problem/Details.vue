@@ -97,9 +97,13 @@
                 {{ T.wordsReportProblem }}
               </button>
             </div>
-            <div v-if="user.reviewer && !nominationStatus.alreadyReviewed">
+            <div v-if="user.reviewer">
               <button class="btn btn-link" @click="onNewPromotionAsReviewer">
-                {{ T.reviewerNomination }}
+                {{
+                  nominationStatus.alreadyReviewed
+                    ? T.editReviewerNomination
+                    : T.reviewerNomination
+                }}
               </button>
             </div>
           </slot>
@@ -166,9 +170,18 @@
               :selected-private-tags="selectedPrivateTags"
               :problem-alias="problem.alias"
               :problem-title="problem.title"
+              :already-reviewed-payload="alreadyReviewedPayload"
               @dismiss="currentPopupDisplayed = PopupDisplayed.None"
               @submit="
-                (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
+                (tag, qualitySeal) =>
+                  alreadyReviewedPayload
+                    ? $emit(
+                        'edit-reviewer',
+                        alreadyReviewedPayload.qualitynomination_id,
+                        tag,
+                        qualitySeal,
+                      )
+                    : $emit('submit-reviewer', tag, qualitySeal)
               "
             ></omegaup-quality-nomination-reviewer-popup>
           </template>
@@ -375,6 +388,7 @@ export default class ProblemDetails extends Vue {
   @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
   @Prop() nominationStatus!: types.NominationStatus;
+  @Prop() alreadyReviewedPayload!: types.QualityNominationContents;
   @Prop() runs!: types.Run[];
   @Prop() solutionStatus!: string;
   @Prop({ default: null }) solution!: types.ProblemStatement | null;
