@@ -504,6 +504,7 @@ demotionProblemNotificationBanned = "Problem [%(problem_name)] has been reported
 demotionProblemNotificationWarning = "A warning has been put on your problem %(problem_name). For more details check your email."
 duplicateTagsNotAllowed = "Duplicate tags are not allowed"
 editFieldRequired = "Missing required field"
+editReviewerNomination = "Edit revision"
 email = "E-Mail"
 emailNotVerified = "Your email is not verified yet. Please look for the verification email in your inbox and spam folder. If you still have problems, please contact omegaup-soporte@googlegroups.com for support."
 enterContest = "Enter Contest"
