@@ -15,7 +15,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestAdmin=array{role: string, username: string}
  * @psalm-type ContestGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type ConsentStatement=array{contest_alias: string, privacy_git_object_id?: string, share_user_information: bool|null, statement_type?: string}
- * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
+ * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, is_extra_problem: bool, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type Signature=array{email: string, name: string, time: \OmegaUp\Timestamp}
@@ -1383,7 +1383,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
     ): array {
         $problemsWithVersions = [];
         foreach ($problems as $problem) {
-            unset($problem['problem_id']);
             $problem['versions'] = \OmegaUp\Controllers\Problem::getVersions(
                 new \OmegaUp\DAO\VO\Problems(
                     array_intersect_key(
@@ -2926,16 +2925,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+        $problemsetExists = \OmegaUp\DAO\Problemsets::existsByPK(
             $contest->problemset_id
         );
-        if (is_null($problemset) || is_null($problemset->problemset_id)) {
+        if (!$problemsetExists) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
             );
         }
         $problems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            $problemset->problemset_id,
+            $contest->problemset_id,
             needSubmissions: true
         );
 
@@ -2943,7 +2942,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'problems' => self::addVersionsToProblems(
                 $problems,
                 $r->identity,
-                $problemset->problemset_id
+                $contest->problemset_id
             ),
         ];
     }
@@ -3155,16 +3154,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         if (self::isPublic($contest->admission_mode)) {
             // Check that contest has at least 2 problems
-            $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            $problemsetExists = \OmegaUp\DAO\Problemsets::existsByPK(
                 $contest->problemset_id
             );
-            if (is_null($problemset)) {
+            if (!$problemsetExists) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemsetNotFound'
                 );
             }
             $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::GetRelevantProblems(
-                $problemset
+                $contest->problemset_id
             );
             if (count($problemsInContest) < 2) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -4522,10 +4521,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Enforces rules to avoid having invalid/unactionable public contests
      */
     private static function validateContestCanBePublic(\OmegaUp\DAO\VO\Contests $contest): void {
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+        $problemsetExists = \OmegaUp\DAO\Problemsets::existsByPK(
             intval($contest->problemset_id)
         );
-        if (is_null($problemset)) {
+        if (!$problemsetExists) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
             );
@@ -4538,7 +4537,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
         // Check that contest has some problems at least 1 problem
         $problemsInProblemset = \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
-            $problemset
+            intval($contest->problemset_id)
         );
         if (count($problemsInProblemset) < 1) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
