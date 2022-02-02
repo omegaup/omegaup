@@ -13,11 +13,9 @@ import pika
 
 @contextlib.contextmanager
 def connect(
-        args: argparse.Namespace
+        *, username: str, password: str
 ) -> Iterator[pika.adapters.blocking_connection.BlockingChannel]:
     '''Connects to rabbitmq with the arguments provided.'''
-    username = args.rabbitmq_username
-    password = args.rabbitmq_password
     connection = pika.BlockingConnection(pika.ConnectionParameters(
         host='rabbitmq',
         port=5672,

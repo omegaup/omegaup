@@ -2,7 +2,6 @@
 
 '''test rabbitmq connection module.'''
 
-import argparse
 import pytest
 import pika
 import rabbitmq_connection
@@ -18,10 +17,8 @@ import rabbitmq_connection
 )  # type: ignore
 def test_rabbitmq_connection(exchange: str, expected: bool):
     '''Test rabbitmq'''
-    parser = argparse.ArgumentParser(description=__doc__)
-    rabbitmq_connection.configure_parser(parser)
-    args = parser.parse_args()
-    with rabbitmq_connection.connect(args) as channel:
+    with rabbitmq_connection.connect(username='omegaup',
+                                     password='omegaup') as channel:
         def on_message(
                 channel: pika.adapters.blocking_connection.BlockingChannel,
                 _method: pika.spec.Basic.Deliver,

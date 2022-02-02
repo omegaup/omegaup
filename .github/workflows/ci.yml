@@ -468,6 +468,12 @@ jobs:
   python:
     runs-on: ubuntu-20.04
 
+    services:
+      rabbitmq:
+        image: rabbitmq
+        ports:
+          - 15672:15672
+
     steps:
       - uses: actions/checkout@v2
         with:
