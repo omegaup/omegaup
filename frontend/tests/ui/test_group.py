@@ -45,7 +45,7 @@ def test_create_group_with_identities_and_restrictions(driver):
         group_alias = util.create_group(driver, group_title, description)
         identity, *_ = util.add_identities_group(driver, group_alias)
 
-    with driver.login(identity.username, identity.password):
+    with driver.login(identity.username, identity.password, False):
         navbar = driver.wait.until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, '.navbar-nav:first-child')))

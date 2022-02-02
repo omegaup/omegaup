@@ -35,7 +35,7 @@ def test_create_contest(driver):
     create_contest_admin(driver, contest_alias, problem, invited_users,
                          driver.user_username, access_mode='Private')
 
-    with driver.login(identity.username, identity.password):
+    with driver.login(identity.username, identity.password, False):
         create_run_user(driver, contest_alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
 
@@ -106,7 +106,8 @@ def test_user_ranking_contest(driver):
                         verdict='AC', score=1)
 
     with driver.login(uninvited_identity.username,
-                      uninvited_identity.password):
+                      uninvited_identity.password,
+                      False):
         create_run_user(driver, contest_alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
 
