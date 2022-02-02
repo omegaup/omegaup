@@ -2,8 +2,10 @@
 
 '''test rabbitmq connection module.'''
 
+import argparse
 import pytest
 import pika
+import rabbitmq_connection
 
 
 # mypy has conflict with pytest decorations
@@ -16,41 +18,38 @@ import pika
 )  # type: ignore
 def test_rabbitmq_connection(exchange: str, expected: bool):
     '''Test rabbitmq'''
-    conn = pika.BlockingConnection(pika.ConnectionParameters(
-        host='rabbitmq',
-        port=5672,
-        virtual_host='/',
-        credentials=pika.PlainCredentials('omegaup', 'omegaup')))
-    channel = conn.channel()
+    parser = argparse.ArgumentParser(description=__doc__)
+    rabbitmq_connection.configure_parser(parser)
+    args = parser.parse_args()
+    with rabbitmq_connection.connect(args) as channel:
+        def on_message(
+                channel: pika.adapters.blocking_connection.BlockingChannel,
+                _method: pika.spec.Basic.Deliver,
+                _properties: pika.spec.BasicProperties,
+                body: bytes) -> None:
+            '''Mocking on_message function'''
+            message = body.decode()
+            assert message == 'value'
+            channel.basic_cancel('test-consumer')
 
-    def on_message(
-            channel: pika.adapters.blocking_connection.BlockingChannel,
-            _method: pika.spec.Basic.Deliver,
-            _properties: pika.spec.BasicProperties,
-            body: bytes) -> None:
-        '''Mocking on_message function'''
-        message = body.decode()
-        assert message == 'value'
-        channel.basic_cancel('test-consumer')
+        def publish_message(body: str) -> None:
+            '''Mocking publish_message function'''
+            channel.basic_publish(
+                exchange=exchange,
+                routing_key='ContestQueue',
+                body=body.encode(),
+            )
 
-    def publish_message(body: str) -> None:
-        '''Mocking publish_message function'''
-        channel.basic_publish(
-            exchange=exchange,
-            routing_key='ContestQueue',
-            body=body.encode(),
-        )
+        result = channel.queue_declare(queue='', exclusive=True)
+        queue_name = result.method.queue
+        assert queue_name is not None
 
-    result = channel.queue_declare(queue='', exclusive=True)
-    queue_name = result.method.queue
-    assert queue_name is not None
-
-    publish_message('some message')
-    try:
-        channel.basic_consume(
-            queue=queue_name,
-            on_message_callback=on_message,
-        )
-        assert expected is True
-    except:  # noqa: bare-except
-        assert expected is False
+        publish_message('some message')
+        try:
+            channel.basic_consume(
+                queue=queue_name,
+                on_message_callback=on_message,
+            )
+            assert expected is True
+        except:  # noqa: bare-except
+            assert expected is False
