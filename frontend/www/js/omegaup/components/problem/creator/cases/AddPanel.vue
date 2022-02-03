@@ -10,7 +10,7 @@
             @click="tab = 'case'"
           >
             <b-alert
-              v-model="invalidName"
+              v-model="invalidCaseName"
               variant="danger"
               class="mt-2"
               dismissible
@@ -25,7 +25,15 @@
             name="modal-form"
             @click="tab = 'group'"
           >
-            <group-input />
+            <b-alert
+              v-model="invalidGroupName"
+              variant="danger"
+              class="mt-2"
+              dismissible
+            >
+              {{ T.problemCreatorCannotHaveSameName }}</b-alert
+            >
+            <group-input ref="group-input" />
           </b-tab>
           <b-tab
             :active="tab === 'multiplecases'"
@@ -77,16 +85,20 @@ const casesStore = namespace('casesStore');
 export default class AddPanel extends Vue {
   tab: AddTabTypes = 'case';
 
-  invalidName = false;
+  invalidCaseName = false;
+  invalidGroupName = false;
   T = T;
 
   @Ref('case-input') caseInputRef!: cases_CaseInput;
+  @Ref('group-input') groupInputRef!: cases_GroupInput;
 
-  @casesStore.Mutation('addCase') addCase!: (caseRequest: CaseRequest) => Group;
+  @casesStore.Mutation('addCase') addCase!: (caseRequest: CaseRequest) => void;
+  @casesStore.Mutation('addGroup') addGroup!: (groupRequest: Group) => void;
   @casesStore.State('groups') groups!: Group[];
 
   addItemToStore() {
-    this.invalidName = false;
+    this.invalidCaseName = false;
+    this.invalidGroupName = false;
 
     if (this.tab === 'case') {
       // Case Input
@@ -100,7 +112,7 @@ export default class AddPanel extends Vue {
         // In this case we just need to check if there is a group with the same name. Since everytime a new ungrouped case is created, a coressponding group is created too
         const nameAlreadyExists = this.groups.find((g) => g.name === caseName);
         if (nameAlreadyExists) {
-          this.invalidName = true;
+          this.invalidCaseName = true;
           return;
         }
       } else {
@@ -108,7 +120,7 @@ export default class AddPanel extends Vue {
         if (!group) return;
         const nameAlreadyExists = group.cases.find((c) => c.name === caseName);
         if (nameAlreadyExists) {
-          this.invalidName = true;
+          this.invalidCaseName = true;
           return;
         }
       }
@@ -119,6 +131,26 @@ export default class AddPanel extends Vue {
         name: caseName,
         points: casePoints,
         autoPoints: caseAutoPoints,
+      });
+    } else if (this.tab === 'group') {
+      const groupName = this.groupInputRef.groupName;
+      const groupPoints = this.groupInputRef.groupPoints;
+      const groupAutoPoints = groupPoints === null;
+
+      // Check if there is a group with the same name already
+      const nameAlreadyExists = this.groups.find((g) => g.name === groupName);
+      if (nameAlreadyExists) {
+        this.invalidGroupName = true;
+        return;
+      }
+
+      this.addGroup({
+        groupID: uuid(),
+        name: groupName,
+        points: groupPoints,
+        autoPoints: groupAutoPoints,
+        ungroupedCase: false,
+        cases: [],
       });
     }
     this.$emit('close-add-window');

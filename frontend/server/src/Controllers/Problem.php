@@ -5,7 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  * ProblemsController
  *
- * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
+ * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type NominationStatus=array{alreadyReviewed: bool, canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language: string, nominated: bool, nominatedBeforeAc: bool, solved: bool, tried: bool}
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
@@ -3044,6 +3044,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             !\OmegaUp\Authorization::canEditProblem($identity, $problem) &&
             (
                 is_null($problemsetId) ||
+                !\OmegaUp\DAO\ProblemsetProblems::existsByPK(
+                    $problemsetId,
+                    $problem->problem_id
+                ) ||
                 !\OmegaUp\Authorization::canEditProblemset(
                     $identity,
                     $problemsetId
@@ -3523,9 +3527,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{clarifications: list<Clarification>}
      *
-     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param int|null $offset
      * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param int|null $rowcount
      */
     public static function apiClarifications(\OmegaUp\Request $r): array {
         // Get user
@@ -3535,6 +3539,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+        $offset = $r->ensureOptionalInt('offset');
+        $rowcount = $r->ensureOptionalInt('rowcount') ?? 0;
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
@@ -3549,8 +3555,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problem->problem_id,
             $isProblemAdmin,
             $r->identity->identity_id,
-            !empty($r['offset']) ? intval($r['offset']) : null,
-            intval($r['rowcount'])
+            $offset,
+            $rowcount
         );
 
         // Add response to array

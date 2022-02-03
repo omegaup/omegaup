@@ -2716,11 +2716,11 @@ Entry point for Problem clarifications API
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `problem_alias` | `string` |             |
-| `offset`        | `mixed`  |             |
-| `rowcount`      | `mixed`  |             |
+| Name            | Type        | Description |
+| --------------- | ----------- | ----------- |
+| `problem_alias` | `string`    |             |
+| `offset`        | `int\|null` |             |
+| `rowcount`      | `int\|null` |             |
 
 ### Returns
 

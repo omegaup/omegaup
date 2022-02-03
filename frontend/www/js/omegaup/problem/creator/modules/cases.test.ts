@@ -44,7 +44,6 @@ describe('cases.ts', () => {
     const newCase = generateCase({ name: 'case1', groupID: newGroup.groupID }); // casesStore
     const newCaseRequest: CaseRequest = {
       ...newCase,
-      points: 0,
       autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);
@@ -86,7 +85,6 @@ describe('cases.ts', () => {
     const newCase = generateCase({ name: 'case1', groupID: newGroup.groupID });
     const newCaseRequest: CaseRequest = {
       ...newCase,
-      points: 0,
       autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);

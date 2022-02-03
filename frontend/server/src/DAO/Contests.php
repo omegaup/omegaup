@@ -472,8 +472,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 $columns,
                 p.scoreboard_url,
                 p.scoreboard_url_admin,
-                COUNT(contestants.identity_id) AS `contestants`,
-                organizer.username AS `organizer`
+                COUNT(contestants.identity_id) AS contestants,
+                ANY_VALUE(organizer.username) AS organizer
             FROM
                 (SELECT
                     pi.problemset_id
@@ -529,7 +529,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 $activeCondition AND
                 $queryCondition AND
                 archived = 0
-            GROUP BY Contests.contest_id, organizer.identity_id
+            GROUP BY Contests.contest_id
         ";
         $params = [
             // Direct participation
@@ -592,8 +592,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $sql = "
             SELECT
                 $columns,
-                COUNT(contestants.identity_id) AS `contestants`,
-                organizer.username AS `organizer`,
+                COUNT(contestants.identity_id) AS contestants,
+                ANY_VALUE(organizer.username) AS organizer,
                 (participating.identity_id IS NOT NULL) AS `participating`
             FROM
                 Contests
@@ -618,7 +618,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 $recommended_check  AND $end_check AND $query_check
                 AND `admission_mode` != 'private'
                 AND archived = 0
-            GROUP BY Contests.contest_id, organizer.identity_id
+            GROUP BY
+                Contests.contest_id
             ORDER BY
                 `last_updated` DESC,
                 `recommended` DESC,
@@ -852,7 +853,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                SELECT
                     $columns,
                     COUNT(contestants.identity_id) AS `contestants`,
-                    organizer.username AS `organizer`,
+                    ANY_VALUE(organizer.username) AS organizer,
                     FALSE AS `participating`
                 FROM
                     `Contests`
@@ -874,7 +875,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     AND $end_check
                     AND $query_check
                     AND archived = 0
-                GROUP BY Contests.contest_id, organizer.identity_id
+                GROUP BY
+                    Contests.contest_id
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,
@@ -922,9 +924,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $sql = "
                 SELECT
                     $columns,
-                    COUNT(contestants.identity_id) AS `contestants`,
-                    organizer.username AS `organizer`,
-                    TRUE AS `participating`
+                    COUNT(contestants.identity_id) AS contestants,
+                    ANY_VALUE(organizer.username) AS organizer,
+                    TRUE AS participating
                 FROM
                     Contests
                 LEFT JOIN
@@ -940,7 +942,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 ON
                     a.owner_id = organizer.user_id
                 WHERE $recommended_check AND $end_check AND $query_check AND archived = 0
-                GROUP BY Contests.contest_id, organizer.identity_id
+                GROUP BY
+                    Contests.contest_id
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,

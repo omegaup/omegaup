@@ -119,7 +119,7 @@ export default class ArenaNewClarificationPopup extends Vue {
     if (this.currentProblemAlias == null || this.message == null) return;
     const clarificationRequest: types.Clarification = {
       clarification_id: 0,
-      author: this.currentUsername != null ? this.currentUsername : undefined,
+      author: this.currentUsername ?? '',
       problem_alias: this.currentProblemAlias,
       message: this.message,
       public:

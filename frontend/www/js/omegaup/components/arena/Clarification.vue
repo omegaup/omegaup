@@ -21,7 +21,9 @@
           : clarification.problem_alias
       }}
     </td>
-    <td class="text-center align-middle">{{ clarification.author }}</td>
+    <td class="text-center align-middle" data-author>
+      {{ clarificationAuthorReceiver }}
+    </td>
     <td class="text-center align-middle">
       {{ time.formatDateTime(clarification.time) }}
     </td>
@@ -95,6 +97,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
+import * as ui from '../../ui';
 
 @Component
 export default class ArenaClarification extends Vue {
@@ -132,6 +135,16 @@ export default class ArenaClarification extends Vue {
     },
   ];
 
+  get clarificationAuthorReceiver(): string {
+    if (this.clarification.receiver) {
+      return ui.formatString(T.clarificationsOnBehalf, {
+        author: this.clarification.author,
+        receiver: this.clarification.receiver,
+      });
+    }
+    return this.clarification.author;
+  }
+
   get isDirectMessage(): boolean {
     return (
       this.clarification.answer == null && this.clarification.receiver != null
@@ -151,6 +164,7 @@ export default class ArenaClarification extends Vue {
   sendClarificationResponse(): void {
     const response: types.Clarification = {
       clarification_id: this.clarification.clarification_id,
+      author: this.clarification.author,
       answer: this.responseText,
       public: this.isPublic,
       message: this.message,
