@@ -124,16 +124,13 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     }
 
     /**
-     * Returns the contents and id of a nomination for a given problem and user.
-     */
+    * Returns the contents and id of a nomination for a given problem and user.
+    * @return array{contents: array{quality_seal: bool, tag: string}, qualitynomination_id: int}
+    */
     public static function getReviewedData(
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Problems $problem
     ): array {
-        // This SQL is basically the same as the one in QualityNominations::getNominationStatusForProblem
-        // Is there a way to merge them?
-
-        // Count is not neccesary, because we can just check if the query returned a non null value
         $sql = "
             SELECT
                 qn.qualitynomination_id,
@@ -156,7 +153,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         if (is_null($query)) {
             return [];
         }
-
+        /** @var  array{quality_seal: bool, tag: string} $contents */
         $contents = json_decode($query['contents'], true);
 
         return [
