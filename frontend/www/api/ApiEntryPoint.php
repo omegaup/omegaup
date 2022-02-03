@@ -1,6 +1,6 @@
 <?php
 
-header("X-Robots-Tag: noindex");
+header('X-Robots-Tag: noindex');
 
 require_once(__DIR__ . '/../../server/bootstrap.php');
 
