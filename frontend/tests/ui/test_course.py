@@ -192,7 +192,9 @@ def test_create_identities_for_course(driver):
 
     # Unassociated identity joins the course which it was created for and
     # creates a new run
-    with driver.login(unassociated.username, unassociated.password):
+    with driver.login(unassociated.username,
+                      unassociated.password,
+                      is_main_user_identity=False):
         enter_course(driver, course_alias, assignment_alias)
 
         driver.wait.until(
@@ -257,7 +259,9 @@ def test_create_identities_for_course(driver):
         assert associated_identities is not None, 'No identity matches'
 
     # The new associated identity joins the course
-    with driver.login(associated.username, associated.password):
+    with driver.login(associated.username,
+                      associated.password,
+                      is_main_user_identity=False):
         enter_course(driver, course_alias, assignment_alias)
 
 

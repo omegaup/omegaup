@@ -3043,6 +3043,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             !\OmegaUp\Authorization::canEditProblem($identity, $problem) &&
             (
                 is_null($problemsetId) ||
+                !\OmegaUp\DAO\ProblemsetProblems::existsByPK(
+                    $problemsetId,
+                    $problem->problem_id
+                ) ||
                 !\OmegaUp\Authorization::canEditProblemset(
                     $identity,
                     $problemsetId
