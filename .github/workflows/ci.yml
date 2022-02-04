@@ -468,12 +468,6 @@ jobs:
   python:
     runs-on: ubuntu-20.04
 
-    services:
-      rabbitmq:
-        image: rabbitmq
-        ports:
-          - 15672:15672
-
     steps:
       - uses: actions/checkout@v2
         with:
@@ -489,6 +483,27 @@ jobs:
             mysqlclient==2.0.1 \
             pandas \
             pytest
+
+      - name: Install wait-for-it
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y wait-for-it
+
+      - name: Download the Docker containers
+        run: |
+          docker-compose pull
+
+      - name: Start the Docker containers
+         run: |
+           docker-compose up --no-build --detach
+
+           # Add the container names as aliases to localhost
+           cat << EOF | sudo tee --append /etc/hosts
+           127.0.0.1 mysql rabbitmq
+           EOF
+
+           # Wait for some of the containers
+           wait-for-it -t 30 mysql:13306
+           wait-for-it -t 30 rabbitmq:5672
 
       - name: Run Python tests
         run: |
