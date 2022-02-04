@@ -45,6 +45,9 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
     parser.add_argument('--rabbitmq-password', type=str,
                         help='rabbitmq password',
                         default='omegaup')
+    parser.add_argument('--rabbitmq-host', type=str,
+                        help='rabbitmq host',
+                        default='rabbitmq')
     parser.add_argument('--date-lower-limit',
                         type=lambda s:
                         datetime.datetime.strptime(s, '%Y-%m-%d'),
