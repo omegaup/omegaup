@@ -522,11 +522,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 Problems p
             INNER JOIN
                 Problemset_Problems pp ON pp.problem_id = p.problem_id
-            INNER JOIN
-                Problemsets ps ON ps.problemset_id = pp.problemset_id
             WHERE
                 p.alias = ?
-                AND ps.problemset_id = ?
+                AND pp.problemset_id = ?
             ';
         $params = [
             $alias,
