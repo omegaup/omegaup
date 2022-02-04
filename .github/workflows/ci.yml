@@ -490,14 +490,6 @@ jobs:
             pandas \
             pytest
 
-      - name: Install wait-for-it
-        run: |
-          sudo apt-get update -y && sudo apt-get install -y wait-for-it
-
-      - name: Wait for dependencies
-        run: |
-          wait-for-it -t 30 rabbitmq:5672
-
       - name: Run Python tests
         run: |
           python3 -m pytest ./stuff/
