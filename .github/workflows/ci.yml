@@ -471,18 +471,8 @@ jobs:
     services:
       rabbitmq:
         image: rabbitmq:3-management-alpine
-        environment:
-          RABBITMQ_DEFAULT_USER: 'omegaup'
-          RABBITMQ_DEFAULT_PASS: 'omegaup'
         ports:
-          - target: 5672
-            published: 5672
-            protocol: tcp
-            mode: host
-          - target: 15672
-            published: 15672
-            protocol: tcp
-            mode: host
+          - 5672:5672
 
     steps:
       - uses: actions/checkout@v2
