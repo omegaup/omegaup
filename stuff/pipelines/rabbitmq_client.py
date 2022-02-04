@@ -2,18 +2,17 @@
 
 '''Implementation of rabbitmq client.'''
 
-import json
-from typing import Callable, Dict
+from typing import Callable
 import pika
 
 
 ClientCallback = Callable[
-            [
-                pika.adapters.blocking_connection.BlockingChannel,
-                pika.spec.Basic.Deliver,
-                pika.spec.BasicProperties,
-                bytes,
-            ], None]
+    [
+        pika.adapters.blocking_connection.BlockingChannel,
+        pika.spec.Basic.Deliver,
+        pika.spec.BasicProperties,
+        bytes,
+    ], None]
 
 
 def receive_messages(
