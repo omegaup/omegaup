@@ -252,7 +252,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             yield
 
     @contextlib.contextmanager
-    def login(self, username, password):
+    def login(self, username, password, is_main_user_identity=True):
         '''Logs in as :username, and logs out when out of scope.'''
 
         # Home page
@@ -274,9 +274,10 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         with self.page_transition():
             self.browser.find_element_by_name('login').click()
 
-        self.wait.until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'button[aria-label="Close"]'))).click()
+        if is_main_user_identity:
+            self.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, 'button[aria-label="Close"]'))).click()
         try:
             yield
         except:  # noqa: bare-except
