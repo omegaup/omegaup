@@ -741,64 +741,42 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     public static function getProblemsByUsersInACourse(string $courseAlias) {
         $sql  = '
            SELECT
-                rp.alias,
-                rp.title,
-                IFNULL(rp.solved, FALSE) AS solved,
-                i.username
+                ANY_VALUE(p.alias) AS alias,
+                ANY_VALUE(p.title) AS title,
+                SUM(s.verdict = "AC") > 0 AS solved,
+                ANY_VALUE(i.username) AS username
             FROM
                 Identities i
             INNER JOIN
-                Groups_Identities gi
-            ON
-                gi.identity_id = i.identity_id
+                Groups_Identities gi ON gi.identity_id = i.identity_id
             INNER JOIN
-                Courses c
-            ON
-                c.group_id = gi.group_id
+                Courses c ON c.group_id = gi.group_id
             INNER JOIN
-                (
-                SELECT
-                    p.problem_id,
-                    p.alias,
-                    p.title,
-                    s.identity_id,
-                    MAX(r.score) = 1 AS solved
-                FROM
-                    Submissions s
-                INNER JOIN
-                    Runs r
-                ON
-                    r.run_id = s.current_run_id
-                INNER JOIN
-                    Problems p
-                ON
-                    p.problem_id = s.problem_id
-                WHERE
-                    p.visibility = ?
-                GROUP BY
-                    p.problem_id, s.identity_id
-                ) rp
-            ON
-                rp.identity_id = i.identity_id
+                Submissions s ON s.identity_id = i.identity_id
+            INNER JOIN
+                Problems p ON p.problem_id = s.problem_id
             WHERE
                 c.alias = ?
                 AND gi.accept_teacher = true
+                AND p.visibility = ?
+            GROUP BY
+                i.user_id,
+                p.problem_id
             ORDER BY
-                i.username ASC,
-                rp.problem_id DESC;';
+                username ASC,
+                p.problem_id DESC;';
 
         $problemsUsers = [];
         /** @var array{alias: string, solved: int, title: string, username: string} $problemsUser */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
-                [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $courseAlias]
+                [$courseAlias, \OmegaUp\ProblemParams::VISIBILITY_PUBLIC]
             ) as $problemsUser
         ) {
             $problemsUser['solved'] = boolval($problemsUser['solved']);
             $problemsUsers[] = $problemsUser;
         }
-
         return $problemsUsers;
     }
 
