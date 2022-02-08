@@ -743,7 +743,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
            SELECT
                 ANY_VALUE(p.alias) AS alias,
                 ANY_VALUE(p.title) AS title,
-                SUM(s.verdict = "AC") > 0 AS solved,
+                IFNULL(SUM(s.verdict = "AC"), 0) > 0 AS solved,
                 ANY_VALUE(i.username) AS username
             FROM
                 Identities i
