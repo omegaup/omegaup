@@ -6,9 +6,9 @@ import pika
 
 
 def send_message(
-    queue: str, exchange: str, routing_key: str,
-    channel: pika.adapters.blocking_connection.BlockingChannel,
-    message: str) -> None:
+        queue: str, exchange: str, routing_key: str,
+        channel: pika.adapters.blocking_connection.BlockingChannel,
+        message: str) -> None:
     '''Send message to any queue'''
     channel.queue_declare(queue, passive=False,
                           durable=False, exclusive=False,
