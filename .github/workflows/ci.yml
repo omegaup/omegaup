@@ -503,7 +503,7 @@ jobs:
 
            # Wait for some of the containers
            wait-for-it -t 30 mysql:13306
-           wait-for-it -t 30 rabbitmq:5671
+           wait-for-it -t 30 rabbitmq:5672
 
       - name: Run Python tests
         run: |
