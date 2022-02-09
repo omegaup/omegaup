@@ -1186,7 +1186,13 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // Prevent date changes if a course already has runs from students
-        if ($startTime->time !== $assignment->start_time->time) {
+        if (
+            floor(
+                $startTime->time / 1000
+            ) !== floor(
+                $assignment->start_time->time / 1000
+            )
+        ) {
             /** @var list<int> $adminsIds */
             $adminsIds = array_map(
                 fn($admin) => $admin['user_id'],
