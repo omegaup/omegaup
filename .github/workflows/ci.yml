@@ -509,7 +509,7 @@ jobs:
           docker-compose pull
 
       - name: Start the Docker containers
-         run: |
+        run: |
            docker-compose up --no-build --detach
 
            # Add the container names as aliases to localhost
