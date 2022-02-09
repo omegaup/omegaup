@@ -468,12 +468,6 @@ jobs:
   python:
     runs-on: ubuntu-20.04
 
-    services:
-      rabbitmq:
-        image: rabbitmq:3-management-alpine
-        ports:
-          - 5672:5672
-
     steps:
       - uses: actions/checkout@v2
         with:
@@ -509,7 +503,7 @@ jobs:
 
            # Wait for some of the containers
            wait-for-it -t 30 mysql:13306
-           wait-for-it -t 30 rabbitmq:5672
+           wait-for-it -t 30 rabbitmq:5671
 
       - name: Run Python tests
         run: |
