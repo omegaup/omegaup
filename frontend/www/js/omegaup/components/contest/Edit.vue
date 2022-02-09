@@ -115,6 +115,7 @@
     <div class="tab-content">
       <div v-if="showTab === 'new_form'" class="tab-pane active">
         <omegaup-contest-new-form
+          :admission-mode="details.admission_mode"
           :initial-alias="details.alias"
           :initial-title="details.title"
           :initial-description="details.description"
