@@ -423,16 +423,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testUpdateAssignmentAlreadyHasRuns() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
-            admin: null,
-            adminLogin: null,
-            admissionMode: \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
-            requestsUserInformation: 'no',
-            showScoreboard: 'false',
-            startTimeDelay: 0,
-            courseDuration: 120 * 1000,
-            assignmentDuration: 120 * 1000
-        );
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
         $courseAlias = $courseData['course_alias'];
         $assignmentAlias = $courseData['assignment_alias'];
 
@@ -493,7 +484,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'assignment' => $assignmentAlias,
                 'course' => $courseAlias,
-                'start_time' => $courseData['request']['start_time']->time + 2 * 1000,
+                'start_time' => $courseData['request']['start_time']->time + 2,
                 'finish_time' => $courseData['request']['finish_time'],
             ]));
             $this->fail(
