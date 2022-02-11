@@ -154,70 +154,53 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'submit-new-assignment': (
-            source: course_AssignmentDetails,
+          'add-assignment': (params: {
+            name: string,
+            description: string,
+            assignment_type: string,
+            start_time: Date,
+            alias: string,
+            course_alias: string,
             problems: types.AddedProblem[],
-          ) => {
-            const params = {
-              name: source.name,
-              description: source.description,
-              start_time: source.startTime.getTime() / 1000,
-              assignment_type: source.assignmentType,
-            };
-            if (source.update) {
-              Object.assign(params, {
-                assignment: source.alias,
-                course: courseAlias,
-              });
-
-              if (source.unlimitedDuration) {
-                Object.assign(params, { unlimited_duration: true });
-              } else {
-                Object.assign(params, {
-                  finish_time: source.finishTime.getTime() / 1000,
-                });
-              }
-
-              api.Course.updateAssignment(params)
-                .then(() => {
-                  ui.success(T.courseAssignmentUpdated);
-                  this.invalidParameterName = '';
-                  this.refreshAssignmentsList();
-                })
-                .catch((error) => {
-                  ui.apiError(error);
-                  component.assignmentFormMode =
-                    omegaup.AssignmentFormMode.Edit;
-                  this.invalidParameterName = error.parameter || '';
-                });
-            } else {
-              Object.assign(params, {
-                alias: source.alias,
-                course_alias: courseAlias,
-                problems: JSON.stringify(problems),
-              });
-
-              if (source.unlimitedDuration) {
-                Object.assign(params, { unlimited_duration: true });
-              } else {
-                Object.assign(params, {
-                  finish_time: source.finishTime.getTime() / 1000,
-                });
-              }
-
-              api.Course.createAssignment(params)
-                .then(() => {
-                  ui.success(T.courseAssignmentAdded);
-                  this.invalidParameterName = '';
-                  this.refreshAssignmentsList();
-                })
-                .catch((error) => {
-                  ui.apiError(error);
-                  component.assignmentFormMode = omegaup.AssignmentFormMode.New;
-                  this.invalidParameterName = error.parameter || '';
-                });
-              window.scrollTo(0, 0);
-            }
+            finish_time?: Date,
+            unlimited_duration?: boolean,
+          }) => {
+            api.Course.createAssignment(params)
+            .then(() => {
+              ui.success(T.courseAssignmentAdded);
+              this.invalidParameterName = '';
+              this.refreshAssignmentsList();
+            })
+            .catch((error) => {
+              ui.apiError(error);
+              component.assignmentFormMode = omegaup.AssignmentFormMode.New;
+              this.invalidParameterName = error.parameter || '';
+            });
+            window.scrollTo(0, 0);
+          },
+          'update-assignment': (params: {
+            name: string,
+            description: string,
+            assignment_type: string,
+            start_time?: Date,
+            alias: string,
+            course_alias: string,
+            problems: types.AddedProblem[],
+            finish_time?: Date,
+            unlimited_duration?: boolean,
+          }) => {
+            api.Course.updateAssignment(params)
+            .then(() => {
+              ui.success(T.courseAssignmentUpdated);
+              this.invalidParameterName = '';
+              this.refreshAssignmentsList();
+            })
+            .catch((error) => {
+              ui.apiError(error);
+              component.assignmentFormMode =
+                omegaup.AssignmentFormMode.Edit;
+              this.invalidParameterName = error.parameter || '';
+            });
           },
           'delete-assignment': (assignment: types.CourseAssignment) => {
             if (

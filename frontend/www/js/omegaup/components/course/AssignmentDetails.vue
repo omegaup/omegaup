@@ -263,6 +263,7 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop() assignment!: types.CourseAssignment;
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
+  @Prop() courseAlias!: string;
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop({ default: true }) shouldAddProblems!: boolean;
@@ -331,7 +332,34 @@ export default class CourseAssignmentDetails extends Vue {
   }
 
   onSubmit(): void {
-    this.$emit('submit', this, this.scheduledProblemList?.problems ?? []);
+    let params = {
+      name: this.name,
+      description: this.description,
+      assignment_type: this.assignmentType,
+    };
+    if (this.unlimitedDuration) {
+      params = { ...params, ...{ unlimited_duration: true }};
+    } else {
+      params = { ...params, ...{ finish_time: this.finishTime.getTime() / 1000 }};
+    }
+    if (this.update) {
+      if (!this.assignment.has_runs) {
+        params = { ...params, ...{ start_time: this.startTime.getTime() / 1000 }};
+      }
+      params = { ...params, ...{ assignment: this.alias, course: this.courseAlias }};
+      this.$emit('update-assignment', params);
+      return;
+    }
+    params = {
+      ...params,
+      ...{
+        alias: this.alias,
+        course_alias: this.courseAlias,
+        start_time: this.startTime.getTime() / 1000,
+        problems: JSON.stringify(this.scheduledProblemList?.problems ?? []),
+      },
+    };
+    this.$emit('add-asignment', params);
   }
 
   onChangeSelect(event: Event): void {
