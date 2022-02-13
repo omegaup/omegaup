@@ -373,6 +373,7 @@ import { types } from '../../api_types';
 export default class NewForm extends Vue {
   @Prop() update!: boolean;
   @Prop() allLanguages!: string[];
+  @Prop({ default: 'private' }) admissionMode!: string;
   @Prop({ default: '' }) initialAlias!: string;
   @Prop({ default: '' }) initialDescription!: string;
   @Prop({ default: 'none' }) initialFeedback!: string;
@@ -499,7 +500,7 @@ export default class NewForm extends Vue {
   onSubmit() {
     const contest: types.ContestAdminDetails = {
       admin: true,
-      admission_mode: 'private',
+      admission_mode: this.update ? this.admissionMode : 'private',
       alias: this.alias,
       archived: false,
       available_languages: {},
