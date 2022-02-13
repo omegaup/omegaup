@@ -159,7 +159,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         $startTime = $r->ensureTimestamp(
             'start_time',
             lowerBound: null,
-            upperBound: is_null($course->finish_time) ? null : $course->finish_time->time
+            upperBound: is_null(
+                $course->finish_time
+            ) ? null : $course->finish_time->time
         );
         if ($unlimitedDuration && !is_null($course->finish_time)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -170,7 +172,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         $finishTime = $r->ensureOptionalTimestamp(
             'finish_time',
             lowerBound: null,
-            upperBound: is_null($course->finish_time) ? null : $course->finish_time->time,
+            upperBound: is_null(
+                $course->finish_time
+            ) ? null : $course->finish_time->time,
             required: !is_null($course->finish_time) || !$unlimitedDuration,
         );
 
@@ -1133,7 +1137,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         $startTime = $r->ensureOptionalTimestamp(
             'start_time',
             lowerBound: null,
-            upperBound: is_null($course->finish_time) ? null : $course->finish_time->time
+            upperBound: is_null(
+                $course->finish_time
+            ) ? null : $course->finish_time->time
         );
         if ($unlimitedDuration && !is_null($course->finish_time)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -1144,11 +1150,17 @@ class Course extends \OmegaUp\Controllers\Controller {
         $finishTime = $r->ensureOptionalTimestamp(
             'finish_time',
             lowerBound: null,
-            upperBound: is_null($course->finish_time) ? null : $course->finish_time->time,
+            upperBound: is_null(
+                $course->finish_time
+            ) ? null : $course->finish_time->time,
             required: !is_null($course->finish_time) || !$unlimitedDuration,
         );
 
-        if (!is_null($startTime) && $startTime->time < $course->start_time->time) {
+        if (
+            !is_null(
+                $startTime
+            ) && $startTime->time < $course->start_time->time
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseAssignmentStartDateBeforeCourseStartDate',
                 'start_time'
@@ -1165,7 +1177,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        if (!is_null($startTime) && !is_null($finishTime) && $startTime->time > $finishTime->time) {
+        if (
+            !is_null(
+                $startTime
+            ) && !is_null(
+                $finishTime
+            ) && $startTime->time > $finishTime->time
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime',
                 'finish_time'
@@ -1173,7 +1191,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // Prevent date changes if a course already has runs from students
-        if (!is_null($startTime) && $startTime->time !== $assignment->start_time->time) {
+        if (
+            !is_null(
+                $startTime
+            ) && $startTime->time !== $assignment->start_time->time
+        ) {
             /** @var list<int> $adminsIds */
             $adminsIds = array_map(
                 fn($admin) => $admin['user_id'],

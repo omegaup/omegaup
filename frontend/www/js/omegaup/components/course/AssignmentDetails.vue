@@ -338,15 +338,24 @@ export default class CourseAssignmentDetails extends Vue {
       assignment_type: this.assignmentType,
     };
     if (this.unlimitedDuration) {
-      params = { ...params, ...{ unlimited_duration: true }};
+      params = { ...params, ...{ unlimited_duration: true } };
     } else {
-      params = { ...params, ...{ finish_time: this.finishTime.getTime() / 1000 }};
+      params = {
+        ...params,
+        ...{ finish_time: this.finishTime.getTime() / 1000 },
+      };
     }
     if (this.update) {
       if (!this.assignment.has_runs) {
-        params = { ...params, ...{ start_time: this.startTime.getTime() / 1000 }};
+        params = {
+          ...params,
+          ...{ start_time: this.startTime.getTime() / 1000 },
+        };
       }
-      params = { ...params, ...{ assignment: this.alias, course: this.courseAlias }};
+      params = {
+        ...params,
+        ...{ assignment: this.alias, course: this.courseAlias },
+      };
       this.$emit('update-assignment', params);
       return;
     }
