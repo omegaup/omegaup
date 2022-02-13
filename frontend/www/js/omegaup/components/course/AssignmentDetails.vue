@@ -368,7 +368,7 @@ export default class CourseAssignmentDetails extends Vue {
         problems: JSON.stringify(this.scheduledProblemList?.problems ?? []),
       },
     };
-    this.$emit('add-asignment', params);
+    this.$emit('add-assignment', params);
   }
 
   onChangeSelect(event: Event): void {
