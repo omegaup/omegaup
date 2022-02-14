@@ -143,9 +143,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     pr.last_submission_time
                 FROM Courses c
                 INNER JOIN (
-                    SELECT g.group_id, gi.accept_teacher
+                    SELECT gi.group_id, gi.accept_teacher
                     FROM Groups_Identities gi
-                    INNER JOIN `Groups_` AS g ON g.group_id = gi.group_id
                     WHERE gi.identity_id = ?
                 ) gg
                 ON c.group_id = gg.group_id
@@ -284,13 +283,11 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             COUNT(*)
                         FROM
                             Groups_Identities gi
-                        INNER JOIN
-                            Identities i ON i.identity_id = gi.identity_id
                         WHERE
                             gi.group_id = c.group_id
                     ),
                     0
-                ) AS student_count,
+                ) AS studentCount,
                 IFNULL(
                     (
                         SELECT
@@ -302,8 +299,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             a.assignment_type = ?
                     ),
                     0
-                ) AS lesson_count,
-                0 AS already_started
+                ) AS lessonCount,
+                0 AS alreadyStarted
             FROM
                 Courses c
             LEFT JOIN
@@ -311,11 +308,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 c.admission_mode = ? AND
                 c.finish_time IS NULL AND
-                c.alias IS NOT NULL AND
-                c.name IS NOT NULL AND
                 c.archived = 0;';
 
-        /** @var list<array{alias: null|string, already_started: int, lesson_count: int, level: null|string, name: null|string, school_name: null|string, student_count: int}> */
+        /** @var list<array{alias: null|string, alreadyStarted: int, lessonCount: int, level: null|string, name: null|string, school_name: null|string, studentCount: int}> */
         $rs =  \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
@@ -329,12 +324,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             if (is_null($row['alias']) || is_null($row['name'])) {
                 continue;
             }
-            $row['lessonCount'] = $row['lesson_count'];
-            $row['studentCount'] = $row['student_count'];
-            $row['alreadyStarted'] = boolval($row['already_started']);
-            unset($row['lesson_count']);
-            unset($row['student_count']);
-            unset($row['already_started']);
+            $row['alreadyStarted'] = boolval($row['alreadyStarted']);
             $results[] = $row;
         }
         return $results;
@@ -417,11 +407,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                         SELECT
                             *
                         FROM
-                            `Groups_` AS g
-                        INNER JOIN
-                            Groups_Identities gi ON gi.group_id = g.group_id
+                            Groups_Identities gi
                         WHERE
-                            g.group_id = c.group_id AND
+                            gi.group_id = c.group_id AND
                             gi.identity_id = ?
                     )
                 ORDER BY
@@ -634,9 +622,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             FROM
                 Assignments a
             INNER JOIN
-                Problemsets ps ON a.problemset_id = ps.problemset_id
-            INNER JOIN
-                Problemset_Problems psp ON psp.problemset_id = ps.problemset_id
+                Problemset_Problems psp ON psp.problemset_id = a.problemset_id
             INNER JOIN
                 Problems p ON p.problem_id = psp.problem_id
             WHERE
@@ -685,8 +671,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 COUNT(*)
             FROM
                 Groups_Identities AS gi
-            INNER JOIN
-                Identities i ON i.identity_id = gi.identity_id
             WHERE
                 gi.group_id = ?';
         /** @var int */
@@ -763,9 +747,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             INNER JOIN
                 Runs r ON r.run_id = s.current_run_id
             INNER JOIN
-                Problemsets ps ON ps.problemset_id = s.problemset_id
-            INNER JOIN
-                Problemset_Problems psp ON psp.problemset_id = ps.problemset_id
+                Problemset_Problems psp ON psp.problemset_id = s.problemset_id
             INNER JOIN
                 Problems p ON p.problem_id = s.problem_id AND p.problem_id = psp.problem_id
             INNER JOIN
@@ -1310,11 +1292,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 Assignments a ON a.course_id = c.course_id
             INNER JOIN
                 Submissions s ON s.problemset_id = a.problemset_id
-            INNER JOIN
-                Runs r ON r.run_id = s.current_run_id
             WHERE
                 c.alias = ?
-                AND r.verdict = "AC"
+                AND s.verdict = "AC"
                 AND s.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?);
 ';
         /** @var int */
