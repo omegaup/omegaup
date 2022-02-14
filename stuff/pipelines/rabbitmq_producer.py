@@ -5,19 +5,31 @@
 import pika
 
 
-def send_message(
-        queue: str, exchange: str, routing_key: str,
-        channel: pika.adapters.blocking_connection.BlockingChannel,
-        message: str) -> None:
-    '''Send message to any queue'''
-    channel.queue_declare(queue, passive=False,
-                          durable=False, exclusive=False,
-                          auto_delete=False)
-    channel.exchange_declare(exchange=exchange,
-                             auto_delete=False,
-                             durable=True,
-                             exchange_type='direct')
-    body = message.encode()
-    channel.basic_publish(exchange=exchange,
-                          routing_key=routing_key,
-                          body=body)
+class RabbitmqProducer:
+    '''Implementation of rabbitmq producer.'''
+    def __init__(
+            self,
+            queue: str, exchange: str, routing_key: str,
+            channel: pika.adapters.blocking_connection.BlockingChannel
+    ) -> None:
+        '''initializes the queue, exchange and channel'''
+        self.queue = queue
+        self.exchange = exchange
+        self.routing_key = routing_key
+        self.channel = channel
+        self.channel.queue_declare(
+            self.queue, passive=False,
+            durable=False, exclusive=False,
+            auto_delete=False)
+        self.channel.exchange_declare(
+            exchange=self.exchange,
+            auto_delete=False,
+            durable=True,
+            exchange_type='direct')
+
+    def send_message(self, message: str) -> None:
+        '''Send message to any queue'''
+        body = message.encode()
+        self.channel.basic_publish(exchange=self.exchange,
+                                   routing_key=self.routing_key,
+                                   body=body)
