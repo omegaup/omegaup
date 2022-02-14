@@ -465,6 +465,27 @@ jobs:
           name: test-logs
           path: frontend/tests/runfiles/*/*.log
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: 'omegaup'
+      RABBITMQ_DEFAULT_PASS: 'omegaup'
+    expose:
+      - '5672'
+      - '15672'
+    volumes:
+      - 'rabbitmq:/var/lib/rabbitmq'
+    ports:
+      - target: 5672
+        published: 5672
+        protocol: tcp
+        mode: host
+      - target: 15672
+        published: 15672
+        protocol: tcp
+        mode: host
+
   python:
     runs-on: ubuntu-20.04
 
@@ -498,11 +519,10 @@ jobs:
 
            # Add the container names as aliases to localhost
            cat << EOF | sudo tee --append /etc/hosts
-           127.0.0.1 mysql rabbitmq
+           127.0.0.1 rabbitmq
            EOF
 
            # Wait for some of the containers
-           wait-for-it -t 30 mysql:13306
            wait-for-it -t 30 rabbitmq:5672
 
       - name: Run Python tests
