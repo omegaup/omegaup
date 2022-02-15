@@ -70,10 +70,8 @@ describe('Basic ContestListv2 Tests', () => {
     };
     cy.createContest(contestOptions);
     cy.visit('http://127.0.0.1:8001/arenav2');
-    /* ==== Generated with Cypress Studio ==== */
-    cy.get('#__BVID__69___BV_tab_button__').click();
-    cy.get('#__BVID__69 > :nth-child(1) > .card-body > .container > :nth-child(1) > :nth-child(1) > .card-text > h5 > a').should('have.text', 'contest2c1ed');
-    /* ==== End Cypress Studio ==== */
+    cy.get('a[__BVID__69___BV_tab_button__]').click();
+    cy.get('#__BVID__69 > :nth-child(1) > .card-body > .container > :nth-child(1) > :nth-child(1) > .card-text > h5 > a').should('have.text', contestAlias);
   });
 
   it('Should show past contest', function () {
