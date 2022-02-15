@@ -48,7 +48,7 @@ describe('Basic ContestListv2 Tests', () => {
       requestParticipantInformation: 'no',
     };
     cy.createContest(contestOptions);
-    cy.visit('http://127.0.0.1:8001/arenav2');
+    cy.visit('http://127.0.0.1:8001/arenav2?tab_name=current');
   });
 
   it('Should show future contest', function () {
@@ -69,9 +69,7 @@ describe('Basic ContestListv2 Tests', () => {
       requestParticipantInformation: 'no',
     };
     cy.createContest(contestOptions);
-    cy.visit('http://127.0.0.1:8001/arenav2');
-    cy.get('a[__BVID__69___BV_tab_button__]').click();
-    cy.get('#__BVID__69 > :nth-child(1) > .card-body > .container > :nth-child(1) > :nth-child(1) > .card-text > h5 > a').should('have.text', contestAlias);
+    cy.visit('http://127.0.0.1:8001/arenav2?tab_name=future');
   });
 
   it('Should show past contest', function () {
@@ -84,14 +82,14 @@ describe('Basic ContestListv2 Tests', () => {
     const contestOptions: ContestOptions = {
       contestAlias: contestAlias,
       description: 'Test Description',
-      startDate: new Date(yesterday.getTime() - daySeconds),
-      endDate: new Date(yesterday.getTime() - daySeconds * 2),
+      startDate: new Date(yesterday.getTime() - daySeconds * 2),
+      endDate: new Date(yesterday.getTime() - daySeconds),
       showScoreboard: true,
       basicInformation: false,
       partialPoints: true,
       requestParticipantInformation: 'no',
     };
     cy.createContest(contestOptions);
-    cy.visit('http://127.0.0.1:8001/arenav2');
+    cy.visit('http://127.0.0.1:8001/arenav2?tab_name=past');
   });
 });
