@@ -504,10 +504,6 @@ jobs:
            # Wait for some of the containers
            wait-for-it -t 30 rabbitmq:5672
 
-      - name: Run Python tests
-        run: |
-          python3 -m pytest ./stuff/
-
       - name: Collect container logs
         if: ${{ always() }}
         run: |
@@ -523,3 +519,7 @@ jobs:
         with:
           name: test-logs
           path: /tmp/container-logs/*.log
+
+      - name: Run Python tests
+        run: |
+          python3 -m pytest ./stuff/
