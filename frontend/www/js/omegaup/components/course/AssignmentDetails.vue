@@ -6,7 +6,7 @@
       </div>
     </slot>
     <div class="card-body">
-      <form class="form schedule" @submit.prevent="onSubmit">
+      <form class="form" @submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-4">
             <label
@@ -243,6 +243,29 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
+interface UpdateParams {
+  name: string;
+  description: string;
+  assignment_type: string;
+  unlimited_duration?: boolean;
+  finish_time?: number;
+  start_time?: number;
+  assignment: string;
+  course: string;
+}
+
+interface AddParams {
+  name: string;
+  description: string;
+  assignment_type: string;
+  unlimited_duration?: boolean;
+  finish_time?: number;
+  start_time: number;
+  alias: string;
+  course_alias: string;
+  problems: string;
+}
+
 @Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon,
@@ -311,6 +334,51 @@ export default class CourseAssignmentDetails extends Vue {
     }
   }
 
+  get updateParams(): UpdateParams {
+    let params: UpdateParams = {
+      name: this.name,
+      description: this.description,
+      assignment_type: this.assignmentType,
+      assignment: this.alias,
+      course: this.courseAlias,
+    };
+    if (this.unlimitedDuration) {
+      params.unlimited_duration = true;
+    } else {
+      params.finish_time = this.finishTime.getTime() / 1000;
+    }
+    if (!this.assignment.has_runs) {
+      params.start_time = this.startTime.getTime() / 1000;
+    }
+    return params;
+  }
+
+  get addParams(): AddParams {
+    let params: AddParams = {
+      name: this.name,
+      description: this.description,
+      assignment_type: this.assignmentType,
+      alias: this.alias,
+      course_alias: this.courseAlias,
+      start_time: this.startTime.getTime() / 1000,
+      problems: JSON.stringify(this.scheduledProblemList?.problems ?? []),
+    };
+    if (this.unlimitedDuration) {
+      params.unlimited_duration = true;
+    } else {
+      params.finish_time = this.finishTime.getTime() / 1000;
+    }
+    return params;
+  }
+
+  onAddSubmit(): void {
+    this.$emit('add-assignment', this.addParams);
+  }
+
+  onUpdateSubmit(): void {
+    this.$emit('update-assignment', this.updateParams);
+  }
+
   reset(): void {
     this.alias = this.assignment.alias;
     this.assignmentType = this.assignment.assignment_type || 'homework';
@@ -332,43 +400,7 @@ export default class CourseAssignmentDetails extends Vue {
   }
 
   onSubmit(): void {
-    let params = {
-      name: this.name,
-      description: this.description,
-      assignment_type: this.assignmentType,
-    };
-    if (this.unlimitedDuration) {
-      params = { ...params, ...{ unlimited_duration: true } };
-    } else {
-      params = {
-        ...params,
-        ...{ finish_time: this.finishTime.getTime() / 1000 },
-      };
-    }
-    if (this.update) {
-      if (!this.assignment.has_runs) {
-        params = {
-          ...params,
-          ...{ start_time: this.startTime.getTime() / 1000 },
-        };
-      }
-      params = {
-        ...params,
-        ...{ assignment: this.alias, course: this.courseAlias },
-      };
-      this.$emit('update-assignment', params);
-      return;
-    }
-    params = {
-      ...params,
-      ...{
-        alias: this.alias,
-        course_alias: this.courseAlias,
-        start_time: this.startTime.getTime() / 1000,
-        problems: JSON.stringify(this.scheduledProblemList?.problems ?? []),
-      },
-    };
-    this.$emit('add-assignment', params);
+    this.update ? this.onUpdateSubmit() : this.onAddSubmit();
   }
 
   onChangeSelect(event: Event): void {

@@ -1134,6 +1134,12 @@ class Course extends \OmegaUp\Controllers\Controller {
         $unlimitedDuration = $r->ensureOptionalBool(
             'unlimited_duration'
         ) ?? false;
+        if ($unlimitedDuration && !is_null($course->finish_time)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseDoesNotHaveUnlimitedDuration',
+                'unlimited_duration'
+            );
+        }
         $startTime = $r->ensureOptionalTimestamp(
             'start_time',
             lowerBound: null,
@@ -1141,12 +1147,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $course->finish_time
             ) ? null : $course->finish_time->time
         );
-        if ($unlimitedDuration && !is_null($course->finish_time)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseDoesNotHaveUnlimitedDuration',
-                'unlimited_duration'
-            );
-        }
         $finishTime = $r->ensureOptionalTimestamp(
             'finish_time',
             lowerBound: null,
@@ -1220,10 +1220,15 @@ class Course extends \OmegaUp\Controllers\Controller {
         $valueProperties = [
             'name',
             'description',
-            'start_time',
-            'finish_time',
             'assignment_type',
         ];
+
+        if (!is_null($startTime)) {
+            array_push($valueProperties, 'start_time');
+        }
+        if (!is_null($finishTime)) {
+            array_push($valueProperties, 'finish_time');
+        }
         self::updateValueProperties($r, $assignment, $valueProperties);
 
         if (is_null($course->finish_time) && $unlimitedDuration) {
