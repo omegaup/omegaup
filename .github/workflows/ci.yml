@@ -507,3 +507,19 @@ jobs:
       - name: Run Python tests
         run: |
           python3 -m pytest ./stuff/
+
+      - name: Collect container logs
+        if: ${{ always() }}
+        run: |
+          mkdir -p /tmp/container-logs
+          for name in $(docker ps --format '{{.Names}}'); do
+            docker logs --timestamps --since 1970-01-01T00:00:00 "${name}" > \
+              "/tmp/container-logs/${name}.log" 2>&1
+          done
+
+      - name: Upload artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-logs
+          path: /tmp/container-logs/*.log
