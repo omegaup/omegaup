@@ -5158,7 +5158,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
-     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null $language
+     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
      * @omegaup-request-param int|null $offset
      * @omegaup-request-param null|string $problem_alias
      * @omegaup-request-param int|null $rowcount
