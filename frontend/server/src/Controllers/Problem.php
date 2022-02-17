@@ -4904,7 +4904,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             join(
                 ',',
                 $sortedLanguages
-            ) => 'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
+            ) => 'C, C++, C#, Java, Kotlin, Python, Ruby, Pascal, Haskell, Lua, Go, Rust, JavaScript',
             'kj,kp' => 'Karel',
             'cat' => \OmegaUp\Translations::getInstance()->get(
                 'wordsJustOutput'
