@@ -13,12 +13,11 @@ class RabbitmqProducer:
             channel: pika.adapters.blocking_connection.BlockingChannel
     ) -> None:
         '''initializes the queue, exchange and channel'''
-        self.queue = queue
         self.exchange = exchange
         self.routing_key = routing_key
         self.channel = channel
         self.channel.queue_declare(
-            self.queue, passive=False,
+            queue=queue, passive=False,
             durable=False, exclusive=False,
             auto_delete=False)
         self.channel.exchange_declare(
