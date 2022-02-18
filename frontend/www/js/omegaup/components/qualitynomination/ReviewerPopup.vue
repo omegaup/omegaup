@@ -111,6 +111,7 @@ import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { types } from '../../api_types';
 library.add(faTrash);
 
 interface ProblemTag {
@@ -147,12 +148,18 @@ export default class ReviewerPopup extends Vue {
   @Prop() selectedPrivateTags!: string[];
   @Prop() problemAlias!: string;
   @Prop() problemTitle!: string;
+  @Prop() alreadyReviewedPayload!: types.QualityNominationContents | undefined;
 
   AvailableViews = AvailableViews;
   T = T;
   currentView: AvailableViews = AvailableViews.Content;
-  qualitySeal = true;
-  tag = '';
+  qualitySeal = this.alreadyReviewedPayload
+    ? this.alreadyReviewedPayload.contents.quality_seal
+    : true;
+  tag = this.alreadyReviewedPayload
+    ? this.alreadyReviewedPayload.contents.tag
+    : '';
+
   publicTagsList = this.selectedPublicTags ?? [];
 
   get sortedProblemTags(): ProblemTag[] {

@@ -124,6 +124,70 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     }
 
     /**
+    * Returns the contents and id of a nomination for a given problem and user.
+    * @return array{contents: array{quality_seal: bool, tag: string}, qualitynomination_id: int}
+    */
+    public static function getReviewedData(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Problems $problem
+    ): array {
+        $sql = "
+            SELECT
+                qn.qualitynomination_id,
+                qn.contents
+            FROM
+                QualityNominations qn
+            INNER JOIN
+                Identities i ON i.user_id = qn.user_id
+            WHERE
+                nomination = 'quality_tag' AND
+                i.identity_id = ? AND
+                qn.problem_id = ?";
+
+        /** @var array{contents: string, qualitynomination_id: int}|null */
+        $query = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identity->identity_id, $problem->problem_id]
+        );
+
+        if (is_null($query)) {
+            return [];
+        }
+        /** @var  array{quality_seal: bool, tag: string} $contents */
+        $contents = json_decode($query['contents'], true);
+
+        return [
+            'qualitynomination_id' => $query['qualitynomination_id'],
+            'contents' => $contents,
+        ];
+    }
+
+    /*
+        Edits a Quality Nomination given its id and contents
+    */
+    public static function edit(
+        int $qualityNominationId,
+        string $contents
+    ): array {
+        $sql = '
+            UPDATE
+                QualityNominations
+            SET
+                contents = ?
+            WHERE
+                qualitynomination_id = ?;';
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [
+                $contents,
+                $qualityNominationId,
+            ]
+        );
+        return [ 'status' => 'ok' ];
+    }
+
+    /**
      * Returns the votes from all the assigned reviewers for a particular
      * nomination.
      *

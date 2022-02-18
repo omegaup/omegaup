@@ -1442,6 +1442,10 @@ export const QualityNomination = {
     })(x.votes);
     return x;
   }),
+  edit: apiCall<
+    messages.QualityNominationEditRequest,
+    messages.QualityNominationEditResponse
+  >('/api/qualityNomination/edit/'),
   list: apiCall<
     messages.QualityNominationListRequest,
     messages._QualityNominationListServerResponse,

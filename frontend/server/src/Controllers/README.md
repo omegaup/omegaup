@@ -166,6 +166,7 @@
 - [QualityNomination](#qualitynomination)
   - [`/api/qualityNomination/create/`](#apiqualitynominationcreate)
   - [`/api/qualityNomination/details/`](#apiqualitynominationdetails)
+  - [`/api/qualityNomination/edit/`](#apiqualitynominationedit)
   - [`/api/qualityNomination/list/`](#apiqualitynominationlist)
   - [`/api/qualityNomination/myAssignedList/`](#apiqualitynominationmyassignedlist)
   - [`/api/qualityNomination/myList/`](#apiqualitynominationmylist)
@@ -3422,6 +3423,23 @@ nominator or a member of the reviewer group.
 | `reviewer`             | `boolean`                                                                                                                                                        |
 | `time`                 | `Date`                                                                                                                                                           |
 | `votes`                | `{ time: Date; user: { name: string; username: string; }; vote: number; }[]`                                                                                     |
+
+## `/api/qualityNomination/edit/`
+
+### Description
+
+Edits a QualityNomination given an id and contents
+
+### Parameters
+
+| Name                   | Type     | Description |
+| ---------------------- | -------- | ----------- |
+| `contents`             | `string` |             |
+| `qualitynomination_id` | `int`    |             |
+
+### Returns
+
+_Nothing_
 
 ## `/api/qualityNomination/list/`
 

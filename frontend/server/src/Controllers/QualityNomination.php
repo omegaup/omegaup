@@ -674,6 +674,32 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Edits a QualityNomination given an id and contents
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param int $qualitynomination_id
+     * @omegaup-request-param string $contents
+     */
+    public static function apiEdit(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        // Validate request
+        $r->ensureMainUserIdentity();
+        self::validateMemberOfReviewerGroup($r);
+
+        $qualityNominationId = $r->ensureInt('qualitynomination_id');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
+
+        \OmegaUp\DAO\QualityNominations::edit(
+            $qualityNominationId,
+            $r['contents']
+        );
+
+        return ['status' => 'ok'];
+    }
+
+    /**
      * Marks a problem of a nomination (only the demotion type supported for now) as (resolved, banned, warning).
      *
      * @return array{status: string}
