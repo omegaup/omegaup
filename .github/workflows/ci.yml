@@ -503,7 +503,7 @@ jobs:
 
            # Wait for some of the containers
            wait-for-it -t 30 rabbitmq:5672
-           docker-compose exec rabbitmq rabbitmqctl await_startup
+           docker-compose exec -T rabbitmq rabbitmqctl await_startup
 
       - name: Run Python tests
         run: |
