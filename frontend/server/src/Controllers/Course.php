@@ -175,16 +175,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         if (
-            !is_null($finishTime)
-            && $finishTime->time < $course->start_time->time
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseAssignmentEndDateBeforeCourseStartDate',
-                'finish_time'
-            );
-        }
-
-        if (
             !is_null($finishTime) &&
             $startTime->time > $finishTime->time
         ) {
@@ -1189,19 +1179,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         if (!is_null($finishTime) && $startTime->time > $finishTime->time) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseAssignmentEndDateBeforeCourseStartDate',
-                'finish_time'
-            );
-        }
-
-        if (
-            !is_null(
-                $startTime
-            ) && !is_null(
-                $finishTime
-            ) && $startTime->time > $finishTime->time
-        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime',
                 'finish_time'
