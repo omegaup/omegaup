@@ -522,5 +522,5 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v2
         with:
-          name: test-logs
+          name: python-test-logs
           path: /tmp/container-logs/*.log
