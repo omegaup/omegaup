@@ -536,7 +536,6 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $updatedFinishTime = self::$courseData['request']['start_time']->time + 20;
 
-        // Should throw a exception
         $login = self::login($courseData['admin']);
         \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
