@@ -1631,13 +1631,13 @@ Clone a course
 
 ### Parameters
 
-| Name           | Type                 | Description |
-| -------------- | -------------------- | ----------- |
-| `alias`        | `string`             |             |
-| `course_alias` | `string`             |             |
-| `name`         | `string`             |             |
-| `start_time`   | `\OmegaUp\Timestamp` |             |
-| `token`        | `null\|string`       |             |
+| Name           | Type                | Description |
+| -------------- | ------------------- | ----------- |
+| `alias`        | `string`            |             |
+| `course_alias` | `string`            |             |
+| `name`         | `string`            |             |
+| `start_time`   | `OmegaUp\Timestamp` |             |
+| `token`        | `null\|string`      |             |
 
 ### Returns
 
@@ -2081,14 +2081,14 @@ Edit Course contents
 | `school_id`                 | `int`                                       |             |
 | `admission_mode`            | `'private'\|'public'\|'registration'\|null` |             |
 | `description`               | `null\|string`                              |             |
-| `finish_time`               | `\OmegaUp\Timestamp\|null`                  |             |
+| `finish_time`               | `OmegaUp\Timestamp\|null`                   |             |
 | `level`                     | `null\|string`                              |             |
 | `name`                      | `null\|string`                              |             |
 | `needs_basic_information`   | `bool\|null`                                |             |
 | `objective`                 | `null\|string`                              |             |
 | `requests_user_information` | `'no'\|'optional'\|'required'\|null`        |             |
 | `show_scoreboard`           | `bool\|null`                                |             |
-| `start_time`                | `\OmegaUp\Timestamp\|null`                  |             |
+| `start_time`                | `OmegaUp\Timestamp\|null`                   |             |
 | `unlimited_duration`        | `bool\|null`                                |             |
 
 ### Returns
@@ -2103,13 +2103,13 @@ Update an assignment
 
 ### Parameters
 
-| Name                 | Type                       | Description |
-| -------------------- | -------------------------- | ----------- |
-| `assignment`         | `string`                   |             |
-| `course`             | `string`                   |             |
-| `finish_time`        | `\OmegaUp\Timestamp\|null` |             |
-| `start_time`         | `\OmegaUp\Timestamp\|null` |             |
-| `unlimited_duration` | `bool\|null`               |             |
+| Name                 | Type                | Description |
+| -------------------- | ------------------- | ----------- |
+| `assignment`         | `string`            |             |
+| `course`             | `string`            |             |
+| `finish_time`        | `OmegaUp\Timestamp` |             |
+| `start_time`         | `OmegaUp\Timestamp` |             |
+| `unlimited_duration` | `bool\|null`        |             |
 
 ### Returns
 
