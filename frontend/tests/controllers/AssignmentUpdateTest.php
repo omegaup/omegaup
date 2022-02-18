@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     private static $login = null;
@@ -187,7 +188,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAssignmentUpdateByStudent() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => self::$login->auth_token,
             'usernameOrEmail' => $identity->username,
             'course_alias' => self::$courseData['course_alias'],
@@ -271,7 +272,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             [$problemData]
         );
         // Create our participant
-        ['identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $user, 'identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add student to course
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
@@ -462,7 +463,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Create a participant and a run
-        ['identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $_, 'identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
 
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $courseData,
@@ -495,71 +496,5 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $e->getMessage()
             );
         }
-    }
-
-    public function testUpdateFinishTimeAssignmentAlreadyHasRuns() {
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
-        $courseAlias = $courseData['course_alias'];
-        $assignmentAlias = $courseData['assignment_alias'];
-
-        $login = self::login($courseData['admin']);
-
-        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
-            $login,
-            $courseAlias,
-            $assignmentAlias,
-            [$problemData]
-        );
-
-        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
-            $problemData,
-            $courseData,
-            $courseData['admin']
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        // Create a participant and a run
-        ['identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
-
-        \OmegaUp\Test\Factories\Course::addStudentToCourse(
-            $courseData,
-            $participant
-        );
-
-        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
-            $problemData,
-            $courseData,
-            $participant
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        $updatedFinishTime = self::$courseData['request']['start_time']->time + 20;
-
-        // Should throw a exception
-        $login = self::login($courseData['admin']);
-        \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'assignment' => $assignmentAlias,
-            'course' => $courseAlias,
-            'finish_time' => $updatedFinishTime,
-        ]));
-
-        $login = self::login($courseData['admin']);
-
-        // Read the assignment again
-        $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'assignment' => $assignmentAlias,
-                'course' => $courseAlias,
-            ])
-        );
-
-        $this->assertEquals(
-            self::$courseData['request']['start_time']->time,
-            $response['start_time']->time
-        );
-        $this->assertEquals($updatedFinishTime, $response['finish_time']->time);
     }
 }
