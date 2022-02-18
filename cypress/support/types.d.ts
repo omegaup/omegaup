@@ -50,12 +50,18 @@ export type Language =
   | 'cpp11-clang'
   | 'cpp17-gcc'
   | 'cpp17-clang'
+  | 'cpp20-gcc'
+  | 'cpp20-clang'
   | 'java'
+  | 'kt'
   | 'py2'
   | 'py3'
   | 'rb'
   | 'cs'
   | 'pas'
   | 'hs'
-  | 'lua';
+  | 'lua'
+  | 'go'
+  | 'rs'
+  | 'js';
 export type Status = 'AC' | 'TLE' | 'MLE' | 'PA';
