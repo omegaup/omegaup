@@ -6,7 +6,7 @@
       </div>
     </slot>
     <div class="card-body">
-      <form class="form" @submit.prevent="onSubmit">
+      <form class="form schedule" @submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-4">
             <label
@@ -170,6 +170,10 @@
             :tagged-problems="taggedProblems"
             :selected-assignment="assignment"
             :assignment-form-mode.sync="assignmentFormMode"
+            :search-result-problems="searchResultProblems"
+            @update-search-result-problems="
+              (query) => $emit('update-search-result-problems', query)
+            "
             @save-problem="
               (assignment, problem) => $emit('add-problem', assignment, problem)
             "
@@ -292,6 +296,7 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop({ default: true }) shouldAddProblems!: boolean;
   @Prop({ default: false }) unlimitedDurationCourse!: boolean;
   @Prop({ default: '' }) invalidParameterName!: string;
+  @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
   AssignmentFormMode = omegaup.AssignmentFormMode;
