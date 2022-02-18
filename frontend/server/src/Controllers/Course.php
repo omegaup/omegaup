@@ -1215,7 +1215,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             'finish_time',
             'assignment_type',
         ];
-
         self::updateValueProperties($r, $assignment, $valueProperties);
 
         if (is_null($course->finish_time) && $unlimitedDuration) {
