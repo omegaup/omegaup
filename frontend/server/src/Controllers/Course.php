@@ -134,24 +134,16 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $alias
      * @omegaup-request-param 'homework'|'lesson'|'test' $assignment_type
      * @omegaup-request-param string $description
-     * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
+     * @omegaup-request-param \OmegaUp\Timestamp|null $finish_time
      * @omegaup-request-param string $name
      * @omegaup-request-param null|string $problems
-     * @omegaup-request-param OmegaUp\Timestamp $start_time
+     * @omegaup-request-param \OmegaUp\Timestamp $start_time
      * @omegaup-request-param bool|null $unlimited_duration
      */
     private static function validateCreateAssignment(
         \OmegaUp\Request $r,
         \OmegaUp\DAO\VO\Courses $course
     ): array {
-        /** @var \OmegaUp\Timestamp */
-        $courseStartTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-            $course->start_time
-        );
-        $courseFinishTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-            $course->finish_time
-        );
-
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['name'],
             'name'
@@ -164,15 +156,44 @@ class Course extends \OmegaUp\Controllers\Controller {
         $unlimitedDuration = $r->ensureOptionalBool(
             'unlimited_duration'
         ) ?? false;
-        [
-            'startTime' => $startTime,
-            'finishTime' => $finishTime,
-        ] = self::validateAssignmentDates(
-            $r,
-            $unlimitedDuration,
-            $courseStartTime,
-            $courseFinishTime
+        $startTime = $r->ensureTimestamp(
+            'start_time',
+            lowerBound: null,
+            upperBound: is_null(
+                $course->finish_time
+            ) ? null : $course->finish_time->time
         );
+        if ($unlimitedDuration && !is_null($course->finish_time)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseDoesNotHaveUnlimitedDuration',
+                'unlimited_duration'
+            );
+        }
+        $finishTime = $r->ensureOptionalTimestamp(
+            'finish_time',
+            lowerBound: null,
+            upperBound: is_null(
+                $course->finish_time
+            ) ? null : $course->finish_time->time,
+            required: !is_null($course->finish_time) || !$unlimitedDuration,
+        );
+
+        if ($startTime->time < $course->start_time->time) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseAssignmentStartDateBeforeCourseStartDate',
+                'start_time'
+            );
+        }
+
+        if (
+            !is_null($finishTime)
+            && $finishTime->time < $course->start_time->time
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseAssignmentEndDateBeforeCourseStartDate',
+                'finish_time'
+            );
+        }
 
         if (
             !is_null($finishTime) &&
@@ -235,57 +256,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         return ['addedProblems' => $addedProblems];
-    }
-
-    /**
-     * @return array{finishTime: \OmegaUp\Timestamp|null, startTime: \OmegaUp\Timestamp}
-     *
-     * @omegaup-request-param OmegaUp\Timestamp $start_time
-     * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
-     */
-    private static function validateAssignmentDates(
-        \OmegaUp\Request $r,
-        bool $unlimitedDuration,
-        \OmegaUp\Timestamp $courseStartTime,
-        ?\OmegaUp\Timestamp $courseFinishTime
-    ): array {
-        $startTime = $r->ensureTimestamp(
-            'start_time',
-            lowerBound: null,
-            upperBound: is_null($courseFinishTime) ? null : $courseFinishTime->time
-        );
-        if ($startTime->time < $courseStartTime->time) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseAssignmentStartDateBeforeCourseStartDate',
-                'start_time'
-            );
-        }
-        if ($unlimitedDuration && !is_null($courseFinishTime)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseDoesNotHaveUnlimitedDuration',
-                'unlimited_duration'
-            );
-        }
-
-        $finishTime = $r->ensureOptionalTimestamp(
-            'finish_time',
-            lowerBound: null,
-            upperBound: is_null(
-                $courseFinishTime
-            ) ? null : $courseFinishTime->time,
-            required: !is_null($courseFinishTime) || !$unlimitedDuration,
-        );
-        if (
-            !is_null($finishTime)
-            && $finishTime->time < $courseStartTime->time
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseAssignmentEndDateBeforeCourseStartDate',
-                'finish_time'
-            );
-        }
-
-        return ['startTime' => $startTime, 'finishTime' => $finishTime];
     }
 
     /**
@@ -360,7 +330,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $alias
      * @omegaup-request-param null|string $description
      * @omegaup-request-param null|string $objective
-     * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
+     * @omegaup-request-param \OmegaUp\Timestamp|null $finish_time
      * @omegaup-request-param null|string $languages
      * @omegaup-request-param null|string $level
      * @omegaup-request-param null|string $name
@@ -368,7 +338,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param int $school_id
      * @omegaup-request-param bool|null $show_scoreboard
-     * @omegaup-request-param OmegaUp\Timestamp|null $start_time
+     * @omegaup-request-param \OmegaUp\Timestamp|null $start_time
      * @omegaup-request-param bool|null $unlimited_duration
      */
     private static function validateUpdate(
@@ -613,7 +583,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $alias
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param string $name
-     * @omegaup-request-param OmegaUp\Timestamp $start_time
+     * @omegaup-request-param \OmegaUp\Timestamp $start_time
      * @omegaup-request-param null|string $token
      */
     public static function apiClone(\OmegaUp\Request $r): array {
@@ -1133,8 +1103,8 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $assignment
      * @omegaup-request-param string $course
-     * @omegaup-request-param OmegaUp\Timestamp $finish_time
-     * @omegaup-request-param OmegaUp\Timestamp $start_time
+     * @omegaup-request-param \OmegaUp\Timestamp|null $finish_time
+     * @omegaup-request-param \OmegaUp\Timestamp|null $start_time
      * @omegaup-request-param bool|null $unlimited_duration
      */
     public static function apiUpdateAssignment(\OmegaUp\Request $r): array {
@@ -1161,24 +1131,59 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        if (is_null($r['start_time'])) {
-            $r['start_time'] = $assignment->start_time;
-        }
-
         $unlimitedDuration = $r->ensureOptionalBool(
             'unlimited_duration'
         ) ?? false;
-        [
-            'startTime' => $startTime,
-            'finishTime' => $finishTime,
-        ] = self::validateAssignmentDates(
-            $r,
-            $unlimitedDuration,
-            $course->start_time,
-            $course->finish_time
+        if ($unlimitedDuration && !is_null($course->finish_time)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseDoesNotHaveUnlimitedDuration',
+                'unlimited_duration'
+            );
+        }
+        $startTime = $r->ensureOptionalTimestamp(
+            'start_time',
+            lowerBound: null,
+            upperBound: is_null(
+                $course->finish_time
+            ) ? null : $course->finish_time->time
+        );
+        $finishTime = $r->ensureOptionalTimestamp(
+            'finish_time',
+            lowerBound: null,
+            upperBound: is_null(
+                $course->finish_time
+            ) ? null : $course->finish_time->time,
+            required: !is_null($course->finish_time) || !$unlimitedDuration,
         );
 
-        if (!is_null($finishTime) && $startTime->time > $finishTime->time) {
+        if (
+            !is_null(
+                $startTime
+            ) && $startTime->time < $course->start_time->time
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseAssignmentStartDateBeforeCourseStartDate',
+                'start_time'
+            );
+        }
+
+        if (
+            !is_null($finishTime)
+            && $finishTime->time < $course->start_time->time
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseAssignmentEndDateBeforeCourseStartDate',
+                'finish_time'
+            );
+        }
+
+        if (
+            !is_null(
+                $startTime
+            ) && !is_null(
+                $finishTime
+            ) && $startTime->time > $finishTime->time
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime',
                 'finish_time'
@@ -1186,7 +1191,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // Prevent date changes if a course already has runs from students
-        if ($startTime->time !== $assignment->start_time->time) {
+        if (
+            !is_null(
+                $startTime
+            ) && $startTime->time !== $assignment->start_time->time
+        ) {
             /** @var list<int> $adminsIds */
             $adminsIds = array_map(
                 fn($admin) => $admin['user_id'],
@@ -1211,10 +1220,15 @@ class Course extends \OmegaUp\Controllers\Controller {
         $valueProperties = [
             'name',
             'description',
-            'start_time',
-            'finish_time',
             'assignment_type',
         ];
+
+        if (!is_null($startTime)) {
+            array_push($valueProperties, 'start_time');
+        }
+        if (!is_null($finishTime)) {
+            array_push($valueProperties, 'finish_time');
+        }
         self::updateValueProperties($r, $assignment, $valueProperties);
 
         if (is_null($course->finish_time) && $unlimitedDuration) {
@@ -5332,14 +5346,14 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $description
      * @omegaup-request-param null|string $level
      * @omegaup-request-param null|string $objective
-     * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
+     * @omegaup-request-param \OmegaUp\Timestamp|null $finish_time
      * @omegaup-request-param string $languages
      * @omegaup-request-param null|string $name
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param int $school_id
      * @omegaup-request-param bool|null $show_scoreboard
-     * @omegaup-request-param OmegaUp\Timestamp|null $start_time
+     * @omegaup-request-param \OmegaUp\Timestamp|null $start_time
      * @omegaup-request-param bool|null $unlimited_duration
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
