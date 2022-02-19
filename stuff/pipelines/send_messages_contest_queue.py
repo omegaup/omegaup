@@ -12,6 +12,7 @@ import mysql.connector
 import mysql.connector.cursor
 import pika
 import rabbitmq_connection
+import credentials
 
 sys.path.insert(
     0,
@@ -94,7 +95,11 @@ def main() -> None:
 
     try:
         with dbconn.cursor(buffered=True, dictionary=True) as cur, \
-            rabbitmq_connection.connect(args) as channel:
+            rabbitmq_connection.connect(
+                    username=credentials.OMEGAUP_USERNAME,
+                    password=credentials.OMEGAUP_PASSWORD,
+                    host=credentials.RABBITMQ_HOST
+            ) as channel:
             send_contest(cur, channel,
                          args.date_lower_limit,
                          args.date_upper_limit)

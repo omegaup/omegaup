@@ -17,6 +17,7 @@ import mysql.connector.cursor
 import pika
 import test_constants
 import send_messages_contest_queue
+import credentials
 
 sys.path.insert(
     0,
@@ -66,7 +67,11 @@ def test_client_contest() -> None:
     dbconn = lib.db.connect(args)
 
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
-        rabbitmq_connection.connect(args) as channel:
+        rabbitmq_connection.connect(
+            username=credentials.OMEGAUP_USERNAME,
+            password=credentials.OMEGAUP_PASSWORD,
+            host=credentials.RABBITMQ_HOST
+        ) as channel:
         send_messages_contest_queue.send_contest(
             cur,
             channel,
@@ -111,7 +116,11 @@ def test_client_contest_with_mocked_codes(mocker: MockerFixture) -> None:
     logging.info('Started')
     dbconn = lib.db.connect(args)
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
-        rabbitmq_connection.connect(args) as channel:
+        rabbitmq_connection.connect(
+            username=credentials.OMEGAUP_USERNAME,
+            password=credentials.OMEGAUP_PASSWORD,
+            host=credentials.RABBITMQ_HOST
+        ) as channel:
         send_messages_contest_queue.send_contest(
             cur,
             channel,
@@ -158,7 +167,11 @@ def test_client_contest_with_duplicated_codes(mocker: MockerFixture) -> None:
     logging.info('Started')
     dbconn = lib.db.connect(args)
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
-        rabbitmq_connection.connect(args) as channel:
+        rabbitmq_connection.connect(
+            username=credentials.OMEGAUP_USERNAME,
+            password=credentials.OMEGAUP_PASSWORD,
+            host=credentials.RABBITMQ_HOST
+        ) as channel:
         send_messages_contest_queue.send_contest(
             cur,
             channel,

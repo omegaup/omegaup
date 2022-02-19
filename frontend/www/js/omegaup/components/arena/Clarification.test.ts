@@ -3,6 +3,7 @@ import { shallowMount } from '@vue/test-utils';
 import T from '../../lang';
 
 import arena_Clarification from './Clarification.vue';
+import * as ui from '../../ui';
 
 describe('Clarification.vue', () => {
   const clarification = {
@@ -27,6 +28,22 @@ describe('Clarification.vue', () => {
 
     expect(wrapper.text()).toContain(clarification.problem_alias);
     expect(wrapper.find('label.form-check-label').text()).toBe(T.wordsPublic);
+  });
+
+  it('Should handle contest clarification on behalf', async () => {
+    const wrapper = shallowMount(arena_Clarification, {
+      propsData: {
+        clarification: { ...clarification, ...{ receiver: 'user' } },
+        isAdmin: true,
+      },
+    });
+
+    expect(wrapper.find('td[data-author]').text()).toBe(
+      ui.formatString(T.clarificationsOnBehalf, {
+        author: 'omegaUp',
+        receiver: 'user',
+      }),
+    );
   });
 
   it('Should handle course clarification', async () => {

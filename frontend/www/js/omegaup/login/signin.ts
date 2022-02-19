@@ -42,7 +42,7 @@ OmegaUp.on('ready', () => {
 
   const payload = types.payloadParsers.LoginDetailsPayload();
   if (payload.statusError) {
-    ui.error(payload.statusError);
+    ui.warning(payload.statusError);
   } else if (payload.verifyEmailSuccessfully) {
     ui.success(payload.verifyEmailSuccessfully);
   }

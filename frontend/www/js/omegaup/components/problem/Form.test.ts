@@ -25,7 +25,7 @@ const props: types.ProblemFormPayload = {
   levelTags: [],
   visibilityStatuses: {},
   languages:
-    'c11-clang,c11-gcc,cpp11-clang,cpp11-gcc,cpp17-clang,cpp17-gcc,cs,hs,java,lua,pas,py2,py3,rb',
+    'c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js',
   tags: [
     {
       name: 'problemLevelBasicKarel',
@@ -42,8 +42,8 @@ const props: types.ProblemFormPayload = {
     custom: 'Validador personalizado (validator.$lang$)',
   },
   validLanguages: {
-    'c11-clang,c11-gcc,cpp11-clang,cpp11-gcc,cpp17-clang,cpp17-gcc,cs,hs,java,lua,pas,py2,py3,rb':
-      'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
+    'c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js':
+      'C, C++, C#, Java, Kotlin, Python, Ruby, Pascal, Haskell, Lua, Go, Rust, JavaScript',
     'kj,kp': 'Karel',
     cat: T.wordsJustOutput,
     '': T.wordsNoSubmissions,

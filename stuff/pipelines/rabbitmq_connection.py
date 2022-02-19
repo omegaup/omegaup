@@ -13,13 +13,11 @@ import pika
 
 @contextlib.contextmanager
 def connect(
-        args: argparse.Namespace
+        *, username: str, password: str, host: str
 ) -> Iterator[pika.adapters.blocking_connection.BlockingChannel]:
     '''Connects to rabbitmq with the arguments provided.'''
-    username = args.rabbitmq_username
-    password = args.rabbitmq_password
     connection = pika.BlockingConnection(pika.ConnectionParameters(
-        host='rabbitmq',
+        host=host,
         port=5672,
         virtual_host='/',
         credentials=pika.PlainCredentials(username, password),
@@ -47,6 +45,9 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
     parser.add_argument('--rabbitmq-password', type=str,
                         help='rabbitmq password',
                         default='omegaup')
+    parser.add_argument('--rabbitmq-host', type=str,
+                        help='rabbitmq host',
+                        default='rabbitmq')
     parser.add_argument('--date-lower-limit',
                         type=lambda s:
                         datetime.datetime.strptime(s, '%Y-%m-%d'),
