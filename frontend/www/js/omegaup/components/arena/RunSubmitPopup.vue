@@ -127,7 +127,10 @@ export default class ArenaRunSubmitPopup extends Vue {
       { language: 'cpp11-clang', name: 'C++11 (clang++ 10.0)' },
       { language: 'cpp17-gcc', name: 'C++17 (g++ 10.3)' },
       { language: 'cpp17-clang', name: 'C++17 (clang++ 10.0)' },
+      { language: 'cpp20-gcc', name: 'C++20 (g++ 10.3)' },
+      { language: 'cpp20-clang', name: 'C++20 (clang++ 10.0)' },
       { language: 'java', name: 'Java (openjdk 16.0)' },
+      { language: 'kotlin', name: 'Kotlin (1.6.10)' },
       { language: 'py', name: 'Python (2.7)' },
       { language: 'py2', name: 'Python (2.7)' },
       { language: 'py3', name: 'Python (3.9)' },
@@ -137,6 +140,9 @@ export default class ArenaRunSubmitPopup extends Vue {
       { language: 'cat', name: T.outputOnly },
       { language: 'hs', name: 'Haskell (ghc 8.8)' },
       { language: 'lua', name: 'Lua (5.3)' },
+      { language: 'go', name: 'Go (1.18.beta2)' },
+      { language: 'rs', name: 'Rust (1.56.1)' },
+      { language: 'js', name: 'JavaScript (Node.js 16)' },
     ];
 
     allLanguages

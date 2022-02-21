@@ -19,7 +19,7 @@
 					"source": "omegaUp classics",
 					"show_diff": "examples",
 					"allow_user_add_tags": "true",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
 					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
@@ -71,7 +71,7 @@
 					"source": "omegaUp classics",
 					"show_diff": "all",
 					"allow_user_add_tags": "true",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
 					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
@@ -97,7 +97,7 @@
 					"source": "omegaUp classics",
 					"show_diff": "examples",
 					"allow_user_add_tags": "true",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
 					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
@@ -148,7 +148,7 @@
 					"source": "omegaUp classics",
 					"show_diff": "examples",
 					"allow_user_add_tags": "true",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
 					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
@@ -174,7 +174,7 @@
 					"source": "omegaUp classics",
 					"show_diff": "examples",
 					"allow_user_add_tags": "true",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
 					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
@@ -200,7 +200,7 @@
 					"source": "omegaUp classics",
 					"show_diff": "examples",
 					"allow_user_add_tags": "true",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
 					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
@@ -226,7 +226,7 @@
 					"source": "omegaUp classics",
 					"show_diff": "examples",
 					"allow_user_add_tags": "true",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
 					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
@@ -252,7 +252,7 @@
 					"source": "omegaUp classics",
 					"show_diff": "examples",
 					"allow_user_add_tags": "true",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
 					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
@@ -278,7 +278,7 @@
 					"source": "omegaUp classics",
 					"show_diff": "examples",
 					"allow_user_add_tags": "true",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
 					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
@@ -304,7 +304,7 @@
 					"source": "omegaUp classics",
 					"show_diff": "examples",
 					"allow_user_add_tags": "true",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
 					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
@@ -330,7 +330,7 @@
 					"penalty": 0,
 					"feedback": "detailed",
 					"penalty_type": "contest_start",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"penalty_calc_policy": "sum",
 					"admission_mode": "private",
 					"show_scoreboard_after": "true"
@@ -357,7 +357,7 @@
 				"params": {
 					"contest_alias": "prueba",
 					"admission_mode": "public",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua"
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js"
 				}
 			},
 			{
@@ -377,7 +377,7 @@
 					"penalty": 0,
 					"feedback": "detailed",
 					"penalty_type": "contest_start",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"penalty_calc_policy": "sum",
 					"admission_mode": "private",
 					"show_scoreboard_after": "true",
@@ -469,7 +469,7 @@
 				"params": {
 					"contest_alias": "pasado",
 					"admission_mode": "public",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua"
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js"
 				}
 			},
 			{
@@ -1652,7 +1652,7 @@
 				"params": {
 					"contest_alias": "pasado",
 					"finish_time": "$NOW$",
-					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua"
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js"
 				}
 			}
 		]
