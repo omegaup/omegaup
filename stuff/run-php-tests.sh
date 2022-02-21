@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -e
 
 # This script is the one which actually runs the PHPUnit test suite.
@@ -17,13 +19,13 @@ set -e
 OMEGAUP_ROOT=$(/usr/bin/git rev-parse --show-toplevel)
 
 if [[ -z "$@" ]]; then
-        ARGS="${OMEGAUP_ROOT}/frontend/tests/";
+        ARGS=("${OMEGAUP_ROOT}/frontend/tests/")
 else
-        ARGS="$@";
+        ARGS="$@"
 fi
 
 "${OMEGAUP_ROOT}/vendor/bin/phpunit" \
 	--bootstrap "${OMEGAUP_ROOT}/frontend/tests/bootstrap.php" \
 	--configuration="${OMEGAUP_ROOT}/frontend/tests/phpunit.xml" \
 	--coverage-clover="${OMEGAUP_ROOT}/coverage.xml" \
-	${ARGS}
+	"${ARGS[@]}"
