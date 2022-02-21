@@ -12,7 +12,7 @@ if [[ -d "${OMEGAUP_ROOT}/frontend/tests/runfiles/" ]]; then
 	find "${OMEGAUP_ROOT}/frontend/tests/runfiles/" -mindepth 2 -name mysql_types.log -exec rm -f {} \;
 fi
 
-$(dirname $0)/run-php-tests.sh
+"${OMEGAUP_ROOT}/stuff/run-php-tests.sh"
 
 sort --unique \
 	--output "${OMEGAUP_ROOT}/frontend/tests/runfiles/mysql_types.log" \
