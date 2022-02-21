@@ -12,11 +12,7 @@ if [[ -d "${OMEGAUP_ROOT}/frontend/tests/runfiles/" ]]; then
 	find "${OMEGAUP_ROOT}/frontend/tests/runfiles/" -mindepth 2 -name mysql_types.log -exec rm -f {} \;
 fi
 
-"${OMEGAUP_ROOT}/vendor/bin/phpunit" \
-	--bootstrap "${OMEGAUP_ROOT}/frontend/tests/bootstrap.php" \
-	--configuration="${OMEGAUP_ROOT}/frontend/tests/phpunit.xml" \
-	--coverage-clover="${OMEGAUP_ROOT}/coverage.xml" \
-	"${OMEGAUP_ROOT}/frontend/tests/"
+$(dirname $0)/run-php-tests.sh
 
 sort --unique \
 	--output "${OMEGAUP_ROOT}/frontend/tests/runfiles/mysql_types.log" \
