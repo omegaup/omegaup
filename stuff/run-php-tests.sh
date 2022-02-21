@@ -24,7 +24,7 @@ else
         ARGS="$@"
 fi
 
-"${OMEGAUP_ROOT}/vendor/bin/phpunit" \
+exec "${OMEGAUP_ROOT}/vendor/bin/phpunit" \
 	--bootstrap "${OMEGAUP_ROOT}/frontend/tests/bootstrap.php" \
 	--configuration="${OMEGAUP_ROOT}/frontend/tests/phpunit.xml" \
 	--coverage-clover="${OMEGAUP_ROOT}/coverage.xml" \
