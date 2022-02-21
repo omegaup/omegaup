@@ -115,17 +115,20 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
                          default='omegaup')
 
 
-def connect(args: argparse.Namespace) -> Connection:
+def connect(
+        host: str,
+        user: str,
+        password: str,
+        database: str,
+        mysql_config_file: Optional[str] = default_config_file_path()
+) -> Connection:
     '''Connects to MySQL with the arguments provided.
 
     Returns a MySQL connection.
     '''
-    host = args.host
-    user = args.user
-    password = args.password
-    if user is None and os.path.isfile(args.mysql_config_file):
+    if user is None and os.path.isfile(mysql_config_file):
         config = configparser.ConfigParser()
-        config.read(args.mysql_config_file)
+        config.read(mysql_config_file)
         # Puppet quotes some configuration entries.
         host = config['client']['host'].strip("'")
         user = config['client']['user'].strip("'")
@@ -142,7 +145,7 @@ def connect(args: argparse.Namespace) -> Connection:
             host=host,
             user=user,
             password=password,
-            database=args.database,
+            database=database,
         ))
 
 

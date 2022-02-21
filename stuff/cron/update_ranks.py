@@ -8,6 +8,7 @@ import logging
 import os
 import sys
 from typing import Sequence, NamedTuple
+import stuff.pipelines.credentials
 
 import mysql.connector
 import mysql.connector.cursor
@@ -802,7 +803,12 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = lib.db.connect(args)
+    dbconn = lib.db.connect(
+        host=stuff.pipelines.credentials.MYSQL_HOST,
+        user=stuff.pipelines.credentials.MYSQL_USERNAME,
+        password=stuff.pipelines.credentials.MYSQL_PASSWORD,
+        database=stuff.pipelines.credentials.MYSQL_DATABASE
+    )
     try:
         with dbconn.cursor(buffered=True, dictionary=True) as cur:
             update_problem_accepted_stats(cur)

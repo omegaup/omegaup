@@ -8,6 +8,7 @@ import logging
 from typing import List, Optional
 import omegaup.api
 import mysql.connector
+from mysql.connector import errors
 import mysql.connector.cursor
 from mysql.connector import errorcode
 import pika
@@ -91,7 +92,7 @@ class ContestsCallback:
                                         ) for certificate in certificates])
                     self.dbconn.commit()
                     break
-                except mysql.connector.Error as err:
+                except errors.IntegrityError as err:
                     self.dbconn.rollback()
                     if err.errno != errorcode.ER_DUP_ENTRY:
                         raise

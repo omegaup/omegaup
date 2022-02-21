@@ -4,13 +4,11 @@
 
 import os
 
-import argparse
-import logging
 import sys
 from pytest_mock import MockerFixture
 import rabbitmq_connection
 import contests_callback
-import client_contest
+import rabbitmq_client
 import verification_code
 import mysql.connector
 import mysql.connector.cursor
@@ -30,6 +28,7 @@ import lib.logs  # pylint: disable=wrong-import-position
 class ContestsCallbackForTesting:
     '''Contests callback'''
     def __init__(self,
+                 *,
                  dbconn: mysql.connector.MySQLConnection,
                  api_token: str,
                  url: str):
@@ -53,33 +52,25 @@ class ContestsCallbackForTesting:
 
 def test_client_contest() -> None:
     '''Basic test for client contest queue.'''
-    parser = argparse.ArgumentParser(description=__doc__)
-    lib.db.configure_parser(parser)
-    lib.logs.configure_parser(parser)
-    rabbitmq_connection.configure_parser(parser)
-
-    parser.add_argument('--api-token', default=test_constants.API_TOKEN)
-    parser.add_argument('--url', default=test_constants.OMEGAUP_API_ENDPOINT)
-
-    args = parser.parse_args()
-    lib.logs.init(parser.prog, args)
-    logging.info('Started')
-    dbconn = lib.db.connect(args)
+    dbconn = lib.db.connect(host=credentials.MYSQL_HOST,
+                            user=credentials.MYSQL_USERNAME,
+                            password=credentials.MYSQL_PASSWORD,
+                            database=credentials.MYSQL_DATABASE)
 
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
-        rabbitmq_connection.connect(
-            username=credentials.OMEGAUP_USERNAME,
-            password=credentials.OMEGAUP_PASSWORD,
-            host=credentials.RABBITMQ_HOST
-        ) as channel:
+        rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
+                                    password=credentials.OMEGAUP_PASSWORD,
+                                    host=credentials.RABBITMQ_HOST) as channel:
         send_messages_contest_queue.send_contest(
             cur,
             channel,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT)
-        callback = ContestsCallbackForTesting(dbconn.conn,
-                                              args.api_token,
-                                              args.url)
+        callback = ContestsCallbackForTesting(
+            dbconn=dbconn.conn,
+            api_token=test_constants.API_TOKEN,
+            url=test_constants.OMEGAUP_API_ENDPOINT
+        )
         cur.execute('TRUNCATE TABLE `Certificates`;')
         dbconn.conn.commit()
 
@@ -87,10 +78,10 @@ def test_client_contest() -> None:
         count = cur.fetchone()
         assert count['count'] == 0
 
-        client_contest.process_queue(
+        rabbitmq_client.receive_messages(
             channel=channel,
-            exchange_name='certificates',
-            queue_name='contest',
+            exchange='certificates',
+            queue='contest',
             routing_key='ContestQueue',
             callback=callback)
         cur.execute('SELECT COUNT(*) AS count FROM `Certificates`;')
@@ -103,45 +94,36 @@ def test_client_contest_with_mocked_codes(mocker: MockerFixture) -> None:
     mocker.patch('contests_callback.generate_code',
                  side_effect=iter(['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F',
                                    'XMCF384X8M']))
-    parser = argparse.ArgumentParser(description=__doc__)
-    lib.db.configure_parser(parser)
-    lib.logs.configure_parser(parser)
-    rabbitmq_connection.configure_parser(parser)
-
-    parser.add_argument('--api-token', default=test_constants.API_TOKEN)
-    parser.add_argument('--url', default=test_constants.OMEGAUP_API_ENDPOINT)
-
-    args = parser.parse_args()
-    lib.logs.init(parser.prog, args)
-    logging.info('Started')
-    dbconn = lib.db.connect(args)
+    dbconn = lib.db.connect(host=credentials.MYSQL_HOST,
+                            user=credentials.MYSQL_USERNAME,
+                            password=credentials.MYSQL_PASSWORD,
+                            database=credentials.MYSQL_DATABASE)
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
-        rabbitmq_connection.connect(
-            username=credentials.OMEGAUP_USERNAME,
-            password=credentials.OMEGAUP_PASSWORD,
-            host=credentials.RABBITMQ_HOST
-        ) as channel:
+        rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
+                                    password=credentials.OMEGAUP_PASSWORD,
+                                    host=credentials.RABBITMQ_HOST) as channel:
         send_messages_contest_queue.send_contest(
             cur,
             channel,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT)
-        callback = ContestsCallbackForTesting(dbconn.conn,
-                                              args.api_token,
-                                              args.url)
+        callback = ContestsCallbackForTesting(
+            dbconn=dbconn.conn,
+            api_token=test_constants.API_TOKEN,
+            url=test_constants.OMEGAUP_API_ENDPOINT
+        )
         cur.execute('TRUNCATE TABLE `Certificates`;')
         dbconn.conn.commit()
 
         cur.execute('SELECT COUNT(*) AS count FROM `Certificates`;')
         count = cur.fetchone()
         assert count['count'] == 0
-        client_contest.process_queue(
+        rabbitmq_client.receive_messages(
             channel=channel,
-            exchange_name='certificates',
-            queue_name='contest',
+            exchange='certificates',
+            queue='contest',
             routing_key='ContestQueue',
             callback=callback)
-
         spy = mocker.spy(verification_code, 'generate_code')
         assert spy.call_count == 4
 
@@ -154,44 +136,35 @@ def test_client_contest_with_duplicated_codes(mocker: MockerFixture) -> None:
                                    'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
                                    'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
                                    'XMCF384X8X', 'XMCF384X8M']))
-    parser = argparse.ArgumentParser(description=__doc__)
-    lib.db.configure_parser(parser)
-    lib.logs.configure_parser(parser)
-    rabbitmq_connection.configure_parser(parser)
-
-    parser.add_argument('--api-token', default=test_constants.API_TOKEN)
-    parser.add_argument('--url', default=test_constants.OMEGAUP_API_ENDPOINT)
-
-    args = parser.parse_args()
-    lib.logs.init(parser.prog, args)
-    logging.info('Started')
-    dbconn = lib.db.connect(args)
+    dbconn = lib.db.connect(host=credentials.MYSQL_HOST,
+                            user=credentials.MYSQL_USERNAME,
+                            password=credentials.MYSQL_PASSWORD,
+                            database=credentials.MYSQL_DATABASE)
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
-        rabbitmq_connection.connect(
-            username=credentials.OMEGAUP_USERNAME,
-            password=credentials.OMEGAUP_PASSWORD,
-            host=credentials.RABBITMQ_HOST
-        ) as channel:
+        rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
+                                    password=credentials.OMEGAUP_PASSWORD,
+                                    host=credentials.RABBITMQ_HOST) as channel:
         send_messages_contest_queue.send_contest(
             cur,
             channel,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT)
-        callback = ContestsCallbackForTesting(dbconn.conn,
-                                              args.api_token,
-                                              args.url)
+        callback = ContestsCallbackForTesting(
+            dbconn=dbconn.conn,
+            api_token=test_constants.API_TOKEN,
+            url=test_constants.OMEGAUP_API_ENDPOINT
+        )
         cur.execute('TRUNCATE TABLE `Certificates`;')
         dbconn.conn.commit()
 
         cur.execute('SELECT COUNT(*) AS count FROM `Certificates`;')
         count = cur.fetchone()
         assert count['count'] == 0
-        client_contest.process_queue(
+        rabbitmq_client.receive_messages(
             channel=channel,
-            exchange_name='certificates',
-            queue_name='contest',
+            exchange='certificates',
+            queue='contest',
             routing_key='ContestQueue',
             callback=callback)
-
         spy = mocker.spy(verification_code, 'generate_code')
         assert spy.call_count > 4

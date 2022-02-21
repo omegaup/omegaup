@@ -91,15 +91,19 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = lib.db.connect(args)
+    dbconn = lib.db.connect(
+        host=credentials.MYSQL_HOST,
+        user=credentials.MYSQL_USERNAME,
+        password=credentials.MYSQL_PASSWORD,
+        database=credentials.MYSQL_DATABASE
+    )
 
     try:
         with dbconn.cursor(buffered=True, dictionary=True) as cur, \
-            rabbitmq_connection.connect(
-                    username=credentials.OMEGAUP_USERNAME,
-                    password=credentials.OMEGAUP_PASSWORD,
-                    host=credentials.RABBITMQ_HOST
-            ) as channel:
+            rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
+                                        password=credentials.OMEGAUP_PASSWORD,
+                                        host=credentials.RABBITMQ_HOST
+                                        ) as channel:
             send_contest(cur, channel,
                          args.date_lower_limit,
                          args.date_upper_limit)
