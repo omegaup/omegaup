@@ -10,10 +10,12 @@
             <div>
               <span v-if="loggedIn">
                 <h5 card-title mb-0>
-                  <a :href="`/course/${course.alias}/`">{{course.name}}</a>
+                  <a :href="`/course/${course.alias}/`">{{ course.name }}</a>
                 </h5>
               </span>
-              <span v-else><h5 class="card-title mb-0">{{ course.name }}</h5></span>
+              <span v-else
+                ><h5 class="card-title mb-0">{{ course.name }}</h5></span
+              >
               <p class="card-text">
                 <small>{{ course.school_name }}</small>
               </p>
@@ -35,7 +37,8 @@
                 <a
                   class="btn btn-primary text-white"
                   role="button"
-                  :href="`/course/${course.alias}/`">
+                  :href="`/course/${course.alias}/`"
+                >
                   {{
                     course.alreadyStarted
                       ? T.courseCardCourseResume
