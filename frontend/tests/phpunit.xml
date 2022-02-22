@@ -20,4 +20,8 @@
       <directory>./badges/</directory>
     </testsuite>
   </testsuites>
+  <listeners>
+    <listener class="\OmegaUp\Test\GitServerTestSuiteListener" file="GitServerTestSuiteListener.php">
+    </listener>
+  </listeners>
 </phpunit>
