@@ -2316,7 +2316,7 @@ export namespace types {
     problemset_id: number;
     runs: types.Run[];
     start_time: Date;
-    totalRuns: number;
+    totalRuns?: number;
   }
 
   export interface ArenaContest {
