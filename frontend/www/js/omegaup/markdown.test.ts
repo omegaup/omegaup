@@ -77,7 +77,7 @@ describe('markdown', () => {
            <iframe src="https://www.youtube.com/embed/enMumwvLAug?start=20&end=65" frameborder="0" allowfullscreen="true"> </iframe>
          </figure>`),
       ).toEqual(`<p><figure class="video_container">
-           <iframe src="https://www.youtube.com/embed/enMumwvLAug?start=20&end=65" frameborder="0" allowfullscreen="true"> </iframe>
+           <iframe src="https://www.youtube.com/embed/enMumwvLAug?start=20&amp;end=65" frameborder="0" allowfullscreen="true"> </iframe>
          </figure></p>`);
     });
 
