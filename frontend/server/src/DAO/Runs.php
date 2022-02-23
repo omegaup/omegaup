@@ -138,15 +138,15 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         }
 
         if (!is_null($status)) {
-            $where[] = 'r.status = ?';
+            $where[] = 's.status = ?';
             $val[] = $status;
         }
         if (!is_null($verdict)) {
             if ($verdict === 'NO-AC') {
-                $where[] = 'r.verdict <> ?';
+                $where[] = 's.verdict <> ?';
                 $val[] = 'AC';
             } else {
-                $where[] = 'r.verdict = ?';
+                $where[] = 's.verdict = ?';
                 $val[] = $verdict;
             }
         }
@@ -156,10 +156,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 COUNT(*) AS total
             FROM
                 Submissions s
-            INNER JOIN
-                Runs r
-            ON
-                r.submission_id = s.submission_id
         ';
         if (!empty($where)) {
             $sqlCount .= 'WHERE ' . implode(' AND ', $where) . ' ';
