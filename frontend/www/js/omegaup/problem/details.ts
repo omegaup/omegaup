@@ -105,6 +105,7 @@ OmegaUp.on('ready', async () => {
           shouldShowTabs: true,
           searchResultUsers: this.searchResultUsers,
           problemAlias: payload.problem.alias,
+          totalRuns: runsStore.state.totalRuns,
         },
         on: {
           'show-run': (request: SubmissionRequest) => {
@@ -438,7 +439,7 @@ OmegaUp.on('ready', async () => {
       .then(time.remoteTimeAdapter)
       .then((response) => {
         if (!problemDetailsView.nominationStatus) return;
-        onRefreshRuns({ runs: response.runs });
+        onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
         setNominationStatus({
           runs: response.runs,
           nominationStatus: problemDetailsView.nominationStatus,
@@ -448,6 +449,7 @@ OmegaUp.on('ready', async () => {
   }
 
   if (runs) {
+    runsStore.commit('setTotalRuns', payload.totalRuns);
     for (const run of runs) {
       trackRun({ run });
     }
