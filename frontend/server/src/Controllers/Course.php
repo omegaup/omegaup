@@ -54,7 +54,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>}
  * @psalm-type IntroDetailsPayload=array{course: CourseDetails, isFirstTimeAccess: bool, needsBasicInformation: bool, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
  * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
- * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, problemset_id: int, runs: list<Run>, start_time: \OmegaUp\Timestamp}
+ * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, problemset_id: int, runs: list<Run>, start_time: \OmegaUp\Timestamp, totalRuns: int}
  * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard: Scoreboard, courseDetails: CourseDetails, currentAssignment: ArenaAssignment, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type AssignmentDetails=array{admin: bool, alias: string, assignmentType: string, courseAssignments: list<CourseAssignment>, description: string, director: string, finishTime: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemsetId: int, startTime: \OmegaUp\Timestamp}
  * @psalm-type CourseScoreboardPayload=array{assignment: AssignmentDetails, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardToken:null|string}
@@ -84,6 +84,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ArenaCourseAssignment=array{alias: string, name: string, description: string, problemset_id: int}
  * @psalm-type ArenaCourseProblem=array{alias: string, letter: string, title: string}
  * @psalm-type ArenaCoursePayload=array{course: ArenaCourseDetails, assignment: ArenaCourseAssignment, clarifications: list<Clarification>, problems: list<ArenaCourseProblem>, currentProblem: null|ProblemDetails, runs: list<Run>, scoreboard: null|Scoreboard}
+ * @psalm-type ListItem=array{key: string, value: string}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -2550,6 +2551,56 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Search users in course assignment
+     *
+     * @return array{results: list<ListItem>}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param null|string $query
+     */
+    public static function apiSearchUsers(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $assignmentAlias = $r->ensureString(
+            'assignment_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        [
+            'course' => $course,
+            'assignment' => $assignment
+        ] = self::validateAssignmentDetails(
+            $courseAlias,
+            $assignmentAlias,
+            $r->identity
+        );
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $users = \OmegaUp\DAO\ProblemsetIdentities::searchUsers(
+            $r->ensureString('query'),
+            intval($assignment->problemset_id)
+        );
+        $response = [];
+        foreach ($users as $user) {
+            $response[] = [
+                'key' => $user['username'],
+                'value' => $user['name'] ?? $user['username'],
+            ];
+        }
+        return [
+            'results' => $response,
+        ];
+    }
+
+    /**
      * Returns all course administrators
      *
      * @return array{admins: list<array{role: string, username: string}>, group_admins: list<array{alias: string, name: string, role: string}>}
@@ -4130,9 +4181,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         $scoreboard = new \OmegaUp\Scoreboard($params);
 
         $runs = [];
+        $totalRuns = 0;
         if ($isAdmin) {
             [
                 'runs' => $runs,
+                'totalRuns' => $totalRuns,
             ] = self::getAllRuns($assignment->problemset_id);
         }
 
@@ -4169,6 +4222,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'problems' => $problemsResponseArray,
                         'problemset_id' => intval($assignment->problemset_id),
                         'runs' => $runs,
+                        'totalRuns' => $totalRuns,
                     ],
                     'scoreboard' => $scoreboard->generate(
                         withRunDetails: false,
@@ -5168,7 +5222,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns all runs for a course
      *
-     * @return array{runs: list<Run>}
+     * @return array{runs: list<Run>, totalRuns: int}
      *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
@@ -5220,9 +5274,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $languages = array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES);
         // Get our runs
-        [
-            'runs' => $runs,
-        ] = self::getAllRuns(
+        return self::getAllRuns(
             $assignment->problemset_id,
             $r->ensureOptionalEnum('status', \OmegaUp\Controllers\Run::STATUS),
             $r->ensureOptionalEnum(
@@ -5235,10 +5287,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             max($r->ensureOptionalInt('offset') ?? 0, 0),
             $r->ensureOptionalInt('rowcount') ?? 100
         );
-
-        return [
-            'runs' => $runs,
-        ];
     }
 
     /**
