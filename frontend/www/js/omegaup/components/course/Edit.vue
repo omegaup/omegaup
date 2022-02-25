@@ -131,6 +131,10 @@
           :tagged-problems="data.taggedProblems"
           :invalid-parameter-name="invalidParameterName"
           :assignment-form-mode.sync="assignmentFormMode"
+          :search-result-problems="searchResultProblems"
+          @update-search-result-problems="
+            (query) => $emit('update-search-result-problems', query)
+          "
           @add-problem="
             (assignment, problem) => $emit('add-problem', assignment, problem)
           "
@@ -351,6 +355,7 @@ export default class CourseEdit extends Vue {
   @Prop() invalidParameterName!: string;
   @Prop() initialTab!: string;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
   showTab = this.initialTab;

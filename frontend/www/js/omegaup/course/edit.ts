@@ -32,6 +32,7 @@ OmegaUp.on('ready', () => {
       invalidParameterName: '',
       token: '',
       searchResultUsers: [] as types.ListItem[],
+      searchResultProblems: [] as types.ListItem[],
     }),
     methods: {
       refreshCourseAdminDetails: (): void => {
@@ -103,8 +104,30 @@ OmegaUp.on('ready', () => {
           invalidParameterName: this.invalidParameterName,
           token: this.token,
           searchResultUsers: this.searchResultUsers,
+          searchResultProblems: this.searchResultProblems,
         },
         on: {
+          'update-search-result-problems': (query: string) => {
+            api.Problem.list({
+              query,
+            })
+              .then((data) => {
+                // Problems previously added into the assignment should not be
+                // shown in the dropdown
+                const addedProblems = new Set(
+                  component.assignmentProblems.map((problem) => problem.alias),
+                );
+                this.searchResultProblems = data.results
+                  .filter((problem) => !addedProblems.has(problem.alias))
+                  .map((problem) => ({
+                    key: problem.alias,
+                    value: `${ui.escape(problem.title)} (<strong>${ui.escape(
+                      problem.alias,
+                    )}</strong>)`,
+                  }));
+              })
+              .catch(ui.apiError);
+          },
           'submit-edit-course': (source: course_Form) => {
             new Promise<number | null>((accept) => {
               if (source.school_id !== undefined) {
