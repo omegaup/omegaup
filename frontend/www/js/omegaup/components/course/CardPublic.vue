@@ -8,7 +8,12 @@
             class="card-body d-flex flex-column h-100 justify-content-between"
           >
             <div>
-              <h5 class="card-title mb-0">{{ course.name }}</h5>
+              <h5 class="card-title mb-0">
+                <a v-if="loggedIn" :href="`/course/${course.alias}/`">{{
+                  course.name
+                }}</a>
+                <template v-else>{{ course.name }}</template>
+              </h5>
               <p class="card-text">
                 <small>{{ course.school_name }}</small>
               </p>
