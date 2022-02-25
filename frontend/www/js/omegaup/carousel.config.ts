@@ -91,6 +91,30 @@ const carouselConfig: {
       href: 'https://omegaup.com/course/ResolviendoProblemas2022/',
     },
   },
+  {
+    image: '/media/homepage/discord_logo.svg',
+    title: {
+      en: 'Join our coders community',
+      es: 'Unete a nuestra comunidad de coders',
+      pt: 'Junte-se à nossa comunidade de coders',
+    },
+    description: {
+      en:
+        'Join our coders community and help us solve problems. Join our Discord server and get help from other coders.',
+      es:
+        'Únete a nuestra comunidad de coders y ayúdanos a resolver problemas. Únete al servidor de Discord y obtenga ayuda de otros coders.',
+      pt:
+        'Junte-se à nossa comunidade de coders e ajude-nos a resolver problemas. Junte-se ao servidor do Discord e obtenha ajuda de outros coders.',
+    },
+    button: {
+      text: {
+        en: 'Join here',
+        es: 'Únete aquí',
+        pt: 'Junte-se aqui',
+      },
+      href: 'https://discord.com/invite/K3JFd9d3wk',
+    },
+  },
 ];
 
 export default carouselConfig;
