@@ -17,6 +17,7 @@ describe('Course.vue', () => {
     start_time: new Date(),
     problems: [],
     runs: [],
+    totalRuns: 0,
   };
 
   const course: types.CourseDetails = {
