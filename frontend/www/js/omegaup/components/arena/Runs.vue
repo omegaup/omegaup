@@ -26,10 +26,12 @@
               >
                 &lt;
               </button>
-              {{ filterOffset + 1 }}
+              {{ currentPage }}
               <button
                 data-button-page-next
-                :disabled="runs && runs.length < rowCount"
+                :disabled="
+                  totalRuns && Math.ceil(totalRuns / rowCount) == currentPage
+                "
                 @click="filterOffset++"
               >
                 &gt;
@@ -429,6 +431,7 @@ export default class Runs extends Vue {
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: false }) showAllRuns!: boolean;
+  @Prop() totalRuns!: number;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
@@ -445,6 +448,10 @@ export default class Runs extends Vue {
   filters: { name: string; value: string }[] = [];
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
+
+  get currentPage(): number {
+    return this.filterOffset + 1;
+  }
 
   get filteredRuns(): types.Run[] {
     if (

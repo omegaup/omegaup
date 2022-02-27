@@ -250,7 +250,14 @@ export function onSetNominationStatus({
   }
 }
 
-export function onRefreshRuns({ runs }: { runs: types.Run[] }): void {
+export function onRefreshRuns({
+  runs,
+  totalRuns,
+}: {
+  runs: types.Run[];
+  totalRuns: number;
+}): void {
+  runsStore.commit('setTotalRuns', totalRuns);
   runsStore.commit('clear');
   for (const run of runs) {
     trackRun({ run });
