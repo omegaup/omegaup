@@ -53,18 +53,18 @@ class GitServerTestSuiteListener implements \PHPUnit\Framework\TestListener {
 
     private int $openSuiteCount = 0;
     public function startTestSuite(\PHPUnit\Framework\TestSuite $suite): void {
+        $this->openSuiteCount += 1;
         /**
          * @psalm-suppress UndefinedConstant OMEGAUP_TEST_SHARD is only
          * defined in the test bootstrap.php file
          */
-        $this->openSuiteCount += 1;
         if ($this->openSuiteCount == 1) {
             $scriptFilename = __DIR__ . '/controllers/gitserver-start.sh ' .
             OMEGAUP_GITSERVER_PORT . ' ' . OMEGAUP_TEST_ROOT .
             ' /tmp/omegaup/problems-' . OMEGAUP_TEST_SHARD . '.git';
             exec($scriptFilename, $output, $returnVar);
             if ($returnVar != 0) {
-                throw new \Throwable(
+                throw new \Exception(
                     "{$scriptFilename} failed with {$returnVar}:\n" .
                     implode("\n", $output)
                 );
@@ -78,7 +78,7 @@ class GitServerTestSuiteListener implements \PHPUnit\Framework\TestListener {
             $scriptFilename = __DIR__ . '/controllers/gitserver-stop.sh ' . OMEGAUP_TEST_ROOT;
             exec($scriptFilename, $output, $returnVar);
             if ($returnVar != 0) {
-                throw new \Throwable(
+                throw new \Exception(
                     "{$scriptFilename} failed with {$returnVar}:\n" .
                     implode("\n", $output)
                 );
