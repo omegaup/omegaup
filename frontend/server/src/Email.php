@@ -38,7 +38,7 @@ class Email {
 
         $mail = new \PHPMailer\PHPMailer\PHPMailer();
         $mail->IsSMTP();
-        $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+        $mail->SMTPDebug = \PHPMailer\PHPMailer\SMTP::DEBUG_SERVER;
         $mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
         $mail->CharSet = 'utf-8';
         $mail->SMTPAuth = true;
