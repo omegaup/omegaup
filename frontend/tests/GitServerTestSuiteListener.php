@@ -2,6 +2,11 @@
 
 namespace OmegaUp\Test;
 
+/**
+ * @psalm-suppress DeprecatedInterface The replacement is TestHooks which are
+ * themselves also deprecated. Keep using this while the Events framework is
+ * ready.
+ */
 class GitServerTestSuiteListener implements \PHPUnit\Framework\TestListener {
     public function addWarning(
         \PHPUnit\Framework\Test $test,
