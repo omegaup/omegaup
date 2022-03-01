@@ -4,6 +4,8 @@
 
 import os
 
+import argparse
+import logging
 import sys
 from pytest_mock import MockerFixture
 import rabbitmq_connection
@@ -52,10 +54,18 @@ class ContestsCallbackForTesting:
 
 def test_client_contest() -> None:
     '''Basic test for client contest queue.'''
-    dbconn = lib.db.connect(host=credentials.MYSQL_HOST,
-                            user=credentials.MYSQL_USERNAME,
-                            password=credentials.MYSQL_PASSWORD,
-                            database=credentials.MYSQL_DATABASE)
+    parser = argparse.ArgumentParser(description=__doc__)
+    lib.db.configure_parser(parser)
+    lib.logs.configure_parser(parser)
+    rabbitmq_connection.configure_parser(parser)
+
+    parser.add_argument('--api-token', default=test_constants.API_TOKEN)
+    parser.add_argument('--url', default=test_constants.OMEGAUP_API_ENDPOINT)
+
+    args = parser.parse_args()
+    lib.logs.init(parser.prog, args)
+    logging.info('Started')
+    dbconn = lib.db.connect(args)
 
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
         rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
@@ -94,10 +104,18 @@ def test_client_contest_with_mocked_codes(mocker: MockerFixture) -> None:
     mocker.patch('contests_callback.generate_code',
                  side_effect=iter(['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F',
                                    'XMCF384X8M']))
-    dbconn = lib.db.connect(host=credentials.MYSQL_HOST,
-                            user=credentials.MYSQL_USERNAME,
-                            password=credentials.MYSQL_PASSWORD,
-                            database=credentials.MYSQL_DATABASE)
+    parser = argparse.ArgumentParser(description=__doc__)
+    lib.db.configure_parser(parser)
+    lib.logs.configure_parser(parser)
+    rabbitmq_connection.configure_parser(parser)
+
+    parser.add_argument('--api-token', default=test_constants.API_TOKEN)
+    parser.add_argument('--url', default=test_constants.OMEGAUP_API_ENDPOINT)
+
+    args = parser.parse_args()
+    lib.logs.init(parser.prog, args)
+    logging.info('Started')
+    dbconn = lib.db.connect(args)
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
         rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
                                     password=credentials.OMEGAUP_PASSWORD,
@@ -136,10 +154,18 @@ def test_client_contest_with_duplicated_codes(mocker: MockerFixture) -> None:
                                    'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
                                    'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
                                    'XMCF384X8X', 'XMCF384X8M']))
-    dbconn = lib.db.connect(host=credentials.MYSQL_HOST,
-                            user=credentials.MYSQL_USERNAME,
-                            password=credentials.MYSQL_PASSWORD,
-                            database=credentials.MYSQL_DATABASE)
+    parser = argparse.ArgumentParser(description=__doc__)
+    lib.db.configure_parser(parser)
+    lib.logs.configure_parser(parser)
+    rabbitmq_connection.configure_parser(parser)
+
+    parser.add_argument('--api-token', default=test_constants.API_TOKEN)
+    parser.add_argument('--url', default=test_constants.OMEGAUP_API_ENDPOINT)
+
+    args = parser.parse_args()
+    lib.logs.init(parser.prog, args)
+    logging.info('Started')
+    dbconn = lib.db.connect(args)
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
         rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
                                     password=credentials.OMEGAUP_PASSWORD,

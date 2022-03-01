@@ -9,7 +9,6 @@ import sys
 import contests_callback
 import rabbitmq_connection
 import rabbitmq_client
-import credentials
 
 sys.path.insert(
     0,
@@ -35,12 +34,7 @@ def main() -> None:
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
     logging.info('Started')
-    dbconn = lib.db.connect(
-        host=credentials.MYSQL_HOST,
-        user=credentials.MYSQL_USERNAME,
-        password=credentials.MYSQL_PASSWORD,
-        database=credentials.MYSQL_DATABASE
-    )
+    dbconn = lib.db.connect(args)
     try:
         with rabbitmq_connection.connect(
                 username=args.rabbitmq_username,

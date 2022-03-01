@@ -18,7 +18,6 @@ import sqlite3
 import sys
 from typing import (DefaultDict, Dict, List, Mapping, Optional, Sequence, Set,
                     Tuple)
-import stuff.pipelines.credentials
 
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
@@ -77,12 +76,7 @@ def load_mysql(args: argparse.Namespace) -> pd.DataFrame:
     Ignoring problem sets helps remove bias in recommendations
     introduced by problem ordering in contests and tests.
     '''
-    dbconn = lib.db.connect(
-        host=stuff.pipelines.credentials.MYSQL_HOST,
-        user=stuff.pipelines.credentials.MYSQL_USERNAME,
-        password=stuff.pipelines.credentials.MYSQL_PASSWORD,
-        database=stuff.pipelines.credentials.MYSQL_DATABASE
-    )
+    dbconn = lib.db.connect(args)
     try:
         logging.info('Reading runs from MySQL')
         runs: pd.DataFrame = pd.read_sql_query(

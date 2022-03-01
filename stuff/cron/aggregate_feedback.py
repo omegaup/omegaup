@@ -17,7 +17,6 @@ import os
 import sys
 from typing import (DefaultDict, Dict, Mapping, NamedTuple, Optional, Sequence,
                     Tuple, Set)
-import stuff.pipelines.credentials
 
 from mysql.connector import errorcode
 
@@ -576,12 +575,7 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = lib.db.connect(
-        host=stuff.pipelines.credentials.MYSQL_HOST,
-        user=stuff.pipelines.credentials.MYSQL_USERNAME,
-        password=stuff.pipelines.credentials.MYSQL_PASSWORD,
-        database=stuff.pipelines.credentials.MYSQL_DATABASE
-    )
+    dbconn = lib.db.connect(args)
     try:
         try:
             aggregate_reviewers_feedback(dbconn)

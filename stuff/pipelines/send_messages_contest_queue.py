@@ -91,13 +91,7 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = lib.db.connect(
-        host=credentials.MYSQL_HOST,
-        user=credentials.MYSQL_USERNAME,
-        password=credentials.MYSQL_PASSWORD,
-        database=credentials.MYSQL_DATABASE
-    )
-
+    dbconn = lib.db.connect(args)
     try:
         with dbconn.cursor(buffered=True, dictionary=True) as cur, \
             rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
