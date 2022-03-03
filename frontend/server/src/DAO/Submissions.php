@@ -39,6 +39,18 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$guid]);
     }
 
+    final public static function requalify(string $guid): void {
+        $sql = '
+            UPDATE
+                Submissions s
+            SET
+                s.type = "normal"
+            WHERE
+                s.guid = ?;
+        ';
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$guid]);
+    }
+
     /**
      * Gets the count of total submissions sent to a given problem
      */

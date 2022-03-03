@@ -1591,6 +1591,10 @@ export const Run = {
   rejudge: apiCall<messages.RunRejudgeRequest, messages.RunRejudgeResponse>(
     '/api/run/rejudge/',
   ),
+  requalify: apiCall<
+    messages.RunRequalifyRequest,
+    messages.RunRequalifyResponse
+  >('/api/run/requalify/'),
   source: apiCall<messages.RunSourceRequest, messages.RunSourceResponse>(
     '/api/run/source/',
   ),

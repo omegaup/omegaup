@@ -5250,6 +5250,8 @@ export namespace messages {
   export type RunListResponse = { runs: types.Run[] };
   export type RunRejudgeRequest = { [key: string]: any };
   export type RunRejudgeResponse = {};
+  export type RunRequalifyRequest = { [key: string]: any };
+  export type RunRequalifyResponse = {};
   export type RunSourceRequest = { [key: string]: any };
   export type RunSourceResponse = {
     compile_error?: string;
@@ -6008,6 +6010,9 @@ export namespace controllers {
     rejudge: (
       params?: messages.RunRejudgeRequest,
     ) => Promise<messages.RunRejudgeResponse>;
+    requalify: (
+      params?: messages.RunRequalifyRequest,
+    ) => Promise<messages.RunRequalifyResponse>;
     source: (
       params?: messages.RunSourceRequest,
     ) => Promise<messages.RunSourceResponse>;

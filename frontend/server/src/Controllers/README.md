@@ -181,6 +181,7 @@
   - [`/api/run/disqualify/`](#apirundisqualify)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
+  - [`/api/run/requalify/`](#apirunrequalify)
   - [`/api/run/source/`](#apirunsource)
   - [`/api/run/status/`](#apirunstatus)
 - [School](#school)
@@ -3679,6 +3680,22 @@ Re-sends a problem to Grader.
 | ----------- | -------- | ----------- |
 | `run_alias` | `string` |             |
 | `debug`     | `mixed`  |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/run/requalify/`
+
+### Description
+
+Requalify a submission previously disqualified
+
+### Parameters
+
+| Name        | Type     | Description |
+| ----------- | -------- | ----------- |
+| `run_alias` | `string` |             |
 
 ### Returns
 

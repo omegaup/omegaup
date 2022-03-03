@@ -801,7 +801,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDisqualify(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         $runAlias = $r->ensureString(
             'run_alias',
@@ -823,6 +823,45 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         \OmegaUp\DAO\Submissions::disqualify(strval($submission->guid));
+
+        // Expire ranks
+        \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
+        return [
+            'status' => 'ok'
+        ];
+    }
+
+    /**
+     * Requalify a submission previously disqualified
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $run_alias
+     */
+    public static function apiRequalify(\OmegaUp\Request $r): array {
+        // Get the user who is calling this API
+        $r->ensureMainUserIdentity();
+
+        $runAlias = $r->ensureString(
+            'run_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        [
+            'submission' => $submission,
+        ] = self::validateDetailsRequest($runAlias);
+
+        if (
+            !\OmegaUp\Authorization::canEditSubmission(
+                $r->identity,
+                $submission
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
+        \OmegaUp\DAO\Submissions::requalify(strval($submission->guid));
 
         // Expire ranks
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
