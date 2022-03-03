@@ -956,6 +956,10 @@ export const Course = {
     })(x.runs);
     return x;
   }),
+  searchUsers: apiCall<
+    messages.CourseSearchUsersRequest,
+    messages.CourseSearchUsersResponse
+  >('/api/course/searchUsers/'),
   studentProgress: apiCall<
     messages.CourseStudentProgressRequest,
     messages._CourseStudentProgressServerResponse,

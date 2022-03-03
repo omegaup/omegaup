@@ -26,10 +26,12 @@
               >
                 &lt;
               </button>
-              {{ filterOffset + 1 }}
+              {{ currentPage }}
               <button
                 data-button-page-next
-                :disabled="runs && runs.length < rowCount"
+                :disabled="
+                  totalRuns && Math.ceil(totalRuns / rowCount) == currentPage
+                "
                 @click="filterOffset++"
               >
                 &gt;
@@ -82,20 +84,26 @@
                 class="form-control"
               >
                 <option value="">{{ T.wordsAll }}</option>
-                <option value="cpp17-gcc">C++17 (g++ 9.3)</option>
+                <option value="cpp20-gcc">C++20 (g++ 10.3)</option>
+                <option value="cpp20-clang">C++20 (clang++ 10.0)</option>
+                <option value="cpp17-gcc">C++17 (g++ 10.3)</option>
                 <option value="cpp17-clang">C++17 (clang++ 10.0)</option>
-                <option value="cpp11-gcc">C++11 (g++ 9.3)</option>
+                <option value="cpp11-gcc">C++11 (g++ 10.3)</option>
                 <option value="cpp11-clang">C++11 (clang++ 10.0)</option>
-                <option value="c11-gcc">C (gcc 9.3)</option>
+                <option value="c11-gcc">C (gcc 10.3)</option>
                 <option value="c11-clang">C (clang 10.0)</option>
-                <option value="cs">C# (8.0, dotnet 3.1)</option>
-                <option value="hs">Haskell (ghc 8.6)</option>
-                <option value="java">Java (openjdk 14.0)</option>
+                <option value="cs">C# (10, dotnet 6.0)</option>
+                <option value="hs">Haskell (ghc 8.8)</option>
+                <option value="java">Java (openjdk 16.0)</option>
+                <option value="kt">Kotlin (1.6.10)</option>
                 <option value="pas">Pascal (fpc 3.0)</option>
-                <option value="py3">Python 3.8</option>
-                <option value="py2">Python 2.7</option>
+                <option value="py3">Python (3.9)</option>
+                <option value="py2">Python (2.7)</option>
                 <option value="rb">Ruby (2.7)</option>
                 <option value="lua">Lua (5.3)</option>
+                <option value="go">Go (1.18.beta2)</option>
+                <option value="rs">Rust (1.56.1)</option>
+                <option value="lua">JavaScript (Node.js 16)</option>
                 <option value="kp">Karel (Pascal)</option>
                 <option value="kj">Karel (Java)</option>
                 <option value="cat">{{ T.wordsJustOutput }}</option>
@@ -423,6 +431,7 @@ export default class Runs extends Vue {
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: false }) showAllRuns!: boolean;
+  @Prop() totalRuns!: number;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
@@ -439,6 +448,10 @@ export default class Runs extends Vue {
   filters: { name: string; value: string }[] = [];
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
+
+  get currentPage(): number {
+    return this.filterOffset + 1;
+  }
 
   get filteredRuns(): types.Run[] {
     if (

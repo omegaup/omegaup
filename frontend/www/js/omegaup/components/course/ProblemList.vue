@@ -82,11 +82,14 @@
             <div class="row">
               <div class="form-group col-md-5">
                 <span class="faux-label">{{ problemCardFooterLabel }}</span>
-                <omegaup-autocomplete
-                  v-model="problemAlias"
-                  class="form-control"
-                  :init="(el) => typeahead.problemTypeahead(el)"
-                ></omegaup-autocomplete>
+                <omegaup-common-typeahead
+                  :existing-options="searchResultProblems"
+                  :value.sync="problemAlias"
+                  @update-existing-options="
+                    (query) => $emit('update-search-result-problems', query)
+                  "
+                >
+                </omegaup-common-typeahead>
                 <small class="form-text text-muted">
                   {{ addCardFooterDescLabel }}
                 </small>
@@ -163,7 +166,7 @@
                 data-add-problem
                 class="btn btn-primary mr-2"
                 type="submit"
-                :disabled="problemAlias.length == 0"
+                :disabled="!problemAlias"
                 @click.prevent="
                   onSaveProblem(assignment, {
                     alias: problemAlias,
@@ -197,8 +200,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 import problem_Versions from '../problem/Versions.vue';
 
 import {
@@ -212,7 +214,7 @@ library.add(fas);
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-problem-versions': problem_Versions,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
@@ -224,15 +226,15 @@ export default class CourseProblemList extends Vue {
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: types.CourseAssignment;
+  @Prop() searchResultProblems!: types.ListItem[];
 
-  typeahead = typeahead;
   T = T;
   assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
   problems: types.AddedProblem[] = this.assignmentProblems;
   difficulty = 'intro';
   topics: string[] = [];
   taggedProblemAlias = '';
-  problemAlias = '';
+  problemAlias: null | string = null;
   points = 100;
   showTopicsAndDifficulty = false;
   problemsOrderChanged = false;
@@ -303,7 +305,7 @@ export default class CourseProblemList extends Vue {
   }
 
   get addProblemButtonDisabled(): boolean {
-    if (this.useLatestVersion) return this.problemAlias === '';
+    if (this.useLatestVersion) return !!this.problemAlias;
     return !this.selectedRevision;
   }
 
@@ -428,7 +430,7 @@ export default class CourseProblemList extends Vue {
   }
 
   reset(): void {
-    this.problemAlias = '';
+    this.problemAlias = null;
     this.points = 100;
     this.useLatestVersion = true;
   }
