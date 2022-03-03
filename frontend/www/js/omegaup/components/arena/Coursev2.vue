@@ -95,15 +95,14 @@
         <omegaup-problem-details
           v-if="currentSelectedTab === null && currentProblem"
           :all-runs="allRuns"
-          :current-run-details="currentRunDetails"
           :in-contest-or-course="true"
           :languages="course.languages"
           :problem="currentProblem"
           :user="user"
           :user-runs="userRuns"
-          @show-run-details="
+          @fetch-run-details="
             (request) => {
-              $emit('show-run-details', request);
+              $emit('fetch-run-details', request);
             }
           "
           @submit-run="
@@ -152,16 +151,15 @@ export enum Tabs {
   },
 })
 export default class ArenaCourse extends Vue {
-  @Prop() allRuns!: types.Run[];
+  @Prop() allRuns!: types.RunWithDetails[];
   @Prop() assignment!: types.ArenaCourseAssignment;
   @Prop() course!: types.ArenaCourseDetails;
   @Prop() currentProblem!: types.ProblemDetails;
-  @Prop() currentRunDetails!: types.RunDetails | null;
   @Prop() problems!: types.ArenaCourseProblem[];
   @Prop() scoreboard!: types.Scoreboard;
   @Prop({ default: Tabs.Summary }) selectedTab!: string | null;
   @Prop() user!: types.UserInfoForProblem;
-  @Prop() userRuns!: types.Run[];
+  @Prop() userRuns!: types.RunWithDetails[];
 
   T = T;
   ui = ui;

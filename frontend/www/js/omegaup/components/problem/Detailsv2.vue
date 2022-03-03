@@ -87,10 +87,9 @@
           <omegaup-arena-runs-v2
             :problem-alias="problem.alias"
             :runs="userRuns"
-            :current-run-details="currentRunDetails"
-            @show-run-details="
+            @fetch-run-details="
               (request) =>
-                $emit('show-run-details', {
+                $emit('fetch-run-details', {
                   ...request,
                   isAdmin: user.admin,
                 })
@@ -170,12 +169,11 @@ export enum PopupDisplayed {
   },
 })
 export default class ProblemDetails extends Vue {
-  @Prop() allRuns!: types.Run[];
-  @Prop() currentRunDetails!: types.RunDetails | null;
+  @Prop() allRuns!: types.RunWithDetails[];
   @Prop({ default: null }) languages!: null | string[];
   @Prop() problem!: types.ProblemDetails;
   @Prop() user!: types.UserInfoForProblem;
-  @Prop() userRuns!: types.Run[];
+  @Prop() userRuns!: types.RunWithDetails[];
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 

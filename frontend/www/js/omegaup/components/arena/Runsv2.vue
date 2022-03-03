@@ -4,18 +4,23 @@
     <b-table :fields="tableFields" :items="filteredRuns" striped responsive>
       <template #cell(index)="row">
         <b-button
-          :disabled="!row.detailsShowing && showDetails"
+          v-if="row.item.details === null || !('details' in row.item)"
           variant="link"
           size="sm"
-          @click="toggleDetails(row)"
+          @click="$emit('fetch-run-details', { guid: row.item.guid })"
         >
+          <b-icon-download></b-icon-download>
+        </b-button>
+        <b-button v-else variant="link" size="sm" @click="row.toggleDetails">
           <b-icon-chevron-right v-if="!row.detailsShowing" />
           <b-icon-chevron-down v-else />
         </b-button>
       </template>
 
-      <template #row-details>
-        {{ currentRunDetails }}
+      <template #row-details="data">
+        <div v-if="data.item.details">
+          {{ data.item }}
+        </div>
       </template>
 
       <template #cell(guid)="data">
@@ -49,6 +54,7 @@ import {
   BootstrapVue,
   BIconChevronRight,
   BIconChevronDown,
+  BIconDownload,
   BIconQuestionCircleFill,
 } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -75,6 +81,7 @@ interface TableField {
 interface TableRunItem {
   guid: string;
   time: string;
+  details: types.RunDetailsV2 | null;
   language: string;
   verdict: string;
   runtime: string;
@@ -91,25 +98,16 @@ interface TableRunItem {
   components: {
     BIconChevronRight,
     BIconChevronDown,
+    BIconDownload,
     BIconQuestionCircleFill,
   },
 })
 export default class Runs extends Vue {
-  @Prop() currentRunDetails!: types.RunDetails | null;
   @Prop({ default: null }) problemAlias!: string | null;
-  @Prop() runs!: null | types.Run[];
+  @Prop() runs!: null | types.RunWithDetails[];
 
   T = T;
   time = time;
-  showDetails = false;
-
-  toggleDetails(row: { toggleDetails: () => void; item: TableRunItem }): void {
-    this.showDetails = !this.showDetails;
-    if (this.showDetails) {
-      this.$emit('show-run-details', { guid: row.item.guid });
-    }
-    row.toggleDetails();
-  }
 
   get filteredRuns(): TableRunItem[] {
     return this.sortedRuns.map((run) => {
@@ -123,6 +121,7 @@ export default class Runs extends Vue {
         verdict: run.verdict,
         status: run.status,
         type: run.type,
+        details: run.details || null,
         _cellVariants: {
           verdict: this.statusClass(run),
         },
@@ -133,7 +132,7 @@ export default class Runs extends Vue {
   get tableFields(): (string | TableField)[] {
     return [
       {
-        label: '',
+        label: T.wordsDetails,
         key: 'index',
         class: 'align-middle',
       },
@@ -188,7 +187,7 @@ export default class Runs extends Vue {
     ];
   }
 
-  get sortedRuns(): types.Run[] {
+  get sortedRuns(): types.RunWithDetails[] {
     if (!this.runs) {
       return [];
     }
@@ -197,7 +196,7 @@ export default class Runs extends Vue {
       .sort((a, b) => b.time.getTime() - a.time.getTime());
   }
 
-  memory(run: types.Run): string {
+  memory(run: types.RunWithDetails): string {
     if (
       run.status == 'ready' &&
       run.verdict != 'JE' &&
@@ -214,7 +213,7 @@ export default class Runs extends Vue {
     }
   }
 
-  percentage(run: types.Run): string {
+  percentage(run: types.RunWithDetails): string {
     if (
       run.status == 'ready' &&
       run.verdict != 'JE' &&
@@ -226,7 +225,7 @@ export default class Runs extends Vue {
     return '—';
   }
 
-  runtime(run: types.Run): string {
+  runtime(run: types.RunWithDetails): string {
     if (
       run.status == 'ready' &&
       run.verdict != 'JE' &&
@@ -242,7 +241,7 @@ export default class Runs extends Vue {
     return '—';
   }
 
-  statusClass(run: types.Run): string {
+  statusClass(run: types.RunWithDetails): string {
     if (run.status != 'ready') return '';
     if (run.type == 'disqualified') return 'danger';
     if (run.verdict == 'AC') {
@@ -257,13 +256,13 @@ export default class Runs extends Vue {
     return '';
   }
 
-  status(run: types.Run): string {
+  status(run: types.RunWithDetails): string {
     if (run.type == 'disqualified') return T.wordsDisqualified;
 
     return run.status == 'ready' ? run.verdict : run.status;
   }
 
-  statusHelp(run: types.Run): string {
+  statusHelp(run: types.RunWithDetails): string {
     if (run.status != 'ready' || run.verdict == 'AC') {
       return '';
     }

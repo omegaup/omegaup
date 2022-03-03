@@ -16,7 +16,7 @@ export interface RunFilters {
 
 export interface RunsState {
   // The list of runs.
-  runs: types.Run[];
+  runs: types.RunWithDetails[];
 
   // The mapping of run GUIDs to indices on the runs array.
   index: Record<string, number>;
@@ -34,7 +34,7 @@ export const runsStoreConfig = {
     totalRuns: 0,
   },
   mutations: {
-    addRun(state: RunsState, run: types.Run) {
+    addRun(state: RunsState, run: types.RunWithDetails) {
       if (Object.prototype.hasOwnProperty.call(state.index, run.guid)) {
         Vue.set(
           state.runs,
@@ -45,6 +45,26 @@ export const runsStoreConfig = {
       }
       Vue.set(state.index, run.guid, state.runs.length);
       state.runs.push(run);
+    },
+    addRunDetails(
+      state: RunsState,
+      {
+        runGUID,
+        runDetails,
+      }: {
+        runGUID: string;
+        runDetails: types.RunDetails;
+      },
+    ) {
+      if (Object.prototype.hasOwnProperty.call(state.index, runGUID)) {
+        const run = state.runs[state.index[runGUID]];
+        run.details = runDetails;
+        Vue.set(
+          state.runs,
+          state.index[run.guid],
+          Object.assign({}, state.runs[state.index[run.guid]], run),
+        );
+      }
     },
     setTotalRuns(state: RunsState, totalRuns: number) {
       Vue.set(state, 'totalRuns', totalRuns);
@@ -81,7 +101,7 @@ export const myRunsStore = new Vuex.Store<RunsState>({
     totalRuns: 0,
   },
   mutations: {
-    addRun(state, run: types.Run) {
+    addRun(state, run: types.RunWithDetails) {
       if (Object.prototype.hasOwnProperty.call(state.index, run.guid)) {
         Vue.set(
           state.runs,
@@ -92,6 +112,26 @@ export const myRunsStore = new Vuex.Store<RunsState>({
       }
       Vue.set(state.index, run.guid, state.runs.length);
       state.runs.push(run);
+    },
+    addRunDetails(
+      state: RunsState,
+      {
+        runGUID,
+        runDetails,
+      }: {
+        runGUID: string;
+        runDetails: types.RunDetails;
+      },
+    ) {
+      if (Object.prototype.hasOwnProperty.call(state.index, runGUID)) {
+        const run = state.runs[state.index[runGUID]];
+        run.details = runDetails;
+        Vue.set(
+          state.runs,
+          state.index[run.guid],
+          Object.assign({}, state.runs[state.index[run.guid]], run),
+        );
+      }
     },
     clear(state) {
       state.runs.splice(0);
