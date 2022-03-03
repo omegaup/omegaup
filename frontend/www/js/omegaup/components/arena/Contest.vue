@@ -130,6 +130,7 @@
         @details="(run) => onRunAdminDetails(run.guid)"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
+        @requalify="(run) => $emit('requalify', run)"
         @update-search-result-users-contest="
           (request) => $emit('update-search-result-users-contest', request)
         "

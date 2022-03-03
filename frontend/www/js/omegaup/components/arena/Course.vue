@@ -151,6 +151,7 @@
         @details="onRunAdminDetails"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
+        @requalify="(run) => $emit('requalify', run)"
       >
         <template #title><div></div></template>
         <template #runs><div></div></template>

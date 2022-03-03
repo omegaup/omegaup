@@ -171,7 +171,7 @@
             <th class="numeric">{{ T.wordsMemory }}</th>
             <th class="numeric">{{ T.wordsRuntime }}</th>
             <th v-if="showDetails && !showDisqualify && !showRejudge">
-              {{ T.wordsActions }}
+              {{ T.arenaRunsActions }}
             </th>
             <th v-else></th>
           </tr>
@@ -283,7 +283,7 @@
               </button>
             </td>
             <td v-else-if="showDetails || showDisqualify || showRejudge">
-              <div class="dropdown">
+              <div v-if="run.type !== 'disqualified'" class="dropdown">
                 <button
                   class="btn-secondary dropdown-toggle"
                   type="button"
@@ -291,7 +291,7 @@
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  {{ T.wordsActions }}
+                  {{ T.arenaRunsActions }}
                 </button>
                 <div class="dropdown-menu">
                   <button
@@ -300,7 +300,7 @@
                     class="btn-link dropdown-item"
                     @click="onRunDetails(run)"
                   >
-                    {{ T.wordsDetails }}
+                    {{ T.arenaRunsActionsDetails }}
                   </button>
                   <button
                     v-if="showRejudge"
@@ -308,7 +308,7 @@
                     class="btn-link dropdown-item"
                     @click="$emit('rejudge', run)"
                   >
-                    {{ T.wordsRejudge }}
+                    {{ T.arenaRunsActionsRejudge }}
                   </button>
                   <div class="dropdown-divider"></div>
                   <button
@@ -317,7 +317,27 @@
                     class="btn-link dropdown-item"
                     @click="$emit('disqualify', run)"
                   >
-                    {{ T.wordsDisqualify }}
+                    {{ T.arenaRunsActionsDisqualify }}
+                  </button>
+                </div>
+              </div>
+              <div v-else class="dropdown">
+                <button
+                  class="btn-secondary dropdown-toggle"
+                  type="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  {{ T.arenaRunsActions }}
+                </button>
+                <div class="dropdown-menu">
+                  <button
+                    data-actions-requalify
+                    class="btn-link dropdown-item"
+                    @click="$emit('requalify', run)"
+                  >
+                    {{ T.arenaRunsActionsRequalify }}
                   </button>
                 </div>
               </div>
@@ -612,7 +632,7 @@ export default class Runs extends Vue {
   }
 
   status(run: types.Run): string {
-    if (run.type == 'disqualified') return T.wordsDisqualified;
+    if (run.type == 'disqualified') return T.arenaRunsActionsDisqualified;
 
     return run.status == 'ready' ? run.verdict : run.status;
   }
