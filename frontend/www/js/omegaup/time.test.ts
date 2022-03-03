@@ -87,7 +87,7 @@ describe('time', () => {
         [{ milliseconds: 5259492000, expected: 'en 2 meses' }],
         [{ milliseconds: 7889238000, expected: 'en 3 meses' }],
         [{ milliseconds: 10518984000, expected: 'en 4 meses' }],
-        [{ milliseconds: 63113904000, expected: 'en alrededor de 2 años' }],
+        [{ milliseconds: 63113904000, expected: 'en casi 2 años' }],
         [{ milliseconds: 94670856000, expected: 'en casi 3 años' }],
       ];
       for (const [{ milliseconds, expected }] of millMapping) {
