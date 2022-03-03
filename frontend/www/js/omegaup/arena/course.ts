@@ -9,6 +9,7 @@ import Vue from 'vue';
 import arena_Course from '../components/arena/Course.vue';
 import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import {
+  onRefreshRuns,
   showSubmission,
   SubmissionRequest,
   submitRun,
@@ -26,7 +27,7 @@ import {
 import { EventsSocket } from './events_socket';
 import clarificationStore from './clarificationsStore';
 import socketStore from './socketStore';
-import { myRunsStore, runsStore } from './runsStore';
+import { myRunsStore, RunFilters, runsStore } from './runsStore';
 
 OmegaUp.on('ready', async () => {
   time.setSugarLocale();
@@ -98,6 +99,7 @@ OmegaUp.on('ready', async () => {
           guid: this.guid,
           runs: myRunsStore.state.runs,
           allRuns: runsStore.state.runs,
+          totalRuns: runsStore.state.totalRuns,
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
@@ -127,6 +129,28 @@ OmegaUp.on('ready', async () => {
               problems: this.problems,
               problemsetId: payload.currentAssignment.problemset_id,
             });
+          },
+          'update-search-result-users-assignment': ({
+            query,
+          }: {
+            query: string;
+          }) => {
+            api.Course.searchUsers({
+              query,
+              course_alias: payload.courseDetails.alias,
+              assignment_alias: payload.currentAssignment.alias,
+            })
+              .then(({ results }) => {
+                this.searchResultUsers = results.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
           },
           'show-run': (request: SubmissionRequest) => {
             api.Run.details({ run_alias: request.guid })
@@ -232,6 +256,21 @@ OmegaUp.on('ready', async () => {
                 updateRunFallback({ run });
               })
               .catch(ui.ignoreError);
+          },
+          'apply-filter': ({
+            filter,
+            value,
+          }: {
+            filter: 'verdict' | 'language' | 'username' | 'status' | 'offset';
+            value: string;
+          }) => {
+            if (value != '') {
+              const newFilter: RunFilters = { [filter]: value };
+              runsStore.commit('applyFilter', newFilter);
+            } else {
+              runsStore.commit('removeFilter', filter);
+            }
+            refreshRuns();
           },
           disqualify: (run: types.Run) => {
             if (!window.confirm(T.runDisqualifyConfirm)) {
@@ -375,7 +414,27 @@ OmegaUp.on('ready', async () => {
     return isValidTab ? tab : defaultTab;
   }
 
+  function refreshRuns(): void {
+    api.Course.runs({
+      course_alias: payload.courseDetails.alias,
+      assignment_alias: payload.currentAssignment.alias,
+      problem_alias: runsStore.state.filters?.problem,
+      offset: runsStore.state.filters?.offset,
+      rowcount: runsStore.state.filters?.rowcount,
+      verdict: runsStore.state.filters?.verdict,
+      language: runsStore.state.filters?.language,
+      username: runsStore.state.filters?.username,
+      status: runsStore.state.filters?.status,
+    })
+      .then(time.remoteTimeAdapter)
+      .then((response) => {
+        onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
+      })
+      .catch(ui.apiError);
+  }
+
   if (payload.currentAssignment.runs) {
+    runsStore.commit('setTotalRuns', payload.currentAssignment.totalRuns);
     for (const run of payload.currentAssignment.runs) {
       trackRun({ run });
     }

@@ -2,7 +2,6 @@ from typing import overload, Literal, Text
 
 from . import cursor
 
-
 def connect(
     user: Text,
     password: Text,

@@ -398,7 +398,7 @@ OmegaUp.on('ready', async () => {
     })
       .then(time.remoteTimeAdapter)
       .then((response) => {
-        onRefreshRuns({ runs: response.runs });
+        onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
       })
       .catch(ui.apiError);
   }

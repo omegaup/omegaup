@@ -150,6 +150,7 @@ const translations: { [key: string]: string; } = {
   clarificationUpdateAnswer: "Atualizar resposta",
   clarificationsAskedBy: "A pedido de",
   clarificationsEmpty: "Ainda n\u00e3o existem clarifica\u00e7\u00f5es",
+  clarificationsOnBehalf: "%(author) (em nome de %(receiver))",
   clarificationsRangeHeader: "Clarifica\u00e7\u00f5es (da %(lowCount) \u00e0 %(highCount))",
   coderOfTheMonth: "Coder do M\u00eas Geral",
   coderOfTheMonthAlreadySelected: "O programador do m\u00eas foi selecionado anteriormente",

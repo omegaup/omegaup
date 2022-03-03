@@ -53,6 +53,7 @@ OmegaUp.on('ready', async () => {
           guid: this.guid,
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
+          totalRuns: runsStore.state.totalRuns,
         },
         on: {
           details: (request: SubmissionRequest) => {
@@ -152,7 +153,7 @@ OmegaUp.on('ready', async () => {
     })
       .then(time.remoteTimeAdapter)
       .then((response) => {
-        onRefreshRuns({ runs: response.runs });
+        onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
       })
       .catch(ui.apiError);
   }

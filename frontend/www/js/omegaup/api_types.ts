@@ -2316,6 +2316,7 @@ export namespace types {
     problemset_id: number;
     runs: types.Run[];
     start_time: Date;
+    totalRuns?: number;
   }
 
   export interface ArenaContest {
@@ -2523,7 +2524,7 @@ export namespace types {
   export interface Clarification {
     answer?: string;
     assignment_alias?: string;
-    author?: string;
+    author: string;
     clarification_id: number;
     contest_alias?: string;
     message: string;
@@ -3660,6 +3661,7 @@ export namespace types {
     selectedPublicTags?: string[];
     solutionStatus?: string;
     solvers: types.BestSolvers[];
+    totalRuns?: number;
     user: types.UserInfoForProblem;
   }
 
@@ -4928,7 +4930,9 @@ export namespace messages {
   export type CourseRequestsResponse = { users: types.IdentityRequest[] };
   export type CourseRunsRequest = { [key: string]: any };
   export type _CourseRunsServerResponse = any;
-  export type CourseRunsResponse = { runs: types.Run[] };
+  export type CourseRunsResponse = { runs: types.Run[]; totalRuns: number };
+  export type CourseSearchUsersRequest = { [key: string]: any };
+  export type CourseSearchUsersResponse = { results: types.ListItem[] };
   export type CourseStudentProgressRequest = { [key: string]: any };
   export type _CourseStudentProgressServerResponse = any;
   export type CourseStudentProgressResponse = {
@@ -5088,7 +5092,7 @@ export namespace messages {
   export type ProblemRemoveTagResponse = {};
   export type ProblemRunsRequest = { [key: string]: any };
   export type _ProblemRunsServerResponse = any;
-  export type ProblemRunsResponse = { runs: types.Run[] };
+  export type ProblemRunsResponse = { runs: types.Run[]; totalRuns: number };
   export type ProblemRunsDiffRequest = { [key: string]: any };
   export type ProblemRunsDiffResponse = { diff: types.RunsDiff[] };
   export type ProblemSelectVersionRequest = { [key: string]: any };
@@ -5247,7 +5251,7 @@ export namespace messages {
   export type RunDisqualifyResponse = {};
   export type RunListRequest = { [key: string]: any };
   export type _RunListServerResponse = any;
-  export type RunListResponse = { runs: types.Run[] };
+  export type RunListResponse = { runs: types.Run[]; totalRuns: number };
   export type RunRejudgeRequest = { [key: string]: any };
   export type RunRejudgeResponse = {};
   export type RunSourceRequest = { [key: string]: any };
@@ -5744,6 +5748,9 @@ export namespace controllers {
     runs: (
       params?: messages.CourseRunsRequest,
     ) => Promise<messages.CourseRunsResponse>;
+    searchUsers: (
+      params?: messages.CourseSearchUsersRequest,
+    ) => Promise<messages.CourseSearchUsersResponse>;
     studentProgress: (
       params?: messages.CourseStudentProgressRequest,
     ) => Promise<messages.CourseStudentProgressResponse>;

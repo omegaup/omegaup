@@ -141,6 +141,7 @@
         :show-all-runs="true"
         :contest-alias="currentAssignment.alias"
         :runs="allRuns"
+        :total-runs="totalRuns"
         :show-problem="true"
         :show-details="true"
         :show-disqualify="true"
@@ -148,10 +149,15 @@
         :show-rejudge="true"
         :show-user="true"
         :problemset-problems="Object.values(problems)"
+        :search-result-users="searchResultUsers"
         @details="onRunAdminDetails"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
         @requalify="(run) => $emit('requalify', run)"
+        @filter-changed="(request) => $emit('apply-filter', request)"
+        @update-search-result-users-contest="
+          (request) => $emit('update-search-result-users-assignment', request)
+        "
       >
         <template #title><div></div></template>
         <template #runs><div></div></template>
@@ -265,6 +271,8 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
+  @Prop() totalRuns!: number;
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   omegaup = omegaup;
