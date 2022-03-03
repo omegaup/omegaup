@@ -30,38 +30,32 @@ class RunRequalifyTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($contestData['director']);
 
+        $guid = $runData['response']['guid'];
+
         // Disqualify submission
         \OmegaUp\Controllers\Run::apiDisqualify(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'run_alias' => $runData['response']['guid']
+                'run_alias' => $guid
             ])
         );
 
         $this->assertEquals(
             'disqualified',
-            \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid(
-                    $runData['response']['guid']
-                )->current_run_id
-            )->type
+            \OmegaUp\DAO\Submissions::getByGuid($guid)->type
         );
 
         // Requalify submission
         \OmegaUp\Controllers\Run::apiRequalify(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'run_alias' => $runData['response']['guid']
+                'run_alias' => $guid
             ])
         );
 
         $this->assertEquals(
             'normal',
-            \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid(
-                    $runData['response']['guid']
-                )->current_run_id
-            )->type
+            \OmegaUp\DAO\Submissions::getByGuid($guid)->type
         );
     }
 }
