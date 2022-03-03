@@ -130,7 +130,7 @@ export default class ArenaRunSubmitPopup extends Vue {
       { language: 'cpp20-gcc', name: 'C++20 (g++ 10.3)' },
       { language: 'cpp20-clang', name: 'C++20 (clang++ 10.0)' },
       { language: 'java', name: 'Java (openjdk 16.0)' },
-      { language: 'kotlin', name: 'Kotlin (1.6.10)' },
+      { language: 'kt', name: 'Kotlin (1.6.10)' },
       { language: 'py', name: 'Python (2.7)' },
       { language: 'py2', name: 'Python (2.7)' },
       { language: 'py3', name: 'Python (3.9)' },
