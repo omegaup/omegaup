@@ -61,6 +61,20 @@ describe('time', () => {
   });
 
   describe('formatDelta', () => {
+    // Setting an specific datetime to avoid flakiness in a leap-year
+    const now = new Date(0).getDate();
+    let dateNowSpy: jest.SpyInstance<number, []> | null = null;
+
+    beforeEach(() => {
+      dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
+    });
+
+    afterEach(() => {
+      if (dateNowSpy) {
+        dateNowSpy.mockRestore();
+      }
+    });
+
     it('Should handle valid dates with countdown time format', () => {
       expect(time.formatDelta(-2500000000)).toEqual('−28:22:26:40');
       expect(time.formatDelta(-1000000000)).toEqual('−11:13:46:40');
@@ -87,7 +101,7 @@ describe('time', () => {
         [{ milliseconds: 5259492000, expected: 'en 2 meses' }],
         [{ milliseconds: 7889238000, expected: 'en 3 meses' }],
         [{ milliseconds: 10518984000, expected: 'en 4 meses' }],
-        [{ milliseconds: 63113904000, expected: 'en casi 2 años' }],
+        [{ milliseconds: 63113904000, expected: 'en alrededor de 2 años' }],
         [{ milliseconds: 94670856000, expected: 'en casi 3 años' }],
       ];
       for (const [{ milliseconds, expected }] of millMapping) {
