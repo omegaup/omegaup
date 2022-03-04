@@ -1252,6 +1252,8 @@ const translations: { [key: string]: string; } = {
   reviewerNominationCategory: "Which one is the category of this problem?",
   reviewerNominationFormTitle: "Qualify this problem!",
   reviewerNominationQuality: "Is this a quality problem?",
+  runCannotBeDisqualified: "The run can not be disqualified",
+  runCannotBeRequalified: "The run can not be requalified",
   runDisqualifyConfirm: "Do you really want to disqualify this run?",
   runGUID: "GUID",
   runNotEvenOpened: "You must open the problem before trying to submit a solution.",

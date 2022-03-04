@@ -27,28 +27,38 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         return new \OmegaUp\DAO\VO\Submissions($rs);
     }
 
-    final public static function disqualify(string $guid): void {
+    final public static function disqualify(
+        \OmegaUp\DAO\VO\Submissions $submission
+    ): void {
         $sql = '
             UPDATE
                 Submissions s
             SET
                 s.type = "disqualified"
             WHERE
-                s.guid = ?;
+                s.submission_id = ?;
         ';
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$guid]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$submission->submission_id]
+        );
     }
 
-    final public static function requalify(string $guid): void {
+    final public static function requalify(
+        \OmegaUp\DAO\VO\Submissions $submission
+    ): void {
         $sql = '
             UPDATE
                 Submissions s
             SET
                 s.type = "normal"
             WHERE
-                s.guid = ?;
+                s.submission_id = ?;
         ';
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$guid]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$submission->submission_id]
+        );
     }
 
     /**

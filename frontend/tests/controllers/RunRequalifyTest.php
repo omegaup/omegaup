@@ -32,6 +32,19 @@ class RunRequalifyTest extends \OmegaUp\Test\ControllerTestCase {
 
         $guid = $runData['response']['guid'];
 
+        try {
+            // Trying to requalify a normal run
+            \OmegaUp\Controllers\Run::apiRequalify(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'run_alias' => $guid
+                ])
+            );
+            $this->fail('A run cannot be requalified when it is normal.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('runCannotBeRequalified', $e->getMessage());
+        }
+
         // Disqualify submission
         \OmegaUp\Controllers\Run::apiDisqualify(
             new \OmegaUp\Request([
@@ -44,6 +57,21 @@ class RunRequalifyTest extends \OmegaUp\Test\ControllerTestCase {
             'disqualified',
             \OmegaUp\DAO\Submissions::getByGuid($guid)->type
         );
+
+        try {
+            // Trying to disqualify a disqualified run
+            \OmegaUp\Controllers\Run::apiDisqualify(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'run_alias' => $guid
+                ])
+            );
+            $this->fail(
+                'A run cannot be disqualified when it has been disqualfied before.'
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('runCannotBeDisqualified', $e->getMessage());
+        }
 
         // Requalify submission
         \OmegaUp\Controllers\Run::apiRequalify(

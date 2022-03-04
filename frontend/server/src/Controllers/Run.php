@@ -810,6 +810,8 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param string $run_alias
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiDisqualify(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -834,7 +836,13 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\DAO\Submissions::disqualify(strval($submission->guid));
+        if ($submission->type !== 'normal') {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'runCannotBeDisqualified'
+            );
+        }
+
+        \OmegaUp\DAO\Submissions::disqualify($submission);
 
         // Expire ranks
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
@@ -849,6 +857,8 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param string $run_alias
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiRequalify(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -873,7 +883,13 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\DAO\Submissions::requalify(strval($submission->guid));
+        if ($submission->type !== 'disqualified') {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'runCannotBeRequalified'
+            );
+        }
+
+        \OmegaUp\DAO\Submissions::requalify($submission);
 
         // Expire ranks
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
