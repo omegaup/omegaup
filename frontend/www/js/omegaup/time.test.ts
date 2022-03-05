@@ -61,6 +61,20 @@ describe('time', () => {
   });
 
   describe('formatDelta', () => {
+    // Setting an specific datetime to avoid flakiness in a leap-year
+    const now = new Date(0).getDate();
+    let dateNowSpy: jest.SpyInstance<number, []> | null = null;
+
+    beforeEach(() => {
+      dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
+    });
+
+    afterEach(() => {
+      if (dateNowSpy) {
+        dateNowSpy.mockRestore();
+      }
+    });
+
     it('Should handle valid dates with countdown time format', () => {
       expect(time.formatDelta(-2500000000)).toEqual('−28:22:26:40');
       expect(time.formatDelta(-1000000000)).toEqual('−11:13:46:40');
