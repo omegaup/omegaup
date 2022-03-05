@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Description of RunRejudgeTest
  */
@@ -23,7 +21,7 @@ class RunRejudgeTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
         $runData = \OmegaUp\Test\Factories\Run::createRun(

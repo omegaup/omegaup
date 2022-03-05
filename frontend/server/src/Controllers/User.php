@@ -3746,13 +3746,13 @@ class User extends \OmegaUp\Controllers\Controller {
         $response['templateProperties']['payload']['isLogged'] = true;
         if (!is_null($r->identity->country_id)) {
             $availableFilters['country'] =
-                \OmegaUp\Translations::getInstance()->get(
+                \OmegaUp\Translations::getInstance($r->identity)->get(
                     'wordsFilterByCountry'
                 );
         }
         if (!is_null($r->identity->state_id)) {
             $availableFilters['state'] =
-                \OmegaUp\Translations::getInstance()->get(
+                \OmegaUp\Translations::getInstance($r->identity)->get(
                     'wordsFilterByState'
                 );
         }
@@ -3768,7 +3768,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         if (!is_null($schoolId)) {
             $availableFilters['school'] =
-                \OmegaUp\Translations::getInstance()->get(
+                \OmegaUp\Translations::getInstance($r->identity)->get(
                     'wordsFilterBySchool'
                 );
         }
