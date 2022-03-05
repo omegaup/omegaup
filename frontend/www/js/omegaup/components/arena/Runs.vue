@@ -324,7 +324,7 @@
                   <div class="dropdown-divider"></div>
                   <template v-if="showDisqualify">
                     <button
-                      v-if="run.type !== 'disqualified'"
+                      v-if="run.type === 'normal'"
                       :data-actions-disqualify="run.guid"
                       class="btn-link dropdown-item"
                       @click="$emit('disqualify', run)"
