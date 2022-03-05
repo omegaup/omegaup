@@ -290,8 +290,11 @@
                 <font-awesome-icon :icon="['fas', 'search-plus']" />
               </button>
             </td>
-            <td v-else-if="showDetails || showDisqualify || showRejudge">
-              <div v-if="run.type !== 'disqualified'" class="dropdown">
+            <td
+              v-else-if="showDetails || showDisqualify || showRejudge"
+              :data-actions="run.guid"
+            >
+              <div class="dropdown">
                 <button
                   class="btn-secondary dropdown-toggle"
                   type="button"
@@ -312,41 +315,31 @@
                   </button>
                   <button
                     v-if="showRejudge"
-                    data-actions-rejudge
+                    :data-actions-rejudge="run.guid"
                     class="btn-link dropdown-item"
                     @click="$emit('rejudge', run)"
                   >
                     {{ T.arenaRunsActionsRejudge }}
                   </button>
                   <div class="dropdown-divider"></div>
-                  <button
-                    v-if="showDisqualify"
-                    data-actions-disqualify
-                    class="btn-link dropdown-item"
-                    @click="$emit('disqualify', run)"
-                  >
-                    {{ T.arenaRunsActionsDisqualify }}
-                  </button>
-                </div>
-              </div>
-              <div v-else class="dropdown">
-                <button
-                  class="btn-secondary dropdown-toggle"
-                  type="button"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  {{ T.arenaRunsActions }}
-                </button>
-                <div class="dropdown-menu">
-                  <button
-                    data-actions-requalify
-                    class="btn-link dropdown-item"
-                    @click="$emit('requalify', run)"
-                  >
-                    {{ T.arenaRunsActionsRequalify }}
-                  </button>
+                  <template v-if="showDisqualify">
+                    <button
+                      v-if="run.type !== 'disqualified'"
+                      :data-actions-disqualify="run.guid"
+                      class="btn-link dropdown-item"
+                      @click="$emit('disqualify', run)"
+                    >
+                      {{ T.arenaRunsActionsDisqualify }}
+                    </button>
+                    <button
+                      v-else
+                      :data-actions-requalify="run.guid"
+                      class="btn-link dropdown-item"
+                      @click="$emit('requalify', run)"
+                    >
+                      {{ T.arenaRunsActionsRequalify }}
+                    </button>
+                  </template>
                 </div>
               </div>
             </td>

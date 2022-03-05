@@ -234,4 +234,62 @@ describe('Runs.vue', () => {
 
     expect(wrapper.find('tfoot button').text()).toBe(T.wordsNewSubmissions);
   });
+
+  it('Should handle the right buttons for run actions', async () => {
+    runs.push({
+      ...baseRunData,
+      guid: '122600',
+      time: new Date('1/3/2020, 12:25:00 AM'),
+      type: 'disqualified',
+    });
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        problemAlias: 'alias',
+        runs,
+        showDetails: true,
+        showDisqualify: true,
+        showRejudge: true,
+        isContestFinished: false,
+        useNewSubmissionButton: true,
+      },
+    });
+    expect(wrapper.find('[data-actions="120000"]').text()).toContain(
+      T.arenaRunsActionsDisqualify,
+    );
+    expect(wrapper.find('[data-actions="120000"]').text()).not.toContain(
+      T.arenaRunsActionsRequalify,
+    );
+    await wrapper.find('[data-actions="120000"]').trigger('click');
+    await wrapper.find('[data-actions-disqualify="120000"]').trigger('click');
+    expect(wrapper.emitted('disqualify')).toEqual([
+      [
+        {
+          ...baseRunData,
+          guid: '120000',
+          username: 'other_username',
+          time: new Date('1/1/2020, 12:00:00 AM'),
+        },
+      ],
+    ]);
+
+    expect(wrapper.find('[data-actions="122600"]').text()).not.toContain(
+      T.arenaRunsActionsDisqualify,
+    );
+    expect(wrapper.find('[data-actions="122600"]').text()).toContain(
+      T.arenaRunsActionsRequalify,
+    );
+    await wrapper.find('[data-actions="122600"]').trigger('click');
+    await wrapper.find('[data-actions-requalify="122600"]').trigger('click');
+    expect(wrapper.emitted('requalify')).toEqual([
+      [
+        {
+          ...baseRunData,
+          guid: '122600',
+          time: new Date('1/3/2020, 12:25:00 AM'),
+          type: 'disqualified',
+        },
+      ],
+    ]);
+  });
 });
