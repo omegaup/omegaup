@@ -321,8 +321,8 @@
                   >
                     {{ T.arenaRunsActionsRejudge }}
                   </button>
-                  <div class="dropdown-divider"></div>
                   <template v-if="showDisqualify">
+                    <div class="dropdown-divider"></div>
                     <button
                       v-if="run.type === 'normal'"
                       :data-actions-disqualify="run.guid"
@@ -332,7 +332,7 @@
                       {{ T.arenaRunsActionsDisqualify }}
                     </button>
                     <button
-                      v-else
+                      v-else-if="run.type === 'disqualified'"
                       :data-actions-requalify="run.guid"
                       class="btn-link dropdown-item"
                       @click="$emit('requalify', run)"

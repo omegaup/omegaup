@@ -150,6 +150,7 @@ Here we can add code.
       time: new Date(),
       username: 'omegaUp',
       verdict: 'AC',
+      type: 'normal',
     },
   ];
 
@@ -246,6 +247,7 @@ Here we can add code.
           time: expect.any(Date),
           username: 'omegaUp',
           verdict: 'AC',
+          type: 'normal',
         },
       ],
     ]);
@@ -269,6 +271,7 @@ Here we can add code.
           time: expect.any(Date),
           username: 'omegaUp',
           verdict: 'AC',
+          type: 'normal',
         },
       ],
     ]);
