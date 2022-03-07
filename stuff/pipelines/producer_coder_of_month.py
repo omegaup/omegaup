@@ -8,13 +8,13 @@ import logging
 import os
 import sys
 import json
+from typing import Optional
 from rabbitmq_database import get_coder_of_the_month
 from rabbitmq_producer import RabbitmqProducer
 import mysql.connector
 import mysql.connector.cursor
 import pika
 import rabbitmq_connection
-
 
 sys.path.insert(
     0,
@@ -25,18 +25,17 @@ import lib.logs  # pylint: disable=wrong-import-position
 
 
 def send_message_client(
-        cur: mysql.connector.cursor.MySQLCursorDict,
-        channel:
-        pika.adapters.blocking_connection.BlockingChannel
+        channel: pika.adapters.blocking_connection.BlockingChannel,
+        cur: Optional[mysql.connector.cursor.MySQLCursorDict] = None
 ) -> None:
     '''Function to send message to client'''
     coder_month_producer = RabbitmqProducer('coder_month',
                                             'certificates',
                                             'CoderOfTheMonthQueue',
                                             channel)
-    data_all = get_coder_of_the_month(cur, 'all')
+    data_all = get_coder_of_the_month('all', cur)
     message_all = json.dumps(data_all)
-    data_female = get_coder_of_the_month(cur, 'female')
+    data_female = get_coder_of_the_month('female', cur)
     message_female = json.dumps(data_female)
     coder_month_producer.send_message(message_all)
     coder_month_producer.send_message(message_female)
@@ -59,7 +58,7 @@ def main() -> None:
             rabbitmq_connection.connect(username='omegaup',
                                         password='omegaup',
                                         host='rabbitmq') as channel:
-            send_message_client(cur, channel)
+            send_message_client(channel, cur)
     finally:
         dbconn.conn.close()
         logging.info('Done')

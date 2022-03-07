@@ -3,14 +3,18 @@
 '''Mysql consults to generate messages'''
 
 import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 import mysql.connector
 import mysql.connector.cursor
 
 
-def get_coder_of_the_month(cur: mysql.connector.cursor.MySQLCursorDict,
-                           category: str) -> Dict[str, Any]:
+def get_coder_of_the_month(
+        category: str,
+        cur: Optional[mysql.connector.cursor.MySQLCursorDict] = None
+) -> Dict[str, Any]:
     '''Get coder of the month'''
+    if cur is None:
+        return {}
     today = datetime.date.today()
     first_day_of_current_month = today.replace(day=1)
     if first_day_of_current_month.month == 12:
