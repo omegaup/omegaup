@@ -5,9 +5,9 @@
 import json
 from dataclasses import dataclass, field
 from typing import Dict, Any
+from pytest_mock import MockerFixture
 import pytest
 import rabbitmq_connection
-from pytest_mock import MockerFixture
 from producer_coder_of_month import send_message_client
 import rabbitmq_client
 import pika
