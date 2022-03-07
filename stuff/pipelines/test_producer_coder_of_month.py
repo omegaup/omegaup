@@ -24,6 +24,27 @@ import lib.logs  # pylint: disable=wrong-import-position
 MESSAGE = {}
 
 
+def initialize_rabbitmq(
+        queue: str,
+        exchange: str,
+        routing_key: str,
+        channel: pika.adapters.blocking_connection.BlockingChannel
+) -> None:
+    '''initializes the queue and exchange'''
+    channel.queue_declare(
+        queue=queue, passive=False,
+        durable=False, exclusive=False,
+        auto_delete=False)
+    channel.exchange_declare(
+        exchange=exchange,
+        auto_delete=False,
+        durable=True,
+        exchange_type='direct')
+    channel.queue_bind(exchange=exchange,
+                       queue=queue,
+                       routing_key=routing_key)
+
+
 def callback(channel: pika.adapters.blocking_connection.BlockingChannel,
              method: pika.spec.Basic.Deliver,
              properties: pika.spec.BasicProperties,
@@ -67,6 +88,10 @@ def test_coder_of_the_month_queue(mocker: MockerFixture,
             rabbitmq_connection.connect(username='omegaup',
                                         password='omegaup',
                                         host='rabbitmq') as channel:
+            initialize_rabbitmq('coder_month',
+                                'certificates',
+                                'CoderOfTheMonthQueue',
+                                channel)
             send_message_client(cur, channel)
             rabbitmq_client.receive_messages('coder_month',
                                              'certificates',
