@@ -481,7 +481,7 @@ jobs:
           python3 -m pip install --user \
             -r stuff/docker/requirements.txt \
             mysqlclient==2.0.1 \
-            mypy=0.931 \
+            mypy==0.931 \
             pandas \
             pytest
 
