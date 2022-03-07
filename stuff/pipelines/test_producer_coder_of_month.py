@@ -3,6 +3,8 @@
 '''test verification_code module.'''
 
 import json
+from dataclasses import dataclass, field
+from typing import Dict, Any
 import pytest
 import rabbitmq_connection
 from pytest_mock import MockerFixture
@@ -11,7 +13,13 @@ import rabbitmq_client
 import pika
 
 
-MESSAGE = {}
+@dataclass
+class MESSAGE:
+    '''class to save message'''
+    message: Dict[str, Any] = field(default_factory=dict)
+
+
+messageT = MESSAGE()
 
 
 def initialize_rabbitmq(
@@ -41,8 +49,7 @@ def callback(channel: pika.adapters.blocking_connection.BlockingChannel,
              # pylint: disable=unused-argument,
              body: bytes) -> None:
     '''Callback function to test'''
-    global MESSAGE
-    MESSAGE = json.loads(body.decode())
+    messageT.message = json.loads(body.decode())
     channel.close()
 
 
@@ -78,4 +85,4 @@ def test_coder_of_the_month_queue(mocker: MockerFixture,
                                          'CoderOfTheMonthQueue',
                                          channel,
                                          callback)
-        assert expected == MESSAGE
+        assert expected == messageT.message
