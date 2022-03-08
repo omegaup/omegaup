@@ -93,6 +93,7 @@
   - [`/api/course/removeStudent/`](#apicourseremovestudent)
   - [`/api/course/requests/`](#apicourserequests)
   - [`/api/course/runs/`](#apicourseruns)
+  - [`/api/course/searchUsers/`](#apicoursesearchusers)
   - [`/api/course/studentProgress/`](#apicoursestudentprogress)
   - [`/api/course/studentsProgress/`](#apicoursestudentsprogress)
   - [`/api/course/update/`](#apicourseupdate)
@@ -181,6 +182,7 @@
   - [`/api/run/disqualify/`](#apirundisqualify)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
+  - [`/api/run/requalify/`](#apirunrequalify)
   - [`/api/run/source/`](#apirunsource)
   - [`/api/run/status/`](#apirunstatus)
 - [School](#school)
@@ -2025,9 +2027,30 @@ Returns all runs for a course
 
 ### Returns
 
-| Name   | Type          |
-| ------ | ------------- |
-| `runs` | `types.Run[]` |
+| Name        | Type          |
+| ----------- | ------------- |
+| `runs`      | `types.Run[]` |
+| `totalRuns` | `number`      |
+
+## `/api/course/searchUsers/`
+
+### Description
+
+Search users in course assignment
+
+### Parameters
+
+| Name               | Type           | Description |
+| ------------------ | -------------- | ----------- |
+| `assignment_alias` | `string`       |             |
+| `course_alias`     | `string`       |             |
+| `query`            | `null\|string` |             |
+
+### Returns
+
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/course/studentProgress/`
 
@@ -2967,9 +2990,10 @@ Entry point for Problem runs API
 
 ### Returns
 
-| Name   | Type          |
-| ------ | ------------- |
-| `runs` | `types.Run[]` |
+| Name        | Type          |
+| ----------- | ------------- |
+| `runs`      | `types.Run[]` |
+| `totalRuns` | `number`      |
 
 ## `/api/problem/runsDiff/`
 
@@ -3663,9 +3687,10 @@ Gets a list of latest runs overall
 
 ### Returns
 
-| Name   | Type          |
-| ------ | ------------- |
-| `runs` | `types.Run[]` |
+| Name        | Type          |
+| ----------- | ------------- |
+| `runs`      | `types.Run[]` |
+| `totalRuns` | `number`      |
 
 ## `/api/run/rejudge/`
 
@@ -3679,6 +3704,22 @@ Re-sends a problem to Grader.
 | ----------- | -------- | ----------- |
 | `run_alias` | `string` |             |
 | `debug`     | `mixed`  |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/run/requalify/`
+
+### Description
+
+Requalify a submission previously disqualified
+
+### Parameters
+
+| Name        | Type     | Description |
+| ----------- | -------- | ----------- |
+| `run_alias` | `string` |             |
 
 ### Returns
 

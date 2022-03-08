@@ -258,7 +258,7 @@ export default class Runs extends Vue {
   }
 
   status(run: types.Run): string {
-    if (run.type == 'disqualified') return T.wordsDisqualified;
+    if (run.type == 'disqualified') return T.arenaRunsActionsDisqualified;
 
     return run.status == 'ready' ? run.verdict : run.status;
   }
