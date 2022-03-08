@@ -385,7 +385,6 @@
             <div class="card-header">
               <h2 class="mb-0">
                 <button
-                  ref="privacy"
                   class="btn btn-link btn-block text-left collapsed"
                   type="button"
                   data-toggle="collapse"
@@ -505,7 +504,6 @@ export default class NewForm extends Vue {
   @Ref('basic-info') basicInfoRef!: HTMLButtonElement;
   @Ref('logistics') logisticsRef!: HTMLButtonElement;
   @Ref('scoring-rules') scoringRulesRef!: HTMLButtonElement;
-  @Ref('privacy') privacyRef!: HTMLButtonElement;
 
   T = T;
   alias = this.initialAlias;
@@ -540,7 +538,6 @@ export default class NewForm extends Vue {
     let scoringRulesCollapsed = this.scoringRulesRef.classList.contains(
       'collapsed',
     );
-    let privacyCollapsed = this.privacyRef.classList.contains('collapsed');
 
     console.log('FORM DATA');
     for (const [key, value] of formData.entries()) {
