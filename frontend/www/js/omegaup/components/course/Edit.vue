@@ -131,6 +131,7 @@
           :tagged-problems="data.taggedProblems"
           :invalid-parameter-name="invalidParameterName"
           :assignment-form-mode.sync="assignmentFormMode"
+          :course-alias="data.course.alias"
           :search-result-problems="searchResultProblems"
           @update-search-result-problems="
             (query) => $emit('update-search-result-problems', query)
@@ -154,10 +155,8 @@
               $emit('sort-problems', assignmentAlias, problemsAlias)
           "
           @cancel="onResetAssignmentForm"
-          @submit="
-            (assignmentFormComponent, problems) =>
-              $emit('submit-new-assignment', assignmentFormComponent, problems)
-          "
+          @add-assignment="(params) => $emit('add-assignment', params)"
+          @update-assignment="(params) => $emit('update-assignment', params)"
           @get-versions="(request) => $emit('get-versions', request)"
         >
           <template #page-header><span></span></template>
