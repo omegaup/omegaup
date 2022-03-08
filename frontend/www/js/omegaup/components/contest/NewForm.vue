@@ -26,7 +26,7 @@
           {{ T.contestNewFormICPCStyle }}
         </button>
       </div>
-      <form class="contest-form" @submit.prevent="onSubmit">
+      <form ref="form" class="contest-form" @submit.prevent="onSubmit">
         <div class="accordion mb-3">
           <div class="card">
             <div class="card-header">
@@ -138,7 +138,7 @@
             <div class="card-header">
               <h2 class="mb-0">
                 <button
-                  ref="basic-info"
+                  ref="logistics"
                   class="btn btn-link btn-block text-left collapsed"
                   type="button"
                   data-toggle="collapse"
@@ -252,7 +252,7 @@
             <div class="card-header">
               <h2 class="mb-0">
                 <button
-                  ref="basic-info"
+                  ref="scoring-rules"
                   class="btn btn-link btn-block text-left collapsed"
                   type="button"
                   data-toggle="collapse"
@@ -310,6 +310,7 @@
                   <input
                     v-model="submissionsGap"
                     class="form-control"
+                    name="submissions_gap"
                     :class="{
                       'is-invalid': invalidParameterName === 'submissions_gap',
                     }"
@@ -346,6 +347,7 @@
                 <div class="form-group col-md-6">
                   <label>{{ T.wordsPenalty }}</label>
                   <input
+                    name="penalty"
                     v-model="penalty"
                     class="form-control"
                     :class="{
@@ -361,6 +363,7 @@
                 <div class="form-group col-md-6">
                   <label>{{ T.contestNewFormPointDecrementFactor }}</label>
                   <input
+                    name="points_decay_factor"
                     v-model="pointsDecayFactor"
                     class="form-control"
                     :class="{
@@ -382,7 +385,7 @@
             <div class="card-header">
               <h2 class="mb-0">
                 <button
-                  ref="basic-info"
+                  ref="privacy"
                   class="btn btn-link btn-block text-left collapsed"
                   type="button"
                   data-toggle="collapse"
@@ -394,7 +397,7 @@
                 </button>
               </h2>
             </div>
-            <div class="collapse cardabody privacy">
+            <div class="collapse card-body privacy">
               <div class="row">
                 <div class="form-group col-md-6">
                   <label>{{ T.contestNewFormBasicInformationRequired }}</label>
@@ -438,7 +441,11 @@
         </div>
 
         <div class="form-group">
-          <button class="btn btn-primary" type="submit">
+          <button
+            class="btn btn-primary"
+            type="submit"
+            @click="openCollapsedIfRequired()"
+          >
             {{
               update
                 ? T.contestNewFormUpdateContest
@@ -452,7 +459,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
 import DateTimePicker from '../DateTimePicker.vue';
@@ -494,6 +501,12 @@ export default class NewForm extends Vue {
   @Prop({ default: false }) contestForTeams!: boolean;
   @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
 
+  @Ref('form') formRef!: HTMLFormElement;
+  @Ref('basic-info') basicInfoRef!: HTMLButtonElement;
+  @Ref('logistics') logisticsRef!: HTMLButtonElement;
+  @Ref('scoring-rules') scoringRulesRef!: HTMLButtonElement;
+  @Ref('privacy') privacyRef!: HTMLButtonElement;
+
   T = T;
   alias = this.initialAlias;
   description = this.initialDescription;
@@ -518,6 +531,50 @@ export default class NewForm extends Vue {
   currentContestForTeams = this.contestForTeams;
   currentTeamsGroupAlias = this.teamsGroupAlias;
   titlePlaceHolder = '';
+
+  openCollapsedIfRequired() {
+    const formData = new FormData(this.formRef);
+
+    let basicInfoCollapsed = this.basicInfoRef.classList.contains('collapsed');
+    let logisticsCollapsed = this.logisticsRef.classList.contains('collapsed');
+    let scoringRulesCollapsed = this.scoringRulesRef.classList.contains(
+      'collapsed',
+    );
+    let privacyCollapsed = this.privacyRef.classList.contains('collapsed');
+
+    console.log('FORM DATA');
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value);
+      const isEmpty = value === '';
+      if (isEmpty) {
+        if (
+          basicInfoCollapsed &&
+          (key === 'title' || key === 'alias' || key === 'description')
+        ) {
+          this.basicInfoRef.click();
+          basicInfoCollapsed = false;
+          continue;
+        }
+
+        if (logisticsCollapsed && key === 'scoreboard') {
+          this.logisticsRef.click();
+          logisticsCollapsed = false;
+          continue;
+        }
+
+        if (
+          scoringRulesCollapsed &&
+          (key === 'penalty' ||
+            key === 'submissions_gap' ||
+            key === 'points_decay_factor')
+        ) {
+          this.scoringRulesRef.click();
+          scoringRulesCollapsed = false;
+          continue;
+        }
+      }
+    }
+  }
 
   @Watch('windowLengthEnabled')
   onPropertyChange(newValue: boolean): void {
