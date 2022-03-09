@@ -168,6 +168,7 @@
             <div class="collapse card-body limits">
               <omegaup-problem-settings
                 :errors="errors"
+                :current-languages="currentLanguages"
                 :time-limit="timeLimit"
                 :extra-wall-time="extraWallTime"
                 :memory-limit="memoryLimit"
@@ -426,6 +427,7 @@
           :value="visibility"
         />
         <input name="request" value="submit" type="hidden" />
+        <input name="update_published" value="non-problemset" type="hidden" />
         <div class="row">
           <div class="form-group col-md-6 no-bottom-margin">
             <button
