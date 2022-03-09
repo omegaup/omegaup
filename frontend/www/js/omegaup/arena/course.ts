@@ -249,6 +249,14 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.ignoreError);
           },
+          requalify: (run: types.Run) => {
+            api.Run.requalify({ run_alias: run.guid })
+              .then(() => {
+                run.type = 'normal';
+                updateRunFallback({ run });
+              })
+              .catch(ui.ignoreError);
+          },
           'apply-filter': ({
             filter,
             value,
