@@ -7,76 +7,49 @@ import logging
 import os
 import sys
 import json
+from typing import Optional
 import datetime
+from rabbitmq_producer import RabbitmqProducer
 import mysql.connector
 import mysql.connector.cursor
 import pika
 import rabbitmq_connection
+import test_constants
 import credentials
+from rabbitmq_database import get_contest_contestants
 
 sys.path.insert(
     0,
     os.path.join(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
-
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 
-def send_contest(cur: mysql.connector.cursor.MySQLCursorDict,
-                 channel: pika.adapters.blocking_connection.BlockingChannel,
-                 date_lower_limit: datetime.date,
-                 date_upper_limit: datetime.date) -> None:
+def send_contest(
+        channel: pika.adapters.blocking_connection.BlockingChannel,
+        date_lower_limit: datetime.date = test_constants.DATE_LOWER_LIMIT,
+        date_upper_limit: datetime.date = test_constants.DATE_UPPER_LIMIT,
+        cur: Optional[mysql.connector.cursor.MySQLCursorDict] = None
+) -> None:
     '''Send messages to contest queue.
      date-lower-limit: initial time from which to be taken the finish contests.
      By default. the 2005/01/01 date will be taken.
      date-upper-limit: finish time from which to be taken the finish contests.
      By default, the current date will be taken.
     '''
-    channel.queue_declare(
-        'client_contest',
-        passive=False,
-        durable=False,
-        exclusive=False,
-        auto_delete=False,
-    )
-    channel.exchange_declare(
-        exchange='certificates',
-        auto_delete=False,
-        durable=True,
-        exchange_type='direct',
-    )
-    logging.info('Send messages to Contest_Queue')
-    cur.execute(
-        '''
-        SELECT
-            certificate_cutoff,
-            c.contest_id,
-            alias,
-            scoreboard_url
-        FROM
-            Contests c
-        INNER JOIN
-            Problemsets p
-        ON
-            c.problemset_id = p.problemset_id
-        WHERE
-            finish_time BETWEEN %s AND %s;
-        ''', (date_lower_limit, date_upper_limit)
-    )
-    for row in cur:
-        data = {
-            'certificate_cutoff': row['certificate_cutoff'],
-            'alias': row['alias'],
-            'scoreboard_url': row['scoreboard_url'],
-            'contest_id': row['contest_id'],
-        }
+    contest_producer = RabbitmqProducer(queue='client_contest',
+                                        exchange='certificates',
+                                        routing_key='ContestQueue',
+                                        channel=channel)
+
+    contestants = get_contest_contestants(date_lower_limit=date_lower_limit,
+                                          date_upper_limit=date_upper_limit,
+                                          cur=cur)
+
+    for data in contestants:
         message = json.dumps(data)
-        body = message.encode()
-        channel.basic_publish(
-            exchange='certificates',
-            routing_key='ContestQueue',
-            body=body)
+        contest_producer.send_message(message)
 
 
 def main() -> None:
@@ -98,9 +71,10 @@ def main() -> None:
                                         password=credentials.OMEGAUP_PASSWORD,
                                         host=credentials.RABBITMQ_HOST
                                         ) as channel:
-            send_contest(cur, channel,
+            send_contest(channel,
                          args.date_lower_limit,
-                         args.date_upper_limit)
+                         args.date_upper_limit,
+                         cur)
     finally:
         dbconn.conn.close()
         logging.info('Done')

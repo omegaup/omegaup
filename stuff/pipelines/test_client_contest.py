@@ -27,6 +27,27 @@ import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 
+def initialize_rabbitmq(
+        queue: str,
+        exchange: str,
+        routing_key: str,
+        channel: pika.adapters.blocking_connection.BlockingChannel
+) -> None:
+    '''initializes the queue and exchange'''
+    channel.queue_declare(
+        queue=queue, passive=False,
+        durable=True, exclusive=False,
+        auto_delete=False)
+    channel.exchange_declare(
+        exchange=exchange,
+        auto_delete=False,
+        durable=True,
+        exchange_type='direct')
+    channel.queue_bind(exchange=exchange,
+                       queue=queue,
+                       routing_key=routing_key)
+
+
 class ContestsCallbackForTesting:
     '''Contests callback'''
     def __init__(self,
@@ -71,11 +92,15 @@ def test_client_contest() -> None:
         rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
                                     password=credentials.OMEGAUP_PASSWORD,
                                     host=credentials.RABBITMQ_HOST) as channel:
+        initialize_rabbitmq(queue='contest',
+                            exchange='certificates',
+                            routing_key='ContestQueue',
+                            channel=channel)
         send_messages_contest_queue.send_contest(
-            cur,
-            channel,
+            channel=channel,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
-            date_upper_limit=test_constants.DATE_UPPER_LIMIT)
+            date_upper_limit=test_constants.DATE_UPPER_LIMIT,
+            cur=cur)
         callback = ContestsCallbackForTesting(
             dbconn=dbconn.conn,
             api_token=test_constants.API_TOKEN,
@@ -89,10 +114,10 @@ def test_client_contest() -> None:
         assert count['count'] == 0
 
         rabbitmq_client.receive_messages(
-            channel=channel,
-            exchange='certificates',
             queue='contest',
+            exchange='certificates',
             routing_key='ContestQueue',
+            channel=channel,
             callback=callback)
         cur.execute('SELECT COUNT(*) AS count FROM `Certificates`;')
         count = cur.fetchone()
@@ -120,11 +145,15 @@ def test_client_contest_with_mocked_codes(mocker: MockerFixture) -> None:
         rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
                                     password=credentials.OMEGAUP_PASSWORD,
                                     host=credentials.RABBITMQ_HOST) as channel:
+        initialize_rabbitmq(queue='contest',
+                            exchange='certificates',
+                            routing_key='ContestQueue',
+                            channel=channel)
         send_messages_contest_queue.send_contest(
-            cur,
-            channel,
+            channel=channel,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
-            date_upper_limit=test_constants.DATE_UPPER_LIMIT)
+            date_upper_limit=test_constants.DATE_UPPER_LIMIT,
+            cur=cur)
         callback = ContestsCallbackForTesting(
             dbconn=dbconn.conn,
             api_token=test_constants.API_TOKEN,
@@ -170,11 +199,15 @@ def test_client_contest_with_duplicated_codes(mocker: MockerFixture) -> None:
         rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
                                     password=credentials.OMEGAUP_PASSWORD,
                                     host=credentials.RABBITMQ_HOST) as channel:
+        initialize_rabbitmq(queue='contest',
+                            exchange='certificates',
+                            routing_key='ContestQueue',
+                            channel=channel)
         send_messages_contest_queue.send_contest(
-            cur,
-            channel,
+            channel=channel,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
-            date_upper_limit=test_constants.DATE_UPPER_LIMIT)
+            date_upper_limit=test_constants.DATE_UPPER_LIMIT,
+            cur=cur)
         callback = ContestsCallbackForTesting(
             dbconn=dbconn.conn,
             api_token=test_constants.API_TOKEN,
