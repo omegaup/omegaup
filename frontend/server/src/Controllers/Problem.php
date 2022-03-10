@@ -1575,16 +1575,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $needsUpdate = $response['rejudged'] || ($oldCommit != $problem->commit);
                 }
 
-                if ($needsUpdate) {
+                if (
+                    $updatePublished != \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET
+                    && $needsUpdate
+                ) {
                     \OmegaUp\DAO\Runs::createRunsForVersion($problem);
                     \OmegaUp\DAO\Runs::updateVersionToCurrent($problem);
-                    if ($updatePublished != \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET) {
-                        \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
-                            $problem,
-                            $user,
-                            $updatePublished
-                        );
-                    }
+                    \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
+                        $problem,
+                        $user,
+                        $updatePublished
+                    );
                     $updatedStatementLanguages = $problemDeployer->getUpdatedLanguages();
                 }
             }
