@@ -273,6 +273,8 @@ export default class Markdown extends Vue {
   table td {
     border: 1px solid var(--markdown-td-border-color);
     padding: 10px;
+    overflow-x: scroll;
+    max-width: 50%;
   }
 
   table th {
