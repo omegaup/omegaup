@@ -26,10 +26,12 @@
               >
                 &lt;
               </button>
-              {{ filterOffset + 1 }}
+              {{ currentPage }}
               <button
                 data-button-page-next
-                :disabled="runs && runs.length < rowCount"
+                :disabled="
+                  totalRuns && Math.ceil(totalRuns / rowCount) == currentPage
+                "
                 @click="filterOffset++"
               >
                 &gt;
@@ -177,7 +179,7 @@
             <th class="numeric">{{ T.wordsMemory }}</th>
             <th class="numeric">{{ T.wordsRuntime }}</th>
             <th v-if="showDetails && !showDisqualify && !showRejudge">
-              {{ T.wordsActions }}
+              {{ T.arenaRunsActions }}
             </th>
             <th v-else></th>
           </tr>
@@ -288,7 +290,10 @@
                 <font-awesome-icon :icon="['fas', 'search-plus']" />
               </button>
             </td>
-            <td v-else-if="showDetails || showDisqualify || showRejudge">
+            <td
+              v-else-if="showDetails || showDisqualify || showRejudge"
+              :data-actions="run.guid"
+            >
               <div class="dropdown">
                 <button
                   class="btn-secondary dropdown-toggle"
@@ -297,7 +302,7 @@
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  {{ T.wordsActions }}
+                  {{ T.arenaRunsActions }}
                 </button>
                 <div class="dropdown-menu">
                   <button
@@ -306,25 +311,35 @@
                     class="btn-link dropdown-item"
                     @click="onRunDetails(run)"
                   >
-                    {{ T.wordsDetails }}
+                    {{ T.arenaRunsActionsDetails }}
                   </button>
                   <button
                     v-if="showRejudge"
-                    data-actions-rejudge
+                    :data-actions-rejudge="run.guid"
                     class="btn-link dropdown-item"
                     @click="$emit('rejudge', run)"
                   >
-                    {{ T.wordsRejudge }}
+                    {{ T.arenaRunsActionsRejudge }}
                   </button>
-                  <div class="dropdown-divider"></div>
-                  <button
-                    v-if="showDisqualify"
-                    data-actions-disqualify
-                    class="btn-link dropdown-item"
-                    @click="$emit('disqualify', run)"
-                  >
-                    {{ T.wordsDisqualify }}
-                  </button>
+                  <template v-if="showDisqualify">
+                    <div class="dropdown-divider"></div>
+                    <button
+                      v-if="run.type === 'normal'"
+                      :data-actions-disqualify="run.guid"
+                      class="btn-link dropdown-item"
+                      @click="$emit('disqualify', run)"
+                    >
+                      {{ T.arenaRunsActionsDisqualify }}
+                    </button>
+                    <button
+                      v-else-if="run.type === 'disqualified'"
+                      :data-actions-requalify="run.guid"
+                      class="btn-link dropdown-item"
+                      @click="$emit('requalify', run)"
+                    >
+                      {{ T.arenaRunsActionsRequalify }}
+                    </button>
+                  </template>
                 </div>
               </div>
             </td>
@@ -429,6 +444,7 @@ export default class Runs extends Vue {
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: false }) showAllRuns!: boolean;
+  @Prop() totalRuns!: number;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
@@ -445,6 +461,10 @@ export default class Runs extends Vue {
   filters: { name: string; value: string }[] = [];
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
+
+  get currentPage(): number {
+    return this.filterOffset + 1;
+  }
 
   get filteredRuns(): types.Run[] {
     if (
@@ -618,7 +638,7 @@ export default class Runs extends Vue {
   }
 
   status(run: types.Run): string {
-    if (run.type == 'disqualified') return T.wordsDisqualified;
+    if (run.type == 'disqualified') return T.arenaRunsActionsDisqualified;
 
     return run.status == 'ready' ? run.verdict : run.status;
   }

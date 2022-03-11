@@ -241,9 +241,11 @@
           :show-disqualify="true"
           :problemset-problems="[]"
           :search-result-users="searchResultUsers"
+          :total-runs="totalRuns"
           @details="(request) => onRunDetails(request, 'runs')"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
+          @requalify="(run) => $emit('requalify', run)"
           @filter-changed="(request) => $emit('apply-filter', request)"
           @update-search-result-users-contest="
             (request) => $emit('update-search-result-users-contest', request)
@@ -402,6 +404,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: null }) languages!: null | string[];
+  @Prop() totalRuns!: number;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 

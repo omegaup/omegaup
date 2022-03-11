@@ -956,6 +956,10 @@ export const Course = {
     })(x.runs);
     return x;
   }),
+  searchUsers: apiCall<
+    messages.CourseSearchUsersRequest,
+    messages.CourseSearchUsersResponse
+  >('/api/course/searchUsers/'),
   studentProgress: apiCall<
     messages.CourseStudentProgressRequest,
     messages._CourseStudentProgressServerResponse,
@@ -1591,6 +1595,10 @@ export const Run = {
   rejudge: apiCall<messages.RunRejudgeRequest, messages.RunRejudgeResponse>(
     '/api/run/rejudge/',
   ),
+  requalify: apiCall<
+    messages.RunRequalifyRequest,
+    messages.RunRequalifyResponse
+  >('/api/run/requalify/'),
   source: apiCall<messages.RunSourceRequest, messages.RunSourceResponse>(
     '/api/run/source/',
   ),

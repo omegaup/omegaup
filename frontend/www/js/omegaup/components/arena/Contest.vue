@@ -115,6 +115,7 @@
         v-if="contestAdmin"
         :contest-alias="contest.alias"
         :runs="allRuns"
+        :total-runs="totalRuns"
         :show-all-runs="true"
         :show-contest="false"
         :show-problem="true"
@@ -124,12 +125,12 @@
         :show-rejudge="true"
         :show-user="true"
         :problemset-problems="Object.values(problems)"
-        :global-runs="false"
         :is-contest-finished="isContestFinished"
         :search-result-users="searchResultUsers"
         @details="(run) => onRunAdminDetails(run.guid)"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
+        @requalify="(run) => $emit('requalify', run)"
         @update-search-result-users-contest="
           (request) => $emit('update-search-result-users-contest', request)
         "
@@ -249,6 +250,7 @@ export default class ArenaContest extends Vue {
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
+  @Prop() totalRuns!: number;
   @Prop({ default: null }) guid!: null | string;
   @Prop() miniRankingUsers!: omegaup.UserRank[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
