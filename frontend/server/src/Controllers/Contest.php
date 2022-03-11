@@ -121,11 +121,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'past',
             ]
         );
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 20);
-        $activeContests = isset($r['active'])
-            ? \OmegaUp\DAO\Enum\ActiveStatus::getIntValue(intval($r['active']))
-            : \OmegaUp\DAO\Enum\ActiveStatus::ALL;
+        $page = intval($r['page'] ?? 1);
+        $pageSize = intval($r['page_size'] ?? 20);
+        $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::getIntValue(
+            intval($r['active'] ?? \OmegaUp\DAO\Enum\ActiveStatus::ALL)
+        );
         if (!is_null($tabName)) {
             if ($tabName === 'current') {
                 $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE;
@@ -138,18 +138,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // If the parameter was not set, the default should be ALL which is
         // a number and should pass this check.
         \OmegaUp\Validators::validateNumber($activeContests, 'active');
-        $recommended = isset($r['recommended'])
-            ? \OmegaUp\DAO\Enum\RecommendedStatus::getIntValue(
-                intval($r['recommended'])
+        $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::getIntValue(
+            intval(
+                $r['recommended'] ?? \OmegaUp\DAO\Enum\RecommendedStatus::ALL
             )
-            : \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
+        );
         // Same as above.
         \OmegaUp\Validators::validateNumber($recommended, 'recommended');
-        $participating = isset($r['participating'])
-            ? \OmegaUp\DAO\Enum\ParticipatingStatus::getIntValue(
-                intval($r['participating'])
+        $participating = \OmegaUp\DAO\Enum\ParticipatingStatus::getIntValue(
+            intval(
+                $r['participating'] ?? \OmegaUp\DAO\Enum\ParticipatingStatus::NO
             )
-            : \OmegaUp\DAO\Enum\ParticipatingStatus::NO;
+        );
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['admission_mode'],
             'admission_mode',
@@ -1031,8 +1031,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('page_size');
 
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+        $page = intval($r['page'] ?? 1);
+        $pageSize = intval($r['page_size'] ?? 1000);
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['query'],
             'query',
@@ -1041,66 +1041,73 @@ class Contest extends \OmegaUp\Controllers\Controller {
             required: false
         );
         $contests = [];
-        if (!is_null($r->identity)) {
-            $contests['participating'] = self::getContestList(
+        // tab_name => request settings
+        //
+        // These same settings should be replicated in the frontend to do
+        // API calls to fetch this same data asynchronously.
+        $tab_settings = [
+            'participating' => [
+                'active' => \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+                'recommended' => \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
+                'public' => false,
+                'participating' => \OmegaUp\DAO\Enum\ParticipatingStatus::YES
+            ],
+            'recommended_current' => [
+                'active' => \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
+                'recommended' => \OmegaUp\DAO\Enum\RecommendedStatus::RECOMMENDED,
+                'public' => false,
+                'participating' => \OmegaUp\DAO\Enum\ParticipatingStatus::NO
+            ],
+            'current' => [
+                'active' => \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
+                'recommended' => \OmegaUp\DAO\Enum\RecommendedStatus::NOT_RECOMMENDED,
+                'public' => false,
+                'participating' => \OmegaUp\DAO\Enum\ParticipatingStatus::NO
+            ],
+            'public' => [
+                'active' => \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
+                'recommended' => \OmegaUp\DAO\Enum\RecommendedStatus::NOT_RECOMMENDED,
+                'public' => false,
+                'participating' => \OmegaUp\DAO\Enum\ParticipatingStatus::NO
+            ],
+            'future' => [
+                'active' => \OmegaUp\DAO\Enum\ActiveStatus::FUTURE,
+                'recommended' => \OmegaUp\DAO\Enum\RecommendedStatus::NOT_RECOMMENDED,
+                'public' => false,
+                'participating' => \OmegaUp\DAO\Enum\ParticipatingStatus::NO
+            ],
+            'recommended_past' => [
+                'active' => \OmegaUp\DAO\Enum\ActiveStatus::PAST,
+                'recommended' => \OmegaUp\DAO\Enum\RecommendedStatus::RECOMMENDED,
+                'public' => false,
+                'participating' => \OmegaUp\DAO\Enum\ParticipatingStatus::NO
+            ],
+            'past' => [
+                'active' => \OmegaUp\DAO\Enum\ActiveStatus::PAST,
+                'recommended' => \OmegaUp\DAO\Enum\RecommendedStatus::NOT_RECOMMENDED,
+                'public' => false,
+                'participating' => \OmegaUp\DAO\Enum\ParticipatingStatus::NO
+            ]
+        ];
+        foreach ($tab_settings as $tab_name => $settings) {
+            // Special case tabs that require being signed in.
+            if (
+                $settings['participating'] == \OmegaUp\DAO\Enum\ParticipatingStatus::YES &&
+                is_null($r->identity)
+            ) {
+                continue;
+            }
+            $contests[$tab_name] = self::getContestList(
                 $r->identity,
                 $r['query'],
                 $page,
                 $pageSize,
-                \OmegaUp\DAO\Enum\ActiveStatus::ALL,
-                \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
-                public: false,
-                participating: \OmegaUp\DAO\Enum\ParticipatingStatus::YES
+                $settings['active'],
+                $settings['recommended'],
+                $settings['public'],
+                $settings['participating']
             );
         }
-        $contests['recommended_current'] = self::getContestList(
-            $r->identity,
-            $r['query'],
-            $page,
-            $pageSize,
-            \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
-            \OmegaUp\DAO\Enum\RecommendedStatus::RECOMMENDED
-        );
-        $contests['current'] = self::getContestList(
-            $r->identity,
-            $r['query'],
-            $page,
-            $pageSize,
-            \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
-            \OmegaUp\DAO\Enum\RecommendedStatus::NOT_RECOMMENDED
-        );
-        $contests['public'] = self::getContestList(
-            $r->identity,
-            $r['query'],
-            $page,
-            $pageSize,
-            \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
-            \OmegaUp\DAO\Enum\RecommendedStatus::NOT_RECOMMENDED
-        );
-        $contests['future'] = self::getContestList(
-            $r->identity,
-            $r['query'],
-            $page,
-            $pageSize,
-            \OmegaUp\DAO\Enum\ActiveStatus::FUTURE,
-            \OmegaUp\DAO\Enum\RecommendedStatus::NOT_RECOMMENDED
-        );
-        $contests['recommended_past'] = self::getContestList(
-            $r->identity,
-            $r['query'],
-            $page,
-            $pageSize,
-            \OmegaUp\DAO\Enum\ActiveStatus::PAST,
-            \OmegaUp\DAO\Enum\RecommendedStatus::RECOMMENDED
-        );
-        $contests['past'] = self::getContestList(
-            $r->identity,
-            $r['query'],
-            $page,
-            $pageSize,
-            \OmegaUp\DAO\Enum\ActiveStatus::PAST,
-            \OmegaUp\DAO\Enum\RecommendedStatus::NOT_RECOMMENDED
-        );
 
         return [
             'templateProperties' => [
@@ -1137,8 +1144,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('page_size');
 
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 100);
+        $page = intval($r['page'] ?? 1);
+        $pageSize = intval($r['page_size'] ?? 100);
 
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['query'],
