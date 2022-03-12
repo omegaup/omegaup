@@ -93,7 +93,7 @@ def insert_coder_of_the_month(
         return
     if verificate_coder_of_the_month(cur, data["user_id"]):
         return
-    code_verification = 'XQ92QMMMXF'
+    code_verification = generate_code()
     while True:
         try:
             if data["category"] == "all":
