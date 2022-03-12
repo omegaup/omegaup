@@ -102,8 +102,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         /** @var list<ContestListItem> */
         $contests = [];
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('page_size');
         \OmegaUp\Validators::validateOptionalNumber($r['active'], 'active');
         \OmegaUp\Validators::validateOptionalNumber(
             $r['recommended'],
@@ -121,8 +119,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'past',
             ]
         );
-        $page = intval($r['page'] ?? 1);
-        $pageSize = intval($r['page_size'] ?? 20);
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 20;
         $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::getIntValue(
             intval($r['active'] ?? \OmegaUp\DAO\Enum\ActiveStatus::ALL)
         );
@@ -1028,11 +1026,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             // Do nothing.
             $r->identity = null;
         }
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('page_size');
 
-        $page = intval($r['page'] ?? 1);
-        $pageSize = intval($r['page_size'] ?? 1000);
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['query'],
             'query',
@@ -1141,11 +1137,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->identity = null;
         }
 
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('page_size');
-
-        $page = intval($r['page'] ?? 1);
-        $pageSize = intval($r['page_size'] ?? 100);
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 100;
 
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['query'],
