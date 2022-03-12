@@ -2,15 +2,12 @@
 
 '''test verification_code module.'''
 
-import json
-from dataclasses import dataclass, field
-from typing import Dict, Any
+
 import pytest
 from pytest_mock import MockerFixture
 import rabbitmq_connection
 from producer_coder_of_month import send_message_client
 import client_coder_of_month
-import pika
 from rabbitmq_database import new_message
 from rabbitmq_connection import initialize_rabbitmq
 

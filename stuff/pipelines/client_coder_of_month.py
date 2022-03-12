@@ -29,22 +29,21 @@ import lib.logs  # pylint: disable=wrong-import-position
 def client(
         channel: pika.adapters.blocking_connection.BlockingChannel,
         cur: Optional[mysql.connector.cursor.MySQLCursorDict] = None,
-        dbconn: Optional[mysql.connector.MySQLConnection] = None) -> None:  
+        dbconn: Optional[mysql.connector.MySQLConnection] = None) -> None:
     '''Client function'''
-    
 
     def callback(channel: pika.adapters.blocking_connection.BlockingChannel,
-             method: pika.spec.Basic.Deliver,
-             properties: pika.spec.BasicProperties,
-             # pylint: disable=unused-argument,
-             body: bytes) -> None:
+                 method: pika.spec.Basic.Deliver,
+                 properties: pika.spec.BasicProperties,
+                 # pylint: disable=unused-argument,
+                 body: bytes) -> None:
         '''Callback function'''
         data = json.loads(body.decode())
         rabbitmq_database.insert_coder_of_the_month(data, cur, dbconn)
         if cur is None or dbconn is None:
             channel.close()
 
-    rabbitmq_client.receive_messages('coder_month', 'certificates', 
+    rabbitmq_client.receive_messages('coder_month', 'certificates',
                                      'CoderOfTheMonthQueue', channel, callback)
 
 
