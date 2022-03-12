@@ -5,12 +5,13 @@
 import json
 from dataclasses import dataclass, field
 from typing import Dict, Any
-from pytest_mock import MockerFixture
 import pytest
+from pytest_mock import MockerFixture
 import rabbitmq_connection
 from producer_coder_of_month import send_message_client
 import rabbitmq_client
 import pika
+from rabbitmq_connection import initialize_rabbitmq
 
 
 @dataclass
@@ -20,27 +21,6 @@ class MESSAGE:
 
 
 messageT = MESSAGE()
-
-
-def initialize_rabbitmq(
-        queue: str,
-        exchange: str,
-        routing_key: str,
-        channel: pika.adapters.blocking_connection.BlockingChannel
-) -> None:
-    '''initializes the queue and exchange'''
-    channel.queue_declare(
-        queue=queue, passive=False,
-        durable=False, exclusive=False,
-        auto_delete=False)
-    channel.exchange_declare(
-        exchange=exchange,
-        auto_delete=False,
-        durable=True,
-        exchange_type='direct')
-    channel.queue_bind(exchange=exchange,
-                       queue=queue,
-                       routing_key=routing_key)
 
 
 def callback(channel: pika.adapters.blocking_connection.BlockingChannel,
