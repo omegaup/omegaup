@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `Runs_Groups` (
+CREATE TABLE `Runs_Groups` (
   case_run_id int NOT NULL AUTO_INCREMENT,
   run_id int NOT NULL,
   group_name char(40) NOT NULL,
