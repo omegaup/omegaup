@@ -316,7 +316,6 @@ export default class Markdown extends Vue {
       border: 0;
       padding: 0;
       margin: inherit;
-      
 
       & > button {
         margin-left: 2em;
