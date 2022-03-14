@@ -1311,7 +1311,7 @@ Update a Contest
 | `requests_user_information`                  | `'no'\|'optional'\|'required'\|null` |             |
 | `scoreboard`                                 | `float\|null`                        |             |
 | `show_scoreboard_after`                      | `bool\|null`                         |             |
-| `start_time`                                 | `OmegaUp\Timestamp\|null`            |             |
+| `start_time`                                 | `\OmegaUp\Timestamp\|null`           |             |
 | `teams_group_alias`                          | `null\|string`                       |             |
 | `title`                                      | `null\|string`                       |             |
 
@@ -1331,11 +1331,11 @@ option is turned on
 
 ### Parameters
 
-| Name            | Type                | Description |
-| --------------- | ------------------- | ----------- |
-| `contest_alias` | `string`            |             |
-| `end_time`      | `OmegaUp\Timestamp` |             |
-| `username`      | `string`            |             |
+| Name            | Type                 | Description |
+| --------------- | -------------------- | ----------- |
+| `contest_alias` | `string`             |             |
+| `end_time`      | `\OmegaUp\Timestamp` |             |
+| `username`      | `string`             |             |
 
 ### Returns
 
