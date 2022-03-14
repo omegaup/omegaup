@@ -4,6 +4,7 @@
 
 import datetime
 from typing import List, NamedTuple
+
 import mysql.connector
 import mysql.connector.cursor
 
