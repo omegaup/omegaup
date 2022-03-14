@@ -12,9 +12,18 @@ import contextlib
 import getpass
 import os
 from typing import (overload, ContextManager, Generator, Literal, Optional,
-                    Union)
+                    Union, NamedTuple)
 
 import mysql.connector
+
+
+class DatabaseConnection(NamedTuple):
+    '''Arguments for database connection.'''
+    host: str
+    password: str
+    mysql_config_file: str
+    user: str
+    database: str
 
 
 class Connection:
@@ -115,7 +124,7 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
                          default='omegaup')
 
 
-def connect(args: argparse.Namespace) -> Connection:
+def connect(args: Union[argparse.Namespace, DatabaseConnection]) -> Connection:
     '''Connects to MySQL with the arguments provided.
 
     Returns a MySQL connection.

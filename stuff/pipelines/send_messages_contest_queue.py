@@ -16,7 +16,7 @@ import pika
 import rabbitmq_connection
 import test_constants
 import credentials
-from rabbitmq_database import get_contest_contestants
+import database.contest
 
 sys.path.insert(
     0,
@@ -43,9 +43,14 @@ def send_contest(
                                         routing_key='ContestQueue',
                                         channel=channel)
 
-    contestants = get_contest_contestants(date_lower_limit=date_lower_limit,
-                                          date_upper_limit=date_upper_limit,
-                                          cur=cur)
+    if cur is None:
+        return
+
+    contestants = database.contest.get_contest_contestants(
+        date_lower_limit=date_lower_limit,
+        date_upper_limit=date_upper_limit,
+        cur=cur
+    )
 
     for data in contestants:
         message = json.dumps(data)

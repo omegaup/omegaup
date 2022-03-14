@@ -1,22 +1,28 @@
 #!/usr/bin/python3
 
-'''Mysql consults to generate messages'''
+'''Mysql queries to generate messages for contests'''
 
 import datetime
-from typing import Any, Dict, List, Optional
+from typing import List, NamedTuple
 import mysql.connector
 import mysql.connector.cursor
+
+
+class ContestCertificate(NamedTuple):
+    '''Certificate cutoff for contests.'''
+    certificate_cutoff: int
+    alias: str
+    scoreboard_url: str
+    contest_id: str
 
 
 def get_contest_contestants(
         *,
         date_lower_limit: datetime.date,
         date_upper_limit: datetime.date,
-        cur: Optional[mysql.connector.cursor.MySQLCursorDict] = None
-) -> List[Dict[str, Any]]:
+        cur: mysql.connector.cursor.MySQLCursorDict
+) -> List[ContestCertificate]:
     '''Get contest users to recieve a certificate'''
-    if cur is None:
-        return []
 
     cur.execute(
         '''
@@ -35,7 +41,7 @@ def get_contest_contestants(
             finish_time BETWEEN %s AND %s;
         ''', (date_lower_limit, date_upper_limit)
     )
-    data = list()
+    data: List[ContestCertificate] = list()
     for row in cur:
         data.append({
             'certificate_cutoff': row['certificate_cutoff'],
