@@ -322,7 +322,6 @@ export default class Markdown extends Vue {
     }
 
     tr td:first-child pre {
-      overflow: visible;
       margin-right: 20px;
     }
   }
