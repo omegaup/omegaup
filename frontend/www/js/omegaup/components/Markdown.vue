@@ -243,14 +243,11 @@ export default class Markdown extends Vue {
   }
 
   td > button.clipboard {
-    position: relative;
-    top: 0;
-    left: 0;
+    float: right;
     border-color: var(--markdown-button-clipboard-border-color);
-    margin-left: -0.1rem;
+    margin-left: 0.5em;
     margin-right: -6px;
     margin-top: -6px;
-    margin-bottom: 0.5rem;
     padding: 3px;
     font-size: 90%;
   }
@@ -276,8 +273,6 @@ export default class Markdown extends Vue {
   table td {
     border: 1px solid var(--markdown-td-border-color);
     padding: 10px;
-    max-width: 800px;
-    overflow-x: auto;
   }
 
   table th {
@@ -316,6 +311,8 @@ export default class Markdown extends Vue {
       border: 0;
       padding: 0;
       margin: inherit;
+      max-width: 800px;
+      overflow-x: auto;
 
       & > button {
         margin-left: 2em;
