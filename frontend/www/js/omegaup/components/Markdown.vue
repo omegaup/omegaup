@@ -311,6 +311,8 @@ export default class Markdown extends Vue {
       border: 0;
       padding: 0;
       margin: inherit;
+      max-width: 800px;
+      overflow-x: auto;
 
       & > button {
         margin-left: 2em;
@@ -320,7 +322,6 @@ export default class Markdown extends Vue {
     }
 
     tr td:first-child pre {
-      overflow: visible;
       margin-right: 20px;
     }
   }
