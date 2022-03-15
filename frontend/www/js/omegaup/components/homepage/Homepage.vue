@@ -124,10 +124,20 @@
         :title="T.homepageSponsorsSectionTitle"
         :logos="[
           {
+            src: '/media/homepage/f5_logo.png',
+            alt: 'f5Logo',
+            href: 'https://www.f5.com/',
+          },
+          {
             src: '/media/homepage/amazon_logo.png',
             alt: 'AmazonLogo',
             href: 'https://www.aboutamazon.com/',
           },
+          {
+            src: '/media/homepage/replit_logo.png',
+            alt: 'replitLogo',
+            href: 'https://replit.com/', 
+          }
         ]"
       ></omegaup-sponsors>
     </div>
