@@ -48,6 +48,6 @@ fi
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
 	--env 'PYTHONIOENCODING=utf-8' \
 	--env "MYPYPATH=${OMEGAUP_ROOT}/stuff" \
-	omegaup/hook_tools:20220313 --command-name="./stuff/lint.sh" $ARGS
+	omegaup/hook_tools:20220314 --command-name="./stuff/lint.sh" $ARGS
 
 echo OK
