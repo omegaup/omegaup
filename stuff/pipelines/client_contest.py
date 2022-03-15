@@ -6,6 +6,7 @@ import argparse
 import logging
 import os
 import sys
+
 import contests_callback
 import rabbitmq_connection
 import rabbitmq_client
@@ -34,7 +35,7 @@ def main() -> None:
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
     logging.info('Started')
-    dbconn = lib.db.connect(args)
+    dbconn = lib.db.connect(lib.db.convert_args_to_tuple(args))
     try:
         with rabbitmq_connection.connect(
                 username=args.rabbitmq_username,

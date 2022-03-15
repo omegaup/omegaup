@@ -1,6 +1,5 @@
-from msilib import type_long
 from types import TracebackType
-from typing import Any, Iterator, Iterable, Mapping, Optional, Sequence, Text, Tuple
+from typing import Any, Iterator, Iterable, Mapping, Optional, Sequence, Text, Tuple, Type
 
 
 class BaseCursor:
@@ -46,5 +45,5 @@ class MySQLCursorBufferedDict(MySQLCursorDict):
     def __enter__(self):
         ...
 
-    def __exit__(self, exc_type: Optional[type_long[BaseException]], exc: Optional[BaseException], traceback: Optional[TracebackType]) -> None:
+    def __exit__(self, exc_type: Optional[Type[BaseException]], exc: Optional[BaseException], traceback: Optional[TracebackType]) -> None:
         ...

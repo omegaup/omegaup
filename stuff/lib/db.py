@@ -20,9 +20,9 @@ import mysql.connector
 class DatabaseConnection(NamedTuple):
     '''Arguments for database connection.'''
     host: str
+    user: str
     password: str
     mysql_config_file: str
-    user: str
     database: str
 
 
@@ -124,7 +124,18 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
                          default='omegaup')
 
 
-def connect(args: Union[argparse.Namespace, DatabaseConnection]) -> Connection:
+def convert_args_to_tuple(args: argparse.Namespace) -> DatabaseConnection:
+    '''Converts the arguments to a named tuple for the database connection'''
+    return DatabaseConnection(
+        host=args.host,
+        user=args.user,
+        password=args.password,
+        mysql_config_file=args.mysql_config_file,
+        database=args.database
+    )
+
+
+def connect(args: DatabaseConnection) -> Connection:
     '''Connects to MySQL with the arguments provided.
 
     Returns a MySQL connection.

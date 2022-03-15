@@ -3,19 +3,20 @@
 '''test verification_code module.'''
 
 import os
-
 import sys
-from pytest_mock import MockerFixture
-import rabbitmq_connection
-import contests_callback
-import rabbitmq_client
-import verification_code
+
+import pytest_mock
 import mysql.connector
 import mysql.connector.cursor
 import pika
-import test_constants
-import send_messages_contest_queue
+
+import contests_callback
 import credentials
+import rabbitmq_connection
+import rabbitmq_client
+import send_messages_contest_queue
+import test_constants
+import verification_code
 
 sys.path.insert(
     0,
@@ -73,14 +74,15 @@ class ContestsCallbackForTesting:
 
 def test_client_contest() -> None:
     '''Basic test for client contest queue.'''
-    args = lib.db.DatabaseConnection(
-        user='root',
-        password='omegaup',
-        host='omegaup',
-        database='omegaup',
-        mysql_config_file=lib.db.default_config_file_path() or ''
+    dbconn = lib.db.connect(
+        lib.db.DatabaseConnection(
+            user='root',
+            password='omegaup',
+            host='mysql',
+            database='omegaup',
+            mysql_config_file=lib.db.default_config_file_path() or ''
+        )
     )
-    dbconn = lib.db.connect(args)
 
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
         rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
@@ -91,10 +93,10 @@ def test_client_contest() -> None:
                             routing_key='ContestQueue',
                             channel=channel)
         send_messages_contest_queue.send_contest(
+            cur=cur,
             channel=channel,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
-            date_upper_limit=test_constants.DATE_UPPER_LIMIT,
-            cur=cur)
+            date_upper_limit=test_constants.DATE_UPPER_LIMIT)
         callback = ContestsCallbackForTesting(
             dbconn=dbconn.conn,
             api_token=test_constants.API_TOKEN,
@@ -118,19 +120,22 @@ def test_client_contest() -> None:
         assert count['count'] > 0
 
 
-def test_client_contest_with_mocked_codes(mocker: MockerFixture) -> None:
+def test_client_contest_with_mocked_codes(
+        mocker: pytest_mock.MockerFixture
+) -> None:
     '''Test client contest queue when a code already exists'''
     mocker.patch('contests_callback.generate_code',
                  side_effect=iter(['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F',
                                    'XMCF384X8M']))
-    args = lib.db.DatabaseConnection(
-        user='root',
-        password='omegaup',
-        host='omegaup',
-        database='omegaup',
-        mysql_config_file=lib.db.default_config_file_path() or ''
+    dbconn = lib.db.connect(
+        lib.db.DatabaseConnection(
+            user='root',
+            password='omegaup',
+            host='mysql',
+            database='omegaup',
+            mysql_config_file=lib.db.default_config_file_path() or ''
+        )
     )
-    dbconn = lib.db.connect(args)
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
         rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
                                     password=credentials.OMEGAUP_PASSWORD,
@@ -140,10 +145,10 @@ def test_client_contest_with_mocked_codes(mocker: MockerFixture) -> None:
                             routing_key='ContestQueue',
                             channel=channel)
         send_messages_contest_queue.send_contest(
+            cur=cur,
             channel=channel,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
-            date_upper_limit=test_constants.DATE_UPPER_LIMIT,
-            cur=cur)
+            date_upper_limit=test_constants.DATE_UPPER_LIMIT)
         callback = ContestsCallbackForTesting(
             dbconn=dbconn.conn,
             api_token=test_constants.API_TOKEN,
@@ -165,7 +170,9 @@ def test_client_contest_with_mocked_codes(mocker: MockerFixture) -> None:
         assert spy.call_count == 4
 
 
-def test_client_contest_with_duplicated_codes(mocker: MockerFixture) -> None:
+def test_client_contest_with_duplicated_codes(
+        mocker: pytest_mock.MockerFixture
+) -> None:
     '''Test client contest queue when a code already exists'''
     mocker.patch('contests_callback.generate_code',
                  side_effect=iter(['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F',
@@ -173,14 +180,15 @@ def test_client_contest_with_duplicated_codes(mocker: MockerFixture) -> None:
                                    'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
                                    'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
                                    'XMCF384X8X', 'XMCF384X8M']))
-    args = lib.db.DatabaseConnection(
-        user='root',
-        password='omegaup',
-        host='omegaup',
-        database='omegaup',
-        mysql_config_file=lib.db.default_config_file_path() or ''
+    dbconn = lib.db.connect(
+        lib.db.DatabaseConnection(
+            user='root',
+            password='omegaup',
+            host='mysql',
+            database='omegaup',
+            mysql_config_file=lib.db.default_config_file_path() or ''
+        )
     )
-    dbconn = lib.db.connect(args)
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
         rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
                                     password=credentials.OMEGAUP_PASSWORD,
@@ -190,10 +198,10 @@ def test_client_contest_with_duplicated_codes(mocker: MockerFixture) -> None:
                             routing_key='ContestQueue',
                             channel=channel)
         send_messages_contest_queue.send_contest(
+            cur=cur,
             channel=channel,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
-            date_upper_limit=test_constants.DATE_UPPER_LIMIT,
-            cur=cur)
+            date_upper_limit=test_constants.DATE_UPPER_LIMIT)
         callback = ContestsCallbackForTesting(
             dbconn=dbconn.conn,
             api_token=test_constants.API_TOKEN,

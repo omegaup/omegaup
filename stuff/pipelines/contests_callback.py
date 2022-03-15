@@ -2,16 +2,18 @@
 
 '''Processing contest messages.'''
 
-import json
 import dataclasses
+import json
 import logging
+
 from typing import List, Optional
 import omegaup.api
 import mysql.connector
-from mysql.connector import errors
 import mysql.connector.cursor
+from mysql.connector import errors
 from mysql.connector import errorcode
 import pika
+
 from verification_code import generate_code
 
 
@@ -45,21 +47,21 @@ class ContestsCallback:
         data = json.loads(body.decode())
         client = omegaup.api.Client(api_token=self.api_token,
                                     url=self.url)
+
         scoreboard = client.contest.scoreboard(
-            contest_alias=data['alias'],
-            token=data['scoreboard_url'])
+            contest_alias=data[1],
+            token=data[2])
         ranking = scoreboard['ranking']
         certificates: List[Certificate] = []
 
         for user in ranking:
             contest_place: Optional[int] = None
-            if (data['certificate_cutoff']
-                    and user['place'] <= data['certificate_cutoff']):
+            if (data[0] and user['place'] <= data[0]):
                 contest_place = user['place']
             verification_code = generate_code()
             certificates.append(Certificate(
                 certificate_type='contest',
-                contest_id=int(data['contest_id']),
+                contest_id=int(data[3]),
                 verification_code=verification_code,
                 contest_place=contest_place,
                 username=str(user['username'])

@@ -19,9 +19,9 @@ class ContestCertificate(NamedTuple):
 
 def get_contest_contestants(
         *,
+        cur: mysql.connector.cursor.MySQLCursorDict,
         date_lower_limit: datetime.date,
         date_upper_limit: datetime.date,
-        cur: mysql.connector.cursor.MySQLCursorDict
 ) -> List[ContestCertificate]:
     '''Get contest users to recieve a certificate'''
 
@@ -44,10 +44,12 @@ def get_contest_contestants(
     )
     data: List[ContestCertificate] = list()
     for row in cur:
-        data.append({
-            'certificate_cutoff': row['certificate_cutoff'],
-            'alias': row['alias'],
-            'scoreboard_url': row['scoreboard_url'],
-            'contest_id': row['contest_id'],
-        })
+        data.append(
+            ContestCertificate(
+                certificate_cutoff=row['certificate_cutoff'],
+                alias=row['alias'],
+                scoreboard_url=row['scoreboard_url'],
+                contest_id=row['contest_id'],
+            )
+        )
     return data

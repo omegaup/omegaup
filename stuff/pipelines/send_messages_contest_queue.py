@@ -3,20 +3,21 @@
 '''Send messages to Contest queue in rabbitmq'''
 
 import argparse
+import datetime
 import logging
 import os
 import sys
 import json
-from typing import Optional
-import datetime
-from rabbitmq_producer import RabbitmqProducer
+
 import mysql.connector
 import mysql.connector.cursor
 import pika
-import rabbitmq_connection
-import test_constants
+
 import credentials
 import database.contest
+import rabbitmq_connection
+import rabbitmq_producer
+import test_constants
 
 sys.path.insert(
     0,
@@ -27,10 +28,10 @@ import lib.logs  # pylint: disable=wrong-import-position
 
 
 def send_contest(
+        cur: mysql.connector.cursor.MySQLCursorDict,
         channel: pika.adapters.blocking_connection.BlockingChannel,
         date_lower_limit: datetime.date = test_constants.DATE_LOWER_LIMIT,
         date_upper_limit: datetime.date = test_constants.DATE_UPPER_LIMIT,
-        cur: Optional[mysql.connector.cursor.MySQLCursorDict] = None
 ) -> None:
     '''Send messages to contest queue.
      date-lower-limit: initial time from which to be taken the finish contests.
@@ -38,18 +39,17 @@ def send_contest(
      date-upper-limit: finish time from which to be taken the finish contests.
      By default, the current date will be taken.
     '''
-    contest_producer = RabbitmqProducer(queue='client_contest',
-                                        exchange='certificates',
-                                        routing_key='ContestQueue',
-                                        channel=channel)
-
-    if cur is None:
-        return
+    contest_producer = rabbitmq_producer.RabbitmqProducer(
+        queue='client_contest',
+        exchange='certificates',
+        routing_key='ContestQueue',
+        channel=channel
+    )
 
     contestants = database.contest.get_contest_contestants(
+        cur=cur,
         date_lower_limit=date_lower_limit,
         date_upper_limit=date_upper_limit,
-        cur=cur
     )
 
     for data in contestants:
@@ -69,17 +69,17 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = lib.db.connect(args)
+    dbconn = lib.db.connect(lib.db.convert_args_to_tuple(args))
     try:
         with dbconn.cursor(buffered=True, dictionary=True) as cur, \
             rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
                                         password=credentials.OMEGAUP_PASSWORD,
                                         host=credentials.RABBITMQ_HOST
                                         ) as channel:
-            send_contest(channel,
-                         args.date_lower_limit,
-                         args.date_upper_limit,
-                         cur)
+            send_contest(cur=cur,
+                         channel=channel,
+                         date_lower_limit=args.date_lower_limit,
+                         date_upper_limit=args.date_upper_limit)
     finally:
         dbconn.conn.close()
         logging.info('Done')
