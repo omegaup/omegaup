@@ -5,6 +5,7 @@
 import os
 import sys
 
+# pylint indicates pytest_mock should be placed before "import mysql.connector"
 import pytest_mock
 import mysql.connector
 import mysql.connector.cursor
@@ -75,7 +76,7 @@ class ContestsCallbackForTesting:
 def test_client_contest() -> None:
     '''Basic test for client contest queue.'''
     dbconn = lib.db.connect(
-        lib.db.DatabaseConnection(
+        lib.db.DatabaseConnectionArguments(
             user='root',
             password='omegaup',
             host='mysql',
@@ -128,7 +129,7 @@ def test_client_contest_with_mocked_codes(
                  side_effect=iter(['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F',
                                    'XMCF384X8M']))
     dbconn = lib.db.connect(
-        lib.db.DatabaseConnection(
+        lib.db.DatabaseConnectionArguments(
             user='root',
             password='omegaup',
             host='mysql',
@@ -181,7 +182,7 @@ def test_client_contest_with_duplicated_codes(
                                    'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
                                    'XMCF384X8X', 'XMCF384X8M']))
     dbconn = lib.db.connect(
-        lib.db.DatabaseConnection(
+        lib.db.DatabaseConnectionArguments(
             user='root',
             password='omegaup',
             host='mysql',

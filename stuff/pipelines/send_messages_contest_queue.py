@@ -69,7 +69,7 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = lib.db.connect(lib.db.convert_args_to_tuple(args))
+    dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
     try:
         with dbconn.cursor(buffered=True, dictionary=True) as cur, \
             rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,

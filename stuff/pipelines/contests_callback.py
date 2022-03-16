@@ -6,7 +6,7 @@ import dataclasses
 import json
 import logging
 
-from typing import List, Optional
+from typing import Any, List, Optional
 import omegaup.api
 import mysql.connector
 import mysql.connector.cursor
@@ -27,6 +27,28 @@ class Certificate:
     username: str
 
 
+@dataclasses.dataclass
+class ContestCertificate:
+    '''A dataclass for contest certificate.'''
+    certificate_cutoff: int
+    alias: str
+    scoreboard_url: str
+    contest_id: int
+
+    def __init__(self, certificate_cutoff: int, alias: str,
+                 scoreboard_url: str, contest_id: int) -> None:
+        '''Function to initialize the arguments'''
+        self.certificate_cutoff = certificate_cutoff
+        self.alias = alias
+        self.scoreboard_url = scoreboard_url
+        self.contest_id = contest_id
+        super().__init__()
+
+    def __getitem__(self, item: str) -> Any:
+        '''Get one of the given attributes'''
+        return getattr(self, item)
+
+
 class ContestsCallback:
     '''Contests callback'''
     def __init__(self,
@@ -44,24 +66,25 @@ class ContestsCallback:
                  _properties: pika.spec.BasicProperties,
                  body: bytes) -> None:
         '''Function to stores the certificates by a given contest'''
-        data = json.loads(body.decode())
+        data = ContestCertificate(**json.loads(body.decode()))
         client = omegaup.api.Client(api_token=self.api_token,
                                     url=self.url)
 
         scoreboard = client.contest.scoreboard(
-            contest_alias=data[1],
-            token=data[2])
+            contest_alias=data['alias'],
+            token=data['scoreboard_url'])
         ranking = scoreboard['ranking']
         certificates: List[Certificate] = []
 
         for user in ranking:
             contest_place: Optional[int] = None
-            if (data[0] and user['place'] <= data[0]):
+            if (data['certificate_cutoff']
+                    and user['place'] <= data['certificate_cutoff']):
                 contest_place = user['place']
             verification_code = generate_code()
             certificates.append(Certificate(
                 certificate_type='contest',
-                contest_id=int(data[3]),
+                contest_id=data['contest_id'],
                 verification_code=verification_code,
                 contest_place=contest_place,
                 username=str(user['username'])

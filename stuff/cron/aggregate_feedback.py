@@ -576,7 +576,7 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = lib.db.connect(lib.db.convert_args_to_tuple(args))
+    dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
     try:
         try:
             aggregate_reviewers_feedback(dbconn)

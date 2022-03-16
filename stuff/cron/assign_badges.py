@@ -110,7 +110,7 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = lib.db.connect(lib.db.convert_args_to_tuple(args))
+    dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
     try:
         with dbconn.cursor(dictionary=True) as cur:
             process_badges(args.current_timestamp, cur)
