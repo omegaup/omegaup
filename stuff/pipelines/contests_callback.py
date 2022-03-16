@@ -6,7 +6,7 @@ import dataclasses
 import json
 import logging
 
-from typing import Any, List, Optional
+from typing import List, Optional
 import omegaup.api
 import mysql.connector
 import mysql.connector.cursor
@@ -35,19 +35,6 @@ class ContestCertificate:
     scoreboard_url: str
     contest_id: int
 
-    def __init__(self, certificate_cutoff: int, alias: str,
-                 scoreboard_url: str, contest_id: int) -> None:
-        '''Function to initialize the arguments'''
-        self.certificate_cutoff = certificate_cutoff
-        self.alias = alias
-        self.scoreboard_url = scoreboard_url
-        self.contest_id = contest_id
-        super().__init__()
-
-    def __getitem__(self, item: str) -> Any:
-        '''Get one of the given attributes'''
-        return getattr(self, item)
-
 
 class ContestsCallback:
     '''Contests callback'''
@@ -71,20 +58,20 @@ class ContestsCallback:
                                     url=self.url)
 
         scoreboard = client.contest.scoreboard(
-            contest_alias=data['alias'],
-            token=data['scoreboard_url'])
+            contest_alias=data.alias,
+            token=data.scoreboard_url)
         ranking = scoreboard['ranking']
         certificates: List[Certificate] = []
 
         for user in ranking:
             contest_place: Optional[int] = None
-            if (data['certificate_cutoff']
-                    and user['place'] <= data['certificate_cutoff']):
+            if (data.certificate_cutoff
+                    and user['place'] <= data.certificate_cutoff):
                 contest_place = user['place']
             verification_code = generate_code()
             certificates.append(Certificate(
                 certificate_type='contest',
-                contest_id=data['contest_id'],
+                contest_id=data.contest_id,
                 verification_code=verification_code,
                 contest_place=contest_place,
                 username=str(user['username'])
