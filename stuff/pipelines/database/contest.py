@@ -3,8 +3,7 @@
 '''Mysql queries to generate messages for contests'''
 
 import datetime
-import json
-from typing import List, NamedTuple
+from typing import Dict, List, NamedTuple
 
 import mysql.connector
 import mysql.connector.cursor
@@ -12,7 +11,7 @@ import mysql.connector.cursor
 
 class ContestCertificate(NamedTuple):
     '''Relevant information for contests.'''
-    certificate_cutoff: int
+    certificate_cutoff: str
     alias: str
     scoreboard_url: str
     contest_id: str
@@ -23,7 +22,7 @@ def get_contest_contestants(
         cur: mysql.connector.cursor.MySQLCursorDict,
         date_lower_limit: datetime.date,
         date_upper_limit: datetime.date,
-) -> List[str]:
+) -> List[Dict[str, str]]:
     '''Get contest users to recieve a certificate'''
 
     cur.execute(
@@ -43,7 +42,7 @@ def get_contest_contestants(
             finish_time BETWEEN %s AND %s;
         ''', (date_lower_limit, date_upper_limit)
     )
-    data: List[str] = []
+    data: List[Dict[str, str]] = []
     for row in cur:
         contest = ContestCertificate(
             certificate_cutoff=row['certificate_cutoff'],
@@ -51,5 +50,5 @@ def get_contest_contestants(
             scoreboard_url=row['scoreboard_url'],
             contest_id=row['contest_id'],
         )
-        data.append(json.dumps(contest._asdict()))
+        data.append(contest._asdict())
     return data
