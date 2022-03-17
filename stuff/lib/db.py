@@ -24,6 +24,7 @@ class DatabaseConnectionArguments(NamedTuple):
     password: str
     mysql_config_file: str
     database: str
+    port: int
 
     @staticmethod
     def from_args(args: argparse.Namespace) -> 'DatabaseConnectionArguments':
@@ -33,7 +34,8 @@ class DatabaseConnectionArguments(NamedTuple):
             user=args.user,
             password=args.password,
             mysql_config_file=args.mysql_config_file,
-            database=args.database
+            database=args.database,
+            port=args.port
         )
 
 
@@ -133,6 +135,7 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
                          type=str,
                          help='MySQL database',
                          default='omegaup')
+    db_args.add_argument('--port', type=int, help='MySQL port', default=3306)
 
 
 def connect(args: DatabaseConnectionArguments) -> Connection:
@@ -163,6 +166,7 @@ def connect(args: DatabaseConnectionArguments) -> Connection:
             user=user,
             password=password,
             database=args.database,
+            port=args.port
         ))
 
 

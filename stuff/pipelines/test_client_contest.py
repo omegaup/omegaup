@@ -77,10 +77,11 @@ def test_client_contest() -> None:
     '''Basic test for client contest queue.'''
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
-            user='root',
-            password='omegaup',
-            host='mysql',
-            database='omegaup',
+            user=credentials.MYSQL_USER,
+            password=credentials.MYSQL_PASSWORD,
+            host=credentials.MYSQL_HOST,
+            database=credentials.MYSQL_DATABASE,
+            port=credentials.MYSQL_PORT,
             mysql_config_file=lib.db.default_config_file_path() or ''
         )
     )
@@ -130,10 +131,11 @@ def test_client_contest_with_mocked_codes(
                                    'XMCF384X8M']))
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
-            user='root',
-            password='omegaup',
-            host='mysql',
-            database='omegaup',
+            user=credentials.MYSQL_USER,
+            password=credentials.MYSQL_PASSWORD,
+            host=credentials.MYSQL_HOST,
+            database=credentials.MYSQL_DATABASE,
+            port=credentials.MYSQL_PORT,
             mysql_config_file=lib.db.default_config_file_path() or ''
         )
     )
@@ -183,10 +185,11 @@ def test_client_contest_with_duplicated_codes(
                                    'XMCF384X8X', 'XMCF384X8M']))
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
-            user='root',
-            password='omegaup',
-            host='mysql',
-            database='omegaup',
+            user=credentials.MYSQL_USER,
+            password=credentials.MYSQL_PASSWORD,
+            host=credentials.MYSQL_HOST,
+            database=credentials.MYSQL_DATABASE,
+            port=credentials.MYSQL_PORT,
             mysql_config_file=lib.db.default_config_file_path() or ''
         )
     )
