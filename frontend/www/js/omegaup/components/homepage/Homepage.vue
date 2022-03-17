@@ -124,7 +124,7 @@
         :title="T.homepageSponsorsSectionTitle"
         :logos="[
           {
-            src: '/media/homepage/f5_logo.png',
+            src: '/media/homepage/f5_logo.jpg',
             alt: 'f5Logo',
             href: 'https://www.f5.com/',
           },

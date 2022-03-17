@@ -32,6 +32,6 @@ h3.display-4 {
 }
 
 img.img-fluid {
-  max-height: 200px;
+  max-width: 332px;
 }
 </style>
