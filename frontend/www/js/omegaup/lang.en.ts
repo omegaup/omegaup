@@ -92,6 +92,8 @@ const translations: { [key: string]: string; } = {
   badge_100solvedProblems_name: "100 solved Problems",
   badge_500score_description: "User has achieved a score equal to or greater than 500.",
   badge_500score_name: "500 score",
+  badge_christmasProblem2021_description: "The user has participated in the A Problem for Christmas 2021 Contest by submitting original Christmas-themed problems.",
+  badge_christmasProblem2021_name: "Christmas Problem 2021",
   badge_coderOfTheMonth_description: "User has been Coder of The Month at least once.",
   badge_coderOfTheMonth_name: "Coder Of The Month",
   badge_contestManager_description: "User has managed at least one contest.",
