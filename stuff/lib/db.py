@@ -11,8 +11,8 @@ import configparser
 import contextlib
 import getpass
 import os
-from typing import (overload, ContextManager, Generator, Literal, Optional,
-                    Union, NamedTuple)
+from typing import (overload, ContextManager, Generator, Literal, NamedTuple,
+                    Optional, Union)
 
 import mysql.connector
 
@@ -166,7 +166,7 @@ def connect(args: DatabaseConnectionArguments) -> Connection:
             user=user,
             password=password,
             database=args.database,
-            port=args.port
+            port=args.port,
         ))
 
 
