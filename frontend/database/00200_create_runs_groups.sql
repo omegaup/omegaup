@@ -7,4 +7,4 @@ CREATE TABLE `Runs_Groups` (
   PRIMARY KEY (case_run_id),
   UNIQUE KEY (run_id, group_name),
   FOREIGN KEY (run_id) REFERENCES Runs (run_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guarda los grupos de runs hasta la fecha.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guarda los grupos de runs.';
