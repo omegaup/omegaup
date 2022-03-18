@@ -4328,6 +4328,12 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $third_party_login
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
+        if (!is_null(
+            \OmegaUp\Controllers\Session::getCurrentSession()['identity']
+        )) {
+            header('Location: /');
+            die();
+        }
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         if ($r->offsetExists('fb')) {
             $thirdPartyLogin = 'facebook';
