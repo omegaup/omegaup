@@ -41,14 +41,7 @@ import omegaup_Signup from './Signup.vue';
 export default class Signin extends Vue {
   @Prop() validateRecaptcha!: boolean;
   @Prop() facebookUrl!: string;
-  @Prop() isLoggedIn!: boolean;
 
   T = T;
-
-  mounted() {
-    if (this.isLoggedIn) {
-      window.location.href = '/';
-    }
-  }
 }
 </script>

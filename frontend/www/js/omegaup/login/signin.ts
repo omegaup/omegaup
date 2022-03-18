@@ -41,7 +41,6 @@ OmegaUp.on('ready', () => {
   }
 
   const payload = types.payloadParsers.LoginDetailsPayload();
-  const commonPayload = types.payloadParsers.CommonPayload('header-payload');
   if (payload.statusError) {
     ui.warning(payload.statusError);
   } else if (payload.verifyEmailSuccessfully) {
@@ -58,7 +57,6 @@ OmegaUp.on('ready', () => {
         props: {
           validateRecaptcha: payload.validateRecaptcha,
           facebookUrl: payload.facebookUrl,
-          isLoggedIn: commonPayload.isLoggedIn,
         },
         on: {
           'register-and-login': (
