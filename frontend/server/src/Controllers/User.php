@@ -4328,13 +4328,13 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $third_party_login
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
-        if (
-            !is_null(
-                \OmegaUp\Controllers\Session::getCurrentSession()['identity']
-            )
-        ) {
+        try {
+            $r->ensureIdentity();
+            // If the user has already logged in, redirect them to the home page.
             header('Location: /');
             throw new \OmegaUp\Exceptions\ExitException();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing.
         }
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         if ($r->offsetExists('fb')) {
