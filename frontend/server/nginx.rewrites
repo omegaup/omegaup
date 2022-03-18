@@ -106,6 +106,7 @@ rewrite ^/teamsgroup/?$ /teamsgroup/list.php last;
 rewrite ^/user/emailedit/([a-zA-Z0-9_]+)/?$ /users/emailedit.php?username=$1 last;
 rewrite ^/user/emailedit/?$ /users/emailedit.php last;
 rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/?$ /userverifyemail.php?id=$1 last;
+rewrite ^/img/libropre3.pdf/?$ /docs/assets/libroluisvargas.pdf last;
 
 # Cache control
 location ~ (/dist/|^/third_party/|^/media/|^/css|^/js/|^/img/) {
