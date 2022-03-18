@@ -504,10 +504,11 @@ jobs:
 
            # Add the container names as aliases to localhost
            cat << EOF | sudo tee --append /etc/hosts
-           127.0.0.1 rabbitmq
+           127.0.0.1 rabbitmq mysql
            EOF
 
            # Wait for some of the containers
+           wait-for-it -t 30 mysql:13306
            wait-for-it -t 30 rabbitmq:5672
            docker-compose exec -T rabbitmq rabbitmqctl await_startup
 
