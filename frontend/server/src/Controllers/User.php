@@ -4334,7 +4334,7 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         ) {
             header('Location: /');
-            die();
+            throw new \OmegaUp\Exceptions\ExitException();
         }
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         if ($r->offsetExists('fb')) {
