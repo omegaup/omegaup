@@ -503,9 +503,9 @@ jobs:
            docker-compose up --no-build --detach
 
            # Add the container names as aliases to localhost
-            cat << EOF | sudo tee --append /etc/hosts
-            127.0.0.1 rabbitmq mysql
-            EOF
+           cat << EOF | sudo tee --append /etc/hosts
+           127.0.0.1 rabbitmq mysql
+           EOF
 
            # Wait for some of the containers
            wait-for-it -t 30 mysql:13306
