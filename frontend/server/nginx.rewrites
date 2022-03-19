@@ -65,6 +65,7 @@ rewrite ^/group/([a-zA-Z0-9_+:-]+)/edit/?$ /group/edit.php?group=$1 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /groupscoreboard.php?group=$1&scoreboard=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/edit/?$ /group/scoreboardedit.php?group=$1&scoreboard=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/stats/?$ /groupstats.php?group=$1 last;
+rewrite ^/img/libropre3.pdf/?$ /docs/assets/libroluisvargas.pdf last;
 rewrite ^/login/?$ /login.php last;
 rewrite ^/login/google/?$ /logingoogle.php last;
 rewrite ^/login/password/recover/?$ /loginpasswordrecover.php last;
@@ -106,7 +107,6 @@ rewrite ^/teamsgroup/?$ /teamsgroup/list.php last;
 rewrite ^/user/emailedit/([a-zA-Z0-9_]+)/?$ /users/emailedit.php?username=$1 last;
 rewrite ^/user/emailedit/?$ /users/emailedit.php last;
 rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/?$ /userverifyemail.php?id=$1 last;
-rewrite ^/img/libropre3.pdf/?$ /docs/assets/libroluisvargas.pdf last;
 
 # Cache control
 location ~ (/dist/|^/third_party/|^/media/|^/css|^/js/|^/img/) {
