@@ -3,7 +3,7 @@
     <h3 class="col-12 mb-3 display-4">{{ title }}</h3>
     <div v-for="logo in logos" :key="logo.href" class="p-3 mt-2 mt-md-0">
       <a :href="logo.href" target="_blank">
-        <img class="img-fluid" :src="logo.src" :alt="logo.alt" />
+        <img :class="logo.class" :src="logo.src" :alt="logo.alt" />
       </a>
     </div>
   </div>
@@ -19,6 +19,7 @@ export default class Sponsors extends Vue {
     src: string;
     alt: string;
     href: string;
+    class: string;
   }[];
 }
 </script>
@@ -32,6 +33,7 @@ h3.display-4 {
 }
 
 img.img-fluid {
-  max-height: 200px;
+  max-width: 332px;
 }
+
 </style>
