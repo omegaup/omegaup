@@ -140,7 +140,7 @@
             src: '/media/homepage/replit_logo.png',
             alt: 'replitLogo',
             href: 'https://replit.com/', 
-          }
+          },
         ]"
       ></omegaup-sponsors>
     </div>
