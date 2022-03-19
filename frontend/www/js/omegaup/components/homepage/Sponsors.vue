@@ -35,5 +35,4 @@ h3.display-4 {
 img.img-fluid {
   max-width: 332px;
 }
-
 </style>
