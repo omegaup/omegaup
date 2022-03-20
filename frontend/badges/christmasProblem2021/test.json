@@ -1,0 +1,35 @@
+{
+    "testType": "apicall",
+    "actions": [
+        {
+            "type": "apicalls",
+            "apicalls": [
+                {
+                    "username": "admintest",
+                    "password": "testtesttest",
+                    "requests": [
+                        {
+                            "api": "\\OmegaUp\\Controllers\\User::apiCreate",
+                            "params": {
+                                "username": "test_user_0",
+                                "email": "user_0@domain.com",
+                                "password": "test_user_0"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\User::apiCreate",
+                            "params": {
+                                "username": "eduardo.pacheco",
+                                "email": "eduardo@domain.com",
+                                "password": "test_eduardo"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "expectedResults": [
+        "eduardo.pacheco"
+    ]
+}
