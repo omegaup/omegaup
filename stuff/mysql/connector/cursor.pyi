@@ -1,3 +1,4 @@
+import types
 from typing import Any, Iterator, Iterable, Mapping, Optional, Sequence, Text, Tuple
 
 
@@ -41,4 +42,8 @@ class MySQLCursorDict(BaseCursor):
 
 
 class MySQLCursorBufferedDict(MySQLCursorDict):
-    ...
+    def __enter__(self):
+        ...
+
+    def __exit__(self, exc_type: Optional[types[BaseException]], exc: Optional[BaseException], traceback: Optional[TracebackType]) -> None:
+        ...

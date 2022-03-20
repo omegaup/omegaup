@@ -31,6 +31,8 @@ class DaoLinter(linters.Linter):
             'dao_utils',
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), 'dao_utils.py'))
+        if dao_utils_module_spec is None:
+            raise ModuleNotFoundError('dao_utils module not found')
         dao_utils = importlib.util.module_from_spec(dao_utils_module_spec)
         dao_utils_module_spec.loader.exec_module(dao_utils)  # type: ignore
 
