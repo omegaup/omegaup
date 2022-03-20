@@ -69,7 +69,9 @@ def _revision(args: argparse.Namespace, auth: Sequence[str]) -> int:
         database_utils.mysql(
             'SELECT COALESCE(MAX(id), 0) FROM `Revision`;',
             dbname='_omegaup_metadata',
-            auth=auth).strip())
+            auth=auth,
+            container_check=not args.skip_container_check,
+        ).strip())
 
 
 def _scripts() -> List[Tuple[int, str, str]]:
@@ -128,17 +130,22 @@ def _set_mysql_timeout(args: argparse.Namespace,
                        auth: Sequence[str],
                        timeout: Optional[int] = None) -> None:
     '''Set the MySQL timeouts.'''
-    del args  # unused
     if timeout is None:
         timeout_str = 'DEFAULT'
     else:
         timeout_str = str(timeout)
-    database_utils.mysql('SET GLOBAL interactive_timeout = %s;' % timeout_str,
-                         dbname='mysql',
-                         auth=auth)
-    database_utils.mysql('SET GLOBAL wait_timeout = %s;' % timeout_str,
-                         dbname='mysql',
-                         auth=auth)
+    database_utils.mysql(
+        'SET GLOBAL interactive_timeout = %s;' % timeout_str,
+        dbname='mysql',
+        auth=auth,
+        container_check=not args.skip_container_check,
+    )
+    database_utils.mysql(
+        'SET GLOBAL wait_timeout = %s;' % timeout_str,
+        dbname='mysql',
+        auth=auth,
+        container_check=not args.skip_container_check,
+    )
 
 
 @contextlib.contextmanager
@@ -172,7 +179,9 @@ def _connection_timeout_wrapper(  # pylint: disable=too-many-arguments
                     (_BLOCKING_PROCESSES_QUERY %
                      (', '.join(f'"{dbname}"' for dbname in databases))),
                     dbname='mysql',
-                    auth=auth).strip().split('\n'):
+                    auth=auth,
+                    container_check=not args.skip_container_check,
+            ).strip().split('\n'):
                 if not line.strip():
                     continue
                 try:
@@ -180,12 +189,16 @@ def _connection_timeout_wrapper(  # pylint: disable=too-many-arguments
                         database_utils.mysql(
                             'CALL mysql.rds_kill(%s);' % line.split()[0],
                             dbname='mysql',
-                            auth=auth)
+                            auth=auth,
+                            container_check=not args.skip_container_check,
+                        )
                     else:
                         database_utils.mysql(
                             'KILL %s;' % line.split()[0],
                             dbname='mysql',
-                            auth=auth)
+                            auth=auth,
+                            container_check=not args.skip_container_check,
+                        )
                 except subprocess.CalledProcessError:
                     # The command already logged the error.
                     pass
@@ -206,13 +219,18 @@ def exists(args: argparse.Namespace, auth: Sequence[str]) -> None:
     Exits with 1 (error) if the metadata database has not been installed.
     This is a helper command for Puppet.
     '''
-    del args  # unused
     if not database_utils.mysql(
-            'SHOW DATABASES LIKE "_omegaup_metadata";', auth=auth):
+            'SHOW DATABASES LIKE "_omegaup_metadata";',
+            auth=auth,
+            container_check=not args.skip_container_check,
+    ):
         sys.exit(1)
     if not database_utils.mysql(
-            'SHOW TABLES LIKE "Revision";', dbname='_omegaup_metadata',
-            auth=auth):
+            'SHOW TABLES LIKE "Revision";',
+            dbname='_omegaup_metadata',
+            auth=auth,
+            container_check=not args.skip_container_check,
+    ):
         sys.exit(1)
 
 
@@ -269,14 +287,18 @@ def migrate(args: argparse.Namespace,
                     database_utils.mysql(
                         'source %s;' % database_utils.quote(path),
                         dbname=dbname,
-                        auth=auth)
+                        auth=auth,
+                        container_check=not args.skip_container_check,
+                    )
             if update_metadata:
                 database_utils.mysql(
                     ('INSERT INTO `Revision` '
-                     'VALUES(%d, CURRENT_TIMESTAMP, "%s");') % (revision,
-                                                                comment),
+                     'VALUES(%d, CURRENT_TIMESTAMP, "%s");') %
+                    (revision, comment),
                     dbname='_omegaup_metadata',
-                    auth=auth)
+                    auth=auth,
+                    container_check=not args.skip_container_check,
+                )
             logging.info('Done running script for revision %d', revision)
 
 
@@ -299,10 +321,11 @@ def validate(args: argparse.Namespace, auth: Sequence[str]) -> None:
 def ensure(args: argparse.Namespace, auth: Sequence[str]) -> None:
     '''Creates both the metadata database and table, if they don't exist yet.
     '''
-    del args  # unused
-
     database_utils.mysql(
-        'CREATE DATABASE IF NOT EXISTS `_omegaup_metadata`;', auth=auth)
+        'CREATE DATABASE IF NOT EXISTS `_omegaup_metadata`;',
+        auth=auth,
+        container_check=not args.skip_container_check,
+    )
     # This is the table that tracks the migrations. |id| is the revision,
     # |applied| is the timestamp the operation was made and |comment| is a
     # human-readable comment about the migration. It can be either 'migrate' if
@@ -315,7 +338,9 @@ def ensure(args: argparse.Namespace, auth: Sequence[str]) -> None:
         '`applied` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, '
         '`comment` VARCHAR(50));',
         dbname='_omegaup_metadata',
-        auth=auth)
+        auth=auth,
+        container_check=not args.skip_container_check,
+    )
 
 
 def reset(args: argparse.Namespace, auth: Sequence[str]) -> None:
@@ -328,13 +353,17 @@ def reset(args: argparse.Namespace, auth: Sequence[str]) -> None:
     database_utils.mysql(
         'DELETE FROM `Revision` WHERE `id` >= %d;' % args.revision,
         dbname='_omegaup_metadata',
-        auth=auth)
+        auth=auth,
+        container_check=not args.skip_container_check,
+    )
     if args.revision > 0:
         database_utils.mysql(
             ('INSERT INTO `Revision` '
              'VALUES(%d, CURRENT_TIMESTAMP, "manual reset");') % args.revision,
             dbname='_omegaup_metadata',
-            auth=auth)
+            auth=auth,
+            container_check=not args.skip_container_check,
+        )
 
 
 def print_revision(args: argparse.Namespace, auth: Sequence[str]) -> None:
@@ -359,12 +388,17 @@ def purge(args: argparse.Namespace, auth: Sequence[str]) -> None:
         for dbname in databases:
             logging.info('Dropping database %s', dbname)
             database_utils.mysql(
-                'DROP DATABASE IF EXISTS `%s`;' % dbname, auth=auth)
+                'DROP DATABASE IF EXISTS `%s`;' % dbname,
+                auth=auth,
+                container_check=not args.skip_container_check,
+            )
             logging.info('Creating database %s', dbname)
             database_utils.mysql(
                 'CREATE DATABASE `%s` CHARACTER SET UTF8 COLLATE '
                 'utf8_general_ci;' % dbname,
-                auth=auth)
+                auth=auth,
+                container_check=not args.skip_container_check,
+            )
             logging.info('Done creating database %s', dbname)
 
 
@@ -383,8 +417,16 @@ def schema(args: argparse.Namespace, auth: Sequence[str]) -> None:
     # This is a false positive.
     # pylint: disable=no-member
     sys.stdout.buffer.write(
-        database_utils.mysqldump(dbname=_SCHEMA_DB, auth=auth))
-    database_utils.mysql('DROP DATABASE `%s`;' % _SCHEMA_DB, auth=auth)
+        database_utils.mysqldump(
+            dbname=_SCHEMA_DB,
+            auth=auth,
+            container_check=not args.skip_container_check,
+        ))
+    database_utils.mysql(
+        'DROP DATABASE `%s`;' % _SCHEMA_DB,
+        auth=auth,
+        container_check=not args.skip_container_check,
+    )
 
 
 def main() -> None:
@@ -392,12 +434,19 @@ def main() -> None:
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        '--skip-container-check',
+        action='store_true',
+        help='Skip the container check')
+    parser.add_argument(
         '--mysql-config-file',
         default=database_utils.default_config_file(),
         help='.my.cnf file that stores credentials')
     parser.add_argument(
         '--hostname', default=None, type=str,
         help='Hostname of the MySQL server')
+    parser.add_argument(
+        '--port', default=13306, type=int,
+        help='Port of the MySQL server')
     parser.add_argument(
         '--username', default='root', help='MySQL root username')
     parser.add_argument('--password', default='omegaup', help='MySQL password')
@@ -489,11 +538,14 @@ def main() -> None:
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
-    auth = database_utils.authentication(
-        config_file=args.mysql_config_file,
-        username=args.username,
-        password=args.password,
-        hostname=args.hostname)
+    if not args.skip_container_check:
+        database_utils.check_inside_container()
+
+    auth = database_utils.authentication(config_file=args.mysql_config_file,
+                                         username=args.username,
+                                         password=args.password,
+                                         hostname=args.hostname,
+                                         port=args.port)
     args.func(args, auth)
 
 
