@@ -5,6 +5,7 @@ import Vue from 'vue';
 import arena_ContestList, {
   ContestsTab,
 } from '../components/arena/ContestList.vue';
+import contestStore from './contestStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -20,6 +21,7 @@ OmegaUp.on('ready', () => {
       contest.start_time = time.remoteDate(contest.start_time);
     });
   }
+  contestStore.commit('updateAll', payload.contests);
   const locationHashTab = window.location.hash.substr(1);
   let selectedTab: string | null = null;
   for (const tab of Object.values(ContestsTab)) {
@@ -49,7 +51,7 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-arena-contestlist', {
         props: {
           initialQuery: this.initialQuery,
-          contests: this.contests,
+          contests: contestStore.state.contests,
           isLogged: this.isLogged,
           selectedTab,
         },
