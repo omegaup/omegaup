@@ -35,103 +35,105 @@
                   ref="basic-info"
                   class="btn btn-link btn-block text-left"
                   type="button"
-                  data-toggle="collapse"
-                  data-target=".basic-info"
-                  aria-expanded="true"
                   aria-controls="problem-form-problem"
+                  @click="basicInfoVisible = !basicInfoVisible"
                 >
                   {{ T.contestEditBasicInformation }}
                 </button>
               </h2>
             </div>
-            <div class="collapse show card-body basic-info">
-              <div class="row">
-                <div class="form-group col-md-6">
-                  <label>{{ T.wordsTitle }}</label>
-                  <input
-                    v-model="title"
-                    class="form-control"
-                    :class="{
-                      'is-invalid': invalidParameterName === 'title',
-                    }"
-                    name="title"
-                    data-title
-                    :placeholder="titlePlaceHolder"
-                    size="30"
-                    type="text"
-                    required="required"
-                  />
+            <b-collapse v-model="basicInfoVisible">
+              <div class="card-body basic-info">
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label>{{ T.wordsTitle }}</label>
+                    <input
+                      v-model="title"
+                      class="form-control"
+                      :class="{
+                        'is-invalid': invalidParameterName === 'title',
+                      }"
+                      name="title"
+                      data-title
+                      :placeholder="titlePlaceHolder"
+                      size="30"
+                      type="text"
+                      required="required"
+                    />
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>{{ T.contestNewFormShortTitleAlias }}</label>
+                    <input
+                      v-model="alias"
+                      class="form-control"
+                      :class="{
+                        'is-invalid': invalidParameterName === 'alias',
+                      }"
+                      name="alias"
+                      :disabled="update"
+                      type="text"
+                      required="required"
+                    />
+                    <p class="help-block">
+                      {{ T.contestNewFormShortTitleAliasDesc }}
+                    </p>
+                  </div>
                 </div>
-                <div class="form-group col-md-6">
-                  <label>{{ T.contestNewFormShortTitleAlias }}</label>
-                  <input
-                    v-model="alias"
-                    class="form-control"
-                    :class="{
-                      'is-invalid': invalidParameterName === 'alias',
-                    }"
-                    name="alias"
-                    :disabled="update"
-                    type="text"
-                    required="required"
-                  />
-                  <p class="help-block">
-                    {{ T.contestNewFormShortTitleAliasDesc }}
-                  </p>
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label>{{ T.contestNewFormStartDate }}</label>
+                    <omegaup-datetimepicker
+                      v-model="startTime"
+                      data-start-date
+                    ></omegaup-datetimepicker>
+                    <p class="help-block">
+                      {{ T.contestNewFormStartDateDesc }}
+                    </p>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>{{ T.contestNewFormEndDate }}</label>
+                    <omegaup-datetimepicker
+                      v-model="finishTime"
+                      data-end-date
+                      :is-invalid="invalidParameterName === 'finish_time'"
+                    ></omegaup-datetimepicker>
+                    <p class="help-block">{{ T.contestNewFormEndDateDesc }}</p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label>{{ T.contestNewFormDescription }}</label>
+                    <textarea
+                      v-model="description"
+                      class="form-control"
+                      :class="{
+                        'is-invalid': invalidParameterName === 'description',
+                      }"
+                      name="description"
+                      cols="30"
+                      rows="10"
+                      required="required"
+                    ></textarea>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>{{ T.wordsLanguages }}</label
+                    ><br />
+                    <multiselect
+                      :value="languages"
+                      :options="Object.keys(allLanguages)"
+                      :multiple="true"
+                      :placeholder="T.contestNewFormLanguages"
+                      :close-on-select="false"
+                      :allow-empty="false"
+                      @remove="onRemove"
+                      @select="onSelect"
+                    >
+                    </multiselect>
+                    <p class="help-block">{{ T.contestNewFormLanguages }}</p>
+                  </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="form-group col-md-6">
-                  <label>{{ T.contestNewFormStartDate }}</label>
-                  <omegaup-datetimepicker
-                    v-model="startTime"
-                    data-start-date
-                  ></omegaup-datetimepicker>
-                  <p class="help-block">{{ T.contestNewFormStartDateDesc }}</p>
-                </div>
-                <div class="form-group col-md-6">
-                  <label>{{ T.contestNewFormEndDate }}</label>
-                  <omegaup-datetimepicker
-                    v-model="finishTime"
-                    data-end-date
-                    :is-invalid="invalidParameterName === 'finish_time'"
-                  ></omegaup-datetimepicker>
-                  <p class="help-block">{{ T.contestNewFormEndDateDesc }}</p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="form-group col-md-6">
-                  <label>{{ T.contestNewFormDescription }}</label>
-                  <textarea
-                    v-model="description"
-                    class="form-control"
-                    :class="{
-                      'is-invalid': invalidParameterName === 'description',
-                    }"
-                    name="description"
-                    cols="30"
-                    rows="10"
-                    required="required"
-                  ></textarea>
-                </div>
-                <div class="form-group col-md-6">
-                  <label>{{ T.wordsLanguages }}</label
-                  ><br />
-                  <multiselect
-                    :value="languages"
-                    :options="Object.keys(allLanguages)"
-                    :multiple="true"
-                    :placeholder="T.contestNewFormLanguages"
-                    :close-on-select="false"
-                    :allow-empty="false"
-                    @remove="onRemove"
-                    @select="onSelect"
-                  >
-                  </multiselect>
-                  <p class="help-block">{{ T.contestNewFormLanguages }}</p>
-                </div>
-              </div>
-            </div>
+            </b-collapse>
           </div>
 
           <div class="card">
@@ -139,113 +141,112 @@
               <h2 class="mb-0">
                 <button
                   ref="logistics"
-                  class="btn btn-link btn-block text-left collapsed"
+                  class="btn btn-link btn-block text-left"
                   type="button"
-                  data-toggle="collapse"
-                  data-target=".logistics"
-                  aria-expanded="true"
                   aria-controls="problem-form-problem"
+                  @click="logisticsVisible = !logisticsVisible"
                 >
                   {{ T.contestEditLogistics }}
                 </button>
               </h2>
             </div>
-            <div class="collapse card-body logistics">
-              <!-- Different Starts -->
-              <div class="row">
-                <div class="form-group col-md-6">
-                  <label>{{ T.contestNewFormDifferentStarts }}</label>
-                  <div class="checkbox">
-                    <label
-                      ><input v-model="windowLengthEnabled" type="checkbox" />
-                      {{ T.wordsEnable }}</label
+            <b-collapse v-model="logisticsVisible">
+              <div class="card-body logistics">
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label>{{ T.contestNewFormDifferentStarts }}</label>
+                    <div class="checkbox">
+                      <label
+                        ><input v-model="windowLengthEnabled" type="checkbox" />
+                        {{ T.wordsEnable }}</label
+                      >
+                    </div>
+                    <input
+                      v-model="windowLength"
+                      class="form-control"
+                      :class="{
+                        'is-invalid': invalidParameterName === 'window_length',
+                      }"
+                      size="3"
+                      type="text"
+                      :disabled="!windowLengthEnabled"
+                    />
+                    <p class="help-block">
+                      {{ T.contestNewFormDifferentStartsDesc }}
+                    </p>
+                  </div>
+
+                  <div class="form-group col-md-6">
+                    <label>{{ T.contestNewFormForTeams }}</label>
+                    <div class="checkbox">
+                      <label>
+                        <input
+                          v-model="currentContestForTeams"
+                          type="checkbox"
+                          :disabled="update"
+                        />
+                        {{ T.wordsEnable }}
+                      </label>
+                    </div>
+
+                    <omegaup-common-typeahead
+                      v-if="currentContestForTeams && !hasSubmissions"
+                      :existing-options="searchResultTeamsGroups"
+                      :value.sync="currentTeamsGroupAlias"
+                      @update-existing-options="
+                        (query) =>
+                          $emit('update-search-result-teams-groups', query)
+                      "
                     >
+                    </omegaup-common-typeahead>
+                    <input
+                      v-else
+                      class="form-control"
+                      disabled
+                      :value="currentTeamsGroupAlias"
+                    />
+                    <p class="help-block">{{ T.contestNewFormForTeamsDesc }}</p>
                   </div>
-                  <input
-                    v-model="windowLength"
-                    class="form-control"
-                    :class="{
-                      'is-invalid': invalidParameterName === 'window_length',
-                    }"
-                    size="3"
-                    type="text"
-                    :disabled="!windowLengthEnabled"
-                  />
-                  <p class="help-block">
-                    {{ T.contestNewFormDifferentStartsDesc }}
-                  </p>
                 </div>
-
-                <div class="form-group col-md-6">
-                  <label>{{ T.contestNewFormForTeams }}</label>
-                  <div class="checkbox">
-                    <label>
-                      <input
-                        v-model="currentContestForTeams"
-                        type="checkbox"
-                        :disabled="update"
-                      />
-                      {{ T.wordsEnable }}
-                    </label>
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label>{{ T.contestNewFormScoreboardAtEnd }}</label>
+                    <select
+                      v-model="showScoreboardAfter"
+                      data-show-scoreboard-at-end
+                      class="form-control"
+                    >
+                      <option :value="true">
+                        {{ T.wordsYes }}
+                      </option>
+                      <option :value="false">
+                        {{ T.wordsNo }}
+                      </option>
+                    </select>
+                    <p class="help-block">
+                      {{ T.contestNewFormScoreboardAtEndDesc }}
+                    </p>
                   </div>
-
-                  <omegaup-common-typeahead
-                    v-if="currentContestForTeams && !hasSubmissions"
-                    :existing-options="searchResultTeamsGroups"
-                    :value.sync="currentTeamsGroupAlias"
-                    @update-existing-options="
-                      (query) =>
-                        $emit('update-search-result-teams-groups', query)
-                    "
-                  >
-                  </omegaup-common-typeahead>
-                  <input
-                    v-else
-                    class="form-control"
-                    disabled
-                    :value="currentTeamsGroupAlias"
-                  />
-                  <p class="help-block">{{ T.contestNewFormForTeamsDesc }}</p>
+                  <div class="form-group col-md-6">
+                    <label>{{ T.contestNewFormScoreboardTimePercent }}</label>
+                    <input
+                      v-model="scoreboard"
+                      class="form-control scoreboard-time-percent"
+                      :class="{
+                        'is-invalid': invalidParameterName === 'scoreboard',
+                      }"
+                      name="scoreboard"
+                      size="3"
+                      type="text"
+                      required="required"
+                    />
+                    <p class="help-block">
+                      {{ T.contestNewFormScoreboardTimePercentDesc }}
+                    </p>
+                  </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="form-group col-md-6">
-                  <label>{{ T.contestNewFormScoreboardAtEnd }}</label>
-                  <select
-                    v-model="showScoreboardAfter"
-                    data-show-scoreboard-at-end
-                    class="form-control"
-                  >
-                    <option :value="true">
-                      {{ T.wordsYes }}
-                    </option>
-                    <option :value="false">
-                      {{ T.wordsNo }}
-                    </option>
-                  </select>
-                  <p class="help-block">
-                    {{ T.contestNewFormScoreboardAtEndDesc }}
-                  </p>
-                </div>
-                <div class="form-group col-md-6">
-                  <label>{{ T.contestNewFormScoreboardTimePercent }}</label>
-                  <input
-                    v-model="scoreboard"
-                    class="form-control scoreboard-time-percent"
-                    :class="{
-                      'is-invalid': invalidParameterName === 'scoreboard',
-                    }"
-                    name="scoreboard"
-                    size="3"
-                    type="text"
-                    required="required"
-                  />
-                  <p class="help-block">
-                    {{ T.contestNewFormScoreboardTimePercentDesc }}
-                  </p>
-                </div>
-              </div>
-            </div>
+            </b-collapse>
           </div>
 
           <div class="card">
@@ -253,189 +254,194 @@
               <h2 class="mb-0">
                 <button
                   ref="scoring-rules"
-                  class="btn btn-link btn-block text-left collapsed"
+                  class="btn btn-link btn-block text-left"
                   type="button"
-                  data-toggle="collapse"
-                  data-target=".scoring-rules"
-                  aria-expanded="true"
                   aria-controls="problem-form-problem"
+                  @click="scoringRulesVisible = !scoringRulesVisible"
                 >
                   {{ T.contestEditScoringRules }}
                 </button>
               </h2>
             </div>
-            <div class="collapse card-body scoring-rules">
-              <div class="row">
-                <div class="form-group col-md-6">
-                  <label>{{ T.contestNewFormPartialScore }}</label>
-                  <select
-                    v-model="partialScore"
-                    data-partial-points
-                    class="form-control"
-                  >
-                    <option :value="true">
-                      {{ T.wordsYes }}
-                    </option>
-                    <option :value="false">
-                      {{ T.wordsNo }}
-                    </option>
-                  </select>
-                  <p class="help-block">
-                    {{ T.contestNewFormPartialScoreDesc }}
-                  </p>
+            <b-collapse v-model="scoringRulesVisible">
+              <div class="card-body scoring-rules">
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label>{{ T.contestNewFormPartialScore }}</label>
+                    <select
+                      v-model="partialScore"
+                      data-partial-points
+                      class="form-control"
+                    >
+                      <option :value="true">
+                        {{ T.wordsYes }}
+                      </option>
+                      <option :value="false">
+                        {{ T.wordsNo }}
+                      </option>
+                    </select>
+                    <p class="help-block">
+                      {{ T.contestNewFormPartialScoreDesc }}
+                    </p>
+                  </div>
+
+                  <div class="form-group col-md-6">
+                    <label>{{ T.wordsFeedback }}</label>
+                    <select v-model="feedback" class="form-control">
+                      <option value="none">
+                        {{ T.wordsNone }}
+                      </option>
+                      <option value="summary">
+                        {{ T.wordsSummary }}
+                      </option>
+                      <option value="detailed">
+                        {{ T.wordsDetailed }}
+                      </option>
+                    </select>
+                    <p class="help-block">
+                      {{ T.contestNewFormImmediateFeedbackDesc }}
+                    </p>
+                  </div>
                 </div>
 
-                <div class="form-group col-md-6">
-                  <label>{{ T.wordsFeedback }}</label>
-                  <select v-model="feedback" class="form-control">
-                    <option value="none">
-                      {{ T.wordsNone }}
-                    </option>
-                    <option value="summary">
-                      {{ T.wordsSummary }}
-                    </option>
-                    <option value="detailed">
-                      {{ T.wordsDetailed }}
-                    </option>
-                  </select>
-                  <p class="help-block">
-                    {{ T.contestNewFormImmediateFeedbackDesc }}
-                  </p>
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label>{{ T.contestNewFormSubmissionsSeparation }}</label>
+                    <input
+                      v-model="submissionsGap"
+                      class="form-control"
+                      name="submissions_gap"
+                      :class="{
+                        'is-invalid':
+                          invalidParameterName === 'submissions_gap',
+                      }"
+                      size="2"
+                      type="text"
+                      required="required"
+                    />
+                    <p class="help-block">
+                      {{ T.contestNewFormSubmissionsSeparationDesc }}
+                    </p>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>{{ T.contestNewFormPenaltyType }}</label>
+                    <select v-model="penaltyType" class="form-control">
+                      <option value="none">
+                        {{ T.contestNewFormNoPenalty }}
+                      </option>
+                      <option value="problem_open">
+                        {{ T.contestNewFormByProblem }}
+                      </option>
+                      <option value="contest_start">
+                        {{ T.contestNewFormByContests }}
+                      </option>
+                      <option value="runtime">
+                        {{ T.contestNewFormByRuntime }}
+                      </option>
+                    </select>
+                    <p class="help-block">
+                      {{ T.contestNewFormPenaltyTypeDesc }}
+                    </p>
+                  </div>
                 </div>
-              </div>
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label>{{ T.wordsPenalty }}</label>
+                    <input
+                      v-model="penalty"
+                      name="penalty"
+                      class="form-control"
+                      :class="{
+                        'is-invalid': invalidParameterName === 'penalty',
+                      }"
+                      size="2"
+                      type="text"
+                      required="required"
+                    />
+                    <p class="help-block">{{ T.contestNewFormPenaltyDesc }}</p>
+                  </div>
 
-              <div class="row">
-                <div class="form-group col-md-6">
-                  <label>{{ T.contestNewFormSubmissionsSeparation }}</label>
-                  <input
-                    v-model="submissionsGap"
-                    class="form-control"
-                    name="submissions_gap"
-                    :class="{
-                      'is-invalid': invalidParameterName === 'submissions_gap',
-                    }"
-                    size="2"
-                    type="text"
-                    required="required"
-                  />
-                  <p class="help-block">
-                    {{ T.contestNewFormSubmissionsSeparationDesc }}
-                  </p>
-                </div>
-                <div class="form-group col-md-6">
-                  <label>{{ T.contestNewFormPenaltyType }}</label>
-                  <select v-model="penaltyType" class="form-control">
-                    <option value="none">
-                      {{ T.contestNewFormNoPenalty }}
-                    </option>
-                    <option value="problem_open">
-                      {{ T.contestNewFormByProblem }}
-                    </option>
-                    <option value="contest_start">
-                      {{ T.contestNewFormByContests }}
-                    </option>
-                    <option value="runtime">
-                      {{ T.contestNewFormByRuntime }}
-                    </option>
-                  </select>
-                  <p class="help-block">
-                    {{ T.contestNewFormPenaltyTypeDesc }}
-                  </p>
+                  <div class="form-group col-md-6">
+                    <label>{{ T.contestNewFormPointDecrementFactor }}</label>
+                    <input
+                      v-model="pointsDecayFactor"
+                      name="points_decay_factor"
+                      class="form-control"
+                      :class="{
+                        'is-invalid':
+                          invalidParameterName === 'points_decay_factor',
+                      }"
+                      size="4"
+                      type="text"
+                      required="required"
+                    />
+                    <p class="help-block">
+                      {{ T.contestNewFormPointDecrementFactorDesc }}
+                    </p>
+                  </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="form-group col-md-6">
-                  <label>{{ T.wordsPenalty }}</label>
-                  <input
-                    name="penalty"
-                    v-model="penalty"
-                    class="form-control"
-                    :class="{
-                      'is-invalid': invalidParameterName === 'penalty',
-                    }"
-                    size="2"
-                    type="text"
-                    required="required"
-                  />
-                  <p class="help-block">{{ T.contestNewFormPenaltyDesc }}</p>
-                </div>
-
-                <div class="form-group col-md-6">
-                  <label>{{ T.contestNewFormPointDecrementFactor }}</label>
-                  <input
-                    name="points_decay_factor"
-                    v-model="pointsDecayFactor"
-                    class="form-control"
-                    :class="{
-                      'is-invalid':
-                        invalidParameterName === 'points_decay_factor',
-                    }"
-                    size="4"
-                    type="text"
-                    required="required"
-                  />
-                  <p class="help-block">
-                    {{ T.contestNewFormPointDecrementFactorDesc }}
-                  </p>
-                </div>
-              </div>
-            </div>
+            </b-collapse>
           </div>
           <div class="card">
             <div class="card-header">
               <h2 class="mb-0">
                 <button
-                  class="btn btn-link btn-block text-left collapsed"
+                  class="btn btn-link btn-block text-left"
                   type="button"
-                  data-toggle="collapse"
-                  data-target=".privacy"
-                  aria-expanded="true"
                   aria-controls="problem-form-problem"
+                  @click="privacyVisible = !privacyVisible"
                 >
                   {{ T.contestEditPrivacy }}
                 </button>
               </h2>
             </div>
-            <div class="collapse card-body privacy">
-              <div class="row">
-                <div class="form-group col-md-6">
-                  <label>{{ T.contestNewFormBasicInformationRequired }}</label>
-                  <div class="checkbox form-check">
-                    <input
-                      v-model="needsBasicInformation"
-                      data-basic-information-required
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    <label class="form-check-label"> {{ T.wordsEnable }}</label>
+            <b-collapse v-model="privacyVisible">
+              <div class="card-body privacy">
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label>{{
+                      T.contestNewFormBasicInformationRequired
+                    }}</label>
+                    <div class="checkbox form-check">
+                      <input
+                        v-model="needsBasicInformation"
+                        data-basic-information-required
+                        class="form-check-input"
+                        type="checkbox"
+                      />
+                      <label class="form-check-label">
+                        {{ T.wordsEnable }}</label
+                      >
+                    </div>
+                    <p class="help-block">
+                      {{ T.contestNewFormBasicInformationRequiredDesc }}
+                    </p>
                   </div>
-                  <p class="help-block">
-                    {{ T.contestNewFormBasicInformationRequiredDesc }}
-                  </p>
-                </div>
-                <div class="form-group col-md-6">
-                  <label>{{ T.contestNewFormUserInformationRequired }}</label>
-                  <select
-                    v-model="requestsUserInformation"
-                    data-request-user-information
-                    class="form-control"
-                  >
-                    <option value="no">
-                      {{ T.wordsNo }}
-                    </option>
-                    <option value="optional">
-                      {{ T.wordsOptional }}
-                    </option>
-                    <option value="required">
-                      {{ T.wordsRequired }}
-                    </option>
-                  </select>
-                  <p class="help-block">
-                    {{ T.contestNewFormUserInformationRequiredDesc }}
-                  </p>
+                  <div class="form-group col-md-6">
+                    <label>{{ T.contestNewFormUserInformationRequired }}</label>
+                    <select
+                      v-model="requestsUserInformation"
+                      data-request-user-information
+                      class="form-control"
+                    >
+                      <option value="no">
+                        {{ T.wordsNo }}
+                      </option>
+                      <option value="optional">
+                        {{ T.wordsOptional }}
+                      </option>
+                      <option value="required">
+                        {{ T.wordsRequired }}
+                      </option>
+                    </select>
+                    <p class="help-block">
+                      {{ T.contestNewFormUserInformationRequiredDesc }}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </b-collapse>
           </div>
         </div>
 
@@ -464,11 +470,13 @@ import common_Typeahead from '../common/Typeahead.vue';
 import DateTimePicker from '../DateTimePicker.vue';
 import Multiselect from 'vue-multiselect';
 import { types } from '../../api_types';
+import { BCollapse } from 'bootstrap-vue';
 
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-datetimepicker': DateTimePicker,
+    'b-collapse': BCollapse,
     Multiselect,
   },
 })
@@ -530,46 +538,30 @@ export default class NewForm extends Vue {
   currentTeamsGroupAlias = this.teamsGroupAlias;
   titlePlaceHolder = '';
 
+  // Colapse variables
+
+  basicInfoVisible = true;
+  logisticsVisible = false;
+  scoringRulesVisible = false;
+  privacyVisible = false;
+
   openCollapsedIfRequired() {
-    const formData = new FormData(this.formRef);
+    if (!this.title || !this.alias || !this.description) {
+      this.basicInfoVisible = true;
+    }
 
-    let basicInfoCollapsed = this.basicInfoRef.classList.contains('collapsed');
-    let logisticsCollapsed = this.logisticsRef.classList.contains('collapsed');
-    let scoringRulesCollapsed = this.scoringRulesRef.classList.contains(
-      'collapsed',
-    );
+    // We use this.scoreboard !== 0 && this.scoreboard because '!this.scoreboard' will return true if this.scoreboard equals 0, which is not what we want, since that's a valid value. Also, we use !this.scoreboard since the value could be empty. (e.g the user deletes all the input)
+    if (this.scoreboard !== 0 && !this.scoreboard) {
+      this.logisticsVisible = true;
+    }
 
-    console.log('FORM DATA');
-    for (const [key, value] of formData.entries()) {
-      console.log(key, value);
-      const isEmpty = value === '';
-      if (isEmpty) {
-        if (
-          basicInfoCollapsed &&
-          (key === 'title' || key === 'alias' || key === 'description')
-        ) {
-          this.basicInfoRef.click();
-          basicInfoCollapsed = false;
-          continue;
-        }
-
-        if (logisticsCollapsed && key === 'scoreboard') {
-          this.logisticsRef.click();
-          logisticsCollapsed = false;
-          continue;
-        }
-
-        if (
-          scoringRulesCollapsed &&
-          (key === 'penalty' ||
-            key === 'submissions_gap' ||
-            key === 'points_decay_factor')
-        ) {
-          this.scoringRulesRef.click();
-          scoringRulesCollapsed = false;
-          continue;
-        }
-      }
+    // Refer to the above comment
+    if (
+      (this.penalty !== 0 && !this.penalty) ||
+      (this.submissionsGap !== 0 && !this.submissionsGap) ||
+      (this.pointsDecayFactor !== 0 && !this.pointsDecayFactor)
+    ) {
+      this.scoringRulesVisible = true;
     }
   }
 
