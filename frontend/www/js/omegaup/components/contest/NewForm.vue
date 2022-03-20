@@ -32,7 +32,7 @@
             <div class="card-header">
               <h2 class="mb-0">
                 <button
-                  ref="basic-info"
+                  data-basic-info
                   class="btn btn-link btn-block text-left"
                   type="button"
                   aria-controls="problem-form-problem"
@@ -140,7 +140,7 @@
             <div class="card-header">
               <h2 class="mb-0">
                 <button
-                  ref="logistics"
+                  data-logistics
                   class="btn btn-link btn-block text-left"
                   type="button"
                   aria-controls="problem-form-problem"
@@ -253,7 +253,7 @@
             <div class="card-header">
               <h2 class="mb-0">
                 <button
-                  ref="scoring-rules"
+                  data-scoring-rules
                   class="btn btn-link btn-block text-left"
                   type="button"
                   aria-controls="problem-form-problem"
@@ -387,6 +387,7 @@
             <div class="card-header">
               <h2 class="mb-0">
                 <button
+                  data-privacy
                   class="btn btn-link btn-block text-left"
                   type="button"
                   aria-controls="problem-form-problem"

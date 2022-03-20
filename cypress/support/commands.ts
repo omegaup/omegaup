@@ -139,6 +139,12 @@ Cypress.Commands.add(
     requestParticipantInformation = 'no',
   }) => {
     cy.visit('contest/new/');
+
+    // Open all hidden collapsable
+    cy.get('[data-logistics]').click();
+    cy.get('[data-scoring-rules]').click();
+    cy.get('[data-privacy]').click();
+
     cy.get('[name="title"]').type(contestAlias);
     cy.get('[name="alias"]').type(contestAlias);
     cy.get('[name="description"]').type(description);
