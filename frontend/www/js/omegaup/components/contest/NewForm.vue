@@ -229,15 +229,16 @@
                   </div>
                   <div class="form-group col-md-6">
                     <label>{{ T.contestNewFormScoreboardTimePercent }}</label>
-                    <input
+                    <b-form-input
                       v-model="scoreboard"
-                      class="form-control scoreboard-time-percent"
+                      class="scoreboard-time-percent"
+                      :formatter="numberFormatter"
                       :class="{
                         'is-invalid': invalidParameterName === 'scoreboard',
                       }"
                       name="scoreboard"
                       size="3"
-                      type="text"
+                      type="number"
                       required="required"
                     />
                     <p class="help-block">
@@ -307,16 +308,16 @@
                 <div class="row">
                   <div class="form-group col-md-6">
                     <label>{{ T.contestNewFormSubmissionsSeparation }}</label>
-                    <input
+                    <b-form-input
                       v-model="submissionsGap"
-                      class="form-control"
                       name="submissions_gap"
+                      :formatter="numberFormatter"
                       :class="{
                         'is-invalid':
                           invalidParameterName === 'submissions_gap',
                       }"
                       size="2"
-                      type="text"
+                      type="number"
                       required="required"
                     />
                     <p class="help-block">
@@ -347,15 +348,15 @@
                 <div class="row">
                   <div class="form-group col-md-6">
                     <label>{{ T.wordsPenalty }}</label>
-                    <input
+                    <b-form-input
                       v-model="penalty"
                       name="penalty"
-                      class="form-control"
+                      :formatter="numberFormatter"
                       :class="{
                         'is-invalid': invalidParameterName === 'penalty',
                       }"
                       size="2"
-                      type="text"
+                      type="number"
                       required="required"
                     />
                     <p class="help-block">{{ T.contestNewFormPenaltyDesc }}</p>
@@ -363,16 +364,16 @@
 
                   <div class="form-group col-md-6">
                     <label>{{ T.contestNewFormPointDecrementFactor }}</label>
-                    <input
+                    <b-form-input
                       v-model="pointsDecayFactor"
                       name="points_decay_factor"
-                      class="form-control"
+                      :formatter="numberFormatter"
                       :class="{
                         'is-invalid':
                           invalidParameterName === 'points_decay_factor',
                       }"
                       size="4"
-                      type="text"
+                      type="number"
                       required="required"
                     />
                     <p class="help-block">
@@ -447,8 +448,8 @@
         </div>
 
         <div class="form-group">
-          <button
-            class="btn btn-primary"
+          <b-button
+            variant="primary"
             type="submit"
             @click="openCollapsedIfRequired()"
           >
@@ -457,7 +458,7 @@
                 ? T.contestNewFormUpdateContest
                 : T.contestNewFormScheduleContest
             }}
-          </button>
+          </b-button>
         </div>
       </form>
     </div>
@@ -471,13 +472,15 @@ import common_Typeahead from '../common/Typeahead.vue';
 import DateTimePicker from '../DateTimePicker.vue';
 import Multiselect from 'vue-multiselect';
 import { types } from '../../api_types';
-import { BCollapse } from 'bootstrap-vue';
+import { BCollapse, BFormInput, BButton } from 'bootstrap-vue';
 
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-datetimepicker': DateTimePicker,
     'b-collapse': BCollapse,
+    'b-form-input': BFormInput,
+    'b-button': BButton,
     Multiselect,
   },
 })
@@ -550,20 +553,15 @@ export default class NewForm extends Vue {
     if (!this.title || !this.alias || !this.description) {
       this.basicInfoVisible = true;
     }
+  }
 
-    // We use this.scoreboard !== 0 && this.scoreboard because '!this.scoreboard' will return true if this.scoreboard equals 0, which is not what we want, since that's a valid value. Also, we use !this.scoreboard since the value could be empty. (e.g the user deletes all the input)
-    if (this.scoreboard !== 0 && !this.scoreboard) {
-      this.logisticsVisible = true;
+  // Avoids a number input to get totally cleared by the user
+  numberFormatter(input: number | null) {
+    if (input === null) {
+      return 0;
     }
 
-    // Refer to the above comment
-    if (
-      (this.penalty !== 0 && !this.penalty) ||
-      (this.submissionsGap !== 0 && !this.submissionsGap) ||
-      (this.pointsDecayFactor !== 0 && !this.pointsDecayFactor)
-    ) {
-      this.scoringRulesVisible = true;
-    }
+    return Math.max(0, input);
   }
 
   @Watch('windowLengthEnabled')
