@@ -162,7 +162,7 @@ class RequestParam {
                 $splitTypes[] = 'str';
                 continue;
             }
-            if ($splitType == 'OmegaUp\\Timestamp') {
+            if ($splitType == '\\OmegaUp\\Timestamp') {
                 $splitTypes[] = 'datetime.datetime';
                 continue;
             }

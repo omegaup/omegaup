@@ -176,7 +176,7 @@
           }}</a>
           <a
             class="dropdown-item text-wrap"
-            href="https://omegaup.com/img/libropre3.pdf"
+            href="https://omegaup.com/docs/assets/libroluisvargas.pdf"
             >{{ T.navAlgorithmsBook }}</a
           >
         </div>
