@@ -26,7 +26,7 @@ else
 	TTY_ARGS=""
 fi
 
-if [[ -d /proc ]] && grep -q pids:/docker /proc/1/cgroup; then
+if [[ "${OMEGAUP_ROOT}" == "/opt/omegaup" ]]; then
 	echo "Running ./stuff/lint.sh inside a container is not supported." 1>&2
 	echo "Please run this command outside the container" 1>&2
 	exit 1

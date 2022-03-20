@@ -14,13 +14,14 @@ jobs:
       mysql:
         image: mysql:8.0.23
         ports:
-          - 3306:3306
+          - 13306:13306
         env:
           MYSQL_ROOT_PASSWORD:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_USER: omegaup
           MYSQL_PASSWORD: omegaup
           MYSQL_DATABASE: omegaup-test
+          MYSQL_TCP_PORT: 13306
 
       redis:
         image: redis
@@ -49,6 +50,7 @@ jobs:
         run: |
           cat > frontend/tests/test_config.php <<EOF
           <?php
+          define('OMEGAUP_DB_HOST', 'localhost:13306');
           define('REDIS_HOST', 'localhost');
           define('REDIS_PASS', '');
           EOF
@@ -80,25 +82,31 @@ jobs:
       - name: Create database users
         run: |
           mysql \
-            -uroot --skip-password --protocol=TCP \
+            -uroot --skip-password --port=13306 --protocol=TCP \
             -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
 
       - name: Validate database migration scripts
-        run: python3 stuff/db-migrate.py validate
+        run: |
+          python3 stuff/db-migrate.py --skip-container-check validate
 
       - name: Create test database
         run: |
           python3 stuff/db-migrate.py \
-            --username=root --password= --hostname=localhost \
+            --skip-container-check \
+            --username=root --password= --hostname=localhost --port=13306 \
             migrate --databases=omegaup-test
 
       - name: Validate database schema
         run: |
           python3 stuff/policy-tool.py \
-            --username=root --password= --hostname=localhost --database=omegaup-test \
+            --skip-container-check \
+            --username=root --password= --hostname=localhost --port=13306 \
+            --database=omegaup-test \
             validate
           python3 stuff/database_schema.py \
-            --username=root --password= --hostname=localhost --database=omegaup-test \
+            --skip-container-check \
+            --username=root --password= --hostname=localhost --port=13306 \
+            --database=omegaup-test \
             validate --all < /dev/null
 
       - name: Run tests
@@ -252,7 +260,7 @@ jobs:
 
           for i in $(seq 10); do
             if [[ "$(mysql \
-                     -uomegaup -pomegaup --host=mysql --port= 13306 --skip-column-names --batch \
+                     -uomegaup -pomegaup --host=mysql --port=13306 --skip-column-names --batch \
                      -e 'SELECT 1;' || echo 0)" == "1" ]]; then
               break
             fi
@@ -265,7 +273,7 @@ jobs:
           <?php
           define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
           define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
-          define('OMEGAUP_DB_HOST', 'mysql');
+          define('OMEGAUP_DB_HOST', 'mysql:13306');
           define('OMEGAUP_DB_NAME', 'omegaup');
           define('OMEGAUP_DB_PASS', 'omegaup');
           define('OMEGAUP_DB_USER', 'omegaup');
@@ -308,7 +316,7 @@ jobs:
           # Create directory to prevent --purge from failing.
           sudo mkdir -p /var/lib/omegaup
           sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
-          python3 stuff/bootstrap-environment.py --purge --verbose
+          docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
 
       - name: Install yarn dependencies
         run: yarn install
@@ -376,6 +384,7 @@ jobs:
           wait-for-it -t 30 mysql:13306
           wait-for-it -t 30 gitserver:33861
           wait-for-it -t 30 redis:6379
+          wait-for-it -t 30 grader:21680
 
       - name: Create default configuration files
         run: |
@@ -383,7 +392,7 @@ jobs:
           <?php
           define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
           define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
-          define('OMEGAUP_DB_HOST', 'mysql');
+          define('OMEGAUP_DB_HOST', 'mysql:13306');
           define('OMEGAUP_DB_NAME', 'omegaup');
           define('OMEGAUP_DB_PASS', 'omegaup');
           define('OMEGAUP_DB_USER', 'omegaup');
@@ -430,17 +439,13 @@ jobs:
           # Create directory to prevent --purge from failing.
           sudo mkdir -p /var/lib/omegaup
           sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
-          python3 stuff/bootstrap-environment.py --purge --verbose
+          docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
 
       - name: Install yarn dependencies
         run: yarn install
 
       - name: Build webpack resources
         run: yarn build
-
-      - name: Wait for dependencies
-        run: |
-          wait-for-it -t 30 grader:21680
 
       - name: Run Selenium tests
         run: |

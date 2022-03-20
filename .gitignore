@@ -101,7 +101,6 @@ frontend/www/docs/java
 
 # Ignore omegaup.db
 omegaup.db
-.my.cnf
 
 # Ignore backend stuff
 stuff/docker/go/*/

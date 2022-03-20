@@ -59,7 +59,9 @@ def _missing(
                     '`type` = "%s" AND `git_object_id` = "%s";' %
                     (statement_type, git_object_id),
                     dbname=args.database,
-                    auth=auth)) != 0:
+                    auth=auth,
+                    container_check=not args.skip_container_check,
+                )) != 0:
             continue
         yield (statement_type, git_object_id)
 
@@ -94,6 +96,9 @@ def _main() -> None:
     '''Main entrypoint.'''
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--skip-container-check',
+                        action='store_true',
+                        help='Skip the container check')
     parser.add_argument('--mysql-config-file',
                         default=database_utils.default_config_file(),
                         help='.my.cnf file that stores credentials')
@@ -102,6 +107,10 @@ def _main() -> None:
                         default=None,
                         type=str,
                         help='Hostname of the MySQL server')
+    parser.add_argument('--port',
+                        default=13306,
+                        type=int,
+                        help='Port of the MySQL server')
     parser.add_argument('--username',
                         default='root',
                         help='MySQL root username')
@@ -119,10 +128,15 @@ def _main() -> None:
     parser_upgrade.set_defaults(func=upgrade)
 
     args = parser.parse_args()
+
+    if not args.skip_container_check:
+        database_utils.check_inside_container()
+
     auth = database_utils.authentication(config_file=args.mysql_config_file,
                                          username=args.username,
                                          password=args.password,
-                                         hostname=args.hostname)
+                                         hostname=args.hostname,
+                                         port=args.port)
     args.func(args, auth)
 
 
