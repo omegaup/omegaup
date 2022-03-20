@@ -251,7 +251,7 @@ def get_most_voted_tags(problem_tag_votes: Mapping[str, float],
     if problem_tag_votes_n < MIN_POINTS:
         return None
     maximum = problem_tag_votes[max(problem_tag_votes,
-                                    key=problem_tag_votes.get)]
+                                    key=lambda x: problem_tag_votes.get(x, 0))]
     final_tags = [tag for (tag, votes) in problem_tag_votes.items()
                   if votes >= PROBLEM_TAG_VOTE_MIN_PROPORTION * maximum]
     if len(final_tags) >= MAX_NUM_TOPICS:
@@ -435,7 +435,8 @@ def aggregate_reviewers_feedback_for_problem(
             (seal_positive_votes > (total_votes / 2), problem_id))
 
         # Delete old level and topic tags for problem and add the new ones
-        most_voted_level = max(level_tag_votes, key=level_tag_votes.get)
+        most_voted_level = max(level_tag_votes,
+                               key=lambda x: level_tag_votes.get(x, 0))
         final_tags = list({(problem_id, tag) for tag in topic_tag_votes} |
                           {(problem_id, most_voted_level)})
 
@@ -575,7 +576,7 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = lib.db.connect(args)
+    dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
     try:
         try:
             aggregate_reviewers_feedback(dbconn)

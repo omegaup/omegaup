@@ -4569,7 +4569,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param float|null $scoreboard
      * @omegaup-request-param bool|null $show_scoreboard_after
-     * @omegaup-request-param OmegaUp\Timestamp|null $start_time
+     * @omegaup-request-param \OmegaUp\Timestamp|null $start_time
      * @omegaup-request-param int $submissions_gap
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
@@ -4841,7 +4841,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param OmegaUp\Timestamp $end_time
+     * @omegaup-request-param \OmegaUp\Timestamp $end_time
      * @omegaup-request-param string $username
      */
     public static function apiUpdateEndTimeForIdentity(\OmegaUp\Request $r): array {
