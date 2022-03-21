@@ -11,7 +11,7 @@ import os.path
 import time
 import urllib
 
-from typing import Optional
+from typing import Optional, Sequence
 
 import pytest
 
@@ -29,6 +29,12 @@ _DIRNAME = os.path.dirname(__file__)
 _SUCCESS = True
 _WINDOW_SIZE = (1920, 1080)
 _BLANK = '/404.html'  # An path that returns 200 in both Firefox and Chrome.
+
+
+def _mysql_auth() -> Sequence[str]:
+    '''Gets the authentication string for MySQL.'''
+
+    return ['--defaults-file=/home/ubuntu/.my.cnf']
 
 
 class JavaScriptLogCollector:
@@ -112,13 +118,6 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         '''Gets the full url for :path.'''
 
         return urllib.parse.urljoin(self._url, path)
-
-    def mysql_auth(self):
-        '''Gets the authentication string for MySQL.'''
-
-        return util.database_utils.authentication(
-            config_file=self.options.mysql_config_file,
-            username=self.options.username, password=self.options.password)
 
     def eval_script(self, script):
         '''Returns the evaluation of the JavaScript expression |script|'''
@@ -336,7 +335,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             WHERE
                 `i`.`username` = '%s';
             ''') % (user),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
         self.enable_experiment_identities_to_user(user_id)
 
         # Home screen
@@ -355,7 +354,10 @@ class Driver:  # pylint: disable=too-many-instance-attributes
 
         logging.log(level, message)
 
-    def update_run_score(self, run_id, verdict, score):
+    def update_run_score(self,  # pylint: disable=no-self-use
+                         run_id,
+                         verdict,
+                         score) -> None:
         '''Set verdict and score of specified run'''
 
         util.database_utils.mysql(
@@ -370,7 +372,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             WHERE
                 `run_id` = %s;
             ''') % (str(score), str(score * 100), verdict, str(run_id)),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
 
     def update_score_in_course(self, problem_alias, assignment_alias,
                                verdict='AC', score=1):
@@ -397,7 +399,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 `p`.`alias` = '%s'
                 AND `a`.`alias` = '%s';
             ''') % (problem_alias, assignment_alias),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
         self.update_run_score(int(run_id.strip()), verdict, score)
 
     def update_score_in_contest(self, problem_alias, contest_alias,
@@ -425,7 +427,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 `p`.`alias` = '%s'
                 AND `c`.`alias` = '%s';
             ''') % (problem_alias, contest_alias),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
         self.update_run_score(int(run_id.strip()), verdict, score)
 
     def update_score(self, problem_alias, verdict='AC', score=1):
@@ -446,7 +448,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             WHERE
                 `p`.`alias` = '%s';
             ''') % (problem_alias),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
         self.update_run_score(int(run_id.strip()), verdict, score)
 
     def create_user(self, admin=False):
@@ -473,7 +475,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 ('%s', '%s', '%s');
             SELECT LAST_INSERT_ID();
             ''') % (username, password, username),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
         user_id = util.database_utils.mysql(
             ('''
             INSERT INTO
@@ -482,7 +484,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 (%s, 1);
             SELECT LAST_INSERT_ID();
             ''') % (identity_id),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
         util.database_utils.mysql(
             ('''
             UPDATE
@@ -492,7 +494,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             WHERE
                 identity_id = %s;
             ''') % (user_id, identity_id),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
 
         # Enable experiment
         self.enable_experiment_identities_to_user(user_id)
@@ -505,10 +507,13 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 VALUES
                     (%s, 1, 1);
                 ''') % (user_id,),
-                dbname='omegaup', auth=self.mysql_auth())
+                dbname='omegaup', auth=_mysql_auth())
         return username
 
-    def enable_experiment_identities_to_user(self, user_id):
+    def enable_experiment_identities_to_user(  # pylint: disable=no-self-use
+            self,
+            user_id,
+    ) -> None:
         ''' Enable identities experiment to users can use functions of
         identity refactor
         '''
@@ -519,7 +524,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             VALUES
                 ('%s', 'identities');
             ''') % (user_id),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
 
     def screenshot(self, name: Optional[str] = None) -> None:
         '''Takes a screenshot.'''

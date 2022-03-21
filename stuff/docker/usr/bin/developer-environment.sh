@@ -33,7 +33,7 @@ fi
 define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
 define('OMEGAUP_CACHE_IMPLEMENTATION', 'redis');
 define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
-define('OMEGAUP_DB_HOST', 'mysql');
+define('OMEGAUP_DB_HOST', 'mysql:13306');
 define('OMEGAUP_DB_NAME', 'omegaup');
 define('OMEGAUP_DB_PASS', 'omegaup');
 define('OMEGAUP_DB_USER', 'omegaup');
@@ -50,7 +50,7 @@ ensure_contents "/opt/omegaup/frontend/server/config.php" "${config_contents}"
 
 ! read -r -d '' test_config_contents <<EOF
 <?php
-define('OMEGAUP_DB_HOST', 'mysql');
+define('OMEGAUP_DB_HOST', 'mysql:13306');
 define('OMEGAUP_DB_PASS', 'omegaup');
 define('OMEGAUP_DB_USER', 'omegaup');
 EOF
@@ -67,7 +67,7 @@ done
 
 # Ensure that the database version is up to date.
 if ! /opt/omegaup/stuff/db-migrate.py --mysql-config-file="${HOME}/.my.cnf" exists ; then
-  mysql --defaults-file=/home/ubuntu/.my.cnf \
+  mysql --defaults-file="${HOME}/.my.cnf" \
     -e "CREATE USER IF NOT EXISTS 'omegaup'@'localhost' IDENTIFIED BY 'omegaup';"
   mysql --defaults-file="${HOME}/.my.cnf" \
     -e 'GRANT ALL PRIVILEGES ON `omegaup-test%`.* TO "omegaup"@"%";'
@@ -76,7 +76,7 @@ if ! /opt/omegaup/stuff/db-migrate.py --mysql-config-file="${HOME}/.my.cnf" exis
     --purge --verbose --root-url=http://localhost:8001/
 else
   /opt/omegaup/stuff/db-migrate.py \
-    --mysql-config-file=/home/ubuntu/.my.cnf migrate
+    --mysql-config-file="${HOME}/.my.cnf" migrate
 fi
 
 # If this is a local-backend build, ensure that the built omegaup-gitserver is
