@@ -10,7 +10,7 @@ services:
     user: "${UID_GID}"
     entrypoint: [
       "wait-for-it",
-      "mysql:3306",
+      "mysql:13306",
       "--",
       "/bin/bash",
       "-c",
@@ -23,7 +23,7 @@ services:
       context: ./stuff/docker/
     image: omegaup/local-backend
     user: "${UID_GID}"
-    entrypoint: ["wait-for-it", "mysql:3306", "--", "/usr/bin/omegaup-grader"]
+    entrypoint: ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-grader"]
 
   broadcaster:
     build:
