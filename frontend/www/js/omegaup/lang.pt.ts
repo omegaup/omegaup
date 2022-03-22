@@ -92,6 +92,8 @@ const translations: { [key: string]: string; } = {
   badge_100solvedProblems_name: "100 Problemas Resolvidos",
   badge_500score_description: "Concedido a pessoas que obtiveram pontua\u00e7\u00e3o igual ou superior a 500.",
   badge_500score_name: "Pontua\u00e7\u00e3o 500",
+  badge_christmasProblem2021_description: "Concedido ao usu\u00e1rio que participou do concurso A Problem for Christmas 2021 apresentando problemas originais com temas natalinos.",
+  badge_christmasProblem2021_name: "Problema de Natal 2021",
   badge_coderOfTheMonth_description: "Concedido a pessoas que foram nomeadas Coder do M\u00eas pelo menos uma vez.",
   badge_coderOfTheMonth_name: "Programador do M\u00eas",
   badge_contestManager_description: "Concedido a pessoas que administraram pelo menos um concurso.",

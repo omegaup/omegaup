@@ -7,7 +7,7 @@
 	},
 	"DB": {
 		"Driver": "mysql",
-		"DataSourceName": "omegaup:omegaup@tcp(mysql)/omegaup?parseTime=true"
+		"DataSourceName": "omegaup:omegaup@tcp(mysql:13306)/omegaup?parseTime=true"
 	},
 	"Grader": {
 		"BroadcasterURL": "https://broadcaster:32672/broadcast/",
