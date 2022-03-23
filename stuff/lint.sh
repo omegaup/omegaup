@@ -26,7 +26,7 @@ else
 	TTY_ARGS=""
 fi
 
-if [[ -d /proc ]] && grep -q pids:/docker /proc/1/cgroup; then
+if [[ "${OMEGAUP_ROOT}" == "/opt/omegaup" ]]; then
 	echo "Running ./stuff/lint.sh inside a container is not supported." 1>&2
 	echo "Please run this command outside the container" 1>&2
 	exit 1
@@ -48,6 +48,6 @@ fi
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
 	--env 'PYTHONIOENCODING=utf-8' \
 	--env "MYPYPATH=${OMEGAUP_ROOT}/stuff" \
-	omegaup/hook_tools:20211217 --command-name="./stuff/lint.sh" $ARGS
+	omegaup/hook_tools:20220314 --command-name="./stuff/lint.sh" $ARGS
 
 echo OK

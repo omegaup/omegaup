@@ -6,7 +6,7 @@ services:
     build:
       dockerfile: ./Dockerfile.dev-php
       context: ./stuff/docker/
-    image: omegaup/dev-php:20220115
+    image: omegaup/dev-php:20220320
     user: "${UID_GID}"
     restart: always
     volumes:
@@ -28,7 +28,7 @@ services:
 
   gitserver:
     image: omegaup/gitserver:v1.8.11
-    entrypoint: ["wait-for-it", "mysql:3306", "--", "/usr/bin/omegaup-gitserver"]
+    entrypoint: ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-gitserver"]
     user: "${UID_GID}"
     restart: always
     depends_on:
@@ -68,7 +68,7 @@ services:
 
   grader:
     image: omegaup/backend:v1.6.3
-    entrypoint: ["wait-for-it", "mysql:3306", "--", "/usr/bin/omegaup-grader"]
+    entrypoint: ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-grader"]
     user: "${UID_GID}"
     restart: always
     depends_on:
@@ -111,12 +111,13 @@ services:
       MYSQL_USER: 'omegaup'
       MYSQL_PASSWORD: 'omegaup'
       MYSQL_ROOT_PASSWORD: 'omegaup'
+      MYSQL_TCP_PORT: 13306
     expose:
-      - '3306'
+      - '13306'
     volumes:
       - 'dbdata:/var/lib/mysql'
     ports:
-      - target: 3306
+      - target: 13306
         published: 13306
         protocol: tcp
         mode: host

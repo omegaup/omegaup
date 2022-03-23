@@ -11,10 +11,32 @@ import configparser
 import contextlib
 import getpass
 import os
-from typing import (overload, ContextManager, Generator, Literal, Optional,
-                    Union)
+from typing import (overload, ContextManager, Generator, Literal, NamedTuple,
+                    Optional, Union)
 
 import mysql.connector
+
+
+class DatabaseConnectionArguments(NamedTuple):
+    '''Arguments for database connection.'''
+    host: str
+    user: str
+    password: str
+    mysql_config_file: str
+    database: str
+    port: int
+
+    @staticmethod
+    def from_args(args: argparse.Namespace) -> 'DatabaseConnectionArguments':
+        '''Converts arguments to a named tuple for the database connection'''
+        return DatabaseConnectionArguments(
+            host=args.host,
+            user=args.user,
+            password=args.password,
+            mysql_config_file=args.mysql_config_file,
+            database=args.database,
+            port=args.port
+        )
 
 
 class Connection:
@@ -82,14 +104,8 @@ class Connection:
 def default_config_file_path() -> Optional[str]:
     '''Try to autodetect the config file path.'''
     for candidate_path in (
-            # ${OMEGAUP_ROOT}/.my.cnf
-            os.path.join(
-                os.path.abspath(
-                    os.path.join(os.path.dirname(__file__), '..', '..')),
-                '.my.cnf'),
             # ~/.my.cnf
             os.path.join(os.getenv('HOME') or '.', '.my.cnf'),
-            '/etc/mysql/conf.d/mysql_password.cnf',
     ):
         if os.path.isfile(candidate_path):
             return candidate_path
@@ -113,9 +129,10 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
                          type=str,
                          help='MySQL database',
                          default='omegaup')
+    db_args.add_argument('--port', type=int, help='MySQL port', default=3306)
 
 
-def connect(args: argparse.Namespace) -> Connection:
+def connect(args: DatabaseConnectionArguments) -> Connection:
     '''Connects to MySQL with the arguments provided.
 
     Returns a MySQL connection.
@@ -143,6 +160,7 @@ def connect(args: argparse.Namespace) -> Connection:
             user=user,
             password=password,
             database=args.database,
+            port=args.port,
         ))
 
 

@@ -79,7 +79,7 @@ def main() -> None:
     logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = db.connect(args)
+    dbconn = db.connect(db.DatabaseConnectionArguments.from_args(args))
     try:
         standardize_tags(dbconn)
         dbconn.conn.commit()
