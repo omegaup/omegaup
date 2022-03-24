@@ -448,7 +448,7 @@ class Contests extends \OmegaUp\DAO\VO\VO {
     /**
      * Indica el tipo de evaluación para el concurso
      *
-     * @var string|null
+     * @var string
      */
-    public $score_mode = null;
+    public $score_mode = 'partial';
 }
