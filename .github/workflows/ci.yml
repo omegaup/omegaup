@@ -548,7 +548,6 @@ jobs:
       - name: Create database users
         run: |
           mysql \
-            -uroot --skip-password --port=13306 --protocol=TCP \
             -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
 
       - name: Validate database migration scripts
@@ -559,19 +558,16 @@ jobs:
         run: |
           python3 stuff/db-migrate.py \
             --skip-container-check \
-            --username=root --password= --hostname=localhost --port=13306 \
             migrate --databases=omegaup-test
 
       - name: Validate database schema
         run: |
           python3 stuff/policy-tool.py \
             --skip-container-check \
-            --username=root --password= --hostname=localhost --port=13306 \
             --database=omegaup-test \
             validate
           python3 stuff/database_schema.py \
             --skip-container-check \
-            --username=root --password= --hostname=localhost --port=13306 \
             --database=omegaup-test \
             validate --all < /dev/null
 
