@@ -201,7 +201,7 @@ CREATE TABLE `Contests` (
   `certificates_status` enum('uninitiated','queued','generated','retryable_error','fatal_error') NOT NULL DEFAULT 'uninitiated' COMMENT 'Estado de la petición de generar diplomas',
   `contest_for_teams` tinyint(1) DEFAULT '0' COMMENT 'Bandera que indica si el concurso es para equipos.',
   `default_show_all_contestants_in_scoreboard` tinyint(1) DEFAULT '0' COMMENT 'Bandera que indica si en el scoreboard se mostrarán todos los concursantes por defecto.',
-  `score_mode` enum('partial','all_or_nothing','max_per_group') NOT NULL COMMENT 'Indica el tipo de evaluación para el concurso',
+  `score_mode` enum('partial','all_or_nothing','max_per_group') NOT NULL DEFAULT 'partial' COMMENT 'Indica el tipo de evaluación para el concurso',
   PRIMARY KEY (`contest_id`),
   UNIQUE KEY `contests_alias` (`alias`),
   KEY `rerun_id` (`contest_id`),

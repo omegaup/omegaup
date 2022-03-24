@@ -45,6 +45,7 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         'certificates_status' => true,
         'contest_for_teams' => true,
         'default_show_all_contestants_in_scoreboard' => true,
+        'score_mode' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -231,6 +232,11 @@ class Contests extends \OmegaUp\DAO\VO\VO {
             $this->default_show_all_contestants_in_scoreboard = boolval(
                 $data['default_show_all_contestants_in_scoreboard']
             );
+        }
+        if (isset($data['score_mode'])) {
+            $this->score_mode = is_scalar(
+                $data['score_mode']
+            ) ? strval($data['score_mode']) : '';
         }
     }
 
@@ -438,4 +444,11 @@ class Contests extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $default_show_all_contestants_in_scoreboard = false;
+
+    /**
+     * Indica el tipo de evaluación para el concurso
+     *
+     * @var string|null
+     */
+    public $score_mode = null;
 }
