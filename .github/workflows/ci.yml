@@ -557,16 +557,6 @@ jobs:
           password=omegaup
           EOF
 
-      - name: Create database users
-        run: |
-          mysql \
-            -uroot --skip-password --port=13306 --protocol=TCP \
-            -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
-
-      - name: Validate database migration scripts
-        run: |
-          python3 stuff/db-migrate.py --skip-container-check validate
-
       - name: Run Python tests
         run: |
           python3 -m pytest ./stuff/
