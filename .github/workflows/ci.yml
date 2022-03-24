@@ -567,26 +567,6 @@ jobs:
         run: |
           python3 stuff/db-migrate.py --skip-container-check validate
 
-      - name: Create test database
-        run: |
-          python3 stuff/db-migrate.py \
-            --skip-container-check \
-            --username=root --password= --hostname=localhost --port=13306 \
-            migrate --databases=omegaup-test
-
-      - name: Validate database schema
-        run: |
-          python3 stuff/policy-tool.py \
-            --skip-container-check \
-            --username=root --password= --hostname=localhost --port=13306 \
-            --database=omegaup-test \
-            validate
-          python3 stuff/database_schema.py \
-            --skip-container-check \
-            --username=root --password= --hostname=localhost --port=13306 \
-            --database=omegaup-test \
-            validate --all < /dev/null
-
       - name: Run Python tests
         run: |
           python3 -m pytest ./stuff/
