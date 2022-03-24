@@ -31,6 +31,7 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         'scoreboard' => true,
         'points_decay_factor' => true,
         'partial_score' => true,
+        'score_mode' => true,
         'submissions_gap' => true,
         'feedback' => true,
         'penalty' => true,
@@ -161,6 +162,11 @@ class Contests extends \OmegaUp\DAO\VO\VO {
             $this->partial_score = boolval(
                 $data['partial_score']
             );
+        }
+        if (isset($data['score_mode'])) {
+            $this->score_mode = is_scalar(
+                $data['score_mode']
+            ) ? strval($data['score_mode']) : '';
         }
         if (isset($data['submissions_gap'])) {
             $this->submissions_gap = intval(
@@ -340,6 +346,13 @@ class Contests extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $partial_score = true;
+
+    /**
+     * Indica el tipo de evaluación para el concurso
+     *
+     * @var string|null
+     */
+    public $score_mode = null;
 
     /**
      * Tiempo mínimo en segundos que debe de esperar un usuario despues de realizar un envío para hacer otro
