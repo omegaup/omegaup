@@ -517,6 +517,15 @@ jobs:
           wait-for-it -t 30 rabbitmq:5672
           docker-compose exec -T rabbitmq rabbitmqctl await_startup
 
+          for i in $(seq 10); do
+            if [[ "$(mysql \
+                    -uomegaup -pomegaup --host=mysql --port=13306 --skip-column-names --batch \
+                    -e 'SELECT 1;' || echo 0)" == "1" ]]; then
+              break
+            fi
+            sleep 1
+          done
+
       - name: Create default configuration files
         run: |
           cat > frontend/server/config.php <<EOF
@@ -525,6 +534,15 @@ jobs:
           define('OMEGAUP_DB_NAME', 'omegaup');
           define('OMEGAUP_DB_PASS', 'omegaup');
           define('OMEGAUP_DB_USER', 'omegaup');
+          EOF
+
+          cat > ~/.my.cnf << EOF
+          [client]
+          port=13306
+          host=mysql
+          protocol=tcp
+          user=root
+          password=omegaup
           EOF
 
       - name: Create database users
