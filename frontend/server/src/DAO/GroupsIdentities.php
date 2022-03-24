@@ -21,8 +21,8 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 i.username,
                 i.name,
                 i.gender,
-                c.name as country,
-                c.country_id,
+                IFNULL(c.name, ci.name) as country,
+                IFNULL(c.country_id, ci.country_id) as country_id,
                 s.name as state,
                 s.state_id,
                 sc.name as school,
@@ -38,6 +38,8 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 States s ON s.state_id = i.state_id AND s.country_id = i.country_id
             LEFT JOIN
                 Countries c ON c.country_id = s.country_id
+            LEFT JOIN
+                Countries ci ON ci.country_id = i.country_id
             LEFT JOIN
                 Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
             LEFT JOIN
