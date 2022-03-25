@@ -14,6 +14,7 @@ import TextEditorComponent from './TextEditorComponent.vue';
 import ZipViewerComponent from './ZipViewerComponent.vue';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
+console.log(isEmbedded);
 const defaultValidatorSource = `#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
