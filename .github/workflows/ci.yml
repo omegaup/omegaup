@@ -549,6 +549,8 @@ jobs:
         run: |
           mysql \
             -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
+            -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`;'
+            -e 'GRANT ALL ON `omegaup-test`.* TO "omegaup"@"localhost";'
 
       - name: Validate database migration scripts
         run: |
