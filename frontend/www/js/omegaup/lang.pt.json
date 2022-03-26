@@ -67,7 +67,7 @@
 	"arenaRunSubmitMissingLanguage": "Voc\u00ea deve escolher um idioma",
 	"arenaRunSubmitPaste": "Cole o c\u00f3digo do seu programa aqui",
 	"arenaRunSubmitUpload": "Ou fa\u00e7a upload de um arquivo",
-	"arenaRunSubmitWaitBetweenUploads": "Voc\u00ea deve esperar %(submissionGap) segundos entre  cada solu\u00e7\u00e3o apresentada",
+	"arenaRunSubmitWaitBetweenUploads": "Voc\u00ea tem que esperar %(submissionGap) segundos antes de fazer outro envio para este problema.",
 	"arenaRunsActions": "A\u00e7\u00f5es",
 	"arenaRunsActionsDetails": "Detalhes",
 	"arenaRunsActionsDisqualified": "Desqualificado",

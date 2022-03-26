@@ -68,7 +68,7 @@ const translations: { [key: string]: string; } = {
   arenaRunSubmitMissingLanguage: "(Y0u mu57 ch0053 a 1anguag3)",
   arenaRunSubmitPaste: "(Pa573 y0ur pr0gram'5 c0d3 h3r3)",
   arenaRunSubmitUpload: "(Or up10ad 7h3 fi13)",
-  arenaRunSubmitWaitBetweenUploads: "(Y0u mu57 wai7 %(submissionGap) 53c0nd5 b37w33n 5ubmi55i0n5 f0r a pr0b13m)",
+  arenaRunSubmitWaitBetweenUploads: "(Y0u hav3 70 wai7 %(submissionGap) 53c0nd5 b3f0r3 y0u can mak3 an07h3r 5ubmi55i0n 70 7hi5 pr0b13m.)",
   arenaRunsActions: "(Ac7i0n5)",
   arenaRunsActionsDetails: "(D37ai15)",
   arenaRunsActionsDisqualified: "(Di5qua1ifi3d)",
