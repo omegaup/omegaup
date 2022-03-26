@@ -121,6 +121,8 @@ services:
         published: 13306
         protocol: tcp
         mode: host
+    cap_add:
+      - SYS_NICE
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
