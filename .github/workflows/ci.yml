@@ -483,6 +483,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
+          fetch-depth: 0
 
       - name: Install Python dependencies
         run: |
@@ -505,17 +506,71 @@ jobs:
 
       - name: Start the Docker containers
         run: |
-           docker-compose up --no-build --detach
+          docker-compose up --no-build --detach
 
-           # Add the container names as aliases to localhost
-           cat << EOF | sudo tee --append /etc/hosts
-           127.0.0.1 rabbitmq mysql
-           EOF
+          # Add the container names as aliases to localhost
+          cat << EOF | sudo tee --append /etc/hosts
+          127.0.0.1 rabbitmq mysql
+          EOF
 
-           # Wait for some of the containers
-           wait-for-it -t 30 mysql:13306
-           wait-for-it -t 30 rabbitmq:5672
-           docker-compose exec -T rabbitmq rabbitmqctl await_startup
+          # Wait for some of the containers
+          wait-for-it -t 30 mysql:13306
+          wait-for-it -t 30 rabbitmq:5672
+          docker-compose exec -T rabbitmq rabbitmqctl await_startup
+
+          for i in $(seq 10); do
+            if [[ "$(mysql \
+                    -uomegaup -pomegaup --host=mysql --port=13306 --skip-column-names --batch \
+                    -e 'SELECT 1;' || echo 0)" == "1" ]]; then
+              break
+            fi
+            sleep 1
+          done
+
+      - name: Create default configuration files
+        run: |
+          cat > frontend/server/config.php <<EOF
+          <?php
+          define('OMEGAUP_DB_HOST', 'mysql:13306');
+          define('OMEGAUP_DB_NAME', 'omegaup');
+          define('OMEGAUP_DB_PASS', 'omegaup');
+          define('OMEGAUP_DB_USER', 'omegaup');
+          EOF
+
+          cat > ~/.my.cnf << EOF
+          [client]
+          port=13306
+          host=mysql
+          protocol=tcp
+          user=root
+          password=omegaup
+          EOF
+
+      - name: Create database users
+        run: |
+          mysql \
+            -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup"; CREATE DATABASE IF NOT EXISTS `omegaup-test`; GRANT ALL ON `omegaup-test`.* TO "omegaup"@"localhost";'
+
+      - name: Validate database migration scripts
+        run: |
+          python3 stuff/db-migrate.py --skip-container-check validate
+
+      - name: Create test database
+        run: |
+          python3 stuff/db-migrate.py \
+            --skip-container-check \
+            migrate --databases=omegaup-test
+
+      - name: Validate database schema
+        run: |
+          python3 stuff/policy-tool.py \
+            --skip-container-check \
+            --database=omegaup-test \
+            validate
+          python3 stuff/database_schema.py \
+            --skip-container-check \
+            --database=omegaup-test \
+            validate --all < /dev/null
 
       - name: Run Python tests
         run: |
