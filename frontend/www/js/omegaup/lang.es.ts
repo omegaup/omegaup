@@ -68,7 +68,7 @@ const translations: { [key: string]: string; } = {
   arenaRunSubmitMissingLanguage: "Debes elegir un lenguaje",
   arenaRunSubmitPaste: "Pega el c\u00f3digo de tu programa aqu\u00ed",
   arenaRunSubmitUpload: "O sube un archivo",
-  arenaRunSubmitWaitBetweenUploads: "Tienes que esperar %(submissionGap) segundos antes de puedas hacer otro env\u00edo a este problema",
+  arenaRunSubmitWaitBetweenUploads: "Tienes que esperar %(submissionGap) segundos antes de que puedas hacer otro env\u00edo a este problema",
   arenaRunsActions: "Acciones",
   arenaRunsActionsDetails: "Detalles",
   arenaRunsActionsDisqualified: "Descalificado",
