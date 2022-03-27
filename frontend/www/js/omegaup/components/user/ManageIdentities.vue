@@ -4,6 +4,11 @@
       class="form add-identity-form"
       @submit.prevent="$emit('add-identity', { username, password })"
     >
+      <div>
+        <label>
+        {{T.addContestUsernameAndPassword}}
+        </label>
+      </div> 
       <div class="form-group">
         <label class="w-100">
           {{ T.wordsIdentity }}
