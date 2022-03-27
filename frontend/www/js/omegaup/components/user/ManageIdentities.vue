@@ -6,9 +6,9 @@
     >
       <div>
         <label>
-        {{T.addContestUsernameAndPassword}}
+          {{ T.addContestUsernameAndPassword }}
         </label>
-      </div> 
+      </div>
       <div class="form-group">
         <label class="w-100">
           {{ T.wordsIdentity }}
