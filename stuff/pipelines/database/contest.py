@@ -17,13 +17,13 @@ class ContestCertificate(NamedTuple):
     contest_id: str
 
 
-def get_contest_contestants(
+def get_contests(
         *,
         cur: mysql.connector.cursor.MySQLCursorDict,
         date_lower_limit: datetime.date,
         date_upper_limit: datetime.date,
 ) -> List[Dict[str, str]]:
-    '''Get contest users to recieve a certificate'''
+    '''Get contests information'''
 
     date_upper = date_upper_limit + datetime.timedelta(days=1)
     cur.execute(

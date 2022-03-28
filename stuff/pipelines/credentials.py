@@ -10,7 +10,7 @@ OMEGAUP_PASSWORD = 'omegaup'
 MYSQL_USER = 'root'
 MYSQL_PASSWORD = 'omegaup'
 MYSQL_HOST = 'mysql'
-MYSQL_DATABASE = 'omegaup-test'
+MYSQL_DATABASE = 'omegaup'
 MYSQL_PORT = 13306
 
 # RabbitMQ

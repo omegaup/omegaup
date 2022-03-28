@@ -30,14 +30,17 @@ def test_get_contest_contestants() -> None:
         )
     )
     with dbconn.cursor(buffered=True, dictionary=True) as cur:
-        contestants = database.contest.get_contest_contestants(
+        contests = database.contest.get_contests(
             cur=cur,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT,
         )
 
-        for data in contestants:
-            if data['contest_id'] == 1:
-                assert data['certificate_cutoff'] == 2
-            if data['contest_id'] == 2:
-                assert data['certificate_cutoff'] == 3
+        assert contests == [
+            {
+                'alias': 'pasado',
+                'certificate_cutoff': None,
+                'contest_id': 2,
+                'scoreboard_url': 'pNua7xzDZ3MQryrQb7qqTqnqpCaC2g',
+            }
+        ]

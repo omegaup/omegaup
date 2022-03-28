@@ -549,7 +549,7 @@ jobs:
       - name: Create database users
         run: |
           mysql \
-            -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup"; CREATE DATABASE IF NOT EXISTS `omegaup-test`; GRANT ALL ON `omegaup-test`.* TO "omegaup"@"localhost";'
+            -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup"; CREATE DATABASE IF NOT EXISTS `omegaup`; GRANT ALL ON `omegaup`.* TO "omegaup"@"localhost";'
 
       - name: Validate database migration scripts
         run: |
@@ -559,17 +559,17 @@ jobs:
         run: |
           python3 stuff/db-migrate.py \
             --skip-container-check \
-            migrate --databases=omegaup-test
+            migrate --databases=omegaup
 
       - name: Validate database schema
         run: |
           python3 stuff/policy-tool.py \
             --skip-container-check \
-            --database=omegaup-test \
+            --database=omegaup \
             validate
           python3 stuff/database_schema.py \
             --skip-container-check \
-            --database=omegaup-test \
+            --database=omegaup \
             validate --all < /dev/null
 
       - name: Run Python tests
