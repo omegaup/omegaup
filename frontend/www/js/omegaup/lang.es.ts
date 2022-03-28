@@ -911,7 +911,7 @@ const translations: { [key: string]: string; } = {
   problemEditTagPublicRequired: "Es obligatorio seleccionar al menos una etiqueta p\u00fablica",
   problemEditTags: "Etiquetas",
   problemEditUpdatedSuccessfully: "Problema actualizado exitosamente.",
-  problemEditValidation: "Validaci\u00f3n",
+  problemEditValidation: "Validaci\u00f3n (opcional)",
   problemHasBeenUsedInContestOrCourse: "El problema no puede ser eliminado, porque ya fue utilizado en un curso o un concurso",
   problemIsBanned: "Este problema ha sido suspendido.",
   problemIsNotPublic: "El problema no es p\u00fablico y est\u00e1 siendo usado en al menos un concurso activo.",
