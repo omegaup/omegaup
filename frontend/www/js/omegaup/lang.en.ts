@@ -911,7 +911,7 @@ const translations: { [key: string]: string; } = {
   problemEditTagPublicRequired: "It's required to select at least one public tag",
   problemEditTags: "Tags",
   problemEditUpdatedSuccessfully: "Problem updated succesfully!",
-  problemEditValidation: "Validation (optional)",
+  problemEditValidation: "Validation",
   problemHasBeenUsedInContestOrCourse: "Problem can not be deleted, because it has been used in a contest or a course",
   problemIsBanned: "This problem has been banned.",
   problemIsNotPublic: "The problem is not public and is currently in at least one ongoing contest.",
