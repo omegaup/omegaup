@@ -25,7 +25,6 @@ export namespace dao {
     problemset_id?: number;
     recommended?: boolean;
     rerun_id?: number;
-    score_mode?: string;
     scoreboard?: number;
     show_scoreboard_after?: boolean;
     start_time?: Date;

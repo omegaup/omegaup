@@ -2442,7 +2442,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $problems
      * @omegaup-request-param mixed $requests_user_information
      * @omegaup-request-param mixed $scoreboard
-     * @omegaup-request-param null|string $score_mode
      * @omegaup-request-param mixed $show_scoreboard_after
      * @omegaup-request-param mixed $start_time
      * @omegaup-request-param mixed $submissions_gap
@@ -2505,10 +2504,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'penalty' => max(0, intval($r['penalty'])),
             'penalty_type' => $r['penalty_type'],
             'languages' => $languages,
-            'score_mode' => $r->ensureOptionalEnum(
-                'score_mode',
-                ['partial','all_or_nothing','max_per_group'],
-            ) ?? 'partial',
             'show_scoreboard_after' => $r['show_scoreboard_after'] ?? true,
             'contest_for_teams' => $forTeams,
         ]);

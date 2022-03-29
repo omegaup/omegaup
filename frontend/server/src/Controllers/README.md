@@ -746,7 +746,6 @@ Creates a new contest
 | `points_decay_factor`       | `mixed`        |             |
 | `problems`                  | `null\|string` |             |
 | `requests_user_information` | `mixed`        |             |
-| `score_mode`                | `null\|string` |             |
 | `scoreboard`                | `mixed`        |             |
 | `show_scoreboard_after`     | `mixed`        |             |
 | `start_time`                | `mixed`        |             |
