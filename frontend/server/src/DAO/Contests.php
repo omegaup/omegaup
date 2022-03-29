@@ -35,7 +35,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                                 ';
 
     final public static function getByAlias(string $alias): ?\OmegaUp\DAO\VO\Contests {
-        $sql = 'SELECT * FROM Contests WHERE alias = ? LIMIT 1;';
+        $sql = 'SELECT ' .
+        join(', ', array_keys(\OmegaUp\DAO\VO\Contests::FIELD_NAMES)) . ' ' .
+        'FROM Contests ' . 'WHERE alias = ? LIMIT 1;';
 
         /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, default_show_all_contestants_in_scoreboard: bool|null, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
@@ -114,7 +116,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      * @return list<\OmegaUp\DAO\VO\Contests>
      */
     final public static function getByTitle(string $title) {
-        $sql = 'SELECT * FROM Contests WHERE title = ? AND archived = 0;';
+        $sql = 'SELECT ' .
+        join(', ', array_keys(\OmegaUp\DAO\VO\Contests::FIELD_NAMES)) . ' ' .
+        'FROM Contests ' . 'WHERE title = ? and archived = 0;';
 
         /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, default_show_all_contestants_in_scoreboard: bool|null, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$title]);
@@ -132,17 +136,17 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     final public static function getByAliasWithExtraInformation(string $alias): ?array {
         $sql = '
                 SELECT
-                    c.*,
-                    p.scoreboard_url,
-                    p.scoreboard_url_admin
+                    c . * ,
+                    p . scoreboard_url,
+                    p . scoreboard_url_admin
                 FROM
                     Contests c
                 INNER JOIN
                     Problemsets p
                 ON
-                    p.problemset_id = c.problemset_id
+                    p . problemset_id = c . problemset_id
                 WHERE
-                    c.alias = ?
+                    c . alias = ?
                 LIMIT 1;';
         $params = [$alias];
 
@@ -157,7 +161,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     final public static function getByProblemset(
         int $problemsetId
     ): ?\OmegaUp\DAO\VO\Contests {
-        $sql = 'SELECT * FROM Contests WHERE problemset_id = ? LIMIT 0, 1;';
+        $sql = 'SELECT ' .
+        join(', ', array_keys(\OmegaUp\DAO\VO\Contests::FIELD_NAMES)) . ' ' .
+        'FROM Contests ' . 'WHERE problemset_id = ? LIMIT 0, 1;';
         /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, default_show_all_contestants_in_scoreboard: bool|null, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
@@ -176,13 +182,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             return 0;
         }
         $sql = 'SELECT
-           COUNT(c.contest_id) as total
+           COUNT(c . contest_id) as total
         FROM
-            Contests AS c
+            Contests as c
         INNER JOIN
-            ACLs AS a
+            ACLs as a
         ON
-            a.acl_id = c.acl_id
+            a . acl_id = c . acl_id
         WHERE
             admission_mode = \'private\'
             AND a.owner_id = ?
