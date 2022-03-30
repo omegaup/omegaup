@@ -182,7 +182,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             return 0;
         }
         $sql = 'SELECT
-            COUNT(c.contest_id) as total
+           COUNT(c.contest_id) as total
         FROM
             Contests AS c
         INNER JOIN
