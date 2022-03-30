@@ -23,34 +23,17 @@ sys.path.insert(
 import lib.db   # pylint: disable=wrong-import-position
 
 
-def test_get_contest_contestants() -> None:
+def test_get_contests_information() -> None:
     '''Test get contest contestants'''
-
-    dbconn = lib.db.connect(
-        lib.db.DatabaseConnectionArguments(
-            user=credentials.MYSQL_USER,
-            password=credentials.MYSQL_PASSWORD,
-            host=credentials.MYSQL_HOST,
-            database=credentials.MYSQL_DATABASE,
-            port=credentials.MYSQL_PORT,
-            mysql_config_file=lib.db.default_config_file_path() or ''
-        )
-    )
-    with dbconn.cursor(buffered=True, dictionary=True) as cur:
-        contests = database.contest.get_contests(
-            cur=cur,
-            date_lower_limit=test_constants.DATE_LOWER_LIMIT,
-            date_upper_limit=test_constants.DATE_UPPER_LIMIT,
-        )
-        number_of_contests = len(contests)
 
     client = omegaup.api.Client(api_token=test_constants.API_TOKEN,
                                 url=test_constants.OMEGAUP_API_ENDPOINT)
     current_time = datetime.datetime.now()
-    future_time = datetime.datetime.now() + datetime.timedelta(hours=5)
+    future_time = current_time + datetime.timedelta(hours=5)
+    alias = ''.join(random.choices(string.digits, k=8))
     client.contest.create(
-        title=''.join(random.choices(string.digits, k=8)),
-        alias=''.join(random.choices(string.digits, k=8)),
+        title=alias,
+        alias=alias,
         description='Test contest',
         start_time=time.mktime(current_time.timetuple()),
         finish_time=time.mktime(future_time.timetuple()),
@@ -67,11 +50,29 @@ def test_get_contest_contestants() -> None:
         admission_mode='private',
         show_scoreboard_after=True,
     )
+
+    dbconn = lib.db.connect(
+        lib.db.DatabaseConnectionArguments(
+            user=credentials.MYSQL_USER,
+            password=credentials.MYSQL_PASSWORD,
+            host=credentials.MYSQL_HOST,
+            database=credentials.MYSQL_DATABASE,
+            port=credentials.MYSQL_PORT,
+            mysql_config_file=lib.db.default_config_file_path() or ''
+        )
+    )
+
     with dbconn.cursor(buffered=True, dictionary=True) as cur:
-        new_contests = database.contest.get_contests(
+        contests = database.contest.get_contests(
             cur=cur,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT,
         )
 
-        assert len(new_contests) == number_of_contests
+        contest_found = False
+        for contest in contests:
+            if contest['alias'] == alias:
+                contest_found = True
+                break
+
+        assert contest_found

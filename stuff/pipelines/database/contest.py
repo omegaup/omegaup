@@ -20,12 +20,11 @@ class ContestCertificate(NamedTuple):
 def get_contests(
         *,
         cur: mysql.connector.cursor.MySQLCursorDict,
-        date_lower_limit: datetime.date,
-        date_upper_limit: datetime.date,
+        date_lower_limit: datetime.datetime,
+        date_upper_limit: datetime.datetime,
 ) -> List[Dict[str, str]]:
     '''Get contests information'''
 
-    date_upper = date_upper_limit + datetime.timedelta(days=1)
     cur.execute(
         '''
         SELECT
@@ -40,8 +39,9 @@ def get_contests(
         ON
             c.problemset_id = p.problemset_id
         WHERE
-            finish_time BETWEEN %s AND %s;
-        ''', (date_lower_limit, date_upper)
+            finish_time >= %s AND finish_time <= %s;
+        ''', (date_lower_limit,
+              date_upper_limit.replace(hour=23, minute=59, second=59))
     )
     data: List[Dict[str, str]] = []
     for row in cur:
