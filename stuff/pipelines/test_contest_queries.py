@@ -2,12 +2,19 @@
 
 '''test verification_code module.'''
 
+import datetime
 import os
+import random
+import string
 import sys
+import time
+
+import omegaup.api
 
 import credentials
 import database.contest
 import test_constants
+
 
 sys.path.insert(
     0,
@@ -35,12 +42,36 @@ def test_get_contest_contestants() -> None:
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT,
         )
+        number_of_contests = len(contests)
 
-        assert contests == [
-            {
-                'alias': 'pasado',
-                'certificate_cutoff': None,
-                'contest_id': 2,
-                'scoreboard_url': 'pNua7xzDZ3MQryrQb7qqTqnqpCaC2g',
-            }
-        ]
+    client = omegaup.api.Client(api_token=test_constants.API_TOKEN,
+                                url=test_constants.OMEGAUP_API_ENDPOINT)
+    current_time = datetime.datetime.now()
+    future_time = datetime.datetime.now() + datetime.timedelta(hours=5)
+    client.contest.create(
+        title=''.join(random.choices(string.digits, k=8)),
+        alias=''.join(random.choices(string.digits, k=8)),
+        description='Test contest',
+        start_time=time.mktime(current_time.timetuple()),
+        finish_time=time.mktime(future_time.timetuple()),
+        window_length=0,
+        scoreboard=100,
+        points_decay_factor=0,
+        partial_score=True,
+        submissions_gap=1200,
+        penalty=0,
+        feedback='detailed',
+        penalty_type='contest_start',
+        languages='py2,py3',
+        penalty_calc_policy='sum',
+        admission_mode='private',
+        show_scoreboard_after=True,
+    )
+    with dbconn.cursor(buffered=True, dictionary=True) as cur:
+        new_contests = database.contest.get_contests(
+            cur=cur,
+            date_lower_limit=test_constants.DATE_LOWER_LIMIT,
+            date_upper_limit=test_constants.DATE_UPPER_LIMIT,
+        )
+
+        assert len(new_contests) == number_of_contests
