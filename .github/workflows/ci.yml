@@ -573,8 +573,7 @@ jobs:
             validate --all < /dev/null
             
       - name: Install composer dependencies
-        run: |
-          docker-compose exec -T frontend composer install --prefer-dist --no-progress
+        run: composer install --prefer-dist --no-progress
 
       - name: Run Python tests
         run: |
