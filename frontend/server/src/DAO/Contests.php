@@ -136,17 +136,17 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     final public static function getByAliasWithExtraInformation(string $alias): ?array {
         $sql = '
                 SELECT
-                    c . * ,
-                    p . scoreboard_url,
-                    p . scoreboard_url_admin
+                    c.*,
+                    p.scoreboard_url,
+                    p.scoreboard_url_admin
                 FROM
                     Contests c
                 INNER JOIN
                     Problemsets p
                 ON
-                    p . problemset_id = c . problemset_id
+                    p.problemset_id = c.problemset_id
                 WHERE
-                    c . alias = ?
+                    c.alias = ?
                 LIMIT 1;';
         $params = [$alias];
 
@@ -182,13 +182,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             return 0;
         }
         $sql = 'SELECT
-           COUNT(c . contest_id) as total
+            COUNT(c.contest_id) as total
         FROM
-            Contests as c
+            Contests AS c
         INNER JOIN
-            ACLs as a
+            ACLs AS a
         ON
-            a . acl_id = c . acl_id
+            a.acl_id = c.acl_id
         WHERE
             admission_mode = \'private\'
             AND a.owner_id = ?
