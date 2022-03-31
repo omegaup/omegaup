@@ -546,6 +546,9 @@ jobs:
           password=omegaup
           EOF
 
+      - name: Install composer dependencies
+        run: composer install --prefer-dist --no-progress
+
       - name: Create database users
         run: |
           mysql -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
@@ -555,9 +558,6 @@ jobs:
           sudo mkdir -p /var/lib/omegaup
           sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
           docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose          
-
-      - name: Install composer dependencies
-        run: composer install --prefer-dist --no-progress
 
       - name: Run Python tests
         run: |

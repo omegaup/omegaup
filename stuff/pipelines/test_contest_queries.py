@@ -69,10 +69,4 @@ def test_get_contests_information() -> None:
             date_upper_limit=test_constants.DATE_UPPER_LIMIT,
         )
 
-        contest_found = False
-        for contest in contests:
-            if contest['alias'] == alias:
-                contest_found = True
-                break
-
-        assert contest_found
+        assert any(contest['alias'] == alias for contest in contests), contests
