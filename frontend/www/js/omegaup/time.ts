@@ -89,7 +89,7 @@ export function parseDateLocal(dateString: string): Date {
   // The expected format is yyyy-MM-dd in the local timezone. Date.parse()
   // will use UTC if given a timestamp with that format, instead of the local
   // timezone.
-  const result = new Date();
+  const result = new Date(dateString);
   const matches = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
   if (matches !== null) {
     result.setFullYear(Number.parseInt(matches[1], 10));
@@ -120,7 +120,7 @@ export function parseDateTimeLocal(dateString: string): Date {
   // The expected format is yyyy-MM-ddTHH:MM in the local timezone.
   // Date.parse() will use UTC if given a timestamp with that format, instead
   // of the local timezone.
-  const result = new Date();
+  const result = new Date(dateString);
   const matches = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(dateString);
   if (matches !== null) {
     result.setFullYear(Number.parseInt(matches[1], 10));
