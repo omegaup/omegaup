@@ -12,10 +12,10 @@ export interface ProblemOptions {
 
 export interface CourseOptions {
   courseAlias: string;
+  startDate: Date;
+  endDate: Date;
   showScoreboard?: boolean;
-  startDate?: Date;
   unlimitedDuration?: boolean;
-  endDate?: Date;
   school?: string;
   basicInformation?: boolean;
   requestParticipantInformation?: RequestParticipantInformation;
@@ -27,8 +27,8 @@ export interface CourseOptions {
 export interface ContestOptions {
   contestAlias: string;
   description?: string;
-  startDate?: Date;
-  endDate?: Date;
+  startDate: Date;
+  endDate: Date;
   showScoreboard?: boolean;
   partialPoints?: boolean;
   basicInformation?: boolean;
