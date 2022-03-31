@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import {
-  addDaysToTodaysDate,
+  addDaysToDate,
   getISODate,
   getISODateTime,
 } from '../support/commands';
@@ -59,7 +59,7 @@ describe('Basic Commands Test', () => {
       .should('be.checked');
     cy.get('[name="start-date"]').should(
       'have.value',
-      getISODate(courseOptions.startDate ?? new Date()),
+      getISODate(courseOptions.startDate),
     );
     cy.get('[name="unlimited-duration"]')
       .eq(courseOptions.unlimitedDuration ? 0 : 1)
@@ -86,18 +86,21 @@ describe('Basic Commands Test', () => {
     );
   });
 
-  it('Should create a course with end date', () => {
+  // TODO(#6482): Re-enable when the underlying bug is fixed.
+  it.skip('Should create a course with end date', () => {
     const loginOptions: LoginOptions = {
       username: uuid(),
       password: uuid(),
     };
 
+    const now = new Date();
+
     const courseOptions: CourseOptions = {
       courseAlias: uuid().slice(0, 10),
       showScoreboard: true,
-      startDate: new Date(),
+      startDate: now,
+      endDate: addDaysToDate(now, {days: 1}),
       unlimitedDuration: false,
-      endDate: addDaysToTodaysDate({days: 1}),
       school: 'omegaup',
       basicInformation: false,
       requestParticipantInformation: 'optional',
@@ -126,14 +129,14 @@ describe('Basic Commands Test', () => {
       .should('be.checked');
     cy.get('[name="start-date"]').should(
       'have.value',
-      getISODate(courseOptions.startDate ?? new Date()),
+      getISODate(courseOptions.startDate),
     );
     cy.get('[name="unlimited-duration"]')
       .eq(courseOptions.unlimitedDuration ? 0 : 1)
       .should('be.checked');
     cy.get('[name="end-date"]').should(
       'have.value',
-      getISODate(courseOptions.endDate ?? new Date()),
+      getISODate(courseOptions.endDate),
     );
     cy.get('.tt-input').first().should('have.value', courseOptions.school); //
     cy.get('[name="basic-information"]')
@@ -264,11 +267,13 @@ describe('Basic Commands Test', () => {
 
     cy.login(loginOptions);
 
+    const now = new Date();
+
     const contestOptions: ContestOptions = {
       contestAlias: 'contest' + uuid().slice(0, 5),
       description: 'Test Description',
-      startDate: new Date(),
-      endDate: addDaysToTodaysDate({days: 2}),
+      startDate: now,
+      endDate: addDaysToDate(now, {days: 2}),
       showScoreboard: true,
       basicInformation: false,
       partialPoints: true,
@@ -287,10 +292,10 @@ describe('Basic Commands Test', () => {
     );
     cy.get('[data-start-date]').should(
       'have.value',
-      getISODateTime(contestOptions.startDate ?? new Date()),
+      getISODateTime(contestOptions.startDate),
     );
     cy.get('[data-end-date]').type(
-      getISODateTime(contestOptions.endDate ?? new Date()),
+      getISODateTime(contestOptions.endDate),
     );
     cy.get('[data-show-scoreboard-at-end]').should(
       'have.value',
