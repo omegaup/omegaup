@@ -89,19 +89,20 @@ export function parseDateLocal(dateString: string): Date {
   // The expected format is yyyy-MM-dd in the local timezone. Date.parse()
   // will use UTC if given a timestamp with that format, instead of the local
   // timezone.
-  const result = new Date(dateString);
+  const result = new Date();
   const matches = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
-  if (matches !== null) {
-    result.setFullYear(Number.parseInt(matches[1], 10));
-    // Months in JavaScript start at 0.
-    result.setMonth(Number.parseInt(matches[2], 10) - 1);
-    result.setDate(Number.parseInt(matches[3], 10));
+  if (matches === null) {
+    result.setHours(0);
+    result.setMinutes(0);
+    result.setSeconds(0);
+    result.setMilliseconds(0);
+    return result;
   }
-  result.setHours(0);
-  result.setMinutes(0);
-  result.setSeconds(0);
-  result.setMilliseconds(0);
-  return result;
+  return new Date(
+    /*fullYear*/ Number.parseInt(matches[1], 10),
+    /*month - In JavaScript starts at 0*/ Number.parseInt(matches[2], 10) - 1,
+    /*day*/ Number.parseInt(matches[3], 10),
+  );
 }
 
 export function formatDateTimeLocal(date: Date): string {
