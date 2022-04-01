@@ -259,10 +259,12 @@ class ProblemDeployer {
                 \ZipArchive::OVERWRITE
             );
             if ($err !== true) {
-                throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
                     'problemDeployerInternalError',
                     $err
                 );
+                $this->log->error("commit loose files failed: {$error}");
+                throw $error;
             }
             foreach ($blobUpdate as $path => $contents) {
                 $zipArchive->addFromString($path, $contents);
@@ -523,10 +525,14 @@ class ProblemDeployer {
             /** @var int */
             $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             if ($output === false || $retval != 200) {
-                throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
                     'problemDeployerInternalError',
                     $retval
                 );
+                $this->log->error(
+                    "update published failed: HTTP/{$retval}: {$output}: {$error}"
+                );
+                throw $error;
             }
         } finally {
             curl_close($curl);

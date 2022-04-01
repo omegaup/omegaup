@@ -70,10 +70,10 @@ Cypress.Commands.add(
   'createCourse',
   ({
     courseAlias,
+    startDate,
+    endDate,
     showScoreboard = false,
-    startDate = new Date(),
     unlimitedDuration = true,
-    endDate = new Date(),
     school = 'omegaup',
     basicInformation = false,
     requestParticipantInformation = 'no',
@@ -130,9 +130,9 @@ Cypress.Commands.add(
   'createContest',
   ({
     contestAlias,
+    startDate,
+    endDate,
     description = 'Default Description',
-    startDate = new Date(),
-    endDate = addDaysToTodaysDate({ days: 1 }),
     showScoreboard = true,
     partialPoints = true,
     basicInformation = false,
@@ -175,14 +175,13 @@ export const getISODateTime = (date: Date) => {
 };
 
 /**
- * Return a date relative to today
- * @param days number of days to add to today
- * @returns Relative Date Object
+ * Return a date relative to another date
+ * @param date original Date object
+ * @param days number of days to add to the date
+ * @returns Date Relative Date Object
  */
-export const addDaysToTodaysDate = ({ days }: { days: number }): Date => {
-  if (days == 0) return new Date();
+export const addDaysToDate = (date: Date, { days }: { days: number }): Date => {
+  if (days == 0) return date;
 
-  const newDate = new Date();
-  newDate.setDate(newDate.getDate() + days);
-  return newDate;
+  return new Date(date.getTime() + 24 * 3600 * 1000);
 };
