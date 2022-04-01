@@ -7,13 +7,13 @@ import json
 import logging
 
 from typing import List, Optional
-import omegaup.api
 import mysql.connector
 import mysql.connector.cursor
 from mysql.connector import errors
 from mysql.connector import errorcode
 import pika
 
+from lib_omegaup_petitions import get_contest_scoreboard
 from verification_code import generate_code
 
 
@@ -49,18 +49,15 @@ class ContestsCallback:
 
     def __call__(self,
                  _channel: pika.adapters.blocking_connection.BlockingChannel,
-                 _method: pika.spec.Basic.Deliver,
-                 _properties: pika.spec.BasicProperties,
+                 _method: Optional[pika.spec.Basic.Deliver],
+                 _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
         '''Function to stores the certificates by a given contest'''
         data = ContestCertificate(**json.loads(body.decode()))
-        client = omegaup.api.Client(api_token=self.api_token,
-                                    url=self.url)
-
-        scoreboard = client.contest.scoreboard(
-            contest_alias=data.alias,
-            token=data.scoreboard_url)
-        ranking = scoreboard['ranking']
+        ranking = get_contest_scoreboard(api_token=self.api_token,
+                                         url=self.url,
+                                         alias=data.alias,
+                                         scoreboard_url=data.scoreboard_url)
         certificates: List[Certificate] = []
 
         for user in ranking:
@@ -69,13 +66,15 @@ class ContestsCallback:
                     and user['place'] <= data.certificate_cutoff):
                 contest_place = user['place']
             verification_code = generate_code()
-            certificates.append(Certificate(
+            certificate: Certificate = Certificate(
                 certificate_type='contest',
                 contest_id=data.contest_id,
                 verification_code=verification_code,
                 contest_place=contest_place,
                 username=str(user['username'])
-            ))
+            )
+            certificates.append(certificate)
+            print(certificates)
         with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
             while True:
                 try:
