@@ -66,15 +66,13 @@ class ContestsCallback:
                     and user['place'] <= data.certificate_cutoff):
                 contest_place = user['place']
             verification_code = generate_code()
-            certificate: Certificate = Certificate(
+            certificates.append(Certificate(
                 certificate_type='contest',
                 contest_id=data.contest_id,
                 verification_code=verification_code,
                 contest_place=contest_place,
                 username=str(user['username'])
-            )
-            certificates.append(certificate)
-            print(certificates)
+            ))
         with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
             while True:
                 try:
