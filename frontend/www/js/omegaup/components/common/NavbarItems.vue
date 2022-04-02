@@ -203,3 +203,11 @@ export default class NavbarItems extends Vue {
   T = T;
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.mr-auto {
+  float: right;
+}
+</style>
