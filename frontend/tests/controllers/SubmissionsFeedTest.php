@@ -104,6 +104,12 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Timestamp(strtotime($runCreationDate))
         );
 
+        // Also add a submissing in the 30-day interval but that hasn't been graded yet.
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[0],
+            $identities[0]
+        );
+
         $submissions = \OmegaUp\DAO\Submissions::getLatestSubmissions();
         $this->assertCount(1, $submissions);
         $this->assertEquals(
