@@ -45,6 +45,12 @@ class ConversionResult {
     public $pythonConversion;
 
     /**
+     * @var bool
+     * @readonly
+     */
+    public $pythonVoidType;
+
+    /**
      * @var ?string
      * @readonly
      */
@@ -55,6 +61,7 @@ class ConversionResult {
         string $pythonExpansion,
         string $pythonParamType,
         string $pythonConversion,
+        bool $pythonVoidType,
         ?string $pythonDeclaration,
         ?string $conversionFunction = null,
     ) {
@@ -62,6 +69,7 @@ class ConversionResult {
         $this->pythonExpansion = $pythonExpansion;
         $this->pythonParamType = $pythonParamType;
         $this->pythonConversion = $pythonConversion;
+        $this->pythonVoidType = $pythonVoidType;
         $this->pythonDeclaration = $pythonDeclaration;
         $this->conversionFunction = $conversionFunction;
     }
@@ -350,6 +358,7 @@ class TypeMapper {
         $pythonDeclarationLines = [];
         $pythonConversion = '$';
         $pythonNullable = false;
+        $pythonVoidType = false;
         $savePythonType = false;
         $quotePythonType = fn (string $name): string => (
             str_starts_with($name, '_') ?
@@ -364,7 +373,7 @@ class TypeMapper {
                     $pythonDeclaration = "@dataclasses.dataclass\n";
                     $pythonDeclaration .= "class {$pythonTypeName}:\n";
                     $pythonDeclaration .= "    \"\"\"{$pythonTypeName}\"\"\"\n";
-                    $emptyPythonDeclaration = true;
+                    $pythonVoidType = true;
                     $savePythonType = true;
                     ksort($type->properties);
                     foreach ($type->properties as $propertyName => $propertyType) {
@@ -461,13 +470,13 @@ class TypeMapper {
                             }
                         }
                         $pythonDeclaration .= "\n";
-                        $emptyPythonDeclaration = false;
+                        $pythonVoidType = false;
                         if ($isNullable) {
                             $propertyName .= '?';
                         }
                         $propertyTypes[] = "{$propertyName}: {$conversionResult->typescriptExpansion};";
                     }
-                    if ($emptyPythonDeclaration) {
+                    if ($pythonVoidType) {
                         $pythonDeclaration .= "    pass\n";
                     } else {
                         $pythonDeclaration .= "\n";
@@ -726,6 +735,7 @@ class TypeMapper {
             pythonExpansion: $pythonExpansion,
             pythonParamType: $pythonParamType,
             pythonConversion: $pythonConversion,
+            pythonVoidType: $pythonVoidType,
             pythonDeclaration: $pythonDeclaration,
             conversionFunction: $requiresConversion ? $conversionFunction[0] : null,
         );
@@ -1340,7 +1350,11 @@ EOD;
         echo "\n";
         ksort($this->typeMapper->intermediatePythonTypes);
         foreach ($this->typeMapper->intermediatePythonTypes as $typeName => $conversionResult) {
-            if (is_null($conversionResult->pythonDeclaration)) {
+            if (
+                is_null(
+                    $conversionResult->pythonDeclaration
+                ) || $conversionResult->pythonVoidType
+            ) {
                 continue;
             }
             echo "\n";
@@ -1351,6 +1365,9 @@ EOD;
         ksort($this->controllers);
         foreach ($this->controllers as $controller) {
             foreach ($controller->methods as $apiMethodName => $method) {
+                if ($method->returnType->pythonVoidType) {
+                    continue;
+                }
                 echo "\n";
                 $pythonTypeName = $method->returnType->pythonExpansion;
                 if (str_starts_with($pythonTypeName, "'")) {
@@ -1394,10 +1411,11 @@ EOD;
                     }
                     echo "            {$requestParam->name}: Optional[{$requestParam->pythonPrimitiveType()}] = None,\n";
                 }
+                $returnType = $method->returnType->pythonVoidType ? 'None' : "{$method->apiTypePrefix}Response";
                 echo "            # Out-of-band parameters:\n";
                 echo "            files_: Optional[Mapping[str, BinaryIO]] = None,\n";
                 echo "            check_: bool = True,\n";
-                echo "            timeout_: datetime.timedelta = _DEFAULT_TIMEOUT) -> {$method->apiTypePrefix}Response:\n";
+                echo "            timeout_: datetime.timedelta = _DEFAULT_TIMEOUT) -> {$returnType}:\n";
                 echo '        r"""' . str_replace(
                     "\n",
                     "\n        ",
@@ -1435,16 +1453,20 @@ EOD;
                     echo "        if {$requestParam->name} is not None:\n";
                     echo "            parameters['{$requestParam->name}'] = {$requestParam->pythonStringifiedValue()}\n";
                 }
-                $query = "            self._client.query('/api/{$controller->apiName}/{$apiMethodName}/',\n";
+                $query = "        self._client.query('/api/{$controller->apiName}/{$apiMethodName}/',\n";
                 $query .= "                                 payload=parameters,\n";
                 $query .= "                                 files_=files_,\n";
                 $query .= "                                 timeout_=timeout_,\n";
                 $query .= '                                 check_=check_)';
-                echo '        return ' . str_replace(
-                    '$',
-                    $query,
-                    $method->returnType->pythonConversion
-                ) . "\n";
+                if ($method->returnType->pythonVoidType) {
+                    echo "{$query}\n";
+                } else {
+                    echo '        return ' . str_replace(
+                        '$',
+                        $query,
+                        $method->returnType->pythonConversion
+                    ) . "\n";
+                }
                 echo "\n";
             }
         }
