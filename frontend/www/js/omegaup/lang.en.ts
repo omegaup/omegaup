@@ -246,7 +246,7 @@ const translations: { [key: string]: string; } = {
   contestLengthTooLong: "Contests can't last more than 31 days.",
   contestListArchivedContests: "Archived contests",
   contestListCurrent: "Current",
-  contestListEmpty: "There are no contests with those characteristics",
+  contestListEmpty: "No contests in this list",
   contestListFuture: "Future",
   contestListPast: "Past",
   contestListShowAdminContests: "Also show contests I manage",
