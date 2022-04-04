@@ -28,6 +28,7 @@
                       spellcheck="false"
                       :placeholder="T.wordsKeyword"
                     />
+                    <button class="btn" type="reset">&times;</button>
                     <div class="input-group-append">
                       <input
                         class="btn btn-primary btn-md active"
