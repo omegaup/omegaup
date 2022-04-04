@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 '''Unittest for the recommendation model builder script.
 
 These are function-level unittests for the recommendation model builder.

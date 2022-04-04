@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 '''Mysql queries to generate messages for contests'''
 
