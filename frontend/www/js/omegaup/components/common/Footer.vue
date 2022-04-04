@@ -62,7 +62,9 @@
               <a href="/rank/">{{ T.navRanking }}</a>
             </li>
             <li class="mt-1">
-              <a href="https://blog.omegaup.com">{{ T.navBlog }}</a>
+              <a href="https://blog.omegaup.com" target="_blank">{{
+                T.navBlog
+              }}</a>
             </li>
           </ul>
         </div>
@@ -87,11 +89,12 @@
             <li class="mt-1">
               <a
                 href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar"
+                target="_blank"
                 >{{ T.frontPageFooterHelpUs }}</a
               >
             </li>
             <li class="mt-1">
-              <a href="https://github.com/omegaup/omegaup">
+              <a href="https://github.com/omegaup/omegaup" target="_blank">
                 <font-awesome-icon :icon="['fab', 'github']" />
               </a>
             </li>
@@ -115,17 +118,29 @@
             </li>
           </ul>
           <div class="social-icons my-0 mx-auto">
-            <a class="text-nowrap" href="https://github.com/omegaup/omegaup/">
+            <a
+              class="text-nowrap"
+              href="https://github.com/omegaup/omegaup/"
+              target="_blank"
+            >
               <font-awesome-icon :icon="['fab', 'github']" />
               GitHub
             </a>
             |
-            <a class="text-nowrap" href="https://www.facebook.com/omegaup/">
+            <a
+              class="text-nowrap"
+              href="https://www.facebook.com/omegaup/"
+              target="_blank"
+            >
               <font-awesome-icon :icon="['fab', 'facebook']" />
               Facebook
             </a>
             |
-            <a class="text-nowrap" href="https://discord.gg/K3JFd9d3wk">
+            <a
+              class="text-nowrap"
+              href="https://discord.gg/K3JFd9d3wk"
+              target="_blank"
+            >
               <font-awesome-icon :icon="['fab', 'discord']" />
               Discord
             </a>
@@ -149,13 +164,16 @@
             <li>
               <a
                 href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
+                target="_blank"
                 >{{ T.frontPageFooterCodeConduct }}</a
               >
             </li>
             <li>
-              <a href="https://blog.omegaup.com/privacy-policy/">{{
-                T.frontPageFooterPrivacyPolicy
-              }}</a>
+              <a
+                href="https://blog.omegaup.com/privacy-policy/"
+                target="_blank"
+                >{{ T.frontPageFooterPrivacyPolicy }}</a
+              >
             </li>
           </ul>
         </div>
