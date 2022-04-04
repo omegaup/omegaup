@@ -172,9 +172,12 @@
             target="_blank"
             >{{ T.navTutorials }}</a
           >
-          <a class="dropdown-item" href="http://blog.omegaup.com/">{{
-            T.navBlog
-          }}</a>
+          <a
+            class="dropdown-item"
+            href="http://blog.omegaup.com/"
+            target="_blank"
+            >{{ T.navBlog }}</a
+          >
           <a
             class="dropdown-item text-wrap"
             href="https://omegaup.com/docs/assets/libroluisvargas.pdf"
