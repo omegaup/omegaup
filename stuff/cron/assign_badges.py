@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 ''' Assigns users badges and creates the notifications.'''
 

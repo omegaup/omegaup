@@ -246,7 +246,7 @@ const translations: { [key: string]: string; } = {
   contestLengthTooLong: "(C0n73575 can'7 1a57 m0r3 7han 31 day5.)",
   contestListArchivedContests: "(Archiv3d c0n73575)",
   contestListCurrent: "(Curr3n7)",
-  contestListEmpty: "(N0 c0n73575 in 7hi5 1i57)",
+  contestListEmpty: "(Th3r3 ar3 n0 c0n73575 7ha7 m337 7h053 charac73ri57ic5)",
   contestListFuture: "(Fu7ur3)",
   contestListPast: "(Pa57)",
   contestListShowAdminContests: "(A150 5h0w c0n73575 I manag3)",
