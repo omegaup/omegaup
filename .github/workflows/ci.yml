@@ -262,7 +262,7 @@ jobs:
 
       - name: Start the Docker containers
         run: |
-          docker-compose up --no-build --detach
+          UID_GID="$(id -u):$(id -g)" docker-compose up --no-build --detach
 
           # Add the container names as aliases to localhost
           cat << EOF | sudo tee --append /etc/hosts
@@ -314,15 +314,9 @@ jobs:
           password=omegaup
           EOF
 
-      - name: Install Python dependencies
-        run: |
-          python3 -m pip install --user setuptools
-          python3 -m pip install --user wheel
-          python3 -m pip install --user \
-            -r stuff/requirements.txt
-
       - name: Install composer dependencies
-        run: composer install --prefer-dist --no-progress
+        run: |
+          docker-compose exec -T frontend composer install --prefer-dist --no-progress
 
       - name: Initialize database
         run: |
@@ -331,25 +325,31 @@ jobs:
           # Create directory to prevent --purge from failing.
           sudo mkdir -p /var/lib/omegaup
           sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
-          docker-compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
+          docker-compose exec -T frontend bash -c "\
             python3 -m venv /opt/omegaup/stuff/venv && \
             python3 -m pip install wheel && \
             python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
           docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
 
       - name: Install yarn dependencies
-        run: yarn install
+        run: |
+          docker-compose exec  -T frontend yarn install
 
       - name: Build webpack resources
-        run: yarn build
+        run: |
+          docker-compose exec  -T frontend yarn build
 
       - name: Wait for dependencies
         run: |
           wait-for-it -t 30 grader:21680
 
+      - name: Install Cypress
+        run: |
+          docker-compose exec -T frontend ./node_modules/.bin/cypress install
+
       - name: Run Cypress tests
         run: |
-          ./node_modules/.bin/cypress run --browser chrome
+          docker-compose exec -T frontend ./node_modules/.bin/cypress run --browser chrome
 
       - name: Collect container logs
         if: ${{ always() }}
@@ -392,7 +392,7 @@ jobs:
 
       - name: Start the Docker containers
         run: |
-          docker-compose up --no-build --detach
+          UID_GID="$(id -u):$(id -g)" docker-compose up --no-build --detach
 
           # Add the container names as aliases to localhost
           cat << EOF | sudo tee --append /etc/hosts
@@ -442,9 +442,7 @@ jobs:
           python3 -m pip install --user --upgrade urllib3
           python3 -m pip install --user \
             -r stuff/requirements.txt \
-            selenium \
-            pytest-xdist \
-            flaky
+            -r stuff/requirements.selenium.txt
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
@@ -456,7 +454,7 @@ jobs:
           # Create directory to prevent --purge from failing.
           sudo mkdir -p /var/lib/omegaup
           sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
-          docker-compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
+          docker-compose exec -T frontend bash -c "\
             python3 -m venv /opt/omegaup/stuff/venv && \
             python3 -m pip install wheel && \
             python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
@@ -516,7 +514,7 @@ jobs:
 
       - name: Start the Docker containers
         run: |
-          docker-compose up --no-build --detach
+          UID_GID="$(id -u):$(id -g)" docker-compose up --no-build --detach
 
           # Add the container names as aliases to localhost
           cat << EOF | sudo tee --append /etc/hosts
@@ -578,7 +576,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          docker-compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
+          docker-compose exec -T frontend bash -c "\
             python3 -m venv /opt/omegaup/stuff/venv && \
             python3 -m pip install wheel && \
             python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
