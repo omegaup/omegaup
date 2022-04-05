@@ -121,7 +121,7 @@ export function parseDateTimeLocal(dateString: string): Date {
   // The expected format is yyyy-MM-ddTHH:MM in the local timezone.
   // Date.parse() will use UTC if given a timestamp with that format, instead
   // of the local timezone.
-  const result = new Date(dateString);
+  const result = new Date();
   const matches = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(dateString);
   if (matches === null) {
     result.setSeconds(0);
