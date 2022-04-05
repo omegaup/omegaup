@@ -17,7 +17,7 @@ describe('time', () => {
     });
 
     it('Should be able to get current date', () => {
-      expect(time.parseDateTimeLocal('')).toEqual(expect.any(Date));
+      expect(time.parseDateLocal('')).toEqual(expect.any(Date));
     });
   });
 
