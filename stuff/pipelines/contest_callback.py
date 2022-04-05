@@ -7,14 +7,14 @@ import json
 import logging
 
 from typing import List, Optional
+import omegaup.api
 import mysql.connector
 import mysql.connector.cursor
 from mysql.connector import errors
 from mysql.connector import errorcode
 import pika
 
-from lib_omegaup_petitions import get_contest_scoreboard
-from verification_code import generate_code
+import verification_code
 
 
 @dataclasses.dataclass
@@ -53,11 +53,13 @@ class ContestsCallback:
                  _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
         '''Function to stores the certificates by a given contest'''
-        data = ContestCertificate(**json.loads(body.decode()))
-        ranking = get_contest_scoreboard(api_token=self.api_token,
-                                         url=self.url,
-                                         alias=data.alias,
-                                         scoreboard_url=data.scoreboard_url)
+        data = ContestCertificate(**json.loads(body))
+        client = omegaup.api.Client(api_token=self.api_token, url=self.url)
+
+        scoreboard = client.contest.scoreboard(
+            contest_alias=data.alias,
+            token=data.scoreboard_url)
+        ranking = scoreboard['ranking']
         certificates: List[Certificate] = []
 
         for user in ranking:
@@ -65,11 +67,10 @@ class ContestsCallback:
             if (data.certificate_cutoff
                     and user['place'] <= data.certificate_cutoff):
                 contest_place = user['place']
-            verification_code = generate_code()
             certificates.append(Certificate(
                 certificate_type='contest',
                 contest_id=data.contest_id,
-                verification_code=verification_code,
+                verification_code=verification_code.generate_code(),
                 contest_place=contest_place,
                 username=str(user['username'])
             ))
@@ -106,7 +107,7 @@ class ContestsCallback:
                     if err.errno != errorcode.ER_DUP_ENTRY:
                         raise
                     for certificate in certificates:
-                        certificate.verification_code = generate_code()
+                        certificate.verification_code = verification_code.generate_code()
                     logging.exception(
                         'At least one of the verification codes had a conflict'
                     )

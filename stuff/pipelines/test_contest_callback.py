@@ -3,18 +3,19 @@
 '''test contest_callback module.'''
 
 import datetime
+import json
 import os
 import random
 import string
 import sys
 import time
 
+from typing import Dict
 import omegaup.api
-import pytest_mock
 
 import contest_callback
-import rabbitmq_connection
 import credentials
+import rabbitmq_connection
 import test_constants
 
 
@@ -25,7 +26,7 @@ sys.path.insert(
 import lib.db   # pylint: disable=wrong-import-position
 
 
-def test_insert_contest_certificate(mocker: pytest_mock.MockerFixture) -> None:
+def test_insert_contest_certificate() -> None:
     '''Test get contest contestants'''
 
     client = omegaup.api.Client(api_token=test_constants.API_TOKEN,
@@ -33,6 +34,8 @@ def test_insert_contest_certificate(mocker: pytest_mock.MockerFixture) -> None:
     current_time = datetime.datetime.now()
     future_time = current_time + datetime.timedelta(hours=5)
     alias = ''.join(random.choices(string.digits, k=8))
+
+    # Creating a contest and then adding some users
     client.contest.create(
         title=alias,
         alias=alias,
@@ -52,54 +55,10 @@ def test_insert_contest_certificate(mocker: pytest_mock.MockerFixture) -> None:
         admission_mode='private',
         show_scoreboard_after=True,
     )
-    contest_scoreboard = [{
-        'classname': 'user-rank-unranked',
-        'country': 'xx',
-        'is_invited': True,
-        'name': 'Test User',
-        'place': 1,
-        'problems': [{
-            'alias': 'sumas',
-            'penalty': 0,
-            'points': 100,
-            'runs': 1
-        }],
-        'total': {'points': 100, 'penalty': 0},
-        'username': 'testUser'
-    }]
-    mocker.patch('contest_callback.get_contest_scoreboard',
-                 return_value=contest_scoreboard)
 
-    dbconn = lib.db.connect(
-        lib.db.DatabaseConnectionArguments(
-            user=credentials.MYSQL_USER,
-            password=credentials.MYSQL_PASSWORD,
-            host=credentials.MYSQL_HOST,
-            database=credentials.MYSQL_DATABASE,
-            port=credentials.MYSQL_PORT,
-            mysql_config_file=lib.db.default_config_file_path() or ''
-        )
-    )
-    with rabbitmq_connection.connect(
-            username=credentials.OMEGAUP_USERNAME,
-            password=credentials.OMEGAUP_PASSWORD,
-            host=credentials.RABBITMQ_HOST
-    ) as channel:
-        callback = contest_callback.ContestsCallback(
-            dbconn=dbconn.conn,
-            api_token=test_constants.API_TOKEN,
-            url=test_constants.OMEGAUP_API_ENDPOINT
-        )
-        body = '''
-        {"contest_id": 1, "certificate_cutoff": 3, "alias": "test", \
-        "scoreboard_url": "abcedef"}
-        '''
-        callback(
-            _channel=channel,
-            _method=None,
-            _properties=None,
-            body=body.encode()
-        )
+    for number in range(5):
+        user = f'test_user_{number}'
+        client.contest.addUser(contest_alias=alias, usernameOrEmail=user)
 
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
@@ -115,7 +74,56 @@ def test_insert_contest_certificate(mocker: pytest_mock.MockerFixture) -> None:
     with dbconn.cursor(buffered=True, dictionary=True) as cur:
         cur.execute(
             '''
-            SELECT COUNT(*) AS count FROM Certificates WHERE contest_id = 1;
-            ''')
-        count = cur.fetchone()
-        assert count['count'] == 1
+            SELECT
+                c.contest_id,
+                p.scoreboard_url
+            FROM
+                Contests c
+            INNER JOIN
+                Problemsets p
+            ON
+                p.problemset_id = c.problemset_id
+            WHERE
+                alias = %s;
+            ''', (alias,))
+        result = cur.fetchone()
+        
+    contest_id = result['contest_id']
+    scoreboard_url = result['scoreboard_url']
+    with rabbitmq_connection.connect(
+            username=credentials.OMEGAUP_USERNAME,
+            password=credentials.OMEGAUP_PASSWORD,
+            host=credentials.RABBITMQ_HOST
+    ) as channel:
+        callback = contest_callback.ContestsCallback(
+            dbconn=dbconn.conn,
+            api_token=test_constants.API_TOKEN,
+            url=test_constants.OMEGAUP_API_ENDPOINT
+        )
+        body: Dict[str, str] = {
+            'contest_id': contest_id,
+            'certificate_cutoff': '3', # mocking a default value
+            'alias': alias,
+            'scoreboard_url': scoreboard_url,
+        }
+        callback(
+            _channel=channel,
+            _method=None,
+            _properties=None,
+            body=json.dumps(body)
+        )
+
+    with dbconn.cursor(buffered=True, dictionary=True) as cur:
+        cur.execute(
+            '''
+            SELECT
+                contest_id,
+                certificate_cutoff,
+                alias
+            FROM
+                Certificates
+            WHERE
+                contest_alias = %s;
+            ''', alias)
+        for certificate in cur.fetchall():
+            assert certificate['certificate_cutoff'] == 3
