@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 '''Builds the user recommendation model.
 
 This script reads user submissions and builds a recommendation model for
