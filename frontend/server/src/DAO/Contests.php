@@ -136,7 +136,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     final public static function getByAliasWithExtraInformation(string $alias): ?array {
         $sql = '
                 SELECT
-                    c.*,
+                    join(', ', array_keys(\OmegaUp\DAO\VO\Contests::FIELD_NAMES)),
                     p.scoreboard_url,
                     p.scoreboard_url_admin
                 FROM
@@ -218,7 +218,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     public static function getContestsParticipated(int $identityId) {
         $sql = '
             SELECT
-                *
+                join(', ', array_keys(\OmegaUp\DAO\VO\Contests::FIELD_NAMES)) 
             FROM
                 Contests c
             INNER JOIN
