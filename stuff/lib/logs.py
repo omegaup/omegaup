@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 '''Library of common database code shared across cron scripts.
 
 Using this library consists of two parts:

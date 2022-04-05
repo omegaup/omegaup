@@ -105,6 +105,9 @@ omegaup.db
 # Ignore backend stuff
 stuff/docker/go/*/
 
+# Ignore the Python virtual environment
+stuff/venv/
+
 # Ignore cypress media
 cypress/videos/*
 cypress/screenshots/*

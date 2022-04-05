@@ -245,7 +245,7 @@
 	"contestLengthTooLong": "A dura\u00e7\u00e3o do concurso n\u00e3o podem ser maior \u00e1 31 dias.",
 	"contestListArchivedContests": "Concursos arquivados",
 	"contestListCurrent": "Atuais",
-	"contestListEmpty": "N\u00e3o h\u00e1 concursos nesta lista",
+	"contestListEmpty": "N\u00e3o h\u00e1 concursos que atendam a essas caracter\u00edsticas",
 	"contestListFuture": "Pr\u00f3ximos",
 	"contestListPast": "Pasados",
 	"contestListShowAdminContests": "Tamb\u00e9m mostrar concursos que eu gerencio",
