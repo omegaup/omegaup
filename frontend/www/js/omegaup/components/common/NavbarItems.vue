@@ -169,14 +169,19 @@
           <a
             class="dropdown-item"
             href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
+            target="_blank"
             >{{ T.navTutorials }}</a
           >
-          <a class="dropdown-item" href="http://blog.omegaup.com/">{{
-            T.navBlog
-          }}</a>
+          <a
+            class="dropdown-item"
+            href="http://blog.omegaup.com/"
+            target="_blank"
+            >{{ T.navBlog }}</a
+          >
           <a
             class="dropdown-item text-wrap"
             href="https://omegaup.com/docs/assets/libroluisvargas.pdf"
+            target="_blank"
             >{{ T.navAlgorithmsBook }}</a
           >
         </div>
