@@ -70,8 +70,7 @@ jobs:
           python3 -m pip install --user setuptools
           python3 -m pip install --user wheel
           python3 -m pip install --user \
-            -r stuff/docker/requirements.txt \
-            mysqlclient==2.0.1
+            -r stuff/requirements.txt
 
       - name: Validate composer.json and composer.lock
         run: composer validate
@@ -206,6 +205,23 @@ jobs:
           EOF
           touch 'frontend/tests/test_config.php'
 
+          docker run --rm \
+            --user "$(id -u)":"$(id -g)" \
+            --volume "${PWD}:/src" \
+            --volume "${PWD}:${PWD}" \
+            --volume "${PWD}:/opt/omegaup" \
+            --mount 'type=tmpfs,destination=/home/.cache,tmpfs-mode=1777' \
+            --mount 'type=tmpfs,destination=/home/.local,tmpfs-mode=1777' \
+            --env 'HOME=/home' \
+            --env 'MYPYPATH=/opt/omegaup/stuff' \
+            --env 'VIRTUAL_ENV=/opt/omegaup/stuff/venv' \
+            --entrypoint='' \
+            "$(grep CONTAINER_VERSION= stuff/lint.sh | cut -f2 -d=)" \
+            bash -c "\
+            python3 -m venv /opt/omegaup/stuff/venv && \
+            . /opt/omegaup/stuff/venv/bin/activate && \
+            python3 -m pip install wheel && \
+            python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
           ./stuff/lint.sh --diagnostics-output=github validate --all < /dev/null
 
       - name: Run Psalm
@@ -303,8 +319,7 @@ jobs:
           python3 -m pip install --user setuptools
           python3 -m pip install --user wheel
           python3 -m pip install --user \
-            -r stuff/docker/requirements.txt \
-            mysqlclient==2.0.1
+            -r stuff/requirements.txt
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
@@ -316,6 +331,10 @@ jobs:
           # Create directory to prevent --purge from failing.
           sudo mkdir -p /var/lib/omegaup
           sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
+          docker-compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
+            python3 -m venv /opt/omegaup/stuff/venv && \
+            python3 -m pip install wheel && \
+            python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
           docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
 
       - name: Install yarn dependencies
@@ -422,10 +441,8 @@ jobs:
           python3 -m pip install --user wheel
           python3 -m pip install --user --upgrade urllib3
           python3 -m pip install --user \
-            -r stuff/docker/requirements.txt \
-            mysqlclient==2.0.1 \
+            -r stuff/requirements.txt \
             selenium \
-            pytest \
             pytest-xdist \
             flaky
 
@@ -439,6 +456,10 @@ jobs:
           # Create directory to prevent --purge from failing.
           sudo mkdir -p /var/lib/omegaup
           sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
+          docker-compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
+            python3 -m venv /opt/omegaup/stuff/venv && \
+            python3 -m pip install wheel && \
+            python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
           docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
 
       - name: Install yarn dependencies
@@ -484,17 +505,6 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
-
-      - name: Install Python dependencies
-        run: |
-          python3 -m pip install --user setuptools
-          python3 -m pip install --user wheel
-          python3 -m pip install --user --upgrade urllib3
-          python3 -m pip install --user \
-            -r stuff/docker/requirements.txt \
-            mysqlclient==2.0.1 \
-            pandas \
-            pytest
 
       - name: Install wait-for-it
         run: |
@@ -565,14 +575,24 @@ jobs:
           mysql -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
           mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup`;'
           mysql -e 'GRANT ALL ON `omegaup`.* TO "omegaup"@"localhost";'
+
+      - name: Install Python dependencies
+        run: |
+          docker-compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
+            python3 -m venv /opt/omegaup/stuff/venv && \
+            python3 -m pip install wheel && \
+            python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
+
+      - name: Bootstrap environment
+        run: |
           # Create directory to prevent --purge from failing.
           sudo mkdir -p /var/lib/omegaup
           sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
-          docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose          
+          docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
 
       - name: Run Python tests
         run: |
-          python3 -m pytest ./stuff/
+          docker-compose exec -T frontend python3 -m pytest ./stuff/
 
       - name: Collect container logs
         if: ${{ always() }}
