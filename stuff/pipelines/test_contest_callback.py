@@ -2,6 +2,7 @@
 
 '''test contest_callback module.'''
 
+import dataclasses
 import datetime
 import json
 import os
@@ -10,7 +11,7 @@ import string
 import sys
 import time
 
-from typing import Dict
+from typing import Dict, List
 import omegaup.api
 
 import contest_callback
@@ -56,9 +57,11 @@ def test_insert_contest_certificate() -> None:
         show_scoreboard_after=True,
     )
 
+    usernames: List[str] = []
     for number in range(5):
         user = f'test_user_{number}'
         client.contest.addUser(contest_alias=alias, usernameOrEmail=user)
+        usernames.append(user)
 
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
@@ -100,30 +103,42 @@ def test_insert_contest_certificate() -> None:
             api_token=test_constants.API_TOKEN,
             url=test_constants.OMEGAUP_API_ENDPOINT
         )
-        body: Dict[str, str] = {
-            'contest_id': contest_id,
-            'certificate_cutoff': '3', # mocking a default value
-            'alias': alias,
-            'scoreboard_url': scoreboard_url,
-        }
+        body = contest_callback.ContestCertificate(
+            contest_id=contest_id,
+            certificate_cutoff=3, # mocking a default value
+            alias=alias,
+            scoreboard_url=scoreboard_url,
+        )
         callback(
             _channel=channel,
             _method=None,
             _properties=None,
-            body=json.dumps(body)
+            body=json.dumps(dataclasses.asdict(body)).encode('utf-8')
         )
 
     with dbconn.cursor(buffered=True, dictionary=True) as cur:
         cur.execute(
             '''
             SELECT
-                contest_id,
-                certificate_cutoff,
-                alias
+                i.username,
+                c.contest_place
             FROM
-                Certificates
+                Certificates c
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = c.identity_id
+            INNER JOIN
+                Contests cs
+            ON
+                cs.contest_id = c.contest_id
             WHERE
-                contest_alias = %s;
-            ''', alias)
-        for certificate in cur.fetchall():
-            assert certificate['certificate_cutoff'] == 3
+                cs.alias = %s;
+            ''', (alias,))
+        certificates = cur.fetchall()
+
+    for certificate in certificates:
+        assert certificate['username'] in usernames
+        # At this moment, there are no submissions for the contest, so all the
+        # participants got the first place
+        assert certificate['contest_place'] == 1

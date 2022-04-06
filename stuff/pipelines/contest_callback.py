@@ -59,20 +59,20 @@ class ContestsCallback:
         scoreboard = client.contest.scoreboard(
             contest_alias=data.alias,
             token=data.scoreboard_url)
-        ranking = scoreboard['ranking']
+        ranking = scoreboard.ranking
         certificates: List[Certificate] = []
 
         for user in ranking:
             contest_place: Optional[int] = None
-            if (data.certificate_cutoff
-                    and user['place'] <= data.certificate_cutoff):
-                contest_place = user['place']
+            if (data.certificate_cutoff and user.place
+                    and user.place <= data.certificate_cutoff):
+                contest_place = user.place
             certificates.append(Certificate(
                 certificate_type='contest',
                 contest_id=data.contest_id,
                 verification_code=verification_code.generate_code(),
                 contest_place=contest_place,
-                username=str(user['username'])
+                username=str(user.username)
             ))
         with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
             while True:
