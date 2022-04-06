@@ -29,6 +29,7 @@ def test_get_contests_information() -> None:
     client = omegaup.api.Client(api_token=test_constants.API_TOKEN,
                                 url=test_constants.OMEGAUP_API_ENDPOINT)
     current_time = datetime.datetime.now()
+    past_time = current_time - datetime.timedelta(hours=5)
     future_time = current_time + datetime.timedelta(hours=5)
     alias = ''.join(random.choices(string.digits, k=8))
     client.contest.create(
@@ -49,6 +50,17 @@ def test_get_contests_information() -> None:
         penalty_calc_policy='sum',
         admission_mode='private',
         show_scoreboard_after=True,
+    )
+
+    # Now, we are going to force finishing the contest, so we can generate
+    # certificates for participants
+    client.contest.update(
+        contest_alias=alias,
+        languages='py2,py3',
+        window_length=0,
+        submissions_gap=1200,
+        start_time=past_time,
+        finish_time=int(time.mktime(current_time.timetuple())),
     )
 
     dbconn = lib.db.connect(
