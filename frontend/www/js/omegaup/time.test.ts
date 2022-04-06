@@ -15,6 +15,10 @@ describe('time', () => {
         expectedValue,
       );
     });
+
+    it('Should be able to get current date', () => {
+      expect(time.parseDateLocal('')).toEqual(expect.any(Date));
+    });
   });
 
   describe('formatDateTimeLocal', () => {
@@ -30,6 +34,10 @@ describe('time', () => {
       expect(
         time.formatDateTimeLocal(time.parseDateTimeLocal(expectedValue)),
       ).toEqual(expectedValue);
+    });
+
+    it('Should be able to get current datetime', () => {
+      expect(time.parseDateTimeLocal('')).toEqual(expect.any(Date));
     });
   });
 
