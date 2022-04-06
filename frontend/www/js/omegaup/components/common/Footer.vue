@@ -72,12 +72,12 @@
           <h4>{{ T.frontPageFooterOrganization }}</h4>
           <ul>
             <li class="mt-1">
-              <a href="https://omegaup.org/#about">{{
+              <a href="https://omegaup.org/#about" target="_blank">{{
                 T.frontPageFooterAboutUs
               }}</a>
             </li>
             <li class="mt-1">
-              <a href="https://omegaup.org/#team">{{
+              <a href="https://omegaup.org/#team" target="_blank">{{
                 T.frontPageFooterTeam
               }}</a>
             </li>
