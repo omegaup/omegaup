@@ -658,6 +658,7 @@ const translations: { [key: string]: string; } = {
   navCourses: "Cursos",
   navCoursesEnrolled: "Cursos inscrito",
   navHelp: "Ajuda",
+  navDiscord: "Servidor de Discord",
   navLogIn: "Entrar / Inscrever-se",
   navLogOut: "Sair",
   navMyContent: "Meu conte\u00fado",

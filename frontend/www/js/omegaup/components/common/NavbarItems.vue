@@ -172,6 +172,12 @@
             target="_blank"
             >{{ T.navTutorials }}</a
           >
+            <a
+            class="dropdown-item"
+            href="https://discord.gg/Y4JQ5HQd"
+            target="_blank"
+            >{{ T.navDiscord }}</a
+          >
           <a
             class="dropdown-item"
             href="http://blog.omegaup.com/"
