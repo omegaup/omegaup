@@ -885,7 +885,6 @@ const translations: { [key: string]: string; } = {
   problemEditFormFile: "Anexar arquivo zip",
   problemEditFormFirstTimeCreatingAProblem: "\u00e9 a primeira vez que voc\u00ea cria um problema?",
   problemEditFormHereIsHowToWriteProblems: "aqui \u00e9 como escrever o arquivo",
-  problemEditFormHowToWriteProblems: "Como escrever o arquivo",
   problemEditFormInputLimit: "Tamanho l\u00edmite de entrada (bytes)",
   problemEditFormLanguages: "Tipo de problema",
   problemEditFormLiteral: "Interpretar stdout como pontua\u00e7\u00e3o",
