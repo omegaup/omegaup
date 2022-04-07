@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 '''Send messages to Contest queue in rabbitmq'''
 
@@ -14,7 +14,7 @@ import mysql.connector.cursor
 import pika
 
 import credentials
-import database.contest
+from database.contest import get_contests
 import rabbitmq_connection
 import rabbitmq_producer
 import test_constants
@@ -27,7 +27,8 @@ import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 
-def send_contest(
+def send_contest_message_to_client(
+        *,
         cur: mysql.connector.cursor.MySQLCursorDict,
         channel: pika.adapters.blocking_connection.BlockingChannel,
         date_lower_limit: datetime.datetime = test_constants.DATE_LOWER_LIMIT,
@@ -46,7 +47,7 @@ def send_contest(
         channel=channel
     )
 
-    contestants = database.contest.get_contests(
+    contestants = get_contests(
         cur=cur,
         date_lower_limit=date_lower_limit,
         date_upper_limit=date_upper_limit,
@@ -76,10 +77,11 @@ def main() -> None:
                                         password=credentials.OMEGAUP_PASSWORD,
                                         host=credentials.RABBITMQ_HOST
                                         ) as channel:
-            send_contest(cur=cur,
-                         channel=channel,
-                         date_lower_limit=args.date_lower_limit,
-                         date_upper_limit=args.date_upper_limit)
+            send_contest_message_to_client(
+                cur=cur,
+                channel=channel,
+                date_lower_limit=args.date_lower_limit,
+                date_upper_limit=args.date_upper_limit)
     finally:
         dbconn.conn.close()
         logging.info('Done')

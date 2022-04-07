@@ -61,6 +61,7 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
 
 
 def initialize_rabbitmq(
+        *,
         queue: str,
         exchange: str,
         routing_key: str,
