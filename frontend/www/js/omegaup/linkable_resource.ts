@@ -74,7 +74,7 @@ export class Problem implements LinkableResource {
       return null;
     }
     return {
-      url: '/media/quality-badge-sm.png',
+      url: '/media/quality-badge.png',
       title: T.wordsHighQualityProblem,
     };
   }
