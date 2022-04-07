@@ -22,13 +22,16 @@
             <th class="text-center" width="50%" scope="col">
               {{ T.contestEditTagName }}
             </th>
-            <th style="text-align:left;width:50%;padding-left:15%;" scope="col">
+            <th
+              style="text-align: left; width: 50%; padding-left: 15%"
+              scope="col"
+            >
               {{ T.contestEditTagDelete }}
               <a
                 data-toggle="tooltip"
                 rel="tooltip"
                 :title="T.problemEditTagPublicRequired"
-                >
+              >
                 <span class="question"></span>
               </a>
             </th>
@@ -79,11 +82,14 @@
       </div>
       <table class="table table-striped">
         <thead>
-          <tr >
+          <tr>
             <th class="text-center" width="50%" scope="col">
               {{ T.contestEditTagName }}
             </th>
-            <th style="text-align:left;width:50%;padding-left:15%;" scope="col">
+            <th
+              style="text-align: left; width: 50%; padding-left: 15%"
+              scope="col"
+            >
               {{ T.contestEditTagDelete }}
             </th>
           </tr>
@@ -262,19 +268,20 @@ export default class ProblemTags extends Vue {
 </script>
 
 <style>
-.question{
-  width:20px;
-  height:20px;
-  background:url("/media/question.png");
-  display:inline-block;
+.question {
+  width: 20px;
+  height: 20px;
+  background: url('/media/question.png');
+  display: inline-block;
   vertical-align: middle;
 }
-.question:hover{
-  width:25px;
-  width:25px;
-  background:url("/media/question.png");
-  background-size:25px 25px;
-  display:inline-block;
+
+.question:hover {
+  width: 25px;
+  width: 25px;
+  background: url('/media/question.png');
+  background-size: 25px 25px;
+  display: inline-block;
   vertical-align: middle;
 }
 </style>
