@@ -7,7 +7,7 @@ def connect(
     password: Text,
     database: Text,
     host: Text,
-    port: int = 3306,
+    port: int = 13306,
 ) -> MySQLConnection:
     ...
 
