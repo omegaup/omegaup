@@ -172,7 +172,7 @@
             target="_blank"
             >{{ T.navTutorials }}</a
           >
-            <a
+          <a
             class="dropdown-item"
             href="https://discord.gg/Y4JQ5HQd"
             target="_blank"
