@@ -29,14 +29,14 @@ def test_get_contests_information() -> None:
     client = omegaup.api.Client(api_token=test_constants.API_TOKEN,
                                 url=test_constants.OMEGAUP_API_ENDPOINT)
     current_time = datetime.datetime.now()
-    future_time = current_time + datetime.timedelta(hours=5)
+    past_time = current_time - datetime.timedelta(hours=5)
     alias = ''.join(random.choices(string.digits, k=8))
     client.contest.create(
         title=alias,
         alias=alias,
         description='Test contest',
-        start_time=time.mktime(current_time.timetuple()),
-        finish_time=time.mktime(future_time.timetuple()),
+        start_time=time.mktime(past_time.timetuple()),
+        finish_time=time.mktime(current_time.timetuple()),
         window_length=0,
         scoreboard=100,
         points_decay_factor=0,
