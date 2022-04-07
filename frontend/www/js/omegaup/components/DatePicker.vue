@@ -2,6 +2,7 @@
   <input
     v-model="stringValue"
     :name="name"
+    :max="new Date().toISOString().split('T')[0]"
     class="form-control"
     :class="{ 'is-invalid': isInvalid }"
     required="required"
@@ -38,9 +39,6 @@ export default class DatePicker extends Vue {
       // In that case, use the bootstrap datepicker.
       this.mountedFallback();
     }
-    // only accept birthday before today
-    var today = new Date().toISOString().split('T')[0];
-    document.getElementsByName(this.name)[0].setAttribute('max', today);
   }
 
   private mountedFallback() {
