@@ -3,9 +3,9 @@
     <div class="modal-mask">
       <div class="modal-container">
         <div style="display: flex; justify-content: flex-end">
-        <button class="btn" @click="$emit('close')">❌</button>
+          <button class="btn" @click="$emit('close')">❌</button>
         </div>
-      <form-wizard
+        <form-wizard
           color="#678DD7"
           :back-button-text="T.wordsBack"
           :finish-button-text="T.wordsConfirm"
