@@ -2,7 +2,7 @@
   <transition name="modal">
     <div class="modal-mask">
       <div class="modal-container">
-        <div style="display: flex; justify-content: flex-end">
+        <div class="d-flex justify-content-end">
           <button class="btn" @click="$emit('close')">❌</button>
         </div>
         <form-wizard
