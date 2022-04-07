@@ -30,14 +30,13 @@ def test_get_contests_information() -> None:
                                 url=test_constants.OMEGAUP_API_ENDPOINT)
     current_time = datetime.datetime.now()
     past_time = current_time - datetime.timedelta(hours=5)
-    future_time = current_time + datetime.timedelta(hours=5)
     alias = ''.join(random.choices(string.digits, k=8))
     client.contest.create(
         title=alias,
         alias=alias,
         description='Test contest',
-        start_time=time.mktime(current_time.timetuple()),
-        finish_time=time.mktime(future_time.timetuple()),
+        start_time=time.mktime(past_time.timetuple()),
+        finish_time=time.mktime(current_time.timetuple()),
         window_length=0,
         scoreboard=100,
         points_decay_factor=0,
@@ -50,17 +49,6 @@ def test_get_contests_information() -> None:
         penalty_calc_policy='sum',
         admission_mode='private',
         show_scoreboard_after=True,
-    )
-
-    # Now, we are going to force finishing the contest, so we can generate
-    # certificates for participants
-    client.contest.update(
-        contest_alias=alias,
-        languages='py2,py3',
-        window_length=0,
-        submissions_gap=1200,
-        start_time=past_time,
-        finish_time=int(time.mktime(current_time.timetuple())),
     )
 
     dbconn = lib.db.connect(
