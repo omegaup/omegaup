@@ -129,7 +129,7 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
                          type=str,
                          help='MySQL database',
                          default='omegaup')
-    db_args.add_argument('--port', type=int, help='MySQL port', default=3306)
+    db_args.add_argument('--port', type=int, help='MySQL port', default=13306)
 
 
 def connect(args: DatabaseConnectionArguments) -> Connection:
