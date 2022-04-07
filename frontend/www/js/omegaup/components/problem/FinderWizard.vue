@@ -2,7 +2,9 @@
   <transition name="modal">
     <div class="modal-mask">
       <div class="modal-container">
-        <button class="close" @click="$emit('close')">❌</button>
+        <div style="display: flex; justify-content: flex-end">
+          <button class="btn" @click="$emit('close')">❌</button>
+        </div>
         <form-wizard
           color="#678DD7"
           :back-button-text="T.wordsBack"
