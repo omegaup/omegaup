@@ -19,13 +19,10 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th class="text-center" width="50%" scope="col">
+            <th class="text-center w-50" scope="col">
               {{ T.contestEditTagName }}
             </th>
-            <th
-              style="text-align: left; width: 50%; padding-left: 15%"
-              scope="col"
-            >
+            <th class="text-left w-50 pl-5" scope="col">
               {{ T.contestEditTagDelete }}
               <a
                 data-toggle="tooltip"
@@ -83,13 +80,10 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th class="text-center" width="50%" scope="col">
+            <th class="text-center w-5" scope="col">
               {{ T.contestEditTagName }}
             </th>
-            <th
-              style="text-align: left; width: 50%; padding-left: 15%"
-              scope="col"
-            >
+            <th class="text-left w-50 pl-5" scope="col">
               {{ T.contestEditTagDelete }}
             </th>
           </tr>
@@ -278,7 +272,7 @@ export default class ProblemTags extends Vue {
 
 .question:hover {
   width: 25px;
-  width: 25px;
+  height: 25px;
   background: url('/media/question.png');
   background-size: 25px 25px;
   display: inline-block;
