@@ -1,6 +1,9 @@
 <template>
   <div class="mr-auto">
-    <ul v-if="!omegaUpLockDown && (!inContest || isAdmin)" class="navbar-nav">
+    <ul
+      v-if="!omegaUpLockDown && (!inContest || isAdmin)"
+      class="navbar-nav align-items-end"
+    >
       <li
         v-if="isLoggedIn"
         class="nav-item dropdown nav-contests"

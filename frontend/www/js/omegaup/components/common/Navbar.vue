@@ -105,7 +105,7 @@
               >
             </li>
           </ul>
-          <ul v-else class="navbar-nav navbar-right">
+          <ul v-else class="navbar-nav navbar-right align-items-end">
             <omegaup-notifications-clarifications
               v-if="inContest"
               :clarifications="clarifications"
@@ -383,8 +383,11 @@ export default class Navbar extends Vue {
 @import '../../../../sass/main.scss';
 
 nav.navbar {
+  text-align: end;
   background-color: var(--header-primary-color);
-
+  .navbar-nav .dropdown-menu {
+    position: absolute;
+  }
   .navbar-brand {
     background-color: var(--header-navbar-brand-background-color);
   }
