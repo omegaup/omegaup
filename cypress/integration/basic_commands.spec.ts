@@ -86,12 +86,13 @@ describe('Basic Commands Test', () => {
     );
   });
 
-  // TODO(#6482): Re-enable when the underlying bug is fixed.
-  it.skip('Should create a course with end date', () => {
+  it('Should create a course with end date', () => {
     const loginOptions: LoginOptions = {
       username: uuid(),
       password: uuid(),
     };
+
+    cy.clock(new Date(2022, 2, 31, 22, 19, 0), ['Date']);
 
     const now = new Date();
 
@@ -134,10 +135,12 @@ describe('Basic Commands Test', () => {
     cy.get('[name="unlimited-duration"]')
       .eq(courseOptions.unlimitedDuration ? 0 : 1)
       .should('be.checked');
-    cy.get('[name="end-date"]').should(
-      'have.value',
-      getISODate(courseOptions.endDate),
-    );
+    if (courseOptions.endDate) {
+      cy.get('[name="end-date"]').should(
+        'have.value',
+        getISODate(courseOptions.endDate),
+      );
+    }
     cy.get('.tt-input').first().should('have.value', courseOptions.school); //
     cy.get('[name="basic-information"]')
       .eq(courseOptions.basicInformation ? 0 : 1)

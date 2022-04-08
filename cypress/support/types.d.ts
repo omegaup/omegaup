@@ -13,7 +13,7 @@ export interface ProblemOptions {
 export interface CourseOptions {
   courseAlias: string;
   startDate: Date;
-  endDate: Date;
+  endDate?: Date;
   showScoreboard?: boolean;
   unlimitedDuration?: boolean;
   school?: string;
