@@ -296,6 +296,13 @@
           </ul>
         </div>
       </div>
+      <a
+        v-if="isLoggedIn"
+        class="navbar d-flex justify-content-end"
+        href="/logout/"
+      >
+        <font-awesome-icon :icon="['fas', 'power-off']" />
+      </a>
     </nav>
     <omegaup-user-objectives-questions
       v-if="
