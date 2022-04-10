@@ -123,7 +123,7 @@
                   </template>
                   <b-dropdown-item
                     href="#"
-                    data-filter-by-recommended
+                    data-filter-by-all
                     @click="toggleFilterByAll"
                   >
                     <font-awesome-icon
@@ -356,6 +356,7 @@ export default class ArenaContestList extends Vue {
   @Prop() sortOrder!: ContestOrder;
   @Prop() filterBySignedUp!: boolean;
   @Prop() filterByRecommended!: boolean;
+  @Prop() filterByAll!: boolean;
   @Prop() page!: number;
   T = T;
   ui = ui;
@@ -366,6 +367,7 @@ export default class ArenaContestList extends Vue {
   currentOrder: ContestOrder = this.sortOrder;
   currentFilterBySignedUp: boolean = this.filterBySignedUp;
   currentFilterByRecommended: boolean = this.filterByRecommended;
+  currentFilterByAll: boolean = this.filterByAll;
   currentPage: number = this.page;
   refreshing: boolean = false;
 
@@ -391,6 +393,7 @@ export default class ArenaContestList extends Vue {
         sort_order: this.currentOrder,
         participating: this.currentFilterBySignedUp,
         recommended: this.currentFilterByRecommended,
+        all: this.currentFilterByAll,
       },
     };
   }
@@ -438,6 +441,9 @@ export default class ArenaContestList extends Vue {
   toggleFilterByRecommended() {
     this.currentFilterByRecommended = !this.currentFilterByRecommended;
   }
+  toggleFilterByAll() {
+    this.currentFilterByAll = !this.currentFilterByAll;
+  }
 
   get filteredContestList(): types.ContestListItem[] {
     const filters: Array<(contestItem: types.ContestListItem) => boolean> = [];
@@ -446,6 +452,9 @@ export default class ArenaContestList extends Vue {
     }
     if (this.currentFilterByRecommended) {
       filters.push((item) => item.recommended);
+    }
+    if (this.currentFilterByAll) {
+      filters.push((item) => item.all);
     }
     return this.sortedContestList.slice().filter((contestItem) => {
       for (const filter of filters) {
