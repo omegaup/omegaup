@@ -21,6 +21,36 @@ class ConversionResult {
     public $typescriptExpansion;
 
     /**
+     * @var string
+     * @readonly
+     */
+    public $pythonExpansion;
+
+    /**
+     * @var string
+     * @readonly
+     */
+    public $pythonParamType;
+
+    /**
+     * @var ?string
+     * @readonly
+     */
+    public $pythonDeclaration;
+
+    /**
+     * @var string
+     * @readonly
+     */
+    public $pythonConversion;
+
+    /**
+     * @var bool
+     * @readonly
+     */
+    public $pythonVoidType;
+
+    /**
      * @var ?string
      * @readonly
      */
@@ -28,9 +58,19 @@ class ConversionResult {
 
     public function __construct(
         string $typescriptExpansion,
-        ?string $conversionFunction = null
+        string $pythonExpansion,
+        string $pythonParamType,
+        string $pythonConversion,
+        bool $pythonVoidType,
+        ?string $pythonDeclaration,
+        ?string $conversionFunction = null,
     ) {
         $this->typescriptExpansion = $typescriptExpansion;
+        $this->pythonExpansion = $pythonExpansion;
+        $this->pythonParamType = $pythonParamType;
+        $this->pythonConversion = $pythonConversion;
+        $this->pythonVoidType = $pythonVoidType;
+        $this->pythonDeclaration = $pythonDeclaration;
         $this->conversionFunction = $conversionFunction;
     }
 }
@@ -280,6 +320,9 @@ class TypeMapper {
     /** @var array<string, ConversionResult> */
     public $typeAliases = [];
 
+    /** @var array<string, ConversionResult> */
+    public $intermediatePythonTypes = [];
+
     /** @var array<string, true> */
     private $daoTypes;
 
@@ -293,20 +336,45 @@ class TypeMapper {
     /**
      * @param list<string> $propertyPath
      */
-    public function convertTypeToTypeScript(
+    public function convertType(
         \Psalm\Type\Union $unionType,
         string $methodName,
-        $propertyPath = []
+        $propertyPath = [],
+        bool $rootAPIReturnType = false,
     ): ConversionResult {
-        $path = $methodName . '.' . join('.', $propertyPath);
-        $typeNames = [];
+        $path = $methodName;
+        if (!empty($propertyPath)) {
+            $path .= '.' . join('.', $propertyPath);
+        }
+        $pythonTypeName = '_' . preg_replace('/\\W/', '_', $path);
+        $typescriptTypeNames = [];
+        $pythonTypeNames = [];
+        $pythonParamTypeNames = [];
         $requiresConversion = false;
         $conversionFunction = [];
+        $pythonDeclaration = null;
+        $pythonDeclarationParams = [];
+        $pythonDeclarationOptionalParams = [];
+        $pythonDeclarationLines = [];
+        $pythonConversion = '$';
+        $pythonNullable = false;
+        $pythonVoidType = false;
+        $savePythonType = false;
+        $quotePythonType = fn (string $name): string => (
+            str_starts_with($name, '_') ?
+            "'{$name}'" :
+            $name
+        );
         foreach ($unionType->getAtomicTypes() as $typeName => $type) {
             if ($typeName == 'array') {
                 if ($type instanceof \Psalm\Type\Atomic\ObjectLike) {
                     $convertedProperties = [];
                     $propertyTypes = [];
+                    $pythonDeclaration = "@dataclasses.dataclass\n";
+                    $pythonDeclaration .= "class {$pythonTypeName}:\n";
+                    $pythonDeclaration .= "    \"\"\"{$pythonTypeName}\"\"\"\n";
+                    $pythonVoidType = true;
+                    $savePythonType = true;
                     ksort($type->properties);
                     foreach ($type->properties as $propertyName => $propertyType) {
                         if (is_numeric($propertyName)) {
@@ -314,14 +382,16 @@ class TypeMapper {
                                 "Property {$path}.{$propertyName} is non-string: {$propertyType}"
                             );
                         }
-                        if (empty($propertyPath) && $propertyName == 'status') {
+                        if ($rootAPIReturnType && $propertyName == 'status') {
                             // Omit this.
                             continue;
                         }
-                        $childPropertyPath = array_merge(
-                            $propertyPath,
-                            [$propertyName]
-                        );
+                        $isPythonBuiltin = false;
+                        $pythonPropertyName = $propertyName;
+                        if ($propertyName == 'class' || $propertyName == 'in') {
+                            $isPythonBuiltin = true;
+                            $pythonPropertyName = "{$propertyName}_";
+                        }
                         $isNullable = $propertyType->isNullable();
                         if ($isNullable) {
                             $propertyType->removeType('null');
@@ -329,10 +399,13 @@ class TypeMapper {
                         if ($propertyType->possibly_undefined) {
                             $isNullable = true;
                         }
-                        $conversionResult = $this->convertTypeToTypeScript(
+                        $conversionResult = $this->convertType(
                             $propertyType,
                             $methodName,
-                            $childPropertyPath
+                            array_merge(
+                                $propertyPath,
+                                [$propertyName]
+                            ),
                         );
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
@@ -346,29 +419,118 @@ class TypeMapper {
                             }
                             $convertedProperties[] = $conversionStatement;
                         }
+                        $pythonDeclaration .= "    {$pythonPropertyName}: ";
+                        $pythonConversion = "{$pythonTypeName}(**$)";
+                        $pythonTypeExpansion = $conversionResult->pythonExpansion;
+                        $pythonDeclarationParamTypeExpansion = $conversionResult->pythonParamType;
+                        $pythonDeclarationTypeExpansion = $pythonTypeExpansion;
+                        if (!is_null($conversionResult->pythonDeclaration)) {
+                            $pythonDeclarationTypeExpansion = $quotePythonType(
+                                $pythonDeclarationTypeExpansion
+                            );
+                            $pythonDeclarationParamTypeExpansion = $conversionResult->pythonParamType;
+                        }
+                        if ($isNullable) {
+                            $pythonDeclaration .= "Optional[{$pythonDeclarationTypeExpansion}]";
+                            if ($isPythonBuiltin) {
+                                $pythonDeclarationLines[] = "        if '${propertyName}' in _kwargs:\n";
+                                $pythonDeclarationLines[] = "            self.{$pythonPropertyName} = " . str_replace(
+                                    '$',
+                                    "_kwargs['{$propertyName}']",
+                                    $conversionResult->pythonConversion
+                                ) . "\n";
+                                $pythonDeclarationLines[] = "        else:\n";
+                                $pythonDeclarationLines[] = "            self.{$pythonPropertyName} = None\n";
+                            } else {
+                                $pythonDeclarationOptionalParams [] = "{$pythonPropertyName}: Optional[{$pythonDeclarationParamTypeExpansion}] = None,";
+                                $pythonDeclarationLines[] = "        if ${pythonPropertyName} is not None:\n";
+                                $pythonDeclarationLines[] = "            self.{$pythonPropertyName} = " . str_replace(
+                                    '$',
+                                    $pythonPropertyName,
+                                    $conversionResult->pythonConversion
+                                ) . "\n";
+                                $pythonDeclarationLines[] = "        else:\n";
+                                $pythonDeclarationLines[] = "            self.{$pythonPropertyName} = None\n";
+                            }
+                        } else {
+                            $pythonDeclaration .= $pythonDeclarationTypeExpansion;
+                            if ($isPythonBuiltin) {
+                                $pythonDeclarationLines [] = "        self.{$pythonPropertyName} = " . str_replace(
+                                    '$',
+                                    "_kwargs['{$propertyName}']",
+                                    $conversionResult->pythonConversion
+                                ) . "\n";
+                            } else {
+                                $pythonDeclarationParams [] = "{$pythonPropertyName}: {$pythonDeclarationParamTypeExpansion},";
+                                $pythonDeclarationLines [] = "        self.{$pythonPropertyName} = " . str_replace(
+                                    '$',
+                                    $pythonPropertyName,
+                                    $conversionResult->pythonConversion
+                                ) . "\n";
+                            }
+                        }
+                        $pythonDeclaration .= "\n";
+                        $pythonVoidType = false;
                         if ($isNullable) {
                             $propertyName .= '?';
                         }
                         $propertyTypes[] = "{$propertyName}: {$conversionResult->typescriptExpansion};";
                     }
+                    if ($pythonVoidType) {
+                        $pythonDeclaration .= "    pass\n";
+                    } else {
+                        $pythonDeclaration .= "\n";
+                        $pythonDeclaration .= "    def __init__(\n";
+                        $pythonDeclaration .= "        self,\n";
+                        $pythonDeclaration .= "        *,\n";
+                        foreach ($pythonDeclarationParams as $param) {
+                            $pythonDeclaration .= "        {$param}\n";
+                        }
+                        foreach ($pythonDeclarationOptionalParams as $param) {
+                            $pythonDeclaration .= "        {$param}\n";
+                        }
+                        $pythonDeclaration .= "        # Ignore any unknown arguments\n";
+                        $pythonDeclaration .= "        **_kwargs: Any,\n";
+                        $pythonDeclaration .= "    ):\n";
+                        $pythonDeclaration .= join('', $pythonDeclarationLines);
+                    }
+                    $pythonConversion = "{$pythonTypeName}(**$)";
                     $conversionFunction[] = '(x) => { ' . join(
                         ' ',
                         $convertedProperties
                     ) . ' return x; }';
-                    $typeNames[] = '{ ' . join(' ', $propertyTypes) . ' }';
+                    $typescriptTypeNames[] = '{ ' . join(
+                        ' ',
+                        $propertyTypes
+                    ) . ' }';
+                    $pythonTypeNames[] = $quotePythonType($pythonTypeName);
+                    $pythonParamTypeNames[] = 'Dict[str, Any]';
                 } elseif ($type instanceof \Psalm\Type\Atomic\TList) {
-                    $conversionResult = $this->convertTypeToTypeScript(
+                    $conversionResult = $this->convertType(
                         $type->type_param,
                         $methodName,
-                        $propertyPath
+                        array_merge(
+                            $propertyPath,
+                            ['entry']
+                        ),
                     );
+                    $pythonConversion = '[' . str_replace(
+                        '$',
+                        'v',
+                        $conversionResult->pythonConversion
+                    ) . ' for v in $]';
                     if (!is_null($conversionResult->conversionFunction)) {
                         $requiresConversion = true;
                         $conversionFunction[] = (
                             "(x) => { if (!Array.isArray(x)) { return x; } return x.map({$conversionResult->conversionFunction}); }"
                         );
                     }
-                    $typeNames[] = "{$conversionResult->typescriptExpansion}[]";
+                    $typescriptTypeNames[] = "{$conversionResult->typescriptExpansion}[]";
+                    $quotedPythonType = $quotePythonType(
+                        $conversionResult->pythonExpansion
+                    );
+                    $pythonTypeNames[] = "Sequence[{$quotedPythonType}]";
+                    $pythonParamTypeNames[] = "Sequence[{$conversionResult->pythonParamType}]";
                 } elseif ($type instanceof \Psalm\Type\Atomic\TArray) {
                     if (count($type->type_params) != 2) {
                         throw new \Exception(
@@ -381,12 +543,35 @@ class TypeMapper {
                         );
                     }
                     if ($type->type_params[0]->hasString()) {
-                        $conversionResult = $this->convertTypeToTypeScript(
+                        $conversionResult = $this->convertType(
                             $type->type_params[1],
                             $methodName,
-                            $propertyPath
+                            array_merge(
+                                $propertyPath,
+                                ['value']
+                            ),
                         );
-                        $typeNames[] = "{ [key: string]: {$conversionResult->typescriptExpansion}; }";
+                        $typescriptTypeNames[] = "{ [key: string]: {$conversionResult->typescriptExpansion}; }";
+                        $pythonTypeNames[] = "Dict[str, {$conversionResult->pythonExpansion}]";
+                        $pythonParamTypeNames[] = "Dict[str, {$conversionResult->pythonParamType}]";
+                        if (
+                            str_starts_with(
+                                $conversionResult->pythonParamType,
+                                'Optional['
+                            )
+                        ) {
+                            $pythonConversion = '{k: ' . str_replace(
+                                '$',
+                                'v',
+                                $conversionResult->pythonConversion
+                            ) . ' if v is not None else None for k, v in $.items()}';
+                        } else {
+                            $pythonConversion = '{k: ' . str_replace(
+                                '$',
+                                'v',
+                                $conversionResult->pythonConversion
+                            ) . ' for k, v in $.items()}';
+                        }
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
                             $conversionFunction[] = (
@@ -396,12 +581,35 @@ class TypeMapper {
                         continue;
                     }
                     if ($type->type_params[0]->hasInt()) {
-                        $conversionResult = $this->convertTypeToTypeScript(
+                        $conversionResult = $this->convertType(
                             $type->type_params[1],
                             $methodName,
-                            $propertyPath
+                            array_merge(
+                                $propertyPath,
+                                ['value']
+                            ),
                         );
-                        $typeNames[] = "{ [key: number]: {$conversionResult->typescriptExpansion}; }";
+                        $typescriptTypeNames[] = "{ [key: number]: {$conversionResult->typescriptExpansion}; }";
+                        $pythonTypeNames[] = "Dict[int, {$conversionResult->pythonExpansion}]";
+                        $pythonParamTypeNames[] = "Dict[int, {$conversionResult->pythonParamType}]";
+                        if (
+                            str_starts_with(
+                                $conversionResult->pythonParamType,
+                                'Optional['
+                            )
+                        ) {
+                            $pythonConversion = '{k: ' . str_replace(
+                                '$',
+                                'v',
+                                $conversionResult->pythonConversion
+                            ) . ' if v is not None else None for k, v in $.items()}';
+                        } else {
+                            $pythonConversion = '{k: ' . str_replace(
+                                '$',
+                                'v',
+                                $conversionResult->pythonConversion
+                            ) . ' for k, v in $.items()}';
+                        }
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
                             $conversionFunction[] = (
@@ -416,21 +624,32 @@ class TypeMapper {
                 } else {
                     throw new \Exception("Unsupported type {$path}: {$type}");
                 }
-            } elseif ($typeName == 'int' || $typeName == 'float') {
-                $typeNames[] = 'number';
+            } elseif ($typeName == 'int') {
+                $typescriptTypeNames[] = 'number';
+                $pythonTypeNames[] = 'int';
+                $pythonParamTypeNames[] = 'int';
+            } elseif ($typeName == 'float') {
+                $typescriptTypeNames[] = 'number';
+                $pythonTypeNames[] = 'float';
+                $pythonParamTypeNames[] = 'float';
             } elseif (
                 $typeName == 'string' ||
                 $type instanceof \Psalm\Type\Atomic\TLiteralString
             ) {
-                $typeNames[] = 'string';
+                $typescriptTypeNames[] = 'string';
+                $pythonTypeNames[] = 'str';
+                $pythonParamTypeNames[] = 'str';
             } elseif ($typeName == 'null') {
-                $typeNames[] = 'null';
+                $typescriptTypeNames[] = 'null';
+                $pythonNullable = true;
             } elseif (
                 $typeName == 'bool' ||
                 $typeName == 'false' ||
                 $typeName == 'true'
             ) {
-                $typeNames[] = 'boolean';
+                $typescriptTypeNames[] = 'boolean';
+                $pythonTypeNames[] = 'bool';
+                $pythonParamTypeNames[] = 'bool';
             } elseif ($type instanceof \Psalm\Type\Atomic\TNamedObject) {
                 if ($type->value == 'stdClass') {
                     // This is only used to coerce the response into being an
@@ -439,14 +658,20 @@ class TypeMapper {
                 }
                 if ($type->value == 'OmegaUp\\Timestamp') {
                     // This is automatically cast into a JavaScript Date.
-                    $typeNames[] = 'Date';
+                    $typescriptTypeNames[] = 'Date';
+                    $pythonTypeNames[] = 'datetime.datetime';
+                    $pythonParamTypeNames[] = 'int';
                     $requiresConversion = true;
+                    $pythonConversion = 'datetime.datetime.fromtimestamp($)';
                     $conversionFunction[] = '(x: number) => new Date(x * 1000)';
                     continue;
                 }
                 if (isset($this->typeAliases[$type->value])) {
-                    $typeNames[] = "types.{$type->value}";
+                    $typescriptTypeNames[] = "types.{$type->value}";
                     $conversionResult = $this->typeAliases[$type->value];
+                    $pythonTypeNames[] = $conversionResult->pythonExpansion;
+                    $pythonParamTypeNames[] = $conversionResult->pythonParamType;
+                    $pythonConversion = $conversionResult->pythonConversion;
                     if (!is_null($conversionResult->conversionFunction)) {
                         $requiresConversion = true;
                         $conversionFunction[] = $conversionResult->conversionFunction;
@@ -466,7 +691,10 @@ class TypeMapper {
                     )
                 );
                 $this->daoTypes[$daoTypeName] = true;
-                $typeNames[] = "dao.{$daoTypeName}";
+                $typescriptTypeNames[] = "dao.{$daoTypeName}";
+                $pythonTypeNames[] = "_OmegaUp_DAO_VO_{$daoTypeName}";
+                $pythonParamTypeNames[] = 'Dict[str, Any]';
+                $pythonConversion = "_OmegaUp_DAO_VO_{$daoTypeName}(**$)";
             } else {
                 throw new \Exception("Unsupported type {$path}: {$type}");
             }
@@ -477,11 +705,44 @@ class TypeMapper {
                 join(', ', $conversionFunction)
             );
         }
-        sort($typeNames);
-        return new ConversionResult(
-            join('|', $typeNames),
-            $requiresConversion ? $conversionFunction[0] : null
+        sort($typescriptTypeNames);
+        sort($pythonTypeNames);
+        sort($pythonParamTypeNames);
+        if (count($pythonTypeNames) == 0) {
+            $pythonExpansion = 'None';
+            $pythonParamType = 'None';
+        } else {
+            if (count($pythonTypeNames) == 1) {
+                $pythonExpansion = $pythonTypeNames[0];
+                $pythonParamType = $pythonParamTypeNames[0];
+            } else {
+                $pythonExpansion = 'Union[' . join(
+                    ', ',
+                    $pythonTypeNames
+                ) . ']';
+                $pythonParamType = 'Union[' . join(
+                    ', ',
+                    $pythonParamTypeNames
+                ) . ']';
+            }
+            if ($pythonNullable) {
+                $pythonExpansion = "Optional[{$pythonExpansion}]";
+                $pythonParamType = "Optional[{$pythonParamType}]";
+            }
+        }
+        $conversionResult = new ConversionResult(
+            typescriptExpansion: join('|', $typescriptTypeNames),
+            pythonExpansion: $pythonExpansion,
+            pythonParamType: $pythonParamType,
+            pythonConversion: $pythonConversion,
+            pythonVoidType: $pythonVoidType,
+            pythonDeclaration: $pythonDeclaration,
+            conversionFunction: $requiresConversion ? $conversionFunction[0] : null,
         );
+        if ($savePythonType) {
+            $this->intermediatePythonTypes[$pythonTypeName] = $conversionResult;
+        }
+        return $conversionResult;
     }
 
     public function convertMethod(
@@ -516,9 +777,11 @@ class TypeMapper {
             );
         }
 
-        $conversionResult = $this->convertTypeToTypeScript(
+        $conversionResult = $this->convertType(
             $unionType,
-            $methodName
+            $methodName,
+            propertyPath: [],
+            rootAPIReturnType: true,
         );
         $returnType = array_values($unionType->getAtomicTypes())[0];
         if ($returnType instanceof \Psalm\Type\Atomic\ObjectLike) {
@@ -530,7 +793,7 @@ class TypeMapper {
                 }
                 $responseTypeMapping[strval(
                     $propertyName
-                )] = $this->convertTypeToTypeScript(
+                )] = $this->convertType(
                     $propertyType,
                     $methodName,
                     [strval($propertyName)]
@@ -588,10 +851,10 @@ class APIGenerator {
                     $typeName,
                     $typeExpansion,
                 ] = explode('=', $typeAlias);
-                $conversionResult = $this->typeMapper->convertTypeToTypeScript(
+                $conversionResult = $this->typeMapper->convertType(
                     \Psalm\Type::parseString($typeExpansion),
-                    $typeAlias,
-                    [$typeAlias]
+                    $typeName,
+                    []
                 );
                 if (
                     isset($this->typeMapper->typeAliases[$typeName]) &&
@@ -687,7 +950,7 @@ class APIGenerator {
                     }
                     $properties[
                         $reflectionProperty->getName()
-                    ] = $this->typeMapper->convertTypeToTypeScript(
+                    ] = $this->typeMapper->convertType(
                         $returnType,
                         $typeName
                     )->typescriptExpansion;
@@ -972,11 +1235,12 @@ EOD;
         echo "pprint.pprint(session)\n";
         echo "```\n";
         echo "\"\"\"\n";
+        echo "import dataclasses\n";
         echo "import datetime\n";
         echo "import logging\n";
         echo "import urllib.parse\n";
         echo "\n";
-        echo "from typing import Any, BinaryIO, Dict, Iterable, Mapping, Optional\n";
+        echo "from typing import Any, BinaryIO, Dict, Iterable, Mapping, Optional, Sequence, Union\n";
         echo "\n";
         echo "import requests\n";
         echo "\n";
@@ -996,11 +1260,130 @@ EOD;
         echo "    return result\n";
         echo "\n";
         echo "\n";
-        echo "ApiReturnType = Dict[str, Any]\n";
+        echo "ApiReturnType = Any\n";
         echo "\"\"\"The return type of any of the API requests.\"\"\"\n";
         echo "\n";
+
+        if (!empty($this->daoTypes)) {
+            echo "\n";
+            echo "# DAO types\n";
+            echo "\n";
+            ksort($this->daoTypes);
+            foreach ($this->daoTypes as $typeName => $typeExpansion) {
+                echo "\n";
+                echo "@dataclasses.dataclass\n";
+                echo "class _OmegaUp_DAO_VO_{$typeName}:\n";
+                echo "    \"\"\"Type definition for the \\\\OmegaUp\\\\DAO\\\\VO\\\\{$typeName} Data Object.\"\"\"\n";
+                /** @var class-string */
+                $voClassName = "\\OmegaUp\\DAO\\VO\\{$typeName}";
+                $reflectionClass = new \ReflectionClass($voClassName);
+                /** @var array<string, string> */
+                $properties = [];
+                foreach (
+                    $reflectionClass->getProperties(
+                        ReflectionProperty::IS_PUBLIC
+                    ) as $reflectionProperty
+                ) {
+                    $docComment = $this->parseDocComment(
+                        strval($reflectionProperty->getDocComment())
+                    );
+                    $returns = $docComment->tags['var'];
+                    if (count($returns) != 1) {
+                        throw new \Exception(
+                            'More @var annotations than expected!'
+                        );
+                    }
+                    $returnType = \Psalm\Type::parseString(
+                        array_values(
+                            $returns
+                        )[0]
+                    );
+                    if ($returnType->isNullable()) {
+                        $returnType->removeType('null');
+                    }
+                    $properties[
+                        $reflectionProperty->getName()
+                    ] = $this->typeMapper->convertType(
+                        $returnType,
+                        $typeName
+                    )->pythonExpansion;
+                }
+                ksort($properties);
+                foreach ($properties as $propertyTypeName => $propertyTypeExpansion) {
+                    if ($propertyTypeExpansion == 'datetime.datetime') {
+                        echo "    {$propertyTypeName}: Optional[datetime.datetime]\n";
+                    } else {
+                        echo "    {$propertyTypeName}: Optional[{$propertyTypeExpansion}]\n";
+                    }
+                }
+                echo "\n";
+                echo "    def __init__(\n";
+                echo "        self,\n";
+                echo "        *,\n";
+                foreach ($properties as $propertyTypeName => $propertyTypeExpansion) {
+                    if ($propertyTypeExpansion == 'datetime.datetime') {
+                        echo "        {$propertyTypeName}: Optional[int] = None,\n";
+                    } else {
+                        echo "        {$propertyTypeName}: Optional[{$propertyTypeExpansion}] = None,\n";
+                    }
+                }
+                echo "        # Ignore any unknown arguments\n";
+                echo "        **_kwargs: Any,\n";
+                echo "    ):\n";
+                echo "        \"\"\"Create a new \\\\OmegaUp\\\\DAO\\\\VO\\\\{$typeName} Data Object.\"\"\"\n";
+                foreach ($properties as $propertyTypeName => $propertyTypeExpansion) {
+                    if ($propertyTypeExpansion == 'datetime.datetime') {
+                        echo "        if {$propertyTypeName} is not None:\n";
+                        echo "            self.{$propertyTypeName} = datetime.datetime.fromtimestamp({$propertyTypeName})\n";
+                        echo "        else:\n";
+                        echo "            self.{$propertyTypeName} = None\n";
+                    } else {
+                        echo "        self.{$propertyTypeName} = {$propertyTypeName}\n";
+                    }
+                }
+                echo "\n";
+            }
+        }
+
+        echo "\n";
+        echo "# Type aliases\n";
+        echo "\n";
+        ksort($this->typeMapper->intermediatePythonTypes);
+        foreach ($this->typeMapper->intermediatePythonTypes as $typeName => $conversionResult) {
+            if (
+                is_null(
+                    $conversionResult->pythonDeclaration
+                ) || $conversionResult->pythonVoidType
+            ) {
+                continue;
+            }
+            echo "\n";
+            echo $conversionResult->pythonDeclaration;
+            echo "\n";
+        }
+
         ksort($this->controllers);
         foreach ($this->controllers as $controller) {
+            foreach ($controller->methods as $apiMethodName => $method) {
+                if ($method->returnType->pythonVoidType) {
+                    continue;
+                }
+                echo "\n";
+                $pythonTypeName = $method->returnType->pythonExpansion;
+                if (str_starts_with($pythonTypeName, "'")) {
+                    $pythonTypeName = substr(
+                        $pythonTypeName,
+                        1,
+                        strlen(
+                            $pythonTypeName
+                        ) - 2
+                    );
+                }
+                echo "{$method->apiTypePrefix}Response = {$pythonTypeName}\n";
+                echo "\"\"\"The return type of the {$method->apiTypePrefix} API.\"\"\"\n";
+                echo "\n";
+            }
+
             echo "\n";
             echo "class {$controller->classBasename}:\n";
             echo '    r"""' . str_replace(
@@ -1011,6 +1394,7 @@ EOD;
             echo "    \"\"\"\n";
             echo "    def __init__(self, client: 'Client') -> None:\n";
             echo "        self._client = client\n\n";
+
             foreach ($controller->methods as $apiMethodName => $method) {
                 echo "    def {$apiMethodName}(\n";
                 echo "            self,\n";
@@ -1027,10 +1411,11 @@ EOD;
                     }
                     echo "            {$requestParam->name}: Optional[{$requestParam->pythonPrimitiveType()}] = None,\n";
                 }
+                $returnType = $method->returnType->pythonVoidType ? 'None' : "{$method->apiTypePrefix}Response";
                 echo "            # Out-of-band parameters:\n";
                 echo "            files_: Optional[Mapping[str, BinaryIO]] = None,\n";
                 echo "            check_: bool = True,\n";
-                echo "            timeout_: datetime.timedelta = _DEFAULT_TIMEOUT) -> ApiReturnType:\n";
+                echo "            timeout_: datetime.timedelta = _DEFAULT_TIMEOUT) -> {$returnType}:\n";
                 echo '        r"""' . str_replace(
                     "\n",
                     "\n        ",
@@ -1051,7 +1436,7 @@ EOD;
 
                 echo "\n";
                 echo "        Returns:\n";
-                echo "            The API result dict.\n";
+                echo "            The API result object.\n";
                 echo "        \"\"\"\n";
                 echo "        parameters: Dict[str, str] = {\n";
                 foreach ($method->requestParams as $requestParam) {
@@ -1068,11 +1453,20 @@ EOD;
                     echo "        if {$requestParam->name} is not None:\n";
                     echo "            parameters['{$requestParam->name}'] = {$requestParam->pythonStringifiedValue()}\n";
                 }
-                echo "        return self._client.query('/api/{$controller->apiName}/{$apiMethodName}/',\n";
-                echo "                                  payload=parameters,\n";
-                echo "                                  files_=files_,\n";
-                echo "                                  timeout_=timeout_,\n";
-                echo "                                  check_=check_)\n";
+                $query = "        self._client.query('/api/{$controller->apiName}/{$apiMethodName}/',\n";
+                $query .= "                                 payload=parameters,\n";
+                $query .= "                                 files_=files_,\n";
+                $query .= "                                 timeout_=timeout_,\n";
+                $query .= '                                 check_=check_)';
+                if ($method->returnType->pythonVoidType) {
+                    echo "{$query}\n";
+                } else {
+                    echo '        return ' . str_replace(
+                        '$',
+                        $query,
+                        $method->returnType->pythonConversion
+                    ) . "\n";
+                }
                 echo "\n";
             }
         }

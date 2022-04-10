@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Analyze browser usage from Google Analytics.
 
 In order to use this tool, export a .csv report of browsers (Audience >
