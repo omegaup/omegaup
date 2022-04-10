@@ -231,6 +231,7 @@ const translations: { [key: string]: string; } = {
   contestEndTime: "(End5: %(endDate))",
   contestEnrollStatus: "(Sign3d Up)",
   contestFilterBy: "(Fi173r by)",
+  contestFilterByAll: "(A11)",
   contestFilterByRecommended: "(On1y r3c0mm3nd3d)",
   contestFilterBySignedUp: "(I am par7icipan7)",
   contestForTeamsCanNotChangeToContest: "(A c0n7357 f0r 73am5 cann07 b3 chang3d 70 a n0rma1 c0n7357)",

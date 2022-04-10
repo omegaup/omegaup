@@ -123,6 +123,17 @@
                   </template>
                   <b-dropdown-item
                     href="#"
+                    data-filter-by-recommended
+                    @click="toggleFilterByAll"
+                  >
+                    <font-awesome-icon
+                      v-if="currentFilterByAll"
+                      icon="check-square"
+                      class="mr-1"
+                    />{{ T.contestFilterByAll }}</b-dropdown-item
+                  >
+                  <b-dropdown-item
+                    href="#"
                     data-filter-by-signed-up
                     @click="toggleFilterBySignedUp"
                   >

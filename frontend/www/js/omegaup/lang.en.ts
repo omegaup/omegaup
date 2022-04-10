@@ -231,6 +231,7 @@ const translations: { [key: string]: string; } = {
   contestEndTime: "Ends: %(endDate)",
   contestEnrollStatus: "Signed Up",
   contestFilterBy: "Filter by",
+  contestFilterByAll: "All",
   contestFilterByRecommended: "Only recommended",
   contestFilterBySignedUp: "I am participant",
   contestForTeamsCanNotChangeToContest: "A contest for teams cannot be changed to a normal contest",
