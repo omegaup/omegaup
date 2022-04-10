@@ -79,10 +79,12 @@ export async function getProblemAndRunDetails({
   location,
   contestAlias,
   problems,
+  problemsetId,
 }: {
   location: string;
   contestAlias?: string;
   problems?: types.NavbarProblemsetProblem[];
+  problemsetId?: number;
 }): Promise<{
   runDetails: null | types.RunDetails;
   problemDetails: null | types.ProblemDetails;
@@ -98,6 +100,7 @@ export async function getProblemAndRunDetails({
       problem_alias: problemAlias,
       prevent_problemset_open: false,
       contest_alias: contestAlias || undefined,
+      problemset_id: problemsetId || undefined,
     });
   }
   if (guid) {
