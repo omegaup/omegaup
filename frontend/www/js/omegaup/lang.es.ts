@@ -232,7 +232,7 @@ const translations: { [key: string]: string; } = {
   contestEnrollStatus: "Inscrito",
   contestFilterBy: "Filtrar por",
   contestFilterByRecommended: "Recomendados",
-  contestFilterBySignedUp: "Inscrito",
+  contestFilterBySignedUp: "Soy participante",
   contestForTeamsCanNotChangeToContest: "Un concurso para equipos no se puede cambiar a concurso normal",
   contestGroupAdded: "Grupo agregado correctamente",
   contestGroupRemoved: "Grupo eliminado correctamente",
