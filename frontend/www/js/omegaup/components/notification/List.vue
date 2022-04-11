@@ -1,5 +1,5 @@
 <template>
-  <li class="nav-item dropdown d-none d-lg-flex align-items-center">
+  <li class="nav-item dropdown d-lg-flex align-items-center">
     <a
       aria-expanded="false"
       aria-haspopup="true"

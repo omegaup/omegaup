@@ -55,6 +55,7 @@ OmegaUp.on('ready', async () => {
     ({ runDetails, problemDetails } = await getProblemAndRunDetails({
       problems: payload.currentAssignment.problems,
       location: window.location.hash,
+      problemsetId: payload.currentAssignment.problemset_id,
     }));
   } catch (e: any) {
     ui.apiError(e);
