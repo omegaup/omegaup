@@ -40,23 +40,20 @@ class ContestsCallback:
     '''Contests callback'''
     def __init__(self,
                  dbconn: mysql.connector.MySQLConnection,
-                 api_token: str,
-                 url: str):
+                 client: omegaup.api.Client):
         '''Contructor for contest callback'''
         self.dbconn = dbconn
-        self.api_token = api_token
-        self.url = url
+        self.client = client
 
     def __call__(self,
                  _channel: pika.adapters.blocking_connection.BlockingChannel,
                  _method: Optional[pika.spec.Basic.Deliver],
                  _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
-        '''Function to stores the certificates by a given contest'''
+        '''Function to store the certificates by a given contest'''
         data = ContestCertificate(**json.loads(body))
-        client = omegaup.api.Client(api_token=self.api_token, url=self.url)
 
-        scoreboard = client.contest.scoreboard(
+        scoreboard = self.client.contest.scoreboard(
             contest_alias=data.alias,
             token=data.scoreboard_url)
         ranking = scoreboard.ranking

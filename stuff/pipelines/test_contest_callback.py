@@ -11,7 +11,7 @@ import string
 import sys
 import time
 
-from typing import Dict, List
+from typing import List
 import omegaup.api
 
 import contest_callback
@@ -100,8 +100,7 @@ def test_insert_contest_certificate() -> None:
     ) as channel:
         callback = contest_callback.ContestsCallback(
             dbconn=dbconn.conn,
-            api_token=test_constants.API_TOKEN,
-            url=test_constants.OMEGAUP_API_ENDPOINT
+            client=client,
         )
         body = contest_callback.ContestCertificate(
             contest_id=contest_id,
@@ -136,6 +135,7 @@ def test_insert_contest_certificate() -> None:
                 cs.alias = %s;
             ''', (alias,))
         certificates = cur.fetchall()
+        assert certificates
 
     for certificate in certificates:
         assert certificate['username'] in usernames
