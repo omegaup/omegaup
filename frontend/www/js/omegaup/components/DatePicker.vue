@@ -28,8 +28,7 @@ export default class DatePicker extends Vue {
   @Prop({ default: true }) enabled!: boolean;
   @Prop({ default: T.datePickerFormat }) format!: string;
   @Prop({ default: false }) isInvalid!: boolean;
-  @Prop({ default: new Date(8640000000000000).toISOString().split('T')[0] })
-  max!: Date;
+  @Prop({ default: '' }) max!: string;
 
   private usedFallback: boolean = false;
   private stringValue: string = time.formatDateLocal(this.value);
