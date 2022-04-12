@@ -2832,7 +2832,6 @@ export namespace types {
     participating: boolean;
     problemset_id: number;
     recommended: boolean;
-    all: boolean;
     rerun_id?: number;
     start_time: Date;
     title: string;
