@@ -465,9 +465,6 @@ export default class ArenaContestList extends Vue {
     if (this.currentFilterByRecommended) {
       filters.push((item) => item.recommended);
     }
-    if (this.currentFilterByAll) {
-      filters.push((item) => item.all);
-    }
     return this.sortedContestList.slice().filter((contestItem) => {
       for (const filter of filters) {
         if (!filter(contestItem)) {
