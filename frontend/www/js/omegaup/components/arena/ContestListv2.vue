@@ -356,7 +356,7 @@ export default class ArenaContestList extends Vue {
   @Prop() sortOrder!: ContestOrder;
   @Prop() filterBySignedUp!: boolean;
   @Prop() filterByRecommended!: boolean;
-  @Prop() filterByAll!: boolean;
+  @Prop({ default: true }) filterByAll!: boolean;
   @Prop() page!: number;
   T = T;
   ui = ui;
@@ -436,13 +436,25 @@ export default class ArenaContestList extends Vue {
 
   toggleFilterBySignedUp() {
     this.currentFilterBySignedUp = !this.currentFilterBySignedUp;
+    if (this.currentFilterBySignedUp && this.currentFilterByRecommended) {
+      this.currentFilterByAll = true;
+      return;
+    }
+    this.currentFilterByAll = false;
   }
 
   toggleFilterByRecommended() {
     this.currentFilterByRecommended = !this.currentFilterByRecommended;
+    if (this.currentFilterBySignedUp && this.currentFilterByRecommended) {
+      this.currentFilterByAll = true;
+      return;
+    }
+    this.currentFilterByAll = false;
   }
   toggleFilterByAll() {
     this.currentFilterByAll = !this.currentFilterByAll;
+    this.currentFilterBySignedUp = this.currentFilterByAll;
+    this.currentFilterByRecommended = this.currentFilterByAll;
   }
 
   get filteredContestList(): types.ContestListItem[] {
