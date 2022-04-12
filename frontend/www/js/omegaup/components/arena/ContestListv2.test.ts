@@ -235,6 +235,64 @@ describe('ContestListv2.vue', () => {
     expect(pastContestTab.text()).toContain('Past Contest 1');
   });
 
+  it('Should handle filter buttons', async () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Current,
+      },
+    });
+
+    const dropdownFilterBy = wrapper.findComponent({
+      ref: 'dropdownFilterBy',
+    });
+
+    // Current filter  "By All" is turned on by default
+    expect(wrapper.vm.currentFilterByAll).toBe(true);
+
+    // When this filter is unchecked, all filters are turned off
+    await dropdownFilterBy.find('[data-filter-by-all]').trigger('click');
+
+    expect(wrapper.vm.currentFilterByAll).toBe(false);
+    expect(wrapper.vm.currentFilterBySignedUp).toBe(false);
+    expect(wrapper.vm.currentFilterByRecommended).toBe(false);
+
+    // When this filter is checked again, all filters are turned on
+    await dropdownFilterBy.find('[data-filter-by-all]').trigger('click');
+
+    expect(wrapper.vm.currentFilterByAll).toBe(true);
+    expect(wrapper.vm.currentFilterBySignedUp).toBe(true);
+    expect(wrapper.vm.currentFilterByRecommended).toBe(true);
+
+    await dropdownFilterBy.find('[data-filter-by-signed-up]').trigger('click');
+
+    expect(wrapper.vm.currentFilterByAll).toBe(false);
+    expect(wrapper.vm.currentFilterBySignedUp).toBe(false);
+    expect(wrapper.vm.currentFilterByRecommended).toBe(true);
+
+    await dropdownFilterBy
+      .find('[data-filter-by-recommended]')
+      .trigger('click');
+
+    expect(wrapper.vm.currentFilterByAll).toBe(false);
+    expect(wrapper.vm.currentFilterBySignedUp).toBe(false);
+    expect(wrapper.vm.currentFilterByRecommended).toBe(false);
+
+    await dropdownFilterBy.find('[data-filter-by-signed-up]').trigger('click');
+
+    expect(wrapper.vm.currentFilterByAll).toBe(false);
+    expect(wrapper.vm.currentFilterBySignedUp).toBe(true);
+    expect(wrapper.vm.currentFilterByRecommended).toBe(false);
+
+    await dropdownFilterBy
+      .find('[data-filter-by-recommended]')
+      .trigger('click');
+
+    expect(wrapper.vm.currentFilterByAll).toBe(true);
+    expect(wrapper.vm.currentFilterBySignedUp).toBe(true);
+    expect(wrapper.vm.currentFilterByRecommended).toBe(true);
+  });
+
   const dropdownMapping = [
     [{ value: T.contestOrderByTitle }],
     [{ value: T.contestOrderByEnds }],
