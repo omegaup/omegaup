@@ -102,16 +102,18 @@ export async function getProblemAndRunDetails({
       prevent_problemset_open: false,
       contest_alias: contestAlias || undefined,
       problemset_id: problemsetId || undefined,
-    });
+    }).then(time.remoteTimeAdapter);
   }
   if (guid) {
-    runPromise = api.Run.details({ run_alias: guid });
+    runPromise = api.Run.details({ run_alias: guid }).then(
+      time.remoteTimeAdapter,
+    );
   }
 
   const [problemDetails, runDetails] = await Promise.all([
     problemPromise,
     runPromise,
-  ]).then(time.remoteTimeAdapter);
+  ]);
 
   if (problemDetails != null) {
     for (const run of problemDetails.runs ?? []) {
