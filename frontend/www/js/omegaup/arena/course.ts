@@ -63,6 +63,13 @@ OmegaUp.on('ready', async () => {
 
   trackClarifications(payload.courseDetails.clarifications);
 
+  let nextSubmissionTimestamp: null | Date = null;
+  if (problemDetails?.nextSubmissionTimestamp != null) {
+    nextSubmissionTimestamp = time.remoteTime(
+      problemDetails?.nextSubmissionTimestamp.getTime(),
+    );
+  }
+
   const arenaCourse = new Vue({
     el: '#main-container',
     components: {
@@ -78,7 +85,7 @@ OmegaUp.on('ready', async () => {
       problemAlias,
       searchResultUsers: [] as types.ListItem[],
       runDetailsData: runDetails,
-      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      nextSubmissionTimestamp,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
     }),
