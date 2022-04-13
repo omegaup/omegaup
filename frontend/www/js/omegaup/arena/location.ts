@@ -102,17 +102,15 @@ export async function getProblemAndRunDetails({
       prevent_problemset_open: false,
       contest_alias: contestAlias || undefined,
       problemset_id: problemsetId || undefined,
-    }).then(time.remoteTimeAdapter);
+    });
   }
   if (guid) {
-    runPromise = api.Run.details({ run_alias: guid }).then(
-      time.remoteTimeAdapter,
-    );
+    runPromise = api.Run.details({ run_alias: guid });
   }
 
   const [problemDetails, runDetails] = await Promise.all([
-    problemPromise,
-    runPromise,
+    problemPromise.then(time.remoteTimeAdapter),
+    runPromise.then(time.remoteTimeAdapter),
   ]);
 
   if (problemDetails != null) {
