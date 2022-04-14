@@ -13,11 +13,9 @@ import mysql.connector
 import mysql.connector.cursor
 import pika
 
-import credentials
 from database.contest import get_contests
 import rabbitmq_connection
 import rabbitmq_producer
-import test_constants
 
 sys.path.insert(
     0,
@@ -31,8 +29,8 @@ def send_contest_message_to_client(
         *,
         cur: mysql.connector.cursor.MySQLCursorDict,
         channel: pika.adapters.blocking_connection.BlockingChannel,
-        date_lower_limit: datetime.datetime = test_constants.DATE_LOWER_LIMIT,
-        date_upper_limit: datetime.datetime = test_constants.DATE_UPPER_LIMIT,
+        date_lower_limit: datetime.datetime = datetime.datetime(2005, 1, 1),
+        date_upper_limit: datetime.datetime = datetime.datetime.now(),
 ) -> None:
     '''Send messages to contest queue.
      date-lower-limit: initial time from which to be taken the finish contests.
@@ -73,9 +71,9 @@ def main() -> None:
     dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
     try:
         with dbconn.cursor(buffered=True, dictionary=True) as cur, \
-            rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
-                                        password=credentials.OMEGAUP_PASSWORD,
-                                        host=credentials.RABBITMQ_HOST
+            rabbitmq_connection.connect(username=args.rabbitmq_username,
+                                        password=args.rabbitmq_password,
+                                        host=args.rabbitmq_host,
                                         ) as channel:
             send_contest_message_to_client(
                 cur=cur,

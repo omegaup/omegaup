@@ -7,12 +7,13 @@ import dataclasses
 import os
 import sys
 
-from typing import Dict, Any
+from typing import Optional
 import pytest
 import pika
-import pytest_mock 
+import pytest_mock
+import contest_callback
 
-import credentials
+import test_credentials
 import rabbitmq_connection
 import producer_contest
 import rabbitmq_client
@@ -25,9 +26,9 @@ sys.path.insert(
 import lib.db   # pylint: disable=wrong-import-position
 
 @dataclasses.dataclass
-class Message:
+class MessageSavingCallback:
     '''class to save message'''
-    message: Dict[str, Any] = dataclasses.field(default_factory=dict)
+    message: Optional[contest_callback.ContestCertificate] = dataclasses.field(default_factory=dict)
 
     def __call__(self,
                  channel: pika.adapters.blocking_connection.BlockingChannel,
@@ -61,19 +62,19 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
 
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
-            user=credentials.MYSQL_USER,
-            password=credentials.MYSQL_PASSWORD,
-            host=credentials.MYSQL_HOST,
-            database=credentials.MYSQL_DATABASE,
-            port=credentials.MYSQL_PORT,
+            user=test_credentials.MYSQL_USER,
+            password=test_credentials.MYSQL_PASSWORD,
+            host=test_credentials.MYSQL_HOST,
+            database=test_credentials.MYSQL_DATABASE,
+            port=test_credentials.MYSQL_PORT,
             mysql_config_file=lib.db.default_config_file_path() or ''
         )
     )
 
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
-        rabbitmq_connection.connect(username=credentials.OMEGAUP_USERNAME,
-                                     password=credentials.OMEGAUP_PASSWORD,
-                                     host=credentials.RABBITMQ_HOST) as channel:
+        rabbitmq_connection.connect(username=test_credentials.OMEGAUP_USERNAME,
+                                     password=test_credentials.OMEGAUP_PASSWORD,
+                                     host=test_credentials.RABBITMQ_HOST) as channel:
         rabbitmq_connection.initialize_rabbitmq(
             queue='contest',
             exchange='certificates',
@@ -81,10 +82,10 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
             channel=channel)
         producer_contest.send_contest_message_to_client(cur=cur,
                                                         channel=channel)
-        message = Message
+        callback = MessageSavingCallback()
         rabbitmq_client.receive_messages(queue='contest',
                                          exchange='certificates',
                                          routing_key='ContestQueue',
                                          channel=channel,
-                                         callback=message())
-        assert expected == message()
+                                         callback=callback)
+        assert expected == callback.message

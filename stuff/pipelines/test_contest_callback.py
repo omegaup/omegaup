@@ -15,7 +15,7 @@ from typing import List
 import omegaup.api
 
 import contest_callback
-import credentials
+import test_credentials
 import rabbitmq_connection
 import test_constants
 
@@ -65,11 +65,11 @@ def test_insert_contest_certificate() -> None:
 
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
-            user=credentials.MYSQL_USER,
-            password=credentials.MYSQL_PASSWORD,
-            host=credentials.MYSQL_HOST,
-            database=credentials.MYSQL_DATABASE,
-            port=credentials.MYSQL_PORT,
+            user=test_credentials.MYSQL_USER,
+            password=test_credentials.MYSQL_PASSWORD,
+            host=test_credentials.MYSQL_HOST,
+            database=test_credentials.MYSQL_DATABASE,
+            port=test_credentials.MYSQL_PORT,
             mysql_config_file=lib.db.default_config_file_path() or ''
         )
     )
@@ -94,9 +94,9 @@ def test_insert_contest_certificate() -> None:
     contest_id = result['contest_id']
     scoreboard_url = result['scoreboard_url']
     with rabbitmq_connection.connect(
-            username=credentials.OMEGAUP_USERNAME,
-            password=credentials.OMEGAUP_PASSWORD,
-            host=credentials.RABBITMQ_HOST
+            username=test_credentials.OMEGAUP_USERNAME,
+            password=test_credentials.OMEGAUP_PASSWORD,
+            host=test_credentials.RABBITMQ_HOST
     ) as channel:
         callback = contest_callback.ContestsCallback(
             dbconn=dbconn.conn,
