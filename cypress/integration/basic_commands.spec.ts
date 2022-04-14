@@ -263,50 +263,49 @@ describe('Basic Commands Test', () => {
       .should('have.text', expectedStatus);
   });
 
+  const now = new Date();
+
+  const problemAlias = 'problem-' + uuid().slice(0, 8);
+  const contestOptions: ContestOptions = {
+    contestAlias: 'contest' + uuid().slice(0, 5),
+    description: 'Test Description',
+    startDate: addSubstractDaysToDate(now, {days: -1}),
+    endDate: addSubstractDaysToDate(now, {days: 2}),
+    showScoreboard: true,
+    basicInformation: false,
+    partialPoints: true,
+    requestParticipantInformation: 'no',
+    admissionMode: 'public',
+    problems: [
+      {
+        problemAlias: 'sumas',
+        tag: 'Recursion',
+        autoCompleteTextTag: 'Recur',
+        problemLevelIndex: 1,
+      },
+    ],
+    runs: [
+      {
+        problemAlias: 'sumas',
+        fixturePath: 'main.cpp',
+        language: 'cpp11-gcc',
+        valid: true,
+      },
+      {
+        problemAlias: 'sumas',
+        fixturePath: 'main.cpp',
+        language: 'cpp11-gcc',
+        valid: false,
+      },
+    ]
+  };
+  const loginOptions: LoginOptions = {
+    username: 'omegaup',
+    password: 'omegaup',
+  };
+
   it('Should create a contest', () => {
-    const loginOptions: LoginOptions = {
-      username: 'omegaup',
-      password: 'omegaup',
-    };
-
     cy.login(loginOptions);
-
-    const now = new Date();
-
-    const problemAlias = 'problem-' + uuid().slice(0, 8);
-    const contestOptions: ContestOptions = {
-      contestAlias: 'contest' + uuid().slice(0, 5),
-      description: 'Test Description',
-      startDate: addSubstractDaysToDate(now, {days: -1}),
-      endDate: addSubstractDaysToDate(now, {days: 2}),
-      showScoreboard: true,
-      basicInformation: false,
-      partialPoints: true,
-      requestParticipantInformation: 'no',
-      admissionMode: 'public',
-      problems: [
-        {
-          problemAlias: 'sumas',
-          tag: 'Recursion',
-          autoCompleteTextTag: 'Recur',
-          problemLevelIndex: 1,
-        },
-      ],
-      runs: [
-        {
-          problemAlias: 'sumas',
-          fixturePath: 'main.cpp',
-          language: 'cpp11-gcc',
-          valid: true,
-        },
-        {
-          problemAlias: 'sumas',
-          fixturePath: 'main.cpp',
-          language: 'cpp11-gcc',
-          valid: false,
-        },
-      ]
-    };
 
     cy.createContest(contestOptions);
     cy.location('href').should('include', contestOptions.contestAlias); // Url
@@ -340,7 +339,10 @@ describe('Basic Commands Test', () => {
       'have.value',
       contestOptions.requestParticipantInformation,
     );
+  });
 
+  it('Should create runs inside contest', () => {
+    cy.login(loginOptions);
     cy.addProblemsToContest(contestOptions);
     cy.changeAdmissionModeContest(contestOptions);
 
@@ -349,7 +351,7 @@ describe('Basic Commands Test', () => {
       cy.url().should('eq', 'http://127.0.0.1:8001/'),
     );
 
-    // Mocking date 1 hour before to test timeRemote is working correctly.
+    // Mocking date 2 hours before to test timeRemote is working correctly.
     cy.clock(new Date(
       now.getFullYear(),
       now.getMonth(),
@@ -366,7 +368,7 @@ describe('Basic Commands Test', () => {
       cy.get('header .username').should('have.text', 'user'),
     );
 
-    cy.enterToContest(contestOptions);
+    cy.enterContest(contestOptions);
     cy.createRunsInsideContest(contestOptions);
   });
 });

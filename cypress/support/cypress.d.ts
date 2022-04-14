@@ -30,7 +30,7 @@ declare global {
       ): void;
       addProblemsToContest(contestOptions: ContestOptions): void;
       changeAdmissionModeContest(contestOptions: ContestOptions): void;
-      enterToContest(contestOptions: ContestOptions): void;
+      enterContest(contestOptions: ContestOptions): void;
       createRunsInsideContest(contestOptions: ContestOptions): void;
     }
   }

@@ -192,7 +192,7 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add(
-  'enterToContest',
+  'enterContest',
   ({
     contestAlias,
   }) => {
