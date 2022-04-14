@@ -33,14 +33,19 @@ export interface ContestOptions {
   partialPoints?: boolean;
   basicInformation?: boolean;
   requestParticipantInformation?: RequestParticipantInformation;
+  admissionMode: AdmissionModeOptions;
+  problems: Array<ProblemOptions>;
+  runs: Array<RunOptions>;
 }
 
 export interface RunOptions {
   problemAlias: string;
   fixturePath: string;
   language: Language;
+  valid: boolean;
 }
 
+export type AdmissionModeOptions = 'private' | 'registration' | 'public';
 export type RequestParticipantInformation = 'no' | 'optional' | 'required';
 export type ProblemLevel = 'introductory' | 'intermediate' | 'advanced';
 export type Language =
