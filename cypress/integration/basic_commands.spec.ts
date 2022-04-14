@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import {
-  addDaysToDate,
+  addSubstractDaysToDate,
   getISODate,
   getISODateTime,
 } from '../support/commands';
@@ -20,7 +20,7 @@ describe('Basic Commands Test', () => {
     cy.visit('/');
   });
 
-  it('Should create a course with unlimited duration', () => {
+  /*it('Should create a course with unlimited duration', () => {
     const loginOptions: LoginOptions = {
       username: uuid(),
       password: uuid(),
@@ -100,7 +100,7 @@ describe('Basic Commands Test', () => {
       courseAlias: uuid().slice(0, 10),
       showScoreboard: true,
       startDate: now,
-      endDate: addDaysToDate(now, {days: 1}),
+      endDate: addSubstractDaysToDate(now, {days: 1}),
       unlimitedDuration: false,
       school: 'omegaup',
       basicInformation: false,
@@ -245,6 +245,7 @@ describe('Basic Commands Test', () => {
       problemAlias: problemOptions.problemAlias,
       fixturePath: 'main.cpp',
       language: 'cpp11-gcc',
+      valid: true,
     };
 
     const expectedStatus: Status = 'AC';
@@ -260,33 +261,57 @@ describe('Basic Commands Test', () => {
     cy.get('[data-run-status] > span')
       .first()
       .should('have.text', expectedStatus);
-  });
+  });*/
 
   it('Should create a contest', () => {
     const loginOptions: LoginOptions = {
-      username: 'user',
-      password: 'user',
+      username: 'omegaup',
+      password: 'omegaup',
     };
 
     cy.login(loginOptions);
 
     const now = new Date();
 
+    const problemAlias = 'problem-' + uuid().slice(0, 8);
     const contestOptions: ContestOptions = {
       contestAlias: 'contest' + uuid().slice(0, 5),
       description: 'Test Description',
-      startDate: now,
-      endDate: addDaysToDate(now, {days: 2}),
+      startDate: addSubstractDaysToDate(now, {days: -1}),
+      endDate: addSubstractDaysToDate(now, {days: 2}),
       showScoreboard: true,
       basicInformation: false,
       partialPoints: true,
       requestParticipantInformation: 'no',
+      admissionMode: 'public',
+      problems: [
+        {
+          problemAlias: 'sumas',
+          tag: 'Recursion',
+          autoCompleteTextTag: 'Recur',
+          problemLevelIndex: 1,
+        },
+      ],
+      runs: [
+        {
+          problemAlias: 'sumas',
+          fixturePath: 'main.cpp',
+          language: 'cpp11-gcc',
+          valid: true,
+        },
+        {
+          problemAlias: 'sumas',
+          fixturePath: 'main.cpp',
+          language: 'cpp11-gcc',
+          valid: false,
+        },
+      ]
     };
 
     cy.createContest(contestOptions);
     cy.location('href').should('include', contestOptions.contestAlias); // Url
 
-    // Asert
+    // Assert
     cy.get('[name="title"]').should('have.value', contestOptions.contestAlias);
     cy.get('[name="alias"]').should('have.value', contestOptions.contestAlias);
     cy.get('[name="description"]').should(
@@ -315,5 +340,33 @@ describe('Basic Commands Test', () => {
       'have.value',
       contestOptions.requestParticipantInformation,
     );
+
+    cy.addProblemsToContest(contestOptions);
+    cy.changeAdmissionModeContest(contestOptions);
+
+    cy.get('a[href="/logout/"]:last').click();
+    cy.waitUntil(() =>
+      cy.url().should('eq', 'http://127.0.0.1:8001/'),
+    );
+
+    // Mocking date 1 hour before to test timeRemote is working correctly.
+    cy.clock(new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      now.getHours() - 2,
+      now.getMinutes(),
+      now.getSeconds(),
+    ), ['Date']);
+    cy.get('[data-login-button]').click();
+    cy.get('[data-login-username]').type('user');
+    cy.get('[data-login-password]').type('user');
+    cy.get('[data-login-submit]').click();
+    cy.waitUntil(() =>
+      cy.get('header .username').should('have.text', 'user'),
+    );
+
+    cy.enterToContest(contestOptions);
+    cy.createRunsInsideContest(contestOptions);
   });
 });
