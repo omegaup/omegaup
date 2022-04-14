@@ -20,7 +20,7 @@ describe('Basic Commands Test', () => {
     cy.visit('/');
   });
 
-  /*it('Should create a course with unlimited duration', () => {
+  it('Should create a course with unlimited duration', () => {
     const loginOptions: LoginOptions = {
       username: uuid(),
       password: uuid(),
@@ -261,7 +261,7 @@ describe('Basic Commands Test', () => {
     cy.get('[data-run-status] > span')
       .first()
       .should('have.text', expectedStatus);
-  });*/
+  });
 
   it('Should create a contest', () => {
     const loginOptions: LoginOptions = {
