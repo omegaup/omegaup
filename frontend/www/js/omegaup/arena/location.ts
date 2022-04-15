@@ -2,6 +2,7 @@ import { types } from '../api_types';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import clarificationsStore from './clarificationsStore';
 import * as api from '../api';
+import * as time from '../time';
 import { trackRun } from './submissions';
 import problemsStore from './problemStore';
 
@@ -79,10 +80,12 @@ export async function getProblemAndRunDetails({
   location,
   contestAlias,
   problems,
+  problemsetId,
 }: {
   location: string;
   contestAlias?: string;
   problems?: types.NavbarProblemsetProblem[];
+  problemsetId?: number;
 }): Promise<{
   runDetails: null | types.RunDetails;
   problemDetails: null | types.ProblemDetails;
@@ -98,6 +101,7 @@ export async function getProblemAndRunDetails({
       problem_alias: problemAlias,
       prevent_problemset_open: false,
       contest_alias: contestAlias || undefined,
+      problemset_id: problemsetId || undefined,
     });
   }
   if (guid) {
@@ -105,8 +109,8 @@ export async function getProblemAndRunDetails({
   }
 
   const [problemDetails, runDetails] = await Promise.all([
-    problemPromise,
-    runPromise,
+    problemPromise.then(time.remoteTimeAdapter),
+    runPromise.then(time.remoteTimeAdapter),
   ]);
 
   if (problemDetails != null) {

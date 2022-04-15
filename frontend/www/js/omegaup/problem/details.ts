@@ -51,6 +51,13 @@ OmegaUp.on('ready', async () => {
 
   trackClarifications(payload.clarifications ?? []);
 
+  let nextSubmissionTimestamp: null | Date = null;
+  if (payload.problem.nextSubmissionTimestamp != null) {
+    nextSubmissionTimestamp = time.remoteTime(
+      payload.problem.nextSubmissionTimestamp.getTime(),
+    );
+  }
+
   const problemDetailsView = new Vue({
     el: '#main-container',
     components: {
@@ -70,7 +77,7 @@ OmegaUp.on('ready', async () => {
         (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
       guid,
-      nextSubmissionTimestamp: payload.problem.nextSubmissionTimestamp,
+      nextSubmissionTimestamp,
       searchResultUsers: [] as types.ListItem[],
     }),
     render: function (createElement) {
@@ -155,6 +162,7 @@ OmegaUp.on('ready', async () => {
               language: language,
               source: code,
             })
+              .then(time.remoteTimeAdapter)
               .then((response) => {
                 problemDetailsView.nextSubmissionTimestamp =
                   response.nextSubmissionTimestamp;
@@ -393,6 +401,7 @@ OmegaUp.on('ready', async () => {
       switch (e.data.method) {
         case 'submitRun':
           api.Run.create(e.data.params)
+            .then(time.remoteTimeAdapter)
             .then((response) => {
               problemDetailsView.nextSubmissionTimestamp =
                 response.nextSubmissionTimestamp;
