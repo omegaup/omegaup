@@ -159,7 +159,7 @@
             })
           }}
         </div>
-        <div class="d-none d-md-block">
+        <div class="d-none d-md-block d-flex">
           <ul class="m-0 list-unstyled text-right">
             <li>
               <a
