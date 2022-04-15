@@ -29,8 +29,7 @@ def send_contest_message_to_client(
         *,
         cur: mysql.connector.cursor.MySQLCursorDict,
         channel: pika.adapters.blocking_connection.BlockingChannel,
-        date_lower_limit: datetime.datetime = datetime.datetime(2005, 1, 1),
-        date_upper_limit: datetime.datetime = datetime.datetime.now(),
+        args: argparse.Namespace,
 ) -> None:
     '''Send messages to contest queue.
      date-lower-limit: initial time from which to be taken the finish contests.
@@ -47,8 +46,8 @@ def send_contest_message_to_client(
 
     contestants = get_contests(
         cur=cur,
-        date_lower_limit=date_lower_limit,
-        date_upper_limit=date_upper_limit,
+        date_lower_limit=args.date_lower_limit,
+        date_upper_limit=args.date_upper_limit,
     )
 
     for data in contestants:
@@ -78,8 +77,7 @@ def main() -> None:
             send_contest_message_to_client(
                 cur=cur,
                 channel=channel,
-                date_lower_limit=args.date_lower_limit,
-                date_upper_limit=args.date_upper_limit)
+                args=args)
     finally:
         dbconn.conn.close()
         logging.info('Done')

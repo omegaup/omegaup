@@ -28,7 +28,7 @@ import lib.db   # pylint: disable=wrong-import-position
 @dataclasses.dataclass
 class MessageSavingCallback:
     '''class to save message'''
-    message: Optional[contest_callback.ContestCertificate] = dataclasses.field(default_factory=dict)
+    message: Optional[contest_callback.ContestCertificate] = None
 
     def __call__(self,
                  channel: pika.adapters.blocking_connection.BlockingChannel,
