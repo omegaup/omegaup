@@ -276,7 +276,7 @@ export const getISODateTime = (date: Date) => {
  * @param days number of days to add to the date
  * @returns Date Relative Date Object
  */
-export const addSubstractDaysToDate = (date: Date, { days }: { days: number }): Date => {
+export const addSubtractDaysToDate = (date: Date, { days }: { days: number }): Date => {
   if (days == 0) return date;
   if (days < 0) {
     return new Date(date.getTime() - 24 * 3600 * 1000);
