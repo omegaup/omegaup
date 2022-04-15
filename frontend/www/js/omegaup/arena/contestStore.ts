@@ -22,7 +22,7 @@ interface NamedContestListResponse {
 
 export const contestStoreConfig = {
   state: {
-    contests: types.TimeTypeContests,
+    contests: {},
   },
   mutations: {
     updateAll(state: ContestState, payloadContests: types.TimeTypeContests) {
