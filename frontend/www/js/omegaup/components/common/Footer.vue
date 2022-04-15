@@ -216,6 +216,9 @@ export default class Footer extends Vue {
 .common-footer {
   background-color: $omegaup-primary--darker;
   color: $omegaup-white;
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
 
   .footer-navigation {
     .footer-brand {
