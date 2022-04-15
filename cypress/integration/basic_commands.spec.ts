@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import {
-  addSubstractDaysToDate,
+  addSubtractDaysToDate,
   getISODate,
   getISODateTime,
 } from '../support/commands';
@@ -100,7 +100,7 @@ describe('Basic Commands Test', () => {
       courseAlias: uuid().slice(0, 10),
       showScoreboard: true,
       startDate: now,
-      endDate: addSubstractDaysToDate(now, {days: 1}),
+      endDate: addSubtractDaysToDate(now, {days: 1}),
       unlimitedDuration: false,
       school: 'omegaup',
       basicInformation: false,
@@ -269,8 +269,8 @@ describe('Basic Commands Test', () => {
   const contestOptions: ContestOptions = {
     contestAlias: 'contest' + uuid().slice(0, 5),
     description: 'Test Description',
-    startDate: addSubstractDaysToDate(now, {days: -1}),
-    endDate: addSubstractDaysToDate(now, {days: 2}),
+    startDate: addSubtractDaysToDate(now, {days: -1}),
+    endDate: addSubtractDaysToDate(now, {days: 2}),
     showScoreboard: true,
     basicInformation: false,
     partialPoints: true,
