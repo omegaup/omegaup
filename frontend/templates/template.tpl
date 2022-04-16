@@ -53,7 +53,7 @@
       <div id="common-navbar"></div>
       {% jsInclude 'common_navbar' omitRuntime %}
     {% endif %}
-    <main role="main" {% if not fullWidth %}class="container-lg p-5"{% endif %}>
+    <main role="main" {% if not fullWidth %}class="container-lg p-5"{% endif %} style="flex-grow: 1;">
       <div class="alert mt-0" id="status" style="display: none;">
         <button type="button" class="close" id="alert-close">&times;</button>
         <span class="message"></span>
