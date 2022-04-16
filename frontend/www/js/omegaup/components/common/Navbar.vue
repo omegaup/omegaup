@@ -392,9 +392,6 @@ export default class Navbar extends Vue {
 nav.navbar {
   text-align: end;
   background-color: var(--header-primary-color);
-  .navbar-nav .dropdown-menu {
-    position: absolute;
-  }
   .navbar-brand {
     background-color: var(--header-navbar-brand-background-color);
   }
