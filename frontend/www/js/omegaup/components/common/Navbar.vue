@@ -1,6 +1,6 @@
 <template>
   <header>
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top p-0">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top p-0 text-right">
       <div class="container-xl pl-0 pl-xl-3">
         <a class="navbar-brand p-3" href="/">
           <img
@@ -390,7 +390,6 @@ export default class Navbar extends Vue {
 @import '../../../../sass/main.scss';
 
 nav.navbar {
-  text-align: end;
   background-color: var(--header-primary-color);
   .navbar-brand {
     background-color: var(--header-navbar-brand-background-color);
