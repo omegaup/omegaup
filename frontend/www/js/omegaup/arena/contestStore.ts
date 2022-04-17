@@ -36,7 +36,7 @@ export const contestStoreConfig = {
     },
   },
   actions: {
-    getContestList(
+    fetchContestList(
       { commit }: { commit: Commit },
       payload: NamedContestListRequest,
     ) {
