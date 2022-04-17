@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 '''Library of common database code shared across cron scripts.
 
 Using this library consists of two parts:
@@ -104,14 +104,8 @@ class Connection:
 def default_config_file_path() -> Optional[str]:
     '''Try to autodetect the config file path.'''
     for candidate_path in (
-            # ${OMEGAUP_ROOT}/.my.cnf
-            os.path.join(
-                os.path.abspath(
-                    os.path.join(os.path.dirname(__file__), '..', '..')),
-                '.my.cnf'),
             # ~/.my.cnf
             os.path.join(os.getenv('HOME') or '.', '.my.cnf'),
-            '/etc/mysql/conf.d/mysql_password.cnf',
     ):
         if os.path.isfile(candidate_path):
             return candidate_path
@@ -135,7 +129,7 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
                          type=str,
                          help='MySQL database',
                          default='omegaup')
-    db_args.add_argument('--port', type=int, help='MySQL port', default=3306)
+    db_args.add_argument('--port', type=int, help='MySQL port', default=13306)
 
 
 def connect(args: DatabaseConnectionArguments) -> Connection:

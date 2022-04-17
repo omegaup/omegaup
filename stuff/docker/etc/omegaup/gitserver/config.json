@@ -4,7 +4,7 @@
 	},
 	"DB": {
 		"Driver": "mysql",
-		"DataSourceName": "omegaup:omegaup@tcp(mysql)/omegaup"
+		"DataSourceName": "omegaup:omegaup@tcp(mysql:13306)/omegaup"
 	},
 	"Gitserver": {
 		"PublicKey": "",

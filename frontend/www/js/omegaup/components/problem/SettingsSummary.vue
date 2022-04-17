@@ -5,7 +5,7 @@
       <template v-if="showVisibilityIndicators">
         <img
           v-if="problem.quality_seal || problem.visibility === 3"
-          src="/media/quality-badge-sm.png"
+          src="/media/quality-badge.png"
           :title="T.wordsHighQualityProblem"
           class="mr-2"
         />

@@ -898,6 +898,19 @@ CREATE TABLE `Runs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Runs_Groups` (
+  `case_run_id` int NOT NULL AUTO_INCREMENT,
+  `run_id` int NOT NULL,
+  `group_name` char(40) NOT NULL,
+  `score` double NOT NULL DEFAULT '0',
+  `verdict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE','VE') NOT NULL,
+  PRIMARY KEY (`case_run_id`),
+  UNIQUE KEY `run_id` (`run_id`,`group_name`),
+  CONSTRAINT `Runs_Groups_ibfk_1` FOREIGN KEY (`run_id`) REFERENCES `Runs` (`run_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda los grupos de runs.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `School_Of_The_Month` (
   `school_of_the_month_id` int NOT NULL AUTO_INCREMENT,
   `school_id` int NOT NULL,
