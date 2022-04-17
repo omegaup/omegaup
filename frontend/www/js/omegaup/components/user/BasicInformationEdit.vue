@@ -56,6 +56,7 @@
       <omegaup-datepicker
         v-model="birthDate"
         :required="false"
+        :max="new Date().toISOString().split('T')[0]"
       ></omegaup-datepicker>
     </div>
     <div class="mt-3">

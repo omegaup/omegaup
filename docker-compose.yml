@@ -106,6 +106,7 @@ services:
   mysql:
     image: mysql:8.0
     restart: always
+    platform: linux/amd64
     environment:
       MYSQL_DATABASE: 'omegaup'
       MYSQL_USER: 'omegaup'
