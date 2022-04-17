@@ -28,6 +28,10 @@ declare global {
         contestOptions: Partial<ContestOptions> &
           Pick<ContestOptions, 'contestAlias'>,
       ): void;
+      addProblemsToContest(contestOptions: ContestOptions): void;
+      changeAdmissionModeContest(contestOptions: ContestOptions): void;
+      enterContest(contestOptions: ContestOptions): void;
+      createRunsInsideContest(contestOptions: ContestOptions): void;
     }
   }
 }

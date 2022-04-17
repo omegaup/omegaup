@@ -2,6 +2,7 @@ import { types } from '../api_types';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import clarificationsStore from './clarificationsStore';
 import * as api from '../api';
+import * as time from '../time';
 import { trackRun } from './submissions';
 import problemsStore from './problemStore';
 
@@ -108,8 +109,8 @@ export async function getProblemAndRunDetails({
   }
 
   const [problemDetails, runDetails] = await Promise.all([
-    problemPromise,
-    runPromise,
+    problemPromise.then(time.remoteTimeAdapter),
+    runPromise.then(time.remoteTimeAdapter),
   ]);
 
   if (problemDetails != null) {

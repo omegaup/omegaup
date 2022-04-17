@@ -103,6 +103,13 @@ OmegaUp.on('ready', async () => {
     }
   }
 
+  let nextSubmissionTimestamp: null | Date = null;
+  if (problemDetails?.nextSubmissionTimestamp != null) {
+    nextSubmissionTimestamp = time.remoteTime(
+      problemDetails?.nextSubmissionTimestamp.getTime(),
+    );
+  }
+
   const contestContestant = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest': arena_Contest },
@@ -117,7 +124,7 @@ OmegaUp.on('ready', async () => {
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
       searchResultUsers: [] as types.ListItem[],
-      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      nextSubmissionTimestamp,
       runDetailsData: runDetails,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,

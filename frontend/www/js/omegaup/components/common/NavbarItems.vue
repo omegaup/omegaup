@@ -1,6 +1,9 @@
 <template>
   <div class="mr-auto">
-    <ul v-if="!omegaUpLockDown && (!inContest || isAdmin)" class="navbar-nav">
+    <ul
+      v-if="!omegaUpLockDown && (!inContest || isAdmin)"
+      class="navbar-nav align-items-end"
+    >
       <li
         v-if="isLoggedIn"
         class="nav-item dropdown nav-contests"
@@ -174,7 +177,7 @@
           >
           <a
             class="dropdown-item"
-            href="https://discord.gg/Y4JQ5HQd"
+            href="https://discord.com/invite/K3JFd9d3wk"
             target="_blank"
             >{{ T.navDiscord }}</a
           >
