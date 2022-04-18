@@ -65,7 +65,7 @@ export function apiCall<
             }
             if (!options?.quiet) {
               addError(data);
-              if(data.parameter == 'alias'){
+              if (data.parameter == 'alias') {
                 data.error = data.error + '. ' + T.parameterInvalidAlias;
                 data.errorname = 'parameterInvalidAlias';
               }
