@@ -278,10 +278,12 @@
       </b-tabs>
       <b-pagination-nav
         v-model="currentPage"
+        :number-of-pages="pages"
         size="lg"
         align="center"
-        :link-gen="linkGen"
-        :number-of-pages="10"
+        base-url="#"
+        first-number
+        last-number
       ></b-pagination-nav>
     </b-card>
   </div>
