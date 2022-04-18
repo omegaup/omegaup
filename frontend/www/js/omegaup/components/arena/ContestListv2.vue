@@ -279,12 +279,12 @@
       <b-pagination-nav
         v-model="currentPage"
         :number-of-pages="pages"
-        :link-gen="linkGen"
-        size="lg"
-        align="center"
         base-url="#"
         first-number
         last-number
+        align="center"
+        size="lg"
+        :link-gen="linkGen"
       ></b-pagination-nav>
     </b-card>
   </div>
@@ -368,7 +368,11 @@ export default class ArenaContestList extends Vue {
       return ['text-center', 'title-link'];
     }
   }
-
+  data() {
+    return {
+      pages: 10,
+    };
+  }
   get queryURL(): string {
     return `/arenav2/#${this.currentTab}`;
   }
