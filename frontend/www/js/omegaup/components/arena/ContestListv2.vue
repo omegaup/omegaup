@@ -279,6 +279,7 @@
       <b-pagination-nav
         v-model="currentPage"
         :number-of-pages="pages"
+        :link-gen="linkGen"
         size="lg"
         align="center"
         base-url="#"
