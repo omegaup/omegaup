@@ -171,7 +171,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $problemsetId
     ): ?\OmegaUp\DAO\VO\Contests {
         $fields = join(', ', array_keys(\OmegaUp\DAO\VO\Contests::FIELD_NAMES));
-        $sql = 'SELECT 
+        $sql = 'SELECT
                     ' . $fields . '
                 FROM
                     Contests
