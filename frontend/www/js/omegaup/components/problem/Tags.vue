@@ -22,7 +22,7 @@
             <th class="text-center w-50" scope="col">
               {{ T.contestEditTagName }}
             </th>
-            <th class="text-left w-50 pl-5" scope="col">
+            <th class="pl-5" scope="col">
               {{ T.contestEditTagDelete }}
               <a
                 data-toggle="tooltip"
@@ -80,10 +80,10 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th class="text-center w-5" scope="col">
+            <th class="text-center w-50" scope="col">
               {{ T.contestEditTagName }}
             </th>
-            <th class="text-left w-50 pl-5" scope="col">
+            <th class="pl-5" scope="col">
               {{ T.contestEditTagDelete }}
             </th>
           </tr>
