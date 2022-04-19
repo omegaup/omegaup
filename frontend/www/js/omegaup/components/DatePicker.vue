@@ -34,7 +34,7 @@ export default class DatePicker extends Vue {
   private stringValue: string = time.formatDateLocal(this.value);
 
   get maxDateStr() {
-    return !this.max ? null : this.max.toISOString().split('T')[0];
+    return this.max?.toISOString()?.split('T')?.[0];
   }
 
   mounted() {
