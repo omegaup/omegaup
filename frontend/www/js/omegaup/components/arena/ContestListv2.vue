@@ -28,6 +28,7 @@
                       spellcheck="false"
                       :placeholder="T.wordsKeyword"
                     />
+                    <button class="btn" type="reset">&times;</button>
                     <div class="input-group-append">
                       <input
                         class="btn btn-primary btn-md active"
@@ -48,17 +49,6 @@
                   </template>
                   <b-dropdown-item
                     href="#"
-                    data-order-by-title
-                    @click="orderByTitle"
-                  >
-                    <font-awesome-icon
-                      v-if="currentOrder === ContestOrder.Title"
-                      icon="check"
-                      class="mr-1"
-                    />{{ T.contestOrderByTitle }}</b-dropdown-item
-                  >
-                  <b-dropdown-item
-                    href="#"
                     data-order-by-ends
                     @click="orderByEnds"
                   >
@@ -67,6 +57,17 @@
                       icon="check"
                       class="mr-1"
                     />{{ T.contestOrderByEnds }}</b-dropdown-item
+                  >
+                  <b-dropdown-item
+                    href="#"
+                    data-order-by-title
+                    @click="orderByTitle"
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.Title"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByTitle }}</b-dropdown-item
                   >
                   <b-dropdown-item
                     href="#"
