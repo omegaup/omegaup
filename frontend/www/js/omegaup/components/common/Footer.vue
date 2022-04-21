@@ -221,7 +221,6 @@ export default class Footer extends Vue {
   .footer-navigation {
     .footer-brand {
       max-width: 200px;
-      flex-grow: 1;
 
       @media only screen and (max-width: 991px) {
         max-width: 100%;
