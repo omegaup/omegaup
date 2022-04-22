@@ -48,16 +48,6 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
     parser.add_argument('--rabbitmq-host', type=str,
                         help='rabbitmq host',
                         default='rabbitmq')
-    parser.add_argument('--date-lower-limit',
-                        type=lambda s:
-                        datetime.datetime.strptime(s, '%Y-%m-%d'),
-                        help='date lower limit',
-                        default=datetime.datetime(2005, 1, 1))
-    parser.add_argument('--date-upper-limit',
-                        type=lambda s:
-                        datetime.datetime.strptime(s, '%Y-%m-%d'),
-                        help='date upper limit',
-                        default=datetime.datetime.today())
 
 
 def initialize_rabbitmq(

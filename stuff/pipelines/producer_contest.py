@@ -58,6 +58,16 @@ def send_contest_message_to_client(
 def main() -> None:
     '''Main entrypoint.'''
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--date-lower-limit',
+                        type=lambda s:
+                        datetime.datetime.strptime(s, '%Y-%m-%d'),
+                        help='date lower limit',
+                        default=datetime.datetime(2005, 1, 1))
+    parser.add_argument('--date-upper-limit',
+                        type=lambda s:
+                        datetime.datetime.strptime(s, '%Y-%m-%d'),
+                        help='date upper limit',
+                        default=datetime.datetime.today())
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
 
