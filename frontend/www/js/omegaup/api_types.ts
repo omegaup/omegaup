@@ -2845,12 +2845,14 @@ export namespace types {
 
   export interface ContestListPayload {
     contests: types.TimeTypeContests;
+    countContests: { [key: string]: number };
     isLogged: boolean;
     query: string;
   }
 
   export interface ContestListv2Payload {
     contests: types.ContestList;
+    countContests: { current: number; future: number; past: number };
     query?: string;
   }
 
@@ -4699,10 +4701,16 @@ export namespace messages {
   };
   export type ContestListParticipatingRequest = { [key: string]: any };
   export type _ContestListParticipatingServerResponse = any;
-  export type ContestListParticipatingResponse = { contests: types.Contest[] };
+  export type ContestListParticipatingResponse = {
+    contests: types.Contest[];
+    count: number;
+  };
   export type ContestMyListRequest = { [key: string]: any };
   export type _ContestMyListServerResponse = any;
-  export type ContestMyListResponse = { contests: types.Contest[] };
+  export type ContestMyListResponse = {
+    contests: types.Contest[];
+    count: number;
+  };
   export type ContestOpenRequest = { [key: string]: any };
   export type ContestOpenResponse = {};
   export type ContestProblemClarificationsRequest = { [key: string]: any };
