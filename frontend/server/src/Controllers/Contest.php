@@ -1048,7 +1048,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
-     * @omegaup-request-param string $query
+     * @omegaup-request-param null|string $query
      */
     public static function getContestListDetailsForTypeScript(
         \OmegaUp\Request $r
@@ -1062,14 +1062,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
-        $query = $r->ensureString(
+        $query = $r->ensureOptionalString(
             key: 'query',
+            required: false,
             validator: fn (string $query) => \OmegaUp\Validators::stringOfLengthInRange(
                 $query,
                 0,
                 250
             )
-        );
+        ) ?? '';
         $contestsByType = [];
         $countContestsByType = [];
         // tab_name => request settings
