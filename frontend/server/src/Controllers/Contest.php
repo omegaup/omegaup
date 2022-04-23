@@ -214,7 +214,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         bool $public = false,
         ?int $participating = null
     ) {
-        $cacheKey = "{$activeContests}-{$recommended}-{$page}-{$pageSize}";
+        $cacheKey = "0-{$activeContests}-{$recommended}-{$page}-{$pageSize}";
         if (is_null($identity) || is_null($identity->identity_id)) {
             // Get all public contests
             $callback = /** @return array{contests: list<ContestListItem>, count: int} */ fn () => \OmegaUp\DAO\Contests::getAllPublicContests(
