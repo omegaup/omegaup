@@ -2847,7 +2847,7 @@ export namespace types {
     contests: types.TimeTypeContests;
     countContests: { [key: string]: number };
     isLogged: boolean;
-    query: string;
+    query?: string;
   }
 
   export interface ContestListv2Payload {

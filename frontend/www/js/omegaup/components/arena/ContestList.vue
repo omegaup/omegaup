@@ -252,7 +252,7 @@ export enum ContestsTab {
   },
 })
 export default class ArenaContestList extends Vue {
-  @Prop() initialQuery!: string;
+  @Prop({ default: null }) initialQuery!: null | string;
   @Prop() contests!: types.TimeTypeContests;
   @Prop() isLogged!: boolean;
   @Prop({ default: null }) selectedTab!: ContestsTab | null;

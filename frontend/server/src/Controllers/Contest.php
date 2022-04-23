@@ -33,7 +33,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestList=array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
- * @psalm-type ContestListPayload=array{contests: TimeTypeContests, countContests: array<string, int>, isLogged: bool, query: string}
+ * @psalm-type ContestListPayload=array{contests: TimeTypeContests, countContests: array<string, int>, isLogged: bool, query: null|string}
  * @psalm-type ContestListv2Payload=array{contests: ContestList, countContests: array{current: int, future: int, past: int}, query: string | null}
  * @psalm-type ContestNewPayload=array{languages: array<string, string>}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
@@ -1070,7 +1070,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 0,
                 250
             )
-        ) ?? '';
+        );
         $contestsByType = [];
         $countContestsByType = [];
         // tab_name => request settings
