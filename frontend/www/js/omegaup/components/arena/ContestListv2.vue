@@ -281,10 +281,10 @@
         base-url="#"
         first-number
         last-number
-        :number-of-pages="10"
-        align="center"
         size="lg"
+        align="center"
         :link-gen="linkGen"
+        :number-of-pages="10"
       ></b-pagination-nav>
     </b-card>
   </div>
@@ -368,6 +368,7 @@ export default class ArenaContestList extends Vue {
       return ['text-center', 'title-link'];
     }
   }
+
   get queryURL(): string {
     return `/arenav2/#${this.currentTab}`;
   }
