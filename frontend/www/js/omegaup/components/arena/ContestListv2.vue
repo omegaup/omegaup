@@ -284,7 +284,7 @@
         size="lg"
         align="center"
         :link-gen="linkGen"
-        :number-of-pages="10"
+        :number-of-pages="numberOfPages"
       ></b-pagination-nav>
     </b-card>
   </div>
@@ -367,6 +367,15 @@ export default class ArenaContestList extends Vue {
     } else {
       return ['text-center', 'title-link'];
     }
+  }
+
+  numberOfPages(tab: ContestTab): number {
+    if (!this.countContests[tab]) {
+      // Default value when there are no contests in the list
+      return 1;
+    }
+    const numberOfPages = Math.ceil(this.countContests[tab] / 10);
+    return numberOfPages;
   }
 
   get queryURL(): string {
