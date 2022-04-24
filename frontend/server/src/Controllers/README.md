@@ -842,6 +842,7 @@ Returns a list of contests where current user is participating in
 | Name       | Type              |
 | ---------- | ----------------- |
 | `contests` | `types.Contest[]` |
+| `count`    | `number`          |
 
 ## `/api/contest/myList/`
 
@@ -863,6 +864,7 @@ Returns a list of contests where current user is the director
 | Name       | Type              |
 | ---------- | ----------------- |
 | `contests` | `types.Contest[]` |
+| `count`    | `number`          |
 
 ## `/api/contest/open/`
 
