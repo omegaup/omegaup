@@ -223,6 +223,11 @@ describe('ContestListv2.vue', () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {
         contests,
+        countContests: {
+          current: 24,
+          future: 0,
+          past: 56,
+        },
         tab: ContestTab.Past,
       },
     });

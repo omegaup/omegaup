@@ -277,6 +277,7 @@
         </b-tab>
       </b-tabs>
       <b-pagination-nav
+        ref="paginator"
         v-model="currentPage"
         base-url="#"
         first-number
