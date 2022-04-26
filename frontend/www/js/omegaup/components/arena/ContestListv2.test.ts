@@ -223,11 +223,6 @@ describe('ContestListv2.vue', () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {
         contests,
-        countContests: {
-          current: 24,
-          future: 0,
-          past: 56,
-        },
         tab: ContestTab.Past,
       },
     });
@@ -238,6 +233,24 @@ describe('ContestListv2.vue', () => {
 
     expect(pastContestTab.exists()).toBe(true);
     expect(pastContestTab.text()).toContain('Past Contest 1');
+  });
+
+  it('Should handle paginator', async () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        countContests: {
+          current: 24,
+          future: 0,
+          past: 56,
+        },
+        tab: ContestTab.Future,
+      },
+    });
+
+    const paginator = wrapper.findComponent({ ref: 'paginator' });
+
+    expect(paginator.text()).toBe('ddfd');
   });
 
   const dropdownMapping = [

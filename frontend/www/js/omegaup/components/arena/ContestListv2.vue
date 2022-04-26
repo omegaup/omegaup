@@ -343,6 +343,7 @@ export enum ContestOrder {
   },
 })
 export default class ArenaContestList extends Vue {
+  @Prop() countContests!: { [key: string]: number };
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
   @Prop() tab!: ContestTab;
@@ -370,7 +371,7 @@ export default class ArenaContestList extends Vue {
     }
   }
 
-  numberOfPages(tab: ContestTab): number {
+  numberOfPages(tab: ContestTab) {
     if (!this.countContests[tab]) {
       // Default value when there are no contests in the list
       return 1;
