@@ -537,18 +537,20 @@ class Group extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $scoreboard
         );
-
+        [
+            'contests' => $availableContests,
+        ] = \OmegaUp\Controllers\Contest::getContestList(
+            $r->identity,
+            query: null,
+            page: 1,
+            pageSize: 20,
+            activeContests: \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+            recommended: \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+        );
         return [
             'templateProperties' => [
                 'payload' => [
-                    'availableContests' => \OmegaUp\Controllers\Contest::getContestList(
-                        $r->identity,
-                        query: null,
-                        page: 1,
-                        pageSize: 20,
-                        activeContests: \OmegaUp\DAO\Enum\ActiveStatus::ALL,
-                        recommended: \OmegaUp\DAO\Enum\RecommendedStatus::ALL
-                    ),
+                    'availableContests' => $availableContests,
                     'contests' => $contests,
                     'scoreboardAlias' => $scoreboard,
                     'groupAlias' => $groupAlias,

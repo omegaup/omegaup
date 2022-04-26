@@ -6,10 +6,12 @@ import arena_ContestList, {
   ContestTab,
   ContestOrder,
 } from '../components/arena/ContestListv2.vue';
+import contestStore from './contestStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestListv2Payload();
+  contestStore.commit('updateAll', payload.contests);
   let tab: ContestTab = ContestTab.Current;
   const hash = window.location.hash ? window.location.hash.slice(1) : '';
   if (hash !== '') {
@@ -101,7 +103,7 @@ OmegaUp.on('ready', () => {
     components: { 'omegaup-arena-contestlist': arena_ContestList },
     data: () => ({
       query: payload.query,
-      contests: payload.contests,
+      contests: contestStore.state.contests,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contestlist', {
