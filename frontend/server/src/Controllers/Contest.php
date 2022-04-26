@@ -1924,7 +1924,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $result['submission_deadline'] = new \OmegaUp\Timestamp(
                 min(
                     $contest->finish_time->time,
-                    $problemsetIdentity->access_time->time + $contest->window_length * 60
+                    $problemsetIdentity->end_time->time
                 )
             );
         } else {
