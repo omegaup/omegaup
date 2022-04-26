@@ -8,8 +8,8 @@ Vue.use(Vuex);
 export interface ContestState {
   // The map of contest lists.
   contests: types.TimeTypeContests;
-  countContests:{[key: string]: number };
-  }
+  countContests: { [key: string]: number };
+}
 
 export interface NamedContestListRequest {
   name: string;
@@ -30,7 +30,10 @@ export const contestStoreConfig = {
     updateAll(state: ContestState, payloadContests: types.TimeTypeContests) {
       state.contests = { ...state.contests, ...payloadContests };
     },
-    updateAllcounts(state: ContestState, payloadcountContests:{[key: string]: number }) {
+    updateAllcounts(
+      state: ContestState,
+      payloadcountContests: { [key: string]: number },
+    ) {
       state.countContests = { ...state.countContests, ...payloadcountContests };
     },
     updateList(
