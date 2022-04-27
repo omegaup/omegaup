@@ -639,6 +639,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             array_column($identities['users'], 'username')
         );
 
+        // Extend end_time for an indentity
         \OmegaUp\Controllers\Contest::apiUpdateEndTimeForIdentity(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
