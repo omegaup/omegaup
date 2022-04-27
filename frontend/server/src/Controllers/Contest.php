@@ -1985,11 +1985,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($contest->window_length)) {
             $result['submission_deadline'] = $contest->finish_time;
         } elseif (!is_null($problemsetIdentity->access_time)) {
+            $endTime = (
+                !$problemsetIdentity->end_time ?
+                $problemsetIdentity->access_time->time + $contest->window_length * 60 :
+                $problemsetIdentity->end_time->time
+            );
             $result['submission_deadline'] = new \OmegaUp\Timestamp(
-                min(
-                    $contest->finish_time->time,
-                    $problemsetIdentity->access_time->time + $contest->window_length * 60
-                )
+                min($contest->finish_time->time, $endTime)
             );
         } else {
             $result['submission_deadline'] = $contest->finish_time;
