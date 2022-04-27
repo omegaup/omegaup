@@ -159,24 +159,22 @@
             })
           }}
         </div>
-        <div class="d-none d-md-block">
-          <ul class="m-0 list-unstyled text-right">
-            <li>
-              <a
-                href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
-                target="_blank"
-                >{{ T.frontPageFooterCodeConduct }}</a
-              >
-            </li>
-            <li>
-              <a
-                href="https://blog.omegaup.com/privacy-policy/"
-                target="_blank"
-                >{{ T.frontPageFooterPrivacyPolicy }}</a
-              >
-            </li>
-          </ul>
-        </div>
+        <ul class="m-0 list-unstyled text-right">
+          <li>
+            <a
+              href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
+              target="_blank"
+              >{{ T.frontPageFooterCodeConduct }}</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://blog.omegaup.com/privacy-policy/"
+              target="_blank"
+              >{{ T.frontPageFooterPrivacyPolicy }}</a
+            >
+          </li>
+        </ul>
       </div>
     </div>
   </footer>
@@ -218,6 +216,7 @@ export default class Footer extends Vue {
 .common-footer {
   background-color: $omegaup-primary--darker;
   color: $omegaup-white;
+  flex-grow: 1;
 
   .footer-navigation {
     .footer-brand {
