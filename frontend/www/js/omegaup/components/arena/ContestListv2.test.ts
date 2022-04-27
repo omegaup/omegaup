@@ -235,6 +235,39 @@ describe('ContestListv2.vue', () => {
     expect(pastContestTab.text()).toContain('Past Contest 1');
   });
 
+  const periodMapping = [
+    {
+      tab: ContestTab.Current,
+      expectedValue: '‹123›',
+    },
+    {
+      tab: ContestTab.Future,
+      expectedValue: '‹1›',
+    },
+    {
+      tab: ContestTab.Past,
+      expectedValue: '‹123456›',
+    },
+  ];
+  each(periodMapping).it(
+    'Should handle paginator when "%s" field is selected',
+    async ({ tab, expectedValue }) => {
+      const wrapper = mount(arena_ContestList, {
+        propsData: {
+          contests,
+          countContests: {
+            current: 24,
+            future: 0,
+            past: 56,
+          },
+          tab,
+        },
+      });
+      const paginator = wrapper.findComponent({ ref: 'paginator' });
+      expect(paginator.text()).toBe(expectedValue);
+    },
+  );
+
   const dropdownMapping = [
     [{ value: T.contestOrderByTitle }],
     [{ value: T.contestOrderByEnds }],

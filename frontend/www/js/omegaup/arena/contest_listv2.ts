@@ -12,6 +12,7 @@ OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestListv2Payload();
   contestStore.commit('updateAll', payload.contests);
+  contestStore.commit('updateAllCounts', payload.countContests);
   let tab: ContestTab = ContestTab.Current;
   const hash = window.location.hash ? window.location.hash.slice(1) : '';
   if (hash !== '') {
@@ -104,11 +105,13 @@ OmegaUp.on('ready', () => {
     data: () => ({
       query: payload.query,
       contests: contestStore.state.contests,
+      countContests: contestStore.state.countContests,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contestlist', {
         props: {
           contests: this.contests,
+          countContests: this.countContests,
           query: this.query,
           tab,
           page,
