@@ -639,37 +639,12 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             array_column($identities['users'], 'username')
         );
 
-        $login = self::login($contestantIdentity);
-
-        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'contest_alias' => $contestData['request']['alias'],
-            ])
-        )['templateProperties']['payload'];
-
-        $endTime = $identities['users'][$index]['access_time']->time + 60 * 60;
-        // Extend end_time for an indentity
-        \OmegaUp\Controllers\Contest::apiUpdateEndTimeForIdentity(
-            new \OmegaUp\Request([
-                'contest_alias' => $contestData['request']['alias'],
-                'auth_token' => $directorLogin->auth_token,
-                'username' => $contestantIdentity->username,
-                'end_time' => $endTime,
-            ])
-        );
-
-        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'contest_alias' => $contestData['request']['alias'],
-            ])
-        )['templateProperties']['payload'];
-
-        $this->assertEquals(
-            $contestDetails['submissionDeadline']->time,
-            $endTime
-        );
+        \OmegaUp\Controllers\Contest::apiUpdateEndTimeForIdentity(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+            'username' => $contestantIdentity->username,
+            'end_time' => $identities['users'][$index]['access_time']->time + 60 * 60,
+        ]));
 
         $identities = \OmegaUp\Controllers\Contest::apiUsers(new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
@@ -726,6 +701,97 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             // Pass
             $this->assertEquals('parameterNumberTooLarge', $e->getMessage());
         }
+    }
+
+    /**
+     * Test to get the submission deadline of a contest when it has been set as
+     * "With different starts", and director update the time for a certain
+     * contestant.
+     */
+    public function testUpdateSubmissionDeadlineInAContestWithDifferentStarts() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Create our contestants
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create a run
+        \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+
+        $directorLogin = self::login($contestData['director']);
+
+        // Updating window_length in the contest, to check whether user keeps the extension
+        $windowLength = 20;
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $directorLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'window_length' => $windowLength,
+            'languages' => 'c11-gcc',
+        ]));
+
+        $identities = \OmegaUp\Controllers\Contest::apiUsers(new \OmegaUp\Request([
+            'auth_token' => $directorLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ]));
+
+        $login = self::login($identity);
+
+        $index = array_search(
+            $identity->username,
+            array_column($identities['users'], 'username')
+        );
+
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['templateProperties']['payload'];
+
+        // Submission deadline should be 20 minutes after contestant starts the
+        // contest
+        $this->assertEquals(
+            $contestDetails['submissionDeadline']->time,
+            $identities['users'][$index]['access_time']->time + 20 * 60
+        );
+
+        $endTime = $identities['users'][$index]['access_time']->time + 60 * 60;
+        // Extend end_time for an indentity
+        \OmegaUp\Controllers\Contest::apiUpdateEndTimeForIdentity(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $directorLogin->auth_token,
+                'username' => $identity->username,
+                'end_time' => $endTime,
+            ])
+        );
+
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['templateProperties']['payload'];
+
+        // Now, submission deadline should be updated to 60 minutes after
+        // contestant starts the contest
+        $this->assertEquals(
+            $contestDetails['submissionDeadline']->time,
+            $endTime
+        );
     }
 
     /**
