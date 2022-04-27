@@ -285,7 +285,7 @@
         size="lg"
         align="center"
         :link-gen="linkGen"
-        :number-of-pages="numberOfPages"
+        :number-of-pages="numberOfPages(currentTab)"
       ></b-pagination-nav>
     </b-card>
   </div>
@@ -343,7 +343,7 @@ export enum ContestOrder {
   },
 })
 export default class ArenaContestList extends Vue {
-  @Prop() countContests!: { [key: string]: number };
+  @Prop({ default: null }) countContests!: { [key: string]: number } | null;
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
   @Prop() tab!: ContestTab;
@@ -371,8 +371,8 @@ export default class ArenaContestList extends Vue {
     }
   }
 
-  numberOfPages(tab: ContestTab) {
-    if (!this.countContests[tab]) {
+  numberOfPages(tab: ContestTab): number {
+    if (!this.countContests || !this.countContests[tab]) {
       // Default value when there are no contests in the list
       return 1;
     }

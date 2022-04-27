@@ -30,11 +30,11 @@ export const contestStoreConfig = {
     updateAll(state: ContestState, payloadContests: types.TimeTypeContests) {
       state.contests = { ...state.contests, ...payloadContests };
     },
-    updateAllcounts(
+    updateAllCounts(
       state: ContestState,
-      payloadcountContests: { [key: string]: number },
+      payloadCountContests: { [key: string]: number },
     ) {
-      state.countContests = { ...state.countContests, ...payloadcountContests };
+      state.countContests = { ...state.countContests, ...payloadCountContests };
     },
     updateList(
       state: ContestState,
