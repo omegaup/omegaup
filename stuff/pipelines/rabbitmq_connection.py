@@ -60,7 +60,7 @@ def initialize_rabbitmq(
     '''initializes the queue and exchange'''
     channel.queue_declare(
         queue=queue, passive=False,
-        durable=False, exclusive=False,
+        durable=True, exclusive=False,
         auto_delete=False)
     channel.exchange_declare(
         exchange=exchange,

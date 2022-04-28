@@ -41,7 +41,7 @@ def test_rabbitmq_connection(exchange: str, expected: bool):
                 body=body.encode(),
             )
 
-        result = channel.queue_declare(queue='', exclusive=True)
+        result = channel.queue_declare(queue='', durable=True, exclusive=True)
         queue_name = result.method.queue
         assert queue_name is not None
 
