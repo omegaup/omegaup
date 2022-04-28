@@ -120,7 +120,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         join(', ', array_keys(\OmegaUp\DAO\VO\Contests::FIELD_NAMES)) . ' ' .
         'FROM Contests ' . 'WHERE title = ? and archived = 0;';
 
-        /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, default_show_all_contestants_in_scoreboard: bool|null, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
+        /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, default_show_all_contestants_in_scoreboard: bool|null, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$title]);
 
         $contests = [];
@@ -178,7 +178,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 WHERE
                     problemset_id = ?
                 LIMIT 0, 1;';
-        /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, default_show_all_contestants_in_scoreboard: bool|null, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
+        /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, default_show_all_contestants_in_scoreboard: bool|null, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$problemsetId]
