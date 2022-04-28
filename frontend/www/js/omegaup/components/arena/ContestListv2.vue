@@ -361,8 +361,6 @@ export default class ArenaContestList extends Vue {
   @Prop() tab!: ContestTab;
   @Prop() sortOrder!: ContestOrder;
   @Prop() filter!: ContestFilter;
-  @Prop() filterBySignedUp!: boolean;
-  @Prop() filterByRecommended!: boolean;
   @Prop() page!: number;
   T = T;
   ui = ui;
@@ -372,8 +370,6 @@ export default class ArenaContestList extends Vue {
   currentQuery: string = this.query;
   currentOrder: ContestOrder = this.sortOrder;
   currentFilter: ContestFilter = this.filter;
-  currentFilterBySignedUp: boolean = this.filterBySignedUp;
-  currentFilterByRecommended: boolean = this.filterByRecommended;
   currentPage: number = this.page;
   refreshing: boolean = false;
 
