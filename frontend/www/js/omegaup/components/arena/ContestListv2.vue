@@ -371,7 +371,7 @@ export default class ArenaContestList extends Vue {
   currentTab: ContestTab = this.tab;
   currentQuery: string = this.query;
   currentOrder: ContestOrder = this.sortOrder;
-  currentFilter: ContestList = this.filter;
+  currentFilter: ContestFilter = this.filter;
   currentFilterBySignedUp: boolean = this.filterBySignedUp;
   currentFilterByRecommended: boolean = this.filterByRecommended;
   currentPage: number = this.page;
@@ -399,7 +399,7 @@ export default class ArenaContestList extends Vue {
         sort_order: this.currentOrder,
         participating: this.currentFilterBySignedUp,
         recommended: this.currentFilterByRecommended,
-       },
+      },
     };
   }
 
