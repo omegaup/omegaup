@@ -7,6 +7,7 @@ import type { types } from '../../api_types';
 import arena_ContestList, {
   ContestOrder,
   ContestTab,
+  ContestFilter,
 } from './ContestListv2.vue';
 import each from 'jest-each';
 
@@ -242,55 +243,17 @@ describe('ContestListv2.vue', () => {
         tab: ContestTab.Current,
       },
     });
-
     const dropdownFilterBy = wrapper.findComponent({
       ref: 'dropdownFilterBy',
     });
-
-    // Current filter  "By All" is turned on by default
-    expect(wrapper.vm.currentFilterByAll).toBe(true);
-
-    // When this filter is unchecked, all filters are turned off
-    await dropdownFilterBy.find('[data-filter-by-all]').trigger('click');
-
-    expect(wrapper.vm.currentFilterByAll).toBe(false);
-    expect(wrapper.vm.currentFilterBySignedUp).toBe(false);
-    expect(wrapper.vm.currentFilterByRecommended).toBe(false);
-
-    // When this filter is checked again, all filters are turned on
-    await dropdownFilterBy.find('[data-filter-by-all]').trigger('click');
-
-    expect(wrapper.vm.currentFilterByAll).toBe(true);
-    expect(wrapper.vm.currentFilterBySignedUp).toBe(true);
-    expect(wrapper.vm.currentFilterByRecommended).toBe(true);
-
+    // Current filter "By All" is turned on by default
+    expect(wrapper.vm.currentFilter).toBe(ContestFilter.All);
     await dropdownFilterBy.find('[data-filter-by-signed-up]').trigger('click');
-
-    expect(wrapper.vm.currentFilterByAll).toBe(false);
-    expect(wrapper.vm.currentFilterBySignedUp).toBe(false);
-    expect(wrapper.vm.currentFilterByRecommended).toBe(true);
-
+    expect(wrapper.vm.currentFilter).toBe(ContestFilter.SignedUp);
     await dropdownFilterBy
       .find('[data-filter-by-recommended]')
       .trigger('click');
-
-    expect(wrapper.vm.currentFilterByAll).toBe(false);
-    expect(wrapper.vm.currentFilterBySignedUp).toBe(false);
-    expect(wrapper.vm.currentFilterByRecommended).toBe(false);
-
-    await dropdownFilterBy.find('[data-filter-by-signed-up]').trigger('click');
-
-    expect(wrapper.vm.currentFilterByAll).toBe(false);
-    expect(wrapper.vm.currentFilterBySignedUp).toBe(true);
-    expect(wrapper.vm.currentFilterByRecommended).toBe(false);
-
-    await dropdownFilterBy
-      .find('[data-filter-by-recommended]')
-      .trigger('click');
-
-    expect(wrapper.vm.currentFilterByAll).toBe(true);
-    expect(wrapper.vm.currentFilterBySignedUp).toBe(true);
-    expect(wrapper.vm.currentFilterByRecommended).toBe(true);
+    expect(wrapper.vm.currentFilter).toBe(ContestFilter.OnlyRecommended);
   });
 
   const dropdownMapping = [

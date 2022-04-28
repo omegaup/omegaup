@@ -124,33 +124,33 @@
                   <b-dropdown-item
                     href="#"
                     data-filter-by-all
-                    @click="toggleFilterByAll"
+                    @click="filterByAll"
                   >
                     <font-awesome-icon
-                      v-if="currentFilterByAll"
-                      icon="check-square"
+                      v-if="currentFilter === ContestFilter.All"
+                      icon="check"
                       class="mr-1"
                     />{{ T.contestFilterByAll }}</b-dropdown-item
                   >
                   <b-dropdown-item
                     href="#"
                     data-filter-by-signed-up
-                    @click="toggleFilterBySignedUp"
+                    @click="filterBySignedUp"
                   >
                     <font-awesome-icon
-                      v-if="currentFilterBySignedUp"
-                      icon="check-square"
+                      v-if="currentFilter === ContestFilter.SignedUp"
+                      icon="check"
                       class="mr-1"
                     />{{ T.contestFilterBySignedUp }}</b-dropdown-item
                   >
                   <b-dropdown-item
                     href="#"
                     data-filter-by-recommended
-                    @click="toggleFilterByRecommended"
+                    @click="filterByRecommended"
                   >
                     <font-awesome-icon
-                      v-if="currentFilterByRecommended"
-                      icon="check-square"
+                      v-if="currentFilter === ContestFilter.OnlyRecommended"
+                      icon="check"
                       class="mr-1"
                     />{{ T.contestFilterByRecommended }}</b-dropdown-item
                   >
@@ -343,6 +343,12 @@ export enum ContestOrder {
   SignedUp = 'signedup',
 }
 
+export enum ContestFilter {
+  SignedUp = 'signedup',
+  OnlyRecommended = 'recommended',
+  All = 'all',
+}
+
 @Component({
   components: {
     'omegaup-contest-card': ContestCard,
@@ -354,6 +360,7 @@ export default class ArenaContestList extends Vue {
   @Prop() query!: string;
   @Prop() tab!: ContestTab;
   @Prop() sortOrder!: ContestOrder;
+  @Prop() filter!: ContestFilter;
   @Prop() filterBySignedUp!: boolean;
   @Prop() filterByRecommended!: boolean;
   @Prop() page!: number;
@@ -364,6 +371,7 @@ export default class ArenaContestList extends Vue {
   currentTab: ContestTab = this.tab;
   currentQuery: string = this.query;
   currentOrder: ContestOrder = this.sortOrder;
+  currentFilter: ContestList = this.filter;
   currentFilterBySignedUp: boolean = this.filterBySignedUp;
   currentFilterByRecommended: boolean = this.filterByRecommended;
   currentPage: number = this.page;
@@ -391,7 +399,7 @@ export default class ArenaContestList extends Vue {
         sort_order: this.currentOrder,
         participating: this.currentFilterBySignedUp,
         recommended: this.currentFilterByRecommended,
-      },
+       },
     };
   }
 
@@ -431,27 +439,14 @@ export default class ArenaContestList extends Vue {
     this.currentOrder = ContestOrder.SignedUp;
   }
 
-  toggleFilterBySignedUp() {
-    this.currentFilterBySignedUp = !this.currentFilterBySignedUp;
-    if (this.currentFilterBySignedUp && this.currentFilterByRecommended) {
-      this.currentFilterByAll = true;
-      return;
-    }
-    this.currentFilterByAll = false;
+  filterBySignedUp() {
+    this.currentFilter = ContestFilter.SignedUp;
   }
-
-  toggleFilterByRecommended() {
-    this.currentFilterByRecommended = !this.currentFilterByRecommended;
-    if (this.currentFilterBySignedUp && this.currentFilterByRecommended) {
-      this.currentFilterByAll = true;
-      return;
-    }
-    this.currentFilterByAll = false;
+  filterByRecommended() {
+    this.currentFilter = ContestFilter.OnlyRecommended;
   }
-  toggleFilterByAll() {
-    this.currentFilterByAll = !this.currentFilterByAll;
-    this.currentFilterBySignedUp = this.currentFilterByAll;
-    this.currentFilterByRecommended = this.currentFilterByAll;
+  filterByAll() {
+    this.currentFilter = ContestFilter.All;
   }
 
   get filteredContestList(): types.ContestListItem[] {
