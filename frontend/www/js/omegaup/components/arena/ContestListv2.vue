@@ -365,7 +365,7 @@ export default class ArenaContestList extends Vue {
   @Prop() query!: string;
   @Prop() tab!: ContestTab;
   @Prop() sortOrder!: ContestOrder;
-  @Prop({ default: () => [] }) filter!: ContestFilter;
+  @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
   @Prop() page!: number;
   T = T;
   ui = ui;
