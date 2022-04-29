@@ -322,40 +322,6 @@ describe('ContestListv2.vue', () => {
     [{ tab: ContestTab.Past }],
   ];
 
-  each(tabMapping).it(
-    'Should filter contest list when %s field is selected when selected tab equal to %s',
-    async ({ tab }) => {
-      const wrapper = mount(arena_ContestList, {
-        propsData: {
-          contests,
-          tab: tab,
-          filterBySignedUp: true,
-          filterByRecommended: true,
-        },
-      });
-      expect(
-        wrapper.vm.filteredContestList.map((contest) => contest.alias),
-      ).toEqual(['Contest-1', 'Contest-2']);
-    },
-  );
-
-  each(tabMapping).it(
-    'Should filter contest list when both filters are selected. When selected tab equal to %s',
-    async ({ tab }) => {
-      const wrapper = mount(arena_ContestList, {
-        propsData: {
-          contests,
-          tab: tab,
-          filterBySignedUp: true,
-          filterByRecommended: true,
-        },
-      });
-      expect(
-        wrapper.vm.filteredContestList.map((contest) => contest.alias),
-      ).toEqual(['Contest-1', 'Contest-2']);
-    },
-  );
-
   const orderMapping = [
     [
       {
