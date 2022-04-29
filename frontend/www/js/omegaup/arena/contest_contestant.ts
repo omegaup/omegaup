@@ -160,6 +160,7 @@ OmegaUp.on('ready', async () => {
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
+          submissionDeadline: payload.submissionDeadline,
         },
         on: {
           'navigate-to-problem': ({
