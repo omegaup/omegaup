@@ -44,14 +44,24 @@ class MessageSavingCallback:
 @pytest.mark.parametrize(
     'params, expected',
     [
-        ({'user_id': 1, 'time': '2022-01-26',
-          'category': 'all'},
-         {'user_id': 1, 'time': '2022-01-26',
-          'category': 'all'}),
-        ({'user_id': 1, 'time': '2022-01-26',
-          'category': 'female'},
-         {'user_id': 1, 'time': '2022-01-26',
-          'category': 'female'}),
+        (
+            {
+                'certificate_cutoff': 1,
+                'contest_id': 1,
+                'alias': 'contest1',
+                'scoreboard_url': 'abcdef',
+            },
+            'certificate_cutoff',
+        ),
+        (
+            {
+                'certificate_cutoff': 1,
+                'contest_id': 2,
+                'alias': 'contest2',
+                'scoreboard_url': '123456',
+            },
+            'certificate_cutoff',
+        ),
     ],
 )  # type: ignore
 def test_contest_producer(mocker: pytest_mock.MockerFixture,
