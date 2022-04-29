@@ -446,7 +446,7 @@ export default class ArenaContestList extends Vue {
   }
 
   get filteredContestList(): types.ContestListItem[] {
-    const filters: Array<(contestItem: types.ContestListItem) => enum> = [];
+    const filters: Array<(contestItem: types.ContestListItem) => boolean> = [];
     if (this.currentFilter === ContestFilter.SignedUp) {
       filters.push((item) => item.participating);
     }
