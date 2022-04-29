@@ -394,7 +394,7 @@ export default class ArenaContestList extends Vue {
         tab_name: this.currentTab,
         query: this.query,
         sort_order: this.currentOrder,
-        filter:this.filter,
+        filter: this.filter,
       },
     };
   }
