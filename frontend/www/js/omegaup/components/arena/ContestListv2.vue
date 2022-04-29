@@ -360,12 +360,13 @@ export default class ArenaContestList extends Vue {
   @Prop() query!: string;
   @Prop() tab!: ContestTab;
   @Prop() sortOrder!: ContestOrder;
-  @Prop() filter!: ContestFilter;
+  @Prop({ default: () => [] }) filter!: ContestFilter;
   @Prop() page!: number;
   T = T;
   ui = ui;
   ContestTab = ContestTab;
   ContestOrder = ContestOrder;
+  ContestFilter = ContestFilter;
   currentTab: ContestTab = this.tab;
   currentQuery: string = this.query;
   currentOrder: ContestOrder = this.sortOrder;
@@ -393,8 +394,7 @@ export default class ArenaContestList extends Vue {
         tab_name: this.currentTab,
         query: this.query,
         sort_order: this.currentOrder,
-        participating: this.currentFilterBySignedUp,
-        recommended: this.currentFilterByRecommended,
+        filter:this.filter,
       },
     };
   }
@@ -446,11 +446,11 @@ export default class ArenaContestList extends Vue {
   }
 
   get filteredContestList(): types.ContestListItem[] {
-    const filters: Array<(contestItem: types.ContestListItem) => boolean> = [];
-    if (this.currentFilterBySignedUp) {
+    const filters: Array<(contestItem: types.ContestListItem) => enum> = [];
+    if (this.currentFilter === ContestFilter.SignedUp) {
       filters.push((item) => item.participating);
     }
-    if (this.currentFilterByRecommended) {
+    if (this.currentFilter === ContestFilter.OnlyRecommended) {
       filters.push((item) => item.recommended);
     }
     return this.sortedContestList.slice().filter((contestItem) => {
