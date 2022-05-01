@@ -1350,6 +1350,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         [
             'contest' => $contest,
             'contest_admin' => $contestAdmin,
+            'problemset' => $problemset,
         ] = self::validateDetails($contestAlias, $r->identity);
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1362,14 +1363,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
-            $contest->problemset_id
-        );
-        if (is_null($problemset) || is_null($problemset->problemset_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException(
-                'problemsetNotFound'
-            );
-        }
         $problems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             $problemset->problemset_id,
             needSubmissions: true
@@ -1403,7 +1396,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'details' => self::getContestDetailsForAdmin(
                         $contest,
-                        $r->identity
+                        $r->identity,
+                        $problemset
                     ),
                     'problems' => self::addVersionsToProblems(
                         $problems,
@@ -2009,7 +2003,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function getContestDetailsForAdmin(
         \OmegaUp\DAO\VO\Contests $contest,
-        \OmegaUp\DAO\VO\Identities $adminIdentity
+        \OmegaUp\DAO\VO\Identities $adminIdentity,
+        \OmegaUp\DAO\VO\Problemsets $problemset
     ): array {
         if (is_null($contest->alias) || is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
@@ -2031,6 +2026,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         $result['available_languages'] = \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES;
         $result['admin'] = true;
+        $result['scoreboard_url'] = $problemset->scoreboard_url;
+        $result['scoreboard_url_admin'] = $problemset->scoreboard_url_admin;
         return $result;
     }
 
@@ -2053,11 +2050,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $token = $r->ensureOptionalString('token');
         [
             'contest' => $contest,
+            'problemset' => $problemset,
         ] = self::validateDetails($contestAlias, $r->identity, $token);
 
         return self::getContestDetailsForAdmin(
             $contest,
-            $r->identity
+            $r->identity,
+            $problemset
         );
     }
 
