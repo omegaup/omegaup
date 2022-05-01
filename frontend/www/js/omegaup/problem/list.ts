@@ -11,6 +11,7 @@ OmegaUp.on('ready', () => {
   let columnName = 'problem_id';
   let language = 'all';
   let query = '';
+  let tag: string[] = [];
   if (queryString) {
     const urlParams = new URLSearchParams(queryString);
     if (urlParams.get('sort_order')) {
@@ -38,6 +39,12 @@ OmegaUp.on('ready', () => {
       const queryParam = urlParams.get('query');
       if (queryParam) {
         query = queryParam;
+      }
+    }
+    if (urlParams.get('tag[]')) {
+      const tagParam = urlParams.getAll('tag[]');
+      if (tagParam) {
+        tag = tagParam;
       }
     }
   }
@@ -76,6 +83,7 @@ OmegaUp.on('ready', () => {
               query,
               order_by: columnName,
               sort_order: sortOrder,
+              tag,
             };
             window.location.replace(
               `/problem?${ui.buildURLQuery(queryParameters)}`,
