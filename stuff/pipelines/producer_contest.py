@@ -13,7 +13,7 @@ import mysql.connector
 import mysql.connector.cursor
 import pika
 
-from database.contest import get_contests
+import database.contest
 import rabbitmq_connection
 import rabbitmq_producer
 
@@ -45,7 +45,7 @@ def send_contest_message_to_client(
         channel=channel
     )
 
-    contestants = get_contests(
+    contestants = database.contest.get_contests(
         cur=cur,
         date_lower_limit=date_lower_limit,
         date_upper_limit=date_upper_limit,
