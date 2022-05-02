@@ -68,7 +68,7 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
                           params,
                           expected) -> None:
     '''Test the message send to the contest queue'''
-    mocker.patch('producer_contest.get_contests', return_value=params)
+    mocker.patch('producer_contest.get_contests_from_db', return_value=params)
 
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(

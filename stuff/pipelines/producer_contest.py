@@ -4,11 +4,12 @@
 
 import argparse
 import datetime
+import json
 import logging
 import os
 import sys
-import json
 
+from typing import List
 import mysql.connector
 import mysql.connector.cursor
 import pika
@@ -45,7 +46,7 @@ def send_contest_message_to_client(
         channel=channel
     )
 
-    contestants = database.contest.get_contests(
+    contestants = get_contests_from_db(
         cur=cur,
         date_lower_limit=date_lower_limit,
         date_upper_limit=date_upper_limit,
@@ -54,6 +55,20 @@ def send_contest_message_to_client(
     for data in contestants:
         message = json.dumps(data)
         contest_producer.send_message(message)
+
+
+def get_contests_from_db(
+    *,
+    cur: mysql.connector.cursor.MySQLCursorDict,
+    date_lower_limit: datetime.datetime,
+    date_upper_limit: datetime.datetime,
+) -> List[database.contest.ContestCertificate]:
+    ''''A intermediate function in order to mock the original one'''
+    return database.contest.get_contests(
+        cur=cur,
+        date_lower_limit=date_lower_limit,
+        date_upper_limit=date_upper_limit,
+    )
 
 
 def main() -> None:
