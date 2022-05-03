@@ -7,7 +7,9 @@ import logging
 import os
 import sys
 
-import contests_callback
+import omegaup.api
+
+import contest_callback
 import rabbitmq_connection
 import rabbitmq_client
 
@@ -42,9 +44,11 @@ def main() -> None:
                 password=args.rabbitmq_password,
                 host=args.rabbitmq_host
         ) as channel:
-            callback = contests_callback.ContestsCallback(dbconn.conn,
-                                                          args.api_token,
-                                                          args.url)
+            client = omegaup.api.Client(api_token=args.api_token, url=args.url)
+            callback = contest_callback.ContestsCallback(
+                dbconn=dbconn.conn,
+                client=client,
+            )
             rabbitmq_client.receive_messages(queue='contest',
                                              exchange='certificates',
                                              routing_key='ContestQueue',
