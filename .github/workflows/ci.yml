@@ -517,14 +517,17 @@ jobs:
       - name: Start the Docker containers
         run: |
           docker-compose up --no-build --detach
+
           # Add the container names as aliases to localhost
           cat << EOF | sudo tee --append /etc/hosts
           127.0.0.1 rabbitmq mysql
           EOF
+
           # Wait for some of the containers
           wait-for-it -t 30 mysql:13306
           wait-for-it -t 30 rabbitmq:5672
           docker-compose exec -T rabbitmq rabbitmqctl await_startup
+
           for i in $(seq 10); do
             if [[ "$(mysql \
                     -uomegaup -pomegaup --host=mysql --port=13306 --skip-column-names --batch \
@@ -533,6 +536,7 @@ jobs:
             fi
             sleep 1
           done
+
       - name: Create default configuration files
         run: |
           cat > frontend/server/config.php <<EOF
@@ -571,12 +575,14 @@ jobs:
           mysql -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
           mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup`;'
           mysql -e 'GRANT ALL ON `omegaup`.* TO "omegaup"@"localhost";'
+
       - name: Install Python dependencies
         run: |
           docker-compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
             python3 -m venv /opt/omegaup/stuff/venv && \
             python3 -m pip install wheel && \
             python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
+
       - name: Bootstrap environment
         run: |
           # Create directory to prevent --purge from failing.
