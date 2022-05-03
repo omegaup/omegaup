@@ -7,6 +7,7 @@ import type { types } from '../../api_types';
 import arena_ContestList, {
   ContestOrder,
   ContestTab,
+  ContestFilter,
 } from './ContestListv2.vue';
 import each from 'jest-each';
 
@@ -235,6 +236,25 @@ describe('ContestListv2.vue', () => {
     expect(pastContestTab.text()).toContain('Past Contest 1');
   });
 
+  it('Should handle filter buttons', async () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Current,
+      },
+    });
+    const dropdownFilterBy = wrapper.findComponent({
+      ref: 'dropdownFilterBy',
+    });
+    // Current filter "By All" is turned on by default
+    expect(wrapper.vm.currentFilter).toBe(ContestFilter.All);
+    await dropdownFilterBy.find('[data-filter-by-signed-up]').trigger('click');
+    expect(wrapper.vm.currentFilter).toBe(ContestFilter.SignedUp);
+    await dropdownFilterBy
+      .find('[data-filter-by-recommended]')
+      .trigger('click');
+    expect(wrapper.vm.currentFilter).toBe(ContestFilter.OnlyRecommended);
+  });
   const periodMapping = [
     {
       tab: ContestTab.Current,
@@ -301,40 +321,6 @@ describe('ContestListv2.vue', () => {
     [{ tab: ContestTab.Future }],
     [{ tab: ContestTab.Past }],
   ];
-
-  each(tabMapping).it(
-    'Should filter contest list when %s field is selected when selected tab equal to %s',
-    async ({ tab }) => {
-      const wrapper = mount(arena_ContestList, {
-        propsData: {
-          contests,
-          tab: tab,
-          filterBySignedUp: true,
-          filterByRecommended: true,
-        },
-      });
-      expect(
-        wrapper.vm.filteredContestList.map((contest) => contest.alias),
-      ).toEqual(['Contest-1', 'Contest-2']);
-    },
-  );
-
-  each(tabMapping).it(
-    'Should filter contest list when both filters are selected. When selected tab equal to %s',
-    async ({ tab }) => {
-      const wrapper = mount(arena_ContestList, {
-        propsData: {
-          contests,
-          tab: tab,
-          filterBySignedUp: true,
-          filterByRecommended: true,
-        },
-      });
-      expect(
-        wrapper.vm.filteredContestList.map((contest) => contest.alias),
-      ).toEqual(['Contest-1', 'Contest-2']);
-    },
-  );
 
   const orderMapping = [
     [
