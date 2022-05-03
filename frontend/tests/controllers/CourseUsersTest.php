@@ -48,6 +48,96 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals('open', $response['events'][0]['event']['name']);
     }
 
+    public function testSearchUsersCourse() {
+        // Create a course with 5 assignments
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+
+        // Prepare assignment. Create problem
+        $adminLogin = self::login($courseData['admin']);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment_alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+
+        // Create 10 users
+        $numberOfStudents = 10;
+        $identities = [];
+
+        [
+            'identity' => $identities[0],
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'username' => 'test_course_user_0',
+            ])
+        );
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identities[0]
+        );
+
+        [
+            'identity' => $identities[1],
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'username' => 'test_course_user_1',
+            ])
+        );
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identities[1]
+        );
+
+        foreach (range(2, $numberOfStudents - 1) as $studentIndex) {
+            [
+                'identity' => $identities[$studentIndex],
+            ] = \OmegaUp\Test\Factories\User::createUser();
+            \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData,
+                $identities[$studentIndex]
+            );
+        }
+
+        // Call the details API for the assignment that's already started and
+        // open a problem.
+        foreach (range(0, $numberOfStudents - 1) as $studentIndex) {
+            $userLogin = self::login($identities[$studentIndex]);
+            \OmegaUp\Controllers\Course::apiAssignmentDetails(
+                new \OmegaUp\Request([
+                    'auth_token' => $userLogin->auth_token,
+                    'course' => $courseData['course_alias'],
+                    'assignment' => $courseData['assignment_alias'],
+                ])
+            );
+
+            \OmegaUp\Controllers\Problem::apiDetails(
+                new \OmegaUp\Request([
+                    'auth_token' => $userLogin->auth_token,
+                    'problemset_id' => $courseData['problemset_id'],
+                    'prevent_problemset_open' => false,
+                    'problem_alias' => $problemData['request']['problem_alias'],
+                ])
+            );
+        }
+
+        // Call search API as admin
+        $adminLogin = self::login($courseData['admin']);
+        $response = \OmegaUp\Controllers\Course::apiSearchUsers(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'query' => 'test_course_user_'
+            ])
+        )['results'];
+
+        // Only two users match with the query
+        $this->assertCount(2, $response);
+    }
+
     public function testNormalUserCannotAccessToDetailsCourse() {
         // Create a course
         $courseData = \OmegaUp\Test\Factories\Course::createCourse();

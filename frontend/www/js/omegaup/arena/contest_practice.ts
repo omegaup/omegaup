@@ -51,6 +51,13 @@ OmegaUp.on('ready', async () => {
   }
   trackClarifications(payload.clarifications);
 
+  let nextSubmissionTimestamp: null | Date = null;
+  if (problemDetails?.nextSubmissionTimestamp != null) {
+    nextSubmissionTimestamp = time.remoteTime(
+      problemDetails?.nextSubmissionTimestamp.getTime(),
+    );
+  }
+
   const contestPractice = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
@@ -62,7 +69,7 @@ OmegaUp.on('ready', async () => {
       showNewClarificationPopup,
       guid,
       problemAlias,
-      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      nextSubmissionTimestamp,
       runDetailsData: runDetails,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
@@ -106,7 +113,9 @@ OmegaUp.on('ready', async () => {
             api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
                 this.runDetailsData = showSubmission({ request, runDetails });
-                window.location.hash = request.hash;
+                if (request.hash) {
+                  window.location.hash = request.hash;
+                }
               })
               .catch((run) => {
                 submitRunFailed({

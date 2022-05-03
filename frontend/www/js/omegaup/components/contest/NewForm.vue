@@ -67,6 +67,7 @@
             <label>{{ T.contestNewFormStartDate }}</label>
             <omegaup-datetimepicker
               v-model="startTime"
+              data-start-date
             ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormStartDateDesc }}</p>
           </div>
@@ -74,6 +75,7 @@
             <label>{{ T.contestNewFormEndDate }}</label>
             <omegaup-datetimepicker
               v-model="finishTime"
+              data-end-date
               :is-invalid="invalidParameterName === 'finish_time'"
             ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormEndDateDesc }}</p>
@@ -236,7 +238,11 @@
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormScoreboardAtEnd }}</label>
-            <select v-model="showScoreboardAfter" class="form-control">
+            <select
+              v-model="showScoreboardAfter"
+              data-show-scoreboard-at-end
+              class="form-control"
+            >
               <option :value="true">
                 {{ T.wordsYes }}
               </option>
@@ -248,7 +254,11 @@
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormPartialScore }}</label>
-            <select v-model="partialScore" class="form-control">
+            <select
+              v-model="partialScore"
+              data-partial-points
+              class="form-control"
+            >
               <option :value="true">
                 {{ T.wordsYes }}
               </option>
@@ -296,12 +306,14 @@
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormBasicInformationRequired }}</label>
-            <div class="checkbox">
-              <label
-                ><input v-model="needsBasicInformation" type="checkbox" />{{
-                  T.wordsEnable
-                }}</label
-              >
+            <div class="checkbox form-check">
+              <input
+                v-model="needsBasicInformation"
+                data-basic-information-required
+                class="form-check-input"
+                type="checkbox"
+              />
+              <label class="form-check-label"> {{ T.wordsEnable }}</label>
             </div>
             <p class="help-block">
               {{ T.contestNewFormBasicInformationRequiredDesc }}
@@ -309,7 +321,11 @@
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormUserInformationRequired }}</label>
-            <select v-model="requestsUserInformation" class="form-control">
+            <select
+              v-model="requestsUserInformation"
+              data-request-user-information
+              class="form-control"
+            >
               <option value="no">
                 {{ T.wordsNo }}
               </option>
@@ -357,6 +373,7 @@ import { types } from '../../api_types';
 export default class NewForm extends Vue {
   @Prop() update!: boolean;
   @Prop() allLanguages!: string[];
+  @Prop({ default: 'private' }) admissionMode!: string;
   @Prop({ default: '' }) initialAlias!: string;
   @Prop({ default: '' }) initialDescription!: string;
   @Prop({ default: 'none' }) initialFeedback!: string;
@@ -483,7 +500,7 @@ export default class NewForm extends Vue {
   onSubmit() {
     const contest: types.ContestAdminDetails = {
       admin: true,
-      admission_mode: 'private',
+      admission_mode: this.update ? this.admissionMode : 'private',
       alias: this.alias,
       archived: false,
       available_languages: {},

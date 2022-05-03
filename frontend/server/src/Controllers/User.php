@@ -3746,13 +3746,13 @@ class User extends \OmegaUp\Controllers\Controller {
         $response['templateProperties']['payload']['isLogged'] = true;
         if (!is_null($r->identity->country_id)) {
             $availableFilters['country'] =
-                \OmegaUp\Translations::getInstance()->get(
+                \OmegaUp\Translations::getInstance($r->identity)->get(
                     'wordsFilterByCountry'
                 );
         }
         if (!is_null($r->identity->state_id)) {
             $availableFilters['state'] =
-                \OmegaUp\Translations::getInstance()->get(
+                \OmegaUp\Translations::getInstance($r->identity)->get(
                     'wordsFilterByState'
                 );
         }
@@ -3768,7 +3768,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         if (!is_null($schoolId)) {
             $availableFilters['school'] =
-                \OmegaUp\Translations::getInstance()->get(
+                \OmegaUp\Translations::getInstance($r->identity)->get(
                     'wordsFilterBySchool'
                 );
         }
@@ -4328,6 +4328,14 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $third_party_login
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
+        try {
+            $r->ensureIdentity();
+            // If the user has already logged in, redirect them to the home page.
+            header('Location: /');
+            throw new \OmegaUp\Exceptions\ExitException();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing.
+        }
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         if ($r->offsetExists('fb')) {
             $thirdPartyLogin = 'facebook';

@@ -93,6 +93,7 @@
   - [`/api/course/removeStudent/`](#apicourseremovestudent)
   - [`/api/course/requests/`](#apicourserequests)
   - [`/api/course/runs/`](#apicourseruns)
+  - [`/api/course/searchUsers/`](#apicoursesearchusers)
   - [`/api/course/studentProgress/`](#apicoursestudentprogress)
   - [`/api/course/studentsProgress/`](#apicoursestudentsprogress)
   - [`/api/course/update/`](#apicourseupdate)
@@ -181,6 +182,7 @@
   - [`/api/run/disqualify/`](#apirundisqualify)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
+  - [`/api/run/requalify/`](#apirunrequalify)
   - [`/api/run/source/`](#apirunsource)
   - [`/api/run/status/`](#apirunstatus)
 - [School](#school)
@@ -744,6 +746,7 @@ Creates a new contest
 | `points_decay_factor`       | `mixed`        |             |
 | `problems`                  | `null\|string` |             |
 | `requests_user_information` | `mixed`        |             |
+| `score_mode`                | `null\|string` |             |
 | `scoreboard`                | `mixed`        |             |
 | `show_scoreboard_after`     | `mixed`        |             |
 | `start_time`                | `mixed`        |             |
@@ -840,6 +843,7 @@ Returns a list of contests where current user is participating in
 | Name       | Type              |
 | ---------- | ----------------- |
 | `contests` | `types.Contest[]` |
+| `count`    | `number`          |
 
 ## `/api/contest/myList/`
 
@@ -861,6 +865,7 @@ Returns a list of contests where current user is the director
 | Name       | Type              |
 | ---------- | ----------------- |
 | `contests` | `types.Contest[]` |
+| `count`    | `number`          |
 
 ## `/api/contest/open/`
 
@@ -1120,16 +1125,16 @@ Returns all runs for a contest
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                            | Description |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `contest_alias` | `string`                                                                                                                                                        |             |
-| `problem_alias` | `string`                                                                                                                                                        |             |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cs'\|'hs'\|'java'\|'kj'\|'kp'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|null` |             |
-| `offset`        | `int\|null`                                                                                                                                                     |             |
-| `rowcount`      | `int\|null`                                                                                                                                                     |             |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                       |             |
-| `username`      | `null\|string`                                                                                                                                                  |             |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                          |             |
+| Name            | Type                                                                                                                                                                                                                | Description |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `contest_alias` | `string`                                                                                                                                                                                                            |             |
+| `problem_alias` | `string`                                                                                                                                                                                                            |             |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |
+| `offset`        | `int\|null`                                                                                                                                                                                                         |             |
+| `rowcount`      | `int\|null`                                                                                                                                                                                                         |             |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |
+| `username`      | `null\|string`                                                                                                                                                                                                      |             |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |
 
 ### Returns
 
@@ -1309,7 +1314,7 @@ Update a Contest
 | `requests_user_information`                  | `'no'\|'optional'\|'required'\|null` |             |
 | `scoreboard`                                 | `float\|null`                        |             |
 | `show_scoreboard_after`                      | `bool\|null`                         |             |
-| `start_time`                                 | `OmegaUp\Timestamp\|null`            |             |
+| `start_time`                                 | `\OmegaUp\Timestamp\|null`           |             |
 | `teams_group_alias`                          | `null\|string`                       |             |
 | `title`                                      | `null\|string`                       |             |
 
@@ -1329,11 +1334,11 @@ option is turned on
 
 ### Parameters
 
-| Name            | Type                | Description |
-| --------------- | ------------------- | ----------- |
-| `contest_alias` | `string`            |             |
-| `end_time`      | `OmegaUp\Timestamp` |             |
-| `username`      | `string`            |             |
+| Name            | Type                 | Description |
+| --------------- | -------------------- | ----------- |
+| `contest_alias` | `string`             |             |
+| `end_time`      | `\OmegaUp\Timestamp` |             |
+| `username`      | `string`             |             |
 
 ### Returns
 
@@ -1631,13 +1636,13 @@ Clone a course
 
 ### Parameters
 
-| Name           | Type                | Description |
-| -------------- | ------------------- | ----------- |
-| `alias`        | `string`            |             |
-| `course_alias` | `string`            |             |
-| `name`         | `string`            |             |
-| `start_time`   | `OmegaUp\Timestamp` |             |
-| `token`        | `null\|string`      |             |
+| Name           | Type                 | Description |
+| -------------- | -------------------- | ----------- |
+| `alias`        | `string`             |             |
+| `course_alias` | `string`             |             |
+| `name`         | `string`             |             |
+| `start_time`   | `\OmegaUp\Timestamp` |             |
+| `token`        | `null\|string`       |             |
 
 ### Returns
 
@@ -2011,23 +2016,44 @@ Returns all runs for a course
 
 ### Parameters
 
-| Name               | Type                                                                                                                                                            | Description |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `assignment_alias` | `string`                                                                                                                                                        |             |
-| `course_alias`     | `string`                                                                                                                                                        |             |
-| `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cs'\|'hs'\|'java'\|'kj'\|'kp'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|null` |             |
-| `offset`           | `int\|null`                                                                                                                                                     |             |
-| `problem_alias`    | `null\|string`                                                                                                                                                  |             |
-| `rowcount`         | `int\|null`                                                                                                                                                     |             |
-| `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                       |             |
-| `username`         | `null\|string`                                                                                                                                                  |             |
-| `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                          |             |
+| Name               | Type                                                                                                                                                                                                                | Description |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `assignment_alias` | `string`                                                                                                                                                                                                            |             |
+| `course_alias`     | `string`                                                                                                                                                                                                            |             |
+| `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |
+| `offset`           | `int\|null`                                                                                                                                                                                                         |             |
+| `problem_alias`    | `null\|string`                                                                                                                                                                                                      |             |
+| `rowcount`         | `int\|null`                                                                                                                                                                                                         |             |
+| `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |
+| `username`         | `null\|string`                                                                                                                                                                                                      |             |
+| `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |
 
 ### Returns
 
-| Name   | Type          |
-| ------ | ------------- |
-| `runs` | `types.Run[]` |
+| Name        | Type          |
+| ----------- | ------------- |
+| `runs`      | `types.Run[]` |
+| `totalRuns` | `number`      |
+
+## `/api/course/searchUsers/`
+
+### Description
+
+Search users in course assignment
+
+### Parameters
+
+| Name               | Type           | Description |
+| ------------------ | -------------- | ----------- |
+| `assignment_alias` | `string`       |             |
+| `course_alias`     | `string`       |             |
+| `query`            | `null\|string` |             |
+
+### Returns
+
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/course/studentProgress/`
 
@@ -2081,14 +2107,14 @@ Edit Course contents
 | `school_id`                 | `int`                                       |             |
 | `admission_mode`            | `'private'\|'public'\|'registration'\|null` |             |
 | `description`               | `null\|string`                              |             |
-| `finish_time`               | `OmegaUp\Timestamp\|null`                   |             |
+| `finish_time`               | `\OmegaUp\Timestamp\|null`                  |             |
 | `level`                     | `null\|string`                              |             |
 | `name`                      | `null\|string`                              |             |
 | `needs_basic_information`   | `bool\|null`                                |             |
 | `objective`                 | `null\|string`                              |             |
 | `requests_user_information` | `'no'\|'optional'\|'required'\|null`        |             |
 | `show_scoreboard`           | `bool\|null`                                |             |
-| `start_time`                | `OmegaUp\Timestamp\|null`                   |             |
+| `start_time`                | `\OmegaUp\Timestamp\|null`                  |             |
 | `unlimited_duration`        | `bool\|null`                                |             |
 
 ### Returns
@@ -2103,13 +2129,13 @@ Update an assignment
 
 ### Parameters
 
-| Name                 | Type                | Description |
-| -------------------- | ------------------- | ----------- |
-| `assignment`         | `string`            |             |
-| `course`             | `string`            |             |
-| `finish_time`        | `OmegaUp\Timestamp` |             |
-| `start_time`         | `OmegaUp\Timestamp` |             |
-| `unlimited_duration` | `bool\|null`        |             |
+| Name                 | Type                       | Description |
+| -------------------- | -------------------------- | ----------- |
+| `assignment`         | `string`                   |             |
+| `course`             | `string`                   |             |
+| `finish_time`        | `\OmegaUp\Timestamp\|null` |             |
+| `start_time`         | `\OmegaUp\Timestamp\|null` |             |
+| `unlimited_duration` | `bool\|null`               |             |
 
 ### Returns
 
@@ -2715,11 +2741,11 @@ Entry point for Problem clarifications API
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `problem_alias` | `string` |             |
-| `offset`        | `mixed`  |             |
-| `rowcount`      | `mixed`  |             |
+| Name            | Type        | Description |
+| --------------- | ----------- | ----------- |
+| `problem_alias` | `string`    |             |
+| `offset`        | `int\|null` |             |
+| `rowcount`      | `int\|null` |             |
 
 ### Returns
 
@@ -2967,9 +2993,10 @@ Entry point for Problem runs API
 
 ### Returns
 
-| Name   | Type          |
-| ------ | ------------- |
-| `runs` | `types.Run[]` |
+| Name        | Type          |
+| ----------- | ------------- |
+| `runs`      | `types.Run[]` |
+| `totalRuns` | `number`      |
 
 ## `/api/problem/runsDiff/`
 
@@ -3651,21 +3678,22 @@ Gets a list of latest runs overall
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                            | Description |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `offset`        | `int`                                                                                                                                                           |             |
-| `problem_alias` | `string`                                                                                                                                                        |             |
-| `rowcount`      | `int`                                                                                                                                                           |             |
-| `username`      | `string`                                                                                                                                                        |             |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cs'\|'hs'\|'java'\|'kj'\|'kp'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|null` |             |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                       |             |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                          |             |
+| Name            | Type                                                                                                                                                                                                                | Description |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `offset`        | `int`                                                                                                                                                                                                               |             |
+| `problem_alias` | `string`                                                                                                                                                                                                            |             |
+| `rowcount`      | `int`                                                                                                                                                                                                               |             |
+| `username`      | `string`                                                                                                                                                                                                            |             |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |
 
 ### Returns
 
-| Name   | Type          |
-| ------ | ------------- |
-| `runs` | `types.Run[]` |
+| Name        | Type          |
+| ----------- | ------------- |
+| `runs`      | `types.Run[]` |
+| `totalRuns` | `number`      |
 
 ## `/api/run/rejudge/`
 
@@ -3679,6 +3707,22 @@ Re-sends a problem to Grader.
 | ----------- | -------- | ----------- |
 | `run_alias` | `string` |             |
 | `debug`     | `mixed`  |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/run/requalify/`
+
+### Description
+
+Requalify a submission previously disqualified
+
+### Parameters
+
+| Name        | Type     | Description |
+| ----------- | -------- | ----------- |
+| `run_alias` | `string` |             |
 
 ### Returns
 

@@ -143,9 +143,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     pr.last_submission_time
                 FROM Courses c
                 INNER JOIN (
-                    SELECT g.group_id, gi.accept_teacher
+                    SELECT gi.group_id, gi.accept_teacher
                     FROM Groups_Identities gi
-                    INNER JOIN `Groups_` AS g ON g.group_id = gi.group_id
                     WHERE gi.identity_id = ?
                 ) gg
                 ON c.group_id = gg.group_id
@@ -284,13 +283,11 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             COUNT(*)
                         FROM
                             Groups_Identities gi
-                        INNER JOIN
-                            Identities i ON i.identity_id = gi.identity_id
                         WHERE
                             gi.group_id = c.group_id
                     ),
                     0
-                ) AS student_count,
+                ) AS studentCount,
                 IFNULL(
                     (
                         SELECT
@@ -302,8 +299,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             a.assignment_type = ?
                     ),
                     0
-                ) AS lesson_count,
-                0 AS already_started
+                ) AS lessonCount,
+                0 AS alreadyStarted
             FROM
                 Courses c
             LEFT JOIN
@@ -311,11 +308,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 c.admission_mode = ? AND
                 c.finish_time IS NULL AND
-                c.alias IS NOT NULL AND
-                c.name IS NOT NULL AND
                 c.archived = 0;';
 
-        /** @var list<array{alias: null|string, already_started: int, lesson_count: int, level: null|string, name: null|string, school_name: null|string, student_count: int}> */
+        /** @var list<array{alias: null|string, alreadyStarted: int, lessonCount: int, level: null|string, name: null|string, school_name: null|string, studentCount: int}> */
         $rs =  \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
@@ -329,12 +324,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             if (is_null($row['alias']) || is_null($row['name'])) {
                 continue;
             }
-            $row['lessonCount'] = $row['lesson_count'];
-            $row['studentCount'] = $row['student_count'];
-            $row['alreadyStarted'] = boolval($row['already_started']);
-            unset($row['lesson_count']);
-            unset($row['student_count']);
-            unset($row['already_started']);
+            $row['alreadyStarted'] = boolval($row['alreadyStarted']);
             $results[] = $row;
         }
         return $results;
@@ -353,16 +343,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     IFNULL(pr.progress, 0.0) AS progress
                 FROM
                     Courses c
-                INNER JOIN (
-                    SELECT
-                        g.group_id
-                    FROM
-                        Groups_Identities gi
-                    INNER JOIN
-                        `Groups_` AS g ON g.group_id = gi.group_id
-                    WHERE
-                        gi.identity_id = ?
-                ) gg ON gg.group_id = c.group_id
                 LEFT JOIN
                     Schools s ON c.school_id = s.school_id
                 LEFT JOIN (
@@ -372,42 +352,66 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                         cbpr.course_id,
                         LEAST(100, ROUND(SUM(cbpr.total_assignment_score) / SUM(cbpr.max_points) * 100, 2)) AS progress
                     FROM (
-                        -- aggregate all runs per assignment
+                        -- Aggregate all problem scores of an assignment.
                         SELECT
-                            bpr.alias,
-                            bpr.course_id,
-                            bpr.assignment_id,
-                            SUM(best_score_of_problem) AS total_assignment_score,
-                            bpr.max_points
-                        FROM (
-                            -- get all runs belonging to an identity and get the best score
-                            SELECT
-                                a.alias,
-                                a.course_id,
-                                a.assignment_id,
-                                psp.problem_id,
-                                s.identity_id,
-                                MAX(r.contest_score) AS best_score_of_problem,
-                                a.max_points
-                            FROM
-                                Assignments a
-                            INNER JOIN
-                                Problemset_Problems psp ON a.problemset_id = psp.problemset_id
-                            INNER JOIN
-                                Submissions s ON s.problem_id = psp.problem_id AND s.problemset_id = a.problemset_id
-                            INNER JOIN
-                                Runs r ON r.run_id = s.current_run_id
-                            WHERE
-                                s.identity_id = ?
-                            GROUP BY
-                                a.assignment_id, psp.problem_id, s.identity_id
-                        ) bpr
-                        GROUP BY bpr.assignment_id
+                            a.alias,
+                            a.course_id,
+                            a.assignment_id,
+                            IFNULL(
+                                -- Get the best score of each problem.
+                                (
+                                    SELECT
+                                        SUM(ps.contest_score)
+                                    FROM (
+                                        SELECT
+                                            psp.problem_id,
+                                            MAX(r.contest_score) AS contest_score
+                                        FROM
+                                            Problemset_Problems psp
+                                        INNER JOIN
+                                            Submissions s ON s.problem_id = psp.problem_id AND s.problemset_id = psp.problemset_id
+                                        INNER JOIN
+                                            Runs r ON r.run_id = s.current_run_id
+                                        WHERE
+                                            psp.problemset_id = a.problemset_id AND
+                                            s.identity_id = ?
+                                        GROUP BY
+                                            psp.problem_id
+                                    ) AS ps
+                                ),
+                                0.0
+                            ) AS total_assignment_score,
+                            a.max_points
+                        FROM
+                            Assignments a
+                        WHERE
+                            EXISTS (
+                                SELECT
+                                    *
+                                FROM
+                                    Problemset_Problems psp
+                                INNER JOIN
+                                    Submissions s ON s.problemset_id = psp.problemset_id AND s.problem_id = psp.problem_id
+                                WHERE
+                                    psp.problemset_id = a.problemset_id AND
+                                    s.identity_id = ?
+                            )
+                        GROUP BY
+                            a.assignment_id
                     ) cbpr
                     GROUP BY cbpr.course_id
                 ) pr ON c.course_id = pr.course_id
                 WHERE
-                    c.archived = 0
+                    c.archived = 0 AND
+                    EXISTS (
+                        SELECT
+                            *
+                        FROM
+                            Groups_Identities gi
+                        WHERE
+                            gi.group_id = c.group_id AND
+                            gi.identity_id = ?
+                    )
                 ORDER BY
                     c.name ASC, c.finish_time DESC;';
 
@@ -421,6 +425,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
                 [
+                    $identity->identity_id,
                     $identity->identity_id,
                     $identity->identity_id,
                 ]
@@ -617,9 +622,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             FROM
                 Assignments a
             INNER JOIN
-                Problemsets ps ON a.problemset_id = ps.problemset_id
-            INNER JOIN
-                Problemset_Problems psp ON psp.problemset_id = ps.problemset_id
+                Problemset_Problems psp ON psp.problemset_id = a.problemset_id
             INNER JOIN
                 Problems p ON p.problem_id = psp.problem_id
             WHERE
@@ -662,16 +665,12 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ];
         }
 
-        $offset = ($page - 1) * $rowsPerPage;
-
         // Gets the total count of students in the course.
         $sqlCount = '
             SELECT
                 COUNT(*)
             FROM
                 Groups_Identities AS gi
-            INNER JOIN
-                Identities i ON i.identity_id = gi.identity_id
             WHERE
                 gi.group_id = ?';
         /** @var int */
@@ -702,7 +701,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $sqlUsers,
             [
                 $groupId,
-                $offset,
+                max(0, $page - 1) * $rowsPerPage,
                 $rowsPerPage,
             ]
         );
@@ -748,9 +747,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             INNER JOIN
                 Runs r ON r.run_id = s.current_run_id
             INNER JOIN
-                Problemsets ps ON ps.problemset_id = s.problemset_id
-            INNER JOIN
-                Problemset_Problems psp ON psp.problemset_id = ps.problemset_id
+                Problemset_Problems psp ON psp.problemset_id = s.problemset_id
             INNER JOIN
                 Problems p ON p.problem_id = s.problem_id AND p.problem_id = psp.problem_id
             INNER JOIN
@@ -771,7 +768,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $sqlStudentsProgress,
             [
                 $groupId,
-                $offset,
+                max(0, $page - 1) * $rowsPerPage,
                 $rowsPerPage,
                 $courseId,
             ]
@@ -953,7 +950,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         int $page = 1,
         int $pageSize = 1000
     ): array {
-        $offset = ($page - 1) * $pageSize;
         $sql = '
             SELECT
                 c.*
@@ -989,7 +985,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $identityId,
             \OmegaUp\Authorization::ADMIN_ROLE,
             $identityId,
-            $offset,
+            max(0, $page - 1) * $pageSize,
             $pageSize,
         ];
         /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}> */
@@ -1088,7 +1084,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         int $page = 1,
         int $pageSize = 1000
     ): array {
-        $offset = ($page - 1) * $pageSize;
         $sql = '
             SELECT
                 c.*
@@ -1104,7 +1099,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ?, ?';
         $params = [
             $userId,
-            $offset,
+            max(0, $page - 1) * $pageSize,
             $pageSize,
         ];
 
@@ -1297,11 +1292,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 Assignments a ON a.course_id = c.course_id
             INNER JOIN
                 Submissions s ON s.problemset_id = a.problemset_id
-            INNER JOIN
-                Runs r ON r.run_id = s.current_run_id
             WHERE
                 c.alias = ?
-                AND r.verdict = "AC"
+                AND s.verdict = "AC"
                 AND s.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?);
 ';
         /** @var int */
@@ -1408,8 +1401,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         int $page,
         int $rowsPerPage
     ): array {
-        $offset = ($page - 1) * $rowsPerPage;
-
         $sql = '(
             SELECT
                 i.username,
@@ -1499,7 +1490,13 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         /** @var list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int|null, name: null|string, time: \OmegaUp\Timestamp, username: string}> */
         $activity = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql . $sqlLimit,
-            [$course->course_id, $course->course_id, $course->course_id, $offset, $rowsPerPage]
+            [
+                $course->course_id,
+                $course->course_id,
+                $course->course_id,
+                max(0, $page - 1) * $rowsPerPage,
+                $rowsPerPage,
+            ]
         );
 
         return [

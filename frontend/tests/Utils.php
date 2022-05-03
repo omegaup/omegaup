@@ -365,12 +365,22 @@ class Utils {
                 $runDate
             )
         ));
+        $host_arg = '';
+        $host_chunks = explode(':', OMEGAUP_DB_HOST, 2);
+        if (count($host_chunks) == 2) {
+            [$hostname, $port] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+            $host_arg .= ' --port ' . escapeshellarg($port);
+        } else {
+            [$hostname] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+        }
         self::shellExec(
             ('python3 ' .
              dirname(__DIR__, 2) . '/stuff/cron/update_ranks.py' .
              ' --verbose ' .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
-             ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+             $host_arg .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
             ' --password ' . escapeshellarg(OMEGAUP_DB_PASS) .
@@ -382,12 +392,22 @@ class Utils {
         // Ensure all suggestions are written to the database before invoking
         // the external script.
         self::commit();
+        $host_arg = '';
+        $host_chunks = explode(':', OMEGAUP_DB_HOST, 2);
+        if (count($host_chunks) == 2) {
+            [$hostname, $port] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+            $host_arg .= ' --port ' . escapeshellarg($port);
+        } else {
+            [$hostname] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+        }
         self::shellExec(
             ('python3 ' .
              dirname(__DIR__, 2) . '/stuff/cron/aggregate_feedback.py' .
              ' --verbose ' .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
-             ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+             $host_arg .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
              ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))
@@ -397,12 +417,22 @@ class Utils {
     public static function runAssignBadges(): void {
         // Ensure everything is commited before invoking external script
         self::commit();
+        $host_arg = '';
+        $host_chunks = explode(':', OMEGAUP_DB_HOST, 2);
+        if (count($host_chunks) == 2) {
+            [$hostname, $port] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+            $host_arg .= ' --port ' . escapeshellarg($port);
+        } else {
+            [$hostname] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+        }
         self::shellExec(
             ('python3 ' .
              dirname(__DIR__, 2) . '/stuff/cron/assign_badges.py' .
              ' --verbose ' .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
-             ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+             $host_arg .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
              ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))

@@ -230,10 +230,11 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import contest_FilteredList from '../contest/FilteredList.vue';
 import { types } from '../../api_types';
+import * as UI from '../../ui';
 
 export enum ContestsTab {
   Participating = 'participating',
@@ -251,7 +252,7 @@ export enum ContestsTab {
   },
 })
 export default class ArenaContestList extends Vue {
-  @Prop() initialQuery!: string;
+  @Prop({ default: null }) initialQuery!: null | string;
   @Prop() contests!: types.TimeTypeContests;
   @Prop() isLogged!: boolean;
   @Prop({ default: null }) selectedTab!: ContestsTab | null;
@@ -280,6 +281,11 @@ export default class ArenaContestList extends Vue {
       default:
         return T.arenaMyActiveContests;
     }
+  }
+
+  @Watch('showTab')
+  onTabChanged(newTab: string) {
+    UI.reportPageView(location.pathname + '#' + newTab);
   }
 }
 </script>

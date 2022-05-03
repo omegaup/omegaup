@@ -258,19 +258,16 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     Problems p
                 LEFT JOIN (
                     SELECT
-                        Problems.problem_id,
+                        Submissions.problem_id,
                         MAX(Runs.score) AS score
                     FROM
-                        Problems
-                    INNER JOIN
-                        Submissions ON Submissions.problem_id = Problems.problem_id
+                        Submissions
                     INNER JOIN
                         Runs ON Runs.run_id = Submissions.current_run_id
-                    INNER JOIN
-                        Identities ON Identities.identity_id = ? AND
-                        Submissions.identity_id = Identities.identity_id
+                    WHERE
+                        Submissions.identity_id = ?
                     GROUP BY
-                        Problems.problem_id
+                        Submissions.problem_id
                     ) ps ON ps.problem_id = p.problem_id ' . $languageJoin . $levelJoin;
 
             $clauses[] = [
@@ -294,19 +291,17 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     a.acl_id = p.acl_id
                 LEFT JOIN (
                     SELECT
-                        pi.problem_id,
+                        s.problem_id,
                         s.identity_id,
                         MAX(r.score) AS score
                     FROM
-                        Problems pi
-                    INNER JOIN
-                        Submissions s ON s.problem_id = pi.problem_id
+                        Submissions s
                     INNER JOIN
                         Runs r ON r.run_id = s.current_run_id
-                    INNER JOIN
-                        Identities i ON i.identity_id = ? AND s.identity_id = i.identity_id
+                    WHERE
+                        s.identity_id = ?
                     GROUP BY
-                        pi.problem_id, s.identity_id
+                        s.problem_id, s.identity_id
                 ) ps ON ps.problem_id = p.problem_id
                 LEFT JOIN
                     User_Roles ur ON ur.user_id = ? AND p.acl_id = ur.acl_id AND ur.role_id = ?
@@ -522,11 +517,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 Problems p
             INNER JOIN
                 Problemset_Problems pp ON pp.problem_id = p.problem_id
-            INNER JOIN
-                Problemsets ps ON ps.problemset_id = pp.problemset_id
             WHERE
                 p.alias = ?
-                AND ps.problemset_id = ?
+                AND pp.problemset_id = ?
             ';
         $params = [
             $alias,
@@ -598,10 +591,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             Problems p
         INNER JOIN
             Submissions s ON s.problem_id = p.problem_id
-        INNER JOIN
-            Runs r ON r.run_id = s.current_run_id
         WHERE
-            r.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
+            s.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
         ORDER BY
             p.problem_id DESC;';
 
@@ -623,11 +614,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             INNER JOIN
                 Submissions s ON s.problem_id = p.problem_id
             INNER JOIN
-                Runs r ON r.run_id = s.current_run_id
-            INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
             WHERE
-                r.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
+                s.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
                 AND NOT EXISTS (
                     SELECT
                         `pf`.`problem_id`, `pf`.`user_id`
@@ -678,17 +667,13 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $sql = "
             SELECT
                 p.*,
-                SUM(r.verdict = 'AC') AS solved_count
+                SUM(s.verdict = 'AC') AS solved_count
             FROM
-                Identities i
-            INNER JOIN
-                Submissions s ON s.identity_id = i.identity_id
-            INNER JOIN
-                Runs r ON r.run_id = s.current_run_id
+                Submissions s
             INNER JOIN
                 Problems p ON p.problem_id = s.problem_id
             WHERE
-                i.identity_id = ?
+                s.identity_id = ?
             GROUP BY
                 p.problem_id
             HAVING
@@ -756,64 +741,42 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     public static function getProblemsByUsersInACourse(string $courseAlias) {
         $sql  = '
            SELECT
-                rp.alias,
-                rp.title,
-                IFNULL(rp.solved, FALSE) AS solved,
-                i.username
+                ANY_VALUE(p.alias) AS alias,
+                ANY_VALUE(p.title) AS title,
+                IFNULL(SUM(s.verdict = "AC"), 0) > 0 AS solved,
+                ANY_VALUE(i.username) AS username
             FROM
                 Identities i
             INNER JOIN
-                Groups_Identities gi
-            ON
-                gi.identity_id = i.identity_id
+                Groups_Identities gi ON gi.identity_id = i.identity_id
             INNER JOIN
-                Courses c
-            ON
-                c.group_id = gi.group_id
+                Courses c ON c.group_id = gi.group_id
             INNER JOIN
-                (
-                SELECT
-                    p.problem_id,
-                    p.alias,
-                    p.title,
-                    s.identity_id,
-                    MAX(r.score) = 1 AS solved
-                FROM
-                    Submissions s
-                INNER JOIN
-                    Runs r
-                ON
-                    r.run_id = s.current_run_id
-                INNER JOIN
-                    Problems p
-                ON
-                    p.problem_id = s.problem_id
-                WHERE
-                    p.visibility = ?
-                GROUP BY
-                    p.problem_id, s.identity_id
-                ) rp
-            ON
-                rp.identity_id = i.identity_id
+                Submissions s ON s.identity_id = i.identity_id
+            INNER JOIN
+                Problems p ON p.problem_id = s.problem_id
             WHERE
                 c.alias = ?
                 AND gi.accept_teacher = true
+                AND p.visibility = ?
+            GROUP BY
+                i.user_id,
+                p.problem_id
             ORDER BY
-                i.username ASC,
-                rp.problem_id DESC;';
+                username ASC,
+                p.problem_id DESC;';
 
         $problemsUsers = [];
         /** @var array{alias: string, solved: int, title: string, username: string} $problemsUser */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
-                [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $courseAlias]
+                [$courseAlias, \OmegaUp\ProblemParams::VISIBILITY_PUBLIC]
             ) as $problemsUser
         ) {
             $problemsUser['solved'] = boolval($problemsUser['solved']);
             $problemsUsers[] = $problemsUser;
         }
-
         return $problemsUsers;
     }
 
@@ -823,16 +786,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     ): bool {
         $sql = '
             SELECT
-                COUNT(r.run_id)
+                COUNT(*)
             FROM
                 Submissions s
-            INNER JOIN
-                Runs r
-            ON
-                r.run_id = s.current_run_id
             WHERE
                 s.problem_id = ? AND s.identity_id = ? AND
-                r.verdict NOT IN ("AC", "CE", "JE");
+                s.verdict NOT IN ("AC", "CE", "JE");
         ';
         return (
             /** @var int */
@@ -849,15 +808,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     ): bool {
         $sql = '
             SELECT
-                COUNT(r.run_id)
+                COUNT(*)
             FROM
                 Submissions s
-            INNER JOIN
-                Runs r
-            ON
-                r.run_id = s.current_run_id
             WHERE
-                s.problem_id = ? AND s.identity_id = ? AND r.verdict = "AC";
+                s.problem_id = ? AND s.identity_id = ? AND s.verdict = "AC";
         ';
 
         return (
@@ -987,7 +942,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $pageSize,
         string $query = ''
     ) {
-        $offset = ($page - 1) * $pageSize;
         $params = [];
 
         $sqlCount = '
@@ -1026,7 +980,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             LIMIT
                 ?, ?
         ';
-        $params[] = $offset;
+        $params[] = max(0, $page - 1) * $pageSize;
         $params[] = $pageSize;
 
         $problems = [];
@@ -1059,7 +1013,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $pageSize,
         string $query = ''
     ): array {
-        $offset = ($page - 1) * $pageSize;
         $select = '
             SELECT
                 p.*';
@@ -1116,7 +1069,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $params
         );
 
-        $params[] = $offset;
+        $params[] = max(0, $page - 1) * $pageSize;
         $params[] = $pageSize;
 
         /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
@@ -1147,7 +1100,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $pageSize,
         string $query = ''
     ) {
-        $offset = ($page - 1) * $pageSize;
         $select = '
             SELECT
                 p.*';
@@ -1186,7 +1138,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $params
         );
 
-        $params[] = $offset;
+        $params[] = max(0, $page - 1) * $pageSize;
         $params[] = $pageSize;
 
         /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */

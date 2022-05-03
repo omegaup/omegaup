@@ -367,6 +367,7 @@ OmegaUp.on('ready', () => {
               default_show_all_contestants_in_scoreboard: defaultShowAllContestantsInScoreboard,
             })
               .then(() => {
+                contestEdit.details.admission_mode = admissionMode;
                 ui.success(`
                   ${T.contestEditContestEdited} <a href="/arena/${payload.details.alias}/">${T.contestEditGoToContest}</a>
                 `);

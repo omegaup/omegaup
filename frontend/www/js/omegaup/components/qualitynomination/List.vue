@@ -84,8 +84,8 @@
                 @apply-filter="onApplyFilter"
               ></omegaup-common-sort-controls>
             </th>
-            <th v-if="!myView">{{ T.wordsNominator }}</th>
-            <th>{{ T.qualityNominationReportedBy }}</th>
+            <th v-if="!myView">{{ T.qualityNominationNominatedBy }}</th>
+            <th>{{ T.qualityNominationCreatedBy }}</th>
             <th>
               {{ T.wordsSubmissionDate }}
               <omegaup-common-sort-controls
@@ -186,8 +186,8 @@ export default class QualityNominationList extends Vue {
   selectColumn = '';
   columns = {
     problem_alias: T.wordsProblem,
-    nominator_username: T.wordsNominator,
-    author_username: T.qualityNominationReportedBy,
+    nominator_username: T.qualityNominationNominatedBy,
+    author_username: T.qualityNominationCreatedBy,
   };
 
   get orderedNominations(): types.NominationListItem[] {

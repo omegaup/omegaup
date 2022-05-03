@@ -17,6 +17,7 @@ describe('Course.vue', () => {
     start_time: new Date(),
     problems: [],
     runs: [],
+    totalRuns: 0,
   };
 
   const course: types.CourseDetails = {
@@ -190,7 +191,7 @@ describe('Course.vue', () => {
     text: 'Problem Test',
   };
 
-  const run: types.Run = {
+  const run: types.RunWithDetails = {
     alias: 'test',
     classname: 'user-rank-unranked',
     contest_score: 100,

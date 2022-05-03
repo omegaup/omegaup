@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 '''Builds the user recommendation model.
 
 This script reads user submissions and builds a recommendation model for
@@ -76,7 +76,7 @@ def load_mysql(args: argparse.Namespace) -> pd.DataFrame:
     Ignoring problem sets helps remove bias in recommendations
     introduced by problem ordering in contests and tests.
     '''
-    dbconn = lib.db.connect(args)
+    dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
     try:
         logging.info('Reading runs from MySQL')
         runs: pd.DataFrame = pd.read_sql_query(

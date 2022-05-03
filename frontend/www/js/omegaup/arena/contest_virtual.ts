@@ -119,6 +119,13 @@ OmegaUp.on('ready', async () => {
     }, refreshTime);
   }
 
+  let nextSubmissionTimestamp: null | Date = null;
+  if (problemDetails?.nextSubmissionTimestamp != null) {
+    nextSubmissionTimestamp = time.remoteTime(
+      problemDetails?.nextSubmissionTimestamp.getTime(),
+    );
+  }
+
   const contestContestant = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest': arena_Contest },
@@ -132,7 +139,7 @@ OmegaUp.on('ready', async () => {
       problemAlias,
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
-      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      nextSubmissionTimestamp,
       runDetailsData: runDetails,
     }),
     render: function (createElement) {
@@ -179,7 +186,9 @@ OmegaUp.on('ready', async () => {
             api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
                 this.runDetailsData = showSubmission({ request, runDetails });
-                window.location.hash = request.hash;
+                if (request.hash) {
+                  window.location.hash = request.hash;
+                }
               })
               .catch((run) => {
                 submitRunFailed({

@@ -3,9 +3,11 @@
     <div class="page-header">
       <h1>
         {{ T.wordsEditCourse }}
-        <span :class="{ 'text-secondary': data.course.archived }">{{
-          data.course.name
-        }}</span>
+        <span
+          data-course-name
+          :class="{ 'text-secondary': data.course.archived }"
+          >{{ data.course.name }}</span
+        >
         <small>
           &ndash;
           <a :href="courseURL">
@@ -129,6 +131,11 @@
           :tagged-problems="data.taggedProblems"
           :invalid-parameter-name="invalidParameterName"
           :assignment-form-mode.sync="assignmentFormMode"
+          :course-alias="data.course.alias"
+          :search-result-problems="searchResultProblems"
+          @update-search-result-problems="
+            (query) => $emit('update-search-result-problems', query)
+          "
           @add-problem="
             (assignment, problem) => $emit('add-problem', assignment, problem)
           "
@@ -148,10 +155,8 @@
               $emit('sort-problems', assignmentAlias, problemsAlias)
           "
           @cancel="onResetAssignmentForm"
-          @submit="
-            (assignmentFormComponent, problems) =>
-              $emit('submit-new-assignment', assignmentFormComponent, problems)
-          "
+          @add-assignment="(params) => $emit('add-assignment', params)"
+          @update-assignment="(params) => $emit('update-assignment', params)"
           @get-versions="(request) => $emit('get-versions', request)"
         >
           <template #page-header><span></span></template>
@@ -349,6 +354,7 @@ export default class CourseEdit extends Vue {
   @Prop() invalidParameterName!: string;
   @Prop() initialTab!: string;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
   showTab = this.initialTab;

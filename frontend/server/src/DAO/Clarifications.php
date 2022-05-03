@@ -9,7 +9,7 @@ namespace OmegaUp\DAO;
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Clarifications}.
  *
- * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
+ * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  */
 class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
     /**
@@ -23,29 +23,48 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         ?int $offset,
         int $rowcount
     ): array {
-        $sqlFrom = '
+        if (!is_null($contest)) {
+            $sqlProblemsets = '
+            SELECT
+                problemset_id,
+                "" AS assignment_alias
             FROM
-                Clarifications cl
+                Problemsets
+            WHERE
+                contest_id = ?
+            ';
+            $params = [$contest->contest_id];
+        } elseif (!is_null($course)) {
+            $sqlProblemsets = '
+            SELECT
+                problemset_id,
+                alias AS assignment_alias
+            FROM
+                Assignments
+            WHERE
+                course_id = ?
+            ';
+            $params = [$course->course_id];
+        } else {
+            // This shouldn't happen!
+            return [
+                'totalRows' => 0,
+                'clarifications' => [],
+            ];
+        }
+
+        $sqlFrom = "
+            FROM
+                ($sqlProblemsets) ps
+            INNER JOIN
+                Clarifications cl ON cl.problemset_id = ps.problemset_id
             INNER JOIN
                 Identities i ON i.identity_id = cl.author_id
             LEFT JOIN
                 Identities r ON r.identity_id = cl.receiver_id
             INNER JOIN
                 Problems p ON p.problem_id = cl.problem_id
-            INNER JOIN
-                Problemsets ps ON ps.problemset_id = cl.problemset_id
-            LEFT JOIN
-                Assignments a ON a.problemset_id = cl.problemset_id
-            WHERE
-                (
-                    ps.contest_id = ? OR
-                    a.course_id = ?
-                )';
-
-        $params = [
-            is_null($contest) ? null : $contest->contest_id,
-            is_null($course) ? null : $course->course_id,
-        ];
+            ";
 
         if (!$isAdmin) {
             $sqlFrom .= '
@@ -72,7 +91,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $sql = '
             SELECT
                 cl.clarification_id,
-                a.alias AS assignment_alias,
+                ps.assignment_alias AS assignment_alias,
                 p.alias AS problem_alias,
                 i.username AS author,
                 r.username AS receiver,
@@ -88,13 +107,13 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $sqlLimit = '';
         if (!is_null($offset)) {
             $sqlLimit = 'LIMIT ?, ?';
-            $params[] = ($offset - 1) * $rowcount;
+            $params[] = max(0, $offset - 1) * $rowcount;
             $params[] = $rowcount;
         }
 
         $query .= $sqlOrderBy . $sqlLimit;
 
-        /** @var list<array{answer: null|string, assignment_alias: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
+        /** @var list<array{answer: null|string, assignment_alias: string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
         $clarifications = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $query,
             $params
@@ -184,7 +203,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
 
         if (!is_null($offset)) {
             $sql .= 'LIMIT ?, ?';
-            $params[] = $offset;
+            $params[] = max(0, $offset);
             $params[] = $rowcount;
         }
 
@@ -258,8 +277,8 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $sql .= 'ORDER BY c.answer IS NULL DESC, c.clarification_id DESC ';
         if (!is_null($offset)) {
             $sql .= 'LIMIT ?, ?';
-            $val[] = intval($offset);
-            $val[] = intval($rowcount);
+            $val[] = max(0, $offset);
+            $val[] = $rowcount;
         }
 
         $result = [];
@@ -271,7 +290,6 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             ) as $row
         ) {
             if (!$admin) {
-                $row['author'] = null;
                 $row['receiver'] = null;
             }
             $result[] = $row;

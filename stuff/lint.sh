@@ -3,6 +3,7 @@
 set -e
 
 OMEGAUP_ROOT="$(git rev-parse --show-toplevel)"
+CONTAINER_VERSION=omegaup/hook_tools:20220404
 
 if [[ $# != 0 ]]; then
 	# The caller has given us the explicit arguments.
@@ -26,7 +27,7 @@ else
 	TTY_ARGS=""
 fi
 
-if [[ -d /proc ]] && grep -q pids:/docker /proc/1/cgroup; then
+if [[ "${OMEGAUP_ROOT}" == "/opt/omegaup" ]]; then
 	echo "Running ./stuff/lint.sh inside a container is not supported." 1>&2
 	echo "Please run this command outside the container" 1>&2
 	exit 1
@@ -46,8 +47,11 @@ fi
 	--env "GIT_COMMITTER_EMAIL=$(git config user.email)" \
 	--volume "${OMEGAUP_ROOT}:/src" \
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
+	--volume "${OMEGAUP_ROOT}:/opt/omegaup" \
 	--env 'PYTHONIOENCODING=utf-8' \
 	--env "MYPYPATH=${OMEGAUP_ROOT}/stuff" \
-	omegaup/hook_tools:20211217 --command-name="./stuff/lint.sh" $ARGS
+	--env "VIRTUAL_ENV=${OMEGAUP_ROOT}/stuff/venv" \
+	--entrypoint='' \
+	"${CONTAINER_VERSION}" bash -c "PATH=\"${OMEGAUP_ROOT}/stuff/venv/bin:\$PATH\" exec python3 /hook_tools/lint.py --command-name=\"./stuff/lint.sh\" ${ARGS}"
 
 echo OK

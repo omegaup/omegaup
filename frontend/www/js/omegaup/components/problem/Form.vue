@@ -153,36 +153,6 @@
             <div class="card-header">
               <h2 class="mb-0">
                 <button
-                  ref="limits"
-                  class="btn btn-link btn-block text-left collapsed"
-                  type="button"
-                  data-toggle="collapse"
-                  data-target=".limits"
-                  aria-expanded="true"
-                  aria-controls="problem-form-problem"
-                >
-                  {{ T.problemEditLimits }}
-                </button>
-              </h2>
-            </div>
-            <div class="collapse card-body limits">
-              <omegaup-problem-settings
-                :errors="errors"
-                :time-limit="timeLimit"
-                :extra-wall-time="extraWallTime"
-                :memory-limit="memoryLimit"
-                :output-limit="outputLimit"
-                :input-limit="inputLimit"
-                :initial-validator="validator"
-                :overall-wall-time-limit="overallWallTimeLimit"
-                :validator-time-limit="validatorTimeLimit"
-              ></omegaup-problem-settings>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-header">
-              <h2 class="mb-0">
-                <button
                   class="btn btn-link btn-block text-left collapsed"
                   type="button"
                   data-toggle="collapse"
@@ -194,7 +164,7 @@
                 </button>
               </h2>
             </div>
-            <div class="collapse card-body validation">
+            <div class="card-body validation">
               <div class="row">
                 <div class="form-group col-md-6">
                   <label>{{ T.problemEditFormLanguages }}</label>
@@ -234,6 +204,37 @@
                   </select>
                 </div>
               </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h2 class="mb-0">
+                <button
+                  ref="limits"
+                  class="btn btn-link btn-block text-left collapsed"
+                  type="button"
+                  data-toggle="collapse"
+                  data-target=".limits"
+                  aria-expanded="true"
+                  aria-controls="problem-form-problem"
+                >
+                  {{ T.problemEditLimits }}
+                </button>
+              </h2>
+            </div>
+            <div class="collapse card-body limits">
+              <omegaup-problem-settings
+                :errors="errors"
+                :current-languages="currentLanguages"
+                :time-limit="timeLimit"
+                :extra-wall-time="extraWallTime"
+                :memory-limit="memoryLimit"
+                :output-limit="outputLimit"
+                :input-limit="inputLimit"
+                :initial-validator="validator"
+                :overall-wall-time-limit="overallWallTimeLimit"
+                :validator-time-limit="validatorTimeLimit"
+              ></omegaup-problem-settings>
             </div>
           </div>
           <div class="card">
@@ -426,6 +427,7 @@
           :value="visibility"
         />
         <input name="request" value="submit" type="hidden" />
+        <input name="update_published" value="non-problemset" type="hidden" />
         <div class="row">
           <div class="form-group col-md-6 no-bottom-margin">
             <button

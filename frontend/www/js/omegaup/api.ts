@@ -956,6 +956,10 @@ export const Course = {
     })(x.runs);
     return x;
   }),
+  searchUsers: apiCall<
+    messages.CourseSearchUsersRequest,
+    messages.CourseSearchUsersResponse
+  >('/api/course/searchUsers/'),
   studentProgress: apiCall<
     messages.CourseStudentProgressRequest,
     messages._CourseStudentProgressServerResponse,
@@ -1219,6 +1223,15 @@ export const Problem = {
           return x;
         }
         return x.map((x) => {
+          if (typeof x.details !== 'undefined' && x.details !== null)
+            x.details = ((x) => {
+              if (typeof x.feedback !== 'undefined' && x.feedback !== null)
+                x.feedback = ((x) => {
+                  x.date = ((x: number) => new Date(x * 1000))(x.date);
+                  return x;
+                })(x.feedback);
+              return x;
+            })(x.details);
           x.time = ((x: number) => new Date(x * 1000))(x.time);
           return x;
         });
@@ -1582,6 +1595,10 @@ export const Run = {
   rejudge: apiCall<messages.RunRejudgeRequest, messages.RunRejudgeResponse>(
     '/api/run/rejudge/',
   ),
+  requalify: apiCall<
+    messages.RunRequalifyRequest,
+    messages.RunRequalifyResponse
+  >('/api/run/requalify/'),
   source: apiCall<messages.RunSourceRequest, messages.RunSourceResponse>(
     '/api/run/source/',
   ),

@@ -51,6 +51,13 @@ OmegaUp.on('ready', async () => {
 
   trackClarifications(payload.clarifications ?? []);
 
+  let nextSubmissionTimestamp: null | Date = null;
+  if (payload.problem.nextSubmissionTimestamp != null) {
+    nextSubmissionTimestamp = time.remoteTime(
+      payload.problem.nextSubmissionTimestamp.getTime(),
+    );
+  }
+
   const problemDetailsView = new Vue({
     el: '#main-container',
     components: {
@@ -70,7 +77,7 @@ OmegaUp.on('ready', async () => {
         (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
       guid,
-      nextSubmissionTimestamp: payload.problem.nextSubmissionTimestamp,
+      nextSubmissionTimestamp,
       searchResultUsers: [] as types.ListItem[],
     }),
     render: function (createElement) {
@@ -105,13 +112,16 @@ OmegaUp.on('ready', async () => {
           shouldShowTabs: true,
           searchResultUsers: this.searchResultUsers,
           problemAlias: payload.problem.alias,
+          totalRuns: runsStore.state.totalRuns,
         },
         on: {
           'show-run': (request: SubmissionRequest) => {
             api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
                 this.runDetailsData = showSubmission({ request, runDetails });
-                window.location.hash = request.hash;
+                if (request.hash) {
+                  window.location.hash = request.hash;
+                }
               })
               .catch((run) => {
                 submitRunFailed({
@@ -152,6 +162,7 @@ OmegaUp.on('ready', async () => {
               language: language,
               source: code,
             })
+              .then(time.remoteTimeAdapter)
               .then((response) => {
                 problemDetailsView.nextSubmissionTimestamp =
                   response.nextSubmissionTimestamp;
@@ -345,6 +356,14 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.ignoreError);
           },
+          requalify: (run: types.Run) => {
+            api.Run.requalify({ run_alias: run.guid })
+              .then(() => {
+                run.type = 'normal';
+                updateRunFallback({ run });
+              })
+              .catch(ui.ignoreError);
+          },
           disqualify: (run: types.Run) => {
             if (!window.confirm(T.runDisqualifyConfirm)) {
               return;
@@ -382,6 +401,7 @@ OmegaUp.on('ready', async () => {
       switch (e.data.method) {
         case 'submitRun':
           api.Run.create(e.data.params)
+            .then(time.remoteTimeAdapter)
             .then((response) => {
               problemDetailsView.nextSubmissionTimestamp =
                 response.nextSubmissionTimestamp;
@@ -436,7 +456,7 @@ OmegaUp.on('ready', async () => {
       .then(time.remoteTimeAdapter)
       .then((response) => {
         if (!problemDetailsView.nominationStatus) return;
-        onRefreshRuns({ runs: response.runs });
+        onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
         setNominationStatus({
           runs: response.runs,
           nominationStatus: problemDetailsView.nominationStatus,
@@ -446,6 +466,7 @@ OmegaUp.on('ready', async () => {
   }
 
   if (runs) {
+    runsStore.commit('setTotalRuns', payload.totalRuns);
     for (const run of runs) {
       trackRun({ run });
     }

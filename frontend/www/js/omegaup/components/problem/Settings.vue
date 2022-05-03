@@ -120,6 +120,8 @@ export default class Settings extends Vue {
   @Prop() overallWallTimeLimit!: number;
   @Prop() validatorTimeLimit!: number;
   @Prop() errors!: Array<string>;
+  @Prop() currentLanguages!: string;
+  @Prop() validator!: string;
 
   T = T;
 }

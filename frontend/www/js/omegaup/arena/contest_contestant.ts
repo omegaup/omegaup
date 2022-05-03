@@ -103,6 +103,13 @@ OmegaUp.on('ready', async () => {
     }
   }
 
+  let nextSubmissionTimestamp: null | Date = null;
+  if (problemDetails?.nextSubmissionTimestamp != null) {
+    nextSubmissionTimestamp = time.remoteTime(
+      problemDetails?.nextSubmissionTimestamp.getTime(),
+    );
+  }
+
   const contestContestant = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest': arena_Contest },
@@ -117,7 +124,7 @@ OmegaUp.on('ready', async () => {
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
       searchResultUsers: [] as types.ListItem[],
-      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      nextSubmissionTimestamp,
       runDetailsData: runDetails,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
@@ -153,6 +160,7 @@ OmegaUp.on('ready', async () => {
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
+          submissionDeadline: payload.submissionDeadline,
         },
         on: {
           'navigate-to-problem': ({
@@ -192,7 +200,9 @@ OmegaUp.on('ready', async () => {
             api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
                 this.runDetailsData = showSubmission({ request, runDetails });
-                window.location.hash = request.hash;
+                if (request.hash) {
+                  window.location.hash = request.hash;
+                }
               })
               .catch((run) => {
                 submitRunFailed({
@@ -298,6 +308,14 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.ignoreError);
           },
+          requalify: (run: types.Run) => {
+            api.Run.requalify({ run_alias: run.guid })
+              .then(() => {
+                run.type = 'normal';
+                updateRunFallback({ run });
+              })
+              .catch(ui.ignoreError);
+          },
           disqualify: (run: types.Run) => {
             if (!window.confirm(T.runDisqualifyConfirm)) {
               return;
@@ -388,7 +406,7 @@ OmegaUp.on('ready', async () => {
     })
       .then(time.remoteTimeAdapter)
       .then((response) => {
-        onRefreshRuns({ runs: response.runs });
+        onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
       })
       .catch(ui.apiError);
   }

@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Unittest for disqualifying run
  */
@@ -19,7 +17,7 @@ class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a new run
         $runData = \OmegaUp\Test\Factories\Run::createRun(
@@ -56,8 +54,8 @@ class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our contestants
-        ['user' => $contestant1, 'identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
-        ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create new runs
         $runData1 = \OmegaUp\Test\Factories\Run::createRun(

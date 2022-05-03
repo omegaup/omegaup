@@ -15,6 +15,10 @@ describe('time', () => {
         expectedValue,
       );
     });
+
+    it('Should be able to get current date', () => {
+      expect(time.parseDateLocal('')).toEqual(expect.any(Date));
+    });
   });
 
   describe('formatDateTimeLocal', () => {
@@ -30,6 +34,10 @@ describe('time', () => {
       expect(
         time.formatDateTimeLocal(time.parseDateTimeLocal(expectedValue)),
       ).toEqual(expectedValue);
+    });
+
+    it('Should be able to get current datetime', () => {
+      expect(time.parseDateTimeLocal('')).toEqual(expect.any(Date));
     });
   });
 
@@ -61,6 +69,20 @@ describe('time', () => {
   });
 
   describe('formatDelta', () => {
+    // Setting an specific datetime to avoid flakiness in a leap-year
+    const now = new Date(0).getDate();
+    let dateNowSpy: jest.SpyInstance<number, []> | null = null;
+
+    beforeEach(() => {
+      dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
+    });
+
+    afterEach(() => {
+      if (dateNowSpy) {
+        dateNowSpy.mockRestore();
+      }
+    });
+
     it('Should handle valid dates with countdown time format', () => {
       expect(time.formatDelta(-2500000000)).toEqual('−28:22:26:40');
       expect(time.formatDelta(-1000000000)).toEqual('−11:13:46:40');
@@ -195,7 +217,7 @@ describe('time', () => {
       const hoursSeconds = 60 * 60 * 1000;
       const minutesSeconds = 60 * 1000;
       const seconds = 1000;
-      const today = new Date();
+      const today = new Date('2021-01-01 00:00:00+00:00');
       const tomorrow = new Date(today.getTime() + daySeconds);
       const millMapping = [
         [

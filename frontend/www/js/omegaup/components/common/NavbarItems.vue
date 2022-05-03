@@ -1,6 +1,9 @@
 <template>
   <div class="mr-auto">
-    <ul v-if="!omegaUpLockDown && (!inContest || isAdmin)" class="navbar-nav">
+    <ul
+      v-if="!omegaUpLockDown && (!inContest || isAdmin)"
+      class="navbar-nav align-items-end"
+    >
       <li
         v-if="isLoggedIn"
         class="nav-item dropdown nav-contests"
@@ -169,14 +172,25 @@
           <a
             class="dropdown-item"
             href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
+            target="_blank"
             >{{ T.navTutorials }}</a
           >
-          <a class="dropdown-item" href="http://blog.omegaup.com/">{{
-            T.navBlog
-          }}</a>
+          <a
+            class="dropdown-item"
+            href="https://discord.com/invite/K3JFd9d3wk"
+            target="_blank"
+            >{{ T.navDiscord }}</a
+          >
+          <a
+            class="dropdown-item"
+            href="http://blog.omegaup.com/"
+            target="_blank"
+            >{{ T.navBlog }}</a
+          >
           <a
             class="dropdown-item text-wrap"
-            href="https://omegaup.com/img/libropre3.pdf"
+            href="https://omegaup.com/docs/assets/libroluisvargas.pdf"
+            target="_blank"
             >{{ T.navAlgorithmsBook }}</a
           >
         </div>

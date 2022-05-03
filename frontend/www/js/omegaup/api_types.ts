@@ -25,6 +25,7 @@ export namespace dao {
     problemset_id?: number;
     recommended?: boolean;
     rerun_id?: number;
+    score_mode?: string;
     scoreboard?: number;
     show_scoreboard_after?: boolean;
     start_time?: Date;
@@ -166,6 +167,18 @@ export namespace types {
                   return x;
                 }
                 return x.map((x) => {
+                  if (typeof x.details !== 'undefined' && x.details !== null)
+                    x.details = ((x) => {
+                      if (
+                        typeof x.feedback !== 'undefined' &&
+                        x.feedback !== null
+                      )
+                        x.feedback = ((x) => {
+                          x.date = ((x: number) => new Date(x * 1000))(x.date);
+                          return x;
+                        })(x.feedback);
+                      return x;
+                    })(x.details);
                   x.time = ((x: number) => new Date(x * 1000))(x.time);
                   return x;
                 });
@@ -839,6 +852,23 @@ export namespace types {
                         return x;
                       }
                       return x.map((x) => {
+                        if (
+                          typeof x.details !== 'undefined' &&
+                          x.details !== null
+                        )
+                          x.details = ((x) => {
+                            if (
+                              typeof x.feedback !== 'undefined' &&
+                              x.feedback !== null
+                            )
+                              x.feedback = ((x) => {
+                                x.date = ((x: number) => new Date(x * 1000))(
+                                  x.date,
+                                );
+                                return x;
+                              })(x.feedback);
+                            return x;
+                          })(x.details);
                         x.time = ((x: number) => new Date(x * 1000))(x.time);
                         return x;
                       });
@@ -1768,6 +1798,18 @@ export namespace types {
                 return x;
               }
               return x.map((x) => {
+                if (typeof x.details !== 'undefined' && x.details !== null)
+                  x.details = ((x) => {
+                    if (
+                      typeof x.feedback !== 'undefined' &&
+                      x.feedback !== null
+                    )
+                      x.feedback = ((x) => {
+                        x.date = ((x: number) => new Date(x * 1000))(x.date);
+                        return x;
+                      })(x.feedback);
+                    return x;
+                  })(x.details);
                 x.time = ((x: number) => new Date(x * 1000))(x.time);
                 return x;
               });
@@ -2275,6 +2317,7 @@ export namespace types {
     problemset_id: number;
     runs: types.Run[];
     start_time: Date;
+    totalRuns?: number;
   }
 
   export interface ArenaContest {
@@ -2482,7 +2525,7 @@ export namespace types {
   export interface Clarification {
     answer?: string;
     assignment_alias?: string;
-    author?: string;
+    author: string;
     clarification_id: number;
     contest_alias?: string;
     message: string;
@@ -2803,12 +2846,14 @@ export namespace types {
 
   export interface ContestListPayload {
     contests: types.TimeTypeContests;
+    countContests: { [key: string]: number };
     isLogged: boolean;
-    query: string;
+    query?: string;
   }
 
   export interface ContestListv2Payload {
     contests: types.ContestList;
+    countContests: { current: number; future: number; past: number };
     query?: string;
   }
 
@@ -3590,7 +3635,7 @@ export namespace types {
     problem_id: number;
     problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
-    runs?: types.Run[];
+    runs?: types.RunWithDetails[];
     score: number;
     settings: types.ProblemSettingsDistrib;
     show_diff: string;
@@ -3619,6 +3664,7 @@ export namespace types {
     selectedPublicTags?: string[];
     solutionStatus?: string;
     solvers: types.BestSolvers[];
+    totalRuns?: number;
     user: types.UserInfoForProblem;
   }
 
@@ -3998,12 +4044,58 @@ export namespace types {
     verdict?: string;
   }
 
+  export interface RunDetailsV2 {
+    admin: boolean;
+    cases: types.ProblemCasesContents;
+    compile_error?: string;
+    details?: {
+      compile_meta?: { [key: string]: types.RunMetadata };
+      groups?: types.RunDetailsGroup[];
+      judged_by: string;
+      max_score?: number;
+      memory?: number;
+      score: number;
+      time?: number;
+      verdict: string;
+      wall_time?: number;
+    };
+    feedback?: types.SubmissionFeedback;
+    judged_by?: string;
+    logs?: string;
+    show_diff: string;
+    source?: string;
+    source_link?: boolean;
+    source_name?: string;
+    source_url?: string;
+  }
+
   export interface RunMetadata {
     memory: number;
     sys_time: number;
     time: number;
     verdict: string;
     wall_time: number;
+  }
+
+  export interface RunWithDetails {
+    alias: string;
+    classname: string;
+    contest_alias?: string;
+    contest_score?: number;
+    country: string;
+    details?: types.RunDetailsV2;
+    guid: string;
+    language: string;
+    memory: number;
+    penalty: number;
+    runtime: number;
+    score: number;
+    status: string;
+    submit_delay: number;
+    time: Date;
+    type?: string;
+    username: string;
+    verdict: string;
   }
 
   export interface RunsDiff {
@@ -4610,10 +4702,16 @@ export namespace messages {
   };
   export type ContestListParticipatingRequest = { [key: string]: any };
   export type _ContestListParticipatingServerResponse = any;
-  export type ContestListParticipatingResponse = { contests: types.Contest[] };
+  export type ContestListParticipatingResponse = {
+    contests: types.Contest[];
+    count: number;
+  };
   export type ContestMyListRequest = { [key: string]: any };
   export type _ContestMyListServerResponse = any;
-  export type ContestMyListResponse = { contests: types.Contest[] };
+  export type ContestMyListResponse = {
+    contests: types.Contest[];
+    count: number;
+  };
   export type ContestOpenRequest = { [key: string]: any };
   export type ContestOpenResponse = {};
   export type ContestProblemClarificationsRequest = { [key: string]: any };
@@ -4841,7 +4939,9 @@ export namespace messages {
   export type CourseRequestsResponse = { users: types.IdentityRequest[] };
   export type CourseRunsRequest = { [key: string]: any };
   export type _CourseRunsServerResponse = any;
-  export type CourseRunsResponse = { runs: types.Run[] };
+  export type CourseRunsResponse = { runs: types.Run[]; totalRuns: number };
+  export type CourseSearchUsersRequest = { [key: string]: any };
+  export type CourseSearchUsersResponse = { results: types.ListItem[] };
   export type CourseStudentProgressRequest = { [key: string]: any };
   export type _CourseStudentProgressServerResponse = any;
   export type CourseStudentProgressResponse = {
@@ -5001,7 +5101,7 @@ export namespace messages {
   export type ProblemRemoveTagResponse = {};
   export type ProblemRunsRequest = { [key: string]: any };
   export type _ProblemRunsServerResponse = any;
-  export type ProblemRunsResponse = { runs: types.Run[] };
+  export type ProblemRunsResponse = { runs: types.Run[]; totalRuns: number };
   export type ProblemRunsDiffRequest = { [key: string]: any };
   export type ProblemRunsDiffResponse = { diff: types.RunsDiff[] };
   export type ProblemSelectVersionRequest = { [key: string]: any };
@@ -5160,9 +5260,11 @@ export namespace messages {
   export type RunDisqualifyResponse = {};
   export type RunListRequest = { [key: string]: any };
   export type _RunListServerResponse = any;
-  export type RunListResponse = { runs: types.Run[] };
+  export type RunListResponse = { runs: types.Run[]; totalRuns: number };
   export type RunRejudgeRequest = { [key: string]: any };
   export type RunRejudgeResponse = {};
+  export type RunRequalifyRequest = { [key: string]: any };
+  export type RunRequalifyResponse = {};
   export type RunSourceRequest = { [key: string]: any };
   export type RunSourceResponse = {
     compile_error?: string;
@@ -5657,6 +5759,9 @@ export namespace controllers {
     runs: (
       params?: messages.CourseRunsRequest,
     ) => Promise<messages.CourseRunsResponse>;
+    searchUsers: (
+      params?: messages.CourseSearchUsersRequest,
+    ) => Promise<messages.CourseSearchUsersResponse>;
     studentProgress: (
       params?: messages.CourseStudentProgressRequest,
     ) => Promise<messages.CourseStudentProgressResponse>;
@@ -5921,6 +6026,9 @@ export namespace controllers {
     rejudge: (
       params?: messages.RunRejudgeRequest,
     ) => Promise<messages.RunRejudgeResponse>;
+    requalify: (
+      params?: messages.RunRequalifyRequest,
+    ) => Promise<messages.RunRequalifyResponse>;
     source: (
       params?: messages.RunSourceRequest,
     ) => Promise<messages.RunSourceResponse>;
