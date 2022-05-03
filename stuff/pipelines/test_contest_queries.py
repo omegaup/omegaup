@@ -11,7 +11,7 @@ import time
 
 import omegaup.api
 
-import credentials
+import test_credentials
 import database.contest
 import test_constants
 
@@ -53,11 +53,11 @@ def test_get_contests_information() -> None:
 
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
-            user=credentials.MYSQL_USER,
-            password=credentials.MYSQL_PASSWORD,
-            host=credentials.MYSQL_HOST,
-            database=credentials.MYSQL_DATABASE,
-            port=credentials.MYSQL_PORT,
+            user=test_credentials.MYSQL_USER,
+            password=test_credentials.MYSQL_PASSWORD,
+            host=test_credentials.MYSQL_HOST,
+            database=test_credentials.MYSQL_DATABASE,
+            port=test_credentials.MYSQL_PORT,
             mysql_config_file=lib.db.default_config_file_path() or ''
         )
     )
@@ -69,4 +69,4 @@ def test_get_contests_information() -> None:
             date_upper_limit=test_constants.DATE_UPPER_LIMIT,
         )
 
-        assert alias in [contest['alias'] for contest in contests]
+        assert alias in [contest.alias for contest in contests]
