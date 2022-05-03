@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 '''The omegaUp DAO linter.'''
 
@@ -46,7 +46,10 @@ class DaoLinter(linters.Linter):
                 path = os.path.join('frontend/server/src/DAO/Base', filename)
             else:
                 path = os.path.join('frontend/server/src/DAO/VO', filename)
-            original_contents[path] = contents_callback(path)
+            try:
+                original_contents[path] = contents_callback(path)
+            except FileNotFoundError:
+                original_contents[path] = b''
             new_contents[path] = contents.encode('utf-8')
 
         return linters.MultipleResults(new_contents, original_contents,

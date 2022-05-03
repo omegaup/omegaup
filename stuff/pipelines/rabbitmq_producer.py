@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 '''Implementation of rabbitmq producer.'''
 
@@ -18,7 +18,7 @@ class RabbitmqProducer:
         self.channel = channel
         self.channel.queue_declare(
             queue=queue, passive=False,
-            durable=False, exclusive=False,
+            durable=True, exclusive=False,
             auto_delete=False)
         self.channel.exchange_declare(
             exchange=self.exchange,

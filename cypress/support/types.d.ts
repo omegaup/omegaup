@@ -12,10 +12,10 @@ export interface ProblemOptions {
 
 export interface CourseOptions {
   courseAlias: string;
-  showScoreboard?: boolean;
-  startDate?: Date;
-  unlimitedDuration?: boolean;
+  startDate: Date;
   endDate?: Date;
+  showScoreboard?: boolean;
+  unlimitedDuration?: boolean;
   school?: string;
   basicInformation?: boolean;
   requestParticipantInformation?: RequestParticipantInformation;
@@ -27,20 +27,25 @@ export interface CourseOptions {
 export interface ContestOptions {
   contestAlias: string;
   description?: string;
-  startDate?: Date;
-  endDate?: Date;
+  startDate: Date;
+  endDate: Date;
   showScoreboard?: boolean;
   partialPoints?: boolean;
   basicInformation?: boolean;
   requestParticipantInformation?: RequestParticipantInformation;
+  admissionMode: AdmissionModeOptions;
+  problems: Array<ProblemOptions>;
+  runs: Array<RunOptions>;
 }
 
 export interface RunOptions {
   problemAlias: string;
   fixturePath: string;
   language: Language;
+  valid: boolean;
 }
 
+export type AdmissionModeOptions = 'private' | 'registration' | 'public';
 export type RequestParticipantInformation = 'no' | 'optional' | 'required';
 export type ProblemLevel = 'introductory' | 'intermediate' | 'advanced';
 export type Language =

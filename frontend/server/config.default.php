@@ -34,7 +34,7 @@ try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', false);
 # ####################################
 try_define('OMEGAUP_DB_USER', 'omegaup');
 try_define('OMEGAUP_DB_PASS', '');
-try_define('OMEGAUP_DB_HOST', 'localhost');
+try_define('OMEGAUP_DB_HOST', 'mysql:13306');
 try_define('OMEGAUP_DB_NAME', 'omegaup');
 
 # ####################################

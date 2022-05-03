@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 '''Mysql queries to generate messages for contests'''
 
@@ -11,19 +11,19 @@ import mysql.connector.cursor
 
 class ContestCertificate(NamedTuple):
     '''Relevant information for contests.'''
-    certificate_cutoff: str
+    certificate_cutoff: int
     alias: str
     scoreboard_url: str
     contest_id: str
 
 
-def get_contest_contestants(
+def get_contests(
         *,
         cur: mysql.connector.cursor.MySQLCursorDict,
-        date_lower_limit: datetime.date,
-        date_upper_limit: datetime.date,
-) -> List[Dict[str, str]]:
-    '''Get contest users to recieve a certificate'''
+        date_lower_limit: datetime.datetime,
+        date_upper_limit: datetime.datetime,
+) -> List[ContestCertificate]:
+    '''Get contests information'''
 
     cur.execute(
         '''
@@ -39,10 +39,11 @@ def get_contest_contestants(
         ON
             c.problemset_id = p.problemset_id
         WHERE
-            finish_time BETWEEN %s AND %s;
-        ''', (date_lower_limit, date_upper_limit)
+            finish_time >= %s AND finish_time <= %s;
+        ''', (date_lower_limit,
+              date_upper_limit.replace(hour=23, minute=59, second=59))
     )
-    data: List[Dict[str, str]] = []
+    data: List[ContestCertificate] = []
     for row in cur:
         contest = ContestCertificate(
             certificate_cutoff=row['certificate_cutoff'],
@@ -50,5 +51,5 @@ def get_contest_contestants(
             scoreboard_url=row['scoreboard_url'],
             contest_id=row['contest_id'],
         )
-        data.append(contest._asdict())
+        data.append(contest)
     return data

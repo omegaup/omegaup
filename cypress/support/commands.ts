@@ -7,6 +7,7 @@ import {
   LoginOptions,
   ProblemOptions,
   RunOptions,
+  Status,
 } from './types';
 
 // Logins the user given a username and password
@@ -70,10 +71,10 @@ Cypress.Commands.add(
   'createCourse',
   ({
     courseAlias,
+    startDate,
+    endDate,
     showScoreboard = false,
-    startDate = new Date(),
     unlimitedDuration = true,
-    endDate = new Date(),
     school = 'omegaup',
     basicInformation = false,
     requestParticipantInformation = 'no',
@@ -130,9 +131,9 @@ Cypress.Commands.add(
   'createContest',
   ({
     contestAlias,
+    startDate,
+    endDate,
     description = 'Default Description',
-    startDate = new Date(),
-    endDate = addDaysToTodaysDate({ days: 1 }),
     showScoreboard = true,
     partialPoints = true,
     basicInformation = false,
@@ -156,6 +157,101 @@ Cypress.Commands.add(
   },
 );
 
+Cypress.Commands.add(
+  'addProblemsToContest',
+  ({
+    contestAlias,
+    problems,
+  }) => {
+    cy.visit(`contest/${contestAlias}/edit/`);
+    cy.get('a[data-nav-contest-edit]').click();
+    cy.get('a.dropdown-item.problems').click();
+
+    for (const idx in problems) {
+      cy.get('input[type="text"]').type(problems[idx].problemAlias)
+      cy.get('.typeahead-dropdown').click();
+      cy.get('.add-problem').click();
+    }
+  },
+);
+
+Cypress.Commands.add(
+  'changeAdmissionModeContest',
+  ({
+    contestAlias,
+    admissionMode,
+  }) => {
+    cy.visit(`contest/${contestAlias}/edit/`);
+    cy.get('a[data-nav-contest-edit]').click();
+    cy.get('a.dropdown-item.admission-mode').click();
+    cy.get('select[name="admission-mode"]').select(
+      admissionMode,
+    ); // private | registration | public
+    cy.get('.change-admission-mode').click();
+  },
+);
+
+Cypress.Commands.add(
+  'enterContest',
+  ({
+    contestAlias,
+  }) => {
+    cy.visit('arena/');
+    cy.get('a[data-contests]').click();
+    cy.get('a[data-list-current]').click();
+    cy.get(`a[href="/arena/${contestAlias}/"]`).click();
+    cy.get('button[data-start-contest]').click();
+  },
+);
+
+Cypress.Commands.add(
+  'createRunsInsideContest',
+  ({
+    contestAlias,
+    problems,
+    runs,
+  }) => {
+    const problem = problems[0];
+    if (!problem) {
+      return;
+    }
+    cy.visit(`/arena/${contestAlias}/#problems`);
+    cy.get(`a[data-problem="${problem.problemAlias}"]`).click();
+
+    for (const idx in runs) {
+      // Mocking date just a few seconds after to allow create new run
+      cy.clock(new Date(), ['Date']).then((clock) => clock.tick(3000));
+      cy.get('[data-new-run]').click();
+      cy.get('[name="language"]').select(runs[idx].language);
+
+      // Only the first submission is created because of server validations
+      if (!runs[idx].valid) {
+        cy.fixture(runs[idx].fixturePath).then((fileContent) => {
+          cy.get('.CodeMirror-line').type(fileContent);
+          cy.get('[data-submit-run]').should('be.disabled');
+        });
+        break;
+      }
+
+      cy.fixture(runs[idx].fixturePath).then((fileContent) => {
+        cy.get('.CodeMirror-line').type(fileContent);
+        cy.get('[data-submit-run]').click();
+      });
+
+      const expectedStatus: Status = 'AC';
+      cy.get('[data-run-status] > span').first().should('have.text', 'new');
+      cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
+
+      cy.wait(['@runStatus'], { timeout: 10000 }).its(
+        'response.statusCode',
+      ).should('eq', 200);
+      cy.get('[data-run-status] > span')
+        .first()
+        .should('have.text', expectedStatus);
+    }
+  },
+);
+
 /**
  *
  * @param date Date object to convert
@@ -175,14 +271,16 @@ export const getISODateTime = (date: Date) => {
 };
 
 /**
- * Return a date relative to today
- * @param days number of days to add to today
- * @returns Relative Date Object
+ * Return a date relative to another date
+ * @param date original Date object
+ * @param days number of days to add to the date
+ * @returns Date Relative Date Object
  */
-export const addDaysToTodaysDate = ({ days }: { days: number }): Date => {
-  if (days == 0) return new Date();
+export const addSubtractDaysToDate = (date: Date, { days }: { days: number }): Date => {
+  if (days == 0) return date;
+  if (days < 0) {
+    return new Date(date.getTime() - 24 * 3600 * 1000);
+  }
 
-  const newDate = new Date();
-  newDate.setDate(newDate.getDate() + days);
-  return newDate;
+  return new Date(date.getTime() + 24 * 3600 * 1000);
 };

@@ -746,6 +746,7 @@ Creates a new contest
 | `points_decay_factor`       | `mixed`        |             |
 | `problems`                  | `null\|string` |             |
 | `requests_user_information` | `mixed`        |             |
+| `score_mode`                | `null\|string` |             |
 | `scoreboard`                | `mixed`        |             |
 | `show_scoreboard_after`     | `mixed`        |             |
 | `start_time`                | `mixed`        |             |
@@ -842,6 +843,7 @@ Returns a list of contests where current user is participating in
 | Name       | Type              |
 | ---------- | ----------------- |
 | `contests` | `types.Contest[]` |
+| `count`    | `number`          |
 
 ## `/api/contest/myList/`
 
@@ -863,6 +865,7 @@ Returns a list of contests where current user is the director
 | Name       | Type              |
 | ---------- | ----------------- |
 | `contests` | `types.Contest[]` |
+| `count`    | `number`          |
 
 ## `/api/contest/open/`
 
