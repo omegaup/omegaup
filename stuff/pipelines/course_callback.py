@@ -40,7 +40,7 @@ class CourseCallback:
     def __init__(self,
                  dbconn: mysql.connector.MySQLConnection,
                  client: omegaup.api.Client):
-        '''Contructor for course callback'''
+        '''Constructor for course callback'''
         self.dbconn = dbconn
         self.client = client
 
