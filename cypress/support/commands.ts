@@ -197,7 +197,9 @@ Cypress.Commands.add(
     contestAlias,
   }) => {
     cy.visit('arena/');
-    cy.get(`a[href="/arena/${contestAlias}/"]`).first().click();
+    cy.get('a[data-contests]').click();
+    cy.get('a[data-list-current]').click();
+    cy.get(`a[href="/arena/${contestAlias}/"]`).click();
     cy.get('button[data-start-contest]').click();
   },
 );
