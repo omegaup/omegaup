@@ -11,7 +11,7 @@ import mysql.connector.cursor
 
 class ContestCertificate(NamedTuple):
     '''Relevant information for contests.'''
-    certificate_cutoff: str
+    certificate_cutoff: int
     alias: str
     scoreboard_url: str
     contest_id: str
@@ -22,7 +22,7 @@ def get_contests(
         cur: mysql.connector.cursor.MySQLCursorDict,
         date_lower_limit: datetime.datetime,
         date_upper_limit: datetime.datetime,
-) -> List[Dict[str, str]]:
+) -> List[ContestCertificate]:
     '''Get contests information'''
 
     cur.execute(
@@ -43,7 +43,7 @@ def get_contests(
         ''', (date_lower_limit,
               date_upper_limit.replace(hour=23, minute=59, second=59))
     )
-    data: List[Dict[str, str]] = []
+    data: List[ContestCertificate] = []
     for row in cur:
         contest = ContestCertificate(
             certificate_cutoff=row['certificate_cutoff'],
@@ -51,5 +51,5 @@ def get_contests(
             scoreboard_url=row['scoreboard_url'],
             contest_id=row['contest_id'],
         )
-        data.append(contest._asdict())
+        data.append(contest)
     return data
