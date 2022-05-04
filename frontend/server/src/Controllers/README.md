@@ -2079,11 +2079,11 @@ Search users in course assignment
 
 ### Parameters
 
-| Name     | Type        | Description |
-| -------- | ----------- | ----------- |
-| `course` | `string`    |             |
-| `length` | `int\|null` |             |
-| `page`   | `int\|null` |             |
+| Name     | Type     | Description |
+| -------- | -------- | ----------- |
+| `course` | `string` |             |
+| `length` | `int`    |             |
+| `page`   | `int`    |             |
 
 ### Returns
 

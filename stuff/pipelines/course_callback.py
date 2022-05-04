@@ -27,7 +27,6 @@ class Certificate:
     username: str
 
 
-
 @dataclasses.dataclass
 class CourseCertificate:
     '''A dataclass for course certificate.'''
