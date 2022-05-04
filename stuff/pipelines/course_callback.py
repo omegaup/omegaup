@@ -2,16 +2,20 @@
 
 '''Processing courses messages.'''
 
-import json
 import dataclasses
+import json
 import logging
-from typing import List, Optional
+
 import omegaup.api
+
+from typing import List
+from mysql.connector import errors
+from mysql.connector import errorcode
 import mysql.connector
 import mysql.connector.cursor
-from mysql.connector import errorcode
 import pika
-from verification_code import generate_code
+
+import verification_code
 
 
 @dataclasses.dataclass
@@ -23,20 +27,23 @@ class Certificate:
     username: str
 
 
-class CoursesCallback:
+
+@dataclasses.dataclass
+class CourseCertificate:
+    '''A dataclass for course certificate.'''
+    alias: str
+    course_id: int
+    minimum_progress_for_certificate: int
+
+
+class CourseCallback:
     '''Courses callback'''
     def __init__(self,
                  dbconn: mysql.connector.MySQLConnection,
-                 api_token: str,
-                 url: str,
-                 user_password: str,
-                 user_username: str):
+                 client: omegaup.api.Client):
         '''Contructor for course callback'''
         self.dbconn = dbconn
-        self.api_token = api_token
-        self.url = url
-        self.user_password = user_password
-        self.user_username = user_username
+        self.client = client
 
     def __call__(self,
                  _channel: pika.adapters.blocking_connection.BlockingChannel,
@@ -44,31 +51,26 @@ class CoursesCallback:
                  _properties: pika.spec.BasicProperties,
                  body: bytes) -> None:
         '''Function to stores the certificates by a given course'''
-        data = json.loads(body.decode())
-        client = omegaup.api.Client(api_token=self.api_token,
-                                    url=self.url)
-        login = client.user.login(
-            password=self.user_password,
-            usernameOrEmail=self.user_username,
+        data = CourseCertificate(**json.loads(body))
+
+        result = self.client.course.studentsProgress(
+            course=data.alias,
+            length=100,
+            page=1
         )
-        result = client.course.studentsProgress(
-            auth_token=login['auth_token'],
-            course=data['alias'],
-        )
-        progress = result['progress']
+        progress = result.progress
 
         certificates: List[Certificate] = []
 
         for user in progress:
-            minimum_progress = data['minimum_progress_for_certificate']
-            if user['courseProgress'] < minimum_progress:
+            minimum_progress = data.minimum_progress_for_certificate
+            if user.courseProgress < minimum_progress:
                 continue
-            verification_code = generate_code()
             certificates.append(Certificate(
                 certificate_type='course',
-                course_id=int(data['course_id']),
-                verification_code=verification_code,
-                username=str(user['username']),
+                course_id=int(data.course_id),
+                verification_code=generate_course_code(),
+                username=str(user.username),
             ))
         with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
             while True:
@@ -96,14 +98,18 @@ class CoursesCallback:
                                     ) for certificate in certificates])
                     self.dbconn.commit()
                     break
-                except mysql.connector.Error as err:
+                except errors.IntegrityError as err:
                     self.dbconn.rollback()
                     if err.errno != errorcode.ER_DUP_ENTRY:
                         raise
                     for certificate in certificates:
-                        certificate.verification_code = generate_code()
+                        certificate.verification_code = generate_course_code()
                     logging.exception(
                         'At least one of the verification codes had a conflict'
                     )
+
+
+def generate_course_code() -> str:
+    return verification_code.generate_code()
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

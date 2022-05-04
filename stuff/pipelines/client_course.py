@@ -6,10 +6,13 @@ import argparse
 import logging
 import os
 import sys
-from typing import Callable
+
+import omegaup.api
 import pika
-import CoursesCallback
+
+import course_callback
 import rabbitmq_connection
+import rabbitmq_client
 
 sys.path.insert(
     0,
@@ -17,41 +20,6 @@ sys.path.insert(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__))), '.'))
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
-
-
-def process_queue(
-        *,
-        channel: pika.adapters.blocking_connection.BlockingChannel,
-        exchange_name: str,
-        queue_name: str,
-        routing_key: str,
-        callback: Callable[
-            [
-                pika.adapters.blocking_connection.BlockingChannel,
-                pika.spec.Basic.Deliver,
-                pika.spec.BasicProperties,
-            ], None],
-) -> None:
-    '''Receive course messages from a queue'''
-    channel.exchange_declare(exchange=exchange_name,
-                             durable=True,
-                             exchange_type='direct')
-    channel.queue_declare(queue=queue_name,
-                          durable=True,
-                          exclusive=False)
-    channel.queue_bind(
-        exchange=exchange_name,
-        queue=queue_name,
-        routing_key=routing_key)
-    logging.info('waiting for the messages')
-    channel.basic_consume(
-        queue=queue_name,
-        on_message_callback=callback,
-        auto_ack=False)
-    try:
-        channel.start_consuming()
-    except KeyboardInterrupt:
-        channel.stop_consuming()
 
 
 def main() -> None:
@@ -72,20 +40,23 @@ def main() -> None:
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
     logging.info('Started')
-    dbconn = lib.db.connect(args)
+    dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
     try:
-        with rabbitmq_connection.connect(args) as channel:
-            process_queue(channel=channel,
-                          exchange_name='certificates',
-                          queue_name='courses',
-                          routing_key='CourseQueue',
-                          callback=CoursesCallback.CoursesCallback(
-                              dbconn.conn,
-                              args.api_token,
-                              args.url,
-                              args.user_password,
-                              args.user_username
-                          ))
+        with rabbitmq_connection.connect(
+            username=args.rabbitmq_username,
+            password=args.rabbitmq_password,
+            host=args.rabbitmq_host
+        ) as channel:
+            client = omegaup.api.Client(api_token=args.api_token, url=args.url)
+            callback = course_callback.CourseCallback(
+                dbconn=dbconn.conn,
+                client=client,
+            )
+            rabbitmq_client.receive_messages(queue='course',
+                                             exchange='certificates',
+                                             routing_key='CourseQueue',
+                                             channel=channel,
+                                             callback=callback)
     finally:
         dbconn.conn.close()
         logging.info('Done')
