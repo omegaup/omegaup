@@ -1604,7 +1604,7 @@ const translations: { [key: string]: string; } = {
   wordsGetToKnowOurCourses: "Conhece nossos cursos",
   wordsGlobalSubmissions: "Envios globais",
   wordsGroup: "Grupo",
-  wordsGroupAdmin: "Grupo de administradores",
+  wordsGroupAdmin: "Grupo de admins",
   wordsGroups: "Grupos",
   wordsHighQualityProblem: "Este problema recebeu um distintivo de Alta Qualidade por um comit\u00ea de revisores omegaUp",
   wordsHomework: "Tarefa",
