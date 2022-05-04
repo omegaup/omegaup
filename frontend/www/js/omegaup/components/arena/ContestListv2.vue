@@ -397,12 +397,12 @@ export default class ArenaContestList extends Vue {
   }
 
   get queryURL(): string {
-    return `/arenav2/#${this.currentTab}`;
+    return `/arena/#${this.currentTab}`;
   }
 
   linkGen(pageNum: number) {
     return {
-      path: `/arenav2/`,
+      path: `/arena/`,
       query: {
         page: pageNum,
         tab_name: this.currentTab,
