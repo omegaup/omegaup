@@ -27,6 +27,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                                 Contests.finish_time,
                                 Contests.admission_mode,
                                 Contests.partial_score,
+                                Contests.score_mode,
                                 Contests.alias,
                                 Contests.recommended,
                                 Contests.window_length,
