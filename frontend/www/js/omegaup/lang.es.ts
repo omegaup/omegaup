@@ -411,7 +411,7 @@ const translations: { [key: string]: string; } = {
   courseEditAddProblems: "Agregar problema",
   courseEditAddStudentsAdd: "A\u00f1adir",
   courseEditAddStudentsDescription: "Administra a los estudiantes que van a participar en el curso",
-  courseEditAdmins: "Admin",
+  courseEditAdmins: "Admins",
   courseEditAdminsEmpty: "No hay administradores",
   courseEditAdmissionModeDescription: "Manual: Los estudiantes no pueden inscribirse a menos que sean expl\u00edcitamente invitados.\nCompartir URL: Cualquiera con el link puede solicitar inscribirse. Adicionalmente, puedes agregar de forma manual los nombres de usuario de los estudiantes.",
   courseEditAdmissionModeSelect: "Seleccionar el modo de acceso del curso",
