@@ -159,15 +159,34 @@ class CourseParams {
             );
         }
 
-        $this->courseAlias = $params['alias'];
-        $this->name = $params['name'];
-        $this->description = $params['description'];
-        $this->languages = !is_null(
+        $languages = !is_null(
             $params['languages']
         ) ? explode(
             ',',
             $params['languages']
         ) : null;
+        if (!is_null($languages)) {
+            \OmegaUp\Validators::validateValidSubset(
+                $languages,
+                'languages',
+                array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
+            );
+        }
+
+        if (
+            !is_null($params['finish_time']) &&
+            $params['start_time'] > $params['finish_time']
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseInvalidStartTime',
+                'finish_time'
+            );
+        }
+
+        $this->courseAlias = $params['alias'];
+        $this->name = $params['name'];
+        $this->description = $params['description'];
+        $this->languages = $languages;
         $this->objective = $params['objective'] ?? null;
         $this->level = $params['level'] ?? null;
         $this->startTime = $params['start_time'];

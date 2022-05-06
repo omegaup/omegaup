@@ -355,8 +355,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $start_time
      */
     private static function convertRequestToCourseParams(
-        \OmegaUp\Request $r,
-        bool $isRequired = true
+        \OmegaUp\Request $r
     ): \OmegaUp\CourseParams {
         $params = [
             'alias' => $r->ensureString(
@@ -844,24 +843,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'schoolNotFound'
                 );
             }
-        }
-
-        if (!is_null($courseParams->languages)) {
-            \OmegaUp\Validators::validateValidSubset(
-                $courseParams->languages,
-                'languages',
-                array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
-            );
-        }
-
-        if (
-            !is_null($courseParams->finishTime) &&
-            $courseParams->startTime > $courseParams->finishTime
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseInvalidStartTime',
-                'finish_time'
-            );
         }
 
         // Only curator can set public
