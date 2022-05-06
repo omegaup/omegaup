@@ -386,7 +386,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             ) ?? false,
             'start_time' => $r->ensureInt('start_time'),
         ];
-        return new \OmegaUp\CourseParams($params, $isRequired);
+        return new \OmegaUp\CourseParams($params);
     }
 
     /**
