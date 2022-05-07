@@ -357,8 +357,7 @@ def add_assignment_with_problem(driver, assignment_alias, problem_alias):
             (By.CSS_SELECTOR,
              '[data-course-problemlist] .card-footer')))
 
-    driver.typeahead_helper(
-        '*[contains(@class, "card-footer")]', problem_alias)
+    driver.typeahead_helper_v2('.problems-container', problem_alias)
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR, 'button[data-add-problem]'))).click()
