@@ -14,6 +14,7 @@
             <omegaup-common-typeahead
               v-else
               :existing-options="searchResultProblems"
+              :activation-threshold="2"
               :value.sync="alias"
               @update-existing-options="
                 (query) => $emit('update-search-result-problems', query)
