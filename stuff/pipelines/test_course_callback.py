@@ -12,7 +12,7 @@ import string
 import sys
 import time
 
-from typing import List
+from typing import Set
 
 import omegaup.api
 
@@ -74,11 +74,11 @@ def test_insert_course_certificate() -> None:
         points=1.0,
     )
 
-    usernames: List[str] = []
+    usernames: Set[str] = set()
     for number in range(3):
-        user = f'course_test_user_{number}'
+        username = f'course_test_user_{number}'
         client.course.addStudent(course_alias=course_alias,
-                                 usernameOrEmail=user,
+                                 usernameOrEmail=username,
                                  share_user_information=True,
                                  accept_teacher_git_object_id='0',
                                  privacy_git_object_id='0',
@@ -91,7 +91,7 @@ def test_insert_course_certificate() -> None:
             language='py3',
             source='print(1)',
         )
-        usernames.append(user)
+        usernames.add(username)
 
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
@@ -128,7 +128,7 @@ def test_insert_course_certificate() -> None:
         )
         body = course_callback.CourseCertificate(
             course_id=course_id,
-            minimum_progress_for_certificate=50, # mocking a default value
+            minimum_progress_for_certificate=50, # setting an arbitrary value
             alias=course_alias,
         )
         callback(
@@ -142,8 +142,7 @@ def test_insert_course_certificate() -> None:
         cur.execute(
             '''
             SELECT
-                i.username,
-                c.contest_place
+                i.username
             FROM
                 Certificates c
             INNER JOIN
@@ -151,17 +150,17 @@ def test_insert_course_certificate() -> None:
             ON
                 i.identity_id = c.identity_id
             INNER JOIN
-                Contests cs
+                Courses cs
             ON
-                cs.contest_id = c.contest_id
+                cs.course_id = c.course_id
             WHERE
                 cs.alias = %s;
             ''', (alias,))
         certificates = cur.fetchall()
         assert certificates
 
+    stored_usernames: Set[str] = set()
     for certificate in certificates:
-        assert certificate['username'] in usernames
-        # At this moment, there are no submissions for the contest, so all the
-        # participants got the first place
-        assert certificate['contest_place'] == 1
+        stored_usernames.add(certificate['username'])
+
+    assert stored_usernames == usernames
