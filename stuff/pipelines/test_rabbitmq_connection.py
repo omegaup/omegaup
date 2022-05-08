@@ -5,7 +5,7 @@
 import pytest
 import pika
 import rabbitmq_connection
-import credentials
+import test_credentials
 
 
 # mypy has conflict with pytest decorations
@@ -19,9 +19,9 @@ import credentials
 def test_rabbitmq_connection(exchange: str, expected: bool):
     '''Test rabbitmq'''
     with rabbitmq_connection.connect(
-            username=credentials.OMEGAUP_USERNAME,
-            password=credentials.OMEGAUP_PASSWORD,
-            host=credentials.RABBITMQ_HOST
+            username=test_credentials.OMEGAUP_USERNAME,
+            password=test_credentials.OMEGAUP_PASSWORD,
+            host=test_credentials.RABBITMQ_HOST
     ) as channel:
         def on_message(
                 channel: pika.adapters.blocking_connection.BlockingChannel,
@@ -41,7 +41,7 @@ def test_rabbitmq_connection(exchange: str, expected: bool):
                 body=body.encode(),
             )
 
-        result = channel.queue_declare(queue='', exclusive=True)
+        result = channel.queue_declare(queue='', durable=True, exclusive=True)
         queue_name = result.method.queue
         assert queue_name is not None
 

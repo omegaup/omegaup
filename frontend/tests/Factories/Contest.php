@@ -99,7 +99,13 @@ class ContestParams {
     public $teamsGroupAlias;
 
     /**
-     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, contestForTeams?: bool, teamsGroupAlias?: string, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, partialScore?: bool, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string} $params
+     * @readonly
+     * @var null|string
+     */
+    public $scoreMode;
+
+    /**
+     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, contestForTeams?: bool, teamsGroupAlias?: string, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, partialScore?: bool, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string, scoreMode?: string} $params
      */
     public function __construct($params = []) {
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
@@ -139,6 +145,7 @@ class ContestParams {
         $this->partialScore = $params['partialScore'] ?? true;
         $this->contestForTeams = $params['contestForTeams'] ?? false;
         $this->teamsGroupAlias = $params['teamsGroupAlias'] ?? null;
+        $this->scoreMode = $params['scoreMode'] ?? 'partial';
     }
 }
 
@@ -189,6 +196,7 @@ class Contest {
             'requests_user_information' => $params->requestsUserInformation,
             'penalty_calc_policy' => $params->penaltyCalcPolicy,
             'contest_for_teams' => $params->contestForTeams,
+            'score_mode' => $params->scoreMode,
         ]);
 
         if (!is_null($params->teamsGroupAlias)) {
