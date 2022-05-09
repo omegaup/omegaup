@@ -41,7 +41,7 @@
         </table>
       </div>
     </div>
-    <div class="card-footer">
+    <div class="card-footer" data-course-add-problem>
       <form>
         <div class="row">
           <div class="col-md-12">
