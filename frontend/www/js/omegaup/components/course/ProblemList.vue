@@ -84,6 +84,7 @@
                 <span class="faux-label">{{ problemCardFooterLabel }}</span>
                 <omegaup-common-typeahead
                   :existing-options="searchResultProblems"
+                  :activation-threshold="2"
                   :value.sync="problemAlias"
                   @update-existing-options="
                     (query) => $emit('update-search-result-problems', query)
