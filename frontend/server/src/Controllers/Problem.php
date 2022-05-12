@@ -5674,58 +5674,35 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * @omegaup-request-param 'bmp'|'gif'|'ico'|'jpe'|'jpeg'|'jpg'|'png'|'svg'|'svgz'|'tif'|'tiff' $extension
-     * @omegaup-request-param null|string $object_id
+     * @omegaup-request-param string $object_id
      * @omegaup-request-param string $problem_alias
+     *
+     * @return bool|int
      */
-    public static function apiImage(\OmegaUp\Request $r): void {
+    public static function getImage(\OmegaUp\Request $r) {
         $problemAlias = $r->ensureString(
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringOfLengthInRange(
-            $r['object_id'],
+
+        $objectId = $r->ensureString(
             'object_id',
-            40,
-            40
-        );
-        if (
-            preg_match(
-                '/^[0-9a-f]{40}$/',
-                $r['object_id']
-            ) !== 1
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'object_id'
-            );
-        }
-        $extension = $r->ensureEnum(
-            'extension',
-            self::IMAGE_EXTENSIONS
+            fn (string $objectId) => \OmegaUp\Validators::objectId($objectId)
         );
 
-        self::regenerateImage(
-            $problemAlias,
-            $r['object_id'],
-            $extension
-        );
+        $extension = $r->ensureEnum('extension', self::IMAGE_EXTENSIONS);
 
-        //The noredirect=1 part lets nginx know to not call us again if the file is not found.
-        header(
-            'Location: ' . IMAGES_URL_PATH . "{$problemAlias}/{$r['object_id']}.{$extension}?noredirect=1"
-        );
-        header('HTTP/1.1 303 See Other');
-
-        // Since all the headers and response have been sent, make the API
-        // caller to exit quietly.
-        throw new \OmegaUp\Exceptions\ExitException();
+        return self::regenerateImage($problemAlias, $objectId, $extension);
     }
 
+    /**
+     * @return bool|int
+     */
     public static function regenerateImage(
         string $problemAlias,
         string $objectId,
         string $extension
-    ): void {
+    ) {
         $problem = \OmegaUp\DAO\Problems::getByAlias(
             $problemAlias
         );
@@ -5742,7 +5719,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             IMAGES_PATH . "{$problem->alias}/{$objectId}.{$extension}"
         );
         @mkdir(IMAGES_PATH . $problem->alias, 0755, true);
-        file_put_contents(
+        return file_put_contents(
             $imagePath,
             $problemArtifacts->getByRevision()
         );
