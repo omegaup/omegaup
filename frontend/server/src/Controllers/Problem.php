@@ -5676,10 +5676,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'bmp'|'gif'|'ico'|'jpe'|'jpeg'|'jpg'|'png'|'svg'|'svgz'|'tif'|'tiff' $extension
      * @omegaup-request-param string $object_id
      * @omegaup-request-param string $problem_alias
-     *
-     * @return bool|int
      */
-    public static function getImage(\OmegaUp\Request $r) {
+    public static function getImage(\OmegaUp\Request $r): void {
         $problemAlias = $r->ensureString(
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
@@ -5692,17 +5690,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $extension = $r->ensureEnum('extension', self::IMAGE_EXTENSIONS);
 
-        return self::regenerateImage($problemAlias, $objectId, $extension);
+        self::regenerateImage($problemAlias, $objectId, $extension);
+
+        // Since all the headers and response have been sent, make the API
+        // caller to exit quietly.
+        throw new \OmegaUp\Exceptions\ExitException();
     }
 
-    /**
-     * @return bool|int
-     */
     public static function regenerateImage(
         string $problemAlias,
         string $objectId,
         string $extension
-    ) {
+    ): void {
         $problem = \OmegaUp\DAO\Problems::getByAlias(
             $problemAlias
         );
@@ -5719,10 +5718,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             IMAGES_PATH . "{$problem->alias}/{$objectId}.{$extension}"
         );
         @mkdir(IMAGES_PATH . $problem->alias, 0755, true);
-        return file_put_contents(
+        file_put_contents(
             $imagePath,
             $problemArtifacts->getByRevision()
         );
+
+        $filesize = filesize($imagePath);
+        header("Content-Type: image/{$extension}");
+        header("Content-Length: $filesize");
+        readfile($imagePath);
     }
 
     /**
