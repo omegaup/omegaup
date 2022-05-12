@@ -173,27 +173,28 @@
       </div>
 
       <div v-if="showTab === 'admins'" class="tab-pane active">
-        <omegaup-problem-admins
-          :admins="initialAdmins"
+        <omegaup-common-admins
+          :admins="admins"
           :search-result-users="searchResultUsers"
           @add-admin="(username) => $emit('add-admin', username)"
           @remove-admin="(username) => $emit('remove-admin', username)"
           @update-search-result-users="
             (query) => $emit('update-search-result-users', query)
           "
-        ></omegaup-problem-admins>
-        <omegaup-problem-groupadmins
-          :initial-groups="initialGroups"
-          :has-parent-component="true"
-          @emit-add-group-admin="
-            (groupAdminsComponent) =>
-              $emit('add-group-admin', groupAdminsComponent.groupAlias)
+        ></omegaup-common-admins>
+        <omegaup-common-groupadmins
+          :group-admins="groups"
+          :search-result-groups="searchResultGroups"
+          @add-group-admin="
+            (groupAlias) => $emit('add-group-admin', groupAlias)
           "
-          @emit-remove-group-admin="
-            (groupAdminsComponent) =>
-              $emit('remove-group-admin', groupAdminsComponent.groupAlias)
+          @remove-group-admin="
+            (groupAlias) => $emit('remove-group-admin', groupAlias)
           "
-        ></omegaup-problem-groupadmins>
+          @update-search-result-groups="
+            (query) => $emit('update-search-result-groups', query)
+          "
+        ></omegaup-common-groupadmins>
       </div>
 
       <div v-if="showTab === 'tags'" class="tab-pane active">
@@ -270,8 +271,8 @@ import problem_Form from './Form.vue';
 import problem_Tags from './Tags.vue';
 import problem_Versions from './Versions.vue';
 import problem_StatementEdit from './StatementEdit.vue';
-import problem_Admins from '../common/Adminsv2.vue';
-import problem_GroupAdmins from '../common/GroupAdmins.vue';
+import common_Admins from '../common/Adminsv2.vue';
+import common_GroupAdmins from '../common/GroupAdminsv2.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import omegaup_Markdown from '../Markdown.vue';
@@ -283,17 +284,18 @@ import omegaup_Markdown from '../Markdown.vue';
     'omegaup-problem-tags': problem_Tags,
     'omegaup-problem-versions': problem_Versions,
     'omegaup-problem-statementedit': problem_StatementEdit,
-    'omegaup-problem-admins': problem_Admins,
-    'omegaup-problem-groupadmins': problem_GroupAdmins,
+    'omegaup-common-admins': common_Admins,
+    'omegaup-common-groupadmins': common_GroupAdmins,
   },
 })
 export default class ProblemEdit extends Vue {
   @Prop() data!: types.ProblemEditPayload;
-  @Prop() initialAdmins!: types.ProblemAdmin[];
-  @Prop() initialGroups!: types.ProblemGroupAdmin[];
+  @Prop() admins!: types.ProblemAdmin[];
+  @Prop() groups!: types.ProblemGroupAdmin[];
   @Prop({ default: null }) solution!: types.ProblemStatement | null;
   @Prop() statement!: types.ProblemStatement;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultGroups!: types.ListItem[];
 
   T = T;
   alias = this.data.alias;
