@@ -23,8 +23,8 @@ OmegaUp.on('ready', () => {
       'omegaup-problem-edit': problem_Edit,
     },
     data: () => ({
-      initialAdmins: payload.admins,
-      initialGroups: payload.groupAdmins,
+      admins: payload.admins,
+      groups: payload.groupAdmins,
       publishedRevision: payload.publishedRevision,
       statement: payload.statement,
       solution: payload.solution || {
@@ -36,13 +36,14 @@ OmegaUp.on('ready', () => {
       selectedPublicTags: payload.selectedPublicTags,
       selectedPrivateTags: payload.selectedPrivateTags,
       searchResultUsers: [] as types.ListItem[],
+      searchResultGroups: [] as types.ListItem[],
     }),
     methods: {
       refreshProblemAdmins: (): void => {
         api.Problem.admins({ problem_alias: payload.alias })
           .then((data) => {
-            problemEdit.initialAdmins = data.admins;
-            problemEdit.initialGroups = data.group_admins;
+            problemEdit.admins = data.admins;
+            problemEdit.groups = data.group_admins;
           })
           .catch(ui.apiError);
       },
@@ -52,8 +53,8 @@ OmegaUp.on('ready', () => {
         props: {
           data: payload,
           originalVisibility: payload.visibility,
-          initialAdmins: this.initialAdmins,
-          initialGroups: this.initialGroups,
+          admins: this.admins,
+          groups: this.groups,
           log: payload.log,
           publishedRevision: this.publishedRevision,
           value: this.publishedRevision,
@@ -63,6 +64,7 @@ OmegaUp.on('ready', () => {
           selectedPublicTags: this.selectedPublicTags,
           selectedPrivateTags: this.selectedPrivateTags,
           searchResultUsers: this.searchResultUsers,
+          searchResultGroups: this.searchResultGroups,
         },
         on: {
           'update-problem-level': (levelTag?: string) => {
@@ -297,6 +299,27 @@ OmegaUp.on('ready', () => {
                     )} (<strong>${ui.escape(key)}</strong>)`,
                   }),
                 );
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-groups': (query: string) => {
+            api.Group.list({
+              query,
+            })
+              .then((data) => {
+                // Groups previously added into the contest should not be
+                // shown in the dropdown
+                const addedGroups = new Set(
+                  this.groups.map((group) => group.alias),
+                );
+                this.searchResultGroups = data
+                  .filter((group) => !addedGroups.has(group.value))
+                  .map((group) => ({
+                    key: group.value,
+                    value: `${ui.escape(group.label)} (<strong>${ui.escape(
+                      group.value,
+                    )}</strong>)`,
+                  }));
               })
               .catch(ui.apiError);
           },
