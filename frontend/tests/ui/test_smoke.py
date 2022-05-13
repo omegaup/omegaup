@@ -67,6 +67,29 @@ def test_create_problem(driver):
     with driver.login_admin():
         util.create_problem(driver, problem_alias)
 
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                'a[data-nav-problem-edit]'))).click()
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH, '//a[@data-tab-markdown]'))).click()
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'li#wmd-image-button'))).click()
+        driver.browser.find_element_by
+        image_element = driver.browser.find_element_by_css_selector(
+            'input[type="file"]')
+        resource_path = 'frontend/tests/resources/favicon-76x76.png'
+        image_element.send_keys(os.path.join(OMEGAUP_ROOT, resource_path))
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'input[value="OK"]'))).click()
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                'button[type="submit"]'))).click()
+
     with driver.login_user():
         prepare_run(driver, problem_alias)
         assert (problem_alias in driver.browser.find_element_by_xpath(

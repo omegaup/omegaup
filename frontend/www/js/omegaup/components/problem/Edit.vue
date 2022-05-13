@@ -23,6 +23,7 @@
           href="#"
           data-toggle="dropdown"
           role="button"
+          data-nav-problem-edit
           class="nav-link active dropdown-toggle"
           aria-haspopup="true"
           aria-expanded="false"
