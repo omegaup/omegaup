@@ -863,7 +863,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'runs' => $runs,
                 ] = self::getAllRuns(
                     $contest->problemset_id,
-                    $contest->partial_score
+                    $contest->score_mode
                 );
 
                 $result['templateProperties']['payload']['adminPayload'] = [
@@ -2554,6 +2554,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $alias
             )
         ) : null;
+
+        $partialScore = $r->ensureOptionalBool('partial_score') ?? true;
+        $scoreMode = $r['score_mode'];
+        if (is_null($scoreMode)) {
+            $scoreMode = $partialScore ? 'partial' : 'all_or_nothing';
+        }
+
         $contest = new \OmegaUp\DAO\VO\Contests([
             'admission_mode' => 'private',
             'title' => $r['title'],
@@ -2564,17 +2571,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'alias' => $r['alias'],
             'scoreboard' => $r['scoreboard'],
             'points_decay_factor' => $r['points_decay_factor'],
-            'partial_score' => $r->ensureOptionalBool('partial_score') ?? true,
+            'partial_score' => $partialScore,
             'submissions_gap' => $r['submissions_gap'],
             'feedback' => $r['feedback'],
             'penalty_calc_policy' => $r['penalty_calc_policy'],
             'penalty' => max(0, intval($r['penalty'])),
             'penalty_type' => $r['penalty_type'],
             'languages' => $languages,
-            'score_mode' => $r->ensureOptionalEnum(
-                'score_mode',
-                ['partial','all_or_nothing','max_per_group'],
-            ) ?? 'partial',
+            'score_mode' => $scoreMode,
             'show_scoreboard_after' => $r['show_scoreboard_after'] ?? true,
             'contest_for_teams' => $forTeams,
         ]);
@@ -2719,6 +2723,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureOptionalFloat('scoreboard', 0, 100, $isRequired);
         $r->ensureOptionalFloat('points_decay_factor', 0, 1, $isRequired);
         $r->ensureOptionalBool('partial_score');
+        $r->ensureOptionalEnum(
+            'score_mode',
+            ['partial','all_or_nothing','max_per_group'],
+        );
         $r->ensureOptionalInt('submissions_gap', 0, null, $isRequired);
         $r->ensureOptionalInt('penalty', 0, 10000, $isRequired);
         // Validate the submission_gap in minutes so that the error message
@@ -4740,6 +4748,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'scoreboard',
             'points_decay_factor',
             'partial_score',
+            'score_mode',
             'submissions_gap',
             'feedback',
             'penalty' => ['transform' => fn (string $value): int => max(
@@ -5052,7 +5061,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Get our runs
         return self::getAllRuns(
             $contest->problemset_id,
-            $contest->partial_score,
+            $contest->score_mode,
             $r->ensureOptionalEnum('status', \OmegaUp\Controllers\Run::STATUS),
             $r->ensureOptionalEnum(
                 'verdict',
@@ -5071,7 +5080,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     private static function getAllRuns(
         int $problemsetId,
-        bool $partialScore,
+        string $scoreMode,
         ?string $status = null,
         ?string $verdict = null,
         ?int $problemId = null,
@@ -5098,7 +5107,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $allRuns = [];
         foreach ($runs as $run) {
             unset($run['run_id']);
-            if ($partialScore || $run['score'] == 1) {
+            if ($scoreMode === 'partial' || $run['score'] == 1) {
                 $run['contest_score'] = round(
                     floatval(
                         $run['contest_score']
@@ -5106,9 +5115,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     2
                 );
                 $run['score'] = round(floatval($run['score']), 4);
-            } else {
+            } elseif ($scoreMode === 'all_or_nothing') {
                 $run['contest_score'] = 0;
                 $run['score'] = 0;
+            } else {
+                // TODO: Calculate max score per sub-tasks
             }
             $allRuns[] = $run;
         }
