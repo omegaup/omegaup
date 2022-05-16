@@ -5,6 +5,7 @@
 '''Run Selenium end-to-end tests.'''
 
 import os
+import shutil
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -67,35 +68,19 @@ def test_create_problem(driver):
     with driver.login_admin():
         util.create_problem(driver, problem_alias)
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR,
-                'a[data-nav-problem-edit]'))).click()
-        driver.wait.until(
-            EC.visibility_of_element_located(
-                (By.XPATH, '//a[@data-tab-markdown]'))).click()
-        driver.wait.until(
-            EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'li#wmd-image-button'))).click()
-        driver.browser.find_element_by
-        image_element = driver.browser.find_element_by_css_selector(
-            'input[type="file"]')
-        resource_path = 'frontend/tests/resources/favicon-76x76.png'
-        image_element.send_keys(os.path.join(OMEGAUP_ROOT, resource_path))
-        driver.wait.until(
-            EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'input[value="OK"]'))).click()
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR,
-                'button[type="submit"]'))).click()
+    remove_problem_images()
 
     with driver.login_user():
         prepare_run(driver, problem_alias)
-        assert (problem_alias in driver.browser.find_element_by_xpath(
+        assert (problem_alias in driver.browser.find_element(By.XPATH,
             '//h3[@data-problem-title]').get_attribute('innerText'))
 
-        runs_before_submit = driver.browser.find_elements_by_xpath(
+        img = driver.browser.find_elements(By.XPATH,
+            '//div[contains(concat(" ", normalize-space(@class), " "), " '
+            'markdown ")]/div/p/img')
+        assert len(img) > 0
+
+        runs_before_submit = driver.browser.find_elements(By.XPATH,
             '//div[contains(concat(" ", normalize-space(@class), " "), " '
             'active ")]/div/div/table[contains(concat(" ", normalize-space('
             '@class), " "), " runs ")]/tbody/tr/td[@data-run-status]'
@@ -104,7 +89,7 @@ def test_create_problem(driver):
         filename = 'Main.java'
         util.create_run(driver, problem_alias, filename)
 
-        runs_after_submit = driver.browser.find_elements_by_xpath(
+        runs_after_submit = driver.browser.find_elements(By.XPATH,
             '//div[contains(concat(" ", normalize-space(@class), " "), " '
             'active ")]/div/div/table[contains(concat(" ", normalize-space('
             '@class), " "), " runs ")]/tbody/tr/td[@data-run-status]'
@@ -125,7 +110,7 @@ def test_create_problem(driver):
                  'active ")]/div[@data-overlay]/div[@data-overlay-popup]/form['
                  '@data-run-details-view]')))
 
-        textarea = driver.browser.find_element_by_xpath(
+        textarea = driver.browser.find_element(By.XPATH,
             '//div[contains(concat(" ", normalize-space(@class), " "), " '
             'active ")]/div[@data-overlay]/div[@data-overlay-popup]/form['
             '@data-run-details-view]//div[@class="CodeMirror-code"]')
@@ -141,7 +126,7 @@ def test_create_problem(driver):
                 if row is not None:
                     assert (row in textarea.text), row
 
-        driver.browser.find_element_by_xpath(
+        driver.browser.find_element(By.XPATH,
             '//div[contains(concat(" ", normalize-space(@class), " "), " '
             'active ")]/div[@data-overlay]').click()
         driver.update_score(problem_alias)
@@ -185,7 +170,7 @@ def test_create_problem(driver):
                  'normalize-space(@class), " "), " show ")]/div/button['
                  '@data-actions-rejudge]'))).click()
 
-        global_run = driver.browser.find_element_by_xpath(
+        global_run = driver.browser.find_element(By.XPATH,
             '//table[contains(concat(" ", normalize-space(@class), " "), " '
             'runs ")]/tbody/tr/td[@data-run-status]/span')
 
@@ -216,3 +201,6 @@ def prepare_run(driver, problem_alias):
         EC.element_to_be_clickable(
             (By.XPATH,
              '//a[text() = "%s"]' % problem_alias))).click()
+
+def remove_problem_images() -> None:
+    shutil.rmtree(os.path.join(util.OMEGAUP_ROOT, 'frontend/www/img'))
