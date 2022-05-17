@@ -400,6 +400,14 @@ export default class CourseProblemList extends Vue {
       newPublishedRevision.commit === this.versionLog[0].commit;
   }
 
+  @Watch('useLatestVersion')
+  onUseLatestVersionChange(newUseLatestVersion: boolean) {
+    if (!newUseLatestVersion) {
+      return;
+    }
+    this.selectedRevision = this.versionLog[0];
+  }
+
   @Watch('assignmentProblems')
   onAssignmentProblemChange(newValue: types.AddedProblem[]): void {
     this.problems = newValue;
