@@ -237,33 +237,37 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $group->alias
                 );
 
-                $state = null;
-                if (!is_null($countryId) && !is_null($stateId)) {
-                    $state = \OmegaUp\DAO\States::getByPK(
-                        $countryId,
-                        $stateId
+                if (isset($identity['school_name'])) {
+                    $state = null;
+                    if (!is_null($countryId) && !is_null($stateId)) {
+                        $state = \OmegaUp\DAO\States::getByPK(
+                            $countryId,
+                            $stateId
+                        );
+                    }
+
+                    $schoolId = \OmegaUp\Controllers\School::createSchool(
+                        trim($identity['school_name']),
+                        $state
                     );
+
+                    // Create IdentitySchool
+                    $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
+                        'identity_id' => $newIdentity->identity_id,
+                        'school_id' => $schoolId,
+                    ]);
+
+                    \OmegaUp\DAO\IdentitiesSchools::create($identitySchool);
+
+                    // Save current_identity_school_id on Identity
+                    $newIdentity->current_identity_school_id = $identitySchool->identity_school_id;
                 }
-                $schoolId = \OmegaUp\Controllers\School::createSchool(
-                    trim($identity['school_name']),
-                    $state
-                );
 
                 self::saveIdentityGroupInsideTransaction(
                     $newIdentity,
                     $group
                 );
 
-                // Create IdentitySchool
-                $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
-                    'identity_id' => $newIdentity->identity_id,
-                    'school_id' => $schoolId,
-                ]);
-
-                \OmegaUp\DAO\IdentitiesSchools::create($identitySchool);
-
-                // Save current_identity_school_id on Identity
-                $newIdentity->current_identity_school_id = $identitySchool->identity_school_id;
                 \OmegaUp\DAO\Identities::update($newIdentity);
             }
 
