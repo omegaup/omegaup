@@ -135,6 +135,7 @@
                         v-model="useLatestVersion"
                         class="form-check-input"
                         data-use-latest-version-true
+                        name="use-latest-version"
                         type="radio"
                         :value="true"
                       />{{ T.contestAddproblemLatestVersion }}
@@ -146,6 +147,7 @@
                         v-model="useLatestVersion"
                         class="form-check-input"
                         data-use-latest-version-false
+                        name="use-latest-version"
                         type="radio"
                         :value="false"
                       />{{ T.contestAddproblemOtherVersion }}
