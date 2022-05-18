@@ -237,7 +237,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $group->alias
                 );
 
+                $school = null;
+                $schoolId = null;
                 if (isset($identity['school_name'])) {
+                    $school = trim($identity['school_name']);
+                }
+                if (!empty($school)) {
                     $state = null;
                     if (!is_null($countryId) && !is_null($stateId)) {
                         $state = \OmegaUp\DAO\States::getByPK(
@@ -245,12 +250,18 @@ class Identity extends \OmegaUp\Controllers\Controller {
                             $stateId
                         );
                     }
-
                     $schoolId = \OmegaUp\Controllers\School::createSchool(
-                        trim($identity['school_name']),
+                        $school,
                         $state
                     );
+                }
 
+                self::saveIdentityGroupInsideTransaction(
+                    $newIdentity,
+                    $group
+                );
+
+                if (!is_null($schoolId)) {
                     // Create IdentitySchool
                     $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
                         'identity_id' => $newIdentity->identity_id,
@@ -262,11 +273,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     // Save current_identity_school_id on Identity
                     $newIdentity->current_identity_school_id = $identitySchool->identity_school_id;
                 }
-
-                self::saveIdentityGroupInsideTransaction(
-                    $newIdentity,
-                    $group
-                );
 
                 \OmegaUp\DAO\Identities::update($newIdentity);
             }
