@@ -150,7 +150,7 @@ describe('ProblemLists.vue', () => {
 
     await wrapper.setData({ versionLog, selectedRevision, publishedRevision });
 
-    expect(wrapper.vm.selectedRevision.version).toEqual(versionLog[1].version);
+    expect(wrapper.vm.selectedRevision?.version).toEqual(versionLog[1].version);
 
     expect(
       wrapper.find('input[data-use-latest-version-true]').element,
@@ -171,6 +171,6 @@ describe('ProblemLists.vue', () => {
       wrapper.find('input[data-use-latest-version-false]').element,
     ).not.toBeChecked();
 
-    expect(wrapper.vm.selectedRevision.version).toEqual(versionLog[0].version);
+    expect(wrapper.vm.selectedRevision?.version).toEqual(versionLog[0].version);
   });
 });
