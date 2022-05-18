@@ -5,7 +5,6 @@
 '''Run Selenium end-to-end tests.'''
 
 import os
-import shutil
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -203,4 +202,15 @@ def prepare_run(driver, problem_alias):
              '//a[text() = "%s"]' % problem_alias))).click()
 
 def remove_problem_images() -> None:
-    shutil.rmtree(os.path.join(util.OMEGAUP_ROOT, 'frontend/www/img'))
+    img_path = os.path.join(util.OMEGAUP_ROOT, 'frontend/www/img')
+    is_dir = os.path.isdir(img_path)
+    if is_dir is False:
+        return
+    for dir in os.listdir(img_path):
+        directory = os.path.join(img_path, dir)
+        if os.path.isdir(directory):
+            for file in os.listdir(directory):
+                file_location = os.path.join(directory, file)
+                if os.path.isfile(file_location):
+                    os.remove(file_location)
+            os.rmdir(directory)
