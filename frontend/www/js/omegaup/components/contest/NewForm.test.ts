@@ -132,4 +132,42 @@ describe('NewForm.vue', () => {
 
     wrapper.destroy();
   });
+
+  it('Should format the number to be greater than 0', () => {
+    const wrapper = shallowMount(contest_NewForm, {
+      propsData: {
+        update: false,
+        allLanguages: [{ py2: 'Python 2' }, { py3: 'Python 3' }],
+        initialLanguages: [],
+        initialFinishTime: new Date(),
+        initialStartTime: new Date(),
+        initialSubmissionsGap: 1,
+      },
+    });
+
+    // We use as any since wrapper.vm doesn't detect all the methods inside NewForm.vue component
+    expect((wrapper.vm as any).numberFormatter(2)).toBe(2);
+    expect((wrapper.vm as any).numberFormatter(-2)).toBe(0);
+    expect((wrapper.vm as any).numberFormatter(0)).toBe(0);
+    expect((wrapper.vm as any).numberFormatter(-10)).toBe(0);
+    expect((wrapper.vm as any).numberFormatter(200)).toBe(200);
+    expect((wrapper.vm as any).numberFormatter(null)).toBe(0);
+  });
+
+  it('Should open the collapsed component if required', () => {
+    const wrapper = shallowMount(contest_NewForm, {
+      propsData: {
+        update: false,
+        allLanguages: [{ py2: 'Python 2' }, { py3: 'Python 3' }],
+        initialLanguages: [],
+        initialFinishTime: new Date(),
+        initialStartTime: new Date(),
+        initialSubmissionsGap: 1,
+      },
+    });
+
+    // We use as any since wrapper.vm doesn't detect all the methods and data inside NewForm.vue component
+    (wrapper.vm as any).openCollapsedIfRequired();
+    expect((wrapper.vm as any).basicInfoVisible).toBe(true);
+  });
 });
