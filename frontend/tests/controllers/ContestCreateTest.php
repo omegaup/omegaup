@@ -351,4 +351,47 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'name' =>  $teamGroup->name,
         ], $response['teams_group']);
     }
+
+    /**
+     * A PHPUnit data provider for all the score mode to get profile details.
+     *
+     * @return list<array{0:string}>
+     */
+    public function scoreModeProvider(): array {
+        return [
+            ['partial'],
+            ['all_or_nothing'],
+            ['max_per_group'],
+        ];
+    }
+
+    /**
+     * @dataProvider scoreModeProvider
+     */
+    public function testCreateContestWithScoreMode(string $scoreMode) {
+        // Get a problem
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Create contest with 2 hours and a window length 30 of minutes
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'scoreMode' => $scoreMode,])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contest
+        );
+
+        // Create a contestant
+        $login = self::login($contest['director']);
+
+        // Create a contest request
+        $response = \OmegaUp\DAO\Contests::getByAlias(
+            $contest['request']['alias']
+        );
+
+        $this->assertEquals($response->score_mode, $scoreMode);
+    }
 }

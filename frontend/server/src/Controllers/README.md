@@ -1658,23 +1658,23 @@ Create new course API
 
 ### Parameters
 
-| Name                        | Type           | Description |
-| --------------------------- | -------------- | ----------- |
-| `admission_mode`            | `mixed`        |             |
-| `alias`                     | `mixed`        |             |
-| `description`               | `mixed`        |             |
-| `finish_time`               | `mixed`        |             |
-| `languages`                 | `mixed`        |             |
-| `level`                     | `string\|null` |             |
-| `name`                      | `mixed`        |             |
-| `needs_basic_information`   | `mixed`        |             |
-| `objective`                 | `string\|null` |             |
-| `public`                    | `mixed`        |             |
-| `requests_user_information` | `mixed`        |             |
-| `school_id`                 | `mixed`        |             |
-| `show_scoreboard`           | `mixed`        |             |
-| `start_time`                | `mixed`        |             |
-| `unlimited_duration`        | `bool\|null`   |             |
+| Name                               | Type           | Description |
+| ---------------------------------- | -------------- | ----------- |
+| `alias`                            | `string`       |             |
+| `description`                      | `string`       |             |
+| `name`                             | `string`       |             |
+| `start_time`                       | `int`          |             |
+| `admission_mode`                   | `null\|string` |             |
+| `archived`                         | `bool\|null`   |             |
+| `finish_time`                      | `int\|null`    |             |
+| `languages`                        | `null\|string` |             |
+| `level`                            | `null\|string` |             |
+| `minimum_progress_for_certificate` | `int\|null`    |             |
+| `needs_basic_information`          | `bool\|null`   |             |
+| `objective`                        | `null\|string` |             |
+| `requests_user_information`        | `null\|string` |             |
+| `school_id`                        | `int\|null`    |             |
+| `show_scoreboard`                  | `bool\|null`   |             |
 
 ### Returns
 

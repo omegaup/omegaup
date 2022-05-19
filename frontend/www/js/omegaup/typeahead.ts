@@ -73,33 +73,6 @@ function typeaheadWrapper<T>(
   return wrappedCall;
 }
 
-function typeahead<T extends { label: string; value: string }>(
-  elem: JQuery<HTMLElement>,
-  searchFn: (options?: { query?: string }) => Promise<T[]>,
-  cb: CallbackType<T>,
-) {
-  elem
-    .typeahead<T>(
-      {
-        minLength: 2,
-        highlight: true,
-      },
-      {
-        source: typeaheadWrapper(searchFn),
-        async: true,
-        limit: 100,
-        display: 'label',
-        templates: {
-          suggestion: (val) =>
-            ui.formatString('<div data-value="%(value)">%(label)</div>', val),
-        },
-      },
-    )
-    .on('typeahead:select', cb)
-    .on('typeahead:autocomplete', cb)
-    .trigger('change');
-}
-
 export function problemTypeahead(
   elem: JQuery<HTMLElement>,
   cb?: CallbackType<types.ProblemListItem>,
@@ -211,42 +184,4 @@ export function schoolTypeahead(
     )
     .on('typeahead:select', cb)
     .on('typeahead:autocomplete', cb);
-}
-
-export function tagTypeahead(
-  elem: JQuery<HTMLElement>,
-  cb?: CallbackType<{ name: string }>,
-) {
-  if (!cb) {
-    cb = (event: Event, val: { name: string }) =>
-      $(event.target as EventTarget).val(val.name);
-  }
-  elem
-    .typeahead<{ name: string }>(
-      {
-        minLength: 2,
-        highlight: true,
-      },
-      {
-        source: typeaheadWrapper(api.Tag.list),
-        async: true,
-        limit: 10,
-        display: 'name',
-      },
-    )
-    .on('typeahead:select', cb)
-    .on('typeahead:autocomplete', cb);
-}
-
-export function groupTypeahead(
-  elem: JQuery<HTMLElement>,
-  cb?: CallbackType<{ label: string; value: string }>,
-): void {
-  if (!cb) {
-    cb = (event: Event, val: { label: string; value: string }) =>
-      $(event.target as EventTarget)
-        .attr('data-value', val.value)
-        .val(val.label);
-  }
-  typeahead<{ label: string; value: string }>(elem, api.Group.list, cb);
 }
