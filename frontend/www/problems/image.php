@@ -3,7 +3,7 @@ namespace OmegaUp;
 require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
 try {
-    \OmegaUp\Controllers\Problem::apiImage(
+    \OmegaUp\Controllers\Problem::getImage(
         new \OmegaUp\Request($_REQUEST)
     );
 } catch (\Exception $e) {
