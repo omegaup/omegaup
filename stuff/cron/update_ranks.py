@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 '''Updates the user ranking.'''
 
@@ -802,7 +802,7 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = lib.db.connect(args)
+    dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
     try:
         with dbconn.cursor(buffered=True, dictionary=True) as cur:
             update_problem_accepted_stats(cur)

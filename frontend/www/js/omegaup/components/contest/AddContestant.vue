@@ -70,9 +70,11 @@
                 </div>
                 <div class="col-xs-2">
                   <button
-                    class="btn-link glyphicon glyphicon-floppy-disk"
+                    class="btn btn-link"
                     @click="$emit('save-end-time', user)"
-                  ></button>
+                  >
+                    <font-awesome-icon icon="save" />
+                  </button>
                 </div>
               </div>
             </td>
@@ -103,11 +105,23 @@ import DateTimePicker from '../DateTimePicker.vue';
 import user_Username from '../user/Username.vue';
 import common_MultiTypeahead from '../common/MultiTypeahead.vue';
 
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
 @Component({
   components: {
     'omegaup-datetimepicker': DateTimePicker,
     'omegaup-user-username': user_Username,
     'omegaup-common-multi-typeahead': common_MultiTypeahead,
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
 export default class AddContestant extends Vue {

@@ -185,7 +185,7 @@ OmegaUp.on('ready', () => {
                 // Groups previously added into the contest should not be
                 // shown in the dropdown
                 const addedGroups = new Set(
-                  this.groups.map((problem) => problem.alias),
+                  this.groups.map((group) => group.alias),
                 );
                 this.searchResultGroups = data
                   .filter((group) => !addedGroups.has(group.value))

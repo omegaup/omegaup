@@ -162,7 +162,11 @@
             :assignment-problems="assignmentProblems"
             :tagged-problems="taggedProblems"
             :selected-assignment="assignment"
+            :search-result-problems="searchResultProblems"
             @emit-tags="(tags) => $emit('tags-problems', tags)"
+            @update-search-result-problems="
+              (query) => $emit('update-search-result-problems', query)
+            "
           ></omegaup-course-scheduled-problem-list>
           <omegaup-course-problem-list
             v-else
@@ -291,6 +295,7 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
   @Prop() courseAlias!: string;
+  @Prop() scheduledAssignmentProblems!: types.ProblemsetProblem[];
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop({ default: true }) shouldAddProblems!: boolean;
