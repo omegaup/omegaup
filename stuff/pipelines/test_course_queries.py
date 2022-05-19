@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-'''test database.contest module.'''
+'''test database.course module.'''
 
 import datetime
 import os
@@ -12,7 +12,7 @@ import time
 import omegaup.api
 
 import test_credentials
-import database.contest
+import database.course
 import test_constants
 
 
@@ -23,32 +23,24 @@ sys.path.insert(
 import lib.db   # pylint: disable=wrong-import-position
 
 
-def test_get_contests_information() -> None:
-    '''Test get contest contestants'''
+def test_get_courses_information() -> None:
+    '''Test get course participants'''
 
     client = omegaup.api.Client(api_token=test_constants.API_TOKEN,
                                 url=test_constants.OMEGAUP_API_ENDPOINT)
     current_time = datetime.datetime.now()
     past_time = current_time - datetime.timedelta(hours=5)
-    alias = ''.join(random.choices(string.digits, k=8))
-    client.contest.create(
-        title=alias,
-        alias=alias,
-        description='Test contest',
+    course_alias = ''.join(random.choices(string.digits, k=8))
+    client.course.create(
+        name=course_alias,
+        alias=course_alias,
+        description='Test course',
         start_time=time.mktime(past_time.timetuple()),
         finish_time=time.mktime(current_time.timetuple()),
-        window_length=0,
-        scoreboard=100,
-        points_decay_factor=0,
-        partial_score=True,
-        submissions_gap=1200,
-        penalty=0,
-        feedback='detailed',
-        penalty_type='contest_start',
-        languages='py2,py3',
-        penalty_calc_policy='sum',
-        admission_mode='private',
-        show_scoreboard_after=True,
+        objective='Testing',
+        level='intermediate',
+        show_scoreboard=1,
+        requests_user_information='no',
     )
 
     dbconn = lib.db.connect(
@@ -63,10 +55,10 @@ def test_get_contests_information() -> None:
     )
 
     with dbconn.cursor(buffered=True, dictionary=True) as cur:
-        contests = database.contest.get_contests(
+        courses = database.course.get_courses(
             cur=cur,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT,
         )
 
-        assert alias in [contest.alias for contest in contests]
+        assert course_alias in [course.alias for course in courses]

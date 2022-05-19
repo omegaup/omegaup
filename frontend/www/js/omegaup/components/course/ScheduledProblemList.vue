@@ -20,7 +20,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="problem in problems">
+            <tr v-for="problem in problems" :key="problem.alias">
               <td class="align-middle">
                 <a :href="`/arena/problem/${problem.alias}/`">{{
                   problem.alias
@@ -41,7 +41,7 @@
         </table>
       </div>
     </div>
-    <div class="card-footer">
+    <div class="card-footer" data-course-add-problem>
       <form>
         <div class="row">
           <div class="col-md-12">
@@ -49,12 +49,15 @@
               <div class="form-group col-md-8">
                 <label
                   >{{ problemCardFooterLabel }}
-                  <omegaup-autocomplete
-                    v-model="problemAlias"
-                    class="form-control"
-                    :init="(el) => typeahead.problemTypeahead(el)"
-                  ></omegaup-autocomplete
-                ></label>
+                  <omegaup-common-typeahead
+                    :existing-options="searchResultProblems"
+                    :activation-threshold="2"
+                    :value.sync="problemAlias"
+                    @update-existing-options="
+                      (query) => $emit('update-search-result-problems', query)
+                    "
+                  ></omegaup-common-typeahead>
+                </label>
                 <p class="help-block">
                   {{ addCardFooterDescLabel }}
                 </p>
@@ -93,8 +96,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 
 import {
   FontAwesomeIcon,
@@ -107,7 +109,7 @@ library.add(fas);
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
@@ -118,8 +120,8 @@ export default class CourseScheduledProblemList extends Vue {
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: types.CourseAssignment;
+  @Prop() searchResultProblems!: types.ListItem[];
 
-  typeahead = typeahead;
   T = T;
   assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
   problems: types.AddedProblem[] = this.assignmentProblems;
