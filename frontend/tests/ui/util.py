@@ -50,7 +50,7 @@ class StatusBarIsDismissed:
             return
         message_class = self.status_element.get_attribute('class')
         assert self.message_class in message_class, message_class
-        self.status_element.find_element_by_css_selector(
+        self.status_element.find_element(By.CSS_SELECTOR,
             'button.close').click()
         self.clicked = True
 
@@ -167,7 +167,7 @@ def create_run(driver, problem_alias, filename):
             '.CodeMirror.setValue(arguments[0]);',
             f.read())
     original_url = driver.browser.current_url
-    driver.browser.find_element_by_css_selector(
+    driver.browser.find_element(By.CSS_SELECTOR,
         'form[data-run-submit] button[type="submit"]').submit()
     driver.wait.until(EC.url_changes(original_url))
 
@@ -311,7 +311,7 @@ def create_problem(
         driver,
         problem_alias: str,
         *,
-        resource_path: str = 'frontend/tests/resources/triangulos.zip',
+        resource_path: str = 'frontend/tests/resources/triangulos_imagen.zip',
         private: bool = False,
 ) -> None:
     '''Create a problem.'''
@@ -344,11 +344,11 @@ def create_problem(
                  '//input[@name = "title"]'))).send_keys(problem_alias)
 
     # Alias should be set automatically
-    driver.browser.find_element_by_name('source').send_keys('test')
+    driver.browser.find_element(By.NAME, 'source').send_keys('test')
 
     if not private:
         # Make the problem public
-        driver.browser.find_element_by_xpath(
+        driver.browser.find_element(By.XPATH,
             '//input[@type="radio" and @name="visibility" and @value="true"]'
         ).click()
 
@@ -369,8 +369,7 @@ def create_problem(
         )
     ).select_by_value('problemLevelBasicKarel')
     driver.screenshot()
-    contents_element = driver.browser.find_element_by_name(
-        'problem_contents')
+    contents_element = driver.browser.find_element(By.NAME, 'problem_contents')
     contents_element.send_keys(os.path.join(OMEGAUP_ROOT, resource_path))
     with driver.page_transition(wait_for_ajax=False):
         contents_element.submit()
@@ -438,7 +437,7 @@ def check_scoreboard_events(driver, alias, url, *, num_elements, scoreboard):
             (By.XPATH,
              '//*[name()="svg"]/*[contains(@class, "%s")]' % (series))))
 
-    scoreboard_events = driver.browser.find_elements_by_xpath(
+    scoreboard_events = driver.browser.find_elements(By.XPATH,
         '//*[name()="svg"]/*[contains(@class, "%s")]/*[contains(@class'
         ', "highcharts-tracker")]' % series)
     assert len(scoreboard_events) == num_elements, len(scoreboard_events)
@@ -503,14 +502,14 @@ def add_identities_group(driver, group_alias):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH, '//a[contains(@href, "#identities")]'))).click()
-    identities_element = driver.browser.find_element_by_name('identities')
+    identities_element = driver.browser.find_element(By.NAME, 'identities')
     identities_element.send_keys(os.path.join(
         OMEGAUP_ROOT, 'frontend/tests/resources/identities.csv'))
 
-    username_elements = driver.browser.find_elements_by_xpath(
+    username_elements = driver.browser.find_elements(By.XPATH,
         '//table[@data-identities-table]/tbody/tr/td[contains(concat(" ", '
         'normalize-space(@class), " "), " username ")]/strong')
-    password_elements = driver.browser.find_elements_by_xpath(
+    password_elements = driver.browser.find_elements(By.XPATH,
         '//table[@data-identities-table]/tbody/tr/td[contains(concat(" ", '
         'normalize-space(@class), " "), " password ")]')
     usernames = [username.text for username in username_elements]
@@ -533,7 +532,7 @@ def add_identities_group(driver, group_alias):
         EC.visibility_of_element_located(
             (By.XPATH, '//table[@data-table-identities]')))
 
-    identity_elements = driver.browser.find_elements_by_xpath(
+    identity_elements = driver.browser.find_elements(By.XPATH,
         '//table[@data-table-identities]/tbody/tr/td/span/a'
     )
     uploaded_identities = [identity.text for identity in identity_elements]
