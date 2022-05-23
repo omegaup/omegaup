@@ -139,7 +139,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
     def page_transition(self, wait_for_ajax=True, target_url=None):
         '''Waits for a page transition to finish.'''
 
-        html_node = self.browser.find_element_by_tag_name('html')
+        html_node = self.browser.find_element(By.TAG_NAME, 'html')
         prev_url = self.browser.current_url
         logging.debug('Waiting for a page transition on %s', prev_url)
         yield
@@ -268,10 +268,10 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
         self._wait_for_page_loaded()
 
-        self.browser.find_element_by_name('login_username').send_keys(username)
-        self.browser.find_element_by_name('login_password').send_keys(password)
+        self.browser.find_element(By.NAME, 'login_username').send_keys(username)
+        self.browser.find_element(By.NAME, 'login_password').send_keys(password)
         with self.page_transition():
-            self.browser.find_element_by_name('login').click()
+            self.browser.find_element(By.NAME, 'login').click()
 
         if is_main_user_identity:
             self.wait.until(
@@ -312,14 +312,14 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                      '//a[contains(@href, "/login/")]'))).click()
 
         # Login screen
-        self.browser.find_element_by_name('reg_username').send_keys(user)
-        self.browser.find_element_by_name('reg_email').send_keys(
+        self.browser.find_element(By.NAME, 'reg_username').send_keys(user)
+        self.browser.find_element(By.NAME, 'reg_email').send_keys(
             'email_%s@localhost.localdomain' % user)
-        self.browser.find_element_by_name('reg_password').send_keys(passw)
-        self.browser.find_element_by_name(
+        self.browser.find_element(By.NAME, 'reg_password').send_keys(passw)
+        self.browser.find_element(By.NAME,
             'reg_password_confirmation').send_keys(passw)
         with self.page_transition():
-            self.browser.find_element_by_name('sign_up').click()
+            self.browser.find_element(By.NAME, 'sign_up').click()
 
         # Enable experiment
         user_id = util.database_utils.mysql(
@@ -627,7 +627,7 @@ def _get_browser(request, browser_name):
     return firefox_browser
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def driver(request, browser_name):
     '''Run tests using the selenium webdriver.'''
 
