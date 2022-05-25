@@ -774,7 +774,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $filter = self::formatSearch($query);
         $query_check = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
 
-        $sql_relevant_contests = "
+        $sqlRelevantContests = "
         -- Organizer
         (SELECT
             c.contest_id,
@@ -813,6 +813,20 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             Problemsets p ON gr.acl_id = p.acl_id
         WHERE
             gi.identity_id = ? AND gr.role_id = ?
+        )
+        -- Participating via Teams group
+        UNION DISTINCT
+        (SELECT
+            p.contest_id,
+            TRUE AS participating
+        FROM
+            Teams t
+        INNER JOIN
+            Teams_Group_Roles tgr ON t.team_group_id = tgr.team_group_id
+        INNER JOIN
+            Problemsets p ON tgr.acl_id = p.acl_id
+        WHERE
+            t.identity_id = ? AND tgr.role_id = ?
         )
         -- Admin
         UNION DISTINCT
@@ -870,7 +884,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         BIT_OR(rc.participating) AS participating";
         $sql = "
         FROM
-            ($sql_relevant_contests) rc
+            ($sqlRelevantContests) rc
         INNER JOIN
             Contests ON Contests.contest_id = rc.contest_id
         LEFT JOIN
@@ -890,6 +904,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $identityId,    // Organizer
             $identityId,    // Direct participant
             $identityId,    // Participant via Group
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
+            $identityId,    // Participant via Teams Group
             \OmegaUp\Authorization::CONTESTANT_ROLE,
             $identityId,    // Admin
             \OmegaUp\Authorization::ADMIN_ROLE,
