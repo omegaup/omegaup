@@ -272,13 +272,16 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.currentAssignment);
-        x.scoreboard = ((x) => {
-          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
-          return x;
-        })(x.scoreboard);
+        if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
+          x.scoreboard = ((x) => {
+            if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          })(x.scoreboard);
         return x;
       })(
         JSON.parse(
@@ -2418,7 +2421,7 @@ export namespace types {
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
     currentAssignment: types.ArenaAssignment;
-    scoreboard: types.Scoreboard;
+    scoreboard?: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
   }
