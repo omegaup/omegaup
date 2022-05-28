@@ -166,13 +166,13 @@ def test_client_contest_with_mocked_codes(
         cur.execute('SELECT COUNT(*) AS count FROM `Certificates`;')
         count = cur.fetchone()
         assert count['count'] == 0
+        spy = mocker.spy(contest_callback, 'generate_contest_code')
         rabbitmq_client.receive_messages(
             channel=channel,
             exchange='certificates',
             queue='contest',
             routing_key='ContestQueue',
             callback=callback)
-        spy = mocker.spy(verification_code, 'generate_code')
         assert spy.call_count == 4
 
 
@@ -182,10 +182,10 @@ def test_client_contest_with_duplicated_codes(
     '''Test client contest queue when a code already exists'''
     mocker.patch('contest_callback.generate_contest_code',
                  side_effect=iter(['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F',
-                                   'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
-                                   'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
-                                   'XMCF384X8C', 'XMCF384X8X', 'XMCF384X8C',
-                                   'XMCF384X8X', 'XMCF384X8M']))
+                                   'XMCF384X8C', 'XMDF384X8A', 'XMCF384X8D',
+                                   'XMCF384X8E', 'XMCF384X8L', 'XMCF385X8E',
+                                   'XMCF384X8P', 'XMCF384X5F', 'XNCF384X8F',
+                                   'XMCF384X89', 'XMCF384X8M']))
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
             user=test_credentials.MYSQL_USER,
@@ -222,11 +222,12 @@ def test_client_contest_with_duplicated_codes(
         cur.execute('SELECT COUNT(*) AS count FROM `Certificates`;')
         count = cur.fetchone()
         assert count['count'] == 0
+        spy = mocker.spy(contest_callback, 'generate_contest_code')
         rabbitmq_client.receive_messages(
             channel=channel,
             exchange='certificates',
             queue='contest',
             routing_key='ContestQueue',
             callback=callback)
-        spy = mocker.spy(verification_code, 'generate_code')
+
         assert spy.call_count > 4
