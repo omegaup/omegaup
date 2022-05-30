@@ -55,7 +55,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type IntroDetailsPayload=array{course: CourseDetails, isFirstTimeAccess: bool, needsBasicInformation: bool, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
  * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
  * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, problemset_id: int, runs: list<Run>, start_time: \OmegaUp\Timestamp, totalRuns: int|null}
- * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard: Scoreboard, courseDetails: CourseDetails, currentAssignment: ArenaAssignment, shouldShowFirstAssociatedIdentityRunWarning: bool}
+ * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard?: Scoreboard, courseDetails: CourseDetails, currentAssignment: ArenaAssignment, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type AssignmentDetails=array{admin: bool, alias: string, assignmentType: string, courseAssignments: list<CourseAssignment>, description: string, director: string, finishTime: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemsetId: int, startTime: \OmegaUp\Timestamp}
  * @psalm-type CourseScoreboardPayload=array{assignment: AssignmentDetails, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardToken:null|string}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float, is_extra_problem?: bool}
@@ -4224,7 +4224,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             ] = self::getAllRuns($assignment->problemset_id);
         }
 
-        return [
+        $response = [
             'templateProperties' => [
                 'payload' => [
                     'shouldShowFirstAssociatedIdentityRunWarning' => (
@@ -4259,10 +4259,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'runs' => $runs,
                         'totalRuns' => $totalRuns,
                     ],
-                    'scoreboard' => $scoreboard->generate(
-                        withRunDetails: false,
-                        sortByName: false
-                    ),
                 ],
                 'fullWidth' => true,
                 'title' => new \OmegaUp\TranslationString(
@@ -4277,6 +4273,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             'inContest' => $assignment->assignment_type === 'test',
             'entrypoint' => 'arena_course',
         ];
+        if ($course->admission_mode !== self::ADMISSION_MODE_PUBLIC) {
+            $response['templateProperties']['payload']['scoreboard'] = $scoreboard->generate(
+                withRunDetails: false,
+                sortByName: false
+            );
+        }
+        return $response;
     }
 
     /**
