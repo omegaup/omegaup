@@ -3,7 +3,7 @@
 '''Mysql queries to generate messages for contests'''
 
 import datetime
-from typing import Dict, List, NamedTuple
+from typing import List, NamedTuple
 
 import mysql.connector
 import mysql.connector.cursor
@@ -52,4 +52,5 @@ def get_contests(
             contest_id=row['contest_id'],
         )
         data.append(contest)
+    print(data)
     return data

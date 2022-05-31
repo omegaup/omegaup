@@ -51,16 +51,7 @@ class ContestsCallback:
                  _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
         '''Function to store the certificates by a given contest'''
-        body = json.loads(body)
-        if type(body) is list:
-            data = ContestCertificate(
-                certificate_cutoff=body[0],
-                alias=body[1],
-                scoreboard_url=body[2],
-                contest_id=body[3],
-            )
-        else:
-            data = ContestCertificate(**body)
+        data = ContestCertificate(**json.loads(body))
 
         scoreboard = self.client.contest.scoreboard(
             contest_alias=data.alias,

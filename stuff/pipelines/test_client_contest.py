@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-'''test verification_code module.'''
+'''test client contest module.'''
 
 import os
 import sys
@@ -13,12 +13,11 @@ import omegaup.api
 import pika
 
 import contest_callback
-import test_credentials
 import rabbitmq_connection
 import rabbitmq_client
 import producer_contest
 import test_constants
-import verification_code
+import test_credentials
 
 sys.path.insert(
     0,
@@ -26,27 +25,6 @@ sys.path.insert(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__))), '.'))
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
-
-
-def initialize_rabbitmq(
-        queue: str,
-        exchange: str,
-        routing_key: str,
-        channel: pika.adapters.blocking_connection.BlockingChannel
-) -> None:
-    '''initializes the queue and exchange'''
-    channel.queue_declare(
-        queue=queue, passive=False,
-        durable=True, exclusive=False,
-        auto_delete=False)
-    channel.exchange_declare(
-        exchange=exchange,
-        auto_delete=False,
-        durable=True,
-        exchange_type='direct')
-    channel.queue_bind(exchange=exchange,
-                       queue=queue,
-                       routing_key=routing_key)
 
 
 class ContestsCallbackForTesting:
@@ -90,10 +68,10 @@ def test_client_contest() -> None:
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,
         ) as channel:
-        initialize_rabbitmq(queue='contest',
-                            exchange='certificates',
-                            routing_key='ContestQueue',
-                            channel=channel)
+        rabbitmq_connection.initialize_rabbitmq(queue='contest',
+                                                exchange='certificates',
+                                                routing_key='ContestQueue',
+                                                channel=channel)
         producer_contest.send_contest_message_to_client(
             cur=cur,
             channel=channel,
@@ -146,10 +124,10 @@ def test_client_contest_with_mocked_codes(
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,
         ) as channel:
-        initialize_rabbitmq(queue='contest',
-                            exchange='certificates',
-                            routing_key='ContestQueue',
-                            channel=channel)
+        rabbitmq_connection.initialize_rabbitmq(queue='contest',
+                                                exchange='certificates',
+                                                routing_key='ContestQueue',
+                                                channel=channel)
         producer_contest.send_contest_message_to_client(
             cur=cur,
             channel=channel,
@@ -202,10 +180,10 @@ def test_client_contest_with_duplicated_codes(
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,
         ) as channel:
-        initialize_rabbitmq(queue='contest',
-                            exchange='certificates',
-                            routing_key='ContestQueue',
-                            channel=channel)
+        rabbitmq_connection.initialize_rabbitmq(queue='contest',
+                                                exchange='certificates',
+                                                routing_key='ContestQueue',
+                                                channel=channel)
         producer_contest.send_contest_message_to_client(
             cur=cur,
             channel=channel,
