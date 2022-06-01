@@ -11,16 +11,34 @@
               class="form-control"
               disabled="disabled"
             />
-            <omegaup-common-typeahead
-              v-else
-              :existing-options="searchResultProblems"
-              :activation-threshold="2"
-              :value.sync="alias"
-              @update-existing-options="
-                (query) => $emit('update-search-result-problems', query)
-              "
-            >
-            </omegaup-common-typeahead>
+            <div v-else class="input-group w-100">
+              <div class="input-group-prepend w-25">
+                <select v-model="selectedSearchType" class="custom-select">
+                  <option
+                    v-for="searchType in availableSearchTypes"
+                    :key="searchType.key"
+                    :value="searchType.key"
+                    :selected="selectedSearchType === searchType.key"
+                  >
+                    {{ searchType.value }}
+                  </option>
+                </select>
+              </div>
+              <omegaup-common-typeahead
+                class="w-75"
+                :existing-options="searchResultProblems"
+                :activation-threshold="2"
+                :value.sync="alias"
+                @update-existing-options="
+                  (query) =>
+                    $emit('update-search-result-problems', {
+                      query,
+                      searchType: selectedSearchType,
+                    })
+                "
+              >
+              </omegaup-common-typeahead>
+            </div>
           </div>
         </div>
         <div v-if="alias" class="row">
@@ -174,6 +192,13 @@ interface MappedProblems {
   };
 }
 
+export enum SearchTypes {
+  ALL = 'all',
+  TITLE = 'title',
+  ALIAS = 'alias',
+  ID = 'problem_id',
+}
+
 @Component({
   components: {
     'omegaup-problem-versions': problem_Versions,
@@ -203,6 +228,13 @@ export default class AddProblem extends Vue {
   useLatestVersion = true;
   publishedRevision: null | types.ProblemVersion = null;
   selectedRevision: null | types.ProblemVersion = null;
+  selectedSearchType: SearchTypes = SearchTypes.ALL;
+  availableSearchTypes: types.ListItem[] = [
+    { key: SearchTypes.ALL, value: T.contestEditAddProblemSearchByAll },
+    { key: SearchTypes.ALIAS, value: T.contestEditAddProblemSearchByAlias },
+    { key: SearchTypes.TITLE, value: T.contestEditAddProblemSearchByTitle },
+    { key: SearchTypes.ID, value: T.contestEditAddProblemSearchById },
+  ];
 
   get problemMapping(): MappedProblems {
     let problemMapping: MappedProblems = {};

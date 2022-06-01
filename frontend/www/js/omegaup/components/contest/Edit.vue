@@ -157,7 +157,7 @@
           :search-result-problems="searchResultProblems"
           @add-problem="(request) => $emit('add-problem', request)"
           @update-search-result-problems="
-            (query) => $emit('update-search-result-problems', query)
+            (request) => $emit('update-search-result-problems', request)
           "
           @get-versions="(request) => $emit('get-versions', request)"
           @remove-problem="

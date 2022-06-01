@@ -3,6 +3,7 @@ import { types } from '../api_types';
 import Vue from 'vue';
 import T from '../lang';
 import contest_Edit from '../components/contest/Edit.vue';
+import SearchTypes from '../components/contest/AddProblem.vue';
 import * as ui from '../ui';
 import * as api from '../api';
 import { toCsv, TableCell } from '../csv';
@@ -156,9 +157,16 @@ OmegaUp.on('ready', () => {
           teamsGroup: this.teamsGroup,
         },
         on: {
-          'update-search-result-problems': (query: string) => {
+          'update-search-result-problems': ({
+            query,
+            searchType,
+          }: {
+            query: string;
+            searchType: SearchTypes;
+          }) => {
             api.Problem.list({
               query,
+              search_type: searchType,
             })
               .then((data) => {
                 // Problems previously added into the contest should not be
