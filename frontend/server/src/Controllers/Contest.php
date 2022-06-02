@@ -1792,6 +1792,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'has_submissions',
                     'languages',
                     'partial_score',
+                    'score_mode',
                     'penalty',
                     'penalty_calc_policy',
                     'penalty_type',
@@ -2361,6 +2362,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'points_decay_factor' => $originalContest->points_decay_factor,
             'submissions_gap' => $originalContest->submissions_gap,
             'partial_score' => $originalContest->partial_score,
+            'score_mode' => $originalContest->score_mode,
             'feedback' => $originalContest->feedback,
             'penalty' => $originalContest->penalty,
             'penalty_type' => $originalContest->penalty_type,
@@ -2556,7 +2558,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ) : null;
 
         $partialScore = $r->ensureOptionalBool('partial_score') ?? true;
-        $scoreMode = $r['score_mode'];
+        $scoreMode = $r->ensureOptionalEnum(
+            'score_mode',
+            ['partial','all_or_nothing','max_per_group'],
+        );
         if (is_null($scoreMode)) {
             $scoreMode = $partialScore ? 'partial' : 'all_or_nothing';
         }
@@ -2609,6 +2614,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
@@ -2722,11 +2728,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
         $r->ensureOptionalFloat('scoreboard', 0, 100, $isRequired);
         $r->ensureOptionalFloat('points_decay_factor', 0, 1, $isRequired);
-        $r->ensureOptionalBool('partial_score');
-        $r->ensureOptionalEnum(
+        // $r->ensureOptionalBool('partial_score');
+        // $r->ensureOptionalEnum(
+        //     'score_mode',
+        //     ['partial','all_or_nothing','max_per_group'],
+        // );
+        // TODO: Change this once the UI supports it
+        $partialScore = $r->ensureOptionalBool('partial_score');
+        $scoreMode = $r->ensureOptionalEnum(
             'score_mode',
             ['partial','all_or_nothing','max_per_group'],
         );
+        if (is_null($scoreMode)) {
+            $scoreMode = $partialScore ? 'partial' : 'all_or_nothing';
+        }
+        $r['score_mode'] = $scoreMode;
         $r->ensureOptionalInt('submissions_gap', 0, null, $isRequired);
         $r->ensureOptionalInt('penalty', 0, 10000, $isRequired);
         // Validate the submission_gap in minutes so that the error message
@@ -2851,6 +2867,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
@@ -2888,6 +2905,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
@@ -4640,6 +4658,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
