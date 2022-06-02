@@ -82,7 +82,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
      * @param list<string> $authors
-     * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int, problem_id: int}>, count: int}
+     * @return array{count: int, problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}>}
      */
     final public static function byIdentityType(
         string $identityType,
@@ -104,6 +104,15 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         string $difficulty,
         array $authors
     ) {
+        $fields = join(
+            '',
+            array_map(
+                fn (string $field): string => "p.{$field}, ",
+                array_keys(
+                    \OmegaUp\DAO\VO\Problems::FIELD_NAMES
+                )
+            )
+        );
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
             $order = 'desc';
@@ -139,6 +148,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $collation = ($orderBy === 'title') ? 'COLLATE utf8mb4_bin' : '';
         $select = '';
         $sql = '';
+        $matchingSelect = '';
         $args = [];
 
         // Clauses is an array of 2-tuples that contains a chunk of SQL and the
@@ -227,6 +237,30 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         if (!is_null($query)) {
+            $args[] = $query;
+            $args[] = $query;
+            $matchingFields = join(
+                '',
+                array_map(
+                    fn (string $field): string => "Problems.{$field}, ",
+                    array_keys(
+                        \OmegaUp\DAO\VO\Problems::FIELD_NAMES
+                    )
+                )
+            );
+            $matchingSelect = "
+                SELECT DISTINCT
+                    0.0 AS points,
+                    0.0 AS ratio,
+                    0.0 AS score,
+                    {$matchingFields}
+                    IFNULL(MATCH(alias, title) AGAINST (? IN BOOLEAN MODE), 0) AS relevance
+                FROM
+                    Problems
+                WHERE
+                    MATCH(alias, title) AGAINST (? IN BOOLEAN MODE)
+                UNION DISTINCT
+            ";
             if (is_numeric($query)) {
                 $clauses[] = [
                     "(
@@ -245,14 +279,15 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         if ($identityType === IDENTITY_ADMIN) {
-            $args = [$identityId];
-            $select = '
-                SELECT
-                    ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2)   AS points,
-                    accepted / GREATEST(1, submissions)     AS ratio,
-                    ROUND(100 * IFNULL(ps.score, 0.0))      AS score,
-                    p.*
-            ';
+            $args[] = $identityId;
+            $select = "
+                SELECT DISTINCT
+                    ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2) AS points,
+                    accepted / GREATEST(1, submissions) AS ratio,
+                    ROUND(100 * IFNULL(ps.score, 0.0)) AS score,
+                    {$fields}
+                    0 AS relevance
+            ";
             $sql = '
                 FROM
                     Problems p
@@ -275,13 +310,14 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 [\OmegaUp\ProblemParams::VISIBILITY_DELETED],
             ];
         } elseif ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
-            $select = '
-                SELECT
+            $select = "
+                SELECT DISTINCT
                     ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                     p.accepted / GREATEST(1, p.submissions)     AS ratio,
                     ROUND(100 * IFNULL(ps.score, 0), 2)   AS score,
-                    p.*
-            ';
+                    {$fields}
+                    0 AS relevance
+            ";
             $sql = '
                 FROM
                     Problems p
@@ -338,12 +374,14 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 [\OmegaUp\ProblemParams::VISIBILITY_DELETED],
             ];
         } elseif ($identityType === IDENTITY_ANONYMOUS) {
-            $select = '
-                    SELECT
+            $select = "
+                    SELECT DISTINCT
                         0.0 AS score,
                         ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                         accepted / GREATEST(1, p.submissions)  AS ratio,
-                        p.* ';
+                        {$fields}
+                        0 AS relevance
+                    ";
             $sql = '
                     FROM
                         Problems p ' . $languageJoin . $levelJoin;
@@ -422,7 +460,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             "SELECT COUNT(*) $sql",
-            $args
+            array_slice($args, 2)
         );
 
         // Reset the offset to 0 if out of bounds.
@@ -443,9 +481,39 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $args[] = $offset;
         $args[] = $rowcount;
 
-        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, points: float|null, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, ratio: float|null, score: float, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        $sqFields = join(
+            '',
+            array_map(
+                fn (string $field): string => "sq.{$field}, ",
+                array_keys(
+                    \OmegaUp\DAO\VO\Problems::FIELD_NAMES
+                )
+            )
+        );
+        $sqFieldsWithNoEndingComma = rtrim($sqFields, ', ');
+
+        $fullQuery = "
+            SELECT DISTINCT
+                SUM(sq.points) AS points,
+                SUM(sq.ratio) AS ratio,
+                SUM(sq.score) AS score,
+                {$sqFields}
+                SUM(sq.relevance) AS relevance
+            FROM (
+                {$matchingSelect}
+                (
+                    {$select}
+                    {$sql}
+                )
+            ) AS sq
+            GROUP BY
+                {$sqFieldsWithNoEndingComma}
+            ORDER BY
+                relevance DESC;";
+
+        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, points: float|null, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, ratio: float|null, relevance: float|null, score: float|null, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            "{$select} {$sql};",
+            $fullQuery,
             $args
         );
 
