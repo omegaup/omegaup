@@ -1386,7 +1386,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     public function problemListWithSearchTypeProvider(): array {
         return [
             [
-                'caminos',
+                'Caminos',
                 'all',
                 [
                     'Caminos-en-rejilla',
@@ -1402,14 +1402,17 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                     'Caminos',
                 ],
             ],
-            ['caminos','alias',['Caminos']],
-            ['caminos','title',['Caminos-']],
+            ['Caminos','alias',['Caminos']],
+            ['Caminos','title',['Caminos-']],
+            ['Caminos','problem_id',['Caminos']],
             ['CaminosAB','all',['CaminosAB']],
             ['CaminosAB','alias',['CaminosAB']],
             ['CaminosAB','title',['CaminosAB']],
+            ['CaminosAB','problem_id',['CaminosAB']],
             ['Bacho','all',['Caminos-de-Bacho']],
             ['Bacho','alias',[]],
             ['Bacho','title',[]],
+            ['Bacho','problem_id',[]],
         ];
     }
 
@@ -1451,12 +1454,25 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($admin);
 
+        $params = [
+            'auth_token' => $login->auth_token,
+            'query' => $query,
+            'search_type' => $searchType,
+        ];
+
+        $problem = null;
+        if (in_array($searchType, ['all', 'problem_id'])) {
+            $problem = \OmegaUp\DAO\Problems::getByAlias($query);
+            if ($searchType === 'problem_id') {
+                if (is_null($problem)) {
+                    return;
+                }
+                $params['query'] = $problem->problem_id;
+            }
+        }
+
         $response = \OmegaUp\Controllers\Problem::apiList(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'query' => $query,
-                'search_type' => $searchType,
-            ])
+            new \OmegaUp\Request($params)
         );
         $this->assertCount($response['total'], $expectedAliases);
 
@@ -1465,6 +1481,18 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 $response['results'],
                 fn ($problem) => $problem['alias'] == $problemAlias
             );
+        }
+
+        if ($searchType === 'all' && !is_null($problem)) {
+            $response = \OmegaUp\Controllers\Problem::apiList(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'query' => $problem->problem_id,
+                    'search_type' => $searchType,
+                ])
+            );
+            $this->assertEquals($response['total'], 1);
+            $this->assertEquals($response['results'][0]['alias'], $query);
         }
     }
 }

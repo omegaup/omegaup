@@ -228,7 +228,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         if (!is_null($query)) {
-            if ($searchType !== 'all') {
+            if (in_array($searchType, ['alias', 'title', 'problem_id'])) {
                 $clauses[] = [ " p.{$searchType} = ? ", [$query] ];
             } else {
                 if (is_numeric($query)) {
