@@ -1802,6 +1802,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'scoreboard',
                     'scoreboard_url',
                     'scoreboard_url_admin',
+                    'score_mode',
                     'default_show_all_contestants_in_scoreboard',
                     'show_scoreboard_after',
                     'start_time',
