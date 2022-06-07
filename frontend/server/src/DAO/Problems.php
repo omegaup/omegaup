@@ -102,7 +102,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         bool $onlyQualitySeal,
         ?string $level,
         string $difficulty,
-        array $authors
+        array $authors,
+        string $searchType
     ) {
         $fields = join(
             ', ',
@@ -238,44 +239,48 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         if (!is_null($query)) {
-            $matchingArgs[] = $query;
-            $matchingArgs[] = $query;
-            $matchingFields = join(
-                '',
-                array_map(
-                    fn (string $field): string => "Problems.{$field}, ",
-                    array_keys(
-                        \OmegaUp\DAO\VO\Problems::FIELD_NAMES
-                    )
-                )
-            );
-            $matchingSelect = "
-                SELECT DISTINCT
-                    0.0 AS points,
-                    0.0 AS ratio,
-                    0.0 AS score,
-                    {$matchingFields}
-                    IFNULL(MATCH(alias, title) AGAINST (? IN BOOLEAN MODE), 0) AS relevance
-                FROM
-                    Problems
-                WHERE
-                    MATCH(alias, title) AGAINST (? IN BOOLEAN MODE)
-                UNION DISTINCT
-            ";
-            if (is_numeric($query)) {
-                $clauses[] = [
-                    "(
-                      p.title LIKE CONCAT('%', ?, '%') OR
-                      p.alias LIKE CONCAT('%', ?, '%') OR
-                      p.problem_id = ?
-                    )",
-                    [$query, $query, intval($query)],
-                ];
+            if (in_array($searchType, ['alias', 'title', 'problem_id'])) {
+                $clauses[] = [ " p.{$searchType} = ? ", [$query] ];
             } else {
-                $clauses[] = [
-                    "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
-                    [$query, $query],
-                ];
+                $matchingArgs[] = $query;
+                $matchingArgs[] = $query;
+                $matchingFields = join(
+                    '',
+                    array_map(
+                        fn (string $field): string => "Problems.{$field}, ",
+                        array_keys(
+                            \OmegaUp\DAO\VO\Problems::FIELD_NAMES
+                        )
+                    )
+                );
+                $matchingSelect = "
+                    SELECT DISTINCT
+                        0.0 AS points,
+                        0.0 AS ratio,
+                        0.0 AS score,
+                        {$matchingFields}
+                        IFNULL(MATCH(alias, title) AGAINST (? IN BOOLEAN MODE), 0) AS relevance
+                    FROM
+                        Problems
+                    WHERE
+                        MATCH(alias, title) AGAINST (? IN BOOLEAN MODE)
+                    UNION DISTINCT
+                ";
+                if (is_numeric($query)) {
+                    $clauses[] = [
+                        "(
+                        p.title LIKE CONCAT('%', ?, '%') OR
+                        p.alias LIKE CONCAT('%', ?, '%') OR
+                        p.problem_id = ?
+                        )",
+                        [$query, $query, intval($query)],
+                    ];
+                } else {
+                    $clauses[] = [
+                        "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
+                        [$query, $query],
+                    ];
+                }
             }
         }
 
