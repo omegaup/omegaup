@@ -3877,6 +3877,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
      * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param null|string $search_type
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
      * @omegaup-request-param bool $only_quality_seal
@@ -3896,6 +3897,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $onlyQualitySeal = $r->ensureOptionalBool('only_quality_seal') ?? false;
         $level = $r->ensureOptionalString('level');
+        $searchType = $r->ensureOptionalEnum(
+            'search_type',
+            ['all', 'alias', 'title', 'problem_id']
+        ) ?? 'all';
         $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
 
         if (is_null($r['page'])) {
@@ -3937,7 +3942,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $onlyQualitySeal,
             $level,
             $difficulty,
-            $authors
+            $authors,
+            $searchType
         );
     }
 
@@ -3966,7 +3972,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         bool $onlyQualitySeal,
         ?string $level,
         string $difficulty,
-        array $authors
+        array $authors,
+        string $searchType = 'all'
     ) {
         $authorIdentityId = null;
         $authorUserId = null;
@@ -4020,7 +4027,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $onlyQualitySeal,
             $level,
             $difficulty,
-            $authors
+            $authors,
+            $searchType
         );
         return [
             'total' => $count,
