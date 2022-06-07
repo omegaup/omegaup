@@ -245,9 +245,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $matchingArgs[] = $query;
                 $matchingArgs[] = $query;
                 $matchingFields = join(
-                    '',
+                    ', ',
                     array_map(
-                        fn (string $field): string => "Problems.{$field}, ",
+                        fn (string $field): string => "Problems.{$field}",
                         array_keys(
                             \OmegaUp\DAO\VO\Problems::FIELD_NAMES
                         )
@@ -258,7 +258,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         0.0 AS points,
                         0.0 AS ratio,
                         0.0 AS score,
-                        {$matchingFields}
+                        {$matchingFields},
                         IFNULL(MATCH(alias, title) AGAINST (? IN BOOLEAN MODE), 0) AS relevance
                     FROM
                         Problems

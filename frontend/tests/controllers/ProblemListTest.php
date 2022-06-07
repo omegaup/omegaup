@@ -8,7 +8,23 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Factories\QualityNomination::initQualityReviewers();
         \OmegaUp\Test\Factories\QualityNomination::initTopicTags();
+
+        $this->problemsMapping = [
+            ['alias' => 'Caminos-en-rejilla', 'title' => 'Caminos en rejilla'],
+            ['alias' => 'Caminos-', 'title' => 'Caminos'],
+            ['alias' => 'Caminos-de-Bacho', 'title' => 'Caminos de Bacho'],
+            ['alias' => 'Caminos-de-Fer-I', 'title' => 'Caminos de Fer I'],
+            ['alias' => 'Caminos-cortos', 'title' => 'Caminos cortos'],
+            ['alias' => 'Los-caminos-de-Al', 'title' => 'Los caminos de Al'],
+            ['alias' => 'Caminos-N-buenos', 'title' => 'Caminos N-buenos'],
+            ['alias' => 'Los-Caminos-de-la-Vida', 'title' => 'Los Caminos de la Vida'],
+            ['alias' => 'CaminosAB', 'title' => 'CaminosAB'],
+            ['alias' => 'S1-2020-Senior-CCC', 'title' => 'Velocidad del Correcaminos'],
+            ['alias' => 'Caminos', 'title' => 'Caminos nuevos'],
+        ];
     }
+
+    protected $problemsMapping;
 
     /**
      * Gets the list of problems
@@ -1428,25 +1444,12 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         string $searchType,
         array $expectedAliases
     ) {
-        $problemsMapping = [
-            ['alias' => 'Caminos-en-rejilla', 'title' => 'Caminos en rejilla'],
-            ['alias' => 'Caminos-', 'title' => 'Caminos'],
-            ['alias' => 'Caminos-de-Bacho', 'title' => 'Caminos de Bacho'],
-            ['alias' => 'Caminos-de-Fer-I', 'title' => 'Caminos de Fer I'],
-            ['alias' => 'Caminos-cortos', 'title' => 'Caminos cortos'],
-            ['alias' => 'Los-caminos-de-Al', 'title' => 'Los caminos de Al'],
-            ['alias' => 'Caminos-N-buenos', 'title' => 'Caminos N-buenos'],
-            ['alias' => 'Los-Caminos-de-la-Vida', 'title' => 'Los Caminos de la Vida'],
-            ['alias' => 'CaminosAB', 'title' => 'CaminosAB'],
-            ['alias' => 'S1-2020-Senior-CCC', 'title' => 'Velocidad del Correcaminos'],
-            ['alias' => 'Caminos', 'title' => 'Caminos nuevos'],
-        ];
         [
             'identity' => $admin
         ] = \OmegaUp\Test\Factories\User::createAdminUser(
             new \OmegaUp\Test\Factories\UserParams()
         );
-        foreach ($problemsMapping as $problem) {
+        foreach ($this->problemsMapping as $problem) {
             \OmegaUp\Test\Factories\Problem::createProblem(
                 new \OmegaUp\Test\Factories\ProblemParams($problem)
             );
@@ -1494,5 +1497,48 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals($response['total'], 1);
             $this->assertEquals($response['results'][0]['alias'], $query);
         }
+    }
+
+    public function testProblemListSearchByBestMatch() {
+        [
+            'identity' => $admin
+        ] = \OmegaUp\Test\Factories\User::createAdminUser(
+            new \OmegaUp\Test\Factories\UserParams()
+        );
+        foreach ($this->problemsMapping as $problem) {
+            \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams($problem)
+            );
+        }
+
+        $login = self::login($admin);
+
+        $response = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'query' => 'Caminos',
+                'search_type' => 'all',
+            ])
+        );
+        $this->assertEquals($response['total'], 11);
+
+        $expectedSortedAliases = [
+            'Caminos',
+            'Caminos-',
+            'Caminos-en-rejilla',
+            'Caminos-de-Bacho',
+            'Caminos-de-Fer-I',
+            'Caminos-cortos',
+            'Los-caminos-de-Al',
+            'Caminos-N-buenos',
+            'Los-Caminos-de-la-Vida',
+            'S1-2020-Senior-CCC',
+            'CaminosAB',
+        ];
+        $sortedAliases = array_map(
+            fn ($problem) => $problem['alias'],
+            $response['results']
+        );
+        $this->assertEquals($sortedAliases, $expectedSortedAliases);
     }
 }
