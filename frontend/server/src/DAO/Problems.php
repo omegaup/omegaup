@@ -105,9 +105,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         array $authors
     ) {
         $fields = join(
-            '',
+            ', ',
             array_map(
-                fn (string $field): string => "p.{$field}, ",
+                fn (string $field): string => "p.{$field}",
                 array_keys(
                     \OmegaUp\DAO\VO\Problems::FIELD_NAMES
                 )
@@ -149,6 +149,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $select = '';
         $sql = '';
         $matchingSelect = '';
+        $matchingArgs = [];
         $args = [];
 
         // Clauses is an array of 2-tuples that contains a chunk of SQL and the
@@ -237,8 +238,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         if (!is_null($query)) {
-            $args[] = $query;
-            $args[] = $query;
+            $matchingArgs[] = $query;
+            $matchingArgs[] = $query;
             $matchingFields = join(
                 '',
                 array_map(
@@ -285,7 +286,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2) AS points,
                     accepted / GREATEST(1, submissions) AS ratio,
                     ROUND(100 * IFNULL(ps.score, 0.0)) AS score,
-                    {$fields}
+                    {$fields},
                     0 AS relevance
             ";
             $sql = '
@@ -315,7 +316,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                     p.accepted / GREATEST(1, p.submissions)     AS ratio,
                     ROUND(100 * IFNULL(ps.score, 0), 2)   AS score,
-                    {$fields}
+                    {$fields},
                     0 AS relevance
             ";
             $sql = '
@@ -379,7 +380,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         0.0 AS score,
                         ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                         accepted / GREATEST(1, p.submissions)  AS ratio,
-                        {$fields}
+                        {$fields},
                         0 AS relevance
                     ";
             $sql = '
@@ -460,7 +461,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             "SELECT COUNT(*) $sql",
-            array_slice($args, 2)
+            $args
         );
 
         // Reset the offset to 0 if out of bounds.
@@ -514,7 +515,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, points: float|null, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, ratio: float|null, relevance: float|null, score: float|null, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $fullQuery,
-            $args
+            array_merge($matchingArgs, $args)
         );
 
         // Only these fields (plus score, points and ratio) will be returned.
