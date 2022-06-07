@@ -395,7 +395,6 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($response->score_mode, $scoreMode);
     }
 
-
     /**
      * A PHPUnit data provider for all the partial score to get profile details.
      *
@@ -438,5 +437,4 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals($response->score_mode, $scoreModeExpected);
     }
-
 }
