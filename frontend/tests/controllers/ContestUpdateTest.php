@@ -1620,7 +1620,10 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * @dataProvider partialScoreProvider
      */
-    public function testUpdateContestWithPartialScore(bool $partialScore, string $scoreModeExpected) {
+    public function testUpdateContestWithPartialScore(
+        bool $partialScore,
+        string $scoreModeExpected
+    ) {
         // Get a problem
         $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 

@@ -202,7 +202,7 @@ class Contest {
             $r['teams_group_alias'] = $params->teamsGroupAlias;
         }
 
-        if(!is_null($params->scoreMode)) {
+        if (!is_null($params->scoreMode)) {
             $r['score_mode'] = $params->scoreMode;
         }
 

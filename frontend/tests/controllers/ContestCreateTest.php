@@ -410,7 +410,10 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * @dataProvider partialScoreProvider
      */
-    public function testCreateContestWithPartialScore(bool $partialScore, string $scoreModeExpected) {
+    public function testCreateContestWithPartialScore(
+        bool $partialScore,
+        string $scoreModeExpected
+    ) {
         // Get a problem
         $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
