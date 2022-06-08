@@ -1196,7 +1196,6 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $partialScore = $initialPartialScore;
-        $scoreMode = $initalScoreMode;
 
         // Get a contest, partial_score default value is $partialScore
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
