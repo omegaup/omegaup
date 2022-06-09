@@ -1176,9 +1176,9 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     public function partialScoreValueProvider(): array {
         return [
             [false,'all_or_nothing', 1, 0, 0.05],
-            // [true, 'partial',  1, 0.05, 0],
-            // [false,'all_or_nothing', 100, 0, 5],
-            // [true, 'partial', 100, 5, 0],
+            [true, 'partial',  1, 0.05, 0],
+            [false,'all_or_nothing', 100, 0, 5],
+            [true, 'partial', 100, 5, 0],
         ];
     }
 
