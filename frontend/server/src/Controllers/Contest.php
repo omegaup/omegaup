@@ -5106,9 +5106,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     2
                 );
                 $run['score'] = round(floatval($run['score']), 4);
-            } else {
+            } else if($run['score'] == 0){
                 $run['contest_score'] = 0;
                 $run['score'] = 0;
+            }else if($scoreMode == 'max_per_group'){
+               $run['contest_score'] = \OmegaUp\Controllers\Run::getMaxScorePerGroup();
+               $run['score'] = \OmegaUp\Controllers\Run::getMaxScorePerGroup();
             }
             $allRuns[] = $run;
         }
