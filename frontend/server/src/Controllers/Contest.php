@@ -863,7 +863,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'runs' => $runs,
                 ] = self::getAllRuns(
                     $contest->problemset_id,
-                    $contest->partial_score
+                    $contest->score_mode
                 );
 
                 $result['templateProperties']['payload']['adminPayload'] = [
@@ -5052,7 +5052,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Get our runs
         return self::getAllRuns(
             $contest->problemset_id,
-            $contest->partial_score,
+            $contest->score_mode,
             $r->ensureOptionalEnum('status', \OmegaUp\Controllers\Run::STATUS),
             $r->ensureOptionalEnum(
                 'verdict',
@@ -5071,7 +5071,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     private static function getAllRuns(
         int $problemsetId,
-        bool $partialScore,
+        string $scoreMode,
         ?string $status = null,
         ?string $verdict = null,
         ?int $problemId = null,
@@ -5097,23 +5097,25 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $allRuns = [];
         foreach ($runs as $run) {
-            unset($run['run_id']);
-            if ($partialScore || $run['score'] == 1) {
-                $run['contest_score'] = round(
-                    floatval(
-                        $run['contest_score']
-                    ),
-                    2
-                );
+                if($scoreMode == 'partial' || $run['score'] == 1) {  
+                    $run['contest_score'] = round(
+                        floatval(
+                            $run['contest_score']
+                        ),
+                        2
+                    );
                 $run['score'] = round(floatval($run['score']), 4);
-            } else if($run['score'] == 0){
+
+            }else if($scoreMode == 'max_per_group'){
+                $score = \OmegaUp\Controllers\Run::getScoreForMaxPerGroup($run['run_id']);
+                $run['contest_score'] = $score;
+                $run['score'] = $score;
+            }else{
                 $run['contest_score'] = 0;
                 $run['score'] = 0;
-            }else if($scoreMode == 'max_per_group'){
-               $run['contest_score'] = \OmegaUp\Controllers\Run::getMaxScorePerGroup();
-               $run['score'] = \OmegaUp\Controllers\Run::getMaxScorePerGroup();
             }
             $allRuns[] = $run;
+            unset($run['run_id']);
         }
 
         return [

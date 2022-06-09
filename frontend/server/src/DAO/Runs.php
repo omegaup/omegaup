@@ -1339,4 +1339,40 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         /** @var list<array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
+
+    /**
+     * Gets the max score per group of runs.
+     *
+     * @param int     $runId       the run id.
+     *
+     * @return list<array{ group_name: string, max_score: float, run_id: int }>
+     */
+    final public static function getScoreForMaxPerGroup(int $runId) : array {
+        $sql = '
+
+            SELECT
+                AVG(max_score) AS score  
+            FROM
+                (SELECT
+                    rg.group_name,
+                    MAX(rg.score) AS max_score,
+                    rg.run_id
+                FROM
+                    Runs_Groups rg
+                WHERE
+                    rg.run_id = 69
+                GROUP BY
+                    rg.group_name,
+                    rg.run_id)
+            AS score_max;
+        ';
+
+        $result = [];
+
+        /** @var float */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$runId]
+        ) 
+    }
 }
