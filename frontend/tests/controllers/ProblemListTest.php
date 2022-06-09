@@ -1477,7 +1477,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiList(
             new \OmegaUp\Request($params)
         );
-        $this->assertCount($response['total'], $expectedAliases);
+        $this->assertCount(count($response['results']), $expectedAliases);
 
         foreach ($expectedAliases as $problemAlias) {
             $this->assertArrayContainsWithPredicate(
@@ -1520,7 +1520,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 'search_type' => 'all',
             ])
         );
-        $this->assertEquals($response['total'], 11);
+        $this->assertCount(11, $response['results']);
 
         $expectedSortedAliases = [
             'Caminos',
@@ -1532,8 +1532,8 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'Los-caminos-de-Al',
             'Caminos-N-buenos',
             'Los-Caminos-de-la-Vida',
-            'S1-2020-Senior-CCC',
             'CaminosAB',
+            'S1-2020-Senior-CCC',
         ];
         $sortedAliases = array_map(
             fn ($problem) => $problem['alias'],

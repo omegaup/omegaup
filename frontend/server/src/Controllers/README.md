@@ -2846,14 +2846,14 @@ List of public and user's private problems
 | `max_difficulty`        | `int\|null`    |             |
 | `min_difficulty`        | `int\|null`    |             |
 | `min_visibility`        | `int\|null`    |             |
-| `offset`                | `mixed`        |             |
+| `offset`                | `int\|null`    |             |
 | `only_karel`            | `mixed`        |             |
 | `order_by`              | `mixed`        |             |
-| `page`                  | `mixed`        |             |
+| `page`                  | `int\|null`    |             |
 | `programming_languages` | `null\|string` |             |
 | `query`                 | `null\|string` |             |
 | `require_all_tags`      | `mixed`        |             |
-| `rowcount`              | `mixed`        |             |
+| `rowcount`              | `int\|null`    |             |
 | `search_type`           | `null\|string` |             |
 | `some_tags`             | `mixed`        |             |
 | `sort_order`            | `mixed`        |             |

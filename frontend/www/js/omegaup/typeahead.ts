@@ -91,7 +91,7 @@ export function problemTypeahead(
         source: typeaheadWrapper(
           (options: { query: string }) =>
             new Promise<types.ProblemListItem[]>((resolve, reject) =>
-              api.Problem.list({ query: options.query })
+              api.Problem.list({ query: options.query, search_type: 'all' })
                 .then((data) => resolve(data.results))
                 .catch(reject),
             ),
