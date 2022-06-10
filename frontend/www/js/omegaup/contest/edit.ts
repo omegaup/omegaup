@@ -164,7 +164,7 @@ OmegaUp.on('ready', () => {
             query: string;
             searchType: SearchTypes;
           }) => {
-            api.Problem.list({
+            api.Problem.listForTypeahead({
               query,
               search_type: searchType,
             })
@@ -175,14 +175,14 @@ OmegaUp.on('ready', () => {
                   this.problems.map((problem) => problem.alias),
                 );
                 this.searchResultProblems = data.results
-                  .filter((problem) => !addedProblems.has(problem.alias))
-                  .map((problem, index) => ({
-                    key: problem.alias,
+                  .filter((problem) => !addedProblems.has(problem.key))
+                  .map(({ key, value }, index) => ({
+                    key: key,
                     value: `${String(index + 1).padStart(
                       2,
                       '0',
-                    )}.-  ${ui.escape(problem.title)} (<strong>${ui.escape(
-                      problem.alias,
+                    )}.-  ${ui.escape(value)} (<strong>${ui.escape(
+                      key,
                     )}</strong>)`,
                   }));
               })

@@ -1409,53 +1409,38 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
-     * @return array{count: int, problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}>}
+     * @return array{results: list<array{key: string, value: string}>}
      */
     final public static function byIdentityTypeForTypeahead(
-        string $identityType,
         int $offset,
         int $rowcount,
         string $query,
-        ?int $identityId,
-        ?int $userId,
-        int $minVisibility,
-        string $searchType
+        string $searchType,
+        int $minVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC
     ) {
-        $fields = join(
-            ', ',
-            array_map(
-                fn (string $field): string => "p.{$field}",
-                array_keys(
-                    \OmegaUp\DAO\VO\Problems::FIELD_NAMES
-                )
-            )
-        );
+        $fields = 'alias, title';
 
         $args = [];
         $sql = '';
         $select = "SELECT
-                        0.0 AS points,
-                        0.0 AS ratio,
-                        0.0 AS score,
-                        {$fields},
-        ";
+                        {$fields},";
 
         $groupByClause = '';
         $orderByClause = '';
 
         if (in_array($searchType, ['alias', 'title', 'problem_id'])) {
             $args[] = $query;
-            $select .= '
-                        1.0 AS relevance
+            $select .= ' 1.0 AS relevance
             ';
             $sql = "FROM
                         Problems p
                     WHERE
                         p.{$searchType} = ?";
         } else {
-            $args = array_fill(0, 7, $query);
-            $select .= '
-                        IFNULL(SUM(relevance), 0.0) AS relevance
+            $args = array_fill(0, 5, $query);
+            $args[] = preg_replace('/[\W]/', ' ', $query);
+            $args[] = preg_replace('/[\W]/', ' ', $query);
+            $select .= ' IFNULL(SUM(relevance), 0.0) AS relevance
             ';
             $sql = "FROM
                     (
@@ -1500,55 +1485,32 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                             AGAINST (? IN BOOLEAN MODE)
                     ) AS p";
             $groupByClause = "
-                        GROUP BY points, ratio, score, {$fields}
+                        GROUP BY {$fields}
             ";
             $orderByClause = '
                         ORDER BY relevance DESC
             ';
         }
 
-        /** @var int */
-        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            "SELECT COUNT(*) $sql",
-            $args
-        );
-
         $limits = ' LIMIT ?, ? ';
         $args[] = $offset;
         $args[] = $rowcount;
 
-        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, points: float, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, ratio: float, relevance: float, score: float, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        /** @var list<array{alias: string, relevance: float, title: string}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql} {$groupByClause} {$orderByClause} {$limits};",
             $args
         );
 
-        // Only these fields (plus score, points and ratio) will be returned.
-        $filters = [
-            'title', 'quality', 'difficulty', 'alias', 'visibility', 'problem_id',
-            'quality_histogram', 'difficulty_histogram', 'quality_seal',
-        ];
         $problems = [];
-        foreach ($result as $row) {
-            $problemObject = new \OmegaUp\DAO\VO\Problems(
-                array_intersect_key(
-                    $row,
-                    \OmegaUp\DAO\VO\Problems::FIELD_NAMES
-                )
-            );
-            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, visibility: int,quality_histogram: list<int>, difficulty_histogram: list<int>, quality_seal: bool, problem_id: int} */
-            $problem = $problemObject->asFilteredArray($filters);
-
-            // score, points and ratio are not actually fields of a Problems object.
-            $problem['score'] = floatval($row['score']);
-            $problem['points'] = floatval($row['points']);
-            $problem['ratio'] = floatval($row['ratio']);
-            $problem['tags'] = [];
-            $problems[] = $problem;
+        foreach ($result as $problem) {
+            $problems[] = [
+                'key' => $problem['alias'],
+                'value' => $problem['title'],
+            ];
         }
         return [
-            'problems' => $problems,
-            'count' => $count,
+            'results' => $problems,
         ];
     }
 }
