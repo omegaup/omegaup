@@ -102,7 +102,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         bool $onlyQualitySeal,
         ?string $level,
         string $difficulty,
-        array $authors
+        array $authors,
+        string $searchType
     ) {
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
@@ -227,20 +228,24 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         if (!is_null($query)) {
-            if (is_numeric($query)) {
-                $clauses[] = [
-                    "(
-                      p.title LIKE CONCAT('%', ?, '%') OR
-                      p.alias LIKE CONCAT('%', ?, '%') OR
-                      p.problem_id = ?
-                    )",
-                    [$query, $query, intval($query)],
-                ];
+            if (in_array($searchType, ['alias', 'title', 'problem_id'])) {
+                $clauses[] = [ " p.{$searchType} = ? ", [$query] ];
             } else {
-                $clauses[] = [
-                    "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
-                    [$query, $query],
-                ];
+                if (is_numeric($query)) {
+                    $clauses[] = [
+                        "(
+                        p.title LIKE CONCAT('%', ?, '%') OR
+                        p.alias LIKE CONCAT('%', ?, '%') OR
+                        p.problem_id = ?
+                        )",
+                        [$query, $query, intval($query)],
+                    ];
+                } else {
+                    $clauses[] = [
+                        "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
+                        [$query, $query],
+                    ];
+                }
             }
         }
 

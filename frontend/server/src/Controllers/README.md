@@ -2854,6 +2854,7 @@ List of public and user's private problems
 | `query`                 | `null\|string` |             |
 | `require_all_tags`      | `mixed`        |             |
 | `rowcount`              | `mixed`        |             |
+| `search_type`           | `null\|string` |             |
 | `some_tags`             | `mixed`        |             |
 | `sort_order`            | `mixed`        |             |
 
