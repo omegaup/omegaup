@@ -1367,8 +1367,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             AS score_max;
         ';
 
-        $result = [];
-
         /** @var float */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
