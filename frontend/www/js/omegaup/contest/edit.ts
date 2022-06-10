@@ -176,9 +176,12 @@ OmegaUp.on('ready', () => {
                 );
                 this.searchResultProblems = data.results
                   .filter((problem) => !addedProblems.has(problem.alias))
-                  .map((problem) => ({
+                  .map((problem, index) => ({
                     key: problem.alias,
-                    value: `${ui.escape(problem.title)} (<strong>${ui.escape(
+                    value: `${String(index + 1).padStart(
+                      2,
+                      '0',
+                    )}.-  ${ui.escape(problem.title)} (<strong>${ui.escape(
                       problem.alias,
                     )}</strong>)`,
                   }));
