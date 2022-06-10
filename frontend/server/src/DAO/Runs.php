@@ -1373,6 +1373,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             [$runId]
-        ) 
+        ); 
     }
 }
