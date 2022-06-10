@@ -1347,11 +1347,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      *
      * @return list<array{ group_name: string, max_score: float, run_id: int }>
      */
-    final public static function getScoreForMaxPerGroup(int $runId) : array {
+    final public static function getScoreForMaxPerGroup(int $runId): array {
         $sql = '
 
             SELECT
-                AVG(max_score) AS score  
+                AVG(max_score) AS score
             FROM
                 (SELECT
                     rg.group_name,
@@ -1373,6 +1373,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             [$runId]
-        ); 
+        );
     }
 }

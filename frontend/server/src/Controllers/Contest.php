@@ -5097,20 +5097,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $allRuns = [];
         foreach ($runs as $run) {
-                if($scoreMode == 'partial' || $run['score'] == 1) {  
-                    $run['contest_score'] = round(
-                        floatval(
-                            $run['contest_score']
-                        ),
-                        2
-                    );
+            if ($scoreMode == 'partial' || $run['score'] == 1) {
+                $run['contest_score'] = round(
+                    floatval(
+                        $run['contest_score']
+                    ),
+                    2
+                );
                 $run['score'] = round(floatval($run['score']), 4);
-
-            }else if($scoreMode == 'max_per_group'){
-                $score = \OmegaUp\Controllers\Run::getScoreForMaxPerGroup($run['run_id']);
+            } elseif ($scoreMode == 'max_per_group') {
+                $score = \OmegaUp\Controllers\Run::getScoreForMaxPerGroup(
+                    $run['run_id']
+                );
                 $run['contest_score'] = $score;
                 $run['score'] = $score;
-            }else{
+            } else {
                 $run['contest_score'] = 0;
                 $run['score'] = 0;
             }
