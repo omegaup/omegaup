@@ -3866,22 +3866,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param mixed $language
+     * @omegaup-request-param null|string $level
      * @omegaup-request-param int|null $max_difficulty
      * @omegaup-request-param int|null $min_difficulty
      * @omegaup-request-param int|null $min_visibility
-     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param int|null $offset
      * @omegaup-request-param mixed $only_karel
+     * @omegaup-request-param bool $only_quality_seal
      * @omegaup-request-param mixed $order_by
-     * @omegaup-request-param mixed $page
+     * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
-     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param null|string $search_type
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
-     * @omegaup-request-param bool $only_quality_seal
-     * @omegaup-request-param null|string $level
      */
     public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
@@ -3892,23 +3892,44 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         // Defaults for offset and rowcount
+        $page = $r->ensureOptionalInt('page');
         $offset = null;
-        $rowcount = \OmegaUp\Controllers\Problem::PAGE_SIZE;
+        if (is_null($page)) {
+            $offset = $r->ensureOptionalInt('offset') ?? 0;
+        }
+        $rowcount = $r->ensureOptionalInt(
+            'rowcount'
+        ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
 
-        $onlyQualitySeal = $r->ensureOptionalBool('only_quality_seal') ?? false;
-        $level = $r->ensureOptionalString('level');
         $searchType = $r->ensureOptionalEnum(
             'search_type',
             ['all', 'alias', 'title', 'problem_id']
-        ) ?? 'all';
-        $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
+        );
 
-        if (is_null($r['page'])) {
-            $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
+        if (!is_null($searchType)) {
+            $keyword = $r->ensureOptionalString('query');
+            if (is_null($keyword)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'query'
+                );
+            }
+            $query = substr($keyword, 0, 256);
+
+            return self::getListImplForTypeahead(
+                $offset,
+                $rowcount,
+                $query,
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                $r->identity,
+                $r->user,
+                $searchType
+            );
         }
-        if (!is_null($r['rowcount'])) {
-            $rowcount = intval($r['rowcount']);
-        }
+
+        $onlyQualitySeal = $r->ensureOptionalBool('only_quality_seal') ?? false;
+        $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
+        $level = $r->ensureOptionalString('level');
 
         [
             'sortOrder' => $sortOrder,
@@ -3942,8 +3963,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $onlyQualitySeal,
             $level,
             $difficulty,
-            $authors,
-            $searchType
+            $authors
         );
     }
 
@@ -3972,8 +3992,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         bool $onlyQualitySeal,
         ?string $level,
         string $difficulty,
-        array $authors,
-        string $searchType = 'all'
+        array $authors
     ) {
         $authorIdentityId = null;
         $authorUserId = null;
@@ -4027,7 +4046,68 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $onlyQualitySeal,
             $level,
             $difficulty,
-            $authors,
+            $authors
+        );
+        return [
+            'total' => $count,
+            'results' => $problems,
+        ];
+    }
+
+    /**
+     * @return array{results: list<ProblemListItem>, total: int}
+     */
+    private static function getListImplForTypeahead(
+        ?int $offset,
+        int $rowcount,
+        string $query,
+        int $minVisibility,
+        ?\OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\DAO\VO\Users $user,
+        string $searchType
+    ) {
+        $authorIdentityId = null;
+        $authorUserId = null;
+        // There are basically three types of users:
+        // - Non-logged in users: Anonymous
+        // - Logged in users with normal permissions: Normal
+        // - Logged in users with administrative rights: Admin
+        $identityType = IDENTITY_ANONYMOUS;
+        if (!is_null($identity)) {
+            $authorIdentityId = intval($identity->identity_id);
+            if (!is_null($user)) {
+                $authorUserId = intval($user->user_id);
+            }
+
+            if (
+                \OmegaUp\Authorization::isSystemAdmin($identity) ||
+                \OmegaUp\Authorization::hasRole(
+                    $identity,
+                    \OmegaUp\Authorization::SYSTEM_ACL,
+                    \OmegaUp\Authorization::REVIEWER_ROLE
+                )
+            ) {
+                $identityType = IDENTITY_ADMIN;
+            } else {
+                $identityType = IDENTITY_NORMAL;
+            }
+        }
+
+        if (is_null($offset)) {
+            $offset = 0 * $rowcount;
+        }
+
+        [
+            'problems' => $problems,
+            'count' => $count,
+        ] = \OmegaUp\DAO\Problems::byIdentityTypeForTypeahead(
+            $identityType,
+            $offset,
+            $rowcount,
+            $query,
+            $authorIdentityId,
+            $authorUserId,
+            $minVisibility,
             $searchType
         );
         return [
