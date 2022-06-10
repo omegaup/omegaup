@@ -105,7 +105,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>, totalRuns: int}
+     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|int(0)|mixed, country: string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float|int(0)|mixed, status: string, submit_delay: int, time: OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>, totalRuns: int}
      */
     final public static function getAllRuns(
         ?int $problemsetId,
@@ -225,7 +225,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val[] = $offset * $rowCount;
         $val[] = $rowCount;
 
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|int(0)|mixed, country: string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float|int(0)|mixed, status: string, submit_delay: int, time: OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
         $runs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
 
         return [
@@ -1345,7 +1345,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      *
      * @param int     $runId       the run id.
      *
-     * @return list<array{ group_name: string, max_score: float, run_id: int }>
+     * @return float
      */
     final public static function getScoreForMaxPerGroup(int $runId): array {
         $sql = '
