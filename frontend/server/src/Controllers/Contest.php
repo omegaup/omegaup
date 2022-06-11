@@ -2729,11 +2729,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
         $r->ensureOptionalFloat('scoreboard', 0, 100, $isRequired);
         $r->ensureOptionalFloat('points_decay_factor', 0, 1, $isRequired);
-        // $r->ensureOptionalBool('partial_score');
-        // $r->ensureOptionalEnum(
-        //     'score_mode',
-        //     ['partial','all_or_nothing','max_per_group'],
-        // );
         // TODO: Change this once the UI supports it
         $partialScore = $r->ensureOptionalBool('partial_score');
         $scoreMode = $r->ensureOptionalEnum(
