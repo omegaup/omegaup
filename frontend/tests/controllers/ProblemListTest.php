@@ -1474,7 +1474,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
 
-        $response = \OmegaUp\Controllers\Problem::apiList(
+        $response = \OmegaUp\Controllers\Problem::apiListForTypeahead(
             new \OmegaUp\Request($params)
         );
         $this->assertCount(count($response['results']), $expectedAliases);
@@ -1482,20 +1482,20 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         foreach ($expectedAliases as $problemAlias) {
             $this->assertArrayContainsWithPredicate(
                 $response['results'],
-                fn ($problem) => $problem['alias'] == $problemAlias
+                fn ($problem) => $problem['key'] == $problemAlias
             );
         }
 
         if ($searchType === 'all' && !is_null($problem)) {
-            $response = \OmegaUp\Controllers\Problem::apiList(
+            $response = \OmegaUp\Controllers\Problem::apiListForTypeahead(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                     'query' => $problem->problem_id,
                     'search_type' => $searchType,
                 ])
             );
-            $this->assertEquals($response['total'], 1);
-            $this->assertEquals($response['results'][0]['alias'], $query);
+            $this->assertCount(1, $response['results']);
+            $this->assertEquals($response['results'][0]['key'], $query);
         }
     }
 
@@ -1513,7 +1513,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($admin);
 
-        $response = \OmegaUp\Controllers\Problem::apiList(
+        $response = \OmegaUp\Controllers\Problem::apiListForTypeahead(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'query' => 'Caminos',
@@ -1536,9 +1536,91 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'S1-2020-Senior-CCC',
         ];
         $sortedAliases = array_map(
-            fn ($problem) => $problem['alias'],
+            fn ($problem) => $problem['key'],
             $response['results']
         );
         $this->assertEquals($sortedAliases, $expectedSortedAliases);
+    }
+
+    public function testProblemListSearchWithNoSearchType() {
+        [
+            'identity' => $admin
+        ] = \OmegaUp\Test\Factories\User::createAdminUser(
+            new \OmegaUp\Test\Factories\UserParams()
+        );
+        foreach ($this->problemsMapping as $problem) {
+            \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams($problem)
+            );
+        }
+
+        $login = self::login($admin);
+
+        try {
+            \OmegaUp\Controllers\Problem::apiListForTypeahead(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'query' => 'Caminos',
+                ])
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterEmpty', $e->getMessage());
+        }
+    }
+
+    public function testProblemListSearchWithNoKeyword() {
+        [
+            'identity' => $admin
+        ] = \OmegaUp\Test\Factories\User::createAdminUser(
+            new \OmegaUp\Test\Factories\UserParams()
+        );
+        foreach ($this->problemsMapping as $problem) {
+            \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams($problem)
+            );
+        }
+
+        $login = self::login($admin);
+
+        try {
+            \OmegaUp\Controllers\Problem::apiListForTypeahead(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'search_type' => 'all',
+                ])
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterEmpty', $e->getMessage());
+        }
+    }
+
+    public function testProblemListSearchWithWrongSearchType() {
+        [
+            'identity' => $admin
+        ] = \OmegaUp\Test\Factories\User::createAdminUser(
+            new \OmegaUp\Test\Factories\UserParams()
+        );
+        foreach ($this->problemsMapping as $problem) {
+            \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams($problem)
+            );
+        }
+
+        $login = self::login($admin);
+
+        try {
+            \OmegaUp\Controllers\Problem::apiListForTypeahead(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'query' => 'Caminos',
+                    'search_type' => 'invalid',
+                ])
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
+        }
     }
 }

@@ -20,6 +20,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserInfoForProblem=array{loggedIn: bool, admin: bool, reviewer: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
+ * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}
  * @psalm-type Statements=array<string, string>
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
@@ -3859,6 +3860,44 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * List of public problems shown in the typeahead component
+     *
+     * @return array{results: list<ListItem>}
+     *
+     * @omegaup-request-param int|null $offset
+     * @omegaup-request-param string $query
+     * @omegaup-request-param int|null $rowcount
+     * @omegaup-request-param string $search_type
+     */
+    public static function apiListForTypeahead(\OmegaUp\Request $r) {
+        // Authenticate request
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing, we allow unauthenticated users to use this API
+        }
+
+        // Default values for offset and rowcount
+        $offset = $r->ensureOptionalInt('offset') ?? 0;
+        $rowcount = $r->ensureOptionalInt(
+            'rowcount'
+        ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
+
+        $searchType = $r->ensureEnum(
+            'search_type',
+            ['all', 'alias', 'title', 'problem_id']
+        );
+        $query = substr($r->ensureString('query'), 0, 256);
+
+        return \OmegaUp\DAO\Problems::byIdentityTypeForTypeahead(
+            $offset,
+            $rowcount,
+            $query,
+            $searchType
+        );
+    }
+
+    /**
      * List of public and user's private problems
      *
      * @return array{results: list<ProblemListItem>, total: int}
@@ -3879,7 +3918,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
      * @omegaup-request-param int|null $rowcount
-     * @omegaup-request-param null|string $search_type
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
      */
@@ -3901,31 +3939,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
 
-        $searchType = $r->ensureOptionalEnum(
-            'search_type',
-            ['all', 'alias', 'title', 'problem_id']
-        );
-
-        if (!is_null($searchType)) {
-            $keyword = $r->ensureOptionalString('query');
-            if (is_null($keyword)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    'query'
-                );
-            }
-            $query = substr($keyword, 0, 256);
-
-            return self::getListImplForTypeahead(
-                $offset,
-                $rowcount,
-                $query,
-                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
-                $r->identity,
-                $r->user,
-                $searchType
-            );
-        }
+        $keyword = substr($r->ensureOptionalString('query') ?? '', 0, 256);
 
         $onlyQualitySeal = $r->ensureOptionalBool('only_quality_seal') ?? false;
         $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
@@ -4047,68 +4061,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $level,
             $difficulty,
             $authors
-        );
-        return [
-            'total' => $count,
-            'results' => $problems,
-        ];
-    }
-
-    /**
-     * @return array{results: list<ProblemListItem>, total: int}
-     */
-    private static function getListImplForTypeahead(
-        ?int $offset,
-        int $rowcount,
-        string $query,
-        int $minVisibility,
-        ?\OmegaUp\DAO\VO\Identities $identity,
-        ?\OmegaUp\DAO\VO\Users $user,
-        string $searchType
-    ) {
-        $authorIdentityId = null;
-        $authorUserId = null;
-        // There are basically three types of users:
-        // - Non-logged in users: Anonymous
-        // - Logged in users with normal permissions: Normal
-        // - Logged in users with administrative rights: Admin
-        $identityType = IDENTITY_ANONYMOUS;
-        if (!is_null($identity)) {
-            $authorIdentityId = intval($identity->identity_id);
-            if (!is_null($user)) {
-                $authorUserId = intval($user->user_id);
-            }
-
-            if (
-                \OmegaUp\Authorization::isSystemAdmin($identity) ||
-                \OmegaUp\Authorization::hasRole(
-                    $identity,
-                    \OmegaUp\Authorization::SYSTEM_ACL,
-                    \OmegaUp\Authorization::REVIEWER_ROLE
-                )
-            ) {
-                $identityType = IDENTITY_ADMIN;
-            } else {
-                $identityType = IDENTITY_NORMAL;
-            }
-        }
-
-        if (is_null($offset)) {
-            $offset = 0 * $rowcount;
-        }
-
-        [
-            'problems' => $problems,
-            'count' => $count,
-        ] = \OmegaUp\DAO\Problems::byIdentityTypeForTypeahead(
-            $identityType,
-            $offset,
-            $rowcount,
-            $query,
-            $authorIdentityId,
-            $authorUserId,
-            $minVisibility,
-            $searchType
         );
         return [
             'total' => $count,
