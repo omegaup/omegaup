@@ -1251,6 +1251,10 @@ export const Problem = {
   list: apiCall<messages.ProblemListRequest, messages.ProblemListResponse>(
     '/api/problem/list/',
   ),
+  listForTypeahead: apiCall<
+    messages.ProblemListForTypeaheadRequest,
+    messages.ProblemListForTypeaheadResponse
+  >('/api/problem/listForTypeahead/'),
   myList: apiCall<
     messages.ProblemMyListRequest,
     messages.ProblemMyListResponse

@@ -5085,6 +5085,8 @@ export namespace messages {
     results: types.ProblemListItem[];
     total: number;
   };
+  export type ProblemListForTypeaheadRequest = { [key: string]: any };
+  export type ProblemListForTypeaheadResponse = { results: types.ListItem[] };
   export type ProblemMyListRequest = { [key: string]: any };
   export type ProblemMyListResponse = {
     pagerItems: types.PageItem[];
@@ -5903,6 +5905,9 @@ export namespace controllers {
     list: (
       params?: messages.ProblemListRequest,
     ) => Promise<messages.ProblemListResponse>;
+    listForTypeahead: (
+      params?: messages.ProblemListForTypeaheadRequest,
+    ) => Promise<messages.ProblemListForTypeaheadResponse>;
     myList: (
       params?: messages.ProblemMyListRequest,
     ) => Promise<messages.ProblemMyListResponse>;
