@@ -243,10 +243,13 @@ export default class Markdown extends Vue {
   }
 
   td > button.clipboard {
+    float: right;
     border-color: var(--markdown-button-clipboard-border-color);
+    margin-left: 0.5em;
+    margin-right: -6px;
+    margin-top: -6px;
     padding: 3px;
     font-size: 90%;
-    margin-bottom: 6px;
   }
 
   figure {
@@ -319,7 +322,7 @@ export default class Markdown extends Vue {
     }
 
     tr td:first-child pre {
-      margin-right: 20px;
+      margin-right: 31px;
     }
   }
 
