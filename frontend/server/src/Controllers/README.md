@@ -140,6 +140,7 @@
   - [`/api/problem/delete/`](#apiproblemdelete)
   - [`/api/problem/details/`](#apiproblemdetails)
   - [`/api/problem/list/`](#apiproblemlist)
+  - [`/api/problem/listForTypeahead/`](#apiproblemlistfortypeahead)
   - [`/api/problem/myList/`](#apiproblemmylist)
   - [`/api/problem/randomKarelProblem/`](#apiproblemrandomkarelproblem)
   - [`/api/problem/randomLanguageProblem/`](#apiproblemrandomlanguageproblem)
@@ -2846,14 +2847,14 @@ List of public and user's private problems
 | `max_difficulty`        | `int\|null`    |             |
 | `min_difficulty`        | `int\|null`    |             |
 | `min_visibility`        | `int\|null`    |             |
-| `offset`                | `mixed`        |             |
+| `offset`                | `int\|null`    |             |
 | `only_karel`            | `mixed`        |             |
 | `order_by`              | `mixed`        |             |
-| `page`                  | `mixed`        |             |
+| `page`                  | `int\|null`    |             |
 | `programming_languages` | `null\|string` |             |
 | `query`                 | `null\|string` |             |
 | `require_all_tags`      | `mixed`        |             |
-| `rowcount`              | `mixed`        |             |
+| `rowcount`              | `int\|null`    |             |
 | `some_tags`             | `mixed`        |             |
 | `sort_order`            | `mixed`        |             |
 
@@ -2863,6 +2864,27 @@ List of public and user's private problems
 | --------- | ------------------------- |
 | `results` | `types.ProblemListItem[]` |
 | `total`   | `number`                  |
+
+## `/api/problem/listForTypeahead/`
+
+### Description
+
+List of public problems shown in the typeahead component
+
+### Parameters
+
+| Name          | Type        | Description |
+| ------------- | ----------- | ----------- |
+| `query`       | `string`    |             |
+| `search_type` | `string`    |             |
+| `offset`      | `int\|null` |             |
+| `rowcount`    | `int\|null` |             |
+
+### Returns
+
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/problem/myList/`
 

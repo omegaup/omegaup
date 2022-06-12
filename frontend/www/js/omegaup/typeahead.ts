@@ -75,14 +75,14 @@ function typeaheadWrapper<T>(
 
 export function problemTypeahead(
   elem: JQuery<HTMLElement>,
-  cb?: CallbackType<types.ProblemListItem>,
+  cb?: CallbackType<types.ListItem>,
 ) {
   if (!cb) {
-    cb = (event: Event, val: types.ProblemListItem) =>
-      $(event.target as EventTarget).val(val.alias);
+    cb = (event: Event, val: types.ListItem) =>
+      $(event.target as EventTarget).val(val.key);
   }
   elem
-    .typeahead<types.ProblemListItem>(
+    .typeahead<types.ListItem>(
       {
         minLength: 3,
         highlight: false,
@@ -90,19 +90,22 @@ export function problemTypeahead(
       {
         source: typeaheadWrapper(
           (options: { query: string }) =>
-            new Promise<types.ProblemListItem[]>((resolve, reject) =>
-              api.Problem.list({ query: options.query })
+            new Promise<types.ListItem[]>((resolve, reject) =>
+              api.Problem.listForTypeahead({
+                query: options.query,
+                search_type: 'all',
+              })
                 .then((data) => resolve(data.results))
                 .catch(reject),
             ),
         ),
         async: true,
         limit: 10,
-        display: 'alias',
+        display: 'key',
         templates: {
           suggestion: (val) =>
             ui.formatString(
-              '<div data-value="%(alias)"><strong>%(title)</strong> (%(alias))</div>',
+              '<div data-value="%(key)"><strong>%(value)</strong> (%(key))</div>',
               val,
             ),
         },

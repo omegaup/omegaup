@@ -130,8 +130,9 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'update-search-result-problems': (query: string) => {
-            api.Problem.list({
+            api.Problem.listForTypeahead({
               query,
+              search_type: 'all',
             })
               .then((data) => {
                 // Problems previously added into the assignment should not be
@@ -140,12 +141,12 @@ OmegaUp.on('ready', () => {
                   component.assignmentProblems.map((problem) => problem.alias),
                 );
                 this.searchResultProblems = data.results
-                  .filter((problem) => !addedProblems.has(problem.alias))
-                  .map((problem) => ({
-                    key: problem.alias,
-                    value: `${ui.escape(problem.title)} (<strong>${ui.escape(
-                      problem.alias,
-                    )}</strong>)`,
+                  .filter((problem) => !addedProblems.has(problem.key))
+                  .map(({ key, value }, index) => ({
+                    key,
+                    value: `${String(index + 1).padStart(2, '0')}.- ${ui.escape(
+                      value,
+                    )} (<strong>${ui.escape(key)}</strong>)`,
                   }));
               })
               .catch(ui.apiError);
