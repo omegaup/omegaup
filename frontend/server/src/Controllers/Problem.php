@@ -3897,6 +3897,25 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
     }
 
+    private static function getProblemsList(
+        $offset,
+        $rowcount,
+        $query,
+        $searchType
+    ): bool {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEMS_LIST,
+            "{$query}-{$searchType}-{$offset}-{$rowcount}",
+            fn () => \OmegaUp\DAO\Problems::byIdentityTypeForTypeahead(
+                $offset,
+                $rowcount,
+                $query,
+                $searchType
+            ),
+            APC_USER_CACHE_PROBLEM_LIST_TIMEOUT
+        );
+    }
+
     /**
      * List of public and user's private problems
      *
