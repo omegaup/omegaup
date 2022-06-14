@@ -60,11 +60,16 @@
             </div>
           </div>
         </div>
+
         <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-2">
             <omegaup-markdown
               :markdown="T.privacyPolicyNotice"
             ></omegaup-markdown>
+          </div>
+          <div class="col-md-4">
+            <input v-model="checked" type="checkbox" />
+            <label for="checkbox">{{ T.acceptPrivacyPolicy }}</label>
           </div>
           <div v-if="validateRecaptcha" class="col-md-4">
             <vue-recaptcha

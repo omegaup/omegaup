@@ -1,4 +1,5 @@
 aboutToStart = "Estás a punto de iniciar el concurso. Una vez que hagas clic en entrar, tu tiempo iniciará."
+acceptPrivacyPolicy = "Acepto Política de privacidad"
 activityReport = "Reporte de actividades"
 activityReportDuplicatesForOriginsDescription = "Orígenes con más de un usuario"
 activityReportDuplicatesForUsersDescription = "Usuarios con más de una dirección"
