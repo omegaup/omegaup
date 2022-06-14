@@ -55,7 +55,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type IntroDetailsPayload=array{course: CourseDetails, isFirstTimeAccess: bool, needsBasicInformation: bool, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
  * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
  * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, problemset_id: int, runs: list<Run>, start_time: \OmegaUp\Timestamp, totalRuns: int|null}
- * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard: Scoreboard, courseDetails: CourseDetails, currentAssignment: ArenaAssignment, shouldShowFirstAssociatedIdentityRunWarning: bool}
+ * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard?: Scoreboard, courseDetails: CourseDetails, currentAssignment: ArenaAssignment, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type AssignmentDetails=array{admin: bool, alias: string, assignmentType: string, courseAssignments: list<CourseAssignment>, description: string, director: string, finishTime: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemsetId: int, startTime: \OmegaUp\Timestamp}
  * @psalm-type CourseScoreboardPayload=array{assignment: AssignmentDetails, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardToken:null|string}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float, is_extra_problem?: bool}
@@ -283,45 +283,6 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Validates create Courses
-     *
-     * @param \OmegaUp\Request $r
-     *
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
-     *
-     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
-     * @omegaup-request-param null|string $alias
-     * @omegaup-request-param null|string $description
-     * @omegaup-request-param null|string $level
-     * @omegaup-request-param null|string $objective
-     * @omegaup-request-param mixed $finish_time
-     * @omegaup-request-param null|string $languages
-     * @omegaup-request-param null|string $name
-     * @omegaup-request-param bool|null $needs_basic_information
-     * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
-     * @omegaup-request-param int $school_id
-     * @omegaup-request-param bool|null $show_scoreboard
-     * @omegaup-request-param mixed $start_time
-     * @omegaup-request-param bool|null $unlimited_duration
-     */
-    private static function validateCreate(
-        \OmegaUp\Request $r
-    ): void {
-        self::validateBasicCreateOrUpdate($r);
-
-        if (
-            !is_null($r['finish_time']) &&
-            $r['start_time'] > $r['finish_time']
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseInvalidStartTime',
-                'finish_time'
-            );
-        }
-    }
-
-    /**
      * Validates update Courses
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
@@ -372,6 +333,59 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         return $originalCourse;
+    }
+
+    /**
+     * Returns a CourseParams instance from the Request values.
+     *
+     * @omegaup-request-param string $alias
+     * @omegaup-request-param null|string $admission_mode
+     * @omegaup-request-param bool|null $archived
+     * @omegaup-request-param string $description
+     * @omegaup-request-param null|int $finish_time
+     * @omegaup-request-param null|string $languages
+     * @omegaup-request-param null|string $level
+     * @omegaup-request-param int|null $minimum_progress_for_certificate
+     * @omegaup-request-param string $name
+     * @omegaup-request-param null|bool $needs_basic_information
+     * @omegaup-request-param null|string $objective
+     * @omegaup-request-param null|string $requests_user_information
+     * @omegaup-request-param int|null $school_id
+     * @omegaup-request-param null|bool $show_scoreboard
+     * @omegaup-request-param int $start_time
+     */
+    private static function convertRequestToCourseParams(
+        \OmegaUp\Request $r
+    ): \OmegaUp\CourseParams {
+        $params = [
+            'alias' => $r->ensureString(
+                'alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            ),
+            'admission_mode' => $r->ensureOptionalString('admission_mode'),
+            'archived' => $r->ensureOptionalBool('archived'),
+            'description' => $r->ensureString('description'),
+            'finish_time' => $r->ensureOptionalInt('finish_time'),
+            'languages' => $r->ensureOptionalString('languages'),
+            'level' => $r->ensureOptionalString('level'),
+            'minimum_progress_for_certificate' => $r->ensureOptionalInt(
+                'minimum_progress_for_certificate'
+            ),
+            'name' => $r->ensureString('name'),
+            'needs_basic_information' => $r->ensureOptionalBool(
+                'needs_basic_information'
+            ) ?? false,
+            'objective' => $r->ensureOptionalString('objective'),
+            'requests_user_information' => $r->ensureOptionalString(
+                'requests_user_information'
+            ),
+            'school_id' => $r->ensureOptionalInt('school_id'),
+            'show_scoreboard' => $r->ensureOptionalBool(
+                'show_scoreboard'
+            ) ?? false,
+            'start_time' => $r->ensureInt('start_time'),
+        ];
+        return new \OmegaUp\CourseParams($params);
     }
 
     /**
@@ -798,47 +812,68 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      *
-     * @omegaup-request-param mixed $admission_mode
-     * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $description
-     * @omegaup-request-param string|null $level
-     * @omegaup-request-param string|null $objective
-     * @omegaup-request-param mixed $finish_time
-     * @omegaup-request-param mixed $languages
-     * @omegaup-request-param mixed $name
-     * @omegaup-request-param mixed $needs_basic_information
-     * @omegaup-request-param mixed $public
-     * @omegaup-request-param mixed $requests_user_information
-     * @omegaup-request-param mixed $school_id
-     * @omegaup-request-param mixed $show_scoreboard
-     * @omegaup-request-param mixed $start_time
-     * @omegaup-request-param bool|null $unlimited_duration
+     * @omegaup-request-param null|string $admission_mode
+     * @omegaup-request-param string $alias
+     * @omegaup-request-param bool|null $archived
+     * @omegaup-request-param string $description
+     * @omegaup-request-param int|null $finish_time
+     * @omegaup-request-param null|string $languages
+     * @omegaup-request-param null|string $level
+     * @omegaup-request-param int|null $minimum_progress_for_certificate
+     * @omegaup-request-param string $name
+     * @omegaup-request-param bool|null $needs_basic_information
+     * @omegaup-request-param null|string $objective
+     * @omegaup-request-param null|string $requests_user_information
+     * @omegaup-request-param int|null $school_id
+     * @omegaup-request-param bool|null $show_scoreboard
+     * @omegaup-request-param int $start_time
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
-        if (isset($r['public'])) {
-            $r['admission_mode'] = boolval(
-                $r['public']
-            ) ? self::ADMISSION_MODE_PUBLIC : self::ADMISSION_MODE_PRIVATE;
+        $courseParams = self::convertRequestToCourseParams($r);
+
+        if (is_null($courseParams->schoolId)) {
+            $school = null;
+        } else {
+            $school = \OmegaUp\DAO\Schools::getByPK($courseParams->schoolId);
+            if (is_null($school)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'schoolNotFound'
+                );
+            }
         }
-        self::validateCreate($r);
+
+        // Only curator can set public
+        $admissionMode = $r->ensureOptionalString('admission_mode');
+        if (
+            !is_null($admissionMode) &&
+            $admissionMode === self::ADMISSION_MODE_PUBLIC &&
+            !\OmegaUp\Authorization::canCreatePublicCourse($r->identity)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
 
         self::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
-            'name' => $r['name'],
-            'alias' => $r['alias'],
-            'level' => $r['level'],
-            'description' => $r['description'],
-            'objective' => $r['objective'],
-            'school_id' => $r['school_id'],
-            'languages' => $r['languages'],
-            'start_time' => $r['start_time'],
-            'finish_time' => $r['finish_time'],
-            'admission_mode' => $r['admission_mode'] ?: self::ADMISSION_MODE_PRIVATE,
-            'show_scoreboard' => $r['show_scoreboard'],
-            'needs_basic_information' => $r['needs_basic_information'],
-            'requests_user_information' => $r['requests_user_information'],
+            'name' => $courseParams->name,
+            'alias' => $courseParams->courseAlias,
+            'level' => $courseParams->level,
+            'description' => $courseParams->description,
+            'objective' => $courseParams->objective,
+            'school_id' => $courseParams->schoolId,
+            'languages' => isset(
+                $courseParams->languages
+            ) ? implode(
+                ',',
+                $courseParams->languages
+            ) : null,
+            'start_time' => $courseParams->startTime,
+            'finish_time' => $courseParams->finishTime,
+            'admission_mode' => $courseParams->admissionMode,
+            'show_scoreboard' => $courseParams->showScoreboard,
+            'needs_basic_information' => $courseParams->needsBasicInformation,
+            'requests_user_information' => $courseParams->requestsUserInformation,
         ]), $r->user);
 
         return [
@@ -4189,7 +4224,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             ] = self::getAllRuns($assignment->problemset_id);
         }
 
-        return [
+        $response = [
             'templateProperties' => [
                 'payload' => [
                     'shouldShowFirstAssociatedIdentityRunWarning' => (
@@ -4224,10 +4259,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'runs' => $runs,
                         'totalRuns' => $totalRuns,
                     ],
-                    'scoreboard' => $scoreboard->generate(
-                        withRunDetails: false,
-                        sortByName: false
-                    ),
                 ],
                 'fullWidth' => true,
                 'title' => new \OmegaUp\TranslationString(
@@ -4242,6 +4273,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             'inContest' => $assignment->assignment_type === 'test',
             'entrypoint' => 'arena_course',
         ];
+        if ($course->admission_mode !== self::ADMISSION_MODE_PUBLIC) {
+            $response['templateProperties']['payload']['scoreboard'] = $scoreboard->generate(
+                withRunDetails: false,
+                sortByName: false
+            );
+        }
+        return $response;
     }
 
     /**

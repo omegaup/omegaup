@@ -32,6 +32,7 @@ OmegaUp.on('ready', () => {
       token: '',
       searchResultUsers: [] as types.ListItem[],
       searchResultProblems: [] as types.ListItem[],
+      searchResultGroups: [] as types.ListItem[],
     }),
     methods: {
       refreshCourseAdminDetails: (): void => {
@@ -104,11 +105,34 @@ OmegaUp.on('ready', () => {
           token: this.token,
           searchResultUsers: this.searchResultUsers,
           searchResultProblems: this.searchResultProblems,
+          searchResultGroups: this.searchResultGroups,
         },
         on: {
-          'update-search-result-problems': (query: string) => {
-            api.Problem.list({
+          'update-search-result-groups': (query: string) => {
+            api.Group.list({
               query,
+            })
+              .then((data) => {
+                // Groups previously added into the contest should not be
+                // shown in the dropdown
+                const addedGroups = new Set(
+                  this.data.groupsAdmins.map((group) => group.alias),
+                );
+                this.searchResultGroups = data
+                  .filter((group) => !addedGroups.has(group.value))
+                  .map((group) => ({
+                    key: group.value,
+                    value: `${ui.escape(group.label)} (<strong>${ui.escape(
+                      group.value,
+                    )}</strong>)`,
+                  }));
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-problems': (query: string) => {
+            api.Problem.listForTypeahead({
+              query,
+              search_type: 'all',
             })
               .then((data) => {
                 // Problems previously added into the assignment should not be
@@ -117,12 +141,12 @@ OmegaUp.on('ready', () => {
                   component.assignmentProblems.map((problem) => problem.alias),
                 );
                 this.searchResultProblems = data.results
-                  .filter((problem) => !addedProblems.has(problem.alias))
-                  .map((problem) => ({
-                    key: problem.alias,
-                    value: `${ui.escape(problem.title)} (<strong>${ui.escape(
-                      problem.alias,
-                    )}</strong>)`,
+                  .filter((problem) => !addedProblems.has(problem.key))
+                  .map(({ key, value }, index) => ({
+                    key,
+                    value: `${String(index + 1).padStart(2, '0')}.- ${ui.escape(
+                      value,
+                    )} (<strong>${ui.escape(key)}</strong>)`,
                   }));
               })
               .catch(ui.apiError);

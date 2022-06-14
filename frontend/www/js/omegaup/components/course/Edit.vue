@@ -235,15 +235,16 @@
         </div>
         <div class="col-md-6">
           <omegaup-common-groupadmins
-            :initial-groups="data.groupsAdmins"
-            :has-parent-component="true"
-            @emit-add-group-admin="
-              (groupAdminsComponent) =>
-                $emit('add-group-admin', groupAdminsComponent.groupAlias)
+            :group-admins="data.groupsAdmins"
+            :search-result-groups="searchResultGroups"
+            @add-group-admin="
+              (groupAlias) => $emit('add-group-admin', groupAlias)
             "
-            @emit-remove-group-admin="
-              (groupAdminsComponent) =>
-                $emit('remove-group-admin', groupAdminsComponent.groupAlias)
+            @remove-group-admin="
+              (groupAlias) => $emit('remove-group-admin', groupAlias)
+            "
+            @update-search-result-groups="
+              (query) => $emit('update-search-result-groups', query)
             "
           ></omegaup-common-groupadmins>
         </div>
@@ -295,7 +296,7 @@ import course_AssignmentDetails from './AssignmentDetails.vue';
 import course_AdmissionMode from './AdmissionMode.vue';
 import course_AddStudents from './AddStudents.vue';
 import common_Admins from '../common/Admins.vue';
-import common_GroupAdmins from '../common/GroupAdmins.vue';
+import common_GroupAdmins from '../common/GroupAdminsv2.vue';
 import course_Clone from './Clone.vue';
 import course_GenerateLinkClone from './GenerateLinkClone.vue';
 import T from '../../lang';
@@ -355,6 +356,7 @@ export default class CourseEdit extends Vue {
   @Prop() initialTab!: string;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop() searchResultProblems!: types.ListItem[];
+  @Prop() searchResultGroups!: types.ListItem[];
 
   T = T;
   showTab = this.initialTab;
