@@ -3897,12 +3897,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
     }
 
+    /**
+     * @return array{results: list<ListItem>}
+     */
     private static function getProblemsList(
-        $offset,
-        $rowcount,
-        $query,
-        $searchType
-    ): bool {
+        int $offset,
+        int $rowcount,
+        string $query,
+        string $searchType
+    ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEMS_LIST,
             "{$query}-{$searchType}-{$offset}-{$rowcount}",
