@@ -648,15 +648,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $pageSize = 1000,
         ?string $query = null
     ) {
-        $end_check = \OmegaUp\DAO\Enum\ActiveStatus::sql(
+        $endCheck = \OmegaUp\DAO\Enum\ActiveStatus::sql(
             \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE
         );
-        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
+        $recommendedCheck = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
             \OmegaUp\DAO\Enum\ActiveStatus::ALL
         );
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
         $filter = self::formatSearch($query);
-        $query_check = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
+        $queryCheck = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
 
         $sqlCount = 'SELECT
                         COUNT(*)
@@ -689,7 +689,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 Contests.problemset_id = participating.problemset_id AND
                 participating.identity_id = ?
             WHERE
-                $recommended_check  AND $end_check AND $query_check
+                $recommendedCheck  AND $endCheck AND $queryCheck
                 AND `admission_mode` != 'private'
                 AND archived = 0
             GROUP BY
@@ -760,21 +760,21 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      */
     final public static function getAllContestsForIdentity(
         int $identityId,
-        int $pagina = 1,
-        int $renglones_por_pagina = 1000,
-        int $activos = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
-        int $recomendados = \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
+        int $page = 1,
+        int $rowsPerPage = 1000,
+        int $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+        int $recommendedContests = \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
         ?string $query = null
     ): array {
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
-        $end_check = \OmegaUp\DAO\Enum\ActiveStatus::sql($activos);
-        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
-            $recomendados
+        $endCheck = \OmegaUp\DAO\Enum\ActiveStatus::sql($activeContests);
+        $recommendedCheck = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
+            $recommendedContests
         );
         $filter = self::formatSearch($query);
-        $query_check = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
+        $queryCheck = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
 
-        $sql_relevant_contests = "
+        $sqlRelevantContests = "
         -- Organizer
         (SELECT
             c.contest_id,
@@ -813,6 +813,20 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             Problemsets p ON gr.acl_id = p.acl_id
         WHERE
             gi.identity_id = ? AND gr.role_id = ?
+        )
+        -- Participating via Teams group
+        UNION DISTINCT
+        (SELECT
+            p.contest_id,
+            TRUE AS participating
+        FROM
+            Teams t
+        INNER JOIN
+            Teams_Group_Roles tgr ON t.team_group_id = tgr.team_group_id
+        INNER JOIN
+            Problemsets p ON tgr.acl_id = p.acl_id
+        WHERE
+            t.identity_id = ? AND tgr.role_id = ?
         )
         -- Admin
         UNION DISTINCT
@@ -870,7 +884,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         BIT_OR(rc.participating) AS participating";
         $sql = "
         FROM
-            ($sql_relevant_contests) rc
+            ($sqlRelevantContests) rc
         INNER JOIN
             Contests ON Contests.contest_id = rc.contest_id
         LEFT JOIN
@@ -880,7 +894,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         INNER JOIN
             Identities organizer ON organizer.user_id = a.owner_id
         WHERE
-            $recommended_check AND $end_check AND $query_check
+            $recommendedCheck AND $endCheck AND $queryCheck
             AND archived = 0
         GROUP BY
             Contests.contest_id
@@ -890,6 +904,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $identityId,    // Organizer
             $identityId,    // Direct participant
             $identityId,    // Participant via Group
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
+            $identityId,    // Participant via Teams Group
             \OmegaUp\Authorization::CONTESTANT_ROLE,
             $identityId,    // Admin
             \OmegaUp\Authorization::ADMIN_ROLE,
@@ -918,8 +934,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 original_finish_time DESC
             LIMIT ?, ?';
 
-        $params[] = max(0, $pagina - 1) * $renglones_por_pagina;
-        $params[] = intval($renglones_por_pagina);
+        $params[] = max(0, $page - 1) * $rowsPerPage;
+        $params[] = intval($rowsPerPage);
         /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql} {$limits}",
@@ -941,18 +957,18 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      * @return array{contests: list<ContestListItem>, count: int}
      */
     final public static function getAllPublicContests(
-        int $pagina = 1,
-        int $renglones_por_pagina = 1000,
-        int $activos = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
-        int $recomendados = \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
+        int $page = 1,
+        int $rowsPerPage = 1000,
+        int $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+        int $recommendedContests = \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
         ?string $query = null
     ): array {
-        $end_check = \OmegaUp\DAO\Enum\ActiveStatus::sql($activos);
-        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
-            $recomendados
+        $endCheck = \OmegaUp\DAO\Enum\ActiveStatus::sql($activeContests);
+        $recommendedCheck = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
+            $recommendedContests
         );
         $filter = self::formatSearch($query);
-        $query_check = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
+        $queryCheck = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
 
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
 
@@ -983,9 +999,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     a.owner_id = organizer.user_id
                 WHERE
                     `admission_mode` <> 'private'
-                    AND $recommended_check
-                    AND $end_check
-                    AND $query_check
+                    AND $recommendedCheck
+                    AND $endCheck
+                    AND $queryCheck
                     AND archived = 0
                 GROUP BY
                     Contests.contest_id
@@ -1011,8 +1027,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 `recommended` DESC,
                 `original_finish_time` DESC
             LIMIT ?, ?';
-        $params[] = max(0, $pagina - 1) * $renglones_por_pagina;
-        $params[] = intval($renglones_por_pagina);
+        $params[] = max(0, $page - 1) * $rowsPerPage;
+        $params[] = intval($rowsPerPage);
         /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql} {$limits}",
@@ -1033,19 +1049,19 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     /** @return array{contests: list<ContestListItem>, count: int}
      */
     final public static function getAllContests(
-        int $pagina = 1,
-        int $renglones_por_pagina = 1000,
-        int $activos = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
-        int $recomendados = \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
+        int $page = 1,
+        int $rowsPerPage = 1000,
+        int $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+        int $recommendedContests = \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
         ?string $query = null
     ) {
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
-        $end_check = \OmegaUp\DAO\Enum\ActiveStatus::sql($activos);
-        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
-            $recomendados
+        $endCheck = \OmegaUp\DAO\Enum\ActiveStatus::sql($activeContests);
+        $recommendedCheck = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
+            $recommendedContests
         );
         $filter = self::formatSearch($query);
-        $query_check = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
+        $queryCheck = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
 
         $sqlCount = 'SELECT
                         COUNT(*)
@@ -1071,7 +1087,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     Identities AS organizer
                 ON
                     a.owner_id = organizer.user_id
-                WHERE $recommended_check AND $end_check AND $query_check AND archived = 0
+                WHERE $recommendedCheck AND $endCheck AND $queryCheck AND archived = 0
                 GROUP BY
                     Contests.contest_id
                 ";
@@ -1097,8 +1113,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 `original_finish_time` DESC
             LIMIT ?, ?;';
 
-        $params[] = max(0, $pagina - 1) * $renglones_por_pagina;
-        $params[] = intval($renglones_por_pagina);
+        $params[] = max(0, $page - 1) * $rowsPerPage;
+        $params[] = intval($rowsPerPage);
         /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql} {$limits}",
