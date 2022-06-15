@@ -1,5 +1,5 @@
 aboutToStart = "Você está prestes a iniciar o concurso. Seu tempo começará depois de clicar em Começar Concurso."
-acceptPrivacyPolicy = "Li e aceito a Política de Uso e Privacidade do site, bem como o Código de Conduta."
+acceptPrivacyPolicy = "Li e aceito a [Política de Uso e Privacidade](http://blog.omegaup.com/privacy-policy/) do site, bem como o [Código de Conduta](https://blog.omegaup.com/codigo-de-conducta-en-omegaup/)."
 activityReport = "Relatório de atividade"
 activityReportDuplicatesForOriginsDescription = "Origens com mais do que um usuário"
 activityReportDuplicatesForUsersDescription = "Usuários com mais de uma origem"

@@ -64,7 +64,11 @@
         <div class="row justify-content-md-center">
           <div class="col-md-8">
             <input v-model="checked" type="checkbox" />
-            <label for="checkbox">{{ T.acceptPrivacyPolicy }}</label>
+            <label for="checkbox">
+              <omegaup-markdown
+                :markdown="T.acceptPrivacyPolicy"
+              ></omegaup-markdown>
+            </label>
           </div>
           <div v-if="validateRecaptcha" class="col-md-4">
             <vue-recaptcha
