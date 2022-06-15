@@ -62,12 +62,7 @@
         </div>
 
         <div class="row justify-content-md-center">
-          <div class="col-md-4 col-md-offset-2">
-            <omegaup-markdown
-              :markdown="T.privacyPolicyNotice"
-            ></omegaup-markdown>
-          </div>
-          <div class="col-md-4">
+          <div class="col-md-8">
             <input v-model="checked" type="checkbox" />
             <label for="checkbox">{{ T.acceptPrivacyPolicy }}</label>
           </div>
