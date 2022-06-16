@@ -140,6 +140,7 @@
   - [`/api/problem/delete/`](#apiproblemdelete)
   - [`/api/problem/details/`](#apiproblemdetails)
   - [`/api/problem/list/`](#apiproblemlist)
+  - [`/api/problem/listForTypeahead/`](#apiproblemlistfortypeahead)
   - [`/api/problem/myList/`](#apiproblemmylist)
   - [`/api/problem/randomKarelProblem/`](#apiproblemrandomkarelproblem)
   - [`/api/problem/randomLanguageProblem/`](#apiproblemrandomlanguageproblem)
@@ -746,6 +747,7 @@ Creates a new contest
 | `points_decay_factor`       | `mixed`        |             |
 | `problems`                  | `null\|string` |             |
 | `requests_user_information` | `mixed`        |             |
+| `score_mode`                | `null\|string` |             |
 | `scoreboard`                | `mixed`        |             |
 | `show_scoreboard_after`     | `mixed`        |             |
 | `start_time`                | `mixed`        |             |
@@ -842,6 +844,7 @@ Returns a list of contests where current user is participating in
 | Name       | Type              |
 | ---------- | ----------------- |
 | `contests` | `types.Contest[]` |
+| `count`    | `number`          |
 
 ## `/api/contest/myList/`
 
@@ -863,6 +866,7 @@ Returns a list of contests where current user is the director
 | Name       | Type              |
 | ---------- | ----------------- |
 | `contests` | `types.Contest[]` |
+| `count`    | `number`          |
 
 ## `/api/contest/open/`
 
@@ -1655,23 +1659,23 @@ Create new course API
 
 ### Parameters
 
-| Name                        | Type           | Description |
-| --------------------------- | -------------- | ----------- |
-| `admission_mode`            | `mixed`        |             |
-| `alias`                     | `mixed`        |             |
-| `description`               | `mixed`        |             |
-| `finish_time`               | `mixed`        |             |
-| `languages`                 | `mixed`        |             |
-| `level`                     | `string\|null` |             |
-| `name`                      | `mixed`        |             |
-| `needs_basic_information`   | `mixed`        |             |
-| `objective`                 | `string\|null` |             |
-| `public`                    | `mixed`        |             |
-| `requests_user_information` | `mixed`        |             |
-| `school_id`                 | `mixed`        |             |
-| `show_scoreboard`           | `mixed`        |             |
-| `start_time`                | `mixed`        |             |
-| `unlimited_duration`        | `bool\|null`   |             |
+| Name                               | Type           | Description |
+| ---------------------------------- | -------------- | ----------- |
+| `alias`                            | `string`       |             |
+| `description`                      | `string`       |             |
+| `name`                             | `string`       |             |
+| `start_time`                       | `int`          |             |
+| `admission_mode`                   | `null\|string` |             |
+| `archived`                         | `bool\|null`   |             |
+| `finish_time`                      | `int\|null`    |             |
+| `languages`                        | `null\|string` |             |
+| `level`                            | `null\|string` |             |
+| `minimum_progress_for_certificate` | `int\|null`    |             |
+| `needs_basic_information`          | `bool\|null`   |             |
+| `objective`                        | `null\|string` |             |
+| `requests_user_information`        | `null\|string` |             |
+| `school_id`                        | `int\|null`    |             |
+| `show_scoreboard`                  | `bool\|null`   |             |
 
 ### Returns
 
@@ -2843,14 +2847,14 @@ List of public and user's private problems
 | `max_difficulty`        | `int\|null`    |             |
 | `min_difficulty`        | `int\|null`    |             |
 | `min_visibility`        | `int\|null`    |             |
-| `offset`                | `mixed`        |             |
+| `offset`                | `int\|null`    |             |
 | `only_karel`            | `mixed`        |             |
 | `order_by`              | `mixed`        |             |
-| `page`                  | `mixed`        |             |
+| `page`                  | `int\|null`    |             |
 | `programming_languages` | `null\|string` |             |
 | `query`                 | `null\|string` |             |
 | `require_all_tags`      | `mixed`        |             |
-| `rowcount`              | `mixed`        |             |
+| `rowcount`              | `int\|null`    |             |
 | `some_tags`             | `mixed`        |             |
 | `sort_order`            | `mixed`        |             |
 
@@ -2860,6 +2864,27 @@ List of public and user's private problems
 | --------- | ------------------------- |
 | `results` | `types.ProblemListItem[]` |
 | `total`   | `number`                  |
+
+## `/api/problem/listForTypeahead/`
+
+### Description
+
+List of public problems shown in the typeahead component
+
+### Parameters
+
+| Name          | Type        | Description |
+| ------------- | ----------- | ----------- |
+| `query`       | `string`    |             |
+| `search_type` | `string`    |             |
+| `offset`      | `int\|null` |             |
+| `rowcount`    | `int\|null` |             |
+
+### Returns
+
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/problem/myList/`
 

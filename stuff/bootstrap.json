@@ -324,6 +324,7 @@
 					"finish_time": "$NOW$+18000",
 					"window_length": "0",
 					"scoreboard": 100,
+					"score_mode" : "partial",
 					"points_decay_factor": 0,
 					"partial_score": "true",
 					"submissions_gap": 1200,
@@ -333,7 +334,8 @@
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"penalty_calc_policy": "sum",
 					"admission_mode": "private",
-					"show_scoreboard_after": "true"
+					"show_scoreboard_after": "true",
+					"certificate_cutoff": 2
 				}
 			},
 			{
@@ -371,6 +373,7 @@
 					"finish_time": "$NOW$+1800",
 					"window_length": "0",
 					"scoreboard": 100,
+					"score_mode" : "partial",
 					"points_decay_factor": 0,
 					"partial_score": "true",
 					"submissions_gap": 1200,

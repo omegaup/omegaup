@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 '''Aggregates user feedback.
 
@@ -485,7 +485,7 @@ def get_last_friday() -> datetime.date:
         current_date - datetime.timedelta(days=current_date.weekday())
         + datetime.timedelta(days=calendar.FRIDAY))
 
-    # If day of the week is before Friday substract a week from the date.
+    # If day of the week is before Friday subtract a week from the date.
     if current_date.weekday() < calendar.FRIDAY:
         last_friday -= datetime.timedelta(weeks=1)
 

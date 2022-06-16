@@ -282,6 +282,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 Contests c ON c.contest_id = ps.contest_id
             WHERE
                 TIMESTAMPDIFF(SECOND, s.time, NOW()) <= 24 * 3600
+                AND s.status = 'ready'
                 AND u.is_private = 0
                 AND p.visibility >= ?
                 AND (

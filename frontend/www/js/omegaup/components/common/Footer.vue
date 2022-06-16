@@ -26,6 +26,24 @@
                 />
               </a>
             </li>
+            <li class="mt-1">
+              <a href="https://www.f5.com/" target="_blank">
+                <img
+                  class="sponsor-logo"
+                  src="/media/homepage/f5_logo.png"
+                  alt="F5Logo"
+                />
+              </a>
+            </li>
+            <li class="mt-1">
+              <a href="https://replit.com/" target="_blank">
+                <img
+                  class="sponsor-logo"
+                  src="/media/homepage/replit_logo.png"
+                  alt="ReplitLogo"
+                />
+              </a>
+            </li>
           </ul>
         </div>
         <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
@@ -44,7 +62,9 @@
               <a href="/rank/">{{ T.navRanking }}</a>
             </li>
             <li class="mt-1">
-              <a href="https://blog.omegaup.com">{{ T.navBlog }}</a>
+              <a href="https://blog.omegaup.com" target="_blank">{{
+                T.navBlog
+              }}</a>
             </li>
           </ul>
         </div>
@@ -52,12 +72,12 @@
           <h4>{{ T.frontPageFooterOrganization }}</h4>
           <ul>
             <li class="mt-1">
-              <a href="https://omegaup.org/#about">{{
+              <a href="https://omegaup.org/#about" target="_blank">{{
                 T.frontPageFooterAboutUs
               }}</a>
             </li>
             <li class="mt-1">
-              <a href="https://omegaup.org/#team">{{
+              <a href="https://omegaup.org/#team" target="_blank">{{
                 T.frontPageFooterTeam
               }}</a>
             </li>
@@ -69,11 +89,12 @@
             <li class="mt-1">
               <a
                 href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar"
+                target="_blank"
                 >{{ T.frontPageFooterHelpUs }}</a
               >
             </li>
             <li class="mt-1">
-              <a href="https://github.com/omegaup/omegaup">
+              <a href="https://github.com/omegaup/omegaup" target="_blank">
                 <font-awesome-icon :icon="['fab', 'github']" />
               </a>
             </li>
@@ -97,17 +118,29 @@
             </li>
           </ul>
           <div class="social-icons my-0 mx-auto">
-            <a class="text-nowrap" href="https://github.com/omegaup/omegaup/">
+            <a
+              class="text-nowrap"
+              href="https://github.com/omegaup/omegaup/"
+              target="_blank"
+            >
               <font-awesome-icon :icon="['fab', 'github']" />
               GitHub
             </a>
             |
-            <a class="text-nowrap" href="https://www.facebook.com/omegaup/">
+            <a
+              class="text-nowrap"
+              href="https://www.facebook.com/omegaup/"
+              target="_blank"
+            >
               <font-awesome-icon :icon="['fab', 'facebook']" />
               Facebook
             </a>
             |
-            <a class="text-nowrap" href="https://discord.gg/K3JFd9d3wk">
+            <a
+              class="text-nowrap"
+              href="https://discord.gg/K3JFd9d3wk"
+              target="_blank"
+            >
               <font-awesome-icon :icon="['fab', 'discord']" />
               Discord
             </a>
@@ -126,21 +159,22 @@
             })
           }}
         </div>
-        <div class="d-none d-md-block">
-          <ul class="m-0 list-unstyled text-right">
-            <li>
-              <a
-                href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
-                >{{ T.frontPageFooterCodeConduct }}</a
-              >
-            </li>
-            <li>
-              <a href="https://blog.omegaup.com/privacy-policy/">{{
-                T.frontPageFooterPrivacyPolicy
-              }}</a>
-            </li>
-          </ul>
-        </div>
+        <ul class="m-0 list-unstyled text-right">
+          <li>
+            <a
+              href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
+              target="_blank"
+              >{{ T.frontPageFooterCodeConduct }}</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://blog.omegaup.com/privacy-policy/"
+              target="_blank"
+              >{{ T.frontPageFooterPrivacyPolicy }}</a
+            >
+          </li>
+        </ul>
       </div>
     </div>
   </footer>
@@ -182,6 +216,7 @@ export default class Footer extends Vue {
 .common-footer {
   background-color: $omegaup-primary--darker;
   color: $omegaup-white;
+  flex-grow: 1;
 
   .footer-navigation {
     .footer-brand {

@@ -73,43 +73,16 @@ function typeaheadWrapper<T>(
   return wrappedCall;
 }
 
-function typeahead<T extends { label: string; value: string }>(
-  elem: JQuery<HTMLElement>,
-  searchFn: (options?: { query?: string }) => Promise<T[]>,
-  cb: CallbackType<T>,
-) {
-  elem
-    .typeahead<T>(
-      {
-        minLength: 2,
-        highlight: true,
-      },
-      {
-        source: typeaheadWrapper(searchFn),
-        async: true,
-        limit: 100,
-        display: 'label',
-        templates: {
-          suggestion: (val) =>
-            ui.formatString('<div data-value="%(value)">%(label)</div>', val),
-        },
-      },
-    )
-    .on('typeahead:select', cb)
-    .on('typeahead:autocomplete', cb)
-    .trigger('change');
-}
-
 export function problemTypeahead(
   elem: JQuery<HTMLElement>,
-  cb?: CallbackType<types.ProblemListItem>,
+  cb?: CallbackType<types.ListItem>,
 ) {
   if (!cb) {
-    cb = (event: Event, val: types.ProblemListItem) =>
-      $(event.target as EventTarget).val(val.alias);
+    cb = (event: Event, val: types.ListItem) =>
+      $(event.target as EventTarget).val(val.key);
   }
   elem
-    .typeahead<types.ProblemListItem>(
+    .typeahead<types.ListItem>(
       {
         minLength: 3,
         highlight: false,
@@ -117,19 +90,22 @@ export function problemTypeahead(
       {
         source: typeaheadWrapper(
           (options: { query: string }) =>
-            new Promise<types.ProblemListItem[]>((resolve, reject) =>
-              api.Problem.list({ query: options.query })
+            new Promise<types.ListItem[]>((resolve, reject) =>
+              api.Problem.listForTypeahead({
+                query: options.query,
+                search_type: 'all',
+              })
                 .then((data) => resolve(data.results))
                 .catch(reject),
             ),
         ),
         async: true,
         limit: 10,
-        display: 'alias',
+        display: 'key',
         templates: {
           suggestion: (val) =>
             ui.formatString(
-              '<div data-value="%(alias)"><strong>%(title)</strong> (%(alias))</div>',
+              '<div data-value="%(key)"><strong>%(value)</strong> (%(key))</div>',
               val,
             ),
         },
@@ -211,42 +187,4 @@ export function schoolTypeahead(
     )
     .on('typeahead:select', cb)
     .on('typeahead:autocomplete', cb);
-}
-
-export function tagTypeahead(
-  elem: JQuery<HTMLElement>,
-  cb?: CallbackType<{ name: string }>,
-) {
-  if (!cb) {
-    cb = (event: Event, val: { name: string }) =>
-      $(event.target as EventTarget).val(val.name);
-  }
-  elem
-    .typeahead<{ name: string }>(
-      {
-        minLength: 2,
-        highlight: true,
-      },
-      {
-        source: typeaheadWrapper(api.Tag.list),
-        async: true,
-        limit: 10,
-        display: 'name',
-      },
-    )
-    .on('typeahead:select', cb)
-    .on('typeahead:autocomplete', cb);
-}
-
-export function groupTypeahead(
-  elem: JQuery<HTMLElement>,
-  cb?: CallbackType<{ label: string; value: string }>,
-): void {
-  if (!cb) {
-    cb = (event: Event, val: { label: string; value: string }) =>
-      $(event.target as EventTarget)
-        .attr('data-value', val.value)
-        .val(val.label);
-  }
-  typeahead<{ label: string; value: string }>(elem, api.Group.list, cb);
 }

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Script that analyzes the MySQL type log and Psalm annotations.
 
 This script ensures that all the Psalm annotations for MySQL query methods are

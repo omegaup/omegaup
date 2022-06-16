@@ -201,6 +201,7 @@ CREATE TABLE `Contests` (
   `certificates_status` enum('uninitiated','queued','generated','retryable_error','fatal_error') NOT NULL DEFAULT 'uninitiated' COMMENT 'Estado de la petición de generar diplomas',
   `contest_for_teams` tinyint(1) DEFAULT '0' COMMENT 'Bandera que indica si el concurso es para equipos.',
   `default_show_all_contestants_in_scoreboard` tinyint(1) DEFAULT '0' COMMENT 'Bandera que indica si en el scoreboard se mostrarán todos los concursantes por defecto.',
+  `score_mode` enum('partial','all_or_nothing','max_per_group') NOT NULL DEFAULT 'partial' COMMENT 'Indica el tipo de evaluación para el concurso',
   PRIMARY KEY (`contest_id`),
   UNIQUE KEY `contests_alias` (`alias`),
   KEY `rerun_id` (`contest_id`),
@@ -611,6 +612,7 @@ CREATE TABLE `Problems` (
   KEY `acl_id` (`acl_id`),
   KEY `idx_problems_visibility` (`visibility`),
   KEY `idx_quality_seal` (`quality_seal`),
+  FULLTEXT KEY `ft_alias_title` (`alias`,`title`),
   CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Se crea un registro por cada prob externo.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -895,6 +897,19 @@ CREATE TABLE `Runs` (
   KEY `status_submission_id` (`status`,`submission_id`),
   CONSTRAINT `fk_r_submission_id` FOREIGN KEY (`submission_id`) REFERENCES `Submissions` (`submission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Estado de todas las ejecuciones.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Runs_Groups` (
+  `case_run_id` int NOT NULL AUTO_INCREMENT,
+  `run_id` int NOT NULL,
+  `group_name` char(40) NOT NULL,
+  `score` double NOT NULL DEFAULT '0',
+  `verdict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE','VE') NOT NULL,
+  PRIMARY KEY (`case_run_id`),
+  UNIQUE KEY `run_id` (`run_id`,`group_name`),
+  CONSTRAINT `Runs_Groups_ibfk_1` FOREIGN KEY (`run_id`) REFERENCES `Runs` (`run_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda los grupos de runs.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;

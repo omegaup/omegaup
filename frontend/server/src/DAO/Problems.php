@@ -82,7 +82,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
      * @param list<string> $authors
-     * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int, problem_id: int}>, count: int}
+     * @return array{count: int, problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}>}
      */
     final public static function byIdentityType(
         string $identityType,
@@ -104,6 +104,15 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         string $difficulty,
         array $authors
     ) {
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "p.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Problems::FIELD_NAMES
+                )
+            )
+        );
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
             $order = 'desc';
@@ -230,9 +239,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             if (is_numeric($query)) {
                 $clauses[] = [
                     "(
-                      p.title LIKE CONCAT('%', ?, '%') OR
-                      p.alias LIKE CONCAT('%', ?, '%') OR
-                      p.problem_id = ?
+                    p.title LIKE CONCAT('%', ?, '%') OR
+                    p.alias LIKE CONCAT('%', ?, '%') OR
+                    p.problem_id = ?
                     )",
                     [$query, $query, intval($query)],
                 ];
@@ -245,14 +254,14 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         if ($identityType === IDENTITY_ADMIN) {
-            $args = [$identityId];
-            $select = '
+            $args[] = $identityId;
+            $select = "
                 SELECT
-                    ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2)   AS points,
-                    accepted / GREATEST(1, submissions)     AS ratio,
-                    ROUND(100 * IFNULL(ps.score, 0.0))      AS score,
-                    p.*
-            ';
+                    ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2) AS points,
+                    accepted / GREATEST(1, submissions) AS ratio,
+                    ROUND(100 * IFNULL(ps.score, 0.0)) AS score,
+                    {$fields}
+            ";
             $sql = '
                 FROM
                     Problems p
@@ -275,13 +284,13 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 [\OmegaUp\ProblemParams::VISIBILITY_DELETED],
             ];
         } elseif ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
-            $select = '
-                SELECT
+            $select = "
+                SELECT DISTINCT
                     ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                     p.accepted / GREATEST(1, p.submissions)     AS ratio,
                     ROUND(100 * IFNULL(ps.score, 0), 2)   AS score,
-                    p.*
-            ';
+                    {$fields}
+            ";
             $sql = '
                 FROM
                     Problems p
@@ -338,12 +347,13 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 [\OmegaUp\ProblemParams::VISIBILITY_DELETED],
             ];
         } elseif ($identityType === IDENTITY_ANONYMOUS) {
-            $select = '
-                    SELECT
+            $select = "
+                    SELECT DISTINCT
                         0.0 AS score,
                         ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                         accepted / GREATEST(1, p.submissions)  AS ratio,
-                        p.* ';
+                        {$fields}
+                    ";
             $sql = '
                     FROM
                         Problems p ' . $languageJoin . $levelJoin;
@@ -1396,5 +1406,97 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         /** @var string */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
+    }
+
+    /**
+     * @return array{results: list<array{key: string, value: string}>}
+     */
+    final public static function byIdentityTypeForTypeahead(
+        int $offset,
+        int $rowcount,
+        string $query,
+        string $searchType,
+        int $minVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC
+    ) {
+        $fields = 'alias, title';
+
+        $args = [];
+        $sql = '';
+        $select = "SELECT
+                        {$fields},";
+
+        $groupByClause = '';
+        $orderByClause = '';
+
+        if (in_array($searchType, ['alias', 'title', 'problem_id'])) {
+            $args[] = $query;
+            $select .= ' 1.0 AS relevance
+            ';
+            $sql = "FROM
+                        Problems p
+                    WHERE
+                        p.{$searchType} = ?";
+        } else {
+            $args = array_fill(0, 5, $query);
+            $select .= ' IFNULL(SUM(relevance), 0.0) AS relevance
+            ';
+            $sql = "FROM
+                    (
+                        SELECT
+                            {$fields},
+                            2.0 AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            alias = ?
+                        UNION ALL
+                        SELECT
+                            {$fields},
+                            1.0 AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            title = ?
+                        UNION ALL
+                        SELECT
+                            {$fields},
+                            0.1 AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            (
+                                title LIKE CONCAT('%', ?, '%') OR
+                                alias LIKE CONCAT('%', ?, '%') OR
+                                problem_id = ?
+                            )
+                    ) AS p";
+            $groupByClause = "
+                        GROUP BY {$fields}
+            ";
+            $orderByClause = '
+                        ORDER BY relevance DESC
+            ';
+        }
+
+        $limits = ' LIMIT ?, ? ';
+        $args[] = $offset;
+        $args[] = $rowcount;
+
+        /** @var list<array{alias: string, relevance: float, title: string}> */
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            "{$select} {$sql} {$groupByClause} {$orderByClause} {$limits};",
+            $args
+        );
+
+        $problems = [];
+        foreach ($result as $problem) {
+            $problems[] = [
+                'key' => $problem['alias'],
+                'value' => $problem['title'],
+            ];
+        }
+        return [
+            'results' => $problems,
+        ];
     }
 }

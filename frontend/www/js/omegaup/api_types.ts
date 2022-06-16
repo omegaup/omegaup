@@ -25,6 +25,7 @@ export namespace dao {
     problemset_id?: number;
     recommended?: boolean;
     rerun_id?: number;
+    score_mode?: string;
     scoreboard?: number;
     show_scoreboard_after?: boolean;
     start_time?: Date;
@@ -271,13 +272,16 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.currentAssignment);
-        x.scoreboard = ((x) => {
-          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
-          return x;
-        })(x.scoreboard);
+        if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
+          x.scoreboard = ((x) => {
+            if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          })(x.scoreboard);
         return x;
       })(
         JSON.parse(
@@ -2417,7 +2421,7 @@ export namespace types {
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
     currentAssignment: types.ArenaAssignment;
-    scoreboard: types.Scoreboard;
+    scoreboard?: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
   }
@@ -2845,12 +2849,14 @@ export namespace types {
 
   export interface ContestListPayload {
     contests: types.TimeTypeContests;
+    countContests: { [key: string]: number };
     isLogged: boolean;
-    query: string;
+    query?: string;
   }
 
   export interface ContestListv2Payload {
     contests: types.ContestList;
+    countContests: { current: number; future: number; past: number };
     query?: string;
   }
 
@@ -4699,10 +4705,16 @@ export namespace messages {
   };
   export type ContestListParticipatingRequest = { [key: string]: any };
   export type _ContestListParticipatingServerResponse = any;
-  export type ContestListParticipatingResponse = { contests: types.Contest[] };
+  export type ContestListParticipatingResponse = {
+    contests: types.Contest[];
+    count: number;
+  };
   export type ContestMyListRequest = { [key: string]: any };
   export type _ContestMyListServerResponse = any;
-  export type ContestMyListResponse = { contests: types.Contest[] };
+  export type ContestMyListResponse = {
+    contests: types.Contest[];
+    count: number;
+  };
   export type ContestOpenRequest = { [key: string]: any };
   export type ContestOpenResponse = {};
   export type ContestProblemClarificationsRequest = { [key: string]: any };
@@ -5073,6 +5085,8 @@ export namespace messages {
     results: types.ProblemListItem[];
     total: number;
   };
+  export type ProblemListForTypeaheadRequest = { [key: string]: any };
+  export type ProblemListForTypeaheadResponse = { results: types.ListItem[] };
   export type ProblemMyListRequest = { [key: string]: any };
   export type ProblemMyListResponse = {
     pagerItems: types.PageItem[];
@@ -5891,6 +5905,9 @@ export namespace controllers {
     list: (
       params?: messages.ProblemListRequest,
     ) => Promise<messages.ProblemListResponse>;
+    listForTypeahead: (
+      params?: messages.ProblemListForTypeaheadRequest,
+    ) => Promise<messages.ProblemListForTypeaheadResponse>;
     myList: (
       params?: messages.ProblemMyListRequest,
     ) => Promise<messages.ProblemMyListResponse>;
