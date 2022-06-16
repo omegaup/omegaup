@@ -532,6 +532,7 @@ export default class ProblemDetails extends Vue {
 
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
+    this.currentRunDetailsData = null;
     this.$emit('update:activeTab', this.selectedTab);
   }
 
