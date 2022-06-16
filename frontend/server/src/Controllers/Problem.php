@@ -3889,23 +3889,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         $query = substr($r->ensureString('query'), 0, 256);
 
-        return \OmegaUp\DAO\Problems::byIdentityTypeForTypeahead(
-            $offset,
-            $rowcount,
-            $query,
-            $searchType
-        );
-    }
-
-    /**
-     * @return array{results: list<ListItem>}
-     */
-    private static function getProblemsList(
-        int $offset,
-        int $rowcount,
-        string $query,
-        string $searchType
-    ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEMS_LIST,
             "{$query}-{$searchType}-{$offset}-{$rowcount}",
