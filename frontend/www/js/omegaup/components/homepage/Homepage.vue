@@ -144,6 +144,11 @@
         ]"
       ></omegaup-sponsors>
     </div>
+    <omegaup-cookie-accept-decline
+      @cookie-clicked-accept="cookieClickedAccept"
+      @cookie-clicked-decline="cookieClickedDecline"
+      @cookie-clicked-postpone="cookieClickedPostpone"
+    ></omegaup-cookie-accept-decline>
   </div>
 </template>
 
@@ -160,6 +165,7 @@ import homepage_Section from './Section.vue';
 import school_Rank from '../schools/Rank.vue';
 import user_Rank from '../user/Rank.vue';
 import homepage_Sponsors from './Sponsors.vue';
+import homepage_Cookie from './Cookie.vue';
 
 @Component({
   components: {
@@ -171,6 +177,7 @@ import homepage_Sponsors from './Sponsors.vue';
     'omegaup-testimonials': homepage_Testimonials,
     'omegaup-section': homepage_Section,
     'omegaup-sponsors': homepage_Sponsors,
+    'omegaup-cookie-accept-decline': homepage_Cookie,
   },
 })
 export default class Homepage extends Vue {
@@ -182,5 +189,16 @@ export default class Homepage extends Vue {
   @Prop() schoolsRank!: omegaup.SchoolRankTable;
 
   T = T;
+  cookieClickedAccept() {
+    console.log('Accept cookies button was clicked!!!');
+  }
+
+  cookieClickedDecline() {
+    console.log('Decline cookies button was clicked!!!');
+  }
+
+  cookieClickedPostpone() {
+    console.log('Postpone modal button was clicked!!!');
+  }
 }
 </script>

@@ -137,5 +137,7 @@
     "build-development-frontend": "cross-env webpack --config-name=frontend --mode=development",
     "refactor": "cross-env ./stuff/refactor.js"
   },
-  "dependencies": {}
+  "dependencies": {
+    "vue-cookie-accept-decline": "5.4.0"
+  }
 }
