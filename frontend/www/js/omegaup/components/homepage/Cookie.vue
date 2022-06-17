@@ -1,17 +1,17 @@
 <template>
   <vue-cookie-accept-decline
-    :disableDecline="false"
+    ref="myPanel1"
     :debug="false"
-    :showPostponeButton="false"
+    :disable-decline="false"
+    :show-postpone-button="false"
+    element-id="myPanel1"
+    position="bottom-left"
+    transition-name="slideFromBottom"
+    type="floating"
     @clicked-accept="$emit('cookie-clicked-accept')"
     @clicked-decline="$emit('cookie-clicked-decline')"
     @clicked-postpone="$emit('cookie-clicked-postpone')"
     @removed-cookie="cookieRemovedCookie"
-    elementId="myPanel1"
-    position="bottom-left"
-    ref="myPanel1"
-    transitionName="slideFromBottom"
-    type="floating"
   >
     <!-- Optional -->
     <template #postponeContent>&times;</template>
