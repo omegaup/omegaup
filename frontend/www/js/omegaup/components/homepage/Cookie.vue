@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import VueCookieAcceptDecline from 'vue-cookie-accept-decline';
 import 'vue-cookie-accept-decline/dist/vue-cookie-accept-decline.css';
 @Component({
