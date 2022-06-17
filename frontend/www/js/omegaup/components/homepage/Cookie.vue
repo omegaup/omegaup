@@ -1,7 +1,7 @@
 <template>
   <vue-cookie-accept-decline
-    :debug="false"
     :disableDecline="false"
+    :debug="false"
     :showPostponeButton="false"
     @clicked-accept="$emit('cookie-clicked-accept')"
     @clicked-decline="$emit('cookie-clicked-decline')"
