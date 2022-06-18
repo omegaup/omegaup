@@ -3,6 +3,7 @@
     :active-tab="activeTab"
     :title="currentAssignment.name"
     :should-show-runs="isAdmin"
+    :should-show-ranking="course.admission_mode !== 'public'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #socket-status>
@@ -125,7 +126,7 @@
         </div>
       </div>
     </template>
-    <template #arena-scoreboard>
+    <template v-if="scoreboard" #arena-scoreboard>
       <omegaup-arena-scoreboard
         :show-invited-users-filter="false"
         :problems="scoreboard.problems"
@@ -263,7 +264,7 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
-  @Prop() scoreboard!: types.Scoreboard;
+  @Prop() scoreboard!: null | types.Scoreboard;
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) allRuns!: null | types.Run[];
@@ -355,6 +356,7 @@ export default class ArenaCourse extends Vue {
 
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
+    this.currentRunDetailsData = null;
     this.$emit('reset-hash', { selectedTab: 'runs', alias: null });
   }
 

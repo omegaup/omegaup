@@ -3,17 +3,20 @@
     <div class="card-body">
       <form class="form" @submit.prevent="$emit('add-group-admin', groupAlias)">
         <div class="form-group mb-0">
-          <label
+          <label class="font-weight-bold w-100"
             >{{ T.wordsGroupAdmin }}
             <font-awesome-icon
               :title="T.courseEditAddGroupAdminsTooltip"
               icon="info-circle"
             />
-            <omegaup-autocomplete
-              class="form-control"
-              :init="(el) => typeahead.groupTypeahead(el)"
+            <omegaup-common-typeahead
+              :existing-options="searchResultGroups"
               :value.sync="groupAlias"
-            ></omegaup-autocomplete>
+              :max-results="10"
+              @update-existing-options="
+                (query) => $emit('update-search-result-groups', query)
+              "
+            ></omegaup-common-typeahead>
           </label>
         </div>
         <button class="btn btn-primary" type="submit">
@@ -49,7 +52,7 @@
               v-if="groupAdmin.name !== 'admin'"
               class="close float-none"
               type="button"
-              @click="$emit('remove-group-admin', group.alias)"
+              @click="$emit('remove-group-admin', groupAdmin.alias)"
             >
               ×
             </button>
@@ -64,9 +67,8 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
+import common_Typeahead from '../common/Typeahead.vue';
 
-import Autocomplete from '../Autocomplete.vue';
 import {
   FontAwesomeIcon,
   FontAwesomeLayers,
@@ -78,22 +80,22 @@ library.add(fas);
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
-export default class GroupAdmin extends Vue {
+export default class GroupAdminv2 extends Vue {
   @Prop() groupAdmins!: types.ContestGroupAdmin[];
+  @Prop() searchResultGroups!: types.ListItem[];
 
   T = T;
-  typeahead = typeahead;
-  groupAlias = '';
+  groupAlias: null | string = null;
 
   @Watch('groupAdmins')
   ongroupAdminsChange(): void {
-    this.groupAlias = '';
+    this.groupAlias = null;
   }
 }
 </script>

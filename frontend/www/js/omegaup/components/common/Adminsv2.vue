@@ -16,7 +16,7 @@
               @update-existing-options="
                 (query) => $emit('update-search-result-users', query)
               "
-            />
+            ></omegaup-common-typeahead>
           </label>
         </div>
         <div class="form-group mb-0">
@@ -53,7 +53,7 @@
         <template v-for="admin in admins">
           <tr
             v-if="admin.role !== 'site-admin' || showSiteAdmins"
-            :key="admin.username"
+            :key="`${admin.username}-${admin.role}`"
             class="text-center"
           >
             <td>
