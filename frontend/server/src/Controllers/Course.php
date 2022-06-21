@@ -2829,10 +2829,17 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $groupAlias = $r->ensureString(
-            'group',
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
+
+        try {
+            $groupAlias = $r->ensureString(
+                'group',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidGroupAlias'
+            );
+        }
 
         $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
         if (is_null($group)) {
