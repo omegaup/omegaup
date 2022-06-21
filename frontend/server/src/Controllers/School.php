@@ -5,6 +5,7 @@
 /**
  * SchoolController
  *
+ * @psalm-type SchoolListItem=array{key: int, value: string}
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type School=array{country_id: string|null, name: string, ranking: int|null, school_id: int, score: float}
  * @psalm-type SchoolCoderOfTheMonth=array{time: string, username: string, classname: string}
@@ -18,20 +19,19 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of schools
      *
-     * @omegaup-request-param mixed $query
-     * @omegaup-request-param mixed $term
+     * @omegaup-request-param int|null $query
+     * @omegaup-request-param int|null $term
      *
-     * @return list<array{id: int, label: string, value: string}>
+     * @return array{results: list<SchoolListItem>}
      */
     public static function apiList(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
-        $param = '';
-        if (is_string($r['term'])) {
-            $param = $r['term'];
-        } elseif (is_string($r['query'])) {
-            $param = $r['query'];
-        } else {
+        $param = $r->ensureOptionalString('query');
+        if (is_null($param)) {
+            $param = $r->ensureOptionalString('term');
+        }
+        if (is_null($param)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 'query'
@@ -41,13 +41,14 @@ class School extends \OmegaUp\Controllers\Controller {
         $response = [];
         foreach (\OmegaUp\DAO\Schools::findByName($param) as $school) {
             $response[] = [
-                'label' => strval($school->name),
+                'key' => intval($school->school_id),
                 'value' => strval($school->name),
-                'id' => intval($school->school_id),
             ];
         }
 
-        return $response;
+        return [
+            'results' => $response,
+        ];
     }
 
     /**

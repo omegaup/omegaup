@@ -102,8 +102,18 @@
       v-if="showEditForm"
       :countries="countries"
       :identity="identity"
+      :search-result-schools="searchResultSchools"
       @cancel="onChildCancel"
-      @edit-identity-member="onChildEditIdentityMember"
+      @edit-identity-member="
+        (request) =>
+          $emit('edit-identity-member', {
+            ...request,
+            ...{ showEditForm },
+          })
+      "
+      @update-search-result-schools="
+        (query) => $emit('update-search-result-schools', query)
+      "
     ></omegaup-identity-edit>
     <omegaup-identity-change-password
       v-if="showChangePasswordForm"
@@ -143,6 +153,7 @@ export default class Members extends Vue {
   @Prop() groupAlias!: string;
   @Prop() countries!: Array<dao.Countries>;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultSchools!: types.SchoolListItem[];
 
   T = T;
   identity = {};

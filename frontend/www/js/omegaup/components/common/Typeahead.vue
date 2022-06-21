@@ -6,10 +6,10 @@
     :typeahead-style="'dropdown'"
     :typeahead-max-results="maxResults"
     :typeahead-activation-threshold="activationThreshold"
-    :placeholder="T.typeaheadSearchPlaceholder"
+    :placeholder="placeholder"
     :limit="1"
     :hide-input-on-limit="true"
-    :only-existing-tags="true"
+    :only-existing-tags="onlyExistingTags"
     :typeahead-hide-discard="true"
     @change="updateExistingOptions"
     @tag-added="onTagAdded"
@@ -32,12 +32,15 @@ import { types } from '../../api_types';
 })
 export default class Typeahead extends Vue {
   @Prop() existingOptions!: types.ListItem[];
+  @Prop({ default: () => [] }) currentOptions!: types.ListItem[];
   @Prop({ default: 3 }) activationThreshold!: number;
   @Prop({ default: 5 }) maxResults!: number;
   @Prop({ default: null }) value!: null | string;
+  @Prop({ default: true }) onlyExistingTags!: boolean;
+  @Prop({ default: T.typeaheadSearchPlaceholder }) placeholder!: boolean;
 
   T = T;
-  selectedOptions: types.ListItem[] = [];
+  selectedOptions = this.currentOptions;
 
   updateExistingOptions(query: string): void {
     if (query.length < this.activationThreshold) return;

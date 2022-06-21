@@ -1,4 +1,3 @@
-import T from './lang';
 import * as api from './api';
 import { types } from './api_types';
 import * as ui from './ui';
@@ -152,36 +151,6 @@ export function problemsetProblemTypeahead(
         templates: {
           suggestion: (val) =>
             ui.formatString('<div data-value="%(alias)">%(alias)</div>', val),
-        },
-      },
-    )
-    .on('typeahead:select', cb)
-    .on('typeahead:autocomplete', cb);
-}
-
-export function schoolTypeahead(
-  elem: JQuery<HTMLElement>,
-  cb?: CallbackType<{ id: number; label: string; value: string }>,
-) {
-  if (!cb) {
-    cb = (event: Event, val: { id: number; label: string; value: string }) =>
-      $(event.target as EventTarget).val(val.value);
-  }
-  elem
-    .typeahead<{ id: number; label: string; value: string }>(
-      {
-        minLength: 2,
-        highlight: true,
-      },
-      {
-        source: typeaheadWrapper(api.School.list),
-        async: true,
-        limit: 10,
-        display: 'label',
-        templates: {
-          empty: T.schoolToBeAdded,
-          suggestion: (val) =>
-            ui.formatString('<div data-value="%(value)">%(label)</div>', val),
         },
       },
     )
