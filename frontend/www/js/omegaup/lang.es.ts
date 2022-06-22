@@ -1286,7 +1286,6 @@ const translations: { [key: string]: string; } = {
   schoolOfTheMonthSelectedSuccessfully: "La Escuela del mes ha sido seleccionada satisfactoriamente.",
   schoolRankOfTheMonthHeader: "Las mejores %(count) escuelas con mayor puntaje del mes",
   schoolRankRangeHeader: "Escuelas con m\u00e1s puntaje (%(lowCount) a %(highCount))",
-  schoolToBeAdded: "Tu escuela a\u00fan no existe en omegaUp. Ser\u00e1 agregada cuando guardes tus cambios.",
   schoolUsers: "Coders que pertenecen a esta escuela",
   schoolsCreateCoursesThatMeetNeeds: "Cursos que satisfacen sus necesidades. Puede crear sus propios problemas.",
   schoolsCreateYourCourse: "Cree sus cursos",

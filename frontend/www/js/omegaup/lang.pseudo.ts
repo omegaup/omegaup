@@ -1286,7 +1286,6 @@ const translations: { [key: string]: string; } = {
   schoolOfTheMonthSelectedSuccessfully: "(Sch001 0f 7h3 m0n7h ha5 b33n 5313c73d 5ucc355fu11y!)",
   schoolRankOfTheMonthHeader: "(T0p %(count) 5ch0015 wi7h 7h3 m057 p0in75 in 7h3 m0n7h)",
   schoolRankRangeHeader: "(Sch0015 wi7h 7h3 m057 p0in75 (%(lowCount) 70 %(highCount)))",
-  schoolToBeAdded: "(Y0ur 5ch001 ha5 n07 b33n r3gi573r3d in 0m3gaUp. I7 wi11 b3 add3d wh3n y0u 5av3 y0ur chang35.)",
   schoolUsers: "(U53r5 wh0 b310ng 70 7hi5 5ch001)",
   schoolsCreateCoursesThatMeetNeeds: "(C0ur535 7ha7 m337 y0ur n33d5. Y0u can cr3a73 y0ur 0wn pr0b13m5.)",
   schoolsCreateYourCourse: "(Cr3a73 y0ur c0ur535)",
