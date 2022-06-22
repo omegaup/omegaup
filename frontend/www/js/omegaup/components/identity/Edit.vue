@@ -161,7 +161,7 @@ export default class IdentityEdit extends Vue {
 
   onEditMember(): void {
     this.$emit('edit-identity-member', {
-      username: this.identity?.username,
+      originalUsername: this.identity?.username,
       identity: {
         ...this.selectedIdentity,
         ...{ school_id: this.schoolId, school_name: this.schoolName },

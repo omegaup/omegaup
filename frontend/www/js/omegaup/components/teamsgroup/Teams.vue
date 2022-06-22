@@ -162,8 +162,11 @@ export default class Teams extends Vue {
     this.onCancel();
   }
 
-  onEditIdentityTeam(originalUsername: string, identity: types.Identity): void {
-    this.$emit('edit-identity-team', { originalUsername, identity });
+  onEditIdentityTeam(response: {
+    originalUsername: string;
+    identity: types.Identity;
+  }): void {
+    this.$emit('edit-identity-team', response);
     this.onCancel();
   }
 
