@@ -306,7 +306,7 @@ def create_course(driver, course_alias: str, school_name: str) -> None:
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
              'input[name="show-scoreboard"][value="true"]'))).click()
-    driver.typeahead_helper('omegaup-course-details', school_name)
+    driver.typeahead_helper('.omegaup-course-details', school_name)
     driver.browser.find_element_by_css_selector(
         'textarea[data-course-new-description]'
     ).send_keys('course description')
