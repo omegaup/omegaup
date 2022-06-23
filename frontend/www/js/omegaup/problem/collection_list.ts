@@ -11,6 +11,7 @@ OmegaUp.on('ready', () => {
   let columnName = 'problem_id';
   let language = 'all';
   let difficulty = 'all';
+  let quality = 'all';
   let query = '';
   if (queryString) {
     const urlParams = new URLSearchParams(queryString);
@@ -36,6 +37,12 @@ OmegaUp.on('ready', () => {
       const queryParam = urlParams.get('difficulty');
       if (queryParam) {
         difficulty = queryParam;
+      }
+    }
+    if (urlParams.get('quality')) {
+      const queryParam = urlParams.get('quality');
+      if (queryParam) {
+        quality = queryParam;
       }
     }
     if (urlParams.get('query')) {
@@ -68,12 +75,14 @@ OmegaUp.on('ready', () => {
           sortOrder: sortOrder,
           columnName: columnName,
           difficulty: difficulty,
+          quality: quality,
         },
         on: {
           'apply-filter': (
             columnName: string,
             sortOrder: omegaup.SortOrder,
             difficulty: string,
+            quality: string,
             tag: string[],
           ): void => {
             const queryParameters = {
@@ -82,6 +91,7 @@ OmegaUp.on('ready', () => {
               order_by: columnName,
               sort_order: sortOrder,
               difficulty,
+              quality,
               tag,
             };
             window.location.replace(
