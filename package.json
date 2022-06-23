@@ -72,7 +72,7 @@
     "jest-fetch-mock": "^3.0.3",
     "jest-websocket-mock": "^2.2.0",
     "jquery": "^3.5.1",
-    "jsdom": "^15.2.1",
+    "jsdom": "^16.5.0",
     "jsdom-global": "^3.0.2",
     "jszip": "^3.7.0",
     "latinize": "^0.4.1",
