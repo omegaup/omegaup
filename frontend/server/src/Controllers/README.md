@@ -3821,10 +3821,10 @@ Gets a list of schools
 
 ### Parameters
 
-| Name    | Type        | Description |
-| ------- | ----------- | ----------- |
-| `query` | `int\|null` |             |
-| `term`  | `int\|null` |             |
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+| `term`  | `null\|string` |             |
 
 ### Returns
 

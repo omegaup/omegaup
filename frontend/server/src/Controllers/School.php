@@ -19,8 +19,8 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of schools
      *
-     * @omegaup-request-param int|null $query
-     * @omegaup-request-param int|null $term
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param null|string $term
      *
      * @return array{results: list<SchoolListItem>}
      */
