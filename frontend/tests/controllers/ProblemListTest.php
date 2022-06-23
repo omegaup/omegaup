@@ -1395,9 +1395,50 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Gets the list of quality problems for collections
+     * A PHPUnit data provider for the test with search type values.
+     *
+     * @return array{0: string, 1: string, 2: int}
      */
-    public function testQualityProblemListForCollections() {
+    public function problemListCollectionsProvider(): array {
+        return [
+            [
+                'level',
+                'all',
+                4,
+                [0,1,2,3],
+            ],
+            [
+                'level',
+                'onlyQualityProblems',
+                2,
+                [0,3],
+            ],
+            [
+                'author',
+                'all',
+                4,
+                [0,1,2,3],
+            ],
+            [
+                'author',
+                'onlyQualityProblems',
+                2,
+                [0,3],
+            ],
+        ];
+    }
+
+    /**
+     * Gets the list of quality problems for collections
+     *
+     * @dataProvider problemListCollectionsProvider
+     */
+    public function testQualityProblemListForCollections(
+        string $collectionType,
+        string $filter,
+        int $expectedTotal,
+        array $expectedProblemIds
+    ) {
         $n = 4;
         $problemData = [];
         foreach (range(0, $n - 1) as $i) {
@@ -1436,20 +1477,26 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
-        $response = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'level' => 'problemLevelBasicKarel',
-                'quality' => 'onlyQualityProblems',
-            ])
-        )['templateProperties']['payload']['problems'];
+        $params = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'level' => 'problemLevelBasicKarel',
+            'quality' => $filter,
+        ]);
+        if ($collectionType === 'level') {
+            $response = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
+                $params
+            )['templateProperties']['payload']['problems'];
+        } else {
+            $response = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
+                $params
+            )['templateProperties']['payload']['problems'];
+        }
 
-        $this->assertCount(2, $response);
-
-        $expectedAliases = [
-            $problemData[0]['request']['problem_alias'],
-            $problemData[3]['request']['problem_alias'],
-        ];
+        $this->assertCount($expectedTotal, $response);
+        $expectedAliases = [];
+        foreach ($expectedProblemIds as $problemId) {
+            $expectedAliases[] = $problemData[$problemId]['request']['problem_alias'];
+        }
 
         foreach ($expectedAliases as $problemAlias) {
             $this->assertArrayContainsWithPredicate(
@@ -1457,15 +1504,6 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 fn ($problem) => $problem['alias'] == $problemAlias
             );
         }
-
-        $response = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'level' => 'problemLevelBasicKarel',
-            ])
-        )['templateProperties']['payload']['problems'];
-
-        $this->assertCount(4, $response);
     }
 
     /**

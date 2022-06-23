@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
   let columnName = 'problem_id';
   let language = 'all';
   let difficulty = 'all';
-  let quality = 'all';
+  let quality = 'onlyQualityProblems';
   let query = '';
   if (queryString) {
     const urlParams = new URLSearchParams(queryString);
