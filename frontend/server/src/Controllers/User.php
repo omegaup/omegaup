@@ -3260,7 +3260,7 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiDelete(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
-        \OmegaUp\DAO\Users::deleteUser($User->User_id);
+        \OmegaUp\DAO\Users::deleteUser($Users->User_id);
         return [
             'status' => 'ok',
         ];
