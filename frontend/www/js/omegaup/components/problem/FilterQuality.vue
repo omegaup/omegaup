@@ -28,7 +28,7 @@ import T from '../../lang';
 
 @Component
 export default class FilterQuality extends Vue {
-  @Prop() quality!: string;
+  @Prop({ default: 'onlyQualityProblems' }) quality!: string;
 
   T = T;
   currentQuality = this.quality;
