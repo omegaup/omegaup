@@ -249,6 +249,7 @@
   - [`/api/user/updateMainEmail/`](#apiuserupdatemainemail)
   - [`/api/user/validateFilter/`](#apiuservalidatefilter)
   - [`/api/user/verifyEmail/`](#apiuserverifyemail)
+  - [`/api/user/delete/`](#apiuserdelete)
 
 # Admin
 

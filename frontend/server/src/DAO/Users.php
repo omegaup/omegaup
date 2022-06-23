@@ -281,6 +281,24 @@ class Users extends \OmegaUp\DAO\Base\Users {
         /** @var null|array{username: string, verified: bool} */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql);
     }
+      /**
+       * Delete User
+       */
+
+    public static function deleteUser(int $user): int {
+        $sql =
+             'UPDATE
+                    `Users`
+                SET
+                    `facebook_user_id` = NULL`facebook_user_id` = NULL, `git_token`= NULL, `main_email_id`= NULL, `main_identity_id`= NULL,  `has_learning_objective`= NULL, `has_teaching_objective`= NULL,  `has_scholar_objective`= NULL,  `has_competitive_objective`= NULL,  `verification_id`= NULL, `reset_digest`= NULL, `reset_sent_at`= NULL, `hide_problem_tags`= NULL, `birth_date`= NULL,
+                WHERE
+                    `user_id` = ?;';
+        $params = [
+          $userId,
+        ];
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
 
     /**
      * @return list<\OmegaUp\DAO\VO\Users>
