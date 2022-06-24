@@ -107,7 +107,8 @@ def test_user_ranking_course(driver):
         else:
             logging.error('Failed to toggle contestants')
 
-        run_user = driver.browser.find_element_by_xpath(
+        run_user = driver.browser.find_element(
+            By.XPATH,
             '//td[contains(@class, "accepted")]/preceding-sibling::td[@class='
             '"user"]')
         assert run_user.text == driver.user_username, run_user
@@ -131,7 +132,7 @@ def test_user_ranking_course(driver):
                 (By.XPATH,
                  '//input[@name = "show-scoreboard"][@value="true"]'))).click()
 
-        driver.browser.find_element_by_css_selector(
+        driver.browser.find_element(By.CSS_SELECTOR,
             'form[data-course-form]').submit()
         assert (('/course/%s/edit/' % course_alias) in
                 driver.browser.current_url), driver.browser.current_url
@@ -163,7 +164,7 @@ def show_run_details_course(driver: conftest.Driver, course_alias: str,
 
     util.show_run_details(driver, code='#include <iostream>')
 
-    driver.browser.find_element_by_css_selector('div[data-overlay]').click()
+    driver.browser.find_element(By.CSS_SELECTOR,'div[data-overlay]').click()
 
 
 def test_create_identities_for_course(driver):
@@ -254,7 +255,8 @@ def test_create_identities_for_course(driver):
                  '//form[contains(concat(" ", normalize-space(@class), " "), '
                  '" add-identity-form ")]/div/button'))).click()
 
-        associated_identities = driver.browser.find_element_by_xpath(
+        associated_identities = driver.browser.find_element(
+            By.XPATH,
             '//tr/td[text() = "%s"]' % (associated.username))
         assert associated_identities is not None, 'No identity matches'
 
@@ -309,12 +311,12 @@ def create_course(driver, course_alias: str, school_name: str) -> None:
     driver.typeahead_helper('*[contains(@class, "omegaup-course-details")]',
                             school_name,
                             select_suggestion=False)
-    driver.browser.find_element_by_css_selector(
+    driver.browser.find_element(By.CSS_SELECTOR,
         'textarea[data-course-new-description]'
     ).send_keys('course description')
 
     with driver.page_transition():
-        driver.browser.find_element_by_css_selector(
+        driver.browser.find_element(By.CSS_SELECTOR,
             'form[data-course-form]').submit()
     assert (f'/course/{course_alias}/edit/' in driver.browser.current_url
             ), driver.browser.current_url
@@ -343,13 +345,13 @@ def add_assignment_with_problem(driver, assignment_alias, problem_alias):
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR, ('.schedule .name')))).send_keys(
                 assignment_alias)
-    assignments_tab = driver.browser.find_element_by_css_selector(
+    assignments_tab = driver.browser.find_element(By.CSS_SELECTOR,
         '.tab-pane.active')
-    new_assignment_form = assignments_tab.find_element_by_css_selector(
+    new_assignment_form = assignments_tab.find_element(By.CSS_SELECTOR,
         '.schedule')
-    new_assignment_form.find_element_by_css_selector('.alias').send_keys(
+    new_assignment_form.find_element(By.CSS_SELECTOR,'.alias').send_keys(
         assignment_alias)
-    new_assignment_form.find_element_by_css_selector('textarea').send_keys(
+    new_assignment_form.find_element(By.CSS_SELECTOR,'textarea').send_keys(
         'homework description')
 
     driver.wait.until(
@@ -367,7 +369,7 @@ def add_assignment_with_problem(driver, assignment_alias, problem_alias):
              '[data-course-problemlist] table.table-striped')))
 
     with util.dismiss_status(driver):
-        new_assignment_form.find_element_by_css_selector(
+        new_assignment_form.find_element(By.CSS_SELECTOR,
             'button[data-schedule-assignment]').click()
     driver.wait.until(
         EC.invisibility_of_element_located(
