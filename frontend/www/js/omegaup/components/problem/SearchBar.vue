@@ -2,7 +2,7 @@
   <div class="mb-3">
     <form action="/problem/" method="GET" class="form-inline">
       <div v-if="tags.length !== 0" class="form-group mr-2">
-        <div v-for="tag in tags" class="mr-1">
+        <div v-for="tag in tags" :key="tag" class="mr-1">
           <input type="hidden" name="tag[]" :value="tag" />
           <span class="badge badge-secondary m-1 p-2">{{
             T[tag] ? T[tag] : tag
@@ -13,19 +13,26 @@
         </a>
       </div>
       <div class="form-group mr-2 mt-1">
-        <omegaup-autocomplete
-          v-model="keyword"
-          class="form-control"
-          :init="(el) => typeahead.problemTypeahead(el)"
+        <omegaup-common-typeahead
+          :existing-options="searchResultProblems"
+          :current-options="[]"
+          :value.sync="keyword"
           :placeholder="T.wordsKeywordSearch"
-          name="query"
-        ></omegaup-autocomplete>
+          @update-existing-options="
+            (query) => $emit('update-search-result-problems', query)
+          "
+        ></omegaup-common-typeahead>
+        <input type="hidden" name="query" :value="keyword" />
       </div>
       <div class="form-group mr-2 mt-1">
         <label>
           {{ T.wordsFilterByLanguage }}
           <select v-model="language" name="language" class="ml-1 form-control">
-            <option v-for="language in languages" :value="language">
+            <option
+              v-for="language in languages"
+              :key="language"
+              :value="language"
+            >
               {{ getLanguageText(language) }}
             </option>
           </select>
@@ -43,8 +50,8 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import { types } from '../../api_types';
+import common_Typeahead from '../common/Typeahead.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -54,7 +61,7 @@ library.add(faTimes);
 @Component({
   components: {
     FontAwesomeIcon,
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
   },
 })
 export default class ProblemSearchBar extends Vue {
@@ -62,9 +69,9 @@ export default class ProblemSearchBar extends Vue {
   @Prop() initialKeyword!: string;
   @Prop() initialLanguage!: string;
   @Prop() languages!: string[];
+  @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
-  typeahead = typeahead;
 
   keyword = this.initialKeyword;
   language = this.initialLanguage;
