@@ -531,6 +531,7 @@ class Cache {
     const PROBLEM_SOLUTION = 'solution-';
     const PROBLEM_SOLUTION_EXISTS = 'solution-exists-';
     const PROBLEM_STATS = 'problem-stats-';
+    const PROBLEMS_LIST = 'problems-list-';
     const RUN_ADMIN_DETAILS = 'run-admin-details-';
     const RUN_COUNTS = 'run-counts-';
     const RUN_TOTAL_COUNTS = 'run-total-counts';
