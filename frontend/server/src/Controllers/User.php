@@ -3259,11 +3259,14 @@ class User extends \OmegaUp\Controllers\Controller {
     }
     /**
      * @return array{status: string}
+     *
+     * @omegaup-request-param null|string $username
      */
     public static function apiDelete(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
         $username = $r->ensureOptionalString(
             'username',
+            required: false,
             fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
             )
@@ -3279,10 +3282,10 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         $user = self::resolveTargetUser($r);
         $identity = self::resolveTargetIdentity($r);
-        \OmegaUp\DAO\Users::deleteUserAndIndentityInformation(
-            $user->user_id,
-            $identity->identity_id
-        );
+        if (is_null($user) || is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        \OmegaUp\DAO\Users::deleteUserAndIndentityInformation($user, $identity);
         return [
             'status' => 'ok',
         ];
