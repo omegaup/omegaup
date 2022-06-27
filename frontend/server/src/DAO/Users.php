@@ -285,16 +285,50 @@ class Users extends \OmegaUp\DAO\Base\Users {
        * Delete User
        */
 
-    public static function deleteUser(int $user): int {
-        $sql =
-             'UPDATE
-                    `Users`
-                SET
-                    `facebook_user_id` = NULL`facebook_user_id` = NULL, `git_token`= NULL, `main_email_id`= NULL, `main_identity_id`= NULL,  `has_learning_objective`= NULL, `has_teaching_objective`= NULL,  `has_scholar_objective`= NULL,  `has_competitive_objective`= NULL,  `verification_id`= NULL, `reset_digest`= NULL, `reset_sent_at`= NULL, `hide_problem_tags`= NULL, `birth_date`= NULL,
-                WHERE
-                    `user_id` = ?;';
+    public static function deleteUserAndIndentityInformation(
+        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): int {
+        $sql = '
+            UPDATE
+                `Users`
+            SET
+                `facebook_user_id` = NULL,
+                `git_token`= NULL,
+                `main_email_id`= NULL,
+                `main_identity_id`= NULL,
+                `has_learning_objective`= NULL,
+                `has_scholar_objective`= NULL,
+                `has_competitive_objective`= NULL,
+                `verification_id`= NULL,
+                `reset_digest`= NULL,
+                `reset_sent_at`= NULL,
+                `hide_problem_tags`= NULL,
+                `birth_date`= NULL,
+                verified = 0,
+                in_mailing_list = 0,
+                is_private = 0
+            WHERE
+                `user_id` = ?;';
         $params = [
-          $userId,
+          $user->user_id,
+        ];
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $sql = "
+            UPDATE
+                `Identities`
+            SET
+                `username` = 'deleted_user',
+                `password` = NULL,
+                `name`= NULL,
+                `user_id`= NULL,
+                `language_id`= NULL,
+                `country_id`= NULL,
+                `current_identity_school_id`= NULL
+            WHERE
+                `identity_id` = ?;";
+        $params = [
+          $identity->identity_id,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

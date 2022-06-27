@@ -1794,6 +1794,9 @@ export const User = {
     messages.UserCreateAPITokenRequest,
     messages.UserCreateAPITokenResponse
   >('/api/user/createAPIToken/'),
+  delete: apiCall<messages.UserDeleteRequest, messages.UserDeleteResponse>(
+    '/api/user/delete/',
+  ),
   extraInformation: apiCall<
     messages.UserExtraInformationRequest,
     messages._UserExtraInformationServerResponse,

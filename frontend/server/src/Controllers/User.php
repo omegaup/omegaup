@@ -3257,10 +3257,32 @@ class User extends \OmegaUp\Controllers\Controller {
             'status' => 'ok',
         ];
     }
+    /**
+     * @return array{status: string}
+     */
     public static function apiDelete(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-
-        \OmegaUp\DAO\Users::deleteUser($Users->User_id);
+        $username = $r->ensureOptionalString(
+            'username',
+            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
+        );
+        if (
+            !\OmegaUp\Authorization::isSystemAdmin(
+                $r->identity
+            ) && !is_null(
+                $username
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
+        \OmegaUp\DAO\Users::deleteUserAndIndentityInformation(
+            $user->user_id,
+            $identity->identity_id
+        );
         return [
             'status' => 'ok',
         ];

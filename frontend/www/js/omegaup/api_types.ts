@@ -5398,6 +5398,8 @@ export namespace messages {
   export type UserCreateResponse = { username: string };
   export type UserCreateAPITokenRequest = { [key: string]: any };
   export type UserCreateAPITokenResponse = { token: string };
+  export type UserDeleteRequest = { [key: string]: any };
+  export type UserDeleteResponse = {};
   export type UserExtraInformationRequest = { [key: string]: any };
   export type _UserExtraInformationServerResponse = any;
   export type UserExtraInformationResponse = {
@@ -6157,6 +6159,9 @@ export namespace controllers {
     createAPIToken: (
       params?: messages.UserCreateAPITokenRequest,
     ) => Promise<messages.UserCreateAPITokenResponse>;
+    delete: (
+      params?: messages.UserDeleteRequest,
+    ) => Promise<messages.UserDeleteResponse>;
     extraInformation: (
       params?: messages.UserExtraInformationRequest,
     ) => Promise<messages.UserExtraInformationResponse>;

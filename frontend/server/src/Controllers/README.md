@@ -224,6 +224,7 @@
   - [`/api/user/contestStats/`](#apiuserconteststats)
   - [`/api/user/create/`](#apiusercreate)
   - [`/api/user/createAPIToken/`](#apiusercreateapitoken)
+  - [`/api/user/delete/`](#apiuserdelete)
   - [`/api/user/extraInformation/`](#apiuserextrainformation)
   - [`/api/user/generateGitToken/`](#apiusergenerategittoken)
   - [`/api/user/generateOmiUsers/`](#apiusergenerateomiusers)
@@ -249,7 +250,6 @@
   - [`/api/user/updateMainEmail/`](#apiuserupdatemainemail)
   - [`/api/user/validateFilter/`](#apiuservalidatefilter)
   - [`/api/user/verifyEmail/`](#apiuserverifyemail)
-  - [`/api/user/delete/`](#apiuserdelete)
 
 # Admin
 
@@ -4395,6 +4395,14 @@ There is a limit of 5 API tokens that each user can have.
 | Name    | Type     |
 | ------- | -------- |
 | `token` | `string` |
+
+## `/api/user/delete/`
+
+### Description
+
+### Returns
+
+_Nothing_
 
 ## `/api/user/extraInformation/`
 
