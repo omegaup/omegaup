@@ -3267,7 +3267,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $username = $r->ensureOptionalString(
             'username',
             required: false,
-            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+            validator: fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
             )
         );

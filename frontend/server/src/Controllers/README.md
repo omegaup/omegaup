@@ -4400,6 +4400,12 @@ There is a limit of 5 API tokens that each user can have.
 
 ### Description
 
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
+
 ### Returns
 
 _Nothing_
