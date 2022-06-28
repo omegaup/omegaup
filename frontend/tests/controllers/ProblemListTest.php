@@ -1397,7 +1397,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for the test with search type values.
      *
-     * @return array{0: string, 1: string, 2: int}
+     * @return array{0: string, 1: string, 2: int, 3: int[]}
      */
     public function problemListCollectionsProvider(): array {
         return [
