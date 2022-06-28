@@ -1430,7 +1430,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Gets the list of quality problems for collections
-     *
+     * @param int[] $expectedProblemIds
      * @dataProvider problemListCollectionsProvider
      */
     public function testQualityProblemListForCollections(
