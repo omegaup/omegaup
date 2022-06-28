@@ -32,7 +32,7 @@ import { types } from '../../api_types';
 })
 export default class Typeahead extends Vue {
   @Prop() existingOptions!: types.ListItem[];
-  @Prop({ default: () => [] }) currentOptions!: types.ListItem[];
+  @Prop({ default: () => [] }) options!: types.ListItem[];
   @Prop({ default: 3 }) activationThreshold!: number;
   @Prop({ default: 5 }) maxResults!: number;
   @Prop({ default: null }) value!: null | string;
@@ -40,7 +40,7 @@ export default class Typeahead extends Vue {
   @Prop({ default: T.typeaheadSearchPlaceholder }) placeholder!: boolean;
 
   T = T;
-  selectedOptions = this.currentOptions;
+  selectedOptions = this.options;
 
   updateExistingOptions(query: string): void {
     if (query.length < this.activationThreshold) return;
