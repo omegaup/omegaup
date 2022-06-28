@@ -3892,11 +3892,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         $query = substr($r->ensureString('query'), 0, 256);
 
-        return \OmegaUp\DAO\Problems::byIdentityTypeForTypeahead(
-            $offset,
-            $rowcount,
-            $query,
-            $searchType
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEMS_LIST,
+            "{$query}-{$searchType}-{$offset}-{$rowcount}",
+            fn () => \OmegaUp\DAO\Problems::byIdentityTypeForTypeahead(
+                $offset,
+                $rowcount,
+                $query,
+                $searchType
+            ),
+            APC_USER_CACHE_PROBLEM_LIST_TIMEOUT
         );
     }
 
