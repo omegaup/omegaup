@@ -145,7 +145,7 @@ class ContestParams {
         $this->partialScore = $params['partialScore'] ?? true;
         $this->contestForTeams = $params['contestForTeams'] ?? false;
         $this->teamsGroupAlias = $params['teamsGroupAlias'] ?? null;
-        $this->scoreMode = $params['scoreMode'] ?? 'partial';
+        $this->scoreMode = $params['scoreMode'] ?? null;
     }
 }
 
@@ -196,11 +196,14 @@ class Contest {
             'requests_user_information' => $params->requestsUserInformation,
             'penalty_calc_policy' => $params->penaltyCalcPolicy,
             'contest_for_teams' => $params->contestForTeams,
-            'score_mode' => $params->scoreMode,
         ]);
 
         if (!is_null($params->teamsGroupAlias)) {
             $r['teams_group_alias'] = $params->teamsGroupAlias;
+        }
+
+        if (!is_null($params->scoreMode)) {
+            $r['score_mode'] = $params->scoreMode;
         }
 
         return [
