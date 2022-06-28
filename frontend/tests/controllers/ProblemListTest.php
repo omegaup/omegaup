@@ -1397,6 +1397,118 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for the test with search type values.
      *
+     * @return array{0: string, 1: string, 2: int, 3: int[]}
+     */
+    public function problemListCollectionsProvider(): array {
+        return [
+            [
+                'level',
+                'all',
+                4,
+                [0,1,2,3],
+            ],
+            [
+                'level',
+                'onlyQualityProblems',
+                2,
+                [0,3],
+            ],
+            [
+                'author',
+                'all',
+                4,
+                [0,1,2,3],
+            ],
+            [
+                'author',
+                'onlyQualityProblems',
+                2,
+                [0,3],
+            ],
+        ];
+    }
+
+    /**
+     * Gets the list of quality problems for collections
+     * @param int[] $expectedProblemIds
+     * @dataProvider problemListCollectionsProvider
+     */
+    public function testQualityProblemListForCollections(
+        string $collectionType,
+        string $filter,
+        int $expectedTotal,
+        array $expectedProblemIds
+    ) {
+        $n = 4;
+        $problemData = [];
+        foreach (range(0, $n - 1) as $i) {
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'problem_level' => 'problemLevelBasicKarel',
+                ])
+            );
+        }
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData[0]['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicIntroductionToProgramming',
+                'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
+            ]),
+        ]));
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData[3]['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicKarel',
+                'tags' => ['problemTagMatrices', 'problemTagNumberTheory'],
+            ]),
+        ]));
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $params = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'level' => 'problemLevelBasicKarel',
+            'quality' => $filter,
+        ]);
+        if ($collectionType === 'level') {
+            $response = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
+                $params
+            )['templateProperties']['payload']['problems'];
+        } else {
+            $response = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
+                $params
+            )['templateProperties']['payload']['problems'];
+        }
+
+        $this->assertCount($expectedTotal, $response);
+        $expectedAliases = [];
+        foreach ($expectedProblemIds as $problemId) {
+            $expectedAliases[] = $problemData[$problemId]['request']['problem_alias'];
+        }
+
+        foreach ($expectedAliases as $problemAlias) {
+            $this->assertArrayContainsWithPredicate(
+                $response,
+                fn ($problem) => $problem['alias'] == $problemAlias
+            );
+        }
+    }
+
+    /**
+     * A PHPUnit data provider for the test with search type values.
+     *
      * @return array{0: string, 1: string, 2: list<string>}
      */
     public function problemListWithSearchTypeProvider(): array {
