@@ -115,7 +115,6 @@
                 >{{ T.wordsProblem }}:
                 <omegaup-common-typeahead
                   :existing-options="searchResultProblems"
-                  :current-options="[]"
                   :value.sync="filterProblem"
                   @update-existing-options="
                     (query) => $emit('update-search-result-problems', query)

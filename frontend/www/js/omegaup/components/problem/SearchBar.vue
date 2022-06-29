@@ -15,7 +15,6 @@
       <div class="form-group mr-2 mt-1">
         <omegaup-common-typeahead
           :existing-options="searchResultProblems"
-          :current-options="[]"
           :value.sync="keyword"
           :placeholder="T.wordsKeywordSearch"
           @update-existing-options="

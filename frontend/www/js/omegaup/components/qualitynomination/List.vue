@@ -18,7 +18,6 @@
           <omegaup-common-typeahead
             v-show="selectColumn == 'problem_alias'"
             :existing-options="searchResultProblems"
-            :current-options="[]"
             :value.sync="queryProblem"
             :placeholder="T.wordsKeyword"
             @update-existing-options="
