@@ -74,7 +74,7 @@
               {{ T.profileSchool }}
               <omegaup-common-typeahead
                 :existing-options="searchResultSchools"
-                :current-options="searchResultSchools"
+                :options="searchResultSchools"
                 :value.sync="schoolId"
                 @update-existing-options="
                   (query) => $emit('update-search-result-schools', query)
@@ -164,7 +164,8 @@ export default class IdentityEdit extends Vue {
       originalUsername: this.identity?.username,
       identity: {
         ...this.selectedIdentity,
-        ...{ school_id: this.schoolId, school_name: this.schoolName },
+        school_id: this.schoolId,
+        school_name: this.schoolName,
       },
     });
   }

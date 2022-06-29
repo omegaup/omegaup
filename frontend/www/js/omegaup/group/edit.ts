@@ -142,10 +142,8 @@ OmegaUp.on('ready', () => {
           }) => {
             api.Identity.update({
               ...request.identity,
-              ...{
-                original_username: request.username,
-                group_alias: payload.groupAlias,
-              },
+              original_username: request.username,
+              group_alias: payload.groupAlias,
             })
               .then(() => {
                 ui.success(T.groupEditMemberUpdated);

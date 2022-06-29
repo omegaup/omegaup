@@ -105,11 +105,7 @@
       :search-result-schools="searchResultSchools"
       @cancel="onChildCancel"
       @edit-identity-member="
-        (request) =>
-          $emit('edit-identity-member', {
-            ...request,
-            ...{ showEditForm },
-          })
+        (request) => $emit('edit-identity-member', { ...request, showEditForm })
       "
       @update-search-result-schools="
         (query) => $emit('update-search-result-schools', query)

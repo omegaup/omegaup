@@ -99,7 +99,7 @@
               >{{ T.profileSchool }}
               <omegaup-common-typeahead
                 :existing-options="searchResultSchools"
-                :current-options="searchResultSchools"
+                :options="searchResultSchools"
                 :value.sync="schoolId"
                 @update-existing-options="
                   (query) => $emit('update-search-result-schools', query)
