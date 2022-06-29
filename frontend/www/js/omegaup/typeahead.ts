@@ -1,6 +1,5 @@
 import T from './lang';
 import * as api from './api';
-import { types } from './api_types';
 import * as ui from './ui';
 
 import '../../third_party/js/typeahead.jquery.js';
@@ -71,92 +70,6 @@ function typeaheadWrapper<T>(
       });
   }
   return wrappedCall;
-}
-
-export function problemTypeahead(
-  elem: JQuery<HTMLElement>,
-  cb?: CallbackType<types.ListItem>,
-) {
-  if (!cb) {
-    cb = (event: Event, val: types.ListItem) =>
-      $(event.target as EventTarget).val(val.key);
-  }
-  elem
-    .typeahead<types.ListItem>(
-      {
-        minLength: 3,
-        highlight: false,
-      },
-      {
-        source: typeaheadWrapper(
-          (options: { query: string }) =>
-            new Promise<types.ListItem[]>((resolve, reject) =>
-              api.Problem.listForTypeahead({
-                query: options.query,
-                search_type: 'all',
-              })
-                .then((data) => resolve(data.results))
-                .catch(reject),
-            ),
-        ),
-        async: true,
-        limit: 10,
-        display: 'key',
-        templates: {
-          suggestion: (val) =>
-            ui.formatString(
-              '<div data-value="%(key)"><strong>%(value)</strong> (%(key))</div>',
-              val,
-            ),
-        },
-      },
-    )
-    .on('typeahead:select', cb)
-    .on('typeahead:autocomplete', cb)
-    .trigger('change');
-}
-
-export function problemsetProblemTypeahead(
-  elem: JQuery<HTMLElement>,
-  problemDataset: () => { alias: string; title: string }[],
-  cb?: CallbackType<{ alias: string; title: string }>,
-) {
-  const substringMatcher = (
-    query: string,
-    syncResults: (results: { alias: string; title: string }[]) => void,
-  ) => {
-    // regex used to determine if a string contains the query substring.
-    const substringRegex = new RegExp(query, 'i');
-
-    // Filter out the results that contain the query substring.
-    syncResults(
-      problemDataset().filter((problem) => substringRegex.test(problem.alias)),
-    );
-  };
-
-  if (!cb) {
-    cb = (event: Event, problem) =>
-      $(event.target as EventTarget).val(problem.alias);
-  }
-
-  elem
-    .typeahead<{ alias: string; title: string }>(
-      {
-        minLength: 3,
-        highlight: false,
-      },
-      {
-        source: substringMatcher,
-        async: true,
-        display: 'alias',
-        templates: {
-          suggestion: (val) =>
-            ui.formatString('<div data-value="%(alias)">%(alias)</div>', val),
-        },
-      },
-    )
-    .on('typeahead:select', cb)
-    .on('typeahead:autocomplete', cb);
 }
 
 export function schoolTypeahead(

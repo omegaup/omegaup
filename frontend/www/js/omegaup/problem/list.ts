@@ -3,10 +3,12 @@ import problem_List from '../components/problem/List.vue';
 import { types } from '../api_types';
 import { omegaup, OmegaUp } from '../omegaup';
 import * as ui from '../ui';
+import * as api from '../api';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemListPayload();
   const queryString = window.location.search;
+  const searchResultEmpty: types.ListItem[] = [];
   let sortOrder: omegaup.SortOrder = omegaup.SortOrder.Descending;
   let columnName = 'problem_id';
   let language = 'all';
@@ -53,6 +55,9 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-problem-list': problem_List,
     },
+    data: () => ({
+      searchResultProblems: searchResultEmpty,
+    }),
     render: function (createElement) {
       return createElement('omegaup-problem-list', {
         props: {
@@ -67,6 +72,7 @@ OmegaUp.on('ready', () => {
           tags: payload.tags,
           sortOrder: sortOrder,
           columnName: columnName,
+          searchResultProblems: this.searchResultProblems,
         },
         on: {
           'wizard-search': (queryParameters: {
@@ -88,6 +94,21 @@ OmegaUp.on('ready', () => {
             window.location.replace(
               `/problem?${ui.buildURLQuery(queryParameters)}`,
             );
+          },
+          'update-search-result-problems': (query: string) => {
+            api.Problem.listForTypeahead({
+              query,
+              search_type: 'all',
+            })
+              .then((data) => {
+                this.searchResultProblems = data.results.map(
+                  ({ key, value }) => ({
+                    key,
+                    value,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
           },
         },
       });
