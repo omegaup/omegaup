@@ -37,7 +37,7 @@ export default class Typeahead extends Vue {
   @Prop({ default: 5 }) maxResults!: number;
   @Prop({ default: null }) value!: null | string;
   @Prop({ default: true }) onlyExistingTags!: boolean;
-  @Prop({ default: T.typeaheadSearchPlaceholder }) placeholder!: boolean;
+  @Prop({ default: T.typeaheadSearchPlaceholder }) placeholder!: string;
 
   T = T;
   selectedOptions = this.options;
