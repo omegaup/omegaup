@@ -114,6 +114,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
     // Number of rows shown in problems list
     const PAGE_SIZE = 100;
 
+    // quality values
+    const QUALITY_VALUES = ['onlyQualityProblems', 'all'];
+
     /**
      * Returns a ProblemParams instance from the Request values.
      *
@@ -5983,6 +5986,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
+     * @omegaup-request-param 'all'|'onlyQualityProblems'|null $quality
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
      * @omegaup-request-param int|null $rowcount
@@ -6007,6 +6011,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
         $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
+        $quality = $r->ensureOptionalEnum(
+            'quality',
+            self::QUALITY_VALUES
+        ) ?? 'onlyQualityProblems';
         if ($offset < 0) {
             $offset = 0;
         }
@@ -6040,7 +6048,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            onlyQualitySeal: true,
+            onlyQualitySeal: ($quality === 'onlyQualityProblems'),
             url: "/problem/collection/{$collectionLevel}/",
             level: $collectionLevel,
             difficulty: $difficulty,
@@ -6222,6 +6230,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
+     * @omegaup-request-param 'all'|'onlyQualityProblems'|null $quality
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
      * @omegaup-request-param int|null $rowcount
@@ -6244,6 +6253,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
         $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
+        $quality = $r->ensureOptionalEnum(
+            'quality',
+            self::QUALITY_VALUES
+        ) ?? 'onlyQualityProblems';
         if ($offset < 0) {
             $offset = 0;
         }
@@ -6277,7 +6290,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            onlyQualitySeal: true,
+            onlyQualitySeal: ($quality === 'onlyQualityProblems'),
             url: '/problem/collection/author/',
             level: null,
             difficulty: $difficulty,
