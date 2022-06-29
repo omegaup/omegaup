@@ -113,10 +113,13 @@
             <template v-if="showProblem">
               <label
                 >{{ T.wordsProblem }}:
-                <omegaup-autocomplete
-                  v-model="filterProblem"
-                  :init="initProblemAutocomplete"
-                ></omegaup-autocomplete>
+                <omegaup-common-typeahead
+                  :existing-options="searchResultProblems"
+                  :value.sync="filterProblem"
+                  @update-existing-options="
+                    (query) => $emit('update-search-result-problems', query)
+                  "
+                ></omegaup-common-typeahead>
               </label>
               <button
                 type="button"
@@ -370,13 +373,10 @@ import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
-import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import arena_RunDetailsPopup from './RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
-
-import Autocomplete from '../Autocomplete.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -415,7 +415,6 @@ export enum PopupDisplayed {
   components: {
     FontAwesomeIcon,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
-    'omegaup-autocomplete': Autocomplete,
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-user-username': user_Username,
@@ -445,11 +444,11 @@ export default class Runs extends Vue {
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: false }) showAllRuns!: boolean;
   @Prop() totalRuns!: number;
+  @Prop() searchResultProblems!: types.ListItem[];
 
   PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
-  typeahead = typeahead;
 
   filterLanguage: string = '';
   filterOffset: number = 0;
@@ -531,21 +530,6 @@ export default class Runs extends Vue {
       return T.wordsNewSubmissions;
     }
     return T.arenaContestNotOpened;
-  }
-
-  // eslint-disable-next-line no-undef -- This is defined in TypeScript.
-  initProblemAutocomplete(el: JQuery<HTMLElement>) {
-    if (this.problemsetProblems !== null) {
-      typeahead.problemsetProblemTypeahead(
-        el,
-        () => this.problemsetProblems,
-        (event: Event, item: { alias: string; title: string }) => {
-          this.filterProblem = item.alias;
-        },
-      );
-    } else {
-      typeahead.problemTypeahead(el);
-    }
   }
 
   memory(run: types.Run): string {
