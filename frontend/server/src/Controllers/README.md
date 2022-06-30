@@ -3822,21 +3822,16 @@ Gets a list of schools
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `query` | `mixed` |             |
-| `term`  | `mixed` |             |
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+| `term`  | `null\|string` |             |
 
 ### Returns
 
-```typescript
-{
-  id: number;
-  label: string;
-  value: string;
-}
-[];
-```
+| Name      | Type                     |
+| --------- | ------------------------ |
+| `results` | `types.SchoolListItem[]` |
 
 ## `/api/school/selectSchoolOfTheMonth/`
 
@@ -4776,7 +4771,7 @@ Update user profile
 | `name`                      | `null\|string`                               |             |
 | `scholar_degree`            | `null\|string`                               |             |
 | `school_id`                 | `int\|null`                                  |             |
-| `school_name`               | `mixed`                                      |             |
+| `school_name`               | `null\|string`                               |             |
 | `username`                  | `mixed`                                      |             |
 
 ### Returns

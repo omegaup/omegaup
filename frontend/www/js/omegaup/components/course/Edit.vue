@@ -95,9 +95,11 @@
           :update="true"
           :course="data.course"
           :all-languages="data.allLanguages"
+          :search-result-schools="searchResultSchools"
           @emit-cancel="onCancel"
-          @submit="
-            (formComponent) => $emit('submit-edit-course', formComponent)
+          @submit="(request) => $emit('submit-edit-course', request)"
+          @update-search-result-schools="
+            (query) => $emit('update-search-result-schools', query)
           "
         ></omegaup-course-form>
       </div>
@@ -357,6 +359,7 @@ export default class CourseEdit extends Vue {
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() searchResultGroups!: types.ListItem[];
+  @Prop() searchResultSchools!: types.SchoolListItem[];
 
   T = T;
   showTab = this.initialTab;

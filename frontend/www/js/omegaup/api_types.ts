@@ -4127,6 +4127,11 @@ export namespace types {
     username: string;
   }
 
+  export interface SchoolListItem {
+    key: number;
+    value: string;
+  }
+
   export interface SchoolOfTheMonthPayload {
     candidatesToSchoolOfTheMonth: {
       country_id: string;
@@ -5301,11 +5306,7 @@ export namespace messages {
   export type SchoolCreateRequest = { [key: string]: any };
   export type SchoolCreateResponse = { school_id: number };
   export type SchoolListRequest = { [key: string]: any };
-  export type SchoolListResponse = {
-    id: number;
-    label: string;
-    value: string;
-  }[];
+  export type SchoolListResponse = { results: types.SchoolListItem[] };
   export type SchoolSelectSchoolOfTheMonthRequest = { [key: string]: any };
   export type SchoolSelectSchoolOfTheMonthResponse = {};
 

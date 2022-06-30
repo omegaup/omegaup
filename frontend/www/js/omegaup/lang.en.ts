@@ -1288,7 +1288,6 @@ const translations: { [key: string]: string; } = {
   schoolOfTheMonthSelectedSuccessfully: "School of the month has been selected successfully!",
   schoolRankOfTheMonthHeader: "Top %(count) schools with the most points in the month",
   schoolRankRangeHeader: "Schools with the most points (%(lowCount) to %(highCount))",
-  schoolToBeAdded: "Your school has not been registered in omegaUp. It will be added when you save your changes.",
   schoolUsers: "Users who belong to this school",
   schoolsCreateCoursesThatMeetNeeds: "Courses that meet your needs. You can create your own problems.",
   schoolsCreateYourCourse: "Create your courses",

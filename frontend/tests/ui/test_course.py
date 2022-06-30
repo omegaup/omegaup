@@ -49,7 +49,7 @@ def test_user_ranking_course(driver):
 
     run_id = driver.generate_id()
     course_alias = f'ut_rank_course_{run_id}'
-    school_name = f'ut_rank_school_{run_id}'
+    school_name = f'Escuela curso'
     assignment_alias = f'ut_rank_hw_{run_id}'
     problem = 'ut_rc_problem_%s' % driver.generate_id()
 
@@ -308,9 +308,7 @@ def create_course(driver, course_alias: str, school_name: str) -> None:
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
              'input[name="show-scoreboard"][value="true"]'))).click()
-    driver.typeahead_helper('*[contains(@class, "omegaup-course-details")]',
-                            school_name,
-                            select_suggestion=False)
+    driver.typeahead_helper('.omegaup-course-details', school_name)
     driver.browser.find_element(By.CSS_SELECTOR,
         'textarea[data-course-new-description]'
     ).send_keys('course description')
@@ -359,7 +357,7 @@ def add_assignment_with_problem(driver, assignment_alias, problem_alias):
             (By.CSS_SELECTOR,
              '[data-course-problemlist] .card-footer')))
 
-    driver.typeahead_helper_v2('div[data-course-add-problem]', problem_alias)
+    driver.typeahead_helper('div[data-course-add-problem]', problem_alias)
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR, 'button[data-add-problem]'))).click()

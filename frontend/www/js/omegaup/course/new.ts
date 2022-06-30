@@ -11,6 +11,7 @@ OmegaUp.on('ready', () => {
   finishTime.setDate(finishTime.getDate() + 30);
   const defaultStartTime = now;
   const defaultFinishTime = finishTime;
+  const searchResultSchools: types.SchoolListItem[] = [];
   const payload = types.payloadParsers.CourseNewPayload();
   new Vue({
     el: '#main-container',
@@ -19,6 +20,7 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       invalidParameterName: '',
+      searchResultSchools: searchResultSchools,
     }),
     render: function (createElement) {
       return createElement('omegaup-course-form', {
@@ -41,14 +43,15 @@ OmegaUp.on('ready', () => {
           },
           allLanguages: payload.languages,
           invalidParameterName: this.invalidParameterName,
+          searchResultSchools: this.searchResultSchools,
         },
         on: {
-          submit: (source: course_Form) => {
+          submit: (request: messages.CourseCreateRequest) => {
             new Promise<number | null>((accept) => {
-              if (source.school_id !== undefined) {
-                accept(source.school_id);
-              } else if (source.school_name) {
-                api.School.create({ name: source.school_name })
+              if (request.school_id) {
+                accept(request.school_id);
+              } else if (request.school_name) {
+                api.School.create({ name: request.school_name })
                   .then((data) => {
                     accept(data.school_id);
                   })
@@ -58,29 +61,14 @@ OmegaUp.on('ready', () => {
               }
             })
               .then((schoolId) => {
-                const params: messages.CourseCreateRequest = {
-                  alias: source.alias,
-                  name: source.name,
-                  description: source.description,
-                  languages: source.selectedLanguages,
-                  level: source.level,
-                  objective: source.objective,
-                  start_time: source.startTime,
-                  show_scoreboard: source.showScoreboard,
-                  needs_basic_information: source.needsBasicInformation,
-                  requests_user_information: source.requests_user_information,
-                  school_id: schoolId ?? undefined,
-                  unlimited_duration: source.unlimitedDuration,
-                  finish_time: !source.unlimitedDuration
-                    ? source.finishTime
-                    : null,
-                };
-
-                api.Course.create(params)
+                if (schoolId) {
+                  request.school_id = schoolId;
+                }
+                api.Course.create(request)
                   .then(() => {
                     this.invalidParameterName = '';
                     window.location.replace(
-                      `/course/${source.alias}/edit/#content`,
+                      `/course/${request.alias}/edit/#content`,
                     );
                   })
                   .catch((error) => {
@@ -92,6 +80,27 @@ OmegaUp.on('ready', () => {
           },
           cancel: () => {
             window.location.href = '/course/';
+          },
+          'update-search-result-schools': (query: string) => {
+            api.School.list({ query })
+              .then(({ results }) => {
+                if (!results.length) {
+                  this.searchResultSchools = [
+                    {
+                      key: 0,
+                      value: query,
+                    },
+                  ];
+                  return;
+                }
+                this.searchResultSchools = results.map(
+                  ({ key, value }: types.SchoolListItem) => ({
+                    key,
+                    value,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
           },
         },
       });

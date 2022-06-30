@@ -103,6 +103,7 @@ describe('Teams.vue', () => {
             gender: '',
             name: 'updated user',
             school: '',
+            school_name: '',
             school_id: 0,
             state_id: '',
             username: 'omegaUp:user',

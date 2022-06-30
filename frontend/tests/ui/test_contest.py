@@ -558,7 +558,7 @@ def add_problem_to_contest(driver, problem):
             (By.CSS_SELECTOR,
              'a.problems'))).click()
 
-    driver.typeahead_helper_v2('.problems-container', problem)
+    driver.typeahead_helper('.problems-container', problem)
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH,
