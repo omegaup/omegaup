@@ -165,7 +165,7 @@ import homepage_Section from './Section.vue';
 import school_Rank from '../schools/Rank.vue';
 import user_Rank from '../user/Rank.vue';
 import homepage_Sponsors from './Sponsors.vue';
-import homepage_Cookie from './Cookie.vue';
+import homepage_Cookie from './CookieConsent.vue';
 
 @Component({
   components: {
