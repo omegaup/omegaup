@@ -19,6 +19,7 @@ import {
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.GroupEditPayload();
+  const searchResultSchools: types.SchoolListItem[] = [];
   const groupEdit = new Vue({
     el: '#main-container',
     components: {
@@ -37,6 +38,7 @@ OmegaUp.on('ready', () => {
       scoreboards: payload.scoreboards,
       userErrorRow: null,
       searchResultUsers: [] as types.ListItem[],
+      searchResultSchools: searchResultSchools,
     }),
     methods: {
       refreshGroupScoreboards: (): void => {
@@ -73,6 +75,7 @@ OmegaUp.on('ready', () => {
           scoreboards: this.scoreboards,
           userErrorRow: this.userErrorRow,
           searchResultUsers: this.searchResultUsers,
+          searchResultSchools: this.searchResultSchools,
         },
         on: {
           'update-group': (name: string, description: string) => {
@@ -125,21 +128,26 @@ OmegaUp.on('ready', () => {
             source.showChangePasswordForm = false;
             source.identity = identity;
             source.username = identity.username;
+            if (identity.school && identity.school_id) {
+              searchResultSchools.push({
+                key: identity.school_id,
+                value: identity.school,
+              });
+            }
           },
-          'edit-identity-member': (
-            membersSource: group_Members,
-            originalUsername: string,
-            user: types.Identity,
-          ) => {
-            const request = Object.assign({}, user, {
+          'edit-identity-member': (request: {
+            username: string;
+            identity: types.Identity;
+            showEditForm: boolean;
+          }) => {
+            api.Identity.update({
+              ...request.identity,
+              original_username: request.username,
               group_alias: payload.groupAlias,
-              original_username: originalUsername,
-              school_name: user.school,
-            });
-            api.Identity.update(request)
+            })
               .then(() => {
                 ui.success(T.groupEditMemberUpdated);
-                membersSource.showEditForm = false;
+                request.showEditForm = false;
                 this.refreshMemberList();
               })
               .catch(ui.apiError);
@@ -284,6 +292,27 @@ OmegaUp.on('ready', () => {
                     value: `${ui.escape(key)} (<strong>${ui.escape(
                       value,
                     )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-schools': (query: string) => {
+            api.School.list({ query })
+              .then(({ results }) => {
+                if (!results.length) {
+                  this.searchResultSchools = [
+                    {
+                      key: 0,
+                      value: query,
+                    },
+                  ];
+                  return;
+                }
+                this.searchResultSchools = results.map(
+                  ({ key, value }: types.SchoolListItem) => ({
+                    key,
+                    value,
                   }),
                 );
               })
