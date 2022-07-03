@@ -2281,7 +2281,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $name
      * @omegaup-request-param null|string $scholar_degree
      * @omegaup-request-param int|null $school_id
-     * @omegaup-request-param mixed $school_name
+     * @omegaup-request-param null|string $school_name
      * @omegaup-request-param string $state_id
      * @omegaup-request-param mixed $username
      */
@@ -2362,12 +2362,9 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         $newSchoolId = $currentSchoolId;
 
-        \OmegaUp\Validators::validateOptionalNumber(
-            $r['school_id'],
-            'school_id'
-        );
-        if (!is_null($r['school_id'])) {
-            $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
+        $schoolId = $r->ensureOptionalInt('school_id');
+        if (!is_null($schoolId)) {
+            $school = \OmegaUp\DAO\Schools::getByPK($schoolId);
             if (is_null($school)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
@@ -2381,10 +2378,11 @@ class User extends \OmegaUp\Controllers\Controller {
             $newSchoolId = null;
         }
 
-        if (is_null($newSchoolId) && !empty($r['school_name'])) {
+        $schoolName = $r->ensureOptionalString('school_name');
+        if (is_null($newSchoolId) && !is_null($schoolName)) {
             $response = \OmegaUp\Controllers\School::apiCreate(
                 new \OmegaUp\Request([
-                    'name' => $r['school_name'],
+                    'name' => $schoolName,
                     'country_id' => !is_null(
                         $state
                     ) ? $state->country_id : null,

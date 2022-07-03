@@ -72,18 +72,14 @@
           <div class="form-group col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.profileSchool }}
-              <omegaup-autocomplete
-                v-model="selectedIdentity.school"
-                class="form-control"
-                :init="
-                  (el) =>
-                    typeahead.schoolTypeahead(el, (event, item) => {
-                      selectedIdentity.school = item.value;
-                      selectedIdentity.school_id = item.id;
-                    })
+              <omegaup-common-typeahead
+                :existing-options="searchResultSchools"
+                :options="searchResultSchools"
+                :value.sync="schoolId"
+                @update-existing-options="
+                  (query) => $emit('update-search-result-schools', query)
                 "
-              ></omegaup-autocomplete>
-              <input type="hidden" :value="selectedIdentity.schoolId" />
+              ></omegaup-common-typeahead>
             </label>
           </div>
         </div>
@@ -109,20 +105,19 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import type { types } from '../../api_types';
 import T from '../../lang';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
   },
 })
 export default class IdentityEdit extends Vue {
   @Prop({ default: null }) identity!: types.Identity | null;
   @Prop() countries!: iso3166.Country[];
+  @Prop() searchResultSchools!: types.SchoolListItem[];
 
   T = T;
-  typeahead = typeahead;
   selectedIdentity = Object.assign(
     {
       username: '',
@@ -136,6 +131,8 @@ export default class IdentityEdit extends Vue {
     } as types.Identity,
     this.identity,
   );
+  schoolId = this.selectedIdentity.school_id;
+  schoolName = this.selectedIdentity.school;
 
   get groupName(): string {
     const teamUsername = this.selectedIdentity.username.split(':');
@@ -163,16 +160,31 @@ export default class IdentityEdit extends Vue {
   }
 
   onEditMember(): void {
-    this.$emit(
-      'edit-identity-member',
-      this.identity?.username,
-      this.selectedIdentity,
-    );
+    this.$emit('edit-identity-member', {
+      originalUsername: this.identity?.username,
+      identity: {
+        ...this.selectedIdentity,
+        school_id: this.schoolId,
+        school_name: this.schoolName,
+      },
+    });
   }
 
   @Watch('identity')
   onIdentityChanged(newValue: types.Identity): void {
     this.selectedIdentity = newValue;
+  }
+
+  @Watch('schoolId')
+  onSchoolIdChanged(newValue: string): void {
+    if (newValue) {
+      const school = this.searchResultSchools.find(
+        (school) => String(school.key) == newValue,
+      );
+      this.schoolName = school?.value;
+      return;
+    }
+    this.schoolName = this.searchResultSchools[0].value;
   }
 }
 </script>

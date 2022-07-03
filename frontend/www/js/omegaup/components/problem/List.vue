@@ -5,6 +5,10 @@
       :languages="languages"
       :initial-keyword="keyword"
       :tags="tags"
+      :search-result-problems="searchResultProblems"
+      @update-search-result-problems="
+        (query) => $emit('update-search-result-problems', query)
+      "
     ></omegaup-problem-search-bar>
     <button
       class="btn btn-primary mb-3"
@@ -78,6 +82,7 @@ export default class List extends Vue {
   @Prop() tags!: string[];
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
+  @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
   ui = ui;
