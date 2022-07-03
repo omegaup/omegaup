@@ -13,16 +13,6 @@
     @clicked-postpone="$emit('cookie-clicked-postpone')"
     @removed-cookie="cookieRemovedCookie"
   >
-    <!-- Optional -->
-    <template #postponeContent>&times;</template>
-    <!-- Optional -->
-    <template #message>
-      We use cookies to ensure you get the best experience on our website.
-    </template>
-    <!-- Optional -->
-    <template #declineContent>Opt Out</template>
-    <!-- Optional -->
-    <template #acceptContent>Got It!</template>
   </vue-cookie-accept-decline>
 </template>
 
