@@ -334,7 +334,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
-    /**
+   /**
      * @return list<\OmegaUp\DAO\VO\Users>
      */
     final public static function getVerified(
@@ -370,5 +370,44 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     Users;';
         /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
+    }
+
+    final public static function generateDeletionToken(
+        \OmegaUp\DAO\VO\Users $user,
+        string $token
+    ): void {
+        $sql = '
+            UPDATE
+                Users u
+            SET
+                u.deletion_token = ?
+            WHERE
+                u.user_id = ?;
+        ';
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$token, $user->user_id]
+        );
+    }
+
+    final public static function validateDeletionToken(
+        \OmegaUp\DAO\VO\Users $user,
+        string $token
+    ): bool {
+        $sql = 'SELECT
+                    COUNT(*)
+                FROM
+                    Users
+                WHERE
+                    `user_id` = ?
+                    AND `deletion_token` = ?;';
+
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$user->user_id, $token]
+        );
+
+        return boolval($count);
     }
 }
