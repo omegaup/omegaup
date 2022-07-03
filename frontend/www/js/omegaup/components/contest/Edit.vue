@@ -157,7 +157,7 @@
           :search-result-problems="searchResultProblems"
           @add-problem="(request) => $emit('add-problem', request)"
           @update-search-result-problems="
-            (query) => $emit('update-search-result-problems', query)
+            (request) => $emit('update-search-result-problems', request)
           "
           @get-versions="(request) => $emit('get-versions', request)"
           @remove-problem="
@@ -225,7 +225,7 @@
         ></omegaup-contest-teams-groups>
       </div>
       <div v-if="showTab === 'admins'" class="tab-pane active">
-        <omegaup-contest-admins
+        <omegaup-common-admins
           :admins="admins"
           :search-result-users="searchResultUsers"
           @add-admin="(username) => $emit('add-admin', username)"
@@ -233,17 +233,21 @@
           @update-search-result-users="
             (query) => $emit('update-search-result-users', query)
           "
-        ></omegaup-contest-admins>
+        ></omegaup-common-admins>
         <div class="mt-2"></div>
-        <omegaup-contest-group-admins
+        <omegaup-common-group-admins
           :group-admins="groupAdmins"
+          :search-result-groups="searchResultGroups"
           @add-group-admin="
             (groupAlias) => $emit('add-group-admin', groupAlias)
           "
           @remove-group-admin="
             (groupAlias) => $emit('remove-group-admin', groupAlias)
           "
-        ></omegaup-contest-group-admins>
+          @update-search-result-groups="
+            (query) => $emit('update-search-result-groups', query)
+          "
+        ></omegaup-common-group-admins>
       </div>
       <div v-if="showTab === 'links'" class="tab-pane active">
         <omegaup-contest-links
@@ -284,10 +288,10 @@ import * as ui from '../../ui';
 import contest_AddProblem from './AddProblem.vue';
 import contest_AddContestant from './AddContestant.vue';
 import contest_Clone from './Clone.vue';
-import contest_Admins from '../common/Adminsv2.vue';
+import common_Admins from '../common/Adminsv2.vue';
 import common_Archive from '../common/Archive.vue';
 import common_Requests from '../common/Requests.vue';
-import contest_GroupAdmins from '../common/GroupAdminsv2.vue';
+import common_GroupAdmins from '../common/GroupAdminsv2.vue';
 import contest_Groups from './Groups.vue';
 import contest_TeamsGroups from './TeamsGroup.vue';
 import contest_Links from './Links.vue';
@@ -297,14 +301,14 @@ import common_Publish from '../common/Publish.vue';
 @Component({
   components: {
     'omegaup-contest-add-problem': contest_AddProblem,
-    'omegaup-contest-admins': contest_Admins,
+    'omegaup-common-admins': common_Admins,
     'omegaup-contest-clone': contest_Clone,
     'omegaup-contest-add-contestant': contest_AddContestant,
     'omegaup-common-archive': common_Archive,
     'omegaup-common-requests': common_Requests,
     'omegaup-contest-groups': contest_Groups,
     'omegaup-contest-teams-groups': contest_TeamsGroups,
-    'omegaup-contest-group-admins': contest_GroupAdmins,
+    'omegaup-common-group-admins': common_GroupAdmins,
     'omegaup-contest-links': contest_Links,
     'omegaup-contest-new-form': contest_NewForm,
     'omegaup-common-publish': common_Publish,

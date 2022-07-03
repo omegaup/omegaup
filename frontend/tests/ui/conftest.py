@@ -17,6 +17,9 @@ import pytest
 
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, TimeoutException
+from selenium.webdriver import Firefox
+from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
@@ -139,7 +142,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
     def page_transition(self, wait_for_ajax=True, target_url=None):
         '''Waits for a page transition to finish.'''
 
-        html_node = self.browser.find_element_by_tag_name('html')
+        html_node = self.browser.find_element(By.TAG_NAME, 'html')
         prev_url = self.browser.current_url
         logging.debug('Waiting for a page transition on %s', prev_url)
         yield
@@ -181,26 +184,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                                 'return jQuery.active;'),
                              time.time() - t0)) from ex
 
-    def typeahead_helper(self, parent_xpath, value, select_suggestion=True):
-        '''Helper to interact with Typeahead elements.'''
-
-        tt_input = self.wait.until(
-            EC.visibility_of_element_located(
-                (By.XPATH,
-                 '//%s//input[contains(@class, "tt-input")]' % parent_xpath)))
-        tt_input.click()
-        tt_input.send_keys(value)
-
-        if not select_suggestion:
-            return
-
-        self.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//%s//div[@data-value = "%s"]' %
-                 (parent_xpath, value)))).click()
-
-    def typeahead_helper_v2(self, parent_selector, value):
+    def typeahead_helper(self, parent_selector, value):
         '''Helper to interact with Typeahead elements.'''
 
         tt_input = self.wait.until(
@@ -268,10 +252,10 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
         self._wait_for_page_loaded()
 
-        self.browser.find_element_by_name('login_username').send_keys(username)
-        self.browser.find_element_by_name('login_password').send_keys(password)
+        self.browser.find_element(By.NAME, 'login_username').send_keys(username)
+        self.browser.find_element(By.NAME, 'login_password').send_keys(password)
         with self.page_transition():
-            self.browser.find_element_by_name('login').click()
+            self.browser.find_element(By.NAME, 'login').click()
 
         if is_main_user_identity:
             self.wait.until(
@@ -312,14 +296,14 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                      '//a[contains(@href, "/login/")]'))).click()
 
         # Login screen
-        self.browser.find_element_by_name('reg_username').send_keys(user)
-        self.browser.find_element_by_name('reg_email').send_keys(
+        self.browser.find_element(By.NAME, 'reg_username').send_keys(user)
+        self.browser.find_element(By.NAME, 'reg_email').send_keys(
             'email_%s@localhost.localdomain' % user)
-        self.browser.find_element_by_name('reg_password').send_keys(passw)
-        self.browser.find_element_by_name(
+        self.browser.find_element(By.NAME, 'reg_password').send_keys(passw)
+        self.browser.find_element(By.NAME,
             'reg_password_confirmation').send_keys(passw)
         with self.page_transition():
-            self.browser.find_element_by_name('sign_up').click()
+            self.browser.find_element(By.NAME, 'sign_up').click()
 
         # Enable experiment
         user_id = util.database_utils.mysql(
@@ -614,20 +598,18 @@ def _get_browser(request, browser_name):
             options=chrome_options)
         chrome_browser.set_window_size(*_WINDOW_SIZE)
         return chrome_browser
-    firefox_options = webdriver.firefox.options.Options()
+    firefox_options = Options()
     firefox_options.set_capability('marionette', True)
     firefox_options.set_capability('loggingPrefs', {'browser': 'ALL'})
-    firefox_options.profile = webdriver.FirefoxProfile()
-    firefox_options.profile.set_preference(
+    firefox_options.set_preference(
         'webdriver.log.file', '/tmp/firefox_console')
     firefox_options.headless = request.config.option.headless
-    firefox_browser = webdriver.Firefox(
-        options=firefox_options)
+    firefox_browser = Firefox(options=firefox_options)
     firefox_browser.set_window_size(*_WINDOW_SIZE)
     return firefox_browser
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def driver(request, browser_name):
     '''Run tests using the selenium webdriver.'''
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-'''test verification_code module.'''
+'''test database.contest module.'''
 
 import datetime
 import os

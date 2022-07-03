@@ -192,6 +192,16 @@ class Validators {
     }
 
     /**
+     * @param string $objectId
+     * @return boolean
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function objectId(string $objectId): bool {
+        return preg_match('/^[0-9a-f]{40}$/', $objectId) !== 1;
+    }
+
+    /**
      * Returns whether the alias is valid.
      *
      * @return boolean

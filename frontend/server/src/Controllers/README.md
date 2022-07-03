@@ -140,6 +140,7 @@
   - [`/api/problem/delete/`](#apiproblemdelete)
   - [`/api/problem/details/`](#apiproblemdetails)
   - [`/api/problem/list/`](#apiproblemlist)
+  - [`/api/problem/listForTypeahead/`](#apiproblemlistfortypeahead)
   - [`/api/problem/myList/`](#apiproblemmylist)
   - [`/api/problem/randomKarelProblem/`](#apiproblemrandomkarelproblem)
   - [`/api/problem/randomLanguageProblem/`](#apiproblemrandomlanguageproblem)
@@ -1291,32 +1292,33 @@ Update a Contest
 
 ### Parameters
 
-| Name                                         | Type                                 | Description |
-| -------------------------------------------- | ------------------------------------ | ----------- |
-| `contest_alias`                              | `string`                             |             |
-| `finish_time`                                | `int`                                |             |
-| `submissions_gap`                            | `int`                                |             |
-| `window_length`                              | `int`                                |             |
-| `admission_mode`                             | `null\|string`                       |             |
-| `alias`                                      | `null\|string`                       |             |
-| `contest_for_teams`                          | `bool\|null`                         |             |
-| `default_show_all_contestants_in_scoreboard` | `bool\|null`                         |             |
-| `description`                                | `null\|string`                       |             |
-| `feedback`                                   | `mixed`                              |             |
-| `languages`                                  | `mixed`                              |             |
-| `needs_basic_information`                    | `bool\|null`                         |             |
-| `partial_score`                              | `bool\|null`                         |             |
-| `penalty`                                    | `int\|null`                          |             |
-| `penalty_calc_policy`                        | `mixed`                              |             |
-| `penalty_type`                               | `mixed`                              |             |
-| `points_decay_factor`                        | `float\|null`                        |             |
-| `problems`                                   | `null\|string`                       |             |
-| `requests_user_information`                  | `'no'\|'optional'\|'required'\|null` |             |
-| `scoreboard`                                 | `float\|null`                        |             |
-| `show_scoreboard_after`                      | `bool\|null`                         |             |
-| `start_time`                                 | `\OmegaUp\Timestamp\|null`           |             |
-| `teams_group_alias`                          | `null\|string`                       |             |
-| `title`                                      | `null\|string`                       |             |
+| Name                                         | Type                                                 | Description |
+| -------------------------------------------- | ---------------------------------------------------- | ----------- |
+| `contest_alias`                              | `string`                                             |             |
+| `finish_time`                                | `int`                                                |             |
+| `submissions_gap`                            | `int`                                                |             |
+| `window_length`                              | `int`                                                |             |
+| `admission_mode`                             | `null\|string`                                       |             |
+| `alias`                                      | `null\|string`                                       |             |
+| `contest_for_teams`                          | `bool\|null`                                         |             |
+| `default_show_all_contestants_in_scoreboard` | `bool\|null`                                         |             |
+| `description`                                | `null\|string`                                       |             |
+| `feedback`                                   | `mixed`                                              |             |
+| `languages`                                  | `mixed`                                              |             |
+| `needs_basic_information`                    | `bool\|null`                                         |             |
+| `partial_score`                              | `bool\|null`                                         |             |
+| `penalty`                                    | `int\|null`                                          |             |
+| `penalty_calc_policy`                        | `mixed`                                              |             |
+| `penalty_type`                               | `mixed`                                              |             |
+| `points_decay_factor`                        | `float\|null`                                        |             |
+| `problems`                                   | `null\|string`                                       |             |
+| `requests_user_information`                  | `'no'\|'optional'\|'required'\|null`                 |             |
+| `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null` |             |
+| `scoreboard`                                 | `float\|null`                                        |             |
+| `show_scoreboard_after`                      | `bool\|null`                                         |             |
+| `start_time`                                 | `\OmegaUp\Timestamp\|null`                           |             |
+| `teams_group_alias`                          | `null\|string`                                       |             |
+| `title`                                      | `null\|string`                                       |             |
 
 ### Returns
 
@@ -1658,23 +1660,23 @@ Create new course API
 
 ### Parameters
 
-| Name                        | Type           | Description |
-| --------------------------- | -------------- | ----------- |
-| `admission_mode`            | `mixed`        |             |
-| `alias`                     | `mixed`        |             |
-| `description`               | `mixed`        |             |
-| `finish_time`               | `mixed`        |             |
-| `languages`                 | `mixed`        |             |
-| `level`                     | `string\|null` |             |
-| `name`                      | `mixed`        |             |
-| `needs_basic_information`   | `mixed`        |             |
-| `objective`                 | `string\|null` |             |
-| `public`                    | `mixed`        |             |
-| `requests_user_information` | `mixed`        |             |
-| `school_id`                 | `mixed`        |             |
-| `show_scoreboard`           | `mixed`        |             |
-| `start_time`                | `mixed`        |             |
-| `unlimited_duration`        | `bool\|null`   |             |
+| Name                               | Type           | Description |
+| ---------------------------------- | -------------- | ----------- |
+| `alias`                            | `string`       |             |
+| `description`                      | `string`       |             |
+| `name`                             | `string`       |             |
+| `start_time`                       | `int`          |             |
+| `admission_mode`                   | `null\|string` |             |
+| `archived`                         | `bool\|null`   |             |
+| `finish_time`                      | `int\|null`    |             |
+| `languages`                        | `null\|string` |             |
+| `level`                            | `null\|string` |             |
+| `minimum_progress_for_certificate` | `int\|null`    |             |
+| `needs_basic_information`          | `bool\|null`   |             |
+| `objective`                        | `null\|string` |             |
+| `requests_user_information`        | `null\|string` |             |
+| `school_id`                        | `int\|null`    |             |
+| `show_scoreboard`                  | `bool\|null`   |             |
 
 ### Returns
 
@@ -2846,14 +2848,14 @@ List of public and user's private problems
 | `max_difficulty`        | `int\|null`    |             |
 | `min_difficulty`        | `int\|null`    |             |
 | `min_visibility`        | `int\|null`    |             |
-| `offset`                | `mixed`        |             |
+| `offset`                | `int\|null`    |             |
 | `only_karel`            | `mixed`        |             |
 | `order_by`              | `mixed`        |             |
-| `page`                  | `mixed`        |             |
+| `page`                  | `int\|null`    |             |
 | `programming_languages` | `null\|string` |             |
 | `query`                 | `null\|string` |             |
 | `require_all_tags`      | `mixed`        |             |
-| `rowcount`              | `mixed`        |             |
+| `rowcount`              | `int\|null`    |             |
 | `some_tags`             | `mixed`        |             |
 | `sort_order`            | `mixed`        |             |
 
@@ -2863,6 +2865,27 @@ List of public and user's private problems
 | --------- | ------------------------- |
 | `results` | `types.ProblemListItem[]` |
 | `total`   | `number`                  |
+
+## `/api/problem/listForTypeahead/`
+
+### Description
+
+List of public problems shown in the typeahead component
+
+### Parameters
+
+| Name          | Type        | Description |
+| ------------- | ----------- | ----------- |
+| `query`       | `string`    |             |
+| `search_type` | `string`    |             |
+| `offset`      | `int\|null` |             |
+| `rowcount`    | `int\|null` |             |
+
+### Returns
+
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/problem/myList/`
 
@@ -3799,21 +3822,16 @@ Gets a list of schools
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `query` | `mixed` |             |
-| `term`  | `mixed` |             |
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+| `term`  | `null\|string` |             |
 
 ### Returns
 
-```typescript
-{
-  id: number;
-  label: string;
-  value: string;
-}
-[];
-```
+| Name      | Type                     |
+| --------- | ------------------------ |
+| `results` | `types.SchoolListItem[]` |
 
 ## `/api/school/selectSchoolOfTheMonth/`
 
@@ -4753,7 +4771,7 @@ Update user profile
 | `name`                      | `null\|string`                               |             |
 | `scholar_degree`            | `null\|string`                               |             |
 | `school_id`                 | `int\|null`                                  |             |
-| `school_name`               | `mixed`                                      |             |
+| `school_name`               | `null\|string`                               |             |
 | `username`                  | `mixed`                                      |             |
 
 ### Returns
