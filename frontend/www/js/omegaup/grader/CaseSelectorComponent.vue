@@ -1,5 +1,5 @@
 <template>
-  <div class="root d-flex flex-column h-100">
+  <div class="root d-flex flex-column h-100 bg-dark text-white">
     <div class="summary">
       {{ summary }}
     </div>
