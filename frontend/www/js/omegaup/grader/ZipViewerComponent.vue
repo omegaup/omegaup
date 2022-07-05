@@ -1,5 +1,5 @@
 <template>
-  <div class="root d-flex flex-row h-100">
+  <div class="root d-flex flex-row h-100 bg-dark text-white">
     <div class="filenames">
       <div class="list-group">
         <button
