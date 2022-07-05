@@ -1,5 +1,8 @@
 <template>
-  <div class="root d-flex flex-column h-100 bg-dark text-white">
+  <div
+    class="root d-flex flex-column h-100"
+    :class="{ 'bg-dark': theme == 'vs-dark', 'text-white': theme == 'vs-dark' }"
+  >
     <div class="summary">
       {{ summary }}
     </div>
@@ -102,6 +105,10 @@ export default {
     storeMapping: {
       type: Object,
       required: true,
+    },
+    theme: {
+      type: String,
+      default: 'vs-dark',
     },
   },
   data: function () {
