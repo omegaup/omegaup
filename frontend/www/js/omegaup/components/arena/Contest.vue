@@ -127,6 +127,7 @@
         :problemset-problems="Object.values(problems)"
         :is-contest-finished="isContestFinished"
         :search-result-users="searchResultUsers"
+        :search-result-problems="searchResultProblems"
         @details="(run) => onRunAdminDetails(run.guid)"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
@@ -322,6 +323,16 @@ export default class ArenaContest extends Vue {
     return `/arena/${this.contest.alias}/practice/`;
   }
 
+  get searchResultProblems(): types.ListItem[] {
+    if (!this.problems.length) {
+      return [];
+    }
+    return this.problems.map((problem) => ({
+      key: problem.alias,
+      value: problem.text,
+    }));
+  }
+
   created() {
     if (this.lockdown) {
       window.addEventListener('beforeunload', this.beforeWindowUnload);
@@ -379,6 +390,7 @@ export default class ArenaContest extends Vue {
 
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
+    this.currentRunDetailsData = null;
     this.$emit('reset-hash', { selectedTab: 'runs', alias: null });
   }
 

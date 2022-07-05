@@ -20,6 +20,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserInfoForProblem=array{loggedIn: bool, admin: bool, reviewer: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
+ * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}
  * @psalm-type Statements=array<string, string>
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
@@ -112,6 +113,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     // Number of rows shown in problems list
     const PAGE_SIZE = 100;
+
+    // quality values
+    const QUALITY_VALUES = ['onlyQualityProblems', 'all'];
 
     /**
      * Returns a ProblemParams instance from the Request values.
@@ -3859,6 +3863,49 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * List of public problems shown in the typeahead component
+     *
+     * @return array{results: list<ListItem>}
+     *
+     * @omegaup-request-param int|null $offset
+     * @omegaup-request-param string $query
+     * @omegaup-request-param int|null $rowcount
+     * @omegaup-request-param string $search_type
+     */
+    public static function apiListForTypeahead(\OmegaUp\Request $r) {
+        // Authenticate request
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing, we allow unauthenticated users to use this API
+        }
+
+        // Default values for offset and rowcount
+        $offset = $r->ensureOptionalInt('offset') ?? 0;
+        $rowcount = $r->ensureOptionalInt(
+            'rowcount'
+        ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
+
+        $searchType = $r->ensureEnum(
+            'search_type',
+            ['all', 'alias', 'title', 'problem_id']
+        );
+        $query = substr($r->ensureString('query'), 0, 256);
+
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEMS_LIST,
+            "{$query}-{$searchType}-{$offset}-{$rowcount}",
+            fn () => \OmegaUp\DAO\Problems::byIdentityTypeForTypeahead(
+                $offset,
+                $rowcount,
+                $query,
+                $searchType
+            ),
+            APC_USER_CACHE_PROBLEM_LIST_TIMEOUT
+        );
+    }
+
+    /**
      * List of public and user's private problems
      *
      * @return array{results: list<ProblemListItem>, total: int}
@@ -3866,21 +3913,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param mixed $language
+     * @omegaup-request-param null|string $level
      * @omegaup-request-param int|null $max_difficulty
      * @omegaup-request-param int|null $min_difficulty
      * @omegaup-request-param int|null $min_visibility
-     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param int|null $offset
      * @omegaup-request-param mixed $only_karel
+     * @omegaup-request-param bool $only_quality_seal
      * @omegaup-request-param mixed $order_by
-     * @omegaup-request-param mixed $page
+     * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
-     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
-     * @omegaup-request-param bool $only_quality_seal
-     * @omegaup-request-param null|string $level
      */
     public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
@@ -3891,19 +3938,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         // Defaults for offset and rowcount
+        $page = $r->ensureOptionalInt('page');
         $offset = null;
-        $rowcount = \OmegaUp\Controllers\Problem::PAGE_SIZE;
+        if (is_null($page)) {
+            $offset = $r->ensureOptionalInt('offset') ?? 0;
+        }
+        $rowcount = $r->ensureOptionalInt(
+            'rowcount'
+        ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
+
+        $keyword = substr($r->ensureOptionalString('query') ?? '', 0, 256);
 
         $onlyQualitySeal = $r->ensureOptionalBool('only_quality_seal') ?? false;
-        $level = $r->ensureOptionalString('level');
         $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
-
-        if (is_null($r['page'])) {
-            $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
-        }
-        if (!is_null($r['rowcount'])) {
-            $rowcount = intval($r['rowcount']);
-        }
+        $level = $r->ensureOptionalString('level');
 
         [
             'sortOrder' => $sortOrder,
@@ -5488,53 +5536,29 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param null|string $commit
+     * @omegaup-request-param string $commit
      * @omegaup-request-param string $filename
      * @omegaup-request-param string $problem_alias
      */
-    public static function apiTemplate(\OmegaUp\Request $r): void {
+    public static function getTemplate(\OmegaUp\Request $r): void {
         $problemAlias = $r->ensureString(
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringOfLengthInRange(
-            $r['commit'],
+        $commit = $r->ensureString(
             'commit',
-            40,
-            40
+            fn (string $commit) => \OmegaUp\Validators::objectId($commit)
         );
-        if (
-            preg_match(
-                '/^[0-9a-f]{40}$/',
-                $r['commit']
-            ) !== 1
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'commit'
-            );
-        }
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['filename'],
-            'filename'
+        $filename = $r->ensureString(
+            'filename',
+            fn (string $name) => \OmegaUp\Validators::filename($name)
         );
-        if (
-            preg_match(
-                '/^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+$/',
-                $r['filename']
-            ) !== 1
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'filename'
-            );
-        }
 
-        self::regenerateTemplates($problemAlias, $r['commit']);
+        self::regenerateTemplates($problemAlias, $commit);
 
         //The noredirect=1 part lets nginx know to not call us again if the file is not found.
         header(
-            'Location: ' . TEMPLATES_URL_PATH . "{$problemAlias}/{$r['commit']}/{$r['filename']}?noredirect=1"
+            'Location: ' . TEMPLATES_URL_PATH . "{$problemAlias}/{$commit}/{$filename}?noredirect=1"
         );
         header('HTTP/1.1 303 See Other');
 
@@ -5938,6 +5962,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
+     * @omegaup-request-param 'all'|'onlyQualityProblems'|null $quality
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
      * @omegaup-request-param int|null $rowcount
@@ -5962,6 +5987,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
         $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
+        $quality = $r->ensureOptionalEnum(
+            'quality',
+            self::QUALITY_VALUES
+        ) ?? 'onlyQualityProblems';
         if ($offset < 0) {
             $offset = 0;
         }
@@ -5995,7 +6024,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            onlyQualitySeal: true,
+            onlyQualitySeal: ($quality === 'onlyQualityProblems'),
             url: "/problem/collection/{$collectionLevel}/",
             level: $collectionLevel,
             difficulty: $difficulty,
@@ -6177,6 +6206,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
+     * @omegaup-request-param 'all'|'onlyQualityProblems'|null $quality
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
      * @omegaup-request-param int|null $rowcount
@@ -6199,6 +6229,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
         $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
+        $quality = $r->ensureOptionalEnum(
+            'quality',
+            self::QUALITY_VALUES
+        ) ?? 'onlyQualityProblems';
         if ($offset < 0) {
             $offset = 0;
         }
@@ -6232,7 +6266,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            onlyQualitySeal: true,
+            onlyQualitySeal: ($quality === 'onlyQualityProblems'),
             url: '/problem/collection/author/',
             level: null,
             difficulty: $difficulty,
