@@ -210,11 +210,6 @@ class ProblemDeployer {
                     "interactive/Main.distrib.{$distribSettings['interactive']['language']}"
                 )
             );
-
-            $filesize = filesize($idlPath);
-            header("Content-Length: $filesize");
-            readfile($idlPath);
-
             @mkdir("{$tmpDir}/examples");
             /** @var mixed $data */
             foreach ($distribSettings['cases'] as $filename => $data) {
