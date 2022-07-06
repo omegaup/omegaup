@@ -13,8 +13,39 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Users extends \OmegaUp\DAO\Base\Users {
+    const FIELDS = '
+        u.user_id,
+        u.facebook_user_id,
+        u.git_token,
+        u.main_email_id,
+        u.main_identity_id,
+        u.has_learning_objective,
+        u.has_teaching_objective,
+        u.has_scholar_objective,
+        u.has_competitive_objective,
+        u.scholar_degree,
+        u.birth_date,
+        u.verified,
+        u.verification_id,
+        u.reset_digest,
+        u.reset_sent_at,
+        u.hide_problem_tags,
+        u.in_mailing_list,
+        u.is_private,
+        u.preferred_language
+    ';
     public static function findByEmail(string $email): ?\OmegaUp\DAO\VO\Users {
-        $sql = 'select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id';
+        $fields = self::FIELDS;
+        $sql = "SELECT
+                    {$fields}
+                FROM
+                    `Users` u
+                INNER JOIN
+                    `Emails` e
+                ON
+                    e.user_id = u.user_id
+                WHERE
+                    e.email = ?;";
         $params = [ $email ];
         /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
@@ -27,8 +58,9 @@ class Users extends \OmegaUp\DAO\Base\Users {
     public static function FindByUsername(
         string $username
     ): ?\OmegaUp\DAO\VO\Users {
-        $sql = 'SELECT
-                    u.*
+        $fields = self::FIELDS;
+        $sql = "SELECT
+                    {$fields}
                 FROM
                     Users u
                 INNER JOIN
@@ -37,7 +69,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     i.user_id = u.user_id
                 WHERE
                     i.username = ?
-                LIMIT 1;';
+                LIMIT 1;";
         /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
@@ -236,15 +268,14 @@ class Users extends \OmegaUp\DAO\Base\Users {
     final public static function getByVerification(
         string $verificationId
     ): ?\OmegaUp\DAO\VO\Users {
-        $sql = '
-            SELECT
-                *
-            FROM
-                Users
-            WHERE
-                verification_id = ?
-            LIMIT 1;
-        ';
+        $fields = self::FIELDS;
+        $sql = "SELECT
+                    {$fields}
+                FROM
+                    Users u
+                WHERE
+                    verification_id = ?
+                LIMIT 1;";
 
         /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
@@ -289,14 +320,15 @@ class Users extends \OmegaUp\DAO\Base\Users {
         bool $verified,
         bool $inMailingList
     ): array {
-        $sql = 'SELECT
-                    *
+        $fields = self::FIELDS;
+        $sql = "SELECT
+                    {$fields}
                 FROM
-                    Users
+                    Users u
                 WHERE
                     verified = ?
                 AND
-                    in_mailing_list = ?';
+                    in_mailing_list = ?";
 
         /** @var list<array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(

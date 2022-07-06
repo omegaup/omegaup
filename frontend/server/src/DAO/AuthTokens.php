@@ -17,16 +17,37 @@ namespace OmegaUp\DAO;
  */
 class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
     public static function getUserByToken(string $authToken): ?\OmegaUp\DAO\VO\Users {
-        $sql = 'SELECT
-                    u.*
+        $fields = '
+                        u.user_id,
+                        u.facebook_user_id,
+                        u.git_token,
+                        u.main_email_id,
+                        u.main_identity_id,
+                        u.has_learning_objective,
+                        u.has_teaching_objective,
+                        u.has_scholar_objective,
+                        u.has_competitive_objective,
+                        u.scholar_degree,
+                        u.birth_date,
+                        u.verified,
+                        u.verification_id,
+                        u.reset_digest,
+                        u.reset_sent_at,
+                        u.hide_problem_tags,
+                        u.in_mailing_list,
+                        u.is_private,
+                        u.preferred_language
+        ';
+        $sql = "SELECT
+                    {$fields}
                 FROM
                     `Users` u
                 INNER JOIN
-                    `Auth_Tokens` at
+                    `Auth_Tokens` aut
                 ON
-                    at.user_id = u.user_id
+                    aut.user_id = u.user_id
                 WHERE
-                    at.token = ?;';
+                    aut.token = ?;";
         /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
