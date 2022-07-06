@@ -17,27 +17,15 @@ namespace OmegaUp\DAO;
  */
 class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
     public static function getUserByToken(string $authToken): ?\OmegaUp\DAO\VO\Users {
-        $fields = '
-                        u.user_id,
-                        u.facebook_user_id,
-                        u.git_token,
-                        u.main_email_id,
-                        u.main_identity_id,
-                        u.has_learning_objective,
-                        u.has_teaching_objective,
-                        u.has_scholar_objective,
-                        u.has_competitive_objective,
-                        u.scholar_degree,
-                        u.birth_date,
-                        u.verified,
-                        u.verification_id,
-                        u.reset_digest,
-                        u.reset_sent_at,
-                        u.hide_problem_tags,
-                        u.in_mailing_list,
-                        u.is_private,
-                        u.preferred_language
-        ';
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "u.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Users::FIELD_NAMES
+                )
+            )
+        );
         $sql = "SELECT
                     {$fields}
                 FROM

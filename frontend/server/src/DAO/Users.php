@@ -13,29 +13,16 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Users extends \OmegaUp\DAO\Base\Users {
-    const FIELDS = '
-        u.user_id,
-        u.facebook_user_id,
-        u.git_token,
-        u.main_email_id,
-        u.main_identity_id,
-        u.has_learning_objective,
-        u.has_teaching_objective,
-        u.has_scholar_objective,
-        u.has_competitive_objective,
-        u.scholar_degree,
-        u.birth_date,
-        u.verified,
-        u.verification_id,
-        u.reset_digest,
-        u.reset_sent_at,
-        u.hide_problem_tags,
-        u.in_mailing_list,
-        u.is_private,
-        u.preferred_language
-    ';
     public static function findByEmail(string $email): ?\OmegaUp\DAO\VO\Users {
-        $fields = self::FIELDS;
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "u.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Users::FIELD_NAMES
+                )
+            )
+        );
         $sql = "SELECT
                     {$fields}
                 FROM
@@ -58,7 +45,15 @@ class Users extends \OmegaUp\DAO\Base\Users {
     public static function FindByUsername(
         string $username
     ): ?\OmegaUp\DAO\VO\Users {
-        $fields = self::FIELDS;
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "u.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Users::FIELD_NAMES
+                )
+            )
+        );
         $sql = "SELECT
                     {$fields}
                 FROM
@@ -268,7 +263,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
     final public static function getByVerification(
         string $verificationId
     ): ?\OmegaUp\DAO\VO\Users {
-        $fields = self::FIELDS;
+        $fields = join(', ', array_keys(\OmegaUp\DAO\VO\Users::FIELD_NAMES));
         $sql = "SELECT
                     {$fields}
                 FROM
@@ -320,7 +315,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
         bool $verified,
         bool $inMailingList
     ): array {
-        $fields = self::FIELDS;
+        $fields = join(', ', array_keys(\OmegaUp\DAO\VO\Users::FIELD_NAMES));
         $sql = "SELECT
                     {$fields}
                 FROM
