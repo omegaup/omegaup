@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
@@ -16,6 +17,10 @@ module.exports = {
       'unfetch/polyfill',
       './frontend/www/js/omegaup/polyfills.js',
       './frontend/www/js/omegaup/omegaup-legacy.js',
+    ],
+    grader_ephemeral: [
+      '@babel/polyfill',
+      './frontend/www/js/omegaup/grader/ephemeral.js',
     ],
     activity_feed: './frontend/www/js/omegaup/activity/feed.ts',
     admin_roles: './frontend/www/js/omegaup/admin/roles.ts',
@@ -109,9 +114,9 @@ module.exports = {
   },
 
   output: {
-    path: path.resolve(__dirname, './frontend/www/'),
-    publicPath: '/',
-    filename: 'js/dist/[name].js',
+    path: path.resolve(__dirname, './frontend/www/js/dist/'),
+    publicPath: '/js/dist/',
+    filename: '[name].js',
     library: '[name]',
     libraryTarget: 'umd',
 
@@ -126,13 +131,13 @@ module.exports = {
         {
           from: './frontend/badges/**/query.sql',
           to: path.resolve(__dirname, './frontend/www/media/dist/badges'),
-          transform(content, filepath) {
+          transform(_content, filepath) {
             const iconPath = `${path.dirname(filepath)}/icon.svg`;
             return fs.existsSync(iconPath)
               ? fs.readFileSync(iconPath)
               : defaultBadgeIcon;
           },
-          transformPath(targetPath, absolutePath) {
+          transformPath(_targetPath, absolutePath) {
             return `media/dist/badges/${path.basename(
               path.dirname(absolutePath),
             )}.svg`;
@@ -150,6 +155,7 @@ module.exports = {
       formatter: 'codeframe',
       async: false,
     }),
+    new MonacoWebpackPlugin(),
   ],
 
   optimization: {
@@ -244,6 +250,10 @@ module.exports = {
         test: /\.scss$/,
         use: ['vue-style-loader', 'css-loader', 'sass-loader'],
       },
+      {
+        test: /\.ttf$/,
+        use: ['file-loader'],
+      },
     ],
   },
 
@@ -255,6 +265,10 @@ module.exports = {
       jszip: 'jszip/dist/jszip.js',
       pako: 'pako/dist/pako.min.js',
       '@': path.resolve(__dirname, './frontend/www/'),
+    },
+    fallback: {
+      buffer: require.resolve('buffer/'),
+      stream: require.resolve('stream-browserify'),
     },
   },
 };

@@ -19,7 +19,6 @@ for (const entryname of Object.keys(frontendConfig.entry)) {
 const config = [
   frontendConfig,
   require('./webpack.config-style.js'),
-  require('./webpack.config-grader.js'),
 ];
 
 module.exports = (env, argv) => {
