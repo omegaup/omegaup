@@ -202,17 +202,6 @@ class Validators {
     }
 
     /**
-     * @param string $filename
-     * @return boolean
-     */
-    public static function filename(string $filename): bool {
-        return preg_match(
-            '/^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+$/',
-            $filename
-        ) !== 1;
-    }
-
-    /**
      * Returns whether the alias is valid.
      *
      * @return boolean
