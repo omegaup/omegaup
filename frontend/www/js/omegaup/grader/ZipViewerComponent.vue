@@ -1,5 +1,8 @@
 <template>
-  <div class="root d-flex flex-row h-100 bg-dark text-white">
+  <div
+    class="root d-flex flex-row h-100 bg-dark text-white"
+    :class="{ 'bg-dark': theme == 'vs-dark', 'text-white': theme == 'vs-dark' }"
+  >
     <div class="filenames">
       <div class="list-group">
         <button
@@ -31,6 +34,12 @@
 import * as Util from './util';
 
 export default {
+  props: {
+    theme: {
+      type: String,
+      default: 'vs',
+    },
+  },
   data: () => ({
     zip: null,
     active: null,

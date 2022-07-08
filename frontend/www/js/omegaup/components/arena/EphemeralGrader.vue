@@ -2,7 +2,7 @@
   <iframe
     ref="grader"
     class="mt-2 border border-white"
-    src="/grader/ephemeral-light/?embedded"
+    src="/grader/ephemeral/index-light.html?embedded"
   ></iframe>
 </template>
 
