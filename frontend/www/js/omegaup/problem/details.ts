@@ -211,24 +211,30 @@ OmegaUp.on('ready', async () => {
               }),
             }).catch(ui.apiError);
           },
-          'submit-promotion': (source: qualitynomination_Promotion) => {
+          'submit-promotion': ({
+            solved,
+            tried,
+            quality,
+            difficulty,
+          }: {
+            solved: boolean;
+            tried: boolean;
+            quality: string;
+            difficulty: string;
+          }) => {
             const contents: {
               before_ac?: boolean;
               difficulty?: number;
               quality?: number;
-              tags?: string[];
             } = {};
-            if (!source.solved && source.tried) {
+            if (!solved && tried) {
               contents.before_ac = true;
             }
-            if (source.difficulty !== '') {
-              contents.difficulty = Number.parseInt(source.difficulty, 10);
+            if (difficulty !== '') {
+              contents.difficulty = Number.parseInt(difficulty, 10);
             }
-            if (source.tags.length > 0) {
-              contents.tags = source.tags;
-            }
-            if (source.quality !== '') {
-              contents.quality = Number.parseInt(source.quality, 10);
+            if (quality !== '') {
+              contents.quality = Number.parseInt(quality, 10);
             }
             api.QualityNomination.create({
               problem_alias: payload.problem.alias,

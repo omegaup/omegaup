@@ -1223,7 +1223,6 @@ const translations: { [key: string]: string; } = {
   requestDate: "Date of request",
   resourceNotFound: "Resource not found.",
   reviewerNomination: "Rate problem as reviewer",
-  reviewerNominationCategory: "Which one is the category of this problem?",
   reviewerNominationFormTitle: "Qualify this problem!",
   reviewerNominationQuality: "Is this a quality problem?",
   runCannotBeDisqualified: "The run cannot be disqualified",

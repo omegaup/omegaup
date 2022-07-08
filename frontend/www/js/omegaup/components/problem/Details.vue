@@ -136,10 +136,7 @@
               v-show="currentPopupDisplayed === PopupDisplayed.Promotion"
               :solved="nominationStatus && nominationStatus.solved"
               :tried="nominationStatus && nominationStatus.tried"
-              @submit="
-                (qualityPromotionComponent) =>
-                  $emit('submit-promotion', qualityPromotionComponent)
-              "
+              @submit="(request) => $emit('submit-promotion', request)"
               @dismiss="
                 (qualityPromotionComponent, isDismissed) =>
                   onPopupPromotionDismissed(

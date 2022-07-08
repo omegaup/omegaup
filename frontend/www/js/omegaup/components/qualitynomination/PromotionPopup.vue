@@ -144,7 +144,12 @@ export default class QualityPromotionPopup extends Vue {
   }
 
   onSubmit(): void {
-    this.$emit('submit', this);
+    this.$emit('submit', {
+      solved: this.solved,
+      tried: this.tried,
+      difficulty: this.difficulty,
+      quality: this.quality,
+    });
     this.currentView = AvailableViews.Thanks;
 
     setTimeout(() => this.onHide(false), 2000);

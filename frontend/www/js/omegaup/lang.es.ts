@@ -1223,7 +1223,6 @@ const translations: { [key: string]: string; } = {
   requestDate: "Fecha de solicitud",
   resourceNotFound: "Recurso no encontrado.",
   reviewerNomination: "Calificar el problema como revisor",
-  reviewerNominationCategory: "\u00bfCu\u00e1l es la categor\u00eda de este problema?",
   reviewerNominationFormTitle: "Califica este problema.",
   reviewerNominationQuality: "\u00bfEs un problema de calidad?",
   runCannotBeDisqualified: "El env\u00edo no puede ser descalificado.",
