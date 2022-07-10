@@ -5536,55 +5536,42 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param null|string $commit
+     * @omegaup-request-param string $commit
      * @omegaup-request-param string $filename
      * @omegaup-request-param string $problem_alias
      */
-    public static function apiTemplate(\OmegaUp\Request $r): void {
+    public static function getTemplate(\OmegaUp\Request $r): void {
         $problemAlias = $r->ensureString(
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringOfLengthInRange(
-            $r['commit'],
+        $commit = $r->ensureString(
             'commit',
-            40,
-            40
+            fn (string $commit) => \OmegaUp\Validators::objectId($commit)
         );
-        if (
-            preg_match(
-                '/^[0-9a-f]{40}$/',
-                $r['commit']
-            ) !== 1
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'commit'
+        $filename = $r->ensureString(
+            'filename',
+            fn (string $name) => \OmegaUp\Validators::filename($name)
+        );
+
+        self::regenerateTemplates($problemAlias, $commit);
+        $filePath = TEMPLATES_PATH . "/{$problemAlias}/{$commit}/{$filename}";
+        $fileSize = @filesize($filePath);
+        if ($fileSize === false) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
             );
         }
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['filename'],
-            'filename'
-        );
-        if (
-            preg_match(
-                '/^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+$/',
-                $r['filename']
-            ) !== 1
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'filename'
-            );
+        if (str_ends_with($filePath, '.tar.gz')) {
+            header('Content-Type: application/tar+gzip');
+        } elseif (str_ends_with($filePath, '.zip')) {
+            header('Content-Type: application/zip');
+        } else {
+            header('Content-Type: application/octet-stream');
         }
-
-        self::regenerateTemplates($problemAlias, $r['commit']);
-
-        //The noredirect=1 part lets nginx know to not call us again if the file is not found.
-        header(
-            'Location: ' . TEMPLATES_URL_PATH . "{$problemAlias}/{$r['commit']}/{$r['filename']}?noredirect=1"
-        );
-        header('HTTP/1.1 303 See Other');
+        header("Content-Disposition: attachment; filename=\"{$filename}\"");
+        header("Content-Length: {$fileSize}");
+        readfile($filePath);
 
         // Since all the headers and response have been sent, make the API
         // caller to exit quietly.

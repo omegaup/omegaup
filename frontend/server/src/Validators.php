@@ -198,7 +198,18 @@ class Validators {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function objectId(string $objectId): bool {
-        return preg_match('/^[0-9a-f]{40}$/', $objectId) !== 1;
+        return preg_match('/^[0-9a-f]{40}$/', $objectId) === 1;
+    }
+
+    /**
+     * @param string $filename
+     * @return boolean
+     */
+    public static function filename(string $filename): bool {
+        return preg_match(
+            '/^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+$/',
+            $filename
+        ) === 1;
     }
 
     /**
