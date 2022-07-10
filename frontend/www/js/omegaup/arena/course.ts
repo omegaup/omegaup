@@ -317,28 +317,22 @@ OmegaUp.on('ready', async () => {
             tried,
             quality,
             difficulty,
-            tags,
           }: {
             solved: boolean;
             tried: boolean;
             quality: string;
             difficulty: string;
-            tags: string[];
           }) => {
             const contents: {
               before_ac?: boolean;
               difficulty?: number;
               quality?: number;
-              tags?: string[];
             } = {};
             if (!solved && tried) {
               contents.before_ac = true;
             }
             if (difficulty !== '') {
               contents.difficulty = Number.parseInt(difficulty, 10);
-            }
-            if (tags.length > 0) {
-              contents.tags = tags;
             }
             if (quality !== '') {
               contents.quality = Number.parseInt(quality, 10);
