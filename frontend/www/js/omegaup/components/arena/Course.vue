@@ -144,6 +144,7 @@
         :show-user="true"
         :problemset-problems="Object.values(problems)"
         :search-result-users="searchResultUsers"
+        :search-result-problems="searchResultProblems"
         @details="onRunAdminDetails"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
@@ -345,6 +346,16 @@ export default class ArenaCourse extends Vue {
     }
 
     return PopupDisplayed.Promotion;
+  }
+
+  get searchResultProblems(): types.ListItem[] {
+    if (!this.problems.length) {
+      return [];
+    }
+    return this.problems.map((problem) => ({
+      key: problem.alias,
+      value: problem.text,
+    }));
   }
 
   onPopupDismissed(): void {

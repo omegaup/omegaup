@@ -11,7 +11,14 @@ import { ViewProfileTabs } from '../components/user/ViewProfile.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
-  const locationHash = window.location.hash.substr(1).split('#');
+  const locationHash = window.location.hash.substring(1).split('#');
+  const searchResultSchools: types.SchoolListItem[] = [];
+  if (payload.profile.school && payload.profile.school_id) {
+    searchResultSchools.push({
+      key: payload.profile.school_id,
+      value: payload.profile.school,
+    });
+  }
   let selectedTab = locationHash[0] || 'view-profile';
   let viewProfileSelectedTab: string | null = null;
   if (selectedTab === 'locale-changed') {
@@ -40,6 +47,7 @@ OmegaUp.on('ready', () => {
         identities: payload.identities,
         hasPassword: payload.extraProfileDetails?.hasPassword,
         selectedTab,
+        searchResultSchools: searchResultSchools,
       };
     },
     render: function (createElement) {
@@ -59,6 +67,7 @@ OmegaUp.on('ready', () => {
           programmingLanguages: payload.programmingLanguages,
           hasPassword: this.hasPassword,
           viewProfileSelectedTab,
+          searchResultSchools: this.searchResultSchools,
         },
         on: {
           'update-user-basic-information': (
@@ -156,6 +165,27 @@ OmegaUp.on('ready', () => {
                 ui.success(T.passwordAddRequestSuccess);
                 userProfile.hasPassword = true;
                 userProfile.selectedTab = 'change-password';
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-schools': (query: string) => {
+            api.School.list({ query })
+              .then(({ results }) => {
+                if (!results.length) {
+                  this.searchResultSchools = [
+                    {
+                      key: 0,
+                      value: query,
+                    },
+                  ];
+                  return;
+                }
+                this.searchResultSchools = results.map(
+                  ({ key, value }: types.SchoolListItem) => ({
+                    key,
+                    value,
+                  }),
+                );
               })
               .catch(ui.apiError);
           },
