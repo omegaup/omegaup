@@ -33,7 +33,7 @@ class FileHandler {
 
         do {
             $path = $dir . $prefix . mt_rand(0, 9999999);
-        } while (!@mkdir($path, $mode));
+        } while (!@mkdir($path, $mode, true));
 
         return $path;
     }

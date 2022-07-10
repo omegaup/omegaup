@@ -5554,8 +5554,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
             fn (string $name) => \OmegaUp\Validators::filename($name)
         );
 
+        $fileDirectory = TEMPLATES_PATH . "/{$problemAlias}/{$commit}";
+        if (is_dir($fileDirectory)) {
+            // The generation of templates has happened before. We're never
+            // going to find this.
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
+            );
+        }
+
         self::regenerateTemplates($problemAlias, $commit);
-        $filePath = TEMPLATES_PATH . "/{$problemAlias}/{$commit}/{$filename}";
+        $filePath = "{$fileDirectory}/{$filename}";
         $fileSize = @filesize($filePath);
         if ($fileSize === false) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -5564,12 +5573,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         if (str_ends_with($filePath, '.tar.gz')) {
             header('Content-Type: application/tar+gzip');
+        } elseif (str_ends_with($filePath, '.tar.bz2')) {
+            header('Content-Type: application/tar+bzip2');
         } elseif (str_ends_with($filePath, '.zip')) {
             header('Content-Type: application/zip');
         } else {
             header('Content-Type: application/octet-stream');
         }
-        header("Content-Disposition: attachment; filename=\"{$filename}\"");
         header("Content-Length: {$fileSize}");
         readfile($filePath);
 
@@ -5599,7 +5609,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $filename
      * @omegaup-request-param string $problem_alias
      */
-    public static function apiInput(\OmegaUp\Request $r): void {
+    public static function getInput(\OmegaUp\Request $r): void {
         $commit = $r->ensureString(
             'commit',
             fn (string $commit) => preg_match(
@@ -5618,14 +5628,27 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
         $filename = $r->ensureString('filename');
+        $zipDirectory = INPUTS_PATH . "{$problem->alias}/{$commit}";
+        if (is_dir($zipDirectory)) {
+            // The generation of problems has happened before. We're never
+            // going to find this.
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
+            );
+        }
 
         self::generateInputZip($problem, $commit, $filename);
 
-        //The noredirect=1 part lets nginx know to not call us again if the file is not found.
-        header(
-            'Location: ' . INPUTS_URL_PATH . "{$problem->alias}/{$commit}/{$filename}?noredirect=1"
-        );
-        header('HTTP/1.1 303 See Other');
+        $zipPath = "{$zipDirectory}/{$problem->alias}-input.zip";
+        $fileSize = @filesize($zipPath);
+        if ($fileSize === false) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
+            );
+        }
+        header('Content-Type: application/zip');
+        header("Content-Length: {$fileSize}");
+        readfile($zipPath);
 
         // Since all the headers and response have been sent, make the API
         // caller to exit quietly.
@@ -5659,7 +5682,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $tmpDir = \OmegaUp\FileHandler::tempDir(
-            '/tmp',
+            INPUTS_PATH,
             'InputZip',
             0755
         );
@@ -5690,9 +5713,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             $zipArchive->close();
 
-            $zipPath = INPUTS_PATH . "{$problem->alias}/{$commit}/{$problem->alias}-input.zip";
-            @mkdir(dirname($zipPath), 0755, true);
-            rename($tmpPath, $zipPath);
+            $zipDir = INPUTS_PATH . "{$problem->alias}/{$commit}";
+            @mkdir(dirname($zipDir), 0755, true);
+            rename($tmpDir, $zipDir);
         } catch (\Exception $e) {
             self::$log->error(
                 "Failed to create input .zip for {$problem->alias}",
@@ -5727,6 +5750,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         self::regenerateImage($problemAlias, $objectId, $extension);
 
+        $imagePath = IMAGES_PATH . "{$problemAlias}/{$objectId}.{$extension}";
+        $filesize = filesize($imagePath);
+        header("Content-Type: image/{$extension}");
+        header("Content-Length: $filesize");
+        readfile($imagePath);
+
         // Since all the headers and response have been sent, make the API
         // caller to exit quietly.
         throw new \OmegaUp\Exceptions\ExitException();
@@ -5753,15 +5782,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             IMAGES_PATH . "{$problem->alias}/{$objectId}.{$extension}"
         );
         @mkdir(IMAGES_PATH . $problem->alias, 0755, true);
-        file_put_contents(
-            $imagePath,
-            $problemArtifacts->getByRevision()
-        );
-
-        $filesize = filesize($imagePath);
-        header("Content-Type: image/{$extension}");
-        header("Content-Length: $filesize");
-        readfile($imagePath);
+        $imageContents = $problemArtifacts->getByRevision();
+        file_put_contents($imagePath, $imageContents);
     }
 
     /**
