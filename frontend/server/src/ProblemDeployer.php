@@ -210,6 +210,7 @@ class ProblemDeployer {
                     "interactive/Main.distrib.{$distribSettings['interactive']['language']}"
                 )
             );
+
             @mkdir("{$tmpDir}/examples");
             /** @var mixed $data */
             foreach ($distribSettings['cases'] as $filename => $data) {

@@ -482,7 +482,7 @@ def create_group(driver, group_title, description):
     return group_alias
 
 
-def add_identities_group(driver, group_alias):
+def add_identities_group(driver, group_alias) -> List[Identity]:
     '''Upload csv and add identities into the group'''
 
     driver.wait.until(
