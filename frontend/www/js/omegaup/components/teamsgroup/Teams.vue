@@ -93,7 +93,6 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { dao, types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
 import identity_Edit from '../identity/Edit.vue';
 import identity_ChangePassword from '../identity/ChangePassword.vue';
@@ -132,7 +131,6 @@ export default class Teams extends Vue {
 
   T = T;
   AvailableForms = AvailableForms;
-  typeahead = typeahead;
   identity: null | types.Identity = null;
   username: null | string = null;
   formToShow: AvailableForms = AvailableForms.None;
@@ -162,8 +160,11 @@ export default class Teams extends Vue {
     this.onCancel();
   }
 
-  onEditIdentityTeam(originalUsername: string, identity: types.Identity): void {
-    this.$emit('edit-identity-team', { originalUsername, identity });
+  onEditIdentityTeam(response: {
+    originalUsername: string;
+    identity: types.Identity;
+  }): void {
+    this.$emit('edit-identity-team', response);
     this.onCancel();
   }
 

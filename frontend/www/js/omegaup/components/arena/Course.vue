@@ -86,14 +86,7 @@
               @submit-run="onRunSubmitted"
               @show-run="onRunDetails"
               @submit-promotion="
-                (qualityPromotionComponent) =>
-                  $emit('submit-promotion', {
-                    solved: qualityPromotionComponent.solved,
-                    tried: qualityPromotionComponent.tried,
-                    quality: qualityPromotionComponent.quality,
-                    difficulty: qualityPromotionComponent.difficulty,
-                    tags: qualityPromotionComponent.tags,
-                  })
+                (request) => $emit('submit-promotion', request)
               "
               @dismiss-promotion="
                 (qualityPromotionComponent, isDismissed) =>
@@ -151,6 +144,7 @@
         :show-user="true"
         :problemset-problems="Object.values(problems)"
         :search-result-users="searchResultUsers"
+        :search-result-problems="searchResultProblems"
         @details="onRunAdminDetails"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
@@ -352,6 +346,16 @@ export default class ArenaCourse extends Vue {
     }
 
     return PopupDisplayed.Promotion;
+  }
+
+  get searchResultProblems(): types.ListItem[] {
+    if (!this.problems.length) {
+      return [];
+    }
+    return this.problems.map((problem) => ({
+      key: problem.alias,
+      value: problem.text,
+    }));
   }
 
   onPopupDismissed(): void {

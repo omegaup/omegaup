@@ -17,6 +17,9 @@ import pytest
 
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, TimeoutException
+from selenium.webdriver import Firefox
+from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
@@ -181,26 +184,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                                 'return jQuery.active;'),
                              time.time() - t0)) from ex
 
-    def typeahead_helper(self, parent_xpath, value, select_suggestion=True):
-        '''Helper to interact with Typeahead elements.'''
-
-        tt_input = self.wait.until(
-            EC.visibility_of_element_located(
-                (By.XPATH,
-                 '//%s//input[contains(@class, "tt-input")]' % parent_xpath)))
-        tt_input.click()
-        tt_input.send_keys(value)
-
-        if not select_suggestion:
-            return
-
-        self.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//%s//div[@data-value = "%s"]' %
-                 (parent_xpath, value)))).click()
-
-    def typeahead_helper_v2(self, parent_selector, value):
+    def typeahead_helper(self, parent_selector, value):
         '''Helper to interact with Typeahead elements.'''
 
         tt_input = self.wait.until(
@@ -614,15 +598,13 @@ def _get_browser(request, browser_name):
             options=chrome_options)
         chrome_browser.set_window_size(*_WINDOW_SIZE)
         return chrome_browser
-    firefox_options = webdriver.firefox.options.Options()
+    firefox_options = Options()
     firefox_options.set_capability('marionette', True)
     firefox_options.set_capability('loggingPrefs', {'browser': 'ALL'})
-    firefox_options.profile = webdriver.FirefoxProfile()
-    firefox_options.profile.set_preference(
+    firefox_options.set_preference(
         'webdriver.log.file', '/tmp/firefox_console')
     firefox_options.headless = request.config.option.headless
-    firefox_browser = webdriver.Firefox(
-        options=firefox_options)
+    firefox_browser = Firefox(options=firefox_options)
     firefox_browser.set_window_size(*_WINDOW_SIZE)
     return firefox_browser
 

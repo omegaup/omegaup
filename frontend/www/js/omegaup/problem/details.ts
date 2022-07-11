@@ -40,6 +40,7 @@ OmegaUp.on('ready', async () => {
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
 
   const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
+  const searchResultEmpty: types.ListItem[] = [];
   let runDetails: null | types.RunDetails = null;
   try {
     ({ runDetails } = await getProblemAndRunDetails({
@@ -78,7 +79,8 @@ OmegaUp.on('ready', async () => {
           !payload.nominationStatus?.solved),
       guid,
       nextSubmissionTimestamp,
-      searchResultUsers: [] as types.ListItem[],
+      searchResultUsers: searchResultEmpty,
+      searchResultProblems: searchResultEmpty,
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
@@ -111,6 +113,7 @@ OmegaUp.on('ready', async () => {
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           shouldShowTabs: true,
           searchResultUsers: this.searchResultUsers,
+          searchResultProblems: this.searchResultProblems,
           problemAlias: payload.problem.alias,
           totalRuns: runsStore.state.totalRuns,
         },
@@ -211,24 +214,30 @@ OmegaUp.on('ready', async () => {
               }),
             }).catch(ui.apiError);
           },
-          'submit-promotion': (source: qualitynomination_Promotion) => {
+          'submit-promotion': ({
+            solved,
+            tried,
+            quality,
+            difficulty,
+          }: {
+            solved: boolean;
+            tried: boolean;
+            quality: string;
+            difficulty: string;
+          }) => {
             const contents: {
               before_ac?: boolean;
               difficulty?: number;
               quality?: number;
-              tags?: string[];
             } = {};
-            if (!source.solved && source.tried) {
+            if (!solved && tried) {
               contents.before_ac = true;
             }
-            if (source.difficulty !== '') {
-              contents.difficulty = Number.parseInt(source.difficulty, 10);
+            if (difficulty !== '') {
+              contents.difficulty = Number.parseInt(difficulty, 10);
             }
-            if (source.tags.length > 0) {
-              contents.tags = source.tags;
-            }
-            if (source.quality !== '') {
-              contents.quality = Number.parseInt(source.quality, 10);
+            if (quality !== '') {
+              contents.quality = Number.parseInt(quality, 10);
             }
             api.QualityNomination.create({
               problem_alias: payload.problem.alias,
@@ -384,6 +393,21 @@ OmegaUp.on('ready', async () => {
                     value: `${ui.escape(key)} (<strong>${ui.escape(
                       value,
                     )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-problems': (query: string) => {
+            api.Problem.listForTypeahead({
+              query,
+              search_type: 'all',
+            })
+              .then((data) => {
+                this.searchResultProblems = data.results.map(
+                  ({ key, value }) => ({
+                    key,
+                    value,
                   }),
                 );
               })

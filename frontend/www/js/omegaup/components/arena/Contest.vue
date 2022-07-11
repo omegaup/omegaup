@@ -127,6 +127,7 @@
         :problemset-problems="Object.values(problems)"
         :is-contest-finished="isContestFinished"
         :search-result-users="searchResultUsers"
+        :search-result-problems="searchResultProblems"
         @details="(run) => onRunAdminDetails(run.guid)"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
@@ -320,6 +321,16 @@ export default class ArenaContest extends Vue {
 
   get urlPractice(): string {
     return `/arena/${this.contest.alias}/practice/`;
+  }
+
+  get searchResultProblems(): types.ListItem[] {
+    if (!this.problems.length) {
+      return [];
+    }
+    return this.problems.map((problem) => ({
+      key: problem.alias,
+      value: problem.text,
+    }));
   }
 
   created() {

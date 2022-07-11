@@ -114,6 +114,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
     // Number of rows shown in problems list
     const PAGE_SIZE = 100;
 
+    // quality values
+    const QUALITY_VALUES = ['onlyQualityProblems', 'all'];
+
     /**
      * Returns a ProblemParams instance from the Request values.
      *
@@ -3889,11 +3892,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         $query = substr($r->ensureString('query'), 0, 256);
 
-        return \OmegaUp\DAO\Problems::byIdentityTypeForTypeahead(
-            $offset,
-            $rowcount,
-            $query,
-            $searchType
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEMS_LIST,
+            "{$query}-{$searchType}-{$offset}-{$rowcount}",
+            fn () => \OmegaUp\DAO\Problems::byIdentityTypeForTypeahead(
+                $offset,
+                $rowcount,
+                $query,
+                $searchType
+            ),
+            APC_USER_CACHE_PROBLEM_LIST_TIMEOUT
         );
     }
 
@@ -5528,55 +5536,52 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param null|string $commit
+     * @omegaup-request-param string $commit
      * @omegaup-request-param string $filename
      * @omegaup-request-param string $problem_alias
      */
-    public static function apiTemplate(\OmegaUp\Request $r): void {
+    public static function getTemplate(\OmegaUp\Request $r): void {
         $problemAlias = $r->ensureString(
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringOfLengthInRange(
-            $r['commit'],
+        $commit = $r->ensureString(
             'commit',
-            40,
-            40
+            fn (string $commit) => \OmegaUp\Validators::objectId($commit)
         );
-        if (
-            preg_match(
-                '/^[0-9a-f]{40}$/',
-                $r['commit']
-            ) !== 1
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'commit'
-            );
-        }
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['filename'],
-            'filename'
+        $filename = $r->ensureString(
+            'filename',
+            fn (string $name) => \OmegaUp\Validators::filename($name)
         );
-        if (
-            preg_match(
-                '/^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+$/',
-                $r['filename']
-            ) !== 1
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'filename'
+
+        $fileDirectory = TEMPLATES_PATH . "/{$problemAlias}/{$commit}";
+        if (is_dir($fileDirectory)) {
+            // The generation of templates has happened before. We're never
+            // going to find this.
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
             );
         }
 
-        self::regenerateTemplates($problemAlias, $r['commit']);
-
-        //The noredirect=1 part lets nginx know to not call us again if the file is not found.
-        header(
-            'Location: ' . TEMPLATES_URL_PATH . "{$problemAlias}/{$r['commit']}/{$r['filename']}?noredirect=1"
-        );
-        header('HTTP/1.1 303 See Other');
+        self::regenerateTemplates($problemAlias, $commit);
+        $filePath = "{$fileDirectory}/{$filename}";
+        $fileSize = @filesize($filePath);
+        if ($fileSize === false) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
+            );
+        }
+        if (str_ends_with($filePath, '.tar.gz')) {
+            header('Content-Type: application/tar+gzip');
+        } elseif (str_ends_with($filePath, '.tar.bz2')) {
+            header('Content-Type: application/tar+bzip2');
+        } elseif (str_ends_with($filePath, '.zip')) {
+            header('Content-Type: application/zip');
+        } else {
+            header('Content-Type: application/octet-stream');
+        }
+        header("Content-Length: {$fileSize}");
+        readfile($filePath);
 
         // Since all the headers and response have been sent, make the API
         // caller to exit quietly.
@@ -5604,7 +5609,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $filename
      * @omegaup-request-param string $problem_alias
      */
-    public static function apiInput(\OmegaUp\Request $r): void {
+    public static function getInput(\OmegaUp\Request $r): void {
         $commit = $r->ensureString(
             'commit',
             fn (string $commit) => preg_match(
@@ -5623,14 +5628,27 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
         $filename = $r->ensureString('filename');
+        $zipDirectory = INPUTS_PATH . "{$problem->alias}/{$commit}";
+        if (is_dir($zipDirectory)) {
+            // The generation of problems has happened before. We're never
+            // going to find this.
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
+            );
+        }
 
         self::generateInputZip($problem, $commit, $filename);
 
-        //The noredirect=1 part lets nginx know to not call us again if the file is not found.
-        header(
-            'Location: ' . INPUTS_URL_PATH . "{$problem->alias}/{$commit}/{$filename}?noredirect=1"
-        );
-        header('HTTP/1.1 303 See Other');
+        $zipPath = "{$zipDirectory}/{$problem->alias}-input.zip";
+        $fileSize = @filesize($zipPath);
+        if ($fileSize === false) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
+            );
+        }
+        header('Content-Type: application/zip');
+        header("Content-Length: {$fileSize}");
+        readfile($zipPath);
 
         // Since all the headers and response have been sent, make the API
         // caller to exit quietly.
@@ -5664,7 +5682,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $tmpDir = \OmegaUp\FileHandler::tempDir(
-            '/tmp',
+            INPUTS_PATH,
             'InputZip',
             0755
         );
@@ -5695,9 +5713,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             $zipArchive->close();
 
-            $zipPath = INPUTS_PATH . "{$problem->alias}/{$commit}/{$problem->alias}-input.zip";
-            @mkdir(dirname($zipPath), 0755, true);
-            rename($tmpPath, $zipPath);
+            $zipDir = INPUTS_PATH . "{$problem->alias}/{$commit}";
+            @mkdir(dirname($zipDir), 0755, true);
+            rename($tmpDir, $zipDir);
         } catch (\Exception $e) {
             self::$log->error(
                 "Failed to create input .zip for {$problem->alias}",
@@ -5732,6 +5750,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         self::regenerateImage($problemAlias, $objectId, $extension);
 
+        $imagePath = IMAGES_PATH . "{$problemAlias}/{$objectId}.{$extension}";
+        $filesize = filesize($imagePath);
+        header("Content-Type: image/{$extension}");
+        header("Content-Length: $filesize");
+        readfile($imagePath);
+
         // Since all the headers and response have been sent, make the API
         // caller to exit quietly.
         throw new \OmegaUp\Exceptions\ExitException();
@@ -5758,15 +5782,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             IMAGES_PATH . "{$problem->alias}/{$objectId}.{$extension}"
         );
         @mkdir(IMAGES_PATH . $problem->alias, 0755, true);
-        file_put_contents(
-            $imagePath,
-            $problemArtifacts->getByRevision()
-        );
-
-        $filesize = filesize($imagePath);
-        header("Content-Type: image/{$extension}");
-        header("Content-Length: $filesize");
-        readfile($imagePath);
+        $imageContents = $problemArtifacts->getByRevision();
+        file_put_contents($imagePath, $imageContents);
     }
 
     /**
@@ -5978,6 +5995,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
+     * @omegaup-request-param 'all'|'onlyQualityProblems'|null $quality
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
      * @omegaup-request-param int|null $rowcount
@@ -6002,6 +6020,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
         $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
+        $quality = $r->ensureOptionalEnum(
+            'quality',
+            self::QUALITY_VALUES
+        ) ?? 'onlyQualityProblems';
         if ($offset < 0) {
             $offset = 0;
         }
@@ -6035,7 +6057,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            onlyQualitySeal: true,
+            onlyQualitySeal: ($quality === 'onlyQualityProblems'),
             url: "/problem/collection/{$collectionLevel}/",
             level: $collectionLevel,
             difficulty: $difficulty,
@@ -6217,6 +6239,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
+     * @omegaup-request-param 'all'|'onlyQualityProblems'|null $quality
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
      * @omegaup-request-param int|null $rowcount
@@ -6239,6 +6262,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
         $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
+        $quality = $r->ensureOptionalEnum(
+            'quality',
+            self::QUALITY_VALUES
+        ) ?? 'onlyQualityProblems';
         if ($offset < 0) {
             $offset = 0;
         }
@@ -6272,7 +6299,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            onlyQualitySeal: true,
+            onlyQualitySeal: ($quality === 'onlyQualityProblems'),
             url: '/problem/collection/author/',
             level: null,
             difficulty: $difficulty,

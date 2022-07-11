@@ -14,6 +14,7 @@ import TextEditorComponent from './TextEditorComponent.vue';
 import ZipViewerComponent from './ZipViewerComponent.vue';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
+const theme = document.getElementById('theme').value;
 const defaultValidatorSource = `#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
@@ -660,6 +661,7 @@ const goldenLayoutSettings = {
                       language: 'request.language',
                       module: 'moduleName',
                     },
+                    theme,
                   },
                   id: 'source',
                   isClosable: false,
@@ -690,6 +692,7 @@ const goldenLayoutSettings = {
                     readOnly: true,
                     module: 'compiler',
                     extension: 'out/err',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -704,6 +707,7 @@ const goldenLayoutSettings = {
                     readOnly: true,
                     module: 'logs',
                     extension: 'txt',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -713,6 +717,7 @@ const goldenLayoutSettings = {
                   componentState: {
                     storeMapping: {},
                     id: 'zipviewer',
+                    theme,
                   },
                   title: 'files.zip',
                   isClosable: false,
@@ -741,6 +746,7 @@ const goldenLayoutSettings = {
                     id: 'in',
                     readOnly: false,
                     extension: 'in',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -755,6 +761,7 @@ const goldenLayoutSettings = {
                     id: 'out',
                     readOnly: false,
                     extension: 'out',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -774,6 +781,7 @@ const goldenLayoutSettings = {
                     id: 'stdout',
                     readOnly: false,
                     extension: 'out',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -788,6 +796,7 @@ const goldenLayoutSettings = {
                     id: 'stderr',
                     readOnly: false,
                     extension: 'err',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -800,6 +809,7 @@ const goldenLayoutSettings = {
                       modifiedContents: 'outputStdout',
                     },
                     id: 'diff',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -818,6 +828,7 @@ const goldenLayoutSettings = {
               currentCase: 'currentCase',
             },
             id: 'source',
+            theme,
           },
           title: 'cases/',
           width: 15,
@@ -836,6 +847,7 @@ const validatorSettings = {
       language: 'request.input.validator.custom_validator.language',
     },
     initialModule: 'validator',
+    theme,
   },
   id: 'validator',
   isClosable: false,
@@ -850,6 +862,7 @@ const interactiveIdlSettings = {
     },
     initialLanguage: 'idl',
     readOnly: isEmbedded,
+    theme,
   },
   id: 'interactive-idl',
   isClosable: false,
@@ -863,6 +876,7 @@ const interactiveMainSourceSettings = {
       language: 'request.input.interactive.language',
     },
     initialModule: 'Main',
+    theme,
   },
   id: 'interactive-main-source',
   isClosable: false,
