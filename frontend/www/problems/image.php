@@ -6,6 +6,8 @@ try {
     \OmegaUp\Controllers\Problem::getImage(
         new \OmegaUp\Request($_REQUEST)
     );
+} catch (\OmegaUp\Exceptions\ExitException $e) {
+    exit;
 } catch (\Exception $e) {
     \OmegaUp\ApiCaller::handleException($e);
 }

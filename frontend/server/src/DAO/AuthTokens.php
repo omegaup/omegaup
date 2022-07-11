@@ -17,16 +17,25 @@ namespace OmegaUp\DAO;
  */
 class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
     public static function getUserByToken(string $authToken): ?\OmegaUp\DAO\VO\Users {
-        $sql = 'SELECT
-                    u.*
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "u.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Users::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "SELECT
+                    {$fields}
                 FROM
                     `Users` u
                 INNER JOIN
-                    `Auth_Tokens` at
+                    `Auth_Tokens` aut
                 ON
-                    at.user_id = u.user_id
+                    aut.user_id = u.user_id
                 WHERE
-                    at.token = ?;';
+                    aut.token = ?;";
         /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
