@@ -7,6 +7,8 @@
 import logging
 import urllib
 
+from typing import Optional
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -183,6 +185,8 @@ def test_create_identities_for_course(driver):
 
     # Admin creates a course with one assignment and one problem, and then
     # creates some identities associated with the course group
+    associated: Optional[util.Identity] = None
+    unassociated: Optional[util.Identity] = None
     with driver.login_admin():
         create_course(driver, course_alias, school_name)
         add_assignment_with_problem(driver, assignment_alias, problem)

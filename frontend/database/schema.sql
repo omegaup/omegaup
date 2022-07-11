@@ -1165,6 +1165,7 @@ CREATE TABLE `Users` (
   `birth_date` date DEFAULT NULL,
   `verified` tinyint(1) NOT NULL DEFAULT '0',
   `verification_id` varchar(50) DEFAULT NULL,
+  `deletion_token` varchar(50) DEFAULT NULL,
   `reset_digest` varchar(45) DEFAULT NULL,
   `reset_sent_at` datetime DEFAULT NULL,
   `hide_problem_tags` tinyint(1) DEFAULT NULL COMMENT 'Determina si el usuario quiere ocultar las etiquetas de los problemas',

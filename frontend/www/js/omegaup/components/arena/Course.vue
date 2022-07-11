@@ -86,14 +86,7 @@
               @submit-run="onRunSubmitted"
               @show-run="onRunDetails"
               @submit-promotion="
-                (qualityPromotionComponent) =>
-                  $emit('submit-promotion', {
-                    solved: qualityPromotionComponent.solved,
-                    tried: qualityPromotionComponent.tried,
-                    quality: qualityPromotionComponent.quality,
-                    difficulty: qualityPromotionComponent.difficulty,
-                    tags: qualityPromotionComponent.tags,
-                  })
+                (request) => $emit('submit-promotion', request)
               "
               @dismiss-promotion="
                 (qualityPromotionComponent, isDismissed) =>
