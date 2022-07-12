@@ -107,12 +107,12 @@ class UserDeleteTest extends \OmegaUp\Test\ControllerTestCase {
 
           // Verify DB
             $user = \OmegaUp\DAO\Users::FindByUsername(
-                $identity[$id]->username
+                $identities[$id]->username
             );
             $this->assertNotNull($user);
 
           // Call api using admin
-            $login = self::login($identity[$id]);
+            $login = self::login($identities[$id]);
 
           // Call API to request a token
             $response = \OmegaUp\Controllers\User::apiDeleteRequest(
@@ -133,7 +133,7 @@ class UserDeleteTest extends \OmegaUp\Test\ControllerTestCase {
 
          // Verify DB user no longer exists
             $user = \OmegaUp\DAO\Users::FindByUsername(
-                $identity[$id]->username
+                $identities[$id]->username
             );
             $this->assertNull($user);
         }
