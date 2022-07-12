@@ -1438,7 +1438,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         p.{$searchType} = ?";
         } else {
             $args = array_fill(0, 5, $query);
-            $args[] = preg_replace('/\W+/', ' ', $query);
+            $curatedQuery = preg_replace('/\W+/', ' ', $query);
+            $args = array_merge($args, array_fill(0, 2, $curatedQuery));
             $select .= ' IFNULL(SUM(relevance), 0.0) AS relevance
             ';
             $sql = "FROM
