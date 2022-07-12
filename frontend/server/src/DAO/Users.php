@@ -307,10 +307,9 @@ class Users extends \OmegaUp\DAO\Base\Users {
         /** @var null|array{username: string, verified: bool} */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql);
     }
-      /**
+       /**
        * Delete User
        */
-
     public static function deleteUserAndIndentityInformation(
         \OmegaUp\DAO\VO\Users $user,
         \OmegaUp\DAO\VO\Identities $identity
