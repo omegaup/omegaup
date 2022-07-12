@@ -90,7 +90,7 @@ def add_students(driver, users, *, tab_xpath,
             (By.XPATH, container_xpath)))
 
     for user in users:
-        driver.typeahead_helper_v2(parent_selector, user)
+        driver.typeahead_helper(parent_selector, user)
         driver.wait.until(
             EC.element_to_be_clickable(add_button_locator)).click()
 
@@ -117,7 +117,7 @@ def add_students_to_contest(driver, users, *, tab_xpath, container_xpath,
             (By.XPATH, container_xpath)))
 
     for user in users:
-        driver.typeahead_helper_v2(parent_selector, user)
+        driver.typeahead_helper(parent_selector, user)
 
         with dismiss_status(driver):
             driver.wait.until(
@@ -482,7 +482,7 @@ def create_group(driver, group_title, description):
     return group_alias
 
 
-def add_identities_group(driver, group_alias):
+def add_identities_group(driver, group_alias) -> List[Identity]:
     '''Upload csv and add identities into the group'''
 
     driver.wait.until(

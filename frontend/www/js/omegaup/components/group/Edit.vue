@@ -76,6 +76,10 @@
           :group-alias="groupAlias"
           :countries="countries"
           :search-result-users="searchResultUsers"
+          :search-result-schools="searchResultSchools"
+          @update-search-result-schools="
+            (query) => $emit('update-search-result-schools', query)
+          "
           @add-member="
             (memberComponent, username) =>
               $emit('add-member', memberComponent, username)
@@ -85,27 +89,7 @@
               $emit('edit-identity', memberComponent, identity)
           "
           @edit-identity-member="
-            (
-              memberComponent,
-              originalUsername,
-              username,
-              name,
-              country,
-              state,
-              school,
-              schoolId,
-            ) =>
-              $emit(
-                'edit-identity-member',
-                memberComponent,
-                originalUsername,
-                username,
-                name,
-                country,
-                state,
-                school,
-                schoolId,
-              )
+            (request) => $emit('edit-identity-member', request)
           "
           @change-password-identity="
             (memberComponent, username) =>
@@ -203,6 +187,7 @@ export default class GroupEdit extends Vue {
   @Prop() scoreboards!: types.GroupScoreboard[];
   @Prop() userErrorRow!: null | string;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultSchools!: types.SchoolListItem[];
 
   T = T;
   ui = ui;

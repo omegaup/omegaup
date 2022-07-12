@@ -102,28 +102,39 @@ def _set_aws_rds_timeout(args: argparse.Namespace,
     del auth  # unused
     rds = boto3.client('rds')
 
-    if timeout is None:
-        rds.reset_db_parameter_group(
-            DBParameterGroupName=args.aws_rds_parameter_group_name,
-            ResetAllParameters=False,
-            Parameters=[
-                {
-                    'ApplyMethod': 'immediate',
-                    'ParameterName': 'wait_timeout',
-                },
-            ],
-        )
-    else:
-        rds.reset_db_parameter_group(
-            DBParameterGroupName=args.aws_rds_parameter_group_name,
-            Parameters=[
-                {
-                    'ApplyMethod': 'immediate',
-                    'ParameterName': 'wait_timeout',
-                    'ParameterValue': '10',
-                },
-            ],
-        )
+    retry_limit = 6
+    for i in range(retry_limit):
+        try:
+            if timeout is None:
+                rds.reset_db_parameter_group(
+                    DBParameterGroupName=args.aws_rds_parameter_group_name,
+                    ResetAllParameters=False,
+                    Parameters=[
+                        {
+                            'ApplyMethod': 'immediate',
+                            'ParameterName': 'wait_timeout',
+                        },
+                    ],
+                )
+            else:
+                rds.modify_db_parameter_group(
+                    DBParameterGroupName=args.aws_rds_parameter_group_name,
+                    Parameters=[
+                        {
+                            'ApplyMethod': 'immediate',
+                            'ParameterName': 'wait_timeout',
+                            'ParameterValue': '10',
+                        },
+                    ],
+                )
+            return
+        except Exception as e:  # pylint: disable=broad-except
+            if i == retry_limit - 1:
+                raise
+            logging.exception(
+                'Could not modify MySQL parameter group, retrying... %r',
+                type(e))
+            time.sleep(10)
 
 
 def _set_mysql_timeout(args: argparse.Namespace,
