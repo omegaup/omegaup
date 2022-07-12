@@ -340,11 +340,12 @@ class Users extends \OmegaUp\DAO\Base\Users {
           $user->user_id,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $randomString = \OmegaUp\SecurityTools::randomString(20);
         $sql = "
             UPDATE
                 `Identities`
             SET
-                `username` = 'deleted_user_',
+                `username` = 'deleted_user_{$randomString}',
                 `password` = NULL,
                 `name`= NULL,
                 `user_id`= NULL,
