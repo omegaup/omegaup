@@ -341,11 +341,11 @@ class Users extends \OmegaUp\DAO\Base\Users {
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $randomString = \OmegaUp\SecurityTools::randomString(20);
-        $sql = "
+        $sql = '
             UPDATE
                 `Identities`
             SET
-                `username` = 'deleted_user_{$randomString}',
+                `username` = ?,
                 `password` = NULL,
                 `name`= NULL,
                 `user_id`= NULL,
@@ -353,8 +353,9 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 `country_id`= NULL,
                 `current_identity_school_id`= NULL
             WHERE
-                `identity_id` = ?;";
+                `identity_id` = ?;';
         $params = [
+        "deleted_user_{$randomString}",
           $identity->identity_id,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -431,7 +432,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     AND `deletion_token` = ?;';
 
         /** @var int */
-        $count = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             [$user->user_id, $token]
         );
