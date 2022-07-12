@@ -344,7 +344,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
             UPDATE
                 `Identities`
             SET
-                `username` = 'deleted_user',
+                `username` = 'deleted_user_',
                 `password` = NULL,
                 `name`= NULL,
                 `user_id`= NULL,
