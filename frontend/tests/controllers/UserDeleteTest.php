@@ -138,6 +138,7 @@ class UserDeleteTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertNull($user);
         }
     }
+
     /**
      * Normal user tries to delete another's user account
      */

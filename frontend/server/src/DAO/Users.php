@@ -307,14 +307,17 @@ class Users extends \OmegaUp\DAO\Base\Users {
         /** @var null|array{username: string, verified: bool} */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql);
     }
-       /**
-       * Delete User
-       */
-    public static function deleteUserAndIndentityInformation(
-        \OmegaUp\DAO\VO\Users $user,
-        \OmegaUp\DAO\VO\Identities $identity
-    ): int {
-        $sql = '
+
+     /**
+     * Delete User
+     */
+    try {
+        \OmegaUp\DAO\DAO::transBegin();
+        public static function deleteUserAndIndentityInformation(
+            \OmegaUp\DAO\VO\Users $user,
+            \OmegaUp\DAO\VO\Identities $identity
+        ): int {
+            $sql = '
             UPDATE
                 `Users`
             SET
@@ -335,12 +338,12 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 is_private = 0
             WHERE
                 `user_id` = ?;';
-        $params = [
-          $user->user_id,
-        ];
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
-        $randomString = \OmegaUp\SecurityTools::randomString(20);
-        $sql = '
+            $params = [
+              $user->user_id,
+            ];
+            \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+            $randomString = \OmegaUp\SecurityTools::randomString(20);
+            $sql = '
             UPDATE
                 `Identities`
             SET
@@ -353,12 +356,17 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 `current_identity_school_id`= NULL
             WHERE
                 `identity_id` = ?;';
-        $params = [
-        "deleted_user_{$randomString}",
-          $identity->identity_id,
-        ];
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
-        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+            $params = [
+            "deleted_user_{$randomString}",
+              $identity->identity_id,
+            ];
+            \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+            return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+        }
+        \OmegaUp\DAO\DAO::transEnd();
+    } catch (\Exception $e) {
+        \OmegaUp\DAO\DAO::transRollback();
+        throw $e;
     }
 
    /**
