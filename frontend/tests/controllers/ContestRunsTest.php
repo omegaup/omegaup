@@ -73,6 +73,81 @@ class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * In a contest with score mode `max_per_group`, contestant submits runs and
+     * admin is able to get them calculating the score
+     */
+    public function testGetRunsForContestInMaxPerGroupMode() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get a contest scoreMode
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'scoreMode' => 'max_per_group',
+            ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Create our contestant
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create a run
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+
+        // Grade the run
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            runData: $runData,
+            points: 0,
+            verdict: 'PA',
+            submitDelay: null,
+            runGuid: null,
+            runId: null,
+            problemsetPoints: 100,
+            outputFilesContent: null,
+            problemsetScoreMode: 'max_per_group',
+            runScoreByGroups: [
+                [
+                    'group_name' => 'easy',
+                    'score' => 0.8,
+                    'verdict' => 'PA',
+                ],
+                [
+                    'group_name' => 'medium',
+                    'score' => 0.4,
+                    'verdict' => 'PA',
+                ],
+                [
+                    'group_name' => 'hard',
+                    'score' => 0.3,
+                    'verdict' => 'WA',
+                ],
+            ]
+        );
+
+        // Create request
+        $login = self::login($contestData['director']);
+
+        // Call API
+        $response = \OmegaUp\Controllers\Contest::apiRuns(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertEquals($response['runs'][0]['score'], 0.5);
+    }
+
+    /**
      * Contestant submits runs and admin is able to get them into the contest
      * details for typescript
      */
