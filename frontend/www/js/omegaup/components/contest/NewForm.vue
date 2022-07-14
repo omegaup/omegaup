@@ -253,20 +253,23 @@
             <p class="help-block">{{ T.contestNewFormScoreboardAtEndDesc }}</p>
           </div>
           <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormPartialScore }}</label>
+            <label>{{ T.contestNewFormScoreMode }}</label>
             <select
-              v-model="partialScore"
-              data-partial-points
+              v-model="currentScoreMode"
+              data-score-mode
               class="form-control"
             >
-              <option :value="true">
-                {{ T.wordsYes }}
+              <option :value="ScoreMode.Partial">
+                {{ T.contestNewFormScoreModePartial }}
               </option>
-              <option :value="false">
-                {{ T.wordsNo }}
+              <option :value="ScoreMode.AllOrNothing">
+                {{ T.contestNewFormScoreModeAllOrNothing }}
+              </option>
+              <option :value="ScoreMode.MaxPerGroup">
+                {{ T.contestNewFormScoreModeMaxPerGroup }}
               </option>
             </select>
-            <p class="help-block">{{ T.contestNewFormPartialScoreDesc }}</p>
+            <p class="help-block">{{ T.contestNewFormScoreModeDesc }}</p>
           </div>
         </div>
         <div class="row">
@@ -363,6 +366,12 @@ import DateTimePicker from '../DateTimePicker.vue';
 import Multiselect from 'vue-multiselect';
 import { types } from '../../api_types';
 
+export enum ScoreMode {
+  AllOrNothing = 'all_or_nothing',
+  Partial = 'partial',
+  MaxPerGroup = 'max_per_group',
+}
+
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
@@ -386,7 +395,7 @@ export default class NewForm extends Vue {
   @Prop({ default: 'no' }) initialRequestsUserInformation!: string;
   @Prop({ default: 100 }) initialScoreboard!: number;
   @Prop({ default: true }) initialShowScoreboardAfter!: boolean;
-  @Prop({ default: true }) initialPartialScore!: boolean;
+  @Prop({ default: ScoreMode.Partial }) scoreMode!: ScoreMode;
   @Prop({ default: false }) hasSubmissions!: boolean;
   @Prop() initialStartTime!: Date;
   @Prop() initialSubmissionsGap!: number;
@@ -399,6 +408,7 @@ export default class NewForm extends Vue {
   @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
 
   T = T;
+  ScoreMode = ScoreMode;
   alias = this.initialAlias;
   description = this.initialDescription;
   feedback = this.initialFeedback;
@@ -411,7 +421,7 @@ export default class NewForm extends Vue {
   requestsUserInformation = this.initialRequestsUserInformation;
   scoreboard = this.initialScoreboard;
   showScoreboardAfter = this.initialShowScoreboardAfter;
-  partialScore = this.initialPartialScore;
+  currentScoreMode = this.scoreMode;
   startTime = this.initialStartTime;
   submissionsGap = this.initialSubmissionsGap
     ? this.initialSubmissionsGap / 60
@@ -442,7 +452,7 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.partialScore = true;
+    this.scoreMode = ScoreMode.Partial;
   }
 
   fillPreIoi(): void {
@@ -457,7 +467,7 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.partialScore = true;
+    this.scoreMode = ScoreMode.Partial;
   }
 
   fillConacup(): void {
@@ -472,7 +482,7 @@ export default class NewForm extends Vue {
     this.penalty = 20;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.partialScore = true;
+    this.scoreMode = ScoreMode.Partial;
   }
 
   fillIcpc(): void {
@@ -494,7 +504,7 @@ export default class NewForm extends Vue {
     this.penalty = 20;
     this.penaltyType = 'contest_start';
     this.showScoreboardAfter = true;
-    this.partialScore = false;
+    this.scoreMode = ScoreMode.AllOrNothing;
   }
 
   onSubmit() {
@@ -523,7 +533,7 @@ export default class NewForm extends Vue {
       penalty_type: this.penaltyType,
       default_show_all_contestants_in_scoreboard: false,
       show_scoreboard_after: this.showScoreboardAfter,
-      partial_score: this.partialScore,
+      score_mode: this.currentScoreMode,
       needs_basic_information: this.needsBasicInformation,
       requests_user_information: this.requestsUserInformation,
       contest_for_teams: this.currentContestForTeams,

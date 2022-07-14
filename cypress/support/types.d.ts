@@ -30,7 +30,7 @@ export interface ContestOptions {
   startDate: Date;
   endDate: Date;
   showScoreboard?: boolean;
-  partialPoints?: boolean;
+  scoreMode: string;
   basicInformation?: boolean;
   requestParticipantInformation?: RequestParticipantInformation;
   admissionMode: AdmissionModeOptions;

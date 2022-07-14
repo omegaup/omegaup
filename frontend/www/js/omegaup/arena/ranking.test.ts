@@ -265,6 +265,7 @@ describe('ranking', () => {
         finish_time: new Date(),
         languages: 'py3',
         partial_score: false,
+        score_mode: 'all_or_nothing',
         penalty: 100,
         penalty_calc_policy: 'sum',
         penalty_type: 'none',
