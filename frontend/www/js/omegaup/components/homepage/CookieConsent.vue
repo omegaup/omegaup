@@ -13,10 +13,16 @@
     @clicked-postpone="$emit('cookie-clicked-postpone')"
     @removed-cookie="cookieRemovedCookie"
   >
+    <template #message>
+      {{ T.modalConsentCookiesDescription }}
+    </template>
+    <template #declineContent>{{ T.modalConsentCookiesDecline }}</template>
+    <template #acceptContent>{{ T.modalConsentCookiesAccept }}</template>
   </vue-cookie-accept-decline>
 </template>
 
 <script lang="ts">
+import T from '../../lang';
 import { Vue, Component } from 'vue-property-decorator';
 import VueCookieAcceptDecline from 'vue-cookie-accept-decline';
 import 'vue-cookie-accept-decline/dist/vue-cookie-accept-decline.css';
