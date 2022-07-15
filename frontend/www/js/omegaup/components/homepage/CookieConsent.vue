@@ -22,10 +22,10 @@
 </template>
 
 <script lang="ts">
-import T from '../../lang';
 import { Vue, Component } from 'vue-property-decorator';
 import VueCookieAcceptDecline from 'vue-cookie-accept-decline';
 import 'vue-cookie-accept-decline/dist/vue-cookie-accept-decline.css';
+import T from '../../lang';
 @Component({
   components: {
     'vue-cookie-accept-decline': VueCookieAcceptDecline,
