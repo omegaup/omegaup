@@ -191,10 +191,12 @@ export default class Homepage extends Vue {
   T = T;
   cookieClickedAccept() {
     console.log('Accept cookies button was clicked!!!');
+    this.$cookies.set('accept-cookies', true, -1);
   }
 
   cookieClickedDecline() {
     console.log('Decline cookies button was clicked!!!');
+    this.$cookies.set('accept-cookies', false, -1);
   }
 
   cookieClickedPostpone() {

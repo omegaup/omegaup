@@ -31,7 +31,8 @@ import T from '../../lang';
     'vue-cookie-accept-decline': VueCookieAcceptDecline,
   },
 })
-export default class Cookie extends Vue {
+export default class CookieConsent extends Vue {
+  T = T;
   cookieRemovedCookie = false;
 }
 </script>
