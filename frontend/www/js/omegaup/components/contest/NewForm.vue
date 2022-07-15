@@ -22,7 +22,7 @@
         >
           {{ T.contestNewFormConacupStyle }}
         </button>
-        <button class="btn btn-secondary" data-contest-cpc @click="fillIcpc">
+        <button class="btn btn-secondary" data-contest-icpc @click="fillIcpc">
           {{ T.contestNewFormICPCStyle }}
         </button>
       </div>
