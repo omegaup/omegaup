@@ -452,7 +452,7 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.scoreMode = ScoreMode.Partial;
+    this.currentScoreMode = ScoreMode.Partial;
   }
 
   fillPreIoi(): void {
@@ -467,7 +467,7 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.scoreMode = ScoreMode.Partial;
+    this.currentScoreMode = ScoreMode.Partial;
   }
 
   fillConacup(): void {
@@ -482,7 +482,7 @@ export default class NewForm extends Vue {
     this.penalty = 20;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.scoreMode = ScoreMode.Partial;
+    this.currentScoreMode = ScoreMode.Partial;
   }
 
   fillIcpc(): void {
@@ -504,7 +504,7 @@ export default class NewForm extends Vue {
     this.penalty = 20;
     this.penaltyType = 'contest_start';
     this.showScoreboardAfter = true;
-    this.scoreMode = ScoreMode.AllOrNothing;
+    this.currentScoreMode = ScoreMode.AllOrNothing;
   }
 
   onSubmit() {
