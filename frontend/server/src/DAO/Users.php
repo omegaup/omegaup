@@ -308,65 +308,65 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql);
     }
 
-     /**
-     * Delete User
-     */
-    try {
-        \OmegaUp\DAO\DAO::transBegin();
-        public static function deleteUserAndIndentityInformation(
-            \OmegaUp\DAO\VO\Users $user,
-            \OmegaUp\DAO\VO\Identities $identity
-        ): int {
+    /**
+    * Delete User
+    */
+    public static function deleteUserAndIndentityInformation(
+        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): int {
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
             $sql = '
-            UPDATE
-                `Users`
-            SET
-                `facebook_user_id` = NULL,
-                `git_token`= NULL,
-                `main_email_id`= NULL,
-                `main_identity_id`= NULL,
-                `has_learning_objective`= NULL,
-                `has_scholar_objective`= NULL,
-                `has_competitive_objective`= NULL,
-                `verification_id`= NULL,
-                `reset_digest`= NULL,
-                `reset_sent_at`= NULL,
-                `hide_problem_tags`= NULL,
-                `birth_date`= NULL,
-                verified = 0,
-                in_mailing_list = 0,
-                is_private = 0
-            WHERE
-                `user_id` = ?;';
+                UPDATE
+                    `Users`
+                SET
+                    `facebook_user_id` = NULL,
+                    `git_token`= NULL,
+                    `main_email_id`= NULL,
+                    `main_identity_id`= NULL,
+                    `has_learning_objective`= NULL,
+                    `has_scholar_objective`= NULL,
+                    `has_competitive_objective`= NULL,
+                    `verification_id`= NULL,
+                    `reset_digest`= NULL,
+                    `reset_sent_at`= NULL,
+                    `hide_problem_tags`= NULL,
+                    `birth_date`= NULL,
+                    verified = 0,
+                    in_mailing_list = 0,
+                    is_private = 0
+                WHERE
+                    `user_id` = ?;';
             $params = [
-              $user->user_id,
+                $user->user_id,
             ];
             \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
             $randomString = \OmegaUp\SecurityTools::randomString(20);
             $sql = '
-            UPDATE
-                `Identities`
-            SET
-                `username` = ?,
-                `password` = NULL,
-                `name`= NULL,
-                `user_id`= NULL,
-                `language_id`= NULL,
-                `country_id`= NULL,
-                `current_identity_school_id`= NULL
-            WHERE
-                `identity_id` = ?;';
+                UPDATE
+                    `Identities`
+                SET
+                    `username` = ?,
+                    `password` = NULL,
+                    `name`= NULL,
+                    `user_id`= NULL,
+                    `language_id`= NULL,
+                    `country_id`= NULL,
+                    `current_identity_school_id`= NULL
+                WHERE
+                    `identity_id` = ?;';
             $params = [
-            "deleted_user_{$randomString}",
-              $identity->identity_id,
+                "deleted_user_{$randomString}",
+                $identity->identity_id,
             ];
             \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
-            return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
-        \OmegaUp\DAO\DAO::transEnd();
-    } catch (\Exception $e) {
-        \OmegaUp\DAO\DAO::transRollback();
-        throw $e;
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
    /**
