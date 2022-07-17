@@ -1,16 +1,15 @@
-CREATE TABLE IF NOT EXISTS 'Plagiarisms' (
-    `plagiarism_id` int(11) NOT NULL AUTO_INCREMENT,
-    `contest_id` int(11) DEFAULT NULL,
-    `guid_1` char(32) NOT NULL COMMENT 'The submission id of first plagiarised code',
-    `guid_2` char(32) NOT NULL COMMENT 'The submission id of second plagiarised code',
-    `contents` TEXT NOT NULL COMMENT 'Stores the similarity scores of both the submissions and line number range of those scores',
-    PRIMARY KEY (`plag_id`),
-    FOREIGN KEY (`contest_id`),
-    FOREIGN KEY (`guid_1`), 
-    FOREIGN KEY (`guid_2`),
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Table of plagiarised codes.';
+CREATE TABLE IF NOT EXISTS `Plagiarisms` (
+    `plagiarisms_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada conjunto de plagio',
+    `contest_id` int(11) NOT NULL,
+    `guid_1` char(32) NOT NULL COMMENT 'La identificación de envío del primer código plagiado',
+    `guid_2` char(32) NOT NULL COMMENT 'La identificación de envío del segundo código plagiado',
+    `contents` TEXT NOT NULL COMMENT 'Almacena los puntajes de similitud de los envíos y el rango de números de línea de esos puntajes',
+    PRIMARY KEY (`plagiarisms_id`),
+    KEY (`contest_id`),
+    KEY (`guid_1`),
+    KEY (`guid_2`),
+    CONSTRAINT `fk_pci_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT `fk_pg_guid_1` FOREIGN KEY (`guid_1`) REFERENCES `Runs` (`guid`) ON DELETE NO ACTION ON UPDATE NO ACTION, 
+    CONSTRAINT `fk_pg_guid_2` FOREIGN KEY (`guid_2`) REFERENCES `Runs` (`guid`) ON DELETE NO ACTION ON UPDATE NO ACTION
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='La lista de Códigos Plagiados para un concurso';
 
-ALTER TABLE `Plagiarisms`
-    ADD CONSTRAINT `fk_ppp_contest_id` FOREIGN KEY (`contest_id`) REFRENCES `Plagiarisms` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-    ADD CONSTRAINT `fk_ppp_guid_1` FOREIGN KEY (`guid_1`) REFRENCES `Plagiarisms` (`guid_1`) ON DELETE NO ACTION ON UPDATE NO ACTION, 
-    ADD CONSTRAINT `fk_ppp_guid_2` FOREIGN KEY (`guid_2`) REFRENCES `Plagiarisms` (`guid_2`) ON DELETE NO ACTION ON UPDATE NO ACTION, 
