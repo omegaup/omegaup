@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS `Plagiarisms` (
     CONSTRAINT `fk_pc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     CONSTRAINT `fk_ps_submission_id_1` FOREIGN KEY (`submission_id_1`) REFERENCES `Submissions` (`submission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION, 
     CONSTRAINT `fk_ps_submission_id_2` FOREIGN KEY (`submission_id_2`) REFERENCES `Submissions` (`submission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION, 
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='La lista de Códigos Plagiados para un concurso';
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Los casos potenciales de plagio encontrados por el algoritmo de detección.';
 
