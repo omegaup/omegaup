@@ -21,7 +21,6 @@ export namespace dao {
     penalty?: number;
     penalty_calc_policy?: string;
     penalty_type?: string;
-    plagiarism_threshold?: boolean;
     points_decay_factor?: number;
     problemset_id?: number;
     recommended?: boolean;
@@ -56,7 +55,6 @@ export namespace dao {
 
   export interface Users {
     birth_date?: string;
-    deletion_token?: string;
     facebook_user_id?: string;
     git_token?: string;
     has_competitive_objective?: boolean;
