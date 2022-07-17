@@ -44,7 +44,6 @@ abstract class Users {
                 `birth_date` = ?,
                 `verified` = ?,
                 `verification_id` = ?,
-                `deletion_token` = ?,
                 `reset_digest` = ?,
                 `reset_sent_at` = ?,
                 `hide_problem_tags` = ?,
@@ -92,7 +91,6 @@ abstract class Users {
             $Users->birth_date,
             intval($Users->verified),
             $Users->verification_id,
-            $Users->deletion_token,
             $Users->reset_digest,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Users->reset_sent_at
@@ -139,7 +137,6 @@ abstract class Users {
                 `Users`.`birth_date`,
                 `Users`.`verified`,
                 `Users`.`verification_id`,
-                `Users`.`deletion_token`,
                 `Users`.`reset_digest`,
                 `Users`.`reset_sent_at`,
                 `Users`.`hide_problem_tags`,
@@ -269,7 +266,6 @@ abstract class Users {
                 `Users`.`birth_date`,
                 `Users`.`verified`,
                 `Users`.`verification_id`,
-                `Users`.`deletion_token`,
                 `Users`.`reset_digest`,
                 `Users`.`reset_sent_at`,
                 `Users`.`hide_problem_tags`,
@@ -338,7 +334,6 @@ abstract class Users {
                     `birth_date`,
                     `verified`,
                     `verification_id`,
-                    `deletion_token`,
                     `reset_digest`,
                     `reset_sent_at`,
                     `hide_problem_tags`,
@@ -346,7 +341,6 @@ abstract class Users {
                     `is_private`,
                     `preferred_language`
                 ) VALUES (
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -403,7 +397,6 @@ abstract class Users {
             $Users->birth_date,
             intval($Users->verified),
             $Users->verification_id,
-            $Users->deletion_token,
             $Users->reset_digest,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Users->reset_sent_at
