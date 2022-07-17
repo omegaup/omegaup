@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `Plagiarisms` (
-    `plagiarisms_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada conjunto de plagio',
+    `plagiarism_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada potencial caso de plagio',
     `contest_id` int(11) NOT NULL,
     `guid_1` char(32) NOT NULL COMMENT 'La identificación de envío del primer código plagiado',
     `guid_2` char(32) NOT NULL COMMENT 'La identificación de envío del segundo código plagiado',
