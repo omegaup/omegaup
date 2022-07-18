@@ -29,6 +29,7 @@ class Users extends \OmegaUp\DAO\VO\VO {
         'birth_date' => true,
         'verified' => true,
         'verification_id' => true,
+        'deletion_token' => true,
         'reset_digest' => true,
         'reset_sent_at' => true,
         'hide_problem_tags' => true,
@@ -111,6 +112,11 @@ class Users extends \OmegaUp\DAO\VO\VO {
             $this->verification_id = is_scalar(
                 $data['verification_id']
             ) ? strval($data['verification_id']) : '';
+        }
+        if (isset($data['deletion_token'])) {
+            $this->deletion_token = is_scalar(
+                $data['deletion_token']
+            ) ? strval($data['deletion_token']) : '';
         }
         if (isset($data['reset_digest'])) {
             $this->reset_digest = is_scalar(
@@ -242,6 +248,13 @@ class Users extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $verification_id = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $deletion_token = null;
 
     /**
      * [Campo no documentado]
