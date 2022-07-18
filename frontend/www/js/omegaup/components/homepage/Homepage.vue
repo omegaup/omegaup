@@ -190,17 +190,17 @@ export default class Homepage extends Vue {
 
   T = T;
   cookieClickedAccept() {
-    console.log('Accept cookies button was clicked!!!');
+    // TODO: make an API to send the response to the server
     this.$cookies.set('accept-cookies', true, -1);
   }
 
   cookieClickedDecline() {
-    console.log('Decline cookies button was clicked!!!');
+    // TODO: make an API to send the response to the server
     this.$cookies.set('accept-cookies', false, -1);
   }
 
   cookieClickedPostpone() {
-    console.log('Postpone modal button was clicked!!!');
+    // TODO: make an API to send the response to the server
   }
 }
 </script>
