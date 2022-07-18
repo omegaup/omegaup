@@ -123,7 +123,8 @@
     "vuex-class": "^0.3.2",
     "webpack": "^5.8",
     "webpack-cli": "^4.2",
-    "wrapper-webpack-plugin": "^2.1"
+    "wrapper-webpack-plugin": "^2.1",
+    "vue-cookie-accept-decline": "5.4.0"
   },
   "scripts": {
     "test": "jest 'frontend/www/js/.*test\\.ts$'",
@@ -138,7 +139,5 @@
     "build-development-frontend": "cross-env webpack --config-name=frontend --mode=development",
     "refactor": "cross-env ./stuff/refactor.js"
   },
-  "dependencies": {
-    "vue-cookie-accept-decline": "5.4.0"
-  }
+  "dependencies": {}
 }
