@@ -3288,7 +3288,7 @@ class User extends \OmegaUp\Controllers\Controller {
         self::$log->info(
             "User {$identity->username} is requesting delete their account."
         );
-        $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id); 
+        $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
         $subject = \OmegaUp\Translations::getInstance()->get(
             'accountDeletionEmailSubject'
         );
