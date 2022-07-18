@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS `Plagiarisms` (
     `plagiarism_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada potencial caso de plagio',
     `contest_id` int(11) NOT NULL,
-    `submission_id_1` int(11) NOT NULL COMMENT 'El identificador del envío del primer código plagiado',
-    `submission_id_2` int(11) NOT NULL COMMENT 'El identificador del envío del segundo código plagiado',
+    `submission_id_1` int(11) NOT NULL COMMENT 'El identificador del envío del primer código plagiado`,
+    `submission_id_2` int(11) NOT NULL COMMENT 'El identificador del envío del segundo código plagiado`,
     `score_a` tinyint(1) NOT NULL COMMENT `porcentaje de plagio encontrado usando copydetect en el envío 1`,
     `score_b` tinyint(1) NOT NULL COMMENT `porcentaje de plagio encontrado usando copydetect en el envío 2`, 
     `contents` TEXT NOT NULL COMMENT 'Almacena los puntajes de similitud de los envíos y el rango de números de línea de esos puntajes',
