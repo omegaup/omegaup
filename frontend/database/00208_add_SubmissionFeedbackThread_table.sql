@@ -7,7 +7,7 @@ CREATE TABLE `Submission_Feedback_Thread` (
   `contents` text NOT NULL,
   PRIMARY KEY (`submission_feedback_thread_id`),
   CONSTRAINT `fk_sfs_submission_feedback_id` FOREIGN KEY (`submission_feedback_id`) REFERENCES `Submission_Feedback` (`submission_feedback_id`),
-  CONSTRAINT `fk_sfi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
+  CONSTRAINT `fk_sfti_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
 ) COMMENT="Darle seguimiento a un comentario";
 
 ALTER TABLE `Submission_Feedback`
