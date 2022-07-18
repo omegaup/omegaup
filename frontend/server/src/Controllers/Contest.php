@@ -5121,6 +5121,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $allRuns = [];
         foreach ($runs as $run) {
+            unset($run['run_id']);
             if ($scoreMode === 'partial' || $run['score'] == 1) {
                 $run['contest_score'] = round(
                     floatval(
@@ -5129,17 +5130,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     2
                 );
                 $run['score'] = round(floatval($run['score']), 4);
-            } elseif ($scoreMode === 'max_per_group') {
-                $score = \OmegaUp\DAO\Runs::getScoreForMaxPerGroup(
-                    $run['run_id']
-                );
-                $run['contest_score'] = $score;
-                $run['score'] = $score;
             } elseif ($scoreMode === 'all_or_nothing') {
                 $run['contest_score'] = 0;
                 $run['score'] = 0;
             }
-            unset($run['run_id']);
             $allRuns[] = $run;
         }
 
