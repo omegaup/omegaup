@@ -3279,6 +3279,7 @@ class User extends \OmegaUp\Controllers\Controller {
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
+        $identity = self::resolveTargetIdentity($r);
         $user = self::resolveTargetUser($r);
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
