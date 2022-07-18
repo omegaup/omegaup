@@ -3285,7 +3285,23 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         $token = \OmegaUp\SecurityTools::randomString(50);
         \OmegaUp\DAO\Users::generateDeletionToken($user, $token);
+        self::$log->info(
+            "User {$identity->username} is requesting delete their account."
+        );
 
+        $subject = \OmegaUp\Translations::getInstance()->get(
+            'accountDeletionEmailSubject'
+        );
+        $body = \OmegaUp\ApiUtils::formatString(
+            \OmegaUp\Translations::getInstance()->get(
+                'accountDeletionEmailBody'
+            ),
+            [
+                'verification_id' => strval($username->verification_id),
+            ]
+        );
+
+        \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
         return [
             'token' => $token,
         ];
