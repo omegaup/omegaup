@@ -7028,9 +7028,9 @@ mock-socket@^9.0.3:
     url-parse "^1.4.4"
 
 moment@>=2.14.0:
-  version "2.29.2"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.2.tgz#00910c60b20843bcba52d37d58c628b47b1f20e4"
-  integrity sha512-UgzG4rvxYpN15jgCmVJwac49h9ly9NurikMWGPdVxm8GZD6XjkKPxDTjQQ43gtGgnV3X0cAyWDdP2Wexoquifg==
+  version "2.29.4"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
+  integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
 
 monaco-editor-webpack-plugin@^2.1:
   version "2.1.0"
@@ -9692,6 +9692,11 @@ vue-slider-component@^3.0.25:
   integrity sha512-wT4gC7cWUXDp96Gft1j5Jkapb4rwjnPErZIfJTeJWz85zqXQOVyD7s5LGa9OY8W/qi9VpgjANe3OAaL8HUzERg==
   dependencies:
     vue-property-decorator "^8.0.0"
+
+vue-spinner@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/vue-spinner/-/vue-spinner-1.0.4.tgz#0e794d9d93acb23b5b6564042157a531e7ce413b"
+  integrity sha512-GNG2F+8BLX201JT/jUX+84Gsi3ZteVQwt9K7mues3ts9FcQ95dGn7uu6a5ndSxdYYUEzfh1KngZiOE0u+l4itA==
 
 vue-style-loader@^4.1.0:
   version "4.1.2"
