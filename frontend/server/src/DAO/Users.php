@@ -353,7 +353,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     `user_id`= NULL,
                     `language_id`= NULL,
                     `country_id`= NULL,
-                    `tate_id`= NULL
+                    `state_id`= NULL
                 WHERE
                     `identity_id` = ?;';
             $params = [
