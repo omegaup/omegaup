@@ -3281,7 +3281,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         $identity = self::resolveTargetIdentity($r);
         $user = self::resolveTargetUser($r);
-        if (is_null($user)) {
+        if (is_null($user) || is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         $token = \OmegaUp\SecurityTools::randomString(50);
@@ -3289,7 +3289,18 @@ class User extends \OmegaUp\Controllers\Controller {
         self::$log->info(
             "User {$identity->username} is requesting delete their account."
         );
+        if (is_null($user->main_email_id)) {
+            return [
+                'token' => $token,
+            ];
+        }
         $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
+        
+        if (is_null($email)) {
+            return [
+                'token' => $token,
+            ];
+        }
         $subject = \OmegaUp\Translations::getInstance()->get(
             'accountDeletionEmailSubject'
         );
@@ -3298,7 +3309,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'accountDeletionEmailBody'
             ),
             [
-                'verification_id' => strval($username->verification_id),
+                'username' => $identity->username,,
             ]
         );
 
