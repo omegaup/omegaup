@@ -533,6 +533,25 @@ CREATE TABLE `Permissions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Plagiarisms` (
+  `plagiarism_id` int NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada potencial caso de plagio',
+  `contest_id` int NOT NULL,
+  `submission_id_1` int NOT NULL COMMENT 'El identificador del envío del primer código plagiado',
+  `submission_id_2` int NOT NULL COMMENT 'El identificador del envío del segundo código plagiado',
+  `score_a` tinyint(1) NOT NULL COMMENT 'porcentaje de plagio encontrado usando copydetect en el envío 1',
+  `score_b` tinyint(1) NOT NULL COMMENT 'porcentaje de plagio encontrado usando copydetect en el envío 2',
+  `contents` text NOT NULL COMMENT 'Almacena los puntajes de similitud de los envíos y el rango de números de línea de esos puntajes',
+  PRIMARY KEY (`plagiarism_id`),
+  KEY `fk_pc_contest_id` (`contest_id`),
+  KEY `fk_ps_submission_id_1` (`submission_id_1`),
+  KEY `fk_ps_submission_id_2` (`submission_id_2`),
+  CONSTRAINT `fk_pc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`),
+  CONSTRAINT `fk_ps_submission_id_1` FOREIGN KEY (`submission_id_1`) REFERENCES `Submissions` (`submission_id`),
+  CONSTRAINT `fk_ps_submission_id_2` FOREIGN KEY (`submission_id_2`) REFERENCES `Submissions` (`submission_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Los casos potenciales de plagio encontrados por el algoritmo de detección.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `PrivacyStatement_Consent_Log` (
   `privacystatement_consent_id` int NOT NULL AUTO_INCREMENT COMMENT 'Id del consentimiento de privacidad almacenado en el log',
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
