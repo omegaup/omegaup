@@ -98,10 +98,17 @@ class Scoreboard {
                 $this->params->problemset_id
             );
 
-        $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
-            $this->params->problemset_id,
-            $this->params->only_ac
-        );
+        if ($this->params->score_mode === 'max_per_group') {
+            // The way to calculate the score is different in this mode
+            $contestRuns = \OmegaUp\DAO\RunsGroups::getProblemsetRunsGroups(
+                $this->params->problemset_id
+            );
+        } else {
+            $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
+                $this->params->problemset_id,
+                $this->params->only_ac
+            );
+        }
 
         /** @var array<int, array{order: int, alias: string}> */
         $problemMapping = [];

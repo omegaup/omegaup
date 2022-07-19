@@ -1188,4 +1188,144 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(2, $contests);
     }
+
+    /**
+     * A PHPUnit data provider for the contest with max_per_group mode.
+     *
+     * @return array{0: float, 1: list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}>}
+     */
+    public function runsMappingProvider(): array {
+        return [
+            [
+                80.0,
+                [
+                    [
+                        'total' => 0.4,
+                        'points_per_group' => [
+                            ['group_name' => 'easy', 'score' => 0.8, 'verdict' => 'PA'],
+                            ['group_name' => 'medium', 'score' => 0.4, 'verdict' => 'PA'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.7,
+                        'points_per_group' => [
+                            ['group_name' => 'easy', 'score' => 0.8, 'verdict' => 'PA'],
+                            ['group_name' => 'medium', 'score' => 0.3, 'verdict' => 'PA'],
+                            ['group_name' => 'hard', 'score' => 1.0,'verdict' => 'AC'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.4,
+                        'points_per_group' => [
+                            ['group_name' => 'easy', 'score' => 0.2, 'verdict' => 'PA'],
+                            ['group_name' => 'medium', 'score' => 0.6, 'verdict' => 'PA'],
+                            ['group_name' => 'hard', 'score' => 0.4,'verdict' => 'PA'],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                100.0,
+                [
+                    [
+                        'total' => 0.5,
+                        'points_per_group' => [
+                            ['group_name' => 'easy', 'score' => 1.0, 'verdict' => 'AC'],
+                            ['group_name' => 'medium', 'score' => 0.5, 'verdict' => 'PA'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.7,
+                        'points_per_group' => [
+                            ['group_name' => 'easy', 'score' => 0.8, 'verdict' => 'PA'],
+                            ['group_name' => 'medium', 'score' => 0.3, 'verdict' => 'PA'],
+                            ['group_name' => 'hard', 'score' => 1.0,'verdict' => 'AC'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.6,
+                        'points_per_group' => [
+                            ['group_name' => 'easy', 'score' => 0.4, 'verdict' => 'PA'],
+                            ['group_name' => 'medium', 'score' => 1.0, 'verdict' => 'AC'],
+                            ['group_name' => 'hard', 'score' => 0.4,'verdict' => 'PA'],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}> $runsMapping
+     *
+     * @dataProvider runsMappingProvider
+     */
+    public function testScoreboardForContestInMaxPerGroupMode(
+        float $expectedScore,
+        array $runsMapping
+    ) {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get a contest scoreMode
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'scoreMode' => 'max_per_group',
+            ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Create our contestant
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $time = \OmegaUp\Time::get();
+
+        // Create and grade some runs
+        foreach ($runsMapping as $run) {
+            \OmegaUp\Time::setTimeForTesting($time + (2 * 60));
+
+            $runData = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $identity
+            );
+
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                runData: $runData,
+                points: $run['total'],
+                verdict: 'PA',
+                submitDelay: null,
+                runGuid: null,
+                runId: null,
+                problemsetPoints: 100,
+                outputFilesContent: null,
+                problemsetScoreMode: 'max_per_group',
+                runScoreByGroups: $run['points_per_group']
+            );
+            $time = \OmegaUp\Time::get();
+        }
+
+        // Create request
+        $login = self::login($contestData['director']);
+
+        // Call API
+        $response = \OmegaUp\Controllers\Contest::apiScoreboard(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        )['ranking'];
+
+        $this->assertEquals(
+            $response[0]['problems'][0]['points'],
+            $expectedScore
+        );
+    }
 }
