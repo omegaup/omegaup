@@ -13,13 +13,13 @@ namespace OmegaUp\DAO;
  */
 class RunsGroups extends \OmegaUp\DAO\Base\RunsGroups {
     /**
-     * @return list<array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: \OmegaUp\Timestamp, submit_delay: int, guid: string}>
+     * @return list<array{contest_score: float|null, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string}>
      */
     final public static function getProblemsetRunsGroups(
         int $problemsetId
     ): array {
         $sql = "SELECT
-                    AVG(mspg.score) AS score,
+                    IFNULL(AVG(mspg.score), 0.0) AS score,
                     AVG(mspg.score) * pp.points AS contest_score,
                     r.penalty,
                     s.problem_id,
