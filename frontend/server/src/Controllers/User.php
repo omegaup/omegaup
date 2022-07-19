@@ -3309,7 +3309,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'accountDeletionEmailBody'
             ),
             [
-                'username' => $identity->username,,
+                'username' => $identity->username,
             ]
         );
 
