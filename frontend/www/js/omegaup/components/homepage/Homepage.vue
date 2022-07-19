@@ -166,6 +166,8 @@ import school_Rank from '../schools/Rank.vue';
 import user_Rank from '../user/Rank.vue';
 import homepage_Sponsors from './Sponsors.vue';
 import homepage_Cookie from './CookieConsent.vue';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 @Component({
   components: {
