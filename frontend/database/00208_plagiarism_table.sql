@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `Plagiarisms` (
     `submission_id_2` int(11) NOT NULL COMMENT 'El identificador del envío del segundo código plagiado',
     `score_1` tinyint(1) NOT NULL COMMENT 'porcentaje de plagio encontrado usando copydetect en el envío 1',
     `score_2` tinyint(1) NOT NULL COMMENT 'porcentaje de plagio encontrado usando copydetect en el envío 2',
-    `contents` TEXT NOT NULL COMMENT 'Almacena los puntajes de similitud de los envíos y el rango de números de línea de esos puntajes',
+    `contents` TEXT NOT NULL COMMENT 'Almacena los rangos de números de línea de las similitudes',
     PRIMARY KEY (`plagiarism_id`),
     CONSTRAINT `fk_pc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     CONSTRAINT `fk_ps_submission_id_1` FOREIGN KEY (`submission_id_1`) REFERENCES `Submissions` (`submission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
