@@ -3302,11 +3302,11 @@ class User extends \OmegaUp\Controllers\Controller {
             ];
         }
         $subject = \OmegaUp\Translations::getInstance()->get(
-            'accountDeletionEmailSubject'
+            'accountDeletionRequestEmailSubject'
         );
         $body = \OmegaUp\ApiUtils::formatString(
             \OmegaUp\Translations::getInstance()->get(
-                'accountDeletionEmailBody'
+                'accountDeletionRequestEmailBody'
             ),
             [
                 'username' => $identity->username,
