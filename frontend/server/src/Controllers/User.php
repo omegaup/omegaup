@@ -3295,7 +3295,7 @@ class User extends \OmegaUp\Controllers\Controller {
             ];
         }
         $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
-        
+
         if (is_null($email)) {
             return [
                 'token' => $token,
