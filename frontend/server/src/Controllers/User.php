@@ -3356,6 +3356,37 @@ class User extends \OmegaUp\Controllers\Controller {
                 'token'
             );
         }
+        self::$log->info(
+            "User {$identity->username} deleted their account successfully."
+        );
+        if (is_null($user->main_email_id)) {
+            return [
+                'token' => $token,
+            ];
+        }
+        $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
+
+        if (is_null($email)) {
+            return [
+                'token' => $token,
+            ];
+        }
+        $subject = \OmegaUp\Translations::getInstance()->get(
+            'accountDeletionConfirmEmailSubject'
+        );
+        $body = \OmegaUp\ApiUtils::formatString(
+            \OmegaUp\Translations::getInstance()->get(
+                'accountDeletionConfirmEmailBody'
+            ),
+            [
+                'username' => $identity->username,
+            ]
+        );
+
+        \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
+        return [
+            'token' => $token,
+        ];
         \OmegaUp\DAO\Users::deleteUserAndIndentityInformation($user, $identity);
 
         return [
