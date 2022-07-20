@@ -411,17 +411,25 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     public static function getFeedbackBySubmission(
         \OmegaUp\DAO\VO\Submissions $submission
     ): ?\OmegaUp\DAO\VO\SubmissionFeedback {
-        $sql = '
-            SELECT
-                sf.*
-            FROM
-                Submission_Feedback sf
-            INNER JOIN
-                Submissions s ON s.submission_id = sf.submission_id
-            WHERE
-                s.submission_id = ?
-            FOR UPDATE;
-        ';
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "sf.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\SubmissionFeedback::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "SELECT
+                    {$fields}
+                FROM
+                    Submission_Feedback sf
+                INNER JOIN
+                    Submissions s ON s.submission_id = sf.submission_id
+                WHERE
+                    s.submission_id = ?
+                FOR UPDATE;
+        ";
 
         /** @var array{date: \OmegaUp\Timestamp, feedback: string, identity_id: int, submission_feedback_id: int, submission_id: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
