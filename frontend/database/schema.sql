@@ -1002,7 +1002,7 @@ CREATE TABLE `Submission_Feedback_Thread` (
   KEY `fk_sfti_identity_id` (`identity_id`),
   CONSTRAINT `fk_sfs_submission_feedback_id` FOREIGN KEY (`submission_feedback_id`) REFERENCES `Submission_Feedback` (`submission_feedback_id`),
   CONSTRAINT `fk_sfti_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='Darle seguimiento a un comentario';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Darle seguimiento a un comentario';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
