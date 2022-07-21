@@ -36,3 +36,20 @@ export default class CookieConsent extends Vue {
   cookieRemovedCookie = false;
 }
 </script>
+
+<style lang="scss">
+.cookie {
+  // Floating
+  &__floating {
+    @media (min-width: 768px) {
+      max-width: 600px;
+    }
+    &__buttons {
+      &__button {
+        white-space: break-spaces;
+        width: 50% !important;
+      }
+    }
+  }
+}
+</style>
