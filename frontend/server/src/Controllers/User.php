@@ -3296,7 +3296,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
-        if (is_null($email)) {
+        if (is_null($email) || is_null($email->email)) {
             return [
                 'token' => $token,
             ];
@@ -3361,14 +3361,14 @@ class User extends \OmegaUp\Controllers\Controller {
         );
         if (is_null($user->main_email_id)) {
             return [
-                'token' => $token,
+                'status' => 'ok',
             ];
         }
         $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
-        if (is_null($email)) {
+        if (is_null($email) || is_null($email->email)) {
             return [
-                'token' => $token,
+                'status' => 'ok',
             ];
         }
         $subject = \OmegaUp\Translations::getInstance()->get(
@@ -3383,11 +3383,8 @@ class User extends \OmegaUp\Controllers\Controller {
             ]
         );
 
-        \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
-        return [
-            'token' => $token,
-        ];
         \OmegaUp\DAO\Users::deleteUserAndIndentityInformation($user, $identity);
+        \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
 
         return [
             'status' => 'ok',
