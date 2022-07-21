@@ -1,6 +1,6 @@
 aboutToStart = "Estás a punto de iniciar el concurso. Una vez que hagas clic en entrar, tu tiempo iniciará."
 acceptPrivacyPolicy = "He leído y acepto la [Política de Uso y Privacidad](http://blog.omegaup.com/privacy-policy/) del sitio, así como el [Código de Conducta](https://blog.omegaup.com/codigo-de-conducta-en-omegaup/)."
-accountDeletionConfirmEmailBody = "El usuario %(username) confirmado para eliminar su cuenta."
+accountDeletionConfirmEmailBody = "El usuario %(username) confirmó eliminar su cuenta."
 accountDeletionConfirmEmailSubject = "borrar cuenta confimar"
 accountDeletionRequestEmailBody = "El usuario %(username) ha solicitado borrar su cuenta."
 accountDeletionRequestEmailSubject = "Solicitud de eliminación de cuenta"
