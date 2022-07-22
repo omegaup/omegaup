@@ -58,6 +58,14 @@
                 autocomplete="new-password"
               />
             </div>
+            <div class="form-group">
+              <label>{{ T.userEditBirthDate }}</label>
+              <omegaup-datepicker
+                v-model="birthDate"
+                :required="false"
+                :max="new Date()"
+              ></omegaup-datepicker>
+            </div>
           </div>
         </div>
 
@@ -109,10 +117,12 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import omegaup_Markdown from '../Markdown.vue';
 import T from '../../lang';
+import DatePicker from '../DatePicker.vue';
 
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-datepicker': DatePicker,
   },
 })
 export default class Signup extends Vue {
