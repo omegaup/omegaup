@@ -39,7 +39,7 @@ export default class CookieConsent extends Vue {
 
 <style lang="scss">
 .cookie {
-  // Floating
+  // Our translation strings need a lot more horizontal space.
   &__floating {
     @media (min-width: 768px) {
       max-width: 600px;
