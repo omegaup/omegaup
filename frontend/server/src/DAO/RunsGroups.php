@@ -19,8 +19,8 @@ class RunsGroups extends \OmegaUp\DAO\Base\RunsGroups {
         int $problemsetId
     ): array {
         $sql = "SELECT
-                    IFNULL(AVG(mspg.score), 0.0) AS score,
-                    AVG(mspg.score) * pp.points AS contest_score,
+                    IFNULL(SUM(mspg.score), 0.0) AS score,
+                    SUM(mspg.score) * pp.points AS contest_score,
                     r.penalty,
                     s.problem_id,
                     s.identity_id,

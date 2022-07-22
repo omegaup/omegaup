@@ -1202,25 +1202,25 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                     [
                         'total' => 0.4,
                         'points_per_group' => [
-                            ['group_name' => 'easy', 'score' => 0.8, 'verdict' => 'PA'],
-                            ['group_name' => 'medium', 'score' => 0.4, 'verdict' => 'PA'],
+                            ['group_name' => 'easy', 'score' => (0.8 / 3), 'verdict' => 'PA'],
+                            ['group_name' => 'medium', 'score' => (0.4 / 3), 'verdict' => 'PA'],
                             ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
                         ],
                     ],
                     [
                         'total' => 0.7,
                         'points_per_group' => [
-                            ['group_name' => 'easy', 'score' => 0.8, 'verdict' => 'PA'],
-                            ['group_name' => 'medium', 'score' => 0.3, 'verdict' => 'PA'],
-                            ['group_name' => 'hard', 'score' => 1.0,'verdict' => 'AC'],
+                            ['group_name' => 'easy', 'score' => (0.8 / 3), 'verdict' => 'PA'],
+                            ['group_name' => 'medium', 'score' => (0.3 / 3), 'verdict' => 'PA'],
+                            ['group_name' => 'hard', 'score' => (1.0 / 3),'verdict' => 'AC'],
                         ],
                     ],
                     [
                         'total' => 0.4,
                         'points_per_group' => [
-                            ['group_name' => 'easy', 'score' => 0.2, 'verdict' => 'PA'],
-                            ['group_name' => 'medium', 'score' => 0.6, 'verdict' => 'PA'],
-                            ['group_name' => 'hard', 'score' => 0.4,'verdict' => 'PA'],
+                            ['group_name' => 'easy', 'score' => (0.2 / 3), 'verdict' => 'PA'],
+                            ['group_name' => 'medium', 'score' => (0.6 / 3), 'verdict' => 'PA'],
+                            ['group_name' => 'hard', 'score' => (0.4 / 3),'verdict' => 'PA'],
                         ],
                     ],
                 ],
@@ -1231,25 +1231,25 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                     [
                         'total' => 0.5,
                         'points_per_group' => [
-                            ['group_name' => 'easy', 'score' => 1.0, 'verdict' => 'AC'],
-                            ['group_name' => 'medium', 'score' => 0.5, 'verdict' => 'PA'],
+                            ['group_name' => 'easy', 'score' => (1.0 / 3), 'verdict' => 'AC'],
+                            ['group_name' => 'medium', 'score' => (0.5 / 3), 'verdict' => 'PA'],
                             ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
                         ],
                     ],
                     [
                         'total' => 0.7,
                         'points_per_group' => [
-                            ['group_name' => 'easy', 'score' => 0.8, 'verdict' => 'PA'],
-                            ['group_name' => 'medium', 'score' => 0.3, 'verdict' => 'PA'],
-                            ['group_name' => 'hard', 'score' => 1.0,'verdict' => 'AC'],
+                            ['group_name' => 'easy', 'score' => (0.8 / 3), 'verdict' => 'PA'],
+                            ['group_name' => 'medium', 'score' => (0.3 / 3), 'verdict' => 'PA'],
+                            ['group_name' => 'hard', 'score' => (1.0 / 3),'verdict' => 'AC'],
                         ],
                     ],
                     [
                         'total' => 0.6,
                         'points_per_group' => [
-                            ['group_name' => 'easy', 'score' => 0.4, 'verdict' => 'PA'],
-                            ['group_name' => 'medium', 'score' => 1.0, 'verdict' => 'AC'],
-                            ['group_name' => 'hard', 'score' => 0.4,'verdict' => 'PA'],
+                            ['group_name' => 'easy', 'score' => (0.4 / 3), 'verdict' => 'PA'],
+                            ['group_name' => 'medium', 'score' => (1.0 / 3), 'verdict' => 'AC'],
+                            ['group_name' => 'hard', 'score' => (0.4 / 3),'verdict' => 'PA'],
                         ],
                     ],
                 ],
