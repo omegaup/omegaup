@@ -71,7 +71,7 @@
     {% if OMEGAUP_GA_TRACK == 1 %}
       <script type="text/javascript" src="{% versionHash '/js/analytics.js' %}"></script>
     {% endif %}
-    {% if not headerPayload.inContest and not hideFooterAndHeader %}
+    {% if not headerPayload.inContest and not hideFooterAndHeader and not hideFooter %}
     <div id="common-footer"></div>
     {% jsInclude 'common_footer' omitRuntime %}
     {% endif %}

@@ -734,6 +734,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleCourseScoreboard: "Course scoreboard",
   omegaupTitleCourseStatistics: "Course statistics",
   omegaupTitleCourses: "Coursos",
+  omegaupTitleGraderEphemeral: "omegaUp problemless grader",
   omegaupTitleGroupScoreboardDetails: "Group scoreboard details",
   omegaupTitleGroups: "Groups",
   omegaupTitleGroupsEdit: "Edit group",
