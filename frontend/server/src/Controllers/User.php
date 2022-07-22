@@ -3257,6 +3257,140 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{token: string}
+     *
+     * @omegaup-request-param null|string $username
+     */
+    public static function apiDeleteRequest(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        $username = $r->ensureOptionalString(
+            'username',
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
+        );
+        if (
+            !\OmegaUp\Authorization::isSystemAdmin(
+                $r->identity
+            ) && !is_null(
+                $username
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $identity = self::resolveTargetIdentity($r);
+        $user = self::resolveTargetUser($r);
+        if (is_null($user) || is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        $token = \OmegaUp\SecurityTools::randomString(50);
+        \OmegaUp\DAO\Users::generateDeletionToken($user, $token);
+        self::$log->info(
+            "User {$identity->username} is requesting to delete their account."
+        );
+        if (is_null($user->main_email_id)) {
+            return [
+                'token' => $token,
+            ];
+        }
+        $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
+
+        if (is_null($email) || is_null($email->email)) {
+            return [
+                'token' => $token,
+            ];
+        }
+        $subject = \OmegaUp\Translations::getInstance()->get(
+            'accountDeletionRequestEmailSubject'
+        );
+        $body = \OmegaUp\ApiUtils::formatString(
+            \OmegaUp\Translations::getInstance()->get(
+                'accountDeletionRequestEmailBody'
+            ),
+            [
+                'username' => $identity->username,
+            ]
+        );
+
+        \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
+        return [
+            'token' => $token,
+        ];
+    }
+
+    /**
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $token
+     * @omegaup-request-param null|string $username
+     */
+    public static function apiDeleteConfirm(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        $username = $r->ensureOptionalString(
+            'username',
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
+        );
+        $token = $r->ensureString('token');
+        if (
+            !\OmegaUp\Authorization::isSystemAdmin(
+                $r->identity
+            ) && !is_null(
+                $username
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
+        if (is_null($user) || is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        if (!\OmegaUp\DAO\Users::validateDeletionToken($user, $token)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'token'
+            );
+        }
+        \OmegaUp\DAO\Users::deleteUserAndIndentityInformation($user, $identity);
+        self::$log->info(
+            "User {$identity->username} deleted their account successfully."
+        );
+        if (is_null($user->main_email_id)) {
+            return [
+                'status' => 'ok',
+            ];
+        }
+        $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
+
+        if (is_null($email) || is_null($email->email)) {
+            return [
+                'status' => 'ok',
+            ];
+        }
+        $subject = \OmegaUp\Translations::getInstance()->get(
+            'accountDeletionConfirmEmailSubject'
+        );
+        $body = \OmegaUp\ApiUtils::formatString(
+            \OmegaUp\Translations::getInstance()->get(
+                'accountDeletionConfirmEmailBody'
+            ),
+            [
+                'username' => $identity->username,
+            ]
+        );
+
+        \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+    /**
      * Adds the identity to the group.
      *
      * @return array{status: string}

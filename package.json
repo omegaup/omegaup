@@ -106,6 +106,8 @@
     "vue-async-computed": "^3.8.1",
     "vue-async-computed-decorator": "^0.0.5",
     "vue-codemirror-lite": "^1.0.4",
+    "vue-cookie-accept-decline": "5.4.0",
+    "vue-cookies": "^1.8.1",
     "vue-form-wizard": "^0.8.4",
     "vue-gapi": "^0.3.1",
     "vue-google-oauth2": "^1.5.5",
