@@ -1,5 +1,6 @@
 -- Users table
 ALTER TABLE `Users`
-ADD COLUMN parent_verified boolean 
-ADD COLUMN Creation_timestamp timestamp DEFAULT NULL
-ADD COLUMN parent_identity_id int NOT NULL;
+ADD COLUMN `parent_verified` boolean 
+ADD COLUMN `creation_timestamp` timestamp DEFAULT NULL
+ADD COLUMN `random_token_generated` VARCHAR(100) DEFAULT NULL
+ADD COLUMN `parent_email_verification_deadline` timestamp DEFAULT NULL;
