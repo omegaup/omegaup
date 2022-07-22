@@ -1794,6 +1794,14 @@ export const User = {
     messages.UserCreateAPITokenRequest,
     messages.UserCreateAPITokenResponse
   >('/api/user/createAPIToken/'),
+  deleteConfirm: apiCall<
+    messages.UserDeleteConfirmRequest,
+    messages.UserDeleteConfirmResponse
+  >('/api/user/deleteConfirm/'),
+  deleteRequest: apiCall<
+    messages.UserDeleteRequestRequest,
+    messages.UserDeleteRequestResponse
+  >('/api/user/deleteRequest/'),
   extraInformation: apiCall<
     messages.UserExtraInformationRequest,
     messages._UserExtraInformationServerResponse,

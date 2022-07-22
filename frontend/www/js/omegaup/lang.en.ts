@@ -2,6 +2,10 @@
 const translations: { [key: string]: string; } = {
   aboutToStart: "You are about to start the contest. Once you click Start Contest your time will begin.",
   acceptPrivacyPolicy: "I have read and accept the site's [Use and Privacy Policy](http://blog.omegaup.com/privacy-policy/), as well as the [Code of Conduct](https://blog.omegaup.com/codigo-de-conducta-en-omegaup/).",
+  accountDeletionConfirmEmailBody: "User %(username) confirmed to delete their account.",
+  accountDeletionConfirmEmailSubject: "omegaup account deleted",
+  accountDeletionRequestEmailBody: "User %(username) is requesting delete their account.",
+  accountDeletionRequestEmailSubject: "omegaup account deletion request",
   activityReport: "Activity report",
   activityReportDuplicatesForOriginsDescription: "Addresses with more than one user",
   activityReportDuplicatesForUsersDescription: "Users with more than one address",

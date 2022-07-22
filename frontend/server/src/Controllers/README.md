@@ -224,6 +224,8 @@
   - [`/api/user/contestStats/`](#apiuserconteststats)
   - [`/api/user/create/`](#apiusercreate)
   - [`/api/user/createAPIToken/`](#apiusercreateapitoken)
+  - [`/api/user/deleteConfirm/`](#apiuserdeleteconfirm)
+  - [`/api/user/deleteRequest/`](#apiuserdeleterequest)
   - [`/api/user/extraInformation/`](#apiuserextrainformation)
   - [`/api/user/generateGitToken/`](#apiusergenerategittoken)
   - [`/api/user/generateOmiUsers/`](#apiusergenerateomiusers)
@@ -4384,6 +4386,37 @@ There is a limit of 5 API tokens that each user can have.
 | Name   | Type     | Description                                                          |
 | ------ | -------- | -------------------------------------------------------------------- |
 | `name` | `string` | A non-empty alphanumeric string. May contain underscores and dashes. |
+
+### Returns
+
+| Name    | Type     |
+| ------- | -------- |
+| `token` | `string` |
+
+## `/api/user/deleteConfirm/`
+
+### Description
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `token`    | `string`       |             |
+| `username` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/user/deleteRequest/`
+
+### Description
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
 
 ### Returns
 
