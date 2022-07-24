@@ -309,6 +309,68 @@ class Users extends \OmegaUp\DAO\Base\Users {
     }
 
     /**
+    * Delete User
+    */
+    public static function deleteUserAndIndentityInformation(
+        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): int {
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            $sql = '
+                UPDATE
+                    `Users`
+                SET
+                    `facebook_user_id` = NULL,
+                    `git_token`= NULL,
+                    `main_email_id`= NULL,
+                    `main_identity_id`= NULL,
+                    `has_learning_objective`= NULL,
+                    `has_scholar_objective`= NULL,
+                    `has_competitive_objective`= NULL,
+                    `verification_id`= NULL,
+                    `reset_digest`= NULL,
+                    `reset_sent_at`= NULL,
+                    `hide_problem_tags`= NULL,
+                    `birth_date`= NULL,
+                    verified = 0,
+                    in_mailing_list = 0,
+                    is_private = 0
+                WHERE
+                    `user_id` = ?;';
+            $params = [
+                $user->user_id,
+            ];
+            \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+            $randomString = \OmegaUp\SecurityTools::randomString(20);
+            $sql = '
+                UPDATE
+                    `Identities`
+                SET
+                    `username` = ?,
+                    `password` = NULL,
+                    `name`= NULL,
+                    `user_id`= NULL,
+                    `language_id`= NULL,
+                    `country_id`= NULL,
+                    `state_id`= NULL,
+                    `gender`= NULL
+                WHERE
+                    `identity_id` = ?;';
+            $params = [
+                "deleted_user_{$randomString}",
+                $identity->identity_id,
+            ];
+            \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+   /**
      * @return list<\OmegaUp\DAO\VO\Users>
      */
     final public static function getVerified(
@@ -345,5 +407,44 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     Users;';
         /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
+    }
+
+    final public static function generateDeletionToken(
+        \OmegaUp\DAO\VO\Users $user,
+        string $token
+    ): void {
+        $sql = '
+            UPDATE
+                Users u
+            SET
+                u.deletion_token = ?
+            WHERE
+                u.user_id = ?;
+        ';
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$token, $user->user_id]
+        );
+    }
+
+    final public static function validateDeletionToken(
+        \OmegaUp\DAO\VO\Users $user,
+        string $token
+    ): bool {
+        $sql = 'SELECT
+                    COUNT(*)
+                FROM
+                    Users
+                WHERE
+                    `user_id` = ?
+                    AND `deletion_token` = ?;';
+
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$user->user_id, $token]
+        );
+
+        return boolval($count);
     }
 }
