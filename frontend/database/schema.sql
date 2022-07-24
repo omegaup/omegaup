@@ -533,6 +533,25 @@ CREATE TABLE `Permissions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Plagiarisms` (
+  `plagiarism_id` int NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada potencial caso de plagio',
+  `contest_id` int NOT NULL,
+  `submission_id_1` int NOT NULL COMMENT 'El identificador del envío del primer código plagiado',
+  `submission_id_2` int NOT NULL COMMENT 'El identificador del envío del segundo código plagiado',
+  `score_1` tinyint(1) NOT NULL COMMENT 'porcentaje de plagio encontrado usando copydetect en el envío 1',
+  `score_2` tinyint(1) NOT NULL COMMENT 'porcentaje de plagio encontrado usando copydetect en el envío 2',
+  `contents` text NOT NULL COMMENT 'Almacena los rangos de números de línea de las similitudes',
+  PRIMARY KEY (`plagiarism_id`),
+  KEY `fk_pc_contest_id` (`contest_id`),
+  KEY `fk_ps_submission_id_1` (`submission_id_1`),
+  KEY `fk_ps_submission_id_2` (`submission_id_2`),
+  CONSTRAINT `fk_pc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`),
+  CONSTRAINT `fk_ps_submission_id_1` FOREIGN KEY (`submission_id_1`) REFERENCES `Submissions` (`submission_id`),
+  CONSTRAINT `fk_ps_submission_id_2` FOREIGN KEY (`submission_id_2`) REFERENCES `Submissions` (`submission_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Los casos potenciales de plagio encontrados por el algoritmo de detección.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `PrivacyStatement_Consent_Log` (
   `privacystatement_consent_id` int NOT NULL AUTO_INCREMENT COMMENT 'Id del consentimiento de privacidad almacenado en el log',
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
@@ -980,12 +999,29 @@ CREATE TABLE `Submission_Feedback` (
   `submission_id` int NOT NULL COMMENT 'Identificador del envío asociado',
   `feedback` text NOT NULL,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Hora en la que se envió el feedback',
+  `range_bytes_start` int NOT NULL DEFAULT '0' COMMENT 'Inicio de la subcadena seleccionada (en bytes) para agregarle el comentario',
+  `range_bytes_end` int NOT NULL DEFAULT '0' COMMENT 'Fin de la subcadena seleccionada (en bytes) para agregarle el comentario',
   PRIMARY KEY (`submission_feedback_id`),
   UNIQUE KEY `submission_id` (`submission_id`),
   KEY `fk_sfi_identity_id` (`identity_id`),
   CONSTRAINT `fk_sfi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_sfs_submission_id` FOREIGN KEY (`submission_id`) REFERENCES `Submissions` (`submission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Almacena el feedback dejado por los profesores para los envíos de los estudiantes.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Submission_Feedback_Thread` (
+  `submission_feedback_thread_id` int NOT NULL AUTO_INCREMENT,
+  `submission_feedback_id` int NOT NULL COMMENT 'Identificador del comentario asociado',
+  `identity_id` int NOT NULL COMMENT 'Identidad de quien envió el feedback',
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Hora en la que se envió el feedback',
+  `contents` text NOT NULL,
+  PRIMARY KEY (`submission_feedback_thread_id`),
+  KEY `fk_sfs_submission_feedback_id` (`submission_feedback_id`),
+  KEY `fk_sfti_identity_id` (`identity_id`),
+  CONSTRAINT `fk_sfs_submission_feedback_id` FOREIGN KEY (`submission_feedback_id`) REFERENCES `Submission_Feedback` (`submission_feedback_id`),
+  CONSTRAINT `fk_sfti_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Darle seguimiento a un comentario';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
