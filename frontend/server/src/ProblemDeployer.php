@@ -192,7 +192,7 @@ class ProblemDeployer {
             return;
         }
         $tmpDir = \OmegaUp\FileHandler::tempDir(
-            '/tmp',
+            TEMPLATES_PATH,
             'ProblemDeployer',
             0755
         );
@@ -219,13 +219,16 @@ class ProblemDeployer {
                     $problemArtifacts->get("examples/{$filename}.in")
                 );
             }
-            $target = TEMPLATES_PATH . "/{$this->alias}/{$publishedCommit}";
-            @mkdir($target, 0755, true);
+            $tmpTarget = "{$tmpDir}/target";
+            @mkdir($tmpTarget, 0755, true);
             $args = ['/usr/bin/java', '-Xmx64M', '-jar',
                 '/usr/share/java/libinteractive.jar', 'generate-all', $idlPath,
-                '--package-directory', $target, '--package-prefix',
+                '--package-directory', $tmpTarget, '--package-prefix',
                 "{$this->alias}_", '--shift-time-for-zip'];
-            $this->executeRaw($args, $target);
+            $this->executeRaw($args, $tmpTarget);
+            $target = TEMPLATES_PATH . "/{$this->alias}/{$publishedCommit}";
+            @mkdir(dirname($target), 0755, true);
+            rename($tmpTarget, $target);
         } catch (\Exception $e) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'problemDeployerLibinteractiveValidationError',

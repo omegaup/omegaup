@@ -1438,6 +1438,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         p.{$searchType} = ?";
         } else {
             $args = array_fill(0, 5, $query);
+            $curatedQuery = preg_replace('/\W+/', ' ', $query);
+            $args = array_merge($args, array_fill(0, 2, $curatedQuery));
             $select .= ' IFNULL(SUM(relevance), 0.0) AS relevance
             ';
             $sql = "FROM
@@ -1469,6 +1471,18 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                                 alias LIKE CONCAT('%', ?, '%') OR
                                 problem_id = ?
                             )
+                        UNION ALL
+                        SELECT
+                            {$fields},
+                            IFNULL(
+                                MATCH(alias, title)
+                                AGAINST (? IN BOOLEAN MODE), 0.0
+                            ) AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            MATCH(alias, title)
+                            AGAINST (? IN BOOLEAN MODE)
                     ) AS p";
             $groupByClause = "
                         GROUP BY {$fields}
