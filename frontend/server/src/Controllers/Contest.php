@@ -2570,7 +2570,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $scoreMode = $partialScore ? 'partial' : 'all_or_nothing';
         }
         $plagiarism_threshold = $r->ensureOptionalInt(
-            'plagiarims_threshold'
+            'plagiarism_threshold'
         ) ?? 90 : 0;
 
         $contest = new \OmegaUp\DAO\VO\Contests([
