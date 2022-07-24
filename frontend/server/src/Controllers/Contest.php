@@ -2573,7 +2573,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($scoreMode)) {
             $scoreMode = $partialScore ? 'partial' : 'all_or_nothing';
         }
+<<<<<<< HEAD
         $check_plagiarism = $r->ensureOptionalBool('check_plagiarism') ?? false;
+=======
+        $plagiarism_threshold = $r->ensureOptionalInt(
+            'plagiarism_threshold'
+        ) ?? 90 : 0;
+
+>>>>>>> 2bca66f4ef40d0c05d5b6c43ba732b12c4fe06f7
         $contest = new \OmegaUp\DAO\VO\Contests([
             'admission_mode' => 'private',
             'title' => $r['title'],
