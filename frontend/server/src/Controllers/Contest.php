@@ -4757,7 +4757,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $originalRequestsUserInformation !== $requestsUserInformation
             );
         }
-            $check_plagiarism = $r->ensureOptionalBool('check_plagiarism') ?? false;
+            $check_plagiarism = $r->ensureOptionalBool(
+                'check_plagiarism'
+            ) ?? false;
         $valueProperties = [
             'title',
             'description',
@@ -4796,7 +4798,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     }
             ],
             'admission_mode',
-            'plagiarism_threshold' => $r->ensureOptionalBool('check_plagiarism') ? 90 : 0;
+            'plagiarism_threshold' => $r->ensureOptionalBool(
+                'check_plagiarism'
+            ) ? 90 : 0;
         ];
         self::updateValueProperties($r, $contest, $valueProperties);
 
