@@ -65,7 +65,6 @@ OmegaUp.on('ready', () => {
             password: string,
             passwordConfirmation: string,
             recaptchaResponse: string,
-            birthDate: string,
           ) => {
             if (password != passwordConfirmation) {
               ui.error(T.passwordMismatch);
