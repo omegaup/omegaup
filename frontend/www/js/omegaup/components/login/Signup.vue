@@ -118,6 +118,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import omegaup_Markdown from '../Markdown.vue';
 import T from '../../lang';
+import * as time from '../../time';
 import DatePicker from '../DatePicker.vue';
 
 @Component({
