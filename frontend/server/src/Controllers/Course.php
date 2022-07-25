@@ -25,7 +25,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, counts: array<string, int>, description: string, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>, archived?: list<FilteredCourse>}
+ * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>, archived?: list<FilteredCourse>, teachingAssistant?: list<FilteredCourse>}
  * @psalm-type CourseCloneDetailsPayload=array{creator: array{classname: string, username: string}, details: CourseDetails, token: null|string}
  * @psalm-type CoursesByTimeType=array{courses: list<FilteredCourse>, timeType: string}
  * @psalm-type CoursesByAccessMode=array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType}}
@@ -1709,7 +1709,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
         $group = self::resolveGroup($course);
 
-        // Only Course Admins or Group Members (students) can see these results
+        // Only Course Admins, Teaching Assistant or Group Members (students)
+        // can see these results
         if (
             !\OmegaUp\Authorization::canViewCourse(
                 $r->identity,
@@ -1915,6 +1916,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     $page,
                     $pageSize
                 );
+                if (\OmegaUp\Authorization::isTeachingAssistant($identity)) {
+                    $response['teachingAssistant'] = \OmegaUp\DAO\Courses::getPublicCourses();
+                }
             }
             foreach ($adminCourses as $course) {
                 $response['admin'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
@@ -1938,7 +1942,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $identity->identity_id
             );
         }
-
         return $response;
     }
 
@@ -1963,7 +1966,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
-        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+        if (
+            !\OmegaUp\Authorization::canProvideFeedback($r->identity, $course)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1998,7 +2003,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $course = self::validateCourseExists($courseAlias);
-        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+        if (
+            !\OmegaUp\Authorization::canProvideFeedback($r->identity, $course)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -2115,7 +2122,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+        if (
+            !\OmegaUp\Authorization::canProvideFeedback($r->identity, $course)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -2280,7 +2289,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
         $group = self::resolveGroup($course);
 
-        // Only Course Admins or Group Members (students) can see these results
+        // Only Course Admins, Teaching Assistant or Group Members (students)
+        // can see these results
         if (
             !\OmegaUp\Authorization::canViewCourse(
                 $r->identity,
@@ -2347,11 +2357,11 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // Only course admins or users adding themselves when the course is public
         if (
-            !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
-            && ($course->admission_mode !== self::ADMISSION_MODE_PUBLIC
-            || $resolvedIdentity->identity_id !== $r->identity->identity_id)
-            && $course->requests_user_information == 'no'
-            && is_null($acceptTeacher)
+            !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course) &&
+            ($course->admission_mode !== self::ADMISSION_MODE_PUBLIC ||
+            $resolvedIdentity->identity_id !== $r->identity->identity_id) &&
+            $course->requests_user_information == 'no' &&
+            is_null($acceptTeacher)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -2615,7 +2625,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
 
-        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+        if (
+            !\OmegaUp\Authorization::canProvideFeedback($r->identity, $course)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -2656,7 +2668,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
-        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+        if (
+            !\OmegaUp\Authorization::canProvideFeedback($r->identity, $course)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -3753,7 +3767,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (array_key_exists('archived', $courses)) {
             $filteredCourses['admin']['filteredCourses']['archived']['courses'] = $courses['archived'];
         }
-
+        if (array_key_exists('teachingAssistant', $courses)) {
+            $filteredCourses['admin']['filteredCourses']['teachingAssistant']['courses'] = $courses['teachingAssistant'];
+        }
         if (
             $filteredCourses['admin']['activeTab'] === ''
             && !empty(
@@ -5365,7 +5381,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        if (!\OmegaUp\Authorization::isCourseAdmin($loggedIdentity, $course)) {
+        if (
+            !\OmegaUp\Authorization::canProvideFeedback(
+                $loggedIdentity,
+                $course
+            )
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );

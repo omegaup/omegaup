@@ -3222,6 +3222,7 @@ export namespace types {
     archived?: types.FilteredCourse[];
     public: types.FilteredCourse[];
     student: types.FilteredCourse[];
+    teachingAssistant?: types.FilteredCourse[];
   }
 
   export interface CurrentSession {

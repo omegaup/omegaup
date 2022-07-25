@@ -205,6 +205,20 @@ class User {
     }
 
     /**
+     * Creates a new user with teaching assistant role
+     *
+     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
+     */
+    public static function createTeachingAssistantUser(
+        ?UserParams $params = null
+    ): array {
+        ['user' => $user, 'identity' => $identity] = self::createUser($params);
+        self::addTeachingAssistantRole($identity);
+
+        return ['user' => $user, 'identity' => $identity];
+    }
+
+    /**
      * Creates a new user with contest organizer role
      *
      * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
@@ -260,6 +274,26 @@ class User {
         \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'identity_id' => $identity->identity_id,
             'group_id' => $supportGroup->group_id,
+        ]));
+    }
+
+    public static function addTeachingAssistantRole(\OmegaUp\DAO\VO\Identities $identity): void {
+        $teachingAssistantGroup = \OmegaUp\DAO\Groups::findByAlias(
+            \OmegaUp\Authorization::TEACHING_ASSISTANT_GROUP_ALIAS
+        );
+        if (
+            is_null(
+                $teachingAssistantGroup
+            ) || is_null(
+                $teachingAssistantGroup->group_id
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+
+        \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
+            'identity_id' => $identity->identity_id,
+            'group_id' => $teachingAssistantGroup->group_id,
         ]));
     }
 

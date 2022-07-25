@@ -49,6 +49,12 @@ class Authorization {
      */
     private static $_certificateGeneratorGroup = null;
 
+    /**
+     * Cache for system group for teaching assitants.
+     * @var null|\OmegaUp\DAO\VO\Groups
+     */
+    private static $_teachingAssistantGroup = null;
+
     // Administrator for an ACL.
     const ADMIN_ROLE = 1;
 
@@ -66,6 +72,9 @@ class Authorization {
 
     // Certificate generator.
     const CERTIFICATE_GENERATOR_ROLE = 8;
+
+    // Teaching assitant.
+    const TEACHING_ASSISTANT_ROLE = 9;
 
     // System-level ACL.
     const SYSTEM_ACL = 1;
@@ -87,6 +96,9 @@ class Authorization {
 
     // Group for certificate generators.
     const CERTIFICATE_GENERATOR_GROUP_ALIAS = 'omegaup:group-certificate-generator';
+
+    // Group for teaching assitants.
+    const TEACHING_ASSISTANT_GROUP_ALIAS = 'omegaup:teaching-assistant';
 
     public static function canViewSubmission(
         \OmegaUp\DAO\VO\Identities $identity,
@@ -120,11 +132,11 @@ class Authorization {
                 $submission->problemset_id
             );
             if (
-                !is_null($problemset) &&
+                !is_null($problemset) && (
                 self::isAdmin(
                     $identity,
                     $problemset
-                )
+                ) || self::isTeachingAssistant($identity))
             ) {
                 return true;
             }
@@ -252,6 +264,16 @@ class Authorization {
         return self::isCertificateGenerator($identity);
     }
 
+    public static function canProvideFeedback(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Courses $course
+    ): bool {
+        return(
+            self::isTeachingAssistant($identity) ||
+            self::isCourseAdmin($identity, $course)
+        );
+    }
+
     public static function canViewCourse(
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Courses $course,
@@ -259,7 +281,8 @@ class Authorization {
     ): bool {
         if (
             !self::isCourseAdmin($identity, $course) &&
-            !self::isGroupMember($identity, $group)
+            !self::isGroupMember($identity, $group) &&
+            !self::isTeachingAssistant($identity)
         ) {
             return false;
         }
@@ -400,6 +423,28 @@ class Authorization {
         );
     }
 
+    public static function isTeachingAssistant(\OmegaUp\DAO\VO\Identities $identity): bool {
+        if (is_null(self::$_teachingAssistantGroup)) {
+            self::$_teachingAssistantGroup = \OmegaUp\DAO\Groups::findByAlias(
+                self::TEACHING_ASSISTANT_GROUP_ALIAS
+            );
+            if (is_null(self::$_teachingAssistantGroup)) {
+                return false;
+            }
+        }
+        if (is_null(self::$_teachingAssistantGroup->acl_id)) {
+            return false;
+        }
+        return self::isGroupMember(
+            $identity,
+            self::$_teachingAssistantGroup
+        ) || self::hasRole(
+            $identity,
+            self::$_teachingAssistantGroup->acl_id,
+            self::TEACHING_ASSISTANT_ROLE
+        );
+    }
+
     public static function isGroupIdentityCreator(\OmegaUp\DAO\VO\Identities $identity): bool {
         if (is_null(self::$_groupIdentityCreator)) {
             self::$_groupIdentityCreator = \OmegaUp\DAO\Groups::findByAlias(
@@ -517,6 +562,7 @@ class Authorization {
         self::$_supportGroup = null;
         self::$_groupIdentityCreator = null;
         self::$_certificateGeneratorGroup = null;
+        self::$_teachingAssistantGroup = null;
     }
 
     public static function canSubmitToProblemset(
