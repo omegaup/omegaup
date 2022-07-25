@@ -100,6 +100,7 @@
                     password,
                     passwordConfirmation,
                     recaptchaResponse,
+                    birthDate,
                   )
                 "
               >
@@ -134,6 +135,9 @@ export default class Signup extends Vue {
   password: string = '';
   passwordConfirmation: string = '';
   recaptchaResponse: string = '';
+  birthDate = this.profile.birth_date
+    ? time.convertLocalDateToGMTDate(this.profile.birth_date)
+    : new Date('');
 
   verify(response: string): void {
     this.recaptchaResponse = response;
