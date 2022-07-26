@@ -20,11 +20,23 @@
           </div>
           <div class="col-md-4">
             <div class="form-group">
-              <label class="control-label">{{ T.loginEmail }}</label>
+              <label class="control-label">{{
+                loginEmailDescriptionText
+              }}</label>
               <input
+                v-if="userAge > 13"
                 v-model="email"
                 data-signup-email
                 name="reg_email"
+                type="email"
+                class="form-control"
+                autocomplete="email"
+              />
+              <input
+                v-else
+                v-model="parentEmail"
+                data-signup-email
+                name="reg_parent_email"
                 type="email"
                 class="form-control"
                 autocomplete="email"
@@ -92,17 +104,7 @@
                 data-signup-submit
                 class="btn btn-primary form-control"
                 name="sign_up"
-                @click.prevent="
-                  $emit(
-                    'register-and-login',
-                    username,
-                    email,
-                    password,
-                    passwordConfirmation,
-                    recaptchaResponse,
-                    birthDate,
-                  )
-                "
+                @click.prevent="registerAndLogin"
               >
                 {{ T.loginSignUp }}
               </button>
@@ -115,11 +117,12 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import omegaup_Markdown from '../Markdown.vue';
 import T from '../../lang';
 import * as time from '../../time';
 import DatePicker from '../DatePicker.vue';
+import * as ui from '../../ui';
 
 @Component({
   components: {
@@ -132,13 +135,13 @@ export default class Signup extends Vue {
 
   T = T;
   username: string = '';
-  email: string = '';
+  email: null | string = null;
+  parentEmail: null | string = null;
   password: string = '';
   passwordConfirmation: string = '';
   recaptchaResponse: string = '';
-  birthDate = this.profile.birth_date
-    ? time.convertLocalDateToGMTDate(this.profile.birth_date)
-    : new Date('');
+  birthDate: null | Date = new Date(0);
+  checked = false;
 
   verify(response: string): void {
     this.recaptchaResponse = response;
@@ -148,4 +151,49 @@ export default class Signup extends Vue {
     this.recaptchaResponse = '';
   }
 }
+ get loginEmailDescriptionText(): string {
+    return this.userAge > 13 ? T.loginEmail : T.loginEmailParent;
+  }
+
+ get userAge(): number {
+    if (!this.birthDate) {
+      return 0;
+    }
+    return time.getDifferenceInCalendarYears(this.birthDate);
+  }
+
+   registerAndLogin(): void {
+    if (this.password != this.passwordConfirmation) {
+      ui.error(T.passwordMismatch);
+      return;
+    }
+    if (this.password && this.password.length < 8) {
+      ui.error(T.loginPasswordTooShort);
+      return;
+    }
+
+    this.$emit('register-and-login', {
+      username: this.username,
+      email: this.email,
+      parent_email: this.parentEmail,
+      password: this.password,
+      recaptcha: this.recaptchaResponse,
+      birth_date: this.birthDate,
+    })};
+
+    @Watch('email')
+  onEmailChanged(newValue: null | string): void {
+    if (!newValue) {
+      return;
+    }
+    this.parentEmail = null;
+  }
+
+  @Watch('parentEmail')
+  onParentEmailChanged(newValue: null | string): void {
+    if (!newValue) {
+      return;
+    }
+    this.email = null;
+  }
 </script>
