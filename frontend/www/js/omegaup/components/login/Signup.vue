@@ -80,7 +80,6 @@
             </div>
           </div>
         </div>
-
         <div class="row justify-content-md-center">
           <div class="col-md-8">
             <input v-model="checked" type="checkbox" />
@@ -115,7 +114,6 @@
     </div>
   </div>
 </template>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import omegaup_Markdown from '../Markdown.vue';
@@ -123,7 +121,6 @@ import T from '../../lang';
 import * as time from '../../time';
 import DatePicker from '../DatePicker.vue';
 import * as ui from '../../ui';
-
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
@@ -132,7 +129,6 @@ import * as ui from '../../ui';
 })
 export default class Signup extends Vue {
   @Prop() validateRecaptcha!: boolean;
-
   T = T;
   username: string = '';
   email: null | string = null;
@@ -142,27 +138,22 @@ export default class Signup extends Vue {
   recaptchaResponse: string = '';
   birthDate: null | Date = new Date(0);
   checked = false;
-
-  verify(response: string): void {
-    this.recaptchaResponse = response;
-  }
-
-  expired(): void {
-    this.recaptchaResponse = '';
-  }
-}
- get loginEmailDescriptionText(): string {
+  get loginEmailDescriptionText(): string {
     return this.userAge > 13 ? T.loginEmail : T.loginEmailParent;
   }
-
- get userAge(): number {
+  get userAge(): number {
     if (!this.birthDate) {
       return 0;
     }
     return time.getDifferenceInCalendarYears(this.birthDate);
   }
-
-   registerAndLogin(): void {
+  verify(response: string): void {
+    this.recaptchaResponse = response;
+  }
+  expired(): void {
+    this.recaptchaResponse = '';
+  }
+  registerAndLogin(): void {
     if (this.password != this.passwordConfirmation) {
       ui.error(T.passwordMismatch);
       return;
@@ -171,7 +162,6 @@ export default class Signup extends Vue {
       ui.error(T.loginPasswordTooShort);
       return;
     }
-
     this.$emit('register-and-login', {
       username: this.username,
       email: this.email,
@@ -179,16 +169,15 @@ export default class Signup extends Vue {
       password: this.password,
       recaptcha: this.recaptchaResponse,
       birth_date: this.birthDate,
-    })};
-
-    @Watch('email')
+    });
+  }
+  @Watch('email')
   onEmailChanged(newValue: null | string): void {
     if (!newValue) {
       return;
     }
     this.parentEmail = null;
   }
-
   @Watch('parentEmail')
   onParentEmailChanged(newValue: null | string): void {
     if (!newValue) {
@@ -196,4 +185,5 @@ export default class Signup extends Vue {
     }
     this.email = null;
   }
+}
 </script>
