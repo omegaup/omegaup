@@ -9027,6 +9027,11 @@ through@^2.3.8:
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
   integrity sha1-DdTJ/6q8NXlgsbckEV1+Doai4fU=
 
+tiny-cookie@^2.1.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/tiny-cookie/-/tiny-cookie-2.3.2.tgz#3b5fb4e0888cfa0b4728d5f6b7be3d3a88e6a5f0"
+  integrity sha512-qbymkVh+6+Gc/c9sqnvbG+dOHH6bschjphK3SHgIfT6h/t+63GBL37JXNoXEc6u/+BcwU6XmaWUuf19ouLVtPg==
+
 tmp@~0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.2.1.tgz#8457fc3037dcf4719c251367a1af6500ee1ccf14"
@@ -9571,6 +9576,18 @@ vue-codemirror-lite@^1.0.4:
   integrity sha1-SKXNfRfAkUUDyM2dm1a0OOScNBA=
   dependencies:
     codemirror "^5.22.0"
+
+vue-cookie-accept-decline@5.4.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/vue-cookie-accept-decline/-/vue-cookie-accept-decline-5.4.0.tgz#5c4127a78a68dbb5832b9f901ccb0027c085cc38"
+  integrity sha512-TbpApiW8APhYvuGPENgfHsJfKOQrdOFqHgM6gRJpEz/3ef55IilvdoJjhSna8xBP+u6pbRpUM5cFAtXnZkVt9Q==
+  dependencies:
+    tiny-cookie "^2.1.2"
+
+vue-cookies@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/vue-cookies/-/vue-cookies-1.8.1.tgz#8aeadd7ff9933b820de8c3f121c2be27c5ead7b5"
+  integrity sha512-PDq1EaiRRyau5PBQVscXboHW+iWtcG4wRY2UKIz1j0nrjb3KESRU1PUyNUDdOajAwy4RH1IfiNR0suhWRXQdrA==
 
 vue-eslint-parser@^7.1.0:
   version "7.1.0"
