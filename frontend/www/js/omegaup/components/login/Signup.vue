@@ -22,7 +22,7 @@
                 data-signup-username
                 name="reg_username"
                 class="form-control"
-                :disabled="!birth_date"
+                :disabled="!birthDate"
                 autocomplete="username"
               />
             </div>
@@ -39,7 +39,7 @@
                 name="reg_email"
                 type="email"
                 class="form-control"
-                :disabled="!birth_date"
+                :disabled="!birthDate"
                 autocomplete="email"
               />
               <input
@@ -49,7 +49,7 @@
                 name="reg_parent_email"
                 type="email"
                 class="form-control"
-                :disabled="!birth_date"
+                :disabled="!birthDate"
                 autocomplete="email"
               />
             </div>
@@ -65,7 +65,7 @@
                 name="reg_password"
                 type="password"
                 class="form-control"
-                :disabled="!birth_date"
+                :disabled="!birthDate"
                 autocomplete="new-password"
               />
             </div>
@@ -79,7 +79,7 @@
                 name="reg_password_confirmation"
                 type="password"
                 class="form-control"
-                :disabled="!birth_date"
+                :disabled="!birthDate"
                 autocomplete="new-password"
               />
             </div>
@@ -108,7 +108,7 @@
                 data-signup-submit
                 class="btn btn-primary form-control"
                 name="sign_up"
-                :disabled="!birth_date"
+                :disabled="!birthDate"
                 @click.prevent="registerAndLogin"
               >
                 {{ T.loginSignUp }}
