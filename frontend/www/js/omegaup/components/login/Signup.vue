@@ -5,14 +5,14 @@
     </div>
     <div class="card-body">
       <form>
-       <div class="form-group">
-              <label>{{ T.userEditBirthDate }}</label>
-              <omegaup-datepicker
-                v-model="birthDate"
-                :required="false"
-                :max="new Date()"
-              ></omegaup-datepicker>
-            </div>
+        <div class="form-group">
+          <label>{{ T.userEditBirthDate }}</label>
+          <omegaup-datepicker
+            v-model="birthDate"
+            :required="false"
+            :max="new Date()"
+          ></omegaup-datepicker>
+        </div>
         <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-2">
             <div class="form-group">
@@ -22,7 +22,7 @@
                 data-signup-username
                 name="reg_username"
                 class="form-control"
-                :disabled= "!birth_date"
+                :disabled="!birth_date"
                 autocomplete="username"
               />
             </div>
@@ -39,7 +39,7 @@
                 name="reg_email"
                 type="email"
                 class="form-control"
-                :disabled= "!birth_date"
+                :disabled="!birth_date"
                 autocomplete="email"
               />
               <input
@@ -49,7 +49,7 @@
                 name="reg_parent_email"
                 type="email"
                 class="form-control"
-                :disabled= "!birth_date"
+                :disabled="!birth_date"
                 autocomplete="email"
               />
             </div>
@@ -65,7 +65,7 @@
                 name="reg_password"
                 type="password"
                 class="form-control"
-                :disabled= "!birth_date"
+                :disabled="!birth_date"
                 autocomplete="new-password"
               />
             </div>
@@ -79,7 +79,7 @@
                 name="reg_password_confirmation"
                 type="password"
                 class="form-control"
-                :disabled= "!birth_date"
+                :disabled="!birth_date"
                 autocomplete="new-password"
               />
             </div>
@@ -108,7 +108,7 @@
                 data-signup-submit
                 class="btn btn-primary form-control"
                 name="sign_up"
-                :disabled= "!birth_date"
+                :disabled="!birth_date"
                 @click.prevent="registerAndLogin"
               >
                 {{ T.loginSignUp }}
@@ -148,13 +148,13 @@ export default class Signup extends Vue {
   get loginEmailDescriptionText(): string {
     return this.userAge > 13 ? T.loginEmail : T.loginEmailParent;
   }
- get userAge(): number | null {
+  get userAge(): number | null {
     if (this.birthDate === null) {
       return null;
     }
-       return time.getDifferenceInCalendarYears(this.birthDate);
+    return time.getDifferenceInCalendarYears(this.birthDate);
   }
-    
+
   verify(response: string): void {
     this.recaptchaResponse = response;
   }
