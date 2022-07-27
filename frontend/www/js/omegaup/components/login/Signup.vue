@@ -152,6 +152,9 @@ export default class Signup extends Vue {
     if (this.birthDate === null) {
       return null;
     }
+       return time.getDifferenceInCalendarYears(this.birthDate);
+  }
+    
   verify(response: string): void {
     this.recaptchaResponse = response;
   }
