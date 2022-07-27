@@ -14,7 +14,10 @@
       </div>
       <div class="form-group mr-2 mt-1">
         <omegaup-common-typeahead
+          :only-existing-tags="false"
+          :max-results="10"
           :existing-options="searchResultProblems"
+          :options="searchResultProblems"
           :value.sync="keyword"
           :placeholder="T.wordsKeywordSearch"
           @update-existing-options="

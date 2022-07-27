@@ -10,7 +10,7 @@
     :limit="1"
     :hide-input-on-limit="true"
     :only-existing-tags="onlyExistingTags"
-    :typeahead-hide-discard="true"
+    :typeahead-hide-discard="typeaheadHideDiscard"
     @change="updateExistingOptions"
     @tag-added="onTagAdded"
     @tag-removed="onTagRemoved"
@@ -37,6 +37,7 @@ export default class Typeahead extends Vue {
   @Prop({ default: 5 }) maxResults!: number;
   @Prop({ default: null }) value!: null | string;
   @Prop({ default: true }) onlyExistingTags!: boolean;
+  @Prop({ default: true }) typeaheadHideDiscard!: boolean;
   @Prop({ default: T.typeaheadSearchPlaceholder }) placeholder!: string;
 
   T = T;
@@ -49,7 +50,11 @@ export default class Typeahead extends Vue {
 
   onTagAdded(): void {
     if (this.selectedOptions.length < 1) return;
-    this.$emit('update:value', this.selectedOptions[0].key);
+    let value = this.selectedOptions[0].key;
+    if (value == '') {
+      value = this.selectedOptions[0].value;
+    }
+    this.$emit('update:value', value);
   }
 
   onTagRemoved(): void {
