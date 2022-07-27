@@ -31,7 +31,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CoursesByAccessMode=array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType}}
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
  * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
- * @psalm-type AdminCourses=array{admin: array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType, archived: CoursesByTimeType}}}
+ * @psalm-type AdminCourses=array{admin: array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType, archived: CoursesByTimeType, teachingAssistant: CoursesByTimeType}}}
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseProblemVerdict=array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: null|string}
@@ -3746,6 +3746,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'archived' => [
                         'courses' => [],
                         'timeType' => 'archived',
+                    ],
+                    'teachingAssistant' => [
+                        'courses' => [],
+                        'timeType' => 'teachingAssistant',
                     ],
                 ],
                 'accessMode' => 'admin',

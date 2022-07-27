@@ -1257,6 +1257,45 @@ export namespace types {
                 })(x.courses);
                 return x;
               })(x.past);
+              x.teachingAssistant = ((x) => {
+                x.courses = ((x) => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map((x) => {
+                    x.assignments = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        if (
+                          typeof x.finish_time !== 'undefined' &&
+                          x.finish_time !== null
+                        )
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      });
+                    })(x.assignments);
+                    if (
+                      typeof x.finish_time !== 'undefined' &&
+                      x.finish_time !== null
+                    )
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.teachingAssistant);
               return x;
             })(x.filteredCourses);
             return x;
@@ -2305,6 +2344,7 @@ export namespace types {
         archived: types.CoursesByTimeType;
         current: types.CoursesByTimeType;
         past: types.CoursesByTimeType;
+        teachingAssistant: types.CoursesByTimeType;
       };
     };
   }
