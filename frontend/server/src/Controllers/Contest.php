@@ -2372,7 +2372,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'show_scoreboard_after' => true,
             'languages' => $originalContest->languages,
             'rerun_id' => $originalContest->contest_id,
-            'plagiarism_theshold' = $originalContest->plagiarism_threshold,
+            'plagiarism_threshold' => $originalContest->plagiarism_threshold,
         ]);
 
         $problemset = new \OmegaUp\DAO\VO\Problemsets([
