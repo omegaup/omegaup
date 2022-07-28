@@ -2632,7 +2632,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $submissions_gap
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
-     * @omegaup-request-param bool checkPlagiarism
+     * @omegaup-request-param bool|null $check_plagiarism
      */
     private static function validateCommonCreateOrUpdate(
         \OmegaUp\Request $r,
