@@ -2521,7 +2521,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param mixed $title
      * @omegaup-request-param int|null $window_length
-     * @omegaup-request-param bool checkPlagiarism
+     * @omegaup-request-param bool|null $check_plagiarism
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
