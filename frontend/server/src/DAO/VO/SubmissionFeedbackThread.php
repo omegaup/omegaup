@@ -10,19 +10,17 @@
 namespace OmegaUp\DAO\VO;
 
 /**
- * Value Object class for table `Submission_Feedback`.
+ * Value Object class for table `Submission_Feedback_Thread`.
  *
  * @access public
  */
-class SubmissionFeedback extends \OmegaUp\DAO\VO\VO {
+class SubmissionFeedbackThread extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
+        'submission_feedback_thread_id' => true,
         'submission_feedback_id' => true,
         'identity_id' => true,
-        'submission_id' => true,
-        'feedback' => true,
         'date' => true,
-        'range_bytes_start' => true,
-        'range_bytes_end' => true,
+        'contents' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -35,6 +33,11 @@ class SubmissionFeedback extends \OmegaUp\DAO\VO\VO {
                 'Unknown columns: ' . join(', ', array_keys($unknownColumns))
             );
         }
+        if (isset($data['submission_feedback_thread_id'])) {
+            $this->submission_feedback_thread_id = intval(
+                $data['submission_feedback_thread_id']
+            );
+        }
         if (isset($data['submission_feedback_id'])) {
             $this->submission_feedback_id = intval(
                 $data['submission_feedback_id']
@@ -44,16 +47,6 @@ class SubmissionFeedback extends \OmegaUp\DAO\VO\VO {
             $this->identity_id = intval(
                 $data['identity_id']
             );
-        }
-        if (isset($data['submission_id'])) {
-            $this->submission_id = intval(
-                $data['submission_id']
-            );
-        }
-        if (isset($data['feedback'])) {
-            $this->feedback = is_scalar(
-                $data['feedback']
-            ) ? strval($data['feedback']) : '';
         }
         if (isset($data['date'])) {
             /**
@@ -70,15 +63,10 @@ class SubmissionFeedback extends \OmegaUp\DAO\VO\VO {
                 \OmegaUp\Time::get()
             );
         }
-        if (isset($data['range_bytes_start'])) {
-            $this->range_bytes_start = intval(
-                $data['range_bytes_start']
-            );
-        }
-        if (isset($data['range_bytes_end'])) {
-            $this->range_bytes_end = intval(
-                $data['range_bytes_end']
-            );
+        if (isset($data['contents'])) {
+            $this->contents = is_scalar(
+                $data['contents']
+            ) ? strval($data['contents']) : '';
         }
     }
 
@@ -89,7 +77,14 @@ class SubmissionFeedback extends \OmegaUp\DAO\VO\VO {
      *
      * @var int|null
      */
-    public $submission_feedback_id = 0;
+    public $submission_feedback_thread_id = 0;
+
+    /**
+     * Identificador del comentario asociado
+     *
+     * @var int|null
+     */
+    public $submission_feedback_id = null;
 
     /**
      * Identidad de quien envió el feedback
@@ -99,20 +94,6 @@ class SubmissionFeedback extends \OmegaUp\DAO\VO\VO {
     public $identity_id = null;
 
     /**
-     * Identificador del envío asociado
-     *
-     * @var int|null
-     */
-    public $submission_id = null;
-
-    /**
-     * [Campo no documentado]
-     *
-     * @var string|null
-     */
-    public $feedback = null;
-
-    /**
      * Hora en la que se envió el feedback
      *
      * @var \OmegaUp\Timestamp
@@ -120,16 +101,9 @@ class SubmissionFeedback extends \OmegaUp\DAO\VO\VO {
     public $date;  // CURRENT_TIMESTAMP
 
     /**
-     * Inicio de la subcadena seleccionada (en bytes) para agregarle el comentario
+     * [Campo no documentado]
      *
-     * @var int
+     * @var string|null
      */
-    public $range_bytes_start = 0;
-
-    /**
-     * Fin de la subcadena seleccionada (en bytes) para agregarle el comentario
-     *
-     * @var int
-     */
-    public $range_bytes_end = 0;
+    public $contents = null;
 }
