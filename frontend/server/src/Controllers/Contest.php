@@ -4675,7 +4675,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
-     * @omegaup-request-param bool checkPlagiarism
+     * @omegaup-request-param bool|null $check_plagiarism
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
