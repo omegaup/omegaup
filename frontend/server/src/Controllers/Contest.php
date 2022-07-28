@@ -4757,9 +4757,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $originalRequestsUserInformation !== $requestsUserInformation
             );
         }
-            $checkPlagiarism = $r->ensureOptionalBool(
-                'checkPlagiarism'
-            ) ?? false;
+        $checkPlagiarism = $r->ensureOptionalBool('check_plagiarism') ?? false;
         $valueProperties = [
             'title',
             'description',
