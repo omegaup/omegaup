@@ -4798,7 +4798,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     }
             ],
             'admission_mode',
-            'plagiarism_threshold' => $checkPlagiarism ? 90 : 0,
+            'plagiarism_threshold',
         ];
         self::updateValueProperties($r, $contest, $valueProperties);
 
