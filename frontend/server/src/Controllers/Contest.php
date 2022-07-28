@@ -2852,7 +2852,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'teams_group_alias'
             );
         }
-        $checkPlagiarism = $r->ensureOptionalBool('checkPlagiarism') ?? false;
+        $r->ensureOptionalBool('check_plagiarism') ?? false;
     }
 
     /**
