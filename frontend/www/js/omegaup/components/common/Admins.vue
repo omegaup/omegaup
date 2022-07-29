@@ -16,7 +16,7 @@
               @update-existing-options="
                 (query) => $emit('update-search-result-users', query)
               "
-            />
+            ></omegaup-common-typeahead>
           </label>
         </div>
         <div class="row">
@@ -113,7 +113,7 @@ export default class Admins extends Vue {
   @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
-  username: null | string = null;
+  username: null | types.ListItem = null;
   showSiteAdmins = false;
   selected = {};
   admins = this.initialAdmins;
@@ -124,12 +124,7 @@ export default class Admins extends Vue {
   }
 
   onSubmit(): void {
-    if (this.hasParentComponent) {
-      this.$emit('emit-add-admin', this);
-      this.username = null;
-      return;
-    }
-    this.$emit('add-admin', this.username);
+    this.$emit('add-admin', this.username?.key);
     this.username = null;
   }
 

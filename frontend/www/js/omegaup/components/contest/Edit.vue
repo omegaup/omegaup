@@ -373,8 +373,11 @@ export default class Edit extends Vue {
     return T.contestEditArchiveHelpText;
   }
 
-  get teamsGroupAlias(): null | string {
-    return this.teamsGroup?.alias ?? null;
+  get teamsGroupAlias(): null | types.ListItem {
+    if (!this.teamsGroup) {
+      return null;
+    }
+    return { key: this.teamsGroup?.alias, value: this.teamsGroup.name };
   }
 
   onArchiveContest(archive: boolean): void {

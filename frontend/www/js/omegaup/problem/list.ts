@@ -12,7 +12,7 @@ OmegaUp.on('ready', () => {
   let sortOrder: omegaup.SortOrder = omegaup.SortOrder.Descending;
   let columnName = 'problem_id';
   let language = 'all';
-  let query: null | string = null;
+  let query: null | types.ListItem = null;
   let tag: string[] = [];
   if (queryString) {
     const urlParams = new URLSearchParams(queryString);
@@ -46,12 +46,12 @@ OmegaUp.on('ready', () => {
     if (urlParams.get('query')) {
       const queryParam = urlParams.get('query');
       if (queryParam) {
-        query = queryParam;
+        query = JSON.parse(queryParam);
       }
     }
 
     if (query) {
-      searchResultProblems.push({ key: query, value: query });
+      searchResultProblems.push(query);
     }
   }
   new Vue({

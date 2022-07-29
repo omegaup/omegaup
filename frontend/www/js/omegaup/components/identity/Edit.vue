@@ -75,7 +75,7 @@
               <omegaup-common-typeahead
                 :existing-options="searchResultSchools"
                 :options="searchResultSchools"
-                :value.sync="schoolId"
+                :value.sync="school"
                 @update-existing-options="
                   (query) => $emit('update-search-result-schools', query)
                 "
@@ -125,14 +125,12 @@ export default class IdentityEdit extends Vue {
       name: '',
       gender: '',
       school: '',
-      school_id: 0,
       country_id: 'MX',
       state_id: '',
     } as types.Identity,
     this.identity,
   );
-  schoolId = this.selectedIdentity.school_id;
-  schoolName = this.selectedIdentity.school;
+  school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
 
   get groupName(): string {
     const teamUsername = this.selectedIdentity.username.split(':');
@@ -164,8 +162,7 @@ export default class IdentityEdit extends Vue {
       originalUsername: this.identity?.username,
       identity: {
         ...this.selectedIdentity,
-        school_id: this.schoolId,
-        school_name: this.schoolName,
+        school: this.school?.value,
       },
     });
   }
@@ -173,18 +170,6 @@ export default class IdentityEdit extends Vue {
   @Watch('identity')
   onIdentityChanged(newValue: types.Identity): void {
     this.selectedIdentity = newValue;
-  }
-
-  @Watch('schoolId')
-  onSchoolIdChanged(newValue: string): void {
-    if (newValue) {
-      const school = this.searchResultSchools.find(
-        (school) => String(school.key) == newValue,
-      );
-      this.schoolName = school?.value;
-      return;
-    }
-    this.schoolName = this.searchResultSchools[0].value;
   }
 }
 </script>
