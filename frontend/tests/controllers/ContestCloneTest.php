@@ -132,9 +132,9 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
         // Create a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
-                'plagiarism_threshold' => $checkPlagiarism,
-            ]);
-        )
+                'checkPlagiarism' => $checkPlagiarism,
+            ])
+        );
         $checkPlagiarismDuplicate = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
