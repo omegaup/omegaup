@@ -241,12 +241,12 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'plagiarism_threshold' => $checkPlagiarism,
             ]);
         )
-        checkPlagiarismDuplicate = \OmegaUp\DAO\Contests::getByAlias(
+        $checkPlagiarismDuplicate = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
 
         this->assertEquals(
-            $response->plagiarism_threshold,
+            $checkPlagiarismDuplicate->plagiarism_threshold,
             $plagiarismThresholdExpected
         );
     }
