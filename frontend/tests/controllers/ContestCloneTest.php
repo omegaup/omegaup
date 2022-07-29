@@ -119,8 +119,10 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
             [false, 0],
         ];
     }
+
     /**
      * Check if the plagiarism value is stored correctly in the database.
+     *
      * @dataProvider plagiarismThresholdProvider
      */
     public function testToValidatePlagiarismThresholdValue(
