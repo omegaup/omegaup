@@ -1142,6 +1142,41 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
+    final public static function getByProblemsetId(
+        \OmegaUp\DAO\VO\Problemsets $problemset
+    ): ?\OmegaUp\DAO\VO\Courses {
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "c.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Courses::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "SELECT
+                    {$fields}
+                FROM
+                    Courses c
+                INNER JOIN
+                    Assignments a
+                ON
+                    c.course_id = a.course_id
+                WHERE
+                    a.problemset_id = ?
+                LIMIT 1;";
+
+        /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}|null */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$problemset->problemset_id]
+        );
+        if (empty($row)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\Courses($row);
+    }
+
     final public static function getByAlias(
         string $alias
     ): ?\OmegaUp\DAO\VO\Courses {
