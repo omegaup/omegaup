@@ -103,6 +103,7 @@ class ContestParams {
      * @var null|string
      */
     public $scoreMode;
+
     /**
      * @readonly
      * @var bool
