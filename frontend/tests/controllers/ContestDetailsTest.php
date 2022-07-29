@@ -216,6 +216,41 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * A PHPUnit data provider for all the plagiarism threshold values in a
+     * contest.
+     *
+     * @return list<array{0:bool, 1:int}>
+     */
+    public function plagiarismThresholdProvider(): array {
+        return [
+            [true, 90],
+            [false, 0],
+        ];
+    }
+    /**
+     * Check if the plagiarism value is stored correctly in the database.
+     * @dataProvider plagiarismThresholdProvider
+     */
+    public function testToValidatePlagiarismThresholdValue(
+        bool $checkPlagiarism
+        int $plagiarismThresholdExpected
+    ) {
+        // Create a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'plagiarism_threshold' => $checkPlagiarism,
+            ]);
+        )
+        checkPlagiarismDuplicate = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+
+        this->assertEquals(
+            $response->plagiarism_threshold,
+            $plagiarismThresholdExpected
+        );
+    }
+     /**
      * Check that user in private group list can view private contest
      */
     public function testShowValidPrivateContestFromGroup() {
