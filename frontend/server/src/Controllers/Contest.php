@@ -2882,7 +2882,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
-     * @omegaup-request-param bool|null %checkPlagiarism
+     * @omegaup-request-param bool|null $checkPlagiarism
      */
     private static function validateCreate(
         \OmegaUp\Request $r,
