@@ -106,6 +106,7 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('aliasInUse', $e->getMessage());
         }
     }
+
     /**
      * A PHPUnit data provider for all the plagiarism threshold values in a
      * contest.
