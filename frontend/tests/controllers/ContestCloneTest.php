@@ -120,6 +120,7 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
         ];
     }
 
+
     /**
      * Check if the plagiarism value is stored correctly in the database.
      *
