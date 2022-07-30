@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Similarity Detector</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta property="og:type" content="content">
+    <meta property="og:title" content="Similarity dectector of text">
+    <!-- <script src="http://127.0.0.1:5000/?__debugger__=yes&amp;cmd=resource&amp;f=jquery.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<style>
+    html, body {
+        margin: 0; padding: 0;
+        scroll-behavior: smooth;
+    }
+    :root {
+        --primary-dark-color: #5d5bff;
+        --primary-light-color: #7676fa;
+        --primary-color: #523efc;
+        --secondary-dark-color: #403f3f;
+        --secondary-light-color: #646464;
+        --border-gray-color: #b7b5b5;
+        --shadow-blue-color: #bdbafa;
+        --standard-white: #ffffff;
+        --note: #fafafa;
+        --error: #ff4242;
+    }
+    header {
+        height: 180px;
+        font-family: arial;
+        /*background: linear-gradient(145deg, #3931f4, #8874fc,#5a26ff);*/
+        background-image: url({{url_for('static', filename='1.png')}});
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        color: var(--standard-white);
+        padding: 10px; display: grid;
+        align-items: center;
+        box-shadow: 0px 0px 8px 0px rgb(0 0 0 / 60%);
+    }
+    header .material-icons {
+        font-size: 32px;
+        color: white;
+    }
+    header span {
+        font: 48px arial;
+        text-shadow: 3px 3px rgba(0,0,0,.5);
+    }
+    header a {
+        color: #191717; font-size: 32px; padding-right: 10px;
+    }
+    header a:hover {
+        color: #343436;
+    }
+    h1, h2, h3, h4, h5 , h6 {
+        font-family: verdana, sans-serif;
+        color: var(--primary-color);
+    } 
+    mark {
+        background-color: var(--shadow-blue-color);
+        font-family: serif;
+        font-weight: bold;
+        color: var(--primary-dark-color);
+        padding: 4px 8px; border-radius: 3px;
+    }
+    p {
+        font-family: arial, sans-serif;
+        line-height: 2;
+        text-indent: 25px;
+    }
+    .container {
+        width: 90%;
+        margin: 20px auto;
+    }
+    .pr-5 {
+        padding-right: 5px;
+    }
+    .pr-10 {
+        padding-right: 10px;
+    }
+    .ml-5 {
+        margin-left: 5px;
+    }
+    .flex-layout {
+        display: flex;
+        align-items: center;
+    }
+    .grid-layout {
+        display: grid;
+        align-items: center;
+    }
+    .end {
+        justify-content: flex-end
+    }
+    .start {
+        justify-content: flex-start;
+    }
+    .center {
+        justify-content: center;
+    }
+    .page-container a {
+        text-decoration: none;
+        color: var(--link-color);
+    }
+    .page-container a:hover {
+        text-decoration: underline;
+    }
+    .note {
+        padding: 8px; 
+        background: var(--note); 
+        border: 1px solid #e3e2e2;  
+        border-radius: 4px;
+    }
+    .bl-3 {
+        border-left: 3px solid var(--primary-light-color);
+    }
+
+    /*editor layout & structure css*/
+    .editor-container .editable_area,
+    .editor-container {
+        transition-property: tab-size, -moz-tab-size, -o-tab-size;
+        -webkit-transition: tab-size, -moz-tab-size, -o-tab-size .2s ease;
+        transition-duration: .5s;
+        transition-timing-function: ease;
+    }
+    
+    .editor-toolbar{
+        border: 1px solid var(--border-gray-color);
+        margin-bottom: -1px;
+        display: flex;
+        padding: 3px 3px 0 3px;
+        font-family: monospace;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--primary-dark-color);
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+    .editor-toolbar button {
+        outline: none;
+        border: none;
+        padding: 10px 20px;
+        font-size: 18px;
+        font-family: monospace;
+        border-top-left-radius: 5px;
+        cursor: pointer; background-color: var(--primary-dark-color);
+        font-family: serif; 
+        color: var(--standard-white);
+        opacity: 0.6;
+        margin: 0 5px; 
+        cursor: pointer;
+    }
+    .form-select {
+        height: 26px;
+        padding: 3px 15px 3px 5px;
+        font-size: 12px;
+        display: inline-block;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIGZpbGw9IiM1ODYwNjkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTQuNDI3IDkuNDI3bDMuMzk2IDMuMzk2YS4yNTEuMjUxIDAgMDAuMzU0IDBsMy4zOTYtMy4zOTZBLjI1LjI1IDAgMDAxMS4zOTYgOUg0LjYwNGEuMjUuMjUgMCAwMC0uMTc3LjQyN3pNNC40MjMgNi40N0w3LjgyIDMuMDcyYS4yNS4yNSAwIDAxLjM1NCAwTDExLjU3IDYuNDdhLjI1LjI1IDAgMDEtLjE3Ny40MjdINC42YS4yNS4yNSAwIDAxLS4xNzctLjQyN3oiLz48L3N2Zz4=");
+        background-repeat: no-repeat;
+        background-position: right 4px center;
+        appearance: none;
+        -webkit-appearance: none;
+        background-size: 16px;
+        background-color: var(--standard-white);
+        border-radius: 8px;
+        border: 1px solid var(--border-gray-color);
+    }
+    .form-select:focus {
+        border: 1px solid var(--primary-light-color);
+        outline: none;
+        box-shadow: 0 0 1px 3px var(--shadow-blue-color);
+    }
+    
+    .editor-toolbar .active {
+        color: whitesmoke;
+        border-bottom: 2px solid var(--standard-white);
+        font-weight: 800;
+        opacity: 1;
+    }
+    .editor-status-bar {
+        display: flex;
+        height: 25px; width: auto;
+        margin-top: -2px;
+        justify-content: space-between;
+        padding: 5px; 
+        border: 1px solid var(--border-gray-color);
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        align-items: center; 
+        color: var(--secondary-light-color);
+        font:14px monospace;
+        background-color: #f5f5f566;
+    }
+    /*end*/
+
+    .btn {
+        padding: 10px;
+        cursor: pointer; border: none;
+        font-family: 'Helvetica', sans-serif; font-size: 14px;
+        font-weight: 600;
+        border-radius: 4px; margin-right: 10px;
+    }
+    .btn:hover {
+        box-shadow: rgb(0 0 0 / 12%) 0px 1px 3px, rgb(0 0 0 / 24%) 0px 1px 2px;
+    }
+    .material-icons {
+        padding-right: 10px;
+        font-size: 24px;
+    }
+
+    .editable_area, .linenumber { /*resize editor*/
+        min-height: 300px !important;
+    }
+
+    /*app result css*/
+    .text-result {
+        background: rgb(255 255 255);
+        height: 100px;
+        display: flex;
+        /* box-shadow: rgb(0 0 0 / 12%) 0px 1px 3px, rgb(0 0 0 / 24%) 0px 1px 2px; */
+        /* box-shadow: rgb(100 100 111 / 20%) 0px 7px 29px 0px; */
+        margin: 15px 0;
+        /*box-shadow: rgb(0 0 0 / 16%) 0px 1px 4px;*/
+        box-shadow: rgb(0 0 0 / 10%) 0px 10px 20px 5px, rgb(0 0 0 / 5%) 6px 4px 6px 0px;
+    }
+    .response {
+        font-family: helvetica, serif;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    .error {
+        font-size: large; font-weight: 600px;
+        color: var(--error);
+    }
+    /*end*/
+
+    footer {
+        color: var(--secondary-light-color);
+        border-top: 1px solid var(--border-gray-color);
+    }
+    footer > h3, h4, h5, h6 {
+        color: var(--secondary-light-color);
+    }
+    /*loading animation*/
+    .loader {
+        width: 50px; height: 50px;
+        border-radius: 50%;
+        border: 2px solid var(--light-color);
+        border-top: 2px solid var(--primary-light-color);
+        animation: loading 2s linear infinite;
+    }
+    @keyframes loading{
+        0% {transform: rotate(0deg);}
+        100% {transform: rotate(360deg);}
+    }
+    /*end*/
+
+    @media only screen and (min-width: 920px){
+        .container {
+            width: 800px;
+        }
+    }
+    @media only screen and (min-width: 548px) and (max-width: 920px){
+        header span {
+            font: 40px arial;
+        }
+        .container {
+            width: 90%;
+        }
+        .editor-toolbar button {
+            background-size: 16px;
+            padding: 10px 20px;
+        }
+        .form-select {
+            padding: 3px 10px 3px 3px;
+        }
+    }
+    @media only screen and (max-width: 548px){
+        header span {
+            font: 32px arial;
+        }
+        .container {
+            width: 95%;
+        }
+        .page-container h2 {
+            font-size: 20px;
+        }
+        .page-container p {
+            font-size: 16px;
+        }
+        .editor-toolbar .flex-layout {
+            margin: auto;
+        }
+        .editor-toolbar button {
+            font-size: 16px;
+            padding: 10px 30px;
+        }
+        .container .editor-toolbar select {
+            display: none;
+            padding: 2px ​8px 2px 3px;
+        }
+        .loader {
+            width: 60px; height: 60px;
+        }
+    }
+</style>
+<style type="text/css">
+    .progress-circle {
+        width: 120px; height: 100px;
+    }
+    .progress-circle svg {
+        width: 70px; height: 70px;
+        transform: rotate(-90deg);
+    }
+    .progress-circle svg circle {
+        fill: transparent; stroke: var(--primary-dark-color);
+        stroke-width: 6px; stroke-linecap: round;
+        transform: translate(6px, 6px);
+        stroke-dasharray: 185;
+        stroke-dashoffset: 0; 
+    }
+    .progress-circle svg circle:nth-child(1){
+        stroke: #e6e6e6; stroke-dashoffset: 0;
+    }
+    .progress-circle svg circle:nth-child(2){
+        stroke-dashoffset: calc(185 - (185 * 0)/185);
+        transition: all 1s linear;
+    }
+    .progress-circle span.percent {
+        position: absolute;
+        font: 20px arial;
+    }
+    .progress-circle span.percent i {
+        color: #888888; font-size: 16px;
+    }
+    @keyframes svgText {
+        from { stroke-dasharray: 0 50%; }
+        to { stroke-dasharray: 50% 0;  }
+    }
+</style>
+</head>
+<body>
+    <header>
+        <center>
+            <span>Similarity Detector of text</span><br><br>
+            <a href="https://github.com/RohitYandigeri"><i class="fa fa-github"></i></a>
+            
+        </center>
+
+    </header>
+    <section class="container">
+        
+        <!-- About project -->
+        <div class="page-container">
+            <h2>Title</h2>
+            <p>Describtion about the project.</p>
+            <p class='note bl-3'>
+               It is project about finding the similarity in percentage between the given text using the python cdifflib library and integrated in python flask<br> <bR>
+               i) you can copy the text and paste in text box to find the similarities between them <br>
+               ii) You can upload the txt and docx files and can able to find the similarities between them <br>
+            </p>
+
+        </div>
+        <!-- end -->
+        
+        <!-- similarity dectector -->
+        <div class="sd">
+            <h3>Paragraph/Code Similarity detector</h3>
+            <p>
+                You type the text/code inside the mini editor and click <mark>Process</mark> button to find the similarity of the text/source and <mark>Clear All</mark> button to clear text/source you have enter.
+            </p>
+            <p>
+                You are also allowed to upload file using<span class="material-icons" style="color: grey; transform: translateY(6px);">note_add</span> at bottom right corner of the editor to check similarity.
+            </p>
+            <br><br>
+            <div class="editor-container content">
+                <div class="editor-toolbar">
+                    <div class="flex-layout">
+                        <button class="edit-btn-1 flex-layout">
+                            <span class="material-icons">
+                            text_fields </span>
+                            Box - 1
+                        </button>
+                        <button class="edit-btn-2 flex-layout">
+                           <span class="material-icons">
+                            text_fields </span>
+                            Box - 2
+                        </button>
+                    </div>
+                    <div class="pr-5">
+                        <select id="Indent-mode" class="form-select ml-5" aria-label="Indent-mode">
+                            <optgroup label="Indent-mode">
+                                <option selected>Spaces</option>
+                                <option>Tabs</option>
+                            </optgroup>
+                        </select>
+                        <select id="Indent-size" class="form-select ml-5" aria-label="Indent-size">
+                            <optgroup label="Indent-size">
+                                <option>2</option>
+                                <option selected>4</option>
+                                <option>8</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+                <div class="editor-layout">
+                    <div class="multiline-editor box-1">
+                        <div class="foo"></div>
+                        <div class="editor-status-bar">
+                            <span class="edited-info">Textbox - 1</span>
+                            <input type="file" id="file1"  accept=".txt,.docx"  hidden>
+                            <label for="file1">
+                                <span class="material-icons" style="color: grey; cursor: pointer;">
+                                note_add
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="multiline-editor box-2">
+                        <div class="bar"></div>
+                        <div class="editor-status-bar">
+                            <span class="edited-info">Textbox - 2</span>
+                            <input type="file" id="file2" accept=".txt,.docx" hidden>
+                            <label for="file2">
+                                <span class="material-icons" style="color: grey;cursor: pointer;">
+                                note_add
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="data-process" style="padding: 10px; display: grid; grid-gap: 10px;">
+                <div class="flex-layout end">
+                    <button class="btn" style="background: #00af00; color: #f1f1f1">Process</button>
+                    <button class="btn" style="border: .2px solid #d1d1d1; box-shadow: none;color: var(--secondary-light-color)">Clear All</button>
+                </div>
+                <div class="text-result flex-layout start" style="display: none;">
+                    <div class="progress-circle flex-layout center" >
+                        <svg>
+                            <!-- cx, cy, r => length from center -->
+                            <circle cx="30" cy="30" r="30"/>
+                            <circle cx="30" cy="30" r="30" class='per'/>
+                        </svg>
+                        <span class="percent"><b>0</b>
+                            <i>%</i>
+                        </span>
+                    </div>
+                    <div class="result flex-layout center" style="margin: auto;">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <footer class="container">
+        <center>
+            <h4> Suggestions are heartly well comed <span class="fa fa-heart" style="color: var(--error);"></span>.</h4>
+            <h5> Developed and designed by <i>Rohit yandigeri</i></h5>
+            
+        </center>
+    </footer>
+
+    <script type="text/javascript" src="https://smac01.github.io/js/minieditor.js"></script>
+   
+    <script type="text/javascript">
+        $(document).ready(function(){
+            // editor initialization
+            var foo = new MiniEditor('.foo');
+            foo.build();
+            var bar = new MiniEditor('.bar');
+            bar.build();
+
+            // editor tab & space indentation related functions
+            $('#Indent-mode').change(function(){
+                if(this.value == "Tabs"){
+                    //enable tab spaces
+                    jQuery('.editable_area').keydown(function(e){
+                        if(e.keyCode == 9 || e.which == 9){
+                            e.preventDefault();
+                            var s = this.selectionStart;
+                            this.value = this.value.substring(0, this.selectionStart) + "\t" + this.value.substring(this.selectionEnd)
+                            this.selectionEnd = s+1;
+                        }
+                    });
+                }else{
+                    jQuery('.editable_area').keydown(function(e){
+                        // allow default behaviour
+                    });
+                }
+            });
+            $('#Indent-size').change(function(){
+                jQuery('.editable_area').css('tab-size',this.value)
+                .css('-moz-tab-size', this.value)
+                .css('-o-tab-size', this.value);
+            });
+            // end
+
+            // toggle editor tab
+            jQuery('.edit-btn-1').click(function(){
+                this.classList.add('active');
+                jQuery('.edit-btn-2').removeClass('active');
+                jQuery('.box-1').show();
+                jQuery('.box-2').hide();
+            })
+
+            jQuery('.edit-btn-2').click(function(){
+                this.classList.add('active');
+                jQuery('.edit-btn-1').removeClass('active');
+                jQuery('.box-2').show();
+                jQuery('.box-1').hide();
+            })
+
+            jQuery('.edit-btn-1').click();
+            // end
+
+            // post request to server
+            jQuery('.data-process .btn:first').click(function(){
+                jQuery('.text-result').css('display', 'flex');
+                jQuery('.result').html('<span class="loader"></span>');
+                try{
+                    jQuery.post({
+                        url: '/getdata',
+                        data: JSON.stringify({
+                            'p': jQuery('.box-1 .editable_area')[0].value,
+                            'q': jQuery('.box-2 .editable_area')[0].value
+                        }),
+                        contentType: "application/json",
+                        timeout: 5000,
+                        })
+                    .done(function(response){
+                            // console.log(response);
+                            if(response.status == true){
+                                
+                                $('.percent b').text(response.percentage);
+                                
+                                jQuery('.result').html( `
+                                <p class='response'>${response.result}</p>
+                                `);
+
+                                $('.progress-circle svg .per').css(
+                                    'stroke-dashoffset', `calc(185 - (185 * ${response.percentage})/100)`
+                                );
+
+                            }else{
+                                jQuery('.result').html(`
+                                    <p class="response">${response.result}</p>
+                                `);
+                            }
+                        }
+                    )
+                    .fail(function(){
+                        jQuery('.result').html(`
+                            <p class="error">Request failed.</p>
+                        `);
+                    });
+                }catch(e){
+                    jQuery('.result').html(`
+                        <p class="error">Request failed.</p>
+                    `);
+                }
+            });
+
+            // clear editor content
+            jQuery('.data-process .btn:last').click(function(){
+                jQuery('.box-1 .editable_area')[0].value = '';
+                jQuery('.box-2 .editable_area')[0].value = '';
+                jQuery('.box-1 .linenumber')[0].value = '1';
+                jQuery('.box-2 .linenumber')[0].value = '1';
+                jQuery('.text-result').hide();
+            });
+
+            
+            jQuery('#file1')[0].addEventListener('change', function(){
+                if (this.files && this.files[0]){
+                    var reader = new FileReader();
+                    // console.log(this.files[0]);
+                    reader.addEventListener('load', function(){
+                        jQuery('.box-1 .editable_area')[0].value = reader.result;
+                    });
+                    reader.readAsBinaryString(this.files[0]);
+                }
+            });
+            jQuery('#file2')[0].addEventListener('change', function(){
+                if (this.files && this.files[0]){
+                    var reader = new FileReader();
+                    // console.log(this.files[0]);
+                    reader.addEventListener('load', function(){
+                        jQuery('.box-2 .editable_area')[0].value = reader.result;
+                    });
+                    reader.readAsBinaryString(this.files[0]);
+                }
+            });
+
+        })
+
+        
+    </script>  
+</body>
+</html>
+
+<!-- Web idea
+https://clipboardjs.com/
+https://smac01.github.io/tools/gfmeditor.html
+ -->
+
+<!-- python side
+
+@app.route('/getdata', methods=['POST'])
+def getdata():
+    try:
+        content = request.get_json()
+        # data processing code
+        # content['p'] -> textarea 1 content
+        # content['q'] -> textarea 2 content
+        return jsonify({
+            'status': True,
+            'percentage': randint(0,100),
+            'result': "Your data is measured to be nearly ... matchably"
+        })
+
+    except Exception as e:
+        print(e)
+        return jsonify({
+            'status': False,
+            'result': "Error in processing"
+            })
+ -->
