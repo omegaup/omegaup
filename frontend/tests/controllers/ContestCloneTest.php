@@ -144,7 +144,7 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Controllers\Contest::apiClone(
             new \OmegaUp\Request([
-                'auth_token' => $login['auth_token'],
+                'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'title' => $clonedContestAlias,
                 'description' => $clonedContestAlias,
