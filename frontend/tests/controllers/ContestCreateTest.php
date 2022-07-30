@@ -168,7 +168,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * Check if the plagiarism value is stored correctly in the database.
      * @dataProvider plagiarismThresholdProvider
      */
-    public function testToValidatePlagiarismThresholdValue(
+    public function testValidatePlagiarismThresholdValue(
         bool $checkPlagiarism
         int $plagiarismThresholdExpected
     ) {
