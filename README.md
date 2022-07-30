@@ -1,60 +1,45 @@
-# similarity_detector_python-flask-app
+[![omegaUp](frontend/www/media/omegaup.png)](https://omegaup.com)
 
-It is project about finding the similarity in percentage between the given text using the python cdifflib library and integrated in python flask
+[![Contributors](https://img.shields.io/github/contributors/omegaup/omegaup)](https://github.com/omegaup/omegaup/graphs/contributors) [![Issues open](https://img.shields.io/github/issues/omegaup/omegaup)](https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aopen) [![Issues closed](https://img.shields.io/github/issues-closed/omegaup/omegaup)](https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aclosed)
 
-**prerequisite**
+[![Forks](https://img.shields.io/github/forks/omegaup/omegaup?style=social)](https://github.com/omegaup/omegaup/network/members) [![Stars](https://img.shields.io/github/stars/omegaup/omegaup?style=social)](https://github.com/omegaup/omegaup/stargazers) [![Twitter](https://img.shields.io/twitter/follow/omegaup.svg?style=social&label=Follow)](https://twitter.com/omegaup)
 
-1.Basic python
+[omegaUp](https://omegaup.com) es una plataforma educativa gratuita que ayuda a mejorar las habilidades en programación, usada por decenas de miles de estudiantes y docentes en Latinoamérica.
 
-2.Python Flask [Web frame work]
+## Directorios
 
-4.Basic Html and Css to make website
+Directorios que se utilizan activamente en el desarrollo.
 
-**Working**
+| Directorio | Descripción |
+|------------|-------------|
+| [frontend/server/src/Controllers](https://github.com/omegaup/omegaup/tree/main/frontend/server/src/Controllers) | Lógica de negocio que implementa la API de omegaUp. |
+| [frontend/server/libs](https://github.com/omegaup/omegaup/tree/main/frontend/server/libs) | Bibliotecas y utilerías. |
+| [frontend/server/src/DAO](https://github.com/omegaup/omegaup/tree/main/frontend/server/src/DAO) | Los Data Access Objects [DAO] y Value Objects [VO]. Clases utilizadas para representar los esquemas de la base de datos y facilitar su consumo por los controladores. |
+| [frontend/templates](https://github.com/omegaup/omegaup/tree/main/frontend/templates) | Plantillas utilizadas para generar el HTML que se despliega a los usuarios. También aquí están los archivos de internacionalización para inglés, español y portugués. |
+| [frontend/www](https://github.com/omegaup/omegaup/tree/main/frontend/www) |  Los contenidos completos de la página de internet. |
 
-1.Make sure that you have installed python and any one ide for python [Anaconda spyder, pycharm] in your Computer
+El resto del código está en otros repositorios
 
-2.Download code from github
+| Repositorio| Descripción |
+|------------|-------------|
+| [quark](https://github.com/omegaup/quark) | Incluye el código del grader para la calificación de problemas y ejecutar los códigos bajo minijail, así como el servicio utilizado en los servidores de la nube para servir la cola de envíos. |
+| [karel.js](https://github.com/omegaup/karel.js) | La versión oficial de Karel utilizada por la Olimpiada Mexicana de Informática. |
+| [omegajail](https://github.com/omegaup/omegajail) | Un mecanismo de ejecución segura que basado en contenedores de Linux y seccomp-bpf. Utiliza [minijail](https://android.googlesource.com/platform/external/minijail/+/master), escrito por el proyecto [Chromium](https://www.chromium.org). |
+| [libinteractive](https://github.com/omegaup/libinteractive) | Una librería para hacer problemas interactivos fácilmente.
 
-3.Open the project folder in your IDE.
+## Navegadores Soportados
 
-4.Locate to app.py file and run the file
+Los navegadores oficialmente soportados son aquellos que soportan [ECMAScript 2015 (ES6)](https://caniuse.com/#feat=es6), e incluyen los siguientes:
 
-5.In the compiler you will get the message like this. If not you have error in the code
+| Navegador | Versión |
+|-----------|---------|
+| [Chrome](https://www.google.com/chrome/) | 51 |
+|[Firefox](http://mozilla.org/firefox/releases/) | 68 |
+| [Edge](https://www.microsoft.com/edge) | 12 |
+| [Safari](https://www.apple.com/safari/) | 12 |
 
-Restarting with stat
-Debugger is active!
-Debugger PIN: 716-674-243
-Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+Esto también incluye todos los navegadores basados en Blink / WebKit cuyas versiones sean compatibles con las de Chrome / Safari.
 
-6.On the clicking the url your website will be locally hosted in your web browser.
+## Licencia
 
-**Python Packages to be installed and commands**
-
-1.Flask --> pip install Flask
-
-2.difflib --> pip install cdifflib
-
-**Project Files and its functions**
-
-1.It is very simple deployment as you can find only app.py file contains all the function in it
-
-2.The website consisits of 2 functions 
-
-  i) you can copy the text and paste in text box to find the similarities between them
-  
-  ii) You can upload the txt and docx files and can able to find the similarities between them
-  
-  
-3..txt files are the sample files you can use it for demo
-
-4.profile, requirements are the files help to deploy this app in cloud [heroku] it ia paas service helps to deploye the web apps
-
-5. profile file tells the endpoint to be specified for application and requirements tells the neccessary packages to be installed to run web app.
-
-6.This web application in cloud: https://similaritydectecor12.herokuapp.com/    
-
-you can click and can use anywhere you wanted without python ide as it was published in cloud.
- 
-
-
+BSD
