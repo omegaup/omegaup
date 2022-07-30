@@ -182,7 +182,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['request']['alias']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $checkPlagiarismDuplicate->plagiarism_threshold,
             $plagiarismThresholdExpected
         );
