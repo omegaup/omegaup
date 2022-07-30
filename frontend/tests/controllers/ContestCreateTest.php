@@ -169,7 +169,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * @dataProvider plagiarismThresholdProvider
      */
     public function testToValidatePlagiarismThresholdValue(
-        bool $checkPlagiarism
+        bool $checkPlagiarism,
         int $plagiarismThresholdExpected
     ) {
         // Create a contest
