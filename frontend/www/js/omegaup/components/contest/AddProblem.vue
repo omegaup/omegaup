@@ -335,14 +335,14 @@ export default class AddProblem extends Vue {
   }
 
   @Watch('alias')
-  onAliasChange(newProblemAlias: string) {
+  onAliasChange(newProblemAlias: null | types.ListItem) {
     if (!newProblemAlias) {
       this.versionLog = [];
       this.selectedRevision = this.publishedRevision = null;
       return;
     }
     if (this.isUpdate) {
-      this.onGetVersions(newProblemAlias);
+      this.onGetVersions(newProblemAlias.key);
       return;
     }
     this.$emit('get-versions', {

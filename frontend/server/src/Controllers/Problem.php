@@ -3800,7 +3800,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $searchObject = $r->ensureOptionalString('query');
 
         if ($searchObject) {
-            /** @var array{key: string, value: strng} */
+            /** @var array{key: string, value: string} */
             $keywordObject = json_decode(
                 urldecode(
                     $searchObject

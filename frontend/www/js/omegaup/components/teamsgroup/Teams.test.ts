@@ -23,6 +23,8 @@ describe('Teams.vue', () => {
   const propsData: {
     teams: types.Identity[];
     countries: dao.Countries[];
+    searchResultUsers: types.ListItem[];
+    searchResultSchools: types.SchoolListItem[];
   } = {
     teams: [
       {
@@ -31,6 +33,8 @@ describe('Teams.vue', () => {
       },
     ],
     countries: [{ country_id: 'mx', name: 'Mexico' }],
+    searchResultUsers: [{ key: 'user', value: 'username' }],
+    searchResultSchools: [{ key: 1, value: 'school name' }],
   };
 
   it('Should handle an empty list of members and identities', () => {
@@ -60,6 +64,14 @@ describe('Teams.vue', () => {
     const wrapper = mount(teamsgroup_Teams, {
       attachTo: '#root',
       propsData,
+    });
+
+    await wrapper.vm.$nextTick(async () => {
+      const identityEditWrapper = wrapper.findComponent(identity_Edit);
+
+      await identityEditWrapper.setData({
+        searchResultSchools: [{ key: 1, value: 'school name' }],
+      });
     });
 
     await wrapper
@@ -102,9 +114,7 @@ describe('Teams.vue', () => {
             country_id: 'MX',
             gender: '',
             name: 'updated user',
-            school: '',
-            school_name: '',
-            school_id: 0,
+            school: 'school name',
             state_id: '',
             username: 'omegaUp:user',
           },

@@ -42,7 +42,10 @@ describe('Typeahead.vue', () => {
     tagsInput.vm.$emit('tag-added');
     await Vue.nextTick();
     expect(wrapper.emitted()).toEqual({
-      'update:value': [['key'], ['key']],
+      'update:value': [
+        [{ key: 'key', value: 'value' }],
+        [{ key: 'key', value: 'value' }],
+      ],
     });
   });
 
