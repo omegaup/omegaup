@@ -169,20 +169,20 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * @dataProvider plagiarismThresholdProvider
      */
     public function testValidatePlagiarismThresholdValue(
-        bool $checkPlagiarism
+        bool $checkPlagiarism,
         int $plagiarismThresholdExpected
     ) {
         // Create a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
-                'plagiarism_threshold' => $checkPlagiarism,
-            ]);
-        )
+                'checkPlagiarism' => $checkPlagiarism,
+            ])
+        );
         $checkPlagiarismDuplicate = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
 
-        this->assertEquals(
+        $this->assertSame(
             $checkPlagiarismDuplicate->plagiarism_threshold,
             $plagiarismThresholdExpected
         );

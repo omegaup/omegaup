@@ -216,6 +216,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+    /**
      * A PHPUnit data provider for all the plagiarism threshold values in a
      * contest.
      *
@@ -223,33 +224,57 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function plagiarismThresholdProvider(): array {
         return [
-            [true, 90],
-            [false, 0],
+            [true, 90, 0],
+            [false, 0, 90],
         ];
     }
+
     /**
-     * Check if the plagiarism value is stored correctly in the database.
+     * Check if the plagiarism value is stored correctly in the database when a
+     * contest is updated.
+     *
      * @dataProvider plagiarismThresholdProvider
      */
-    public function testToValidatePlagiarismThresholdValue(
-        bool $checkPlagiarism
-        int $plagiarismThresholdExpected
+    public function testToValidatePlagiarismThresholdValueInUpdatedContest(
+        bool $checkPlagiarism,
+        int $plagiarismThresholdExpected,
+        int $plagiarismThresholdExpectedAfterUpdate
     ) {
         // Create a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
-                'plagiarism_threshold' => $checkPlagiarism,
-            ]);
-        )
-        $checkPlagiarismDuplicate = \OmegaUp\DAO\Contests::getByAlias(
+                'checkPlagiarism' => $checkPlagiarism,
+            ])
+        );
+
+        $response = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
 
-        this->assertEquals(
-            $checkPlagiarismDuplicate->plagiarism_threshold,
+        $this->assertSame(
+            $response->plagiarism_threshold,
             $plagiarismThresholdExpected
         );
+
+        // Login with director to update the contest
+        $login = self::login($contestData['director']);
+
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'check_plagiarism' => !$checkPlagiarism,
+        ]));
+
+        $response = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+
+        $this->assertEquals(
+            $response->plagiarism_threshold,
+            $plagiarismThresholdExpectedAfterUpdate
+        );
     }
+
      /**
      * Check that user in private group list can view private contest
      */
