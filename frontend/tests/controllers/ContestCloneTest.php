@@ -108,23 +108,8 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * A PHPUnit data provider for all the plagiarism threshold values in a
-     * contest.
-     *
-     * @return list<array{0:bool, 1:int}>
-     */
-    public function plagiarismThresholdProvider(): array {
-        return [
-            [true, 90],
-            [false, 0],
-        ];
-    }
-
-    /**
      * Check if the plagiarism value is stored correctly in the database when
      * the contest is cloned.
-     *
-     * @dataProvider plagiarismThresholdProvider
      */
     public function testToValidatePlagiarismThresholdValueInClonedContest(
         bool $checkPlagiarism,
@@ -156,7 +141,7 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\DAO\Contests::getByAlias($clonedContestAlias);
 
         $this->assertSame(
-            $response->plagiarism_threshold,
+            $response->,
             $plagiarismThresholdExpected
         );
     }
