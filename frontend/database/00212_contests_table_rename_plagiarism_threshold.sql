@@ -1,0 +1,2 @@
+ALTER TABLE `Contests`
+    CHANGE COLUMN `plagiarism_threshold` `check_plagiarism` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'El porcentaje mínimo permitido de similitud entre un par de envíos. Cuando plagio Seleccionado, será 90.';
