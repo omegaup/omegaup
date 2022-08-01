@@ -29,12 +29,18 @@ class Users extends \OmegaUp\DAO\VO\VO {
         'birth_date' => true,
         'verified' => true,
         'verification_id' => true,
+        'deletion_token' => true,
         'reset_digest' => true,
         'reset_sent_at' => true,
         'hide_problem_tags' => true,
         'in_mailing_list' => true,
         'is_private' => true,
         'preferred_language' => true,
+        'parent_verified' => true,
+        'creation_timestamp' => true,
+        'parental_verification_token' => true,
+        'parent_email_verification_initial' => true,
+        'parent_email_verification_deadline' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -112,6 +118,11 @@ class Users extends \OmegaUp\DAO\VO\VO {
                 $data['verification_id']
             ) ? strval($data['verification_id']) : '';
         }
+        if (isset($data['deletion_token'])) {
+            $this->deletion_token = is_scalar(
+                $data['deletion_token']
+            ) ? strval($data['deletion_token']) : '';
+        }
         if (isset($data['reset_digest'])) {
             $this->reset_digest = is_scalar(
                 $data['reset_digest']
@@ -147,6 +158,53 @@ class Users extends \OmegaUp\DAO\VO\VO {
             $this->preferred_language = is_scalar(
                 $data['preferred_language']
             ) ? strval($data['preferred_language']) : '';
+        }
+        if (isset($data['parent_verified'])) {
+            $this->parent_verified = boolval(
+                $data['parent_verified']
+            );
+        }
+        if (isset($data['creation_timestamp'])) {
+            /**
+             * @var \OmegaUp\Timestamp|string|int|float $data['creation_timestamp']
+             * @var \OmegaUp\Timestamp $this->creation_timestamp
+             */
+            $this->creation_timestamp = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['creation_timestamp']
+                )
+            );
+        } else {
+            $this->creation_timestamp = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
+        }
+        if (isset($data['parental_verification_token'])) {
+            $this->parental_verification_token = is_scalar(
+                $data['parental_verification_token']
+            ) ? strval($data['parental_verification_token']) : '';
+        }
+        if (isset($data['parent_email_verification_initial'])) {
+            /**
+             * @var \OmegaUp\Timestamp|string|int|float $data['parent_email_verification_initial']
+             * @var \OmegaUp\Timestamp $this->parent_email_verification_initial
+             */
+            $this->parent_email_verification_initial = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['parent_email_verification_initial']
+                )
+            );
+        }
+        if (isset($data['parent_email_verification_deadline'])) {
+            /**
+             * @var \OmegaUp\Timestamp|string|int|float $data['parent_email_verification_deadline']
+             * @var \OmegaUp\Timestamp $this->parent_email_verification_deadline
+             */
+            $this->parent_email_verification_deadline = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['parent_email_verification_deadline']
+                )
+            );
         }
     }
 
@@ -248,6 +306,13 @@ class Users extends \OmegaUp\DAO\VO\VO {
      *
      * @var string|null
      */
+    public $deletion_token = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
     public $reset_digest = null;
 
     /**
@@ -284,4 +349,39 @@ class Users extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $preferred_language = null;
+
+    /**
+     * Almacena la respuesta del padre cuando este verifica la cuenta de su hijo
+     *
+     * @var bool|null
+     */
+    public $parent_verified = null;
+
+    /**
+     * Almacena la hora y fecha en que se creó la cuenta de usuario
+     *
+     * @var \OmegaUp\Timestamp
+     */
+    public $creation_timestamp;  // CURRENT_TIMESTAMP
+
+    /**
+     * Token que se generará para los usuarios menores de 13 años al momento de registrar su cuenta, el cuál será enviado por correo electrónico al padre
+     *
+     * @var string|null
+     */
+    public $parental_verification_token = null;
+
+    /**
+     * Almacena la hora en que se envió el correo electrónico de verificación
+     *
+     * @var \OmegaUp\Timestamp|null
+     */
+    public $parent_email_verification_initial = null;
+
+    /**
+     * Almacena la hora y fecha límite que tienen los padres para verificar la cuenta de su hijo menor a 13 años
+     *
+     * @var \OmegaUp\Timestamp|null
+     */
+    public $parent_email_verification_deadline = null;
 }
