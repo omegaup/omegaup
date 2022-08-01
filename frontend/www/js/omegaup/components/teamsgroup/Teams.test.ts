@@ -66,14 +66,6 @@ describe('Teams.vue', () => {
       propsData,
     });
 
-    await wrapper.vm.$nextTick(async () => {
-      const identityEditWrapper = wrapper.findComponent(identity_Edit);
-
-      await identityEditWrapper.setData({
-        searchResultSchools: [{ key: 1, value: 'school name' }],
-      });
-    });
-
     await wrapper
       .find('button[data-edit-identity="omegaUp:user"]')
       .trigger('click');
