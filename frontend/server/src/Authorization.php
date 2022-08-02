@@ -470,7 +470,7 @@ class Authorization {
         \OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Courses $course
     ): bool {
-        if (is_null($course) || $course->admission_mode !== 'public') {
+        if (is_null($course)) {
             return false;
         }
         return self::isTeachingAssistant($identity);

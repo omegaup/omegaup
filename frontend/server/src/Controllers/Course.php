@@ -2934,6 +2934,82 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Adds a teaching assistant to a course
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $usernameOrEmail
+     */
+    public static function apiAddTeachingAssistant(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        // Authenticate logged user
+        $r->ensureIdentity();
+
+        // Check course_alias
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['usernameOrEmail'],
+            'usernameOrEmail'
+        );
+
+        $resolvedUser = \OmegaUp\Controllers\User::resolveUser(
+            $r['usernameOrEmail']
+        );
+
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
+        if (is_null($course)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        // Only director is allowed to make modifications
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        \OmegaUp\Controllers\ACL::addUserTeachingAssistant(
+            intval($course->acl_id),
+            intval($resolvedUser->user_id)
+        );
+
+        if (
+            $resolvedUser->user_id !== $r->identity->user_id
+            && !is_null($resolvedUser->user_id)
+        ) {
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $resolvedUser->user_id,
+                    'contents' =>  json_encode(
+                        [
+                            'type' => \OmegaUp\DAO\Notifications::COURSE_TEACHING_ASSISTANT_ADDED,
+                            'body' => [
+                                'localizationString' => new \OmegaUp\TranslationString(
+                                    'notificationCourseAddTeachingAssistant'
+                                ),
+                                'localizationParams' => [
+                                    'courseName' => $course->name,
+                                ],
+                                'url' => "/course/{$course->alias}/",
+                                'iconUrl' => '/media/info.png',
+                            ],
+                        ]
+                    ),
+                ])
+            );
+        }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
      * Show course intro only on public courses when user is not yet registered
      *
      * @throws \OmegaUp\Exceptions\NotFoundException Course not found or trying to directly access a private course.

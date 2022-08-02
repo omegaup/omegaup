@@ -64,6 +64,7 @@
   - [`/api/course/addGroupAdmin/`](#apicourseaddgroupadmin)
   - [`/api/course/addProblem/`](#apicourseaddproblem)
   - [`/api/course/addStudent/`](#apicourseaddstudent)
+  - [`/api/course/addTeachingAssistant/`](#apicourseaddteachingassistant)
   - [`/api/course/adminDetails/`](#apicourseadmindetails)
   - [`/api/course/admins/`](#apicourseadmins)
   - [`/api/course/arbitrateRequest/`](#apicoursearbitraterequest)
@@ -1464,6 +1465,23 @@ Add Student to Course.
 | `statement_type`               | `string`     |             |
 | `usernameOrEmail`              | `string`     |             |
 | `accept_teacher`               | `bool\|null` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/course/addTeachingAssistant/`
+
+### Description
+
+Adds a teaching assistant to a course
+
+### Parameters
+
+| Name              | Type     | Description |
+| ----------------- | -------- | ----------- |
+| `course_alias`    | `string` |             |
+| `usernameOrEmail` | `string` |             |
 
 ### Returns
 
