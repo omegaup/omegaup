@@ -22,7 +22,7 @@ class UserDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Check response
-        $this->assertEquals($username, $response['username']);
+        $this->assertSame($username, $response['username']);
 
         // Verify DB
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
@@ -166,7 +166,7 @@ class UserDeleteTest extends \OmegaUp\Test\ControllerTestCase {
                 'Should have failed because no one could delete an account but the owner or admin'
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 }

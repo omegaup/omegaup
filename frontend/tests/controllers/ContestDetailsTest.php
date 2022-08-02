@@ -18,38 +18,44 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Assert we are getting correct data
-        $this->assertEquals($contest->description, $response['description']);
-        $this->assertEquals($contest->start_time, $response['start_time']);
-        $this->assertEquals($contest->finish_time, $response['finish_time']);
-        $this->assertEquals(
+        $this->assertSame($contest->description, $response['description']);
+        $this->assertSame(
+            $contest->start_time->time,
+            $response['start_time']->time
+        );
+        $this->assertSame(
+            $contest->finish_time->time,
+            $response['finish_time']->time
+        );
+        $this->assertSame(
             $contest->window_length,
             $response['window_length']
         );
-        $this->assertEquals($contest->alias, $response['alias']);
-        $this->assertEquals(
+        $this->assertSame($contest->alias, $response['alias']);
+        $this->assertSame(
             $contest->points_decay_factor,
             $response['points_decay_factor']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $contest->partial_score,
             $response['partial_score']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $contest->submissions_gap,
             $response['submissions_gap']
         );
-        $this->assertEquals($contest->feedback, $response['feedback']);
-        $this->assertEquals($contest->penalty, $response['penalty']);
-        $this->assertEquals($contest->scoreboard, $response['scoreboard']);
-        $this->assertEquals($contest->penalty_type, $response['penalty_type']);
-        $this->assertEquals(
+        $this->assertSame($contest->feedback, $response['feedback']);
+        $this->assertSame($contest->penalty, $response['penalty']);
+        $this->assertSame($contest->scoreboard, $response['scoreboard']);
+        $this->assertSame($contest->penalty_type, $response['penalty_type']);
+        $this->assertSame(
             $contest->penalty_calc_policy,
             $response['penalty_calc_policy']
         );
 
         // Assert we have our problems
         $numOfProblems = count($problems);
-        $this->assertEquals($numOfProblems, count($response['problems']));
+        $this->assertSame($numOfProblems, count($response['problems']));
 
         // Assert problem data
         $i = 0;
@@ -60,29 +66,29 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             );
 
             // Assert data in DB
-            $this->assertEquals($problem->title, $problem_array['title']);
-            $this->assertEquals($problem->alias, $problem_array['alias']);
-            $this->assertEquals($problem->visits, $problem_array['visits']);
-            $this->assertEquals(
+            $this->assertSame($problem->title, $problem_array['title']);
+            $this->assertSame($problem->alias, $problem_array['alias']);
+            $this->assertSame($problem->visits, $problem_array['visits']);
+            $this->assertSame(
                 $problem->submissions,
                 $problem_array['submissions']
             );
-            $this->assertEquals($problem->accepted, $problem_array['accepted']);
+            $this->assertSame($problem->accepted, $problem_array['accepted']);
 
             // Get points of problem from Contest-Problem relationship
             $problemInContest = \OmegaUp\DAO\ProblemsetProblems::getByPK(
                 $contest->problemset_id,
                 $problem->problem_id
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $problemInContest->points,
                 $problem_array['points']
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $problemInContest->commit,
                 $problem_array['commit']
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $problemInContest->version,
                 $problem_array['version']
             );
@@ -107,7 +113,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Assert the log is empty.
-        $this->assertEquals(0, count(\OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
+        $this->assertSame(0, count(\OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
             $contestData['contest']->problemset_id,
             $identity->identity_id
         )));
@@ -128,7 +134,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertContestDetails($contestData, $problems, $response);
 
         // Assert the log is not empty.
-        $this->assertEquals(1, count(\OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
+        $this->assertSame(1, count(\OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
             $contestData['contest']->problemset_id,
             $identity->identity_id
         )));
@@ -171,10 +177,10 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         // Call api
         $response = \OmegaUp\Controllers\Contest::apiDetails($r);
 
-        $this->assertEquals(1, count($response['problems']));
+        $this->assertSame(1, count($response['problems']));
         // Verify that the allowed languages for the problem are the intersection of
         // the allowed languages.
-        $this->assertEquals(
+        $this->assertSame(
             'cpp17-gcc,java',
             $response['problems'][0]['languages']
         );
@@ -293,7 +299,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -340,9 +346,9 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $identity->identity_id,
             $contest->problemset_id
         );
-        $this->assertEquals(
-            $firstAccessTime,
-            $problemset_identity->access_time
+        $this->assertSame(
+            $firstAccessTime->time,
+            $problemset_identity->access_time->time
         );
     }
 
@@ -386,9 +392,9 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $identity->identity_id,
             $contest->problemset_id
         );
-        $this->assertEquals(
-            $firstAccessTime,
-            $problemset_identity->access_time
+        $this->assertSame(
+            $firstAccessTime->time,
+            $problemset_identity->access_time->time
         );
     }
 
@@ -436,9 +442,9 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $identity->identity_id,
             $contest->problemset_id
         );
-        $this->assertEquals(
-            $firstAccessTime,
-            $problemset_identity->access_time
+        $this->assertSame(
+            $firstAccessTime->time,
+            $problemset_identity->access_time->time
         );
     }
 
@@ -469,7 +475,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
-            $this->assertEquals('contestNotStarted', $e->getMessage());
+            $this->assertSame('contestNotStarted', $e->getMessage());
         }
     }
 
@@ -537,7 +543,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // All requests were done using tokens, so the log must be identical.
         $contestAccessLog = \OmegaUp\DAO\ProblemsetAccessLog::getAll();
-        $this->assertEquals($originalContestAccessLog, $contestAccessLog);
+        $this->assertSame($originalContestAccessLog, $contestAccessLog);
     }
 
     /**
@@ -588,7 +594,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('invalidScoreboardUrl', $e->getMessage());
+            $this->assertSame('invalidScoreboardUrl', $e->getMessage());
         }
     }
 
@@ -735,7 +741,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
 
-            $this->assertEquals(
+            $this->assertSame(
                 $problemData['request']['problem_alias'],
                 $response['problems'][0]['alias']
             );
@@ -810,7 +816,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
 
         // Get details from a problem in that contest. This should also fail.
@@ -828,7 +834,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
 
         // Call api again. This should (still) fail.
@@ -840,7 +846,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -927,7 +933,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $summary = $files['summary.csv'];
             $this->assertNotEquals($summary, '');
             foreach ($runsData as $runData) {
-                $this->assertEquals(
+                $this->assertSame(
                     $files["runs/{$runData['response']['guid']}.{$runData['request']['language']}"],
                     $runData['request']['source']
                 );
@@ -966,7 +972,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertEquals([
+        $this->assertSame([
             'alias' => $teamGroup->alias,
             'name' =>  $teamGroup->name,
         ], $response['teams_group']);
@@ -986,7 +992,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertEquals([
+        $this->assertSame([
             'alias' => $otherTeamGroup->alias,
             'name' =>  $otherTeamGroup->name,
         ], $response['teams_group']);
@@ -1012,7 +1018,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'teamsGroupsCanNotBeAddedInNormalContest',
                 $e->getMessage()
             );
@@ -1128,7 +1134,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'contestEditCannotReplaceTeamsGroupWithSubmissions',
                 $e->getMessage()
             );
@@ -1174,6 +1180,6 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(2, $problems);
 
         $aliases = array_map(fn ($problem) => $problem['alias'], $problems);
-        $this->assertEquals($aliases, $expectedAliases);
+        $this->assertSame($aliases, $expectedAliases);
     }
 }

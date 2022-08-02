@@ -49,7 +49,7 @@ class AssignmentCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'Updating assignment should have failed due assignment start date incorrect'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'courseAssignmentStartDateBeforeCourseStartDate',
                 $e->getMessage()
             );
@@ -75,7 +75,7 @@ class AssignmentCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'Updating assignment should have failed due assignment end date incorrect'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'courseAssignmentEndDateBeforeCourseStartDate',
                 $e->getMessage()
             );
@@ -102,7 +102,7 @@ class AssignmentCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'Updating assignment should have failed due assignment unlimted duration not allowed'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'courseDoesNotHaveUnlimitedDuration',
                 $e->getMessage()
             );
@@ -126,7 +126,7 @@ class AssignmentCreateTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have thrown an exception');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalid', $e->getMessage());
+            $this->assertSame('parameterInvalid', $e->getMessage());
         }
     }
 }

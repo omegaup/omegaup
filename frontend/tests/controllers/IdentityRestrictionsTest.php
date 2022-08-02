@@ -184,7 +184,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
                 "{$identityStatus} identity does not have access to see apiMyList"
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
 
         try {
@@ -196,7 +196,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
                 "{$identityStatus} identity can not create virtual contests"
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
 
         try {
@@ -210,7 +210,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail("{$identityStatus} identity can not clone contests");
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
 
         try {
@@ -219,7 +219,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('unassociated identity can not create contests');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -241,7 +241,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail("{$identityStatus} identity can not clone courses");
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
 
         try {
@@ -255,7 +255,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail("{$identityStatus} identity can not create courses");
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -274,7 +274,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
                 "{$identityStatus} identity does not have access to see apiMyList"
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
 
         try {
@@ -285,7 +285,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail("{$identityStatus} identity can not create problems");
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -304,7 +304,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
                 "{$identityStatus} identity does not have access to see apiMyList"
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 }

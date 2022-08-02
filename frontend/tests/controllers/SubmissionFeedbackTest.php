@@ -60,15 +60,15 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(1, $notifications);
 
         $contents = json_decode($notifications[0]['contents'], true);
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\Notifications::COURSE_SUBMISSION_FEEDBACK,
             $contents['type']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['course']->name,
             $contents['body']['localizationParams']['courseName']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemData['problem']->alias,
             $contents['body']['localizationParams']['problemAlias']
         );
@@ -142,8 +142,8 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $this->assertNotNull($response['feedback']);
-        $this->assertEquals($feedback, $response['feedback']['feedback']);
-        $this->assertEquals(
+        $this->assertSame($feedback, $response['feedback']['feedback']);
+        $this->assertSame(
             $admin['identity']->username,
             $response['feedback']['author']
         );

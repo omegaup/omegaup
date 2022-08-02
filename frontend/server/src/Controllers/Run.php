@@ -734,8 +734,8 @@ class Run extends \OmegaUp\Controllers\Controller {
                     2
                 );
             } else {
-                $result['contest_score'] = 0;
-                $result['score'] = 0;
+                $result['contest_score'] = 0.0;
+                $result['score'] = 0.0;
             }
         }
         return $result;
@@ -1282,8 +1282,11 @@ class Run extends \OmegaUp\Controllers\Controller {
             $response['compile_error'] = $details['compile_error'];
         }
         if (!is_null($contest) && !$contest->partial_score && $run->score < 1) {
-            $details['contest_score'] = 0;
-            $details['score'] = 0;
+            $details['contest_score'] = 0.0;
+            $details['score'] = 0.0;
+        } else {
+            $details['contest_score'] = floatval($details['contest_score']);
+            $details['score'] = floatval($details['score']);
         }
         if (!OMEGAUP_LOCKDOWN && $showDetails) {
             $response['details'] = $details;

@@ -52,7 +52,7 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload']['courses']['admin']['filteredCourses']['archived']['courses'];
         $this->assertCount(1, $archivedCourses);
-        $this->assertEquals(
+        $this->assertSame(
             $this->courseAliases[3],
             $archivedCourses[0]['alias']
         );

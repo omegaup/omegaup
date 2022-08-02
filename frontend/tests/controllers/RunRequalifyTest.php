@@ -42,7 +42,7 @@ class RunRequalifyTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('A run cannot be requalified when it is normal.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('runCannotBeRequalified', $e->getMessage());
+            $this->assertSame('runCannotBeRequalified', $e->getMessage());
         }
 
         // Disqualify submission
@@ -53,7 +53,7 @@ class RunRequalifyTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'disqualified',
             \OmegaUp\DAO\Submissions::getByGuid($guid)->type
         );
@@ -70,7 +70,7 @@ class RunRequalifyTest extends \OmegaUp\Test\ControllerTestCase {
                 'A run cannot be disqualified when it has been disqualfied before.'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('runCannotBeDisqualified', $e->getMessage());
+            $this->assertSame('runCannotBeDisqualified', $e->getMessage());
         }
 
         // Requalify submission
@@ -81,7 +81,7 @@ class RunRequalifyTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'normal',
             \OmegaUp\DAO\Submissions::getByGuid($guid)->type
         );

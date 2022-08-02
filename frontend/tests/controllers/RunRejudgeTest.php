@@ -45,7 +45,7 @@ class RunRejudgeTest extends \OmegaUp\Test\ControllerTestCase {
         // Call API
         $response = \OmegaUp\Controllers\Run::apiRejudge($r);
 
-        $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(1, $detourGrader->getGraderCallCount());
+        $this->assertSame('ok', $response['status']);
+        $this->assertSame(1, $detourGrader->getGraderCallCount());
     }
 }

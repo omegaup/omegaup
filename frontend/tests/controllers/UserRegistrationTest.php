@@ -76,7 +76,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'User should have not been able to be created because the email already exists in the data base'
             );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('mailInUse', $e->getMessage());
+            $this->assertSame('mailInUse', $e->getMessage());
         }
     }
 
@@ -94,8 +94,8 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
         // Asserts that user has the initial username and email
-        $this->assertEquals($identity->username, $username);
-        $this->assertEquals($email, $email_user->email);
+        $this->assertSame($identity->username, $username);
+        $this->assertSame($email, $email_user->email);
 
         // Inflate request
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
@@ -113,7 +113,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'User should have not been able to be created because the email already exists in the data base'
             );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('mailInUse', $e->getMessage());
+            $this->assertSame('mailInUse', $e->getMessage());
         }
     }
 }
