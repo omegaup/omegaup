@@ -87,9 +87,10 @@
         </div>
         <div class="row justify-content-md-center">
           <div class="col-md-8">
-            <input v-model="checked" type="checkbox" />
+            <input v-model="privacyPolicyAccepted" type="checkbox" />
             <label for="checkbox">
               <omegaup-markdown
+                :disabled="!birthDate"
                 :markdown="T.acceptPrivacyPolicy"
               ></omegaup-markdown>
             </label>
@@ -146,6 +147,9 @@ export default class Signup extends Vue {
   birthDate: null | Date = null;
   privacyPolicyAccepted = false;
   get loginEmailDescriptionText(): string {
+    if (!this.userAge) {
+      return T.loginEmail;
+    }
     return this.userAge > 13 ? T.loginEmail : T.loginEmailParent;
   }
   get userAge(): number | null {
