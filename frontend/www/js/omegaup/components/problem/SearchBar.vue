@@ -24,11 +24,7 @@
             (query) => $emit('update-search-result-problems', query)
           "
         ></omegaup-common-typeahead>
-        <input
-          type="hidden"
-          name="query"
-          :value="JSON.stringify(currentKeyword)"
-        />
+        <input type="hidden" name="query" :value="currentKeywordValue" />
       </div>
       <div class="form-group mr-2 mt-1">
         <label>
@@ -83,7 +79,7 @@ export default class ProblemSearchBar extends Vue {
 
   T = T;
 
-  currentKeyword = this.keyword;
+  currentKeyword: types.ListItem = { key: this.keyword, value: this.keyword };
   currentLanguage = this.language;
 
   getLanguageText(language: string): string {
@@ -91,6 +87,10 @@ export default class ProblemSearchBar extends Vue {
     if (language === 'en') return T.wordsEnglish;
     if (language === 'es') return T.wordsSpanish;
     return T.wordsPortuguese;
+  }
+
+  get currentKeywordValue(): null | string {
+    return this.currentKeyword?.value ?? null;
   }
 }
 </script>

@@ -921,13 +921,10 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             $problemDataPublic['request']['problem_alias']
         );
 
-        $query = substr($problemDataPrivate['request']['title'], 2, 8);
-        $request = ['key' => $query, 'value' => $query];
-        $encodedQueryRequest = urlencode(json_encode($request));
         // Expect 0 problems, matches are private for $user
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
-            'query' => $encodedQueryRequest,
+            'query' => substr($problemDataPrivate['request']['title'], 2, 8),
         ]));
         $this->assertArrayNotContainsInKey(
             $response['results'],
@@ -1010,12 +1007,10 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             array_push($titles, $problem['title']);
         }
         foreach ($titles as $title) {
-            $request = ['key' => $title, 'value' => $title];
-            $encodedQueryRequest = urlencode(json_encode($request));
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'rowcount' => $pageSize,
-                'query' => $encodedQueryRequest,
+                'query' => $title,
             ]));
             $this->assertTrue(count($response['results']) == 1);
             $this->assertTrue($title === $response['results'][0]['title']);

@@ -3796,20 +3796,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $tags = $r->getStringList('tag', []);
         $authors = $r->getStringList('author', []);
 
-        $keyword = '';
-        $searchObject = $r->ensureOptionalString('query');
-
-        if ($searchObject) {
-            /** @var array{key: string, value: string} */
-            $keywordObject = json_decode(
-                urldecode(
-                    $searchObject
-                ),
-                associative: true
-            );
-            if (isset($keywordObject['key']) && $keywordObject['key'] != '') {
-                $keyword = substr($keywordObject['key'], 0, 256);
-            }
+        $keyword = substr($r->ensureOptionalString('query') ?? '', 0, 256);
+        if (!$keyword) {
+            $keyword = '';
         }
         \OmegaUp\Validators::validateOptionalNumber(
             $r['min_difficulty'],
