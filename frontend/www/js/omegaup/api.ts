@@ -674,6 +674,10 @@ export const Course = {
     messages.CourseAddStudentRequest,
     messages.CourseAddStudentResponse
   >('/api/course/addStudent/'),
+  addTeachingAssistant: apiCall<
+    messages.CourseAddTeachingAssistantRequest,
+    messages.CourseAddTeachingAssistantResponse
+  >('/api/course/addTeachingAssistant/'),
   adminDetails: apiCall<
     messages.CourseAdminDetailsRequest,
     messages._CourseAdminDetailsServerResponse,

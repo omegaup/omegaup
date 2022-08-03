@@ -4854,6 +4854,8 @@ export namespace messages {
   export type CourseAddProblemResponse = {};
   export type CourseAddStudentRequest = { [key: string]: any };
   export type CourseAddStudentResponse = {};
+  export type CourseAddTeachingAssistantRequest = { [key: string]: any };
+  export type CourseAddTeachingAssistantResponse = {};
   export type CourseAdminDetailsRequest = { [key: string]: any };
   export type _CourseAdminDetailsServerResponse = any;
   export type CourseAdminDetailsResponse = types.CourseDetails;
@@ -5689,6 +5691,9 @@ export namespace controllers {
     addStudent: (
       params?: messages.CourseAddStudentRequest,
     ) => Promise<messages.CourseAddStudentResponse>;
+    addTeachingAssistant: (
+      params?: messages.CourseAddTeachingAssistantRequest,
+    ) => Promise<messages.CourseAddTeachingAssistantResponse>;
     adminDetails: (
       params?: messages.CourseAdminDetailsRequest,
     ) => Promise<messages.CourseAdminDetailsResponse>;
