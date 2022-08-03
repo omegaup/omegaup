@@ -21,30 +21,23 @@ class RunsGroups extends \OmegaUp\DAO\Base\RunsGroups {
         $sql = "SELECT
                     IFNULL(SUM(mspg.score), 0.0) AS score,
                     SUM(mspg.score) * pp.points AS contest_score,
-                    r.penalty,
-                    s.problem_id,
-                    s.identity_id,
-                    s.`type`,
-                    s.`time`,
-                    s.`submit_delay`,
-                    s.`guid`
+                    0.0 AS penalty,
+                    mspg.problem_id,
+                    mspg.identity_id,
+                    mspg.`type`,
+                    NOW() AS `time`,
+                    0 AS `submit_delay`,
+                    'x' AS `guid`
                 FROM
                     Problemset_Problems pp
-                INNER JOIN
-                    Submissions s
-                ON
-                    s.problemset_id = pp.problemset_id AND
-                    s.problem_id = pp.problem_id
-                INNER JOIN
-                    Runs r
-                ON
-                    s.submission_id = r.submission_id
-                LEFT JOIN (
+                INNER JOIN (
                         SELECT
                             MAX(rg.score) score,
                             rg.group_name,
                             s.problem_id,
-                            s.identity_id
+                            s.identity_id,
+                            s.type,
+                            s.problemset_id
                         FROM
                             Runs_Groups rg
                         INNER JOIN
@@ -65,8 +58,8 @@ class RunsGroups extends \OmegaUp\DAO\Base\RunsGroups {
                             group_name
                 ) AS mspg
                 ON
-                    s.problem_id = mspg.problem_id AND
-                    s.identity_id = mspg.identity_id
+                    pp.problem_id = mspg.problem_id AND
+                    mspg.problemset_id = pp.problemset_id
                 WHERE
                     pp.problemset_id = ?
                 GROUP BY
