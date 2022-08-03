@@ -1,3 +1,3 @@
 -- Emails table
 ALTER TABLE `Emails`
-ADD COLUMN `parentemail` varchar(100) DEFAULT NULL
+ADD COLUMN `parentEmail` varchar(100) DEFAULT NULL
