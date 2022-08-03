@@ -21,6 +21,7 @@ export namespace dao {
     penalty?: number;
     penalty_calc_policy?: string;
     penalty_type?: string;
+    plagiarism_threshold?: boolean;
     points_decay_factor?: number;
     problemset_id?: number;
     recommended?: boolean;
@@ -55,6 +56,8 @@ export namespace dao {
 
   export interface Users {
     birth_date?: string;
+    creation_timestamp?: Date;
+    deletion_token?: string;
     facebook_user_id?: string;
     git_token?: string;
     has_competitive_objective?: boolean;
@@ -66,6 +69,10 @@ export namespace dao {
     is_private?: boolean;
     main_email_id?: number;
     main_identity_id?: number;
+    parent_email_verification_deadline?: Date;
+    parent_email_verification_initial?: Date;
+    parent_verified?: boolean;
+    parental_verification_token?: string;
     preferred_language?: string;
     reset_digest?: string;
     reset_sent_at?: Date;
@@ -4847,6 +4854,8 @@ export namespace messages {
   export type CourseAddProblemResponse = {};
   export type CourseAddStudentRequest = { [key: string]: any };
   export type CourseAddStudentResponse = {};
+  export type CourseAddTeachingAssistantRequest = { [key: string]: any };
+  export type CourseAddTeachingAssistantResponse = {};
   export type CourseAdminDetailsRequest = { [key: string]: any };
   export type _CourseAdminDetailsServerResponse = any;
   export type CourseAdminDetailsResponse = types.CourseDetails;
@@ -5682,6 +5691,9 @@ export namespace controllers {
     addStudent: (
       params?: messages.CourseAddStudentRequest,
     ) => Promise<messages.CourseAddStudentResponse>;
+    addTeachingAssistant: (
+      params?: messages.CourseAddTeachingAssistantRequest,
+    ) => Promise<messages.CourseAddTeachingAssistantResponse>;
     adminDetails: (
       params?: messages.CourseAdminDetailsRequest,
     ) => Promise<messages.CourseAdminDetailsResponse>;
