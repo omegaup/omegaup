@@ -87,10 +87,13 @@
         </div>
         <div class="row justify-content-md-center">
           <div class="col-md-8">
-            <input v-model="privacyPolicyAccepted" type="checkbox" />
+            <input
+              v-model="privacyPolicyAccepted"
+              type="checkbox"
+              :disabled="!birthdate"
+            />
             <label for="checkbox">
               <omegaup-markdown
-                :disabled="!birthDate"
                 :markdown="T.acceptPrivacyPolicy"
               ></omegaup-markdown>
             </label>
