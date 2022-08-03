@@ -131,8 +131,7 @@ export default class CodeView extends Vue {
       height: 100%;
 
       .CodeMirror-scroll {
-        max-height: 638px;
-        min-height: 226px;
+        height: 226px;
       }
     }
   }

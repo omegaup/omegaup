@@ -21,6 +21,7 @@ export namespace dao {
     penalty?: number;
     penalty_calc_policy?: string;
     penalty_type?: string;
+    plagiarism_threshold?: boolean;
     points_decay_factor?: number;
     problemset_id?: number;
     recommended?: boolean;
@@ -55,6 +56,8 @@ export namespace dao {
 
   export interface Users {
     birth_date?: string;
+    creation_timestamp?: Date;
+    deletion_token?: string;
     facebook_user_id?: string;
     git_token?: string;
     has_competitive_objective?: boolean;
@@ -66,6 +69,10 @@ export namespace dao {
     is_private?: boolean;
     main_email_id?: number;
     main_identity_id?: number;
+    parent_email_verification_deadline?: Date;
+    parent_email_verification_initial?: Date;
+    parent_verified?: boolean;
+    parental_verification_token?: string;
     preferred_language?: string;
     reset_digest?: string;
     reset_sent_at?: Date;
@@ -5399,6 +5406,10 @@ export namespace messages {
   export type UserCreateResponse = { username: string };
   export type UserCreateAPITokenRequest = { [key: string]: any };
   export type UserCreateAPITokenResponse = { token: string };
+  export type UserDeleteConfirmRequest = { [key: string]: any };
+  export type UserDeleteConfirmResponse = {};
+  export type UserDeleteRequestRequest = { [key: string]: any };
+  export type UserDeleteRequestResponse = { token: string };
   export type UserExtraInformationRequest = { [key: string]: any };
   export type _UserExtraInformationServerResponse = any;
   export type UserExtraInformationResponse = {
@@ -6158,6 +6169,12 @@ export namespace controllers {
     createAPIToken: (
       params?: messages.UserCreateAPITokenRequest,
     ) => Promise<messages.UserCreateAPITokenResponse>;
+    deleteConfirm: (
+      params?: messages.UserDeleteConfirmRequest,
+    ) => Promise<messages.UserDeleteConfirmResponse>;
+    deleteRequest: (
+      params?: messages.UserDeleteRequestRequest,
+    ) => Promise<messages.UserDeleteRequestResponse>;
     extraInformation: (
       params?: messages.UserExtraInformationRequest,
     ) => Promise<messages.UserExtraInformationResponse>;
