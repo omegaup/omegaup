@@ -21,7 +21,7 @@ class RunsGroups extends \OmegaUp\DAO\Base\RunsGroups {
         $sql = "SELECT
                     IFNULL(SUM(mspg.score), 0.0) AS score,
                     SUM(mspg.score) * pp.points AS contest_score,
-                    0.0 AS penalty,
+                    0 AS penalty,
                     mspg.problem_id,
                     mspg.identity_id,
                     mspg.`type`,
