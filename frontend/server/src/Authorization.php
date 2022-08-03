@@ -424,7 +424,10 @@ class Authorization {
                 return false;
             }
         }
-        if (is_null(self::$_teachingAssistantGroup->acl_id)) {
+        if (
+            is_null(self::$_teachingAssistantGroup->acl_id) ||
+            is_null($course->acl_id)
+        ) {
             return false;
         }
         return self::isGroupMember(
