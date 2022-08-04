@@ -152,7 +152,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Check if the plagiarism value is stored correctly in the database 
+     * Check if the plagiarism value is stored correctly in the database
      * when a contest is created
      */
     public function testPlagiarismThresholdValue() {
