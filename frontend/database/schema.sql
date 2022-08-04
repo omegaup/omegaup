@@ -314,7 +314,7 @@ CREATE TABLE `Emails` (
   `email_id` int NOT NULL AUTO_INCREMENT,
   `email` varchar(100) DEFAULT NULL,
   `user_id` int DEFAULT NULL,
-  `parentEmail` varchar(100) DEFAULT NULL,
+  `parent_email` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`email_id`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   KEY `user_id` (`user_id`),
