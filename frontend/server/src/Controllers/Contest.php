@@ -2521,7 +2521,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param mixed $title
      * @omegaup-request-param int|null $window_length
-     * @omegaup-request-param bool|null $plagiarism_threshold
+     * @omegaup-request-param bool|null $check_plagiarism
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -2569,7 +2569,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($scoreMode)) {
             $scoreMode = $partialScore ? 'partial' : 'all_or_nothing';
         }
-        $plagiarism_threshold = $r->ensureOptionalBool('plagiarism_threshold') ?? false;
+        $checkPlagiarism = $r->ensureOptionalBool('check_plagiarism') ?? false;
         $contest = new \OmegaUp\DAO\VO\Contests([
             'admission_mode' => 'private',
             'title' => $r['title'],
@@ -2590,7 +2590,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'score_mode' => $scoreMode,
             'show_scoreboard_after' => $r['show_scoreboard_after'] ?? true,
             'contest_for_teams' => $forTeams,
-            'plagiarism_threshold' => $plagiarism_threshold,
+            'plagiarism_threshold' => $checkPlagiarism ? true: false,
         ]);
 
         self::createContest(
@@ -2632,7 +2632,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $submissions_gap
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
-     * @omegaup-request-param bool|null $plagiarism_threshold
+     * @omegaup-request-param bool|null $check_plagiarism
      */
     private static function validateCommonCreateOrUpdate(
         \OmegaUp\Request $r,
@@ -2852,7 +2852,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'teams_group_alias'
             );
         }
-        $r->ensureOptionalBool('plagiarism_threshold') ?? false;
+        $r->ensureOptionalBool('check_plagiarism') ?? false;
     }
 
     /**
@@ -2882,7 +2882,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
-     * @omegaup-request-param bool|null $plagiarism_threshold
+     * @omegaup-request-param bool|null $check_plagiarism
      */
     private static function validateCreate(
         \OmegaUp\Request $r,
@@ -2921,7 +2921,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $submissions_gap
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
-     * @omegaup-request-param bool|null $plagiarism_threshold
+     * @omegaup-request-param bool|null $check_plagiarism
      */
     private static function validateUpdate(
         \OmegaUp\Request $r,
@@ -4676,7 +4676,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
-     * @omegaup-request-param bool|null $plagiarism_threshold
+     * @omegaup-request-param bool|null $check_plagiarism
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();

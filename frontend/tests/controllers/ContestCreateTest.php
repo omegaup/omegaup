@@ -150,37 +150,22 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('parameterInvalid', $e->getMessage());
         }
     }
-    /**
-     * A PHPUnit data provider for all the plagiarism threshold values in a
-     * contest.
-     *
-     * @return list<array{0:bool, 1:int}>
-     */
-    public function plagiarismThresholdProvider(): array {
-        return [
-            [true, 90],
-            [false, 0],
-        ];
-    }
 
     /**
-     * Check if the plagiarism value is stored correctly in the database.
-     * @dataProvider plagiarismThresholdProvider
+     * Check if the plagiarism value is stored correctly in the database
      */
     public function testValidatePlagiarismThresholdValue() {
         // Create a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
-                'plagiarism_threshold' => true,
+                'checkPlagiarism' => true,
             ])
         );
         $checkPlagiarismDuplicate = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
 
-        $this->assertTrue(
-            $checkPlagiarismDuplicate->plagiarism_threshold
-        );
+        $this->assertTrue($checkPlagiarismDuplicate->plagiarism_threshold);
     }
 
     /**

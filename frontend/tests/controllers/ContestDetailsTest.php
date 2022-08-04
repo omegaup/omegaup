@@ -216,30 +216,14 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-    /**
-     * A PHPUnit data provider for all the plagiarism threshold values in a
-     * contest.
-     *
-     * @return list<array{0:bool, 1:int}>
-     */
-    public function plagiarismThresholdProvider(): array {
-        return [
-            [true, 90, 0],
-            [false, 0, 90],
-        ];
-    }
-
-    /**
      * Check if the plagiarism value is stored correctly in the database when a
      * contest is updated.
-     *
-     * @dataProvider plagiarismThresholdProvider
      */
     public function testToValidatePlagiarismThresholdValueInUpdatedContest() {
         // Create a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
-                'plagiarism_threshold' => true,
+                'checkPlagiarism' => true,
             ])
         );
 
@@ -247,9 +231,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['request']['alias']
         );
 
-        $this->assertTrue(
-            $response->plagiarism_threshold
-        );
+        $this->assertTrue($response->plagiarism_threshold);
 
         // Login with director to update the contest
         $login = self::login($contestData['director']);
@@ -257,17 +239,14 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'check_plagiarism' => !$checkPlagiarism,
+            'checkPlagiarism' => false,
         ]));
 
         $response = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
 
-        $this->assertEquals(
-            $response->plagiarism_threshold,
-            $plagiarismThresholdExpectedAfterUpdate
-        );
+        $this->assertTrue($response->plagiarism_threshold);
     }
 
      /**

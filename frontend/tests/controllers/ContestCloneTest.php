@@ -107,15 +107,11 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    /**
-     * Check if the plagiarism value is stored correctly in the database when
-     * the contest is cloned.
-     */
-    public function testCheckPlagiarismInClonedContest() {
+    public function testToValidatePlagiarismThresholdValueInClonedContest() {
         // Create a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
-                'plagiarism_threshold' => true,
+                'checkPlagiarism' => true,
             ])
         );
 
@@ -137,7 +133,9 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
 
         $response = \OmegaUp\DAO\Contests::getByAlias($clonedContestAlias);
 
-        $this->assertTrue($response->plagiarism_threshold);
+        $this->assertTrue(
+            $response->plagiarism_threshold
+        );
     }
 
     /**
