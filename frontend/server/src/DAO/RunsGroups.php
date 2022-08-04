@@ -13,26 +13,29 @@ namespace OmegaUp\DAO;
  */
 class RunsGroups extends \OmegaUp\DAO\Base\RunsGroups {
     /**
-     * @return list<array{contest_score: float|null, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string}>
+     * @return list<array{contest_score: float|null, identity_id: int, penalty: int, problem_id: int, score: float, type: null|string}>
      */
     final public static function getProblemsetRunsGroups(
-        int $problemsetId
+        int $problemsetId,
+        string $penaltyType = 'MAX'
     ): array {
+        $penaltyQuery = 'MAX(r.penalty) AS penalty';
+        if ($penaltyType != 'MAX') {
+            $penaltyQuery = 'SUM(r.penalty) AS penalty';
+        }
         $sql = "SELECT
                     IFNULL(SUM(mspg.score), 0.0) AS score,
                     SUM(mspg.score) * pp.points AS contest_score,
-                    0 AS penalty,
+                    IFNULL(mspg.penalty, 0) AS penalty,
                     mspg.problem_id,
                     mspg.identity_id,
-                    mspg.`type`,
-                    NOW() AS `time`,
-                    0 AS `submit_delay`,
-                    'x' AS `guid`
+                    mspg.`type`
                 FROM
                     Problemset_Problems pp
                 INNER JOIN (
                         SELECT
-                            MAX(rg.score) score,
+                            MAX(rg.score) AS score,
+                            {$penaltyQuery},
                             rg.group_name,
                             s.problem_id,
                             s.identity_id,
@@ -58,7 +61,7 @@ class RunsGroups extends \OmegaUp\DAO\Base\RunsGroups {
                             group_name
                 ) AS mspg
                 ON
-                    pp.problem_id = mspg.problem_id AND
+                    mspg.problem_id = pp.problem_id AND
                     mspg.problemset_id = pp.problemset_id
                 WHERE
                     pp.problemset_id = ?
@@ -66,12 +69,9 @@ class RunsGroups extends \OmegaUp\DAO\Base\RunsGroups {
                     problem_id,
                     identity_id,
                     `penalty`,
-                    `type`,
-                    `time`,
-                    `submit_delay`,
-                    `guid`;";
+                    `type`;";
 
-        /** @var list<array{contest_score: float|null, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string}> */
+        /** @var list<array{contest_score: float|null, identity_id: int, penalty: int, problem_id: int, score: float, type: null|string}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId, $problemsetId]

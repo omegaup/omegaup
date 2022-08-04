@@ -508,7 +508,7 @@ class Scoreboard {
     }
 
     /**
-     * @param list<array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: \OmegaUp\Timestamp, submit_delay: int, guid: string}> $contestRuns
+     * @param list<array{contest_score: float|null, guid?: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay?: int, time?: \OmegaUp\Timestamp, type: null|string}> $contestRuns
      * @param list<array{identity_id: int, username: string, name: string|null, country_id: null|string, is_invited: bool, classname: string}> $rawContestIdentities
      * @param array<int, array{order: int, alias: string}> $problemMapping
      * @param int $contestPenalty
@@ -609,6 +609,7 @@ class Scoreboard {
                 }
                 if (
                     !is_null($scoreboardTimeLimit)
+                    && !empty($run['time'])
                     && $run['time']->time >= $scoreboardTimeLimit->time
                 ) {
                     $problem['runs']++;
@@ -628,7 +629,7 @@ class Scoreboard {
                 $problem['percent'] = round($score * 100, 2);
                 $problem['penalty'] = $totalPenalty;
 
-                if ($withRunDetails === true) {
+                if ($withRunDetails === true && !empty($run['guid'])) {
                     $runDetails = [];
 
                     $runDetailsRequest = new \OmegaUp\Request([
