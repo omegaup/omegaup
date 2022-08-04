@@ -106,8 +106,11 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('aliasInUse', $e->getMessage());
         }
     }
-
-    public function testToValidatePlagiarismThresholdValueInClonedContest() {
+    /**
+     * Check if the plagiarism value is stored correctly in the database when
+     * a contest is cloned
+     */
+    public function testPlagiarismThresholdValueInClonedContest() {
         // Create a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
