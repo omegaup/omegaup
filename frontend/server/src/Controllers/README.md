@@ -736,7 +736,7 @@ Creates a new contest
 | --------------------------- | -------------- | ----------- |
 | `admission_mode`            | `mixed`        |             |
 | `alias`                     | `mixed`        |             |
-| `check_plagiarism`          | `bool\|null`   |             |
+| `plagiarism_threshold`      | `bool\|null`   |             |
 | `contest_for_teams`         | `bool\|null`   |             |
 | `description`               | `mixed`        |             |
 | `feedback`                  | `mixed`        |             |
@@ -1303,7 +1303,7 @@ Update a Contest
 | `window_length`                              | `int`                                                |             |
 | `admission_mode`                             | `null\|string`                                       |             |
 | `alias`                                      | `null\|string`                                       |             |
-| `check_plagiarism`                           | `bool\|null`                                         |             |
+| `plagiarism_threshold`                       | `bool\|null`                                         |             |
 | `contest_for_teams`                          | `bool\|null`                                         |             |
 | `default_show_all_contestants_in_scoreboard` | `bool\|null`                                         |             |
 | `description`                                | `null\|string`                                       |             |

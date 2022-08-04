@@ -235,15 +235,11 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      *
      * @dataProvider plagiarismThresholdProvider
      */
-    public function testToValidatePlagiarismThresholdValueInUpdatedContest(
-        bool $checkPlagiarism,
-        int $plagiarismThresholdExpected,
-        int $plagiarismThresholdExpectedAfterUpdate
-    ) {
+    public function testToValidatePlagiarismThresholdValueInUpdatedContest() {
         // Create a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
-                'checkPlagiarism' => $checkPlagiarism,
+                'plagiarism_threshold' => true,
             ])
         );
 
@@ -251,9 +247,8 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['request']['alias']
         );
 
-        $this->assertSame(
-            $response->plagiarism_threshold,
-            $plagiarismThresholdExpected
+        $this->assertTrue(
+            $response->plagiarism_threshold
         );
 
         // Login with director to update the contest
