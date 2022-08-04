@@ -48,7 +48,6 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'feedback',
             'scoreboard',
             'penalty_type',
-            'plagiarism_threshold'
         ];
 
         foreach ($valid_keys as $key) {
