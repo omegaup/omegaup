@@ -115,13 +115,19 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
      * @return list<\OmegaUp\DAO\VO\GroupsIdentities>
      */
     final public static function getByGroupId(int $groupId): array {
-        $sql = '
+        $fields = join(
+            ', ',
+            array_keys(
+                \OmegaUp\DAO\VO\GroupsIdentities::FIELD_NAMES
+            )
+        );
+        $sql = "
             SELECT
-                *
+                {$fields}
             FROM
-                Groups_Identities i
+                Groups_Identities
             WHERE
-                group_id = ?;';
+                group_id = ?;";
 
         $groupsIdentities = [];
         /** @var array{accept_teacher: bool|null, group_id: int, identity_id: int, is_invited: bool, privacystatement_consent_id: int|null, share_user_information: bool|null} $row */

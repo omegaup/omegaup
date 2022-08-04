@@ -16,12 +16,13 @@ class Emails extends \OmegaUp\DAO\Base\Emails {
      * @return list<\OmegaUp\DAO\VO\Emails>
      */
     final public static function getByUserId(int $userId): array {
-        $sql = 'SELECT
-                    *
+        $fields = join(', ', array_keys(\OmegaUp\DAO\VO\Emails::FIELD_NAMES));
+        $sql = "SELECT
+                    {$fields}
                 FROM
                     Emails
                 WHERE
-                    user_id = ?';
+                    user_id = ?";
 
         /** @var list<array{email: null|string, email_id: int, user_id: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]);

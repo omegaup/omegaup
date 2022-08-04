@@ -14,13 +14,19 @@ namespace OmegaUp\DAO;
  */
 class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
     public static function getByAlias(string $alias): ?\OmegaUp\DAO\VO\TeamGroups {
-        $sql = 'SELECT
-                    `tg`.*
+        $fields = join(
+            ', ',
+            array_keys(
+                \OmegaUp\DAO\VO\TeamGroups::FIELD_NAMES
+            )
+        );
+        $sql = "SELECT
+                    {$fields}
                 FROM
-                    `Team_Groups` AS `tg`
+                    `Team_Groups`
                 WHERE
-                    `tg`.`alias` = ?
-                LIMIT 1;';
+                    `alias` = ?
+                LIMIT 1;";
         $params = [$alias];
         /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string, number_of_contestants: int, team_group_id: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
@@ -31,13 +37,19 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
     }
 
     public static function getByName(string $name): ?\OmegaUp\DAO\VO\TeamGroups {
-        $sql = 'SELECT
-                    `tg`.*
+        $fields = join(
+            ', ',
+            array_keys(
+                \OmegaUp\DAO\VO\TeamGroups::FIELD_NAMES
+            )
+        );
+        $sql = "SELECT
+                    {$fields}
                 FROM
-                    `Team_Groups` AS `tg`
+                    `Team_Groups`
                 WHERE
-                    `tg`.`name` = ?
-                LIMIT 1;';
+                    `name` = ?
+                LIMIT 1;";
         /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string, number_of_contestants: int, team_group_id: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($rs)) {

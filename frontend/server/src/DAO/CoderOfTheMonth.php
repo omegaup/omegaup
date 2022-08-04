@@ -24,8 +24,17 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         string $category = 'all',
         int $rowCount = 100
     ): array {
+        $fields = join(
+            '',
+            array_map(
+                fn (string $field): string => "cm.{$field}, ",
+                array_keys(
+                    \OmegaUp\DAO\VO\CoderOfTheMonth::FIELD_NAMES
+                )
+            )
+        );
         $sql = "SELECT
-            cm.*,
+            {$fields}
             i.username,
             IFNULL(i.country_id, 'xx') AS country_id,
             IFNULL(ur.classname, 'user-rank-unranked') AS classname
@@ -224,9 +233,15 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         bool $autoselected = false,
         string $category = 'all'
     ): array {
+        $fields = join(
+            ', ',
+            array_keys(
+                \OmegaUp\DAO\VO\CoderOfTheMonth::FIELD_NAMES
+            )
+        );
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
         $sql = "SELECT
-                    *
+                    {$fields}
                 FROM
                     Coder_Of_The_Month
                 WHERE
@@ -255,13 +270,19 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         string $time,
         string $category = 'all'
     ): array {
-        $sql = 'SELECT
-                    *
+        $fields = join(
+            ', ',
+            array_keys(
+                \OmegaUp\DAO\VO\CoderOfTheMonth::FIELD_NAMES
+            )
+        );
+        $sql = "SELECT
+                    {$fields}
                 FROM
                     Coder_Of_The_Month
                 WHERE
                     `time` = ? AND
-                    category = ?;';
+                    category = ?;";
 
         /** @var list<array{category: string, coder_of_the_month_id: int, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(

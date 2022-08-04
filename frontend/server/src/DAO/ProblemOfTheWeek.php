@@ -16,12 +16,18 @@ class ProblemOfTheWeek extends \OmegaUp\DAO\Base\ProblemOfTheWeek {
      * @return list<\OmegaUp\DAO\VO\ProblemOfTheWeek>
      */
     final public static function getByDifficulty(string $difficulty): array {
-        $sql = 'SELECT
-                    *
+        $fields = join(
+            ', ',
+            array_keys(
+                \OmegaUp\DAO\VO\ProblemOfTheWeek::FIELD_NAMES
+            )
+        );
+        $sql = "SELECT
+                    {$fields}
                 FROM
                     Problem_Of_The_Week
                 WHERE
-                    difficulty = ?;';
+                    difficulty = ?;";
 
         /** @var list<array{difficulty: string, problem_id: int, problem_of_the_week_id: int, time: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(

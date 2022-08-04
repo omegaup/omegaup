@@ -18,9 +18,18 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
     public static function getFirstAdminForProblemsetRequest(
         int $problemsetId
     ) {
-        $sql = '
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "r.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\ProblemsetIdentityRequest::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "
             SELECT
-                r.*,
+                {$fields},
                 i.username,
                 i.name,
                 (SELECT
@@ -39,7 +48,7 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
             INNER JOIN
                 `Identities` i ON i.identity_id = r.identity_id
             WHERE
-                r.problemset_id = ?;';
+                r.problemset_id = ?;";
 
         /** @var list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, name: null|string, problemset_id: int, request_time: \OmegaUp\Timestamp, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(

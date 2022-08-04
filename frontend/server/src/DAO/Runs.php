@@ -767,9 +767,18 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      * @return \OmegaUp\DAO\VO\Runs|null
      */
     final public static function getByGUID(string $guid) {
-        $sql = '
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "r.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Runs::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "
             SELECT
-                `r`.*
+                {$fields}
             FROM
                 `Runs` `r`
             INNER JOIN
@@ -780,7 +789,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `s`.`guid` = ?
             LIMIT
                 1;
-        ';
+        ";
 
         /** @var array{commit: string, contest_score: float|null, judged_by: null|string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submission_id: int, time: \OmegaUp\Timestamp, verdict: string, version: string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$guid]);
@@ -798,9 +807,18 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     final public static function getByProblem(
         int $problemId
     ) {
-        $sql = '
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "r.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Runs::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "
             SELECT
-                r.*
+                {$fields}
             FROM
                 Submissions s
             INNER JOIN
@@ -809,7 +827,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 r.run_id = s.current_run_id
             WHERE
                 s.problem_id = ?;
-        ';
+        ";
         $params = [$problemId];
         /** @var list<array{commit: string, contest_score: float, judged_by: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submission_id: int, status: string, time: int, verdict: string, version: string}> $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);

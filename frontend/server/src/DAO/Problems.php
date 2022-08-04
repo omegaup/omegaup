@@ -498,7 +498,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     final public static function getByAlias(
         string $alias
     ): ?\OmegaUp\DAO\VO\Problems {
-        $sql = 'SELECT * FROM Problems WHERE (alias = ? ) LIMIT 1;';
+        $fields = self::getTableFields();
+        $sql = "SELECT {$fields} FROM Problems WHERE (alias = ? ) LIMIT 1;";
         $params = [$alias];
 
         /** @var array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}|null */
@@ -508,6 +509,31 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         return new \OmegaUp\DAO\VO\Problems($rs);
+    }
+
+    private static function getTableFields(
+        ?string $prefixTable = null
+    ): string {
+        if (is_null($prefixTable)) {
+            return join(
+                ', ',
+                array_map(
+                    fn (string $field): string => "`{$field}`",
+                    array_keys(
+                        \OmegaUp\DAO\VO\Problems::FIELD_NAMES
+                    )
+                )
+            );
+        }
+        return join(
+            ', ',
+            array_map(
+                fn (string $field): string => "`{$prefixTable}`.`{$field}`",
+                array_keys(
+                    \OmegaUp\DAO\VO\Problems::FIELD_NAMES
+                )
+            )
+        );
     }
 
     /**
@@ -520,9 +546,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         string $alias,
         int $problemsetId
     ): ?\OmegaUp\DAO\VO\Problems {
-        $sql = '
+        $fields = self::getTableFields(prefixTable: 'p');
+        $sql = "
             SELECT
-                p.*
+                {$fields}
             FROM
                 Problems p
             INNER JOIN
@@ -530,7 +557,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             WHERE
                 p.alias = ?
                 AND pp.problemset_id = ?
-            ';
+            ";
         $params = [
             $alias,
             $problemsetId
@@ -616,9 +643,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @return list<\OmegaUp\DAO\VO\Problems>
      */
     final public static function getProblemsSolved(int $identityId): array {
-        $sql = '
+        $fields = self::getTableFields(prefixTable: 'p');
+        $sql = "
             SELECT
-                p.*
+                {$fields}
             FROM
                 Problems p
             INNER JOIN
@@ -626,7 +654,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
             WHERE
-                s.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
+                s.verdict = 'AC' AND s.type = 'normal' AND s.identity_id = ?
                 AND NOT EXISTS (
                     SELECT
                         `pf`.`problem_id`, `pf`.`user_id`
@@ -652,7 +680,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ORDER BY
                 min(s.time) DESC,
                 p.problem_id DESC;
-        ';
+        ";
         $val = [$identityId];
 
         $problems = [];
@@ -674,9 +702,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     final public static function getProblemsUnsolvedByIdentity(
         int $identityId
     ): array {
+        $fields = self::getTableFields(prefixTable: 'p');
         $sql = "
             SELECT
-                p.*,
+                {$fields},
                 SUM(s.verdict = 'AC') AS solved_count
             FROM
                 Submissions s
@@ -711,9 +740,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     final public static function getPublicProblemsCreatedByIdentity(
         int $identityId
     ): array {
-        $sql = '
+        $fields = self::getTableFields(prefixTable: 'p');
+        $sql = "
             SELECT DISTINCT
-                p.*
+                {$fields}
             FROM
                 Identities i
             INNER JOIN
@@ -727,7 +757,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     p.visibility >= ? OR
                     p.visibility = ?
                 ) AND
-                i.identity_id = ?;';
+                i.identity_id = ?;";
 
         $params = [
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
@@ -952,6 +982,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $pageSize,
         string $query = ''
     ) {
+        $fields = self::getTableFields(prefixTable: 'p');
         $params = [];
 
         $sqlCount = '
@@ -959,10 +990,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 COUNT(*)
         ';
 
-        $select = '
+        $select = "
             SELECT
-                p.*
-        ';
+                {$fields}
+        ";
 
         $sql = '
             FROM
@@ -1023,9 +1054,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $pageSize,
         string $query = ''
     ): array {
-        $select = '
+        $fields = self::getTableFields(prefixTable: 'p');
+        $select = "
             SELECT
-                p.*';
+                {$fields}";
         $sql = '
             FROM
                 Problems AS p
@@ -1110,9 +1142,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $pageSize,
         string $query = ''
     ) {
-        $select = '
+        $fields = self::getTableFields(prefixTable: 'p');
+        $select = "
             SELECT
-                p.*';
+                {$fields}";
         $sql = '
             FROM
                 Problems AS p
@@ -1179,7 +1212,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         ?string $order,
         string $orderType
     ) {
-        $sql = 'SELECT * from Problems where `visibility` > ? ';
+        $fields = self::getTableFields();
+        $sql = "SELECT {$fields} from Problems where `visibility` > ? ";
         if (!is_null($order)) {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape(
                 $order
@@ -1288,8 +1322,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @return list<\OmegaUp\DAO\VO\Problems>
      */
     final public static function getByContest(int $contestId): array {
-        $sql = 'SELECT
-                    p.*
+        $fields = self::getTableFields(prefixTable: 'p');
+        $sql = "SELECT
+                    {$fields}
                 FROM
                     Problems p
                 INNER JOIN
@@ -1301,7 +1336,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 ON
                     c.problemset_id = pp.problemset_id
                 WHERE
-                    c.contest_id = ?;';
+                    c.contest_id = ?;";
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
@@ -1319,12 +1354,13 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @return list<\OmegaUp\DAO\VO\Problems>
      */
     final public static function getByTitle(string $title): array {
-        $sql = 'SELECT
-                    *
+        $fields = self::getTableFields();
+        $sql = "SELECT
+                    {$fields}
                 FROM
                     Problems
                 WHERE
-                    title = ?;';
+                    title = ?;";
 
         /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$title]);

@@ -25,7 +25,16 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      * @return list<\OmegaUp\DAO\VO\Courses>
      */
     public static function findByName(string $name): array {
-        $sql = "SELECT DISTINCT c.*
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "c.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Courses::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "SELECT {$fields}
                 FROM Courses c
                 WHERE c.name
                 LIKE CONCAT('%', ?, '%') LIMIT 10";
@@ -54,6 +63,15 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         bool $isAdmin,
         ?\OmegaUp\DAO\VO\Identities $identity = null
     ): array {
+        $fields = join(
+            '',
+            array_map(
+                fn (string $field): string => "a.{$field}, ",
+                array_keys(
+                    \OmegaUp\DAO\VO\Assignments::FIELD_NAMES
+                )
+            )
+        );
         // Non-admins should not be able to see assignments that have not
         // started.
         $timeCondition = $isAdmin ? '' : 'AND a.start_time <= CURRENT_TIMESTAMP';
@@ -77,7 +95,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         $sql = "
             SELECT
-                a.*,
+                {$fields}
                 EXISTS(SELECT * FROM Submissions s WHERE s.problemset_id = a.problemset_id) AS has_runs,
                 COUNT(psp.problem_id) AS problem_count,
                 ps.scoreboard_url,
@@ -950,9 +968,18 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         int $page = 1,
         int $pageSize = 1000
     ): array {
-        $sql = '
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "c.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Courses::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "
             SELECT
-                c.*
+                {$fields}
             FROM
                 Courses AS c
             INNER JOIN
@@ -978,7 +1005,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ORDER BY
                 c.course_id DESC
             LIMIT
-                ?, ?';
+                ?, ?";
         $params = [
             $identityId,
             \OmegaUp\Authorization::ADMIN_ROLE,
@@ -1084,9 +1111,18 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         int $page = 1,
         int $pageSize = 1000
     ): array {
-        $sql = '
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "c.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Courses::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "
             SELECT
-                c.*
+                {$fields}
             FROM
                 Courses AS c
             INNER JOIN
@@ -1096,7 +1132,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ORDER BY
                 c.course_id DESC
             LIMIT
-                ?, ?';
+                ?, ?";
         $params = [
             $userId,
             max(0, $page - 1) * $pageSize,
@@ -1119,9 +1155,18 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     final public static function getCoursesCreatedByIdentity(
         int $identityId
     ): array {
-        $sql = '
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "c.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Courses::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "
             SELECT
-                c.*
+                {$fields}
             FROM
                 Courses c
             INNER JOIN
@@ -1132,7 +1177,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 u.main_identity_id = ?
                 AND archived = false
             ORDER BY
-                c.course_id DESC;';
+                c.course_id DESC;";
 
         $params = [
             $identityId,
@@ -1145,7 +1190,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     final public static function getByAlias(
         string $alias
     ): ?\OmegaUp\DAO\VO\Courses {
-        $sql = 'SELECT * FROM Courses WHERE (alias = ?) LIMIT 1;';
+        $fields = join(', ', array_keys(\OmegaUp\DAO\VO\Courses::FIELD_NAMES));
+        $sql = "SELECT {$fields} FROM Courses WHERE (alias = ?) LIMIT 1;";
 
         /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);

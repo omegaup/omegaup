@@ -504,15 +504,21 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * @return list<\OmegaUp\DAO\VO\QualityNominations>
      */
     public static function getAllDemotionsForProblem(int $problemId): array {
-        $sql = '
+        $fields = join(
+            ', ',
+            array_keys(
+                \OmegaUp\DAO\VO\QualityNominations::FIELD_NAMES
+            )
+        );
+        $sql = "
             SELECT
-                *
+                {$fields}
             FROM
                 QualityNominations
             WHERE
-                nomination = "demotion" AND
+                nomination = 'demotion' AND
                 problem_id = ?;
-        ';
+        ";
         /** @var list<array{contents: string, nomination: string, problem_id: int, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
@@ -637,9 +643,15 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         string $contents,
         string $status
     ): array {
-        $sql = '
+        $fields = join(
+            ', ',
+            array_keys(
+                \OmegaUp\DAO\VO\QualityNominations::FIELD_NAMES
+            )
+        );
+        $sql = "
             SELECT
-                *
+                {$fields}
             FROM
                 QualityNominations
             WHERE
@@ -648,7 +660,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 nomination = ? AND
                 contents = ? AND
                 status = ?;
-        ';
+        ";
 
         /** @var list<array{contents: string, nomination: string, problem_id: int, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(

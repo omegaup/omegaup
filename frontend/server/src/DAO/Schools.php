@@ -19,14 +19,15 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
      * @return list<\OmegaUp\DAO\VO\Schools>
      */
     public static function findByName($name) {
-        $sql = '
+        $fields = join(', ', array_keys(\OmegaUp\DAO\VO\Schools::FIELD_NAMES));
+        $sql = "
             SELECT
-                s.*
+                {$fields}
             FROM
-                Schools s
+                Schools
             WHERE
-                s.name LIKE CONCAT(\'%\', ?, \'%\')
-            LIMIT 10';
+                name LIKE CONCAT('%', ?, '%')
+            LIMIT 10";
         $args = [$name];
 
         $result = [];

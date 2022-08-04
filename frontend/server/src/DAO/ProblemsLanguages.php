@@ -26,12 +26,21 @@ class ProblemsLanguages extends \OmegaUp\DAO\Base\ProblemsLanguages {
      * @return list<\OmegaUp\DAO\VO\ProblemsLanguages>
      */
     final public static function getByProblemId(int $problemId): array {
-        $sql = 'SELECT
-                    *
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "`{$field}`",
+                array_keys(
+                    \OmegaUp\DAO\VO\ProblemsLanguages::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "SELECT
+                    {$fields}
                 FROM
                     Problems_Languages
                 WHERE
-                    problem_id = ?;';
+                    problem_id = ?;";
 
         /** @var list<array{language_id: int, problem_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(

@@ -169,10 +169,16 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         string $time,
         bool $autoselected = false
     ): array {
+        $fields = join(
+            ', ',
+            array_keys(
+                \OmegaUp\DAO\VO\SchoolOfTheMonth::FIELD_NAMES
+            )
+        );
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
         $sql = "
             SELECT
-                *
+                {$fields}
             FROM
                 School_Of_The_Month
             WHERE
@@ -199,13 +205,19 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
     public static function getByTime(
         string $time
     ): array {
-        $sql = '
+        $fields = join(
+            ', ',
+            array_keys(
+                \OmegaUp\DAO\VO\SchoolOfTheMonth::FIELD_NAMES
+            )
+        );
+        $sql = "
             SELECT
-                *
+                {$fields}
             FROM
                 School_Of_The_Month
             WHERE
-                time = ?;';
+                time = ?;";
 
         $schools = [];
         /** @var array{ranking: int, school_id: int, school_of_the_month_id: int, score: float, selected_by: int|null, time: string} $row */

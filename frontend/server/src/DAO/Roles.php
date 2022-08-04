@@ -13,12 +13,13 @@ namespace OmegaUp\DAO;
  */
 class Roles extends \OmegaUp\DAO\Base\Roles {
     final public static function getByName(string $name): \OmegaUp\DAO\VO\Roles {
-        $sql = 'SELECT
-                    *
+        $fields = join(', ', array_keys(\OmegaUp\DAO\VO\Roles::FIELD_NAMES));
+        $sql = "SELECT
+                    {$fields}
                 FROM
                     Roles
                 WHERE
-                    name = ?';
+                    name = ?";
 
         /** @var array{description: string, name: string, role_id: int}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);

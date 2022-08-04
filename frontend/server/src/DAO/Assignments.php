@@ -19,8 +19,17 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         int $courseId,
         string $assignmentAlias
     ): ?\OmegaUp\DAO\VO\Problemsets {
-        $sql = 'SELECT
-                    p.*
+        $problemsetFields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "p.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Problemsets::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "SELECT
+                    {$problemsetFields}
                 FROM
                     Assignments a
                 INNER JOIN
@@ -29,7 +38,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                     a.problemset_id = p.problemset_id
                 WHERE
                     a.course_id = ?
-                    AND a.alias = ?';
+                    AND a.alias = ?";
         $params = [$courseId, $assignmentAlias];
 
         /** @var array{access_mode: string, acl_id: int, assignment_id: int|null, contest_id: int|null, interview_id: int|null, languages: null|string, needs_basic_information: bool, problemset_id: int, requests_user_information: string, scoreboard_url: string, scoreboard_url_admin: string, type: string}|null */
@@ -238,15 +247,24 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         ?string $assignmentAlias,
         int $courseId
     ): ?\OmegaUp\DAO\VO\Assignments {
-        $sql = 'SELECT
-                    *
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "`{$field}`",
+                array_keys(
+                    \OmegaUp\DAO\VO\Assignments::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "SELECT
+                    {$fields}
                 FROM
                     Assignments
                 WHERE
                     course_id = ?
                 AND
                     alias = ?
-                LIMIT 1;';
+                LIMIT 1;";
 
         /** @var array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, start_time: \OmegaUp\Timestamp}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(

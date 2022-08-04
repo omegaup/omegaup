@@ -18,14 +18,20 @@ class QualityNominationLog extends \OmegaUp\DAO\Base\QualityNominationLog {
      * @return list<\OmegaUp\DAO\VO\QualityNominationLog>
      */
     public static function getAllLogsForNomination(int $qualityNominationId): array {
-        $sql = '
+        $fields = join(
+            ', ',
+            array_keys(
+                \OmegaUp\DAO\VO\QualityNominationLog::FIELD_NAMES
+            )
+        );
+        $sql = "
             SELECT
-                *
+                {$fields}
             FROM
                 QualityNomination_Log
             WHERE
                 qualitynomination_id = ?;
-        ';
+        ";
 
         /** @var list<array{from_status: string, qualitynomination_id: int, qualitynomination_log_id: int, rationale: null|string, time: \OmegaUp\Timestamp, to_status: string, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(

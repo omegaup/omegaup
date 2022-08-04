@@ -15,14 +15,20 @@ class Languages extends \OmegaUp\DAO\Base\Languages {
     final public static function getByName(
         string $name
     ): ?\OmegaUp\DAO\VO\Languages {
-        $sql = 'SELECT
-                    *
+        $fields = join(
+            ', ',
+            array_keys(
+                \OmegaUp\DAO\VO\Languages::FIELD_NAMES
+            )
+        );
+        $sql = "SELECT
+                    {$fields}
                 FROM
                     Languages
                 WHERE
                     name = ?
                 LIMIT
-                    0, 1;';
+                    0, 1;";
 
         /** @var array{country_id: null|string, language_id: int, name: string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
