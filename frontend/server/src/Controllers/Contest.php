@@ -2590,7 +2590,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'score_mode' => $scoreMode,
             'show_scoreboard_after' => $r['show_scoreboard_after'] ?? true,
             'contest_for_teams' => $forTeams,
-            'plagiarism_threshold' => $checkPlagiarism ? true: false,
+            'plagiarism_threshold' => $checkPlagiarism ? true : false,
         ]);
 
         self::createContest(
