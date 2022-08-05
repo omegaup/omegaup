@@ -62,6 +62,7 @@
   - [`/api/course/activityReport/`](#apicourseactivityreport)
   - [`/api/course/addAdmin/`](#apicourseaddadmin)
   - [`/api/course/addGroupAdmin/`](#apicourseaddgroupadmin)
+  - [`/api/course/addGroupTeachingAssistant/`](#apicourseaddgroupteachingassistant)
   - [`/api/course/addProblem/`](#apicourseaddproblem)
   - [`/api/course/addStudent/`](#apicourseaddstudent)
   - [`/api/course/addTeachingAssistant/`](#apicourseaddteachingassistant)
@@ -90,6 +91,7 @@
   - [`/api/course/removeAdmin/`](#apicourseremoveadmin)
   - [`/api/course/removeAssignment/`](#apicourseremoveassignment)
   - [`/api/course/removeGroupAdmin/`](#apicourseremovegroupadmin)
+  - [`/api/course/removeGroupTeachingAssistant/`](#apicourseremovegroupteachingassistant)
   - [`/api/course/removeProblem/`](#apicourseremoveproblem)
   - [`/api/course/removeStudent/`](#apicourseremovestudent)
   - [`/api/course/requests/`](#apicourserequests)
@@ -1427,6 +1429,23 @@ Adds an group admin to a course
 
 _Nothing_
 
+## `/api/course/addGroupTeachingAssistant/`
+
+### Description
+
+Adds an group teaching assistant to a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+| `group`        | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/course/addProblem/`
 
 ### Description
@@ -1964,6 +1983,23 @@ _Nothing_
 ### Description
 
 Removes a group admin from a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+| `group`        | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/course/removeGroupTeachingAssistant/`
+
+### Description
+
+Removes a group teaching assistant from a course
 
 ### Parameters
 

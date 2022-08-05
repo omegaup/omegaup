@@ -4850,6 +4850,8 @@ export namespace messages {
   export type CourseAddAdminResponse = {};
   export type CourseAddGroupAdminRequest = { [key: string]: any };
   export type CourseAddGroupAdminResponse = {};
+  export type CourseAddGroupTeachingAssistantRequest = { [key: string]: any };
+  export type CourseAddGroupTeachingAssistantResponse = {};
   export type CourseAddProblemRequest = { [key: string]: any };
   export type CourseAddProblemResponse = {};
   export type CourseAddStudentRequest = { [key: string]: any };
@@ -4947,6 +4949,10 @@ export namespace messages {
   export type CourseRemoveAssignmentResponse = {};
   export type CourseRemoveGroupAdminRequest = { [key: string]: any };
   export type CourseRemoveGroupAdminResponse = {};
+  export type CourseRemoveGroupTeachingAssistantRequest = {
+    [key: string]: any;
+  };
+  export type CourseRemoveGroupTeachingAssistantResponse = {};
   export type CourseRemoveProblemRequest = { [key: string]: any };
   export type CourseRemoveProblemResponse = {};
   export type CourseRemoveStudentRequest = { [key: string]: any };
@@ -5685,6 +5691,9 @@ export namespace controllers {
     addGroupAdmin: (
       params?: messages.CourseAddGroupAdminRequest,
     ) => Promise<messages.CourseAddGroupAdminResponse>;
+    addGroupTeachingAssistant: (
+      params?: messages.CourseAddGroupTeachingAssistantRequest,
+    ) => Promise<messages.CourseAddGroupTeachingAssistantResponse>;
     addProblem: (
       params?: messages.CourseAddProblemRequest,
     ) => Promise<messages.CourseAddProblemResponse>;
@@ -5769,6 +5778,9 @@ export namespace controllers {
     removeGroupAdmin: (
       params?: messages.CourseRemoveGroupAdminRequest,
     ) => Promise<messages.CourseRemoveGroupAdminResponse>;
+    removeGroupTeachingAssistant: (
+      params?: messages.CourseRemoveGroupTeachingAssistantRequest,
+    ) => Promise<messages.CourseRemoveGroupTeachingAssistantResponse>;
     removeProblem: (
       params?: messages.CourseRemoveProblemRequest,
     ) => Promise<messages.CourseRemoveProblemResponse>;

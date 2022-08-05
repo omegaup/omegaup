@@ -414,30 +414,26 @@ class Authorization {
 
     public static function isTeachingAssistant(
         \OmegaUp\DAO\VO\Identities $identity,
-        \OmegaUp\DAO\VO\Courses $course
+        \OmegaUp\DAO\VO\Courses $course,
     ): bool {
-        if (is_null(self::$_teachingAssistantGroup)) {
-            self::$_teachingAssistantGroup = \OmegaUp\DAO\Groups::findByAlias(
-                self::TEACHING_ASSISTANT_GROUP_ALIAS
-            );
-            if (is_null(self::$_teachingAssistantGroup)) {
-                return false;
-            }
-        }
-        if (
-            is_null(self::$_teachingAssistantGroup->acl_id) ||
-            is_null($course->acl_id)
-        ) {
+        if (is_null($course->acl_id)) {
             return false;
         }
-        return self::isGroupMember(
-            $identity,
-            self::$_teachingAssistantGroup
-        ) || self::hasRole(
+        return self::hasRole(
             $identity,
             $course->acl_id,
             self::TEACHING_ASSISTANT_ROLE
         );
+    }
+
+    public static function isGroupTeachingAssistantMember(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Groups $group = null
+    ): bool {
+        if (is_null($group) || is_null($identity->user_id)) {
+            return false;
+        }
+        return self::isGroupMember($identity, $group);
     }
 
     public static function isGroupIdentityCreator(\OmegaUp\DAO\VO\Identities $identity): bool {
