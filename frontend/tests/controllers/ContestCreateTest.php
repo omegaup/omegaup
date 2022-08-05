@@ -159,13 +159,12 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Create a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
-                'checkPlagiarism' => true,
+                'plagiarism_threshold' => true,
             ])
         );
         $checkPlagiarismDuplicate = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
-
         $this->assertTrue($checkPlagiarismDuplicate->plagiarism_threshold);
     }
 

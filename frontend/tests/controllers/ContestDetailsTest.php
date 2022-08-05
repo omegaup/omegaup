@@ -230,22 +230,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
-
-        $this->assertTrue($response->plagiarism_threshold);
-
-        // Login with director to update the contest
-        $login = self::login($contestData['director']);
-
-        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'checkPlagiarism' => false,
-        ]));
-
-        $response = \OmegaUp\DAO\Contests::getByAlias(
-            $contestData['request']['alias']
-        );
-
+        print_r($response);
         $this->assertTrue($response->plagiarism_threshold);
     }
 
