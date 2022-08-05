@@ -2920,6 +2920,78 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Removes a teaching assistant from a course
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $usernameOrEmail
+     */
+    public static function apiRemoveTeachingAssistant(\OmegaUp\Request $r): array {
+        // Authenticate logged user
+        $r->ensureIdentity();
+
+        // Check course_alias
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $username = $r->ensureString(
+            'usernameOrEmail',
+            fn (string $user) => \OmegaUp\Validators::usernameOrEmail(
+                $user
+            )
+        );
+
+        $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $username
+        );
+
+        if (is_null($resolvedIdentity->user_id)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $resolvedUser = \OmegaUp\DAO\Users::getByPK($resolvedIdentity->user_id);
+        if (is_null($resolvedUser)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
+
+        if (is_null($course)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        // Only admin is allowed to make modifications
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        // Check if teaching assistant to delete is actually a teaching assistant
+        if (
+            !\OmegaUp\Authorization::isTeachingAssistant(
+                $resolvedIdentity,
+                $course
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+
+        \OmegaUp\Controllers\ACL::removeUser(
+            intval($course->acl_id),
+            intval($resolvedUser->user_id),
+            roleId:\OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE
+        );
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
      * Show course intro only on public courses when user is not yet registered
      *
      * @throws \OmegaUp\Exceptions\NotFoundException Course not found or trying to directly access a private course.

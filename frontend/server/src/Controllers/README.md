@@ -91,6 +91,7 @@
   - [`/api/course/removeGroupAdmin/`](#apicourseremovegroupadmin)
   - [`/api/course/removeProblem/`](#apicourseremoveproblem)
   - [`/api/course/removeStudent/`](#apicourseremovestudent)
+  - [`/api/course/removeTeachingAssistant/`](#apicourseremoveteachingassistant)
   - [`/api/course/requests/`](#apicourserequests)
   - [`/api/course/runs/`](#apicourseruns)
   - [`/api/course/searchUsers/`](#apicoursesearchusers)
@@ -1981,6 +1982,23 @@ _Nothing_
 ### Description
 
 Remove Student from Course
+
+### Parameters
+
+| Name              | Type     | Description |
+| ----------------- | -------- | ----------- |
+| `course_alias`    | `string` |             |
+| `usernameOrEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/course/removeTeachingAssistant/`
+
+### Description
+
+Removes a teaching assistant from a course
 
 ### Parameters
 

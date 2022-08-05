@@ -922,6 +922,10 @@ export const Course = {
     messages.CourseRemoveStudentRequest,
     messages.CourseRemoveStudentResponse
   >('/api/course/removeStudent/'),
+  removeTeachingAssistant: apiCall<
+    messages.CourseRemoveTeachingAssistantRequest,
+    messages.CourseRemoveTeachingAssistantResponse
+  >('/api/course/removeTeachingAssistant/'),
   requests: apiCall<
     messages.CourseRequestsRequest,
     messages._CourseRequestsServerResponse,
