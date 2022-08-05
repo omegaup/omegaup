@@ -108,10 +108,10 @@ class ContestParams {
      * @readonly
      * @var bool
      */
-    public $plagiarism_threshold;
+    public $plagiarismThreshold;
 
     /**
-     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, contestForTeams?: bool, teamsGroupAlias?: string, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, partialScore?: bool, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string, scoreMode?: string, plagiarism_threshold?: bool} $params
+     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, contestForTeams?: bool, teamsGroupAlias?: string, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, partialScore?: bool, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string, scoreMode?: string, palgiarismThreshold?: bool} $params
      */
     public function __construct($params = []) {
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
@@ -152,7 +152,7 @@ class ContestParams {
         $this->contestForTeams = $params['contestForTeams'] ?? false;
         $this->teamsGroupAlias = $params['teamsGroupAlias'] ?? null;
         $this->scoreMode = $params['scoreMode'] ?? null;
-        $this->plagiarism_threshold = $params['plagiarism_threshold'] ?? false;
+        $this->plagiarismThreshold = $params['plagiarismThreshold'] ?? false;
     }
 }
 
@@ -203,7 +203,7 @@ class Contest {
             'requests_user_information' => $params->requestsUserInformation,
             'penalty_calc_policy' => $params->penaltyCalcPolicy,
             'contest_for_teams' => $params->contestForTeams,
-            'plagiarism_threshold' => $params->plagiarism_threshold,
+            'check_plagiarism' => $params->plagiarismThreshold,
         ]);
 
         if (!is_null($params->teamsGroupAlias)) {

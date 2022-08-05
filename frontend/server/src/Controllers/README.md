@@ -1303,6 +1303,7 @@ Update a Contest
 | `window_length`                              | `int`                                                |             |
 | `admission_mode`                             | `null\|string`                                       |             |
 | `alias`                                      | `null\|string`                                       |             |
+| `check_plagiarism`                           | `bool\|null`                                         |             |
 | `contest_for_teams`                          | `bool\|null`                                         |             |
 | `default_show_all_contestants_in_scoreboard` | `bool\|null`                                         |             |
 | `description`                                | `null\|string`                                       |             |
