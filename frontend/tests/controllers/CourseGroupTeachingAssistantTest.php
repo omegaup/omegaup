@@ -33,9 +33,6 @@ class CourseGroupTeachingAssistantTest extends \OmegaUp\Test\ControllerTestCase 
 
         // login user
         $userLogin = self::login($identity);
-        $course = \OmegaUp\DAO\Courses::getByAlias(
-            $courseData['course_alias']
-        );
 
         $this->assertTrue(
             \OmegaUp\Authorization::isGroupTeachingAssistantMember(
