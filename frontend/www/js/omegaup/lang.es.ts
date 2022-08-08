@@ -702,6 +702,7 @@ const translations: { [key: string]: string; } = {
   notificationContestClarificationRequest: "Ha sido solicitada una nueva clarificaci\u00f3n para el problema %(problemAlias) del concurso %(contestAlias), que administras.",
   notificationContestClarificationResponse: "Su pedido de clarificaci\u00f3n para el problema %(problemAlias) del concurso %(contestAlias), ha sido respondido.",
   notificationCourseAddAdmin: "Has sido invitado a ser administrador del curso %(courseName).",
+  notificationCourseAddTeachingAssistant: "Has sido invitado a ser un asistente de ense\u00f1anza del curso %(courseName).",
   notificationCourseClarificationRequest: "Ha sido solicitada una nueva clarificaci\u00f3n para el problema %(problemAlias) del curso %(courseName), que administras.",
   notificationCourseClarificationResponse: "Su pedido de clarificaci\u00f3n para el problema %(problemAlias) del curso %(courseName), ha sido respondido.",
   notificationCourseRegistrationAccepted: "Tu solicitud de registro en el curso %(courseName) ha sido **aceptada**.",
