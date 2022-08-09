@@ -415,17 +415,4 @@ abstract class CourseIdentityRequest {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `cir`.`identity_id`,
-                `cir`.`course_id`,
-                `cir`.`request_time`,
-                `cir`.`last_update`,
-                `cir`.`accepted`,
-                `cir`.`extra_note`,
-                `cir`.`accept_teacher`,
-                `cir`.`share_user_information`
-               ";
-    }
 }

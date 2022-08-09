@@ -137,13 +137,4 @@ abstract class ProblemsetAccessLog {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `pal`.`problemset_id`,
-                `pal`.`identity_id`,
-                `pal`.`ip`,
-                `pal`.`time`
-               ";
-    }
 }

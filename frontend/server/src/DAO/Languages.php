@@ -16,9 +16,12 @@ class Languages extends \OmegaUp\DAO\Base\Languages {
         string $name
     ): ?\OmegaUp\DAO\VO\Languages {
         $sql = 'SELECT
-                    ' .  self::getFields() . '
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Languages::FIELD_NAMES,
+            'Languages'
+        ) . '
                 FROM
-                    Languages l
+                    Languages
                 WHERE
                     name = ?
                 LIMIT

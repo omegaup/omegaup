@@ -322,19 +322,4 @@ abstract class Identities {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `i`.`identity_id`,
-                `i`.`username`,
-                `i`.`password`,
-                `i`.`name`,
-                `i`.`user_id`,
-                `i`.`language_id`,
-                `i`.`country_id`,
-                `i`.`state_id`,
-                `i`.`gender`,
-                `i`.`current_identity_school_id`
-               ";
-    }
 }

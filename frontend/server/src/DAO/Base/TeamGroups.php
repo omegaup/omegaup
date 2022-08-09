@@ -289,16 +289,4 @@ abstract class TeamGroups {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `tg`.`team_group_id`,
-                `tg`.`acl_id`,
-                `tg`.`create_time`,
-                `tg`.`alias`,
-                `tg`.`name`,
-                `tg`.`description`,
-                `tg`.`number_of_contestants`
-               ";
-    }
 }

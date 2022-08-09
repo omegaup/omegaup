@@ -229,11 +229,4 @@ abstract class TeamUsers {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `tu`.`team_id`,
-                `tu`.`identity_id`
-               ";
-    }
 }

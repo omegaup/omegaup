@@ -290,15 +290,4 @@ abstract class Messages {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `m`.`message_id`,
-                `m`.`read`,
-                `m`.`sender_id`,
-                `m`.`recipient_id`,
-                `m`.`message`,
-                `m`.`date`
-               ";
-    }
 }

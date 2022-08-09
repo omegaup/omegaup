@@ -76,4 +76,17 @@ final class DAO {
         }
         return null;
     }
+
+    public static function getFields(
+        array $fieldNames,
+        string $prefix
+    ): string {
+        return join(
+            ', ',
+            array_map(
+                fn (string $field): string => "`{$prefix}`.`{$field}`",
+                array_keys($fieldNames)
+            )
+        );
+    }
 }

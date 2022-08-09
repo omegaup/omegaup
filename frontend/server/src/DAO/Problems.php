@@ -104,7 +104,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         string $difficulty,
         array $authors
     ) {
-        $fields = self::getFields();
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        );
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
             $order = 'desc';
@@ -490,7 +493,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     final public static function getByAlias(
         string $alias
     ): ?\OmegaUp\DAO\VO\Problems {
-        $sql = 'SELECT ' .  self::getFields() . ' FROM Problems p WHERE (alias = ? ) LIMIT 1;';
+        $sql = 'SELECT ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'Problems'
+        ) . ' FROM Problems WHERE (alias = ? ) LIMIT 1;';
         $params = [$alias];
 
         /** @var array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}|null */
@@ -514,7 +520,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     ): ?\OmegaUp\DAO\VO\Problems {
         $sql = '
             SELECT
-            ' .  self::getFields() . '
+            ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        ) . '
             FROM
                 Problems p
             INNER JOIN
@@ -610,7 +619,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     final public static function getProblemsSolved(int $identityId): array {
         $sql = '
             SELECT
-                ' .  self::getFields() . '
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        ) . '
             FROM
                 Problems p
             INNER JOIN
@@ -666,7 +678,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     final public static function getProblemsUnsolvedByIdentity(
         int $identityId
     ): array {
-        $fields = self::getFields();
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        );
         $sql = "
             SELECT
                 {$fields},
@@ -706,7 +721,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     ): array {
         $sql = '
             SELECT DISTINCT
-            ' .  self::getFields() . '
+            ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        ) . '
             FROM
                 Identities i
             INNER JOIN
@@ -954,7 +972,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         $select = '
             SELECT
-                ' .  self::getFields();
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        );
 
         $sql = '
             FROM
@@ -1017,7 +1038,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     ): array {
         $select = '
             SELECT
-            ' .  self::getFields();
+            ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        );
         $sql = '
             FROM
                 Problems AS p
@@ -1104,7 +1128,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     ) {
         $select = '
             SELECT
-            ' .  self::getFields();
+            ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        );
         $sql = '
             FROM
                 Problems AS p
@@ -1171,7 +1198,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         ?string $order,
         string $orderType
     ) {
-        $sql = 'SELECT ' .  self::getFields() . ' from Problems p where `visibility` > ? ';
+        $sql = 'SELECT ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'Problems'
+        ) . ' from Problems p where `visibility` > ? ';
         if (!is_null($order)) {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape(
                 $order
@@ -1281,7 +1311,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      */
     final public static function getByContest(int $contestId): array {
         $sql = 'SELECT
-                    ' .  self::getFields() . '
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        ) . '
                 FROM
                     Problems p
                 INNER JOIN
@@ -1312,9 +1345,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      */
     final public static function getByTitle(string $title): array {
         $sql = 'SELECT
-                    ' .  self::getFields() . '
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'Problems'
+        ) . '
                 FROM
-                    Problems p
+                    Problems
                 WHERE
                     title = ?;';
 

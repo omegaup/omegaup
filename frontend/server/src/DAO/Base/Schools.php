@@ -278,15 +278,4 @@ abstract class Schools {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `s`.`school_id`,
-                `s`.`country_id`,
-                `s`.`state_id`,
-                `s`.`name`,
-                `s`.`ranking`,
-                `s`.`score`
-               ";
-    }
 }

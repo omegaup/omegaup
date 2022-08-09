@@ -232,8 +232,14 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     public static function getContestsParticipated(int $identityId) {
         $sql = '
             SELECT
-                ' .  self::getFields() . ',
-                ' .  \OmegaUp\DAO\Base\Problemsets::getFields() . '
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Contests::FIELD_NAMES,
+            'c'
+        ) . ',
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problemsets::FIELD_NAMES,
+            'p'
+        ) . '
             FROM
                 Contests c
             INNER JOIN

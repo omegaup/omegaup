@@ -119,11 +119,4 @@ abstract class UsersExperiments {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `ue`.`user_id`,
-                `ue`.`experiment`
-               ";
-    }
 }

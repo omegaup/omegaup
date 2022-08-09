@@ -323,12 +323,4 @@ abstract class ProblemsForfeited {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `pf`.`user_id`,
-                `pf`.`problem_id`,
-                `pf`.`forfeited_date`
-               ";
-    }
 }

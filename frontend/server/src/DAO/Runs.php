@@ -769,7 +769,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     final public static function getByGUID(string $guid) {
         $sql = '
             SELECT
-                ' .  self::getFields() . '
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Runs::FIELD_NAMES,
+            'r'
+        ) . '
             FROM
                 `Runs` `r`
             INNER JOIN
@@ -800,7 +803,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ) {
         $sql = '
             SELECT
-                ' .  self::getFields() . '
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Runs::FIELD_NAMES,
+            'r'
+        ) . '
             FROM
                 Submissions s
             INNER JOIN

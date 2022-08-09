@@ -359,22 +359,4 @@ abstract class Assignments {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `a`.`assignment_id`,
-                `a`.`course_id`,
-                `a`.`problemset_id`,
-                `a`.`acl_id`,
-                `a`.`name`,
-                `a`.`description`,
-                `a`.`alias`,
-                `a`.`publish_time_delay`,
-                `a`.`assignment_type`,
-                `a`.`start_time`,
-                `a`.`finish_time`,
-                `a`.`max_points`,
-                `a`.`order`
-               ";
-    }
 }

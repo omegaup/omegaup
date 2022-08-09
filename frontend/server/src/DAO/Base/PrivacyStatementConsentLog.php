@@ -276,13 +276,4 @@ abstract class PrivacyStatementConsentLog {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `pscl`.`privacystatement_consent_id`,
-                `pscl`.`identity_id`,
-                `pscl`.`privacystatement_id`,
-                `pscl`.`timestamp`
-               ";
-    }
 }

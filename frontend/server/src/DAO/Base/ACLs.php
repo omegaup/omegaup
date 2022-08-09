@@ -250,11 +250,4 @@ abstract class ACLs {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `acl`.`acl_id`,
-                `acl`.`owner_id`
-               ";
-    }
 }

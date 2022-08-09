@@ -363,22 +363,4 @@ abstract class Submissions {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `s`.`submission_id`,
-                `s`.`current_run_id`,
-                `s`.`identity_id`,
-                `s`.`problem_id`,
-                `s`.`problemset_id`,
-                `s`.`guid`,
-                `s`.`language`,
-                `s`.`time`,
-                `s`.`status`,
-                `s`.`verdict`,
-                `s`.`submit_delay`,
-                `s`.`type`,
-                `s`.`school_id`
-               ";
-    }
 }

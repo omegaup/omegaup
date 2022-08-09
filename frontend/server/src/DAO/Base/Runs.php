@@ -339,22 +339,4 @@ abstract class Runs {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `r`.`run_id`,
-                `r`.`submission_id`,
-                `r`.`version`,
-                `r`.`commit`,
-                `r`.`status`,
-                `r`.`verdict`,
-                `r`.`runtime`,
-                `r`.`penalty`,
-                `r`.`memory`,
-                `r`.`score`,
-                `r`.`contest_score`,
-                `r`.`time`,
-                `r`.`judged_by`
-               ";
-    }
 }

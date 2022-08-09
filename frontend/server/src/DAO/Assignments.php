@@ -20,7 +20,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         string $assignmentAlias
     ): ?\OmegaUp\DAO\VO\Problemsets {
         $sql = 'SELECT
-                ' .  \OmegaUp\DAO\Base\Problemsets::getFields() . '
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problemsets::FIELD_NAMES,
+            'p'
+        ) . '
                 FROM
                     Assignments a
                 INNER JOIN
@@ -239,9 +242,12 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         int $courseId
     ): ?\OmegaUp\DAO\VO\Assignments {
         $sql = 'SELECT
-                ' .  self::getFields() . '
+                ' . \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Assignments::FIELD_NAMES,
+            'Assignments'
+        ) . '
                 FROM
-                    Assignments a
+                    Assignments
                 WHERE
                     course_id = ?
                 AND

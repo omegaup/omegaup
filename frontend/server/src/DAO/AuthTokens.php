@@ -51,7 +51,10 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
      * @return AuthIdentityExt|null
      */
     public static function getIdentityByToken(string $authToken) {
-        $fields = \OmegaUp\DAO\Base\Identities::getFields();
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'i'
+        );
         $sql = "SELECT
                     {$fields},
                     aut.identity_id = `i`.identity_id AS `is_main_identity`,
@@ -125,7 +128,10 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
      */
     final public static function getByIdentityId(int $identityId): array {
         $sql = 'SELECT
-                ' .  self::getFields() . '
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\AuthTokens::FIELD_NAMES,
+            'at'
+        ) . '
                 FROM
                     `Auth_Tokens` at
                 WHERE

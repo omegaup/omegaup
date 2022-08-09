@@ -17,9 +17,12 @@ class Emails extends \OmegaUp\DAO\Base\Emails {
      */
     final public static function getByUserId(int $userId): array {
         $sql = 'SELECT
-                    ' .  self::getFields() . '
+                    ' . \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Emails::FIELD_NAMES,
+            'Emails'
+        ) . '
                 FROM
-                    Emails e
+                    Emails
                 WHERE
                     user_id = ?';
 

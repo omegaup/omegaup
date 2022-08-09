@@ -27,9 +27,12 @@ class ProblemsLanguages extends \OmegaUp\DAO\Base\ProblemsLanguages {
      */
     final public static function getByProblemId(int $problemId): array {
         $sql = 'SELECT
-                    ' .  self::getFields() . '
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\ProblemsLanguages::FIELD_NAMES,
+            'Problems_Languages'
+        ) . '
                 FROM
-                    Problems_Languages pl
+                    Problems_Languages
                 WHERE
                     problem_id = ?;';
 

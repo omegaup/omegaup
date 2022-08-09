@@ -371,15 +371,4 @@ abstract class ProblemsetIdentityRequest {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `pir`.`identity_id`,
-                `pir`.`problemset_id`,
-                `pir`.`request_time`,
-                `pir`.`last_update`,
-                `pir`.`accepted`,
-                `pir`.`extra_note`
-               ";
-    }
 }

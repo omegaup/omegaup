@@ -268,13 +268,4 @@ abstract class Announcement {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `a`.`announcement_id`,
-                `a`.`user_id`,
-                `a`.`time`,
-                `a`.`description`
-               ";
-    }
 }

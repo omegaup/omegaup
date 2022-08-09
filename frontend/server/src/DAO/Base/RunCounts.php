@@ -294,12 +294,4 @@ abstract class RunCounts {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `rc`.`date`,
-                `rc`.`total`,
-                `rc`.`ac_count`
-               ";
-    }
 }

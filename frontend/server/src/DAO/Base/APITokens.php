@@ -293,16 +293,4 @@ abstract class APITokens {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `apit`.`apitoken_id`,
-                `apit`.`user_id`,
-                `apit`.`timestamp`,
-                `apit`.`name`,
-                `apit`.`token`,
-                `apit`.`last_used`,
-                `apit`.`use_count`
-               ";
-    }
 }

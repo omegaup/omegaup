@@ -244,12 +244,4 @@ abstract class UserRoles {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `ur`.`user_id`,
-                `ur`.`role_id`,
-                `ur`.`acl_id`
-               ";
-    }
 }

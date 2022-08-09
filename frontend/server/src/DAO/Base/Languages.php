@@ -249,12 +249,4 @@ abstract class Languages {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `l`.`language_id`,
-                `l`.`name`,
-                `l`.`country_id`
-               ";
-    }
 }

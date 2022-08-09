@@ -284,11 +284,4 @@ abstract class Countries {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `c`.`country_id`,
-                `c`.`name`
-               ";
-    }
 }

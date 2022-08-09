@@ -320,17 +320,4 @@ abstract class Certificates {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `c`.`certificate_id`,
-                `c`.`identity_id`,
-                `c`.`timestamp`,
-                `c`.`certificate_type`,
-                `c`.`course_id`,
-                `c`.`contest_id`,
-                `c`.`verification_code`,
-                `c`.`contest_place`
-               ";
-    }
 }

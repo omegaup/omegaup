@@ -169,13 +169,16 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         string $time,
         bool $autoselected = false
     ): array {
-        $fields = self::getFields();
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\SchoolOfTheMonth::FIELD_NAMES,
+            'School_Of_The_Month'
+        );
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
         $sql = "
             SELECT
                 {$fields}
             FROM
-                School_Of_The_Month sotm
+                School_Of_The_Month
             WHERE
                 time = ?
             AND
@@ -202,9 +205,12 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
     ): array {
         $sql = '
             SELECT
-                ' .  self::getFields() . '
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\SchoolOfTheMonth::FIELD_NAMES,
+            'School_Of_The_Month'
+        ) . '
             FROM
-                School_Of_The_Month sotm
+                School_Of_The_Month
             WHERE
                 time = ?;';
 

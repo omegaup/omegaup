@@ -271,14 +271,4 @@ abstract class RunsGroups {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `rg`.`case_run_id`,
-                `rg`.`run_id`,
-                `rg`.`group_name`,
-                `rg`.`score`,
-                `rg`.`verdict`
-               ";
-    }
 }

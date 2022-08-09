@@ -290,15 +290,4 @@ abstract class ContestLog {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `cl`.`public_contest_id`,
-                `cl`.`contest_id`,
-                `cl`.`user_id`,
-                `cl`.`from_admission_mode`,
-                `cl`.`to_admission_mode`,
-                `cl`.`time`
-               ";
-    }
 }

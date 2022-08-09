@@ -348,13 +348,4 @@ abstract class ProblemsetProblemOpened {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `ppo`.`problemset_id`,
-                `ppo`.`problem_id`,
-                `ppo`.`identity_id`,
-                `ppo`.`open_time`
-               ";
-    }
 }

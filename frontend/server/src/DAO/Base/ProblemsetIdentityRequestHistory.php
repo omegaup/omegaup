@@ -306,15 +306,4 @@ abstract class ProblemsetIdentityRequestHistory {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `pirh`.`history_id`,
-                `pirh`.`identity_id`,
-                `pirh`.`problemset_id`,
-                `pirh`.`time`,
-                `pirh`.`accepted`,
-                `pirh`.`admin_id`
-               ";
-    }
 }

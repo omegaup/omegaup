@@ -282,15 +282,4 @@ abstract class GroupsScoreboards {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `gs`.`group_scoreboard_id`,
-                `gs`.`group_id`,
-                `gs`.`create_time`,
-                `gs`.`alias`,
-                `gs`.`name`,
-                `gs`.`description`
-               ";
-    }
 }

@@ -506,9 +506,12 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     public static function getAllDemotionsForProblem(int $problemId): array {
         $sql = '
             SELECT
-                ' .  self::getFields() . '
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\QualityNominations::FIELD_NAMES,
+            'QualityNominations'
+        ) . '
             FROM
-                QualityNominations qn
+                QualityNominations
             WHERE
                 nomination = "demotion" AND
                 problem_id = ?;
@@ -639,9 +642,12 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     ): array {
         $sql = '
             SELECT
-                ' .  self::getFields() . '
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\QualityNominations::FIELD_NAMES,
+            'QualityNominations'
+        ) . '
             FROM
-                QualityNominations qn
+                QualityNominations
             WHERE
                 user_id = ? AND
                 problem_id = ? AND

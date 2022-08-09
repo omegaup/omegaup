@@ -297,16 +297,4 @@ abstract class SubmissionFeedback {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `sf`.`submission_feedback_id`,
-                `sf`.`identity_id`,
-                `sf`.`submission_id`,
-                `sf`.`feedback`,
-                `sf`.`date`,
-                `sf`.`range_bytes_start`,
-                `sf`.`range_bytes_end`
-               ";
-    }
 }

@@ -413,18 +413,4 @@ abstract class ProblemsetIdentities {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `pi`.`identity_id`,
-                `pi`.`problemset_id`,
-                `pi`.`access_time`,
-                `pi`.`end_time`,
-                `pi`.`score`,
-                `pi`.`time`,
-                `pi`.`share_user_information`,
-                `pi`.`privacystatement_consent_id`,
-                `pi`.`is_invited`
-               ";
-    }
 }

@@ -249,12 +249,4 @@ abstract class Permissions {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `p`.`permission_id`,
-                `p`.`name`,
-                `p`.`description`
-               ";
-    }
 }

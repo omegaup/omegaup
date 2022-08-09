@@ -268,13 +268,4 @@ abstract class UsersBadges {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `ub`.`user_badge_id`,
-                `ub`.`user_id`,
-                `ub`.`badge_alias`,
-                `ub`.`assignation_time`
-               ";
-    }
 }

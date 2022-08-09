@@ -14,9 +14,12 @@ namespace OmegaUp\DAO;
 class Roles extends \OmegaUp\DAO\Base\Roles {
     final public static function getByName(string $name): \OmegaUp\DAO\VO\Roles {
         $sql = 'SELECT
-                    ' .  self::getFields() . '
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Roles::FIELD_NAMES,
+            'Roles'
+        ) . '
                 FROM
-                    Roles r
+                    Roles
                 WHERE
                     name = ?';
 

@@ -317,16 +317,4 @@ abstract class Plagiarisms {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `p`.`plagiarism_id`,
-                `p`.`contest_id`,
-                `p`.`submission_id_1`,
-                `p`.`submission_id_2`,
-                `p`.`score_1`,
-                `p`.`score_2`,
-                `p`.`contents`
-               ";
-    }
 }

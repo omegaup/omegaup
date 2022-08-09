@@ -14,7 +14,10 @@ namespace OmegaUp\DAO;
 class Identities extends \OmegaUp\DAO\Base\Identities {
     public static function findByEmail(string $email): ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
-                  ' .  self::getFields() . '
+                  ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'i'
+        ) . '
                 FROM
                   `Identities` i
                 INNER JOIN
@@ -41,11 +44,14 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         string $username
     ): ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
-                   ' .  self::getFields() . '
+                   ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'i'
+        ) . '
                 FROM
                   `Identities` i
                 WHERE
-                  username = ?
+                  i.username = ?
                 LIMIT
                   0, 1';
         $params = [ $username ];
@@ -118,11 +124,12 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return $result;
     }
 
-    public static function findByUserId(
-        int $userId
-    ): ?\OmegaUp\DAO\VO\Identities {
+    public static function findByUserId(int $userId): ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
-                  ' .  self::getFields() . '
+                  ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'i'
+        ) . '
                 FROM
                   `Identities` i
                 INNER JOIN
@@ -150,7 +157,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         }
         $sql = '(
                     SELECT
-                    ' .  self::getFields() . '
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'i'
+        ) . '
                     FROM
                         Identities i
                     INNER JOIN
@@ -164,7 +174,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 UNION
                 (
                     SELECT
-                    ' .  self::getFields() . '
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'i'
+        ) . '
                     FROM
                         Identities i
                     INNER JOIN
@@ -406,11 +419,14 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     ): ?\OmegaUp\DAO\VO\Identities {
         $sql = '
             SELECT
-                ' .  self::getFields() . '
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'i'
+        ) . '
             FROM
                 Identities i
             WHERE
-                username = ?
+                i.username = ?
             LIMIT 1;';
         $args = [$username];
 
@@ -568,20 +584,23 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         \OmegaUp\DAO\VO\Identities $identity
     ) {
         $sql = 'SELECT
-                    ' .  self::getFields() . ',
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'ti'
+        ) . ',
                     IFNULL(ur.classname, "user-rank-unranked") AS classname
                 FROM
-                    Identities id
+                    Identities i
                 INNER JOIN
-                    Team_Users tu ON tu.identity_id = id.identity_id
+                    Team_Users tu ON tu.identity_id = i.identity_id
                 LEFT JOIN
-                    User_Rank ur ON ur.user_id = id.user_id
+                    User_Rank ur ON ur.user_id = i.user_id
                 INNER JOIN
                     Teams t ON t.team_id = tu.team_id
                 INNER JOIN
-                    Identities i ON i.identity_id = t.identity_id
+                    Identities ti ON ti.identity_id = t.identity_id
                 WHERE
-                    id.identity_id = ?
+                    i.identity_id = ?
                 LIMIT 1;';
 
         /** @var array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */

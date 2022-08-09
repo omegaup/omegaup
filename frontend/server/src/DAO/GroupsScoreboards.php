@@ -18,7 +18,10 @@ class GroupsScoreboards extends \OmegaUp\DAO\Base\GroupsScoreboards {
     public static function getByGroup(
         int $groupId
     ): array {
-        $sql = 'SELECT ' .  self::getFields() . ' FROM Groups_Scoreboards gs WHERE group_id = ?;';
+        $sql = 'SELECT ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\GroupsScoreboards::FIELD_NAMES,
+            'Groups_Scoreboards'
+        ) . ' FROM Groups_Scoreboards WHERE group_id = ?;';
         /** @var list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, group_scoreboard_id: int, name: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$groupId]);
 

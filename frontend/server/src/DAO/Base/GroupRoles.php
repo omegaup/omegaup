@@ -244,12 +244,4 @@ abstract class GroupRoles {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `gr`.`group_id`,
-                `gr`.`role_id`,
-                `gr`.`acl_id`
-               ";
-    }
 }

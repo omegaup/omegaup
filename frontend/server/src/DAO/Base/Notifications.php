@@ -275,14 +275,4 @@ abstract class Notifications {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `n`.`notification_id`,
-                `n`.`user_id`,
-                `n`.`timestamp`,
-                `n`.`read`,
-                `n`.`contents`
-               ";
-    }
 }

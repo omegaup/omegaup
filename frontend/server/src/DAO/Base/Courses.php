@@ -394,27 +394,4 @@ abstract class Courses {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `c`.`course_id`,
-                `c`.`name`,
-                `c`.`description`,
-                `c`.`objective`,
-                `c`.`alias`,
-                `c`.`group_id`,
-                `c`.`acl_id`,
-                `c`.`level`,
-                `c`.`start_time`,
-                `c`.`finish_time`,
-                `c`.`admission_mode`,
-                `c`.`school_id`,
-                `c`.`needs_basic_information`,
-                `c`.`requests_user_information`,
-                `c`.`show_scoreboard`,
-                `c`.`languages`,
-                `c`.`archived`,
-                `c`.`minimum_progress_for_certificate`
-               ";
-    }
 }

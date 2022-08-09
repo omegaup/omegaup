@@ -344,21 +344,4 @@ abstract class Problemsets {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `p`.`problemset_id`,
-                `p`.`acl_id`,
-                `p`.`access_mode`,
-                `p`.`languages`,
-                `p`.`needs_basic_information`,
-                `p`.`requests_user_information`,
-                `p`.`scoreboard_url`,
-                `p`.`scoreboard_url_admin`,
-                `p`.`type`,
-                `p`.`contest_id`,
-                `p`.`assignment_id`,
-                `p`.`interview_id`
-               ";
-    }
 }

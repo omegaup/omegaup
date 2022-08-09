@@ -24,18 +24,21 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         string $category = 'all',
         int $rowCount = 100
     ): array {
-        $fields = self::getFields();
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\CoderOfTheMonth::FIELD_NAMES,
+            'cm'
+        );
         $sql = "SELECT
             {$fields},
             i.username,
             IFNULL(i.country_id, 'xx') AS country_id,
             IFNULL(ur.classname, 'user-rank-unranked') AS classname
           FROM
-            Coder_Of_The_Month cotm
+            Coder_Of_The_Month cm
           INNER JOIN
-            Identities AS i ON i.user_id = cotm.user_id
+            Identities AS i ON i.user_id = cm.user_id
           LEFT JOIN
-            User_Rank ur ON ur.user_id = cotm.user_id
+            User_Rank ur ON ur.user_id = cm.user_id
           WHERE
             `time` = ? AND
             category = ?
@@ -225,12 +228,15 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         bool $autoselected = false,
         string $category = 'all'
     ): array {
-        $fields = self::getFields();
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\CoderOfTheMonth::FIELD_NAMES,
+            'Coder_Of_The_Month'
+        );
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
         $sql = "SELECT
                 {$fields}
                 FROM
-                    Coder_Of_The_Month cotm
+                    Coder_Of_The_Month
                 WHERE
                     `time` = ? AND
                     category = ?
@@ -258,9 +264,12 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         string $category = 'all'
     ): array {
         $sql = 'SELECT
-                ' .  self::getFields() . '
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\CoderOfTheMonth::FIELD_NAMES,
+            'Coder_Of_The_Month'
+        ) . '
                 FROM
-                    Coder_Of_The_Month cotm
+                    Coder_Of_The_Month
                 WHERE
                     `time` = ? AND
                     category = ?;';

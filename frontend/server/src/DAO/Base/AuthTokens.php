@@ -356,14 +356,4 @@ abstract class AuthTokens {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `at`.`user_id`,
-                `at`.`identity_id`,
-                `at`.`acting_identity_id`,
-                `at`.`token`,
-                `at`.`create_time`
-               ";
-    }
 }

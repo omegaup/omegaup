@@ -327,18 +327,4 @@ abstract class Clarifications {
 
         return $affectedRows;
     }
-
-    final public static function getFields(): string {
-        return "
-                `c`.`clarification_id`,
-                `c`.`author_id`,
-                `c`.`receiver_id`,
-                `c`.`message`,
-                `c`.`answer`,
-                `c`.`time`,
-                `c`.`problem_id`,
-                `c`.`problemset_id`,
-                `c`.`public`
-               ";
-    }
 }

@@ -19,9 +19,12 @@ class IdentityLoginLog extends \OmegaUp\DAO\Base\IdentityLoginLog {
         int $identityId
     ): array {
         $sql = 'SELECT
-                    ' .  self::getFields() . '
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\IdentityLoginLog::FIELD_NAMES,
+            'Identity_Login_Log'
+        ) . '
                 FROM
-                    Identity_Login_Log ill
+                    Identity_Login_Log
                 WHERE
                     identity_id = ?;';
 
