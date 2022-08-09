@@ -485,7 +485,7 @@ abstract class Users {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `u`.`user_id`,
                 `u`.`facebook_user_id`,
                 `u`.`git_token`,
@@ -511,6 +511,6 @@ abstract class Users {
                 `u`.`parental_verification_token`,
                 `u`.`parent_email_verification_initial`,
                 `u`.`parent_email_verification_deadline`
-               ';
+               ";
     }
 }

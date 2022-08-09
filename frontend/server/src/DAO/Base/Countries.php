@@ -286,9 +286,9 @@ abstract class Countries {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `c`.`country_id`,
                 `c`.`name`
-               ';
+               ";
     }
 }

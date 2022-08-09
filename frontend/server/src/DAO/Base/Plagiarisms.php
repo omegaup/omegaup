@@ -319,7 +319,7 @@ abstract class Plagiarisms {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `p`.`plagiarism_id`,
                 `p`.`contest_id`,
                 `p`.`submission_id_1`,
@@ -327,6 +327,6 @@ abstract class Plagiarisms {
                 `p`.`score_1`,
                 `p`.`score_2`,
                 `p`.`contents`
-               ';
+               ";
     }
 }

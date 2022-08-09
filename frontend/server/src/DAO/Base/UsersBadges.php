@@ -270,11 +270,11 @@ abstract class UsersBadges {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `ub`.`user_badge_id`,
                 `ub`.`user_id`,
                 `ub`.`badge_alias`,
                 `ub`.`assignation_time`
-               ';
+               ";
     }
 }

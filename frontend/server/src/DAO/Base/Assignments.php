@@ -361,7 +361,7 @@ abstract class Assignments {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `a`.`assignment_id`,
                 `a`.`course_id`,
                 `a`.`problemset_id`,
@@ -375,6 +375,6 @@ abstract class Assignments {
                 `a`.`finish_time`,
                 `a`.`max_points`,
                 `a`.`order`
-               ';
+               ";
     }
 }

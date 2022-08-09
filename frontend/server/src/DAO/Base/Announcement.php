@@ -270,11 +270,11 @@ abstract class Announcement {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `a`.`announcement_id`,
                 `a`.`user_id`,
                 `a`.`time`,
                 `a`.`description`
-               ';
+               ";
     }
 }

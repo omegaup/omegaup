@@ -292,13 +292,13 @@ abstract class ContestLog {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `cl`.`public_contest_id`,
                 `cl`.`contest_id`,
                 `cl`.`user_id`,
                 `cl`.`from_admission_mode`,
                 `cl`.`to_admission_mode`,
                 `cl`.`time`
-               ';
+               ";
     }
 }

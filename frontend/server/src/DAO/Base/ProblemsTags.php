@@ -319,10 +319,10 @@ abstract class ProblemsTags {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `pt`.`problem_id`,
                 `pt`.`tag_id`,
                 `pt`.`source`
-               ';
+               ";
     }
 }

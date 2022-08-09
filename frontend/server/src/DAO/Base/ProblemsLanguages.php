@@ -231,9 +231,9 @@ abstract class ProblemsLanguages {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `pl`.`problem_id`,
                 `pl`.`language_id`
-               ';
+               ";
     }
 }

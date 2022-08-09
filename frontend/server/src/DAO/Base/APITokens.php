@@ -295,7 +295,7 @@ abstract class APITokens {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `apit`.`apitoken_id`,
                 `apit`.`user_id`,
                 `apit`.`timestamp`,
@@ -303,6 +303,6 @@ abstract class APITokens {
                 `apit`.`token`,
                 `apit`.`last_used`,
                 `apit`.`use_count`
-               ';
+               ";
     }
 }

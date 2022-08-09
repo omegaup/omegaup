@@ -303,7 +303,7 @@ abstract class Interviews {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `i`.`interview_id`,
                 `i`.`problemset_id`,
                 `i`.`acl_id`,
@@ -311,6 +311,6 @@ abstract class Interviews {
                 `i`.`title`,
                 `i`.`description`,
                 `i`.`window_length`
-               ';
+               ";
     }
 }

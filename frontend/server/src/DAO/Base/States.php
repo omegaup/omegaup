@@ -303,10 +303,10 @@ abstract class States {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `s`.`country_id`,
                 `s`.`state_id`,
                 `s`.`name`
-               ';
+               ";
     }
 }

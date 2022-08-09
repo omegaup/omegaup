@@ -329,11 +329,11 @@ abstract class GroupsScoreboardsProblemsets {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `gsp`.`group_scoreboard_id`,
                 `gsp`.`problemset_id`,
                 `gsp`.`only_ac`,
                 `gsp`.`weight`
-               ';
+               ";
     }
 }

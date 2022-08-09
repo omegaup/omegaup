@@ -299,7 +299,7 @@ abstract class SubmissionFeedback {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `sf`.`submission_feedback_id`,
                 `sf`.`identity_id`,
                 `sf`.`submission_id`,
@@ -307,6 +307,6 @@ abstract class SubmissionFeedback {
                 `sf`.`date`,
                 `sf`.`range_bytes_start`,
                 `sf`.`range_bytes_end`
-               ';
+               ";
     }
 }

@@ -322,7 +322,7 @@ abstract class Certificates {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `c`.`certificate_id`,
                 `c`.`identity_id`,
                 `c`.`timestamp`,
@@ -331,6 +331,6 @@ abstract class Certificates {
                 `c`.`contest_id`,
                 `c`.`verification_code`,
                 `c`.`contest_place`
-               ';
+               ";
     }
 }

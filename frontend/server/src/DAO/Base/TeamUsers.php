@@ -231,9 +231,9 @@ abstract class TeamUsers {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `tu`.`team_id`,
                 `tu`.`identity_id`
-               ';
+               ";
     }
 }

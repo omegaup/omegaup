@@ -252,9 +252,9 @@ abstract class ACLs {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `acl`.`acl_id`,
                 `acl`.`owner_id`
-               ';
+               ";
     }
 }

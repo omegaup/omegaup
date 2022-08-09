@@ -324,7 +324,7 @@ abstract class Identities {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `i`.`identity_id`,
                 `i`.`username`,
                 `i`.`password`,
@@ -335,6 +335,6 @@ abstract class Identities {
                 `i`.`state_id`,
                 `i`.`gender`,
                 `i`.`current_identity_school_id`
-               ';
+               ";
     }
 }

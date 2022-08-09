@@ -246,10 +246,10 @@ abstract class TeamsGroupRoles {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `tgr`.`team_group_id`,
                 `tgr`.`role_id`,
                 `tgr`.`acl_id`
-               ';
+               ";
     }
 }

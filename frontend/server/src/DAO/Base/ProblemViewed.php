@@ -325,10 +325,10 @@ abstract class ProblemViewed {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `pv`.`problem_id`,
                 `pv`.`identity_id`,
                 `pv`.`view_time`
-               ';
+               ";
     }
 }

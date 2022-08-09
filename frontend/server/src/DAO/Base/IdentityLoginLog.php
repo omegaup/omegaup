@@ -131,10 +131,10 @@ abstract class IdentityLoginLog {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `ill`.`identity_id`,
                 `ill`.`ip`,
                 `ill`.`time`
-               ';
+               ";
     }
 }

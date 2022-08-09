@@ -346,7 +346,7 @@ abstract class Problemsets {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `p`.`problemset_id`,
                 `p`.`acl_id`,
                 `p`.`access_mode`,
@@ -359,6 +359,6 @@ abstract class Problemsets {
                 `p`.`contest_id`,
                 `p`.`assignment_id`,
                 `p`.`interview_id`
-               ';
+               ";
     }
 }

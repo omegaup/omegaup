@@ -329,7 +329,7 @@ abstract class Clarifications {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `c`.`clarification_id`,
                 `c`.`author_id`,
                 `c`.`receiver_id`,
@@ -339,6 +339,6 @@ abstract class Clarifications {
                 `c`.`problem_id`,
                 `c`.`problemset_id`,
                 `c`.`public`
-               ';
+               ";
     }
 }

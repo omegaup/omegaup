@@ -388,13 +388,13 @@ abstract class SubmissionLog {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `sl`.`problemset_id`,
                 `sl`.`submission_id`,
                 `sl`.`user_id`,
                 `sl`.`identity_id`,
                 `sl`.`ip`,
                 `sl`.`time`
-               ';
+               ";
     }
 }

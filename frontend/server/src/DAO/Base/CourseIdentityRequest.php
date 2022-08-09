@@ -417,7 +417,7 @@ abstract class CourseIdentityRequest {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `cir`.`identity_id`,
                 `cir`.`course_id`,
                 `cir`.`request_time`,
@@ -426,6 +426,6 @@ abstract class CourseIdentityRequest {
                 `cir`.`extra_note`,
                 `cir`.`accept_teacher`,
                 `cir`.`share_user_information`
-               ';
+               ";
     }
 }

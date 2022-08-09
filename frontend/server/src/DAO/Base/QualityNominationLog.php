@@ -299,7 +299,7 @@ abstract class QualityNominationLog {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `qnl`.`qualitynomination_log_id`,
                 `qnl`.`qualitynomination_id`,
                 `qnl`.`time`,
@@ -307,6 +307,6 @@ abstract class QualityNominationLog {
                 `qnl`.`from_status`,
                 `qnl`.`to_status`,
                 `qnl`.`rationale`
-               ';
+               ";
     }
 }

@@ -121,9 +121,9 @@ abstract class UsersExperiments {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `ue`.`user_id`,
                 `ue`.`experiment`
-               ';
+               ";
     }
 }

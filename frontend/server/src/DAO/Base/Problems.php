@@ -426,7 +426,7 @@ abstract class Problems {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `p`.`problem_id`,
                 `p`.`acl_id`,
                 `p`.`visibility`,
@@ -451,6 +451,6 @@ abstract class Problems {
                 `p`.`quality_seal`,
                 `p`.`show_diff`,
                 `p`.`allow_user_add_tags`
-               ';
+               ";
     }
 }

@@ -231,9 +231,9 @@ abstract class Favorites {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `f`.`user_id`,
                 `f`.`problem_id`
-               ';
+               ";
     }
 }

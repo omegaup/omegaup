@@ -296,10 +296,10 @@ abstract class RunCounts {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `rc`.`date`,
                 `rc`.`total`,
                 `rc`.`ac_count`
-               ';
+               ";
     }
 }

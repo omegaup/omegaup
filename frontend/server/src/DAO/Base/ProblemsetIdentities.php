@@ -415,7 +415,7 @@ abstract class ProblemsetIdentities {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `pi`.`identity_id`,
                 `pi`.`problemset_id`,
                 `pi`.`access_time`,
@@ -425,6 +425,6 @@ abstract class ProblemsetIdentities {
                 `pi`.`share_user_information`,
                 `pi`.`privacystatement_consent_id`,
                 `pi`.`is_invited`
-               ';
+               ";
     }
 }

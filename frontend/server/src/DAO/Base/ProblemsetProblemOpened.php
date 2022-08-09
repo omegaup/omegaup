@@ -350,11 +350,11 @@ abstract class ProblemsetProblemOpened {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `ppo`.`problemset_id`,
                 `ppo`.`problem_id`,
                 `ppo`.`identity_id`,
                 `ppo`.`open_time`
-               ';
+               ";
     }
 }

@@ -396,7 +396,7 @@ abstract class Courses {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `c`.`course_id`,
                 `c`.`name`,
                 `c`.`description`,
@@ -415,6 +415,6 @@ abstract class Courses {
                 `c`.`languages`,
                 `c`.`archived`,
                 `c`.`minimum_progress_for_certificate`
-               ';
+               ";
     }
 }

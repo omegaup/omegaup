@@ -296,13 +296,13 @@ abstract class IdentitiesSchools {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `is`.`identity_school_id`,
                 `is`.`identity_id`,
                 `is`.`school_id`,
                 `is`.`graduation_date`,
                 `is`.`creation_time`,
                 `is`.`end_time`
-               ';
+               ";
     }
 }

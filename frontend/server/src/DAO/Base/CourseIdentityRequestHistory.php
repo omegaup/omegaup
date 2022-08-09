@@ -308,13 +308,13 @@ abstract class CourseIdentityRequestHistory {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `cirh`.`history_id`,
                 `cirh`.`identity_id`,
                 `cirh`.`course_id`,
                 `cirh`.`time`,
                 `cirh`.`accepted`,
                 `cirh`.`admin_id`
-               ';
+               ";
     }
 }

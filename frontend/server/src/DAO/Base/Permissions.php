@@ -251,10 +251,10 @@ abstract class Permissions {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `p`.`permission_id`,
                 `p`.`name`,
                 `p`.`description`
-               ';
+               ";
     }
 }

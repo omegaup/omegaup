@@ -314,7 +314,7 @@ abstract class CourseCloneLog {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `ccl`.`course_clone_log_id`,
                 `ccl`.`ip`,
                 `ccl`.`course_id`,
@@ -323,6 +323,6 @@ abstract class CourseCloneLog {
                 `ccl`.`timestamp`,
                 `ccl`.`user_id`,
                 `ccl`.`result`
-               ';
+               ";
     }
 }

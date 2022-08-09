@@ -339,7 +339,7 @@ abstract class CoderOfTheMonth {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `cotm`.`coder_of_the_month_id`,
                 `cotm`.`user_id`,
                 `cotm`.`description`,
@@ -351,6 +351,6 @@ abstract class CoderOfTheMonth {
                 `cotm`.`category`,
                 `cotm`.`score`,
                 `cotm`.`problems_solved`
-               ';
+               ";
     }
 }

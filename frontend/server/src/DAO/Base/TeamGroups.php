@@ -291,7 +291,7 @@ abstract class TeamGroups {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `tg`.`team_group_id`,
                 `tg`.`acl_id`,
                 `tg`.`create_time`,
@@ -299,6 +299,6 @@ abstract class TeamGroups {
                 `tg`.`name`,
                 `tg`.`description`,
                 `tg`.`number_of_contestants`
-               ';
+               ";
     }
 }

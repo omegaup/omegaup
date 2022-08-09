@@ -278,11 +278,11 @@ abstract class PrivacyStatementConsentLog {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `pscl`.`privacystatement_consent_id`,
                 `pscl`.`identity_id`,
                 `pscl`.`privacystatement_id`,
                 `pscl`.`timestamp`
-               ';
+               ";
     }
 }

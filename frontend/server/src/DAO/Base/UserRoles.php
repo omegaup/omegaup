@@ -246,10 +246,10 @@ abstract class UserRoles {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `ur`.`user_id`,
                 `ur`.`role_id`,
                 `ur`.`acl_id`
-               ';
+               ";
     }
 }

@@ -284,13 +284,13 @@ abstract class Groups {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `g`.`group_id`,
                 `g`.`acl_id`,
                 `g`.`create_time`,
                 `g`.`alias`,
                 `g`.`name`,
                 `g`.`description`
-               ';
+               ";
     }
 }

@@ -267,10 +267,10 @@ abstract class Teams {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `t`.`team_id`,
                 `t`.`team_group_id`,
                 `t`.`identity_id`
-               ';
+               ";
     }
 }

@@ -430,7 +430,7 @@ abstract class UserRank {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `ur`.`user_id`,
                 `ur`.`ranking`,
                 `ur`.`problems_solved_count`,
@@ -443,6 +443,6 @@ abstract class UserRank {
                 `ur`.`author_score`,
                 `ur`.`author_ranking`,
                 `ur`.`classname`
-               ';
+               ";
     }
 }

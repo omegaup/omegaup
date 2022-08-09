@@ -259,10 +259,10 @@ abstract class Emails {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `e`.`email_id`,
                 `e`.`email`,
                 `e`.`user_id`
-               ';
+               ";
     }
 }

@@ -285,12 +285,12 @@ abstract class SubmissionFeedbackThread {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `sft`.`submission_feedback_thread_id`,
                 `sft`.`submission_feedback_id`,
                 `sft`.`identity_id`,
                 `sft`.`date`,
                 `sft`.`contents`
-               ';
+               ";
     }
 }

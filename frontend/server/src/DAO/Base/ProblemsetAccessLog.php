@@ -139,11 +139,11 @@ abstract class ProblemsetAccessLog {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `pal`.`problemset_id`,
                 `pal`.`identity_id`,
                 `pal`.`ip`,
                 `pal`.`time`
-               ';
+               ";
     }
 }

@@ -300,13 +300,13 @@ abstract class QualityNominationComments {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `qnc`.`qualitynomination_comment_id`,
                 `qnc`.`qualitynomination_id`,
                 `qnc`.`user_id`,
                 `qnc`.`time`,
                 `qnc`.`vote`,
                 `qnc`.`contents`
-               ';
+               ";
     }
 }

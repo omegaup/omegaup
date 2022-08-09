@@ -299,7 +299,7 @@ abstract class QualityNominations {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `qn`.`qualitynomination_id`,
                 `qn`.`user_id`,
                 `qn`.`problem_id`,
@@ -307,6 +307,6 @@ abstract class QualityNominations {
                 `qn`.`contents`,
                 `qn`.`time`,
                 `qn`.`status`
-               ';
+               ";
     }
 }

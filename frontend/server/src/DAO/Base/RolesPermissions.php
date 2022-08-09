@@ -231,9 +231,9 @@ abstract class RolesPermissions {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `rp`.`role_id`,
                 `rp`.`permission_id`
-               ';
+               ";
     }
 }

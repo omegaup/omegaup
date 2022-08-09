@@ -129,10 +129,10 @@ abstract class UserRankCutoffs {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `urc`.`score`,
                 `urc`.`percentile`,
                 `urc`.`classname`
-               ';
+               ";
     }
 }

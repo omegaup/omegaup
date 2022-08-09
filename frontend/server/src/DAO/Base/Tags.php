@@ -251,10 +251,10 @@ abstract class Tags {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `t`.`tag_id`,
                 `t`.`name`,
                 `t`.`public`
-               ';
+               ";
     }
 }

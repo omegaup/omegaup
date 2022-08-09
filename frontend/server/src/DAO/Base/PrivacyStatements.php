@@ -251,10 +251,10 @@ abstract class PrivacyStatements {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `ps`.`privacystatement_id`,
                 `ps`.`git_object_id`,
                 `ps`.`type`
-               ';
+               ";
     }
 }

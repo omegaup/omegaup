@@ -325,10 +325,10 @@ abstract class ProblemsForfeited {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `pf`.`user_id`,
                 `pf`.`problem_id`,
                 `pf`.`forfeited_date`
-               ';
+               ";
     }
 }

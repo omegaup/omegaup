@@ -373,13 +373,13 @@ abstract class ProblemsetIdentityRequest {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `pir`.`identity_id`,
                 `pir`.`problemset_id`,
                 `pir`.`request_time`,
                 `pir`.`last_update`,
                 `pir`.`accepted`,
                 `pir`.`extra_note`
-               ';
+               ";
     }
 }

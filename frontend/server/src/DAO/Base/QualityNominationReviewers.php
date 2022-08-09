@@ -231,9 +231,9 @@ abstract class QualityNominationReviewers {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `qnr`.`qualitynomination_id`,
                 `qnr`.`user_id`
-               ';
+               ";
     }
 }

@@ -359,7 +359,7 @@ abstract class ProblemsetProblems {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `pp`.`problemset_id`,
                 `pp`.`problem_id`,
                 `pp`.`commit`,
@@ -367,6 +367,6 @@ abstract class ProblemsetProblems {
                 `pp`.`points`,
                 `pp`.`order`,
                 `pp`.`is_extra_problem`
-               ';
+               ";
     }
 }

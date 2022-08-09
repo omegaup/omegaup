@@ -246,10 +246,10 @@ abstract class GroupRoles {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `gr`.`group_id`,
                 `gr`.`role_id`,
                 `gr`.`acl_id`
-               ';
+               ";
     }
 }

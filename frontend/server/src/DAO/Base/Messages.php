@@ -292,13 +292,13 @@ abstract class Messages {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `m`.`message_id`,
                 `m`.`read`,
                 `m`.`sender_id`,
                 `m`.`recipient_id`,
                 `m`.`message`,
                 `m`.`date`
-               ';
+               ";
     }
 }

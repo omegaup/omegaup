@@ -251,10 +251,10 @@ abstract class Roles {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `r`.`role_id`,
                 `r`.`name`,
                 `r`.`description`
-               ';
+               ";
     }
 }

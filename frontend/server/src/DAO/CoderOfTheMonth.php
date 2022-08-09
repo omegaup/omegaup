@@ -26,7 +26,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     ): array {
         $fields = self::getFields();
         $sql = "SELECT
-            {$fields}
+            {$fields},
             i.username,
             IFNULL(i.country_id, 'xx') AS country_id,
             IFNULL(ur.classname, 'user-rank-unranked') AS classname

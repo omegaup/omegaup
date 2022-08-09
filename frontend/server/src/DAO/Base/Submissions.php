@@ -365,7 +365,7 @@ abstract class Submissions {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `s`.`submission_id`,
                 `s`.`current_run_id`,
                 `s`.`identity_id`,
@@ -379,6 +379,6 @@ abstract class Submissions {
                 `s`.`submit_delay`,
                 `s`.`type`,
                 `s`.`school_id`
-               ';
+               ";
     }
 }

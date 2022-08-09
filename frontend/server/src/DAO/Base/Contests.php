@@ -499,7 +499,7 @@ abstract class Contests {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `c`.`contest_id`,
                 `c`.`problemset_id`,
                 `c`.`acl_id`,
@@ -531,6 +531,6 @@ abstract class Contests {
                 `c`.`default_show_all_contestants_in_scoreboard`,
                 `c`.`score_mode`,
                 `c`.`plagiarism_threshold`
-               ';
+               ";
     }
 }

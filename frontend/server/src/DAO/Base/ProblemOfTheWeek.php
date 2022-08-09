@@ -266,11 +266,11 @@ abstract class ProblemOfTheWeek {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `potw`.`problem_of_the_week_id`,
                 `potw`.`problem_id`,
                 `potw`.`time`,
                 `potw`.`difficulty`
-               ';
+               ";
     }
 }

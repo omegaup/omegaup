@@ -274,11 +274,11 @@ abstract class SchoolsProblemsSolvedPerMonth {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `spspm`.`school_pspm_id`,
                 `spspm`.`school_id`,
                 `spspm`.`time`,
                 `spspm`.`problems_solved`
-               ';
+               ";
     }
 }

@@ -341,7 +341,7 @@ abstract class Runs {
     }
 
     final public static function getFields(): string {
-        return '
+        return "
                 `r`.`run_id`,
                 `r`.`submission_id`,
                 `r`.`version`,
@@ -355,6 +355,6 @@ abstract class Runs {
                 `r`.`contest_score`,
                 `r`.`time`,
                 `r`.`judged_by`
-               ';
+               ";
     }
 }
