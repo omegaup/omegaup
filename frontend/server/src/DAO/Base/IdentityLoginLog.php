@@ -129,4 +129,12 @@ abstract class IdentityLoginLog {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `ill`.`identity_id`,
+                `ill`.`ip`,
+                `ill`.`time`
+               ';
+    }
 }

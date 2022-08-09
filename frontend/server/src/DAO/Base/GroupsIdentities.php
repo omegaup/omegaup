@@ -383,4 +383,15 @@ abstract class GroupsIdentities {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `gi`.`group_id`,
+                `gi`.`identity_id`,
+                `gi`.`share_user_information`,
+                `gi`.`privacystatement_consent_id`,
+                `gi`.`accept_teacher`,
+                `gi`.`is_invited`
+               ';
+    }
 }

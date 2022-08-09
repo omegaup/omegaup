@@ -51,18 +51,10 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
      * @return AuthIdentityExt|null
      */
     public static function getIdentityByToken(string $authToken) {
-        $fields = join(
-            '',
-            array_map(
-                fn (string $field): string => "i.{$field}, ",
-                array_keys(
-                    \OmegaUp\DAO\VO\Identities::FIELD_NAMES
-                )
-            )
-        );
+        $fields = \OmegaUp\DAO\Base\Identities::getFields();
         $sql = "SELECT
-                    {$fields}
-                    aut.identity_id = i.identity_id AS `is_main_identity`,
+                    {$fields},
+                    aut.identity_id = `i`.identity_id AS `is_main_identity`,
                     IFNULL(ur.classname, 'user-rank-unranked') AS classname
                 FROM
                     `Auth_Tokens` aut
@@ -132,18 +124,12 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
      * @return list<\OmegaUp\DAO\VO\AuthTokens>
      */
     final public static function getByIdentityId(int $identityId): array {
-        $fields = join(
-            ', ',
-            array_keys(
-                \OmegaUp\DAO\VO\AuthTokens::FIELD_NAMES
-            )
-        );
-        $sql = "SELECT
-                    {$fields}
+        $sql = 'SELECT
+                ' .  self::getFields() . '
                 FROM
-                    `Auth_Tokens`
+                    `Auth_Tokens` at
                 WHERE
-                    identity_id = ?;";
+                    at.identity_id = ?;';
         /** @var list<array{acting_identity_id: int|null, create_time: \OmegaUp\Timestamp, identity_id: int, token: string, user_id: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,

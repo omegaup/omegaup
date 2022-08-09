@@ -16,13 +16,12 @@ class States extends \OmegaUp\DAO\Base\States {
      * @return list<\OmegaUp\DAO\VO\States>
      */
     final public static function getByCountry(string $countryId): array {
-        $fields = join(', ', array_keys(\OmegaUp\DAO\VO\States::FIELD_NAMES));
-        $sql = "SELECT
-                    {$fields}
+        $sql = 'SELECT
+                    ' .  self::getFields() . '
                 FROM
-                    States
+                    States s
                 WHERE
-                    country_id = ?;";
+                    country_id = ?;';
 
         /** @var list<array{country_id: string, name: string, state_id: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(

@@ -13,17 +13,8 @@ namespace OmegaUp\DAO;
  */
 class Identities extends \OmegaUp\DAO\Base\Identities {
     public static function findByEmail(string $email): ?\OmegaUp\DAO\VO\Identities {
-        $fields = join(
-            ', ',
-            array_map(
-                fn (string $field): string => "i.{$field}",
-                array_keys(
-                    \OmegaUp\DAO\VO\Identities::FIELD_NAMES
-                )
-            )
-        );
-        $sql = "SELECT
-                  {$fields}
+        $sql = 'SELECT
+                  ' .  self::getFields() . '
                 FROM
                   `Identities` i
                 INNER JOIN
@@ -37,7 +28,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 WHERE
                   e.email = ?
                 LIMIT
-                  0, 1";
+                  0, 1';
         /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$email]);
         if (empty($rs)) {
@@ -49,20 +40,14 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     public static function findByUsername(
         string $username
     ): ?\OmegaUp\DAO\VO\Identities {
-        $fields = join(
-            ', ',
-            array_keys(
-                \OmegaUp\DAO\VO\Identities::FIELD_NAMES
-            )
-        );
-        $sql = "SELECT
-                   {$fields}
+        $sql = 'SELECT
+                   ' .  self::getFields() . '
                 FROM
-                  `Identities`
+                  `Identities` i
                 WHERE
                   username = ?
                 LIMIT
-                  0, 1";
+                  0, 1';
         $params = [ $username ];
         /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
@@ -136,17 +121,8 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     public static function findByUserId(
         int $userId
     ): ?\OmegaUp\DAO\VO\Identities {
-        $fields = join(
-            ', ',
-            array_map(
-                fn (string $field): string => "i.{$field}",
-                array_keys(
-                    \OmegaUp\DAO\VO\Identities::FIELD_NAMES
-                )
-            )
-        );
-        $sql = "SELECT
-                  {$fields}
+        $sql = 'SELECT
+                  ' .  self::getFields() . '
                 FROM
                   `Identities` i
                 INNER JOIN
@@ -156,7 +132,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 WHERE
                   i.user_id = ?
                 LIMIT
-                  0, 1";
+                  0, 1';
         /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$userId]);
         if (empty($rs)) {
@@ -169,21 +145,12 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         string $usernameOrEmail,
         \OmegaUp\DAO\VO\Identities $currentIdentity
     ): ?\OmegaUp\DAO\VO\Identities {
-        $fields = join(
-            ', ',
-            array_map(
-                fn (string $field): string => "i.{$field}",
-                array_keys(
-                    \OmegaUp\DAO\VO\Identities::FIELD_NAMES
-                )
-            )
-        );
         if (is_null($currentIdentity->identity_id)) {
             return null;
         }
-        $sql = "(
+        $sql = '(
                     SELECT
-                        {$fields}
+                    ' .  self::getFields() . '
                     FROM
                         Identities i
                     INNER JOIN
@@ -197,7 +164,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 UNION
                 (
                     SELECT
-                        {$fields}
+                    ' .  self::getFields() . '
                     FROM
                         Identities i
                     INNER JOIN
@@ -212,7 +179,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                         tu.identity_id = ?
                         AND i.username = ?
                 )
-                LIMIT 1;";
+                LIMIT 1;';
         $args = [
             $currentIdentity->user_id,
             $usernameOrEmail,
@@ -437,20 +404,14 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     public static function getUnassociatedIdentity(
         string $username
     ): ?\OmegaUp\DAO\VO\Identities {
-        $fields = join(
-            ', ',
-            array_keys(
-                \OmegaUp\DAO\VO\Identities::FIELD_NAMES
-            )
-        );
-        $sql = "
+        $sql = '
             SELECT
-                {$fields}
+                ' .  self::getFields() . '
             FROM
-                Identities
+                Identities i
             WHERE
                 username = ?
-            LIMIT 1;";
+            LIMIT 1;';
         $args = [$username];
 
         /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
@@ -606,31 +567,22 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     public static function getTeamIdentity(
         \OmegaUp\DAO\VO\Identities $identity
     ) {
-        $fields = join(
-            '',
-            array_map(
-                fn (string $field): string => "ti.{$field}, ",
-                array_keys(
-                    \OmegaUp\DAO\VO\Identities::FIELD_NAMES
-                )
-            )
-        );
-        $sql = "SELECT
-                    {$fields}
-                    IFNULL(ur.classname, 'user-rank-unranked') AS classname
+        $sql = 'SELECT
+                    ' .  self::getFields() . ',
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
                 FROM
-                    Identities i
+                    Identities id
                 INNER JOIN
-                    Team_Users tu ON tu.identity_id = i.identity_id
+                    Team_Users tu ON tu.identity_id = id.identity_id
                 LEFT JOIN
-                    User_Rank ur ON ur.user_id = i.user_id
+                    User_Rank ur ON ur.user_id = id.user_id
                 INNER JOIN
                     Teams t ON t.team_id = tu.team_id
                 INNER JOIN
-                    Identities ti ON ti.identity_id = t.identity_id
+                    Identities i ON i.identity_id = t.identity_id
                 WHERE
-                    i.identity_id = ?
-                LIMIT 1;";
+                    id.identity_id = ?
+                LIMIT 1;';
 
         /** @var array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(

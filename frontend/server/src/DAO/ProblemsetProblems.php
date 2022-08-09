@@ -274,24 +274,15 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
      * @return list<\OmegaUp\DAO\VO\ProblemsetProblems>
      */
     final public static function getByProblemset(int $problemsetId): array {
-        $fields = join(
-            ', ',
-            array_map(
-                fn (string $field): string => "`{$field}`",
-                array_keys(
-                    \OmegaUp\DAO\VO\ProblemsetProblems::FIELD_NAMES
-                )
-            )
-        );
         // Build SQL statement
-        $sql = "SELECT
-                    {$fields}
+        $sql = 'SELECT
+                    ' .  self::getFields() . '
                 FROM
-                    Problemset_Problems
+                    Problemset_Problems pp
                 WHERE
                     problemset_id = ?
                 ORDER BY
-                    `order`, `problem_id` ASC;";
+                    `order`, `problem_id` ASC;';
 
         /** @var list<array{commit: string, is_extra_problem: bool, order: int, points: float, problem_id: int, problemset_id: int, version: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(

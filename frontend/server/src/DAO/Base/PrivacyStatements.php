@@ -249,4 +249,12 @@ abstract class PrivacyStatements {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `ps`.`privacystatement_id`,
+                `ps`.`git_object_id`,
+                `ps`.`type`
+               ';
+    }
 }

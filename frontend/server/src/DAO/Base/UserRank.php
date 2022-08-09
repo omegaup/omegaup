@@ -428,4 +428,21 @@ abstract class UserRank {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `ur`.`user_id`,
+                `ur`.`ranking`,
+                `ur`.`problems_solved_count`,
+                `ur`.`score`,
+                `ur`.`username`,
+                `ur`.`name`,
+                `ur`.`country_id`,
+                `ur`.`state_id`,
+                `ur`.`school_id`,
+                `ur`.`author_score`,
+                `ur`.`author_ranking`,
+                `ur`.`classname`
+               ';
+    }
 }

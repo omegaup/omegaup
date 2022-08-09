@@ -297,4 +297,16 @@ abstract class QualityNominationLog {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `qnl`.`qualitynomination_log_id`,
+                `qnl`.`qualitynomination_id`,
+                `qnl`.`time`,
+                `qnl`.`user_id`,
+                `qnl`.`from_status`,
+                `qnl`.`to_status`,
+                `qnl`.`rationale`
+               ';
+    }
 }

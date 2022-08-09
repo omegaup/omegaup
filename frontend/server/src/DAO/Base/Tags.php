@@ -249,4 +249,12 @@ abstract class Tags {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `t`.`tag_id`,
+                `t`.`name`,
+                `t`.`public`
+               ';
+    }
 }

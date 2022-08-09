@@ -230,28 +230,10 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      * @return list<array{contest: \OmegaUp\DAO\VO\Contests, problemset: \OmegaUp\DAO\VO\Problemsets}>
      */
     public static function getContestsParticipated(int $identityId) {
-        $fields = join(
-            '',
-            array_map(
-                fn (string $field): string => "`c`.`{$field}`, ",
-                array_keys(
-                    \OmegaUp\DAO\VO\Contests::FIELD_NAMES
-                )
-            )
-        );
-        $problemFields = join(
-            ', ',
-            array_map(
-                fn (string $field): string => "`p`.`{$field}`",
-                array_keys(
-                    \OmegaUp\DAO\VO\Problemsets::FIELD_NAMES
-                )
-            )
-        );
-        $sql = "
+        $sql = '
             SELECT
-                {$fields}
-                {$problemFields}
+                ' .  self::getFields() . ',
+                ' .  \OmegaUp\DAO\Base\Problemsets::getFields() . '
             FROM
                 Contests c
             INNER JOIN
@@ -269,12 +251,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     c2.problemset_id = s.problemset_id
                 WHERE
                     s.identity_id = ?
-                    AND s.type= 'normal'
+                    AND s.type= \'normal\'
                     AND s.problemset_id IS NOT NULL
                     AND archived = 0
             )
             ORDER BY
-                c.contest_id DESC;";
+                c.contest_id DESC;';
 
         /** @var list<array{access_mode: string, acl_id: int, acl_id: int, admission_mode: string, alias: string, archived: bool, assignment_id: int|null, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, contest_id: int|null, default_show_all_contestants_in_scoreboard: bool|null, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, interview_id: int|null, languages: null|string, languages: null|string, last_updated: \OmegaUp\Timestamp, needs_basic_information: bool, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, plagiarism_threshold: bool, points_decay_factor: float, problemset_id: int, problemset_id: int, recommended: bool, requests_user_information: string, rerun_id: int|null, score_mode: string, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, type: string, urgent: bool, window_length: int|null}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(

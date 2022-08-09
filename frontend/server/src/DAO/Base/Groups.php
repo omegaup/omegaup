@@ -282,4 +282,15 @@ abstract class Groups {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `g`.`group_id`,
+                `g`.`acl_id`,
+                `g`.`create_time`,
+                `g`.`alias`,
+                `g`.`name`,
+                `g`.`description`
+               ';
+    }
 }

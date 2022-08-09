@@ -424,4 +424,33 @@ abstract class Problems {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `p`.`problem_id`,
+                `p`.`acl_id`,
+                `p`.`visibility`,
+                `p`.`title`,
+                `p`.`alias`,
+                `p`.`commit`,
+                `p`.`current_version`,
+                `p`.`languages`,
+                `p`.`input_limit`,
+                `p`.`visits`,
+                `p`.`submissions`,
+                `p`.`accepted`,
+                `p`.`difficulty`,
+                `p`.`creation_date`,
+                `p`.`source`,
+                `p`.`order`,
+                `p`.`deprecated`,
+                `p`.`email_clarifications`,
+                `p`.`quality`,
+                `p`.`quality_histogram`,
+                `p`.`difficulty_histogram`,
+                `p`.`quality_seal`,
+                `p`.`show_diff`,
+                `p`.`allow_user_add_tags`
+               ';
+    }
 }

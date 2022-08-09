@@ -244,4 +244,12 @@ abstract class TeamsGroupRoles {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `tgr`.`team_group_id`,
+                `tgr`.`role_id`,
+                `tgr`.`acl_id`
+               ';
+    }
 }

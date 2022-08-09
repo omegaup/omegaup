@@ -229,4 +229,11 @@ abstract class QualityNominationReviewers {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `qnr`.`qualitynomination_id`,
+                `qnr`.`user_id`
+               ';
+    }
 }

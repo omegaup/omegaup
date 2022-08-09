@@ -396,5 +396,11 @@ abstract class {{ table.class_name }} {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return "
+                {{ table.fieldnames_with_prefix|join(',\n                ') }}
+               ";
+    }
 }
 

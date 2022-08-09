@@ -13,8 +13,7 @@ namespace OmegaUp\DAO;
  */
 class Groups extends \OmegaUp\DAO\Base\Groups {
     public static function findByAlias(string $alias): ?\OmegaUp\DAO\VO\Groups {
-        $fields = join(', ', array_keys(\OmegaUp\DAO\VO\Groups::FIELD_NAMES));
-        $sql = "SELECT {$fields} FROM `Groups_` WHERE `alias` = ? LIMIT 1;";
+        $sql = 'SELECT ' .  self::getFields() . ' FROM `Groups_` g WHERE `alias` = ? LIMIT 1;';
         $params = [$alias];
         /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
@@ -28,8 +27,8 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
      * @return list<\OmegaUp\DAO\VO\Groups>
      */
     public static function searchByName(string $name) {
-        $fields = join(', ', array_keys(\OmegaUp\DAO\VO\Groups::FIELD_NAMES));
-        $sql = "SELECT {$fields} FROM `Groups_` WHERE `name` LIKE CONCAT('%', ?, '%') LIMIT 100;";
+        $fields = self::getFields();
+        $sql = "SELECT {$fields} FROM `Groups_` g WHERE `name` LIKE CONCAT('%', ?, '%') LIMIT 100;";
 
         /** @var list<array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$name]);
@@ -41,8 +40,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
     }
 
     public static function getByName(string $name): ?\OmegaUp\DAO\VO\Groups {
-        $fields = join(', ', array_keys(\OmegaUp\DAO\VO\Groups::FIELD_NAMES));
-        $sql = "SELECT {$fields} FROM `Groups_` WHERE `name` = ? LIMIT 1;";
+        $sql = 'SELECT ' .  self::getFields() . ' FROM `Groups_` g WHERE `name` = ? LIMIT 1;';
 
         /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);

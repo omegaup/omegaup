@@ -283,4 +283,14 @@ abstract class SubmissionFeedbackThread {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `sft`.`submission_feedback_thread_id`,
+                `sft`.`submission_feedback_id`,
+                `sft`.`identity_id`,
+                `sft`.`date`,
+                `sft`.`contents`
+               ';
+    }
 }

@@ -497,4 +497,40 @@ abstract class Contests {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `c`.`contest_id`,
+                `c`.`problemset_id`,
+                `c`.`acl_id`,
+                `c`.`title`,
+                `c`.`description`,
+                `c`.`start_time`,
+                `c`.`finish_time`,
+                `c`.`last_updated`,
+                `c`.`window_length`,
+                `c`.`rerun_id`,
+                `c`.`admission_mode`,
+                `c`.`alias`,
+                `c`.`scoreboard`,
+                `c`.`points_decay_factor`,
+                `c`.`partial_score`,
+                `c`.`submissions_gap`,
+                `c`.`feedback`,
+                `c`.`penalty`,
+                `c`.`penalty_type`,
+                `c`.`penalty_calc_policy`,
+                `c`.`show_scoreboard_after`,
+                `c`.`urgent`,
+                `c`.`languages`,
+                `c`.`recommended`,
+                `c`.`archived`,
+                `c`.`certificate_cutoff`,
+                `c`.`certificates_status`,
+                `c`.`contest_for_teams`,
+                `c`.`default_show_all_contestants_in_scoreboard`,
+                `c`.`score_mode`,
+                `c`.`plagiarism_threshold`
+               ';
+    }
 }

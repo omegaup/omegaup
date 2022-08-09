@@ -229,4 +229,11 @@ abstract class RolesPermissions {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `rp`.`role_id`,
+                `rp`.`permission_id`
+               ';
+    }
 }

@@ -30,18 +30,12 @@ class UsersExperiments extends \OmegaUp\DAO\Base\UsersExperiments {
      * @return \OmegaUp\DAO\VO\UsersExperiments[]
      */
     final public static function getByUserId(int $userId) {
-        $fields = join(
-            ', ',
-            array_keys(
-                \OmegaUp\DAO\VO\UsersExperiments::FIELD_NAMES
-            )
-        );
-        $sql = "SELECT
-                    {$fields}
+        $sql = 'SELECT
+                    ' .  self::getFields() . '
                 FROM
-                    Users_Experiments
+                    Users_Experiments ue
                 WHERE
-                    user_id = ?;";
+                    user_id = ?;';
 
         /** @var \OmegaUp\DAO\VO\UsersExperiments[] */
         $usersExperiments = [];

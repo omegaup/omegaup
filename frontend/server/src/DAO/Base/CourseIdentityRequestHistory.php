@@ -306,4 +306,15 @@ abstract class CourseIdentityRequestHistory {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `cirh`.`history_id`,
+                `cirh`.`identity_id`,
+                `cirh`.`course_id`,
+                `cirh`.`time`,
+                `cirh`.`accepted`,
+                `cirh`.`admin_id`
+               ';
+    }
 }

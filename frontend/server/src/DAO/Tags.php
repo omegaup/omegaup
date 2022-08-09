@@ -15,8 +15,7 @@ namespace OmegaUp\DAO;
  */
 class Tags extends \OmegaUp\DAO\Base\Tags {
     final public static function getByName(string $name): ?\OmegaUp\DAO\VO\Tags {
-        $fields = join(', ', array_keys(\OmegaUp\DAO\VO\Tags::FIELD_NAMES));
-        $sql = "SELECT {$fields} FROM Tags WHERE name = ? LIMIT 1;";
+        $sql = 'SELECT ' .  self::getFields() . ' FROM Tags t WHERE name = ? LIMIT 1;';
 
         /** @var array{name: string, public: bool, tag_id: int}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
@@ -30,8 +29,8 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
      * @return list<\OmegaUp\DAO\VO\Tags>
      */
     public static function findByName(string $name): array {
-        $fields = join(', ', array_keys(\OmegaUp\DAO\VO\Tags::FIELD_NAMES));
-        $sql = "SELECT {$fields} FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 100";
+        $fields = self::getFields();
+        $sql = "SELECT {$fields} FROM Tags t WHERE name LIKE CONCAT('%', ?, '%') LIMIT 100";
         $args = [$name];
 
         $result = [];

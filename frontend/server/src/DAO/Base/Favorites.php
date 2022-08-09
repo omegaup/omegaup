@@ -229,4 +229,11 @@ abstract class Favorites {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `f`.`user_id`,
+                `f`.`problem_id`
+               ';
+    }
 }

@@ -301,4 +301,16 @@ abstract class Interviews {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `i`.`interview_id`,
+                `i`.`problemset_id`,
+                `i`.`acl_id`,
+                `i`.`alias`,
+                `i`.`title`,
+                `i`.`description`,
+                `i`.`window_length`
+               ';
+    }
 }

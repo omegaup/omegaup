@@ -18,18 +18,9 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
     public static function getFirstAdminForProblemsetRequest(
         int $problemsetId
     ) {
-        $fields = join(
-            ', ',
-            array_map(
-                fn (string $field): string => "r.{$field}",
-                array_keys(
-                    \OmegaUp\DAO\VO\ProblemsetIdentityRequest::FIELD_NAMES
-                )
-            )
-        );
-        $sql = "
+        $sql = '
             SELECT
-                {$fields},
+                ' .  self::getFields() . ',
                 i.username,
                 i.name,
                 (SELECT
@@ -37,18 +28,18 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
                 FROM
                     `Problemset_Identity_Request_History` h
                 WHERE
-                    r.identity_id = h.identity_id
-                    AND r.problemset_id = h.problemset_id
+                    pir.identity_id = h.identity_id
+                    AND pir.problemset_id = h.problemset_id
                 ORDER BY
                     h.history_id
                 LIMIT
                     1) AS admin_id
             FROM
-                `Problemset_Identity_Request` r
+                `Problemset_Identity_Request` pir
             INNER JOIN
-                `Identities` i ON i.identity_id = r.identity_id
+                `Identities` i ON i.identity_id = pir.identity_id
             WHERE
-                r.problemset_id = ?;";
+                pir.problemset_id = ?;';
 
         /** @var list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, name: null|string, problemset_id: int, request_time: \OmegaUp\Timestamp, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(

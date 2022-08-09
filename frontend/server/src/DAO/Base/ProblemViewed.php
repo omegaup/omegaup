@@ -323,4 +323,12 @@ abstract class ProblemViewed {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `pv`.`problem_id`,
+                `pv`.`identity_id`,
+                `pv`.`view_time`
+               ';
+    }
 }

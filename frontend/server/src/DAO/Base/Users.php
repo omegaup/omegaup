@@ -483,4 +483,34 @@ abstract class Users {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `u`.`user_id`,
+                `u`.`facebook_user_id`,
+                `u`.`git_token`,
+                `u`.`main_email_id`,
+                `u`.`main_identity_id`,
+                `u`.`has_learning_objective`,
+                `u`.`has_teaching_objective`,
+                `u`.`has_scholar_objective`,
+                `u`.`has_competitive_objective`,
+                `u`.`scholar_degree`,
+                `u`.`birth_date`,
+                `u`.`verified`,
+                `u`.`verification_id`,
+                `u`.`deletion_token`,
+                `u`.`reset_digest`,
+                `u`.`reset_sent_at`,
+                `u`.`hide_problem_tags`,
+                `u`.`in_mailing_list`,
+                `u`.`is_private`,
+                `u`.`preferred_language`,
+                `u`.`parent_verified`,
+                `u`.`creation_timestamp`,
+                `u`.`parental_verification_token`,
+                `u`.`parent_email_verification_initial`,
+                `u`.`parent_email_verification_deadline`
+               ';
+    }
 }

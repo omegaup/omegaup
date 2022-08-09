@@ -19,20 +19,14 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
         int $problemsetId,
         int $identityId
     ): array {
-        $fields = join(
-            ', ',
-            array_keys(
-                \OmegaUp\DAO\VO\ProblemsetAccessLog::FIELD_NAMES
-            )
-        );
-        $sql = "SELECT
-                    {$fields}
+        $sql = 'SELECT
+                    ' .  self::getFields() . '
                 FROM
-                    Problemset_Access_Log
+                    Problemset_Access_Log pal
                 WHERE
                     problemset_id = ?
                 AND
-                    identity_id = ?;";
+                    identity_id = ?;';
 
         /** @var list<array{identity_id: int, ip: int, problemset_id: int, time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(

@@ -265,4 +265,12 @@ abstract class Teams {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `t`.`team_id`,
+                `t`.`team_group_id`,
+                `t`.`identity_id`
+               ';
+    }
 }

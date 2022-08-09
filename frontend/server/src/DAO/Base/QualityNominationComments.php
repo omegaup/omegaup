@@ -298,4 +298,15 @@ abstract class QualityNominationComments {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `qnc`.`qualitynomination_comment_id`,
+                `qnc`.`qualitynomination_id`,
+                `qnc`.`user_id`,
+                `qnc`.`time`,
+                `qnc`.`vote`,
+                `qnc`.`contents`
+               ';
+    }
 }

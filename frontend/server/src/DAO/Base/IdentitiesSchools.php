@@ -294,4 +294,15 @@ abstract class IdentitiesSchools {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `is`.`identity_school_id`,
+                `is`.`identity_id`,
+                `is`.`school_id`,
+                `is`.`graduation_date`,
+                `is`.`creation_time`,
+                `is`.`end_time`
+               ';
+    }
 }

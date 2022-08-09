@@ -294,4 +294,15 @@ abstract class SchoolOfTheMonth {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `sotm`.`school_of_the_month_id`,
+                `sotm`.`school_id`,
+                `sotm`.`time`,
+                `sotm`.`ranking`,
+                `sotm`.`selected_by`,
+                `sotm`.`score`
+               ';
+    }
 }

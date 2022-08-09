@@ -249,4 +249,12 @@ abstract class Roles {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `r`.`role_id`,
+                `r`.`name`,
+                `r`.`description`
+               ';
+    }
 }

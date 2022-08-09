@@ -18,18 +18,12 @@ class IdentityLoginLog extends \OmegaUp\DAO\Base\IdentityLoginLog {
     final public static function getByIdentity(
         int $identityId
     ): array {
-        $fields = join(
-            ', ',
-            array_keys(
-                \OmegaUp\DAO\VO\IdentityLoginLog::FIELD_NAMES
-            )
-        );
-        $sql = "SELECT
-                    {$fields}
+        $sql = 'SELECT
+                    ' .  self::getFields() . '
                 FROM
-                    Identity_Login_Log
+                    Identity_Login_Log ill
                 WHERE
-                    identity_id = ?;";
+                    identity_id = ?;';
 
         /** @var list<array{identity_id: int, ip: int, time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(

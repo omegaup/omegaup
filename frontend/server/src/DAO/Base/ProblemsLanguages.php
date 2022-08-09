@@ -229,4 +229,11 @@ abstract class ProblemsLanguages {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `pl`.`problem_id`,
+                `pl`.`language_id`
+               ';
+    }
 }

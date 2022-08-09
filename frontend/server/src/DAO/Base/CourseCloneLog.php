@@ -312,4 +312,17 @@ abstract class CourseCloneLog {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `ccl`.`course_clone_log_id`,
+                `ccl`.`ip`,
+                `ccl`.`course_id`,
+                `ccl`.`new_course_id`,
+                `ccl`.`token_payload`,
+                `ccl`.`timestamp`,
+                `ccl`.`user_id`,
+                `ccl`.`result`
+               ';
+    }
 }

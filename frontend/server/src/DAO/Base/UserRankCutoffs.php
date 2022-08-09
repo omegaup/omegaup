@@ -127,4 +127,12 @@ abstract class UserRankCutoffs {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `urc`.`score`,
+                `urc`.`percentile`,
+                `urc`.`classname`
+               ';
+    }
 }

@@ -357,4 +357,16 @@ abstract class ProblemsetProblems {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `pp`.`problemset_id`,
+                `pp`.`problem_id`,
+                `pp`.`commit`,
+                `pp`.`version`,
+                `pp`.`points`,
+                `pp`.`order`,
+                `pp`.`is_extra_problem`
+               ';
+    }
 }

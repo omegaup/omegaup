@@ -317,4 +317,12 @@ abstract class ProblemsTags {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `pt`.`problem_id`,
+                `pt`.`tag_id`,
+                `pt`.`source`
+               ';
+    }
 }

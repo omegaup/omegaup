@@ -61,8 +61,10 @@ class Constraint:
 class Table:
     '''Represents a MySQL table.'''
     def __init__(self, tokens: Mapping[str, Any]):
-        self.name: str = tokens['tbl_name']
-        self.class_name: str = tokens['tbl_name'].replace('_', '')
+        table_name: str = tokens['tbl_name']
+        self.name: str = table_name
+        self.class_name: str = table_name.replace('_', '')
+        self.prefix: str = self.get_prefix()
         self.columns: Sequence[Column] = tokens['column']
         self.constraints: Sequence[Constraint] = tokens.get('constraint', ())
         for constraint in self.constraints:
@@ -82,6 +84,18 @@ class Table:
             "`{}`.`{}`".format(self.name, column.name)
             for column in self.columns
         ]
+
+    @property
+    def fieldnames_with_prefix(self) -> List[str]:
+        '''A quoted list of fields using a predefined prefix.'''
+
+        return [
+            "`{}`.`{}`".format(self.prefix, column.name)
+            for column in self.columns
+        ]
+
+    def get_prefix(self) -> str:
+        return ''.join(c for c in self.name if c.isupper()).lower()
 
     def __repr__(self) -> str:
         return 'Table<name={}, columns={}>'.format(self.name, self.columns)

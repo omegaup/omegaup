@@ -386,4 +386,15 @@ abstract class SubmissionLog {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `sl`.`problemset_id`,
+                `sl`.`submission_id`,
+                `sl`.`user_id`,
+                `sl`.`identity_id`,
+                `sl`.`ip`,
+                `sl`.`time`
+               ';
+    }
 }

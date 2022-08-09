@@ -337,4 +337,20 @@ abstract class CoderOfTheMonth {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `cotm`.`coder_of_the_month_id`,
+                `cotm`.`user_id`,
+                `cotm`.`description`,
+                `cotm`.`time`,
+                `cotm`.`interview_url`,
+                `cotm`.`ranking`,
+                `cotm`.`selected_by`,
+                `cotm`.`school_id`,
+                `cotm`.`category`,
+                `cotm`.`score`,
+                `cotm`.`problems_solved`
+               ';
+    }
 }

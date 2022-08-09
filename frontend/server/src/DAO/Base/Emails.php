@@ -257,4 +257,12 @@ abstract class Emails {
 
         return $affectedRows;
     }
+
+    final public static function getFields(): string {
+        return '
+                `e`.`email_id`,
+                `e`.`email`,
+                `e`.`user_id`
+               ';
+    }
 }
