@@ -137,7 +137,7 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\DAO\Contests::getByAlias($clonedContestAlias);
 
         $this->assertTrue(
-            $response->plagiarism_threshold
+            $response->check_plagiarism
         );
     }
 

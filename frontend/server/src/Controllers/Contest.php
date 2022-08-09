@@ -1809,7 +1809,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'submissions_gap',
                     'title',
                     'window_length',
-                    'plagiarism_threshold'
+                    'check_plagiarism',
                 ]);
 
                 $result['original_contest_alias'] = null;
@@ -2267,7 +2267,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'penalty_type' => $originalContest->penalty_type,
             'admission_mode' => 'private', // Cloned contests start in private
                                            // admission_mode
-            'plagiarism_threshold' => $originalContest->plagiarism_threshold,
+            'check_plagiarism' => $originalContest->check_plagiarism,
         ]);
 
         \OmegaUp\DAO\DAO::transBegin();
@@ -2373,7 +2373,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'show_scoreboard_after' => true,
             'languages' => $originalContest->languages,
             'rerun_id' => $originalContest->contest_id,
-            'plagiarism_threshold' => $originalContest->plagiarism_threshold,
+            'check_plagiarism' => $originalContest->check_plagiarism,
         ]);
 
         $problemset = new \OmegaUp\DAO\VO\Problemsets([
@@ -2591,7 +2591,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'score_mode' => $scoreMode,
             'show_scoreboard_after' => $r['show_scoreboard_after'] ?? true,
             'contest_for_teams' => $forTeams,
-            'plagiarism_threshold' => $checkPlagiarism ? true : false,
+            'check_plagiarism' => $checkPlagiarism ? true : false,
         ]);
 
         self::createContest(
@@ -4797,7 +4797,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     }
             ],
             'admission_mode',
-            'plagiarism_threshold',
+            'check_plagiarism',
         ];
         self::updateValueProperties($r, $contest, $valueProperties);
 
