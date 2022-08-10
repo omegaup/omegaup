@@ -4906,6 +4906,8 @@ export namespace messages {
   export type CourseAdminsResponse = {
     admins: { role: string; username: string }[];
     group_admins: { alias: string; name: string; role: string }[];
+    group_teaching_assistants: { alias: string; name: string; role: string }[];
+    teaching_assistants: { role: string; username: string }[];
   };
   export type CourseArbitrateRequestRequest = { [key: string]: any };
   export type CourseArbitrateRequestResponse = {};
@@ -4998,6 +5000,8 @@ export namespace messages {
   export type CourseRemoveProblemResponse = {};
   export type CourseRemoveStudentRequest = { [key: string]: any };
   export type CourseRemoveStudentResponse = {};
+  export type CourseRemoveTeachingAssistantRequest = { [key: string]: any };
+  export type CourseRemoveTeachingAssistantResponse = {};
   export type CourseRequestsRequest = { [key: string]: any };
   export type _CourseRequestsServerResponse = any;
   export type CourseRequestsResponse = { users: types.IdentityRequest[] };
@@ -5828,6 +5832,9 @@ export namespace controllers {
     removeStudent: (
       params?: messages.CourseRemoveStudentRequest,
     ) => Promise<messages.CourseRemoveStudentResponse>;
+    removeTeachingAssistant: (
+      params?: messages.CourseRemoveTeachingAssistantRequest,
+    ) => Promise<messages.CourseRemoveTeachingAssistantResponse>;
     requests: (
       params?: messages.CourseRequestsRequest,
     ) => Promise<messages.CourseRequestsResponse>;
