@@ -37,11 +37,9 @@ class GroupsScoreboards extends \OmegaUp\DAO\Base\GroupsScoreboards {
     public static function getByAlias(
         string $alias
     ): ?\OmegaUp\DAO\VO\GroupsScoreboards {
-        $fields = join(
-            ', ',
-            array_keys(
-                \OmegaUp\DAO\VO\GroupsScoreboards::FIELD_NAMES
-            )
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\GroupsScoreboards::FIELD_NAMES,
+            'Groups_Scoreboards',
         );
         $sql = "SELECT {$fields} FROM Groups_Scoreboards WHERE alias = ? LIMIT 1;";
         /** @var array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, group_scoreboard_id: int, name: string}|null */
