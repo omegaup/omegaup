@@ -3005,7 +3005,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         ];
     }
 
-     /**
+    /**
      * Adds an group teaching assistant to a course
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
