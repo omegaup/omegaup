@@ -77,6 +77,9 @@ final class DAO {
         return null;
     }
 
+    /**
+     * @param $fieldNames array<string, bool>
+     */
     public static function getFields(
         array $fieldNames,
         string $prefix
@@ -84,7 +87,7 @@ final class DAO {
         return join(
             ', ',
             array_map(
-                fn (string $field): string => "`{$prefix}`.`{$field}`",
+                fn ($field) => "`{$prefix}`.`{$field}`",
                 array_keys($fieldNames)
             )
         );
