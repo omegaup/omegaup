@@ -34,7 +34,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 WHERE
                     e.email = ?;";
         $params = [ $email ];
-        /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
+        /** @var array{birth_date: null|string, creation_timestamp: \OmegaUp\Timestamp, deletion_token: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_email_verification_initial: \OmegaUp\Timestamp|null, parent_verified: bool|null, parental_verification_token: null|string, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -65,7 +65,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 WHERE
                     i.username = ?
                 LIMIT 1;";
-        /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
+        /** @var array{birth_date: null|string, creation_timestamp: \OmegaUp\Timestamp, deletion_token: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_email_verification_initial: \OmegaUp\Timestamp|null, parent_verified: bool|null, parental_verification_token: null|string, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$username]
@@ -272,7 +272,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     verification_id = ?
                 LIMIT 1;";
 
-        /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
+        /** @var array{birth_date: null|string, creation_timestamp: \OmegaUp\Timestamp, deletion_token: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_email_verification_initial: \OmegaUp\Timestamp|null, parent_verified: bool|null, parental_verification_token: null|string, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$verificationId]
@@ -387,7 +387,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 AND
                     in_mailing_list = ?";
 
-        /** @var list<array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}> */
+        /** @var list<array{birth_date: null|string, creation_timestamp: \OmegaUp\Timestamp, deletion_token: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_email_verification_initial: \OmegaUp\Timestamp|null, parent_verified: bool|null, parental_verification_token: null|string, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$verified, $inMailingList]
