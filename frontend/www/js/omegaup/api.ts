@@ -666,6 +666,10 @@ export const Course = {
     messages.CourseAddGroupAdminRequest,
     messages.CourseAddGroupAdminResponse
   >('/api/course/addGroupAdmin/'),
+  addGroupTeachingAssistant: apiCall<
+    messages.CourseAddGroupTeachingAssistantRequest,
+    messages.CourseAddGroupTeachingAssistantResponse
+  >('/api/course/addGroupTeachingAssistant/'),
   addProblem: apiCall<
     messages.CourseAddProblemRequest,
     messages.CourseAddProblemResponse
@@ -918,6 +922,10 @@ export const Course = {
     messages.CourseRemoveGroupAdminRequest,
     messages.CourseRemoveGroupAdminResponse
   >('/api/course/removeGroupAdmin/'),
+  removeGroupTeachingAssistant: apiCall<
+    messages.CourseRemoveGroupTeachingAssistantRequest,
+    messages.CourseRemoveGroupTeachingAssistantResponse
+  >('/api/course/removeGroupTeachingAssistant/'),
   removeProblem: apiCall<
     messages.CourseRemoveProblemRequest,
     messages.CourseRemoveProblemResponse

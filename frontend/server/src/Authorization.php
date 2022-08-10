@@ -139,10 +139,10 @@ class Authorization {
                     $course = \OmegaUp\DAO\Courses::getByProblemsetId(
                         $problemset
                     );
-                    return self::isTeachingAssistantForPublicCourses(
+                    return (!is_null($course) && self::isTeachingAssistant(
                         $identity,
                         $course
-                    );
+                    ));
                 }
             }
         }
@@ -176,10 +176,10 @@ class Authorization {
         return self::isAdmin(
             $identity,
             $problemset
-        ) || self::isTeachingAssistantForPublicCourses(
+        ) || (!is_null($course) && self::isTeachingAssistant(
             $identity,
             $course
-        );
+        ));
     }
 
     public static function canEditClarification(
@@ -211,10 +211,10 @@ class Authorization {
                 || self::isAdmin(
                     $identity,
                     $problemset
-                ) || self::isTeachingAssistantForPublicCourses(
+                ) || (!is_null($course) && self::isTeachingAssistant(
                     $identity,
                     $course
-                ));
+                )));
     }
 
     /**
@@ -290,7 +290,7 @@ class Authorization {
         \OmegaUp\DAO\VO\Courses $course
     ): bool {
         return(
-            self::isTeachingAssistantForPublicCourses($identity, $course) ||
+            self::isTeachingAssistant($identity, $course) ||
             self::isCourseAdmin($identity, $course)
         );
     }
@@ -303,7 +303,7 @@ class Authorization {
         if (
             !self::isCourseAdmin($identity, $course) &&
             !self::isGroupMember($identity, $group) &&
-            !self::isTeachingAssistantForPublicCourses($identity, $course)
+            !self::isTeachingAssistant($identity, $course)
         ) {
             return false;
         }
@@ -444,36 +444,28 @@ class Authorization {
         );
     }
 
-    public static function isTeachingAssistant(\OmegaUp\DAO\VO\Identities $identity): bool {
-        if (is_null(self::$_teachingAssistantGroup)) {
-            self::$_teachingAssistantGroup = \OmegaUp\DAO\Groups::findByAlias(
-                self::TEACHING_ASSISTANT_GROUP_ALIAS
-            );
-            if (is_null(self::$_teachingAssistantGroup)) {
-                return false;
-            }
-        }
-        if (is_null(self::$_teachingAssistantGroup->acl_id)) {
+    public static function isTeachingAssistant(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Courses $course
+    ): bool {
+        if (is_null($course->acl_id)) {
             return false;
         }
-        return self::isGroupMember(
+        return self::hasRole(
             $identity,
-            self::$_teachingAssistantGroup
-        ) || self::hasRole(
-            $identity,
-            self::$_teachingAssistantGroup->acl_id,
+            $course->acl_id,
             self::TEACHING_ASSISTANT_ROLE
         );
     }
 
-    private static function isTeachingAssistantForPublicCourses(
+    public static function isGroupTeachingAssistantMember(
         \OmegaUp\DAO\VO\Identities $identity,
-        ?\OmegaUp\DAO\VO\Courses $course
+        \OmegaUp\DAO\VO\Groups $group = null
     ): bool {
-        if (is_null($course)) {
+        if (is_null($group) || is_null($identity->user_id)) {
             return false;
         }
-        return self::isTeachingAssistant($identity);
+        return self::isGroupMember($identity, $group);
     }
 
     public static function isGroupIdentityCreator(\OmegaUp\DAO\VO\Identities $identity): bool {

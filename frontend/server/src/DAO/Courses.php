@@ -948,7 +948,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     final public static function getAllCoursesAdminedByIdentity(
         int $identityId,
         int $page = 1,
-        int $pageSize = 1000
+        int $pageSize = 1000,
+        int $roleId = \OmegaUp\Authorization::ADMIN_ROLE
     ): array {
         $sql = '
             SELECT
@@ -981,9 +982,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ?, ?';
         $params = [
             $identityId,
-            \OmegaUp\Authorization::ADMIN_ROLE,
+            $roleId,
             $identityId,
-            \OmegaUp\Authorization::ADMIN_ROLE,
+            $roleId,
             $identityId,
             max(0, $page - 1) * $pageSize,
             $pageSize,

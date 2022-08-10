@@ -15,30 +15,34 @@ class CourseAddTeachingAssistantTest extends \OmegaUp\Test\ControllerTestCase {
         $adminLogin = self::login($adminUser);
 
         // create normal user
-        ['identity' => $identityUser] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // admin is able to add a teaching assistant
         \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
             new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
-                'usernameOrEmail' => $identityUser->username,
+                'usernameOrEmail' => $identity->username,
                 'course_alias' => $courseData['course_alias'],
             ])
         );
 
         // login user
-        $userLogin = self::login($identityUser);
+        $userLogin = self::login($identity);
+        $course = \OmegaUp\DAO\Courses::getByAlias(
+            $courseData['course_alias']
+        );
 
-        /*$this->AssertTrue(
+        $this->assertTrue(
             \OmegaUp\Authorization::isTeachingAssistant(
-                $identityUser
+                $identity,
+                $course
             )
-        );*/
+        );
 
         // create another normal user
         ['identity' => $identityUser2] = \OmegaUp\Test\Factories\User::createUser();
 
-        // teaching assistant cant add another teaching assistant
+        // teaching assistant can't add another teaching assistant
         try {
             \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
                 new \OmegaUp\Request([

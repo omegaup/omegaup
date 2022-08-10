@@ -1893,7 +1893,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         int $page,
         int $pageSize,
-        array $courseTypes = ['admin', 'student', 'public']
+        array $courseTypes = ['admin', 'student', 'public'],
+        int $roleId = \OmegaUp\Authorization::ADMIN_ROLE
     ) {
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -1916,8 +1917,20 @@ class Course extends \OmegaUp\Controllers\Controller {
                     $page,
                     $pageSize
                 );
-                if (\OmegaUp\Authorization::isTeachingAssistant($identity)) {
-                    $response['teachingAssistant'] = \OmegaUp\DAO\Courses::getPublicCourses();
+
+                $teachingAssistantCourses = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
+                    $identity->identity_id,
+                    $page,
+                    $pageSize,
+                    roleId: \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE
+                );
+
+                if ($roleId === \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE) {
+                    foreach ($teachingAssistantCourses as $course) {
+                        $response['teachingAssistant'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
+                            $course
+                        );
+                    }
                 }
             }
             foreach ($adminCourses as $course) {
@@ -2676,7 +2689,10 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         return [
             'admins' => \OmegaUp\DAO\UserRoles::getCourseAdmins($course),
-            'group_admins' => \OmegaUp\DAO\GroupRoles::getCourseAdmins($course)
+            'group_admins' => \OmegaUp\DAO\GroupRoles::getCourseAdmins($course),
+            'group_teaching_assistants' => \OmegaUp\DAO\GroupRoles::getCourseTeachingAssistants(
+                $course
+            )
         ];
     }
 
@@ -2954,13 +2970,16 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['usernameOrEmail'],
-            'usernameOrEmail'
+
+        $username = $r->ensureString(
+            'usernameOrEmail',
+            fn (string $user) => \OmegaUp\Validators::usernameOrEmail(
+                $user
+            )
         );
 
         $resolvedUser = \OmegaUp\Controllers\User::resolveUser(
-            $r['usernameOrEmail']
+            $username
         );
 
         $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
@@ -2973,9 +2992,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        \OmegaUp\Controllers\ACL::addUserTeachingAssistant(
+        \OmegaUp\Controllers\ACL::addUser(
             intval($course->acl_id),
-            intval($resolvedUser->user_id)
+            intval($resolvedUser->user_id),
+            roleId: \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE
         );
 
         if (
@@ -3003,6 +3023,119 @@ class Course extends \OmegaUp\Controllers\Controller {
                 ])
             );
         }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Adds an group teaching assistant to a course
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $group
+     */
+    public static function apiAddGroupTeachingAssistant(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        // Authenticate logged user
+        $r->ensureIdentity();
+
+        // Check course_alias
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        try {
+            $groupAlias = $r->ensureString(
+                'group',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidGroupAlias'
+            );
+        }
+
+        $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
+        if (is_null($group)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
+        }
+
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
+        if (is_null($course)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        // Only admins are allowed to modify course
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        \OmegaUp\Controllers\ACL::addGroup(
+            intval($course->acl_id),
+            intval($group->group_id),
+            roleId: \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE
+        );
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Removes a group teaching assistant from a course
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $group
+     */
+    public static function apiRemoveGroupTeachingAssistant(\OmegaUp\Request $r): array {
+        // Authenticate logged user
+        $r->ensureIdentity();
+
+        // Check course_alias
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $groupAlias = $r->ensureString(
+            'group',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
+        if (is_null($group)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
+        }
+
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
+        if (is_null($course)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        // Only admin is alowed to make modifications
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        \OmegaUp\Controllers\ACL::removeGroup(
+            intval($course->acl_id),
+            intval($group->group_id),
+            roleId: \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE
+        );
 
         return [
             'status' => 'ok',
@@ -3797,7 +3930,10 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, templateProperties: array{payload: CourseListMinePayload, title: \OmegaUp\TranslationString}}
      */
-    public static function getCourseMineDetailsForTypeScript(\OmegaUp\Request $r): array {
+    public static function getCourseMineDetailsForTypeScript(
+        \OmegaUp\Request $r,
+        int $roleId = \OmegaUp\Authorization::ADMIN_ROLE
+    ): array {
         $r->ensureIdentity();
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
@@ -3806,7 +3942,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $page,
             $pageSize,
-            courseTypes: ['admin', 'archived']
+            courseTypes: ['admin', 'archived'],
+            roleId: $roleId
         );
         $filteredCourses = [
             'admin' => [
