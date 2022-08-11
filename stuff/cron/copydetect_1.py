@@ -13,7 +13,6 @@ import argparse
 import calendar
 import collections
 import copydetect
-import datetime
 import json
 import logging
 import operator
@@ -24,7 +23,8 @@ from typing import (DefaultDict, Dict, Mapping, NamedTuple, Optional, Sequence,
 
 from mysql.connector import errorcode
 from copydetect import CopyDetector
-
+from datetime import datetime
+from datetime import timedelta
 sys.path.insert(
     0,
     os.path.join(
@@ -33,33 +33,47 @@ import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 
-# This Cronjob run after every 15 mins. 
 
-# We will have a contests list of those contests that have ended in the last 20 mins of 
-# starting this cronjob. 
+# SQL Queries
+
+CONTESTS_TO_RUN_PLAGIARISM_ON = """ SELECT c.`contest_id`
+                                    FROM `Contests` as c
+                                    WHERE (c.`check_plagiarism` = 1 AND c.`finish_time` BETWEEN %s AND %s) 
+                                        AND c.`contest_id` NOT IN
+                                            (SELECT p.`contest_id` 
+                                            FROM `Plagiarisms` as p);
+                                """
+INSERT_RESULT_TO_PLAGIARISMS = """
+
+                                """
+
+
+
+FLAG_START = "<span class='highlight-red'>" # where the flagging starts for getting line numbers of matched code. 
+FLAG_END = "</span>" # where the flagging ends. 
+MINUTES = 20
 contests = []
 
-def get_contests():
-    stuff
-    # Then we will check if a plagiarism_table already exists for any of the contests in the contests list. And remove those contests. 
-    # For those contests that don't have a plagiarism_table we will check if check_plagiarism is true in the database. 
+
+def get_contests(dbconn: lib.db.Connection) -> None:
+    now = datetime.now()
+    date_format_str = '%d/%m/%Y %H:%M:%S.%f'
+
+    final_time = now - timedelta(minutes=MINUTES)
+    final_time_str = final_time.strftime('%d/%m/%Y %H:%M:%S.%f')
+
+    with dbconn.cursor() as cur:
+        cur.execute(CONTESTS_TO_RUN_PLAGIARISM_ON,(final_time_str, now))
+        contests = cur.fetchall()
 
 
 
-# S3 code will go here to retreive the results
-# We will make a folder /omegaup/stuff/cron/submissions/ and in that folder will store different folders for all the contests
-# example:- for a contest alias:- Gsoc, the adress for storing files will be 
-    # /omegaup/stuff/cron/submissions/Gsoc
+# Get Submission files from S#
 
-def get_submission():
-    # get submissions from S3
-
-    for i in range(0, len(contests)):
-        os.mkdir(contest[i])
+# def get_submission():
 
 
-# Then will we will run copydetect on each contest
-def return_range(self, code_list_splitted):
+def return_range(self, code_list_splitted) -> List:
     
     '''
     returns a list of integers that are in pair. 
@@ -82,9 +96,10 @@ def return_range(self, code_list_splitted):
     return content
 
 
-def detector(self, contest_alias):
+def detector(
+    dbconn: lib.db.Connection, contest_id) -> None:
     # copydetect 
-    detector = CopyDetector(test_dirs=["/omegaup/stuff/cron/submissions/"+contest_alia+"/"],extensions=["cpp"], display_t=0.0, autoopen = False, disable_filtering=True, out_file= "result.html")
+    detector = CopyDetector(test_dirs=["/omegaup/stuff/cron/submissions/"+contest_id+"/"],extensions=["cpp"], display_t=0.0, autoopen = False, disable_filtering=True, out_file= "result.html")
     detector.run()
     detector_result = list(detector.get_copied_code_list())
 
@@ -92,25 +107,28 @@ def detector(self, contest_alias):
     s = "<span class='highlight-red'>" # where the flagging starts. 
     ss = "</span>" # where the flagging ends. 
     for i in range(len(detector_result)):
-        percent_one = detector_result[i][0] # percentage match in first code
-        percent_two = detector_result[i][1] # percentage match in second code
-        file_one = detector_result[i][2] # address of file one. Will be needed to extract information like the GUID. 
-        file_two = detector_result[i][3] # address of file two. 
+        score_1 = detector_result[i][0] # percentage match in first code
+        score_2 = detector_result[i][1] # percentage match in second code
+        submission_id_1 = detector_result[i][2] # address of file one. Will be needed to extract information like the GUID. 
+        submission_id_2 = detector_result[i][3] # address of file two. 
         code_one = return_range(detector_result[i][4].split('\n')) # Gets the range of lines that are marked red. 
         code_two = retur_range(detector_result[i][5].split('\n')) # Gets teh range of lines that are marked green. 
 
         # Now push these values to the Plagiarism Table. 
+        with dbconn.cursor() as cur:
+            cur.execute(INSERT_RESULT_TO_PLAGIARISMS,(contest_id, percent_one,percent_two,submission_id_1, submission_id_2,  now))
+            contests = cur.fetchall()
 
 
 def run_detector_on_each_contests():
     for i in range(0, len(contests)):
-        detector(contests[i])
+        detector(dbconn,contests[i])
 
 
 def main() -> None:
     '''Main entrypoint. '''
     parser = argparse.ArgumentParser(
-    description='Aggregate user feedback.')
+    description='Runs the Plagiarism Detector')
 
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
@@ -120,14 +138,14 @@ def main() -> None:
 
     logging.info('Started')
     dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
-    
-    get_contests()
-    check_contest_okay()
-    if(len(contests)!=0):
-        get_submissions()
-        run_detector_on_each_contests()
 
-
+    try:
+        get_contests(dbconn)
+        if(len(contests)!=0):
+            get_submissions()
+            run_detector_on_each_contests()
+    except:
+        logging.exception('Failed to generate Plagiarism Table')
 
 if __name__ == '__main__':
     main()
