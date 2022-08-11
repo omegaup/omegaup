@@ -1,3 +1,4 @@
+copydetect==0.4.2
 Jinja2==3.0.3
 boto3>=1.20.26
 markupsafe==2.0.1
