@@ -25,12 +25,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      * @return list<\OmegaUp\DAO\VO\Courses>
      */
     public static function findByName(string $name): array {
-        $fields = \OmegaUp\DAO\DAO::getFields(
-            \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
-            'c'
-        );
-        $sql = "SELECT DISTINCT
-                {$fields}
+        $sql = "SELECT DISTINCT c.*
                 FROM Courses c
                 WHERE c.name
                 LIKE CONCAT('%', ?, '%') LIMIT 10";
@@ -79,13 +74,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ';
             $args[] = $identity->identity_id;
         }
-        $fields =  \OmegaUp\DAO\DAO::getFields(
-            \OmegaUp\DAO\VO\Assignments::FIELD_NAMES,
-            'a'
-        );
+
         $sql = "
             SELECT
-                {$fields},
+                a.*,
                 EXISTS(SELECT * FROM Submissions s WHERE s.problemset_id = a.problemset_id) AS has_runs,
                 COUNT(psp.problem_id) AS problem_count,
                 ps.scoreboard_url,
@@ -961,10 +953,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     ): array {
         $sql = '
             SELECT
-            ' .  \OmegaUp\DAO\DAO::getFields(
-            \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
-            'c'
-        ) . '
+                c.*
             FROM
                 Courses AS c
             INNER JOIN
@@ -1098,10 +1087,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     ): array {
         $sql = '
             SELECT
-            ' .  \OmegaUp\DAO\DAO::getFields(
-            \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
-            'c'
-        ) . '
+                c.*
             FROM
                 Courses AS c
             INNER JOIN
@@ -1136,10 +1122,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     ): array {
         $sql = '
             SELECT
-            ' .  \OmegaUp\DAO\DAO::getFields(
-            \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
-            'c'
-        ) . '
+                c.*
             FROM
                 Courses c
             INNER JOIN
@@ -1163,14 +1146,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     final public static function getByProblemsetId(
         \OmegaUp\DAO\VO\Problemsets $problemset
     ): ?\OmegaUp\DAO\VO\Courses {
-        $fields = join(
-            ', ',
-            array_map(
-                fn (string $field): string => "c.{$field}",
-                array_keys(
-                    \OmegaUp\DAO\VO\Courses::FIELD_NAMES
-                )
-            )
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
+            'c'
         );
         $sql = "SELECT
                     {$fields}
@@ -1198,10 +1176,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     final public static function getByAlias(
         string $alias
     ): ?\OmegaUp\DAO\VO\Courses {
-        $sql = 'SELECT ' .  \OmegaUp\DAO\DAO::getFields(
-            \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
-            'Courses'
-        ) . ' FROM Courses WHERE (alias = ?) LIMIT 1;';
+        $sql = 'SELECT * FROM Courses WHERE (alias = ?) LIMIT 1;';
 
         /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);

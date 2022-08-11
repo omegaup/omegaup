@@ -144,9 +144,6 @@ export default class CourseFilteredList extends Vue {
     if (timeType === 'current') return T.courseListCurrentCourses;
     if (timeType === 'past') return T.courseListPastCourses;
     if (timeType === 'archived') return T.courseListArchivedCourses;
-    if (timeType === 'teachingAssistant') {
-      return T.courseListTeachingAssistantCourses;
-    }
     return '';
   }
 }

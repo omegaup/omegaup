@@ -33,36 +33,6 @@ class ACL extends \OmegaUp\Controllers\Controller {
         ]));
     }
 
-     /**
-     * Adds a user to an ACL with the specified role.
-     */
-    public static function addUserTeachingAssistant(
-        int $aclId,
-        int $userId,
-        int $roleId = \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE
-    ): void {
-        \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
-            'acl_id' => $aclId,
-            'user_id' => $userId,
-            'role_id' => $roleId,
-        ]));
-    }
-
-    /**
-     * Removes a user from an ACL with the specified role.
-     */
-    public static function removeUserTeachingAssistant(
-        int $aclId,
-        int $userId,
-        int $roleId = \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE
-    ): void {
-        \OmegaUp\DAO\UserRoles::delete(new \OmegaUp\DAO\VO\UserRoles([
-            'acl_id' => $aclId,
-            'user_id' => $userId,
-            'role_id' => $roleId,
-        ]));
-    }
-
     /**
      * Adds a group to an ACL with the specified role.
      */

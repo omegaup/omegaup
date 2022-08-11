@@ -285,7 +285,7 @@ class Authorization {
         return self::isCertificateGenerator($identity);
     }
 
-    public static function canProvideFeedback(
+    public static function isAdminOrTeachingAssistant(
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Courses $course
     ): bool {

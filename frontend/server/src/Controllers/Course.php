@@ -1980,7 +1980,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
         if (
-            !\OmegaUp\Authorization::canProvideFeedback($r->identity, $course)
+            !\OmegaUp\Authorization::isAdminOrTeachingAssistant(
+                $r->identity,
+                $course
+            )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -2017,7 +2020,10 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $course = self::validateCourseExists($courseAlias);
         if (
-            !\OmegaUp\Authorization::canProvideFeedback($r->identity, $course)
+            !\OmegaUp\Authorization::isAdminOrTeachingAssistant(
+                $r->identity,
+                $course
+            )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -2136,7 +2142,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         if (
-            !\OmegaUp\Authorization::canProvideFeedback($r->identity, $course)
+            !\OmegaUp\Authorization::isAdminOrTeachingAssistant(
+                $r->identity,
+                $course
+            )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -2370,11 +2379,11 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // Only course admins or users adding themselves when the course is public
         if (
-            !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course) &&
-            ($course->admission_mode !== self::ADMISSION_MODE_PUBLIC ||
-            $resolvedIdentity->identity_id !== $r->identity->identity_id) &&
-            $course->requests_user_information == 'no' &&
-            is_null($acceptTeacher)
+            !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
+            && ($course->admission_mode !== self::ADMISSION_MODE_PUBLIC
+            || $resolvedIdentity->identity_id !== $r->identity->identity_id)
+            && $course->requests_user_information == 'no'
+            && is_null($acceptTeacher)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -2639,7 +2648,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         if (
-            !\OmegaUp\Authorization::canProvideFeedback($r->identity, $course)
+            !\OmegaUp\Authorization::isAdminOrTeachingAssistant(
+                $r->identity,
+                $course
+            )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -2682,7 +2694,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         if (
-            !\OmegaUp\Authorization::canProvideFeedback($r->identity, $course)
+            !\OmegaUp\Authorization::isAdminOrTeachingAssistant(
+                $r->identity,
+                $course
+            )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -5674,7 +5689,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         if (
-            !\OmegaUp\Authorization::canProvideFeedback(
+            !\OmegaUp\Authorization::isAdminOrTeachingAssistant(
                 $loggedIdentity,
                 $course
             )
