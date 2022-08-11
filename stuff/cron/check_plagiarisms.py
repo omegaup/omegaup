@@ -36,10 +36,11 @@ import lib.logs  # pylint: disable=wrong-import-position
 
 # SQL Queries
 
-CONTESTS_TO_RUN_PLAGIARISM_ON = """ SELECT c.`contest_id`
+CONTESTS_TO_RUN_PLAGIARISM_ON = """ SELECT c.`contest_id`, NOW(), NOW() - INTERVAL 20 MINUTE
                                     FROM `Contests` as c
-                                    WHERE (c.`check_plagiarism` = 1 AND c.`finish_time` BETWEEN %s AND %s) 
-                                        AND c.`contest_id` NOT IN
+                                    WHERE
+                                        c.`check_plagiarism` = 1 AND
+                                        c.`contest_id` NOT IN
                                             (SELECT p.`contest_id` 
                                             FROM `Plagiarisms` as p);
                                 """
@@ -54,7 +55,7 @@ def get_contests(dbconn: lib.db.Connection) -> None:
     final_time_str = final_time.strftime('%d/%m/%Y %H:%M:%S.%f')
 
     with dbconn.cursor() as cur:
-        cur.execute(CONTESTS_TO_RUN_PLAGIARISM_ON,(final_time_str, now))
+        cur.execute(CONTESTS_TO_RUN_PLAGIARISM_ON)
         contests = cur.fetchall()
 
 
@@ -67,12 +68,14 @@ def main() -> None:
     lib.logs.configure_parser(parser)
 
     args = parser.parse_args()
+    args.verbose = True
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
     dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
 
     try:
+        logging.debug('Debug Start')
         get_contests(dbconn)
     except:
         logging.exception('Failed to generate Plagiarism Table')

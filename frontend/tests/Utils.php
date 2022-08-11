@@ -414,6 +414,30 @@ class Utils {
         );
     }
 
+    public static function runCheckPlagiarisms(): void {
+        self::commit();
+        $host_arg = '';
+        $host_chunks = explode(':', OMEGAUP_DB_HOST, 2);
+        if (count($host_chunks) == 2) {
+            [$hostname, $port] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+            $host_arg .= ' --port ' . escapeshellarg($port);
+        } else {
+            [$hostname] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+        }
+        self::shellExec(
+            ('python3 ' .
+             dirname(__DIR__, 2) . '/stuff/cron/check_plagiarisms.py' .
+             ' --verbose ' .
+             ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
+             $host_arg .
+             ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+             ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+             ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))
+        );
+    }
+
     public static function runAssignBadges(): void {
         // Ensure everything is commited before invoking external script
         self::commit();
