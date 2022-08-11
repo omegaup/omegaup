@@ -20,7 +20,10 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
     ) {
         $sql = '
             SELECT
-                r.*,
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\ProblemsetIdentityRequest::FIELD_NAMES,
+            'r'
+        ) . ',
                 i.username,
                 i.name,
                 (SELECT

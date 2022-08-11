@@ -14,7 +14,10 @@ namespace OmegaUp\DAO;
 class Identities extends \OmegaUp\DAO\Base\Identities {
     public static function findByEmail(string $email): ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
-                  i.*
+                  ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'i'
+        ) . '
                 FROM
                   `Identities` i
                 INNER JOIN
@@ -37,9 +40,14 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
-    public static function findByUsername(string $username): ?\OmegaUp\DAO\VO\Identities {
+    public static function findByUsername(
+        string $username
+    ): ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
-                   i.*
+                   ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'i'
+        ) . '
                 FROM
                   `Identities` i
                 WHERE
@@ -118,7 +126,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
 
     public static function findByUserId(int $userId): ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
-                  i.*
+                  ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'i'
+        ) . '
                 FROM
                   `Identities` i
                 INNER JOIN
@@ -146,7 +157,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         }
         $sql = '(
                     SELECT
-                        i.*
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'i'
+        ) . '
                     FROM
                         Identities i
                     INNER JOIN
@@ -160,7 +174,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 UNION
                 (
                     SELECT
-                        i.*
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'i'
+        ) . '
                     FROM
                         Identities i
                     INNER JOIN
@@ -402,7 +419,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     ): ?\OmegaUp\DAO\VO\Identities {
         $sql = '
             SELECT
-                i.*
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'i'
+        ) . '
             FROM
                 Identities i
             WHERE
@@ -564,7 +584,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         \OmegaUp\DAO\VO\Identities $identity
     ) {
         $sql = 'SELECT
-                    ti.*,
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'ti'
+        ) . ',
                     IFNULL(ur.classname, "user-rank-unranked") AS classname
                 FROM
                     Identities i
