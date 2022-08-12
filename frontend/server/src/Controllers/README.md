@@ -4003,12 +4003,14 @@ Updates the admin feedback for a submission
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
-| `feedback`         | `string` |             |
-| `guid`             | `string` |             |
+| Name                | Type        | Description |
+| ------------------- | ----------- | ----------- |
+| `assignment_alias`  | `string`    |             |
+| `course_alias`      | `string`    |             |
+| `feedback`          | `string`    |             |
+| `guid`              | `string`    |             |
+| `range_bytes_end`   | `int\|null` |             |
+| `range_bytes_start` | `int\|null` |             |
 
 ### Returns
 

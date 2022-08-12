@@ -222,10 +222,7 @@
             :initial-admins="data.admins"
             :search-result-users="searchResultUsers"
             :has-parent-component="true"
-            @emit-add-admin="
-              (addAdminComponent) =>
-                $emit('add-admin', addAdminComponent.username)
-            "
+            @add-admin="(username) => $emit('add-admin', username)"
             @emit-remove-admin="
               (addAdminComponent) =>
                 $emit('remove-admin', addAdminComponent.selected.username)

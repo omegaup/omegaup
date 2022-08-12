@@ -30,7 +30,7 @@ describe('Typeahead.vue', () => {
     });
   });
 
-  it('Should call update:value with a non-empty tag', async () => {
+  it('Should call update:value with a non-empty tag', () => {
     const wrapper = mount(common_Typeahead, {
       propsData: {
         existingOptions: [],
@@ -40,9 +40,8 @@ describe('Typeahead.vue', () => {
     const tagsInput = wrapper.findComponent(VoerroTagsInput);
     tagsInput.vm.$emit('input', [{ key: 'key', value: 'value' }]);
     tagsInput.vm.$emit('tag-added');
-    await Vue.nextTick();
     expect(wrapper.emitted()).toEqual({
-      'update:value': [['key'], ['key']],
+      'update:value': [[{ key: 'key', value: 'value' }]],
     });
   });
 

@@ -14,25 +14,32 @@
       </div>
       <div class="form-group mr-2 mt-1">
         <omegaup-common-typeahead
+          :only-existing-tags="false"
+          :max-results="10"
           :existing-options="searchResultProblems"
-          :value.sync="keyword"
+          :options="searchResultProblems"
+          :value.sync="currentKeyword"
           :placeholder="T.wordsKeywordSearch"
           @update-existing-options="
             (query) => $emit('update-search-result-problems', query)
           "
         ></omegaup-common-typeahead>
-        <input type="hidden" name="query" :value="keyword" />
+        <input type="hidden" name="query" :value="currentKeywordValue" />
       </div>
       <div class="form-group mr-2 mt-1">
         <label>
           {{ T.wordsFilterByLanguage }}
-          <select v-model="language" name="language" class="ml-1 form-control">
+          <select
+            v-model="currentLanguage"
+            name="language"
+            class="ml-1 form-control"
+          >
             <option
               v-for="language in languages"
               :key="language"
               :value="language"
             >
-              {{ getLanguageText(language) }}
+              {{ getLanguageText(currentLanguage) }}
             </option>
           </select>
         </label>
@@ -65,21 +72,25 @@ library.add(faTimes);
 })
 export default class ProblemSearchBar extends Vue {
   @Prop() tags!: string[];
-  @Prop() initialKeyword!: string;
-  @Prop() initialLanguage!: string;
+  @Prop() keyword!: string;
+  @Prop() language!: string;
   @Prop() languages!: string[];
   @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
 
-  keyword = this.initialKeyword;
-  language = this.initialLanguage;
+  currentKeyword: types.ListItem = { key: this.keyword, value: this.keyword };
+  currentLanguage = this.language;
 
   getLanguageText(language: string): string {
     if (language === 'all') return T.wordsAll;
     if (language === 'en') return T.wordsEnglish;
     if (language === 'es') return T.wordsSpanish;
     return T.wordsPortuguese;
+  }
+
+  get currentKeywordValue(): null | string {
+    return this.currentKeyword?.value ?? null;
   }
 }
 </script>
