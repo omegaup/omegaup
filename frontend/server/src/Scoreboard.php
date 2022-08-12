@@ -98,10 +98,15 @@ class Scoreboard {
                 $this->params->problemset_id
             );
 
+        $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitTimestamp(
+            $this->params
+        );
+
         if ($this->params->score_mode === 'max_per_group') {
             // The way to calculate the score is different in this mode
             $contestRuns = \OmegaUp\DAO\RunsGroups::getProblemsetRunsGroups(
-                $this->params->problemset_id
+                $this->params->problemset_id,
+                $scoreboardTimeLimit
             );
         } else {
             $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
@@ -122,10 +127,6 @@ class Scoreboard {
                 'alias' => strval($problem->alias),
             ];
         }
-
-        $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitTimestamp(
-            $this->params
-        );
 
         $result = \OmegaUp\Scoreboard::getScoreboardFromRuns(
             $contestRuns,
@@ -508,7 +509,7 @@ class Scoreboard {
     }
 
     /**
-     * @param list<array{contest_score: float|null, guid?: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay?: int, time?: \OmegaUp\Timestamp, type: null|string}> $contestRuns
+     * @param list<array{contest_score: float, guid?: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay?: int, submission_count?: int, time?: \OmegaUp\Timestamp, type: string}> $contestRuns
      * @param list<array{identity_id: int, username: string, name: string|null, country_id: null|string, is_invited: bool, classname: string}> $rawContestIdentities
      * @param array<int, array{order: int, alias: string}> $problemMapping
      * @param int $contestPenalty
