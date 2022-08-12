@@ -230,7 +230,6 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
-        print_r($response);
         $this->assertTrue($response->check_plagiarism);
     }
 
