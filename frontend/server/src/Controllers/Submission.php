@@ -218,7 +218,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
-            $submissionFeedback = \OmegaUp\DAO\Submissions::getFeedbackBySubmission(
+            $submissionFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
                 $submission
             );
 
