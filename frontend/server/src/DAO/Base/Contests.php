@@ -61,8 +61,7 @@ abstract class Contests {
                 `contest_for_teams` = ?,
                 `default_show_all_contestants_in_scoreboard` = ?,
                 `score_mode` = ?,
-                `plagiarism_threshold` = ?,
-                `check_plagiarism` = ?
+                `plagiarism_threshold` = ?
             WHERE
                 (
                     `contest_id` = ?
@@ -124,7 +123,6 @@ abstract class Contests {
             intval($Contests->default_show_all_contestants_in_scoreboard),
             $Contests->score_mode,
             intval($Contests->plagiarism_threshold),
-            intval($Contests->check_plagiarism),
             intval($Contests->contest_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -176,8 +174,7 @@ abstract class Contests {
                 `Contests`.`contest_for_teams`,
                 `Contests`.`default_show_all_contestants_in_scoreboard`,
                 `Contests`.`score_mode`,
-                `Contests`.`plagiarism_threshold`,
-                `Contests`.`check_plagiarism`
+                `Contests`.`plagiarism_threshold`
             FROM
                 `Contests`
             WHERE
@@ -318,8 +315,7 @@ abstract class Contests {
                 `Contests`.`contest_for_teams`,
                 `Contests`.`default_show_all_contestants_in_scoreboard`,
                 `Contests`.`score_mode`,
-                `Contests`.`plagiarism_threshold`,
-                `Contests`.`check_plagiarism`
+                `Contests`.`plagiarism_threshold`
             FROM
                 `Contests`
         ';
@@ -399,10 +395,8 @@ abstract class Contests {
                     `contest_for_teams`,
                     `default_show_all_contestants_in_scoreboard`,
                     `score_mode`,
-                    `plagiarism_threshold`,
-                    `check_plagiarism`
+                    `plagiarism_threshold`
                 ) VALUES (
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -491,7 +485,6 @@ abstract class Contests {
             intval($Contests->default_show_all_contestants_in_scoreboard),
             $Contests->score_mode,
             intval($Contests->plagiarism_threshold),
-            intval($Contests->check_plagiarism),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
