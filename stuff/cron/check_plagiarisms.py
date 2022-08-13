@@ -12,7 +12,7 @@ Finally it pushes the necessary data to the database
 import argparse
 import calendar
 import collections
-import copydetect
+import datetime
 import json
 import logging
 import operator
@@ -22,9 +22,6 @@ from typing import (DefaultDict, Dict, Mapping, NamedTuple, Optional, Sequence,
                     Tuple, Set)
 
 from mysql.connector import errorcode
-from copydetect import CopyDetector
-from datetime import datetime
-from datetime import timedelta
 sys.path.insert(
     0,
     os.path.join(
@@ -48,12 +45,6 @@ CONTESTS_TO_RUN_PLAGIARISM_ON = """ SELECT c.`contest_id`, NOW(), NOW() - INTERV
 MINUTES = 20
 
 def get_contests(dbconn: lib.db.Connection) -> None:
-    now = datetime.now()
-    date_format_str = '%d/%m/%Y %H:%M:%S.%f'
-
-    final_time = now - timedelta(minutes=MINUTES)
-    final_time_str = final_time.strftime('%d/%m/%Y %H:%M:%S.%f')
-
     with dbconn.cursor() as cur:
         cur.execute(CONTESTS_TO_RUN_PLAGIARISM_ON)
         contests = cur.fetchall()
