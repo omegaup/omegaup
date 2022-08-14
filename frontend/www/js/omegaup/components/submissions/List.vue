@@ -25,7 +25,7 @@
           "
         />
 
-        <a :href="`/submissions/${encodeURIComponent(searchedUsername)}/`">
+        <a :href="hrefSearchUser">
           <button class="btn btn-primary" type="button">
             {{ T.searchUser }}
           </button>
@@ -141,7 +141,14 @@ export default class SubmissionsList extends Vue {
   T = T;
   ui = ui;
   time = time;
-  searchedUsername: null | string = null;
+  searchedUsername: null | types.ListItem = null;
+
+  get hrefSearchUser(): string {
+    if (!this.searchedUsername?.key) {
+      return '/submissions/';
+    }
+    return `/submissions/${encodeURIComponent(this.searchedUsername?.key)}/`;
+  }
 }
 </script>
 

@@ -60,6 +60,10 @@
       v-if="formToShow === AvailableForms.Edit"
       :countries="countries"
       :identity="identity"
+      :search-result-schools="searchResultSchools"
+      @update-search-result-schools="
+        (query) => $emit('update-search-result-schools', query)
+      "
       @cancel="onCancel"
       @edit-identity-member="onEditIdentityTeam"
     ></omegaup-identity-edit>
@@ -127,6 +131,7 @@ export default class Teams extends Vue {
   @Prop() teams!: types.Identity[];
   @Prop() countries!: Array<dao.Countries>;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultSchools!: types.SchoolListItem[];
   @Prop({ default: () => [] }) teamsMembers!: types.TeamMember[];
 
   T = T;
@@ -139,6 +144,7 @@ export default class Teams extends Vue {
     this.identity = identity;
     this.formToShow = AvailableForms.Edit;
     this.username = identity.username;
+    this.$emit('update-identity-team', this.identity);
   }
 
   onChangePass(username: string): void {
