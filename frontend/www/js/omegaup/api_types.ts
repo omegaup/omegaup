@@ -3267,8 +3267,8 @@ export namespace types {
   export interface CoursesList {
     admin: types.FilteredCourse[];
     archived?: types.FilteredCourse[];
-    public: types.FilteredCourse[];
-    student: types.FilteredCourse[];
+    public?: types.FilteredCourse[];
+    student?: types.FilteredCourse[];
     teachingAssistant?: types.FilteredCourse[];
   }
 
