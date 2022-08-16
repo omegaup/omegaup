@@ -4,9 +4,9 @@ namespace OmegaUp;
 
 /**
  * @psalm-type AssociatedIdentity=array{default: bool, username: string}
- * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, hideFooterAndHeader: bool, isAdmin: bool, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>}
  * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
- * @psalm-type RenderCallbackPayload=array{templateProperties: array{fullWidth?: bool, hideFooter?: bool, hideFooterAndHeader?: bool, payload: array<string, mixed>, scripts?: list<string>, title: \OmegaUp\TranslationString}, entrypoint: string, inContest?: bool, navbarSection?: string}
+ * @psalm-type RenderCallbackPayload=array{templateProperties: array{fullWidth?: bool, hideFooterAndHeader?: bool, payload: array<string, mixed>, scripts?: list<string>, title: \OmegaUp\TranslationString}, entrypoint: string, inContest?: bool, navbarSection?: string}
  */
 class UITools {
     /** @var ?\Twig\Environment */
@@ -73,7 +73,7 @@ class UITools {
         $twig->addTokenParser(new \OmegaUp\Template\JsIncludeParser());
 
         /** @var array<string, mixed> */
-        $twigContext = [
+        $twigContext = array_merge([
             'GOOGLECLIENTID' => OMEGAUP_GOOGLE_CLIENTID,
             'NEW_RELIC_SCRIPT' => NEW_RELIC_SCRIPT,
             'ENABLE_SOCIAL_MEDIA_RESOURCES' => OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES,
@@ -87,7 +87,7 @@ class UITools {
             'OMEGAUP_MAINTENANCE' => (defined(
                 'OMEGAUP_MAINTENANCE'
             )  && OMEGAUP_MAINTENANCE),
-        ] + \OmegaUp\UITools::getNavbarHeaderContext();
+        ], \OmegaUp\UITools::getNavbarHeaderContext());
 
         [
             'identity' => $identity,
@@ -114,19 +114,21 @@ class UITools {
 
     /**
      * @param array<string, mixed> $payload
-     * @return array<string, mixed>
+     * @return array{payload: array<string, mixed>, headerPayload: array<string, mixed>}
      */
     private static function getNavbarHeaderContext(
         $payload = [],
         bool $inContest = false,
+        bool $hideFooterAndHeader = false,
         string $navbarSection = ''
     ): array {
         $headerPayload = self::getCommonPayload(
             $inContest,
+            $hideFooterAndHeader,
             $navbarSection
         );
         return [
-            'payload' => $payload + $headerPayload,
+            'payload' => array_merge($payload, $headerPayload),
             'headerPayload' => $headerPayload,
         ];
     }
@@ -136,6 +138,7 @@ class UITools {
      */
     private static function getCommonPayload(
         bool $inContest = false,
+        bool $hideFooterAndHeader = false,
         string $navbarSection = ''
     ) {
         [
@@ -149,6 +152,7 @@ class UITools {
         return [
             'omegaUpLockDown' => OMEGAUP_LOCKDOWN,
             'inContest' => $inContest,
+            'hideFooterAndHeader' => $hideFooterAndHeader,
             'isLoggedIn' => !is_null($identity),
             'isReviewer' => (
                 !is_null($identity) ?
@@ -206,6 +210,7 @@ class UITools {
             $twigProperties = $response['templateProperties'];
             $entrypoint = $response['entrypoint'];
             $inContest = $response['inContest'] ?? false;
+            $hideFooterAndHeader = $twigProperties['hideFooterAndHeader'] ?? false;
             $navbarSection = $response['navbarSection'] ?? '';
             /** @var array<string, mixed> */
             $payload = $twigProperties['payload'] ?? [];
@@ -233,6 +238,7 @@ class UITools {
             \OmegaUp\UITools::getNavbarHeaderContext(
                 $payload,
                 $inContest,
+                $hideFooterAndHeader,
                 $navbarSection
             ),
         );

@@ -47,12 +47,10 @@
     {% endif %}
   </head>
 
-  <body class="d-flex flex-column h-100{% if OMEGAUP_LOCKDOWN %} lockdown{% endif %}">
+  <body class="d-flex flex-column h-100{% if OMEGAUP_LOCKDOWN %} lockdown{% endif %}{% if hideFooterAndHeader %} p-0{% endif %}">
     <script type="text/json" id="header-payload">{{ headerPayload|json_encode|raw }}</script>
-    {% if not hideFooterAndHeader %}
-      <div id="common-navbar"></div>
-      {% jsInclude 'common_navbar' omitRuntime %}
-    {% endif %}
+    <div id="common-navbar"></div>
+    {% jsInclude 'common_navbar' omitRuntime %}
     <main role="main" {% if not fullWidth %}class="container-lg p-5"{% endif %}>
       <div class="alert mt-0" id="status" style="display: none;">
         <button type="button" class="close" id="alert-close">&times;</button>
@@ -71,7 +69,7 @@
     {% if OMEGAUP_GA_TRACK == 1 %}
       <script type="text/javascript" src="{% versionHash '/js/analytics.js' %}"></script>
     {% endif %}
-    {% if not headerPayload.inContest and not hideFooterAndHeader and not hideFooter %}
+    {% if not headerPayload.inContest %}
     <div id="common-footer"></div>
     {% jsInclude 'common_footer' omitRuntime %}
     {% endif %}

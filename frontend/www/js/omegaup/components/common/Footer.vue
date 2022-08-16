@@ -1,5 +1,5 @@
 <template>
-  <footer class="common-footer text-center">
+  <footer v-if="!hideFooterAndHeader" class="common-footer text-center">
     <div class="container-xl">
       <div
         class="footer-navigation d-table d-lg-flex justify-content-between py-5"
@@ -201,6 +201,7 @@ library.add(faFacebook, faGithub, faDiscord);
   },
 })
 export default class Footer extends Vue {
+  @Prop() hideFooterAndHeader!: boolean;
   @Prop() isLoggedIn!: boolean;
   @Prop() omegaUpLockDown!: boolean;
 

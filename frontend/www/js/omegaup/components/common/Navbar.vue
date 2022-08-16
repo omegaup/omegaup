@@ -1,5 +1,5 @@
 <template>
-  <header>
+  <header v-if="!hideFooterAndHeader">
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top p-0 text-right">
       <div class="container-xl pl-0 pl-xl-3">
         <a class="navbar-brand p-3" href="/">
@@ -342,6 +342,7 @@ library.add(faSignOutAlt, faUser);
 })
 export default class Navbar extends Vue {
   @Prop() omegaUpLockDown!: boolean;
+  @Prop() hideFooterAndHeader!: boolean;
   @Prop() inContest!: boolean;
   @Prop() isLoggedIn!: boolean;
   @Prop() isReviewer!: boolean;

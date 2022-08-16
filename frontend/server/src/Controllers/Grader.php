@@ -27,7 +27,7 @@ class Grader extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{templateProperties: array{fullWidth: bool, hideFooter: bool, payload: EphemeralDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{fullWidth: bool, hideFooterAndHeader: bool, payload: EphemeralDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getEphemeralDetailsForTypeScript(
         \OmegaUp\Request $r
@@ -45,7 +45,7 @@ class Grader extends \OmegaUp\Controllers\Controller {
                     // TODO: Here we could send user preferences, like golden-layout theme
                     'theme' => 'vs-dark',
                 ],
-                'hideFooter' => true,
+                'hideFooterAndHeader' => true,
                 'fullWidth' => true,
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleGraderEphemeral'

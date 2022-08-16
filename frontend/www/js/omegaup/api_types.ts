@@ -2642,6 +2642,7 @@ export namespace types {
     currentUsername: string;
     gravatarURL128: string;
     gravatarURL51: string;
+    hideFooterAndHeader: boolean;
     inContest: boolean;
     isAdmin: boolean;
     isLoggedIn: boolean;
