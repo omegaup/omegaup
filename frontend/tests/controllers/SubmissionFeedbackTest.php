@@ -313,7 +313,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 'feedback' => 'Initial test feedback',
             ])
         );
-        $initialFeedback = \OmegaUp\DAO\Submissions::getFeedbackBySubmission(
+        $initialFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
             $submission
         );
 
@@ -326,7 +326,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 'feedback' => 'New feedback',
             ])
         );
-        $newFeedback = \OmegaUp\DAO\Submissions::getFeedbackBySubmission(
+        $newFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
             $submission
         );
 
