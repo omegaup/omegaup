@@ -9,6 +9,7 @@ export namespace dao {
     archived?: boolean;
     certificate_cutoff?: number;
     certificates_status?: string;
+    check_plagiarism?: boolean;
     contest_for_teams?: boolean;
     contest_id?: number;
     default_show_all_contestants_in_scoreboard?: boolean;
