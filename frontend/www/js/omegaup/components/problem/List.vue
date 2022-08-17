@@ -1,9 +1,9 @@
 <template>
   <div class="container-fluid p-5">
     <omegaup-problem-search-bar
-      :initial-language="language"
+      :language="language"
       :languages="languages"
-      :initial-keyword="keyword"
+      :keyword="keyword"
       :tags="tags"
       :search-result-problems="searchResultProblems"
       @update-search-result-problems="

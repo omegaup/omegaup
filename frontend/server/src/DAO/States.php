@@ -17,7 +17,10 @@ class States extends \OmegaUp\DAO\Base\States {
      */
     final public static function getByCountry(string $countryId): array {
         $sql = 'SELECT
-                    *
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\States::FIELD_NAMES,
+            'States'
+        ) . '
                 FROM
                     States
                 WHERE

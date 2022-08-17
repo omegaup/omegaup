@@ -8,11 +8,11 @@ import * as api from '../api';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemListPayload();
   const queryString = window.location.search;
-  const searchResultEmpty: types.ListItem[] = [];
+  const searchResultProblems: types.ListItem[] = [];
   let sortOrder: omegaup.SortOrder = omegaup.SortOrder.Descending;
   let columnName = 'problem_id';
   let language = 'all';
-  let query = '';
+  let query: null | string = null;
   let tag: string[] = [];
   if (queryString) {
     const urlParams = new URLSearchParams(queryString);
@@ -37,17 +37,21 @@ OmegaUp.on('ready', () => {
         language = languageParam;
       }
     }
+    if (urlParams.get('tag[]')) {
+      const tagParam = urlParams.getAll('tag[]');
+      if (tagParam) {
+        tag = tagParam;
+      }
+    }
     if (urlParams.get('query')) {
       const queryParam = urlParams.get('query');
       if (queryParam) {
         query = queryParam;
       }
     }
-    if (urlParams.get('tag[]')) {
-      const tagParam = urlParams.getAll('tag[]');
-      if (tagParam) {
-        tag = tagParam;
-      }
+
+    if (query) {
+      searchResultProblems.push({ key: query, value: query });
     }
   }
   new Vue({
@@ -56,7 +60,7 @@ OmegaUp.on('ready', () => {
       'omegaup-problem-list': problem_List,
     },
     data: () => ({
-      searchResultProblems: searchResultEmpty,
+      searchResultProblems: searchResultProblems,
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-list', {
@@ -101,12 +105,8 @@ OmegaUp.on('ready', () => {
               search_type: 'all',
             })
               .then((data) => {
-                this.searchResultProblems = data.results.map(
-                  ({ key, value }) => ({
-                    key,
-                    value,
-                  }),
-                );
+                data.results.push({ key: query, value: query });
+                this.searchResultProblems = data.results;
               })
               .catch(ui.apiError);
           },

@@ -1000,7 +1000,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'guid' => strval($submission->guid),
             'language' => strval($submission->language),
             'alias' => strval($problem->alias),
-            'feedback' => \OmegaUp\DAO\Submissions::getSubmissionFeedback(
+            'feedback' => \OmegaUp\DAO\SubmissionFeedback::getSubmissionFeedback(
                 $submission
             ),
         ];

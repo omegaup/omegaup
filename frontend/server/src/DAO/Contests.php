@@ -14,7 +14,7 @@ namespace OmegaUp\DAO;
  * @psalm-type Contest=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type Contestv2=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
-  */
+ */
 class Contests extends \OmegaUp\DAO\Base\Contests {
     /** @var string */
     private static $getContestsColumns = '
@@ -230,19 +230,16 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      * @return list<array{contest: \OmegaUp\DAO\VO\Contests, problemset: \OmegaUp\DAO\VO\Problemsets}>
      */
     public static function getContestsParticipated(int $identityId) {
-        $fields = join(
-            '',
-            array_map(
-                fn (string $field): string => "c.{$field}, ",
-                array_keys(
-                    \OmegaUp\DAO\VO\Contests::FIELD_NAMES
-                )
-            )
-        );
         $sql = '
             SELECT
-                ' . $fields .
-                ' p.*
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Contests::FIELD_NAMES,
+            'c'
+        ) . ',
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problemsets::FIELD_NAMES,
+            'p'
+        ) . '
             FROM
                 Contests c
             INNER JOIN

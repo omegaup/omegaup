@@ -1,7 +1,10 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <form class="form" @submit.prevent="$emit('add-group-admin', groupAlias)">
+      <form
+        class="form"
+        @submit.prevent="$emit('add-group-admin', groupAlias.key)"
+      >
         <div class="form-group mb-0">
           <label class="font-weight-bold w-100"
             >{{ T.wordsGroupAdmin }}
@@ -91,7 +94,7 @@ export default class GroupAdminv2 extends Vue {
   @Prop() searchResultGroups!: types.ListItem[];
 
   T = T;
-  groupAlias: null | string = null;
+  groupAlias: null | types.ListItem = null;
 
   @Watch('groupAdmins')
   ongroupAdminsChange(): void {

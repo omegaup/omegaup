@@ -16,7 +16,10 @@ class Languages extends \OmegaUp\DAO\Base\Languages {
         string $name
     ): ?\OmegaUp\DAO\VO\Languages {
         $sql = 'SELECT
-                    *
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Languages::FIELD_NAMES,
+            'Languages'
+        ) . '
                 FROM
                     Languages
                 WHERE
