@@ -1316,8 +1316,6 @@
 	"tagSourceLevel": "Level",
 	"tagSourceOwner": "Author's tag",
 	"tagSourceVoted": "User's tag",
-	"teachingAssistantAdded": "Teaching assistant successfully added.",
-	"teachingAssistantRemoved": "Teaching assistant successfully removed.",
 	"teamAliasInUse": "There is at least one duplicate team alias. Please check the CSV file to fix the information.",
 	"teamMemberExceededNumberOfContestants": "The number of contestants in one of the teams exceeds the maximum allowed",
 	"teamMemberUsernameInUse": "There is at least one duplicate username in the teams of the group. Please fix the information.",

@@ -1317,8 +1317,6 @@ const translations: { [key: string]: string; } = {
   tagSourceLevel: "Nivel",
   tagSourceOwner: "Etiqueta del autor",
   tagSourceVoted: "Etiqueta de los usuarios",
-  teachingAssistantAdded: "Asistente de ense\u00f1anza agregado correctamente",
-  teachingAssistantRemoved: "Asistente de ense\u00f1anza eliminado correctamente",
   teamAliasInUse: "Existe al menos un alias de equipo duplicado. Por favor revisa el archivo CSV y corrige la informaci\u00f3n",
   teamMemberExceededNumberOfContestants: "El n\u00famero de concursantes en uno de los equipos supera el m\u00e1ximo permitido",
   teamMemberUsernameInUse: "Existe al menos un nombre de usuario duplicado en los equipos del grupo. Por favor corrige la informaci\u00f3n.",
