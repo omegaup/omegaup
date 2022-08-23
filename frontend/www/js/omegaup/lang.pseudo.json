@@ -585,8 +585,6 @@
 	"groupNewFormUpdateGroup": "(Sav3 gr0up)",
 	"groupNewFormWeight": "(Sc0r3 w3igh7)",
 	"groupNotFound": "(Gr0up n07 f0und)",
-	"groupTeachingAssistantAdded": "(Gr0up 73aching a55i57an7 5ucc355fu11y add3d.)",
-	"groupTeachingAssistantRemoved": "(Gr0up 73aching a55i57an7 5ucc355fu11y r3m0v3d.)",
 	"groupsCanNotBeAddedInContestForTeams": "(Gr0up5 cann07 b3 add3d in c0n73575 f0r 73am5)",
 	"groupsCreateNew": "(N3w gr0up)",
 	"groupsCsvHelp": "(<p>Quick1y add mu17ip13 id3n7i7i35 70 7hi5 gr0up. Id3n7i7i35 ar3 n07 r3a1 u53r5, and d0n'7 n33d 70 hav3 an 3mai1 0r va1ida73 7h3ir acc0un7.</p>\n<p>Id3n7i7i35 5h0u1d b3 in a <c0d3>.c5v</c0d3> fi13 wi7h 7h3 f0110wing f0rma7:\n<5amp><pr3>u53rnam3,nam3,c0un7ry_id,57a73_id,g3nd3r,5ch001_nam3\nu53rnam3-1,D3v310p3r Diana,MX,AGU,f3ma13,B357 Sch001\nu53rnam3-2,Danny D3v,MX,AGU,ma13,B357 Sch001</pr3></5amp></p>)",

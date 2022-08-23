@@ -585,8 +585,6 @@
 	"groupNewFormUpdateGroup": "Save group",
 	"groupNewFormWeight": "Score weight",
 	"groupNotFound": "Group not found",
-	"groupTeachingAssistantAdded": "Group teaching assistant successfully added.",
-	"groupTeachingAssistantRemoved": "Group teaching assistant successfully removed.",
 	"groupsCanNotBeAddedInContestForTeams": "Groups cannot be added in contests for teams",
 	"groupsCreateNew": "New group",
 	"groupsCsvHelp": "<p>Quickly add multiple identities to this group. Identities are not real users, and don't need to have an email or validate their account.</p>\n<p>Identities should be in a <code>.csv</code> file with the following format:\n<samp><pre>username,name,country_id,state_id,gender,school_name\nusername-1,Developer Diana,MX,AGU,female,Best School\nusername-2,Danny Dev,MX,AGU,male,Best School</pre></samp></p>",
