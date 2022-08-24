@@ -109,12 +109,31 @@
         <a v-if="data.source_link" download="data.zip" :href="data.source">{{
           T.wordsDownload
         }}</a>
-        <omegaup-arena-code-view
-          v-else
-          :language="data.language"
-          :readonly="true"
-          :value="data.source"
-        ></omegaup-arena-code-view>
+        <div v-else>
+          <div v-for="(code, index) in splittedCode" :key="index">
+            <omegaup-arena-code-view
+              :language="data.language"
+              :lines-per-chunk="getLinesPerCode(index)"
+              :enable-feedback="false"
+              :readonly="true"
+              :value="code"
+              @show-feedback-form="onShowFeedbackForm"
+            ></omegaup-arena-code-view>
+            <div v-if="index != splittedCode.length - 1" class="card">
+              <textarea
+                :placeholder="T.runDetailsFeedbackPlaceholder"
+              ></textarea>
+              <div class="form-group my-2">
+                <button class="btn-primary mx-2" @click="onSubmit(index)">
+                  {{ T.runDetailsFeedbackSubmit }}
+                </button>
+                <button class="btn-danger mx-2" @click="onCancel(index)">
+                  {{ T.runDetailsFeedbackCancel }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
         <div v-if="data.compile_error" class="compile_error">
           <h3>{{ T.wordsCompilerOutput }}</h3>
           <pre class="compile_error">
@@ -205,10 +224,77 @@ const EMPTY_FIELD = '∅';
 })
 export default class ArenaRunDetailsPopup extends Vue {
   @Prop() data!: types.RunDetails;
+  @Prop({ default: () => [] }) feedbackLines!: number[];
 
   EMPTY_FIELD = EMPTY_FIELD;
   T = T;
   groupVisible: GroupVisibility = {};
+  currentFeedbackLines = this.feedbackLines;
+
+  get numberOfLines(): number {
+    const lines = this.data.source?.split('\n') ?? [];
+    return lines.length;
+  }
+
+  get splittedCode(): string[] {
+    const ranges: { start: number; end: number }[] = [];
+    let previousLine = 0;
+    const splittedCode: string[][] = [];
+    const splittedCodeString: string[] = [];
+    const codeSplittedByLine = this.data.source?.split('\n') ?? [];
+    for (const item of this.currentFeedbackLines) {
+      let start = 0;
+      if (previousLine != 0) {
+        start = previousLine + 1;
+      }
+      const range = { start: start, end: item + 1 };
+      ranges.push(range);
+      previousLine = item;
+      splittedCode.push(codeSplittedByLine.slice(range.start, range.end));
+    }
+
+    if (!splittedCode.length) {
+      splittedCode.push(codeSplittedByLine.splice(0));
+    } else {
+      splittedCode.push(
+        codeSplittedByLine.splice(this.currentFeedbackLines.slice(-1)[0] + 1),
+      );
+    }
+    for (const code of splittedCode) {
+      const chunk = code.join('\n');
+      splittedCodeString.push(chunk);
+    }
+    return splittedCodeString;
+  }
+
+  getLinesPerCode(index: number): number[] {
+    let start = 0;
+    const linesPerChunk: number[][] = [];
+    for (const lines of this.currentFeedbackLines) {
+      linesPerChunk.push(this.numberRange(start + 1, lines + 2));
+      start = lines + 1;
+    }
+    linesPerChunk.push(this.numberRange(start + 1, this.numberOfLines + 2));
+
+    return linesPerChunk[index];
+  }
+
+  numberRange(start: number, end: number): number[] {
+    return new Array(end - start).fill(0).map((_d, i) => i + start);
+  }
+
+  onShowFeedbackForm(line: number): void {
+    this.currentFeedbackLines.push(line - 1);
+    this.currentFeedbackLines.sort();
+  }
+
+  onCancel(index: number): void {
+    this.currentFeedbackLines.splice(index, 1);
+  }
+
+  onSubmit(index: number): void {
+    console.log(`Sending feedback for ${index}...`);
+  }
 
   toggle(group: string): void {
     const visible = this.groupVisible[group];
