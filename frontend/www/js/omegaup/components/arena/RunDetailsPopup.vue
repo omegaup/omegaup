@@ -124,10 +124,16 @@
                 :placeholder="T.runDetailsFeedbackPlaceholder"
               ></textarea>
               <div class="form-group my-2">
-                <button class="btn-primary mx-2" @click="onSubmit(index)">
+                <button
+                  class="btn-primary mx-2"
+                  @click.prevent="onSubmit(index)"
+                >
                   {{ T.runDetailsFeedbackSubmit }}
                 </button>
-                <button class="btn-danger mx-2" @click="onCancel(index)">
+                <button
+                  class="btn-danger mx-2"
+                  @click.prevent="onCancel(index)"
+                >
                   {{ T.runDetailsFeedbackCancel }}
                 </button>
               </div>
@@ -193,7 +199,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import arena_CodeView from './CodeView.vue';
+import arena_FeedbackCodeView from './FeedbackCodeView.vue';
 import arena_DiffView from './DiffView.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
@@ -217,7 +223,7 @@ const EMPTY_FIELD = '∅';
   components: {
     FontAwesomeIcon,
     'clip-loader': ClipLoader,
-    'omegaup-arena-code-view': arena_CodeView,
+    'omegaup-arena-code-view': arena_FeedbackCodeView,
     'omegaup-arena-diff-view': arena_DiffView,
     'omegaup-overlay-popup': omegaup_OverlayPopup,
   },
@@ -238,13 +244,13 @@ export default class ArenaRunDetailsPopup extends Vue {
 
   get splittedCode(): string[] {
     const ranges: { start: number; end: number }[] = [];
-    let previousLine = 0;
+    let previousLine = -1;
     const splittedCode: string[][] = [];
     const splittedCodeString: string[] = [];
     const codeSplittedByLine = this.data.source?.split('\n') ?? [];
+    let start = 0;
     for (const item of this.currentFeedbackLines) {
-      let start = 0;
-      if (previousLine != 0) {
+      if (previousLine != -1) {
         start = previousLine + 1;
       }
       const range = { start: start, end: item + 1 };
@@ -269,12 +275,16 @@ export default class ArenaRunDetailsPopup extends Vue {
 
   getLinesPerCode(index: number): number[] {
     let start = 0;
+    let step = 1;
     const linesPerChunk: number[][] = [];
     for (const lines of this.currentFeedbackLines) {
       linesPerChunk.push(this.numberRange(start + 1, lines + 2));
       start = lines + 1;
     }
-    linesPerChunk.push(this.numberRange(start + 1, this.numberOfLines + 2));
+    if (this.currentFeedbackLines.length) {
+      step = 1;
+    }
+    linesPerChunk.push(this.numberRange(start + 1, this.numberOfLines + step));
 
     return linesPerChunk[index];
   }
@@ -284,8 +294,12 @@ export default class ArenaRunDetailsPopup extends Vue {
   }
 
   onShowFeedbackForm(line: number): void {
-    this.currentFeedbackLines.push(line - 1);
-    this.currentFeedbackLines.sort();
+    const index = line - 1;
+    if (this.currentFeedbackLines.includes(index)) {
+      return;
+    }
+    this.currentFeedbackLines.push(index);
+    this.currentFeedbackLines.sort((a, b) => a - b);
   }
 
   onCancel(index: number): void {

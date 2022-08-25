@@ -1,34 +1,12 @@
 <template>
-  <div data-code-mirror class="container-fluid">
-    <div class="row">
-      <div v-if="enableFeedback" class="gutter align-text-bottom">
-        <div
-          v-for="line in linesPerChunk"
-          :key="line"
-          class="linenumber"
-          @mouseover="hover = line"
-          @mouseleave="hover = null"
-        >
-          <button
-            class="btn-xs text-weight-bold btn-primary"
-            :hidden="hover != line"
-            @click="onPressLine(line)"
-          >
-            +
-          </button>
-          {{ line }}
-        </div>
-      </div>
-      <div class="code">
-        <codemirror-editor
-          ref="cm-wrapper"
-          :options="editorOptions"
-          :value="value"
-          @change="onChange"
-          @input="onInput"
-        ></codemirror-editor>
-      </div>
-    </div>
+  <div data-code-mirror>
+    <codemirror-editor
+      ref="cm-wrapper"
+      :options="editorOptions"
+      :value="value"
+      @change="onChange"
+      @input="onInput"
+    ></codemirror-editor>
   </div>
 </template>
 
@@ -37,7 +15,7 @@ import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { codemirror } from 'vue-codemirror-lite';
 
-const languageModeMap: {
+export const languageModeMap: {
   [language: string]: string;
 } = {
   c: 'text/x-csrc',
@@ -69,7 +47,7 @@ const languageModeMap: {
 };
 
 // Preload all language modes.
-const modeList: string[] = [
+export const modeList: string[] = [
   'clike',
   'python',
   'ruby',
@@ -86,7 +64,7 @@ for (const mode of modeList) {
   require(`codemirror/mode/${mode}/${mode}.js`);
 }
 
-interface EditorOptions {
+export interface EditorOptions {
   tabSize: number;
   lineNumbers: boolean;
   mode?: string;
@@ -102,8 +80,6 @@ export default class CodeView extends Vue {
   @Prop() language!: string;
   @Prop({ default: false }) readonly!: boolean;
   @Prop() value!: string;
-  @Prop({ default: () => [] }) linesPerChunk!: number[];
-  @Prop({ default: false }) enableFeedback!: boolean;
   @Ref('cm-wrapper') readonly cmWrapper!: codemirror;
 
   T = T;
@@ -122,7 +98,7 @@ export default class CodeView extends Vue {
   get editorOptions(): EditorOptions {
     return {
       tabSize: 2,
-      lineNumbers: !this.enableFeedback,
+      lineNumbers: true,
       mode: this.mode,
       readOnly: this.readonly,
     };
@@ -134,17 +110,6 @@ export default class CodeView extends Vue {
 
   onInput(value: string): void {
     this.$emit('input', value);
-  }
-
-  onPressLine(number: number) {
-    this.$emit('show-feedback-form', number);
-  }
-
-  @Watch('hover')
-  onHoverChange(line: null | number) {
-    if (!line) {
-      return;
-    }
   }
 
   @Watch('language')
@@ -167,27 +132,9 @@ export default class CodeView extends Vue {
       height: 100%;
 
       .CodeMirror-scroll {
-        height: auto;
+        height: 226px;
       }
     }
-  }
-
-  .gutter {
-    width: 4%;
-    background-color: var(--codemirror-gutter-background-color);
-  }
-
-  .code {
-    width: 96%;
-  }
-
-  .linenumber {
-    padding: 0 3px 0 5px;
-    min-width: 20px;
-    text-align: right;
-    color: var(--codemirror-line-number-font-color);
-    white-space: nowrap;
-    cursor: pointer;
   }
 }
 </style>
