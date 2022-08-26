@@ -10,7 +10,7 @@
           @mouseleave="hover = null"
         >
           <button
-            class="btn-xs text-weight-bold btn-primary"
+            class="btn btn-xs text-weight-bold btn-primary"
             :hidden="hover != line"
             @click.prevent="onPressLine(line)"
           >
@@ -21,11 +21,8 @@
       </div>
       <div class="code">
         <codemirror-editor
-          ref="cm-wrapper"
           :options="editorOptions"
           :value="value"
-          @change="onChange"
-          @input="onInput"
         ></codemirror-editor>
       </div>
     </div>
@@ -33,7 +30,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { codemirror } from 'vue-codemirror-lite';
 import { EditorOptions, languageModeMap, modeList } from './CodeView.vue';
@@ -49,24 +46,13 @@ for (const mode of modeList) {
 })
 export default class CodeView extends Vue {
   @Prop() language!: string;
-  @Prop({ default: false }) readonly!: boolean;
   @Prop() value!: string;
   @Prop({ default: () => [] }) linesPerChunk!: number[];
   @Prop({ default: false }) enableFeedback!: boolean;
-  @Ref('cm-wrapper') readonly cmWrapper!: codemirror;
 
   T = T;
   mode = languageModeMap[this.language] || languageModeMap['cpp17-gcc'];
   hover: null | number = null;
-
-  refresh() {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore vue-codemirror-lite does not declare `editor` as a legitimate
-    // property, so TypeScript cannot know about it.
-    // It's also possible for the actual editor to not have been set yet if
-    // this method is used before the mounted event handler is called.
-    this.cmWrapper.editor?.refresh();
-  }
 
   get editorOptions(): EditorOptions {
     return {
@@ -75,14 +61,6 @@ export default class CodeView extends Vue {
       mode: this.mode,
       readOnly: true,
     };
-  }
-
-  onChange(value: string): void {
-    this.$emit('change', value);
-  }
-
-  onInput(value: string): void {
-    this.$emit('input', value);
   }
 
   onPressLine(number: number) {
@@ -94,11 +72,6 @@ export default class CodeView extends Vue {
     if (!line) {
       return;
     }
-  }
-
-  @Watch('language')
-  onLanguageChange(newLanguage: string) {
-    this.mode = languageModeMap[newLanguage];
   }
 }
 </script>
@@ -137,6 +110,13 @@ export default class CodeView extends Vue {
     color: var(--codemirror-line-number-font-color);
     white-space: nowrap;
     cursor: pointer;
+  }
+
+  .btn-xs {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.575rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
   }
 }
 </style>

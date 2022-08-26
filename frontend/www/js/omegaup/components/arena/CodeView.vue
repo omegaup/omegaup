@@ -84,7 +84,6 @@ export default class CodeView extends Vue {
 
   T = T;
   mode = languageModeMap[this.language] || languageModeMap['cpp17-gcc'];
-  hover: null | number = null;
 
   refresh() {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

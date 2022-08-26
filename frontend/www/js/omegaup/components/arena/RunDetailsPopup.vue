@@ -114,28 +114,37 @@
             <omegaup-arena-code-view
               :language="data.language"
               :lines-per-chunk="getLinesPerCode(index)"
-              :enable-feedback="false"
+              :enable-feedback="true"
               :readonly="true"
               :value="code"
-              @show-feedback-form="onShowFeedbackForm"
+              @show-feedback-form="(line) => onShowFeedbackForm(line)"
             ></omegaup-arena-code-view>
             <div v-if="index != splittedCode.length - 1" class="card">
-              <textarea
-                :placeholder="T.runDetailsFeedbackPlaceholder"
-              ></textarea>
-              <div class="form-group my-2">
-                <button
-                  class="btn-primary mx-2"
-                  @click.prevent="onSubmit(index)"
-                >
-                  {{ T.runDetailsFeedbackSubmit }}
-                </button>
-                <button
-                  class="btn-danger mx-2"
-                  @click.prevent="onCancel(index)"
-                >
-                  {{ T.runDetailsFeedbackCancel }}
-                </button>
+              <div class="card-header">Feedback</div>
+              <div class="card-body">
+                <textarea
+                  :ref="`ta-${getLine(index)}`"
+                  v-model="feedback[getLine(index)]"
+                  :placeholder="T.runDetailsFeedbackPlaceholder"
+                  class="w-100"
+                ></textarea>
+              </div>
+              <div class="card-footer text-muted">
+                <div class="form-group my-2">
+                  <button
+                    :disabled="!feedback[getLine(index)]"
+                    class="btn btn-primary mx-2"
+                    @click.prevent="onSubmit(index)"
+                  >
+                    {{ T.runDetailsFeedbackAddReview }}
+                  </button>
+                  <button
+                    class="btn btn-danger mx-2"
+                    @click.prevent="onCancel(index)"
+                  >
+                    {{ T.runDetailsFeedbackCancel }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -236,6 +245,7 @@ export default class ArenaRunDetailsPopup extends Vue {
   T = T;
   groupVisible: GroupVisibility = {};
   currentFeedbackLines = this.feedbackLines;
+  feedback: string[] = [];
 
   get numberOfLines(): number {
     const lines = this.data.source?.split('\n') ?? [];
@@ -285,8 +295,12 @@ export default class ArenaRunDetailsPopup extends Vue {
       step = 1;
     }
     linesPerChunk.push(this.numberRange(start + 1, this.numberOfLines + step));
-
     return linesPerChunk[index];
+  }
+
+  getLine(index: number): number {
+    const lines = this.getLinesPerCode(index);
+    return lines[lines.length - 1];
   }
 
   numberRange(start: number, end: number): number[] {
@@ -300,6 +314,11 @@ export default class ArenaRunDetailsPopup extends Vue {
     }
     this.currentFeedbackLines.push(index);
     this.currentFeedbackLines.sort((a, b) => a - b);
+
+    this.$nextTick(() => {
+      const textarea = this.$refs[`ta-${line}`] as HTMLTextAreaElement[];
+      textarea[0].focus();
+    });
   }
 
   onCancel(index: number): void {
