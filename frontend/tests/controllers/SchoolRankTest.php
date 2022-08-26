@@ -308,18 +308,24 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Tests the historical rank of schools, based on the current
+     * Tests the historical rank of schools, based on the current with
+     * schools scoring 0
      * criteria: distinct active users and distinct problems solved
+     * with schools with a score of 0 without appearing in the ranking
      */
     public function testSchoolRank() {
-        // Three schools:
+        // Four schools:
         // School0: two distinct problems solved
         // School1: three distinct problems solved
         // School2: two distinct problems solved
+        // School3: without solving problem
         // => School0 and School2 must have same rank and score
         // => School1 must have a better (lower) rank than School0 and School2
+        // => School3 must have a better (lower) score than School0
+        // => NUmber of schools in the ranking must be 3
 
         $schoolsData = [
+            \OmegaUp\Test\Factories\Schools::createSchool(),
             \OmegaUp\Test\Factories\Schools::createSchool(),
             \OmegaUp\Test\Factories\Schools::createSchool(),
             \OmegaUp\Test\Factories\Schools::createSchool()
@@ -327,7 +333,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         $users = [];
         $identities = [];
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
         }
 
@@ -351,6 +357,10 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Schools::addUserToSchool(
             $schoolsData[2],
             $identities[3]
+        );
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolsData[3],
+            $identities[4]
         );
 
         // School 0
@@ -416,127 +426,19 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $school2 = \Omegaup\DAO\Schools::getByPK(
             $schoolsData[2]['school']->school_id
         );
+        $school3 = \Omegaup\DAO\Schools::getByPK(
+            $schoolsData[3]['school']->school_id
+        );
 
         $this->assertEquals($school0->score, $school0->score);
         $this->assertEquals($school0->ranking, $school2->ranking);
         $this->assertGreaterThan($school1->ranking, $school0->ranking);
         $this->assertGreaterThan($school0->score, $school1->score);
+        $this->assertGreaterThan($school3->score, $school0->score);
 
         // Test apiRank
         $results = \OmegaUp\DAO\Schools::getRank(1, 100);
-        $this->assertGreaterThanOrEqual(3, count($results['rank']));
-        $this->assertGreaterThanOrEqual(
-            $results['rank'][0]['ranking'],
-            $results['rank'][1]['ranking']
-        ); /** is sorted */
-    }
-    /**
-     * Tests the historical rank of schools, based on the current with
-     * schools scoring 0
-     * ***criteria: distinct active users and distinct problems solved
-     * with schools with a score of 0 without appearing in the ranking
-     */
-    public function testSchoolRankWithSchoolsScore0() {
-        // Four schools:
-        // School0: one distinct problems solved
-        // School1: three distinct problems solved
-        // School2 and School3: without solving problem
-        // => School2 and School3 must have same rank and score
-        // => School1 must have a better (lower) rank than School0
-        // => School2 must have a better (lower) score than School0
-        // => Number of schools in the ranking must be 2
-
-        $schoolsData = [
-            \OmegaUp\Test\Factories\Schools::createSchool(),
-            \OmegaUp\Test\Factories\Schools::createSchool(),
-            \OmegaUp\Test\Factories\Schools::createSchool(),
-            \OmegaUp\Test\Factories\Schools::createSchool()
-        ];
-
-        $users = [];
-        $identities = [];
-        for ($i = 0; $i < 4; $i++) {
-            ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
-        }
-
-        $problemsData = [];
-        for ($i = 0; $i < 3; $i++) {
-            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
-        }
-
-        \OmegaUp\Test\Factories\Schools::addUserToSchool(
-            $schoolsData[0],
-            $identities[1]
-        );
-        \OmegaUp\Test\Factories\Schools::addUserToSchool(
-            $schoolsData[1],
-            $identities[0]
-        );
-        \OmegaUp\Test\Factories\Schools::addUserToSchool(
-            $schoolsData[1],
-            $identities[2]
-        );
-        \OmegaUp\Test\Factories\Schools::addUserToSchool(
-            $schoolsData[2],
-            $identities[3]
-        );
-
-        // School 0
-        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-            $problemsData[2],
-            $identities[1]
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        // School 1
-        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-            $problemsData[0],
-            $identities[0]
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-            $problemsData[2],
-            $identities[0]
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-            $problemsData[1],
-            $identities[2]
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-            $problemsData[2],
-            $identities[2]
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        // Refresh Rank
-        \OmegaUp\Test\Utils::runUpdateRanks();
-
-        $school0 = \Omegaup\DAO\Schools::getByPK(
-            $schoolsData[0]['school']->school_id
-        );
-        $school1 = \Omegaup\DAO\Schools::getByPK(
-            $schoolsData[1]['school']->school_id
-        );
-        $school2 = \Omegaup\DAO\Schools::getByPK(
-            $schoolsData[2]['school']->school_id
-        );
-        $school3 = \Omegaup\DAO\Schools::getByPK(
-            $schoolsData[3]['school']->school_id
-        );
-
-        $this->assertEquals($school2->score, $school3->score);
-        $this->assertEquals($school2->ranking, $school3->ranking);
-        $this->assertGreaterThan($school1->ranking, $school0->ranking);
-        $this->assertGreaterThan($school2->score, $school0->score);
-
-        // Test apiRank
-        $results = \OmegaUp\DAO\Schools::getRank(1, 100);
-        $this->assertEquals(2, count($results['rank']));
+        $this->assertEquals(3, count($results['rank']));
         $this->assertGreaterThanOrEqual(
             $results['rank'][0]['ranking'],
             $results['rank'][1]['ranking']
