@@ -57,7 +57,7 @@
               type="button"
               @click="$emit('remove-group-admin', groupAdmin.alias)"
             >
-              ×
+              <font-awesome-icon :icon="['fas', 'trash']" size="xs" />
             </button>
           </td>
         </tr>
@@ -89,7 +89,7 @@ library.add(fas);
     'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
-export default class GroupAdminv2 extends Vue {
+export default class GroupAdmin extends Vue {
   @Prop() groupAdmins!: types.ContestGroupAdmin[];
   @Prop() searchResultGroups!: types.ListItem[];
 
