@@ -62,8 +62,10 @@
   - [`/api/course/activityReport/`](#apicourseactivityreport)
   - [`/api/course/addAdmin/`](#apicourseaddadmin)
   - [`/api/course/addGroupAdmin/`](#apicourseaddgroupadmin)
+  - [`/api/course/addGroupTeachingAssistant/`](#apicourseaddgroupteachingassistant)
   - [`/api/course/addProblem/`](#apicourseaddproblem)
   - [`/api/course/addStudent/`](#apicourseaddstudent)
+  - [`/api/course/addTeachingAssistant/`](#apicourseaddteachingassistant)
   - [`/api/course/adminDetails/`](#apicourseadmindetails)
   - [`/api/course/admins/`](#apicourseadmins)
   - [`/api/course/arbitrateRequest/`](#apicoursearbitraterequest)
@@ -89,8 +91,10 @@
   - [`/api/course/removeAdmin/`](#apicourseremoveadmin)
   - [`/api/course/removeAssignment/`](#apicourseremoveassignment)
   - [`/api/course/removeGroupAdmin/`](#apicourseremovegroupadmin)
+  - [`/api/course/removeGroupTeachingAssistant/`](#apicourseremovegroupteachingassistant)
   - [`/api/course/removeProblem/`](#apicourseremoveproblem)
   - [`/api/course/removeStudent/`](#apicourseremovestudent)
+  - [`/api/course/removeTeachingAssistant/`](#apicourseremoveteachingassistant)
   - [`/api/course/requests/`](#apicourserequests)
   - [`/api/course/runs/`](#apicourseruns)
   - [`/api/course/searchUsers/`](#apicoursesearchusers)
@@ -736,6 +740,7 @@ Creates a new contest
 | --------------------------- | -------------- | ----------- |
 | `admission_mode`            | `mixed`        |             |
 | `alias`                     | `mixed`        |             |
+| `check_plagiarism`          | `bool\|null`   |             |
 | `contest_for_teams`         | `bool\|null`   |             |
 | `description`               | `mixed`        |             |
 | `feedback`                  | `mixed`        |             |
@@ -1302,6 +1307,7 @@ Update a Contest
 | `window_length`                              | `int`                                                |             |
 | `admission_mode`                             | `null\|string`                                       |             |
 | `alias`                                      | `null\|string`                                       |             |
+| `check_plagiarism`                           | `bool\|null`                                         |             |
 | `contest_for_teams`                          | `bool\|null`                                         |             |
 | `default_show_all_contestants_in_scoreboard` | `bool\|null`                                         |             |
 | `description`                                | `null\|string`                                       |             |
@@ -1426,6 +1432,23 @@ Adds an group admin to a course
 
 _Nothing_
 
+## `/api/course/addGroupTeachingAssistant/`
+
+### Description
+
+Adds an group teaching assistant to a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+| `group`        | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/course/addProblem/`
 
 ### Description
@@ -1469,6 +1492,23 @@ Add Student to Course.
 
 _Nothing_
 
+## `/api/course/addTeachingAssistant/`
+
+### Description
+
+Adds a teaching assistant to a course
+
+### Parameters
+
+| Name              | Type     | Description |
+| ----------------- | -------- | ----------- |
+| `course_alias`    | `string` |             |
+| `usernameOrEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/course/adminDetails/`
 
 ### Description
@@ -1501,10 +1541,12 @@ Returns all course administrators
 
 ### Returns
 
-| Name           | Type                                               |
-| -------------- | -------------------------------------------------- |
-| `admins`       | `{ role: string; username: string; }[]`            |
-| `group_admins` | `{ alias: string; name: string; role: string; }[]` |
+| Name                        | Type                                               |
+| --------------------------- | -------------------------------------------------- |
+| `admins`                    | `{ role: string; username: string; }[]`            |
+| `group_admins`              | `{ alias: string; name: string; role: string; }[]` |
+| `group_teaching_assistants` | `{ alias: string; name: string; role: string; }[]` |
+| `teaching_assistants`       | `{ role: string; username: string; }[]`            |
 
 ## `/api/course/arbitrateRequest/`
 
@@ -1958,6 +2000,23 @@ Removes a group admin from a course
 
 _Nothing_
 
+## `/api/course/removeGroupTeachingAssistant/`
+
+### Description
+
+Removes a group teaching assistant from a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+| `group`        | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/course/removeProblem/`
 
 ### Description
@@ -1981,6 +2040,23 @@ _Nothing_
 ### Description
 
 Remove Student from Course
+
+### Parameters
+
+| Name              | Type     | Description |
+| ----------------- | -------- | ----------- |
+| `course_alias`    | `string` |             |
+| `usernameOrEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/course/removeTeachingAssistant/`
+
+### Description
+
+Removes a teaching assistant from a course
 
 ### Parameters
 
@@ -3927,12 +4003,14 @@ Updates the admin feedback for a submission
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
-| `feedback`         | `string` |             |
-| `guid`             | `string` |             |
+| Name                | Type        | Description |
+| ------------------- | ----------- | ----------- |
+| `assignment_alias`  | `string`    |             |
+| `course_alias`      | `string`    |             |
+| `feedback`          | `string`    |             |
+| `guid`              | `string`    |             |
+| `range_bytes_end`   | `int\|null` |             |
+| `range_bytes_start` | `int\|null` |             |
 
 ### Returns
 

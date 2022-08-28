@@ -20,7 +20,10 @@ class QualityNominationLog extends \OmegaUp\DAO\Base\QualityNominationLog {
     public static function getAllLogsForNomination(int $qualityNominationId): array {
         $sql = '
             SELECT
-                *
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\QualityNominationLog::FIELD_NAMES,
+            'QualityNomination_Log'
+        ) . '
             FROM
                 QualityNomination_Log
             WHERE

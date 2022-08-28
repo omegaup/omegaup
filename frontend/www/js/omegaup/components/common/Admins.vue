@@ -1,9 +1,9 @@
 <template>
-  <div class="card mb-3 panel panel-primary">
-    <div class="card-body panel-body">
-      <form class="form" @submit.prevent="onSubmit">
-        <div class="form-group">
-          <label class="font-weight-bold"
+  <div class="card mb-3">
+    <div class="card-body">
+      <form class="form" @submit.prevent="$emit('add-admin', username.key)">
+        <div class="form-group mb-0">
+          <label class="font-weight-bold w-100"
             >{{ T.wordsAdmin }}
             <font-awesome-icon
               :title="T.courseEditAddAdminsTooltip"
@@ -16,37 +16,35 @@
               @update-existing-options="
                 (query) => $emit('update-search-result-users', query)
               "
-            />
+            ></omegaup-common-typeahead>
           </label>
         </div>
-        <div class="row">
-          <div class="action-container col-md-6">
-            <button class="btn btn-primary" type="submit">
-              {{ T.wordsAddAdmin }}
-            </button>
-          </div>
-          <div class="toggle-container col-md-6">
-            <label class="font-weight-bold">
-              <input
-                v-model="showSiteAdmins"
-                type="checkbox"
-                name="toggle-site-admins"
-              />
-              {{ T.wordsShowSiteAdmins }}
-            </label>
-          </div>
+        <div class="form-group mb-0">
+          <label>
+            <input
+              v-model="showSiteAdmins"
+              type="checkbox"
+              name="toggle-site-admins"
+            />
+            {{ T.wordsShowSiteAdmins }}
+          </label>
         </div>
+        <button class="btn btn-primary" type="submit">
+          {{ T.wordsAddAdmin }}
+        </button>
       </form>
     </div>
     <div v-if="admins.length === 0">
-      <div class="empty-table-message">
+      <div class="my-2 empty-table-message">
         {{ T.courseEditAdminsEmpty }}
       </div>
     </div>
-    <table v-else class="table table-striped">
+    <table v-else class="table table-striped mb-0">
       <thead>
-        <tr>
-          <th>{{ T.contestEditRegisteredAdminUsername }}</th>
+        <tr class="text-center">
+          <th>
+            {{ T.contestEditRegisteredAdminUsername }}
+          </th>
           <th>{{ T.contestEditRegisteredAdminRole }}</th>
           <th>{{ T.contestEditRegisteredAdminDelete }}</th>
         </tr>
@@ -55,7 +53,8 @@
         <template v-for="admin in admins">
           <tr
             v-if="admin.role !== 'site-admin' || showSiteAdmins"
-            :key="admin.username"
+            :key="`${admin.username}-${admin.role}`"
+            class="text-center"
           >
             <td>
               <omegaup-user-username
@@ -68,10 +67,10 @@
               <button
                 v-if="admin.role === 'admin'"
                 type="button"
-                class="close"
-                @click="onRemove(admin)"
+                class="close float-none"
+                @click="$emit('remove-admin', admin.username)"
               >
-                &times;
+                <font-awesome-icon :icon="['fas', 'trash']" size="xs" />
               </button>
             </td>
           </tr>
@@ -83,7 +82,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
 import user_Username from '../user/Username.vue';
@@ -108,42 +106,16 @@ library.add(fas);
   },
 })
 export default class Admins extends Vue {
-  @Prop() initialAdmins!: omegaup.UserRole[];
-  @Prop({ default: false }) hasParentComponent!: boolean;
+  @Prop() admins!: types.ContestAdmin[];
   @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
-  username: null | string = null;
+  username: null | types.ListItem = null;
   showSiteAdmins = false;
-  selected = {};
-  admins = this.initialAdmins;
 
-  @Watch('initialAdmins')
-  onAdminsChanged(newValue: omegaup.UserRole[]): void {
-    this.admins = newValue;
-  }
-
-  onSubmit(): void {
-    if (this.hasParentComponent) {
-      this.$emit('emit-add-admin', this);
-      this.username = null;
-      return;
-    }
-    this.$emit('add-admin', this.username);
+  @Watch('admins')
+  onAdminsChange(): void {
     this.username = null;
-  }
-
-  onRemove(admin: omegaup.UserRole): void {
-    if (this.hasParentComponent) {
-      this.selected = admin;
-      this.$emit('emit-remove-admin', this);
-      return;
-    }
-    this.$emit('remove-admin', admin.username);
   }
 }
 </script>
-
-<style lang="scss">
-@import '../../../../sass/main.scss';
-</style>

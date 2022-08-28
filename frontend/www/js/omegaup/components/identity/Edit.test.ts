@@ -13,6 +13,7 @@ describe('Edit.vue', () => {
           name: 'hello',
         } as types.Identity,
         countries: [{ country_id: 'mx', name: 'Mexico' }] as dao.Countries[],
+        searchResultSchools: [{ key: 'teams-group', value: 'teams group' }],
       },
     });
 
@@ -30,6 +31,7 @@ describe('Edit.vue', () => {
           name: 'hello',
         } as types.Identity,
         countries: [{ country_id: 'mx', name: 'Mexico' }] as dao.Countries[],
+        searchResultSchools: [{ key: 'teams-group', value: 'teams group' }],
       },
     });
 
@@ -47,6 +49,7 @@ describe('Edit.vue', () => {
           name: 'hello',
         } as types.Identity,
         countries: [{ country_id: 'mx', name: 'Mexico' }] as dao.Countries[],
+        searchResultSchools: [{ key: 'teams-group', value: 'teams group' }],
       },
     });
 

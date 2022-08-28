@@ -180,8 +180,8 @@ export default class QualityNominationList extends Vue {
   sortOrder: omegaup.SortOrder = omegaup.SortOrder.Ascending;
   columnName = 'title';
 
-  queryProblem = '';
-  queryUsername: null | string = null;
+  queryProblem: null | types.ListItem = null;
+  queryUsername: null | types.ListItem = null;
   selectColumn = '';
   columns = {
     problem_alias: T.wordsProblem,
@@ -207,7 +207,7 @@ export default class QualityNominationList extends Vue {
 
   @Watch('selectColumn')
   onPropertyChanged() {
-    this.queryProblem = '';
+    this.queryProblem = null;
     this.queryUsername = null;
   }
 
@@ -216,9 +216,9 @@ export default class QualityNominationList extends Vue {
       this.selectColumn == 'nominator_username' ||
       this.selectColumn == 'author_username'
     ) {
-      return this.queryUsername;
+      return this.queryUsername?.key ?? null;
     } else {
-      return this.queryProblem;
+      return this.queryProblem?.key ?? null;
     }
   }
 

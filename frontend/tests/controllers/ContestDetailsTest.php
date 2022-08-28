@@ -216,6 +216,24 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Check if the plagiarism value is stored correctly in the database when a
+     * contest is updated.
+     */
+    public function testPlagiarismThresholdValueInUpdatedContest() {
+        // Create a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'checkPlagiarism' => true,
+            ])
+        );
+
+        $response = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+        $this->assertTrue($response->check_plagiarism);
+    }
+
+     /**
      * Check that user in private group list can view private contest
      */
     public function testShowValidPrivateContestFromGroup() {
