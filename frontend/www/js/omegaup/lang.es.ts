@@ -1241,6 +1241,7 @@ const translations: { [key: string]: string; } = {
   runDetailsFeedbackAddReview: "Agregar comentario",
   runDetailsFeedbackCancel: "Cancelar",
   runDetailsFeedbackPlaceholder: "Escribe tu retroalimentaci\u00f3n aqu\u00ed...",
+  runDetailsNewFeedback: "Nueva retroalimentaci\u00f3n",
   runDisqualifyConfirm: "Realmente desea descalificar este env\u00edo?",
   runGUID: "GUID",
   runNotEvenOpened: "Debes abrir el problema antes de intentar enviar una soluci\u00f3n.",

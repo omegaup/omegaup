@@ -1,22 +1,26 @@
 <template>
   <div data-feedback-code-mirror class="container-fluid">
-    <div class="row">
-      <div v-if="enableFeedback" class="gutter align-text-bottom">
+    <div class="d-flex flex-nowrap">
+      <div v-if="enableFeedback" class="gutter flex-nowrap">
         <div
           v-for="line in linesPerChunk"
           :key="line"
-          class="linenumber"
+          class="line-number d-flex flex-nowrap"
           @mouseover="hover = line"
           @mouseleave="hover = null"
         >
-          <button
-            class="btn btn-xs text-weight-bold btn-primary"
-            :hidden="hover != line"
-            @click.prevent="onPressLine(line)"
-          >
-            +
-          </button>
-          {{ line }}
+          <div class="number">
+            {{ line }}
+          </div>
+          <div class="add-button">
+            <button
+              class="btn btn-xs text-weight-bold btn-primary"
+              :hidden="hover != line"
+              @click.prevent="onPressLine(line)"
+            >
+              +
+            </button>
+          </div>
         </div>
       </div>
       <div class="code">
@@ -44,7 +48,7 @@ for (const mode of modeList) {
     'codemirror-editor': codemirror,
   },
 })
-export default class CodeView extends Vue {
+export default class FeedbackCodeView extends Vue {
   @Prop() language!: string;
   @Prop() value!: string;
   @Prop({ default: () => [] }) linesPerChunk!: number[];
@@ -95,21 +99,28 @@ export default class CodeView extends Vue {
   }
 
   .gutter {
-    width: 4%;
+    width: 72px;
     background-color: var(--codemirror-gutter-background-color);
   }
 
   .code {
-    width: 96%;
+    width: 100%;
   }
 
-  .linenumber {
-    padding: 0 3px 0 5px;
+  .line-number {
     min-width: 20px;
     text-align: right;
     color: var(--codemirror-line-number-font-color);
     white-space: nowrap;
     cursor: pointer;
+
+    .number {
+      width: 50px;
+    }
+
+    .add-button {
+      width: 22px;
+    }
   }
 
   .btn-xs {

@@ -111,42 +111,24 @@
         }}</a>
         <div v-else>
           <div v-for="(code, index) in splittedCode" :key="index">
-            <omegaup-arena-code-view
+            <omegaup-arena-feedback-code-view
               :language="data.language"
               :lines-per-chunk="getLinesPerCode(index)"
               :enable-feedback="true"
               :readonly="true"
-              :value="code"
+              :value="code.code"
               @show-feedback-form="(line) => onShowFeedbackForm(line)"
-            ></omegaup-arena-code-view>
-            <div v-if="index != splittedCode.length - 1" class="card">
-              <div class="card-header">Feedback</div>
-              <div class="card-body">
-                <textarea
-                  :ref="`ta-${getLine(index)}`"
-                  v-model="feedback[getLine(index)]"
-                  :placeholder="T.runDetailsFeedbackPlaceholder"
-                  class="w-100"
-                ></textarea>
-              </div>
-              <div class="card-footer text-muted">
-                <div class="form-group my-2">
-                  <button
-                    :disabled="!feedback[getLine(index)]"
-                    class="btn btn-primary mx-2"
-                    @click.prevent="onSubmit(index)"
-                  >
-                    {{ T.runDetailsFeedbackAddReview }}
-                  </button>
-                  <button
-                    class="btn btn-danger mx-2"
-                    @click.prevent="onCancel(index)"
-                  >
-                    {{ T.runDetailsFeedbackCancel }}
-                  </button>
-                </div>
-              </div>
-            </div>
+            ></omegaup-arena-feedback-code-view>
+            <omegaup-arena-feedback
+              v-if="index != splittedCode.length - 1"
+              :feedback="{
+                line: code.line,
+                text: null,
+                status: FeedbackStatus.New,
+              }"
+              @submit="onSubmit"
+              @cancel="onCancel"
+            ></omegaup-arena-feedback>
           </div>
         </div>
         <div v-if="data.compile_error" class="compile_error">
@@ -208,6 +190,10 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import arena_Feedback, {
+  ArenaCourseFeedback,
+  FeedbackStatus,
+} from './Feedback.vue';
 import arena_FeedbackCodeView from './FeedbackCodeView.vue';
 import arena_DiffView from './DiffView.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
@@ -232,7 +218,8 @@ const EMPTY_FIELD = '∅';
   components: {
     FontAwesomeIcon,
     'clip-loader': ClipLoader,
-    'omegaup-arena-code-view': arena_FeedbackCodeView,
+    'omegaup-arena-feedback-code-view': arena_FeedbackCodeView,
+    'omegaup-arena-feedback': arena_Feedback,
     'omegaup-arena-diff-view': arena_DiffView,
     'omegaup-overlay-popup': omegaup_OverlayPopup,
   },
@@ -243,20 +230,21 @@ export default class ArenaRunDetailsPopup extends Vue {
 
   EMPTY_FIELD = EMPTY_FIELD;
   T = T;
+  FeedbackStatus = FeedbackStatus;
   groupVisible: GroupVisibility = {};
   currentFeedbackLines = this.feedbackLines;
-  feedback: string[] = [];
+  feedback: ArenaCourseFeedback[] = [];
 
   get numberOfLines(): number {
     const lines = this.data.source?.split('\n') ?? [];
     return lines.length;
   }
 
-  get splittedCode(): string[] {
+  get splittedCode(): { code: string; line: number }[] {
     const ranges: { start: number; end: number }[] = [];
     let previousLine = -1;
     const splittedCode: string[][] = [];
-    const splittedCodeString: string[] = [];
+    const splittedCodeString: { code: string; line: number }[] = [];
     const codeSplittedByLine = this.data.source?.split('\n') ?? [];
     let start = 0;
     for (const item of this.currentFeedbackLines) {
@@ -276,9 +264,9 @@ export default class ArenaRunDetailsPopup extends Vue {
         codeSplittedByLine.splice(this.currentFeedbackLines.slice(-1)[0] + 1),
       );
     }
-    for (const code of splittedCode) {
+    for (const [index, code] of splittedCode.entries()) {
       const chunk = code.join('\n');
-      splittedCodeString.push(chunk);
+      splittedCodeString.push({ code: chunk, line: ranges[index]?.end });
     }
     return splittedCodeString;
   }
@@ -298,11 +286,6 @@ export default class ArenaRunDetailsPopup extends Vue {
     return linesPerChunk[index];
   }
 
-  getLine(index: number): number {
-    const lines = this.getLinesPerCode(index);
-    return lines[lines.length - 1];
-  }
-
   numberRange(start: number, end: number): number[] {
     return new Array(end - start).fill(0).map((_d, i) => i + start);
   }
@@ -314,19 +297,14 @@ export default class ArenaRunDetailsPopup extends Vue {
     }
     this.currentFeedbackLines.push(index);
     this.currentFeedbackLines.sort((a, b) => a - b);
-
-    this.$nextTick(() => {
-      const textarea = this.$refs[`ta-${line}`] as HTMLTextAreaElement[];
-      textarea[0].focus();
-    });
   }
 
   onCancel(index: number): void {
     this.currentFeedbackLines.splice(index, 1);
   }
 
-  onSubmit(index: number): void {
-    console.log(`Sending feedback for ${index}...`);
+  onSubmit(feedback: ArenaCourseFeedback): void {
+    console.log(`Sending feedback for line ${feedback.line}...`);
   }
 
   toggle(group: string): void {

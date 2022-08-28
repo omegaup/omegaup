@@ -1241,6 +1241,7 @@ const translations: { [key: string]: string; } = {
   runDetailsFeedbackAddReview: "Add feedback",
   runDetailsFeedbackCancel: "Cancel",
   runDetailsFeedbackPlaceholder: "Type your feedback here...",
+  runDetailsNewFeedback: "New feedback",
   runDisqualifyConfirm: "Do you really want to disqualify this run?",
   runGUID: "GUID",
   runNotEvenOpened: "You must open the problem before trying to submit a solution.",

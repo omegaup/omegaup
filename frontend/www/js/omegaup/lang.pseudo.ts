@@ -1241,6 +1241,7 @@ const translations: { [key: string]: string; } = {
   runDetailsFeedbackAddReview: "(Add f33dback)",
   runDetailsFeedbackCancel: "(Canc31)",
   runDetailsFeedbackPlaceholder: "(Typ3 y0ur f33dback h3r3...)",
+  runDetailsNewFeedback: "(N3w f33dback)",
   runDisqualifyConfirm: "(D0 y0u r3a11y wan7 70 di5qua1ify 7hi5 run?)",
   runGUID: "(GUID)",
   runNotEvenOpened: "(Y0u mu57 0p3n 7h3 pr0b13m b3f0r3 7rying 70 5ubmi7 a 501u7i0n.)",
