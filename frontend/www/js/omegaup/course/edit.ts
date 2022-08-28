@@ -162,10 +162,10 @@ OmegaUp.on('ready', () => {
           },
           'submit-edit-course': (request: messages.CourseUpdateRequest) => {
             new Promise<number | null>((accept) => {
-              if (request.school_id) {
-                accept(request.school_id);
-              } else if (request.school_name) {
-                api.School.create({ name: request.school_name })
+              if (request.school.key) {
+                accept(request.school.key);
+              } else if (request.school.value) {
+                api.School.create({ name: request.school.value })
                   .then((response) => {
                     accept(response.school_id);
                   })
@@ -397,12 +397,12 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'add-student': (ev: {
-            participant: string;
+            participant: null | types.ListItem;
             participants: string;
           }) => {
             let participants: string[] = [];
             if (ev.participants) participants = ev.participants.split(/[\n,]/);
-            if (ev.participant) participants.push(ev.participant);
+            if (ev.participant) participants.push(ev.participant.key);
             if (participants.length === 0) {
               ui.error(T.wordsEmptyAddStudentInput);
               return;

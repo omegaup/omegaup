@@ -48,10 +48,10 @@ OmegaUp.on('ready', () => {
         on: {
           submit: (request: messages.CourseCreateRequest) => {
             new Promise<number | null>((accept) => {
-              if (request.school_id) {
-                accept(request.school_id);
-              } else if (request.school_name) {
-                api.School.create({ name: request.school_name })
+              if (request.school.key) {
+                accept(request.school.key);
+              } else if (request.school.value) {
+                api.School.create({ name: request.school.value })
                   .then((data) => {
                     accept(data.school_id);
                   })

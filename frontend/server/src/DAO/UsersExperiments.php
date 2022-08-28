@@ -31,7 +31,10 @@ class UsersExperiments extends \OmegaUp\DAO\Base\UsersExperiments {
      */
     final public static function getByUserId(int $userId) {
         $sql = 'SELECT
-                    *
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\UsersExperiments::FIELD_NAMES,
+            'Users_Experiments'
+        ) . '
                 FROM
                     Users_Experiments
                 WHERE
