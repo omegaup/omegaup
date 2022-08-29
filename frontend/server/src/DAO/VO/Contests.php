@@ -47,6 +47,7 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         'default_show_all_contestants_in_scoreboard' => true,
         'score_mode' => true,
         'plagiarism_threshold' => true,
+        'check_plagiarism' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -242,6 +243,11 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         if (isset($data['plagiarism_threshold'])) {
             $this->plagiarism_threshold = boolval(
                 $data['plagiarism_threshold']
+            );
+        }
+        if (isset($data['check_plagiarism'])) {
+            $this->check_plagiarism = boolval(
+                $data['check_plagiarism']
             );
         }
     }
@@ -464,4 +470,11 @@ class Contests extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $plagiarism_threshold = false;
+
+    /**
+     * Indica si se debe correr el detector de plagios.
+     *
+     * @var bool
+     */
+    public $check_plagiarism = false;
 }
