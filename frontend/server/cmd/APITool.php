@@ -751,10 +751,10 @@ class TypeMapper {
         string $controllerClassBasename
     ): Method {
         $returns = $docComment->tags['return'];
-        if (count([$returns]) != 1) {
+        if (count($returns) != 1) {
             throw new \Exception('More @return annotations than expected!');
         }
-        $returnTypeString = is_array($returns)[0]? array_values($returns): array();
+        $returnTypeString = array_values($returns)[0];
         for ($i = strlen($returnTypeString) - 1; $i >= 0; --$i) {
             if (
                 $returnTypeString[$i] == '}' ||
