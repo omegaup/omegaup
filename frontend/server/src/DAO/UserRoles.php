@@ -180,6 +180,37 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
     }
 
     /**
+     * @return list<array{acl: int, user_id: int, username: string}>
+     */
+    public static function getCourseAdministrators(
+        \OmegaUp\DAO\VO\Courses $course
+    ): array {
+        $sql = '
+            SELECT DISTINCT
+                i.user_id,
+                i.username,
+                ur.acl_id AS acl
+            FROM
+                User_Roles ur
+            INNER JOIN
+                Identities i ON i.user_id = ur.user_id
+            WHERE
+                ur.role_id IN (?,?) AND ur.acl_id IN (?);
+            ';
+        $params = [
+            \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            $course->acl_id,
+        ];
+
+        /** @var list<array{acl: int, role: string, user_id: int, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
+    }
+
+    /**
      * @return list<array{role: 'admin'|'owner'|'site-admin', username: string}>
      */
     public static function getContestAdmins(\OmegaUp\DAO\VO\Contests $contest): array {

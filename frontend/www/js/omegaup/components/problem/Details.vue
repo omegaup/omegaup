@@ -183,7 +183,9 @@
             :runs="runsByProblem"
             :show-details="true"
             :problemset-problems="[]"
+            :request-feedback="requestFeedback"
             :is-contest-finished="isContestFinished"
+            @request-feedback="(runId) => $emit('request-feedback', runId)"
             @details="(request) => onRunDetails(request, 'problems')"
             @update-search-result-users-contest="
               (request) => $emit('update-search-result-users-contest', request)
@@ -407,6 +409,7 @@ export default class ProblemDetails extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop({ default: null }) languages!: null | string[];
   @Prop() totalRuns!: number;
+  @Prop({ default: false }) requestFeedback!: boolean;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 

@@ -95,6 +95,7 @@
   - [`/api/course/removeProblem/`](#apicourseremoveproblem)
   - [`/api/course/removeStudent/`](#apicourseremovestudent)
   - [`/api/course/removeTeachingAssistant/`](#apicourseremoveteachingassistant)
+  - [`/api/course/requestFeedback/`](#apicourserequestfeedback)
   - [`/api/course/requests/`](#apicourserequests)
   - [`/api/course/runs/`](#apicourseruns)
   - [`/api/course/searchUsers/`](#apicoursesearchusers)
@@ -2062,6 +2063,24 @@ Removes a teaching assistant from a course
 | ----------------- | -------- | ----------- |
 | `course_alias`    | `string` |             |
 | `usernameOrEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/course/requestFeedback/`
+
+### Description
+
+Request feedback
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `run_id`           | `string` |             |
 
 ### Returns
 
