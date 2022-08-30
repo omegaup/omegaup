@@ -754,7 +754,7 @@ class TypeMapper {
         if (count([$returns]) != 1) {
             throw new \Exception('More @return annotations than expected!');
         }
-        $returnTypeString = array_values($returns)[0];
+        $returnTypeString = is_array($returns)[0]? array_values($returns): array();
         for ($i = strlen($returnTypeString) - 1; $i >= 0; --$i) {
             if (
                 $returnTypeString[$i] == '}' ||
