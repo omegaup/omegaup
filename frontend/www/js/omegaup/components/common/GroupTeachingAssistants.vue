@@ -105,7 +105,7 @@ export default class GroupTeachingAssistants extends Vue {
   group: null | types.ListItem = null;
 
   @Watch('groupTeachingAssistants')
-  ongroupTeachingAssistantsChanged(): void {
+  onGroupTeachingAssistantsChanged(): void {
     this.group = null;
   }
 }
