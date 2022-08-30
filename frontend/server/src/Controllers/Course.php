@@ -3248,15 +3248,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $getAdmins = \OmegaUp\DAO\UserRoles::getCourseAdministrators(
+        $getAllAdministrators = \OmegaUp\DAO\UserRoles::getCourseAdministrators(
             $course
         );
-
-        $getGroupAdmins = \OmegaUp\DAO\GroupRoles::getCourseAdministrators(
-            $course
-        );
-
-        $getAllAdministrators = array_merge($getGroupAdmins, $getAdmins);
 
         if (
             !is_null($r->user) && !is_null($r->user->user_id)
@@ -3287,7 +3281,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 );
             }
         }
-
         return [
             'status' => 'ok',
         ];

@@ -175,6 +175,7 @@ class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTes
                 'auth_token' => $userLogin->auth_token,
                 'assignment_alias' => $assignmentAlias,
                 'course_alias' => $courseData['course_alias'],
+                'run_id' => $runData['response']['guid']
             ])
         );
 

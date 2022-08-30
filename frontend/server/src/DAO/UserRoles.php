@@ -186,20 +186,43 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
         \OmegaUp\DAO\VO\Courses $course
     ): array {
         $sql = '
-            SELECT DISTINCT
+            (SELECT DISTINCT
                 i.user_id,
                 i.username,
                 ur.acl_id AS acl
-            FROM
-                User_Roles ur
-            INNER JOIN
-                Identities i ON i.user_id = ur.user_id
-            WHERE
-                ur.role_id IN (?,?) AND ur.acl_id IN (?);
+                FROM
+                    User_Roles ur
+                INNER JOIN
+                    Identities i ON i.user_id = ur.user_id
+                WHERE
+                    ur.role_id IN (?,?) AND ur.acl_id IN (?))
+            UNION DISTINCT
+            (SELECT DISTINCT
+                i.user_id,
+                i.username,
+                gr.acl_id as acl
+                FROM
+                    `Group_Roles` gr
+                INNER JOIN
+                    `Groups_` g ON gr.group_id = g.group_id
+                INNER JOIN
+                    `Groups_Identities` gi ON g.group_id = gi.group_id
+                INNER JOIN
+                    `Identities` i ON gi.identity_id = i.identity_id
+                INNER JOIN
+                    `User_Roles` ur ON gr.acl_id = ur.acl_id
+                INNER JOIN
+                `Users` u ON u.user_id = i.user_id
+                WHERE
+                    gr.role_id IN (?,?)
+                    AND gr.acl_id IN (?));
             ';
         $params = [
             \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE,
             \OmegaUp\Authorization::ADMIN_ROLE,
+            $course->acl_id,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE,
             $course->acl_id,
         ];
 
