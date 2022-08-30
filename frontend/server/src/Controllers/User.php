@@ -167,6 +167,15 @@ class User extends \OmegaUp\Controllers\Controller {
             'verification_id' => \OmegaUp\SecurityTools::randomString(50),
             'is_private' => boolval($createUserParams->isPrivate),
         ];
+        $userAge = \OmegaUp\Controllers\User::ageCalculator(
+            $createUserParams->birthDate
+        );
+        if ($userAge < 13) {
+            $userData['parental_verification_token'] =  \OmegaUp\SecurityTools::randomHexString(
+                25
+            );
+        }
+
         if (!is_null($createUserParams->name)) {
             $identityData['name'] = $createUserParams->name;
         }
@@ -275,6 +284,25 @@ class User extends \OmegaUp\Controllers\Controller {
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
+        }
+    }
+
+    /**
+      * Simple PHP age Calculator
+      *
+      * Calculate and returns age based on the date provided by the user.
+      * @param   date of birth('Format:yyyy-mm-dd').
+      * @return  age based on date of birth
+      */
+    private static function ageCalculator($dob) {
+        if (!empty($dob)) {
+            $birthdate =  new \DateTime($dob);
+            $timestamp = \OmegaUp\Time::get();
+            $today =  \DateTime::createFromFormat('U', $timestamp);
+            $age = $birthdate->diff($today)->y;
+            return $age;
+        } else {
+            return 0;
         }
     }
 
@@ -4570,6 +4598,10 @@ class User extends \OmegaUp\Controllers\Controller {
             }
             throw $e;
         }
+    }
+    public static function apiParentChildLinkAccounts(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        $r->ensureMainUserIdentity();
     }
 
     /**
