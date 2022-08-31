@@ -131,14 +131,19 @@ class Authorization {
             $problemset = \OmegaUp\DAO\Problemsets::getByPK(
                 $submission->problemset_id
             );
-            if (
-                !is_null($problemset) &&
-                self::isAdmin(
-                    $identity,
-                    $problemset
-                )
-            ) {
-                return true;
+            if (!is_null($problemset)) {
+                if (self::isAdmin($identity, $problemset)) {
+                    return true;
+                }
+                if ($problemset->type === 'Assignment') {
+                    $course = \OmegaUp\DAO\Courses::getByProblemsetId(
+                        $problemset
+                    );
+                    return (!is_null($course) && self::isTeachingAssistant(
+                        $identity,
+                        $course
+                    ));
+                }
             }
         }
 
@@ -166,7 +171,14 @@ class Authorization {
             return false;
         }
 
-        return self::isAdmin($identity, $problemset);
+        $course = \OmegaUp\DAO\Courses::getByProblemsetId($problemset);
+        return self::isAdmin(
+            $identity,
+            $problemset
+        ) || (!is_null($course) && self::isTeachingAssistant(
+            $identity,
+            $course
+        ));
     }
 
     public static function canEditClarification(
@@ -187,13 +199,21 @@ class Authorization {
             return false;
         }
 
+        $course = \OmegaUp\DAO\Courses::getByProblemsetId($problemset);
+
         $problem = \OmegaUp\DAO\Problems::getByPK($clarification->problem_id);
         if (is_null($problem) || is_null($problem->acl_id)) {
             return false;
         }
 
         return (self::isOwner($identity, $problem->acl_id)
-                || self::isAdmin($identity, $problemset));
+                || self::isAdmin(
+                    $identity,
+                    $problemset
+                ) || (!is_null($course) && self::isTeachingAssistant(
+                    $identity,
+                    $course
+                )));
     }
 
     /**
@@ -264,6 +284,16 @@ class Authorization {
         return self::isCertificateGenerator($identity);
     }
 
+    public static function isAdminOrTeachingAssistant(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Courses $course
+    ): bool {
+        return(
+            self::isTeachingAssistant($identity, $course) ||
+            self::isCourseAdmin($identity, $course)
+        );
+    }
+
     public static function canViewCourse(
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Courses $course,
@@ -271,7 +301,8 @@ class Authorization {
     ): bool {
         if (
             !self::isCourseAdmin($identity, $course) &&
-            !self::isGroupMember($identity, $group)
+            !self::isGroupMember($identity, $group) &&
+            !self::isTeachingAssistant($identity, $course)
         ) {
             return false;
         }
@@ -414,7 +445,7 @@ class Authorization {
 
     public static function isTeachingAssistant(
         \OmegaUp\DAO\VO\Identities $identity,
-        \OmegaUp\DAO\VO\Courses $course,
+        \OmegaUp\DAO\VO\Courses $course
     ): bool {
         if (is_null($course->acl_id)) {
             return false;
@@ -553,6 +584,7 @@ class Authorization {
         self::$_supportGroup = null;
         self::$_groupIdentityCreator = null;
         self::$_certificateGeneratorGroup = null;
+        self::$_teachingAssistantGroup = null;
     }
 
     public static function canSubmitToProblemset(
