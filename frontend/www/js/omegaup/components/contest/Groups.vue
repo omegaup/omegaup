@@ -3,7 +3,7 @@
     <div class="card-body">
       <form
         class="form"
-        @submit.prevent="$emit('emit-add-group', typeaheadGroup)"
+        @submit.prevent="$emit('emit-add-group', typeaheadGroup.key)"
       >
         <div class="form-group">
           <label>{{ T.wordsGroup }}</label>
@@ -66,7 +66,7 @@ export default class Groups extends Vue {
   @Prop() searchResultGroups!: types.ListItem[];
 
   T = T;
-  typeaheadGroup: null | string = null;
+  typeaheadGroup: null | types.ListItem = null;
   selected: types.ContestGroup | null = null;
 
   @Watch('groups')

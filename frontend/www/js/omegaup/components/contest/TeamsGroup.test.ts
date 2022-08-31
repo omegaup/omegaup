@@ -42,7 +42,7 @@ describe('TeamsGroup.vue', () => {
       },
     });
     await wrapper.setData({
-      typeaheadGroup: 'teams-group',
+      typeaheadGroup: { key: 'teams-group', value: 'teams group' },
     });
     await wrapper.find('button[type="submit"]').trigger('click');
     expect(wrapper.emitted('replace-teams-group')).toEqual([

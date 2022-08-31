@@ -769,7 +769,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     final public static function getByGUID(string $guid) {
         $sql = '
             SELECT
-                `r`.*
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Runs::FIELD_NAMES,
+            'r'
+        ) . '
             FROM
                 `Runs` `r`
             INNER JOIN
@@ -800,7 +803,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ) {
         $sql = '
             SELECT
-                r.*
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Runs::FIELD_NAMES,
+            'r'
+        ) . '
             FROM
                 Submissions s
             INNER JOIN
@@ -947,7 +953,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     ),
                     "user-rank-unranked"
                 ) AS feedback_author_classname,
-                sf.date as feedback_date
+                sf.date as feedback_date,
+                sf.`range_bytes_start` as start_feedback_range,
+                sf.`range_bytes_end` as end_feedback_range
             FROM
                 Submissions s
             INNER JOIN
@@ -986,7 +994,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ' AND s.problemset_id = ?';
             $params[] = $problemsetId;
         }
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, feedback_author: null|string, feedback_author_classname: string, feedback_content: null|string, feedback_date: \OmegaUp\Timestamp|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, end_feedback_range: int|null, feedback_author: null|string, feedback_author_classname: string, feedback_content: null|string, feedback_date: \OmegaUp\Timestamp|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, start_feedback_range: int|null, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 

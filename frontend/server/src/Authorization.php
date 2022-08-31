@@ -49,6 +49,12 @@ class Authorization {
      */
     private static $_certificateGeneratorGroup = null;
 
+    /**
+     * Cache for system group for teaching assistants.
+     * @var null|\OmegaUp\DAO\VO\Groups
+     */
+    private static $_teachingAssistantGroup = null;
+
     // Administrator for an ACL.
     const ADMIN_ROLE = 1;
 
@@ -66,6 +72,9 @@ class Authorization {
 
     // Certificate generator.
     const CERTIFICATE_GENERATOR_ROLE = 8;
+
+    // Teaching assitant.
+    const TEACHING_ASSISTANT_ROLE = 9;
 
     // System-level ACL.
     const SYSTEM_ACL = 1;
@@ -87,6 +96,9 @@ class Authorization {
 
     // Group for certificate generators.
     const CERTIFICATE_GENERATOR_GROUP_ALIAS = 'omegaup:group-certificate-generator';
+
+    // Group for teaching assitants.
+    const TEACHING_ASSISTANT_GROUP_ALIAS = 'omegaup:teaching-assistant';
 
     public static function canViewSubmission(
         \OmegaUp\DAO\VO\Identities $identity,
@@ -398,6 +410,30 @@ class Authorization {
             $identity,
             self::$_certificateGeneratorGroup
         );
+    }
+
+    public static function isTeachingAssistant(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Courses $course,
+    ): bool {
+        if (is_null($course->acl_id)) {
+            return false;
+        }
+        return self::hasRole(
+            $identity,
+            $course->acl_id,
+            self::TEACHING_ASSISTANT_ROLE
+        );
+    }
+
+    public static function isGroupTeachingAssistantMember(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Groups $group = null
+    ): bool {
+        if (is_null($group) || is_null($identity->user_id)) {
+            return false;
+        }
+        return self::isGroupMember($identity, $group);
     }
 
     public static function isGroupIdentityCreator(\OmegaUp\DAO\VO\Identities $identity): bool {

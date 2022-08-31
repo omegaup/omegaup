@@ -31,6 +31,9 @@ const baseCourseFormProps = {
     languages: ['py2'],
   } as types.CourseDetails,
   update: true,
+  searchResultSchools: [
+    { key: 1, value: 'New school' },
+  ] as types.SchoolListItem[],
 };
 const selector = '.omegaup-course-details button.btn-primary';
 

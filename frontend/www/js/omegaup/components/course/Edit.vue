@@ -219,17 +219,10 @@
       >
         <div class="col-md-6">
           <omegaup-common-admins
-            :initial-admins="data.admins"
+            :admins="data.admins"
             :search-result-users="searchResultUsers"
-            :has-parent-component="true"
-            @emit-add-admin="
-              (addAdminComponent) =>
-                $emit('add-admin', addAdminComponent.username)
-            "
-            @emit-remove-admin="
-              (addAdminComponent) =>
-                $emit('remove-admin', addAdminComponent.selected.username)
-            "
+            @add-admin="(username) => $emit('add-admin', username)"
+            @remove-admin="(username) => $emit('remove-admin', username)"
             @update-search-result-users="
               (query) => $emit('update-search-result-users', query)
             "
@@ -298,7 +291,7 @@ import course_AssignmentDetails from './AssignmentDetails.vue';
 import course_AdmissionMode from './AdmissionMode.vue';
 import course_AddStudents from './AddStudents.vue';
 import common_Admins from '../common/Admins.vue';
-import common_GroupAdmins from '../common/GroupAdminsv2.vue';
+import common_GroupAdmins from '../common/GroupAdmins.vue';
 import course_Clone from './Clone.vue';
 import course_GenerateLinkClone from './GenerateLinkClone.vue';
 import T from '../../lang';
