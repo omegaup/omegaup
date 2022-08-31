@@ -256,15 +256,19 @@
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormPartialScore }}</label>
             <select
-              v-model="partialScore"
+              v-model="scoreMode"
               data-partial-points
+              data-score-mode
               class="form-control"
             >
-              <option :value="true">
-                {{ T.wordsYes }}
+              <option :value="ScoreMode.Partial">
+                {{ T.contestNewFormScoreModePartial }}
               </option>
-              <option :value="false">
-                {{ T.wordsNo }}
+              <option :value="ScoreMode.AllOrNothing">
+                {{ T.contestNewFormScoreModeAllOrNothing }}
+              </option>
+              <option :value="ScoreMode.MaxPerGroup">
+                {{ T.contestNewFormScoreModeMaxPerGroup }}
               </option>
             </select>
             <p class="help-block">{{ T.contestNewFormPartialScoreDesc }}</p>
@@ -364,6 +368,12 @@ import DateTimePicker from '../DateTimePicker.vue';
 import Multiselect from 'vue-multiselect';
 import { types } from '../../api_types';
 
+export enum ScoreMode {
+  AllOrNothing = 'all_or_nothing',
+  Partial = 'partial',
+  MaxPerGroup = 'max_per_group',
+}
+
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
@@ -388,6 +398,7 @@ export default class NewForm extends Vue {
   @Prop({ default: 100 }) initialScoreboard!: number;
   @Prop({ default: true }) initialShowScoreboardAfter!: boolean;
   @Prop({ default: true }) initialPartialScore!: boolean;
+  @Prop({ default: ScoreMode.Partial }) initialScoreMode!: ScoreMode;
   @Prop({ default: false }) hasSubmissions!: boolean;
   @Prop() initialStartTime!: Date;
   @Prop() initialSubmissionsGap!: number;
@@ -400,6 +411,7 @@ export default class NewForm extends Vue {
   @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
 
   T = T;
+  ScoreMode = ScoreMode;
   alias = this.initialAlias;
   description = this.initialDescription;
   feedback = this.initialFeedback;
@@ -411,6 +423,7 @@ export default class NewForm extends Vue {
   pointsDecayFactor = this.initialPointsDecayFactor;
   requestsUserInformation = this.initialRequestsUserInformation;
   scoreboard = this.initialScoreboard;
+  scoreMode = this.initialScoreMode;
   showScoreboardAfter = this.initialShowScoreboardAfter;
   partialScore = this.initialPartialScore;
   startTime = this.initialStartTime;
