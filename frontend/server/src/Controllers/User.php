@@ -4599,10 +4599,6 @@ class User extends \OmegaUp\Controllers\Controller {
             throw $e;
         }
     }
-    public static function apiParentChildLinkAccounts(\OmegaUp\Request $r) {
-        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
-        $r->ensureMainUserIdentity();
-    }
 
     /**
      * Returns a list of all the API tokens associated with the user.
