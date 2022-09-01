@@ -167,13 +167,38 @@ class User extends \OmegaUp\Controllers\Controller {
             'verification_id' => \OmegaUp\SecurityTools::randomString(50),
             'is_private' => boolval($createUserParams->isPrivate),
         ];
-        $userAge = \OmegaUp\Controllers\User::ageCalculator(
-            $createUserParams->birthDate
+        \OmegaUp\Validators::validateNumber(
+            $createUserParams->birthDate,
+            'birth_date'
         );
-        if ($userAge < 13) {
-            $userData['parental_verification_token'] =  \OmegaUp\SecurityTools::randomHexString(
+        if ($createUserParams->birthDate >= strtotime('-13 year', \OmegaUp\Time::get())) {
+            // Fill all the columns refering to user's parent
+            $userData['parental_verification_token'] = \OmegaUp\SecurityTools::randomHexString(
                 25
             );
+            $userData['creation_timestamp'] =  \OmegaUp\Time::get();
+            $userData['parent_email_verification_initial'] = \OmegaUp\Time::get();
+            $userData['parent_email_verification_deadline'] = strtotime('+7 days', \OmegaUp\Time::get());
+              
+    
+            if (!self::$sendEmailOnVerify) {
+                self::$log->info(
+                    'Not sending email beacause sendEmailOnVerify = FALSE'
+                );
+                return;
+            }
+            
+            $subject = \OmegaUp\Translations::getInstance()->get(
+                'parentEmailSubject'
+            );
+            $body = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get('parentEmailBody'),
+                [
+                    'parental_verification_token' => strval($user->parental_verification_token),
+                ]
+            );
+    
+            \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
         }
 
         if (!is_null($createUserParams->name)) {
@@ -284,25 +309,6 @@ class User extends \OmegaUp\Controllers\Controller {
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
-        }
-    }
-
-    /**
-      * Simple PHP age Calculator
-      *
-      * Calculate and returns age based on the date provided by the user.
-      * @param   date of birth('Format:yyyy-mm-dd').
-      * @return  age based on date of birth
-      */
-    private static function ageCalculator($dob) {
-        if (!empty($dob)) {
-            $birthdate =  new \DateTime($dob);
-            $timestamp = \OmegaUp\Time::get();
-            $today =  \DateTime::createFromFormat('U', $timestamp);
-            $age = $birthdate->diff($today)->y;
-            return $age;
-        } else {
-            return 0;
         }
     }
 
@@ -4598,7 +4604,7 @@ class User extends \OmegaUp\Controllers\Controller {
             }
             throw $e;
         }
-    }
+    } 
 
     /**
      * Returns a list of all the API tokens associated with the user.

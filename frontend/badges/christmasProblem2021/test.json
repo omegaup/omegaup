@@ -13,7 +13,8 @@
                             "params": {
                                 "username": "test_user_0",
                                 "email": "user_0@domain.com",
-                                "password": "test_user_0"
+                                "password": "test_user_0",
+                                "birth_date": "946684800"
                             }
                         },
                         {
@@ -21,7 +22,8 @@
                             "params": {
                                 "username": "eduardo.pacheco",
                                 "email": "eduardo@domain.com",
-                                "password": "test_eduardo"
+                                "password": "test_eduardo",
+                                "birth_date": "946684800"
                             }
                         }
                     ]
