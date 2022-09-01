@@ -90,7 +90,7 @@
             <input
               v-model="privacyPolicyAccepted"
               type="checkbox"
-              :disabled="!birthdate"
+              :disabled="!birthDate"
             />
             <label for="checkbox">
               <omegaup-markdown
