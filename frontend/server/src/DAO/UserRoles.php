@@ -143,7 +143,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
     }
 
     /**
-     * @return list<array{role: 'teaching_assistant', username: string, user_id: int}>
+     * @return list<array{role: 'teaching_assistant', user_id: int|null, username: string}>
      */
     public static function getCourseTeachingAssistants(
         \OmegaUp\DAO\VO\Courses $course
@@ -162,7 +162,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             $course->acl_id,
         ];
 
-        /** @var list<array{acl: int, username: string, user_id: int}> */
+        /** @var list<array{acl: int, user_id: int|null, username: string}> */
         $rawTeachingAssistants = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
