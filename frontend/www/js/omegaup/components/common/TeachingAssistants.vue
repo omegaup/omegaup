@@ -28,7 +28,7 @@
         </div>
       </form>
     </div>
-    <div v-if="teachingAssistants.length === 0">
+    <div v-if="currentTeachingAssistants.length === 0">
       <div class="empty-table-message">
         {{ T.courseEditTeachingAssistantsEmpty }}
       </div>
@@ -42,7 +42,7 @@
         </tr>
       </thead>
       <tbody>
-        <template v-for="teachingAssistant in teachingAssistants">
+        <template v-for="teachingAssistant in currentTeachingAssistants">
           <tr
             v-if="teachingAssistant.role !== 'teaching-assistant'"
             :key="teachingAssistant.username"
@@ -98,17 +98,17 @@ library.add(fas);
   },
 })
 export default class TeachingAssistants extends Vue {
-  @Prop() initialTeachingAssistants!: omegaup.UserRole[];
+  @Prop() teachingAssistants!: omegaup.UserRole[];
   @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   username: null | types.ListItem = null;
   selected = {};
-  teachingAssistants = this.initialTeachingAssistants;
+  currentTeachingAssistants = this.teachingAssistants;
 
-  @Watch('initialTeachingAssistants')
+  @Watch('teachingAssistants')
   onTeachingAssistantsChanged(newValue: omegaup.UserRole[]): void {
-    this.teachingAssistants = newValue;
+    this.currentTeachingAssistants = newValue;
   }
 
   onSubmit(): void {
