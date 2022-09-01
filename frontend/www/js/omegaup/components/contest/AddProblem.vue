@@ -219,7 +219,7 @@ export default class AddProblem extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
-  alias: null | string = null;
+  alias: null | types.ListItem = null;
   title: null | string = null;
   points = this.initialPoints;
   order = this.initialProblems.length + 1;
@@ -269,7 +269,7 @@ export default class AddProblem extends Vue {
     this.$emit('add-problem', {
       problem: {
         order: this.order,
-        alias: this.alias,
+        alias: this.alias?.key,
         points: this.points,
         commit: !this.useLatestVersion
           ? this.selectedRevision?.commit
@@ -283,7 +283,7 @@ export default class AddProblem extends Vue {
 
   onEdit(problem: types.ProblemsetProblemWithVersions): void {
     this.title = problem.title;
-    this.alias = problem.alias;
+    this.alias = { key: problem.alias, value: problem.title };
     this.points = problem.points;
     this.order = problem.order;
   }
@@ -298,7 +298,7 @@ export default class AddProblem extends Vue {
   ): void {
     let found = false;
     for (const problem of this.problems) {
-      if (this.alias === problem.alias) {
+      if (this.alias?.key === problem.alias) {
         found = true;
         break;
       }
@@ -306,12 +306,12 @@ export default class AddProblem extends Vue {
     if (!found) {
       return;
     }
-    this.$emit('runs-diff', this.alias, versions, selectedCommit);
+    this.$emit('runs-diff', this.alias?.key, versions, selectedCommit);
   }
 
   get isUpdate(): boolean {
     if (!this.alias) return false;
-    return !!this.problemMapping[this.alias];
+    return !!this.problemMapping[this.alias.key];
   }
 
   get addProblemButtonLabel(): string {
@@ -335,19 +335,19 @@ export default class AddProblem extends Vue {
   }
 
   @Watch('alias')
-  onAliasChange(newProblemAlias: string) {
+  onAliasChange(newProblemAlias: null | types.ListItem) {
     if (!newProblemAlias) {
       this.versionLog = [];
       this.selectedRevision = this.publishedRevision = null;
       return;
     }
     if (this.isUpdate) {
-      this.onGetVersions(newProblemAlias);
+      this.onGetVersions(newProblemAlias.key);
       return;
     }
     this.$emit('get-versions', {
       target: this,
-      request: { problemAlias: this.alias },
+      request: { problemAlias: this.alias?.key },
     });
   }
 }

@@ -9,6 +9,7 @@ export namespace dao {
     archived?: boolean;
     certificate_cutoff?: number;
     certificates_status?: string;
+    check_plagiarism?: boolean;
     contest_for_teams?: boolean;
     contest_id?: number;
     default_show_all_contestants_in_scoreboard?: boolean;
@@ -4850,10 +4851,14 @@ export namespace messages {
   export type CourseAddAdminResponse = {};
   export type CourseAddGroupAdminRequest = { [key: string]: any };
   export type CourseAddGroupAdminResponse = {};
+  export type CourseAddGroupTeachingAssistantRequest = { [key: string]: any };
+  export type CourseAddGroupTeachingAssistantResponse = {};
   export type CourseAddProblemRequest = { [key: string]: any };
   export type CourseAddProblemResponse = {};
   export type CourseAddStudentRequest = { [key: string]: any };
   export type CourseAddStudentResponse = {};
+  export type CourseAddTeachingAssistantRequest = { [key: string]: any };
+  export type CourseAddTeachingAssistantResponse = {};
   export type CourseAdminDetailsRequest = { [key: string]: any };
   export type _CourseAdminDetailsServerResponse = any;
   export type CourseAdminDetailsResponse = types.CourseDetails;
@@ -4861,6 +4866,8 @@ export namespace messages {
   export type CourseAdminsResponse = {
     admins: { role: string; username: string }[];
     group_admins: { alias: string; name: string; role: string }[];
+    group_teaching_assistants: { alias: string; name: string; role: string }[];
+    teaching_assistants: { role: string; username: string }[];
   };
   export type CourseArbitrateRequestRequest = { [key: string]: any };
   export type CourseArbitrateRequestResponse = {};
@@ -4945,10 +4952,16 @@ export namespace messages {
   export type CourseRemoveAssignmentResponse = {};
   export type CourseRemoveGroupAdminRequest = { [key: string]: any };
   export type CourseRemoveGroupAdminResponse = {};
+  export type CourseRemoveGroupTeachingAssistantRequest = {
+    [key: string]: any;
+  };
+  export type CourseRemoveGroupTeachingAssistantResponse = {};
   export type CourseRemoveProblemRequest = { [key: string]: any };
   export type CourseRemoveProblemResponse = {};
   export type CourseRemoveStudentRequest = { [key: string]: any };
   export type CourseRemoveStudentResponse = {};
+  export type CourseRemoveTeachingAssistantRequest = { [key: string]: any };
+  export type CourseRemoveTeachingAssistantResponse = {};
   export type CourseRequestsRequest = { [key: string]: any };
   export type _CourseRequestsServerResponse = any;
   export type CourseRequestsResponse = { users: types.IdentityRequest[] };
@@ -5683,12 +5696,18 @@ export namespace controllers {
     addGroupAdmin: (
       params?: messages.CourseAddGroupAdminRequest,
     ) => Promise<messages.CourseAddGroupAdminResponse>;
+    addGroupTeachingAssistant: (
+      params?: messages.CourseAddGroupTeachingAssistantRequest,
+    ) => Promise<messages.CourseAddGroupTeachingAssistantResponse>;
     addProblem: (
       params?: messages.CourseAddProblemRequest,
     ) => Promise<messages.CourseAddProblemResponse>;
     addStudent: (
       params?: messages.CourseAddStudentRequest,
     ) => Promise<messages.CourseAddStudentResponse>;
+    addTeachingAssistant: (
+      params?: messages.CourseAddTeachingAssistantRequest,
+    ) => Promise<messages.CourseAddTeachingAssistantResponse>;
     adminDetails: (
       params?: messages.CourseAdminDetailsRequest,
     ) => Promise<messages.CourseAdminDetailsResponse>;
@@ -5764,12 +5783,18 @@ export namespace controllers {
     removeGroupAdmin: (
       params?: messages.CourseRemoveGroupAdminRequest,
     ) => Promise<messages.CourseRemoveGroupAdminResponse>;
+    removeGroupTeachingAssistant: (
+      params?: messages.CourseRemoveGroupTeachingAssistantRequest,
+    ) => Promise<messages.CourseRemoveGroupTeachingAssistantResponse>;
     removeProblem: (
       params?: messages.CourseRemoveProblemRequest,
     ) => Promise<messages.CourseRemoveProblemResponse>;
     removeStudent: (
       params?: messages.CourseRemoveStudentRequest,
     ) => Promise<messages.CourseRemoveStudentResponse>;
+    removeTeachingAssistant: (
+      params?: messages.CourseRemoveTeachingAssistantRequest,
+    ) => Promise<messages.CourseRemoveTeachingAssistantResponse>;
     requests: (
       params?: messages.CourseRequestsRequest,
     ) => Promise<messages.CourseRequestsResponse>;

@@ -127,6 +127,7 @@ describe('AddProblem.vue', () => {
         contestAlias: 'testContestAlias',
         initialPoints: 100,
         initialProblems,
+        searchResultProblems: [{ key: 'problem', value: 'problem title' }],
       },
     });
 
@@ -197,10 +198,10 @@ describe('AddProblem.vue', () => {
       .trigger('click');
 
     expect(wrapper.find('[data-versions]').text()).toContain(
-      commit.substr(0, 8),
+      commit.substring(0, 8),
     );
     expect(wrapper.find('[data-versions]').text()).toContain(
-      alternativeCommit.substr(0, 8),
+      alternativeCommit.substring(0, 8),
     );
 
     await wrapper
@@ -282,10 +283,10 @@ describe('AddProblem.vue', () => {
       .trigger('click');
 
     expect(wrapper.find('[data-versions]').text()).toContain(
-      commit.substr(0, 8),
+      commit.substring(0, 8),
     );
     expect(wrapper.find('[data-versions]').text()).toContain(
-      alternativeCommit.substr(0, 8),
+      alternativeCommit.substring(0, 8),
     );
 
     await wrapper.find(`tr[data-revision="${commit}"]`).trigger('click');

@@ -63,14 +63,14 @@ export default class TeamsGroup extends Vue {
   @Prop({ default: false }) hasSubmissions!: boolean;
 
   T = T;
-  typeaheadGroup: null | string = null;
+  typeaheadGroup: null | types.ListItem = null;
 
   onSubmit(): void {
     const name = this.searchResultTeamsGroups.find(
-      (teamsGroup) => teamsGroup.key === this.typeaheadGroup,
+      (teamsGroup) => teamsGroup.key === this.typeaheadGroup?.key,
     )?.value;
     this.$emit('replace-teams-group', {
-      alias: this.typeaheadGroup,
+      alias: this.typeaheadGroup?.key,
       name,
     });
   }

@@ -199,7 +199,9 @@ describe('Runs.vue', () => {
       },
     });
 
-    await wrapper.setData({ filterUsername: 'other_username' });
+    await wrapper.setData({
+      filterUsername: { key: 'other_username', value: 'other username' },
+    });
     expect(wrapper.emitted('filter-changed')).toEqual([
       [{ filter: 'username', value: 'other_username' }],
     ]);
@@ -215,7 +217,9 @@ describe('Runs.vue', () => {
       },
     });
 
-    await wrapper.setData({ filterProblem: 'other_problem' });
+    await wrapper.setData({
+      filterProblem: { key: 'other_problem', value: 'other problem' },
+    });
     expect(wrapper.emitted('filter-changed')).toEqual([
       [{ filter: 'problem', value: 'other_problem' }],
     ]);

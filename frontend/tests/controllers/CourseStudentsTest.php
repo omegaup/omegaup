@@ -356,4 +356,114 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             0
         );
     }
+
+    /**
+     * Basic apiStudentProgress test.
+     */
+    public function testGiveFeedbackWithNewFields() {
+        // create course with an assignment
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $studentsInCourse = 5;
+
+        // Prepare assignment. Create problems
+        $adminLogin = self::login($courseData['admin']);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // add problem
+        \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment_alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+
+        $problem = $problemData['problem'];
+
+        // Add students to course
+        $students = [];
+        for ($i = 0; $i < $studentsInCourse; $i++) {
+            $students[] = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData
+            );
+        }
+
+        // Add one run to one of the problems.
+        $submissionSource = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+        {
+            $studentLogin = \OmegaUp\Test\ControllerTestCase::login(
+                $students[0]
+            );
+            $runResponsePA = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'problemset_id' => $courseData['assignment']->problemset_id,
+                'problem_alias' => $problem->alias,
+                'language' => 'c11-gcc',
+                'source' => $submissionSource,
+            ]));
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                null /*runData*/,
+                0.5,
+                'PA',
+                null,
+                $runResponsePA['guid']
+            );
+        }
+
+        $adminLogin = self::login($courseData['admin']);
+
+        // create normal user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // admin is able to add a teaching assistant
+        \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $identity->username,
+                'course_alias' => $courseData['course_alias'],
+             ])
+        );
+
+        $course = \OmegaUp\DAO\Courses::getByAlias(
+            $courseData['course_alias']
+        );
+
+        // login user
+        $userLogin = self::login($identity);
+
+        $this->assertTrue(
+            \OmegaUp\Authorization::isTeachingAssistant(
+                $identity,
+                $course
+            )
+        );
+
+        // Send feedback for the submission by a teaching assistant, include the new fields
+        $feedback = 'Test feedback!';
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'guid' => $runResponsePA['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback' => $feedback,
+                1,
+                89
+            ])
+        );
+
+        // Call API
+        $adminLogin = self::login($courseData['admin']);
+
+        $response = \OmegaUp\Controllers\Course::apiStudentProgress(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment_alias'],
+            'usernameOrEmail' => $students[0]->username,
+        ]));
+
+        $this->assertEquals(
+            $feedback,
+            $response['problems'][0]['runs'][0]['feedback']['feedback']
+        );
+    }
 }
