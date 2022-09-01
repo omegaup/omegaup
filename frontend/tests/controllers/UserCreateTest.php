@@ -16,7 +16,8 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'username' => \OmegaUp\Test\Utils::createRandomString(),
             'password' => \OmegaUp\Test\Utils::createRandomString(),
             'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
-            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
+            'birth_date' => 946684800, // 01-01-2000
         ]);
 
         // Call API
@@ -49,7 +50,8 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'username' => \OmegaUp\Test\Utils::createRandomString(),
             'password' => \OmegaUp\Test\Utils::createRandomString(),
             'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
-            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
+            'birth_date' => 946684800, // 01-01-2000
         ]);
 
         // Call API twice.
@@ -78,7 +80,8 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'username' => \OmegaUp\Test\Utils::createRandomString(),
             'password' => \OmegaUp\Test\Utils::createRandomString(),
             'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
-            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
+            'birth_date' => 946684800, // 01-01-2000
         ]);
 
         // Call API
@@ -106,7 +109,8 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'username' => \OmegaUp\Test\Utils::createRandomString(),
             'password' => \OmegaUp\Test\Utils::createRandomString(),
             'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
-            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
+            'birth_date' => 946684800, // 01-01-2000
         ]);
 
         // Call API
@@ -133,7 +137,8 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
                 'username' => \OmegaUp\Test\Utils::createRandomString(),
                 'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
-                'permission_key' => \OmegaUp\Controllers\User::$permissionKey
+                'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
+                'birth_date' => 946684800, // 01-01-2000
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
@@ -152,7 +157,8 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
                 'username' => \OmegaUp\Test\Utils::createRandomString(),
                 'password' => \OmegaUp\Test\Utils::createRandomString(),
-                'permission_key' => \OmegaUp\Controllers\User::$permissionKey
+                'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
+                'birth_date' => 946684800, // 01-01-2000
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
@@ -191,6 +197,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $_REQUEST['password'] = \OmegaUp\Test\Utils::createRandomString();
         $_REQUEST['email'] = \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com';
         $_REQUEST['permission_key'] = \OmegaUp\Controllers\User::$permissionKey;
+        $_REQUEST['birth_date'] = 946684800; // 01-01-2000
 
         // Override session_start, php
 // phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariableunit doesn't like it, but we still validate that it is called once

@@ -180,14 +180,16 @@ class User extends \OmegaUp\Controllers\Controller {
             $userData['parent_email_verification_initial'] = \OmegaUp\Time::get();
             $userData['parent_email_verification_deadline'] = strtotime('+7 days', \OmegaUp\Time::get());
               
-    
+            $user = \OmegaUp\DAO\Users::getAll();
+            $email = \OmegaUp\DAO\Emails::getByPK($user->parentEmail);
+
             if (!self::$sendEmailOnVerify) {
                 self::$log->info(
                     'Not sending email beacause sendEmailOnVerify = FALSE'
                 );
                 return;
             }
-            
+    
             $subject = \OmegaUp\Translations::getInstance()->get(
                 'parentEmailSubject'
             );
@@ -198,7 +200,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 ]
             );
     
-            \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
+            \OmegaUp\Email::sendEmail([$parentEmail], $subject, $body);
         }
 
         if (!is_null($createUserParams->name)) {
