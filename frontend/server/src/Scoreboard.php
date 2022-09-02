@@ -509,7 +509,7 @@ class Scoreboard {
     }
 
     /**
-     * @param list<array{contest_score: float, guid?: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay?: int, submission_count?: int, time?: \OmegaUp\Timestamp, type: string}> $contestRuns
+     * @param list<array{contest_score: float, guid?: string, identity_id: int, penalty: float|int, problem_id: int, score: float, submit_delay?: int, submission_count?: int, time?: \OmegaUp\Timestamp, type: string}> $contestRuns
      * @param list<array{identity_id: int, username: string, name: string|null, country_id: null|string, is_invited: bool, classname: string}> $rawContestIdentities
      * @param array<int, array{order: int, alias: string}> $problemMapping
      * @param int $contestPenalty
