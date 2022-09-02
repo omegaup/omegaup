@@ -7,7 +7,9 @@
       <form>
         <div class="form-group">
           <label>{{ T.userEditBirthDate }}</label>
-          <omegaup-datepicker
+           <omegaup-datepicker
+            name="reg_birthdate"
+            data-signup-birthdate
             v-model="birthDate"
             :required="false"
             :max="new Date()"
