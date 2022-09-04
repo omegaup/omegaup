@@ -41,7 +41,7 @@ CONTESTS_TO_RUN_PLAGIARISM_ON = """ SELECT c.`contest_id`, c.`alias`, c.`problem
                                             (SELECT p.`contest_id` 
                                             FROM `Plagiarisms` as p);
                                 """
-GET_CONTEST_SUBMISSION_IDS= """SELECT Contests.contest_id, s.submission_id, s.problemset_id,
+GET_CONTEST_SUBMISSION_IDS= """ SELECT Contests.contest_id, s.submission_id, s.problemset_id,
                                 s.problem_id, s.verdict, s.guid
                                 FROM Submissions as s 
                                 INNER JOIN Contests ON Contests.problemset_id = s.problemset_id 
