@@ -41,11 +41,11 @@ CONTESTS_TO_RUN_PLAGIARISM_ON = """ SELECT c.`contest_id`, c.`alias`, c.`problem
                                             (SELECT p.`contest_id` 
                                             FROM `Plagiarisms` as p);
                                 """
-GET_CONTEST_SUBMISSION_IDS= """ SELECT Contests.contest_id, s.submission_id, s.problemset_id,
+GET_CONTEST_SUBMISSION_IDS= """ SELECT c.contest_id, s.submission_id, s.problemset_id,
                                 s.problem_id, s.verdict, s.guid
                                 FROM Submissions as s 
-                                INNER JOIN Contests ON Contests.problemset_id = s.problemset_id 
-                                WHERE Contests.contest_id = %s;
+                                INNER JOIN Contests c ON c.problemset_id = s.problemset_id 
+                                WHERE c.contest_id = %s;
                             """
 
 
@@ -55,7 +55,7 @@ GET_CONTEST_SUBMISSION_IDS= """ SELECT Contests.contest_id, s.submission_id, s.p
             /stuff/cron/Submissions/Contest_id/problem_id/language 
 '''
 
-def get_submission_id(dbconn: lib.db.Connection, contest: int) -> None:
+def get_submission_ids(dbconn: lib.db.Connection, contest: int) -> None:
     with dbconn.cursor() as cur:
         cur.execute(GET_CONTEST_SUBMISSION_IDS, (contest,))
         submission_ids = cur.fetchall()
@@ -66,7 +66,7 @@ def get_contests(dbconn: lib.db.Connection) -> None:
         contests = cur.fetchall()
         contests = [tuple(i) for i in contests]
         for i in range(0, len(contests)):
-            get_submission_id(dbconn, contests[i][0])
+            get_submission_ids(dbconn, contests[i][0])
         
 def main() -> None:
     '''Main entrypoint. '''
