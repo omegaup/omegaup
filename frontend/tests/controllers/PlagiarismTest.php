@@ -12,14 +12,14 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Test\Factories\ContestParams([
                 'startTime' => $originalTime - 60 * 60,
                 'finishTime' => $originalTime - 60 * 45,
-                // TO:DO Use check plagiarism flag here
+                'check_plagiarism' => 1,
             ])
         );
         \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'startTime' => $originalTime - 60 * 60,
                 'finishTime' => $originalTime - 60 * 30,
-                // TO:DO Use check plagiarism flag here
+                'check_plagiarism' => 1,
             ])
         );
         \OmegaUp\Test\Utils::runCheckPlagiarisms();
