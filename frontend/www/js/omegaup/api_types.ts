@@ -3102,6 +3102,7 @@ export namespace types {
     selectedAssignment?: types.CourseAssignment;
     students: types.CourseStudent[];
     tags: string[];
+    teachingAssistants: types.CourseAdmin[];
   }
 
   export interface CourseGroupAdmin {

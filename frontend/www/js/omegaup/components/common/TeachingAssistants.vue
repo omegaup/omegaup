@@ -1,12 +1,12 @@
 <template>
-  <div class="card mb-3">
-    <div class="card-body">
-      <form class="form" @submit.prevent="$emit('add-admin', username.key)">
-        <div class="form-group mb-0">
-          <label class="font-weight-bold w-100"
-            >{{ T.wordsAdmin }}
+  <div class="card mb-3 panel panel-primary">
+    <div class="card-body panel-body">
+      <form class="form" @submit.prevent="onSubmit">
+        <div class="form-group">
+          <label class="font-weight-bold"
+            >{{ T.courseEditTeachingAssistants }}
             <font-awesome-icon
-              :title="T.courseEditAddAdminsTooltip"
+              :title="T.courseEditAddTeachingAssistantsTooltip"
               icon="info-circle"
             />
             <omegaup-common-typeahead
@@ -16,61 +16,52 @@
               @update-existing-options="
                 (query) => $emit('update-search-result-users', query)
               "
-            ></omegaup-common-typeahead>
-          </label>
-        </div>
-        <div class="form-group mb-0">
-          <label>
-            <input
-              v-model="showSiteAdmins"
-              type="checkbox"
-              name="toggle-site-admins"
             />
-            {{ T.wordsShowSiteAdmins }}
           </label>
         </div>
-        <button class="btn btn-primary" type="submit">
-          {{ T.wordsAddAdmin }}
-        </button>
+        <div class="row">
+          <div class="action-container col-md-6">
+            <button class="btn btn-primary" type="submit">
+              {{ T.courseEditAddTeachingAssistants }}
+            </button>
+          </div>
+        </div>
       </form>
     </div>
-    <div v-if="admins.length === 0">
-      <div class="my-2 empty-table-message">
-        {{ T.courseEditAdminsEmpty }}
+    <div v-if="currentTeachingAssistants.length === 0">
+      <div class="empty-table-message">
+        {{ T.courseEditTeachingAssistantsEmpty }}
       </div>
     </div>
-    <table v-else class="table table-striped mb-0">
+    <table v-else class="table table-striped">
       <thead>
-        <tr class="text-center">
-          <th>
-            {{ T.contestEditRegisteredAdminUsername }}
-          </th>
+        <tr>
+          <th>{{ T.contestEditRegisteredAdminUsername }}</th>
           <th>{{ T.contestEditRegisteredAdminRole }}</th>
           <th>{{ T.contestEditRegisteredAdminDelete }}</th>
         </tr>
       </thead>
       <tbody>
-        <template v-for="admin in admins">
+        <template v-for="teachingAssistant in currentTeachingAssistants">
           <tr
-            v-if="admin.role !== 'site-admin' || showSiteAdmins"
-            :key="`${admin.username}-${admin.role}`"
-            class="text-center"
+            v-if="teachingAssistant.role !== 'teaching-assistant'"
+            :key="teachingAssistant.username"
           >
             <td>
               <omegaup-user-username
                 :linkify="true"
-                :username="admin.username"
+                :username="teachingAssistant.username"
               ></omegaup-user-username>
             </td>
-            <td>{{ admin.role }}</td>
+            <td>{{ teachingAssistant.role }}</td>
             <td>
               <button
-                v-if="admin.role === 'admin'"
+                v-if="teachingAssistant.role === 'teaching_assistant'"
                 type="button"
-                class="close float-none"
-                @click="$emit('remove-admin', admin.username)"
+                class="close"
+                @click="onRemove(teachingAssistant)"
               >
-                <font-awesome-icon :icon="['fas', 'trash']" size="xs" />
+                &times;
               </button>
             </td>
           </tr>
@@ -82,6 +73,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
 import user_Username from '../user/Username.vue';
@@ -105,17 +97,27 @@ library.add(fas);
     'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
-export default class Admins extends Vue {
-  @Prop() admins!: types.ContestAdmin[];
+export default class TeachingAssistants extends Vue {
+  @Prop() teachingAssistants!: omegaup.UserRole[];
   @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   username: null | types.ListItem = null;
-  showSiteAdmins = false;
+  selected = {};
+  currentTeachingAssistants = this.teachingAssistants;
 
-  @Watch('admins')
-  onAdminsChange(): void {
+  @Watch('teachingAssistants')
+  onTeachingAssistantsChanged(newValue: omegaup.UserRole[]): void {
+    this.currentTeachingAssistants = newValue;
+  }
+
+  onSubmit(): void {
+    this.$emit('add-teaching-assistant', this.username?.key);
     this.username = null;
+  }
+
+  onRemove(teachingAssistant: omegaup.UserRole): void {
+    this.$emit('remove-teaching-assistant', teachingAssistant.username);
   }
 }
 </script>

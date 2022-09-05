@@ -60,6 +60,7 @@ describe('Edit.vue', () => {
           admins: [],
           groupsAdmins: [],
           groupsTeachingAssistants: [],
+          teachingAssistants: [],
           tags: [],
         } as types.CourseEditPayload,
         initialTab: 'course',
