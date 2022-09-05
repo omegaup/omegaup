@@ -28,7 +28,7 @@ class RunsGroups extends \OmegaUp\DAO\Base\RunsGroups {
         $params = [$problemsetId];
         if (!is_null($scoreboardTimeLimit)) {
             $timeQuery = 'mspg.`time` < ?';
-            $params[] = $scoreboardTimeLimit->time;
+            $params[] = $scoreboardTimeLimit;
         }
         $sql = "WITH mspg AS (
                     SELECT

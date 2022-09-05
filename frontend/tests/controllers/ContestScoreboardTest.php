@@ -1188,64 +1188,87 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for the contest with max_per_group mode.
      *
-     * @return array{0: float, 1: list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}>}
+     * @return array{0: int, 1: list<array: {runs: int, score: float}>, 2: list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}>}
      */
     public function runsMappingProvider(): array {
-        return [
+        $runsMapping = [
             [
-                80.0,
-                [
-                    [
-                        'total' => 0.4,
-                        'points_per_group' => [
-                            ['group_name' => 'easy', 'score' => (0.8 / 3), 'verdict' => 'PA'],
-                            ['group_name' => 'medium', 'score' => (0.4 / 3), 'verdict' => 'PA'],
-                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
-                        ],
-                    ],
-                    [
-                        'total' => 0.7,
-                        'points_per_group' => [
-                            ['group_name' => 'easy', 'score' => (0.8 / 3), 'verdict' => 'PA'],
-                            ['group_name' => 'medium', 'score' => (0.3 / 3), 'verdict' => 'PA'],
-                            ['group_name' => 'hard', 'score' => (1.0 / 3),'verdict' => 'AC'],
-                        ],
-                    ],
-                    [
-                        'total' => 0.4,
-                        'points_per_group' => [
-                            ['group_name' => 'easy', 'score' => (0.2 / 3), 'verdict' => 'PA'],
-                            ['group_name' => 'medium', 'score' => (0.6 / 3), 'verdict' => 'PA'],
-                            ['group_name' => 'hard', 'score' => (0.4 / 3),'verdict' => 'PA'],
-                        ],
-                    ],
+                'total' => 0.4,
+                'points_per_group' => [
+                    ['group_name' => 'easy', 'score' => (0.8 / 3), 'verdict' => 'PA'],
+                    ['group_name' => 'medium', 'score' => (0.4 / 3), 'verdict' => 'PA'],
+                    ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
                 ],
             ],
             [
-                100.0,
+                'total' => 0.7,
+                'points_per_group' => [
+                    ['group_name' => 'easy', 'score' => (0.8 / 3), 'verdict' => 'PA'],
+                    ['group_name' => 'medium', 'score' => (0.3 / 3), 'verdict' => 'PA'],
+                    ['group_name' => 'hard', 'score' => (1.0 / 3),'verdict' => 'AC'],
+                ],
+            ],
+            [
+                'total' => 0.4,
+                'points_per_group' => [
+                    ['group_name' => 'easy', 'score' => (0.2 / 3), 'verdict' => 'PA'],
+                    ['group_name' => 'medium', 'score' => (0.6 / 3), 'verdict' => 'PA'],
+                    ['group_name' => 'hard', 'score' => (0.4 / 3),'verdict' => 'PA'],
+                ],
+            ],
+        ];
+
+        return [
+            [
+                100,
+                [
+                    ['runs' => 1, 'score' => 40.0],
+                    ['runs' => 2, 'score' => 73.33],
+                    ['runs' => 3, 'score' => 80.0],
+                ],
+                $runsMapping
+            ],
+            [
+                60,
+                [
+                    ['runs' => 1, 'score' => 40.0],
+                    ['runs' => 2, 'score' => 73.33],
+                    // Only the number of runs should be updated, because of the
+                    // contest's settings
+                    ['runs' => 3, 'score' => 73.33],
+                ],
+                $runsMapping
+            ],
+            [
+                100,
+                [
+                    ['runs' => 1, 'score' => 50.0],
+                    ['runs' => 2, 'score' => 83.33],
+                    ['runs' => 3, 'score' => 100.0],
+                ],
                 [
                     [
                         'total' => 0.5,
                         'points_per_group' => [
-                            ['group_name' => 'easy', 'score' => (1.0 / 3), 'verdict' => 'AC'],
-                            ['group_name' => 'medium', 'score' => (0.5 / 3), 'verdict' => 'PA'],
-                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => (1.0 / 3), 'verdict' => 'AC'],    // 0.33
+                            ['group_name' => 'medium', 'score' => (0.5 / 3), 'verdict' => 'PA'],  // 0.16
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],           // 0.00
                         ],
                     ],
                     [
                         'total' => 0.7,
                         'points_per_group' => [
-                            ['group_name' => 'easy', 'score' => (0.8 / 3), 'verdict' => 'PA'],
-                            ['group_name' => 'medium', 'score' => (0.3 / 3), 'verdict' => 'PA'],
-                            ['group_name' => 'hard', 'score' => (1.0 / 3),'verdict' => 'AC'],
+                            ['group_name' => 'easy', 'score' => (0.8 / 3), 'verdict' => 'PA'],    // 0.26
+                            ['group_name' => 'medium', 'score' => (0.3 / 3), 'verdict' => 'PA'],  // 0.10
+                            ['group_name' => 'hard', 'score' => (1.0 / 3),'verdict' => 'AC'],     // 0.33
                         ],
                     ],
                     [
                         'total' => 0.6,
                         'points_per_group' => [
-                            ['group_name' => 'easy', 'score' => (0.4 / 3), 'verdict' => 'PA'],
-                            ['group_name' => 'medium', 'score' => (1.0 / 3), 'verdict' => 'AC'],
-                            ['group_name' => 'hard', 'score' => (0.4 / 3),'verdict' => 'PA'],
+                            ['group_name' => 'easy', 'score' => (0.4 / 3), 'verdict' => 'PA'],    // 0.13
+                            ['group_name' => 'medium', 'score' => (1.0 / 3), 'verdict' => 'AC'],  // 0.33
+                            ['group_name' => 'hard', 'score' => (0.4 / 3),'verdict' => 'PA'],     // 0.13
                         ],
                     ],
                 ],
@@ -1254,12 +1277,14 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * @param list<array: {runs: int, score: float}> $expectedResultsInEverySubmission
      * @param list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}> $runsMapping
      *
      * @dataProvider runsMappingProvider
      */
     public function testScoreboardForContestInMaxPerGroupMode(
-        float $expectedScore,
+        int $scoreboardPercentage,
+        array $expectedResultsInEverySubmission,
         array $runsMapping
     ) {
         // Get a problem
@@ -1269,6 +1294,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'scoreMode' => 'max_per_group',
+                'scoreboardPct' => $scoreboardPercentage,
             ])
         );
 
@@ -1283,9 +1309,9 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
 
         $time = \OmegaUp\Time::get();
 
-        // Create and grade some runs
-        foreach ($runsMapping as $run) {
-            \OmegaUp\Time::setTimeForTesting($time + (2 * 60));
+        // Create and grade some runs every five minutes
+        foreach ($runsMapping as $index => $run) {
+            \OmegaUp\Time::setTimeForTesting($time + (5 * 60));
 
             $runData = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
@@ -1306,22 +1332,26 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 runScoreByGroups: $run['points_per_group']
             );
             $time = \OmegaUp\Time::get();
+
+            // Create request as a contestant
+            $login = self::login($identity);
+
+            // Call API
+            $response = \OmegaUp\Controllers\Contest::apiScoreboard(
+                new \OmegaUp\Request([
+                    'contest_alias' => $contestData['request']['alias'],
+                    'auth_token' => $login->auth_token,
+                ])
+            )['ranking'];
+
+            $this->assertSame(
+                $response[0]['problems'][0]['points'],
+                $expectedResultsInEverySubmission[$index]['score']
+            );
+            $this->assertSame(
+                $response[0]['problems'][0]['runs'],
+                $expectedResultsInEverySubmission[$index]['runs']
+            );
         }
-
-        // Create request
-        $login = self::login($contestData['director']);
-
-        // Call API
-        $response = \OmegaUp\Controllers\Contest::apiScoreboard(
-            new \OmegaUp\Request([
-                'contest_alias' => $contestData['request']['alias'],
-                'auth_token' => $login->auth_token,
-            ])
-        )['ranking'];
-
-        $this->assertSame(
-            $response[0]['problems'][0]['points'],
-            $expectedScore
-        );
     }
 }

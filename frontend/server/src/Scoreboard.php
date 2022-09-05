@@ -140,6 +140,7 @@ class Scoreboard {
             $this->params->finish_time,
             $this->params->admin,
             $this->params->scoreboard_pct,
+            $this->params->score_mode,
             $sortByName,
             $withRunDetails,
             $this->params->auth_token
@@ -362,6 +363,7 @@ class Scoreboard {
             $params->finish_time,
             $params->admin,
             $params->scoreboard_pct,
+            $params->score_mode,
             sortByName: false,
         );
 
@@ -398,6 +400,7 @@ class Scoreboard {
             $params->finish_time,
             $params->admin,
             $params->scoreboard_pct,
+            $params->score_mode,
             sortByName: false,
         );
         $adminScoreboardCache->set($adminScoreboard, $timeout);
@@ -534,6 +537,7 @@ class Scoreboard {
         ?\OmegaUp\Timestamp $contestFinishTime,
         bool $showAllRuns,
         int $scoreboardPct,
+        string $scoreMode,
         bool $sortByName,
         bool $withRunDetails = false,
         ?string $authToken = null
@@ -644,7 +648,11 @@ class Scoreboard {
                     $problem['run_details'] = $runDetails;
                 }
             }
-            $problem['runs']++;
+            if ($scoreMode == 'max_per_group') {
+                $problem['runs'] = $run['submission_count'] ?? 0;
+            } else {
+                $problem['runs']++;
+            }
         }
 
         /** @var list<ScoreboardRankingEntry> */
