@@ -5,7 +5,7 @@
       <omegaup-common-typeahead
         :existing-options="searchResultSchools"
         :options="searchResultSchools"
-        :value.sync="schoolId"
+        :value.sync="school"
         @update-existing-options="
           (query) => $emit('update-search-result-schools', query)
         "
@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
@@ -81,8 +81,7 @@ export default class UserManageSchools extends Vue {
   graduationDate = this.profile.graduation_date
     ? time.convertLocalDateToGMTDate(this.profile.graduation_date)
     : new Date('');
-  school = this.profile.school;
-  schoolId = this.profile.school_id;
+  school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
   scholarDegree = this.profile.scholar_degree;
   isCurrentlyEnrolled = !this.profile.graduation_date;
 
@@ -93,22 +92,14 @@ export default class UserManageSchools extends Vue {
           ? null
           : this.graduationDate,
       school_id:
-        !this.schoolId ||
-        (this.schoolId === this.profile.school_id &&
-          this.school !== this.profile.school)
+        !this.school ||
+        (this.school.key === this.profile.school_id &&
+          this.school.value !== this.profile.school)
           ? null
-          : this.schoolId,
-      school_name: this.school,
+          : this.school.key,
+      school_name: this.school?.value,
       scholar_degree: this.scholarDegree,
     });
-  }
-
-  @Watch('schoolId')
-  onSchoolIdChanged(newValue: string): void {
-    if (newValue) {
-      return;
-    }
-    this.school = this.searchResultSchools[0].value;
   }
 }
 </script>

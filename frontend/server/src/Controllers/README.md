@@ -740,6 +740,7 @@ Creates a new contest
 | --------------------------- | -------------- | ----------- |
 | `admission_mode`            | `mixed`        |             |
 | `alias`                     | `mixed`        |             |
+| `check_plagiarism`          | `bool\|null`   |             |
 | `contest_for_teams`         | `bool\|null`   |             |
 | `description`               | `mixed`        |             |
 | `feedback`                  | `mixed`        |             |
@@ -1306,6 +1307,7 @@ Update a Contest
 | `window_length`                              | `int`                                                |             |
 | `admission_mode`                             | `null\|string`                                       |             |
 | `alias`                                      | `null\|string`                                       |             |
+| `check_plagiarism`                           | `bool\|null`                                         |             |
 | `contest_for_teams`                          | `bool\|null`                                         |             |
 | `default_show_all_contestants_in_scoreboard` | `bool\|null`                                         |             |
 | `description`                                | `null\|string`                                       |             |
@@ -4001,12 +4003,14 @@ Updates the admin feedback for a submission
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
-| `feedback`         | `string` |             |
-| `guid`             | `string` |             |
+| Name                | Type        | Description |
+| ------------------- | ----------- | ----------- |
+| `assignment_alias`  | `string`    |             |
+| `course_alias`      | `string`    |             |
+| `feedback`          | `string`    |             |
+| `guid`              | `string`    |             |
+| `range_bytes_end`   | `int\|null` |             |
+| `range_bytes_start` | `int\|null` |             |
 
 ### Returns
 

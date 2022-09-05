@@ -10,7 +10,7 @@
     :limit="1"
     :hide-input-on-limit="true"
     :only-existing-tags="onlyExistingTags"
-    :typeahead-hide-discard="true"
+    :typeahead-hide-discard="typeaheadHideDiscard"
     @change="updateExistingOptions"
     @tag-added="onTagAdded"
     @tag-removed="onTagRemoved"
@@ -35,8 +35,9 @@ export default class Typeahead extends Vue {
   @Prop({ default: () => [] }) options!: types.ListItem[];
   @Prop({ default: 3 }) activationThreshold!: number;
   @Prop({ default: 5 }) maxResults!: number;
-  @Prop({ default: null }) value!: null | string;
+  @Prop({ default: null }) value!: null | types.ListItem;
   @Prop({ default: true }) onlyExistingTags!: boolean;
+  @Prop({ default: true }) typeaheadHideDiscard!: boolean;
   @Prop({ default: T.typeaheadSearchPlaceholder }) placeholder!: string;
 
   T = T;
@@ -49,7 +50,7 @@ export default class Typeahead extends Vue {
 
   onTagAdded(): void {
     if (this.selectedOptions.length < 1) return;
-    this.$emit('update:value', this.selectedOptions[0].key);
+    this.$emit('update:value', this.selectedOptions[0]);
   }
 
   onTagRemoved(): void {
@@ -57,14 +58,14 @@ export default class Typeahead extends Vue {
   }
 
   @Watch('value')
-  onValueChanged(newValue: null | string): void {
+  onValueChanged(newValue: null | types.ListItem): void {
     if (!newValue) {
       this.selectedOptions = [];
       return;
     }
-    this.existingOptions.push({ value: newValue, key: newValue });
+    this.existingOptions.push(newValue);
     this.selectedOptions = this.existingOptions.filter(
-      (option) => option.key === newValue,
+      (option) => option.key === newValue.key,
     );
   }
 }

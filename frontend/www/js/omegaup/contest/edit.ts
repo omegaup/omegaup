@@ -10,7 +10,13 @@ import { toCsv, TableCell } from '../csv';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestEditPayload();
-
+  const searchResultTeamsGroups: types.ListItem[] = [];
+  if (payload.teams_group) {
+    searchResultTeamsGroups.push({
+      key: payload.teams_group.alias,
+      value: payload.teams_group.name,
+    });
+  }
   const contestEdit = new Vue({
     el: '#main-container',
     components: {
@@ -26,7 +32,7 @@ OmegaUp.on('ready', () => {
       users: payload.users,
       searchResultProblems: [] as types.ListItem[],
       searchResultUsers: [] as types.ListItem[],
-      searchResultTeamsGroups: [] as types.ListItem[],
+      searchResultTeamsGroups,
       searchResultGroups: [] as types.ListItem[],
       teamsGroup: payload.teams_group,
     }),

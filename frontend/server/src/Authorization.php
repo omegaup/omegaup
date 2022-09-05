@@ -416,7 +416,7 @@ class Authorization {
 
     public static function isTeachingAssistant(
         \OmegaUp\DAO\VO\Identities $identity,
-        \OmegaUp\DAO\VO\Courses $course
+        \OmegaUp\DAO\VO\Courses $course,
     ): bool {
         if (is_null($course->acl_id)) {
             return false;

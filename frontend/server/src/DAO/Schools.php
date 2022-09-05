@@ -84,6 +84,8 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         $sqlFrom = '
             FROM
                 Schools s
+            WHERE
+                s.score != 0
             ORDER BY
                 s.`ranking` IS NULL, s.`ranking` ASC
         ';

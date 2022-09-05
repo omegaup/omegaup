@@ -91,7 +91,7 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
             $teachingAssistantCourses
         );
 
-        // All non-archived courses should be dispayed in the courses list for
+        // All non-archived courses should be displayed in the courses list for
         // teaching assistants
         $this->assertCount(3, $teachingAssistantCourses);
         $expectedAliases = array_slice($this->courseAliases, 0, 3);

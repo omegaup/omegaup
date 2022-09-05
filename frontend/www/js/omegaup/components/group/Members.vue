@@ -12,7 +12,7 @@
               @update-existing-options="
                 (query) => $emit('update-search-result-users', query)
               "
-            />
+            ></omegaup-common-typeahead>
           </label>
         </div>
         <button class="btn btn-primary" type="submit">
@@ -156,10 +156,10 @@ export default class Members extends Vue {
   username = '';
   showEditForm = false;
   showChangePasswordForm = false;
-  searchedUsername: null | string = null;
+  searchedUsername: null | types.ListItem = null;
 
   onAddMember(): void {
-    this.$emit('add-member', this, this.searchedUsername);
+    this.$emit('add-member', this, this.searchedUsername?.key);
     this.reset();
   }
 

@@ -27,7 +27,7 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       tab: window.location.hash
-        ? window.location.hash.substr(1)
+        ? window.location.hash.substring(1)
         : AvailableTabs.Members,
       identities: payload.identities.filter(
         (identity) => !identity.username.includes(':'),
@@ -129,6 +129,7 @@ OmegaUp.on('ready', () => {
             source.identity = identity;
             source.username = identity.username;
             if (identity.school && identity.school_id) {
+              searchResultSchools.splice(0, searchResultSchools.length);
               searchResultSchools.push({
                 key: identity.school_id,
                 value: identity.school,
@@ -136,14 +137,15 @@ OmegaUp.on('ready', () => {
             }
           },
           'edit-identity-member': (request: {
-            username: string;
+            originalUsername: string;
             identity: types.Identity;
             showEditForm: boolean;
           }) => {
             api.Identity.update({
               ...request.identity,
-              original_username: request.username,
+              original_username: request.originalUsername,
               group_alias: payload.groupAlias,
+              school_name: request.identity.school,
             })
               .then(() => {
                 ui.success(T.groupEditMemberUpdated);

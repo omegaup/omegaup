@@ -2455,10 +2455,10 @@
     "@typescript-eslint/types" "4.3.0"
     eslint-visitor-keys "^2.0.0"
 
-"@voerro/vue-tagsinput@^2.0.2":
-  version "2.4.3"
-  resolved "https://registry.yarnpkg.com/@voerro/vue-tagsinput/-/vue-tagsinput-2.4.3.tgz#a4e9bdd1cf2f3248584380c8491799059dca5b73"
-  integrity sha512-r+4CJmuzrTgcHWit+vdnuiBdPRoEm7r361DMpSkGBlth/Cvf1vOdF/0WRI1vdstQc0r9j/Ifce34ImuzoFKqLw==
+"@voerro/vue-tagsinput@^2.7.1":
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/@voerro/vue-tagsinput/-/vue-tagsinput-2.7.1.tgz#80bb936c645b9294a4566e0569dd1e8c41b65f9c"
+  integrity sha512-G7ClILHgtc/D1vEw9qp6dlsAstlhwLDkPvEp6w1iY/dmSzu4hhxaMk8jyahjxQRDgiLlrAikESOsfkVhy18YwQ==
 
 "@vue/component-compiler-utils@^3.1.0":
   version "3.2.1"

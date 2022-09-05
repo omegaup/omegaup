@@ -2911,7 +2911,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
-        // Only admin is alowed to make modifications
+        // Only admin is allowed to make modifications
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -3103,7 +3103,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
-        // Only admin is alowed to make modifications
+        // Only admin is allowed to make modifications
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -3646,8 +3646,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             'groupsAdmins' => \OmegaUp\DAO\GroupRoles::getCourseAdmins(
                 $course
             ),
-            'teachingAssistants' => $teachingAssistants,
             'groupsTeachingAssistants' => \OmegaUp\DAO\GroupRoles::getCourseTeachingAssistants(
+                $course
+            ),
+            'teachingAssistants' => \OmegaUp\DAO\UserRoles::getCourseTeachingAssistants(
                 $course
             ),
         ];
