@@ -428,7 +428,7 @@ class Utils {
         }
         self::shellExec(
             ('python3 ' .
-             dirname(__DIR__, 2) . '/stuff/cron/check_plagiarisms.py' .
+             dirname(__DIR__, 2) . '/stuff/cron/plagiarism_detector.py' .
              ' --verbose ' .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              $host_arg .
