@@ -95,6 +95,9 @@ OmegaUp.on('ready', () => {
               sort_order: sortOrder,
               tag,
             };
+            if (queryParameters.query == null) {
+              queryParameters.query = '';
+            }
             window.location.replace(
               `/problem?${ui.buildURLQuery(queryParameters)}`,
             );
