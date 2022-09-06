@@ -4529,6 +4529,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ];
     }
 
+
+
     /**
      * @return array{entrypoint: string, templateProperties: array{payload: ProblemDetailsPayload, title: \OmegaUp\TranslationString}}
      *
@@ -4692,11 +4694,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity->user_id
         );
 
+        $reviewedData = \OmegaUp\DAO\QualityNominations::getReviewedData(
+            $r->identity,
+            $problem
+        );
+
+        $alreadyReviewed = count($reviewedData) > 0;
+
         $nominationPayload = [
-            'alreadyReviewed' => \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
-                $r->identity,
-                $problem
-            ),
+            'alreadyReviewed' => !is_null($alreadyReviewed),
             'dismissed' => $nominationStatus['dismissed'],
             'dismissedBeforeAc' => $nominationStatus['dismissedBeforeAc'],
             'nominated' => $nominationStatus['nominated'],
@@ -4706,6 +4712,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'solved' => false,
             'tried' => false,
         ];
+
+        if(!is_null($alreadyReviewed)) {
+            $response['templateProperties']['payload']['alreadyReviewedPayload'] = $alreadyReviewed;
+        }
 
         foreach ($details['runs'] ?? [] as $run) {
             if ($run['verdict'] === 'AC') {

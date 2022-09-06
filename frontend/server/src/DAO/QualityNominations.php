@@ -191,6 +191,63 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     }
 
     /**
+     * Returns the contents and id of a nom
+     */
+    public static function getReviewedData(
+        \Omegaup\DAO\VO\Identities $identity,
+        \Omegaup\DAO\VO\Problems $problem
+    ): array {
+        $sql = "
+            SELECT
+                qn.qualitynomination_id,
+                qn.contents
+            FROM
+                QualityNominations qn
+            INNER JOIN
+                Identities i ON i.user_id = qn.user_id
+            WHERE
+                nomination = 'quality_tag' AND
+                i.identity_id = ? AND
+                qn.problem_id = ?;";
+        $query = \Omegaup\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identity->identity_id, $problem->problem_id]
+        );
+        if (is_null($query)) {
+            return null;
+        }
+
+        $contents = json_decode($query['contents'], true);
+        return [
+            'qualitynomination_id' => $query['qualitynomination_id'],
+            'contenst' => $contents
+        ];
+    }
+
+    public static function updateQualityNominations(
+        int $qualityNominationsId,
+        string $contents
+    ): array {
+        $sql = '
+            UPDATE 
+                QualityNominations
+            SET
+                contents = ?
+            WHERE
+                qualitynomination_id = ?;';
+        
+        \OmegaUp\MySQLConnection::getInstanace()->Execute(
+            $sql,
+            [
+                $contents,
+                $qualityNominationsId
+            ]
+        );
+
+        return ['status' => 'ok'];
+    }
+
+    /**
      * Gets additional details for $nomination and structures it as an object
      * instead of as a flat array.
      *

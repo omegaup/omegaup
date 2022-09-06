@@ -673,6 +673,24 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         ];
     }
 
+    public static function apiUpdate(\Omegaup\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        // Validate request
+        $r->ensureMainUserIdentity();
+        self::validateMemberOfReviewerGroup($r);
+
+        $qualityNominationId = $r->ensureInt('qualitynomination_id');
+        \OmegaUp\Validtors::validateStringNonEmpty($r['contents'], 'contents');
+
+        \OmegaUp\DAO\QualityNominations::updateQualityNominations(
+            $qualityNominationId,
+            $r['contents']
+        );
+
+        return ['status' => 'ok'];
+    }
+
     /**
      * Marks a problem of a nomination (only the demotion type supported for now) as (resolved, banned, warning).
      *
