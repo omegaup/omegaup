@@ -4,7 +4,7 @@
  * Test administrative tasks for teaching assistant team
  */
 class CourseTeachingAssistantTest extends \OmegaUp\Test\ControllerTestCase {
-    public function testTeachingAssistantPrivilegies() {
+    public function testTeachingAssistantCanViewCourse() {
         // Create a course
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
@@ -57,8 +57,6 @@ class CourseTeachingAssistantTest extends \OmegaUp\Test\ControllerTestCase {
             return;
         }
 
-        // login teaching assistant
-        $loginTeachingAssistant = self::login($teachingAssistant);
         $course = \OmegaUp\DAO\Courses::getByAlias(
             $courseData['course_alias']
         );
@@ -78,38 +76,159 @@ class CourseTeachingAssistantTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals($courseData['course_alias'], $response['alias']);
 
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+        $submission = \OmegaUp\DAO\Submissions::getByGuid(
+            $runData['response']['guid']
+        );
 
-        $r = new \OmegaUp\Request([
-            'auth_token' => $loginTeachingAssistant->auth_token,
-            'run_alias' => $runData['response']['guid']
-        ]);
+        //teaching assistant is able to view the submission
+        $this->assertTrue(
+            \OmegaUp\Authorization::canEditSubmission(
+                $teachingAssistant,
+                $submission
+            )
+        );
+    }
 
-        //teaching assistant can disqualify a submission
-        $response = \OmegaUp\Controllers\Run::apiDisqualify($r);
+    public function testTeachingAssistantCanViewSubmission() {
+        // Create a course
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
-        $this->assertEquals('ok', $response['status']);
+        // create a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        $guid = $runData['response']['guid'];
+        // create admin
+        ['identity' => $adminUser] = \OmegaUp\Test\Factories\User::createAdminUser();
 
-        //teaching assistant can requalify a submission
-        \OmegaUp\Controllers\Run::apiRequalify(
+        // login admin
+        $adminLogin = self::login($adminUser);
+
+        // add problem to assignment
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $adminLogin,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+
+        // create normal user
+        ['identity' => $teachingAssistant] = \OmegaUp\Test\Factories\User::createUser();
+        // create normal user
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+
+        // add user like teaching assistant
+        \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
             new \OmegaUp\Request([
-                'auth_token' => $loginTeachingAssistant->auth_token,
-                'run_alias' => $guid
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $teachingAssistant->username,
+                'course_alias' => $courseData['course_alias'],
             ])
         );
 
-        $this->assertEquals(
-            'normal',
-            \OmegaUp\DAO\Submissions::getByGuid($guid)->type
+        // add user like student
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student
         );
 
-        //teaching assistant can rejudge a submission
-        $response = \OmegaUp\Controllers\Run::apiRejudge($r);
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $student
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(1, $detourGrader->getGraderCallCount());
+        $run = \OmegaUp\DAO\Runs::getByGUID($runData['response']['guid']);
+        if (is_null($run)) {
+            return;
+        }
+
+        $course = \OmegaUp\DAO\Courses::getByAlias(
+            $courseData['course_alias']
+        );
+
+        $this->assertTrue(
+            \OmegaUp\Authorization::isTeachingAssistant(
+                $teachingAssistant,
+                $course
+            )
+        );
+
+        $submission = \OmegaUp\DAO\Submissions::getByGuid(
+            $runData['response']['guid']
+        );
+
+        //teaching assistant is able to view the submission
+        $this->assertTrue(
+            \OmegaUp\Authorization::canViewSubmission(
+                $teachingAssistant,
+                $submission
+            )
+        );
+    }
+
+    public function testTeachingAssistantCanEditSubmission() {
+        // Create a course
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+
+        // create a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // create admin
+        ['identity' => $adminUser] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        // login admin
+        $adminLogin = self::login($adminUser);
+
+        // add problem to assignment
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $adminLogin,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+
+        // create normal user
+        ['identity' => $teachingAssistant] = \OmegaUp\Test\Factories\User::createUser();
+        // create normal user
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+
+        // add user like teaching assistant
+        \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $teachingAssistant->username,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        // add user like student
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $student
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $run = \OmegaUp\DAO\Runs::getByGUID($runData['response']['guid']);
+        if (is_null($run)) {
+            return;
+        }
+
+        $course = \OmegaUp\DAO\Courses::getByAlias(
+            $courseData['course_alias']
+        );
+
+        $this->assertTrue(
+            \OmegaUp\Authorization::isTeachingAssistant(
+                $teachingAssistant,
+                $course
+            )
+        );
 
         $submission = \OmegaUp\DAO\Submissions::getByGuid(
             $runData['response']['guid']

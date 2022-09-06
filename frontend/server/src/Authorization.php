@@ -171,11 +171,12 @@ class Authorization {
             return false;
         }
 
+        if (self::isAdmin($identity, $problemset)) {
+            return true;
+        }
+
         $course = \OmegaUp\DAO\Courses::getByProblemsetId($problemset);
-        return self::isAdmin(
-            $identity,
-            $problemset
-        ) || (!is_null($course) && self::isTeachingAssistant(
+        return (!is_null($course) && self::isTeachingAssistant(
             $identity,
             $course
         ));
@@ -199,18 +200,18 @@ class Authorization {
             return false;
         }
 
-        $course = \OmegaUp\DAO\Courses::getByProblemsetId($problemset);
-
         $problem = \OmegaUp\DAO\Problems::getByPK($clarification->problem_id);
         if (is_null($problem) || is_null($problem->acl_id)) {
             return false;
         }
 
+        if (self::isAdmin($identity, $problemset)) {
+            return true;
+        }
+
+        $course = \OmegaUp\DAO\Courses::getByProblemsetId($problemset);
         return (self::isOwner($identity, $problem->acl_id)
-                || self::isAdmin(
-                    $identity,
-                    $problemset
-                ) || (!is_null($course) && self::isTeachingAssistant(
+                || (!is_null($course) && self::isTeachingAssistant(
                     $identity,
                     $course
                 )));
