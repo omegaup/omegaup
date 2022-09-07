@@ -156,11 +156,18 @@
                   <span class="mr-2"
                     >{{ filter.name }}: {{ filter.value }}</span
                   >
-                  <a @click="onRemoveFilter(filter.name)">
+                  <a
+                    :data-remove-filter="filter.name"
+                    @click="onRemoveFilter(filter.name)"
+                  >
                     <font-awesome-icon :icon="['fas', 'times']" />
                   </a>
                 </span>
-                <a href="#runs" @click="onRemoveFilter('all')">
+                <a
+                  href="#runs"
+                  data-remove-all-filters
+                  @click="onRemoveFilter('all')"
+                >
                   <span class="mr-2">{{ T.wordsRemoveFilter }}</span>
                 </a>
               </div>

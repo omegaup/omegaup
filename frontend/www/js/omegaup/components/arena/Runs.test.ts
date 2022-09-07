@@ -354,10 +354,22 @@ describe('Runs.vue', () => {
         filteredRuns.length,
       );
 
-      await wrapper.find('a.tags-input-remove').trigger('click');
+      await wrapper.find('[data-remove-all-filters]').trigger('click');
 
       // Now all runs should appear
       expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
+
+      await wrapper
+        .findAll(`td[data-username="${username}"]`)
+        .at(1)
+        .find(`a[title="${username}"]`)
+        .trigger('click');
+
+      await wrapper.find('[data-remove-filter]').trigger('click');
+
+      // Now all runs should appear
+      expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
+      expect(wrapper.vm.filterUser).toBeFalsy();
     });
   });
 });
