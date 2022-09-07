@@ -297,6 +297,30 @@ describe('Runs.vue', () => {
     ]);
   });
 
+  it('Should handle filterUser when username changes', async () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        runs,
+        showContest: true,
+        showDetails: true,
+        showDisqualify: true,
+        showPager: true,
+        showPoints: false,
+        showProblem: true,
+        showRejudge: true,
+        showUser: true,
+        username: null,
+      },
+    });
+
+    await wrapper.setProps({ username: 'username' });
+    expect(wrapper.vm.filterUser?.key).toBe('username');
+
+    await wrapper.setProps({ username: null });
+    expect(wrapper.vm.filterUser).toBeFalsy();
+  });
+
   const usernamesToBeFiltered = ['username', 'other_username'];
   describe.each(usernamesToBeFiltered)(`A user:`, (username) => {
     it(`whose username is ${username} should be filtered when they are selected.`, async () => {
@@ -329,6 +353,11 @@ describe('Runs.vue', () => {
       expect(wrapper.findAll('table tbody tr').length).toBe(
         filteredRuns.length,
       );
+
+      await wrapper.find('a.tags-input-remove').trigger('click');
+
+      // Now all runs should appear
+      expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
     });
   });
 });
