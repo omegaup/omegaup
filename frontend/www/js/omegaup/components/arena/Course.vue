@@ -80,7 +80,7 @@
               :run-details-data="runDetailsData"
               :problem-alias="problemAlias"
               :in-contest-or-course="true"
-              @request-feedback="(runId) => $emit('request-feedback', runId)"
+              @request-feedback="(guid) => $emit('request-feedback', guid)"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', { selectedTab, problemAlias })

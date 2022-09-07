@@ -161,14 +161,13 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.apiError);
           },
-          'request-feedback': (runId: string) => {
+          'request-feedback': (guid: string) => {
             api.Course.requestFeedback({
               course_alias: payload.courseDetails.alias,
               assignment_alias: payload.currentAssignment.alias,
-              run_id: runId,
+              guid,
             })
               .then(() => {
-                console.log(runId);
                 ui.success(T.requestFeedback);
               })
               .catch(ui.apiError);

@@ -185,7 +185,7 @@
             :problemset-problems="[]"
             :request-feedback="requestFeedback"
             :is-contest-finished="isContestFinished"
-            @request-feedback="(runId) => $emit('request-feedback', runId)"
+            @request-feedback="(guid) => $emit('request-feedback', guid)"
             @details="(request) => onRunDetails(request, 'problems')"
             @update-search-result-users-contest="
               (request) => $emit('update-search-result-users-contest', request)

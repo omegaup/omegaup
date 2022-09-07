@@ -4,70 +4,121 @@
  * Test administrative tasks for teaching assistant team
  */
 class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
-    public function testCanSendNotificationsToAdministrators() {
-        // Create a course
-        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+    private static $adminLogin = null;
+    private static $courseAlias = null;
+    private static $assignmentAlias = null;
+    private static $course = null;
+    private static $courseData = null;
+    private static $problemData = null;
+    private static $identity = null;
+    private static $identity2 = null;
+    private static $identity3 = null;
+    private static $identityGroupTA = null;
+    private static $identityGroupTA2 = null;
+    private static $identityGroupAdmin = null;
+    private static $groupDataAdmin = null;
+    private static $groupDataTA = null;
 
-        $assignmentAlias = $courseData['assignment_alias'];
+    public function setUp(): void {
+        parent::setUp();
+
+        ['identity' => $adminUser] = \OmegaUp\Test\Factories\User::createAdminUser();
+        self::$adminLogin = self::login($adminUser);
+
+        // Create a course
+        self::$courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
         // create a problem
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        self::$problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        // create admin
-        ['identity' => $adminUser] = \OmegaUp\Test\Factories\User::createAdminUser();
+        // create normal users
+        ['identity' => self::$identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => self::$identity2] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => self::$identity3] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => self::$identityGroupTA] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => self::$identityGroupTA2] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => self::$identityGroupAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
-        // login admin
-        $adminLogin = self::login($adminUser);
+        // Get a group for admins and other for teaching assistants
+        self::$groupDataAdmin = \OmegaUp\Test\Factories\Groups::createGroup();
+        self::$groupDataTA = \OmegaUp\Test\Factories\Groups::createGroup();
+
+        self::$courseAlias = self::$courseData['course_alias'];
 
         // add problem to assignment
         \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
-            $adminLogin,
-            $courseData['course_alias'],
-            $courseData['assignment_alias'],
-            [ $problemData ]
+            self::$adminLogin,
+            self::$courseData['course_alias'],
+            self::$courseData['assignment_alias'],
+            [ self::$problemData ]
         );
-
-        // create normal user
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        // create normal user
-        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
-        // create normal user
-        ['identity' => $identity3] = \OmegaUp\Test\Factories\User::createUser();
-        // create normal user
-        ['identity' => $identityGroupTA] = \OmegaUp\Test\Factories\User::createUser();
-        // create normal user
-        ['identity' => $identityGroupTA2] = \OmegaUp\Test\Factories\User::createUser();
-        // create normal user
-        ['identity' => $identityGroupAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
         // add identity like teaching assistant
         \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
             new \OmegaUp\Request([
-                'auth_token' => $adminLogin->auth_token,
-                'usernameOrEmail' => $identity->username,
-                'course_alias' => $courseData['course_alias'],
+                'auth_token' => self::$adminLogin->auth_token,
+                'usernameOrEmail' => self::$identity->username,
+                'course_alias' => self::$courseData['course_alias'],
             ])
         );
 
         // add identity2 like an admin
         \OmegaUp\Controllers\Course::apiAddAdmin(
             new \OmegaUp\Request([
-                'auth_token' => $adminLogin->auth_token,
-                'usernameOrEmail' => $identity2->username,
-                'course_alias' => $courseData['course_alias'],
+                'auth_token' => self::$adminLogin->auth_token,
+                'usernameOrEmail' => self::$identity2->username,
+                'course_alias' => self::$courseData['course_alias'],
             ])
         );
 
         // add identity3 like student
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
-            $courseData,
-            $identity3
+            self::$courseData,
+            self::$identity3
         );
 
+        // add user to the groups
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            self::$groupDataAdmin,
+            self::$identityGroupAdmin
+        );
+
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            self::$groupDataTA,
+            self::$identityGroupTA
+        );
+
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            self::$groupDataTA,
+            self::$identityGroupTA2
+        );
+
+        // Call api to add group admin
+        \OmegaUp\Controllers\Course::apiAddGroupAdmin(new \OmegaUp\Request([
+            'auth_token' => self::$adminLogin->auth_token,
+            'group' => self::$groupDataAdmin['request']['alias'],
+            'course_alias' => self::$courseData['course_alias'],
+        ]));
+
+        // Call api to add group teaching assistant
+        \OmegaUp\Controllers\Course::apiAddGroupTeachingAssistant(new \OmegaUp\Request([
+            'auth_token' => self::$adminLogin->auth_token,
+            'group' => self::$groupDataTA['request']['alias'],
+            'course_alias' => self::$courseData['course_alias'],
+        ]));
+
+        // Create the assignment
+        self::$assignmentAlias = self::$courseData['assignment_alias'];
+        self::$course = \OmegaUp\DAO\Courses::getByAlias(self::$courseAlias);
+        if (is_null(self::$course) || is_null(self::$course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        // Create a run for assignment
         $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
-            $problemData,
-            $courseData,
-            $identity3
+            self::$problemData,
+            self::$courseData,
+            self::$identity3
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
@@ -76,111 +127,57 @@ class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTes
             return;
         }
 
-        // Get a group
-        $groupDataAdmin = \OmegaUp\Test\Factories\Groups::createGroup();
-        \OmegaUp\Test\Factories\Groups::addUserToGroup(
-            $groupDataAdmin,
-            $identityGroupAdmin
+        $studentLogin = self::login(self::$identity3);
+
+        // student call api to send notifications to all administrators
+        // members in the course
+        \OmegaUp\Controllers\Course::apiRequestFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'assignment_alias' => self::$assignmentAlias,
+                'course_alias' => self::$courseData['course_alias'],
+                'run_id' => $runData['response']['guid']
+            ])
         );
+    }
 
-        // Get a group
-        $groupDataTA = \OmegaUp\Test\Factories\Groups::createGroup();
-        \OmegaUp\Test\Factories\Groups::addUserToGroup(
-            $groupDataTA,
-            $identityGroupTA
-        );
-        \OmegaUp\Test\Factories\Groups::addUserToGroup(
-            $groupDataTA,
-            $identityGroupTA2
-        );
-
-        // Prepare request
-        $rAdmin = new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-            'group' => $groupDataAdmin['request']['alias'],
-            'course_alias' => $courseData['course_alias'],
-        ]);
-
-        $rTA = new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-            'group' => $groupDataTA['request']['alias'],
-            'course_alias' => $courseData['course_alias'],
-        ]);
-
-        // Call api to add group admin
-        \OmegaUp\Controllers\Course::apiAddGroupAdmin($rAdmin);
-
-        // Call api to add group teaching assistant
-        \OmegaUp\Controllers\Course::apiAddGroupTeachingAssistant($rTA);
-
+    public function testAdministratorsHaveCorrectRoles() {
         // login teaching assistant
-        $userLogin = self::login($identity);
-        $course = \OmegaUp\DAO\Courses::getByAlias(
-            $courseData['course_alias']
-        );
-
         $this->assertTrue(
             \OmegaUp\Authorization::isTeachingAssistant(
-                $identity,
-                $course
+                self::$identity,
+                self::$course
             )
         );
 
         // newly added admin login
-        $userLogin = self::login($identity2);
-        $course = \OmegaUp\DAO\Courses::getByAlias(
-            $courseData['course_alias']
-        );
-
         $this->assertTrue(
             \OmegaUp\Authorization::isCourseAdmin(
-                $identity2,
-                $course
+                self::$identity2,
+                self::$course
             )
         );
 
         // newly added admin login like a group member
-        $userLogin = self::login($identityGroupAdmin);
-        $course = \OmegaUp\DAO\Courses::getByAlias(
-            $courseData['course_alias']
-        );
-
         $this->assertTrue(
             \OmegaUp\Authorization::isCourseAdmin(
-                $identity2,
-                $course
+                self::$identity2,
+                self::$course
             )
         );
 
         // login teaching assistant like a group member
-        $userLogin = self::login($identityGroupTA);
-        $course = \OmegaUp\DAO\Courses::getByAlias(
-            $courseData['course_alias']
-        );
-
         $this->assertTrue(
             \OmegaUp\Authorization::isTeachingAssistant(
-                $identity,
-                $course
+                self::$identity,
+                self::$course
             )
         );
+    }
 
-        $userLogin = self::login($identity3);
-        $course = \OmegaUp\DAO\Courses::getByAlias(
-            $courseData['course_alias']
-        );
-
-        \OmegaUp\Controllers\Course::apiRequestFeedback(
-            new \OmegaUp\Request([
-                'auth_token' => $userLogin->auth_token,
-                'assignment_alias' => $assignmentAlias,
-                'course_alias' => $courseData['course_alias'],
-                'run_id' => $runData['response']['guid']
-            ])
-        );
-
+    public function testCanAdministratorsReceiveNotifications() {
         // Verify if notification has been sent to an admin
-        $author = \Omegaup\DAO\Users::FindByUsername($identity->username);
+        $author = \Omegaup\DAO\Users::FindByUsername(self::$identity->username);
         if (is_null($author)) {
             return;
         }
@@ -195,12 +192,14 @@ class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTes
             $contents['type']
         );
         $this->assertEquals(
-            $courseData['course']->name,
+            self::$courseData['course']->name,
             $contents['body']['localizationParams']['courseName']
         );
 
         // Verify if notification has been sent to a teaching assistant
-        $author = \Omegaup\DAO\Users::FindByUsername($identity2->username);
+        $author = \Omegaup\DAO\Users::FindByUsername(
+            self::$identity2->username
+        );
         if (is_null($author)) {
             return;
         }
@@ -215,13 +214,13 @@ class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTes
             $contents['type']
         );
         $this->assertEquals(
-            $courseData['course']->name,
+            self::$courseData['course']->name,
             $contents['body']['localizationParams']['courseName']
         );
 
         // Verify if notification has been sent to a teaching assistant group member
         $author = \Omegaup\DAO\Users::FindByUsername(
-            $identityGroupTA->username
+            self::$identityGroupTA->username
         );
         if (is_null($author)) {
             return;
@@ -237,13 +236,13 @@ class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTes
             $contents['type']
         );
         $this->assertEquals(
-            $courseData['course']->name,
+            self::$courseData['course']->name,
             $contents['body']['localizationParams']['courseName']
         );
 
         // Verify if notification has been sent to aa admin group member
         $author = \Omegaup\DAO\Users::FindByUsername(
-            $identityGroupAdmin->username
+            self::$identityGroupAdmin->username
         );
         if (is_null($author)) {
             return;
@@ -259,7 +258,7 @@ class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTes
             $contents['type']
         );
         $this->assertEquals(
-            $courseData['course']->name,
+            self::$courseData['course']->name,
             $contents['body']['localizationParams']['courseName']
         );
     }
