@@ -3199,7 +3199,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
-     * @omegaup-request-param string $run_id
+     * @omegaup-request-param string $guid
      */
 
     public static function apiRequestFeedback(\OmegaUp\Request $r): array {
@@ -3219,8 +3219,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
-        $runId = $r->ensureString(
-            'run_id',
+        $guid = $r->ensureString(
+            'guid',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
@@ -3253,7 +3253,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         if (
-            !is_null($r->user) && !is_null($r->user->user_id)
+            !is_null($r->user)
         ) {
             //get admins, groups admin, teaching assistants, groups teaching assistant
             foreach ($getAllAdministrators as $administrator) {
@@ -3272,7 +3272,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                                         'assignmentName' => $assignment->name,
                                         'courseName' => $course->name,
                                     ],
-                                    'url' => "/course/{$course->alias}/assignment/{$assignmentAlias}/#runs/all/show-run:{$runId}",
+                                    'url' => "/course/{$course->alias}/assignment/{$assignmentAlias}/#runs/all/show-run:{$guid}",
                                     'iconUrl' => '/media/info.png',
                                 ],
                             ]

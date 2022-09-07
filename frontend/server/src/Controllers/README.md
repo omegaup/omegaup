@@ -2080,7 +2080,7 @@ Request feedback
 | ------------------ | -------- | ----------- |
 | `assignment_alias` | `string` |             |
 | `course_alias`     | `string` |             |
-| `run_id`           | `string` |             |
+| `guid`             | `string` |             |
 
 ### Returns
 
