@@ -136,7 +136,7 @@
                 >{{ T.contestParticipant }}:
                 <omegaup-common-typeahead
                   :existing-options="searchResultUsers"
-                  :value.sync="filterUsername"
+                  :value.sync="filterUser"
                   :max-results="10"
                   @update-existing-options="updateSearchResultUsers"
                 ></omegaup-common-typeahead>
@@ -219,14 +219,18 @@
                 <tt>{{ run.guid.substring(0, 8) }}</tt>
               </acronym>
             </td>
-            <td v-if="showUser" class="text-break-all">
+            <td
+              v-if="showUser"
+              class="text-break-all"
+              :data-username="run.username"
+            >
               <omegaup-user-username
                 :classname="run.classname"
                 :username="run.username"
                 :country="run.country_id"
                 :linkify="true"
                 :emit-click-event="true"
-                @click="(username) => (filterUsername = username)"
+                @click="(user) => (filterUser = { key: user, value: user })"
               ></omegaup-user-username>
               <a :href="`/profile/${run.username}/`" class="ml-2">
                 <font-awesome-icon :icon="['fas', 'external-link-alt']" />
@@ -454,7 +458,7 @@ export default class Runs extends Vue {
   filterOffset: number = 0;
   filterProblem: null | types.ListItem = null;
   filterStatus: string = '';
-  filterUsername: null | types.ListItem = null;
+  filterUser: null | types.ListItem = null;
   filterVerdict: string = '';
   filterContest: string = '';
   filters: { name: string; value: string }[] = [];
@@ -470,7 +474,7 @@ export default class Runs extends Vue {
       !this.filterLanguage &&
       !this.filterProblem &&
       !this.filterStatus &&
-      !this.filterUsername &&
+      !this.filterUser &&
       !this.filterContest &&
       !this.filterVerdict
     ) {
@@ -495,7 +499,7 @@ export default class Runs extends Vue {
       if (this.filterStatus && run.status !== this.filterStatus) {
         return false;
       }
-      if (this.filterUsername && run.username !== this.filterUsername.key) {
+      if (this.filterUser && run.username !== this.filterUser.key) {
         return false;
       }
       if (this.filterContest && run.contest_alias !== this.filterContest) {
@@ -669,10 +673,10 @@ export default class Runs extends Vue {
   @Watch('username')
   onUsernameChanged(newValue: string | null) {
     if (!newValue) {
-      this.filterUsername = null;
+      this.filterUser = null;
       return;
     }
-    this.filterUsername = { key: newValue, value: newValue };
+    this.filterUser = { key: newValue, value: newValue };
   }
 
   @Watch('problemAlias')
@@ -708,7 +712,7 @@ export default class Runs extends Vue {
     this.onEmitFilterChanged({ filter: 'status', value: newValue });
   }
 
-  @Watch('filterUsername')
+  @Watch('filterUser')
   onFilterUsernameChanged(newValue: null | types.ListItem) {
     if (!newValue) {
       this.onEmitFilterChanged({ filter: 'username', value: null });
@@ -752,7 +756,7 @@ export default class Runs extends Vue {
       this.filterLanguage = '';
       this.filterProblem = null;
       this.filterStatus = '';
-      this.filterUsername = null;
+      this.filterUser = null;
       this.filterVerdict = '';
       this.filterContest = '';
       this.filterOffset = 0;
@@ -771,7 +775,7 @@ export default class Runs extends Vue {
         this.filterStatus = '';
         break;
       case 'username':
-        this.filterUsername = null;
+        this.filterUser = null;
         break;
       case 'verdict':
         this.filterVerdict = '';

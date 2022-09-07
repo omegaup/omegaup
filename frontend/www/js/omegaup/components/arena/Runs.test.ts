@@ -1,6 +1,6 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
-import { shallowMount } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
 
 import T from '../../lang';
@@ -200,7 +200,7 @@ describe('Runs.vue', () => {
     });
 
     await wrapper.setData({
-      filterUsername: { key: 'other_username', value: 'other username' },
+      filterUser: { key: 'other_username', value: 'other username' },
     });
     expect(wrapper.emitted('filter-changed')).toEqual([
       [{ filter: 'username', value: 'other_username' }],
@@ -295,5 +295,40 @@ describe('Runs.vue', () => {
         },
       ],
     ]);
+  });
+
+  const usernamesToBeFiltered = ['username', 'other_username'];
+  describe.each(usernamesToBeFiltered)(`A user:`, (username) => {
+    it(`whose username is ${username} should be filtered when they are selected.`, async () => {
+      const wrapper = mount(arena_Runs, {
+        propsData: {
+          contestAlias: 'admin',
+          runs,
+          showContest: true,
+          showDetails: true,
+          showDisqualify: true,
+          showPager: true,
+          showPoints: false,
+          showProblem: true,
+          showRejudge: true,
+          showUser: true,
+          username: null,
+        },
+      });
+
+      expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
+
+      await wrapper
+        .findAll(`td[data-username="${username}"]`)
+        .at(1)
+        .find(`a[title="${username}"]`)
+        .trigger('click');
+
+      const filteredRuns = runs.filter((run) => run.username == username);
+
+      expect(wrapper.findAll('table tbody tr').length).toBe(
+        filteredRuns.length,
+      );
+    });
   });
 });
