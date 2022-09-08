@@ -5143,8 +5143,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             } elseif ($scoreMode === 'all_or_nothing') {
                 $run['contest_score'] = 0;
                 $run['score'] = 0;
-            } else {
-                // TODO: Calculate max score per sub-tasks
             }
             $allRuns[] = $run;
         }
