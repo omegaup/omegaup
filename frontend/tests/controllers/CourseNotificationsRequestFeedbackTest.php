@@ -19,6 +19,8 @@ class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTes
     private static $groupDataAdmin = null;
     private static $groupDataTA = null;
 
+    //separar TA de admins
+
     public function setUp(): void {
         parent::setUp();
 
@@ -141,16 +143,7 @@ class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTes
         );
     }
 
-    public function testAdministratorsHaveCorrectRoles() {
-        // login teaching assistant
-        $this->assertTrue(
-            \OmegaUp\Authorization::isTeachingAssistant(
-                self::$identity,
-                self::$course
-            )
-        );
-
-        // newly added admin login
+    public function testAdminsHaveCorrectRoles() {
         $this->assertTrue(
             \OmegaUp\Authorization::isCourseAdmin(
                 self::$identity2,
@@ -158,45 +151,39 @@ class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTes
             )
         );
 
-        // newly added admin login like a group member
         $this->assertTrue(
             \OmegaUp\Authorization::isCourseAdmin(
-                self::$identity2,
-                self::$course
-            )
-        );
-
-        // login teaching assistant like a group member
-        $this->assertTrue(
-            \OmegaUp\Authorization::isTeachingAssistant(
-                self::$identity,
+                self::$identityGroupAdmin,
                 self::$course
             )
         );
     }
 
-    public function testCanAdministratorsReceiveNotifications() {
-        // Verify if notification has been sent to an admin
-        $author = \Omegaup\DAO\Users::FindByUsername(self::$identity->username);
-        if (is_null($author)) {
-            return;
-        }
-        $notifications = \OmegaUp\DAO\Notifications::getUnreadNotifications(
-            $author
-        );
-        $this->assertCount(2, $notifications);
-
-        $contents = json_decode($notifications[1]['contents'], true);
-        $this->assertEquals(
-            \OmegaUp\DAO\Notifications::COURSE_REQUEST_FEEDBACK,
-            $contents['type']
-        );
-        $this->assertEquals(
-            self::$courseData['course']->name,
-            $contents['body']['localizationParams']['courseName']
+    public function testTeachingAssistantsHaveCorrectRoles() {
+        $this->assertTrue(
+            \OmegaUp\Authorization::isTeachingAssistant(
+                self::$identity,
+                self::$course
+            )
         );
 
-        // Verify if notification has been sent to a teaching assistant
+        $this->assertTrue(
+            \OmegaUp\Authorization::isTeachingAssistant(
+                self::$identityGroupTA,
+                self::$course
+            )
+        );
+
+        $this->assertTrue(
+            \OmegaUp\Authorization::isTeachingAssistant(
+                self::$identityGroupTA2,
+                self::$course
+            )
+        );
+    }
+
+    public function testCanAdminsReceiveNotifications() {
+        // Verify if notification has been sent to admins
         $author = \Omegaup\DAO\Users::FindByUsername(
             self::$identity2->username
         );
@@ -218,7 +205,54 @@ class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTes
             $contents['body']['localizationParams']['courseName']
         );
 
-        // Verify if notification has been sent to a teaching assistant group member
+        // Verify if notification has been sent to admins group members
+        $author = \Omegaup\DAO\Users::FindByUsername(
+            self::$identityGroupAdmin->username
+        );
+        if (is_null($author)) {
+            return;
+        }
+        $notifications = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+            $author
+        );
+        $this->assertCount(1, $notifications);
+
+        $contents = json_decode($notifications[0]['contents'], true);
+        $this->assertEquals(
+            \OmegaUp\DAO\Notifications::COURSE_REQUEST_FEEDBACK,
+            $contents['type']
+        );
+        $this->assertEquals(
+            self::$courseData['course']->name,
+            $contents['body']['localizationParams']['courseName']
+        );
+    }
+
+    public function testCanTeachingAssistantsReceiveNotifications() {
+        // Verify if notification has been sent to teaching assistants
+        $author = \Omegaup\DAO\Users::FindByUsername(
+            self::$identity->username
+        );
+        if (is_null($author)) {
+            return;
+        }
+        $notifications = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+            $author
+        );
+        $this->assertCount(2, $notifications);
+
+        $contents = json_decode($notifications[1]['contents'], true);
+        $this->assertEquals(
+            \OmegaUp\DAO\Notifications::COURSE_REQUEST_FEEDBACK,
+            $contents['type']
+        );
+        $this->assertEquals(
+            self::$courseData['course']->name,
+            $contents['body']['localizationParams']['courseName']
+        );
+
+        // Verify if notification has been sent to a teaching assistants
+        // group members
         $author = \Omegaup\DAO\Users::FindByUsername(
             self::$identityGroupTA->username
         );
@@ -240,9 +274,8 @@ class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTes
             $contents['body']['localizationParams']['courseName']
         );
 
-        // Verify if notification has been sent to aa admin group member
         $author = \Omegaup\DAO\Users::FindByUsername(
-            self::$identityGroupAdmin->username
+            self::$identityGroupTA2->username
         );
         if (is_null($author)) {
             return;

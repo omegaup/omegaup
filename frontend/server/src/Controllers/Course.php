@@ -3252,34 +3252,29 @@ class Course extends \OmegaUp\Controllers\Controller {
             $course
         );
 
-        if (
-            !is_null($r->user)
-        ) {
-            //get admins, groups admin, teaching assistants, groups teaching assistant
-            foreach ($getAllAdministrators as $administrator) {
-                \OmegaUp\DAO\Notifications::create(
-                    new \OmegaUp\DAO\VO\Notifications([
-                        'user_id' => $administrator['user_id'],
-                        'contents' =>  json_encode(
-                            [
-                                'type' => \OmegaUp\DAO\Notifications::COURSE_REQUEST_FEEDBACK,
-                                'body' => [
-                                    'localizationString' => new \OmegaUp\TranslationString(
-                                        'notificationCourseRequestFeedback'
-                                    ),
-                                    'localizationParams' => [
-                                        'username' => $r->identity->username,
-                                        'assignmentName' => $assignment->name,
-                                        'courseName' => $course->name,
-                                    ],
-                                    'url' => "/course/{$course->alias}/assignment/{$assignmentAlias}/#runs/all/show-run:{$guid}",
-                                    'iconUrl' => '/media/info.png',
+        foreach ($getAllAdministrators as $administrator) {
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $administrator['user_id'],
+                    'contents' =>  json_encode(
+                        [
+                            'type' => \OmegaUp\DAO\Notifications::COURSE_REQUEST_FEEDBACK,
+                            'body' => [
+                                'localizationString' => new \OmegaUp\TranslationString(
+                                    'notificationCourseRequestFeedback'
+                                ),
+                                'localizationParams' => [
+                                    'username' => $r->identity->username,
+                                    'assignmentName' => $assignment->name,
+                                    'courseName' => $course->name,
                                 ],
-                            ]
-                        ),
-                    ])
-                );
-            }
+                                'url' => "/course/{$course->alias}/assignment/{$assignmentAlias}/#runs/all/show-run:{$guid}",
+                                'iconUrl' => '/media/info.png',
+                            ],
+                        ]
+                    ),
+                ])
+            );
         }
         return [
             'status' => 'ok',
