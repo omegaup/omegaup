@@ -2,9 +2,9 @@ import { shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
 
-import common_GroupAdmins from './GroupAdminsv2.vue';
+import common_GroupAdmins from './GroupAdmins.vue';
 
-describe('GroupAdminsv2.vue', () => {
+describe('GroupAdmins.vue', () => {
   it('Should handle empty group admins list', () => {
     const wrapper = shallowMount(common_GroupAdmins, {
       propsData: {
@@ -17,7 +17,7 @@ describe('GroupAdminsv2.vue', () => {
     );
   });
 
-  it('Should handle runs', async () => {
+  it('Should handle group admins list with data', async () => {
     const wrapper = shallowMount(common_GroupAdmins, {
       propsData: {
         groupAdmins: [

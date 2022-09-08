@@ -3098,10 +3098,12 @@ export namespace types {
     assignmentProblems: types.ProblemsetProblem[];
     course: types.CourseDetails;
     groupsAdmins: types.CourseGroupAdmin[];
+    groupsTeachingAssistants: types.CourseGroupAdmin[];
     identityRequests: types.IdentityRequest[];
     selectedAssignment?: types.CourseAssignment;
     students: types.CourseStudent[];
     tags: string[];
+    teachingAssistants: types.CourseAdmin[];
   }
 
   export interface CourseGroupAdmin {

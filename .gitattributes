@@ -26,6 +26,10 @@
 
 # Auto-generated files
 /yarn.lock linguist-generated=true
-/frontend/www/js/omegaup/lang* linguist-generated=true
+/frontend/server/src/Controllers/README.md linguist-generated=true
 /frontend/server/src/DAO/Base/*.php linguist-generated=true
 /frontend/server/src/DAO/VO/*.php linguist-generated=true
+/frontend/templates/pseudo.lang linguist-generated=true
+/frontend/www/js/omegaup/api.ts linguist-generated=true
+/frontend/www/js/omegaup/api_types.ts linguist-generated=true
+/frontend/www/js/omegaup/lang* linguist-generated=true
