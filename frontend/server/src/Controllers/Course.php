@@ -25,13 +25,13 @@ namespace OmegaUp\Controllers;
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, counts: array<string, int>, description: string, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>, archived?: list<FilteredCourse>}
+ * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>, archived: list<FilteredCourse>, teachingAssistant: list<FilteredCourse>}
  * @psalm-type CourseCloneDetailsPayload=array{creator: array{classname: string, username: string}, details: CourseDetails, token: null|string}
  * @psalm-type CoursesByTimeType=array{courses: list<FilteredCourse>, timeType: string}
  * @psalm-type CoursesByAccessMode=array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType}}
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
  * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
- * @psalm-type AdminCourses=array{admin: array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType, archived: CoursesByTimeType}}}
+ * @psalm-type AdminCourses=array{admin: array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType, archived: CoursesByTimeType, teachingAssistant: CoursesByTimeType}}}
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseProblemVerdict=array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: null|string}
@@ -1709,7 +1709,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
         $group = self::resolveGroup($course);
 
-        // Only Course Admins or Group Members (students) can see these results
+        // Only Course Admins, Teaching Assistant or Group Members (students)
+        // can see these results
         if (
             !\OmegaUp\Authorization::canViewCourse(
                 $r->identity,
@@ -1856,7 +1857,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return FilteredCourse
      */
-    private static function convertCourseToArray(\OmegaUp\DAO\VO\Courses $course): array {
+    public static function convertCourseToArray(\OmegaUp\DAO\VO\Courses $course): array {
         if (is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseNotFound'
@@ -1897,7 +1898,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-        $response = ['admin' => [], 'student' => [], 'public' => []];
+        $response = ['admin' => [], 'student' => [], 'public' => [], 'archived' => [], 'teachingAssistant' => []];
 
         if (in_array('admin', $courseTypes)) {
             // TODO(pablo): Cache
@@ -1909,17 +1910,20 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'course_id',
                     'DESC'
                 );
+
+                foreach ($adminCourses as $course) {
+                    $response['admin'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
+                        $course
+                    );
+                }
             } else {
-                $adminCourses = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
+                $adminCoursesByIdentity = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
                     $identity->identity_id,
                     $page,
                     $pageSize
                 );
-            }
-            foreach ($adminCourses as $course) {
-                $response['admin'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
-                    $course
-                );
+
+                $response = array_merge($response, $adminCoursesByIdentity);
             }
         }
 
@@ -1938,7 +1942,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $identity->identity_id
             );
         }
-
         return $response;
     }
 
@@ -2910,7 +2913,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
-        // Only admin is alowed to make modifications
+        // Only admin is allowed to make modifications
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -3102,7 +3105,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
-        // Only admin is alowed to make modifications
+        // Only admin is allowed to make modifications
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -3712,6 +3715,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             unset($admin['user_id']);
         }
 
+        $teachingAssistants = \OmegaUp\DAO\UserRoles::getCourseTeachingAssistants(
+            $course
+        );
+        foreach ($teachingAssistants as &$teachingAssistant) {
+            unset($teachingAssistant['user_id']);
+        }
+
         return [
             'course' => self::getCommonCourseDetails($course, $identity),
             'assignmentProblems' => [],
@@ -4075,7 +4085,9 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, templateProperties: array{payload: CourseListMinePayload, title: \OmegaUp\TranslationString}}
      */
-    public static function getCourseMineDetailsForTypeScript(\OmegaUp\Request $r): array {
+    public static function getCourseMineDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
         $r->ensureIdentity();
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
@@ -4101,6 +4113,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'courses' => [],
                         'timeType' => 'archived',
                     ],
+                    'teachingAssistant' => [
+                        'courses' => [],
+                        'timeType' => 'teachingAssistant',
+                    ],
                 ],
                 'accessMode' => 'admin',
                 'activeTab' => '',
@@ -4121,7 +4137,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (array_key_exists('archived', $courses)) {
             $filteredCourses['admin']['filteredCourses']['archived']['courses'] = $courses['archived'];
         }
-
+        if (array_key_exists('teachingAssistant', $courses)) {
+            $filteredCourses['admin']['filteredCourses']['teachingAssistant']['courses'] = $courses['teachingAssistant'];
+        }
         if (
             $filteredCourses['admin']['activeTab'] === ''
             && !empty(
