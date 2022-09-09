@@ -1362,6 +1362,7 @@ const translations: { [key: string]: string; } = {
   unverifiedUser: "Unverified user.",
   updateItemsSuccess: "All the selected items has been updated",
   updateProblemLevel: "Update problem level",
+  updateReviewerNomination: "Edit revision",
   updateStatementsCommitMessage: "Updated statements",
   userAlreadyAcceptedPrivacyPolicy: "User has already accepted the privacy policy",
   userAlreadyHasSelectedRole: "User already has the selected role",

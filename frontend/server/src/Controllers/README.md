@@ -176,6 +176,7 @@
   - [`/api/qualityNomination/myAssignedList/`](#apiqualitynominationmyassignedlist)
   - [`/api/qualityNomination/myList/`](#apiqualitynominationmylist)
   - [`/api/qualityNomination/resolve/`](#apiqualitynominationresolve)
+  - [`/api/qualityNomination/update/`](#apiqualitynominationupdate)
 - [Reset](#reset)
   - [`/api/reset/create/`](#apiresetcreate)
   - [`/api/reset/generateToken/`](#apiresetgeneratetoken)
@@ -3624,6 +3625,23 @@ Marks a problem of a nomination (only the demotion type supported for now) as (r
 | `rationale`            | `string`                                  |             |
 | `status`               | `'banned'\|'open'\|'resolved'\|'warning'` |             |
 | `all`                  | `bool\|null`                              |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/qualityNomination/update/`
+
+### Description
+
+Updates a QualityNominations given an id and contents
+
+### Parameters
+
+| Name                   | Type     | Description |
+| ---------------------- | -------- | ----------- |
+| `contents`             | `string` |             |
+| `qualitynomination_id` | `int`    |             |
 
 ### Returns
 

@@ -673,6 +673,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         ];
     }
 
+    /**
+     * Updates a QualityNominations given an id and contents
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param int $qualitynomination_id
+     * @omegaup-request-param string $contents
+     */
     public static function apiUpdate(\Omegaup\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
@@ -681,7 +689,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         self::validateMemberOfReviewerGroup($r);
 
         $qualityNominationId = $r->ensureInt('qualitynomination_id');
-        \OmegaUp\Validtors::validateStringNonEmpty($r['contents'], 'contents');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
 
         \OmegaUp\DAO\QualityNominations::updateQualityNominations(
             $qualityNominationId,

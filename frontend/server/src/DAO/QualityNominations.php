@@ -191,7 +191,9 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     }
 
     /**
-     * Returns the contents and id of a nom
+     * Returns the contents and id of a nomination for a given problem and user.
+     *
+     * @return array{contents: array{quality_seal: bool, tag: string}, qualitynomination_id: int}|null
      */
     public static function getReviewedData(
         \Omegaup\DAO\VO\Identities $identity,
@@ -206,9 +208,11 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             INNER JOIN
                 Identities i ON i.user_id = qn.user_id
             WHERE
-                nomination = 'quality_tag' AND
+                qn.nomination = 'quality_tag' AND
                 i.identity_id = ? AND
                 qn.problem_id = ?;";
+
+        /** @var array{contents: string, qualitynomination_id: int}|null */
         $query = \Omegaup\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$identity->identity_id, $problem->problem_id]
@@ -220,23 +224,26 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         $contents = json_decode($query['contents'], true);
         return [
             'qualitynomination_id' => $query['qualitynomination_id'],
-            'contenst' => $contents
+            'contents' => $contents
         ];
     }
 
+    /**
+     * Update a QualityNominations given its id and contents
+     */
     public static function updateQualityNominations(
         int $qualityNominationsId,
         string $contents
     ): array {
         $sql = '
-            UPDATE 
+            UPDATE
                 QualityNominations
             SET
                 contents = ?
             WHERE
                 qualitynomination_id = ?;';
-        
-        \OmegaUp\MySQLConnection::getInstanace()->Execute(
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
             $sql,
             [
                 $contents,

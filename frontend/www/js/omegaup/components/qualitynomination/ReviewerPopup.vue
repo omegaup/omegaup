@@ -58,7 +58,7 @@
               <button
                 class="btn btn-primary mr-3"
                 type="submit"
-                :disabled="qualitySeal && !tag"
+                :disabled="qualitySeal == qualitySealReviewed"
                 @click="onSubmit"
               >
                 {{ T.wordsSend }}
@@ -84,6 +84,7 @@ import { Vue, Prop, Component } from 'vue-property-decorator';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import { AvailableViews } from './DemotionPopup.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
+import { types } from '../../api_types';
 import T from '../../lang';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 
@@ -126,12 +127,20 @@ export default class ReviewerPopup extends Vue {
   @Prop() selectedPrivateTags!: string[];
   @Prop() problemAlias!: string;
   @Prop() problemTitle!: string;
+  @Prop() alreadyReviewedPayload!: types.QualityNominationContents | undefined;
 
   AvailableViews = AvailableViews;
   T = T;
   currentView: AvailableViews = AvailableViews.Content;
-  qualitySeal = true;
-  tag = '';
+  qualitySeal = this.alreadyReviewedPayload
+    ? this.alreadyReviewedPayload.contents.quality_seal
+    : true;
+  qualitySealReviewed = this.alreadyReviewedPayload
+    ? this.alreadyReviewedPayload.contents.quality_seal
+    : true;
+  tag = this.alreadyReviewedPayload
+    ? this.alreadyReviewedPayload.contents.tag
+    : '';
   publicTagsList = this.selectedPublicTags ?? [];
 
   get sortedProblemTags(): ProblemTag[] {
@@ -152,6 +161,7 @@ export default class ReviewerPopup extends Vue {
   addOtherTag(tag: string): void {
     if (!this.publicTagsList.includes(tag)) {
       this.publicTagsList.push(tag);
+      this.$emit('emit-add-tag', this.problemAlias, tag);
     }
   }
 
@@ -169,6 +179,7 @@ export default class ReviewerPopup extends Vue {
   removeTag(name: string) {
     let pos = this.publicTagsList.indexOf(name);
     this.publicTagsList.splice(pos, 1);
+    this.$emit('emit-remove-tag', this.problemAlias, name);
   }
 
   onHide(): void {

@@ -1548,6 +1548,10 @@ export const QualityNomination = {
     messages.QualityNominationResolveRequest,
     messages.QualityNominationResolveResponse
   >('/api/qualityNomination/resolve/'),
+  update: apiCall<
+    messages.QualityNominationUpdateRequest,
+    messages.QualityNominationUpdateResponse
+  >('/api/qualityNomination/update/'),
 };
 
 export const Reset = {

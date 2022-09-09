@@ -3665,6 +3665,7 @@ export namespace types {
   export interface ProblemDetailsPayload {
     allRuns?: types.Run[];
     allowUserAddTags?: boolean;
+    alreadyReviewedPayload?: types.QualityNominationContents;
     clarifications?: types.Clarification[];
     histogram: types.Histogram;
     levelTags?: string[];
@@ -3997,6 +3998,11 @@ export namespace types {
   export interface Progress {
     max_score: number;
     score: number;
+  }
+
+  export interface QualityNominationContents {
+    contents: { quality_seal: boolean; tag: string };
+    qualitynomination_id: number;
   }
 
   export interface Run {
@@ -5262,6 +5268,8 @@ export namespace messages {
   };
   export type QualityNominationResolveRequest = { [key: string]: any };
   export type QualityNominationResolveResponse = {};
+  export type QualityNominationUpdateRequest = { [key: string]: any };
+  export type QualityNominationUpdateResponse = {};
 
   // Reset
   export type ResetCreateRequest = { [key: string]: any };
@@ -6040,6 +6048,9 @@ export namespace controllers {
     resolve: (
       params?: messages.QualityNominationResolveRequest,
     ) => Promise<messages.QualityNominationResolveResponse>;
+    update: (
+      params?: messages.QualityNominationUpdateRequest,
+    ) => Promise<messages.QualityNominationUpdateResponse>;
   }
 
   export interface Reset {

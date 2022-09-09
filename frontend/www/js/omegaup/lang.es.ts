@@ -1362,6 +1362,7 @@ const translations: { [key: string]: string; } = {
   unverifiedUser: "Usuario no verificado.",
   updateItemsSuccess: "Todos los items han sido actualizados",
   updateProblemLevel: "Actualizar el nivel del problema",
+  updateReviewerNomination: "Editar revisi\u00f3n",
   updateStatementsCommitMessage: "Actualizando redacciones",
   userAlreadyAcceptedPrivacyPolicy: "El usuario ya hab\u00eda aceptado la pol\u00edtica de privacidad",
   userAlreadyHasSelectedRole: "El usuario ya cuenta con rol seleccionado",

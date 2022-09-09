@@ -1362,6 +1362,7 @@ const translations: { [key: string]: string; } = {
   unverifiedUser: "(Unv3rifi3d u53r.)",
   updateItemsSuccess: "(A11 7h3 5313c73d i73m5 ha5 b33n upda73d)",
   updateProblemLevel: "(Upda73 pr0b13m 13v31)",
+  updateReviewerNomination: "(Edi7 r3vi5i0n)",
   updateStatementsCommitMessage: "(Upda73d 57a73m3n75)",
   userAlreadyAcceptedPrivacyPolicy: "(U53r ha5 a1r3ady acc3p73d 7h3 privacy p01icy)",
   userAlreadyHasSelectedRole: "(U53r a1r3ady ha5 7h3 5313c73d r013)",

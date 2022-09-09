@@ -1360,6 +1360,7 @@ unsupportedBrowser = "Su navegador no admite todas las funciones de esta página
 unverifiedUser = "Usuario no verificado."
 updateItemsSuccess = "Todos los items han sido actualizados"
 updateProblemLevel = "Actualizar el nivel del problema"
+updateReviewerNomination = "Editar revisión"
 updateStatementsCommitMessage = "Actualizando redacciones"
 userAlreadyAcceptedPrivacyPolicy = "El usuario ya había aceptado la política de privacidad"
 userAlreadyHasSelectedRole = "El usuario ya cuenta con rol seleccionado"

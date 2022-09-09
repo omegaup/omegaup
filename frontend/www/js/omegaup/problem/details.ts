@@ -73,6 +73,7 @@ OmegaUp.on('ready', async () => {
       allTokens: 0,
       activeTab: window.location.hash ? locationHash[0] : 'problems',
       nominationStatus: payload.nominationStatus,
+      alreadyReviewedPayload: payload.alreadyReviewedPayload,
       hasBeenNominated:
         payload.nominationStatus?.nominated ||
         (payload.nominationStatus?.nominatedBeforeAc &&
@@ -92,6 +93,7 @@ OmegaUp.on('ready', async () => {
           solvers: payload.solvers,
           user: payload.user,
           nominationStatus: this.nominationStatus,
+          alreadyReviewedPayload: this.alreadyReviewedPayload,
           histogram: payload.histogram,
           clarifications: clarificationStore.state.clarifications,
           solutionStatus: this.solutionStatus,
@@ -383,6 +385,41 @@ OmegaUp.on('ready', async () => {
                 updateRunFallback({ run });
               })
               .catch(ui.ignoreError);
+          },
+          'add-tag': (alias: string, tagname: string) => {
+            api.Problem.addTag({
+              problem_alias: alias,
+              name: tagname,
+            })
+              .then(() => {
+                ui.success(T.tagAdded);
+              })
+              .catch(ui.apiError);
+          },
+          'remove-tag': (alias: string, tagname: string) => {
+            api.Problem.removeTag({
+              problem_alias: alias,
+              name: tagname,
+            })
+              .then(() => {
+                ui.success(T.tagRemoved);
+              })
+              .catch(ui.apiError);
+          },
+          'update-reviewer': (
+            qualitynomination_id: string,
+            tag: string,
+            qualitySeal: boolean,
+          ) => {
+            const contents: { quality_seal?: boolean; tag?: string } = {};
+            if (tag) {
+              contents.tag = tag;
+            }
+            contents.quality_seal = qualitySeal;
+            api.QualityNomination.update({
+              qualitynomination_id,
+              contents: JSON.stringify(contents),
+            }).catch(ui.apiError);
           },
           'update-search-result-users': ({ query }: { query: string }) => {
             api.User.list({ query })
