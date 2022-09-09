@@ -25,7 +25,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, counts: array<string, int>, description: string, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public?: list<FilteredCourse>, student?: list<FilteredCourse>, archived?: list<FilteredCourse>, teachingAssistant?: list<FilteredCourse>}
+ * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>, archived: list<FilteredCourse>, teachingAssistant: list<FilteredCourse>}
  * @psalm-type CourseCloneDetailsPayload=array{creator: array{classname: string, username: string}, details: CourseDetails, token: null|string}
  * @psalm-type CoursesByTimeType=array{courses: list<FilteredCourse>, timeType: string}
  * @psalm-type CoursesByAccessMode=array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType}}
@@ -1898,7 +1898,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-        $response = ['admin' => []];
+        $response = ['admin' => [], 'student' => [], 'public' => [], 'archived' => [], 'teachingAssistant' => []];
 
         if (in_array('admin', $courseTypes)) {
             // TODO(pablo): Cache
@@ -1917,11 +1917,13 @@ class Course extends \OmegaUp\Controllers\Controller {
                     );
                 }
             } else {
-                $response = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
+                $adminCoursesByIdentity = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
                     $identity->identity_id,
                     $page,
                     $pageSize
                 );
+
+                $response = array_merge($response, $adminCoursesByIdentity);
             }
         }
 
