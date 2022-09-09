@@ -184,7 +184,6 @@ class Authorization {
         $problemset = \OmegaUp\DAO\Problemsets::getByPK(
             $clarification->problemset_id
         );
-
         if (is_null($problemset)) {
             return false;
         }
