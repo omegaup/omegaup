@@ -2469,6 +2469,7 @@ export namespace types {
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
     currentAssignment: types.ArenaAssignment;
+    isTeachingAssistant: boolean;
     scoreboard?: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
@@ -5005,6 +5006,8 @@ export namespace messages {
   export type CourseRemoveStudentResponse = {};
   export type CourseRemoveTeachingAssistantRequest = { [key: string]: any };
   export type CourseRemoveTeachingAssistantResponse = {};
+  export type CourseRequestFeedbackRequest = { [key: string]: any };
+  export type CourseRequestFeedbackResponse = {};
   export type CourseRequestsRequest = { [key: string]: any };
   export type _CourseRequestsServerResponse = any;
   export type CourseRequestsResponse = { users: types.IdentityRequest[] };
@@ -5838,6 +5841,9 @@ export namespace controllers {
     removeTeachingAssistant: (
       params?: messages.CourseRemoveTeachingAssistantRequest,
     ) => Promise<messages.CourseRemoveTeachingAssistantResponse>;
+    requestFeedback: (
+      params?: messages.CourseRequestFeedbackRequest,
+    ) => Promise<messages.CourseRequestFeedbackResponse>;
     requests: (
       params?: messages.CourseRequestsRequest,
     ) => Promise<messages.CourseRequestsResponse>;
