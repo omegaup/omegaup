@@ -237,7 +237,10 @@
                 :country="run.country_id"
                 :linkify="true"
                 :emit-click-event="true"
-                @click="(user) => (filterUsername = { key: user, value: user })"
+                @click="
+                  (username) =>
+                    (filterUsername = { key: user, value: username })
+                "
               ></omegaup-user-username>
               <a :href="`/profile/${run.username}/`" class="ml-2">
                 <font-awesome-icon :icon="['fas', 'external-link-alt']" />
