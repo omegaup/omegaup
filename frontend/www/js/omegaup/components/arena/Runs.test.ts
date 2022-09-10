@@ -200,7 +200,7 @@ describe('Runs.vue', () => {
     });
 
     await wrapper.setData({
-      filterUser: { key: 'other_username', value: 'other username' },
+      filterUsername: { key: 'other_username', value: 'other username' },
     });
     expect(wrapper.emitted('filter-changed')).toEqual([
       [{ filter: 'username', value: 'other_username' }],
@@ -297,7 +297,7 @@ describe('Runs.vue', () => {
     ]);
   });
 
-  it('Should handle filterUser when username changes', async () => {
+  it('Should handle filterUsername when username changes', async () => {
     const wrapper = shallowMount(arena_Runs, {
       propsData: {
         contestAlias: 'admin',
@@ -315,10 +315,10 @@ describe('Runs.vue', () => {
     });
 
     await wrapper.setProps({ username: 'username' });
-    expect(wrapper.vm.filterUser?.key).toBe('username');
+    expect(wrapper.vm.filterUsername?.key).toBe('username');
 
     await wrapper.setProps({ username: null });
-    expect(wrapper.vm.filterUser).toBeFalsy();
+    expect(wrapper.vm.filterUsername).toBeFalsy();
   });
 
   const usernamesToBeFiltered = ['username', 'other_username'];
@@ -369,7 +369,7 @@ describe('Runs.vue', () => {
 
       // Now all runs should appear
       expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
-      expect(wrapper.vm.filterUser).toBeFalsy();
+      expect(wrapper.vm.filterUsername).toBeFalsy();
     });
   });
 });
