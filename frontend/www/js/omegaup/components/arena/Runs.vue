@@ -239,7 +239,7 @@
                 :emit-click-event="true"
                 @click="
                   (username) =>
-                    (filterUsername = { key: user, value: username })
+                    (filterUsername = { key: username, value: username })
                 "
               ></omegaup-user-username>
               <a :href="`/profile/${run.username}/`" class="ml-2">
