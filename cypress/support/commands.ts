@@ -89,12 +89,12 @@ Cypress.Commands.add(
     cy.get('[name="show-scoreboard"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
       .eq(showScoreboard ? 0 : 1)
       .click();
-    cy.get('[name="start-date"]').type(getISODate(startDate));
+    cy.get('[name="start-date"]').type(getISODate(startDate || new Date()));
     cy.get('[name="unlimited-duration"]')
       .eq(unlimitedDuration ? 0 : 1)
       .click();
     // only if unlimited duration is false we should change the end date
-    if (!unlimitedDuration) {
+    if (!unlimitedDuration && endDate) {
       cy.get('[name="end-date"]').type(getISODate(endDate));
     } else {
       // the end date input should be disabled
@@ -141,6 +141,12 @@ Cypress.Commands.add(
   }) => {
     cy.visit('contest/new/');
 
+    // Check if the collapse buttons are hidden or visible
+    cy.get('.basic-info').should('be.visible');
+    cy.get('.logistics').should('not.be.visible');
+    cy.get('.scoring-rules').should('not.be.visible');
+    cy.get('.privacy').should('not.be.visible');
+
     // Open all hidden collapsable
     cy.get('[data-logistics]').click();
     cy.get('[data-scoring-rules]').click();
@@ -149,8 +155,8 @@ Cypress.Commands.add(
     cy.get('[name="title"]').type(contestAlias);
     cy.get('[name="alias"]').type(contestAlias);
     cy.get('[name="description"]').type(description);
-    cy.get('[data-start-date]').type(getISODateTime(startDate));
-    cy.get('[data-end-date]').type(getISODateTime(endDate));
+    cy.get('[data-start-date]').type(getISODateTime(startDate || new Date()));
+    cy.get('[data-end-date]').type(getISODateTime(endDate || new Date()));
     cy.get('[data-show-scoreboard-at-end]').select(`${showScoreboard}`); // "true" | "false"
     cy.get('[data-partial-points]').select(`${partialPoints}`);
     if (basicInformation) {
@@ -163,58 +169,38 @@ Cypress.Commands.add(
   },
 );
 
-Cypress.Commands.add(
-  'addProblemsToContest',
-  ({
-    contestAlias,
-    problems,
-  }) => {
-    cy.visit(`contest/${contestAlias}/edit/`);
-    cy.get('a[data-nav-contest-edit]').click();
-    cy.get('a.dropdown-item.problems').click();
+Cypress.Commands.add('addProblemsToContest', ({ contestAlias, problems }) => {
+  cy.visit(`contest/${contestAlias}/edit/`);
+  cy.get('a[data-nav-contest-edit]').click();
+  cy.get('a.dropdown-item.problems').click();
 
-    for (const idx in problems) {
-      cy.get('input[type="text"]').type(problems[idx].problemAlias)
-      cy.get('.typeahead-dropdown').click();
-      cy.get('.add-problem').click();
-    }
-  },
-);
+  for (const idx in problems) {
+    cy.get('input[type="text"]').type(problems[idx].problemAlias);
+    cy.get('.typeahead-dropdown').click();
+    cy.get('.add-problem').click();
+  }
+});
 
 Cypress.Commands.add(
   'changeAdmissionModeContest',
-  ({
-    contestAlias,
-    admissionMode,
-  }) => {
+  ({ contestAlias, admissionMode }) => {
     cy.visit(`contest/${contestAlias}/edit/`);
     cy.get('a[data-nav-contest-edit]').click();
     cy.get('a.dropdown-item.admission-mode').click();
-    cy.get('select[name="admission-mode"]').select(
-      admissionMode,
-    ); // private | registration | public
+    cy.get('select[name="admission-mode"]').select(admissionMode); // private | registration | public
     cy.get('.change-admission-mode').click();
   },
 );
 
-Cypress.Commands.add(
-  'enterContest',
-  ({
-    contestAlias,
-  }) => {
-    cy.visit('arena/');
-    cy.get(`a[href="/arena/${contestAlias}/"]`).first().click();
-    cy.get('button[data-start-contest]').click();
-  },
-);
+Cypress.Commands.add('enterContest', ({ contestAlias }) => {
+  cy.visit('arena/');
+  cy.get(`a[href="/arena/${contestAlias}/"]`).first().click();
+  cy.get('button[data-start-contest]').click();
+});
 
 Cypress.Commands.add(
   'createRunsInsideContest',
-  ({
-    contestAlias,
-    problems,
-    runs,
-  }) => {
+  ({ contestAlias, problems, runs }) => {
     const problem = problems[0];
     if (!problem) {
       return;
@@ -246,9 +232,9 @@ Cypress.Commands.add(
       cy.get('[data-run-status] > span').first().should('have.text', 'new');
       cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
 
-      cy.wait(['@runStatus'], { timeout: 10000 }).its(
-        'response.statusCode',
-      ).should('eq', 200);
+      cy.wait(['@runStatus'], { timeout: 10000 })
+        .its('response.statusCode')
+        .should('eq', 200);
       cy.get('[data-run-status] > span')
         .first()
         .should('have.text', expectedStatus);
@@ -280,7 +266,10 @@ export const getISODateTime = (date: Date) => {
  * @param days number of days to add to the date
  * @returns Date Relative Date Object
  */
-export const addSubtractDaysToDate = (date: Date, { days }: { days: number }): Date => {
+export const addSubtractDaysToDate = (
+  date: Date,
+  { days }: { days: number },
+): Date => {
   if (days == 0) return date;
   if (days < 0) {
     return new Date(date.getTime() - 24 * 3600 * 1000);
