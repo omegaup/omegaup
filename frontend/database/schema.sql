@@ -1003,8 +1003,8 @@ CREATE TABLE `Submission_Feedback` (
   `range_bytes_start` int NOT NULL DEFAULT '0' COMMENT 'Inicio de la subcadena seleccionada (en bytes) para agregarle el comentario',
   `range_bytes_end` int NOT NULL DEFAULT '0' COMMENT 'Fin de la subcadena seleccionada (en bytes) para agregarle el comentario',
   PRIMARY KEY (`submission_feedback_id`),
-  UNIQUE KEY `submission_id` (`submission_id`),
   KEY `fk_sfi_identity_id` (`identity_id`),
+  KEY `fk_sfs_submission_id` (`submission_id`),
   CONSTRAINT `fk_sfi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_sfs_submission_id` FOREIGN KEY (`submission_id`) REFERENCES `Submissions` (`submission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Almacena el feedback dejado por los profesores para los envíos de los estudiantes.';
