@@ -135,6 +135,7 @@
                         v-model="useLatestVersion"
                         class="form-check-input"
                         data-use-latest-version-true
+                        name="use-latest-version"
                         type="radio"
                         :value="true"
                       />{{ T.contestAddproblemLatestVersion }}
@@ -146,6 +147,7 @@
                         v-model="useLatestVersion"
                         class="form-check-input"
                         data-use-latest-version-false
+                        name="use-latest-version"
                         type="radio"
                         :value="false"
                       />{{ T.contestAddproblemOtherVersion }}
@@ -170,7 +172,7 @@
                 :disabled="!problemAlias"
                 @click.prevent="
                   onSaveProblem(assignment, {
-                    alias: problemAlias,
+                    alias: problemAlias.key,
                     points: points,
                     commit: selectedRevision.commit,
                     is_extra_problem: isExtraProblem,
@@ -235,7 +237,7 @@ export default class CourseProblemList extends Vue {
   difficulty = 'intro';
   topics: string[] = [];
   taggedProblemAlias = '';
-  problemAlias: null | string = null;
+  problemAlias: null | types.ListItem = null;
   points = 100;
   showTopicsAndDifficulty = false;
   problemsOrderChanged = false;
@@ -312,7 +314,7 @@ export default class CourseProblemList extends Vue {
 
   get addProblemButtonLabel(): string {
     for (const problem of this.problems) {
-      if (this.problemAlias === problem.alias) {
+      if (this.problemAlias?.key === problem.alias) {
         if (this.assignment.assignment_type === 'lesson') {
           return T.wordsUpdateLecture;
         }
@@ -351,7 +353,7 @@ export default class CourseProblemList extends Vue {
   }
 
   onEditProblem(problem: types.AddedProblem): void {
-    this.problemAlias = problem.alias;
+    this.problemAlias = { key: problem.alias, value: problem.alias };
   }
 
   onRemoveProblem(
@@ -367,7 +369,7 @@ export default class CourseProblemList extends Vue {
   ): void {
     let found = false;
     for (const problem of this.problems) {
-      if (this.problemAlias === problem.alias) {
+      if (this.problemAlias?.key === problem.alias) {
         found = true;
         break;
       }
@@ -379,7 +381,7 @@ export default class CourseProblemList extends Vue {
   }
 
   @Watch('problemAlias')
-  onAliasChange(newProblemAlias: string) {
+  onAliasChange(newProblemAlias: null | types.ListItem) {
     if (!newProblemAlias) {
       this.versionLog = [];
       this.selectedRevision = this.publishedRevision;
@@ -387,7 +389,7 @@ export default class CourseProblemList extends Vue {
     }
     this.$emit('change-alias', {
       target: this,
-      request: { problemAlias: newProblemAlias },
+      request: { problemAlias: newProblemAlias.key },
     });
   }
 
@@ -398,6 +400,14 @@ export default class CourseProblemList extends Vue {
     }
     this.useLatestVersion =
       newPublishedRevision.commit === this.versionLog[0].commit;
+  }
+
+  @Watch('useLatestVersion')
+  onUseLatestVersionChange(newUseLatestVersion: boolean) {
+    if (!newUseLatestVersion) {
+      return;
+    }
+    this.selectedRevision = this.versionLog[0];
   }
 
   @Watch('assignmentProblems')
@@ -421,8 +431,8 @@ export default class CourseProblemList extends Vue {
   }
 
   @Watch('taggedProblemAlias')
-  onTaggedProblemAliasChange() {
-    this.problemAlias = this.taggedProblemAlias;
+  onTaggedProblemAliasChange(newValue: string) {
+    this.problemAlias = { key: newValue, value: newValue };
   }
 
   @Watch('tags')

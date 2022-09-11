@@ -9,6 +9,7 @@ export namespace dao {
     archived?: boolean;
     certificate_cutoff?: number;
     certificates_status?: string;
+    check_plagiarism?: boolean;
     contest_for_teams?: boolean;
     contest_id?: number;
     default_show_all_contestants_in_scoreboard?: boolean;
@@ -21,6 +22,7 @@ export namespace dao {
     penalty?: number;
     penalty_calc_policy?: string;
     penalty_type?: string;
+    plagiarism_threshold?: boolean;
     points_decay_factor?: number;
     problemset_id?: number;
     recommended?: boolean;
@@ -55,6 +57,8 @@ export namespace dao {
 
   export interface Users {
     birth_date?: string;
+    creation_timestamp?: Date;
+    deletion_token?: string;
     facebook_user_id?: string;
     git_token?: string;
     has_competitive_objective?: boolean;
@@ -66,6 +70,10 @@ export namespace dao {
     is_private?: boolean;
     main_email_id?: number;
     main_identity_id?: number;
+    parent_email_verification_deadline?: Date;
+    parent_email_verification_initial?: Date;
+    parent_verified?: boolean;
+    parental_verification_token?: string;
     preferred_language?: string;
     reset_digest?: string;
     reset_sent_at?: Date;
@@ -272,13 +280,16 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.currentAssignment);
-        x.scoreboard = ((x) => {
-          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
-          return x;
-        })(x.scoreboard);
+        if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
+          x.scoreboard = ((x) => {
+            if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          })(x.scoreboard);
         return x;
       })(
         JSON.parse(
@@ -1254,6 +1265,45 @@ export namespace types {
                 })(x.courses);
                 return x;
               })(x.past);
+              x.teachingAssistant = ((x) => {
+                x.courses = ((x) => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map((x) => {
+                    x.assignments = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        if (
+                          typeof x.finish_time !== 'undefined' &&
+                          x.finish_time !== null
+                        )
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      });
+                    })(x.assignments);
+                    if (
+                      typeof x.finish_time !== 'undefined' &&
+                      x.finish_time !== null
+                    )
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.teachingAssistant);
               return x;
             })(x.filteredCourses);
             return x;
@@ -2302,6 +2352,7 @@ export namespace types {
         archived: types.CoursesByTimeType;
         current: types.CoursesByTimeType;
         past: types.CoursesByTimeType;
+        teachingAssistant: types.CoursesByTimeType;
       };
     };
   }
@@ -2418,7 +2469,8 @@ export namespace types {
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
     currentAssignment: types.ArenaAssignment;
-    scoreboard: types.Scoreboard;
+    isTeachingAssistant: boolean;
+    scoreboard?: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
   }
@@ -3086,10 +3138,12 @@ export namespace types {
     assignmentProblems: types.ProblemsetProblem[];
     course: types.CourseDetails;
     groupsAdmins: types.CourseGroupAdmin[];
+    groupsTeachingAssistants: types.CourseGroupAdmin[];
     identityRequests: types.IdentityRequest[];
     selectedAssignment?: types.CourseAssignment;
     students: types.CourseStudent[];
     tags: string[];
+    teachingAssistants: types.CourseAdmin[];
   }
 
   export interface CourseGroupAdmin {
@@ -3216,9 +3270,10 @@ export namespace types {
 
   export interface CoursesList {
     admin: types.FilteredCourse[];
-    archived?: types.FilteredCourse[];
+    archived: types.FilteredCourse[];
     public: types.FilteredCourse[];
     student: types.FilteredCourse[];
+    teachingAssistant: types.FilteredCourse[];
   }
 
   export interface CurrentSession {
@@ -4124,6 +4179,11 @@ export namespace types {
     username: string;
   }
 
+  export interface SchoolListItem {
+    key: number;
+    value: string;
+  }
+
   export interface SchoolOfTheMonthPayload {
     candidatesToSchoolOfTheMonth: {
       country_id: string;
@@ -4835,10 +4895,14 @@ export namespace messages {
   export type CourseAddAdminResponse = {};
   export type CourseAddGroupAdminRequest = { [key: string]: any };
   export type CourseAddGroupAdminResponse = {};
+  export type CourseAddGroupTeachingAssistantRequest = { [key: string]: any };
+  export type CourseAddGroupTeachingAssistantResponse = {};
   export type CourseAddProblemRequest = { [key: string]: any };
   export type CourseAddProblemResponse = {};
   export type CourseAddStudentRequest = { [key: string]: any };
   export type CourseAddStudentResponse = {};
+  export type CourseAddTeachingAssistantRequest = { [key: string]: any };
+  export type CourseAddTeachingAssistantResponse = {};
   export type CourseAdminDetailsRequest = { [key: string]: any };
   export type _CourseAdminDetailsServerResponse = any;
   export type CourseAdminDetailsResponse = types.CourseDetails;
@@ -4846,6 +4910,8 @@ export namespace messages {
   export type CourseAdminsResponse = {
     admins: { role: string; username: string }[];
     group_admins: { alias: string; name: string; role: string }[];
+    group_teaching_assistants: { alias: string; name: string; role: string }[];
+    teaching_assistants: { role: string; username: string }[];
   };
   export type CourseArbitrateRequestRequest = { [key: string]: any };
   export type CourseArbitrateRequestResponse = {};
@@ -4930,10 +4996,18 @@ export namespace messages {
   export type CourseRemoveAssignmentResponse = {};
   export type CourseRemoveGroupAdminRequest = { [key: string]: any };
   export type CourseRemoveGroupAdminResponse = {};
+  export type CourseRemoveGroupTeachingAssistantRequest = {
+    [key: string]: any;
+  };
+  export type CourseRemoveGroupTeachingAssistantResponse = {};
   export type CourseRemoveProblemRequest = { [key: string]: any };
   export type CourseRemoveProblemResponse = {};
   export type CourseRemoveStudentRequest = { [key: string]: any };
   export type CourseRemoveStudentResponse = {};
+  export type CourseRemoveTeachingAssistantRequest = { [key: string]: any };
+  export type CourseRemoveTeachingAssistantResponse = {};
+  export type CourseRequestFeedbackRequest = { [key: string]: any };
+  export type CourseRequestFeedbackResponse = {};
   export type CourseRequestsRequest = { [key: string]: any };
   export type _CourseRequestsServerResponse = any;
   export type CourseRequestsResponse = { users: types.IdentityRequest[] };
@@ -5082,6 +5156,8 @@ export namespace messages {
     results: types.ProblemListItem[];
     total: number;
   };
+  export type ProblemListForTypeaheadRequest = { [key: string]: any };
+  export type ProblemListForTypeaheadResponse = { results: types.ListItem[] };
   export type ProblemMyListRequest = { [key: string]: any };
   export type ProblemMyListResponse = {
     pagerItems: types.PageItem[];
@@ -5296,11 +5372,7 @@ export namespace messages {
   export type SchoolCreateRequest = { [key: string]: any };
   export type SchoolCreateResponse = { school_id: number };
   export type SchoolListRequest = { [key: string]: any };
-  export type SchoolListResponse = {
-    id: number;
-    label: string;
-    value: string;
-  }[];
+  export type SchoolListResponse = { results: types.SchoolListItem[] };
   export type SchoolSelectSchoolOfTheMonthRequest = { [key: string]: any };
   export type SchoolSelectSchoolOfTheMonthResponse = {};
 
@@ -5393,6 +5465,10 @@ export namespace messages {
   export type UserCreateResponse = { username: string };
   export type UserCreateAPITokenRequest = { [key: string]: any };
   export type UserCreateAPITokenResponse = { token: string };
+  export type UserDeleteConfirmRequest = { [key: string]: any };
+  export type UserDeleteConfirmResponse = {};
+  export type UserDeleteRequestRequest = { [key: string]: any };
+  export type UserDeleteRequestResponse = { token: string };
   export type UserExtraInformationRequest = { [key: string]: any };
   export type _UserExtraInformationServerResponse = any;
   export type UserExtraInformationResponse = {
@@ -5666,12 +5742,18 @@ export namespace controllers {
     addGroupAdmin: (
       params?: messages.CourseAddGroupAdminRequest,
     ) => Promise<messages.CourseAddGroupAdminResponse>;
+    addGroupTeachingAssistant: (
+      params?: messages.CourseAddGroupTeachingAssistantRequest,
+    ) => Promise<messages.CourseAddGroupTeachingAssistantResponse>;
     addProblem: (
       params?: messages.CourseAddProblemRequest,
     ) => Promise<messages.CourseAddProblemResponse>;
     addStudent: (
       params?: messages.CourseAddStudentRequest,
     ) => Promise<messages.CourseAddStudentResponse>;
+    addTeachingAssistant: (
+      params?: messages.CourseAddTeachingAssistantRequest,
+    ) => Promise<messages.CourseAddTeachingAssistantResponse>;
     adminDetails: (
       params?: messages.CourseAdminDetailsRequest,
     ) => Promise<messages.CourseAdminDetailsResponse>;
@@ -5747,12 +5829,21 @@ export namespace controllers {
     removeGroupAdmin: (
       params?: messages.CourseRemoveGroupAdminRequest,
     ) => Promise<messages.CourseRemoveGroupAdminResponse>;
+    removeGroupTeachingAssistant: (
+      params?: messages.CourseRemoveGroupTeachingAssistantRequest,
+    ) => Promise<messages.CourseRemoveGroupTeachingAssistantResponse>;
     removeProblem: (
       params?: messages.CourseRemoveProblemRequest,
     ) => Promise<messages.CourseRemoveProblemResponse>;
     removeStudent: (
       params?: messages.CourseRemoveStudentRequest,
     ) => Promise<messages.CourseRemoveStudentResponse>;
+    removeTeachingAssistant: (
+      params?: messages.CourseRemoveTeachingAssistantRequest,
+    ) => Promise<messages.CourseRemoveTeachingAssistantResponse>;
+    requestFeedback: (
+      params?: messages.CourseRequestFeedbackRequest,
+    ) => Promise<messages.CourseRequestFeedbackResponse>;
     requests: (
       params?: messages.CourseRequestsRequest,
     ) => Promise<messages.CourseRequestsResponse>;
@@ -5900,6 +5991,9 @@ export namespace controllers {
     list: (
       params?: messages.ProblemListRequest,
     ) => Promise<messages.ProblemListResponse>;
+    listForTypeahead: (
+      params?: messages.ProblemListForTypeaheadRequest,
+    ) => Promise<messages.ProblemListForTypeaheadResponse>;
     myList: (
       params?: messages.ProblemMyListRequest,
     ) => Promise<messages.ProblemMyListResponse>;
@@ -6149,6 +6243,12 @@ export namespace controllers {
     createAPIToken: (
       params?: messages.UserCreateAPITokenRequest,
     ) => Promise<messages.UserCreateAPITokenResponse>;
+    deleteConfirm: (
+      params?: messages.UserDeleteConfirmRequest,
+    ) => Promise<messages.UserDeleteConfirmResponse>;
+    deleteRequest: (
+      params?: messages.UserDeleteRequestRequest,
+    ) => Promise<messages.UserDeleteRequestResponse>;
     extraInformation: (
       params?: messages.UserExtraInformationRequest,
     ) => Promise<messages.UserExtraInformationResponse>;

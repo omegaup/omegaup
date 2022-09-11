@@ -75,7 +75,7 @@ Cypress.Commands.add(
     endDate,
     showScoreboard = false,
     unlimitedDuration = true,
-    school = 'omegaup',
+    school = 'Escuela curso',
     basicInformation = false,
     requestParticipantInformation = 'no',
     problemLevel = 'introductory',
@@ -100,7 +100,8 @@ Cypress.Commands.add(
       // the end date input should be disabled
       cy.get('[name="end-date"]').should('be.disabled');
     }
-    cy.get('.tt-input').first().type(school); // If we use the data attribute, the autocomplete makes multiple elements
+    cy.get('.tags-input input[type="text"]').first().type(school); // If we use the data attribute, the autocomplete makes multiple elements
+    cy.get('.typeahead-dropdown li').first().click();
     cy.get('[name="basic-information"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
       .eq(basicInformation ? 0 : 1)
       .click();
@@ -175,8 +176,8 @@ Cypress.Commands.add('addProblemsToContest', ({ contestAlias, problems }) => {
   cy.get('a.dropdown-item.problems').click();
 
   for (const idx in problems) {
-    cy.get('input[type="text"]').type(problems[idx].problemAlias);
-    cy.get('.typeahead-dropdown').click();
+    cy.get('.tags-input input[type="text"]').type(problems[idx].problemAlias);
+    cy.get('.typeahead-dropdown li').first().click();
     cy.get('.add-problem').click();
   }
 });

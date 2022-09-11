@@ -48,6 +48,10 @@
         <template v-else-if="currentSelectedTab === 'manage-schools'">
           <omegaup-user-manage-schools
             :profile="profile"
+            :search-result-schools="searchResultSchools"
+            @update-search-result-schools="
+              (query) => $emit('update-search-result-schools', query)
+            "
             @update-user-schools="
               (request) => $emit('update-user-schools', request)
             "
@@ -116,6 +120,7 @@ export default class Profile extends Vue {
   @Prop() countries!: dao.Countries[];
   @Prop() programmingLanguages!: { [key: string]: string };
   @Prop() hasPassword!: boolean;
+  @Prop() searchResultSchools!: types.SchoolListItem[];
 
   T = T;
   ui = ui;

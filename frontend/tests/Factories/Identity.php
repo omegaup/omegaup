@@ -49,18 +49,21 @@ class Identity {
                     )
                 );
             }
-            array_push($identities, [
+            $identity = [
                 'username' => $username,
                 'name' => strval($data[1]),
                 'country_id' => strval($data[2]),
                 'state_id' => strval($data[3]),
                 'gender' => strval($data[4]),
-                'school_name' => strval($data[5]),
                 'password' => is_null(
                     $password
                 ) ? \OmegaUp\Test\Utils::createRandomString() : $password,
                 'usernames' => $members,
-            ]);
+            ];
+            if (isset($data[5])) {
+                $identity['school_name'] = strval($data[5]);
+            }
+            array_push($identities, $identity);
         }
         fclose($handle);
 
@@ -104,7 +107,7 @@ class Identity {
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
-                'identities.csv',
+                'identities_no_school_name.csv',
                 strval($group->alias),
                 $password
             ),

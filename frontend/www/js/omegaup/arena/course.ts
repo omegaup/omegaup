@@ -95,6 +95,7 @@ OmegaUp.on('ready', async () => {
           clarifications: clarificationStore.state.clarifications,
           course: payload.courseDetails,
           currentAssignment: payload.currentAssignment,
+          isTeachingAssistant: payload.isTeachingAssistant,
           problemInfo: this.problemInfo,
           problem: this.problem,
           problemAlias: this.problemAlias,
@@ -157,6 +158,17 @@ OmegaUp.on('ready', async () => {
                     )}</strong>)`,
                   }),
                 );
+              })
+              .catch(ui.apiError);
+          },
+          'request-feedback': (guid: string) => {
+            api.Course.requestFeedback({
+              course_alias: payload.courseDetails.alias,
+              assignment_alias: payload.currentAssignment.alias,
+              guid,
+            })
+              .then(() => {
+                ui.success(T.requestFeedback);
               })
               .catch(ui.apiError);
           },
@@ -317,28 +329,22 @@ OmegaUp.on('ready', async () => {
             tried,
             quality,
             difficulty,
-            tags,
           }: {
             solved: boolean;
             tried: boolean;
             quality: string;
             difficulty: string;
-            tags: string[];
           }) => {
             const contents: {
               before_ac?: boolean;
               difficulty?: number;
               quality?: number;
-              tags?: string[];
             } = {};
             if (!solved && tried) {
               contents.before_ac = true;
             }
             if (difficulty !== '') {
               contents.difficulty = Number.parseInt(difficulty, 10);
-            }
-            if (tags.length > 0) {
-              contents.tags = tags;
             }
             if (quality !== '') {
               contents.quality = Number.parseInt(quality, 10);

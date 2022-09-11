@@ -113,16 +113,19 @@
             <template v-if="showProblem">
               <label
                 >{{ T.wordsProblem }}:
-                <omegaup-autocomplete
-                  v-model="filterProblem"
-                  :init="initProblemAutocomplete"
-                ></omegaup-autocomplete>
+                <omegaup-common-typeahead
+                  :existing-options="searchResultProblems"
+                  :value.sync="filterProblem"
+                  @update-existing-options="
+                    (query) => $emit('update-search-result-problems', query)
+                  "
+                ></omegaup-common-typeahead>
               </label>
               <button
                 type="button"
                 class="close"
                 style="float: none"
-                @click="filterProblem = ''"
+                @click="filterProblem = null"
               >
                 &times;
               </button>
@@ -136,7 +139,7 @@
                   :value.sync="filterUsername"
                   :max-results="10"
                   @update-existing-options="updateSearchResultUsers"
-                />
+                ></omegaup-common-typeahead>
               </label>
             </template>
 
@@ -249,7 +252,7 @@
               </a>
             </td>
             <td v-if="showProblem" class="text-break-all">
-              <a href="#runs" @click.prevent="filterProblem = run.alias">{{
+              <a href="#runs" @click.prevent="filterProblem.key = run.alias">{{
                 run.alias
               }}</a>
               <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
@@ -288,6 +291,16 @@
                 @click="onRunDetails(run)"
               >
                 <font-awesome-icon :icon="['fas', 'search-plus']" />
+              </button>
+              <button
+                v-if="requestFeedback"
+                class="details btn-outline-dark btn-sm"
+                @click="$emit('request-feedback', run.guid)"
+              >
+                <font-awesome-icon
+                  :title="T.courseRequestFeedback"
+                  icon="comment-dots"
+                />
               </button>
             </td>
             <td
@@ -370,13 +383,10 @@ import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
-import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import arena_RunDetailsPopup from './RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
-
-import Autocomplete from '../Autocomplete.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -415,7 +425,6 @@ export enum PopupDisplayed {
   components: {
     FontAwesomeIcon,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
-    'omegaup-autocomplete': Autocomplete,
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-user-username': user_Username,
@@ -445,17 +454,18 @@ export default class Runs extends Vue {
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: false }) showAllRuns!: boolean;
   @Prop() totalRuns!: number;
+  @Prop() searchResultProblems!: types.ListItem[];
+  @Prop() requestFeedback!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
-  typeahead = typeahead;
 
   filterLanguage: string = '';
   filterOffset: number = 0;
-  filterProblem: string = '';
+  filterProblem: null | types.ListItem = null;
   filterStatus: string = '';
-  filterUsername: null | string = null;
+  filterUsername: null | types.ListItem = null;
   filterVerdict: string = '';
   filterContest: string = '';
   filters: { name: string; value: string }[] = [];
@@ -490,13 +500,13 @@ export default class Runs extends Vue {
       if (this.filterLanguage && run.language !== this.filterLanguage) {
         return false;
       }
-      if (this.filterProblem && run.alias !== this.filterProblem) {
+      if (this.filterProblem && run.alias !== this.filterProblem.key) {
         return false;
       }
       if (this.filterStatus && run.status !== this.filterStatus) {
         return false;
       }
-      if (this.filterUsername && run.username !== this.filterUsername) {
+      if (this.filterUsername && run.username !== this.filterUsername.key) {
         return false;
       }
       if (this.filterContest && run.contest_alias !== this.filterContest) {
@@ -531,21 +541,6 @@ export default class Runs extends Vue {
       return T.wordsNewSubmissions;
     }
     return T.arenaContestNotOpened;
-  }
-
-  // eslint-disable-next-line no-undef -- This is defined in TypeScript.
-  initProblemAutocomplete(el: JQuery<HTMLElement>) {
-    if (this.problemsetProblems !== null) {
-      typeahead.problemsetProblemTypeahead(
-        el,
-        () => this.problemsetProblems,
-        (event: Event, item: { alias: string; title: string }) => {
-          this.filterProblem = item.alias;
-        },
-      );
-    } else {
-      typeahead.problemTypeahead(el);
-    }
   }
 
   memory(run: types.Run): string {
@@ -673,6 +668,7 @@ export default class Runs extends Vue {
 
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
+    this.currentRunDetailsData = null;
     this.$emit('reset-hash');
   }
 
@@ -683,16 +679,20 @@ export default class Runs extends Vue {
 
   @Watch('username')
   onUsernameChanged(newValue: string | null) {
-    this.filterUsername = newValue;
+    if (!newValue) {
+      this.filterUsername = null;
+      return;
+    }
+    this.filterUsername = { key: newValue, value: newValue };
   }
 
   @Watch('problemAlias')
   onProblemAliasChanged(newValue: string | null) {
     if (!newValue) {
-      this.filterProblem = '';
-    } else {
-      this.filterProblem = newValue;
+      this.filterProblem = null;
+      return;
     }
+    this.filterProblem = { key: newValue, value: newValue };
   }
 
   @Watch('filterLanguage')
@@ -706,8 +706,12 @@ export default class Runs extends Vue {
   }
 
   @Watch('filterProblem')
-  onFilterProblemChanged(newValue: string) {
-    this.onEmitFilterChanged({ filter: 'problem', value: newValue });
+  onFilterProblemChanged(newValue: null | types.ListItem) {
+    if (!newValue) {
+      this.onEmitFilterChanged({ filter: 'problem', value: null });
+      return;
+    }
+    this.onEmitFilterChanged({ filter: 'problem', value: newValue.key });
   }
 
   @Watch('filterStatus')
@@ -716,8 +720,12 @@ export default class Runs extends Vue {
   }
 
   @Watch('filterUsername')
-  onFilterUsernameChanged(newValue: string) {
-    this.onEmitFilterChanged({ filter: 'username', value: newValue });
+  onFilterUsernameChanged(newValue: null | types.ListItem) {
+    if (!newValue) {
+      this.onEmitFilterChanged({ filter: 'username', value: null });
+      return;
+    }
+    this.onEmitFilterChanged({ filter: 'username', value: newValue.key });
   }
 
   @Watch('filterVerdict')
@@ -731,7 +739,7 @@ export default class Runs extends Vue {
     value,
   }: {
     filter: string;
-    value: string;
+    value: null | string;
   }): void {
     this.filterOffset = 0;
     if (!value) {
@@ -753,7 +761,7 @@ export default class Runs extends Vue {
   onRemoveFilter(filter: string): void {
     if (filter === 'all') {
       this.filterLanguage = '';
-      this.filterProblem = '';
+      this.filterProblem = null;
       this.filterStatus = '';
       this.filterUsername = null;
       this.filterVerdict = '';
@@ -768,7 +776,7 @@ export default class Runs extends Vue {
         this.filterLanguage = '';
         break;
       case 'problem':
-        this.filterProblem = '';
+        this.filterProblem = null;
         break;
       case 'status':
         this.filterStatus = '';

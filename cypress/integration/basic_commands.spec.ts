@@ -31,7 +31,7 @@ describe('Basic Commands Test', () => {
       showScoreboard: true,
       startDate: new Date(),
       unlimitedDuration: true,
-      school: 'omegaup',
+      school: 'Escuela curso',
       basicInformation: false,
       requestParticipantInformation: 'optional',
       problemLevel: 'intermediate',
@@ -64,7 +64,7 @@ describe('Basic Commands Test', () => {
     cy.get('[name="unlimited-duration"]')
       .eq(courseOptions.unlimitedDuration ? 0 : 1)
       .should('be.checked');
-    cy.get('.tt-input').first().should('have.value', courseOptions.school);
+    cy.get('.tags-input').should('have.text', courseOptions.school);
     cy.get('[name="basic-information"]')
       .eq(courseOptions.basicInformation ? 0 : 1)
       .should('be.checked');
@@ -102,7 +102,7 @@ describe('Basic Commands Test', () => {
       startDate: now,
       endDate: addSubtractDaysToDate(now, { days: 1 }),
       unlimitedDuration: false,
-      school: 'omegaup',
+      school: 'Escuela curso',
       basicInformation: false,
       requestParticipantInformation: 'optional',
       problemLevel: 'intermediate',
@@ -141,7 +141,7 @@ describe('Basic Commands Test', () => {
         getISODate(courseOptions.endDate),
       );
     }
-    cy.get('.tt-input').first().should('have.value', courseOptions.school); //
+    cy.get('.tags-input').should('have.text', courseOptions.school); //
     cy.get('[name="basic-information"]')
       .eq(courseOptions.basicInformation ? 0 : 1)
       .should('be.checked');

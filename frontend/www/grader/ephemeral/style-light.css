@@ -1,0 +1,17 @@
+textarea.editor {
+	width: 100%;
+	height: 100%;
+	background: #F8F9Fa;
+	border: 0px;
+	font-family: "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+}
+
+button.ephemeral-button:disabled img, button.ephemeral-button span {
+	display: inline;
+}
+button.ephemeral-button img, button.ephemeral-button:disabled span {
+	display: none;
+}
+input[type="file"] {
+	display: none;
+}
