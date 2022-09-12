@@ -595,7 +595,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: \OmegaUp\Timestamp, submit_delay: int, guid: string}>
+     * @return list<array{contest_score: float, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: string}>
      */
     final public static function getProblemsetRuns(
         int $problemsetId,
@@ -614,14 +614,17 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                         r.score
                 ) AS score,
                 r.penalty,
-                IF(
-                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
-                        0,
-                        r.contest_score
+                IFNULL(
+                    IF(
+                        COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                            0,
+                            r.contest_score
+                    ),
+                    0.0
                 ) AS contest_score,
                 s.problem_id,
                 s.identity_id,
-                s.type,
+                IFNULL(s.`type`, 'normal') AS `type`,
                 s.`time`,
                 s.submit_delay,
                 s.guid
@@ -639,12 +642,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             WHERE
                 pp.problemset_id = ? AND
                 s.status = 'ready' AND
-                s.type = 'normal' AND
+                s.`type` = 'normal' AND
                 $verdictCondition
             ORDER BY
                 s.submission_id;";
 
-        /** @var list<array{contest_score: float|null, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string}> */
+        /** @var list<array{contest_score: float, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
