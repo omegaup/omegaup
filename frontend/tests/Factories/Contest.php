@@ -111,7 +111,13 @@ class ContestParams {
     public $checkPlagiarism;
 
     /**
-     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, contestForTeams?: bool, teamsGroupAlias?: string, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, partialScore?: bool, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string, scoreMode?: string, checkPlagiarism?: bool} $params
+     * @readonly
+     * @var int|null
+     */
+    public $scoreboardPct;
+
+    /**
+     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, contestForTeams?: bool, teamsGroupAlias?: string, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, partialScore?: bool, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string, scoreMode?: string, checkPlagiarism?: bool, scoreboardPct?: int} $params
      */
     public function __construct($params = []) {
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
@@ -153,6 +159,7 @@ class ContestParams {
         $this->teamsGroupAlias = $params['teamsGroupAlias'] ?? null;
         $this->scoreMode = $params['scoreMode'] ?? null;
         $this->checkPlagiarism = $params['checkPlagiarism'] ?? false;
+        $this->scoreboardPct = $params['scoreboardPct'] ?? 100;
     }
 }
 
@@ -195,7 +202,7 @@ class Contest {
             'submissions_gap' => '60',
             'feedback' => $params->feedback,
             'penalty' => 100,
-            'scoreboard' => 100,
+            'scoreboard' => $params->scoreboardPct,
             'penalty_type' => 'contest_start',
             'languages' => $params->languages,
             'recommended' => 0, // This is just a default value, it is not honored by apiCreate.

@@ -306,6 +306,16 @@
               >
                 <font-awesome-icon :icon="['fas', 'search-plus']" />
               </button>
+              <button
+                v-if="requestFeedback"
+                class="details btn-outline-dark btn-sm"
+                @click="$emit('request-feedback', run.guid)"
+              >
+                <font-awesome-icon
+                  :title="T.courseRequestFeedback"
+                  icon="comment-dots"
+                />
+              </button>
             </td>
             <td
               v-else-if="showDetails || showDisqualify || showRejudge"
@@ -459,6 +469,7 @@ export default class Runs extends Vue {
   @Prop({ default: false }) showAllRuns!: boolean;
   @Prop() totalRuns!: number;
   @Prop() searchResultProblems!: types.ListItem[];
+  @Prop() requestFeedback!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
