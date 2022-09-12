@@ -27,9 +27,10 @@ describe('SearchBar.vue', () => {
 
     expect(wrapper.text()).toContain(T.wordsFilterByLanguage);
 
-    for (const language of Object.entries(languages)) {
-      const value = language[1];
-      expect(wrapper.find('select').text()).toContain(value);
+    for (const [key, language] of Object.entries(languages)) {
+      expect(wrapper.find(`select>option[value="${key}"]`).text()).toBe(
+        language,
+      );
     }
   });
 });

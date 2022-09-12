@@ -90,14 +90,11 @@ OmegaUp.on('ready', () => {
           ): void => {
             const queryParameters = {
               language,
-              query,
+              query: query ?? '',
               order_by: columnName,
               sort_order: sortOrder,
               tag,
             };
-            if (queryParameters.query == null) {
-              queryParameters.query = '';
-            }
             window.location.replace(
               `/problem?${ui.buildURLQuery(queryParameters)}`,
             );
