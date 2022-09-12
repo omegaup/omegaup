@@ -161,7 +161,6 @@ export default class ReviewerPopup extends Vue {
   addOtherTag(tag: string): void {
     if (!this.publicTagsList.includes(tag)) {
       this.publicTagsList.push(tag);
-      this.$emit('emit-add-tag', this.problemAlias, tag);
     }
   }
 
@@ -179,7 +178,6 @@ export default class ReviewerPopup extends Vue {
   removeTag(name: string) {
     let pos = this.publicTagsList.indexOf(name);
     this.publicTagsList.splice(pos, 1);
-    this.$emit('emit-remove-tag', this.problemAlias, name);
   }
 
   onHide(): void {

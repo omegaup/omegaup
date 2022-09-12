@@ -386,26 +386,6 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.ignoreError);
           },
-          'add-tag': (alias: string, tagname: string) => {
-            api.Problem.addTag({
-              problem_alias: alias,
-              name: tagname,
-            })
-              .then(() => {
-                ui.success(T.tagAdded);
-              })
-              .catch(ui.apiError);
-          },
-          'remove-tag': (alias: string, tagname: string) => {
-            api.Problem.removeTag({
-              problem_alias: alias,
-              name: tagname,
-            })
-              .then(() => {
-                ui.success(T.tagRemoved);
-              })
-              .catch(ui.apiError);
-          },
           'update-reviewer': (
             qualitynomination_id: string,
             tag: string,
