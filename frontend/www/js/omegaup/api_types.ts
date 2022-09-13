@@ -3665,7 +3665,6 @@ export namespace types {
   export interface ProblemDetailsPayload {
     allRuns?: types.Run[];
     allowUserAddTags?: boolean;
-    alreadyReviewedPayload?: types.QualityNominationContents;
     clarifications?: types.Clarification[];
     histogram: types.Histogram;
     levelTags?: string[];

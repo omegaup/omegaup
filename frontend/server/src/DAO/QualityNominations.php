@@ -10,6 +10,8 @@ namespace OmegaUp\DAO;
  * {@link \OmegaUp\DAO\VO\QualityNominations}.
  *
  * @access public
+ *
+ * @psalm-type QualityNominationContents=array{quality_seal: boolean, tag: string}
  */
 class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     /**
@@ -193,7 +195,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     /**
      * Returns the contents and id of a nomination for a given problem and user.
      *
-     * @return array{contents: array{quality_seal: bool, tag: string}, qualitynomination_id: int}|null
+     * @return array{contents: QualityNominationContents, qualitynomination_id: int}|null
      */
     public static function getReviewedData(
         \Omegaup\DAO\VO\Identities $identity,
