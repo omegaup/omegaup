@@ -230,8 +230,8 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problemData['request']['problem_alias'],
             ]));
             $this->fail('Should have failed');
-        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('problemIsPrivate', $e->getMessage());
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
         }
     }
 
