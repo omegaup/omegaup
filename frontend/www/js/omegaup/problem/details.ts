@@ -388,13 +388,9 @@ OmegaUp.on('ready', async () => {
           },
           'update-reviewer': (
             qualitynomination_id: string,
-            tag: string,
             qualitySeal: boolean,
           ) => {
-            const contents: { quality_seal?: boolean; tag?: string } = {};
-            if (tag) {
-              contents.tag = tag;
-            }
+            const contents: { quality_seal?: boolean } = {};
             contents.quality_seal = qualitySeal;
             api.QualityNomination.update({
               qualitynomination_id,

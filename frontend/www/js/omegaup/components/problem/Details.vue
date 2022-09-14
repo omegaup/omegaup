@@ -175,7 +175,6 @@
                     ? $emit(
                         'update-reviewer',
                         alreadyReviewedPayload.qualitynomination_id,
-                        tag,
                         qualitySeal,
                       )
                     : $emit('submit-reviewer', tag, qualitySeal)

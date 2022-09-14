@@ -133,14 +133,12 @@ export default class ReviewerPopup extends Vue {
   T = T;
   currentView: AvailableViews = AvailableViews.Content;
   qualitySeal = this.alreadyReviewedPayload
-    ? this.alreadyReviewedPayload.contents.quality_seal
+    ? this.alreadyReviewedPayload.quality_seal
     : true;
   qualitySealReviewed = this.alreadyReviewedPayload
-    ? this.alreadyReviewedPayload.contents.quality_seal
+    ? this.alreadyReviewedPayload.quality_seal
     : true;
-  tag = this.alreadyReviewedPayload
-    ? this.alreadyReviewedPayload.contents.tag
-    : '';
+  tag = '';
   publicTagsList = this.selectedPublicTags ?? [];
 
   get sortedProblemTags(): ProblemTag[] {

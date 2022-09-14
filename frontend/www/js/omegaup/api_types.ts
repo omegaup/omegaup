@@ -3665,6 +3665,7 @@ export namespace types {
   export interface ProblemDetailsPayload {
     allRuns?: types.Run[];
     allowUserAddTags?: boolean;
+    alreadyReviewedPayload?: types.QualityNominationContents;
     clarifications?: types.Clarification[];
     histogram: types.Histogram;
     levelTags?: string[];
@@ -4000,7 +4001,7 @@ export namespace types {
   }
 
   export interface QualityNominationContents {
-    contents: { quality_seal: boolean; tag: string };
+    quality_seal: boolean;
     qualitynomination_id: number;
   }
 
