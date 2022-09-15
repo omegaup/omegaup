@@ -9,7 +9,7 @@ import differenceInCalendarYears from 'date-fns/differenceInCalendarYears';
 let remoteDeltaTime: number = 0;
 
 export function getDifferenceInCalendarYears(date: Date): number {
-  return differenceInCalendarYears(Date.now(), date);
+  return differenceInCalendarYears(date, Date.now());
 }
 
 export function formatFutureDateRelative(futureDate: Date): string {
