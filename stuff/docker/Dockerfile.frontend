@@ -94,7 +94,7 @@ RUN apt-get update -y && \
     apt-get update -y && \
     apt-get install --no-install-recommends -y \
         newrelic-php5 \
-        openjdk-16-jre-headless \
+        openjdk-11-jre-headless \
         php8.0-apcu \
         php8.0-curl \
         php8.0-fpm \
