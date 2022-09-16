@@ -1,6 +1,5 @@
 import * as time from './time';
 
-
 describe('getDifferenceInCalendarYears', () => {
   // Setting an specific datetime to avoid flakiness in a leap-year
   const now = new Date(0).getDate();
@@ -19,11 +18,21 @@ describe('getDifferenceInCalendarYears', () => {
   it('Should handle difference in calendar years', () => {
     // https://www.epochconverter.com/
     const yearInSeconds = 31556926 * 1000;
-    expect(time.getDifferenceInCalendarYears(new Date(yearInSeconds))).toEqual(1);
-    expect(time.getDifferenceInCalendarYears(new Date(yearInSeconds * 3))).toEqual(3);
-    expect(time.getDifferenceInCalendarYears(new Date(yearInSeconds * 4))).toEqual(4);
-    expect(time.getDifferenceInCalendarYears(new Date(yearInSeconds * 8))).toEqual(8);
-    expect(time.getDifferenceInCalendarYears(new Date(yearInSeconds * 15))).toEqual(15);
+    expect(time.getDifferenceInCalendarYears(new Date(yearInSeconds))).toEqual(
+      1,
+    );
+    expect(
+      time.getDifferenceInCalendarYears(new Date(yearInSeconds * 3)),
+    ).toEqual(3);
+    expect(
+      time.getDifferenceInCalendarYears(new Date(yearInSeconds * 4)),
+    ).toEqual(4);
+    expect(
+      time.getDifferenceInCalendarYears(new Date(yearInSeconds * 8)),
+    ).toEqual(8);
+    expect(
+      time.getDifferenceInCalendarYears(new Date(yearInSeconds * 15)),
+    ).toEqual(15);
   });
 });
 
