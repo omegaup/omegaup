@@ -139,12 +139,14 @@ export default class ProblemFinderWizard extends Vue {
   get tagObjects(): TagObject[] {
     const tagObjects: TagObject[] = [];
     this.possibleTags.forEach((tagObject) => {
-      tagObjects.push({
-        key: tagObject.name,
-        value: Object.prototype.hasOwnProperty.call(T, tagObject.name)
-          ? T[tagObject.name]
-          : tagObject.name,
-      });
+      if (T[tagObject.name]) {
+        tagObjects.push({
+          key: tagObject.name,
+          value: Object.prototype.hasOwnProperty.call(T, tagObject.name)
+            ? T[tagObject.name]
+            : tagObject.name,
+        });
+      }
     });
     return tagObjects;
   }
