@@ -84,6 +84,33 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
     }
 
     /**
+     * Finds all public tags
+     *
+     * @return list<string>
+     */
+    public static function getAllPublicTag() {
+        $sql = '
+            SELECT
+                name
+            FROM
+                Tags
+            WHERE
+                public = true;';
+
+        $results = [];
+        /** @var array{name: string} $row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql
+            ) as $row
+        ) {
+            $results[] = $row['name'];
+        }
+
+        return $results;
+    }
+
+    /**
      * @return list<TagWithProblemCount>
      */
     public static function getPublicQualityTagsByLevel(

@@ -4893,13 +4893,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r
     ): array {
         $tags = [];
-        $allTags = self::getAllTagsFromCache();
+        $allTags = \OmegaUp\DAO\Tags::getAllPublicTag();
 
         foreach ($allTags as $tag) {
-            if (is_null($tag->name)) {
-                continue;
-            }
-            $tags[] = ['name' => $tag->name];
+            $tags[] = ['name' => $tag];
         }
         return [
             'templateProperties' => [
