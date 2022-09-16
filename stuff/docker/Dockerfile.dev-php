@@ -24,7 +24,7 @@ RUN add-apt-repository ppa:ondrej/php && \
         mysql-client-core-8.0 \
         nginx \
         nodejs \
-        openjdk-16-jre-headless \
+        openjdk-11-jre-headless \
         php8.0 \
         php8.0-apcu \
         php8.0-curl \
