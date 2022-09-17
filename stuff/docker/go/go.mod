@@ -1,8 +1,6 @@
 module github.com/omegaup
 
-go 1.13
-
-replace github.com/lhchavez/git2go/v29 => ./git2go
+go 1.17
 
 replace github.com/omegaup/githttp => ./githttp
 
