@@ -666,6 +666,10 @@ export const Course = {
     messages.CourseAddGroupAdminRequest,
     messages.CourseAddGroupAdminResponse
   >('/api/course/addGroupAdmin/'),
+  addGroupTeachingAssistant: apiCall<
+    messages.CourseAddGroupTeachingAssistantRequest,
+    messages.CourseAddGroupTeachingAssistantResponse
+  >('/api/course/addGroupTeachingAssistant/'),
   addProblem: apiCall<
     messages.CourseAddProblemRequest,
     messages.CourseAddProblemResponse
@@ -674,6 +678,10 @@ export const Course = {
     messages.CourseAddStudentRequest,
     messages.CourseAddStudentResponse
   >('/api/course/addStudent/'),
+  addTeachingAssistant: apiCall<
+    messages.CourseAddTeachingAssistantRequest,
+    messages.CourseAddTeachingAssistantResponse
+  >('/api/course/addTeachingAssistant/'),
   adminDetails: apiCall<
     messages.CourseAdminDetailsRequest,
     messages._CourseAdminDetailsServerResponse,
@@ -914,6 +922,10 @@ export const Course = {
     messages.CourseRemoveGroupAdminRequest,
     messages.CourseRemoveGroupAdminResponse
   >('/api/course/removeGroupAdmin/'),
+  removeGroupTeachingAssistant: apiCall<
+    messages.CourseRemoveGroupTeachingAssistantRequest,
+    messages.CourseRemoveGroupTeachingAssistantResponse
+  >('/api/course/removeGroupTeachingAssistant/'),
   removeProblem: apiCall<
     messages.CourseRemoveProblemRequest,
     messages.CourseRemoveProblemResponse
@@ -922,6 +934,14 @@ export const Course = {
     messages.CourseRemoveStudentRequest,
     messages.CourseRemoveStudentResponse
   >('/api/course/removeStudent/'),
+  removeTeachingAssistant: apiCall<
+    messages.CourseRemoveTeachingAssistantRequest,
+    messages.CourseRemoveTeachingAssistantResponse
+  >('/api/course/removeTeachingAssistant/'),
+  requestFeedback: apiCall<
+    messages.CourseRequestFeedbackRequest,
+    messages.CourseRequestFeedbackResponse
+  >('/api/course/requestFeedback/'),
   requests: apiCall<
     messages.CourseRequestsRequest,
     messages._CourseRequestsServerResponse,
@@ -956,6 +976,10 @@ export const Course = {
     })(x.runs);
     return x;
   }),
+  searchUsers: apiCall<
+    messages.CourseSearchUsersRequest,
+    messages.CourseSearchUsersResponse
+  >('/api/course/searchUsers/'),
   studentProgress: apiCall<
     messages.CourseStudentProgressRequest,
     messages._CourseStudentProgressServerResponse,
@@ -1247,6 +1271,10 @@ export const Problem = {
   list: apiCall<messages.ProblemListRequest, messages.ProblemListResponse>(
     '/api/problem/list/',
   ),
+  listForTypeahead: apiCall<
+    messages.ProblemListForTypeaheadRequest,
+    messages.ProblemListForTypeaheadResponse
+  >('/api/problem/listForTypeahead/'),
   myList: apiCall<
     messages.ProblemMyListRequest,
     messages.ProblemMyListResponse
@@ -1591,6 +1619,10 @@ export const Run = {
   rejudge: apiCall<messages.RunRejudgeRequest, messages.RunRejudgeResponse>(
     '/api/run/rejudge/',
   ),
+  requalify: apiCall<
+    messages.RunRequalifyRequest,
+    messages.RunRequalifyResponse
+  >('/api/run/requalify/'),
   source: apiCall<messages.RunSourceRequest, messages.RunSourceResponse>(
     '/api/run/source/',
   ),
@@ -1782,6 +1814,14 @@ export const User = {
     messages.UserCreateAPITokenRequest,
     messages.UserCreateAPITokenResponse
   >('/api/user/createAPIToken/'),
+  deleteConfirm: apiCall<
+    messages.UserDeleteConfirmRequest,
+    messages.UserDeleteConfirmResponse
+  >('/api/user/deleteConfirm/'),
+  deleteRequest: apiCall<
+    messages.UserDeleteRequestRequest,
+    messages.UserDeleteRequestResponse
+  >('/api/user/deleteRequest/'),
   extraInformation: apiCall<
     messages.UserExtraInformationRequest,
     messages._UserExtraInformationServerResponse,

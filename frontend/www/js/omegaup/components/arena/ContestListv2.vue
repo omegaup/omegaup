@@ -28,6 +28,7 @@
                       spellcheck="false"
                       :placeholder="T.wordsKeyword"
                     />
+                    <button class="btn" type="reset">&times;</button>
                     <div class="input-group-append">
                       <input
                         class="btn btn-primary btn-md active"
@@ -48,17 +49,6 @@
                   </template>
                   <b-dropdown-item
                     href="#"
-                    data-order-by-title
-                    @click="orderByTitle"
-                  >
-                    <font-awesome-icon
-                      v-if="currentOrder === ContestOrder.Title"
-                      icon="check"
-                      class="mr-1"
-                    />{{ T.contestOrderByTitle }}</b-dropdown-item
-                  >
-                  <b-dropdown-item
-                    href="#"
                     data-order-by-ends
                     @click="orderByEnds"
                   >
@@ -67,6 +57,17 @@
                       icon="check"
                       class="mr-1"
                     />{{ T.contestOrderByEnds }}</b-dropdown-item
+                  >
+                  <b-dropdown-item
+                    href="#"
+                    data-order-by-title
+                    @click="orderByTitle"
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.Title"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByTitle }}</b-dropdown-item
                   >
                   <b-dropdown-item
                     href="#"
@@ -122,23 +123,34 @@
                   </template>
                   <b-dropdown-item
                     href="#"
-                    data-filter-by-signed-up
-                    @click="toggleFilterBySignedUp"
+                    data-filter-by-all
+                    @click="filterByAll"
                   >
                     <font-awesome-icon
-                      v-if="currentFilterBySignedUp"
-                      icon="check-square"
+                      v-if="currentFilter === ContestFilter.All"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestFilterByAll }}</b-dropdown-item
+                  >
+                  <b-dropdown-item
+                    href="#"
+                    data-filter-by-signed-up
+                    @click="filterBySignedUp"
+                  >
+                    <font-awesome-icon
+                      v-if="currentFilter === ContestFilter.SignedUp"
+                      icon="check"
                       class="mr-1"
                     />{{ T.contestFilterBySignedUp }}</b-dropdown-item
                   >
                   <b-dropdown-item
                     href="#"
                     data-filter-by-recommended
-                    @click="toggleFilterByRecommended"
+                    @click="filterByRecommended"
                   >
                     <font-awesome-icon
-                      v-if="currentFilterByRecommended"
-                      icon="check-square"
+                      v-if="currentFilter === ContestFilter.OnlyRecommended"
+                      icon="check"
                       class="mr-1"
                     />{{ T.contestFilterByRecommended }}</b-dropdown-item
                   >
@@ -149,9 +161,6 @@
         </b-card>
         <b-tab
           ref="currentContestTab"
-          v-infinite-scroll="loadMoreContests"
-          infinite-scroll-disabled="refreshing"
-          infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListCurrent"
           :title-link-class="titleLinkClass(ContestTab.Current)"
@@ -194,9 +203,6 @@
         </b-tab>
         <b-tab
           ref="futureContestTab"
-          v-infinite-scroll="loadMoreContests"
-          infinite-scroll-disabled="refreshing"
-          infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListFuture"
           :title-link-class="titleLinkClass(ContestTab.Future)"
@@ -242,9 +248,6 @@
         </b-tab>
         <b-tab
           ref="pastContestTab"
-          v-infinite-scroll="loadMoreContests"
-          infinite-scroll-disabled="refreshing"
-          infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListPast"
           :title-link-class="titleLinkClass(ContestTab.Past)"
@@ -282,13 +285,19 @@
               <div></div>
             </template>
           </omegaup-contest-card>
-          <b-spinner
-            v-if="refreshing"
-            class="spinner mt-4"
-            variant="primary"
-          ></b-spinner>
         </b-tab>
       </b-tabs>
+      <b-pagination-nav
+        ref="paginator"
+        v-model="currentPage"
+        base-url="#"
+        first-number
+        last-number
+        size="lg"
+        align="center"
+        :link-gen="linkGen"
+        :number-of-pages="numberOfPages(currentTab)"
+      ></b-pagination-nav>
     </b-card>
   </div>
 </template>
@@ -307,21 +316,19 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import infiniteScroll from 'vue-infinite-scroll';
 import {
   TabsPlugin,
   CardPlugin,
   DropdownPlugin,
   LayoutPlugin,
-  SpinnerPlugin,
+  PaginationNavPlugin,
 } from 'bootstrap-vue';
 import ContestCard from './ContestCard.vue';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
 Vue.use(LayoutPlugin);
-Vue.use(SpinnerPlugin);
-Vue.use(infiniteScroll);
+Vue.use(PaginationNavPlugin);
 library.add(fas);
 
 export enum ContestTab {
@@ -340,6 +347,12 @@ export enum ContestOrder {
   SignedUp = 'signedup',
 }
 
+export enum ContestFilter {
+  SignedUp = 'signedup',
+  OnlyRecommended = 'recommended',
+  All = 'all',
+}
+
 @Component({
   components: {
     'omegaup-contest-card': ContestCard,
@@ -347,18 +360,23 @@ export enum ContestOrder {
   },
 })
 export default class ArenaContestList extends Vue {
+  @Prop({ default: null }) countContests!: { [key: string]: number } | null;
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
   @Prop() tab!: ContestTab;
+  @Prop() sortOrder!: ContestOrder;
+  @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
+  @Prop() page!: number;
   T = T;
   ui = ui;
   ContestTab = ContestTab;
   ContestOrder = ContestOrder;
+  ContestFilter = ContestFilter;
   currentTab: ContestTab = this.tab;
   currentQuery: string = this.query;
-  currentOrder: ContestOrder = ContestOrder.None;
-  currentFilterBySignedUp: boolean = false;
-  currentFilterByRecommended: boolean = false;
+  currentOrder: ContestOrder = this.sortOrder;
+  currentFilter: ContestFilter = this.filter;
+  currentPage: number = this.page;
   refreshing: boolean = false;
 
   titleLinkClass(tab: ContestTab) {
@@ -369,15 +387,30 @@ export default class ArenaContestList extends Vue {
     }
   }
 
-  get queryURL(): string {
-    return `/arenav2/#${this.currentTab}`;
+  numberOfPages(tab: ContestTab): number {
+    if (!this.countContests || !this.countContests[tab]) {
+      // Default value when there are no contests in the list
+      return 1;
+    }
+    const numberOfPages = Math.ceil(this.countContests[tab] / 10);
+    return numberOfPages;
   }
 
-  loadMoreContests() {
-    this.refreshing = true;
-    let currentPageSize: number = this.filteredContestList.length + 10;
-    this.$emit('get-chunk', 1, currentPageSize, this.query, this.currentTab);
-    this.refreshing = false;
+  get queryURL(): string {
+    return `/arena/#${this.currentTab}`;
+  }
+
+  linkGen(pageNum: number) {
+    return {
+      path: `/arena/`,
+      query: {
+        page: pageNum,
+        tab_name: this.currentTab,
+        query: this.query,
+        sort_order: this.currentOrder,
+        filter: this.filter,
+      },
+    };
   }
 
   finishContestDate(contest: types.ContestListItem): string {
@@ -416,20 +449,22 @@ export default class ArenaContestList extends Vue {
     this.currentOrder = ContestOrder.SignedUp;
   }
 
-  toggleFilterBySignedUp() {
-    this.currentFilterBySignedUp = !this.currentFilterBySignedUp;
+  filterBySignedUp() {
+    this.currentFilter = ContestFilter.SignedUp;
   }
-
-  toggleFilterByRecommended() {
-    this.currentFilterByRecommended = !this.currentFilterByRecommended;
+  filterByRecommended() {
+    this.currentFilter = ContestFilter.OnlyRecommended;
+  }
+  filterByAll() {
+    this.currentFilter = ContestFilter.All;
   }
 
   get filteredContestList(): types.ContestListItem[] {
     const filters: Array<(contestItem: types.ContestListItem) => boolean> = [];
-    if (this.currentFilterBySignedUp) {
+    if (this.currentFilter === ContestFilter.SignedUp) {
       filters.push((item) => item.participating);
     }
-    if (this.currentFilterByRecommended) {
+    if (this.currentFilter === ContestFilter.OnlyRecommended) {
       filters.push((item) => item.recommended);
     }
     return this.sortedContestList.slice().filter((contestItem) => {
@@ -522,8 +557,8 @@ export default class ArenaContestList extends Vue {
 }
 
 .scroll-content {
-  overflow-y: scroll;
-  max-height: 500px;
+  overflow-y: auto;
+  max-height: 800px;
 }
 
 .empty-category {
@@ -531,13 +566,5 @@ export default class ArenaContestList extends Vue {
   font-size: 200%;
   margin: 1em;
   color: var(--arena-contest-list-empty-category-font-color);
-}
-
-.spinner {
-  width: 3rem;
-  height: 3rem;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
 }
 </style>

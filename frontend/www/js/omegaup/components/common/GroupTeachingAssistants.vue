@@ -1,19 +1,25 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <form class="form" @submit.prevent="$emit('add-group-admin', groupAlias)">
+      <form
+        class="form"
+        @submit.prevent="$emit('add-group-teaching-assistant', group.key)"
+      >
         <div class="form-group mb-0">
-          <label
-            >{{ T.wordsGroupAdmin }}
+          <label class="font-weight-bold w-100"
+            >{{ T.courseEditGroupTeachingAssistant }}
             <font-awesome-icon
-              :title="T.courseEditAddGroupAdminsTooltip"
+              :title="T.courseEditAddGroupTeachingAssistantTooltip"
               icon="info-circle"
             />
-            <omegaup-autocomplete
-              class="form-control"
-              :init="(el) => typeahead.groupTypeahead(el)"
-              :value.sync="groupAlias"
-            ></omegaup-autocomplete>
+            <omegaup-common-typeahead
+              :existing-options="searchResultGroups"
+              :value.sync="group"
+              :max-results="10"
+              @update-existing-options="
+                (query) => $emit('update-search-result-groups', query)
+              "
+            ></omegaup-common-typeahead>
           </label>
         </div>
         <button class="btn btn-primary" type="submit">
@@ -21,9 +27,9 @@
         </button>
       </form>
     </div>
-    <div v-if="groupAdmins.length === 0">
+    <div v-if="groupTeachingAssistants.length === 0">
       <div class="my-2 empty-table-message">
-        {{ T.courseEditGroupAdminsEmpty }}
+        {{ T.courseEditGroupTeachingAssistantsEmpty }}
       </div>
     </div>
     <table v-else class="table table-striped mb-0">
@@ -37,19 +43,27 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="groupAdmin in groupAdmins" :key="groupAdmin.alias">
+        <tr
+          v-for="groupTeachingAssistant in groupTeachingAssistants"
+          :key="groupTeachingAssistant.alias"
+        >
           <td>
-            <a :href="`/group/${groupAdmin.alias}/edit/`">
-              {{ groupAdmin.name }}
+            <a :href="`/group/${groupTeachingAssistant.alias}/edit/`">
+              {{ groupTeachingAssistant.name }}
             </a>
           </td>
-          <td class="text-center">{{ groupAdmin.role }}</td>
+          <td class="text-center">{{ groupTeachingAssistant.role }}</td>
           <td class="text-center">
             <button
-              v-if="groupAdmin.name !== 'admin'"
+              v-if="groupTeachingAssistant.name !== 'teaching_assistant'"
               class="close float-none"
               type="button"
-              @click="$emit('remove-group-admin', group.alias)"
+              @click="
+                $emit(
+                  'remove-group-teaching-assistant',
+                  groupTeachingAssistant.alias,
+                )
+              "
             >
               ×
             </button>
@@ -64,9 +78,8 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
+import common_Typeahead from '../common/Typeahead.vue';
 
-import Autocomplete from '../Autocomplete.vue';
 import {
   FontAwesomeIcon,
   FontAwesomeLayers,
@@ -78,22 +91,22 @@ library.add(fas);
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
-export default class GroupAdmin extends Vue {
-  @Prop() groupAdmins!: types.ContestGroupAdmin[];
+export default class GroupTeachingAssistants extends Vue {
+  @Prop() groupTeachingAssistants!: types.ContestGroupAdmin[];
+  @Prop() searchResultGroups!: types.ListItem[];
 
   T = T;
-  typeahead = typeahead;
-  groupAlias = '';
+  group: null | types.ListItem = null;
 
-  @Watch('groupAdmins')
-  ongroupAdminsChange(): void {
-    this.groupAlias = '';
+  @Watch('groupTeachingAssistants')
+  onGroupTeachingAssistantsChanged(): void {
+    this.group = null;
   }
 }
 </script>

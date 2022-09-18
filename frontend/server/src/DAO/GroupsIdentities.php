@@ -37,7 +37,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
             LEFT JOIN
                 States s ON s.state_id = i.state_id AND s.country_id = i.country_id
             LEFT JOIN
-                Countries c ON c.country_id = s.country_id
+                Countries c ON c.country_id = i.country_id
             LEFT JOIN
                 Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
             LEFT JOIN
@@ -117,7 +117,10 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
     final public static function getByGroupId(int $groupId): array {
         $sql = '
             SELECT
-                *
+            ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\GroupsIdentities::FIELD_NAMES,
+            'i'
+        ) . '
             FROM
                 Groups_Identities i
             WHERE

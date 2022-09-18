@@ -36,10 +36,7 @@ RUN add-apt-repository ppa:ondrej/php && \
         php8.0-redis \
         php8.0-xml \
         php8.0-zip \
-        python3-jinja2 \
-        python3-pip \
-        python3-pyparsing \
-        python3-requests \
+        python3.8-venv \
         sudo \
         supervisor \
         wait-for-it \
@@ -48,9 +45,6 @@ RUN add-apt-repository ppa:ondrej/php && \
         && \
     apt-get autoremove -y && \
     apt-get clean
-
-COPY requirements.txt /tmp/
-RUN python3 -m pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
 RUN curl -sL https://getcomposer.org/download/2.2.4/composer.phar -o /usr/bin/composer && \
     chmod +x /usr/bin/composer
@@ -82,7 +76,9 @@ WORKDIR /opt/omegaup
 EXPOSE 8001
 
 ENV CI=false
+ENV VIRTUAL_ENV=/opt/omegaup/stuff/venv
+ENV PATH=/opt/omegaup/stuff/venv/bin:$PATH
 
-CMD ["wait-for-it", "grader:36663", "gitserver:33861", "broadcaster:22291", "mysql:3306", "--", \
+CMD ["wait-for-it", "grader:36663", "gitserver:33861", "broadcaster:22291", "mysql:13306", "--", \
      "/bin/bash", "-c", \
      "while [[ ! -d /opt/omegaup/frontend/server ]]; do sleep 1; done; exec /usr/bin/supervisord"]

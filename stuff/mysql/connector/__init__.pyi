@@ -2,13 +2,12 @@ from typing import overload, Literal, Text
 
 from . import cursor
 
-
 def connect(
     user: Text,
     password: Text,
     database: Text,
     host: Text,
-    port: int = 3306,
+    port: int = 13306,
 ) -> MySQLConnection:
     ...
 

@@ -24,7 +24,10 @@ const languageModeMap: {
   cpp: 'text/x-c++src',
   'cpp17-gcc': 'text/x-c++src',
   'cpp17-clang': 'text/x-c++src',
+  'cpp20-gcc': 'text/x-c++src',
+  'cpp20-clang': 'text/x-c++src',
   java: 'text/x-java',
+  kt: 'text/x-kotlin',
   py: 'text/x-python',
   py2: 'text/x-python',
   py3: 'text/x-python',
@@ -38,6 +41,9 @@ const languageModeMap: {
   'cpp11-gcc': 'text/x-c++src',
   'cpp11-clang': 'text/x-c++src',
   lua: 'text/x-lua',
+  go: 'text/x-go',
+  rs: 'text/x-rust',
+  js: 'text/x-javascript',
 };
 
 // Preload all language modes.
@@ -49,6 +55,9 @@ const modeList: string[] = [
   'pascal',
   'haskell',
   'lua',
+  'go',
+  'rust',
+  'javascript',
 ];
 
 for (const mode of modeList) {
@@ -122,8 +131,7 @@ export default class CodeView extends Vue {
       height: 100%;
 
       .CodeMirror-scroll {
-        max-height: 638px;
-        min-height: 226px;
+        height: 226px;
       }
     }
   }

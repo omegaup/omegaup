@@ -62,8 +62,10 @@
   - [`/api/course/activityReport/`](#apicourseactivityreport)
   - [`/api/course/addAdmin/`](#apicourseaddadmin)
   - [`/api/course/addGroupAdmin/`](#apicourseaddgroupadmin)
+  - [`/api/course/addGroupTeachingAssistant/`](#apicourseaddgroupteachingassistant)
   - [`/api/course/addProblem/`](#apicourseaddproblem)
   - [`/api/course/addStudent/`](#apicourseaddstudent)
+  - [`/api/course/addTeachingAssistant/`](#apicourseaddteachingassistant)
   - [`/api/course/adminDetails/`](#apicourseadmindetails)
   - [`/api/course/admins/`](#apicourseadmins)
   - [`/api/course/arbitrateRequest/`](#apicoursearbitraterequest)
@@ -89,10 +91,14 @@
   - [`/api/course/removeAdmin/`](#apicourseremoveadmin)
   - [`/api/course/removeAssignment/`](#apicourseremoveassignment)
   - [`/api/course/removeGroupAdmin/`](#apicourseremovegroupadmin)
+  - [`/api/course/removeGroupTeachingAssistant/`](#apicourseremovegroupteachingassistant)
   - [`/api/course/removeProblem/`](#apicourseremoveproblem)
   - [`/api/course/removeStudent/`](#apicourseremovestudent)
+  - [`/api/course/removeTeachingAssistant/`](#apicourseremoveteachingassistant)
+  - [`/api/course/requestFeedback/`](#apicourserequestfeedback)
   - [`/api/course/requests/`](#apicourserequests)
   - [`/api/course/runs/`](#apicourseruns)
+  - [`/api/course/searchUsers/`](#apicoursesearchusers)
   - [`/api/course/studentProgress/`](#apicoursestudentprogress)
   - [`/api/course/studentsProgress/`](#apicoursestudentsprogress)
   - [`/api/course/update/`](#apicourseupdate)
@@ -139,6 +145,7 @@
   - [`/api/problem/delete/`](#apiproblemdelete)
   - [`/api/problem/details/`](#apiproblemdetails)
   - [`/api/problem/list/`](#apiproblemlist)
+  - [`/api/problem/listForTypeahead/`](#apiproblemlistfortypeahead)
   - [`/api/problem/myList/`](#apiproblemmylist)
   - [`/api/problem/randomKarelProblem/`](#apiproblemrandomkarelproblem)
   - [`/api/problem/randomLanguageProblem/`](#apiproblemrandomlanguageproblem)
@@ -181,6 +188,7 @@
   - [`/api/run/disqualify/`](#apirundisqualify)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
+  - [`/api/run/requalify/`](#apirunrequalify)
   - [`/api/run/source/`](#apirunsource)
   - [`/api/run/status/`](#apirunstatus)
 - [School](#school)
@@ -221,6 +229,8 @@
   - [`/api/user/contestStats/`](#apiuserconteststats)
   - [`/api/user/create/`](#apiusercreate)
   - [`/api/user/createAPIToken/`](#apiusercreateapitoken)
+  - [`/api/user/deleteConfirm/`](#apiuserdeleteconfirm)
+  - [`/api/user/deleteRequest/`](#apiuserdeleterequest)
   - [`/api/user/extraInformation/`](#apiuserextrainformation)
   - [`/api/user/generateGitToken/`](#apiusergenerategittoken)
   - [`/api/user/generateOmiUsers/`](#apiusergenerateomiusers)
@@ -731,6 +741,7 @@ Creates a new contest
 | --------------------------- | -------------- | ----------- |
 | `admission_mode`            | `mixed`        |             |
 | `alias`                     | `mixed`        |             |
+| `check_plagiarism`          | `bool\|null`   |             |
 | `contest_for_teams`         | `bool\|null`   |             |
 | `description`               | `mixed`        |             |
 | `feedback`                  | `mixed`        |             |
@@ -744,6 +755,7 @@ Creates a new contest
 | `points_decay_factor`       | `mixed`        |             |
 | `problems`                  | `null\|string` |             |
 | `requests_user_information` | `mixed`        |             |
+| `score_mode`                | `null\|string` |             |
 | `scoreboard`                | `mixed`        |             |
 | `show_scoreboard_after`     | `mixed`        |             |
 | `start_time`                | `mixed`        |             |
@@ -840,6 +852,7 @@ Returns a list of contests where current user is participating in
 | Name       | Type              |
 | ---------- | ----------------- |
 | `contests` | `types.Contest[]` |
+| `count`    | `number`          |
 
 ## `/api/contest/myList/`
 
@@ -861,6 +874,7 @@ Returns a list of contests where current user is the director
 | Name       | Type              |
 | ---------- | ----------------- |
 | `contests` | `types.Contest[]` |
+| `count`    | `number`          |
 
 ## `/api/contest/open/`
 
@@ -1120,16 +1134,16 @@ Returns all runs for a contest
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                            | Description |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `contest_alias` | `string`                                                                                                                                                        |             |
-| `problem_alias` | `string`                                                                                                                                                        |             |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cs'\|'hs'\|'java'\|'kj'\|'kp'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|null` |             |
-| `offset`        | `int\|null`                                                                                                                                                     |             |
-| `rowcount`      | `int\|null`                                                                                                                                                     |             |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                       |             |
-| `username`      | `null\|string`                                                                                                                                                  |             |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                          |             |
+| Name            | Type                                                                                                                                                                                                                | Description |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `contest_alias` | `string`                                                                                                                                                                                                            |             |
+| `problem_alias` | `string`                                                                                                                                                                                                            |             |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |
+| `offset`        | `int\|null`                                                                                                                                                                                                         |             |
+| `rowcount`      | `int\|null`                                                                                                                                                                                                         |             |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |
+| `username`      | `null\|string`                                                                                                                                                                                                      |             |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |
 
 ### Returns
 
@@ -1286,32 +1300,34 @@ Update a Contest
 
 ### Parameters
 
-| Name                                         | Type                                 | Description |
-| -------------------------------------------- | ------------------------------------ | ----------- |
-| `contest_alias`                              | `string`                             |             |
-| `finish_time`                                | `int`                                |             |
-| `submissions_gap`                            | `int`                                |             |
-| `window_length`                              | `int`                                |             |
-| `admission_mode`                             | `null\|string`                       |             |
-| `alias`                                      | `null\|string`                       |             |
-| `contest_for_teams`                          | `bool\|null`                         |             |
-| `default_show_all_contestants_in_scoreboard` | `bool\|null`                         |             |
-| `description`                                | `null\|string`                       |             |
-| `feedback`                                   | `mixed`                              |             |
-| `languages`                                  | `mixed`                              |             |
-| `needs_basic_information`                    | `bool\|null`                         |             |
-| `partial_score`                              | `bool\|null`                         |             |
-| `penalty`                                    | `int\|null`                          |             |
-| `penalty_calc_policy`                        | `mixed`                              |             |
-| `penalty_type`                               | `mixed`                              |             |
-| `points_decay_factor`                        | `float\|null`                        |             |
-| `problems`                                   | `null\|string`                       |             |
-| `requests_user_information`                  | `'no'\|'optional'\|'required'\|null` |             |
-| `scoreboard`                                 | `float\|null`                        |             |
-| `show_scoreboard_after`                      | `bool\|null`                         |             |
-| `start_time`                                 | `OmegaUp\Timestamp\|null`            |             |
-| `teams_group_alias`                          | `null\|string`                       |             |
-| `title`                                      | `null\|string`                       |             |
+| Name                                         | Type                                                 | Description |
+| -------------------------------------------- | ---------------------------------------------------- | ----------- |
+| `contest_alias`                              | `string`                                             |             |
+| `finish_time`                                | `int`                                                |             |
+| `submissions_gap`                            | `int`                                                |             |
+| `window_length`                              | `int`                                                |             |
+| `admission_mode`                             | `null\|string`                                       |             |
+| `alias`                                      | `null\|string`                                       |             |
+| `check_plagiarism`                           | `bool\|null`                                         |             |
+| `contest_for_teams`                          | `bool\|null`                                         |             |
+| `default_show_all_contestants_in_scoreboard` | `bool\|null`                                         |             |
+| `description`                                | `null\|string`                                       |             |
+| `feedback`                                   | `mixed`                                              |             |
+| `languages`                                  | `mixed`                                              |             |
+| `needs_basic_information`                    | `bool\|null`                                         |             |
+| `partial_score`                              | `bool\|null`                                         |             |
+| `penalty`                                    | `int\|null`                                          |             |
+| `penalty_calc_policy`                        | `mixed`                                              |             |
+| `penalty_type`                               | `mixed`                                              |             |
+| `points_decay_factor`                        | `float\|null`                                        |             |
+| `problems`                                   | `null\|string`                                       |             |
+| `requests_user_information`                  | `'no'\|'optional'\|'required'\|null`                 |             |
+| `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null` |             |
+| `scoreboard`                                 | `float\|null`                                        |             |
+| `show_scoreboard_after`                      | `bool\|null`                                         |             |
+| `start_time`                                 | `\OmegaUp\Timestamp\|null`                           |             |
+| `teams_group_alias`                          | `null\|string`                                       |             |
+| `title`                                      | `null\|string`                                       |             |
 
 ### Returns
 
@@ -1329,11 +1345,11 @@ option is turned on
 
 ### Parameters
 
-| Name            | Type                | Description |
-| --------------- | ------------------- | ----------- |
-| `contest_alias` | `string`            |             |
-| `end_time`      | `OmegaUp\Timestamp` |             |
-| `username`      | `string`            |             |
+| Name            | Type                 | Description |
+| --------------- | -------------------- | ----------- |
+| `contest_alias` | `string`             |             |
+| `end_time`      | `\OmegaUp\Timestamp` |             |
+| `username`      | `string`             |             |
 
 ### Returns
 
@@ -1417,6 +1433,23 @@ Adds an group admin to a course
 
 _Nothing_
 
+## `/api/course/addGroupTeachingAssistant/`
+
+### Description
+
+Adds an group teaching assistant to a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+| `group`        | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/course/addProblem/`
 
 ### Description
@@ -1460,6 +1493,23 @@ Add Student to Course.
 
 _Nothing_
 
+## `/api/course/addTeachingAssistant/`
+
+### Description
+
+Adds a teaching assistant to a course
+
+### Parameters
+
+| Name              | Type     | Description |
+| ----------------- | -------- | ----------- |
+| `course_alias`    | `string` |             |
+| `usernameOrEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/course/adminDetails/`
 
 ### Description
@@ -1492,10 +1542,12 @@ Returns all course administrators
 
 ### Returns
 
-| Name           | Type                                               |
-| -------------- | -------------------------------------------------- |
-| `admins`       | `{ role: string; username: string; }[]`            |
-| `group_admins` | `{ alias: string; name: string; role: string; }[]` |
+| Name                        | Type                                               |
+| --------------------------- | -------------------------------------------------- |
+| `admins`                    | `{ role: string; username: string; }[]`            |
+| `group_admins`              | `{ alias: string; name: string; role: string; }[]` |
+| `group_teaching_assistants` | `{ alias: string; name: string; role: string; }[]` |
+| `teaching_assistants`       | `{ role: string; username: string; }[]`            |
 
 ## `/api/course/arbitrateRequest/`
 
@@ -1631,13 +1683,13 @@ Clone a course
 
 ### Parameters
 
-| Name           | Type                | Description |
-| -------------- | ------------------- | ----------- |
-| `alias`        | `string`            |             |
-| `course_alias` | `string`            |             |
-| `name`         | `string`            |             |
-| `start_time`   | `OmegaUp\Timestamp` |             |
-| `token`        | `null\|string`      |             |
+| Name           | Type                 | Description |
+| -------------- | -------------------- | ----------- |
+| `alias`        | `string`             |             |
+| `course_alias` | `string`             |             |
+| `name`         | `string`             |             |
+| `start_time`   | `\OmegaUp\Timestamp` |             |
+| `token`        | `null\|string`       |             |
 
 ### Returns
 
@@ -1653,23 +1705,23 @@ Create new course API
 
 ### Parameters
 
-| Name                        | Type           | Description |
-| --------------------------- | -------------- | ----------- |
-| `admission_mode`            | `mixed`        |             |
-| `alias`                     | `mixed`        |             |
-| `description`               | `mixed`        |             |
-| `finish_time`               | `mixed`        |             |
-| `languages`                 | `mixed`        |             |
-| `level`                     | `string\|null` |             |
-| `name`                      | `mixed`        |             |
-| `needs_basic_information`   | `mixed`        |             |
-| `objective`                 | `string\|null` |             |
-| `public`                    | `mixed`        |             |
-| `requests_user_information` | `mixed`        |             |
-| `school_id`                 | `mixed`        |             |
-| `show_scoreboard`           | `mixed`        |             |
-| `start_time`                | `mixed`        |             |
-| `unlimited_duration`        | `bool\|null`   |             |
+| Name                               | Type           | Description |
+| ---------------------------------- | -------------- | ----------- |
+| `alias`                            | `string`       |             |
+| `description`                      | `string`       |             |
+| `name`                             | `string`       |             |
+| `start_time`                       | `int`          |             |
+| `admission_mode`                   | `null\|string` |             |
+| `archived`                         | `bool\|null`   |             |
+| `finish_time`                      | `int\|null`    |             |
+| `languages`                        | `null\|string` |             |
+| `level`                            | `null\|string` |             |
+| `minimum_progress_for_certificate` | `int\|null`    |             |
+| `needs_basic_information`          | `bool\|null`   |             |
+| `objective`                        | `null\|string` |             |
+| `requests_user_information`        | `null\|string` |             |
+| `school_id`                        | `int\|null`    |             |
+| `show_scoreboard`                  | `bool\|null`   |             |
 
 ### Returns
 
@@ -1949,6 +2001,23 @@ Removes a group admin from a course
 
 _Nothing_
 
+## `/api/course/removeGroupTeachingAssistant/`
+
+### Description
+
+Removes a group teaching assistant from a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+| `group`        | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/course/removeProblem/`
 
 ### Description
@@ -1984,6 +2053,41 @@ Remove Student from Course
 
 _Nothing_
 
+## `/api/course/removeTeachingAssistant/`
+
+### Description
+
+Removes a teaching assistant from a course
+
+### Parameters
+
+| Name              | Type     | Description |
+| ----------------- | -------- | ----------- |
+| `course_alias`    | `string` |             |
+| `usernameOrEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/course/requestFeedback/`
+
+### Description
+
+Request feedback
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `guid`             | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/course/requests/`
 
 ### Description
@@ -2011,23 +2115,44 @@ Returns all runs for a course
 
 ### Parameters
 
-| Name               | Type                                                                                                                                                            | Description |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `assignment_alias` | `string`                                                                                                                                                        |             |
-| `course_alias`     | `string`                                                                                                                                                        |             |
-| `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cs'\|'hs'\|'java'\|'kj'\|'kp'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|null` |             |
-| `offset`           | `int\|null`                                                                                                                                                     |             |
-| `problem_alias`    | `null\|string`                                                                                                                                                  |             |
-| `rowcount`         | `int\|null`                                                                                                                                                     |             |
-| `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                       |             |
-| `username`         | `null\|string`                                                                                                                                                  |             |
-| `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                          |             |
+| Name               | Type                                                                                                                                                                                                                | Description |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `assignment_alias` | `string`                                                                                                                                                                                                            |             |
+| `course_alias`     | `string`                                                                                                                                                                                                            |             |
+| `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |
+| `offset`           | `int\|null`                                                                                                                                                                                                         |             |
+| `problem_alias`    | `null\|string`                                                                                                                                                                                                      |             |
+| `rowcount`         | `int\|null`                                                                                                                                                                                                         |             |
+| `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |
+| `username`         | `null\|string`                                                                                                                                                                                                      |             |
+| `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |
 
 ### Returns
 
-| Name   | Type          |
-| ------ | ------------- |
-| `runs` | `types.Run[]` |
+| Name        | Type          |
+| ----------- | ------------- |
+| `runs`      | `types.Run[]` |
+| `totalRuns` | `number`      |
+
+## `/api/course/searchUsers/`
+
+### Description
+
+Search users in course assignment
+
+### Parameters
+
+| Name               | Type           | Description |
+| ------------------ | -------------- | ----------- |
+| `assignment_alias` | `string`       |             |
+| `course_alias`     | `string`       |             |
+| `query`            | `null\|string` |             |
+
+### Returns
+
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/course/studentProgress/`
 
@@ -2081,14 +2206,14 @@ Edit Course contents
 | `school_id`                 | `int`                                       |             |
 | `admission_mode`            | `'private'\|'public'\|'registration'\|null` |             |
 | `description`               | `null\|string`                              |             |
-| `finish_time`               | `OmegaUp\Timestamp\|null`                   |             |
+| `finish_time`               | `\OmegaUp\Timestamp\|null`                  |             |
 | `level`                     | `null\|string`                              |             |
 | `name`                      | `null\|string`                              |             |
 | `needs_basic_information`   | `bool\|null`                                |             |
 | `objective`                 | `null\|string`                              |             |
 | `requests_user_information` | `'no'\|'optional'\|'required'\|null`        |             |
 | `show_scoreboard`           | `bool\|null`                                |             |
-| `start_time`                | `OmegaUp\Timestamp\|null`                   |             |
+| `start_time`                | `\OmegaUp\Timestamp\|null`                  |             |
 | `unlimited_duration`        | `bool\|null`                                |             |
 
 ### Returns
@@ -2103,13 +2228,13 @@ Update an assignment
 
 ### Parameters
 
-| Name                 | Type                | Description |
-| -------------------- | ------------------- | ----------- |
-| `assignment`         | `string`            |             |
-| `course`             | `string`            |             |
-| `finish_time`        | `OmegaUp\Timestamp` |             |
-| `start_time`         | `OmegaUp\Timestamp` |             |
-| `unlimited_duration` | `bool\|null`        |             |
+| Name                 | Type                       | Description |
+| -------------------- | -------------------------- | ----------- |
+| `assignment`         | `string`                   |             |
+| `course`             | `string`                   |             |
+| `finish_time`        | `\OmegaUp\Timestamp\|null` |             |
+| `start_time`         | `\OmegaUp\Timestamp\|null` |             |
+| `unlimited_duration` | `bool\|null`               |             |
 
 ### Returns
 
@@ -2715,11 +2840,11 @@ Entry point for Problem clarifications API
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `problem_alias` | `string` |             |
-| `offset`        | `mixed`  |             |
-| `rowcount`      | `mixed`  |             |
+| Name            | Type        | Description |
+| --------------- | ----------- | ----------- |
+| `problem_alias` | `string`    |             |
+| `offset`        | `int\|null` |             |
+| `rowcount`      | `int\|null` |             |
 
 ### Returns
 
@@ -2820,14 +2945,14 @@ List of public and user's private problems
 | `max_difficulty`        | `int\|null`    |             |
 | `min_difficulty`        | `int\|null`    |             |
 | `min_visibility`        | `int\|null`    |             |
-| `offset`                | `mixed`        |             |
+| `offset`                | `int\|null`    |             |
 | `only_karel`            | `mixed`        |             |
 | `order_by`              | `mixed`        |             |
-| `page`                  | `mixed`        |             |
+| `page`                  | `int\|null`    |             |
 | `programming_languages` | `null\|string` |             |
 | `query`                 | `null\|string` |             |
 | `require_all_tags`      | `mixed`        |             |
-| `rowcount`              | `mixed`        |             |
+| `rowcount`              | `int\|null`    |             |
 | `some_tags`             | `mixed`        |             |
 | `sort_order`            | `mixed`        |             |
 
@@ -2837,6 +2962,27 @@ List of public and user's private problems
 | --------- | ------------------------- |
 | `results` | `types.ProblemListItem[]` |
 | `total`   | `number`                  |
+
+## `/api/problem/listForTypeahead/`
+
+### Description
+
+List of public problems shown in the typeahead component
+
+### Parameters
+
+| Name          | Type        | Description |
+| ------------- | ----------- | ----------- |
+| `query`       | `string`    |             |
+| `search_type` | `string`    |             |
+| `offset`      | `int\|null` |             |
+| `rowcount`    | `int\|null` |             |
+
+### Returns
+
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/problem/myList/`
 
@@ -2967,9 +3113,10 @@ Entry point for Problem runs API
 
 ### Returns
 
-| Name   | Type          |
-| ------ | ------------- |
-| `runs` | `types.Run[]` |
+| Name        | Type          |
+| ----------- | ------------- |
+| `runs`      | `types.Run[]` |
+| `totalRuns` | `number`      |
 
 ## `/api/problem/runsDiff/`
 
@@ -3651,21 +3798,22 @@ Gets a list of latest runs overall
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                            | Description |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `offset`        | `int`                                                                                                                                                           |             |
-| `problem_alias` | `string`                                                                                                                                                        |             |
-| `rowcount`      | `int`                                                                                                                                                           |             |
-| `username`      | `string`                                                                                                                                                        |             |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cs'\|'hs'\|'java'\|'kj'\|'kp'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|null` |             |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                       |             |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                          |             |
+| Name            | Type                                                                                                                                                                                                                | Description |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `offset`        | `int`                                                                                                                                                                                                               |             |
+| `problem_alias` | `string`                                                                                                                                                                                                            |             |
+| `rowcount`      | `int`                                                                                                                                                                                                               |             |
+| `username`      | `string`                                                                                                                                                                                                            |             |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |
 
 ### Returns
 
-| Name   | Type          |
-| ------ | ------------- |
-| `runs` | `types.Run[]` |
+| Name        | Type          |
+| ----------- | ------------- |
+| `runs`      | `types.Run[]` |
+| `totalRuns` | `number`      |
 
 ## `/api/run/rejudge/`
 
@@ -3679,6 +3827,22 @@ Re-sends a problem to Grader.
 | ----------- | -------- | ----------- |
 | `run_alias` | `string` |             |
 | `debug`     | `mixed`  |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/run/requalify/`
+
+### Description
+
+Requalify a submission previously disqualified
+
+### Parameters
+
+| Name        | Type     | Description |
+| ----------- | -------- | ----------- |
+| `run_alias` | `string` |             |
 
 ### Returns
 
@@ -3755,21 +3919,16 @@ Gets a list of schools
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `query` | `mixed` |             |
-| `term`  | `mixed` |             |
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+| `term`  | `null\|string` |             |
 
 ### Returns
 
-```typescript
-{
-  id: number;
-  label: string;
-  value: string;
-}
-[];
-```
+| Name      | Type                     |
+| --------- | ------------------------ |
+| `results` | `types.SchoolListItem[]` |
 
 ## `/api/school/selectSchoolOfTheMonth/`
 
@@ -3863,12 +4022,14 @@ Updates the admin feedback for a submission
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
-| `feedback`         | `string` |             |
-| `guid`             | `string` |             |
+| Name                | Type        | Description |
+| ------------------- | ----------- | ----------- |
+| `assignment_alias`  | `string`    |             |
+| `course_alias`      | `string`    |             |
+| `feedback`          | `string`    |             |
+| `guid`              | `string`    |             |
+| `range_bytes_end`   | `int\|null` |             |
+| `range_bytes_start` | `int\|null` |             |
 
 ### Returns
 
@@ -4329,6 +4490,37 @@ There is a limit of 5 API tokens that each user can have.
 | ------- | -------- |
 | `token` | `string` |
 
+## `/api/user/deleteConfirm/`
+
+### Description
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `token`    | `string`       |             |
+| `username` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/user/deleteRequest/`
+
+### Description
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
+
+### Returns
+
+| Name    | Type     |
+| ------- | -------- |
+| `token` | `string` |
+
 ## `/api/user/extraInformation/`
 
 ### Description
@@ -4709,7 +4901,7 @@ Update user profile
 | `name`                      | `null\|string`                               |             |
 | `scholar_degree`            | `null\|string`                               |             |
 | `school_id`                 | `int\|null`                                  |             |
-| `school_name`               | `mixed`                                      |             |
+| `school_name`               | `null\|string`                               |             |
 | `username`                  | `mixed`                                      |             |
 
 ### Returns

@@ -244,16 +244,16 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEmpty(
             $response['templateProperties']['payload']['courses']['public']
         );
-        $this->assertCount(
-            1,
+        $this->assertEmpty(
             $response['templateProperties']['payload']['courses']['enrolled']
         );
-        $this->assertEmpty(
+        $this->assertCount(
+            1,
             $response['templateProperties']['payload']['courses']['finished']
         );
         $this->assertEquals(
             $courseData['course_alias'],
-            $response['templateProperties']['payload']['courses']['enrolled'][0]['alias']
+            $response['templateProperties']['payload']['courses']['finished'][0]['alias']
         );
     }
 }

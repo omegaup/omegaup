@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import * as api from '../api';
 import * as ui from '../ui';
+import * as time from '../time';
 import { setLocationHash } from '../location';
 import { types } from '../api_types';
 import { myRunsStore } from './runsStore';
@@ -68,6 +69,7 @@ export async function navigateToProblem(
     contest_alias: contestAlias,
     problemset_id: problemsetId,
   })
+    .then(time.remoteTimeAdapter)
     .then((problemInfo) => {
       for (const run of problemInfo.runs ?? []) {
         trackRun({ run });

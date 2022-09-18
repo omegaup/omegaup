@@ -82,11 +82,15 @@
             <div class="row">
               <div class="form-group col-md-5">
                 <span class="faux-label">{{ problemCardFooterLabel }}</span>
-                <omegaup-autocomplete
-                  v-model="problemAlias"
-                  class="form-control"
-                  :init="(el) => typeahead.problemTypeahead(el)"
-                ></omegaup-autocomplete>
+                <omegaup-common-typeahead
+                  :existing-options="searchResultProblems"
+                  :activation-threshold="2"
+                  :value.sync="problemAlias"
+                  @update-existing-options="
+                    (query) => $emit('update-search-result-problems', query)
+                  "
+                >
+                </omegaup-common-typeahead>
                 <small class="form-text text-muted">
                   {{ addCardFooterDescLabel }}
                 </small>
@@ -131,6 +135,7 @@
                         v-model="useLatestVersion"
                         class="form-check-input"
                         data-use-latest-version-true
+                        name="use-latest-version"
                         type="radio"
                         :value="true"
                       />{{ T.contestAddproblemLatestVersion }}
@@ -142,6 +147,7 @@
                         v-model="useLatestVersion"
                         class="form-check-input"
                         data-use-latest-version-false
+                        name="use-latest-version"
                         type="radio"
                         :value="false"
                       />{{ T.contestAddproblemOtherVersion }}
@@ -163,10 +169,10 @@
                 data-add-problem
                 class="btn btn-primary mr-2"
                 type="submit"
-                :disabled="problemAlias.length == 0"
+                :disabled="!problemAlias"
                 @click.prevent="
                   onSaveProblem(assignment, {
-                    alias: problemAlias,
+                    alias: problemAlias.key,
                     points: points,
                     commit: selectedRevision.commit,
                     is_extra_problem: isExtraProblem,
@@ -197,8 +203,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 import problem_Versions from '../problem/Versions.vue';
 
 import {
@@ -212,7 +217,7 @@ library.add(fas);
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-problem-versions': problem_Versions,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
@@ -224,15 +229,15 @@ export default class CourseProblemList extends Vue {
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: types.CourseAssignment;
+  @Prop() searchResultProblems!: types.ListItem[];
 
-  typeahead = typeahead;
   T = T;
   assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
   problems: types.AddedProblem[] = this.assignmentProblems;
   difficulty = 'intro';
   topics: string[] = [];
   taggedProblemAlias = '';
-  problemAlias = '';
+  problemAlias: null | types.ListItem = null;
   points = 100;
   showTopicsAndDifficulty = false;
   problemsOrderChanged = false;
@@ -303,13 +308,13 @@ export default class CourseProblemList extends Vue {
   }
 
   get addProblemButtonDisabled(): boolean {
-    if (this.useLatestVersion) return this.problemAlias === '';
+    if (this.useLatestVersion) return !!this.problemAlias;
     return !this.selectedRevision;
   }
 
   get addProblemButtonLabel(): string {
     for (const problem of this.problems) {
-      if (this.problemAlias === problem.alias) {
+      if (this.problemAlias?.key === problem.alias) {
         if (this.assignment.assignment_type === 'lesson') {
           return T.wordsUpdateLecture;
         }
@@ -348,7 +353,7 @@ export default class CourseProblemList extends Vue {
   }
 
   onEditProblem(problem: types.AddedProblem): void {
-    this.problemAlias = problem.alias;
+    this.problemAlias = { key: problem.alias, value: problem.alias };
   }
 
   onRemoveProblem(
@@ -364,7 +369,7 @@ export default class CourseProblemList extends Vue {
   ): void {
     let found = false;
     for (const problem of this.problems) {
-      if (this.problemAlias === problem.alias) {
+      if (this.problemAlias?.key === problem.alias) {
         found = true;
         break;
       }
@@ -376,7 +381,7 @@ export default class CourseProblemList extends Vue {
   }
 
   @Watch('problemAlias')
-  onAliasChange(newProblemAlias: string) {
+  onAliasChange(newProblemAlias: null | types.ListItem) {
     if (!newProblemAlias) {
       this.versionLog = [];
       this.selectedRevision = this.publishedRevision;
@@ -384,7 +389,7 @@ export default class CourseProblemList extends Vue {
     }
     this.$emit('change-alias', {
       target: this,
-      request: { problemAlias: newProblemAlias },
+      request: { problemAlias: newProblemAlias.key },
     });
   }
 
@@ -395,6 +400,14 @@ export default class CourseProblemList extends Vue {
     }
     this.useLatestVersion =
       newPublishedRevision.commit === this.versionLog[0].commit;
+  }
+
+  @Watch('useLatestVersion')
+  onUseLatestVersionChange(newUseLatestVersion: boolean) {
+    if (!newUseLatestVersion) {
+      return;
+    }
+    this.selectedRevision = this.versionLog[0];
   }
 
   @Watch('assignmentProblems')
@@ -418,8 +431,8 @@ export default class CourseProblemList extends Vue {
   }
 
   @Watch('taggedProblemAlias')
-  onTaggedProblemAliasChange() {
-    this.problemAlias = this.taggedProblemAlias;
+  onTaggedProblemAliasChange(newValue: string) {
+    this.problemAlias = { key: newValue, value: newValue };
   }
 
   @Watch('tags')
@@ -428,7 +441,7 @@ export default class CourseProblemList extends Vue {
   }
 
   reset(): void {
-    this.problemAlias = '';
+    this.problemAlias = null;
     this.points = 100;
     this.useLatestVersion = true;
   }

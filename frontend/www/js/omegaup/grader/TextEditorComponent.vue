@@ -3,6 +3,7 @@
     <textarea
       v-model="contents"
       class="col px-0"
+      :class="theme"
       :disabled="readOnly"
     ></textarea>
   </div>
@@ -33,6 +34,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    theme: {
+      type: String,
+      default: 'vs',
+    },
   },
   computed: {
     filename: function () {
@@ -62,7 +67,15 @@ export default {
 </script>
 
 <style>
-textarea {
+textarea.vs-dark {
+  background: #222;
+  border: 0px;
+  font-family: 'Droid Sans Mono', 'Courier New', monospace,
+    'Droid Sans Fallback';
+  color: #d4d4d4;
+}
+
+textarea.vs {
   border: 0px;
   font-family: 'Droid Sans Mono', 'Courier New', monospace,
     'Droid Sans Fallback';

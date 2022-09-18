@@ -98,7 +98,8 @@ export default class Summary extends Vue {
       return T.wordsUnlimitedDuration;
     }
     if (this.windowLength) {
-      return time.formatDelta(this.windowLength);
+      // Convert minutes to miliseconds
+      return time.formatDelta(this.windowLength * (60 * 1000));
     }
     return time.formatDelta(this.duration);
   }

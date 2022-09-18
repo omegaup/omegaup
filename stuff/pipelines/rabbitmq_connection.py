@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 '''Send messages to queues in rabbitmq'''
 
@@ -13,24 +13,19 @@ import pika
 
 @contextlib.contextmanager
 def connect(
-        args: argparse.Namespace
+        *, username: str, password: str, host: str
 ) -> Iterator[pika.adapters.blocking_connection.BlockingChannel]:
     '''Connects to rabbitmq with the arguments provided.'''
-    username = args.rabbitmq_username
-    password = args.rabbitmq_password
-    credentials = pika.PlainCredentials(username, password)
-    parameters = pika.ConnectionParameters(
-        'rabbitmq',
-        5672,
-        '/',
-        credentials,
+    connection = pika.BlockingConnection(pika.ConnectionParameters(
+        host=host,
+        port=5672,
+        virtual_host='/',
+        credentials=pika.PlainCredentials(username, password),
         heartbeat=600,
         # mypy does not support structural typing yet
         # https://github.com/python/mypy/issues/3186
         blocked_connection_timeout=300.0,  # type: ignore
-    )
-
-    connection = pika.BlockingConnection(parameters)
+    ))
     channel = connection.channel()
 
     channel.exchange_declare(exchange='certificates',
@@ -50,13 +45,28 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
     parser.add_argument('--rabbitmq-password', type=str,
                         help='rabbitmq password',
                         default='omegaup')
-    parser.add_argument('--date-lower-limit',
-                        type=lambda s:
-                        datetime.datetime.strptime(s, '%Y-%m-%d'),
-                        help='date lower limit',
-                        default=datetime.date(2005, 1, 1))
-    parser.add_argument('--date-upper-limit',
-                        type=lambda s:
-                        datetime.datetime.strptime(s, '%Y-%m-%d'),
-                        help='date upper limit',
-                        default=datetime.date.today())
+    parser.add_argument('--rabbitmq-host', type=str,
+                        help='rabbitmq host',
+                        default='rabbitmq')
+
+
+def initialize_rabbitmq(
+        *,
+        queue: str,
+        exchange: str,
+        routing_key: str,
+        channel: pika.adapters.blocking_connection.BlockingChannel
+) -> None:
+    '''initializes the queue and exchange'''
+    channel.queue_declare(
+        queue=queue, passive=False,
+        durable=True, exclusive=False,
+        auto_delete=False)
+    channel.exchange_declare(
+        exchange=exchange,
+        auto_delete=False,
+        durable=True,
+        exchange_type='direct')
+    channel.queue_bind(exchange=exchange,
+                       queue=queue,
+                       routing_key=routing_key)

@@ -3,14 +3,17 @@ import problem_List from '../components/problem/List.vue';
 import { types } from '../api_types';
 import { omegaup, OmegaUp } from '../omegaup';
 import * as ui from '../ui';
+import * as api from '../api';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemListPayload();
   const queryString = window.location.search;
+  const searchResultProblems: types.ListItem[] = [];
   let sortOrder: omegaup.SortOrder = omegaup.SortOrder.Descending;
   let columnName = 'problem_id';
   let language = 'all';
-  let query = '';
+  let query: null | string = null;
+  let tag: string[] = [];
   if (queryString) {
     const urlParams = new URLSearchParams(queryString);
     if (urlParams.get('sort_order')) {
@@ -34,11 +37,21 @@ OmegaUp.on('ready', () => {
         language = languageParam;
       }
     }
+    if (urlParams.get('tag[]')) {
+      const tagParam = urlParams.getAll('tag[]');
+      if (tagParam) {
+        tag = tagParam;
+      }
+    }
     if (urlParams.get('query')) {
       const queryParam = urlParams.get('query');
       if (queryParam) {
         query = queryParam;
       }
+    }
+
+    if (query) {
+      searchResultProblems.push({ key: query, value: query });
     }
   }
   new Vue({
@@ -46,6 +59,9 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-problem-list': problem_List,
     },
+    data: () => ({
+      searchResultProblems: searchResultProblems,
+    }),
     render: function (createElement) {
       return createElement('omegaup-problem-list', {
         props: {
@@ -60,6 +76,7 @@ OmegaUp.on('ready', () => {
           tags: payload.tags,
           sortOrder: sortOrder,
           columnName: columnName,
+          searchResultProblems: this.searchResultProblems,
         },
         on: {
           'wizard-search': (queryParameters: {
@@ -73,13 +90,25 @@ OmegaUp.on('ready', () => {
           ): void => {
             const queryParameters = {
               language,
-              query,
+              query: query ?? '',
               order_by: columnName,
               sort_order: sortOrder,
+              tag,
             };
             window.location.replace(
               `/problem?${ui.buildURLQuery(queryParameters)}`,
             );
+          },
+          'update-search-result-problems': (query: string) => {
+            api.Problem.listForTypeahead({
+              query,
+              search_type: 'all',
+            })
+              .then((data) => {
+                data.results.push({ key: query, value: query });
+                this.searchResultProblems = data.results;
+              })
+              .catch(ui.apiError);
           },
         },
       });

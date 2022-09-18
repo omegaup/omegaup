@@ -194,13 +194,16 @@ CREATE TABLE `Contests` (
   `penalty_calc_policy` enum('sum','max') NOT NULL COMMENT 'Indica como afecta el penalty al score.',
   `show_scoreboard_after` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Mostrar el scoreboard automáticamente después del concurso',
   `urgent` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el concurso es de alta prioridad y requiere mejor QoS.',
-  `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar en un concurso',
+  `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','cpp20-gcc','cpp20-clang','java','kt','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua','go','rs','js') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar en un concurso',
   `recommended` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Mostrar el concurso en la lista de recomendados.',
   `archived` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el concurso ha sido archivado por el administrador.',
   `certificate_cutoff` int DEFAULT NULL COMMENT 'Número de concursantes a premiar con diplomas que mencionan su lugar en el ranking',
   `certificates_status` enum('uninitiated','queued','generated','retryable_error','fatal_error') NOT NULL DEFAULT 'uninitiated' COMMENT 'Estado de la petición de generar diplomas',
   `contest_for_teams` tinyint(1) DEFAULT '0' COMMENT 'Bandera que indica si el concurso es para equipos.',
   `default_show_all_contestants_in_scoreboard` tinyint(1) DEFAULT '0' COMMENT 'Bandera que indica si en el scoreboard se mostrarán todos los concursantes por defecto.',
+  `score_mode` enum('partial','all_or_nothing','max_per_group') NOT NULL DEFAULT 'partial' COMMENT 'Indica el tipo de evaluación para el concurso',
+  `plagiarism_threshold` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'El porcentaje mínimo permitido de similitud entre un par de envíos. Cuando plagio Seleccionado, será 90.',
+  `check_plagiarism` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si se debe correr el detector de plagios.',
   PRIMARY KEY (`contest_id`),
   UNIQUE KEY `contests_alias` (`alias`),
   KEY `rerun_id` (`contest_id`),
@@ -293,7 +296,7 @@ CREATE TABLE `Courses` (
   `needs_basic_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso sólo si ya llenó su información de perfil',
   `requests_user_information` enum('no','optional','required') NOT NULL DEFAULT 'no' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',
   `show_scoreboard` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Los estudiantes pueden visualizar el scoreboard de un curso.',
-  `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar en un curso',
+  `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','cpp20-gcc','cpp20-clang','java','kt','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua','go','rs','js') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar en un curso',
   `archived` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el curso ha sido archivado por el administrador.',
   `minimum_progress_for_certificate` int DEFAULT NULL COMMENT 'Progreso mínimo que debe cumplir el estudiante para que se le otorgue el diploma del curso. NULL indica que el curso no da diplomas.',
   PRIMARY KEY (`course_id`),
@@ -531,6 +534,25 @@ CREATE TABLE `Permissions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Plagiarisms` (
+  `plagiarism_id` int NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada potencial caso de plagio',
+  `contest_id` int NOT NULL,
+  `submission_id_1` int NOT NULL COMMENT 'El identificador del envío del primer código plagiado',
+  `submission_id_2` int NOT NULL COMMENT 'El identificador del envío del segundo código plagiado',
+  `score_1` int NOT NULL COMMENT 'porcentaje de plagio encontrado usando copydetect en el envío 1',
+  `score_2` int NOT NULL COMMENT 'porcentaje de plagio encontrado usando copydetect en el envío 2',
+  `contents` text NOT NULL COMMENT 'Almacena los rangos de números de línea de las similitudes',
+  PRIMARY KEY (`plagiarism_id`),
+  KEY `fk_pc_contest_id` (`contest_id`),
+  KEY `fk_ps_submission_id_1` (`submission_id_1`),
+  KEY `fk_ps_submission_id_2` (`submission_id_2`),
+  CONSTRAINT `fk_pc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`),
+  CONSTRAINT `fk_ps_submission_id_1` FOREIGN KEY (`submission_id_1`) REFERENCES `Submissions` (`submission_id`),
+  CONSTRAINT `fk_ps_submission_id_2` FOREIGN KEY (`submission_id_2`) REFERENCES `Submissions` (`submission_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Los casos potenciales de plagio encontrados por el algoritmo de detección.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `PrivacyStatement_Consent_Log` (
   `privacystatement_consent_id` int NOT NULL AUTO_INCREMENT COMMENT 'Id del consentimiento de privacidad almacenado en el log',
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
@@ -589,7 +611,7 @@ CREATE TABLE `Problems` (
   `alias` varchar(32) NOT NULL,
   `commit` char(40) NOT NULL DEFAULT 'published' COMMENT 'El hash SHA1 del commit en la rama master del problema.',
   `current_version` char(40) NOT NULL COMMENT 'El hash SHA1 del árbol de la rama private.',
-  `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') NOT NULL DEFAULT 'c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua',
+  `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','cpp20-gcc','cpp20-clang','java','kt','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua','go','rs','js') NOT NULL DEFAULT 'c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js',
   `input_limit` int NOT NULL DEFAULT '10240',
   `visits` int NOT NULL DEFAULT '0',
   `submissions` int NOT NULL DEFAULT '0',
@@ -611,6 +633,7 @@ CREATE TABLE `Problems` (
   KEY `acl_id` (`acl_id`),
   KEY `idx_problems_visibility` (`visibility`),
   KEY `idx_quality_seal` (`quality_seal`),
+  FULLTEXT KEY `ft_alias_title` (`alias`,`title`),
   CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Se crea un registro por cada prob externo.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -758,7 +781,7 @@ CREATE TABLE `Problemsets` (
   `problemset_id` int NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada conjunto de problemas',
   `acl_id` int NOT NULL COMMENT 'La lista de control de acceso compartida con su container',
   `access_mode` enum('private','public','registration') NOT NULL DEFAULT 'public' COMMENT 'La modalidad de acceso a este conjunto de problemas',
-  `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas',
+  `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','cpp20-gcc','cpp20-clang','java','kt','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua','go','rs','js') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas',
   `needs_basic_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un concurso sólo si ya llenó su información de perfil',
   `requests_user_information` enum('no','optional','required') NOT NULL DEFAULT 'no' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',
   `scoreboard_url` varchar(30) NOT NULL COMMENT 'Token para la url del scoreboard en problemsets',
@@ -898,6 +921,19 @@ CREATE TABLE `Runs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Runs_Groups` (
+  `case_run_id` int NOT NULL AUTO_INCREMENT,
+  `run_id` int NOT NULL,
+  `group_name` char(40) NOT NULL,
+  `score` double NOT NULL DEFAULT '0',
+  `verdict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE','VE') NOT NULL,
+  PRIMARY KEY (`case_run_id`),
+  UNIQUE KEY `run_id` (`run_id`,`group_name`),
+  CONSTRAINT `Runs_Groups_ibfk_1` FOREIGN KEY (`run_id`) REFERENCES `Runs` (`run_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda los grupos de runs.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `School_Of_The_Month` (
   `school_of_the_month_id` int NOT NULL AUTO_INCREMENT,
   `school_id` int NOT NULL,
@@ -964,12 +1000,29 @@ CREATE TABLE `Submission_Feedback` (
   `submission_id` int NOT NULL COMMENT 'Identificador del envío asociado',
   `feedback` text NOT NULL,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Hora en la que se envió el feedback',
+  `range_bytes_start` int NOT NULL DEFAULT '0' COMMENT 'Inicio de la subcadena seleccionada (en bytes) para agregarle el comentario',
+  `range_bytes_end` int NOT NULL DEFAULT '0' COMMENT 'Fin de la subcadena seleccionada (en bytes) para agregarle el comentario',
   PRIMARY KEY (`submission_feedback_id`),
-  UNIQUE KEY `submission_id` (`submission_id`),
   KEY `fk_sfi_identity_id` (`identity_id`),
+  KEY `fk_sfs_submission_id` (`submission_id`),
   CONSTRAINT `fk_sfi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_sfs_submission_id` FOREIGN KEY (`submission_id`) REFERENCES `Submissions` (`submission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Almacena el feedback dejado por los profesores para los envíos de los estudiantes.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Submission_Feedback_Thread` (
+  `submission_feedback_thread_id` int NOT NULL AUTO_INCREMENT,
+  `submission_feedback_id` int NOT NULL COMMENT 'Identificador del comentario asociado',
+  `identity_id` int NOT NULL COMMENT 'Identidad de quien envió el feedback',
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Hora en la que se envió el feedback',
+  `contents` text NOT NULL,
+  PRIMARY KEY (`submission_feedback_thread_id`),
+  KEY `fk_sfs_submission_feedback_id` (`submission_feedback_id`),
+  KEY `fk_sfti_identity_id` (`identity_id`),
+  CONSTRAINT `fk_sfs_submission_feedback_id` FOREIGN KEY (`submission_feedback_id`) REFERENCES `Submission_Feedback` (`submission_feedback_id`),
+  CONSTRAINT `fk_sfti_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Darle seguimiento a un comentario';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -997,7 +1050,7 @@ CREATE TABLE `Submissions` (
   `problem_id` int NOT NULL,
   `problemset_id` int DEFAULT NULL,
   `guid` char(32) NOT NULL,
-  `language` enum('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') NOT NULL,
+  `language` enum('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','cpp20-gcc','cpp20-clang','java','kt','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua','go','rs','js') NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `status` enum('new','waiting','compiling','running','ready','uploading') NOT NULL DEFAULT 'new',
   `verdict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE','VE') NOT NULL,
@@ -1150,12 +1203,19 @@ CREATE TABLE `Users` (
   `birth_date` date DEFAULT NULL,
   `verified` tinyint(1) NOT NULL DEFAULT '0',
   `verification_id` varchar(50) DEFAULT NULL,
+  `deletion_token` varchar(50) DEFAULT NULL,
   `reset_digest` varchar(45) DEFAULT NULL,
   `reset_sent_at` datetime DEFAULT NULL,
   `hide_problem_tags` tinyint(1) DEFAULT NULL COMMENT 'Determina si el usuario quiere ocultar las etiquetas de los problemas',
   `in_mailing_list` tinyint(1) NOT NULL DEFAULT '0',
   `is_private` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Determina si el usuario eligió no compartir su información de manera pública',
-  `preferred_language` enum('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') DEFAULT NULL COMMENT 'El lenguaje de programación de preferencia de este usuario',
+  `preferred_language` enum('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','cpp20-gcc','cpp20-clang','java','kt','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua','go','rs','js') DEFAULT NULL COMMENT 'El lenguaje de programación de preferencia de este usuario',
+  `parent_verified` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del padre cuando este verifica la cuenta de su hijo',
+  `creation_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Almacena la hora y fecha en que se creó la cuenta de usuario',
+  `parental_verification_token` varchar(25) DEFAULT NULL COMMENT 'Token que se generará para los usuarios menores de 13 años al momento de registrar su cuenta, el cuál será enviado por correo electrónico al padre',
+  `parent_email_verification_initial` timestamp NULL DEFAULT NULL COMMENT 'Almacena la hora en que se envió el correo electrónico de verificación',
+  `parent_email_verification_deadline` timestamp NULL DEFAULT NULL COMMENT 'Almacena la hora y fecha límite que tienen los padres para verificar la cuenta de su hijo menor a 13 años',
+  `parent_email_id` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   KEY `fk_main_email_id` (`main_email_id`),
   KEY `fk_main_identity_id` (`main_identity_id`),

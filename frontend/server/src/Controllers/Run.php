@@ -18,21 +18,27 @@ class Run extends \OmegaUp\Controllers\Controller {
     public const SUPPORTED_LANGUAGES = [
         'kp' => 'Karel (Pascal)',
         'kj' => 'Karel (Java)',
-        'c11-gcc' => 'C11 (gcc 9.3)',
+        'c11-gcc' => 'C11 (gcc 10.3)',
         'c11-clang' => 'C11 (clang 10.0)',
-        'cpp11-gcc' => 'C++11 (g++ 9.3)',
+        'cpp11-gcc' => 'C++11 (g++ 10.3)',
         'cpp11-clang' => 'C++11 (clang++ 10.0)',
-        'cpp17-gcc' => 'C++17 (g++ 9.3)',
+        'cpp17-gcc' => 'C++17 (g++ 10.3)',
         'cpp17-clang' => 'C++17 (clang++ 10.0)',
-        'java' => 'Java (openjdk 14.0)',
-        'py2' => 'Python 2.7',
-        'py3' => 'Python 3.8',
+        'cpp20-gcc' => 'C++20 (g++ 10.3)',
+        'cpp20-clang' => 'C++20 (clang++ 10.0)',
+        'java' => 'Java (openjdk 16.0)',
+        'kt' => 'Kotlin (1.6.10)',
+        'py2' => 'Python (2.7)',
+        'py3' => 'Python (3.9)',
         'rb' => 'Ruby (2.7)',
-        'cs' => 'C# (8.0, dotnet 3.1)',
+        'cs' => 'C# (10, dotnet 6.0)',
         'pas' => 'Pascal (fpc 3.0)',
         'cat' => 'Output Only',
-        'hs' => 'Haskell (ghc 8.6)',
+        'hs' => 'Haskell (ghc 8.8)',
         'lua' => 'Lua (5.3)',
+        'go' => 'Go (1.18.beta2)',
+        'rs' => 'Rust (1.56.1)',
+        'js' => 'JavaScript (Node.js 16)',
     ];
 
     // These languages are aliases. They can be shown to the user, but should
@@ -51,14 +57,20 @@ class Run extends \OmegaUp\Controllers\Controller {
         'cpp11-clang',
         'cpp17-gcc',
         'cpp17-clang',
-        'cs',
-        'hs',
+        'cpp20-gcc',
+        'cpp20-clang',
         'java',
-        'lua',
-        'pas',
+        'kt',
         'py2',
         'py3',
         'rb',
+        'cs',
+        'pas',
+        'hs',
+        'lua',
+        'go',
+        'rs',
+        'js',
     ];
 
     /** @var int */
@@ -798,10 +810,12 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param string $run_alias
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiDisqualify(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         $runAlias = $r->ensureString(
             'run_alias',
@@ -822,7 +836,60 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\DAO\Submissions::disqualify(strval($submission->guid));
+        if ($submission->type !== 'normal') {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'runCannotBeDisqualified'
+            );
+        }
+
+        \OmegaUp\DAO\Submissions::disqualify($submission);
+
+        // Expire ranks
+        \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
+        return [
+            'status' => 'ok'
+        ];
+    }
+
+    /**
+     * Requalify a submission previously disqualified
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $run_alias
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function apiRequalify(\OmegaUp\Request $r): array {
+        // Get the user who is calling this API
+        $r->ensureMainUserIdentity();
+
+        $runAlias = $r->ensureString(
+            'run_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        [
+            'submission' => $submission,
+        ] = self::validateDetailsRequest($runAlias);
+
+        if (
+            !\OmegaUp\Authorization::canEditSubmission(
+                $r->identity,
+                $submission
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
+        if ($submission->type !== 'disqualified') {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'runCannotBeRequalified'
+            );
+        }
+
+        \OmegaUp\DAO\Submissions::requalify($submission);
 
         // Expire ranks
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
@@ -933,7 +1000,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'guid' => strval($submission->guid),
             'language' => strval($submission->language),
             'alias' => strval($problem->alias),
-            'feedback' => \OmegaUp\DAO\Submissions::getSubmissionFeedback(
+            'feedback' => \OmegaUp\DAO\SubmissionFeedback::getSubmissionFeedback(
                 $submission
             ),
         ];
@@ -1592,9 +1659,9 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of latest runs overall
      *
-     * @return array{runs: list<Run>}
+     * @return array{runs: list<Run>, totalRuns: int}
      *
-     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null $language
+     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
      * @omegaup-request-param int $offset
      * @omegaup-request-param string $problem_alias
      * @omegaup-request-param int $rowcount
@@ -1614,6 +1681,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         $languagesKeys = array_keys(self::SUPPORTED_LANGUAGES);
         [
             'runs' => $runs,
+            'totalRuns' => $totalRuns,
         ] = \OmegaUp\DAO\Runs::getAllRuns(
             null,
             $r->ensureOptionalEnum('status', self::STATUS),
@@ -1641,6 +1709,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         return [
             'runs' => $result,
+            'totalRuns' => $totalRuns,
         ];
     }
 }

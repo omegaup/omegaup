@@ -86,13 +86,17 @@ def _check_mutually_exclusive_schema_modifications(
 
 
 def _expected_database_schema(*,
+                              skip_container_check: bool = False,
                               config_file: Optional[str] = None,
                               username: Optional[str] = None,
                               password: Optional[str] = None,
                               hostname: Optional[str] = None,
+                              port: Optional[int] = None,
                               verbose: bool = False) -> bytes:
     '''Runs mysqldump and removes the AUTO_INCREMENT annotation.'''
     args = [os.path.join(OMEGAUP_ROOT, 'stuff/db-migrate.py')]
+    if skip_container_check:
+        args.extend(['--skip-container-check'])
     if config_file:
         args.extend(['--mysql-config-file', config_file])
     if username is not None:
@@ -101,6 +105,8 @@ def _expected_database_schema(*,
         args.extend(['--password', password])
     if hostname is not None:
         args.extend(['--hostname', hostname])
+    if port is not None:
+        args.extend(['--port', str(port)])
     args.append('schema')
     stderr: Optional[int] = subprocess.DEVNULL
     if verbose:
@@ -122,6 +128,10 @@ def main() -> None:
         tool_description='validates schema.sql',
         extra_arguments=[
             git_tools.Argument(
+                '--skip-container-check',
+                action='store_true',
+                help='Skip the container check'),
+            git_tools.Argument(
                 '--mysql-config-file',
                 default=database_utils.default_config_file(),
                 help='.my.cnf file that stores credentials'),
@@ -131,9 +141,15 @@ def main() -> None:
                 '--hostname', default=None, type=str,
                 help='Hostname of the MySQL server'),
             git_tools.Argument(
+                '--port', default=13306, type=int,
+                help='Port of the MySQL server'),
+            git_tools.Argument(
                 '--username', default='root', help='MySQL root username'),
             git_tools.Argument(
                 '--password', default='omegaup', help='MySQL password')])
+
+    if not args.skip_container_check:
+        database_utils.check_inside_container()
 
     validate_only = args.tool == 'validate'
 
@@ -151,11 +167,15 @@ def main() -> None:
     if not filtered_files:
         return
 
-    expected = _expected_database_schema(config_file=args.mysql_config_file,
-                                         username=args.username,
-                                         password=args.password,
-                                         hostname=args.hostname,
-                                         verbose=args.verbose)
+    expected = _expected_database_schema(
+        skip_container_check=args.skip_container_check,
+        config_file=args.mysql_config_file,
+        username=args.username,
+        password=args.password,
+        hostname=args.hostname,
+        port=args.port,
+        verbose=args.verbose,
+    )
     actual = git_tools.file_contents(args, root, _SCHEMA_FILENAME)
 
     expected_contents = strip_mysql_extensions(expected.strip())

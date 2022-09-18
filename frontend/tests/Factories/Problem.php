@@ -16,6 +16,12 @@ class ProblemParams {
     public $title;
 
     /**
+     * @readonly
+     * @var string
+     */
+    public $alias;
+
+    /**
      * @var 'deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'
      */
     public $visibility;
@@ -75,7 +81,7 @@ class ProblemParams {
     public $validator;
 
     /**
-     * @param array{allow_user_add_tags?: bool, quality_seal?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, selected_tags?: string, validator?: string} $params
+     * @param array{alias?: string, allow_user_add_tags?: bool, quality_seal?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, selected_tags?: string, validator?: string} $params
      */
     public function __construct($params = []) {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
@@ -93,6 +99,17 @@ class ProblemParams {
             ],
         ]);
         $this->validator = $params['validator'] ?? 'token';
+
+        $problemAlias = substr(
+            preg_replace(
+                '/[^a-zA-Z0-9_-]/',
+                '',
+                str_replace(' ', '-', $this->title)
+            ),
+            0,
+            \OmegaUp\Validators::ALIAS_MAX_LENGTH
+        );
+        $this->alias = $params['alias'] ?? $problemAlias;
         if (!empty($params['author']) && !empty($params['authorUser'])) {
             $this->author = $params['author'];
             $this->authorUser = $params['authorUser'];
@@ -141,15 +158,7 @@ class Problem {
         }
         $r = new \OmegaUp\Request([
             'title' => $params->title,
-            'problem_alias' => substr(
-                preg_replace(
-                    '/[^a-zA-Z0-9_-]/',
-                    '',
-                    str_replace(' ', '-', $params->title)
-                ),
-                0,
-                \OmegaUp\Validators::ALIAS_MAX_LENGTH
-            ),
+            'problem_alias' => $params->alias,
             'author_username' => $params->author->username,
             'validator' => $params->validator,
             'time_limit' => 5000,

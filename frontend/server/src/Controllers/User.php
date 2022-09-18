@@ -10,7 +10,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank, pagerItems: list<PageItem>}
  * @psalm-type Badge=array{assignation_time: \OmegaUp\Timestamp|null, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}
  * @psalm-type AssociatedIdentity=array{username: string, default: bool}
- * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, omegaUpLockDown: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL128: string, gravatarURL51: string, currentEmail: string, currentName: null|string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string, userTypes: list<string>}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float, quality_seal: bool}
@@ -2281,7 +2281,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $name
      * @omegaup-request-param null|string $scholar_degree
      * @omegaup-request-param int|null $school_id
-     * @omegaup-request-param mixed $school_name
+     * @omegaup-request-param null|string $school_name
      * @omegaup-request-param string $state_id
      * @omegaup-request-param mixed $username
      */
@@ -2362,12 +2362,9 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         $newSchoolId = $currentSchoolId;
 
-        \OmegaUp\Validators::validateOptionalNumber(
-            $r['school_id'],
-            'school_id'
-        );
-        if (!is_null($r['school_id'])) {
-            $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
+        $schoolId = $r->ensureOptionalInt('school_id');
+        if (!is_null($schoolId)) {
+            $school = \OmegaUp\DAO\Schools::getByPK($schoolId);
             if (is_null($school)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
@@ -2381,10 +2378,11 @@ class User extends \OmegaUp\Controllers\Controller {
             $newSchoolId = null;
         }
 
-        if (is_null($newSchoolId) && !empty($r['school_name'])) {
+        $schoolName = $r->ensureOptionalString('school_name');
+        if (is_null($newSchoolId) && !is_null($schoolName)) {
             $response = \OmegaUp\Controllers\School::apiCreate(
                 new \OmegaUp\Request([
-                    'name' => $r['school_name'],
+                    'name' => $schoolName,
                     'country_id' => !is_null(
                         $state
                     ) ? $state->country_id : null,
@@ -3259,6 +3257,140 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{token: string}
+     *
+     * @omegaup-request-param null|string $username
+     */
+    public static function apiDeleteRequest(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        $username = $r->ensureOptionalString(
+            'username',
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
+        );
+        if (
+            !\OmegaUp\Authorization::isSystemAdmin(
+                $r->identity
+            ) && !is_null(
+                $username
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $identity = self::resolveTargetIdentity($r);
+        $user = self::resolveTargetUser($r);
+        if (is_null($user) || is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        $token = \OmegaUp\SecurityTools::randomString(50);
+        \OmegaUp\DAO\Users::generateDeletionToken($user, $token);
+        self::$log->info(
+            "User {$identity->username} is requesting to delete their account."
+        );
+        if (is_null($user->main_email_id)) {
+            return [
+                'token' => $token,
+            ];
+        }
+        $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
+
+        if (is_null($email) || is_null($email->email)) {
+            return [
+                'token' => $token,
+            ];
+        }
+        $subject = \OmegaUp\Translations::getInstance()->get(
+            'accountDeletionRequestEmailSubject'
+        );
+        $body = \OmegaUp\ApiUtils::formatString(
+            \OmegaUp\Translations::getInstance()->get(
+                'accountDeletionRequestEmailBody'
+            ),
+            [
+                'username' => $identity->username,
+            ]
+        );
+
+        \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
+        return [
+            'token' => $token,
+        ];
+    }
+
+    /**
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $token
+     * @omegaup-request-param null|string $username
+     */
+    public static function apiDeleteConfirm(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        $username = $r->ensureOptionalString(
+            'username',
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
+        );
+        $token = $r->ensureString('token');
+        if (
+            !\OmegaUp\Authorization::isSystemAdmin(
+                $r->identity
+            ) && !is_null(
+                $username
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
+        if (is_null($user) || is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        if (!\OmegaUp\DAO\Users::validateDeletionToken($user, $token)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'token'
+            );
+        }
+        \OmegaUp\DAO\Users::deleteUserAndIndentityInformation($user, $identity);
+        self::$log->info(
+            "User {$identity->username} deleted their account successfully."
+        );
+        if (is_null($user->main_email_id)) {
+            return [
+                'status' => 'ok',
+            ];
+        }
+        $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
+
+        if (is_null($email) || is_null($email->email)) {
+            return [
+                'status' => 'ok',
+            ];
+        }
+        $subject = \OmegaUp\Translations::getInstance()->get(
+            'accountDeletionConfirmEmailSubject'
+        );
+        $body = \OmegaUp\ApiUtils::formatString(
+            \OmegaUp\Translations::getInstance()->get(
+                'accountDeletionConfirmEmailBody'
+            ),
+            [
+                'username' => $identity->username,
+            ]
+        );
+
+        \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+    /**
      * Adds the identity to the group.
      *
      * @return array{status: string}
@@ -3746,13 +3878,13 @@ class User extends \OmegaUp\Controllers\Controller {
         $response['templateProperties']['payload']['isLogged'] = true;
         if (!is_null($r->identity->country_id)) {
             $availableFilters['country'] =
-                \OmegaUp\Translations::getInstance()->get(
+                \OmegaUp\Translations::getInstance($r->identity)->get(
                     'wordsFilterByCountry'
                 );
         }
         if (!is_null($r->identity->state_id)) {
             $availableFilters['state'] =
-                \OmegaUp\Translations::getInstance()->get(
+                \OmegaUp\Translations::getInstance($r->identity)->get(
                     'wordsFilterByState'
                 );
         }
@@ -3768,7 +3900,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         if (!is_null($schoolId)) {
             $availableFilters['school'] =
-                \OmegaUp\Translations::getInstance()->get(
+                \OmegaUp\Translations::getInstance($r->identity)->get(
                     'wordsFilterBySchool'
                 );
         }
@@ -4328,6 +4460,14 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $third_party_login
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
+        try {
+            $r->ensureIdentity();
+            // If the user has already logged in, redirect them to the home page.
+            header('Location: /');
+            throw new \OmegaUp\Exceptions\ExitException();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing.
+        }
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         if ($r->offsetExists('fb')) {
             $thirdPartyLogin = 'facebook';

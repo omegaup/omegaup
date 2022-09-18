@@ -45,6 +45,9 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         'certificates_status' => true,
         'contest_for_teams' => true,
         'default_show_all_contestants_in_scoreboard' => true,
+        'score_mode' => true,
+        'plagiarism_threshold' => true,
+        'check_plagiarism' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -230,6 +233,21 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         if (isset($data['default_show_all_contestants_in_scoreboard'])) {
             $this->default_show_all_contestants_in_scoreboard = boolval(
                 $data['default_show_all_contestants_in_scoreboard']
+            );
+        }
+        if (isset($data['score_mode'])) {
+            $this->score_mode = is_scalar(
+                $data['score_mode']
+            ) ? strval($data['score_mode']) : '';
+        }
+        if (isset($data['plagiarism_threshold'])) {
+            $this->plagiarism_threshold = boolval(
+                $data['plagiarism_threshold']
+            );
+        }
+        if (isset($data['check_plagiarism'])) {
+            $this->check_plagiarism = boolval(
+                $data['check_plagiarism']
             );
         }
     }
@@ -438,4 +456,25 @@ class Contests extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $default_show_all_contestants_in_scoreboard = false;
+
+    /**
+     * Indica el tipo de evaluación para el concurso
+     *
+     * @var string
+     */
+    public $score_mode = 'partial';
+
+    /**
+     * El porcentaje mínimo permitido de similitud entre un par de envíos. Cuando plagio Seleccionado, será 90.
+     *
+     * @var bool
+     */
+    public $plagiarism_threshold = false;
+
+    /**
+     * Indica si se debe correr el detector de plagios.
+     *
+     * @var bool
+     */
+    public $check_plagiarism = false;
 }

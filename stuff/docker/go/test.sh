@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Running this will open a shell where the sources for quark is
+# installed. Useful to develop quark in a jiffy. Run all tests with:
+#
+#   make
+#
+# Or only the quark tests with
+#
+#   make test-quark
+
 DIR="$(realpath "$(dirname "$(dirname "${0}")")")"
 
 if [[ ! -d "${DIR}/go/go-base" ]]; then

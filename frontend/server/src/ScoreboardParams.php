@@ -54,6 +54,9 @@ class ScoreboardParams {
     /** @var bool */
     public $show_all_runs;
 
+    /** @var string */
+    public $score_mode;
+
     /**
      * @param array<string, \OmegaUp\Timestamp|null|int|string|bool> $params
      */
@@ -213,6 +216,14 @@ class ScoreboardParams {
             default: true,
         );
         $this->show_all_runs = boolval($params['show_all_runs']);
+
+        ScoreboardParams::validateParameter(
+            'score_mode',
+            $params,
+            required: false,
+            default: 'all_or_nothing',
+        );
+        $this->score_mode = strval($params['score_mode']);
     }
 
     public static function fromContest(
@@ -229,7 +240,8 @@ class ScoreboardParams {
             'virtual' => \OmegaUp\DAO\Contests::isVirtual($contest),
             'penalty_calc_policy' => $contest->penalty_calc_policy,
             'show_scoreboard_after' => $contest->show_scoreboard_after,
-            'scoreboard_pct' => $contest->scoreboard
+            'scoreboard_pct' => $contest->scoreboard,
+            'score_mode' => $contest->score_mode,
         ]);
     }
 

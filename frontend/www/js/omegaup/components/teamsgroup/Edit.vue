@@ -65,9 +65,16 @@
           :alias="alias"
           :countries="countries"
           :search-result-users="searchResultUsers"
+          :search-result-schools="searchResultSchools"
           :teams-members="teamsMembers"
+          @update-identity-team="
+            (identity) => $emit('update-identity-team', identity)
+          "
           @update-search-result-users="
             (query) => $emit('update-search-result-users', query)
+          "
+          @update-search-result-schools="
+            (query) => $emit('update-search-result-schools', query)
           "
           @edit-identity-team="
             (request) => $emit('edit-identity-team', request)
@@ -144,6 +151,7 @@ export default class TeamsGroupEdit extends Vue {
   @Prop({ default: () => [] }) teamsMembers!: types.TeamMember[];
   @Prop() teamErrorRow!: null | string;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultSchools!: types.SchoolListItem[];
   @Prop() isLoading!: boolean;
 
   T = T;

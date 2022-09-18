@@ -34,7 +34,7 @@ try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', false);
 # ####################################
 try_define('OMEGAUP_DB_USER', 'omegaup');
 try_define('OMEGAUP_DB_PASS', '');
-try_define('OMEGAUP_DB_HOST', 'localhost');
+try_define('OMEGAUP_DB_HOST', 'mysql:13306');
 try_define('OMEGAUP_DB_NAME', 'omegaup');
 
 # ####################################
@@ -144,6 +144,7 @@ try_define('OMEGAUP_EMAIL_SENDY_LIST', 'xxx');
 # #########################
 try_define('APC_USER_CACHE_TIMEOUT', 7 * 24 * 3600); // in seconds
 try_define('APC_USER_CACHE_CONTEST_INFO_TIMEOUT', 10);
+try_define('APC_USER_CACHE_PROBLEM_LIST_TIMEOUT', 60 * 30); // in seconds
 try_define('APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT', 60); // in seconds
 try_define('APC_USER_CACHE_PROBLEM_STATS_TIMEOUT', 0); // in seconds
 try_define('APC_USER_CACHE_SESSION_TIMEOUT', 8 * 3600); // seconds, match OMEGAUP_EXPIRE_TOKEN_AFTER

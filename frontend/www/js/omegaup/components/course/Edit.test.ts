@@ -59,6 +59,8 @@ describe('Edit.vue', () => {
           identityRequests: [],
           admins: [],
           groupsAdmins: [],
+          groupsTeachingAssistants: [],
+          teachingAssistants: [],
           tags: [],
         } as types.CourseEditPayload,
         initialTab: 'course',

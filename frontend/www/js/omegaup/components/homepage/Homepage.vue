@@ -124,13 +124,31 @@
         :title="T.homepageSponsorsSectionTitle"
         :logos="[
           {
+            class: 'img-fluid w-50',
+            src: '/media/homepage/f5_logo.png',
+            alt: 'f5Logo',
+            href: 'https://www.f5.com/',
+          },
+          {
+            class: 'img-fluid',
             src: '/media/homepage/amazon_logo.png',
             alt: 'AmazonLogo',
             href: 'https://www.aboutamazon.com/',
           },
+          {
+            class: 'img-fluid',
+            src: '/media/homepage/replit_logo.png',
+            alt: 'replitLogo',
+            href: 'https://replit.com/',
+          },
         ]"
       ></omegaup-sponsors>
     </div>
+    <omegaup-cookie-accept-decline
+      @cookie-clicked-accept="cookieClickedAccept"
+      @cookie-clicked-decline="cookieClickedDecline"
+      @cookie-clicked-postpone="cookieClickedPostpone"
+    ></omegaup-cookie-accept-decline>
   </div>
 </template>
 
@@ -147,6 +165,9 @@ import homepage_Section from './Section.vue';
 import school_Rank from '../schools/Rank.vue';
 import user_Rank from '../user/Rank.vue';
 import homepage_Sponsors from './Sponsors.vue';
+import homepage_Cookie from './CookieConsent.vue';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 @Component({
   components: {
@@ -158,6 +179,7 @@ import homepage_Sponsors from './Sponsors.vue';
     'omegaup-testimonials': homepage_Testimonials,
     'omegaup-section': homepage_Section,
     'omegaup-sponsors': homepage_Sponsors,
+    'omegaup-cookie-accept-decline': homepage_Cookie,
   },
 })
 export default class Homepage extends Vue {
@@ -169,5 +191,18 @@ export default class Homepage extends Vue {
   @Prop() schoolsRank!: omegaup.SchoolRankTable;
 
   T = T;
+  cookieClickedAccept() {
+    // TODO: make an API to send the response to the server
+    this.$cookies.set('accept-cookies', true, -1);
+  }
+
+  cookieClickedDecline() {
+    // TODO: make an API to send the response to the server
+    this.$cookies.set('accept-cookies', false, -1);
+  }
+
+  cookieClickedPostpone() {
+    // TODO: make an API to send the response to the server
+  }
 }
 </script>

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 ''' Assigns users badges and creates the notifications.'''
 
@@ -110,7 +110,7 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = lib.db.connect(args)
+    dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
     try:
         with dbconn.cursor(dictionary=True) as cur:
             process_badges(args.current_timestamp, cur)

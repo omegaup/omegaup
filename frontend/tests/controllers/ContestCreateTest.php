@@ -152,6 +152,23 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Check if the plagiarism value is stored correctly in the database
+     * when a contest is created
+     */
+    public function testPlagiarismThresholdValue() {
+        // Create a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'checkPlagiarism' => true,
+            ])
+        );
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+        $this->assertTrue($contest->check_plagiarism);
+    }
+
+    /**
      * Public contest without problems is not valid.
      */
     public function testCreatePublicContest() {
@@ -350,5 +367,94 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'alias' => $teamGroup->alias,
             'name' =>  $teamGroup->name,
         ], $response['teams_group']);
+    }
+
+    /**
+     * A PHPUnit data provider for all the score mode to get profile details.
+     *
+     * @return list<array{0:string}>
+     */
+    public function scoreModeProvider(): array {
+        return [
+            ['partial'],
+            ['all_or_nothing'],
+            ['max_per_group'],
+        ];
+    }
+
+    /**
+     * @dataProvider scoreModeProvider
+     */
+    public function testCreateContestWithScoreMode(string $scoreMode) {
+        // Get a problem
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Create contest with 2 hours and a window length 30 of minutes
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'scoreMode' => $scoreMode,])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contest
+        );
+
+        // Create a contestant
+        $login = self::login($contest['director']);
+
+        // Create a contest request
+        $response = \OmegaUp\DAO\Contests::getByAlias(
+            $contest['request']['alias']
+        );
+
+        $this->assertEquals($response->score_mode, $scoreMode);
+    }
+
+    /**
+     * A PHPUnit data provider for all the partial score to get profile details.
+     *
+     * @return list<array{0:bool, 1:string}>
+     */
+    public function partialScoreProvider(): array {
+        return [
+            [true, 'partial'],
+            [false, 'all_or_nothing'],
+        ];
+    }
+
+    /**
+     * @dataProvider partialScoreProvider
+     */
+    public function testCreateContestWithPartialScore(
+        bool $partialScore,
+        string $scoreModeExpected
+    ) {
+        // Get a problem
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Create contest with 2 hours and a window length 30 of minutes
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'partialScore' => $partialScore,
+                ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contest
+        );
+
+        // Create a contestant
+        $login = self::login($contest['director']);
+
+        // Create a contest request
+        $response = \OmegaUp\DAO\Contests::getByAlias(
+            $contest['request']['alias']
+        );
+
+        $this->assertEquals($response->score_mode, $scoreModeExpected);
     }
 }

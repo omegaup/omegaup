@@ -14,9 +14,9 @@ location /preguntas/ {
 
 rewrite ^/admin/user/([a-zA-Z0-9_+.-]+)/?$ /admin/user.php?username=$1 last;
 rewrite ^/admin/support/?$ /admin/support.php last;
-rewrite ^/arena/?$ /arena/index.php last;
+rewrite ^/arenav1/?$ /arena/index.php last;
 rewrite ^/arena/admin/?$ /arena/admin.php last;
-rewrite ^/arenav2/?$ /arena/indexv2.php last;
+rewrite ^/arena/?$ /arena/indexv2.php?page_size=10 last;
 rewrite ^/arena/problem/([a-zA-Z0-9_+-]+)/?$ /arena/problem.php?problem_alias=$1 last;
 rewrite ^/arena/problem/([a-zA-Z0-9_+-]+)/print/?$ /arena/problemprint.php?problem_alias=$1 last;
 rewrite ^/arena/([a-zA-Z0-9_+-]+)/virtual/?$ /arena/virtual.php?contest_alias=$1  last;
@@ -65,6 +65,7 @@ rewrite ^/group/([a-zA-Z0-9_+:-]+)/edit/?$ /group/edit.php?group=$1 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /groupscoreboard.php?group=$1&scoreboard=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/edit/?$ /group/scoreboardedit.php?group=$1&scoreboard=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/stats/?$ /groupstats.php?group=$1 last;
+rewrite ^/img/libropre3.pdf/?$ /docs/assets/libroluisvargas.pdf last;
 rewrite ^/login/?$ /login.php last;
 rewrite ^/login/google/?$ /logingoogle.php last;
 rewrite ^/login/password/recover/?$ /loginpasswordrecover.php last;
@@ -107,66 +108,23 @@ rewrite ^/user/emailedit/([a-zA-Z0-9_]+)/?$ /users/emailedit.php?username=$1 las
 rewrite ^/user/emailedit/?$ /users/emailedit.php last;
 rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/?$ /userverifyemail.php?id=$1 last;
 
-# Cache control
-location ~ (/dist/|^/third_party/|^/media/|^/css|^/js/|^/img/) {
-  add_header  Cache-Control "max-age=31557600";
-}
-
 # libinteractive templates
 location ~ '^/templates/([a-zA-Z0-9_-]+)/([0-9a-f]{40})/([a-zA-Z0-9_.-]+)$' {
-  if (-f $request_filename) {
-    # Normal case: file is found and nginx can handle it natively.
-    break;
-  }
-  if (-d $document_root/templates/$1/$2) {
-    # Directory was found, but file was not. That means that the
-    # re-generation process was already run, so we will never be
-    # able to find that file.
-    return 404;
-  }
-  if ($args != '') {
-    # The re-generation process was already run, and we still
-    # could not find that file. Give up to avoid infinitely
-    # redirecting.
-    return 404;
-  }
-  # Try re-generating the template. Once this is done, it will cause a redirect to nginx.
-  rewrite '^/templates/([a-zA-Z0-9_-]+)/([0-9a-f]{40})/(.*)$' /problems/template.php?problem_alias=$1&commit=$2&filename=$3? last;
+  try_files $uri /problems/template.php?problem_alias=$1&commit=$2&filename=$3;
 }
 
 # output-only inputs.
 location ~ '^/probleminput/([a-zA-Z0-9_-]+)/([0-9a-f]{40})/([a-zA-Z0-9_.-]+)$' {
-  if (-f $request_filename) {
-    # Normal case: file is found and nginx can handle it natively.
-    break;
-  }
-  if (-d $document_root/probleminput/$1/$2) {
-    # Directory was found, but file was not. That means that the
-    # re-generation process was already run, so we will never be
-    # able to find that file.
-    return 404;
-  }
-  if ($args != '') {
-    # The re-generation process was already run, and we still
-    # could not find that file. Give up to avoid infinitely
-    # redirecting.
-    return 404;
-  }
-  # Try re-generating the template. Once this is done, it will cause a redirect to nginx.
-  rewrite '^/probleminput/([a-zA-Z0-9_-]+)/([0-9a-f]{40})/(.*)$' /problems/input.php?problem_alias=$1&commit=$2&filename=$3 last;
+  try_files $uri /problems/input.php?problem_alias=$1&commit=$2&filename=$3;
 }
 
 # problem images
 location ~ '^/img/([a-zA-Z0-9_-]+)/([0-9a-f]{40})\.([a-zA-Z0-9._-]+)$' {
-  if (-f $request_filename) {
-    break;
-  }
-  if ($args != '') {
-    # The re-generation process was already run, and we still
-    # could not find that file. Give up to avoid infinitely
-    # redirecting.
-    return 404;
-  }
-  # Try re-generating the image. Once this is done, it will cause a redirect to nginx.
-  rewrite /problems/image.php?problem_alias=$1&object_id=$2&extension=$3? last;
+  add_header  Cache-Control "max-age=31557600";
+  try_files $uri /problems/image.php?problem_alias=$1&object_id=$2&extension=$3;
+}
+
+# Cache control. This should go last.
+location ~ (/dist/|^/third_party/|^/media/|^/css|^/js/|^/img/) {
+  add_header  Cache-Control "max-age=31557600";
 }

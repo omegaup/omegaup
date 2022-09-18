@@ -1,63 +1,48 @@
-import { mount } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
 
 import common_Navbar from './Navbar.vue';
+import UserObjectivesQuestions from '../user/ObjectivesQuestions.vue';
 
 describe('Navbar.vue', () => {
-  it('Should handle empty navbar (in contest only)', async () => {
-    const wrapper = mount(common_Navbar, {
-      propsData: {
-        currentUsername: 'user',
-        errorMessage: null,
-        graderInfo: null,
-        graderQueueLength: -1,
-        gravatarURL51:
-          'https://secure.gravatar.com/avatar/568c0ec2147500d7cd09cc8bbc8e5ec4?s=51',
-        inContest: true,
-        clarifications: [],
-        isAdmin: false,
-        isLoggedIn: true,
-        isMainUserIdentity: true,
-        isReviewer: false,
-        lockDownImage: 'data:image/png;base64...',
-        navbarSection: '',
-        omegaUpLockDown: false,
-        allIdentities: [{ username: 'user', default: true }],
-        notifications: [],
-        fromLogin: false,
-        userTypes: [],
-      },
-    });
+  const propsData = {
+    currentUsername: 'user',
+    errorMessage: null,
+    graderInfo: null,
+    graderQueueLength: -1,
+    gravatarURL51:
+      'https://secure.gravatar.com/avatar/568c0ec2147500d7cd09cc8bbc8e5ec4?s=51',
+    inContest: true,
+    clarifications: [],
+    isAdmin: false,
+    isLoggedIn: true,
+    isMainUserIdentity: false,
+    isReviewer: false,
+    lockDownImage: 'data:image/png;base64...',
+    navbarSection: '',
+    omegaUpLockDown: false,
+    associatedIdentities: [{ username: 'user', default: true }],
+    notifications: [],
+    fromLogin: false,
+    userTypes: [],
+  };
 
+  it('Should handle empty navbar (in contest only)', () => {
+    const wrapper = mount(common_Navbar, {
+      propsData,
+    });
     expect(wrapper.find('.nav-contests').exists()).toBe(false);
     expect(wrapper.find('.nav-courses').exists()).toBe(false);
     expect(wrapper.find('.nav-problems').exists()).toBe(false);
     expect(wrapper.find('.nav-rank').exists()).toBe(false);
   });
 
-  it('Should handle common navbar to logged user', async () => {
+  it('Should handle common navbar to logged user', () => {
     const wrapper = mount(common_Navbar, {
       propsData: {
-        currentUsername: 'user',
-        errorMessage: null,
-        graderInfo: null,
-        graderQueueLength: -1,
-        gravatarURL51:
-          'https://secure.gravatar.com/avatar/568c0ec2147500d7cd09cc8bbc8e5ec4?s=51',
-        inContest: false,
-        clarifications: [],
-        isAdmin: false,
-        isLoggedIn: true,
-        isMainUserIdentity: true,
-        isReviewer: false,
-        lockDownImage: 'data:image/png;base64...',
-        navbarSection: '',
-        omegaUpLockDown: false,
-        associatedIdentities: [{ username: 'user', default: true }],
-        notifications: [],
-        fromLogin: false,
-        userTypes: ['student', 'teacher'],
+        ...propsData,
+        ...{ inContest: false, userTypes: ['student', 'teacher'] },
       },
     });
 
@@ -67,34 +52,26 @@ describe('Navbar.vue', () => {
     expect(wrapper.find('.nav-rank').exists()).toBe(true);
   });
 
-  it('Should handle common navbar to not-logged user', async () => {
+  it('Should handle common navbar to not-logged user', () => {
     const wrapper = mount(common_Navbar, {
-      propsData: {
-        currentUsername: 'user',
-        errorMessage: null,
-        graderInfo: null,
-        graderQueueLength: -1,
-        gravatarURL51:
-          'https://secure.gravatar.com/avatar/568c0ec2147500d7cd09cc8bbc8e5ec4?s=51',
-        inContest: false,
-        clarifications: [],
-        isAdmin: false,
-        isLoggedIn: false,
-        isMainUserIdentity: true,
-        isReviewer: false,
-        lockDownImage: 'data:image/png;base64...',
-        navbarSection: '',
-        omegaUpLockDown: false,
-        associatedIdentities: [{ username: 'user', default: true }],
-        notifications: [],
-        fromLogin: false,
-        userTypes: [],
-      },
+      propsData: { ...propsData, ...{ inContest: false, isLoggedIn: false } },
     });
 
     expect(wrapper.find('.nav-problems').exists()).toBe(true);
     expect(wrapper.find('[data-nav-course]').exists()).toBe(true);
     expect(wrapper.find('.nav-rank').exists()).toBe(true);
     expect(wrapper.find('.navbar-right').text()).toBe(T.navLogIn);
+  });
+
+  it('Should show objectives modal only when a main user identity is logged', async () => {
+    const wrapper = shallowMount(common_Navbar, {
+      propsData: { ...propsData, ...{ fromLogin: true } },
+    });
+
+    expect(wrapper.findComponent(UserObjectivesQuestions).exists()).toBe(false);
+
+    await wrapper.setProps({ isMainUserIdentity: true });
+
+    expect(wrapper.findComponent(UserObjectivesQuestions).exists()).toBe(true);
   });
 });

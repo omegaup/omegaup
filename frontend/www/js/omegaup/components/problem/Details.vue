@@ -136,10 +136,7 @@
               v-show="currentPopupDisplayed === PopupDisplayed.Promotion"
               :solved="nominationStatus && nominationStatus.solved"
               :tried="nominationStatus && nominationStatus.tried"
-              @submit="
-                (qualityPromotionComponent) =>
-                  $emit('submit-promotion', qualityPromotionComponent)
-              "
+              @submit="(request) => $emit('submit-promotion', request)"
               @dismiss="
                 (qualityPromotionComponent, isDismissed) =>
                   onPopupPromotionDismissed(
@@ -186,7 +183,9 @@
             :runs="runsByProblem"
             :show-details="true"
             :problemset-problems="[]"
+            :request-feedback="requestFeedback"
             :is-contest-finished="isContestFinished"
+            @request-feedback="(guid) => $emit('request-feedback', guid)"
             @details="(request) => onRunDetails(request, 'problems')"
             @update-search-result-users-contest="
               (request) => $emit('update-search-result-users-contest', request)
@@ -241,12 +240,18 @@
           :show-disqualify="true"
           :problemset-problems="[]"
           :search-result-users="searchResultUsers"
+          :search-result-problems="searchResultProblems"
+          :total-runs="totalRuns"
           @details="(request) => onRunDetails(request, 'runs')"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
+          @requalify="(run) => $emit('requalify', run)"
           @filter-changed="(request) => $emit('apply-filter', request)"
           @update-search-result-users-contest="
             (request) => $emit('update-search-result-users-contest', request)
+          "
+          @update-search-result-problems="
+            (request) => $emit('update-search-result-problems', request)
           "
           @update-search-result-users="
             (request) => $emit('update-search-result-users', request)
@@ -401,7 +406,10 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultProblems!: types.ListItem[];
   @Prop({ default: null }) languages!: null | string[];
+  @Prop() totalRuns!: number;
+  @Prop({ default: false }) requestFeedback!: boolean;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
@@ -529,6 +537,7 @@ export default class ProblemDetails extends Vue {
 
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
+    this.currentRunDetailsData = null;
     this.$emit('update:activeTab', this.selectedTab);
   }
 

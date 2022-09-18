@@ -18,6 +18,7 @@ import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 
 OmegaUp.on('ready', async () => {
   const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
+  const searchResultEmpty: types.ListItem[] = [];
   let runDetails: null | types.RunDetails = null;
   try {
     ({ runDetails } = await getProblemAndRunDetails({
@@ -32,7 +33,8 @@ OmegaUp.on('ready', async () => {
       'omegaup-arena-runs': arena_Runs,
     },
     data: () => ({
-      searchResultUsers: [] as types.ListItem[],
+      searchResultUsers: searchResultEmpty,
+      searchResultProblems: searchResultEmpty,
       popupDisplayed,
       guid,
       runDetailsData: runDetails,
@@ -52,7 +54,9 @@ OmegaUp.on('ready', async () => {
           showUser: true,
           guid: this.guid,
           searchResultUsers: this.searchResultUsers,
+          searchResultProblems: this.searchResultProblems,
           runDetailsData: this.runDetailsData,
+          totalRuns: runsStore.state.totalRuns,
         },
         on: {
           details: (request: SubmissionRequest) => {
@@ -67,6 +71,14 @@ OmegaUp.on('ready', async () => {
                 ui.apiError(error);
                 this.popupDisplayed = PopupDisplayed.None;
               });
+          },
+          requalify: (run: types.Run) => {
+            api.Run.requalify({ run_alias: run.guid })
+              .then(() => {
+                run.type = 'normal';
+                updateRunFallback({ run });
+              })
+              .catch(ui.ignoreError);
           },
           disqualify: (run: types.Run) => {
             if (!window.confirm(T.runDisqualifyConfirm)) {
@@ -124,6 +136,23 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.apiError);
           },
+          'update-search-result-problems': (query: string) => {
+            api.Problem.listForTypeahead({
+              query,
+              search_type: 'all',
+            })
+              .then((data) => {
+                this.searchResultProblems = data.results.map(
+                  ({ key, value }, index) => ({
+                    key,
+                    value: `${String(index + 1).padStart(2, '0')}.- ${ui.escape(
+                      value,
+                    )} (<strong>${ui.escape(key)}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
           'reset-hash': () => {
             history.replaceState({}, '', '#');
           },
@@ -144,7 +173,7 @@ OmegaUp.on('ready', async () => {
     })
       .then(time.remoteTimeAdapter)
       .then((response) => {
-        onRefreshRuns({ runs: response.runs });
+        onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
       })
       .catch(ui.apiError);
   }

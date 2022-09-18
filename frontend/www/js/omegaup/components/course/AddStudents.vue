@@ -19,7 +19,7 @@
               @update-existing-options="
                 (query) => $emit('update-search-result-users', query)
               "
-            />
+            ></omegaup-common-typeahead>
             <button
               class="btn btn-secondary add-participant ml-2"
               :disabled="!participant"
@@ -111,7 +111,7 @@ export default class CourseAddStudents extends Vue {
 
   T = T;
   studentUsername = '';
-  participant: null | string = null;
+  participant: null | types.ListItem = null;
   participants = '';
   requests: types.IdentityRequest[] = [];
 
@@ -123,7 +123,7 @@ export default class CourseAddStudents extends Vue {
     if (this.participants.length) {
       this.participants += '\n';
     }
-    this.participants += this.participant;
+    this.participants += this.participant?.key;
 
     this.participant = null;
   }

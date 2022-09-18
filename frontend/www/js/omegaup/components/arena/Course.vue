@@ -2,7 +2,8 @@
   <omegaup-arena
     :active-tab="activeTab"
     :title="currentAssignment.name"
-    :should-show-runs="isAdmin"
+    :should-show-runs="isAdmin || isTeachingAssistant"
+    :should-show-ranking="course.admission_mode !== 'public'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #socket-status>
@@ -71,6 +72,7 @@
                 problemInfo ? problemInfo.nominationStatus : null
               "
               :popup-displayed="problemDetailsPopup"
+              :request-feedback="true"
               :active-tab="'problems'"
               :languages="course.languages"
               :runs="runs"
@@ -78,6 +80,7 @@
               :run-details-data="runDetailsData"
               :problem-alias="problemAlias"
               :in-contest-or-course="true"
+              @request-feedback="(guid) => $emit('request-feedback', guid)"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', { selectedTab, problemAlias })
@@ -85,14 +88,7 @@
               @submit-run="onRunSubmitted"
               @show-run="onRunDetails"
               @submit-promotion="
-                (qualityPromotionComponent) =>
-                  $emit('submit-promotion', {
-                    solved: qualityPromotionComponent.solved,
-                    tried: qualityPromotionComponent.tried,
-                    quality: qualityPromotionComponent.quality,
-                    difficulty: qualityPromotionComponent.difficulty,
-                    tags: qualityPromotionComponent.tags,
-                  })
+                (request) => $emit('submit-promotion', request)
               "
               @dismiss-promotion="
                 (qualityPromotionComponent, isDismissed) =>
@@ -125,7 +121,7 @@
         </div>
       </div>
     </template>
-    <template #arena-scoreboard>
+    <template v-if="scoreboard" #arena-scoreboard>
       <omegaup-arena-scoreboard
         :show-invited-users-filter="false"
         :problems="scoreboard.problems"
@@ -141,6 +137,7 @@
         :show-all-runs="true"
         :contest-alias="currentAssignment.alias"
         :runs="allRuns"
+        :total-runs="totalRuns"
         :show-problem="true"
         :show-details="true"
         :show-disqualify="true"
@@ -148,9 +145,16 @@
         :show-rejudge="true"
         :show-user="true"
         :problemset-problems="Object.values(problems)"
+        :search-result-users="searchResultUsers"
+        :search-result-problems="searchResultProblems"
         @details="onRunAdminDetails"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
+        @requalify="(run) => $emit('requalify', run)"
+        @filter-changed="(request) => $emit('apply-filter', request)"
+        @update-search-result-users-contest="
+          (request) => $emit('update-search-result-users-assignment', request)
+        "
       >
         <template #title><div></div></template>
         <template #runs><div></div></template>
@@ -256,7 +260,7 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
-  @Prop() scoreboard!: types.Scoreboard;
+  @Prop() scoreboard!: null | types.Scoreboard;
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) allRuns!: null | types.Run[];
@@ -264,6 +268,9 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
+  @Prop() totalRuns!: number;
+  @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: false }) isTeachingAssistant!: boolean;
 
   T = T;
   omegaup = omegaup;
@@ -344,8 +351,19 @@ export default class ArenaCourse extends Vue {
     return PopupDisplayed.Promotion;
   }
 
+  get searchResultProblems(): types.ListItem[] {
+    if (!this.problems.length) {
+      return [];
+    }
+    return this.problems.map((problem) => ({
+      key: problem.alias,
+      value: problem.text,
+    }));
+  }
+
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
+    this.currentRunDetailsData = null;
     this.$emit('reset-hash', { selectedTab: 'runs', alias: null });
   }
 
