@@ -78,13 +78,11 @@ export default class MultipleCasesInput extends Vue {
 
   T = T;
 
-  // getGroupIdsAndNames getter is not instant, we need to wait for it to be defined otherwise the app will crash
   get options() {
-    const noGroup = { value: NIL, text: T.problemCreatorNoGroup };
-    if (!this.storedGroups) {
-      return [noGroup];
-    }
-    return [noGroup, ...this.storedGroups];
+    return [
+      { value: NIL, text: T.problemCreatorNoGroup },
+      ...this.storedGroups,
+    ];
   }
 
   get caseNamePreview() {
