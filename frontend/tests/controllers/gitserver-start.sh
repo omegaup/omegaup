@@ -26,7 +26,8 @@ cat > "${RUNFILES}/gitserver.config.json" <<EOF
 		"AllowSecretTokenAuthentication": true,
 		"PublicKey": "",
 		"AllowDirectPushToMaster": true,
-		"RootPath": "${ROOT_PATH}"
+		"RootPath": "${ROOT_PATH}",
+		"FrontendAuthorizationProblemRequestURL": "http://localhost:8001/api/authorization/problem/"
 	}
 }
 EOF

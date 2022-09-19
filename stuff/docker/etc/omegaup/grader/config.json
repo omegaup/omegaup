@@ -11,6 +11,8 @@
 	},
 	"Grader": {
 		"BroadcasterURL": "https://broadcaster:32672/broadcast/",
+		"GitserverURL": "http://gitserver:33861",
+		"GitserverAuthorization": "OmegaUpSharedSecret secret omegaup:grader",
 		"V1": {
 			"Enabled": true
 		}
