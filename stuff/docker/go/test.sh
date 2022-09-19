@@ -9,7 +9,7 @@
 #
 #   make test-quark
 
-DIR="$(realpath "$(dirname "$(dirname "${0}")")")"
+DIR="$(realpath "$(git rev-parse --show-toplevel)")/stuff/docker/"
 
 if [[ ! -d "${DIR}/go/go-base" ]]; then
 	git clone https://github.com/omegaup/go-base.git "${DIR}/go/go-base"
