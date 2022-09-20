@@ -4904,7 +4904,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             $tags[] = ['name' => $tag->name];
         }
-
         return [
             'templateProperties' => [
                 'payload' => [
