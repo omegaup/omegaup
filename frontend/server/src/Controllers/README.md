@@ -202,6 +202,7 @@
   - [`/api/session/googleLogin/`](#apisessiongooglelogin)
 - [Submission](#submission)
   - [`/api/submission/setFeedback/`](#apisubmissionsetfeedback)
+  - [`/api/submission/setFeedbackRequestFeedback/`](#apisubmissionsetfeedbackrequestfeedback)
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
@@ -4027,6 +4028,26 @@ Updates the admin feedback for a submission
 | `assignment_alias`  | `string`    |             |
 | `course_alias`      | `string`    |             |
 | `feedback`          | `string`    |             |
+| `guid`              | `string`    |             |
+| `range_bytes_end`   | `int\|null` |             |
+| `range_bytes_start` | `int\|null` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/submission/setFeedbackRequestFeedback/`
+
+### Description
+
+Updates the student feedback for a submission
+
+### Parameters
+
+| Name                | Type        | Description |
+| ------------------- | ----------- | ----------- |
+| `assignment_alias`  | `string`    |             |
+| `course_alias`      | `string`    |             |
 | `guid`              | `string`    |             |
 | `range_bytes_end`   | `int\|null` |             |
 | `range_bytes_start` | `int\|null` |             |

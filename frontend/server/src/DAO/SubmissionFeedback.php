@@ -48,6 +48,34 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
     }
 
     /**
+     * Get the submission feedback where user-id is the person who send the submission
+     *
+     * @return array{feedback:string, identity_id:int, submission_feedback_id: int, submission_id: int}|null
+     */
+    public static function getAllSubmissionFeedbacks(): ?array {
+        $sql = '
+            SELECT
+                sf.`submission_feedback_id`,
+                sf.`identity_id`,
+                sf.`feedback`,
+                sf.`submission_id`
+            FROM
+                `Submission_Feedback` sf
+            INNER JOIN
+                `Submissions` s
+            ON
+                sf.`submission_id` = s.`submission_id`
+            WHERE
+                sf.`identity_id` = s.`identity_id`;
+        ';
+
+        /** @var array{feedback:string, identity_id:int, submission_feedback_id: int, submission_id: int}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql
+        );
+    }
+
+    /**
      * Gets the SubmissionFeedback object of a certain submission
      *
      * @return \OmegaUp\DAO\VO\SubmissionFeedback|null

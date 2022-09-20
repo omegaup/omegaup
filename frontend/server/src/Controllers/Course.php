@@ -3277,6 +3277,31 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        /*$submission = \OmegaUp\DAO\Submissions::getByGuid(
+            $r->ensureString('guid')
+        );*/
+
+        //save a feedback by default
+        $feedback = 'I need your help in this submission!';
+
+        ///aqui en ves de mandar llamar la apiset feedback voy a mandar llamar la nueva funcion
+        /// que va a validar que el usuario que realizo la submission sea el mismo que realizo
+        /// el feedback
+        \OmegaUp\Controllers\Submission::apiSetFeedbackRequestFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $r['auth_token'],
+                'guid' => $guid,
+                'course_alias' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'feedback' => $feedback,
+            ])
+        );
+
+        /*$submissionFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
+            $submission
+        );*/
+
+        //error_log(print_r($submissionFeedback, true));
         $getAllAdministrators = \OmegaUp\DAO\UserRoles::getCourseAdministrators(
             $course
         );

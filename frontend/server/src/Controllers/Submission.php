@@ -128,6 +128,56 @@ class Submission extends \OmegaUp\Controllers\Controller {
         }
     }
 
+    public static function tryCreateFeedback(
+        \OmegaUp\Request $r,
+        \OmegaUp\DAO\VO\Submissions $submission,
+        array $courseSubmissionInfo,
+        \OmegaUp\DAO\VO\Courses $course,
+        int|null $range_bytes_start,
+        int|null $range_bytes_end,
+        string $feedback
+    ): void {
+        $r->ensureIdentity();
+
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+
+            $submissionFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
+                $submission
+            );
+
+            if (is_null($submissionFeedback)) {
+                self::createFeedback(
+                    $r->identity,
+                    $submission,
+                    $course,
+                    $range_bytes_start,
+                    $range_bytes_end,
+                    $feedback,
+                    $courseSubmissionInfo
+                );
+            } else {
+                $submissionFeedback->identity_id = $r->identity->identity_id;
+                $submissionFeedback->feedback = $feedback;
+                \OmegaUp\DAO\Base\SubmissionFeedback::update(
+                    $submissionFeedback
+                );
+            }
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'submissionFeedbackAlreadyExists'
+                );
+            }
+
+            throw $e;
+        }
+    }
+
     /**
      * Updates the admin feedback for a submission
      *
@@ -215,44 +265,101 @@ class Submission extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        try {
-            \OmegaUp\DAO\DAO::transBegin();
+        self::tryCreateFeedback(
+            $r,
+            $submission,
+            $courseSubmissionInfo,
+            $course,
+            $range_bytes_start,
+            $range_bytes_end,
+            $feedback
+        );
+        return [
+            'status' => 'ok',
+        ];
+    }
 
-            $submissionFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
-                $submission
+     /**
+     * Updates the student feedback for a submission
+     *
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $guid
+     * @omegaup-request-param int|null $range_bytes_end
+     * @omegaup-request-param int|null $range_bytes_start
+     *
+     * @return array{status: string}
+     */
+    public static function apiSetFeedbackRequestFeedback(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        $feedback = 'I need your help';
+
+        $submission = \OmegaUp\DAO\Submissions::getByGuid(
+            $r->ensureString('guid')
+        );
+        if (is_null($submission)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'submissionNotFound'
             );
-
-            if (is_null($submissionFeedback)) {
-                self::createFeedback(
-                    $r->identity,
-                    $submission,
-                    $course,
-                    $range_bytes_start,
-                    $range_bytes_end,
-                    $feedback,
-                    $courseSubmissionInfo
-                );
-            } else {
-                $submissionFeedback->identity_id = $r->identity->identity_id;
-                $submissionFeedback->feedback = $feedback;
-                \OmegaUp\DAO\Base\SubmissionFeedback::update(
-                    $submissionFeedback
-                );
-            }
-
-            \OmegaUp\DAO\DAO::transEnd();
-        } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
-
-            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'submissionFeedbackAlreadyExists'
-                );
-            }
-
-            throw $e;
         }
 
+        $courseSubmissionInfo = \OmegaUp\DAO\Submissions::getCourseSubmissionInfo(
+            $submission,
+            $r->ensureString(
+                'assignment_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            ),
+            $r->ensureString(
+                'course_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            )
+        );
+        if (is_null($courseSubmissionInfo)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseSubmissionNotFound'
+            );
+        }
+
+        $course = \OmegaUp\DAO\Courses::getByPK(
+            $courseSubmissionInfo['course_id']
+        );
+        if (is_null($course)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseNotFound'
+            );
+        }
+
+        $range_bytes_start = $r->ensureOptionalInt('range_bytes_start');
+        $range_bytes_end = $r->ensureOptionalInt('range_bytes_end');
+
+        if (
+            !is_null(
+                $range_bytes_start
+            ) && !is_null(
+                $range_bytes_end
+            ) && ($range_bytes_start < 0
+            ||  $range_bytes_end < $range_bytes_start)
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
+        }
+
+        // checar que la persona que realizo el envio sea la misma que va a realizar la retroalimentacion
+        if ($r->identity->identity_id !== $submission->identity_id) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        self::tryCreateFeedback(
+            $r,
+            $submission,
+            $courseSubmissionInfo,
+            $course,
+            $range_bytes_start,
+            $range_bytes_end,
+            $feedback
+        );
         return [
             'status' => 'ok',
         ];
