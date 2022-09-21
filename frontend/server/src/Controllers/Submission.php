@@ -128,17 +128,18 @@ class Submission extends \OmegaUp\Controllers\Controller {
         }
     }
 
+    /**
+     * @param array{assignment_alias: string, author_id: int|null, course_alias: string, course_id: int, problem_alias: string} $courseSubmissionInfo
+     */
     public static function tryCreateFeedback(
-        \OmegaUp\Request $r,
+        \OmegaUp\DAO\VO\Identities $r,
         \OmegaUp\DAO\VO\Submissions $submission,
         array $courseSubmissionInfo,
         \OmegaUp\DAO\VO\Courses $course,
-        int|null $range_bytes_start,
-        int|null $range_bytes_end,
+        ?int $range_bytes_start,
+        ?int $range_bytes_end,
         string $feedback
     ): void {
-        $r->ensureIdentity();
-
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
@@ -148,7 +149,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
 
             if (is_null($submissionFeedback)) {
                 self::createFeedback(
-                    $r->identity,
+                    $r,
                     $submission,
                     $course,
                     $range_bytes_start,
@@ -157,7 +158,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
                     $courseSubmissionInfo
                 );
             } else {
-                $submissionFeedback->identity_id = $r->identity->identity_id;
+                $submissionFeedback->identity_id = $r->identity_id;
                 $submissionFeedback->feedback = $feedback;
                 \OmegaUp\DAO\Base\SubmissionFeedback::update(
                     $submissionFeedback
@@ -179,16 +180,18 @@ class Submission extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Updates the admin feedback for a submission
+     * Request feedback
      *
-     * @omegaup-request-param string $guid
-     * @omegaup-request-param string $course_alias
-     * @omegaup-request-param string $assignment_alias
-     * @omegaup-request-param string $feedback
-     * @omegaup-request-param int|null $range_bytes_end
-     * @omegaup-request-param int|null $range_bytes_start
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $feedback
+     * @omegaup-request-param string $guid
+     * @omegaup-request-param int|null $range_bytes_end
+     * @omegaup-request-param int|null $range_bytes_start
      */
     public static function apiSetFeedback(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -266,7 +269,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         }
 
         self::tryCreateFeedback(
-            $r,
+            $r->identity,
             $submission,
             $courseSubmissionInfo,
             $course,
@@ -282,18 +285,21 @@ class Submission extends \OmegaUp\Controllers\Controller {
      /**
      * Updates the student feedback for a submission
      *
+     * @return array{status: string}
+     *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param string $guid
      * @omegaup-request-param int|null $range_bytes_end
      * @omegaup-request-param int|null $range_bytes_start
-     *
-     * @return array{status: string}
      */
+
     public static function apiSetFeedbackRequestFeedback(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $feedback = 'I need your help';
+        $feedback = $feedback = \OmegaUp\Translations::getInstance()->get(
+            'requestFeedbackMessage'
+        );
 
         $submission = \OmegaUp\DAO\Submissions::getByGuid(
             $r->ensureString('guid')
@@ -352,7 +358,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         }
 
         self::tryCreateFeedback(
-            $r,
+            $r->identity,
             $submission,
             $courseSubmissionInfo,
             $course,
