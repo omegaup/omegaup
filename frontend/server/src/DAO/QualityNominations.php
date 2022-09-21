@@ -196,9 +196,13 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * @return array{quality_seal: boolean, qualitynomination_id: int}|null
      */
     public static function getReviewedData(
-        \Omegaup\DAO\VO\Identities $identity,
-        \Omegaup\DAO\VO\Problems $problem
+        int $problemId,
+        int $userId
     ): array {
+        $response = [
+            'quality_seal' => false,
+            'qualitynomination_id' => 0,
+        ];
         $sql = "
             SELECT
                 qn.qualitynomination_id,
@@ -215,17 +219,17 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         /** @var array{contents: string, qualitynomination_id: int}|null */
         $query = \Omegaup\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$identity->identity_id, $problem->problem_id]
+            [$userId, $problemId]
         );
         if (is_null($query)) {
             return null;
         }
 
         $contents = json_decode($query['contents'], true);
-        return [
-            'quality_seal' => $contents['quality_seal'],
-            'qualitynomination_id' => $query['qualitynomination_id']
-        ];
+        $response['quality_seal'] = $contents['quality_seal'];
+        $response['qualitynomination_id'] = $query['qualitynomination_id'];
+
+        return $response;
     }
 
     /**

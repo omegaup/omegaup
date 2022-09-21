@@ -396,7 +396,7 @@ export default class ProblemDetails extends Vue {
   @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
   @Prop() nominationStatus!: types.NominationStatus;
-  @Prop() alreadyReviewedPayload!: types.QualityNominationContents;
+  @Prop() alreadyReviewedPayload!: types.AlreadyReviewedPayload;
   @Prop() runs!: types.Run[];
   @Prop() solutionStatus!: string;
   @Prop({ default: null }) solution!: types.ProblemStatement | null;

@@ -108,6 +108,14 @@ export namespace types {
       );
     }
 
+    export function AlreadyReviewedPayload(
+      elementId: string = 'payload',
+    ): types.AlreadyReviewedPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function ArenaCoursePayload(
       elementId: string = 'payload',
     ): types.ArenaCoursePayload {
@@ -2317,6 +2325,11 @@ export namespace types {
     };
   }
 
+  export interface AlreadyReviewedPayload {
+    quality_seal: boolean;
+    qualitynomination_id: number;
+  }
+
   export interface ArenaAssignment {
     alias?: string;
     assignment_type: string;
@@ -3665,7 +3678,7 @@ export namespace types {
   export interface ProblemDetailsPayload {
     allRuns?: types.Run[];
     allowUserAddTags?: boolean;
-    alreadyReviewedPayload?: types.QualityNominationContents;
+    alreadyReviewedPayload?: types.AlreadyReviewedPayload;
     clarifications?: types.Clarification[];
     histogram: types.Histogram;
     levelTags?: string[];
@@ -3998,11 +4011,6 @@ export namespace types {
   export interface Progress {
     max_score: number;
     score: number;
-  }
-
-  export interface QualityNominationContents {
-    quality_seal: boolean;
-    qualitynomination_id: number;
   }
 
   export interface Run {

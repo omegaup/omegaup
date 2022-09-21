@@ -127,7 +127,7 @@ export default class ReviewerPopup extends Vue {
   @Prop() selectedPrivateTags!: string[];
   @Prop() problemAlias!: string;
   @Prop() problemTitle!: string;
-  @Prop() alreadyReviewedPayload!: types.QualityNominationContents | undefined;
+  @Prop() alreadyReviewedPayload!: types.AlreadyReviewedPayload | undefined;
 
   AvailableViews = AvailableViews;
   T = T;
