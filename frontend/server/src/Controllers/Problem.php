@@ -2101,11 +2101,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 )
             ) {
                 // If the problem is requested outside a contest, we need to
-                // check that it is not private
+                // check that it is not private and the user is logged in
                 if (!\OmegaUp\DAO\Problems::isVisible($problem)) {
-                    throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                        'problemIsPrivate'
-                    );
+                    if (is_null($identity)) {
+                        throw new \OmegaUp\Exceptions\UnauthorizedException(
+                            'userNotAllowed'
+                        );
+                    } else {
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                            'problemIsPrivate'
+                        );
+                    }
                 }
             }
         }
@@ -4891,6 +4897,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         foreach ($allTags as $tag) {
             if (is_null($tag->name)) {
+                continue;
+            }
+            if ($tag->public == 0) {
                 continue;
             }
             $tags[] = ['name' => $tag->name];
