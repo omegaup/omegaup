@@ -18,6 +18,7 @@ class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTes
     private static $identityGroupAdmin = null;
     private static $groupDataAdmin = null;
     private static $groupDataTA = null;
+    private static $response = null;
 
     //separar TA de admins
 
@@ -133,7 +134,7 @@ class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTes
 
         // student call api to send notifications to all administrators
         // members in the course
-        \OmegaUp\Controllers\Course::apiRequestFeedback(
+        self::$response = \OmegaUp\Controllers\Course::apiRequestFeedback(
             new \OmegaUp\Request([
                 'auth_token' => $studentLogin->auth_token,
                 'assignment_alias' => self::$assignmentAlias,
@@ -293,6 +294,15 @@ class CourseNotificationsRequestFeedbackTest extends \OmegaUp\Test\ControllerTes
         $this->assertEquals(
             self::$courseData['course']->name,
             $contents['body']['localizationParams']['courseName']
+        );
+    }
+
+    public function testStorageSubmissionFeedback() {
+        //check if the user that write the message is the same that
+        // the user who sent a request feedback
+        $this->assertEquals(
+            self::$identity3->identity_id,
+            self::$response[0]['identity_id']
         );
     }
 }

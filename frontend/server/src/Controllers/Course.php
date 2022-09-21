@@ -3227,8 +3227,11 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param string $guid
+     * @omegaup-request-param int|null $range_bytes_end
+     * @omegaup-request-param int|null $range_bytes_start
      */
 
     public static function apiRequestFeedback(\OmegaUp\Request $r): array {
@@ -3277,12 +3280,18 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        /*$submission = \OmegaUp\DAO\Submissions::getByGuid(
+        $submission = \OmegaUp\DAO\Submissions::getByGuid(
             $r->ensureString('guid')
-        );*/
+        );
+
+        if (is_null($submission)) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
 
         //save a feedback by default
-        $feedback = 'I need your help in this submission!';
+        $feedback = \OmegaUp\Translations::getInstance()->get(
+            'requestFeedbackMessage'
+        );
 
         ///aqui en ves de mandar llamar la apiset feedback voy a mandar llamar la nueva funcion
         /// que va a validar que el usuario que realizo la submission sea el mismo que realizo
@@ -3297,11 +3306,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             ])
         );
 
-        /*$submissionFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
-            $submission
-        );*/
+        $getSubmissionsFeedback = \OmegaUp\DAO\SubmissionFeedback::getAllSubmissionFeedbacks();
 
-        //error_log(print_r($submissionFeedback, true));
         $getAllAdministrators = \OmegaUp\DAO\UserRoles::getCourseAdministrators(
             $course
         );
@@ -3331,6 +3337,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
         return [
+            $getSubmissionsFeedback,
             'status' => 'ok',
         ];
     }

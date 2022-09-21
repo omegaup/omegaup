@@ -69,7 +69,7 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
                 sf.`identity_id` = s.`identity_id`;
         ';
 
-        /** @var array{feedback:string, identity_id:int, submission_feedback_id: int, submission_id: int}|null */
+        /** @var array{feedback: string, identity_id: int, submission_feedback_id: int, submission_id: int}|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql
         );

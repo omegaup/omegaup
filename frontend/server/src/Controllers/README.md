@@ -2079,11 +2079,14 @@ Request feedback
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
-| `guid`             | `string` |             |
+| Name                | Type        | Description |
+| ------------------- | ----------- | ----------- |
+| `assignment_alias`  | `string`    |             |
+| `course_alias`      | `string`    |             |
+| `guid`              | `string`    |             |
+| `auth_token`        | `mixed`     |             |
+| `range_bytes_end`   | `int\|null` |             |
+| `range_bytes_start` | `int\|null` |             |
 
 ### Returns
 
@@ -4019,7 +4022,7 @@ SubmissionController
 
 ### Description
 
-Updates the admin feedback for a submission
+Request feedback
 
 ### Parameters
 
