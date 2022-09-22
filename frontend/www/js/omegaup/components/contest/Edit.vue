@@ -288,10 +288,10 @@ import * as ui from '../../ui';
 import contest_AddProblem from './AddProblem.vue';
 import contest_AddContestant from './AddContestant.vue';
 import contest_Clone from './Clone.vue';
-import common_Admins from '../common/Adminsv2.vue';
+import common_Admins from '../common/Admins.vue';
 import common_Archive from '../common/Archive.vue';
 import common_Requests from '../common/Requests.vue';
-import common_GroupAdmins from '../common/GroupAdminsv2.vue';
+import common_GroupAdmins from '../common/GroupAdmins.vue';
 import contest_Groups from './Groups.vue';
 import contest_TeamsGroups from './TeamsGroup.vue';
 import contest_Links from './Links.vue';
@@ -373,8 +373,11 @@ export default class Edit extends Vue {
     return T.contestEditArchiveHelpText;
   }
 
-  get teamsGroupAlias(): null | string {
-    return this.teamsGroup?.alias ?? null;
+  get teamsGroupAlias(): null | types.ListItem {
+    if (!this.teamsGroup) {
+      return null;
+    }
+    return { key: this.teamsGroup?.alias, value: this.teamsGroup.name };
   }
 
   onArchiveContest(archive: boolean): void {

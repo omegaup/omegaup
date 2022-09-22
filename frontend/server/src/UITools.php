@@ -80,7 +80,7 @@ class UITools {
             'ENABLED_EXPERIMENTS' => \OmegaUp\Experiments::getInstance()->getEnabledExperiments(),
             'OMEGAUP_GA_TRACK' => (defined(
                 'OMEGAUP_GA_TRACK'
-            )  && OMEGAUP_GA_TRACK),
+            )  && OMEGAUP_GA_TRACK && self::shouldReportToAnalytics()),
             'OMEGAUP_LOCKDOWN' => (defined(
                 'OMEGAUP_LOCKDOWN'
             )  && OMEGAUP_LOCKDOWN),
@@ -110,6 +110,13 @@ class UITools {
         string $size
     ): string {
         return "https://secure.gravatar.com/avatar/{$hashedEmail}?s={$size}";
+    }
+
+    private static function shouldReportToAnalytics(): bool {
+        if (!isset($_COOKIE['accept_cookies'])) {
+            return true;
+        }
+        return boolval($_COOKIE['accept_cookies']);
     }
 
     /**

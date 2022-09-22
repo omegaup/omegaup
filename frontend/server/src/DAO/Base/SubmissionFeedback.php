@@ -35,7 +35,9 @@ abstract class SubmissionFeedback {
                 `identity_id` = ?,
                 `submission_id` = ?,
                 `feedback` = ?,
-                `date` = ?
+                `date` = ?,
+                `range_bytes_start` = ?,
+                `range_bytes_end` = ?
             WHERE
                 (
                     `submission_feedback_id` = ?
@@ -55,6 +57,8 @@ abstract class SubmissionFeedback {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Submission_Feedback->date
             ),
+            intval($Submission_Feedback->range_bytes_start),
+            intval($Submission_Feedback->range_bytes_end),
             intval($Submission_Feedback->submission_feedback_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -80,7 +84,9 @@ abstract class SubmissionFeedback {
                 `Submission_Feedback`.`identity_id`,
                 `Submission_Feedback`.`submission_id`,
                 `Submission_Feedback`.`feedback`,
-                `Submission_Feedback`.`date`
+                `Submission_Feedback`.`date`,
+                `Submission_Feedback`.`range_bytes_start`,
+                `Submission_Feedback`.`range_bytes_end`
             FROM
                 `Submission_Feedback`
             WHERE
@@ -195,7 +201,9 @@ abstract class SubmissionFeedback {
                 `Submission_Feedback`.`identity_id`,
                 `Submission_Feedback`.`submission_id`,
                 `Submission_Feedback`.`feedback`,
-                `Submission_Feedback`.`date`
+                `Submission_Feedback`.`date`,
+                `Submission_Feedback`.`range_bytes_start`,
+                `Submission_Feedback`.`range_bytes_end`
             FROM
                 `Submission_Feedback`
         ';
@@ -249,8 +257,12 @@ abstract class SubmissionFeedback {
                     `identity_id`,
                     `submission_id`,
                     `feedback`,
-                    `date`
+                    `date`,
+                    `range_bytes_start`,
+                    `range_bytes_end`
                 ) VALUES (
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -271,6 +283,8 @@ abstract class SubmissionFeedback {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Submission_Feedback->date
             ),
+            intval($Submission_Feedback->range_bytes_start),
+            intval($Submission_Feedback->range_bytes_end),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

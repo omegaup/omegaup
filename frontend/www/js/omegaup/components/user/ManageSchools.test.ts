@@ -27,7 +27,10 @@ const profile: types.UserProfileInfo = {
 describe('ManageSchools.vue', () => {
   it('Should enable graduation date', async () => {
     const wrapper = mount(userManageSchools, {
-      propsData: { profile },
+      propsData: {
+        profile,
+        searchResultSchools: [{ key: 'teams-group', value: 'teams group' }],
+      },
     });
 
     expect(wrapper.findComponent(datePicker).element).toBeDisabled();
@@ -40,7 +43,10 @@ describe('ManageSchools.vue', () => {
 
   it('Should emit user update schools', async () => {
     const wrapper = mount(userManageSchools, {
-      propsData: { profile },
+      propsData: {
+        profile,
+        searchResultSchools: [{ key: 1, value: 'escuela' }],
+      },
     });
 
     await wrapper

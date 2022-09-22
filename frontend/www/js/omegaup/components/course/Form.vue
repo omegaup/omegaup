@@ -100,7 +100,7 @@
               <omegaup-common-typeahead
                 :existing-options="searchResultSchools"
                 :options="searchResultSchools"
-                :value.sync="schoolId"
+                :value.sync="school"
                 @update-existing-options="
                   (query) => $emit('update-search-result-schools', query)
                 "
@@ -237,7 +237,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
@@ -297,8 +297,7 @@ export default class CourseDetails extends Vue {
   name = this.course.name;
   level = this.course.level;
   objective = this.course.objective;
-  schoolName: null | string = this.course.school_name ?? null;
-  schoolId: number | null = this.course.school_id ?? null;
+  school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
   needsBasicInformation = this.course.needs_basic_information;
   requestsUserInformation = this.course.requests_user_information;
   unlimitedDuration = this.course.finish_time === null;
@@ -312,8 +311,7 @@ export default class CourseDetails extends Vue {
     this.showScoreboard = this.course.show_scoreboard;
     this.startTime = this.course.start_time;
     this.name = this.course.name;
-    this.schoolName = this.course.school_name ?? null;
-    this.schoolId = this.course.school_id ?? null;
+    this.school = this.searchResultSchools[0];
     this.needsBasicInformation = this.course.needs_basic_information;
     this.requestsUserInformation = this.course.requests_user_information;
     this.unlimitedDuration = this.course.finish_time === null;
@@ -331,8 +329,7 @@ export default class CourseDetails extends Vue {
       show_scoreboard: this.showScoreboard,
       needs_basic_information: this.needsBasicInformation,
       requests_user_information: this.requestsUserInformation,
-      school_id: this.schoolId,
-      school_name: this.schoolName,
+      school: this.school,
       unlimited_duration: this.unlimitedDuration,
       finish_time: !this.unlimitedDuration
         ? new Date(this.finishTime).setHours(23, 59, 59, 999) / 1000
@@ -343,14 +340,6 @@ export default class CourseDetails extends Vue {
   @Emit('emit-cancel')
   onCancel(): void {
     this.reset();
-  }
-
-  @Watch('schoolId')
-  onSchoolIdChanged(newValue: string): void {
-    if (newValue) {
-      return;
-    }
-    this.schoolName = this.searchResultSchools[0].value;
   }
 }
 </script>

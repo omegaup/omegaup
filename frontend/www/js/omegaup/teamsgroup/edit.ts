@@ -21,6 +21,7 @@ export type CsvTeam = types.Identity & { usernames: string };
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.TeamGroupEditPayload();
+  const searchResultSchools: types.SchoolListItem[] = [];
   const teamsGroupEdit = new Vue({
     el: '#main-container',
     components: {
@@ -35,6 +36,7 @@ OmegaUp.on('ready', () => {
       userErrorRow: null,
       searchResultUsers: [] as types.ListItem[],
       isLoading: false,
+      searchResultSchools: searchResultSchools,
     }),
     methods: {
       refreshTeamsList: (): void => {
@@ -69,6 +71,7 @@ OmegaUp.on('ready', () => {
           teamsMembers: this.teamsMembers,
           userErrorRow: this.userErrorRow,
           searchResultUsers: this.searchResultUsers,
+          searchResultSchools: this.searchResultSchools,
           isLoading: this.isLoading,
         },
         on: {
@@ -185,6 +188,27 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'update-search-result-schools': (query: string) => {
+            api.School.list({ query })
+              .then(({ results }) => {
+                if (!results.length) {
+                  this.searchResultSchools = [
+                    {
+                      key: 0,
+                      value: query,
+                    },
+                  ];
+                  return;
+                }
+                this.searchResultSchools = results.map(
+                  ({ key, value }: types.SchoolListItem) => ({
+                    key,
+                    value,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
           'bulk-identities': ({
             identities,
             identitiesTeams,
@@ -221,6 +245,16 @@ OmegaUp.on('ready', () => {
           },
           'invalid-file': () => {
             ui.error(T.groupsInvalidCsv);
+          },
+
+          'update-identity-team': (identity: types.Identity) => {
+            if (identity.school && identity.school_id) {
+              searchResultSchools.splice(0, searchResultSchools.length);
+              searchResultSchools.push({
+                key: identity.school_id,
+                value: identity.school,
+              });
+            }
           },
           'add-members': ({
             teamUsername,

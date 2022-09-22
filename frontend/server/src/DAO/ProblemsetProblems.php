@@ -276,7 +276,10 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     final public static function getByProblemset(int $problemsetId): array {
         // Build SQL statement
         $sql = 'SELECT
-                    *
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\ProblemsetProblems::FIELD_NAMES,
+            'Problemset_Problems'
+        ) . '
                 FROM
                     Problemset_Problems
                 WHERE
