@@ -50,9 +50,11 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
     /**
      * Get the submission feedback where user-id is the person who send the submission
      *
-     * @return array{feedback:string, identity_id:int, submission_feedback_id: int, submission_id: int}|null
+     * @return list<array{feedback:string, identity_id:int, submission_feedback_id: int, submission_id: int}>
      */
-    public static function getAllSubmissionFeedbacks(): ?array {
+    public static function getAllSubmissionFeedbacks(
+        int $problemsetId
+    ) {
         $sql = '
             SELECT
                 sf.`submission_feedback_id`,
@@ -65,13 +67,17 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
                 `Submissions` s
             ON
                 sf.`submission_id` = s.`submission_id`
+            AND
+                sf.`identity_id` = s.`identity_id`
             WHERE
-                sf.`identity_id` = s.`identity_id`;
+                s.`problemset_id` = ?
+                ;
         ';
 
-        /** @var array{feedback: string, identity_id: int, submission_feedback_id: int, submission_id: int}|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
-            $sql
+        /** @var list<array{feedback: string, identity_id: int, submission_feedback_id: int, submission_id: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [ $problemsetId ]
         );
     }
 

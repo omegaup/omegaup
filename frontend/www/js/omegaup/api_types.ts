@@ -5392,10 +5392,6 @@ export namespace messages {
   // Submission
   export type SubmissionSetFeedbackRequest = { [key: string]: any };
   export type SubmissionSetFeedbackResponse = {};
-  export type SubmissionSetFeedbackRequestFeedbackRequest = {
-    [key: string]: any;
-  };
-  export type SubmissionSetFeedbackRequestFeedbackResponse = {};
 
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
@@ -6166,9 +6162,6 @@ export namespace controllers {
     setFeedback: (
       params?: messages.SubmissionSetFeedbackRequest,
     ) => Promise<messages.SubmissionSetFeedbackResponse>;
-    setFeedbackRequestFeedback: (
-      params?: messages.SubmissionSetFeedbackRequestFeedbackRequest,
-    ) => Promise<messages.SubmissionSetFeedbackRequestFeedbackResponse>;
   }
 
   export interface Tag {

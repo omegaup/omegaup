@@ -3227,13 +3227,9 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param string $assignment_alias
-     * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param string $guid
-     * @omegaup-request-param int|null $range_bytes_end
-     * @omegaup-request-param int|null $range_bytes_start
      */
-
     public static function apiRequestFeedback(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
@@ -3293,20 +3289,24 @@ class Course extends \OmegaUp\Controllers\Controller {
             'requestFeedbackMessage'
         );
 
-        ///aqui en ves de mandar llamar la apiset feedback voy a mandar llamar la nueva funcion
-        /// que va a validar que el usuario que realizo la submission sea el mismo que realizo
-        /// el feedback
-        \OmegaUp\Controllers\Submission::apiSetFeedbackRequestFeedback(
-            new \OmegaUp\Request([
-                'auth_token' => $r['auth_token'],
-                'guid' => $guid,
-                'course_alias' => $courseAlias,
-                'assignment_alias' => $assignmentAlias,
-                'feedback' => $feedback,
-            ])
+        $courseSubmissionInfo = \OmegaUp\DAO\Submissions::getCourseSubmissionInfo(
+            $submission,
+            $assignmentAlias,
+            $courseAlias
         );
+        if (is_null($courseSubmissionInfo)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseSubmissionNotFound'
+            );
+        }
 
-        $getSubmissionsFeedback = \OmegaUp\DAO\SubmissionFeedback::getAllSubmissionFeedbacks();
+        \OmegaUp\Controllers\Submission::createFeedback(
+            $r->identity,
+            $submission,
+            $courseSubmissionInfo,
+            $course,
+            $feedback
+        );
 
         $getAllAdministrators = \OmegaUp\DAO\UserRoles::getCourseAdministrators(
             $course
@@ -3337,7 +3337,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
         return [
-            $getSubmissionsFeedback,
             'status' => 'ok',
         ];
     }

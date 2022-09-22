@@ -1672,10 +1672,6 @@ export const Submission = {
     messages.SubmissionSetFeedbackRequest,
     messages.SubmissionSetFeedbackResponse
   >('/api/submission/setFeedback/'),
-  setFeedbackRequestFeedback: apiCall<
-    messages.SubmissionSetFeedbackRequestFeedbackRequest,
-    messages.SubmissionSetFeedbackRequestFeedbackResponse
-  >('/api/submission/setFeedbackRequestFeedback/'),
 };
 
 export const Tag = {
