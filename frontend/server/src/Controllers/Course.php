@@ -3230,7 +3230,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param string $guid
      */
-
     public static function apiRequestFeedback(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
@@ -3276,6 +3275,38 @@ class Course extends \OmegaUp\Controllers\Controller {
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
+
+        $submission = \OmegaUp\DAO\Submissions::getByGuid(
+            $r->ensureString('guid')
+        );
+
+        if (is_null($submission)) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+
+        //save a feedback by default
+        $feedback = \OmegaUp\Translations::getInstance()->get(
+            'requestFeedbackMessage'
+        );
+
+        $courseSubmissionInfo = \OmegaUp\DAO\Submissions::getCourseSubmissionInfo(
+            $submission,
+            $assignmentAlias,
+            $courseAlias
+        );
+        if (is_null($courseSubmissionInfo)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseSubmissionNotFound'
+            );
+        }
+
+        \OmegaUp\Controllers\Submission::createFeedback(
+            $r->identity,
+            $submission,
+            $courseSubmissionInfo,
+            $course,
+            $feedback
+        );
 
         $getAllAdministrators = \OmegaUp\DAO\UserRoles::getCourseAdministrators(
             $course

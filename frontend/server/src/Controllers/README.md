@@ -4018,7 +4018,7 @@ SubmissionController
 
 ### Description
 
-Updates the admin feedback for a submission
+Request feedback
 
 ### Parameters
 
