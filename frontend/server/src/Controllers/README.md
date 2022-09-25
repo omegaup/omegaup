@@ -95,6 +95,7 @@
   - [`/api/course/removeProblem/`](#apicourseremoveproblem)
   - [`/api/course/removeStudent/`](#apicourseremovestudent)
   - [`/api/course/removeTeachingAssistant/`](#apicourseremoveteachingassistant)
+  - [`/api/course/requestFeedback/`](#apicourserequestfeedback)
   - [`/api/course/requests/`](#apicourserequests)
   - [`/api/course/runs/`](#apicourseruns)
   - [`/api/course/searchUsers/`](#apicoursesearchusers)
@@ -2069,6 +2070,24 @@ Removes a teaching assistant from a course
 
 _Nothing_
 
+## `/api/course/requestFeedback/`
+
+### Description
+
+Request feedback
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `guid`             | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/course/requests/`
 
 ### Description
@@ -3999,7 +4018,7 @@ SubmissionController
 
 ### Description
 
-Updates the admin feedback for a submission
+Request feedback
 
 ### Parameters
 
