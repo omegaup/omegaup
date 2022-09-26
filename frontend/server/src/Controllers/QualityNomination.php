@@ -841,9 +841,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r         The request.
      *
      * @return array{status: string}
-     *
-     * @omegaup-request-param string $contents
-     * @omegaup-request-param int $qualitynomination_id
      */
     public static function apiUpdate(\Omegaup\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();

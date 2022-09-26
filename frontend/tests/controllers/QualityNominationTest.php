@@ -532,6 +532,8 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\QualityNomination::apiUpdate(
             new \OmegaUp\Request([
                 'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'quality_tag',
                 'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
                 'contents' => json_encode([
                     'quality_seal' => true,
