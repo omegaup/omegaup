@@ -179,12 +179,6 @@
                       )
                     : $emit('submit-reviewer', tag, qualitySeal)
               "
-              @emit-remove-tag="
-                (alias, tagname) => $emit('remove-tag', alias, tagname)
-              "
-              @emit-add-tag="
-                (alias, tagname) => $emit('add-tag', alias, tagname)
-              "
             ></omegaup-quality-nomination-reviewer-popup>
           </template>
         </omegaup-overlay>

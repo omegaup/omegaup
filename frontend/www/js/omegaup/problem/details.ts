@@ -393,8 +393,8 @@ OmegaUp.on('ready', async () => {
             const contents: { quality_seal?: boolean } = {};
             contents.quality_seal = qualitySeal;
             api.QualityNomination.update({
-              qualitynomination_id,
               contents: JSON.stringify(contents),
+              qualitynomination_id,
             }).catch(ui.apiError);
           },
           'update-search-result-users': ({ query }: { query: string }) => {

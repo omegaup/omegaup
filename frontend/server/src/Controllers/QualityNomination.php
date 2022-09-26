@@ -674,32 +674,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Updates a QualityNominations given an id and contents
-     *
-     * @return array{status: string}
-     *
-     * @omegaup-request-param int $qualitynomination_id
-     * @omegaup-request-param string $contents
-     */
-    public static function apiUpdate(\Omegaup\Request $r): array {
-        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
-
-        // Validate request
-        $r->ensureMainUserIdentity();
-        self::validateMemberOfReviewerGroup($r);
-
-        $qualityNominationId = $r->ensureInt('qualitynomination_id');
-        \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
-
-        \OmegaUp\DAO\QualityNominations::updateQualityNominations(
-            $qualityNominationId,
-            $r['contents']
-        );
-
-        return ['status' => 'ok'];
-    }
-
-    /**
      * Marks a problem of a nomination (only the demotion type supported for now) as (resolved, banned, warning).
      *
      * @return array{status: string}
@@ -857,6 +831,34 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             );
             throw $e;
         }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Updates a QualityNominations given an id and contents
+     *
+     * @param \OmegaUp\Request $r         The request.
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $contents
+     * @omegaup-request-param int $qualitynomination_id
+     */
+    public static function apiUpdate(\Omegaup\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        // Validate request
+        $r->ensureMainUserIdentity();
+        self::validateMemberOfReviewerGroup($r);
+
+        $qualityNominationId = $r->ensureInt('qualitynomination_id');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
+
+        \OmegaUp\DAO\QualityNominations::updateQualityNominations(
+            $qualityNominationId,
+            $r['contents']
+        );
 
         return ['status' => 'ok'];
     }
