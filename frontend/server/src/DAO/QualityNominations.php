@@ -193,12 +193,12 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     /**
      * Returns the quality seal and id of a nomination for a given problem and user.
      *
-     * @return array{quality_seal: bool, qualitynomination_id: int}|null
+     * @return array{quality_seal: mixed, qualitynomination_id: int}|null
      */
     public static function getReviewedData(
         int $problemId,
         int $userId
-    ) {
+    ): ?array {
         $sql = "
             SELECT
                 qn.qualitynomination_id,
