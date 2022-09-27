@@ -1222,29 +1222,29 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             [
                 100,
                 [
-                    ['runs' => 1, 'score' => 40.0],
-                    ['runs' => 2, 'score' => 73.33],
-                    ['runs' => 3, 'score' => 80.0],
+                    ['runs' => 1, 'score' => 0.4],
+                    ['runs' => 2, 'score' => 0.73],
+                    ['runs' => 3, 'score' => 0.8],
                 ],
                 $runsMapping
             ],
             [
                 60,
                 [
-                    ['runs' => 1, 'score' => 40.0],
-                    ['runs' => 2, 'score' => 73.33],
+                    ['runs' => 1, 'score' => 0.4],
+                    ['runs' => 2, 'score' => 0.73],
                     // Only the number of runs should be updated, because of the
                     // contest's settings
-                    ['runs' => 3, 'score' => 73.33],
+                    ['runs' => 3, 'score' => 0.73],
                 ],
                 $runsMapping
             ],
             [
                 100,
                 [
-                    ['runs' => 1, 'score' => 50.0],
-                    ['runs' => 2, 'score' => 83.33],
-                    ['runs' => 3, 'score' => 100.0],
+                    ['runs' => 1, 'score' => 0.5],
+                    ['runs' => 2, 'score' => 0.83],
+                    ['runs' => 3, 'score' => 1.0],
                 ],
                 [
                     [
