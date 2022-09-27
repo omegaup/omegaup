@@ -193,12 +193,12 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     /**
      * Returns the quality seal and id of a nomination for a given problem and user.
      *
-     * @return array{quality_seal: bool, qualitynomination_id: int}|null
+     * @return array{quality_seal: bool, qualitynomination_id: int}
      */
     public static function getReviewedData(
         int $problemId,
         int $userId
-    ): ?array {
+    ): array {
         $sql = "
             SELECT
                 qn.contents,
@@ -211,15 +211,12 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 nomination = 'quality_tag' AND
                 i.identity_id = ? AND
                 qn.problem_id = ?;";
+        $params = [
+            $userId,
+            $problemId,
+        ];
 
-        /** @var array{contents: string, qualitynomination_id: int}|null */
-        $row = \Omegaup\MySQLConnection::getInstance()->GetRow(
-            $sql,
-            [$userId, $problemId]
-        );
-        if (is_null($row)) {
-            return null;
-        }
+        $row = \Omegaup\MySQLConnection::getInstance()->GetRow($sql, $params);
 
         /** @var array{quality_seal: bool} */
         $contents = json_decode($row['contents'], true);
