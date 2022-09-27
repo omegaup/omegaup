@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 ''' Main Plagiairism Detector Script. 
 
 This script gets all the contest that finised in the last 15 minutes and acesses those contests and gets
@@ -10,6 +11,7 @@ Finally it pushes the necessary data to the database
 '''
 
 import argparse
+import boto3
 import calendar
 import collections
 import datetime
@@ -29,6 +31,8 @@ sys.path.insert(
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
+
+_OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
 
 # SQL Queries
@@ -55,10 +59,45 @@ GET_CONTEST_SUBMISSION_IDS= """ SELECT c.contest_id, s.submission_id, s.problems
             /stuff/cron/Submissions/Contest_id/problem_id/language 
 '''
 
+
+def get_submission_files(dbconn: lib.db.Connection) -> None:
+
+    current_directory = os.getcwd()
+    current_directory += "/stuff/cron"
+    final_directory = os.path.join(current_directory, r'temp_directory')
+    if not os.path.exists(final_directory):
+        os.makedirs(final_directory)
+        
+    f = open("stuff/cron/temp_directory/test.log", "w")
+    f.write(_OMEGAUP_ROOT + "/tests/controllers/submissions/" + "\n")
+    f.write(os.listdir(_OMEGAUP_ROOT + "/tests/controllers/submissions/"))
+    f.write("\n" + "finished")
+
+    # session = boto3.Session(
+    #     aws_access_key_id="AKIA2RD4KJNQKME5QDFO",
+    #     aws_secret_access_key="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"
+    #     )
+    # s3 = session.resource('s3')
+    
+    # os.chdir(final_directory)
+    # print(os.getcwd())
+    # for i in range(0, len(submission_ids)):
+    #     if not os.path.exists("problem" + str(submission_ids[i][3])):
+    #         problem_directory = os.path.join(final_directory, "problem" + str(submission_ids[i][3]))
+    #         os.makedirs(problem_directory)
+    #     file_name = submission_ids[i][5] + ".cpp"
+    #     os.chdir("problem" + str(submission_ids[i][3]))
+    #     # s3.Bucket('omegaup-test-mohit').download_file('omegaup/submissions/omi-2021-extremos-020a0f906823c91ec17e968d2c93.cpp', 
+    #     #                                                 file_name)'omegaup/submissions/omi-2021-extremos-020a0f906823c91ec17e968d2c93.cpp', 
+    #     #                                                 file_name)
+    #     os.chdir(final_directory)
+
+    # os.chdir("/opt/omegaup")
 def get_submission_ids(dbconn: lib.db.Connection, contest: int) -> None:
     with dbconn.cursor() as cur:
         cur.execute(GET_CONTEST_SUBMISSION_IDS, (contest,))
         submission_ids = cur.fetchall()
+    get_submission_files(dbconn, submission_ids)
 
 def get_contests(dbconn: lib.db.Connection) -> None:
     with dbconn.cursor() as cur:
@@ -82,10 +121,9 @@ def main() -> None:
 
     logging.info('Started')
     dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
-
     try:
         logging.debug('Debug Start')
-        get_contests(dbconn)
+        get_submission_files(dbconn)
     except:
         logging.exception('Failed to generate Plagiarism Table')
 
