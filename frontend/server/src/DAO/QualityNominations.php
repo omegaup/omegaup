@@ -201,14 +201,14 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     ): ?array {
         $sql = "
             SELECT
-                qn.qualitynomination_id,
-                qn.contents
+                qn.contents,
+                qn.qualitynomination_id
             FROM
                 QualityNominations qn
             INNER JOIN
                 Identities i ON i.user_id = qn.user_id
             WHERE
-                qn.nomination = 'quality_tag' AND
+                nomination = 'quality_tag' AND
                 i.identity_id = ? AND
                 qn.problem_id = ?;";
 
@@ -221,6 +221,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             return null;
         }
 
+        /** @var array{quality_seal: bool} */
         $contents = json_decode($row['contents'], true);
         return [
             'quality_seal' => boolval($contents['quality_seal']),
