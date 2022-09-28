@@ -171,15 +171,23 @@ class User extends \OmegaUp\Controllers\Controller {
             $createUserParams->birthDate,
             'birth_date'
         );
-        if ($createUserParams->birthDate >= strtotime('-13 year', \OmegaUp\Time::get())) {
+        if (
+            $createUserParams->birthDate >= strtotime(
+                '-13 year',
+                \OmegaUp\Time::get()
+            )
+        ) {
             // Fill all the columns refering to user's parent
             $userData['parental_verification_token'] = \OmegaUp\SecurityTools::randomHexString(
                 25
             );
             $userData['creation_timestamp'] =  \OmegaUp\Time::get();
             $userData['parent_email_verification_initial'] = \OmegaUp\Time::get();
-            $userData['parent_email_verification_deadline'] = strtotime('+7 days', \OmegaUp\Time::get());
-    
+            $userData['parent_email_verification_deadline'] = strtotime(
+                '+7 days',
+                \OmegaUp\Time::get()
+            );
+
             $subject = \OmegaUp\Translations::getInstance()->get(
                 'parentEmailSubject'
             );
@@ -189,8 +197,12 @@ class User extends \OmegaUp\Controllers\Controller {
                     'parental_verification_token' => $userData['parental_verification_token'],
                 ]
             );
-    
-            \OmegaUp\Email::sendEmail([$createUserParams->parentEmail], $subject, $body);
+
+            \OmegaUp\Email::sendEmail(
+                [$createUserParams->parentEmail],
+                $subject,
+                $body
+            );
         }
 
         if (!is_null($createUserParams->name)) {
@@ -4596,7 +4608,7 @@ class User extends \OmegaUp\Controllers\Controller {
             }
             throw $e;
         }
-    } 
+    }
 
     /**
      * Returns a list of all the API tokens associated with the user.

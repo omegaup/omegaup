@@ -45,14 +45,6 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'A' . $salt . '2'
             )
         );
-
-        if (isset($params['birth_date'])) {
-            \OmegaUp\Validators::validateNumber(
-                $params['birth_date'],
-                'birth_date'
-            );
-            $this->birthDate = $params['birth_date'];
-        } 
     }
 
     /**
@@ -86,13 +78,6 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             $this->assertEquals('mailInUse', $e->getMessage());
         }
-        if (isset($params['birth_date'])) {
-            \OmegaUp\Validators::validateNumber(
-                $params['birth_date'],
-                'birth_date'
-            );
-            $this->birthDate = $params['birth_date'];
-        } 
     }
 
     /**
@@ -130,12 +115,5 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             $this->assertEquals('mailInUse', $e->getMessage());
         }
-        if (isset($params['birth_date'])) {
-            \OmegaUp\Validators::validateNumber(
-                $params['birth_date'],
-                'birth_date'
-            );
-            $this->birthDate = $params['birth_date'];
-        } 
     }
 }
