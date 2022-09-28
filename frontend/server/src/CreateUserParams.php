@@ -99,14 +99,14 @@ class CreateUserParams {
         $this->gender = $params['gender'] ?? null;
 
         $this->recaptcha = $params['recaptcha'] ?? null;
-        
+
         if (isset($params['birth_date'])) {
             \OmegaUp\Validators::validateNumber(
                 $params['birth_date'],
                 'birth_date'
             );
             $this->birthDate = $params['birth_date'];
-        } 
+        }
 
         if (isset($params['parent_email'])) {
             \OmegaUp\Validators::validateStringNonEmpty(
