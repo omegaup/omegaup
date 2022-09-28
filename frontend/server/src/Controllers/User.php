@@ -167,10 +167,6 @@ class User extends \OmegaUp\Controllers\Controller {
             'verification_id' => \OmegaUp\SecurityTools::randomString(50),
             'is_private' => boolval($createUserParams->isPrivate),
         ];
-        \OmegaUp\Validators::validateNumber(
-            $createUserParams->birthDate,
-            'birth_date'
-        );
         if (
             $createUserParams->birthDate >= strtotime(
                 '-13 year',
