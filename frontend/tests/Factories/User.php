@@ -47,7 +47,7 @@ class UserParams {
 
     /**
      * @readonly
-     * @var int|null
+     * @var int
      */
     public $birthDate;
 

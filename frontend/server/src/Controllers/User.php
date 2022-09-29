@@ -172,6 +172,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 '-13 year',
                 \OmegaUp\Time::get()
             )
+            && !empty($createUserParams->parentEmail)
         ) {
             // Fill all the columns refering to user's parent
             $userData['parental_verification_token'] = \OmegaUp\SecurityTools::randomHexString(
