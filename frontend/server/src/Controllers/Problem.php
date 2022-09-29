@@ -4909,6 +4909,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (is_null($tag->name)) {
                 continue;
             }
+            if ($tag->public == 0) {
+                continue;
+            }
             $tags[] = ['name' => $tag->name];
         }
         return [

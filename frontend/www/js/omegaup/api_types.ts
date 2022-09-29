@@ -1273,6 +1273,45 @@ export namespace types {
                 })(x.courses);
                 return x;
               })(x.past);
+              x.teachingAssistant = ((x) => {
+                x.courses = ((x) => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map((x) => {
+                    x.assignments = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        if (
+                          typeof x.finish_time !== 'undefined' &&
+                          x.finish_time !== null
+                        )
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      });
+                    })(x.assignments);
+                    if (
+                      typeof x.finish_time !== 'undefined' &&
+                      x.finish_time !== null
+                    )
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.teachingAssistant);
               return x;
             })(x.filteredCourses);
             return x;
@@ -2321,6 +2360,7 @@ export namespace types {
         archived: types.CoursesByTimeType;
         current: types.CoursesByTimeType;
         past: types.CoursesByTimeType;
+        teachingAssistant: types.CoursesByTimeType;
       };
     };
   }
@@ -2442,6 +2482,7 @@ export namespace types {
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
     currentAssignment: types.ArenaAssignment;
+    isTeachingAssistant: boolean;
     scoreboard?: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
@@ -3242,9 +3283,10 @@ export namespace types {
 
   export interface CoursesList {
     admin: types.FilteredCourse[];
-    archived?: types.FilteredCourse[];
+    archived: types.FilteredCourse[];
     public: types.FilteredCourse[];
     student: types.FilteredCourse[];
+    teachingAssistant: types.FilteredCourse[];
   }
 
   export interface CurrentSession {
@@ -4978,6 +5020,8 @@ export namespace messages {
   export type CourseRemoveStudentResponse = {};
   export type CourseRemoveTeachingAssistantRequest = { [key: string]: any };
   export type CourseRemoveTeachingAssistantResponse = {};
+  export type CourseRequestFeedbackRequest = { [key: string]: any };
+  export type CourseRequestFeedbackResponse = {};
   export type CourseRequestsRequest = { [key: string]: any };
   export type _CourseRequestsServerResponse = any;
   export type CourseRequestsResponse = { users: types.IdentityRequest[] };
@@ -5813,6 +5857,9 @@ export namespace controllers {
     removeTeachingAssistant: (
       params?: messages.CourseRemoveTeachingAssistantRequest,
     ) => Promise<messages.CourseRemoveTeachingAssistantResponse>;
+    requestFeedback: (
+      params?: messages.CourseRequestFeedbackRequest,
+    ) => Promise<messages.CourseRequestFeedbackResponse>;
     requests: (
       params?: messages.CourseRequestsRequest,
     ) => Promise<messages.CourseRequestsResponse>;

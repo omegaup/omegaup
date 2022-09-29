@@ -938,6 +938,10 @@ export const Course = {
     messages.CourseRemoveTeachingAssistantRequest,
     messages.CourseRemoveTeachingAssistantResponse
   >('/api/course/removeTeachingAssistant/'),
+  requestFeedback: apiCall<
+    messages.CourseRequestFeedbackRequest,
+    messages.CourseRequestFeedbackResponse
+  >('/api/course/requestFeedback/'),
   requests: apiCall<
     messages.CourseRequestsRequest,
     messages._CourseRequestsServerResponse,

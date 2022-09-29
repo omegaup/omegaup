@@ -39,7 +39,7 @@
               :key="language"
               :value="language"
             >
-              {{ getLanguageText(currentLanguage) }}
+              {{ getLanguageText(language) }}
             </option>
           </select>
         </label>

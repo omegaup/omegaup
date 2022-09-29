@@ -90,7 +90,7 @@ OmegaUp.on('ready', () => {
           ): void => {
             const queryParameters = {
               language,
-              query,
+              query: query ?? '',
               order_by: columnName,
               sort_order: sortOrder,
               tag,
