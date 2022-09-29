@@ -109,12 +109,28 @@
         <a v-if="data.source_link" download="data.zip" :href="data.source">{{
           T.wordsDownload
         }}</a>
-        <omegaup-arena-code-view
-          v-else
-          :language="data.language"
-          :readonly="true"
-          :value="data.source"
-        ></omegaup-arena-code-view>
+        <div v-else>
+          <div v-for="(code, index) in splittedCode" :key="index">
+            <omegaup-arena-feedback-code-view
+              :language="data.language"
+              :lines-per-chunk="getLinesPerCode(index)"
+              :enable-feedback="true"
+              :readonly="true"
+              :value="code.code"
+              @show-feedback-form="(line) => onShowFeedbackForm(line)"
+            ></omegaup-arena-feedback-code-view>
+            <omegaup-arena-feedback
+              v-if="index != splittedCode.length - 1"
+              :feedback="{
+                line: code.line,
+                text: null,
+                status: FeedbackStatus.New,
+              }"
+              @submit="onSubmit"
+              @cancel="onCancel"
+            ></omegaup-arena-feedback>
+          </div>
+        </div>
         <div v-if="data.compile_error" class="compile_error">
           <h3>{{ T.wordsCompilerOutput }}</h3>
           <pre class="compile_error">
@@ -174,7 +190,8 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import arena_CodeView from './CodeView.vue';
+import arena_Feedback from './Feedback.vue';
+import arena_FeedbackCodeView from './FeedbackCodeView.vue';
 import arena_DiffView from './DiffView.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
@@ -188,6 +205,18 @@ import {
 library.add(faChevronCircleUp);
 library.add(faChevronCircleDown);
 
+enum FeedbackStatus {
+  New = 'New',
+  InProgress = 'InProgress',
+  Saved = 'Saved',
+}
+
+interface ArenaCourseFeedback {
+  line: number;
+  text: null | string;
+  status: FeedbackStatus;
+}
+
 interface GroupVisibility {
   [name: string]: boolean;
 }
@@ -198,17 +227,94 @@ const EMPTY_FIELD = '∅';
   components: {
     FontAwesomeIcon,
     'clip-loader': ClipLoader,
-    'omegaup-arena-code-view': arena_CodeView,
+    'omegaup-arena-feedback-code-view': arena_FeedbackCodeView,
+    'omegaup-arena-feedback': arena_Feedback,
     'omegaup-arena-diff-view': arena_DiffView,
     'omegaup-overlay-popup': omegaup_OverlayPopup,
   },
 })
 export default class ArenaRunDetailsPopup extends Vue {
   @Prop() data!: types.RunDetails;
+  @Prop({ default: () => [] }) feedbackLines!: number[];
 
   EMPTY_FIELD = EMPTY_FIELD;
   T = T;
+  FeedbackStatus = FeedbackStatus;
   groupVisible: GroupVisibility = {};
+  currentFeedbackLines = this.feedbackLines;
+  feedback: ArenaCourseFeedback[] = [];
+
+  get numberOfLines(): number {
+    const lines = this.data.source?.split('\n') ?? [];
+    return lines.length;
+  }
+
+  get splittedCode(): { code: string; line: number }[] {
+    const ranges: { start: number; end: number }[] = [];
+    let previousLine = -1;
+    const splittedCode: string[][] = [];
+    const splittedCodeString: { code: string; line: number }[] = [];
+    const codeSplittedByLine = this.data.source?.split('\n') ?? [];
+    let start = 0;
+    for (const item of this.currentFeedbackLines) {
+      if (previousLine != -1) {
+        start = previousLine + 1;
+      }
+      const range = { start: start, end: item + 1 };
+      ranges.push(range);
+      previousLine = item;
+      splittedCode.push(codeSplittedByLine.slice(range.start, range.end));
+    }
+
+    if (!splittedCode.length) {
+      splittedCode.push(codeSplittedByLine.splice(0));
+    } else {
+      splittedCode.push(
+        codeSplittedByLine.splice(this.currentFeedbackLines.slice(-1)[0] + 1),
+      );
+    }
+    for (const [index, code] of splittedCode.entries()) {
+      const chunk = code.join('\n');
+      splittedCodeString.push({ code: chunk, line: ranges[index]?.end });
+    }
+    return splittedCodeString;
+  }
+
+  getLinesPerCode(index: number): number[] {
+    let start = 0;
+    let step = 1;
+    const linesPerChunk: number[][] = [];
+    for (const lines of this.currentFeedbackLines) {
+      linesPerChunk.push(this.numberRange(start + 1, lines + 2));
+      start = lines + 1;
+    }
+    if (this.currentFeedbackLines.length) {
+      step = 1;
+    }
+    linesPerChunk.push(this.numberRange(start + 1, this.numberOfLines + step));
+    return linesPerChunk[index];
+  }
+
+  numberRange(start: number, end: number): number[] {
+    return new Array(end - start).fill(0).map((_d, i) => i + start);
+  }
+
+  onShowFeedbackForm(line: number): void {
+    const index = line - 1;
+    if (this.currentFeedbackLines.includes(index)) {
+      return;
+    }
+    this.currentFeedbackLines.push(index);
+    this.currentFeedbackLines.sort((a, b) => a - b);
+  }
+
+  onCancel(index: number): void {
+    this.currentFeedbackLines.splice(index, 1);
+  }
+
+  onSubmit(feedback: ArenaCourseFeedback): void {
+    console.log(`Sending feedback for line ${feedback.line}...`);
+  }
 
   toggle(group: string): void {
     const visible = this.groupVisible[group];

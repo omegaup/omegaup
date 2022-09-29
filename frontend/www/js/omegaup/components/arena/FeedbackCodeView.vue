@@ -1,43 +1,13 @@
 <template>
-  <div data-feedback-code-mirror class="container-fluid">
-    <div class="d-flex flex-nowrap">
-      <div v-if="enableFeedback" class="gutter flex-nowrap">
-        <div
-          v-for="line in linesPerChunk"
-          :key="line"
-          class="line-number d-flex flex-nowrap"
-          @mouseover="hover = line"
-          @mouseleave="hover = null"
-        >
-          <div class="number">
-            {{ line }}
-          </div>
-          <div class="add-button">
-            <button
-              :data-button-line="line"
-              class="btn btn-xs text-weight-bold btn-primary"
-              :hidden="hover != line"
-              @click.prevent="onPressLine(line)"
-            >
-              +
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="code">
-        <codemirror-editor
-          :options="editorOptions"
-          :value="value"
-        ></codemirror-editor>
-      </div>
-    </div>
+  <div class="container-fluid">
+    <textarea data-feedback-code-mirror></textarea>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
-import { codemirror } from 'vue-codemirror-lite';
+import CodeMirror from 'codemirror';
 import { EditorOptions, languageModeMap, modeList } from './CodeView.vue';
 
 for (const mode of modeList) {
@@ -45,9 +15,7 @@ for (const mode of modeList) {
 }
 
 @Component({
-  components: {
-    'codemirror-editor': codemirror,
-  },
+  components: {},
 })
 export default class FeedbackCodeView extends Vue {
   @Prop() language!: string;
@@ -62,9 +30,36 @@ export default class FeedbackCodeView extends Vue {
   get editorOptions(): EditorOptions {
     return {
       tabSize: 2,
-      lineNumbers: false,
+      lineNumbers: true,
       mode: this.mode,
-      readOnly: true,
+      readOnly: false,
+      value: this.value,
+      gutters: ['CodeMirror-linenumbers', 'breakpoints'],
+    };
+  }
+
+  mounted() {
+    const editor = CodeMirror.fromTextArea(
+      document.querySelector(
+        '[data-feedback-code-mirror]',
+      ) as HTMLTextAreaElement,
+      this.editorOptions,
+    );
+    editor.on('gutterClick', (codeMirror, numberOfLine) => {
+      const info = codeMirror.lineInfo(numberOfLine);
+      codeMirror.setGutterMarker(
+        numberOfLine,
+        'breakpoints',
+        info.gutterMarkers ? null : makeMarker(numberOfLine),
+      );
+    });
+
+    const makeMarker = (numberOfLine: number): HTMLDivElement => {
+      this.onPressLine(numberOfLine);
+      const marker = document.createElement('div');
+      marker.style.color = '#822';
+      marker.innerHTML = '●';
+      return marker;
     };
   }
 
