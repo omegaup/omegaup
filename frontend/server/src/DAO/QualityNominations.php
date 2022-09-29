@@ -209,20 +209,28 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 Identities i ON i.user_id = qn.user_id
             WHERE
                 nomination = 'quality_tag' AND
-                i.identity_id = ? AND
+                i.user_id = ? AND
                 qn.problem_id = ?;";
         $params = [
             $userId,
             $problemId,
         ];
 
+        /** @var array{contents: string, qualitynomination_id: int}|null */
         $row = \Omegaup\MySQLConnection::getInstance()->GetRow($sql, $params);
+
+        if (is_null($row)) {
+            return [
+                'quality_seal' => false,
+                'qualitynomination_id' => 0,
+            ];
+        }
 
         /** @var array{quality_seal: bool} */
         $contents = json_decode($row['contents'], true);
         return [
             'quality_seal' => boolval($contents['quality_seal']),
-            'qualitynomination_id' => intval($row['qualitynomination_id'])
+            'qualitynomination_id' => intval($row['qualitynomination_id']),
         ];
     }
 
