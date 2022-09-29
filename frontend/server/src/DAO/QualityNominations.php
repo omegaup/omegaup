@@ -217,7 +217,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         ];
 
         /** @var array{contents: string, qualitynomination_id: int}|null */
-        $row = \Omegaup\MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
 
         if (is_null($row)) {
             return [
