@@ -67,10 +67,9 @@ class CreateUserParams {
      * @var null|string
      */
     public $parentEmail = null;
-
-      /**
-     * @param array{username?: string, name?: string, email?: string, password?: string, scholar_degree?: string, is_private?: string, gender?: string, recaptcha?: string, birth_date: int, parent_email?: string} $params
-     */
+    /*
+    * @param array{username?: string, name?: string, email?: string, password?: string, scholar_degree?: string, is_private?: string, gender?: string, recaptcha?: string, birth_date?: int, parent_email?: string} $params
+    */
     public function __construct($params = []) {
         \OmegaUp\Validators::validateValidUsername(
             $params['username'] ?? null,
