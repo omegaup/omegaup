@@ -2,6 +2,10 @@
 
 namespace OmegaUp\Controllers;
 
+use Cassandra\Tinyint;
+use Google_Service_Games_TurnBasedMatch;
+use phpDocumentor\Reflection\Types\Boolean;
+
 /**
  *  UserController
  *
@@ -4640,6 +4644,44 @@ class User extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\APITokens::deleteByName($r->user->user_id, $name);
         return ['status' => 'ok'];
     }
+    /*
+    * @omegaup-request-param null|string $username
+    */
+    public static function getVerificationParentalTokenDetailsForTypeScript(\OmegaUp\Request $r){
+        $r->ensureIdentity();
+        $user = self::resolveTargetUser($r);
+        $userData = \OmegaUp\DAO\Users::getUserDataByParentalToken(
+            $token
+        );
+        if(is_null($userData['parental_verification_token'])){
+            throw new \OmegaUp\Exceptions\NotFoundException('tokenNotFound');
+           }
+        $userData['parent_verified'] = true;
+        $userData['parent_email_id'] = $user->main_email_id;
+
+    }
+
+
+    public static function getUserDataByParentalToken(string $token) {
+     
+        $sql = 'SELECT
+                  u.user_id,
+                  i.identity_id,
+                  i.username
+                FROM
+                    Users u
+                INNER JOIN
+                    Identities i ON u.main_identity_id = i.identity_id
+                WHERE
+                  parental_verification_token = ?
+                LIMIT 1';
+
+        /** @var array{identity_id: int, user_id: int, username: string}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$token]
+        );      
+     }
 }
 
 \OmegaUp\Controllers\User::$urlHelper = new \OmegaUp\UrlHelper();
