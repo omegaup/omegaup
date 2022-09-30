@@ -520,6 +520,20 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $reviewerLogin = self::login(
             \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
         );
+
+        $getReviewedDataReviewer = \OmegaUp\DAO\QualityNominations::getReviewedData(
+            $problemData['problem']->problem_id,
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id
+        );
+        $this->assertEquals(
+            false,
+            $getReviewedDataReviewer['quality_seal'],
+        );
+        $this->assertEquals(
+            0,
+            $getReviewedDataReviewer['qualitynomination_id'],
+        );
+
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -541,6 +555,11 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
+        $getReviewedDataReviewer = \OmegaUp\DAO\QualityNominations::getReviewedData(
+            $problemData['problem']->problem_id,
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id
+        );
+
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
@@ -549,6 +568,14 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             true,
             $details['contents']['quality_seal'],
+        );
+        $this->assertEquals(
+            true,
+            $getReviewedDataReviewer['quality_seal'],
+        );
+        $this->assertEquals(
+            $details['qualitynomination_id'],
+            $getReviewedDataReviewer['qualitynomination_id'],
         );
     }
 
