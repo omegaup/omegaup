@@ -10,6 +10,7 @@
           v-if="button"
           class="btn btn-primary mb-3"
           :href="button.href"
+          :target="button.target"
           role="button"
         >
           {{ button.text[T.locale] }}
@@ -38,6 +39,7 @@ export default class Slide extends Vue {
       pt: string;
     };
     href: string;
+    target: strign;
   };
 
   T = T;
