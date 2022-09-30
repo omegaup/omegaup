@@ -4605,40 +4605,48 @@ class User extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\APITokens::deleteByName($r->user->user_id, $name);
         return ['status' => 'ok'];
     }
-     /*
-    * @omegaup-request-param null|string $username
-    */
-    public static function getVerificationParentalTokenDetailsForTypeScript(\OmegaUp\Request $r) {
+   
+     /**
+     * @return array{entrypoint: string, templateProperties: array{payload: VerificationParentalTokenDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $token
+     */
+    public static function getVerificationParentalTokenDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
         $r->ensureIdentity();
-        $user = self::resolveTargetUser($r);
+
+        $token = $r->ensureString('token');
+
         $userData = \OmegaUp\DAO\Users::getUserDataByParentalToken(
             $token
         );
-        if (is_null($userData['parental_verification_token'])) {
+
+        if(is_null($userData) || is_null($userData['parental_verification_token'])){
             throw new \OmegaUp\Exceptions\NotFoundException('tokenNotFound');
         }
-        $userData['parent_verified'] = true;
-        $userData['parent_email_id'] = $user->main_email_id;
-    }
 
-    public static function getUserDataByParentalToken(string $token) {
-        $sql = 'SELECT
-                  u.user_id,
-                  i.identity_id,
-                  i.username
-                FROM
-                    Users u
-                INNER JOIN
-                    Identities i ON u.main_identity_id = i.identity_id
-                WHERE
-                  parental_verification_token = ?
-                LIMIT 1';
+        $user = \OmegaUp\DAO\Users::getByPK($userData['user_id']);
+    
+        try {
+            $user->parent_verified = true;
+            $user->parent_email_id = $r->user->main_email_id;
+            \OmegaUp\DAO\Users::update($user);
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            self::$log->info("Unable to save parental token verification: $e");
+        }
 
-        /** @var array{identity_id: int, user_id: int, username: string}|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
-            $sql,
-            [$token]
-        );
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'parentalVerificationTokenSuccessfully' => \OmegaUp\Translations::getInstance()->get(
+                        'parentalVerificationTokenSuccessfully'
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString('omegaupTitleParentalVerificationToken'),
+            ],
+            'entrypoint' => 'user_verification_parental_token',
+        ];
     }
 }
 
