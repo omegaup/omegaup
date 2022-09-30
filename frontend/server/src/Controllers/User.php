@@ -4608,23 +4608,20 @@ class User extends \OmegaUp\Controllers\Controller {
      /*
     * @omegaup-request-param null|string $username
     */
-    public static function getVerificationParentalTokenDetailsForTypeScript(\OmegaUp\Request $r){
+    public static function getVerificationParentalTokenDetailsForTypeScript(\OmegaUp\Request $r) {
         $r->ensureIdentity();
         $user = self::resolveTargetUser($r);
         $userData = \OmegaUp\DAO\Users::getUserDataByParentalToken(
             $token
         );
-        if(is_null($userData['parental_verification_token'])){
+        if (is_null($userData['parental_verification_token'])) {
             throw new \OmegaUp\Exceptions\NotFoundException('tokenNotFound');
-           }
+        }
         $userData['parent_verified'] = true;
         $userData['parent_email_id'] = $user->main_email_id;
-
     }
 
-
     public static function getUserDataByParentalToken(string $token) {
-
         $sql = 'SELECT
                   u.user_id,
                   i.identity_id,
@@ -4641,8 +4638,8 @@ class User extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$token]
-        );      
-     }
+        );
+    }
 }
 
 \OmegaUp\Controllers\User::$urlHelper = new \OmegaUp\UrlHelper();
