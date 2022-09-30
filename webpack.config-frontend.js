@@ -106,6 +106,7 @@ module.exports = {
     user_profile: './frontend/www/js/omegaup/user/profile.ts',
     user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.ts',
     users_rank: './frontend/www/js/omegaup/user/rank.ts',
+    user_verification_parental_token: './frontend/www/js/omegaup/user/verification_parental_token.ts',
   },
 
   output: {
