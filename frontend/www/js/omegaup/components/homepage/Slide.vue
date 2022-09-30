@@ -39,7 +39,7 @@ export default class Slide extends Vue {
       pt: string;
     };
     href: string;
-    target: strign;
+    target: string;
   };
 
   T = T;
