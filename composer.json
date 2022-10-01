@@ -27,7 +27,7 @@
     "psr-4": {"OmegaUp\\": "frontend/server/src"}
   },
   "require": {
-    "google/apiclient": "^v1.1.9",
+    "google/apiclient": "^v2.12.6",
     "league/oauth2-facebook": "^2.0",
     "monolog/monolog": "^2.3",
     "newrelic/monolog-enricher": "^2.0",
