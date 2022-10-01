@@ -4008,7 +4008,9 @@ contestant's machine and the server.
 
 | Name                | Type      |
 | ------------------- | --------- |
+| `email`             | `string`  |
 | `isAccountCreation` | `boolean` |
+| `username`          | `string`  |
 
 # Submission
 

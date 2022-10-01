@@ -775,6 +775,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleQualityNominationList: "Problem report list",
   omegaupTitleQualityNominationMyList: "My problem report list",
   omegaupTitleRecoverPassword: "Recover your password",
+  omegaupTitleRegister: "Register user",
   omegaupTitleSchoolOfTheMonth: "Schools of the Month",
   omegaupTitleSchoolProfile: "School Profile",
   omegaupTitleSchoolsRank: "School ranking",

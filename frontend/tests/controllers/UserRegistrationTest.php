@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Testing new user special cases
  */
@@ -30,9 +28,19 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create collision
-        \OmegaUp\Controllers\Session::LoginViaGoogle('A' . $salt . '@isp1.com');
-        \OmegaUp\Controllers\Session::LoginViaGoogle('A' . $salt . '@isp2.com');
-        \OmegaUp\Controllers\Session::LoginViaGoogle('A' . $salt . '@isp3.com');
+        foreach (range(0, 2) as $id) {
+            $username = "A{$salt}";
+            $iterator = $id + 1;
+            $domain = "@isp{$iterator}.com";
+            $email = "{$username}{$domain}";
+            $userData = \OmegaUp\Controllers\Session::LoginViaGoogle($email);
+            \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
+                'username' => $userData['username'],
+                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'email' => $email,
+                'permission_key' => \OmegaUp\Controllers\User::$permissionKey
+            ]));
+        }
 
         $this->assertNotNull(\OmegaUp\DAO\Users::FindByUsername('A' . $salt));
         $this->assertNotNull(
@@ -52,13 +60,22 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUserLoggedViaGoogleAndThenNativeMode() {
         $username = 'X' . \OmegaUp\Time::get();
+        $email = $username . '@isp.com';
         $password = \OmegaUp\Test\Utils::createRandomString();
 
-        \OmegaUp\Controllers\Session::LoginViaGoogle($username . '@isp.com');
+        \OmegaUp\Controllers\Session::LoginViaGoogle($email);
+
+        \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
+            'username' => $username,
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'email' => $email,
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
+        ]));
+
         $identity = \OmegaUp\DAO\Identities::findByUsername($username);
 
         // Users logged via google, facebook
-        $this->assertNull($identity->password);
+        $this->assertNotNull($identity->password);
 
         // Inflate request
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
@@ -71,7 +88,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             // Try to create new user
-            $response = \OmegaUp\Controllers\User::apiCreate($r);
+            \OmegaUp\Controllers\User::apiCreate($r);
             $this->fail(
                 'User should have not been able to be created because the email already exists in the data base'
             );
@@ -89,6 +106,15 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $email = $username . '@isp.com';
 
         \OmegaUp\Controllers\Session::LoginViaGoogle($email);
+
+        // Now, we need to create the account appart
+        \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
+            'username' => $username,
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'email' => $email,
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
+        ]));
+
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
         $identity = \OmegaUp\DAO\Identities::FindByUserId($user->user_id);
         $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
@@ -108,7 +134,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             // Call API
-            $response = \OmegaUp\Controllers\User::apiCreate($r);
+            \OmegaUp\Controllers\User::apiCreate($r);
             $this->fail(
                 'User should have not been able to be created because the email already exists in the data base'
             );

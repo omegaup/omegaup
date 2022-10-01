@@ -106,6 +106,7 @@ rewrite ^/teamsgroup/([a-zA-Z0-9_+:-]+)/edit/?$ /teamsgroup/edit.php?team_group_
 rewrite ^/teamsgroup/?$ /teamsgroup/list.php last;
 rewrite ^/user/emailedit/([a-zA-Z0-9_]+)/?$ /users/emailedit.php?username=$1 last;
 rewrite ^/user/emailedit/?$ /users/emailedit.php last;
+rewrite ^/user/register/username/([a-zA-Z0-9_+\/=.]+)/email/([a-zA-Z0-9_+\/=.]+)/?$ /users/register.php?username=$1&email=$2 last;
 rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/?$ /userverifyemail.php?id=$1 last;
 
 # libinteractive templates

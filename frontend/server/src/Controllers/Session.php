@@ -503,7 +503,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param string $storeToken
      *
-     * @return array{isAccountCreation: bool}
+     * @return array{isAccountCreation: bool, username?: string, email?: string}
      */
     public static function apiGoogleLogin(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -516,38 +516,30 @@ class Session extends \OmegaUp\Controllers\Controller {
         $client->setClientSecret(OMEGAUP_GOOGLE_SECRET);
 
         try {
-            $loginTicket = $client->verifyIdToken($r['storeToken']);
-        } catch (\Google_Auth_Exception $ge) {
+            /** @var array{email: string, email_verified: int, name?: string, picture: string, locale: string} */
+            $payload = $client->verifyIdToken($r['storeToken']);
+
+            // payload will have a superset of:
+            //    [email] => johndoe@gmail.com
+            //    [email_verified] => 1
+            //    [name] => Alan Gonzalez
+            //    [picture] => https://lh3.googleusercontent.com/-zrLvBe-AU/AAAAAAAAAAI/AAAAAAAAATU/hh0yUXEisCI/photo.jpg
+            //    [locale] => en
+        } catch (\Exception $ge) {
             throw new \OmegaUp\Exceptions\UnauthorizedException(
                 'loginRequired',
                 $ge
             );
         }
 
-        /** @var array{email: string, email_verified: int, name?: string, picture: string, locale: string} */
-        $payload = $loginTicket->getAttributes()['payload'];
-
-        // payload will have a superset of:
-        //    [email] => johndoe@gmail.com
-        //    [email_verified] => 1
-        //    [name] => Alan Gonzalez
-        //    [picture] => https://lh3.googleusercontent.com/-zrLvBe-AU/AAAAAAAAAAI/AAAAAAAAATU/hh0yUXEisCI/photo.jpg
-        //    [locale] => en
-
-        return self::LoginViaGoogle(
-            $payload['email'],
-            (isset($payload['name']) ? $payload['name'] : null)
-        );
+        return self::LoginViaGoogle($payload['email']);
     }
 
     /**
-     * @return array{isAccountCreation: bool}
+     * @return array{isAccountCreation: bool, username?: string, email?: string}
      */
-    public static function LoginViaGoogle(
-        string $email,
-        ?string $name = null
-    ): array {
-        return self::thirdPartyLogin('Google', $email, $name);
+    public static function LoginViaGoogle(string $email): array {
+        return self::thirdPartyLogin('Google', $email);
     }
 
     /**
@@ -590,8 +582,7 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\Controllers\Session::thirdPartyLogin(
             'Facebook',
-            strval($fbUserProfile->getEmail()),
-            $fbUserProfile->getName()
+            strval($fbUserProfile->getEmail())
         );
 
         self::redirect();
@@ -761,49 +752,32 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{isAccountCreation: bool}
+     * @return array{isAccountCreation: bool, username?: string, email?: string}
      */
     private static function thirdPartyLogin(
         string $provider,
-        string $email,
-        ?string $name = null
+        string $email
     ): array {
         // We trust this user's identity
         self::$log->info("User is logged in via $provider");
         $results = \OmegaUp\DAO\Identities::findByEmail($email);
         $isAccountCreation = true;
-        if (!is_null($results)) {
-            self::$log->info("User has been here before with $provider");
-            $identity = $results;
-            $isAccountCreation = false;
-        } else {
-            // The user has never been here before, let's register them
-            self::$log->info("LoginVia$provider: Creating new user for $email");
+        if (is_null($results)) {
+            self::$log->info("Preparing user to be created via $provider");
 
             $username = self::getUniqueUsernameFromEmail($email);
 
-            try {
-                \OmegaUp\Controllers\User::createUser(
-                    new \OmegaUp\CreateUserParams([
-                        'name' => (!is_null($name) ? $name : $username),
-                        'username' => $username,
-                        'email' => $email,
-                    ]),
-                    ignorePassword: true,
-                    forceVerification: true
-                );
-            } catch (\OmegaUp\Exceptions\ApiException $e) {
-                self::$log->error(
-                    'Unable to login via provider',
-                    ['provider' => $provider, 'exception' => $e],
-                );
-                throw $e;
-            }
-            $identity = \OmegaUp\DAO\Identities::findByUsername($username);
-            if (is_null($identity)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-            }
+            return [
+                'isAccountCreation' => $isAccountCreation,
+                'username' => $username,
+                'email' => $email,
+            ];
         }
+
+        self::$log->info("User has been here before with $provider");
+        $identity = $results;
+        $isAccountCreation = false;
+
         if (is_null($identity->username) || is_null($identity->user_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }

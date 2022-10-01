@@ -10,11 +10,12 @@
             <div class="form-group">
               <label class="control-label">{{ T.wordsUser }}</label>
               <input
-                v-model="username"
+                v-model="currentUsername"
                 data-signup-username
                 name="reg_username"
                 class="form-control"
                 autocomplete="username"
+                :disabled="username != null"
               />
             </div>
           </div>
@@ -22,12 +23,13 @@
             <div class="form-group">
               <label class="control-label">{{ T.loginEmail }}</label>
               <input
-                v-model="email"
+                v-model="currentEmail"
                 data-signup-email
                 name="reg_email"
                 type="email"
                 class="form-control"
                 autocomplete="email"
+                :disabled="email != null"
               />
             </div>
           </div>
@@ -87,8 +89,8 @@
                 @click.prevent="
                   $emit(
                     'register-and-login',
-                    username,
-                    email,
+                    currentUsername,
+                    currentEmail,
                     password,
                     passwordConfirmation,
                     recaptchaResponse,
@@ -117,10 +119,12 @@ import T from '../../lang';
 })
 export default class Signup extends Vue {
   @Prop() validateRecaptcha!: boolean;
+  @Prop({ default: null }) username!: null | string;
+  @Prop({ default: null }) email!: null | string;
 
   T = T;
-  username: string = '';
-  email: string = '';
+  currentUsername = this.username;
+  currentEmail = this.email;
   password: string = '';
   passwordConfirmation: string = '';
   recaptchaResponse: string = '';
