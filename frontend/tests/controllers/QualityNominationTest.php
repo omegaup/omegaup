@@ -525,10 +525,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData['problem']->problem_id,
             \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id
         );
-        $this->assertEquals(
-            false,
-            $getReviewedDataReviewer['quality_seal'],
-        );
+        $this->assertFalse($getReviewedDataReviewer['quality_seal']);
         $this->assertEquals(
             0,
             $getReviewedDataReviewer['qualitynomination_id'],
@@ -565,14 +562,8 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
         ]));
 
-        $this->assertEquals(
-            true,
-            $details['contents']['quality_seal'],
-        );
-        $this->assertEquals(
-            true,
-            $getReviewedDataReviewer['quality_seal'],
-        );
+        $this->assertTrue($details['contents']['quality_seal']);
+        $this->assertTrue($getReviewedDataReviewer['quality_seal']);
         $this->assertEquals(
             $details['qualitynomination_id'],
             $getReviewedDataReviewer['qualitynomination_id'],
