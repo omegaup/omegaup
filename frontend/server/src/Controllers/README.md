@@ -4020,7 +4020,7 @@ SubmissionController
 
 ### Description
 
-Request feedback
+Updates the admin feedback for a submission
 
 ### Parameters
 
