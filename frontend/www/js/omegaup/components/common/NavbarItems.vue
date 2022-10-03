@@ -218,6 +218,8 @@ export default class NavbarItems extends Vue {
   @Prop() navbarSection!: string;
 
   T = T;
+  birthDate: null | Date = null;
+  
 
     get userAge(): number | null {
     if (this.birthDate === null) {
