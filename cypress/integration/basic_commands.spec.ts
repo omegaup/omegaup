@@ -100,7 +100,7 @@ describe('Basic Commands Test', () => {
       courseAlias: uuid().slice(0, 10),
       showScoreboard: true,
       startDate: now,
-      endDate: addSubtractDaysToDate(now, {days: 1}),
+      endDate: addSubtractDaysToDate(now, { days: 1 }),
       unlimitedDuration: false,
       school: 'Escuela curso',
       basicInformation: false,
@@ -269,8 +269,8 @@ describe('Basic Commands Test', () => {
   const contestOptions: ContestOptions = {
     contestAlias: 'contest' + uuid().slice(0, 5),
     description: 'Test Description',
-    startDate: addSubtractDaysToDate(now, {days: -1}),
-    endDate: addSubtractDaysToDate(now, {days: 2}),
+    startDate: addSubtractDaysToDate(now, { days: -1 }),
+    endDate: addSubtractDaysToDate(now, { days: 2 }),
     showScoreboard: true,
     basicInformation: false,
     partialPoints: true,
@@ -297,7 +297,7 @@ describe('Basic Commands Test', () => {
         language: 'cpp11-gcc',
         valid: false,
       },
-    ]
+    ],
   };
   const loginOptions: LoginOptions = {
     username: 'omegaup',
@@ -321,9 +321,7 @@ describe('Basic Commands Test', () => {
       'have.value',
       getISODateTime(contestOptions.startDate),
     );
-    cy.get('[data-end-date]').type(
-      getISODateTime(contestOptions.endDate),
-    );
+    cy.get('[data-end-date]').type(getISODateTime(contestOptions.endDate));
     cy.get('[data-show-scoreboard-at-end]').should(
       'have.value',
       `${contestOptions.showScoreboard}`,
@@ -347,26 +345,25 @@ describe('Basic Commands Test', () => {
     cy.changeAdmissionModeContest(contestOptions);
 
     cy.get('a[href="/logout/"]:last').click();
-    cy.waitUntil(() =>
-      cy.url().should('eq', 'http://127.0.0.1:8001/'),
-    );
+    cy.waitUntil(() => cy.url().should('eq', 'http://127.0.0.1:8001/'));
 
     // Mocking date 2 hours before to test timeRemote is working correctly.
-    cy.clock(new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      now.getHours() - 2,
-      now.getMinutes(),
-      now.getSeconds(),
-    ), ['Date']);
+    cy.clock(
+      new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        now.getHours() - 2,
+        now.getMinutes(),
+        now.getSeconds(),
+      ),
+      ['Date'],
+    );
     cy.get('[data-login-button]').click();
     cy.get('[data-login-username]').type('user');
     cy.get('[data-login-password]').type('user');
     cy.get('[data-login-submit]').click();
-    cy.waitUntil(() =>
-      cy.get('header .username').should('have.text', 'user'),
-    );
+    cy.waitUntil(() => cy.get('header .username').should('have.text', 'user'));
 
     cy.enterContest(contestOptions);
     cy.createRunsInsideContest(contestOptions);
