@@ -5,7 +5,7 @@
         <h1 class="card-title">{{ T.collectionTitle }}</h1>
       </div>
       <div class="col-md-5 text-right align-self-end">
-        <a class="btn btn-primary" href="/problem/" data-nav-problems-all>{{
+        <a v-if="userAge > 13" class="btn btn-primary" href="/problem/" data-nav-problems-all>{{
           T.navAllProblems
         }}</a>
       </div>
@@ -137,6 +137,7 @@ import { types } from '../../api_types';
 import * as ui from '../../ui';
 import problem_Collection from './CollectionProblem.vue';
 import problem_FinderWizard from './FinderWizard.vue';
+import * as time from '../../time';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -190,6 +191,7 @@ export default class Collection extends Vue {
   T = T;
   ui = ui;
   showFinderWizard = false;
+  birthDate: null | Date = null;
 
   getProblemLevelIcon(problemLevel: string): string {
     if (Object.prototype.hasOwnProperty.call(problemLevelIcons, problemLevel))
@@ -199,6 +201,13 @@ export default class Collection extends Vue {
 
   getName(alias: string): string {
     return T[alias];
+  }
+
+      get userAge(): number | null {
+    if (this.birthDate === null) {
+      return null;
+    }
+    return time.getDifferenceInCalendarYears(this.birthDate);
   }
 }
 </script>
