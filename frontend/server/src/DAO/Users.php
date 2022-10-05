@@ -447,4 +447,22 @@ class Users extends \OmegaUp\DAO\Base\Users {
 
         return boolval($count);
     }
+        public static function getUserDataByParentalToken(string $token): ?int {
+            $sql = 'SELECT
+                      u.user_id
+                    FROM
+                        Users u
+                    INNER JOIN
+                        Identities i ON u.main_identity_id = i.identity_id
+                    WHERE
+                      parental_verification_token = ?
+                    LIMIT 1';
+    
+            /** @var int|null */
+            return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+                $sql,
+                [$token]
+            );
+    
+    }
 }
