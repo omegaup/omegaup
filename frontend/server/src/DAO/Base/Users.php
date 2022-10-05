@@ -483,24 +483,4 @@ abstract class Users {
 
         return $affectedRows;
     }
-    
-    public static function getUserDataByParentalToken(string $token) {
-        $sql = 'SELECT
-                  u.user_id,
-                  i.identity_id,
-                  i.username
-                FROM
-                    Users u
-                INNER JOIN
-                    Identities i ON u.main_identity_id = i.identity_id
-                WHERE
-                  parental_verification_token = ?
-                LIMIT 1';
-
-        /** @var array{identity_id: int, user_id: int, username: string}|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
-            $sql,
-            [$token]
-        );
-    }
 }

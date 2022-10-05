@@ -3454,6 +3454,7 @@ export namespace types {
       female?: types.UserProfile;
     };
     currentUserInfo: { username?: string };
+    parentalVerificationToken: boolean;
     schoolOfTheMonthData?: {
       country?: string;
       country_id?: string;

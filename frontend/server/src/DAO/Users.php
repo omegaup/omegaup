@@ -447,8 +447,8 @@ class Users extends \OmegaUp\DAO\Base\Users {
 
         return boolval($count);
     }
-        public static function getUserDataByParentalToken(string $token): ?int {
-            $sql = 'SELECT
+    public static function getUserDataByParentalToken(string $token): ?int {
+        $sql = 'SELECT
                       u.user_id
                     FROM
                         Users u
@@ -457,12 +457,11 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     WHERE
                       parental_verification_token = ?
                     LIMIT 1';
-    
-            /** @var int|null */
-            return \OmegaUp\MySQLConnection::getInstance()->GetOne(
-                $sql,
-                [$token]
-            );
-    
+
+        /** @var int|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$token]
+        );
     }
 }

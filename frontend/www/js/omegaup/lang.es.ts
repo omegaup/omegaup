@@ -810,6 +810,8 @@ const translations: { [key: string]: string; } = {
   parameterStringTooLong: "La longitud de la cadena no debe exceder %(max_length) caracteres",
   parameterStringTooShort: "La longitud de la cadena debe ser al menos %(min_length) caracteres",
   parameterUsernameInUse: "El nombre de usuario ya fue tomado",
+  parentalTokenNotFound: "El token parental no fue encontrado",
+  parentalTokenVerificationSuccessful: "El token parental fue vaildado correctamente",
   passwordAddRequestSuccess: "Se ha agregado tu contrase\u00f1a.",
   passwordCopyToken: "Copiar token",
   passwordGenerateToken: "Generar token",
