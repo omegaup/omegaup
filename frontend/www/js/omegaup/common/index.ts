@@ -35,7 +35,6 @@ OmegaUp.on('ready', () => {
           coderOfTheMonthFemale: payload.coderOfTheMonthData
             ? payload.coderOfTheMonthData.female
             : null,
-          parentalVerificationToken: payload.parentalVerificationToken,
           currentUserInfo: payload.currentUserInfo,
           rankTable: {
             page: 1,
