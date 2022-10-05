@@ -57,19 +57,8 @@ class CreateUserParams {
     public $recaptcha = null;
 
     /**
-     * @readonly
-     * @var int|null
+     * @param array{username?: string, name?: string, email?: string, password?: string, scholar_degree?: string, is_private?: string, gender?: string, recaptcha?: string} $params
      */
-    public $birthDate = null;
-
-     /**
-     * @readonly
-     * @var null|string
-     */
-    public $parentEmail = null;
-    /*
-    * @param array{username?: string, name?: string, email?: string, password?: string, scholar_degree?: string, is_private?: string, gender?: string, recaptcha?: string, birth_date?: int, parent_email?: string} $params
-    */
     public function __construct($params = []) {
         \OmegaUp\Validators::validateValidUsername(
             $params['username'] ?? null,
@@ -98,13 +87,5 @@ class CreateUserParams {
         $this->gender = $params['gender'] ?? null;
 
         $this->recaptcha = $params['recaptcha'] ?? null;
-
-        if (isset($params['birth_date'])) {
-            $this->birthDate = intval($params['birth_date']);
-        }
-
-        if (isset($params['parent_email'])) {
-            $this->parentEmail = $params['parent_email'];
-        }
     }
 }
