@@ -3946,6 +3946,42 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
         );
 
+        $token = $r->ensureOptionalString(
+            'token',
+            required: false,
+            validator: fn (string $token) => preg_match('/^[a-zA-Z0-9]{25}$/', $token) === 1
+        );
+        $parentalVerificationToken = false;
+
+        if (!is_null($token)) {
+            $userId = \OmegaUp\DAO\Users::getUserDataByParentalToken($token);
+
+            if (is_null($userId)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'parentalTokenNotFound'
+                );
+            }
+
+            if (is_null($r->user) || is_null($r->user->main_email_id)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+            }
+
+            $user = \OmegaUp\DAO\Users::getByPK($userId);
+
+            try {
+                $user->parent_email_id = $r->user->main_email_id;
+                $user->parent_verified = true;
+                $user->parental_verification_token = null;
+
+                \OmegaUp\DAO\Users::update($user);
+                $parentalVerificationToken = true;
+            } catch (\OmegaUp\Exceptions\ApiException $e) {
+                self::$log->info(
+                    "Unable to save parental token verification: $e"
+                );
+            }
+        }
+
         return [
             'templateProperties' => [
                 'payload' => [
@@ -3966,6 +4002,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'schoolRank' => \OmegaUp\Controllers\School::getTopSchoolsOfTheMonth(
                         $rowCount
                     ),
+                    'parentalVerificationToken' => $parentalVerificationToken,
                     'currentUserInfo' => (
                         !is_null($r->identity) &&
                         !is_null($r->identity->username)
@@ -4604,66 +4641,6 @@ class User extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\DAO\APITokens::deleteByName($r->user->user_id, $name);
         return ['status' => 'ok'];
-    }
-
-     /**
-     * @return array{entrypoint: string, templateProperties: array{payload: VerificationParentalTokenDetailsPayload, title: \OmegaUp\TranslationString}}
-     *
-     * @omegaup-request-param string $token
-     */
-    public static function getIndexDetailsForTypeScript(
-        \OmegaUp\Request $r
-    ): array {
-        $token = $r->ensureOptionalString(
-            'token',
-            required: false,
-            validator: fn (string $token) => preg_match('/^[a-zA-Z0-9]{25}$/', $token) === 1
-        );
-        $parentalVerificationToken = false;
-
-        if (!is_null($token)) {
-            $userId = \OmegaUp\DAO\Users::getUserDataByParentalToken($token);
-
-            if (is_null($userId)) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'parentalTokenNotFound'
-                );
-            }
-
-            if (is_null($r->user) || is_null($r->user->main_email_id)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-            }
-
-            $user = \OmegaUp\DAO\Users::getByPK($userId);
-
-            try {
-                $user->parent_email_id = $r->user->main_email_id;
-                $user->parent_verified = true;
-                $user->parental_verification_token = null;
-
-                \OmegaUp\DAO\Users::update($user);
-                $parentalVerificationToken = true;
-            } catch (\OmegaUp\Exceptions\ApiException $e) {
-                self::$log->info(
-                    "Unable to save parental token verification: $e"
-                );
-            }
-        }
-
-        return [
-            'templateProperties' => [
-                'payload' => [
-                    'parentalVerificationToken' => $parentalVerificationToken,
-                    'parentalVerificationTokenSuccessfully' => \OmegaUp\Translations::getInstance()->get(
-                        'parentalVerificationTokenSuccessfully'
-                    ),
-                ],
-                'title' => new \OmegaUp\TranslationString(
-                    'omegaupTitleParentalVerificationToken'
-                ),
-            ],
-            'entrypoint' => 'user_verification_parental_token',
-        ];
     }
 }
 
