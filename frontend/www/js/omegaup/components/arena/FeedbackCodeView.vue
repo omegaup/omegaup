@@ -1,6 +1,10 @@
 <template>
   <div class="container-fluid">
-    <textarea data-feedback-code-mirror></textarea>
+    <textarea
+      v-show="false"
+      v-model="value"
+      data-feedback-code-mirror
+    ></textarea>
   </div>
 </template>
 
@@ -20,7 +24,6 @@ for (const mode of modeList) {
 export default class FeedbackCodeView extends Vue {
   @Prop() language!: string;
   @Prop() value!: string;
-  @Prop({ default: () => [] }) linesPerChunk!: number[];
   @Prop({ default: false }) enableFeedback!: boolean;
 
   T = T;
@@ -33,7 +36,6 @@ export default class FeedbackCodeView extends Vue {
       lineNumbers: true,
       mode: this.mode,
       readOnly: false,
-      value: this.value,
       gutters: ['CodeMirror-linenumbers', 'breakpoints'],
     };
   }
@@ -45,20 +47,57 @@ export default class FeedbackCodeView extends Vue {
       ) as HTMLTextAreaElement,
       this.editorOptions,
     );
-    editor.on('gutterClick', (codeMirror, numberOfLine) => {
-      const info = codeMirror.lineInfo(numberOfLine);
-      codeMirror.setGutterMarker(
-        numberOfLine,
-        'breakpoints',
-        info.gutterMarkers ? null : makeMarker(numberOfLine),
-      );
-    });
+    editor.on(
+      'gutterClick',
+      (codeMirror: CodeMirror.Editor, numberOfLine: number) => {
+        const info = codeMirror.lineInfo(numberOfLine);
+        codeMirror.setGutterMarker(
+          numberOfLine,
+          'breakpoints',
+          info.gutterMarkers ? null : makeMarker(numberOfLine),
+        );
+        codeMirror.addLineWidget(numberOfLine, showFeedbackForm(numberOfLine));
+      },
+    );
 
     const makeMarker = (numberOfLine: number): HTMLDivElement => {
       this.onPressLine(numberOfLine);
       const marker = document.createElement('div');
       marker.style.color = '#822';
       marker.innerHTML = '●';
+      return marker;
+    };
+
+    const showFeedbackForm = (numberOfLine: number): HTMLDivElement => {
+      this.onPressLine(numberOfLine);
+      const marker = document.createElement('div');
+      marker.innerHTML = `
+        <div class="card" ref="feedback">
+          <div class="card-header">${T.runDetailsNewFeedback}</div>
+          <div class="card-body">
+            <textarea
+              placeholder="${T.runDetailsFeedbackPlaceholder}"
+              class="w-100"
+            ></textarea>
+          </div>
+          <div class="card-footer text-muted">
+            <div class="form-group my-2">
+              <button
+                data-button-submit
+                class="btn btn-primary mx-2"
+              >
+                ${T.runDetailsFeedbackAddReview}
+              </button>
+              <button
+                data-button-cancel
+                class="btn btn-danger mx-2"
+              >
+                ${T.runDetailsFeedbackCancel}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
       return marker;
     };
   }
@@ -85,6 +124,10 @@ export default class FeedbackCodeView extends Vue {
   .vue-codemirror-wrap {
     height: 95%;
 
+    .CodeMirror-linenumber:hover::before {
+      content: '+';
+    }
+
     .CodeMirror {
       height: auto;
 
@@ -92,38 +135,6 @@ export default class FeedbackCodeView extends Vue {
         height: auto;
       }
     }
-  }
-
-  .gutter {
-    width: 72px;
-    background-color: var(--codemirror-gutter-background-color);
-  }
-
-  .code {
-    width: 100%;
-  }
-
-  .line-number {
-    min-width: 20px;
-    text-align: right;
-    color: var(--codemirror-line-number-font-color);
-    white-space: nowrap;
-    cursor: pointer;
-
-    .number {
-      width: 50px;
-    }
-
-    .add-button {
-      width: 22px;
-    }
-  }
-
-  .btn-xs {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.575rem;
-    line-height: 1.5;
-    border-radius: 0.2rem;
   }
 }
 </style>

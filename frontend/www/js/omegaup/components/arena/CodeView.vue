@@ -69,7 +69,6 @@ export interface EditorOptions {
   lineNumbers: boolean;
   mode?: string;
   readOnly: boolean;
-  value?: string;
   gutters?: string[];
 }
 
