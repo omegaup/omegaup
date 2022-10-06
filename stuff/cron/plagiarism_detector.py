@@ -65,33 +65,9 @@ GET_CONTEST_SUBMISSION_IDS= """ SELECT c.contest_id, s.submission_id, s.problems
 # Test files list
 TEST_FILES = ['test1.cpp', 'test2.cpp', 'test3.cpp', 'test4.cpp' ,
                 'test5.cpp', 'test6.cpp', 'test7.cpp', 'test8.cpp', 'test9.cpp']
-START_RED = "<span class='highlight-red'>" # where the flagging starts for red. 
-START_GREEN = "<span class='highlight-green'" # where the flagging starts for green. 
-END = "</span>" # where the flagging ends.
-MIN_RANGE = 0.9000000000
-
-def return_range(code_list_splitted: str) -> Sequence[Any]:
-    
-    '''
-    returns a list of integers that are in pair. 
-    example:- [0, 25, 28, 40, 42, 45]
-    meaning, first 0 to 25 lines are flagged. Then lines 28 to 40 are flagged. 
-    '''
-
-    content = [] # range of lines of code.
-    # get the range. 
-    for i in range(0,len(code_list_splitted)):
-        if START_RED in code_list_splitted[i]:
-            content.append(i)
-        if START_GREEN in code_list_splitted[i]:
-            content.append(i)
-        if END in code_list_splitted[i]:
-            content.append(i)
-
-    return content
 
 def run_copy_detect(dbconn: lib.db.Connection, 
-submission_ids: Sequence[Any], contest:int, problem_id: str) -> None:
+    submission_ids: Sequence[Any], contest:int, problem_id: str) -> None:
 
     detector_result = []
     if os.path.exists("/opt/omegaup/stuff/cron/temp_directory/problem"+problem_id+"/"):
@@ -101,53 +77,7 @@ submission_ids: Sequence[Any], contest:int, problem_id: str) -> None:
                                 disable_filtering=True)
         detector.run()
         detector_result = list(detector.get_copied_code_list())
-    result = []
     
-    for i in range(len(detector_result)):
-        if(detector_result[i][0] > MIN_RANGE and detector_result[i][1] > MIN_RANGE):
-            temp = []
-            temp.append(detector_result[i][0]) # percentage match in first code
-            temp.append(detector_result[i][1]) # percentage match in second code
-            temp.append(str(detector_result[0][2]).split("/")[-1].split(".")[0])
-            temp.append(str(detector_result[0][3]).split("/")[-1].split(".")[0])
-            temp.append([return_range(detector_result[i][4].split('\n')),
-                        return_range(detector_result[i][5].split('\n'))])
-            temp.append(contest)
-            result.append(temp)
-
-    # with dbconn.cursor() as cur:
-    #     cur.executemany("""
-    #                     INSERT INTO `Plagiarisms`
-    #                     (`score_1`, `score_2`, `submission_id_1`, `submission_id_2`, 
-    #                       `contents`, `contest_id`)
-    #                     VALUES
-    #                     (%d, %d, %d, %d, %s, %d);
-    #                 """, (result))
-
-
-def get_submission_files_from_S3(dbconn: lib.db.Connection, 
-submission_ids: Sequence[Any], contest: int) -> None: 
-    #  S3 code. 
-    session = boto3.Session()
-    s3 = session.resource('s3')
-    
-    # os.chdir(final_directory)
-    # print(os.getcwd())
-    # for i in range(0, len(submission_ids)):
-    #     if not os.path.exists("problem" + str(submission_ids[i][3])):
-    #         problem_directory = os.path.join(final_directory, "problem" + str(submission_ids[i][3]))
-    #         os.makedirs(problem_directory)
-    #     file_name = submission_ids[i][5] + ".cpp"
-    #     os.chdir("problem" + str(submission_ids[i][3]))
-    #     # s3.Bucket('omegaup-test-mohit').download_file
-    #     # ('omegaup/submissions/omi-2021-extremos-020a0f906823c91ec17e968d2c93.cpp', 
-    #     #                                                 
-    #     # file_name)'omegaup/submissions/omi-2021-extremos-020a0f906823c91ec17e968d2c93.cpp', 
-    #     #                                                 file_name)
-    #     os.chdir(final_directory)
-
-    # os.chdir("/opt/omegaup")
-
 def get_submission_files(dbconn: lib.db.Connection, submission_ids: Sequence[Any], contest: int) -> None:
     # For tests. 
     current_directory = os.getcwd()
@@ -156,10 +86,12 @@ def get_submission_files(dbconn: lib.db.Connection, submission_ids: Sequence[Any
     if not os.path.exists(final_directory):
         os.makedirs(final_directory)
     
+    # set to have unique problem_id only
     problem_id = set()
     for i in range(0, len(submission_ids)):
         problem_id.add(submission_ids[i][3])
     
+    # converting the set to list for making it iterable. 
     problem_ids = list(problem_id)
 
     for i in range(0, len(problem_ids)):
@@ -179,8 +111,9 @@ def get_submission_files(dbconn: lib.db.Connection, submission_ids: Sequence[Any
         
         #  Now we can run Copydetect on these files. 
         run_copy_detect(dbconn, submission_ids, contest, str(problem_ids[i]))
+        # delete the directory for submssions of next problem to be added.
         shutil.rmtree('/opt/omegaup/stuff/cron/temp_directory/problem'+str(problem_ids[i])+"/")
-    
+    # delete temp_directory
     shutil.rmtree(current_directory+'/temp_directory')
     
 def get_submission_ids(dbconn: lib.db.Connection, contest: int) -> None:
