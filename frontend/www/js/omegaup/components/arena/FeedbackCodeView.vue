@@ -47,6 +47,9 @@ export default class FeedbackCodeView extends Vue {
       ) as HTMLTextAreaElement,
       this.editorOptions,
     );
+
+    if (!this.enableFeedback) return;
+
     editor.on(
       'gutterClick',
       (codeMirror: CodeMirror.Editor, numberOfLine: number) => {

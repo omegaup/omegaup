@@ -112,7 +112,7 @@
         <omegaup-arena-feedback-code-view
           v-else
           :language="data.language"
-          :enable-feedback="true"
+          :enable-feedback="false"
           :readonly="true"
           :value="data.source"
         ></omegaup-arena-feedback-code-view>
