@@ -119,10 +119,10 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
      /**
      * user!3 logged in and a parental Token is generated
-     * 
+     *
      */
     public function testUser13ToGenerateParentalTokenAtTimeOfRegistration() {
-        $user_data = new \OmegaUp\DAO\VO\Users;
+        $user_data = new \OmegaUp\DAO\VO\Users();
         $r = new \OmegaUp\Request(['birth_date' => $user_data-> birth_date]);
         // $response = \OmegaUp\Controllers\User::apiCreate($r);
 
@@ -134,7 +134,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             )
         ) {
             //Verify that the token is generated or not.
-             $response = \OmegaUp\Controllers\User::apiCreate(
+            $response = \OmegaUp\Controllers\User::apiCreate(
                 new \OmegaUp\Request([
                 'parental_verification_token' => $user_data -> parental_verification_token,
                 ])
@@ -142,5 +142,5 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
             $this->assertNotNull($response['parental_verification_token']);
         }
-}
+    }
 }

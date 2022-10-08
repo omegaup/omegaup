@@ -809,7 +809,7 @@
 	"parameterStringTooLong": "Par\u00e2metro \u00e9 maior de %(max_length) caracteres",
 	"parameterStringTooShort": "Par\u00e2metro \u00e9 mais curto que *(MIN_LENGTH) caracteres",
 	"parameterUsernameInUse": "Nome de usu\u00e1rio j\u00e1 est\u00e1 em uso",
-	"parentEmailBody": "Insira este token para vincular a conta do seu filho",
+	"parentEmailBody": "Insira este token para vincular a conta do seu filho https://omegaup.com/user/parentalverification/token/$(token)/",
 	"parentEmailSubject": "Token gerado",
 	"passwordAddRequestSuccess": "Sua senha foi adicionada.",
 	"passwordCopyToken": "C\u00f3pia token",
