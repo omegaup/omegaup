@@ -109,6 +109,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             'contestData' => $contestData,
             'contestants' => $identities,
             'contestAdmin' => $contestAdmin,
+            'contestIdentityAdmin' => $contestIdentityAdmin,
             'runMap' => $runMap,
         ];
     }
@@ -1199,7 +1200,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         $admins = [
             $identityToRemove->username,
             $contestData['director']->username,
-            $contestData['contestAdmin']->username
+            $testData['contestIdentityAdmin']->username
         ];
 
         // Check admin scoreboard.
