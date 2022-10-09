@@ -1205,11 +1205,8 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Check admin scoreboard.
         $this->assertArrayHasKey('ranking', $response);
-        $this->assertArrayHasKey('problems', $response);
         foreach ($response['ranking'] as $entry) {
-            if (in_array($entry['username'], $admins)) {
-                $this->fail('username should not be present');
-            }
+            $this->assertNotContains($entry['username'], $admins);
         }
 
         // Check the public scoreboard.
@@ -1221,6 +1218,10 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 'contest_alias' => $contestAlias,
             ])
         );
+        $this->assertArrayHasKey('ranking', $response);
+        foreach ($response['ranking'] as $entry) {
+            $this->assertNotContains($entry['username'], $admins);
+        }
     }
 
     public function testScoreboardMergeDetailsForTypeScript() {
