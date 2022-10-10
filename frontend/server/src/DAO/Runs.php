@@ -457,11 +457,24 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                             i.user_id NOT IN (
                                 SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?
                             )
+                            AND i.identity_id NOT IN (
+                                SELECT
+                                    gi.identity_id
+                                FROM
+                                    Group_Roles gr
+                                INNER JOIN
+                                    Groups_Identities gi ON gi.group_id = gr.group_id
+                                WHERE
+                                    gr.acl_id IN (?, ?) AND gr.role_id = ?
+                            )
                 ";
                 $val = [
                     $problemsetId,
                     $aclId,
                     \OmegaUp\Authorization::CONTESTANT_ROLE,
+                    $aclId,
+                    \OmegaUp\Authorization::SYSTEM_ACL,
+                    \OmegaUp\Authorization::ADMIN_ROLE,
                     $aclId,
                     \OmegaUp\Authorization::SYSTEM_ACL,
                     \OmegaUp\Authorization::ADMIN_ROLE,
@@ -488,10 +501,23 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                         gi.group_id = ? AND
                         (i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
                         i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?)
-                        OR i.user_id IS NULL);";
+                        AND i.identity_id NOT IN (
+                            SELECT
+                                gi.identity_id
+                            FROM
+                                Group_Roles gr
+                            INNER JOIN
+                                Groups_Identities gi ON gi.group_id = gr.group_id
+                            WHERE
+                                gr.acl_id IN (?, ?) AND gr.role_id = ?
+                        )
+                    OR i.user_id IS NULL);";
                 $val = [
                     $groupId,
                     $aclId,
+                    $aclId,
+                    \OmegaUp\Authorization::SYSTEM_ACL,
+                    \OmegaUp\Authorization::ADMIN_ROLE,
                     $aclId,
                     \OmegaUp\Authorization::SYSTEM_ACL,
                     \OmegaUp\Authorization::ADMIN_ROLE,
