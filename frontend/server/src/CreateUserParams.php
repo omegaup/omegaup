@@ -17,7 +17,7 @@ class CreateUserParams {
 
     /**
      * @readonly
-     * @var string
+     * @var null|string
      */
     public $email;
 
@@ -81,8 +81,14 @@ class CreateUserParams {
 
         $this->name = $params['name'] ?? null;
 
-        \OmegaUp\Validators::validateEmail($params['email'] ?? null, 'email');
-        $this->email = $params['email'] ?? '';
+        $this->email = null;
+        if (isset($params['email'])) {
+            \OmegaUp\Validators::validateEmail(
+                $params['email'] ?? null,
+                'email'
+            );
+            $this->email = $params['email'];
+        }
 
         $this->password = $params['password'] ?? null;
 

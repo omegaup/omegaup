@@ -122,25 +122,36 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
      *
      */
     public function testUser13ToGenerateParentalTokenAtTimeOfRegistration() {
-        $user_data = new \OmegaUp\DAO\VO\Users();
-        $r = new \OmegaUp\Request(['birth_date' => $user_data-> birth_date]);
-        // $response = \OmegaUp\Controllers\User::apiCreate($r);
 
-       //This is check for the User is under 13
-        if (
-            $user_data -> birth_date >= strtotime(
-                '-13 year',
-                \OmegaUp\Time::get()
-            )
-        ) {
-            //Verify that the token is generated or not.
-            $response = \OmegaUp\Controllers\User::apiCreate(
-                new \OmegaUp\Request([
-                'parental_verification_token' => $user_data -> parental_verification_token,
-                ])
-            );
-
-            $this->assertNotNull($response['parental_verification_token']);
-        }
+        // Verify that the token is generated.
+        $under13BirthDateTimestamp = strtotime('-10 years');
+        $randomString = \OmegaUp\Test\Utils::createRandomString();
+        \OmegaUp\Controllers\User::apiCreate(
+            new \OmegaUp\Request([
+                'username' => $randomString,
+                'password' => $randomString,
+                'parent_email' => $randomString . '@' . $randomString . '.com',
+                'birth_date' => $under13BirthDateTimestamp,
+            ])
+        );
+        $response = \OmegaUp\DAO\Users::FindByUsername($randomString);
+        
+        $this->assertNotNull($response->parental_verification_token);
+        
+         //Verify that the token is not generated.
+         $over13BirthDateTimestamp = strtotime('-15 years');
+         $randomString = \OmegaUp\Test\Utils::createRandomString();
+         \OmegaUp\Controllers\User::apiCreate(
+             new \OmegaUp\Request([
+                 'username' => $randomString,
+                 'password' => $randomString,
+                 'email' => $randomString . '@' . $randomString . '.com',
+                 'birth_date' => $over13BirthDateTimestamp,
+             ])
+         );
+ 
+         $response = \OmegaUp\DAO\Users::FindByUsername($randomString);
+ 
+         $this->assertNull($response->parental_verification_token);
     }
 }

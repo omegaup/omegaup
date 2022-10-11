@@ -167,8 +167,33 @@ class User extends \OmegaUp\Controllers\Controller {
             'verification_id' => \OmegaUp\SecurityTools::randomString(50),
             'is_private' => boolval($createUserParams->isPrivate),
         ];
-        if (
-            $createUserParams->birthDate >= strtotime(
+        if ($createUserParams->email) {
+            $identityByEmail = \OmegaUp\DAO\Identities::findByEmail(
+                $createUserParams->email
+            );
+    
+            if (!is_null($identityByEmail)) {
+                    // Check if the same user had already tried to create this account.
+                if (
+                    !is_null($identityByEmail->password) &&
+                    !is_null($identity) &&
+                    $identity->user_id === $identityByEmail->user_id &&
+                    \OmegaUp\SecurityTools::compareHashedStrings(
+                        strval($createUserParams->password),
+                        strval($identity->password)
+                    )
+                ) {
+                    return;
+                }
+                // Given that the user has already been created, and we
+                // have no way of validating if this request was made by
+                // the same person, let's just bail out.
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'mailInUse'
+                );
+            }
+        }
+        if ($createUserParams->birthDate >= strtotime(
                 '-13 year',
                 \OmegaUp\Time::get()
             )
