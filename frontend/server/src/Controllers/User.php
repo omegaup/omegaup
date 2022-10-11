@@ -4619,7 +4619,10 @@ class User extends \OmegaUp\Controllers\Controller {
         $token = $r->ensureOptionalString(
             'parental_verification_token',
             required: false,
-            validator: fn (string $token) => preg_match('/^[a-zA-Z0-9]{25}$/', $token) === 1
+            validator: fn (string $token) => preg_match(
+                '/^[a-zA-Z0-9]{25}$/',
+                $token
+            ) === 1
         );
         $parentalVerificationToken = false;
 
@@ -4651,7 +4654,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
             }
         }
-     
+
         return [
             'templateProperties' => [
                 'payload' => [
@@ -4659,7 +4662,9 @@ class User extends \OmegaUp\Controllers\Controller {
                         'parentalVerificationTokenSuccessfully'
                     ),
                 ],
-                'title' => new \OmegaUp\TranslationString('omegaupTitleParentalVerificationToken'),
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleParentalVerificationToken'
+                ),
             ],
             'entrypoint' => 'user_verification_parental_token',
         ];

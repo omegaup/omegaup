@@ -447,7 +447,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
 
         return boolval($count);
     }
-    
+
     public static function getUserDataByParentalToken(string $token): ?int {
         $sql = 'SELECT
                       u.user_id
