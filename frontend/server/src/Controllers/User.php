@@ -171,7 +171,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $identityByEmail = \OmegaUp\DAO\Identities::findByEmail(
                 $createUserParams->email
             );
-    
+
             if (!is_null($identityByEmail)) {
                     // Check if the same user had already tried to create this account.
                 if (
@@ -193,7 +193,8 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
             }
         }
-        if ($createUserParams->birthDate >= strtotime(
+        if (
+            $createUserParams->birthDate >= strtotime(
                 '-13 year',
                 \OmegaUp\Time::get()
             )
