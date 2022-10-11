@@ -4611,7 +4611,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $token
      */
-    public static function getVerificationParentalTokenDetailsForTypeScript(
+    public static function getVerificationParentalTokenDetailsScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureIdentity();
