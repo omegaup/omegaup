@@ -4606,7 +4606,6 @@ class User extends \OmegaUp\Controllers\Controller {
         return ['status' => 'ok'];
     }
 
-
     /**
      * @return array{entrypoint: string, templateProperties: array{payload: VerificationParentalTokenDetailsPayload, title: \OmegaUp\TranslationString}}
      *
@@ -4623,12 +4622,18 @@ class User extends \OmegaUp\Controllers\Controller {
             $token
         );
 
-        if(is_null($userData) || is_null($userData['parental_verification_token'])){
+        if (
+            is_null(
+                $userData
+            ) || is_null(
+                $userData['parental_verification_token']
+            )
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('tokenNotFound');
         }
 
         $user = \OmegaUp\DAO\Users::getByPK($userData['user_id']);
-    
+
         try {
             $user->parent_verified = true;
             $user->parent_email_id = $r->user->main_email_id;
@@ -4644,11 +4649,13 @@ class User extends \OmegaUp\Controllers\Controller {
                         'parentalVerificationTokenSuccessfully'
                     ),
                 ],
-                'title' => new \OmegaUp\TranslationString('omegaupTitleParentalVerificationToken'),
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleParentalVerificationToken'
+                ),
             ],
             'entrypoint' => 'user_verification_parental_token',
         ];
     }
-  }
+}
 
 \OmegaUp\Controllers\User::$urlHelper = new \OmegaUp\UrlHelper();
