@@ -3916,7 +3916,6 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * @omegaup-request-param mixed $category
-     * @omegaup-request-param null|string $token
      * @omegaup-request-param null|string $date
      *
      * @return array{entrypoint: string, templateProperties: array{fullWidth: bool, payload: IndexPayload, title: \OmegaUp\TranslationString}}
