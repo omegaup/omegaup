@@ -2318,6 +2318,14 @@ export namespace types {
         (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
+
+    export function VerificationParentalTokenDetailsPayload(
+      elementId: string = 'payload',
+    ): types.VerificationParentalTokenDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
   }
 
   export interface ActivityEvent {
@@ -3454,7 +3462,6 @@ export namespace types {
       female?: types.UserProfile;
     };
     currentUserInfo: { username?: string };
-    parentalVerificationToken: boolean;
     schoolOfTheMonthData?: {
       country?: string;
       country_id?: string;
@@ -4645,6 +4652,10 @@ export namespace types {
     userSystemGroups: { [key: number]: { name: string; value: boolean } };
     userSystemRoles: { [key: number]: { name: string; value: boolean } };
     username: string;
+  }
+
+  export interface VerificationParentalTokenDetailsPayload {
+    parentalVerificationToken: boolean;
   }
 }
 
