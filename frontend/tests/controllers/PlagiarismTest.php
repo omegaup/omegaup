@@ -16,7 +16,8 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
                 'finishTime' => $originalTime - 60 * 45,
                 'check_plagiarism' => 1,
             ])
-        );\OmegaUp\Time::setTimeForTesting($originalTime - (60 * 60));
+        );
+        \OmegaUp\Time::setTimeForTesting($originalTime - (60 * 60));
 
         // Get problems and add them to the contest
         $problems = [];
