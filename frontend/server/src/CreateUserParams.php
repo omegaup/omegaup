@@ -71,7 +71,6 @@ class CreateUserParams {
     /**
      * @param array{username?: string, name?: string, email?: string, password?: string, scholar_degree?: string, is_private?: string, gender?: string, recaptcha?: string, birth_date?: int, parent_email?: string} $params
      */
-
     public function __construct($params = []) {
         \OmegaUp\Validators::validateValidUsername(
             $params['username'] ?? null,
@@ -82,12 +81,22 @@ class CreateUserParams {
         $this->name = $params['name'] ?? null;
 
         $this->email = null;
-        if (isset($params['email'])) {
-            \OmegaUp\Validators::validateEmail(
-                $params['email'] ?? null,
-                'email'
-            );
+        if (!isset($params['parent_email'])) {
+            if (!isset($params['email'])) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterEmpty',
+                        'email'
+                    );
+            }
+            if (!filter_var($params['email'], FILTER_VALIDATE_EMAIL)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'email'
+                );
+            }
             $this->email = $params['email'];
+        } else {
+            $this->parentEmail = $params['parent_email'];
         }
 
         $this->password = $params['password'] ?? null;
@@ -109,10 +118,6 @@ class CreateUserParams {
 
         if (isset($params['birth_date'])) {
             $this->birthDate = intval($params['birth_date']);
-        }
-
-        if (isset($params['parent_email'])) {
-            $this->parentEmail = $params['parent_email'];
         }
     }
 }

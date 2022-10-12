@@ -126,48 +126,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $identity = \OmegaUp\DAO\Identities::findByUsername(
             $createUserParams->username
         );
-        $identityByEmail = \OmegaUp\DAO\Identities::findByEmail(
-            $createUserParams->email
-        );
-
-        if (!is_null($identityByEmail)) {
-                // Check if the same user had already tried to create this account.
-            if (
-                !is_null($identityByEmail->password) &&
-                !is_null($identity) &&
-                $identity->user_id === $identityByEmail->user_id &&
-                \OmegaUp\SecurityTools::compareHashedStrings(
-                    strval($createUserParams->password),
-                    strval($identity->password)
-                )
-            ) {
-                return;
-            }
-            // Given that the user has already been created, and we
-            // have no way of validating if this request was made by
-            // the same person, let's just bail out.
-            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                'mailInUse'
-            );
-        }
-
-        if (!is_null($identity)) {
-            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                'usernameInUse'
-            );
-        }
-
-        // Prepare DAOs
-        $identityData = [
-            'username' => $createUserParams->username,
-            'password' => $hashedPassword,
-        ];
-        $userData = [
-            'verified' => 0,
-            'verification_id' => \OmegaUp\SecurityTools::randomString(50),
-            'is_private' => boolval($createUserParams->isPrivate),
-        ];
-        if ($createUserParams->email) {
+        if (isset($createUserParams->email)) {
             $identityByEmail = \OmegaUp\DAO\Identities::findByEmail(
                 $createUserParams->email
             );
@@ -193,6 +152,23 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
             }
         }
+
+        if (!is_null($identity)) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'usernameInUse'
+            );
+        }
+
+        // Prepare DAOs
+        $identityData = [
+            'username' => $createUserParams->username,
+            'password' => $hashedPassword,
+        ];
+        $userData = [
+            'verified' => 0,
+            'verification_id' => \OmegaUp\SecurityTools::randomString(50),
+            'is_private' => boolval($createUserParams->isPrivate),
+        ];
         if (
             $createUserParams->birthDate >= strtotime(
                 '-13 year',
@@ -295,9 +271,12 @@ class User extends \OmegaUp\Controllers\Controller {
         $user = new \OmegaUp\DAO\VO\Users($userData);
         $identity = new \OmegaUp\DAO\VO\Identities($identityData);
 
-        $email = new \OmegaUp\DAO\VO\Emails([
-            'email' => $createUserParams->email,
-        ]);
+        $email = null;
+        if (!is_null($createUserParams->email)) {
+            $email = new \OmegaUp\DAO\VO\Emails([
+                'email' => $createUserParams->email,
+            ]);
+        }
 
         // Save objects into DB
         try {
@@ -305,14 +284,16 @@ class User extends \OmegaUp\Controllers\Controller {
 
             \OmegaUp\DAO\Users::create($user);
 
-            $email->user_id = $user->user_id;
-            \OmegaUp\DAO\Emails::create($email);
-            if (empty($email->email_id)) {
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'mailInUse'
-                );
+            if (!is_null($email)) {
+                $email->user_id = $user->user_id;
+                \OmegaUp\DAO\Emails::create($email);
+                if (empty($email->email_id)) {
+                    throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                        'mailInUse'
+                    );
+                }
+                $user->main_email_id = $email->email_id;
             }
-            $user->main_email_id = $email->email_id;
 
             $identity->user_id = $user->user_id;
             \OmegaUp\DAO\Identities::create($identity);
@@ -324,7 +305,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 self::$log->info(
                     "Identity {$identity->username} created, trusting e-mail"
                 );
-            } else {
+            } elseif (is_null($createUserParams->parentEmail)) {
                 self::$log->info(
                     "Identity {$identity->username} created, sending verification mail"
                 );
