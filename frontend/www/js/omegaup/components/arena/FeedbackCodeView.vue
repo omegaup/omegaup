@@ -1,15 +1,11 @@
 <template>
-  <div class="container-fluid">
-    <textarea
-      v-show="false"
-      v-model="value"
-      data-feedback-code-mirror
-    ></textarea>
+  <div class="container-fluid" data-feedback-code-mirror>
+    <textarea v-show="false" ref="cm-editor" v-model="value"></textarea>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import T from '../../lang';
 import CodeMirror from 'codemirror';
 import { EditorOptions, languageModeMap, modeList } from './CodeView.vue';
@@ -25,9 +21,10 @@ export default class FeedbackCodeView extends Vue {
   @Prop() language!: string;
   @Prop() value!: string;
   @Prop({ default: false }) enableFeedback!: boolean;
+  @Ref('cm-editor') private readonly cmEditor!: HTMLTextAreaElement;
 
   T = T;
-  mode = languageModeMap[this.language] || languageModeMap['cpp17-gcc'];
+  mode = languageModeMap[this.language] ?? languageModeMap['cpp17-gcc'];
   hover: null | number = null;
 
   get editorOptions(): EditorOptions {
@@ -41,12 +38,7 @@ export default class FeedbackCodeView extends Vue {
   }
 
   mounted() {
-    const editor = CodeMirror.fromTextArea(
-      document.querySelector(
-        '[data-feedback-code-mirror]',
-      ) as HTMLTextAreaElement,
-      this.editorOptions,
-    );
+    const editor = CodeMirror.fromTextArea(this.cmEditor, this.editorOptions);
 
     if (!this.enableFeedback) return;
 
@@ -120,15 +112,27 @@ export default class FeedbackCodeView extends Vue {
 
 <style lang="scss">
 @import '../../../../sass/main.scss';
+@import 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.css';
 
 [data-feedback-code-mirror] {
   height: auto;
 
-  .vue-codemirror-wrap {
+  .cm-s-default {
     height: 95%;
 
-    .CodeMirror-linenumber:hover::before {
-      content: '+';
+    .CodeMirror-linenumbers {
+      width: 39px !important;
+    }
+
+    .CodeMirror-linenumber:hover::after {
+      font: var(--fa-font-solid);
+      content: '\f0fe';
+      display: inline-block;
+      vertical-align: middle;
+      font-weight: 900;
+      cursor: pointer;
+      color: var(--btn-ok-background-color);
+      font-size: x-large;
     }
 
     .CodeMirror {
