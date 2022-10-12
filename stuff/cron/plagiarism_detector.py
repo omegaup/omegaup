@@ -79,7 +79,7 @@ class LocalSubmissoinDownloader:
         shutil.copyfile(os.path.join(self._dir, "test1.cpp"), destination_path)
     
 
-def run_copy_detect(dir: str, contest_id: int, submissions: Iterable[Mapping[str, Any]]) -> Iterable[[Tuple[Any]]]:
+def run_copy_detect(dir: str, contest_id: int, submissions: Iterable[Tuple[Any, ...]]) -> Any:
 
     for problem in os.listdir(dir):
         detector = CopyDetector(test_dirs=
@@ -90,7 +90,7 @@ def run_copy_detect(dir: str, contest_id: int, submissions: Iterable[Mapping[str
         return detector.get_copied_code_list()
     
 def download_submission_files(dbconn: lib.db.Connection, dir: str, 
-    download: SubmissionDownloader, submission_ids: Iterable[Mapping[str, Any]]) -> None:
+    download: SubmissionDownloader, submission_ids: Iterable[Tuple[Any, ...]]) -> None:
 
     for submission in submission_ids:
         submission_path = os.path.join(dir, str(submission[3]), f'{submission[5]}.{submission[6]}')
@@ -102,7 +102,7 @@ def get_contests(dbconn: lib.db.Connection) -> Iterable[Tuple[str, Any]]:
         cur.execute(CONTESTS_TO_RUN_PLAGIARISM_ON)
         return cur.fetchall()
 
-def get_submissions_for_contest(dbconn: lib.db.Connection, contest_id: int) -> Iterable[Tuple[str, Any]]:
+def get_submissions_for_contest(dbconn: lib.db.Connection, contest_id: int) -> Iterable[Tuple[Any, ...]]:
     with dbconn.cursor() as cur:
         cur.execute(GET_CONTEST_SUBMISSION_IDS, (contest_id, ))
         return cur.fetchall()
@@ -113,7 +113,7 @@ def run_detector_for_contest(dbconn: lib.db.Connection,
   with tempfile.TemporaryDirectory(prefix='plagiarism_detector') as dir:
     submissions = get_submissions_for_contest(dbconn, contest_id)
     download_submission_files(dbconn, dir, download, submissions)
-    result = run_copy_detect(dir, contest_id, submissions )
+    result = run_copy_detect(dir, contest_id, submissions)
 
 def main() -> None:
     ''' Main entrypoint. '''
@@ -131,12 +131,11 @@ def main() -> None:
 
     logging.info('started')
     dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
-
+    print(args.local_downloader_dir)
     if args.local_downloader_dir != None:
         download = LocalSubmissoinDownloader(args.local_downloader_dir)
     else:
-        download = S3SubmissionDownloader(args.s3_bucket_name)
-
+        download = S3SubmissionDownloader()
     for contest in get_contests(dbconn):
         run_detector_for_contest(dbconn, download, int(contest[0]))
 
