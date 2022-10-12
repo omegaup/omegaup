@@ -69,7 +69,7 @@ class S3SubmissionDownloader:
     def __call__(self, guid: str, destination_path: str) -> None:
         self._bucket.download_file(f'omegaup/submissions/{guid[:2]}/{guid[2:]}', destination_path)
     
-class LocalSubmissoinDownloader:
+class LocalSubmissionDownloader:
 
     def __init__(self, dir: str) -> None:
         self._dir = dir
@@ -97,7 +97,7 @@ def download_submission_files(dbconn: lib.db.Connection, dir: str,
         os.makedirs(os.path.dirname(submission_path), exist_ok=True)
         download(submission[5], submission_path)
 
-def get_contests(dbconn: lib.db.Connection) -> Iterable[Tuple[str, Any]]:
+def get_contests(dbconn: lib.db.Connection) -> Iterable[Tuple[Any, ...]]:
     with dbconn.cursor() as cur:
         cur.execute(CONTESTS_TO_RUN_PLAGIARISM_ON)
         return cur.fetchall()
@@ -133,9 +133,9 @@ def main() -> None:
     dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
     print(args.local_downloader_dir)
     if args.local_downloader_dir != None:
-        download = LocalSubmissoinDownloader(args.local_downloader_dir)
+        download: SubmissionDownloader = LocalSubmissionDownloader(args.local_downloader_dir)
     else:
-        download = S3SubmissionDownloader()
+        download= S3SubmissionDownloader()
     for contest in get_contests(dbconn):
         run_detector_for_contest(dbconn, download, int(contest[0]))
 
