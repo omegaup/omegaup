@@ -4616,11 +4616,13 @@ class User extends \OmegaUp\Controllers\Controller {
     ): array {
         $r->ensureIdentity();
 
-    
         $token = $r->ensureOptionalString(
             'token',
             required: false,
-            validator: fn (string $token) => preg_match('/^[a-zA-Z0-9]{25}$/', $token) === 1
+            validator: fn (string $token) => preg_match(
+                '/^[a-zA-Z0-9]{25}$/',
+                $token
+            ) === 1
         );
         $parentalVerificationToken = false;
 
