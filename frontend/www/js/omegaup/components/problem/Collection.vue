@@ -5,9 +5,13 @@
         <h1 class="card-title">{{ T.collectionTitle }}</h1>
       </div>
       <div class="col-md-5 text-right align-self-end">
-        <a v-if="userAge > 13" class="btn btn-primary" href="/problem/" data-nav-problems-all>{{
-          T.navAllProblems
-        }}</a>
+        <a
+          v-if="userAge > 13"
+          class="btn btn-primary"
+          href="/problem/"
+          data-nav-problems-all
+          >{{ T.navAllProblems }}</a
+        >
       </div>
     </div>
     <div class="card panel panel-default">
@@ -203,7 +207,7 @@ export default class Collection extends Vue {
     return T[alias];
   }
 
-      get userAge(): number | null {
+  get userAge(): number | null {
     if (this.birthDate === null) {
       return null;
     }

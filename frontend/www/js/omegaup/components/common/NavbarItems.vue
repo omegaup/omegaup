@@ -68,7 +68,7 @@
             </a>
             <template v-if="isMainUserIdentity">
               <a
-              v-if="userAge > 13"
+                v-if="userAge > 13"
                 class="dropdown-item"
                 href="/course/new/"
                 data-nav-courses-create
@@ -113,7 +113,7 @@
               T.navViewLatestSubmissions
             }}</a>
             <a
-              v-if="userAge > 13 &&isLoggedIn && isMainUserIdentity"
+              v-if="userAge > 13 && isLoggedIn && isMainUserIdentity"
               class="dropdown-item"
               href="/problem/new/"
               data-nav-problems-create
@@ -177,7 +177,7 @@
             >{{ T.navTutorials }}</a
           >
           <a
-          v-if="userAge > 13"
+            v-if="userAge > 13"
             class="dropdown-item"
             href="https://discord.com/invite/K3JFd9d3wk"
             target="_blank"
@@ -219,14 +219,12 @@ export default class NavbarItems extends Vue {
 
   T = T;
   birthDate: null | Date = null;
-  
 
-    get userAge(): number | null {
+  get userAge(): number | null {
     if (this.birthDate === null) {
       return null;
     }
     return time.getDifferenceInCalendarYears(this.birthDate);
   }
-
 }
 </script>
