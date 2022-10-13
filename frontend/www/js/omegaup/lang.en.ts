@@ -762,6 +762,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleLogout: "Logout",
   omegaupTitleMyContests: "My contests",
   omegaupTitleMyProblemsList: "MyProblemsList",
+  omegaupTitleParentalVerificationToken: "Parental verification token",
   omegaupTitlePrivacyPolicy: "Privacy Policy",
   omegaupTitleProblem: "Problem",
   omegaupTitleProblemCreator: "Problem Creator",

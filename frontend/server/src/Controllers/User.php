@@ -4610,16 +4610,15 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{entrypoint: string, templateProperties: array{payload: VerificationParentalTokenDetailsPayload, title: \OmegaUp\TranslationString}}
      *
-     * @omegaup-request-param string $token
+     * @omegaup-request-param string $parental_verification_token
      */
-    public static function getVerificationParentalTokenDetailsScript(
+    public static function getVerificationParentalTokenDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureIdentity();
 
-        $token = $r->ensureOptionalString(
+        $token = $r->ensureString(
             'parental_verification_token',
-            required: false,
             validator: fn (string $token) => preg_match(
                 '/^[a-zA-Z0-9]{25}$/',
                 $token
@@ -4629,12 +4628,6 @@ class User extends \OmegaUp\Controllers\Controller {
 
         if (!is_null($token)) {
             $userId = \OmegaUp\DAO\Users::getUserDataByParentalToken($token);
-
-            if (is_null($userId)) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'parentalTokenNotFound'
-                );
-            }
 
             if (is_null($r->user) || is_null($r->user->main_email_id)) {
                 throw new \OmegaUp\Exceptions\UnauthorizedException();
