@@ -1,31 +1,37 @@
-FROM ubuntu:bionic AS base-builder
+FROM ubuntu:focal AS base-builder
 
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
     apt install -y --no-install-recommends \
-        pkg-config cmake curl ca-certificates git gcc libc-dev zlib1g-dev && \
+        ca-certificates \
+        cmake \
+        curl \
+        gcc \
+        git \
+        libc-dev \
+        make \
+        pkg-config \
+        zlib1g-dev \
+        && \
     /usr/sbin/update-ca-certificates && \
-    curl --location https://dl.google.com/go/go1.17.9.linux-amd64.tar.gz | \
+    curl --location https://dl.google.com/go/go1.19.1.linux-amd64.tar.gz | \
         tar -xz -C /usr/local && \
     apt autoremove -y && \
     apt clean
 ENV PATH $PATH:/usr/local/go/bin
 RUN useradd --create-home --uid 1000 --shell /bin/bash --user-group ubuntu
 
+# Build system libgit2
+RUN git clone --recurse-submodules https://github.com/libgit2/git2go -b v33.0.4 --depth=1 /tmp/git2go && \
+    (cd /tmp/git2go && \
+     git submodule update --init && \
+     ./script/build-libgit2.sh --system --static) && \
+    rm -rf /tmp/git2go
+
 RUN mkdir -p /home/ubuntu/go/omegaup/bin
 WORKDIR /home/ubuntu/go/omegaup
 
-ADD go/go.mod /home/ubuntu/go/omegaup/
-RUN chown -R ubuntu:ubuntu /home/ubuntu/go/
 USER ubuntu
-
-# Get dependencies.
-RUN git clone --recurse-submodules https://github.com/lhchavez/git2go
-
-RUN go get -d -tags=static github.com/lhchavez/git2go/v29@v29.0.0
-
-RUN (cd git2go && \
-     git submodule update --init && \
-     ./script/build-libgit2-static.sh)
 
 
 FROM base-builder AS quark-builder
@@ -67,7 +73,11 @@ FROM ubuntu:focal
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
-      curl ca-certificates openjdk-11-jre-headless wait-for-it && \
+      ca-certificates \
+      curl \
+      openjdk-16-jre-headless \
+      wait-for-it \
+      && \
     /usr/sbin/update-ca-certificates && \
     apt-get autoremove -y && \
     apt-get clean
