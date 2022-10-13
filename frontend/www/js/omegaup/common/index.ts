@@ -7,6 +7,7 @@ import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.IndexPayload();
+  const parentPayload = types.payloadParsers.VerificationParentalTokenDetailsPayload();
 
   const ranking = payload.userRank.map((user, index) => ({
     rank: index + 1,
@@ -17,7 +18,7 @@ OmegaUp.on('ready', () => {
     problems_solved: user.problems_solved,
   }));
 
-  if (payload.parentalVerificationToken) {
+  if (parentPayload.VerificationParentalTokenDetailsPayload) {
     ui.success(T.parentalTokenVerificationSuccessful);
   }
 
