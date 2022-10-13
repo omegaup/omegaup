@@ -109,13 +109,13 @@
         <a v-if="data.source_link" download="data.zip" :href="data.source">{{
           T.wordsDownload
         }}</a>
-        <omegaup-arena-feedback-code-view
-          v-else
-          :language="data.language"
-          :enable-feedback="false"
-          :readonly="true"
-          :value="data.source"
-        ></omegaup-arena-feedback-code-view>
+        <slot v-else name="code-view">
+          <omegaup-arena-code-view
+            :language="data.language"
+            :readonly="true"
+            :value="data.source"
+          ></omegaup-arena-code-view>
+        </slot>
         <div v-if="data.compile_error" class="compile_error">
           <h3>{{ T.wordsCompilerOutput }}</h3>
           <pre class="compile_error">
@@ -175,7 +175,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import arena_FeedbackCodeView from './FeedbackCodeView.vue';
+import arena_CodeView from './CodeView.vue';
 import arena_DiffView from './DiffView.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
@@ -199,7 +199,7 @@ const EMPTY_FIELD = '∅';
   components: {
     FontAwesomeIcon,
     'clip-loader': ClipLoader,
-    'omegaup-arena-feedback-code-view': arena_FeedbackCodeView,
+    'omegaup-arena-code-view': arena_CodeView,
     'omegaup-arena-diff-view': arena_DiffView,
     'omegaup-overlay-popup': omegaup_OverlayPopup,
   },

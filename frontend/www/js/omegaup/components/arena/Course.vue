@@ -176,6 +176,12 @@
                 @set-feedback="(request) => $emit('set-feedback', request)"
               ></omegaup-submission-feedback>
             </template>
+            <template #code-view>
+              <omegaup-arena-feedback-code-view
+                :language="runDetailsData.language"
+                :value="runDetailsData.source"
+              ></omegaup-arena-feedback-code-view>
+            </template>
           </omegaup-arena-rundetails-popup>
         </template>
       </omegaup-overlay>
@@ -228,6 +234,7 @@ import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import submission_Feedback from '../submissions/Feedback.vue';
 import { SocketStatus } from '../../arena/events_socket';
 import { SubmissionRequest } from '../../arena/submissions';
+import arena_FeedbackCodeView from './FeedbackCodeView.vue';
 
 @Component({
   components: {
@@ -243,6 +250,7 @@ import { SubmissionRequest } from '../../arena/submissions';
     'omegaup-problem-details': problem_Details,
     'omegaup-submission-feedback': submission_Feedback,
     'omegaup-countdown': omegaup_Countdown,
+    'omegaup-arena-feedback-code-view': arena_FeedbackCodeView,
   },
 })
 export default class ArenaCourse extends Vue {

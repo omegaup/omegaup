@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
 import T from '../../lang';
 import CodeMirror from 'codemirror';
 import { EditorOptions, languageModeMap, modeList } from './CodeView.vue';
@@ -20,7 +20,6 @@ for (const mode of modeList) {
 export default class FeedbackCodeView extends Vue {
   @Prop() language!: string;
   @Prop() value!: string;
-  @Prop({ default: false }) enableFeedback!: boolean;
   @Ref('cm-editor') private readonly cmEditor!: HTMLTextAreaElement;
 
   T = T;
@@ -32,7 +31,7 @@ export default class FeedbackCodeView extends Vue {
       tabSize: 2,
       lineNumbers: true,
       mode: this.mode,
-      readOnly: false,
+      readOnly: true,
       gutters: ['CodeMirror-linenumbers', 'breakpoints'],
     };
   }
@@ -40,28 +39,12 @@ export default class FeedbackCodeView extends Vue {
   mounted() {
     const editor = CodeMirror.fromTextArea(this.cmEditor, this.editorOptions);
 
-    if (!this.enableFeedback) return;
-
     editor.on(
       'gutterClick',
       (codeMirror: CodeMirror.Editor, numberOfLine: number) => {
-        const info = codeMirror.lineInfo(numberOfLine);
-        codeMirror.setGutterMarker(
-          numberOfLine,
-          'breakpoints',
-          info.gutterMarkers ? null : makeMarker(numberOfLine),
-        );
         codeMirror.addLineWidget(numberOfLine, showFeedbackForm(numberOfLine));
       },
     );
-
-    const makeMarker = (numberOfLine: number): HTMLDivElement => {
-      this.onPressLine(numberOfLine);
-      const marker = document.createElement('div');
-      marker.style.color = '#822';
-      marker.innerHTML = '●';
-      return marker;
-    };
 
     const showFeedbackForm = (numberOfLine: number): HTMLDivElement => {
       this.onPressLine(numberOfLine);
@@ -99,13 +82,6 @@ export default class FeedbackCodeView extends Vue {
 
   onPressLine(number: number) {
     this.$emit('show-feedback-form', number);
-  }
-
-  @Watch('hover')
-  onHoverChange(line: null | number) {
-    if (!line) {
-      return;
-    }
   }
 }
 </script>
