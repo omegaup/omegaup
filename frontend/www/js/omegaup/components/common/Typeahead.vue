@@ -6,11 +6,11 @@
     :typeahead-style="'dropdown'"
     :typeahead-max-results="maxResults"
     :typeahead-activation-threshold="activationThreshold"
-    :placeholder="T.typeaheadSearchPlaceholder"
+    :placeholder="placeholder"
     :limit="1"
     :hide-input-on-limit="true"
-    :only-existing-tags="true"
-    :typeahead-hide-discard="true"
+    :only-existing-tags="onlyExistingTags"
+    :typeahead-hide-discard="typeaheadHideDiscard"
     @change="updateExistingOptions"
     @tag-added="onTagAdded"
     @tag-removed="onTagRemoved"
@@ -31,13 +31,17 @@ import { types } from '../../api_types';
   },
 })
 export default class Typeahead extends Vue {
-  @Prop() existingOptions!: types.ListItem[];
+  @Prop({ default: () => [] }) existingOptions!: types.ListItem[];
+  @Prop({ default: () => [] }) options!: types.ListItem[];
   @Prop({ default: 3 }) activationThreshold!: number;
   @Prop({ default: 5 }) maxResults!: number;
-  @Prop({ default: null }) value!: null | string;
+  @Prop({ default: null }) value!: null | types.ListItem;
+  @Prop({ default: true }) onlyExistingTags!: boolean;
+  @Prop({ default: true }) typeaheadHideDiscard!: boolean;
+  @Prop({ default: T.typeaheadSearchPlaceholder }) placeholder!: string;
 
   T = T;
-  selectedOptions: types.ListItem[] = [];
+  selectedOptions = this.options;
 
   updateExistingOptions(query: string): void {
     if (query.length < this.activationThreshold) return;
@@ -46,7 +50,7 @@ export default class Typeahead extends Vue {
 
   onTagAdded(): void {
     if (this.selectedOptions.length < 1) return;
-    this.$emit('update:value', this.selectedOptions[0].key);
+    this.$emit('update:value', this.selectedOptions[0]);
   }
 
   onTagRemoved(): void {
@@ -54,14 +58,14 @@ export default class Typeahead extends Vue {
   }
 
   @Watch('value')
-  onValueChanged(newValue: null | string): void {
+  onValueChanged(newValue: null | types.ListItem): void {
     if (!newValue) {
       this.selectedOptions = [];
       return;
     }
-    this.existingOptions.push({ value: newValue, key: newValue });
+    this.existingOptions.push(newValue);
     this.selectedOptions = this.existingOptions.filter(
-      (option) => option.key === newValue,
+      (option) => option.key === newValue.key,
     );
   }
 }

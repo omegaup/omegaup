@@ -15,13 +15,15 @@
           </select>
         </div>
         <div class="col-md-4">
-          <omegaup-autocomplete
+          <omegaup-common-typeahead
             v-show="selectColumn == 'problem_alias'"
-            v-model="queryProblem"
-            :init="(el) => typeahead.problemTypeahead(el)"
+            :existing-options="searchResultProblems"
+            :value.sync="queryProblem"
             :placeholder="T.wordsKeyword"
-            class="form-control"
-          ></omegaup-autocomplete>
+            @update-existing-options="
+              (query) => $emit('update-search-result-problems', query)
+            "
+          ></omegaup-common-typeahead>
           <omegaup-common-typeahead
             v-show="
               selectColumn == 'nominator_username' ||
@@ -33,7 +35,7 @@
             @update-existing-options="
               (query) => $emit('update-search-result-users', query)
             "
-          />
+          ></omegaup-common-typeahead>
         </div>
       </div>
       <button
@@ -151,15 +153,12 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import common_Paginator from '../common/Paginator.vue';
 import { types } from '../../api_types';
-import Autocomplete from '../Autocomplete.vue';
 import common_Typeahead from '../common/Typeahead.vue';
-import * as typeahead from '../../typeahead';
 import common_SortControls from '../common/SortControls.vue';
 
 @Component({
   components: {
     'omegaup-common-paginator': common_Paginator,
-    'omegaup-autocomplete': Autocomplete,
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-sort-controls': common_SortControls,
   },
@@ -172,17 +171,17 @@ export default class QualityNominationList extends Vue {
   @Prop() pagerItems!: types.PageItem[];
   @Prop() isAdmin!: boolean;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultProblems!: types.ListItem[];
 
   showAll = true;
   T = T;
   ui = ui;
-  typeahead = typeahead;
 
   sortOrder: omegaup.SortOrder = omegaup.SortOrder.Ascending;
   columnName = 'title';
 
-  queryProblem = '';
-  queryUsername: null | string = null;
+  queryProblem: null | types.ListItem = null;
+  queryUsername: null | types.ListItem = null;
   selectColumn = '';
   columns = {
     problem_alias: T.wordsProblem,
@@ -208,7 +207,7 @@ export default class QualityNominationList extends Vue {
 
   @Watch('selectColumn')
   onPropertyChanged() {
-    this.queryProblem = '';
+    this.queryProblem = null;
     this.queryUsername = null;
   }
 
@@ -217,9 +216,9 @@ export default class QualityNominationList extends Vue {
       this.selectColumn == 'nominator_username' ||
       this.selectColumn == 'author_username'
     ) {
-      return this.queryUsername;
+      return this.queryUsername?.key ?? null;
     } else {
-      return this.queryProblem;
+      return this.queryProblem?.key ?? null;
     }
   }
 

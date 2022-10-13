@@ -24,7 +24,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestListMinePayload=array{contests: list<Contest>, privateContestsAlert: bool}
  * @psalm-type ContestDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, contest_for_teams: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
  * @psalm-type ArenaContest=array{alias: string, director: string, finish_time: \OmegaUp\Timestamp|null, start_time: \OmegaUp\Timestamp|null, rerun_id?: int, title: string, window_length?: int}
- * @psalm-type ContestAdminDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, available_languages: array<string, string>, contest_for_teams: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems?: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
+ * @psalm-type ContestAdminDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, available_languages: array<string, string>, contest_for_teams: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems?: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, scoreboard: int, scoreboard_url: null|string, scoreboard_url_admin: null|string, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int|null, scoreboard: int, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null, window_length: int|null}
  * @psalm-type ContestVirtualDetailsPayload=array{contest: ContestPublicDetails}
@@ -863,7 +863,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'runs' => $runs,
                 ] = self::getAllRuns(
                     $contest->problemset_id,
-                    $contest->partial_score
+                    $contest->score_mode
                 );
 
                 $result['templateProperties']['payload']['adminPayload'] = [
@@ -1165,9 +1165,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{templateProperties: array{payload: ContestListv2Payload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
-     * @omegaup-request-param string $query
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param null|string $query
      */
     public static function getContestListDetailsv2ForTypeScript(
         \OmegaUp\Request $r
@@ -1403,7 +1403,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'details' => self::getContestDetailsForAdmin(
                         $contest,
-                        $r->identity
+                        $r->identity,
+                        $problemset
                     ),
                     'problems' => self::addVersionsToProblems(
                         $problems,
@@ -1792,6 +1793,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'has_submissions',
                     'languages',
                     'partial_score',
+                    'score_mode',
                     'penalty',
                     'penalty_calc_policy',
                     'penalty_type',
@@ -1801,12 +1803,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'scoreboard',
                     'scoreboard_url',
                     'scoreboard_url_admin',
+                    'score_mode',
                     'default_show_all_contestants_in_scoreboard',
                     'show_scoreboard_after',
                     'start_time',
                     'submissions_gap',
                     'title',
                     'window_length',
+                    'check_plagiarism',
                 ]);
 
                 $result['original_contest_alias'] = null;
@@ -2009,7 +2013,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function getContestDetailsForAdmin(
         \OmegaUp\DAO\VO\Contests $contest,
-        \OmegaUp\DAO\VO\Identities $adminIdentity
+        \OmegaUp\DAO\VO\Identities $adminIdentity,
+        \OmegaUp\DAO\VO\Problemsets $problemset
     ): array {
         if (is_null($contest->alias) || is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
@@ -2031,6 +2036,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         $result['available_languages'] = \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES;
         $result['admin'] = true;
+        $result['scoreboard_url'] = $problemset->scoreboard_url;
+        $result['scoreboard_url_admin'] = $problemset->scoreboard_url_admin;
         return $result;
     }
 
@@ -2053,11 +2060,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $token = $r->ensureOptionalString('token');
         [
             'contest' => $contest,
+            'problemset' => $problemset,
         ] = self::validateDetails($contestAlias, $r->identity, $token);
 
         return self::getContestDetailsForAdmin(
             $contest,
-            $r->identity
+            $r->identity,
+            $problemset
         );
     }
 
@@ -2264,6 +2273,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'penalty_type' => $originalContest->penalty_type,
             'admission_mode' => 'private', // Cloned contests start in private
                                            // admission_mode
+            'check_plagiarism' => $originalContest->check_plagiarism,
         ]);
 
         \OmegaUp\DAO\DAO::transBegin();
@@ -2361,6 +2371,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'points_decay_factor' => $originalContest->points_decay_factor,
             'submissions_gap' => $originalContest->submissions_gap,
             'partial_score' => $originalContest->partial_score,
+            'score_mode' => $originalContest->score_mode,
             'feedback' => $originalContest->feedback,
             'penalty' => $originalContest->penalty,
             'penalty_type' => $originalContest->penalty_type,
@@ -2368,6 +2379,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'show_scoreboard_after' => true,
             'languages' => $originalContest->languages,
             'rerun_id' => $originalContest->contest_id,
+            'check_plagiarism' => $originalContest->check_plagiarism,
         ]);
 
         $problemset = new \OmegaUp\DAO\VO\Problemsets([
@@ -2516,6 +2528,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param mixed $title
      * @omegaup-request-param int|null $window_length
+     * @omegaup-request-param bool|null $check_plagiarism
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -2554,6 +2567,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $alias
             )
         ) : null;
+
+        $partialScore = $r->ensureOptionalBool('partial_score') ?? true;
+        $scoreMode = $r->ensureOptionalEnum(
+            'score_mode',
+            ['partial','all_or_nothing','max_per_group'],
+        );
+        if (is_null($scoreMode)) {
+            $scoreMode = $partialScore ? 'partial' : 'all_or_nothing';
+        }
+        $checkPlagiarism = $r->ensureOptionalBool('check_plagiarism') ?? false;
         $contest = new \OmegaUp\DAO\VO\Contests([
             'admission_mode' => 'private',
             'title' => $r['title'],
@@ -2564,19 +2587,17 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'alias' => $r['alias'],
             'scoreboard' => $r['scoreboard'],
             'points_decay_factor' => $r['points_decay_factor'],
-            'partial_score' => $r->ensureOptionalBool('partial_score') ?? true,
+            'partial_score' => $partialScore,
             'submissions_gap' => $r['submissions_gap'],
             'feedback' => $r['feedback'],
             'penalty_calc_policy' => $r['penalty_calc_policy'],
             'penalty' => max(0, intval($r['penalty'])),
             'penalty_type' => $r['penalty_type'],
             'languages' => $languages,
-            'score_mode' => $r->ensureOptionalEnum(
-                'score_mode',
-                ['partial','all_or_nothing','max_per_group'],
-            ) ?? 'partial',
+            'score_mode' => $scoreMode,
             'show_scoreboard_after' => $r['show_scoreboard_after'] ?? true,
             'contest_for_teams' => $forTeams,
+            'check_plagiarism' => $checkPlagiarism ? true : false,
         ]);
 
         self::createContest(
@@ -2605,6 +2626,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
@@ -2617,6 +2639,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $submissions_gap
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
+     * @omegaup-request-param bool|null $check_plagiarism
      */
     private static function validateCommonCreateOrUpdate(
         \OmegaUp\Request $r,
@@ -2718,7 +2741,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
         $r->ensureOptionalFloat('scoreboard', 0, 100, $isRequired);
         $r->ensureOptionalFloat('points_decay_factor', 0, 1, $isRequired);
-        $r->ensureOptionalBool('partial_score');
+        // TODO: Change this once the UI supports it
+        $partialScore = $r->ensureOptionalBool('partial_score');
+        $scoreMode = $r->ensureOptionalEnum(
+            'score_mode',
+            ['partial','all_or_nothing','max_per_group'],
+        );
+        if (is_null($scoreMode)) {
+            $scoreMode = $partialScore ? 'partial' : 'all_or_nothing';
+        }
+        $r['score_mode'] = $scoreMode;
         $r->ensureOptionalInt('submissions_gap', 0, null, $isRequired);
         $r->ensureOptionalInt('penalty', 0, 10000, $isRequired);
         // Validate the submission_gap in minutes so that the error message
@@ -2827,6 +2859,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'teams_group_alias'
             );
         }
+        $r->ensureOptionalBool('check_plagiarism') ?? false;
     }
 
     /**
@@ -2843,6 +2876,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
@@ -2855,6 +2889,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
+     * @omegaup-request-param bool|null $check_plagiarism
      */
     private static function validateCreate(
         \OmegaUp\Request $r,
@@ -2880,6 +2915,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
@@ -2892,6 +2928,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $submissions_gap
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
+     * @omegaup-request-param bool|null $check_plagiarism
      */
     private static function validateUpdate(
         \OmegaUp\Request $r,
@@ -4632,6 +4669,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
@@ -4645,6 +4683,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
+     * @omegaup-request-param bool|null $check_plagiarism
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -4726,7 +4765,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $originalRequestsUserInformation !== $requestsUserInformation
             );
         }
-
         $valueProperties = [
             'title',
             'description',
@@ -4740,6 +4778,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'scoreboard',
             'points_decay_factor',
             'partial_score',
+            'score_mode',
             'submissions_gap',
             'feedback',
             'penalty' => ['transform' => fn (string $value): int => max(
@@ -4764,6 +4803,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     }
             ],
             'admission_mode',
+            'check_plagiarism',
         ];
         self::updateValueProperties($r, $contest, $valueProperties);
 
@@ -5052,7 +5092,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Get our runs
         return self::getAllRuns(
             $contest->problemset_id,
-            $contest->partial_score,
+            $contest->score_mode,
             $r->ensureOptionalEnum('status', \OmegaUp\Controllers\Run::STATUS),
             $r->ensureOptionalEnum(
                 'verdict',
@@ -5071,7 +5111,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     private static function getAllRuns(
         int $problemsetId,
-        bool $partialScore,
+        string $scoreMode,
         ?string $status = null,
         ?string $verdict = null,
         ?int $problemId = null,
@@ -5098,7 +5138,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $allRuns = [];
         foreach ($runs as $run) {
             unset($run['run_id']);
-            if ($partialScore || $run['score'] == 1) {
+            if ($scoreMode === 'partial' || $run['score'] == 1) {
                 $run['contest_score'] = round(
                     floatval(
                         $run['contest_score']
@@ -5106,7 +5146,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     2
                 );
                 $run['score'] = round(floatval($run['score']), 4);
-            } else {
+            } elseif ($scoreMode === 'all_or_nothing') {
                 $run['contest_score'] = 0;
                 $run['score'] = 0;
             }

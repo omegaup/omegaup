@@ -35,11 +35,11 @@ OmegaUp.on('ready', () => {
             teamsGroupAlias,
           }: {
             contest: types.ContestAdminDetails;
-            teamsGroupAlias?: string;
+            teamsGroupAlias?: types.ListItem;
           }): void => {
             api.Contest.create({
               ...contest,
-              teams_group_alias: teamsGroupAlias,
+              teams_group_alias: teamsGroupAlias?.key,
             })
               .then(() => {
                 this.invalidParameterName = null;

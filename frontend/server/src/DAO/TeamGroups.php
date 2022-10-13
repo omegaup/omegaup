@@ -15,9 +15,12 @@ namespace OmegaUp\DAO;
 class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
     public static function getByAlias(string $alias): ?\OmegaUp\DAO\VO\TeamGroups {
         $sql = 'SELECT
-                    `tg`.*
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\TeamGroups::FIELD_NAMES,
+            'tg'
+        ) . '
                 FROM
-                    `Team_Groups` AS `tg`
+                    `Team_Groups` `tg`
                 WHERE
                     `tg`.`alias` = ?
                 LIMIT 1;';
@@ -32,9 +35,12 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
 
     public static function getByName(string $name): ?\OmegaUp\DAO\VO\TeamGroups {
         $sql = 'SELECT
-                    `tg`.*
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\TeamGroups::FIELD_NAMES,
+            'tg'
+        ) . '
                 FROM
-                    `Team_Groups` AS `tg`
+                    `Team_Groups` `tg`
                 WHERE
                     `tg`.`name` = ?
                 LIMIT 1;';

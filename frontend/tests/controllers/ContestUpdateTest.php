@@ -1171,14 +1171,14 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for the test with different partial score values.
      *
-     * @return list<array{0: bool, 1: int, 2: float, 3: float}>
+     * @return list<array{0: bool, 1:string, 2: int, 3: float, 4: float}>
      */
     public function partialScoreValueProvider(): array {
         return [
-            [false, 1, 0, 0.05],
-            [true, 1, 0.05, 0],
-            [false, 100, 0, 5],
-            [true, 100, 5, 0],
+            [false,'all_or_nothing', 1, 0, 0.05],
+            [true, 'partial',  1, 0.05, 0],
+            [false,'all_or_nothing', 100, 0, 5],
+            [true, 'partial', 100, 5, 0],
         ];
     }
 
@@ -1187,6 +1187,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCreateContestWhenPartialScoreIsUpdated(
         bool $initialPartialScore,
+        string $initalScoreMode,
         int $problemsetProblemPoints,
         float $expectedContestScoreBeforeUpdate,
         float $expectedContestScoreAfterUpdate
@@ -1273,6 +1274,10 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'partial_score' => $partialScore,
                 'languages' => 'c11-gcc',
             ])
+        );
+
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
         );
 
         $login = self::login($identity);
@@ -1597,5 +1602,57 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $expectedContestScore,
             $runList['contest_score']
         );
+    }
+
+        /**
+     * A PHPUnit data provider for all the partial score to get profile details.
+     *
+     * @return list<array{0:bool, 1:string}>
+     */
+    public function partialScoreProvider(): array {
+        return [
+            [true, 'all_or_nothing'],
+            [false, 'partial'],
+        ];
+    }
+
+    /**
+     * @dataProvider partialScoreProvider
+     */
+    public function testUpdateContestWithPartialScore(
+        bool $partialScore,
+        string $scoreModeExpected
+    ) {
+        // Get a problem
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Create contest with 2 hours and a window length 30 of minutes
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'partialScore' => $partialScore,
+                ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contest
+        );
+
+        // Create a contestant
+        $login = self::login($contest['director']);
+
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contest['request']['alias'],
+                'partial_score' => !$partialScore,
+            ]));
+
+        // Update a contest request
+        $response = \OmegaUp\DAO\Contests::getByAlias(
+            $contest['request']['alias']
+        );
+
+        $this->assertEquals($response->score_mode, $scoreModeExpected);
     }
 }

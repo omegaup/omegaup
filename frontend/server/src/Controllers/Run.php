@@ -782,7 +782,14 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         // Reset fields.
         $run->status = 'new';
-        \OmegaUp\DAO\Runs::update($run);
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            \OmegaUp\DAO\Runs::update($run);
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
 
         try {
             \OmegaUp\Grader::getInstance()->rejudge(
@@ -1000,7 +1007,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'guid' => strval($submission->guid),
             'language' => strval($submission->language),
             'alias' => strval($problem->alias),
-            'feedback' => \OmegaUp\DAO\Submissions::getSubmissionFeedback(
+            'feedback' => \OmegaUp\DAO\SubmissionFeedback::getSubmissionFeedback(
                 $submission
             ),
         ];

@@ -22,6 +22,8 @@ class Notifications extends \OmegaUp\DAO\Base\Notifications {
     const COURSE_SUBMISSION_FEEDBACK = 'course-submission-feedback';
     const COURSE_REGISTRATION_MANUAL = 'course-registration-manual';
     const COURSE_ADMINISTRATOR_ADDED = 'course-administrator-added';
+    const COURSE_TEACHING_ASSISTANT_ADDED = 'course-teaching-assistant-added';
+    const COURSE_REQUEST_FEEDBACK = 'course-request-feedback';
     const DEMOTION = 'demotion';
 
     /**
