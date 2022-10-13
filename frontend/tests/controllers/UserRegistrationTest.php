@@ -1,8 +1,6 @@
 <?php
 // phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
-use OmegaUp\Controllers\User;
-
 /**
  * Testing new user special cases
  */

@@ -4637,10 +4637,13 @@ class User extends \OmegaUp\Controllers\Controller {
             }
 
             if (is_null($r->user) || is_null($r->user->main_email_id)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+                throw new \OmegaUp\Exceptions\UnauthorizedException();
             }
 
             $user = \OmegaUp\DAO\Users::getByPK($userId);
+            if (is_null($user)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+            }
 
             try {
                 $user->parent_email_id = $r->user->main_email_id;
