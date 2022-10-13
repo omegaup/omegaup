@@ -40,6 +40,7 @@ CONTESTS_TO_RUN_PLAGIARISM_ON = """ SELECT c.`contest_id`, c.`alias`, c.`problem
                                     FROM `Contests` as c
                                     WHERE
                                         c.`check_plagiarism` = 1 AND
+                                        c.`finish_time` < NOW() - INTERVAL 20 MINUTE AND
                                         c.`contest_id` NOT IN
                                             (SELECT p.`contest_id` 
                                             FROM `Plagiarisms` as p);
@@ -50,11 +51,11 @@ GET_CONTEST_SUBMISSION_IDS= """ SELECT c.contest_id, s.submission_id, s.problems
                                 INNER JOIN Contests c ON c.problemset_id = s.problemset_id 
                                 WHERE c.contest_id = %s;
                             """
-INSERT_INTO_PLAGIARISMS = """
+INSERT_INTO_PLAGIARISMS = """  
                                 INSERT INTO `Plagiarisms`
-                                (`contest_id`, `submission_id_1` , `submission_id_2`, `score_1`, `score_2` , `contents`)
+                                (`contest_id`, `score_1`, `score_2` , `submission_id_1` , `submission_id_2`, `contents`)
                                 VALUES
-                                (1, 2, 3, 5, 5, 6)
+                                (%s, %s, %s, %s, %s, %s)
                             """
 
 #Constants
@@ -94,33 +95,35 @@ def get_range(code: Sequence[str]) -> Sequence[int]:
 
     return code_range
 
-def filter_and_format_result(result: Sequence[Any]) -> Sequence[Any]:
+def filter_and_format_result(dbconn: lib.db.Connection, contest_id: int, submissions: Iterable[Tuple[Any, ...]], result: Sequence[Any]) -> None:
+    d = {}
+    for i in submissions:
+        d[i[5][2:]] = i[1]
+    update = []
     for r in result:
-        r[0] = int(100*r[0])
-        r[1] = int(100*r[1])
-        r[2] = r[2].split('/')[4].split('.')[0]
-        r[3] = r[3].split('/')[4].split('.')[0]
-        r[4] = get_range(r[4].split('\n'))
-        r[5] = get_range(r[5].split('\n'))
-    return result
+        update.append((contest_id, int(100*r[0]), int(100*r[1]),
+                        d[r[2].split('/')[4].split('.')[0]], 
+                        d[r[3].split('/')[4].split('.')[0]],
+                        json.dumps({'file1': get_range(r[4].split('\n')), 
+                                    'file2': get_range(r[4].split('\n'))})
+                        ))
+    with dbconn.cursor() as cur:
+        cur.executemany(INSERT_INTO_PLAGIARISMS, update)
 
-def run_copy_detect(dir: str, contest_id: int, submissions: Iterable[Tuple[Any, ...]]) -> Dict[Any, Any]:
-    result = {}
+def run_copy_detect(dbconn: lib.db.Connection, dir: str, contest_id: int, submissions: Iterable[Tuple[Any, ...]]) -> None:
     for problem in os.listdir(dir):
         detector = CopyDetector(test_dirs=
                                     [(os.path.join(dir, problem))],
                                     extensions=["cpp", "py", "py3", "java", "c"], display_t=0.9, autoopen = False, 
                                     disable_filtering=True)
         detector.run()
-        detector_result = detector.get_copied_code_list()
-        result[problem] = (filter_and_format_result(detector_result))
-    return result
+        (filter_and_format_result(dbconn, contest_id, submissions, detector.get_copied_code_list()))
     
 def download_submission_files(dbconn: lib.db.Connection, dir: str, 
     download: SubmissionDownloader, submission_ids: Iterable[Tuple[Any, ...]]) -> None:
 
     for submission in submission_ids:
-        submission_path = os.path.join(dir, str(submission[3]), f'{submission[5]}.{submission[6]}')
+        submission_path = os.path.join(dir, str(submission[3]), f'{submission[5][2:]}.{submission[6]}')
         os.makedirs(os.path.dirname(submission_path), exist_ok=True)
         download(submission[5], submission_path)
 
@@ -140,10 +143,7 @@ def run_detector_for_contest(dbconn: lib.db.Connection,
     with tempfile.TemporaryDirectory(prefix='plagiarism_detector') as dir:
         submissions = get_submissions_for_contest(dbconn, contest_id)
         download_submission_files(dbconn, dir, download, submissions)
-        result = run_copy_detect(dir, contest_id, submissions)
-        print(result)
-    with dbconn.cursor() as cur:
-        cur.execute(INSERT_INTO_PLAGIARISMS)
+        run_copy_detect(dbconn, dir, contest_id, submissions)
 
 def main() -> None:
     ''' Main entrypoint. '''
@@ -166,9 +166,9 @@ def main() -> None:
         download: SubmissionDownloader = LocalSubmissionDownloader(args.local_downloader_dir)
     else:
         download= S3SubmissionDownloader()
-
+        
     for contest in get_contests(dbconn):
         run_detector_for_contest(dbconn, download, int(contest[0]))
-
+    dbconn.conn.commit()
 if __name__ == '__main__':
     main()
