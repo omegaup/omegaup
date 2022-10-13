@@ -4626,30 +4626,34 @@ class User extends \OmegaUp\Controllers\Controller {
         );
         $parentalVerificationToken = false;
 
-        if (!is_null($token)) {
             $userId = \OmegaUp\DAO\Users::getUserDataByParentalToken($token);
 
-            if (is_null($r->user) || is_null($r->user->main_email_id)) {
-                throw new \OmegaUp\Exceptions\UnauthorizedException();
-            }
+        if (is_null($userId)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'parentalTokenNotFound'
+            );
+        }
+
+        if (is_null($r->user) || is_null($r->user->main_email_id)) {
+            throw new \OmegaUp\Exceptions\UnauthorizedException();
+        }
 
             $user = \OmegaUp\DAO\Users::getByPK($userId);
-            if (is_null($user)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-            }
+        if (is_null($user)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
 
-            try {
-                $user->parent_email_id = $r->user->main_email_id;
-                $user->parent_verified = true;
-                $user->parental_verification_token = null;
+        try {
+            $user->parent_email_id = $r->user->main_email_id;
+            $user->parent_verified = true;
+            $user->parental_verification_token = null;
 
-                \OmegaUp\DAO\Users::update($user);
-                $parentalVerificationToken = true;
-            } catch (\OmegaUp\Exceptions\ApiException $e) {
-                self::$log->error(
-                    "Unable to save parental token verification: $e"
-                );
-            }
+            \OmegaUp\DAO\Users::update($user);
+            $parentalVerificationToken = true;
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            self::$log->error(
+                "Unable to save parental token verification: $e"
+            );
         }
 
         return [
