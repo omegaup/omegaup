@@ -18,7 +18,7 @@ OmegaUp.on('ready', () => {
     problems_solved: user.problems_solved,
   }));
 
-  if (parentPayload.VerificationParentalTokenDetailsPayload) {
+  if (parentPayload.parentalVerificationToken) {
     ui.success(T.parentalTokenVerificationSuccessful);
   }
 
