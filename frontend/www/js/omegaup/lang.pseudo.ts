@@ -1245,7 +1245,6 @@ const translations: { [key: string]: string; } = {
   reportProblemFormThanksForReview: "(Thank5 f0r y0ur r3p0r7!)",
   requestDate: "(Da73 0f r3qu357)",
   requestFeedback: "(Th3 f33dback r3qu357 ha5 b33n 53n7 70 7h3 a11 admini57ra70r5)",
-  requestFeedbackMessage: "(I n33d y0ur h31p in 7hi5 5ubmi55i0n.)",
   resourceNotFound: "(R350urc3 n07 f0und.)",
   reviewerNomination: "(Ra73 pr0b13m a5 r3vi3w3r)",
   reviewerNominationFormTitle: "(Qua1ify 7hi5 pr0b13m!)",

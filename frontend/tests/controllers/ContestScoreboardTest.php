@@ -109,6 +109,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             'contestData' => $contestData,
             'contestants' => $identities,
             'contestAdmin' => $contestAdmin,
+            'contestIdentityAdmin' => $contestIdentityAdmin,
             'runMap' => $runMap,
         ];
     }
@@ -1152,6 +1153,74 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+    }
+
+    public function testScoreboardHideAdminRuns() {
+        $runMap = [
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 0,
+                'points' => 0,
+                'verdict' => 'CE',
+                'submit_delay' => 60,
+            ],
+        ];
+        $testData = $this->prepareContestScoreboardData(
+            nUsers: 3,
+            runMap: $runMap,
+            runForAdmin: true,
+            runForDirector: true,
+            admissionMode: 'private'
+        );
+
+        // Add contestant as an admin via a group
+        $contestData = $testData['contestData'];
+        $adminGroup = \OmegaUp\Test\Factories\Groups::createGroup();
+        $identityToRemove = $testData['contestants'][0];
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $adminGroup,
+            $identityToRemove
+        );
+        \OmegaUp\Test\Factories\Contest::addGroupAdmin(
+            $contestData,
+            $adminGroup['group']
+        );
+
+        // Create API
+        $login = self::login($identityToRemove);
+        $contestAlias = $contestData['contest']->alias;
+        $response = \OmegaUp\Controllers\Contest::apiScoreboard(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestAlias,
+            ])
+        );
+
+        $admins = [
+            $identityToRemove->username,
+            $contestData['director']->username,
+            $testData['contestIdentityAdmin']->username
+        ];
+
+        // Check admin scoreboard.
+        $this->assertArrayHasKey('ranking', $response);
+        foreach ($response['ranking'] as $entry) {
+            $this->assertNotContains($entry['username'], $admins);
+        }
+
+        // Check the public scoreboard.
+        $contestant = $testData['contestants'][1];
+        $login = self::login($contestant);
+        $response = \OmegaUp\Controllers\Contest::apiScoreboard(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestAlias,
+            ])
+        );
+        $this->assertArrayHasKey('ranking', $response);
+        foreach ($response['ranking'] as $entry) {
+            $this->assertNotContains($entry['username'], $admins);
         }
     }
 
