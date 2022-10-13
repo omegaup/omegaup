@@ -50,13 +50,17 @@ GET_CONTEST_SUBMISSION_IDS= """ SELECT c.contest_id, s.submission_id, s.problems
                                 INNER JOIN Contests c ON c.problemset_id = s.problemset_id 
                                 WHERE c.contest_id = %s;
                             """
+INSERT_INTO_PLAGIARISMS = """
+                                INSERT INTO `Plagiarisms`
+                                (`contest_id`, `submission_id_1` , `submission_id_2`, `score_1`, `score_2` , `contents`)
+                                VALUES
+                                (1, 2, 3, 5, 5, 6)
+                            """
 
-
-'''
-    Function to get the submission files of a contest from S3. 
-        The files are stored as follow:-
-            /stuff/cron/Submissions/Contest_id/problem_id/language 
-'''
+#Constants
+START_RED = "<span class='highlight-red'>"
+START_GREEN = "<span class='highlight-green'>"
+END = "</span>"
 
 SubmissionDownloader = Callable[[str, str], None]
 
@@ -77,17 +81,40 @@ class LocalSubmissionDownloader:
     def __call__(self, guid: str, destination_path: str) -> None:
         
         shutil.copyfile(os.path.join(self._dir, "test1.cpp"), destination_path)
-    
+def get_range(code: Sequence[str]) -> Sequence[int]:
 
-def run_copy_detect(dir: str, contest_id: int, submissions: Iterable[Tuple[Any, ...]]) -> Any:
+    code_range = []
+    for i in range(0,len(code)):
+        if START_RED in code[i]:
+            code_range.append(i)
+        if( START_GREEN in code[i]):
+            code_range.append(i)
+        if END in code[i]:
+            code_range.append(i)
 
+    return code_range
+
+def filter_and_format_result(result: Sequence[Any]) -> Sequence[Any]:
+    for r in result:
+        r[0] = int(100*r[0])
+        r[1] = int(100*r[1])
+        r[2] = r[2].split('/')[4].split('.')[0]
+        r[3] = r[3].split('/')[4].split('.')[0]
+        r[4] = get_range(r[4].split('\n'))
+        r[5] = get_range(r[5].split('\n'))
+    return result
+
+def run_copy_detect(dir: str, contest_id: int, submissions: Iterable[Tuple[Any, ...]]) -> Dict[Any, Any]:
+    result = {}
     for problem in os.listdir(dir):
         detector = CopyDetector(test_dirs=
                                     [(os.path.join(dir, problem))],
-                                    extensions=["py3"], display_t=0.9, autoopen = False, 
+                                    extensions=["cpp", "py", "py3", "java", "c"], display_t=0.9, autoopen = False, 
                                     disable_filtering=True)
         detector.run()
-        return detector.get_copied_code_list()
+        detector_result = detector.get_copied_code_list()
+        result[problem] = (filter_and_format_result(detector_result))
+    return result
     
 def download_submission_files(dbconn: lib.db.Connection, dir: str, 
     download: SubmissionDownloader, submission_ids: Iterable[Tuple[Any, ...]]) -> None:
@@ -110,10 +137,13 @@ def get_submissions_for_contest(dbconn: lib.db.Connection, contest_id: int) -> I
 def run_detector_for_contest(dbconn: lib.db.Connection, 
     download: SubmissionDownloader, contest_id: int) -> None:
 
-  with tempfile.TemporaryDirectory(prefix='plagiarism_detector') as dir:
-    submissions = get_submissions_for_contest(dbconn, contest_id)
-    download_submission_files(dbconn, dir, download, submissions)
-    result = run_copy_detect(dir, contest_id, submissions)
+    with tempfile.TemporaryDirectory(prefix='plagiarism_detector') as dir:
+        submissions = get_submissions_for_contest(dbconn, contest_id)
+        download_submission_files(dbconn, dir, download, submissions)
+        result = run_copy_detect(dir, contest_id, submissions)
+        print(result)
+    with dbconn.cursor() as cur:
+        cur.execute(INSERT_INTO_PLAGIARISMS)
 
 def main() -> None:
     ''' Main entrypoint. '''
@@ -131,11 +161,12 @@ def main() -> None:
 
     logging.info('started')
     dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
-    print(args.local_downloader_dir)
+
     if args.local_downloader_dir != None:
         download: SubmissionDownloader = LocalSubmissionDownloader(args.local_downloader_dir)
     else:
         download= S3SubmissionDownloader()
+
     for contest in get_contests(dbconn):
         run_detector_for_contest(dbconn, download, int(contest[0]))
 
