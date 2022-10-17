@@ -128,6 +128,12 @@ Cypress.Commands.add(
   },
 );
 
+declare enum ScoreMode {
+  AllOrNothing = 'all_or_nothing',
+  Partial = 'partial',
+  MaxPerGroup = 'max_per_group',
+}
+
 Cypress.Commands.add(
   'createContest',
   ({
@@ -136,7 +142,7 @@ Cypress.Commands.add(
     endDate,
     description = 'Default Description',
     showScoreboard = true,
-    scoreMode = 'partial',
+    scoreMode = ScoreMode.Partial,
     basicInformation = false,
     requestParticipantInformation = 'no',
   }) => {

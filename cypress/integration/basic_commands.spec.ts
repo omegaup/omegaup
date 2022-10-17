@@ -265,6 +265,12 @@ describe('Basic Commands Test', () => {
 
   const now = new Date();
 
+  enum ScoreMode {
+    AllOrNothing = 'all_or_nothing',
+    Partial = 'partial',
+    MaxPerGroup = 'max_per_group',
+  }
+
   const problemAlias = 'problem-' + uuid().slice(0, 8);
   const contestOptions: ContestOptions = {
     contestAlias: 'contest' + uuid().slice(0, 5),
@@ -273,7 +279,7 @@ describe('Basic Commands Test', () => {
     endDate: addSubtractDaysToDate(now, {days: 2}),
     showScoreboard: true,
     basicInformation: false,
-    scoreMode: 'partial',
+    scoreMode: ScoreMode.Partial,
     requestParticipantInformation: 'no',
     admissionMode: 'public',
     problems: [
