@@ -42,12 +42,11 @@ export default class FeedbackCodeView extends Vue {
     editor.on(
       'gutterClick',
       (codeMirror: CodeMirror.Editor, numberOfLine: number) => {
-        codeMirror.addLineWidget(numberOfLine, showFeedbackForm(numberOfLine));
+        codeMirror.addLineWidget(numberOfLine, showFeedbackForm());
       },
     );
 
-    const showFeedbackForm = (numberOfLine: number): HTMLDivElement => {
-      this.onPressLine(numberOfLine);
+    const showFeedbackForm = (): HTMLDivElement => {
       const marker = document.createElement('div');
       marker.innerHTML = `
         <div class="card" ref="feedback">
@@ -78,10 +77,6 @@ export default class FeedbackCodeView extends Vue {
       `;
       return marker;
     };
-  }
-
-  onPressLine(number: number) {
-    this.$emit('show-feedback-form', number);
   }
 }
 </script>
