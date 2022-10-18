@@ -2,7 +2,7 @@
   <omegaup-arena
     :active-tab="activeTab"
     :title="currentAssignment.name"
-    :should-show-runs="isAdmin"
+    :should-show-runs="isAdmin || isTeachingAssistant"
     :should-show-ranking="course.admission_mode !== 'public'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
@@ -72,6 +72,7 @@
                 problemInfo ? problemInfo.nominationStatus : null
               "
               :popup-displayed="problemDetailsPopup"
+              :request-feedback="true"
               :active-tab="'problems'"
               :languages="course.languages"
               :runs="runs"
@@ -79,6 +80,7 @@
               :run-details-data="runDetailsData"
               :problem-alias="problemAlias"
               :in-contest-or-course="true"
+              @request-feedback="(guid) => $emit('request-feedback', guid)"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', { selectedTab, problemAlias })
@@ -268,6 +270,7 @@ export default class ArenaCourse extends Vue {
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
   @Prop() totalRuns!: number;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: false }) isTeachingAssistant!: boolean;
 
   T = T;
   omegaup = omegaup;
