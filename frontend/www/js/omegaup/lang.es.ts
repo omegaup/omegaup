@@ -1250,6 +1250,7 @@ const translations: { [key: string]: string; } = {
   runCannotBeRequalified: "El env\u00edo no puede ser recalificado.",
   runDetailsFeedbackAddReview: "Agregar comentario",
   runDetailsFeedbackCancel: "Cancelar",
+  runDetailsFeedbackCreated: "Retroalimentaci\u00f3n creada",
   runDetailsFeedbackPlaceholder: "Escribe tu retroalimentaci\u00f3n aqu\u00ed...",
   runDetailsNewFeedback: "Nueva retroalimentaci\u00f3n",
   runDisqualifyConfirm: "Realmente desea descalificar este env\u00edo?",

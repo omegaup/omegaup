@@ -1,6 +1,17 @@
 <template>
-  <div class="container-fluid" data-feedback-code-mirror>
-    <textarea v-show="false" ref="cm-editor" v-model="value"></textarea>
+  <div>
+    <div class="container-fluid" data-feedback-code-mirror>
+      <textarea v-show="false" ref="cm-editor" v-model="value"></textarea>
+    </div>
+    <div class="container-fluid text-right py-2">
+      <button
+        class="btn btn-primary mx-2"
+        :disabled="!feedbackList.length"
+        @click="saveFeedbackList"
+      >
+        {{ T.submissionSendFeedback }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -9,6 +20,7 @@ import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
 import T from '../../lang';
 import CodeMirror from 'codemirror';
 import { EditorOptions, languageModeMap, modeList } from './CodeView.vue';
+import Feedback, { ArenaCourseFeedback, FeedbackStatus } from './Feedback.vue';
 
 for (const mode of modeList) {
   require(`codemirror/mode/${mode}/${mode}.js`);
@@ -20,11 +32,11 @@ for (const mode of modeList) {
 export default class FeedbackCodeView extends Vue {
   @Prop() language!: string;
   @Prop() value!: string;
+  @Prop({ default: () => [] }) feedbackList!: ArenaCourseFeedback[];
   @Ref('cm-editor') private readonly cmEditor!: HTMLTextAreaElement;
 
   T = T;
   mode = languageModeMap[this.language] ?? languageModeMap['cpp17-gcc'];
-  hover: null | number = null;
 
   get editorOptions(): EditorOptions {
     return {
@@ -42,41 +54,47 @@ export default class FeedbackCodeView extends Vue {
     editor.on(
       'gutterClick',
       (codeMirror: CodeMirror.Editor, numberOfLine: number) => {
-        codeMirror.addLineWidget(numberOfLine, showFeedbackForm());
+        codeMirror.addLineWidget(numberOfLine, showFeedbackForm(numberOfLine));
       },
     );
 
-    const showFeedbackForm = (): HTMLDivElement => {
+    const showFeedbackForm = (numberOfLine: number): HTMLDivElement => {
       const marker = document.createElement('div');
-      marker.innerHTML = `
-        <div class="card" ref="feedback">
-          <div class="card-header">${T.runDetailsNewFeedback}</div>
-          <div class="card-body">
-            <textarea
-              placeholder="${T.runDetailsFeedbackPlaceholder}"
-              class="w-100"
-            ></textarea>
-          </div>
-          <div class="card-footer text-muted">
-            <div class="form-group my-2">
-              <button
-                data-button-submit
-                class="btn btn-primary mx-2"
-              >
-                ${T.runDetailsFeedbackAddReview}
-              </button>
-              <button
-                data-button-cancel
-                class="btn btn-danger mx-2"
-              >
-                ${T.runDetailsFeedbackCancel}
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
+      marker.classList.add('px-2');
+
+      const feedback: ArenaCourseFeedback = {
+        text: null,
+        line: numberOfLine,
+        status: FeedbackStatus.New,
+      };
+      const componentClass = Vue.extend(Feedback);
+      const feedbackForm = new componentClass({
+        propsData: {
+          feedback,
+        },
+      });
+
+      feedbackForm.$mount();
+
+      feedbackForm.$on('submit', (feedback: ArenaCourseFeedback) =>
+        this.storeFeedback(feedback),
+      );
+
+      feedbackForm.$on('cancel', (feedback: ArenaCourseFeedback) => {
+        console.log(feedback);
+      });
+
+      marker.appendChild(feedbackForm.$el);
       return marker;
     };
+  }
+
+  storeFeedback(feedback: ArenaCourseFeedback): void {
+    this.feedbackList.push(feedback);
+  }
+
+  saveFeedbackList(): void {
+    this.$emit('save-feedback-list', this.feedbackList);
   }
 }
 </script>
@@ -90,6 +108,10 @@ export default class FeedbackCodeView extends Vue {
 
   .cm-s-default {
     height: 95%;
+
+    .CodeMirror-sizer {
+      min-height: 100% !important;
+    }
 
     .CodeMirror-linenumbers {
       width: 39px !important;
