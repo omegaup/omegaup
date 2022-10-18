@@ -34,11 +34,6 @@ import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 from mysql.connector import errorcode
 
-SUBMISSION_PATH = os.path.abspath(
-    os.path.join(__file__, '..', '..', '..',
-                 'frontend/tests/runfiles/shard-0'))
-
-
 class Results(NamedTuple):
     contest_id: int
     score_1: int
@@ -123,11 +118,11 @@ class S3SubmissionDownloader:
 class LocalSubmissionDownloader:
 
     def __init__(self, dir: str) -> None:
-        self._dir = os.path.join(SUBMISSION_PATH, dir)
+        self._dir = dir
 
     def __call__(self, guid: str, destination_dir: str, language: str) -> None:
         shutil.copyfile(os.path.join(self._dir, f'{guid[:2]}/{guid[2:]}'),
-                        os.path.join(destination_dir, guid))
+                        os.path.join(destination_dir, f'{guid}.{language}'))
 
 
 """
@@ -142,7 +137,7 @@ def get_range(code: Sequence[str]) -> Sequence[int]:
     code_range: List[int] = []
     for line_number, line in enumerate(code):
 
-        #If the color is red, then it will be the same for the entire 'code'.
+        # If the color is red, then it will be the same for the entire 'code'.
         #that's why we don't really make a distinction between them.
 
         if START_RED in line or START_GREEN in line:
@@ -168,22 +163,9 @@ def filter_and_format_result(dbconn: lib.db.Connection, contest_id: int,
     guid_and_submission_id_dict: Dict[str, int] = {}
 
     for submission in submissions:
-        guid_and_submission_id_dict[submission['guid']
-                                    [2:]] = submission['submission_id']
-    """
-        Formatting the result to insert into database
-        current result format = 
-                [test similarity(float),      
-                reference similarity(float), 
-                path to test file(str), 
-                path to reference file(str), 
-                highlighted test code(str), 
-                highlighted reference code(str), 
-                numer of overlapping tokens(int)]
-        Since it not a dict, we will use 0 based indexing. 
-    """
+        guid_and_submission_id_dict[submission['guid']] = submission['submission_id']
 
-    updated_result = []
+    updated_result: List[Results] = []
     for result in results:
         updated_result.append(
             Results(
@@ -210,7 +192,7 @@ def run_copy_detect(dbconn: lib.db.Connection, dir: str, contest_id: int,
     # we will run detector for each problem.
     for problem in os.listdir(dir):
         detector = copydetect.CopyDetector(
-            test_dirs=[(os.path.join(dir, problem))],
+            test_dirs=[os.path.join(dir, problem)],
             extensions=["cpp", "py", "py3", "java", "c"],
             display_t=0.9,
             autoopen=False,
