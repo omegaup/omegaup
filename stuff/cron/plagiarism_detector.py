@@ -32,7 +32,6 @@ sys.path.insert(
                  "."))
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
-from mysql.connector import errorcode
 
 class Results(NamedTuple):
     contest_id: int
@@ -125,20 +124,19 @@ class LocalSubmissionDownloader:
                         os.path.join(destination_dir, f'{guid}.{language}'))
 
 
-"""
+def get_range(code: Sequence[str]) -> Sequence[int]:
+
+    """
     Function to get the range of lines that are plagiarised. 
     The length of each list should be even. 
     [1, 4, 7, 9] So, the ranges are 1-4 and 7-9. 
-"""
-
-
-def get_range(code: Sequence[str]) -> Sequence[int]:
+    """
 
     code_range: List[int] = []
     for line_number, line in enumerate(code):
 
         # If the color is red, then it will be the same for the entire 'code'.
-        #that's why we don't really make a distinction between them.
+        # that's why we don't really make a distinction between them.
 
         if START_RED in line or START_GREEN in line:
             code_range.append(line_number)
@@ -198,7 +196,6 @@ def run_copy_detect(dbconn: lib.db.Connection, dir: str, contest_id: int,
             autoopen=False,
             disable_filtering=True)
         detector.run()
-        # detector.get_copied_code_list() return a list.
         copydetector_result: List[CopyDetectorResult] = [
             CopyDetectorResult(
                 test_similarity=test_sim,
@@ -275,7 +272,7 @@ def main() -> None:
     for contest in get_contests(dbconn):
         run_detector_for_contest(dbconn, download, contest['contest_id'])
 
-    # dbconn.conn.commit()
+    dbconn.conn.commit()
 
 
 if __name__ == '__main__':
