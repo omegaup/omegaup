@@ -72,12 +72,6 @@ OmegaUp.on('ready', () => {
   });
 });
  
-function userAge(): number | null {
-  if (this.birthDate === null) {
-    return null;
-  }
-  return time.getDifferenceInCalendarYears(this.birthDate);
-}
 
 function Date_diff(currentDate: Date, parent_email_verification_initial: Date) {
    //calculate time difference  
