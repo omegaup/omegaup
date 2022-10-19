@@ -17,10 +17,10 @@ OmegaUp.on('ready', () => {
 
     if(differenceDate < 5)
     {
-      ui.warning(T.AccountVerifyWarning + differenceDate + 'days left')
+      ui.warning(T.AccountVerifyWarning + differenceDate + T.Days)
     }
     else if(differenceDate <=7){
-      ui.warning(T.AccountVerifyWarning + differenceDate + 'days left')
+      ui.warning(T.accountVerifyWarning + differenceDate + T.days)
     }
 
   const ranking = payload.userRank.map((user, index) => ({

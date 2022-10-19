@@ -4,6 +4,7 @@ accountDeletionConfirmEmailBody = "User %(username) confirmed to delete their ac
 accountDeletionConfirmEmailSubject = "omegaup account deleted"
 accountDeletionRequestEmailBody = "User %(username) is requesting delete their account."
 accountDeletionRequestEmailSubject = "omegaup account deletion request"
+accountVerifyWarning = "Your parent or Guardian must approve your acount otherwise it will be deleted in"
 activityReport = "Activity report"
 activityReportDuplicatesForOriginsDescription = "Addresses with more than one user"
 activityReportDuplicatesForUsersDescription = "Users with more than one address"
