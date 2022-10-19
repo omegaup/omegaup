@@ -4508,7 +4508,6 @@ export namespace types {
   }
 
   export interface UserDetailsPayload {
-    parent_email_verification_initial: Date;
     emails: string[];
     experiments: string[];
     roleNames: types.UserRole[];
