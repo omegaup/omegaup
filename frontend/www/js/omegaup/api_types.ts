@@ -4655,7 +4655,7 @@ export namespace types {
   }
 
   export interface VerificationParentalTokenDetailsPayload {
-    parentalVerificationToken: boolean;
+    hasparentalVerificationToken: boolean;
   }
 }
 
