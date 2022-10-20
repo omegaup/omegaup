@@ -4624,9 +4624,9 @@ class User extends \OmegaUp\Controllers\Controller {
                 $token
             ) === 1
         );
-        $parentalVerificationToken = false;
+        $hasParentalVerificationToken = false;
 
-            $userId = \OmegaUp\DAO\Users::getUserDataByParentalToken($token);
+        $userId = \OmegaUp\DAO\Users::getUserDataByParentalToken($token);
 
         if (is_null($userId)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -4638,7 +4638,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
         }
 
-            $user = \OmegaUp\DAO\Users::getByPK($userId);
+        $user = \OmegaUp\DAO\Users::getByPK($userId);
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
@@ -4649,17 +4649,11 @@ class User extends \OmegaUp\Controllers\Controller {
             $user->parental_verification_token = null;
 
             \OmegaUp\DAO\Users::update($user);
-            $parentalVerificationToken = true;
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            self::$log->error(
-                "Unable to save parental token verification: $e"
-            );
-        }
 
         return [
             'templateProperties' => [
                 'payload' => [
-                    'parentalVerificationToken' => $parentalVerificationToken,
+                    'hasParentalVerificationToken' => $hasParentalVerificationToken,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleParentalVerificationToken'

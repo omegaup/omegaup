@@ -448,9 +448,19 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return boolval($count);
     }
 
-    public static function getUserDataByParentalToken(string $token): ?int {
-        $sql = 'SELECT
-                      u.user_id
+    public static function findByParentalToken(string $token): ?\OmegaUp\DAO\VO\Users {
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "u.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Users::FIELD_NAMES
+                )
+            )
+        );                   
+        $sql = "SELECT
+                      {$fields}
+
                     FROM
                         Users u
                     INNER JOIN
