@@ -2691,7 +2691,7 @@ export namespace types {
     lockDownImage: string;
     navbarSection: string;
     omegaUpLockDown: boolean;
-    pendingDaysForVerification: number;
+    pendingDaysForVerification?: number;
     profileProgress: number;
     userClassname: string;
     userCountry: string;

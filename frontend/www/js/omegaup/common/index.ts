@@ -11,9 +11,17 @@ OmegaUp.on('ready', () => {
   console.log(commonPayload.pendingDaysForVerification);
 
   if (commonPayload.pendingDaysForVerification < 5) {
-    ui.warning(T.accountVerifyWarning + commonPayload.pendingDaysForVerification + T.days);
+    ui.warning(
+      T.accountVerifyWarning +
+        commonPayload.pendingDaysForVerification +
+        T.days,
+    );
   } else if (commonPayload.pendingDaysForVerification <= 7) {
-    ui.warning(T.accountVerifyWarning + commonPayload.pendingDaysForVerification + T.days);
+    ui.warning(
+      T.accountVerifyWarning +
+        commonPayload.pendingDaysForVerification +
+        T.days,
+    );
   }
 
   const ranking = payload.userRank.map((user, index) => ({
