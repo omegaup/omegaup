@@ -126,7 +126,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $identity = \OmegaUp\DAO\Identities::findByUsername(
             $createUserParams->username
         );
-        if (isset($createUserParams->email)) {
+        if (!is_null($createUserParams->email)) {
             $identityByEmail = \OmegaUp\DAO\Identities::findByEmail(
                 $createUserParams->email
             );
@@ -174,7 +174,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 '-13 year',
                 \OmegaUp\Time::get()
             )
-            && !empty($createUserParams->parentEmail)
+            && !is_null($createUserParams->parentEmail)
         ) {
             // Fill all the columns refering to user's parent
             $userData['parental_verification_token'] = \OmegaUp\SecurityTools::randomHexString(

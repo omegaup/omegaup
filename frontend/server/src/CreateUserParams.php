@@ -81,13 +81,7 @@ class CreateUserParams {
         $this->name = $params['name'] ?? null;
 
         $this->email = null;
-        if (!isset($params['parent_email'])) {
-            if (!isset($params['email'])) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'parameterEmpty',
-                        'email'
-                    );
-            }
+        if (isset($params['email'])) {
             if (!filter_var($params['email'], FILTER_VALIDATE_EMAIL)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
@@ -95,10 +89,14 @@ class CreateUserParams {
                 );
             }
             $this->email = $params['email'];
-        } else {
+        } else if (isset($params['parent_email']) {
             $this->parentEmail = $params['parent_email'];
+        } else {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'email'
+            );
         }
-
         $this->password = $params['password'] ?? null;
 
         \OmegaUp\Validators::validateInEnum(
