@@ -7,17 +7,13 @@ import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.IndexPayload();
-  const bannerPayload = types.payloadParsers.UserDetailsPayload();
-  const currentDate = new Date(); //  \OmegaUp\Time::get()
-  const differenceDate = Date_diff(
-    currentDate,
-    bannerPayload.parent_email_verification_initial,
-  );
+  const commonPayload = types.payloadParsers.CommonPayload();
+  console.log(commonPayload.pendingDaysForVerification);
 
-  if (differenceDate < 5) {
-    ui.warning(T.accountVerifyWarning + differenceDate + T.days);
-  } else if (differenceDate <= 7) {
-    ui.warning(T.accountVerifyWarning + differenceDate + T.days);
+  if (commonPayload.pendingDaysForVerification < 5) {
+    ui.warning(T.accountVerifyWarning + commonPayload.pendingDaysForVerification + T.days);
+  } else if (commonPayload.pendingDaysForVerification <= 7) {
+    ui.warning(T.accountVerifyWarning + commonPayload.pendingDaysForVerification + T.days);
   }
 
   const ranking = payload.userRank.map((user, index) => ({
@@ -67,13 +63,3 @@ OmegaUp.on('ready', () => {
     },
   });
 });
-
-function Date_diff(currentDate: Date, parent_email_verification_initial: Date) {
-  //calculate time difference
-  const time_difference =
-    currentDate.getTime() - parent_email_verification_initial.getTime();
-
-  //calculate days difference by dividing total milliseconds in a day
-  const days_difference = time_difference / (1000 * 60 * 60 * 24);
-  return days_difference;
-}

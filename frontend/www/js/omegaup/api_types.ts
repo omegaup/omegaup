@@ -2691,6 +2691,7 @@ export namespace types {
     lockDownImage: string;
     navbarSection: string;
     omegaUpLockDown: boolean;
+    pendingDaysForVerification: number;
     profileProgress: number;
     userClassname: string;
     userCountry: string;
@@ -3286,6 +3287,7 @@ export namespace types {
     identity?: dao.Identities;
     is_admin: boolean;
     loginIdentity?: dao.Identities;
+    pendingDaysForVerification?: number;
     user?: dao.Users;
     valid: boolean;
   }
