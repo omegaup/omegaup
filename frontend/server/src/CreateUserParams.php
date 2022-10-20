@@ -89,7 +89,7 @@ class CreateUserParams {
                 );
             }
             $this->email = $params['email'];
-        } else if (isset($params['parent_email']) {
+        } elseif (isset($params['parent_email']) {
             $this->parentEmail = $params['parent_email'];
         } else {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
