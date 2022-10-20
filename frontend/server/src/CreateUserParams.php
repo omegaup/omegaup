@@ -114,8 +114,6 @@ class CreateUserParams {
 
         $this->recaptcha = $params['recaptcha'] ?? null;
 
-        if (isset($params['birth_date'])) {
-            $this->birthDate = intval($params['birth_date']);
-        }
+        $this->birthDate = intval($params['birth_date']);
     }
 }
