@@ -25,7 +25,7 @@ class ScopedFacebook {
  * @psalm-type AssociatedIdentity=array{default: bool, username: string}
  * @psalm-type IdentityExt=array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}
  * @psalm-type AuthIdentityExt=array{currentIdentity: IdentityExt, loginIdentity: IdentityExt}
- * @psalm-type CurrentSession=array{apiTokenId: int|null, associated_identities: list<AssociatedIdentity>, auth_token: null|string, cacheKey: null|string, classname: string, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool,pendingDaysForVerification: int|null}
+ * @psalm-type CurrentSession=array{apiTokenId: int|null, associated_identities: list<AssociatedIdentity>, auth_token: null|string, cacheKey: null|string, classname: string, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool, pendingDaysForVerification: int|null}
  */
 class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
@@ -302,6 +302,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         $associatedIdentities = [];
         $currentUser = null;
         $email = null;
+        $pendingDaysForVerification = null;
         if (is_null($currentIdentity->user_id)) {
             if (\OmegaUp\DAO\Identities::isMainIdentity($loginIdentity)) {
                 $associatedIdentities = [
@@ -325,10 +326,14 @@ class Session extends \OmegaUp\Controllers\Controller {
             $currentUser = \OmegaUp\DAO\Users::getByPK(
                 $currentIdentity->user_id
             );
-            $pendingDaysForVerification = null;
+            if (is_null($currentUser)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+            }
             $now = \OmegaUp\Time::get();
             if (
-                strtotime(
+                !is_null(
+                    $currentUser->birth_date
+                ) && strtotime(
                     $currentUser->birth_date
                 ) >= strtotime(
                     '-13 year',
@@ -336,11 +341,13 @@ class Session extends \OmegaUp\Controllers\Controller {
                 ) && !$currentUser->parent_verified
             ) {
                 $diff = $currentUser->parent_email_verification_deadline->time - $now;
-                $pendingDaysForVerification = floor($diff / (60 * 60 * 24));
+                $pendingDaysForVerification = intval(
+                    floor(
+                        $diff / (60 * 60 * 24)
+                    )
+                );
             }
-            if (is_null($currentUser)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-            }
+
             $email = !is_null($currentUser->main_email_id) ?
                 \OmegaUp\DAO\Emails::getByPK($currentUser->main_email_id) :
                 null;

@@ -8,20 +8,21 @@ import T from '../lang';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.IndexPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
-  console.log(commonPayload.pendingDaysForVerification);
 
-  if (commonPayload.pendingDaysForVerification < 5) {
-    ui.warning(
-      T.accountVerifyWarning +
-        commonPayload.pendingDaysForVerification +
-        T.days,
-    );
-  } else if (commonPayload.pendingDaysForVerification <= 7) {
-    ui.warning(
-      T.accountVerifyWarning +
-        commonPayload.pendingDaysForVerification +
-        T.days,
-    );
+  if (commonPayload.pendingDaysForVerification != null) {
+    if (commonPayload.pendingDaysForVerification < 5) {
+      ui.warning(
+        ui.formatString(T.accountVerifyWarning, {
+          days: commonPayload.pendingDaysForVerification,
+        }),
+      );
+    } else if (commonPayload.pendingDaysForVerification <= 7) {
+      ui.error(
+        ui.formatString(T.accountVerifyWarning, {
+          days: commonPayload.pendingDaysForVerification,
+        }),
+      );
+    }
   }
 
   const ranking = payload.userRank.map((user, index) => ({
