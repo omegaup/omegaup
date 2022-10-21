@@ -11,13 +11,13 @@ OmegaUp.on('ready', () => {
 
   if (commonPayload.pendingDaysForVerification != null) {
     if (commonPayload.pendingDaysForVerification < 5) {
-      ui.warning(
+      ui.error(
         ui.formatString(T.accountVerifyWarning, {
           days: commonPayload.pendingDaysForVerification,
         }),
       );
     } else if (commonPayload.pendingDaysForVerification <= 7) {
-      ui.error(
+      ui.warning(
         ui.formatString(T.accountVerifyWarning, {
           days: commonPayload.pendingDaysForVerification,
         }),
