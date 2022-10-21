@@ -339,7 +339,10 @@ class Session extends \OmegaUp\Controllers\Controller {
                     '-13 year',
                     $now
                 ) && !$currentUser->parent_verified
-            ) {
+            ) if(
+                !is_null($currentUser->parent_email_verification_deadline)
+            ){
+            {
                 $diff = $currentUser->parent_email_verification_deadline->time - $now;
                 $pendingDaysForVerification = intval(
                     floor(
@@ -347,6 +350,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                     )
                 );
             }
+        }
 
             $email = !is_null($currentUser->main_email_id) ?
                 \OmegaUp\DAO\Emails::getByPK($currentUser->main_email_id) :
