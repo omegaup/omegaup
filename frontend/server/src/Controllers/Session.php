@@ -356,7 +356,6 @@ class Session extends \OmegaUp\Controllers\Controller {
                 if ($pendingDaysForVerification < 0) {
                     throw new \OmegaUp\Exceptions\NotFoundException('U13HasNotBeenVerifiedForTheirParent');
                 }
-
             $email = !is_null($currentUser->main_email_id) ?
                 \OmegaUp\DAO\Emails::getByPK($currentUser->main_email_id) :
                 null;
