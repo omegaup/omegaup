@@ -132,7 +132,7 @@ class User extends \OmegaUp\Controllers\Controller {
             );
 
             if (!is_null($identityByEmail)) {
-                    // Check if the same user had already tried to create this account.
+                // Check if the same user had already tried to create this account.
                 if (
                     !is_null($identityByEmail->password) &&
                     !is_null($identity) &&
@@ -180,7 +180,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $userData['parental_verification_token'] = \OmegaUp\SecurityTools::randomHexString(
                 25
             );
-            $userData['creation_timestamp'] =  \OmegaUp\Time::get();
+            $userData['creation_timestamp'] = \OmegaUp\Time::get();
             $userData['parent_email_verification_initial'] = \OmegaUp\Time::get();
             $userData['parent_email_verification_deadline'] = strtotime(
                 '+7 days',

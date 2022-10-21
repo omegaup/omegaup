@@ -118,7 +118,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
      /**
-     * user!3 logged in and a parental Token is generated
+     * user13 logged in and a parental Token is generated
      *
      */
     public function testUser13ToGenerateParentalTokenAtTimeOfRegistration() {
@@ -131,7 +131,8 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'password' => $randomString,
                 'parent_email' => $randomString . '@' . $randomString . '.com',
                 'birth_date' => $under13BirthDateTimestamp,
-            ])
+            ]),
+            $this->assertNotNull($under13BirthDateTimestamp)
         );
         $response = \OmegaUp\DAO\Users::FindByUsername($randomString);
 
@@ -146,7 +147,8 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                  'password' => $randomString,
                  'email' => $randomString . '@' . $randomString . '.com',
                  'birth_date' => $over13BirthDateTimestamp,
-             ])
+            ]),
+            $this->assertNotNull($over13BirthDateTimestamp)
         );
 
          $response = \OmegaUp\DAO\Users::FindByUsername($randomString);
