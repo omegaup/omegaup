@@ -56,12 +56,12 @@ class Plagiarisms extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['score_1'])) {
-            $this->score_1 = boolval(
+            $this->score_1 = intval(
                 $data['score_1']
             );
         }
         if (isset($data['score_2'])) {
-            $this->score_2 = boolval(
+            $this->score_2 = intval(
                 $data['score_2']
             );
         }
@@ -105,14 +105,14 @@ class Plagiarisms extends \OmegaUp\DAO\VO\VO {
     /**
      * porcentaje de plagio encontrado usando copydetect en el envío 1
      *
-     * @var bool|null
+     * @var int|null
      */
     public $score_1 = null;
 
     /**
      * porcentaje de plagio encontrado usando copydetect en el envío 2
      *
-     * @var bool|null
+     * @var int|null
      */
     public $score_2 = null;
 
