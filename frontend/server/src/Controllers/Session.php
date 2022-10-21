@@ -340,9 +340,8 @@ class Session extends \OmegaUp\Controllers\Controller {
                     $now
                 ) && !$currentUser->parent_verified
             ) {
-                if (
-                    is_null($currentUser->parent_email_verification_deadline)
-                ) {
+                if (is_null($currentUser->parent_email_verification_deadline)) {
+
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'parameterNotFound',
                         'parent_email_verification_deadline'
@@ -354,11 +353,9 @@ class Session extends \OmegaUp\Controllers\Controller {
                         $diff / (60 * 60 * 24)
                     )
                 );
-               if (
-                $pendingDaysForVerification < 0
-               ) {
-                throw new \OmegaUp\Exceptions\NotFoundException('U13HasNotBeenVerifiedForTheirParent');
-               }
+                if ($pendingDaysForVerification < 0) {
+                    throw new \OmegaUp\Exceptions\NotFoundException('U13HasNotBeenVerifiedForTheirParent');
+                }
 
             $email = !is_null($currentUser->main_email_id) ?
                 \OmegaUp\DAO\Emails::getByPK($currentUser->main_email_id) :
