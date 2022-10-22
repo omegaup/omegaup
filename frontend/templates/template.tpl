@@ -69,7 +69,15 @@
       <div id="main-container"></div>
     </main>
     {% if OMEGAUP_GA_TRACK == 1 %}
-      <script type="text/javascript" src="{% versionHash '/js/analytics.js' %}"></script>
+      <!-- Google tag (gtag.js) -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id={{ OMEGAUP_GA_ID|raw }}"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', '{{ OMEGAUP_GA_ID|raw }}');
+      </script>
     {% endif %}
     {% if not headerPayload.inContest and not hideFooterAndHeader %}
     <div id="common-footer"></div>
