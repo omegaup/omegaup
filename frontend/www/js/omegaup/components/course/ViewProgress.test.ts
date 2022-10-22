@@ -162,7 +162,7 @@ office:value="${new Percentage(
 </table:table-cell><table:table-cell office:value-type="percentage" office:value="\
 ${new Percentage(
   student.assignments[assignment.alias].progress / 100,
-).toString()}"><text:p>${new Percentage(
+).value.toFixed(4)}"><text:p>${new Percentage(
       student.assignments[assignment.alias].progress / 100,
     ).toString()}</text:p></table:table-cell></table:table-row>
 </table:table>`);
