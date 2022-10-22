@@ -70,13 +70,13 @@
     </main>
     {% if OMEGAUP_GA_TRACK == 1 %}
       <!-- Google tag (gtag.js) -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id={{ OMEGAUP_GA_ID|raw }}"></script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id={{ OMEGAUP_GA_V4_ID|raw }}"></script>
       <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
 
-        gtag('config', '{{ OMEGAUP_GA_ID|raw }}');
+        gtag('config', '{{ OMEGAUP_GA_V4_ID|raw }}');
       </script>
     {% endif %}
     {% if not headerPayload.inContest and not hideFooterAndHeader %}
