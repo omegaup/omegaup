@@ -86,9 +86,9 @@ class CreateUserParams {
             if (isset($params['parent_email'])) {
                 // It's not valid to provide both email and parent_email.
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
-	            'parameterInvalid',
-	            'parent_email'
-	        );
+                    'parameterInvalid',
+                    'parent_email'
+                );
             }
             $this->email = $params['email'];
         } elseif (isset($params['parent_email'])) {
