@@ -75,6 +75,7 @@ module.exports = {
     libinteractive_gen: './frontend/www/js/omegaup/libinteractive/gen.ts',
     login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
+    login_register: './frontend/www/js/omegaup/login/register.ts',
     login_signin: './frontend/www/js/omegaup/login/signin.ts',
     logout: './frontend/www/js/omegaup/login/logout.ts',
     problem_creator: './frontend/www/js/omegaup/problem/creator/creator.ts',

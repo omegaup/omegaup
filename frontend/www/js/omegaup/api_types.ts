@@ -1901,6 +1901,14 @@ export namespace types {
       );
     }
 
+    export function RegisterDetailsPayload(
+      elementId: string = 'payload',
+    ): types.RegisterDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function SchoolOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.SchoolOfTheMonthPayload {
@@ -4042,6 +4050,11 @@ export namespace types {
     score: number;
   }
 
+  export interface RegisterDetailsPayload {
+    email: string;
+    username: string;
+  }
+
   export interface Run {
     alias: string;
     classname: string;
@@ -5388,7 +5401,11 @@ export namespace messages {
     time: number;
   };
   export type SessionGoogleLoginRequest = { [key: string]: any };
-  export type SessionGoogleLoginResponse = { isAccountCreation: boolean };
+  export type SessionGoogleLoginResponse = {
+    email?: string;
+    isAccountCreation: boolean;
+    username?: string;
+  };
 
   // Submission
   export type SubmissionSetFeedbackRequest = { [key: string]: any };

@@ -18,14 +18,30 @@ OmegaUp.on('ready', () => {
       password: password,
     })
       .then(() => {
-        redirect(isAccountCreation);
+        redirect({ isAccountCreation, byThirdParty: false });
       })
       .catch(ui.apiError);
   }
 
-  function redirect(isAccountCreation: boolean): void {
+  function redirect({
+    isAccountCreation,
+    username,
+    email,
+    byThirdParty,
+  }: {
+    isAccountCreation: boolean;
+    username?: string;
+    email?: string;
+    byThirdParty: boolean;
+  }): void {
     const params = new URL(document.location.toString()).searchParams;
     const pathname = params.get('redirect');
+    if (byThirdParty && username != null && email != null) {
+      const usernameBase64 = btoa(username);
+      const emailBase64 = btoa(email);
+      window.location.href = `/user/register/username/${usernameBase64}/email/${emailBase64}`;
+      return;
+    }
     if (pathname && pathname.indexOf('/') === 0) {
       const url = new URL(document.location.origin + pathname);
       url.searchParams.set('fromLogin', '');
@@ -100,8 +116,13 @@ OmegaUp.on('ready', () => {
           'google-login': (idToken: string) => {
             // Only log in if the user actually clicked the sign-in button.
             api.Session.googleLogin({ storeToken: idToken })
-              .then((data) => {
-                redirect(data.isAccountCreation);
+              .then(({ isAccountCreation, username, email }) => {
+                redirect({
+                  isAccountCreation,
+                  username,
+                  email,
+                  byThirdParty: true,
+                });
               })
               .catch(ui.apiError);
           },
