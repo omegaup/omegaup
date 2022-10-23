@@ -137,7 +137,13 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\DAO\Users::FindByUsername($randomString);
 
         $this->assertNotNull($response->parental_verification_token);
-
+    }
+        
+    /**
+     * user logged in and a parental Token is not generated
+     *
+     */
+    public function testUserDoToGenerateParentalTokenAtTimeOfRegistration() {
          //Verify that the token is not generated.
          $over13BirthDateTimestamp = strtotime('-15 years');
          $randomString = \OmegaUp\Test\Utils::createRandomString();
