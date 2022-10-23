@@ -138,7 +138,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertNotNull($response->parental_verification_token);
     }
-        
+
     /**
      * user logged in and a parental Token is not generated
      *
