@@ -36,7 +36,7 @@ def main() -> None:
     logging.info('started')
     dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
 
-def test_get_contests(dbconn: lib.db.Connection):
+def test_get_contests(dbconn: lib.db.Connection) -> None:
     assert get_contests(dbconn) == [] 
     # dbconn not found error 
 
