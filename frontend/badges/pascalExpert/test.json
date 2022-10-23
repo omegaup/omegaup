@@ -278,7 +278,7 @@
                                 "username": "test_user_0",
                                 "email": "user_0@domain.com",
                                 "password": "test_user_0",
-                                "birth_date": "946684800"
+                                "birth_date": 946684800
                             }
                         },
                         {
@@ -287,7 +287,7 @@
                                 "username": "test_user_1",
                                 "email": "user_1@domain.com",
                                 "password": "test_user_1",
-                                "birth_date": "946684800"
+                                "birth_date": 946684800
                             }
                         }
                     ]

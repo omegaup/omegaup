@@ -14,7 +14,7 @@
                                 "username": "test_user_0",
                                 "email": "user_0@domain.com",
                                 "password": "test_user_0",
-                                "birth_date": "946684800"
+                                "birth_date": 946684800
                             }
                         },
                         {
@@ -23,7 +23,7 @@
                                 "username": "eduardo.pacheco",
                                 "email": "eduardo@domain.com",
                                 "password": "test_eduardo",
-                                "birth_date": "946684800"
+                                "birth_date": 946684800
                             }
                         }
                     ]
