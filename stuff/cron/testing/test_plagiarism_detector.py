@@ -12,16 +12,20 @@ import string
 import time
 import operator
 import sys
+import unittest
 import os
 import random
+
 sys.path.insert(
     0,
     os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
-                "."))
-import lib.db  # pylint: disable=wrong-import-position
+                "../"))
+
+
+import lib.db
 import omegaup.api
 import test_constants
-from plagiarism_detector import get_contests # can only import if in the same directory.
+from plagiarism_detector import get_contests
 
 UPDATE_CHECK_PLAGIARISM = '''
                             UPDATE Contests
@@ -74,7 +78,7 @@ def test_get_contests(dbconn: lib.db.Connection) -> None:
         show_scoreboard_after=True,
     )
     with dbconn.cursor(dictionary=True) as cur:
-        cur.execute(UPDATE_CHECK_PLAGIARISM, (str(alias),))
+        cur.execute(UPDATE_CHECK_PLAGIARISM, (alias,))
 
     usernames: List[str] = []
     for number in range(3):
@@ -83,7 +87,6 @@ def test_get_contests(dbconn: lib.db.Connection) -> None:
         usernames.append(user)
         
     assert get_contests(dbconn) == []
-
 
 # create a contest - DONE
       # from creating the contest we will need make a contest specific to our needs using SQL queries! 

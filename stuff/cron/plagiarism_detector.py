@@ -58,7 +58,7 @@ CONTESTS_TO_RUN_PLAGIARISM_ON = """ SELECT c.`contest_id`, c.`problemset_id`, c.
                                     FROM `Contests` as c
                                     WHERE
                                         c.`check_plagiarism` = 1 AND
-                                        c.`finish_time` < NOW() - INTERVAL 20 MINUTE AND
+                                        c.`finish_time` > NOW() - INTERVAL 20 MINUTE AND
                                         c.`contest_id` NOT IN
                                             (SELECT p.`contest_id` 
                                             FROM `Plagiarisms` as p);
