@@ -44,7 +44,6 @@ if (!defined('OMEGAUP_LOCKDOWN')) {
     define(
         'OMEGAUP_LOCKDOWN',
         isset($_SERVER['HTTP_HOST']) &&
-        is_string($_SERVER['HTTP_HOST']) &&
         strpos($_SERVER['HTTP_HOST'], OMEGAUP_LOCKDOWN_DOMAIN) === 0
     );
 }
@@ -79,8 +78,10 @@ $contentSecurityPolicy = [
         '/cspreport.php',
     ],
 ];
-if (!is_null(NEW_RELIC_SCRIPT_HASH)) {
-    array_push($contentSecurityPolicy['script-src'], NEW_RELIC_SCRIPT_HASH);
+/** @var string|null $nrsh */
+$nrsh = NEW_RELIC_SCRIPT_HASH;
+if (!is_null($nrsh)) {
+    array_push($contentSecurityPolicy['script-src'], $nrsh);
 }
 header('Content-Security-Policy: ' . implode('; ', array_map(
     fn ($k) => "{$k} " . implode(' ', $contentSecurityPolicy[$k]),

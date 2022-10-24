@@ -162,11 +162,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!is_null($r['input_limit'])) {
             $params['input_limit'] = intval($r['input_limit']);
         }
-        if (!is_null($r['languages'])) {
-            if (is_array($r['languages'])) {
-                $params['languages'] = implode(',', $r['languages']);
-            } elseif (is_scalar($r['languages'])) {
-                $params['languages'] = strval($r['languages']);
+        /** @var null|array<string>|scalar $languages */
+        $languages = $r['languages'];
+        if (!is_null($languages)) {
+            if (is_array($languages)) {
+                $params['languages'] = implode(',', $languages);
+            } else {
+                $params['languages'] = strval($languages);
             }
         }
         if (!is_null($r['memory_limit'])) {
@@ -4899,7 +4901,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (is_null($tag->name)) {
                 continue;
             }
-            if ($tag->public == 0) {
+            if (!$tag->public) {
                 continue;
             }
             $tags[] = ['name' => $tag->name];
@@ -5947,7 +5949,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 \RecursiveIteratorIterator::LEAVES_ONLY
             );
 
-            /** @var \SplFileInfo $file */
+            /**
+             * @var string $name
+             * @var \SplFileInfo $file
+             */
             foreach ($files as $name => $file) {
                 if ($file->isDir()) {
                     continue;
@@ -6206,7 +6211,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (is_null($tag->name)) {
                 continue;
             }
-            if ($tag->public == 0) {
+            if (!$tag->public) {
                 continue;
             }
             $tagData[] = ['name' => $tag->name];
