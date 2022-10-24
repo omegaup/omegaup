@@ -2555,10 +2555,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'requests_user_information' => $r['requests_user_information'],
         ]);
 
+        /** @var null|list<string>|scalar $languages */
+        $languages = $r['languages'];
         $languages = (
-            empty($r['languages']) || !is_array($r['languages']) ?
+            empty($languages) || !is_array($languages) ?
             null :
-            join(',', $r['languages'])
+            join(',', $languages)
         );
         $forTeams = $r->ensureOptionalBool('contest_for_teams') ?? false;
         $teamsGroupsAlias = $forTeams ? $r->ensureString(
