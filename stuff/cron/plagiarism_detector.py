@@ -20,8 +20,8 @@ import shutil
 import sys
 import tempfile
 import typing
-from typing import (DefaultDict, Dict, List, Mapping, NamedTuple, Optional,
-                    Sequence, Set, Tuple, TypedDict, Callable, Iterable)
+from typing import (Callable, DefaultDict, Dict, Iterable, List, Mapping,
+                    NamedTuple, Optional, Sequence, Set, Tuple, TypedDict)
 
 import boto3  # type: ignore
 import copydetect  # type: ignore
@@ -32,6 +32,7 @@ sys.path.insert(
                  "."))
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+
 
 class Results(NamedTuple):
     contest_id: int
@@ -53,7 +54,7 @@ class CopyDetectorResult(NamedTuple):
 
 # SQL Queries
 
-CONTESTS_TO_RUN_PLAGIARISM_ON = """ SELECT c.`contest_id`, c.`problemset_id`
+CONTESTS_TO_RUN_PLAGIARISM_ON = """ SELECT c.`contest_id`, c.`problemset_id`, c.`alias`
                                     FROM `Contests` as c
                                     WHERE
                                         c.`check_plagiarism` = 1 AND
