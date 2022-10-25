@@ -343,7 +343,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
         sort($expectedSet);
         $actualSet = explode($delim, $actual);
         sort($actualSet);
-        $this->assertSame($expectedSet, $actualSet);
+        $this->assertEquals($expectedSet, $actualSet);
     }
 
     /**
