@@ -116,6 +116,8 @@ class CreateUserParams {
 
         $this->recaptcha = $params['recaptcha'] ?? null;
 
+         // TODO: Assert that the birth date is always passed, and if and only if the user is U13,
+        // the parent email is passed.
         $this->birthDate = $params['birth_date'] ?? null;
     }
 }

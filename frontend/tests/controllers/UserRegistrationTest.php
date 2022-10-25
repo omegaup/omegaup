@@ -161,4 +161,31 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
          $this->assertNull($response->parental_verification_token);
     }
+
+    /**
+     * user logged in and a parantal token fails due to both email address
+     *
+     */
+    public function testUserParentaltokenNotGeneratedDueEmailAlreadyExists() {
+        try {
+            $over13BirthDateTimestamp = strtotime('-15 years');
+            $randomString = \OmegaUp\Test\Utils::createRandomString();
+            $r = \OmegaUp\Controllers\User::apiCreate(
+                new \OmegaUp\Request([
+                    'username' => $randomString,
+                    'password' => $randomString,
+                    'email' => $randomString . '@' . $randomString . '.com',
+                    'parent_email'$randomString . '@' . $randomString . '.com',
+                    'birth_date' => $over13BirthDateTimestamp,
+                ]),
+                $this->assertNotNull($over13BirthDateTimestamp)
+            );
+              $response = \OmegaUp\Controllers\User::apiCreate($r);
+            $this->fail(
+                'User should have not been able to be created because the email already exists in the data base'
+            );
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertSame('mailInUse', $e->getMessage());
+        }
+    }
 }
