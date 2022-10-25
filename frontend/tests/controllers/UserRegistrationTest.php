@@ -170,7 +170,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             $over13BirthDateTimestamp = strtotime('-15 years');
             $randomString = \OmegaUp\Test\Utils::createRandomString();
-            $r = \OmegaUp\Controllers\User::apiCreate(
+            $r =
                 new \OmegaUp\Request([
                     'username' => $randomString,
                     'password' => $randomString,
@@ -179,7 +179,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                     'birth_date' => $over13BirthDateTimestamp,
                 ]),
                 $this->assertNotNull($over13BirthDateTimestamp)
-            );
+
               $response = \OmegaUp\Controllers\User::apiCreate($r);
             $this->fail(
                 'User should have not been able to be created because the email already exists in the data base'
