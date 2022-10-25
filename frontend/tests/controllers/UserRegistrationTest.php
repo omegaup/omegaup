@@ -167,20 +167,19 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
      *
      */
     public function testUserParentaltokenNotGeneratedDueEmailAlreadyExists() {
+        $over13BirthDateTimestamp = strtotime('-15 years');
+        $randomString = \OmegaUp\Test\Utils::createRandomString();
         try {
-            $over13BirthDateTimestamp = strtotime('-15 years');
-            $randomString = \OmegaUp\Test\Utils::createRandomString();
-            $r =
-                new \OmegaUp\Request([
+            $r = new \OmegaUp\Request([
                     'username' => $randomString,
                     'password' => $randomString,
                     'email' => $randomString . '@' . $randomString . '.com',
-                    'parent_email'$randomString . '@' . $randomString . '.com',
+                    'parent_email' => $randomString . '@' . $randomString . '.com',
                     'birth_date' => $over13BirthDateTimestamp,
-                ]),
-                $this->assertNotNull($over13BirthDateTimestamp)
+            ]);
+            $this->assertNotNull($over13BirthDateTimestamp);
 
-              $response = \OmegaUp\Controllers\User::apiCreate($r);
+             $response = \OmegaUp\Controllers\User::apiCreate($r);
             $this->fail(
                 'User should have not been able to be created because the email already exists in the data base'
             );
