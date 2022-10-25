@@ -28,6 +28,7 @@ class Translations {
         $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
             identity: $identity
         );
+        /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
         $filename = sprintf("%s/templates/{$lang}.lang", strval(OMEGAUP_ROOT));
         /** @var array<int, string> $match */
         foreach (

@@ -17,7 +17,10 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * @return list<string>
      */
     public static function getAllBadges(): array {
-        /** @psalm-suppress MixedArgument OMEGAUP_BADGES_ROOT is really a string. */
+        /**
+         * @psalm-suppress MixedArgument OMEGAUP_BADGES_ROOT is really a string.
+         * @var array<string> $aliases
+         */
         $aliases = array_diff(
             scandir(static::OMEGAUP_BADGES_ROOT),
             ['..', '.', 'default_icon.svg']
