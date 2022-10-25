@@ -1,40 +1,43 @@
 <template>
-  <div v-if="!saved" class="card">
-    <div class="card-header">{{ T.runDetailsNewFeedback }}</div>
-    <div class="card-body">
-      <textarea
-        ref="feedback-form"
-        v-model="text"
-        :placeholder="T.runDetailsFeedbackPlaceholder"
-        class="w-100"
-      ></textarea>
-    </div>
-    <div class="card-footer text-muted">
-      <div class="form-group my-2">
-        <button
-          data-button-submit
-          :disabled="!text"
-          class="btn btn-primary mx-2"
-          @click.prevent="onSubmitFeedback"
-        >
-          {{ T.runDetailsFeedbackAddReview }}
-        </button>
-        <button
-          data-button-cancel
-          class="btn btn-danger mx-2"
-          @click.prevent="
-            $emit('cancel', { ...feedback, status: FeedbackStatus.New })
-          "
-        >
-          {{ T.runDetailsFeedbackCancel }}
-        </button>
+  <div v-if="visible" class="card">
+    <div v-if="!saved" class="card">
+      <div class="card-header">{{ T.runDetailsNewFeedback }}</div>
+      <div class="card-body">
+        <textarea
+          ref="feedback-form"
+          v-model="text"
+          :placeholder="T.runDetailsFeedbackPlaceholder"
+          class="w-100"
+        ></textarea>
+      </div>
+      <div class="card-footer text-muted">
+        <div class="form-group my-2">
+          <button
+            data-button-submit
+            :disabled="!text"
+            class="btn btn-primary mx-2"
+            @click.prevent="onSubmitFeedback"
+          >
+            {{ T.runDetailsFeedbackAddReview }}
+          </button>
+          <button
+            data-button-cancel
+            class="btn btn-danger mx-2"
+            @click.prevent="onCancelFeedback"
+          >
+            {{ T.runDetailsFeedbackCancel }}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-  <div v-else class="card">
-    <div class="card-header">{{ T.runDetailsFeedbackCreated }}</div>
-    <div class="card-body">
-      <omegaup-markdown :markdown="text"></omegaup-markdown>
+    <div v-else class="card">
+      <div class="card-header">{{ T.runDetailsFeedbackCreated }}</div>
+      <div class="card-body">
+        <omegaup-markdown
+          :markdown="text"
+          :full-width="true"
+        ></omegaup-markdown>
+      </div>
     </div>
   </div>
 </template>
@@ -69,6 +72,7 @@ export default class Feedback extends Vue {
   T = T;
   text = this.feedback.text;
   saved: boolean = false;
+  visible = true;
 
   mounted() {
     this.$nextTick(() => this.feedbackForm.focus());
@@ -81,6 +85,11 @@ export default class Feedback extends Vue {
       text: this.text,
       status: FeedbackStatus.InProgress,
     });
+  }
+
+  onCancelFeedback() {
+    this.visible = false;
+    this.$emit('cancel', this.feedback);
   }
 }
 </script>

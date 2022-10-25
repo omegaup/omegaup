@@ -54,7 +54,18 @@ export default class FeedbackCodeView extends Vue {
     editor.on(
       'gutterClick',
       (codeMirror: CodeMirror.Editor, numberOfLine: number) => {
+        if (
+          this.feedbackList.find((feedback) => feedback.line === numberOfLine)
+        ) {
+          return;
+        }
         codeMirror.addLineWidget(numberOfLine, showFeedbackForm(numberOfLine));
+
+        this.feedbackList.push({
+          line: numberOfLine,
+          text: null,
+          status: FeedbackStatus.New,
+        });
       },
     );
 
@@ -80,8 +91,11 @@ export default class FeedbackCodeView extends Vue {
         this.storeFeedback(feedback),
       );
 
-      feedbackForm.$on('cancel', (feedback: ArenaCourseFeedback) => {
-        console.log(feedback);
+      feedbackForm.$on('cancel', (removedFeedback: ArenaCourseFeedback) => {
+        const index = this.feedbackList.findIndex(
+          (feedback) => feedback.line === removedFeedback.line,
+        );
+        this.feedbackList.splice(index, 1);
       });
 
       marker.appendChild(feedbackForm.$el);
@@ -89,8 +103,15 @@ export default class FeedbackCodeView extends Vue {
     };
   }
 
-  storeFeedback(feedback: ArenaCourseFeedback): void {
-    this.feedbackList.push(feedback);
+  storeFeedback(newFeedback: ArenaCourseFeedback): void {
+    const feedback = this.feedbackList.find(
+      (feedback) => feedback.line === newFeedback.line,
+    );
+    if (!feedback) {
+      return;
+    }
+    feedback.text = newFeedback.text;
+    feedback.status = FeedbackStatus.InProgress;
   }
 
   saveFeedbackList(): void {
