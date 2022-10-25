@@ -367,7 +367,7 @@ class TypeMapper {
         );
         foreach ($unionType->getAtomicTypes() as $typeName => $type) {
             if ($typeName == 'array') {
-                if ($type instanceof \Psalm\Type\Atomic\ObjectLike) {
+                if ($type instanceof \Psalm\Type\Atomic\TKeyedArray) {
                     $convertedProperties = [];
                     $propertyTypes = [];
                     $pythonDeclaration = "@dataclasses.dataclass\n";
@@ -651,7 +651,7 @@ class TypeMapper {
                 $pythonTypeNames[] = 'bool';
                 $pythonParamTypeNames[] = 'bool';
             } elseif ($type instanceof \Psalm\Type\Atomic\TNamedObject) {
-                if ($type->value == 'stdClass') {
+                if ($type->value == 'object' || $type->value == 'stdClass') {
                     // This is only used to coerce the response into being an
                     // associative array instead of a flat array.
                     continue;
@@ -784,7 +784,7 @@ class TypeMapper {
             rootAPIReturnType: true,
         );
         $returnType = array_values($unionType->getAtomicTypes())[0];
-        if ($returnType instanceof \Psalm\Type\Atomic\ObjectLike) {
+        if ($returnType instanceof \Psalm\Type\Atomic\TKeyedArray) {
             /** @var array<string, string> */
             $responseTypeMapping = [];
             foreach ($returnType->properties as $propertyName => $propertyType) {
@@ -884,7 +884,7 @@ class APIGenerator {
             $returnType = $reflectionMethod->getReturnType();
             if (
                 !is_null($returnType) &&
-                $returnType->getName() == 'void'
+                strval($returnType) == 'void'
             ) {
                 // void APIs are not really intended to be called from
                 // JavaScript, so they are not exposed.
@@ -1587,11 +1587,13 @@ function listDir(string $path): Generator {
 $rootDirectory = dirname(__DIR__, 3);
 /** @psalm-suppress DeprecatedClass cannot yet upgrade to Composer 2 */
 define('PSALM_VERSION', \PackageVersions\Versions::getVersion('vimeo/psalm'));
+/** @psalm-suppress InternalMethod This should be okay */
 $_projectAnalyzer = new \Psalm\Internal\Analyzer\ProjectAnalyzer(
     \Psalm\Config::loadFromXMLFile(
         "{$rootDirectory}/psalm.xml",
         $rootDirectory
     ),
+    /** @psalm-suppress InternalMethod This should be okay */
     new \Psalm\Internal\Provider\Providers(
         new \Psalm\Internal\Provider\FileProvider()
     )

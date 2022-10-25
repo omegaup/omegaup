@@ -3976,11 +3976,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
             $courseAlias,
             function () use ($course) {
-                if (is_null($course->course_id) || is_null($course->group_id)) {
-                    throw new \OmegaUp\Exceptions\NotFoundException(
-                        'courseNotFound'
-                    );
-                }
                 return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
                     $course->course_id,
                     $course->group_id
@@ -4072,11 +4067,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
             $courseAlias,
             function () use ($course) {
-                if (is_null($course->course_id) || is_null($course->group_id)) {
-                    throw new \OmegaUp\Exceptions\NotFoundException(
-                        'courseNotFound'
-                    );
-                }
                 return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
                     $course->course_id,
                     $course->group_id
@@ -4455,7 +4445,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @param array{userRegistrationAccepted?: bool|null, userRegistrationAnswered: bool, userRegistrationRequested: bool} $registrationResponse
+     * @param array{userRegistrationAccepted?: bool|null, userRegistrationAnswered: bool, userRegistrationRequested: bool}|array<empty, empty> $registrationResponse
      *
      * @return array{entrypoint: string, templateProperties: array{coursePayload?: IntroDetailsPayload, payload: IntroCourseDetails|IntroDetailsPayload, title: \OmegaUp\TranslationString}}
      *
