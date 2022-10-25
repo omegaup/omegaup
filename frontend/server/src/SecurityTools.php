@@ -79,26 +79,17 @@ class SecurityTools {
      */
     public static function hashString(string $string): string {
         if (!defined('PASSWORD_ARGON2ID')) {
-            $hashedString = sodium_crypto_pwhash_str(
+            return sodium_crypto_pwhash_str(
                 $string,
                 SODIUM_CRYPTO_PWHASH_OPSLIMIT_MODERATE,
                 self::ARGON2ID_MEMORY_COST * 1024
             );
-        } else {
-            /** @psalm-suppress InvalidScalarArgument This misfires in PHP 7.4 */
-            $hashedString = password_hash(
-                $string,
-                PASSWORD_ARGON2ID,
-                self::PASSWORD_HASH_OPTIONS
-            );
         }
-        if (is_null($hashedString)) {
-            throw new \OmegaUp\Exceptions\InternalServerErrorException(
-                'generalError',
-                new \Exception('Hash function returned false')
-            );
-        }
-        return $hashedString;
+        return password_hash(
+            $string,
+            PASSWORD_ARGON2ID,
+            self::PASSWORD_HASH_OPTIONS
+        );
     }
 
     /**
@@ -158,7 +149,7 @@ class SecurityTools {
      * @return string The string.
      */
     public static function randomHexString(int $length): string {
-        return bin2hex(random_bytes(intval($length / 2)));
+        return bin2hex(random_bytes(max(1, intval($length / 2))));
     }
 
     /**

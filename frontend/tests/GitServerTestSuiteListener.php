@@ -69,6 +69,7 @@ class GitServerTestSuiteListener implements \PHPUnit\Framework\TestListener {
             ' /tmp/omegaup/problems-' . OMEGAUP_TEST_SHARD . '.git';
             exec($scriptFilename, $output, $returnVar);
             if ($returnVar != 0) {
+                /** @var list<string> $output */
                 throw new \Exception(
                     "{$scriptFilename} failed with {$returnVar}:\n" .
                     implode("\n", $output)
@@ -83,6 +84,7 @@ class GitServerTestSuiteListener implements \PHPUnit\Framework\TestListener {
             $scriptFilename = __DIR__ . '/controllers/gitserver-stop.sh ' . OMEGAUP_TEST_ROOT;
             exec($scriptFilename, $output, $returnVar);
             if ($returnVar != 0) {
+                /** @var list<string> $output */
                 throw new \Exception(
                     "{$scriptFilename} failed with {$returnVar}:\n" .
                     implode("\n", $output)

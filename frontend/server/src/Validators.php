@@ -322,7 +322,7 @@ class Validators {
      *
      * @param mixed $parameter
      * @param string $parameterName
-     * @psalm-assert string $parameter
+     * @psalm-assert non-empty-string $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateValidUsername(
@@ -618,10 +618,10 @@ class Validators {
     }
 
     /**
-     * @template T
+     * @template T of scalar
      * @param mixed $parameter
      * @param string $parameterName
-     * @param T[] $enum
+     * @param list<T> $enum
      * @param bool $required
      * @psalm-assert T $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
@@ -651,10 +651,10 @@ class Validators {
     }
 
     /**
-     * @template T
+     * @template T of scalar
      * @param mixed $parameter
      * @param string $parameterName
-     * @param T[] $enum
+     * @param list<T> $enum
      * @param bool $required
      * @psalm-assert null|T $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
@@ -672,7 +672,7 @@ class Validators {
     }
 
     /**
-     * @template T
+     * @template T of scalar
      * @param list<T> $parameter
      * @param string $parameterName
      * @param list<T> $validOptions
