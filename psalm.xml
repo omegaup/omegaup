@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <psalm
-    totallyTyped="true"
     autoloader="frontend/server/bootstrap.php"
     cacheDirectory="/tmp/psalm"
     hoistConstants="true"

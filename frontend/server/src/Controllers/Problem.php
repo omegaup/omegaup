@@ -162,11 +162,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!is_null($r['input_limit'])) {
             $params['input_limit'] = intval($r['input_limit']);
         }
-        if (!is_null($r['languages'])) {
-            if (is_array($r['languages'])) {
-                $params['languages'] = implode(',', $r['languages']);
-            } elseif (is_scalar($r['languages'])) {
-                $params['languages'] = strval($r['languages']);
+        /** @var null|array<string>|scalar $languages */
+        $languages = $r['languages'];
+        if (!is_null($languages)) {
+            if (is_array($languages)) {
+                $params['languages'] = implode(',', $languages);
+            } else {
+                $params['languages'] = strval($languages);
             }
         }
         if (!is_null($r['memory_limit'])) {
@@ -2101,11 +2103,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 )
             ) {
                 // If the problem is requested outside a contest, we need to
-                // check that it is not private
+                // check that it is not private and the user is logged in
                 if (!\OmegaUp\DAO\Problems::isVisible($problem)) {
-                    throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                        'problemIsPrivate'
-                    );
+                    if (is_null($identity)) {
+                        throw new \OmegaUp\Exceptions\UnauthorizedException(
+                            'userNotAllowed'
+                        );
+                    } else {
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                            'problemIsPrivate'
+                        );
+                    }
                 }
             }
         }
@@ -4893,6 +4901,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (is_null($tag->name)) {
                 continue;
             }
+            if (!$tag->public) {
+                continue;
+            }
             $tags[] = ['name' => $tag->name];
         }
         return [
@@ -5938,7 +5949,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 \RecursiveIteratorIterator::LEAVES_ONLY
             );
 
-            /** @var \SplFileInfo $file */
+            /**
+             * @var string $name
+             * @var \SplFileInfo $file
+             */
             foreach ($files as $name => $file) {
                 if ($file->isDir()) {
                     continue;
@@ -6197,7 +6211,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (is_null($tag->name)) {
                 continue;
             }
-            if ($tag->public == 0) {
+            if (!$tag->public) {
                 continue;
             }
             $tagData[] = ['name' => $tag->name];

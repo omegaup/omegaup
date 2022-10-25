@@ -532,6 +532,9 @@ class NoOpGrader extends \OmegaUp\Grader {
         array_push($this->_runs, $run);
     }
 
+    /**
+     * @param list<\OmegaUp\DAO\VO\Runs> $runs
+     */
     public function rejudge(array $runs, bool $debug): void {
         $this->_runs += $runs;
     }

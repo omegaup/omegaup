@@ -152,6 +152,23 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Check if the plagiarism value is stored correctly in the database
+     * when a contest is created
+     */
+    public function testPlagiarismThresholdValue() {
+        // Create a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'checkPlagiarism' => true,
+            ])
+        );
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+        $this->assertTrue($contest->check_plagiarism);
+    }
+
+    /**
      * Public contest without problems is not valid.
      */
     public function testCreatePublicContest() {

@@ -47,10 +47,7 @@ function preferredLanguage(
 $languages = ['en', 'es'];
 $preferred = $languages[0];
 
-if (
-    isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) &&
-    is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])
-) {
+if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
     $preferred = preferredLanguage(
         $languages,
         strval($_SERVER['HTTP_ACCEPT_LANGUAGE'])
@@ -58,8 +55,7 @@ if (
 }
 
 $location = (
-    isset($_SERVER['REQUEST_URI']) &&
-    is_string($_SERVER['REQUEST_URI'])
+    isset($_SERVER['REQUEST_URI'])
 ) ? $_SERVER['REQUEST_URI'] : '';
 if ($location[strlen($location) - 1] != '/') {
     $location .= '/';

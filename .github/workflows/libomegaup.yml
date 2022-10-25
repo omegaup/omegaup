@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v2
@@ -17,13 +17,13 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Use PHP 8.0
+      - name: Use PHP 8.1
         run: |
-          sudo update-alternatives --install /usr/bin/php php /usr/bin/php8.0 100
+          sudo update-alternatives --install /usr/bin/php php /usr/bin/php8.1 100
           # Enable APCu for tests
-          echo 'apc.enable_cli=1' | sudo tee --append /etc/php/8.0/cli/conf.d/20-apcu.ini >/dev/null
+          echo 'apc.enable_cli=1' | sudo tee --append /etc/php/8.1/cli/conf.d/20-apcu.ini >/dev/null
           # Enable coverage for XDebug so that codecov can do its magic.
-          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/8.0/cli/conf.d/20-xdebug.ini >/dev/null
+          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/8.1/cli/conf.d/20-xdebug.ini >/dev/null
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress

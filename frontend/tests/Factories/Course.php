@@ -4,7 +4,8 @@ namespace OmegaUp\Test\Factories;
 
 class Course {
     /**
-     * @param $languages list<string>
+     * @param list<string>|null $languages
+     *
      * @return array{admin: \OmegaUp\DAO\VO\Identities, course_alias: string, request: \OmegaUp\Request}
      */
     public static function createCourse(
@@ -56,7 +57,7 @@ class Course {
             'requests_user_information' => $requestsUserInformation,
             'show_scoreboard' => $showScoreboard,
             'needs_basic_information' => $needsBasicInformation,
-            'languages' => !is_null(
+            'languages' => is_array(
                 $languages
             ) ? implode(
                 ',',

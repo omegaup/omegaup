@@ -550,7 +550,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $response = [
             'templateProperties' => [
                 'payload' => [
-                    'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
+                    'validateRecaptcha' => boolval(OMEGAUP_VALIDATE_CAPTCHA),
                     'verifyEmailSuccessfully' => \OmegaUp\Translations::getInstance()->get(
                         'verificationEmailSuccesfully'
                     ),
@@ -571,7 +571,7 @@ class User extends \OmegaUp\Controllers\Controller {
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             \OmegaUp\ApiCaller::logException($e);
             $response['templateProperties']['payload'] = [
-                'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
+                'validateRecaptcha' => boolval(OMEGAUP_VALIDATE_CAPTCHA),
                 'statusError' => $e->getErrorMessage(),
             ];
         } finally {
@@ -2116,12 +2116,6 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         );
         $rowcount = $r->ensureOptionalInt('rowcount') ?? 100;
-        if (is_null($term) && is_null($query)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterEmpty',
-                'query'
-            );
-        }
         $param = $term ?? $query;
         if (is_null($param)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -2834,7 +2828,7 @@ class User extends \OmegaUp\Controllers\Controller {
             }
 
             // Add verification_id if not there
-            if ($user->verified == '0') {
+            if (!$user->verified) {
                 self::$log->info('User not verified.');
 
                 if (is_null($user->verification_id)) {
@@ -3549,13 +3543,15 @@ class User extends \OmegaUp\Controllers\Controller {
                 'privacyStatementNotFound'
             );
         }
+        /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
+        $omegaupRoot = strval(OMEGAUP_ROOT);
         return [
             'templateProperties' => [
                 'payload' => [
                     'policy_markdown' => file_get_contents(
                         sprintf(
                             "%s/privacy/privacy_policy/{$lang}.md",
-                            strval(OMEGAUP_ROOT)
+                            $omegaupRoot,
                         )
                     ) ?: '',
                     'has_accepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
@@ -4455,9 +4451,9 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString, scripts: list<string>}}
      *
-     * @omegaup-request-param string $third_party_login
+     * @omegaup-request-param null|string $third_party_login
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
@@ -4476,7 +4472,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $response = [
             'templateProperties' => [
                 'payload' => [
-                    'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
+                    'validateRecaptcha' => boolval(OMEGAUP_VALIDATE_CAPTCHA),
                     'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
@@ -4492,7 +4488,9 @@ class User extends \OmegaUp\Controllers\Controller {
             }
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             \OmegaUp\ApiCaller::logException($e);
-            $response['templateProperties']['payload']['statusError'] = $e->getErrorMessage();
+            $response['templateProperties']['payload']['statusError'] = strval(
+                $e->getErrorMessage()
+            );
             return $response;
         }
         return $response;

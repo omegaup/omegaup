@@ -57,4 +57,48 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
             $archivedCourses[0]['alias']
         );
     }
+
+    public function testListCoursesMineForTeachingAssistant() {
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        $adminLogin = self::login($admin);
+
+        // create normal user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // admin is able to add a teaching assistant
+        foreach ($this->courseAliases as $alias) {
+            \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
+                new \OmegaUp\Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'usernameOrEmail' => $identity->username,
+                    'course_alias' => $alias,
+                ])
+            );
+        }
+
+        // Teaching assistant login
+        $userLogin = self::login($identity);
+
+        $teachingAssistantCourses = \OmegaUp\Controllers\Course::getCourseMineDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+            ])
+        )['templateProperties']['payload']['courses']['admin']['filteredCourses']['teachingAssistant']['courses'];
+
+        $teachingAssistantCoursesAliases = array_map(
+            fn ($course) => $course['alias'],
+            $teachingAssistantCourses
+        );
+
+        // All non-archived courses should be displayed in the courses list for
+        // teaching assistants
+        $this->assertCount(3, $teachingAssistantCourses);
+        $expectedAliases = array_slice($this->courseAliases, 0, 3);
+
+        $this->assertSame(
+            sort($expectedAliases),
+            sort($teachingAssistantCoursesAliases)
+        );
+    }
 }

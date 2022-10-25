@@ -74,6 +74,117 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testSubmissionFeedbackForCourseByTeachingAssistant() {
+        // create admin
+        $admin = \OmegaUp\Test\Factories\User::createUser();
+
+        // create course with an assignment
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $admin['identity'],
+            self::login($admin['identity']),
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+
+        // login admin
+        $loginAdmin = self::login($admin['identity']);
+
+        // create a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // add problem to assignment
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $loginAdmin,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+
+        // create a user
+        $student = \OmegaUp\Test\Factories\User::createUser();
+
+        // add user like a student
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student['identity']
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $student['identity']
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $run = \OmegaUp\DAO\Runs::getByGUID($runData['response']['guid']);
+        if (is_null($run)) {
+            return;
+        }
+
+        // create a user
+        ['identity' => $teachigAssistantUser] = \OmegaUp\Test\Factories\User::createUser();
+
+        // login admin
+        $loginAdmin = self::login($admin['identity']);
+
+        // add user like a teaching assistant
+        \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
+            new \OmegaUp\Request([
+                'auth_token' => $loginAdmin->auth_token,
+                'usernameOrEmail' => $teachigAssistantUser->username,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        // login teaching assistant
+        $loginTeachingAssistant = self::login($teachigAssistantUser);
+
+        $course = \OmegaUp\DAO\Courses::getByAlias(
+            $courseData['course_alias']
+        );
+
+        // check if is a teaching assistant
+        $this->assertTrue(
+            \OmegaUp\Authorization::isTeachingAssistant(
+                $teachigAssistantUser,
+                $course
+            )
+        );
+
+        // give a feedback like teaching assistant
+        $feedback = 'Test feedback!';
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $loginTeachingAssistant->auth_token,
+                'guid' => $runData['response']['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback' => $feedback,
+                'range_bytes_start' => 1,
+                'range_bytes_end' => 88,
+            ])
+        );
+
+        // Verify notification for admin
+        $notifications = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+            $student['user']
+        );
+        $this->assertCount(1, $notifications);
+
+        $contents = json_decode($notifications[0]['contents'], true);
+        $this->assertEquals(
+            \OmegaUp\DAO\Notifications::COURSE_SUBMISSION_FEEDBACK,
+            $contents['type']
+        );
+        $this->assertEquals(
+            $courseData['course']->name,
+            $contents['body']['localizationParams']['courseName']
+        );
+        $this->assertEquals(
+            $problemData['problem']->alias,
+            $contents['body']['localizationParams']['problemAlias']
+        );
+    }
+
     public function testGetCourseSubmissionFeedback() {
         $admin = \OmegaUp\Test\Factories\User::createUser();
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
@@ -202,7 +313,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 'feedback' => 'Initial test feedback',
             ])
         );
-        $initialFeedback = \OmegaUp\DAO\Submissions::getFeedbackBySubmission(
+        $initialFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
             $submission
         );
 
@@ -215,7 +326,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 'feedback' => 'New feedback',
             ])
         );
-        $newFeedback = \OmegaUp\DAO\Submissions::getFeedbackBySubmission(
+        $newFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
             $submission
         );
 

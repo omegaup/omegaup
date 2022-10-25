@@ -462,6 +462,7 @@ class Session extends \OmegaUp\Controllers\Controller {
 
     private static function getUniqueUsernameFromEmail(string $email): string {
         $idx = strpos($email, '@');
+        $username = null;
         if ($idx === false) {
             $username = 'OmegaupUser';
         } else {
@@ -516,23 +517,21 @@ class Session extends \OmegaUp\Controllers\Controller {
         $client->setClientSecret(OMEGAUP_GOOGLE_SECRET);
 
         try {
-            $loginTicket = $client->verifyIdToken($r['storeToken']);
-        } catch (\Google_Auth_Exception $ge) {
+            /** @var array{email: string, email_verified: int, name?: string, picture: string, locale: string} */
+            $payload = $client->verifyIdToken($r['storeToken']);
+
+            // payload will have a superset of:
+            //    [email] => johndoe@gmail.com
+            //    [email_verified] => 1
+            //    [name] => Alan Gonzalez
+            //    [picture] => https://lh3.googleusercontent.com/-zrLvBe-AU/AAAAAAAAAAI/AAAAAAAAATU/hh0yUXEisCI/photo.jpg
+            //    [locale] => en
+        } catch (\Exception $ge) {
             throw new \OmegaUp\Exceptions\UnauthorizedException(
                 'loginRequired',
                 $ge
             );
         }
-
-        /** @var array{email: string, email_verified: int, name?: string, picture: string, locale: string} */
-        $payload = $loginTicket->getAttributes()['payload'];
-
-        // payload will have a superset of:
-        //    [email] => johndoe@gmail.com
-        //    [email_verified] => 1
-        //    [name] => Alan Gonzalez
-        //    [picture] => https://lh3.googleusercontent.com/-zrLvBe-AU/AAAAAAAAAAI/AAAAAAAAATU/hh0yUXEisCI/photo.jpg
-        //    [locale] => en
 
         return self::LoginViaGoogle(
             $payload['email'],
