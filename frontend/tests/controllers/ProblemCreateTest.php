@@ -58,7 +58,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertSame($r['order'], $problem->order);
         $this->assertSame($r['source'], $problem->source);
-        $this->assertSameets($r['languages'], $problem->languages);
+        $this->assertSameSets($r['languages'], $problem->languages);
 
         // Verify author username -> author id conversion
         $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);

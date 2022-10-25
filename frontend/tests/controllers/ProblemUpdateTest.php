@@ -374,7 +374,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Check that we only retrieved 1 element
         $this->assertNotNull($problem);
-        $this->assertSameets($languages, $problem->languages);
+        $this->assertSameSets($languages, $problem->languages);
     }
 
     public function testUpdateProblemWithInvalidLanguages() {
@@ -2041,7 +2041,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Check that we retrieved 1 element
         $this->assertNotNull($problem);
-        $this->assertSameets($showDiffValue, $problem->show_diff);
+        $this->assertSameSets($showDiffValue, $problem->show_diff);
     }
 
     public function testUpdateProblemWithInvalidShowDiffValue() {
@@ -2111,7 +2111,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Check that we retrieved 1 element
         $this->assertNotNull($problem);
-        $this->assertSameets(
+        $this->assertSameSets(
             $allowUserAddTagsValue,
             $problem->allow_user_add_tags
         );

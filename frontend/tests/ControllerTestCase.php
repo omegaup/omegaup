@@ -334,7 +334,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     /**
      * Checks that two sets (given by char delimited strings) are equal.
      */
-    public function assertSameets(
+    public function assertSameSets(
         string $expected,
         string $actual,
         string $delim = ','
