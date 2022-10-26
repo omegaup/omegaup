@@ -201,7 +201,35 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `p`.`alias`,
                 IFNULL(`i`.`country_id`, "xx") `country`,
                 `c`.`alias` AS `contest_alias`,
-                IFNULL(ur.classname, "user-rank-unranked") `classname`
+                IFNULL(ur.classname, "user-rank-unranked") `classname` ';
+
+        $sql .= ',(
+            SELECT
+                IF(
+                    verdict IN ("JE", "VE", "CE"), verdict,
+                IF(
+                    verdict IN ("OF", "RFE"), "RFE",
+                IF(
+                    verdict IN ("RE", "RTE"), "RE",
+                IF(
+                    verdict IN ("ML", "MLE", "TLE", "OLE", "TO", "OL"), "INTR",
+                IF(
+                    verdict IN ("WA", "AC", "PA"), "FIN", null)
+                )))
+            ) AS execution
+            FROM
+                Runs_Groups
+            WHERE
+                run_id = `r`.`run_id`
+            GROUP BY
+                execution
+            ORDER BY
+                field(execution, "JE", "VE", "CE", "RFE", "RE", "INTR", "FIN")
+            LIMIT 1
+            ) AS
+                execution ';
+
+        $sql .= '
             FROM
                 Submissions s
             INNER JOIN
@@ -225,7 +253,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val[] = $offset * $rowCount;
         $val[] = $rowCount;
 
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
         $runs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
 
         return [
