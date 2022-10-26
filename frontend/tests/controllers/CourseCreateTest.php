@@ -28,9 +28,21 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * Create course hot path
      */
     public function testCreateSchoolCourse() {
+        // creation admin user
+        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        // log in admin user
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identityAdmin);
+        //normal user
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-
         $login = self::login($identity);
+
+        \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'username' => $identity->username,
+            'role' => 'CertificateGenerator'
+        ]));
+        //error_log(print_r($identity,true));
+
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => \OmegaUp\Test\Utils::createRandomString(),
@@ -41,6 +53,16 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
 
         $response = \OmegaUp\Controllers\Course::apiCreate($r);
+        $course = \OmegaUp\DAO\Courses::findByName(
+            $r['name']
+        );
+        //error_log(print_r($identity,true));
+        $this->assertTrue(
+            \OmegaUp\Authorization::isCertificateGeneratorRole(
+                $identity,
+                $course[0]
+            )
+        );
 
         $this->assertEquals('ok', $response['status']);
         $this->assertCount(

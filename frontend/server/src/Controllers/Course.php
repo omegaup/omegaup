@@ -828,6 +828,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param bool|null $show_scoreboard
      * @omegaup-request-param int $start_time
      */
+    // aqui es donde se va a estar modificando
     public static function apiCreate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
@@ -843,6 +844,21 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'schoolNotFound'
                 );
             }
+        }
+
+        // check if minimum_progress_for_certificate is valid
+        $minimum_progress_for_certificate = $r->ensureOptionalInt(
+            'minimum_progress_for_certificate'
+        );
+
+        if (
+            !is_null(
+                $minimum_progress_for_certificate
+            ) && ($minimum_progress_for_certificate < 0 || $minimum_progress_for_certificate > 100)
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
         }
 
         // Only curator can set public
@@ -875,6 +891,26 @@ class Course extends \OmegaUp\Controllers\Controller {
             'needs_basic_information' => $courseParams->needsBasicInformation,
             'requests_user_information' => $courseParams->requestsUserInformation,
         ]), $r->user);
+
+        // Check course_alias
+        $courseAlias = $r->ensureString(
+            'alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
+
+        if (
+            \OmegaUp\Authorization::isCertificateGeneratorRole(
+                $r->identity,
+                $course
+            )
+        ) {
+            //se puede otorgar diplomas
+            error_log(print_r('puedo otorgar diplomas', true));
+            ///ellos van a ser capaces de modificar el nuevo campo de minimum_progress_for_certificate
+            ///como indico que se va a poder modificar?
+        }
 
         return [
             'status' => 'ok',

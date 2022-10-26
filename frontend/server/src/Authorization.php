@@ -444,6 +444,20 @@ class Authorization {
         );
     }
 
+    public static function isCertificateGeneratorRole(
+        \OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\DAO\VO\Courses $course
+    ): bool {
+        if (!is_null($course) && is_null($course->acl_id)) {
+            return false;
+        }
+        return self::hasRole(
+            $identity,
+            $course->acl_id,
+            self::CERTIFICATE_GENERATOR_ROLE
+        );
+    }
+
     public static function isTeachingAssistant(
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Courses $course
