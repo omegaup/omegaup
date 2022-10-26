@@ -41,7 +41,6 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'username' => $identity->username,
             'role' => 'CertificateGenerator'
         ]));
-        //error_log(print_r($identity,true));
 
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -49,18 +48,16 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'alias' => \OmegaUp\Test\Utils::createRandomString(),
             'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => (\OmegaUp\Time::get() + 60),
-            'finish_time' => (\OmegaUp\Time::get() + 120)
+            'finish_time' => (\OmegaUp\Time::get() + 120),
+            'rol' => 8
         ]);
 
         $response = \OmegaUp\Controllers\Course::apiCreate($r);
-        $course = \OmegaUp\DAO\Courses::findByName(
-            $r['name']
-        );
-        //error_log(print_r($identity,true));
+
         $this->assertTrue(
-            \OmegaUp\Authorization::isCertificateGeneratorRole(
+            \OmegaUp\Authorization::isCertificateGenerator(
                 $identity,
-                $course[0]
+                8
             )
         );
 

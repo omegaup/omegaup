@@ -281,8 +281,14 @@ class Authorization {
         return self::isGroupIdentityCreator($identity);
     }
 
-    public static function canGenerateCertificates(\OmegaUp\DAO\VO\Identities $identity): bool {
-        return self::isCertificateGenerator($identity);
+    public static function canGenerateCertificates(
+        \OmegaUp\DAO\VO\Identities $identity,
+        ?int $role
+    ): bool {
+        if (!is_null($role)) {
+            return self::isCertificateGenerator($identity, $role);
+        }
+        return self::isCertificateGenerator($identity, null);
     }
 
     public static function isAdminOrTeachingAssistant(
@@ -429,7 +435,13 @@ class Authorization {
         return in_array($today, $availableDateToChooseCoder);
     }
 
-    public static function isCertificateGenerator(\OmegaUp\DAO\VO\Identities $identity): bool {
+    public static function isCertificateGenerator(
+        \OmegaUp\DAO\VO\Identities $identity,
+        ?int $role
+    ): bool {
+        if (!is_null($role) && $role === self::CERTIFICATE_GENERATOR_ROLE) {
+                return true;
+        }
         if (is_null(self::$_certificateGeneratorGroup)) {
             self::$_certificateGeneratorGroup = \OmegaUp\DAO\Groups::findByAlias(
                 self::CERTIFICATE_GENERATOR_GROUP_ALIAS
@@ -441,20 +453,6 @@ class Authorization {
         return self::isGroupMember(
             $identity,
             self::$_certificateGeneratorGroup
-        );
-    }
-
-    public static function isCertificateGeneratorRole(
-        \OmegaUp\DAO\VO\Identities $identity,
-        ?\OmegaUp\DAO\VO\Courses $course
-    ): bool {
-        if (!is_null($course) && is_null($course->acl_id)) {
-            return false;
-        }
-        return self::hasRole(
-            $identity,
-            $course->acl_id,
-            self::CERTIFICATE_GENERATOR_ROLE
         );
     }
 

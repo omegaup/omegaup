@@ -828,7 +828,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param bool|null $show_scoreboard
      * @omegaup-request-param int $start_time
      */
-    // aqui es donde se va a estar modificando
     public static function apiCreate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
@@ -847,14 +846,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // check if minimum_progress_for_certificate is valid
-        $minimum_progress_for_certificate = $r->ensureOptionalInt(
-            'minimum_progress_for_certificate'
-        );
-
         if (
             !is_null(
-                $minimum_progress_for_certificate
-            ) && ($minimum_progress_for_certificate < 0 || $minimum_progress_for_certificate > 100)
+                $courseParams->minimumProgressForCertificate
+            ) && ($courseParams->minimumProgressForCertificate < 0 || $courseParams->minimumProgressForCertificate > 100)
         ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidParameters'
@@ -871,45 +866,56 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        self::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
-            'name' => $courseParams->name,
-            'alias' => $courseParams->courseAlias,
-            'level' => $courseParams->level,
-            'description' => $courseParams->description,
-            'objective' => $courseParams->objective,
-            'school_id' => $courseParams->schoolId,
-            'languages' => isset(
-                $courseParams->languages
-            ) ? implode(
-                ',',
-                $courseParams->languages
-            ) : null,
-            'start_time' => $courseParams->startTime,
-            'finish_time' => $courseParams->finishTime,
-            'admission_mode' => $courseParams->admissionMode,
-            'show_scoreboard' => $courseParams->showScoreboard,
-            'needs_basic_information' => $courseParams->needsBasicInformation,
-            'requests_user_information' => $courseParams->requestsUserInformation,
-        ]), $r->user);
-
-        // Check course_alias
-        $courseAlias = $r->ensureString(
-            'alias',
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
-
-        $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
-
         if (
-            \OmegaUp\Authorization::isCertificateGeneratorRole(
+            !is_null(
+                $r['rol']
+            ) && \OmegaUp\Authorization::isCertificateGenerator(
                 $r->identity,
-                $course
+                $r['rol']
             )
         ) {
-            //se puede otorgar diplomas
-            error_log(print_r('puedo otorgar diplomas', true));
-            ///ellos van a ser capaces de modificar el nuevo campo de minimum_progress_for_certificate
-            ///como indico que se va a poder modificar?
+            self::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
+                'name' => $courseParams->name,
+                'alias' => $courseParams->courseAlias,
+                'level' => $courseParams->level,
+                'description' => $courseParams->description,
+                'objective' => $courseParams->objective,
+                'school_id' => $courseParams->schoolId,
+                'languages' => isset(
+                    $courseParams->languages
+                ) ? implode(
+                    ',',
+                    $courseParams->languages
+                ) : null,
+                'start_time' => $courseParams->startTime,
+                'finish_time' => $courseParams->finishTime,
+                'admission_mode' => $courseParams->admissionMode,
+                'show_scoreboard' => $courseParams->showScoreboard,
+                'needs_basic_information' => $courseParams->needsBasicInformation,
+                'requests_user_information' => $courseParams->requestsUserInformation,
+                'minimum_progress_for_certificate' => $courseParams->minimumProgressForCertificate,
+            ]), $r->user);
+        } else {
+            self::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
+                'name' => $courseParams->name,
+                'alias' => $courseParams->courseAlias,
+                'level' => $courseParams->level,
+                'description' => $courseParams->description,
+                'objective' => $courseParams->objective,
+                'school_id' => $courseParams->schoolId,
+                'languages' => isset(
+                    $courseParams->languages
+                ) ? implode(
+                    ',',
+                    $courseParams->languages
+                ) : null,
+                'start_time' => $courseParams->startTime,
+                'finish_time' => $courseParams->finishTime,
+                'admission_mode' => $courseParams->admissionMode,
+                'show_scoreboard' => $courseParams->showScoreboard,
+                'needs_basic_information' => $courseParams->needsBasicInformation,
+                'requests_user_information' => $courseParams->requestsUserInformation,
+            ]), $r->user);
         }
 
         return [
