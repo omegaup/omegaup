@@ -23,7 +23,6 @@ sys.path.insert(
 
 import lib.db
 import omegaup.api
-import test_constants
 import cron.plagiarism_detector # type: ignore
 
 # Constants
@@ -34,6 +33,7 @@ GUID = ["00000000000000000000000000000001", "00000000000000000000000000000002",
         "00000000000000000000000000000007", "00000000000000000000000000000008",
         "00000000000000000000000000000009"
         ]
+LOCAL_DOWNLOADER_DIR = "stuff/cron/testing/testdata/"
 # SQL Queries
 CREATE_A_TEST_CONTEST = '''
                             INSERT INTO `Contests`
@@ -118,6 +118,7 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
         submissions = cron.plagiarism_detector.get_submissions_for_contest(dbconn, res['contest_id'])
         for sub in submissions:
             assert sub['guid'] in GUID
+    
 
 
     
