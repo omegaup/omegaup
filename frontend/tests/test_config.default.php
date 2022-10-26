@@ -1,5 +1,8 @@
 <?php
-/** @psalm-suppress MissingFile try_define.php definitely exists... */
+/**
+ * @psalm-suppress MissingFile try_define.php definitely exists...
+ * @psalm-suppress MixedOperand OMEGAUP_ROOT is really a string
+ */
 require_once OMEGAUP_ROOT . '/server/try_define.php';
 
 /** @var string */

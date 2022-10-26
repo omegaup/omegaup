@@ -462,6 +462,7 @@ class Session extends \OmegaUp\Controllers\Controller {
 
     private static function getUniqueUsernameFromEmail(string $email): string {
         $idx = strpos($email, '@');
+        $username = null;
         if ($idx === false) {
             $username = 'OmegaupUser';
         } else {

@@ -3,7 +3,7 @@
 set -e
 
 OMEGAUP_ROOT="$(git rev-parse --show-toplevel)"
-CONTAINER_VERSION=omegaup/hook_tools:20220710
+CONTAINER_VERSION=omegaup/hook_tools:20221023
 
 if [[ $# != 0 ]]; then
 	# The caller has given us the explicit arguments.
