@@ -72,7 +72,7 @@ def dbconn() -> lib.db.Connection:
     )
     return dbconn
 
-def test_get_contests(dbconn: lib.db.Connection) -> None:
+def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
 
     current_time = datetime.datetime.now()
     start_time= current_time - datetime.timedelta(minutes = 30)
@@ -81,6 +81,7 @@ def test_get_contests(dbconn: lib.db.Connection) -> None:
     problemset_id = 5 # Because it already contains 3 problems
     acl_id = 65551
     check_plagiarism = 1
+    aliases = [alias]
 
     with dbconn.cursor() as cur:
         cur.execute(CREATE_A_TEST_CONTEST, 
@@ -88,7 +89,7 @@ def test_get_contests(dbconn: lib.db.Connection) -> None:
             start_time, current_time,
             check_plagiarism, 
             problemset_id, acl_id,))
-    
+            
     # add submissions to the contest
     problems: List[int] = [1, 3, 5] # Problems inside Problemset
     submission_id: int = int(69) # counter for submission_id
@@ -108,8 +109,17 @@ def test_get_contests(dbconn: lib.db.Connection) -> None:
                         status,verdict, ttype,))
                 submission_id+=1
                 guid+=1
+
     dbconn.conn.commit()
     result = cron.plagiarism_detector.get_contests(dbconn)
 
-    # only one entry should be there hence '0' as first element
-    assert alias == result[0]['alias']
+    for res in result:
+        assert res['alias'] in aliases
+        submissions = cron.plagiarism_detector.get_submissions_for_contest(dbconn, res['contest_id'])
+        for sub in submissions:
+            assert sub['guid'] in GUID
+
+
+    
+        
+        

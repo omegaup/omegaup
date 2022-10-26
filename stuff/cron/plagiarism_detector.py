@@ -59,6 +59,7 @@ CONTESTS_TO_RUN_PLAGIARISM_ON = """ SELECT c.`contest_id`, c.`problemset_id`, c.
                                     WHERE
                                         c.`check_plagiarism` = 1 AND
                                         c.`finish_time` > NOW() - INTERVAL 20 MINUTE AND
+                                        c.`finish_time` < NOW() AND
                                         c.`contest_id` NOT IN
                                             (SELECT p.`contest_id` 
                                             FROM `Plagiarisms` as p);
@@ -73,7 +74,7 @@ class Contest(TypedDict):
 GET_CONTEST_SUBMISSION_IDS = """ SELECT c.contest_id, s.submission_id, s.problemset_id,
                                 s.problem_id, s.verdict, s.guid, s.language
                                 FROM Submissions as s 
-                                INNER JOIN Contests c ON c.problemset_id = s.problemset_id 
+                                JOIN Contests c ON c.problemset_id = s.problemset_id 
                                 WHERE c.contest_id = %s;
                             """
 
