@@ -201,7 +201,32 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `p`.`alias`,
                 IFNULL(`i`.`country_id`, "xx") `country`,
                 `c`.`alias` AS `contest_alias`,
-                IFNULL(ur.classname, "user-rank-unranked") `classname`
+                IFNULL(ur.classname, "user-rank-unranked") `classname` ';
+
+        $sql .= ',(
+            SELECT
+                IF(
+                    verdict IN ("OLE", "OL"), "EXCEED",
+                IF(
+                    verdict IN ("WA", "PA"), "WRG",
+                IF(
+                    verdict IN ("JE", "VE", "CE", "FO", "RFE", "RE", "RTE", "MLE", "TLE"), "INTR",
+                IF(
+                    verdict = "AC", verdict, null)
+                )))
+            AS output
+            FROM
+                Runs_Groups
+            WHERE
+                run_id = `r`.`run_id`
+            GROUP BY
+                output
+            ORDER BY
+                field(output, "EXCEED", "WRG", "INTR", "AC")
+            LIMIT 1
+            ) AS output ';
+
+        $sql .= '
             FROM
                 Submissions s
             INNER JOIN
@@ -225,7 +250,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val[] = $offset * $rowCount;
         $val[] = $rowCount;
 
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
         $runs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
 
         return [
