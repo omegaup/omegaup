@@ -21,18 +21,42 @@ sys.path.insert(
     os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
                 "../"))
 
-
 import lib.db
 import omegaup.api
 import test_constants
-from plagiarism_detector import get_contests
+import cron.plagiarism_detector
 
-UPDATE_CHECK_PLAGIARISM = '''
-                            UPDATE Contests
-                            SET check_plagiarism = 1
-                            WHERE alias = %s;
+# Constants
 
-'''
+GUID = ["00000000000000000000000000000001", "00000000000000000000000000000002",
+        "00000000000000000000000000000003", "00000000000000000000000000000004",
+        "00000000000000000000000000000005", "00000000000000000000000000000006",
+        "00000000000000000000000000000007", "00000000000000000000000000000008",
+        "00000000000000000000000000000009"
+        ]
+# SQL Queries
+CREATE_A_TEST_CONTEST = '''
+                            INSERT INTO `Contests`
+                            (`title`, `alias`, `description`, 
+                            `start_time`, `finish_time`,
+                             `check_plagiarism`, `problemset_id`,
+                             `acl_id`
+                            )
+                            VALUES
+                            (%s, %s, %s, %s, %s, %s, %s, %s)
+                            '''
+
+ADD_A_SUBMISSION_TO_THE_CONTEST = '''
+                                INSERT INTO `Submissions`
+                                (`submission_id`, `identity_id`,
+                                  `problem_id`, `problemset_id`, 
+                                   `guid`, `language`, `status`, 
+                                   `verdict`, `type`
+                                )
+                                VALUES
+                                (%s, %s, %s, %s, %s, %s, %s, %s,
+                                %s)
+                            '''
 
 @pytest.fixture(scope='session')
 def dbconn() -> lib.db.Connection:
@@ -50,51 +74,42 @@ def dbconn() -> lib.db.Connection:
 
 def test_get_contests(dbconn: lib.db.Connection) -> None:
 
-    
-    client = omegaup.api.Client(api_token=test_constants.API_TOKEN,
-                                url=test_constants.OMEGAUP_API_ENDPOINT)
-    current_time = datetime.datetime.now() - datetime.timedelta(minutes=30)
-    future_time = datetime.datetime.now()
+    current_time = datetime.datetime.now()
+    start_time= current_time - datetime.timedelta(minutes = 30)
     alias = ''.join(random.choices(string.digits, k=8))
+    description = "For Plagiarism tests"
+    problemset_id = 5 # Because it already contains 3 problems
+    acl_id = 65551
+    check_plagiarism = 1
 
-    # Creating a contest and then adding some users
-    client.contest.create(
-        title=alias,
-        alias=alias,
-        description='Test contest',
-        start_time=time.mktime(current_time.timetuple()),
-        finish_time=time.mktime(future_time.timetuple()),
-        window_length=0,
-        scoreboard=100,
-        points_decay_factor=0,
-        partial_score=True,
-        submissions_gap=1200,
-        penalty=0,
-        feedback='detailed',
-        penalty_type='contest_start',
-        languages='py2,py3',
-        penalty_calc_policy='sum',
-        admission_mode='private',
-        show_scoreboard_after=True,
-    )
-    with dbconn.cursor(dictionary=True) as cur:
-        cur.execute(UPDATE_CHECK_PLAGIARISM, (alias,))
+    with dbconn.cursor() as cur:
+        cur.execute(CREATE_A_TEST_CONTEST, 
+            (alias, alias, description,
+            start_time, current_time,
+            check_plagiarism, 
+            problemset_id, acl_id,))
+    
+    # add submissions to the contest
+    problems: List[int] = [1, 3, 5] # Problems inside Problemset
+    submission_id: int = int(69) # counter for submission_id
+    guid: int = 0 #counter for GUID
+    language = "cpp20-gcc"
+    status = "ready"
+    verdict = "AC"
+    ttype = "test"
 
-    usernames: List[str] = []
-    for number in range(3):
-        user = f'test_user_{number}'
-        client.contest.addUser(contest_alias=alias, usernameOrEmail=user)
-        usernames.append(user)
-        
-    assert get_contests(dbconn) == []
+    for identity in range(3, 6):
+        for problem in problems:
+            with dbconn.cursor() as cur:
+                cur.execute(
+                        ADD_A_SUBMISSION_TO_THE_CONTEST, 
+                        (submission_id, identity, problem, 
+                        problemset_id, GUID[guid], language,
+                        status,verdict, ttype,))
+                submission_id+=1
+                guid+=1
+    dbconn.conn.commit()
+    result = cron.plagiarism_detector.get_contests(dbconn)
 
-# create a contest - DONE
-      # from creating the contest we will need make a contest specific to our needs using SQL queries! 
-      # add 3 different problems to the contest. 
-      # add 3 different users to the contest.  - DONE
-      # for each user add 3 submission to each problem. 
-      # for all of this we will need to manually call a SQL query unlike how we do this is PHP using DAO's. 
- # run the plagiarism_detector.py
- # then check if there are correct amount of entries in the database for each contest
-       # will again use SQL queries. 
- # then check if there are all values correctly in the database.
+    # only one entry should be there hence '0' as first element
+    assert alias == result[0]['alias']
