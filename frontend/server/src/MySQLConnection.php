@@ -75,8 +75,8 @@ class MySQLConnection {
 
     private function connect(): void {
         $this->_connection = \mysqli_init();
-        $this->_connection->options(MYSQLI_READ_DEFAULT_GROUP, false);
-        $this->_connection->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
+        $this->_connection->options(MYSQLI_READ_DEFAULT_GROUP, 0);
+        $this->_connection->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, 1);
 
         if (
             !@$this->_connection->real_connect(
@@ -88,7 +88,7 @@ class MySQLConnection {
         ) {
             throw new \OmegaUp\Exceptions\DatabaseOperationException(
                 'Failed to connect to MySQL (' . \mysqli_connect_errno() . '): '
-                . \mysqli_connect_error(),
+                . strval(\mysqli_connect_error()),
                 \mysqli_connect_errno()
             );
         }
@@ -355,6 +355,35 @@ class MySQLConnection {
     }
 
     /**
+     * Attempts to executes a MySQL query.
+     */
+    private function QueryAttempt(
+        string $query,
+        int $resultmode
+    ): ?\mysqli_result {
+        try {
+            $result = $this->_connection->query($query, $resultmode);
+            if ($result === false) {
+                $errorMessage = "Failed to query MySQL ({$this->_connection->errno}): {$this->_connection->error}";
+                throw new \OmegaUp\Exceptions\DatabaseOperationException(
+                    $errorMessage,
+                    intval($this->_connection->errno)
+                );
+            } elseif ($result === true) {
+                return null;
+            }
+            /** @var \mysqli_result */
+            return $result;
+        } catch (\mysqli_sql_exception $e) {
+            $errorMessage = "Failed to query MySQL ({$e->getCode()}): {$e->getMessage()}";
+            throw new \OmegaUp\Exceptions\DatabaseOperationException(
+                $errorMessage,
+                $e->getCode()
+            );
+        }
+    }
+
+    /**
      * Executes a MySQL query.
      */
     private function Query(
@@ -363,33 +392,25 @@ class MySQLConnection {
         int $resultmode
     ): ?\mysqli_result {
         $query = $this->BindQueryParams($sql, $params);
-        $result = $this->_connection->query($query, $resultmode);
-        if (
-            $result === false &&
-            $this->_needsFlushing === false &&
-            $this->_connection->errno == 2006
-        ) {
-            // If there have not been any non-committed updates to the
-            // database, let's try to reconnect and do this one more time.
-            $this->connect();
-            $result = $this->_connection->query($query, $resultmode);
-        }
-        if ($result === false) {
-            $errorMessage = "Failed to query MySQL ({$this->_connection->errno}): {$this->_connection->error}";
+        try {
+            return $this->QueryAttempt($query, $resultmode);
+        } catch (\OmegaUp\Exceptions\DatabaseOperationException $e) {
+            if (
+                $this->_needsFlushing === false &&
+                $e->isGoneAway()
+            ) {
+                // If there have not been any non-committed updates to the
+                // database, let's try to reconnect and do this one more time.
+                $this->connect();
+                return $this->QueryAttempt($query, $resultmode);
+            }
             \Monolog\Registry::omegaup()->withName(
                 'mysql'
             )->debug(
-                $errorMessage
+                $e->getMessage()
             );
-            throw new \OmegaUp\Exceptions\DatabaseOperationException(
-                $errorMessage,
-                intval($this->_connection->errno)
-            );
-        } elseif ($result === true) {
-            return null;
+            throw $e;
         }
-        /** @var \mysqli_result */
-        return $result;
     }
 
     /**
