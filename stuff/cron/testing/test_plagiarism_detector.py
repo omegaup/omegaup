@@ -24,7 +24,7 @@ sys.path.insert(
 import lib.db
 import omegaup.api
 import test_constants
-import cron.plagiarism_detector
+import cron.plagiarism_detector # type: ignore
 
 # Constants
 
@@ -89,7 +89,7 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
             start_time, current_time,
             check_plagiarism, 
             problemset_id, acl_id,))
-            
+
     # add submissions to the contest
     problems: List[int] = [1, 3, 5] # Problems inside Problemset
     submission_id: int = int(69) # counter for submission_id
