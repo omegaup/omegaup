@@ -21,7 +21,7 @@ class Validators {
      *
      * @param mixed $parameter
      * @param string $parameterName Name of parameter that will appear en error message
-     * @psalm-assert string $parameter
+     * @psalm-assert non-empty-string $parameter
      */
     public static function validateEmail(
         $parameter,
