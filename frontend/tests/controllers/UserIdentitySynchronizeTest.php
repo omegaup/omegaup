@@ -15,7 +15,8 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
             'username' => \OmegaUp\Test\Utils::createRandomString(),
             'password' => \OmegaUp\Test\Utils::createRandomString(),
             'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
-            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
+            'birth_date' => 946684800, // 01-01-2000
         ]);
 
         // Call API
