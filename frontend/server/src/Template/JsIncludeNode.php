@@ -10,7 +10,7 @@ class JsIncludeNode extends \Twig\Node\Node {
     private static $_includedScripts = [];
 
     /**
-     * @var []string $options
+     * @param string[] $options
      */
     public function __construct(
         string $entrypoint,
@@ -44,7 +44,8 @@ class JsIncludeNode extends \Twig\Node\Node {
     }
 
     /**
-     * @var string[] $options
+     * @param string[] $options
+     *
      * @return string[]
      */
     public static function getScriptTags(

@@ -126,7 +126,11 @@ abstract class Users {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Users->parent_email_verification_deadline
             ),
-            $Users->parent_email_id,
+            (
+                is_null($Users->parent_email_id) ?
+                null :
+                intval($Users->parent_email_id)
+            ),
             intval($Users->user_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -477,7 +481,11 @@ abstract class Users {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Users->parent_email_verification_deadline
             ),
-            $Users->parent_email_id,
+            (
+                is_null($Users->parent_email_id) ?
+                null :
+                intval($Users->parent_email_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

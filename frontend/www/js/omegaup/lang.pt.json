@@ -810,6 +810,8 @@
 	"parameterStringTooLong": "Par\u00e2metro \u00e9 maior de %(max_length) caracteres",
 	"parameterStringTooShort": "Par\u00e2metro \u00e9 mais curto que *(MIN_LENGTH) caracteres",
 	"parameterUsernameInUse": "Nome de usu\u00e1rio j\u00e1 est\u00e1 em uso",
+	"parentEmailBody": "Insira este token para vincular a conta do seu filho https://omegaup.com/user/parentalverification/token/$(token)/",
+	"parentEmailSubject": "Token gerado",
 	"parentalTokenNotFound": "Token parental n\u00e3o encontrado",
 	"parentalTokenVerificationSuccessful": "O token parental foi validado com sucesso",
 	"passwordAddRequestSuccess": "Sua senha foi adicionada.",
