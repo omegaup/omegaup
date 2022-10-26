@@ -163,28 +163,27 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * user logged in and a parantal token fails due to both email address
+     *  User registration fails due to both email address were provided
      *
      */
-    public function testUserParentaltokenNotGeneratedDueEmailAlreadyExists() {
+    public function testUserParentalTokenNotGeneratedDueInvalidParameters() {
         $over13BirthDateTimestamp = strtotime('-15 years');
         $randomString = \OmegaUp\Test\Utils::createRandomString();
         try {
-            $r = new \OmegaUp\Request([
+            \OmegaUp\Controllers\User::apiCreate(
+                new \OmegaUp\Request([
                     'username' => $randomString,
                     'password' => $randomString,
                     'email' => $randomString . '@' . $randomString . '.com',
                     'parent_email' => $randomString . '@' . $randomString . '.com',
                     'birth_date' => $over13BirthDateTimestamp,
-            ]);
-            $this->assertNotNull($over13BirthDateTimestamp);
-
-             $response = \OmegaUp\Controllers\User::apiCreate($r);
-            $this->fail(
-                'User should have not been able to be created because the email already exists in the data base'
+                ])
             );
-        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertSame('mailInUse', $e->getMessage());
+            $this->fail(
+                'User should have not been able to be created because it is not valid provide both email and parent_email'
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
         }
     }
 }
