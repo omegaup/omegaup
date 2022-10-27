@@ -100,8 +100,12 @@ INSERT_INTO_PLAGIARISMS = """
 START_RED = "<span class='highlight-red'>"
 START_GREEN = "<span class='highlight-green'>"
 END = "</span>"
+C_LANGS = [
+    'c', 'c11-gcc', 'c11-clang', 'cpp', 'cpp11', 'cpp11-gcc', 'cpp11-clang',
+    'cpp17-gcc', 'cpp17-clang', 'cpp20-gcc', 'cpp20-clang'
+]
 
-SubmissionDownloader = Callable[[str, str, str], None]
+SubmissionDownloader = Callable[[str, str], None]
 
 
 class S3SubmissionDownloader:
@@ -110,10 +114,10 @@ class S3SubmissionDownloader:
     def __init__(self, bucket_name: str = 'omegaup-backup') -> None:
         self._bucket = boto3.client('s3').Bucket(bucket_name)
 
-    def __call__(self, guid: str, destination_dir: str, language: str) -> None:
+    def __call__(self, guid: str, destination_dir: str) -> None:
         self._bucket.download_file(
             f'omegaup/submissions/{guid[:2]}/{guid[2:]}',
-            os.path.join(destination_dir, f'{guid}.{language}'))
+            os.path.join(destination_dir))
 
 
 class LocalSubmissionDownloader:
@@ -121,13 +125,12 @@ class LocalSubmissionDownloader:
     def __init__(self, dir: str) -> None:
         self._dir = dir
 
-    def __call__(self, guid: str, destination_dir: str, language: str) -> None:
+    def __call__(self, guid: str, destination_dir: str) -> None:
         shutil.copyfile(os.path.join(self._dir, f'{guid[:2]}/{guid[2:]}'),
-                        os.path.join(destination_dir, f'{guid}.{language}'))
+                        os.path.join(destination_dir))
 
 
 def get_range(code: Sequence[str]) -> Sequence[int]:
-
     """
     Function to get the range of lines that are plagiarised. 
     The length of each list should be even. 
@@ -163,7 +166,8 @@ def filter_and_format_result(dbconn: lib.db.Connection, contest_id: int,
     guid_and_submission_id_dict: Dict[str, int] = {}
 
     for submission in submissions:
-        guid_and_submission_id_dict[submission['guid']] = submission['submission_id']
+        guid_and_submission_id_dict[
+            submission['guid']] = submission['submission_id']
 
     updated_result: List[Results] = []
     for result in results:
@@ -175,15 +179,16 @@ def filter_and_format_result(dbconn: lib.db.Connection, contest_id: int,
                 submission_id_1=guid_and_submission_id_dict[os.path.splitext(
                     os.path.basename(result.test_filename))[0]],
                 submission_id_2=guid_and_submission_id_dict[os.path.splitext(
-                    os.path.basename(result.test_filename))[0]],
+                    os.path.basename(result.reference_filename))[0]],
                 contents=json.dumps({
                     'file1': get_range(result[4].split('\n')),
                     'file2': get_range(result[5].split('\n'))
                 }),
             ))
-    # add to the database.
+        # add to the database.
     with dbconn.cursor() as cur:
         cur.executemany(INSERT_INTO_PLAGIARISMS, updated_result)
+    dbconn.conn.commit()
 
 
 def run_copy_detect(dbconn: lib.db.Connection, dir: str, contest_id: int,
@@ -193,7 +198,7 @@ def run_copy_detect(dbconn: lib.db.Connection, dir: str, contest_id: int,
     for problem in os.listdir(dir):
         detector = copydetect.CopyDetector(
             test_dirs=[os.path.join(dir, problem)],
-            extensions=["cpp", "py", "py3", "java", "c"],
+            extensions=["cpp", "py", "py3", "java"],
             display_t=0.9,
             autoopen=False,
             disable_filtering=True)
@@ -219,9 +224,17 @@ def download_submission_files(dbconn: lib.db.Connection, dir: str,
                               submission_ids: Iterable[Submission]) -> None:
 
     for submission in submission_ids:
-        submission_path = os.path.join(dir, str(submission['problem_id']))
+        lang = submission['language']
+        if lang in C_LANGS:
+            lang = "cpp"
+
+        submission_path = os.path.join(dir, str(submission['problem_id']),
+                                       f'{submission["guid"]}.{lang}')
         os.makedirs(os.path.dirname(submission_path), exist_ok=True)
-        download(submission['guid'], submission_path, submission['language'])
+        lang = submission['language']
+        if lang in C_LANGS:
+            lang = "cpp"
+        download(submission['guid'], submission_path)
 
 
 def get_contests(dbconn: lib.db.Connection) -> Iterable[Contest]:
