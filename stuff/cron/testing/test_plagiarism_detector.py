@@ -112,7 +112,6 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
     status: str = "ready"
     verdict: str = "AC"
     ttype: str = "test"
-    submission_ids: List = []
 
     # create Problemset for contest
     with dbconn.cursor() as cur:
@@ -179,7 +178,6 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
                     verdict,
                     ttype,
                 ))
-                submission_ids.append(submission_id)
                 submission_id += 1
                 guid += 1
 
@@ -187,12 +185,12 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
 
     dbconn.conn.commit()
     result = cron.plagiarism_detector.get_contests(dbconn)
-    print(result)
+
     for res in result:
         assert alias == res['alias']
         submissions = cron.plagiarism_detector.get_submissions_for_contest(
             dbconn, res['contest_id'])
-        print(submissions)
+
         for sub in submissions:
             assert sub['guid'] in GUID
 
@@ -205,5 +203,5 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
         with dbconn.cursor(dictionary=True) as cur:
             cur.execute(GET_PLAGIARISM_DETAILS, (res['contest_id'],))
             plag = cur.fetchall()
-
-        assert len(plag) == 5
+        
+        assert plag
