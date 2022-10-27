@@ -19,8 +19,7 @@ describe('getDifferenceInCalendarYears', () => {
     // https://www.epochconverter.com/
     const yearInSeconds = 31556926 * 1000;
     expect(time.getDifferenceInCalendarYears(new Date(yearInSeconds))).toEqual(
-      1,
-    );
+      1);
     expect(
       time.getDifferenceInCalendarYears(new Date(yearInSeconds * 3)),
     ).toEqual(3);
