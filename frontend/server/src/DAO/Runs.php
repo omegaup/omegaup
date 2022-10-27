@@ -206,16 +206,14 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $sql .= ',(
             SELECT
                 IF(
-                    verdict IN ("JE", "VE", "CE"), verdict,
-                IF(
                     verdict IN ("OF", "RFE"), "RFE",
                 IF(
                     verdict IN ("RE", "RTE"), "RE",
                 IF(
                     verdict IN ("ML", "MLE", "TLE", "OLE", "TO", "OL"), "INTR",
                 IF(
-                    verdict IN ("WA", "AC", "PA"), "FIN", null)
-                )))
+                    verdict IN ("WA", "AC", "PA"), "FIN", verdict)
+                ))
             ) AS execution
             FROM
                 Runs_Groups
