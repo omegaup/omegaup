@@ -2,15 +2,9 @@
 
 from typing import List, Callable
 import pytest
-import argparse
-import calendar
-import collections
 import datetime
-import json
-import logging
 import string
 import time
-import operator
 import sys
 import unittest
 import os
@@ -22,7 +16,6 @@ sys.path.insert(
                  "../"))
 
 import lib.db
-import omegaup.api
 import cron.plagiarism_detector  # type: ignore
 
 # Constants
@@ -34,7 +27,10 @@ GUID = [
     "00000000000000000000000000000007", "00000000000000000000000000000008",
     "00000000000000000000000000000009"
 ]
-LOCAL_DOWNLOADER_DIR = "/opt/omegaup/stuff/cron/testing/testdata/"
+
+_OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..'))
+LOCAL_DOWNLOADER_DIR = os.path.join(_OMEGAUP_ROOT, "testdata", "")
+
 # SQL Queries
 CREATE_A_TEST_CONTEST = '''
                             INSERT INTO `Contests`
@@ -63,13 +59,13 @@ ADD_PROBLEMS_TO_PROBLEMSET = '''
 '''
 ADD_A_SUBMISSION_TO_THE_CONTEST = '''
                                 INSERT INTO `Submissions`
-                                (`submission_id`, `identity_id`,
+                                (`identity_id`,
                                   `problem_id`, `problemset_id`, 
                                    `guid`, `language`, `status`, 
                                    `verdict`, `type`
                                 )
                                 VALUES
-                                (%s, %s, %s, %s, %s, %s, %s, %s,
+                                (%s, %s, %s, %s, %s, %s, %s,
                                 %s)
                             '''
 GET_PLAGIARISM_DETAILS = '''
@@ -168,7 +164,6 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
         for problem in range(1, 4):
             with dbconn.cursor() as cur:
                 cur.execute(ADD_A_SUBMISSION_TO_THE_CONTEST, (
-                    submission_id,
                     identity,
                     problem,
                     problemset_id,
@@ -178,7 +173,6 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
                     verdict,
                     ttype,
                 ))
-                submission_id += 1
                 guid += 1
 
             dbconn.conn.commit()
