@@ -296,6 +296,8 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                      '//a[contains(@href, "/login/")]'))).click()
 
         # Login screen
+        self.browser.find_element(By.NAME, 'reg_birthdate').send_keys(
+            '2000-01-01')
         self.browser.find_element(By.NAME, 'reg_username').send_keys(user)
         self.browser.find_element(By.NAME, 'reg_email').send_keys(
             'email_%s@localhost.localdomain' % user)

@@ -635,6 +635,7 @@ const translations: { [key: string]: string; } = {
   lockdownMessageWarning: "Advertencia: en modo lockdown, tus env\u00edos ya no ser\u00e1n accesibles si te sales de la p\u00e1gina.",
   loginDisabled: "Tu usuario es muy viejo y por tu seguridad ha sido deshabilitado. Para logguearte de nuevo contacta a omegaup-soporte@googlegroups.com",
   loginEmail: "E-mail",
+  loginEmailParent: "E-mail de la figura parental",
   loginEmailUsername: "E-mail o usuario",
   loginFacebookEmptyEmailError: "Se necesita acceso a tu direcci\u00f3n de correo para utilizar omegaUp. Por favor permite el acceso a tu correo de Facebook para continuar.",
   loginFederated: "Cuenta en otros sitios",

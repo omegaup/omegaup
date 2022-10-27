@@ -24,14 +24,16 @@ export default class DatePicker extends Vue {
   T = T;
 
   @Prop({ default: '' }) name!: string;
-  @Prop() value!: Date;
+  @Prop() value!: Date | null;
   @Prop({ default: true }) enabled!: boolean;
   @Prop({ default: T.datePickerFormat }) format!: string;
   @Prop({ default: false }) isInvalid!: boolean;
   @Prop({ default: null }) max!: Date | null;
 
   private usedFallback: boolean = false;
-  private stringValue: string = time.formatDateLocal(this.value);
+  private stringValue: null | string = !this.value
+    ? null
+    : time.formatDateLocal(this.value);
 
   get maxDateStr() {
     return this.max?.toISOString()?.split('T')?.[0];

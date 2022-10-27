@@ -8,17 +8,7 @@
     </omegaup-login>
     <omegaup-signup
       :validate-recaptcha="validateRecaptcha"
-      @register-and-login="
-        (username, email, password, passwordConfirmation, recaptchaResponse) =>
-          $emit(
-            'register-and-login',
-            username,
-            email,
-            password,
-            passwordConfirmation,
-            recaptchaResponse,
-          )
-      "
+      @register-and-login="(response) => $emit('register-and-login', response)"
     >
     </omegaup-signup>
   </div>

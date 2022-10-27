@@ -59,32 +59,19 @@ OmegaUp.on('ready', () => {
           facebookUrl: payload.facebookUrl,
         },
         on: {
-          'register-and-login': (
-            username: string,
-            email: string,
-            password: string,
-            passwordConfirmation: string,
-            recaptchaResponse: string,
-          ) => {
-            if (password != passwordConfirmation) {
-              ui.error(T.passwordMismatch);
-              return;
-            }
-            if (password.length < 8) {
-              ui.error(T.loginPasswordTooShort);
-              return;
-            }
-
-            api.User.create({
-              username: username,
-              email: email,
-              password: password,
-              recaptcha: recaptchaResponse,
-            })
+          'register-and-login': (request: {
+            username: string;
+            email?: string;
+            parent_email?: string;
+            password: string;
+            recaptcha: string;
+            birth_date: Date;
+          }) => {
+            api.User.create(request)
               .then(() => {
                 loginAndRedirect(
-                  username,
-                  password,
+                  request.username,
+                  request.password,
                   /*isAccountCreation=*/ true,
                 );
               })

@@ -24,7 +24,8 @@ Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
 Cypress.Commands.add('register', ({ username, password }: LoginOptions) => {
   const URL =
     '/api/user/create?' +
-    buildURLQuery({ username, password, email: username + '@omegaup.com' });
+    buildURLQuery({ username, password, email: username + '@omegaup.com', birth_date: 946684800 // 01-01-2000
+    });
   cy.request(URL).then((response) => {
     expect(response.status).to.equal(200);
     cy.login({ username, password });
