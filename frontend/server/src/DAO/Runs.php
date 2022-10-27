@@ -210,9 +210,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 IF(
                     verdict IN ("WA", "PA"), "WRG",
                 IF(
-                    verdict IN ("JE", "VE", "CE", "FO", "RFE", "RE", "RTE", "MLE", "TLE"), "INTR",
-                IF(
-                    verdict = "AC", verdict, null)
+                    verdict IN ("JE", "VE", "CE", "FO", "RFE", "RE", "RTE", "MLE", "TLE"), "INTR", verdict
                 )))
             AS output
             FROM
