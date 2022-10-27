@@ -5,12 +5,8 @@ import esLocale from 'date-fns/locale/es';
 import enLocale from 'date-fns/locale/en-US';
 import ptLocale from 'date-fns/locale/pt-BR';
 import T from './lang';
-import differenceInCalendarYears from 'date-fns/differenceInCalendarYears';
-let remoteDeltaTime: number = 0;
 
-export function getDifferenceInCalendarYears(date: Date): number {
-  return differenceInCalendarYears(date, Date.now());
-}
+let remoteDeltaTime: number = 0;
 
 export function formatFutureDateRelative(futureDate: Date): string {
   let currentLocale;

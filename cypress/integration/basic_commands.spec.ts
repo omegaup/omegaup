@@ -176,8 +176,6 @@ describe('Basic Commands Test', () => {
     const username = uuid();
     const password = uuid();
     cy.get('[data-login-button]').click();
-    now.setFullYear(now.getFullYear() - 18);
-    cy.get('[data-signup-birthdate]').type(getISODate(now));
     cy.get('[data-signup-username]').type(username);
     cy.get('[data-signup-password]').type(password);
     cy.get('[data-signup-repeat-password]').type(password);
