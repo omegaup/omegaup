@@ -72,7 +72,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $name
      */
     public static function apiCreate(\OmegaUp\Request $r) {
-        $r->ensureMainUserIdentity();
+        $r->ensureIdentityIsOver13();
 
         $groupAlias = $r->ensureString(
             'alias',
@@ -159,7 +159,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $usernameOrEmail
      */
     public static function apiAddUser(\OmegaUp\Request $r): array {
-        $r->ensureIdentity();
+        $r->ensureIdentityIsOver13();
         $groupAlias = $r->ensureString(
             'group_alias',
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
@@ -386,7 +386,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $name
      */
     public static function apiCreateScoreboard(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
+        $r->ensureIdentityIsOver13();
         $groupAlias = $r->ensureString(
             'group_alias',
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)

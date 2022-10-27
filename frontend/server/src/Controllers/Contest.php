@@ -2533,7 +2533,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiCreate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Authenticate user
-        $r->ensureMainUserIdentity();
+        $r->ensureIdentityIsOver13();
 
         // Validate request
         self::validateCreate($r, $r->identity);
@@ -3709,7 +3709,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiAddAdmin(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Authenticate logged user
-        $r->ensureMainUserIdentity();
+        $r->ensureIdentityIsOver13();
 
         // Check contest_alias
         $contestAlias = $r->ensureString(
@@ -3797,7 +3797,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiAddGroupAdmin(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Authenticate logged user
-        $r->ensureMainUserIdentity();
+        $r->ensureIdentityIsOver13();
 
         // Check contest_alias
         $contestAlias = $r->ensureString(
