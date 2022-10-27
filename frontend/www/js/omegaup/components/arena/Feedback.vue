@@ -1,42 +1,39 @@
 <template>
-  <div v-if="visible" class="card">
-    <div v-if="!saved" class="card">
-      <div class="card-header">{{ T.runDetailsNewFeedback }}</div>
-      <div class="card-body">
-        <textarea
-          ref="feedback-form"
-          v-model="text"
-          :placeholder="T.runDetailsFeedbackPlaceholder"
-          class="w-100"
-        ></textarea>
-      </div>
-      <div class="card-footer text-muted">
-        <div class="form-group my-2">
-          <button
-            data-button-submit
-            :disabled="!text"
-            class="btn btn-primary mx-2"
-            @click.prevent="onSubmitFeedback"
-          >
-            {{ T.runDetailsFeedbackAddReview }}
-          </button>
-          <button
-            data-button-cancel
-            class="btn btn-danger mx-2"
-            @click.prevent="onCancelFeedback"
-          >
-            {{ T.runDetailsFeedbackCancel }}
-          </button>
-        </div>
-      </div>
+  <div class="card">
+    <div class="card-header">
+      {{ !saved ? T.runDetailsNewFeedback : T.runDetailsFeedbackCreated }}
     </div>
-    <div v-else class="card">
-      <div class="card-header">{{ T.runDetailsFeedbackCreated }}</div>
-      <div class="card-body">
-        <omegaup-markdown
-          :markdown="text"
-          :full-width="true"
-        ></omegaup-markdown>
+    <div class="card-body">
+      <textarea
+        v-if="!saved"
+        ref="feedback-form"
+        v-model="text"
+        :placeholder="T.runDetailsFeedbackPlaceholder"
+        class="w-100"
+      ></textarea>
+      <omegaup-markdown
+        v-else
+        :markdown="text"
+        :full-width="true"
+      ></omegaup-markdown>
+    </div>
+    <div v-if="!saved" class="card-footer text-muted">
+      <div class="form-group my-2">
+        <button
+          data-button-submit
+          :disabled="!text"
+          class="btn btn-primary mx-2"
+          @click.prevent="onSubmitFeedback"
+        >
+          {{ T.runDetailsFeedbackAddReview }}
+        </button>
+        <button
+          data-button-cancel
+          class="btn btn-danger mx-2"
+          @click.prevent="onCancelFeedback"
+        >
+          {{ T.runDetailsFeedbackCancel }}
+        </button>
       </div>
     </div>
   </div>
@@ -54,7 +51,7 @@ export enum FeedbackStatus {
 }
 
 export interface ArenaCourseFeedback {
-  line: null | number;
+  line: number;
   text: null | string;
   status: FeedbackStatus;
 }
@@ -72,7 +69,6 @@ export default class Feedback extends Vue {
   T = T;
   text = this.feedback.text;
   saved: boolean = false;
-  visible = true;
 
   mounted() {
     this.$nextTick(() => this.feedbackForm.focus());
@@ -88,7 +84,6 @@ export default class Feedback extends Vue {
   }
 
   onCancelFeedback() {
-    this.visible = false;
     this.$emit('cancel', this.feedback);
   }
 }
