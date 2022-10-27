@@ -72,7 +72,12 @@ ADD_A_SUBMISSION_TO_THE_CONTEST = '''
                                 (%s, %s, %s, %s, %s, %s, %s, %s,
                                 %s)
                             '''
-
+GET_PLAGIARISM_DETAILS = '''
+                        SELECT `contest_id`, `submission_id_1`,
+                               `submission_id_2`
+                        FROM `Plagiarisms`
+                        WHERE `contest_id` =  %s; 
+'''
 SubmissionDownloader = Callable[[str, str, str], None]
 
 
@@ -94,19 +99,20 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
     current_time = datetime.datetime.now()
     start_time = current_time - datetime.timedelta(minutes=30)
     finish_time = current_time - datetime.timedelta(minutes=5)
-    alias = ''.join(random.choices(string.digits, k=8))
-    description = "For Plagiarism tests"
-    problemset_id = random.randint(90, 199)
-    acl_id = 65551
-    check_plagiarism = 1
-    scoreboard_url = ''.join(random.choices(string.ascii_letters, k=30))
-    scoreboard_url_admin = ''.join(random.choices(string.ascii_letters, k=30))
-    submission_id: int = int(69)  # counter for submission_id
-    guid: int = 0  #counter for GUID
-    language = "cpp20-gcc"
-    status = "ready"
-    verdict = "AC"
-    ttype = "test"
+    alias: str = ''.join(random.choices(string.digits, k=8))
+    description: str = "For Plagiarism tests"
+    problemset_id: int = random.randint(90, 199)
+    acl_id: int = 65551 # Maybe create a New ACL
+    check_plagiarism: int = 1
+    scoreboard_url: str = ''.join(random.choices(string.ascii_letters, k=30))
+    scoreboard_url_admin: str = ''.join(random.choices(string.ascii_letters, k=30))
+    submission_id: int = random.randint(100, 500) # counter for submission_id
+    guid: int = 0  #counter for GUID LIST
+    language: str = "cpp20-gcc"
+    status: str = "ready"
+    verdict: str = "AC"
+    ttype: str = "test"
+    submission_ids: List = []
 
     # create Problemset for contest
     with dbconn.cursor() as cur:
@@ -173,8 +179,10 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
                     verdict,
                     ttype,
                 ))
+                submission_ids.append(submission_id)
                 submission_id += 1
                 guid += 1
+
             dbconn.conn.commit()
 
     dbconn.conn.commit()
@@ -193,3 +201,9 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
 
         cron.plagiarism_detector.run_detector_for_contest(
             dbconn, download, res['contest_id'])
+        
+        with dbconn.cursor(dictionary=True) as cur:
+            cur.execute(GET_PLAGIARISM_DETAILS, (res['contest_id'],))
+            plag = cur.fetchall()
+
+        assert len(plag) == 5
