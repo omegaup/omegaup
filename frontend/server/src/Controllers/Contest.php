@@ -2218,7 +2218,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiClone(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Authenticate user
-        $r->ensureMainUserIdentity();
+        $r->ensureIdentityIsOver13();
 
         $contestAlias = $r->ensureString(
             'contest_alias',
@@ -3071,7 +3071,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiAddProblem(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Authenticate user
-        $r->ensureMainUserIdentity();
+        $r->ensureIdentityIsOver13();
         $contestAlias = $r->ensureString(
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
