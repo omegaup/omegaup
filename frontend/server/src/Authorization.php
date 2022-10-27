@@ -95,7 +95,7 @@ class Authorization {
     const IDENTITY_CREATOR_GROUP_ALIAS = 'omegaup:group-identity-creator';
 
     // Group for certificate generators.
-    const CERTIFICATE_GENERATOR_GROUP_ALIAS = 'omegaup:group-certificate-generator';
+    const CERTIFICATE_GENERATOR_GROUP_ALIAS = 'omegaup:certificate-generator';
 
     // Group for teaching assitants.
     const TEACHING_ASSISTANT_GROUP_ALIAS = 'omegaup:teaching-assistant';
@@ -281,14 +281,8 @@ class Authorization {
         return self::isGroupIdentityCreator($identity);
     }
 
-    public static function canGenerateCertificates(
-        \OmegaUp\DAO\VO\Identities $identity,
-        ?int $role
-    ): bool {
-        if (!is_null($role)) {
-            return self::isCertificateGenerator($identity, $role);
-        }
-        return self::isCertificateGenerator($identity, null);
+    public static function canGenerateCertificates(\OmegaUp\DAO\VO\Identities $identity): bool {
+        return self::isCertificateGenerator($identity);
     }
 
     public static function isAdminOrTeachingAssistant(
@@ -435,13 +429,7 @@ class Authorization {
         return in_array($today, $availableDateToChooseCoder);
     }
 
-    public static function isCertificateGenerator(
-        \OmegaUp\DAO\VO\Identities $identity,
-        ?int $role
-    ): bool {
-        if (!is_null($role) && $role === self::CERTIFICATE_GENERATOR_ROLE) {
-                return true;
-        }
+    public static function isCertificateGenerator(\OmegaUp\DAO\VO\Identities $identity): bool {
         if (is_null(self::$_certificateGeneratorGroup)) {
             self::$_certificateGeneratorGroup = \OmegaUp\DAO\Groups::findByAlias(
                 self::CERTIFICATE_GENERATOR_GROUP_ALIAS
@@ -453,6 +441,10 @@ class Authorization {
         return self::isGroupMember(
             $identity,
             self::$_certificateGeneratorGroup
+        ) || self::hasRole(
+            $identity,
+            self::$_certificateGeneratorGroup->acl_id,
+            self::CERTIFICATE_GENERATOR_ROLE
         );
     }
 
@@ -572,6 +564,7 @@ class Authorization {
             $group->group_id,
             $identity->identity_id
         );
+
         return !empty($groupUsers);
     }
 

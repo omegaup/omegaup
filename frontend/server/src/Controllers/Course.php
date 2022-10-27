@@ -331,7 +331,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'finish_time'
             );
         }
-
         return $originalCourse;
     }
 
@@ -369,7 +368,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             'languages' => $r->ensureOptionalString('languages'),
             'level' => $r->ensureOptionalString('level'),
             'minimum_progress_for_certificate' => $r->ensureOptionalInt(
-                'minimum_progress_for_certificate'
+                'minimum_progress_for_certificate',
+                lowerBound: 0,
+                upperBound: 100
             ),
             'name' => $r->ensureString('name'),
             'needs_basic_information' => $r->ensureOptionalBool(
@@ -820,6 +821,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $languages
      * @omegaup-request-param null|string $level
      * @omegaup-request-param int|null $minimum_progress_for_certificate
+     * @omegaup-request-param int|null $rol
      * @omegaup-request-param string $name
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param null|string $objective
@@ -845,17 +847,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        // check if minimum_progress_for_certificate is valid
-        if (
-            !is_null(
-                $courseParams->minimumProgressForCertificate
-            ) && ($courseParams->minimumProgressForCertificate < 0 || $courseParams->minimumProgressForCertificate > 100)
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'invalidParameters'
-            );
-        }
-
         // Only curator can set public
         $admissionMode = $r->ensureOptionalString('admission_mode');
         if (
@@ -865,58 +856,33 @@ class Course extends \OmegaUp\Controllers\Controller {
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
+        $course = new \OmegaUp\DAO\VO\Courses(
+            [
+            'name' => $courseParams->name,
+            'alias' => $courseParams->courseAlias,
+            'level' => $courseParams->level,
+            'description' => $courseParams->description,
+            'objective' => $courseParams->objective,
+            'school_id' => $courseParams->schoolId,
+            'languages' => isset(
+                $courseParams->languages
+            ) ? implode(
+                ',',
+                $courseParams->languages
+            ) : null,
+            'start_time' => $courseParams->startTime,
+            'finish_time' => $courseParams->finishTime,
+            'admission_mode' => $courseParams->admissionMode,
+            'show_scoreboard' => $courseParams->showScoreboard,
+            'needs_basic_information' => $courseParams->needsBasicInformation,
+            'requests_user_information' => $courseParams->requestsUserInformation]
+        );
 
-        if (
-            !is_null(
-                $r['rol']
-            ) && \OmegaUp\Authorization::isCertificateGenerator(
-                $r->identity,
-                $r['rol']
-            )
-        ) {
-            self::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
-                'name' => $courseParams->name,
-                'alias' => $courseParams->courseAlias,
-                'level' => $courseParams->level,
-                'description' => $courseParams->description,
-                'objective' => $courseParams->objective,
-                'school_id' => $courseParams->schoolId,
-                'languages' => isset(
-                    $courseParams->languages
-                ) ? implode(
-                    ',',
-                    $courseParams->languages
-                ) : null,
-                'start_time' => $courseParams->startTime,
-                'finish_time' => $courseParams->finishTime,
-                'admission_mode' => $courseParams->admissionMode,
-                'show_scoreboard' => $courseParams->showScoreboard,
-                'needs_basic_information' => $courseParams->needsBasicInformation,
-                'requests_user_information' => $courseParams->requestsUserInformation,
-                'minimum_progress_for_certificate' => $courseParams->minimumProgressForCertificate,
-            ]), $r->user);
-        } else {
-            self::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
-                'name' => $courseParams->name,
-                'alias' => $courseParams->courseAlias,
-                'level' => $courseParams->level,
-                'description' => $courseParams->description,
-                'objective' => $courseParams->objective,
-                'school_id' => $courseParams->schoolId,
-                'languages' => isset(
-                    $courseParams->languages
-                ) ? implode(
-                    ',',
-                    $courseParams->languages
-                ) : null,
-                'start_time' => $courseParams->startTime,
-                'finish_time' => $courseParams->finishTime,
-                'admission_mode' => $courseParams->admissionMode,
-                'show_scoreboard' => $courseParams->showScoreboard,
-                'needs_basic_information' => $courseParams->needsBasicInformation,
-                'requests_user_information' => $courseParams->requestsUserInformation,
-            ]), $r->user);
+        if (\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
+            $course->minimum_progress_for_certificate = $courseParams->minimumProgressForCertificate;
         }
+
+        self::createCourseAndGroup($course, $r->user);
 
         return [
             'status' => 'ok',
@@ -5951,6 +5917,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             'requests_user_information',
             'admission_mode',
         ];
+
+        if (\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
+            array_push($valueProperties, 'minimum_progress_for_certificate');
+        }
+
         $importantChange = self::updateValueProperties(
             $r,
             $course,
