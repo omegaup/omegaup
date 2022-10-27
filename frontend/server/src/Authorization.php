@@ -228,7 +228,7 @@ class Authorization {
             \OmegaUp\Time::get()
         );
     }
-    
+
     /**
      * Returns whether the identity can edit the problem. Only problem admins and
      * reviewers can do so.

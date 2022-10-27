@@ -186,7 +186,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame('parameterInvalid', $e->getMessage());
         }
     }
-    
+
     /**
      * User13 can't perform the restricted actions
      * An exception throws
@@ -344,6 +344,5 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('U13CannotPerform', $e->getMessage());
         }
-    
     }
 }
