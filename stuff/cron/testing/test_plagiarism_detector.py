@@ -20,16 +20,8 @@ import cron.plagiarism_detector  # type: ignore
 
 # Constants
 
-GUID = [
-    "00000000000000000000000000000001", "00000000000000000000000000000002",
-    "00000000000000000000000000000003", "00000000000000000000000000000004",
-    "00000000000000000000000000000005", "00000000000000000000000000000006",
-    "00000000000000000000000000000007", "00000000000000000000000000000008",
-    "00000000000000000000000000000009"
-]
-
 _OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..'))
-LOCAL_DOWNLOADER_DIR = os.path.join(_OMEGAUP_ROOT, "testdata", "")
+LOCAL_DOWNLOADER_DIR = os.path.join(_OMEGAUP_ROOT, "testdata")
 
 # SQL Queries
 CREATE_A_TEST_CONTEST = '''
@@ -103,11 +95,12 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
     scoreboard_url: str = ''.join(random.choices(string.ascii_letters, k=30))
     scoreboard_url_admin: str = ''.join(random.choices(string.ascii_letters, k=30))
     submission_id: int = random.randint(100, 500) # counter for submission_id
-    guid: int = 0  #counter for GUID LIST
+    guid: int = 1  #counter for GUID LIST
     language: str = "cpp20-gcc"
     status: str = "ready"
     verdict: str = "AC"
     ttype: str = "test"
+    GUID: List[str] = [] # needed for assertions
 
     # create Problemset for contest
     with dbconn.cursor() as cur:
@@ -167,12 +160,13 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
                     identity,
                     problem,
                     problemset_id,
-                    GUID[guid],
+                    f'{guid:032x}',
                     language,
                     status,
                     verdict,
                     ttype,
                 ))
+                GUID.append(f'{guid:032x}')
                 guid += 1
 
             dbconn.conn.commit()
@@ -185,8 +179,8 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
         submissions = cron.plagiarism_detector.get_submissions_for_contest(
             dbconn, res['contest_id'])
 
-        for sub in submissions:
-            assert sub['guid'] in GUID
+        for submission in submissions:
+            assert submission['guid'] in GUID
 
         download: SubmissionDownloader = cron.plagiarism_detector.LocalSubmissionDownloader(
             LOCAL_DOWNLOADER_DIR)

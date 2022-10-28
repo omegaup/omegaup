@@ -74,7 +74,7 @@ class Contest(TypedDict):
 GET_CONTEST_SUBMISSION_IDS = """ SELECT c.contest_id, s.submission_id, s.problemset_id,
                                 s.problem_id, s.verdict, s.guid, s.language
                                 FROM Submissions as s 
-                                JOIN Contests c ON c.problemset_id = s.problemset_id 
+                                INNER JOIN Contests c ON c.problemset_id = s.problemset_id 
                                 WHERE c.contest_id = %s;
                             """
 
@@ -185,7 +185,7 @@ def filter_and_format_result(dbconn: lib.db.Connection, contest_id: int,
                     'file2': get_range(result[5].split('\n'))
                 }),
             ))
-        # add to the database.
+    # add to the database.
     with dbconn.cursor() as cur:
         cur.executemany(INSERT_INTO_PLAGIARISMS, updated_result)
     dbconn.conn.commit()
@@ -231,9 +231,6 @@ def download_submission_files(dbconn: lib.db.Connection, dir: str,
         submission_path = os.path.join(dir, str(submission['problem_id']),
                                        f'{submission["guid"]}.{lang}')
         os.makedirs(os.path.dirname(submission_path), exist_ok=True)
-        lang = submission['language']
-        if lang in C_LANGS:
-            lang = "cpp"
         download(submission['guid'], submission_path)
 
 
