@@ -438,14 +438,16 @@ class Authorization {
                 return false;
             }
         }
-        return self::isGroupMember(
+        return !is_null(
+            self::$_certificateGeneratorGroup
+        ) && (self::isGroupMember(
             $identity,
             self::$_certificateGeneratorGroup
         ) || self::hasRole(
             $identity,
             self::$_certificateGeneratorGroup->acl_id,
             self::CERTIFICATE_GENERATOR_ROLE
-        );
+        ));
     }
 
     public static function isTeachingAssistant(

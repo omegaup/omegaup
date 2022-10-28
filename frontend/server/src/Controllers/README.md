@@ -1720,7 +1720,6 @@ Create new course API
 | `needs_basic_information`          | `bool\|null`   |             |
 | `objective`                        | `null\|string` |             |
 | `requests_user_information`        | `null\|string` |             |
-| `rol`                              | `int\|null`    |             |
 | `school_id`                        | `int\|null`    |             |
 | `show_scoreboard`                  | `bool\|null`   |             |
 

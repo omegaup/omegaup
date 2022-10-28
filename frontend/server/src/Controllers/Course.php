@@ -821,7 +821,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $languages
      * @omegaup-request-param null|string $level
      * @omegaup-request-param int|null $minimum_progress_for_certificate
-     * @omegaup-request-param int|null $rol
      * @omegaup-request-param string $name
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param null|string $objective
