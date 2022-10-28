@@ -18,6 +18,7 @@ class UserDeleteTest extends \OmegaUp\Test\ControllerTestCase {
                 'password' => $username,
                 'email' => $email,
                 'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
+                'birth_date' => 946684800, // 01-01-2000
             ])
         );
 

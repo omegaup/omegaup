@@ -46,7 +46,13 @@ class UserParams {
     public $preferredLanguage;
 
     /**
-     * @param array{username?: string, name?: string, password?: string, email?: string, isPrivate?: bool, verify?: bool, preferredLanguage?: string} $params
+     * @readonly
+     * @var int
+     */
+    public $birthDate;
+
+    /**
+     * @param array{username?: string, name?: string, password?: string, email?: string, isPrivate?: bool, verify?: bool, preferredLanguage?: string, birthDate?: int} $params
      */
     public function __construct(array $params = []) {
         $this->username = $params['username'] ?? \OmegaUp\Test\Utils::CreateRandomString();
@@ -56,6 +62,7 @@ class UserParams {
         $this->isPrivate = $params['isPrivate'] ?? false;
         $this->verify = $params['verify'] ?? true;
         $this->preferredLanguage = $params['preferredLanguage'] ?? null;
+        $this->birthDate = $params['birthDate'] ?? 946684800; // 01-01-2000
     }
 }
 
@@ -82,6 +89,7 @@ class User {
                 'password' => $params->password,
                 'email' => $params->email,
                 'is_private' => strval($params->isPrivate),
+                'birth_date' => $params->birthDate,
             ]),
             ignorePassword: false,
             forceVerification: true
