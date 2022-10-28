@@ -75,7 +75,7 @@ GET_CONTEST_SUBMISSION_IDS = """ SELECT c.contest_id, s.identity_id,
                                 s.submission_id, s.problemset_id,
                                 s.problem_id, s.verdict, s.guid, s.language
                                 FROM Submissions as s 
-                                JOIN Contests c ON c.problemset_id = s.problemset_id 
+                                INNER JOIN Contests c ON c.problemset_id = s.problemset_id 
                                 WHERE c.contest_id = %s AND
                                 s.verdict = "AC";
                             """
