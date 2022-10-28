@@ -34,7 +34,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['request']['start_time']
         );
 
-        $this->assertEquals($durationFromRequest, $durationFromResponse);
+        $this->assertSame($durationFromRequest, $durationFromResponse);
     }
 
     /**
@@ -493,7 +493,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
                 fn ($value) => $value['alias'] == $contest['contest']->alias
             );
 
-            $this->assertEquals(0, $contest['recommended']);
+            $this->assertFalse($contest['recommended']);
         }
 
         // Turn recommended ON
@@ -531,7 +531,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
                 fn ($value) => $value['alias'] == $contest['contest']->alias,
             );
 
-            $this->assertEquals(1, $contest['recommended']);
+            $this->assertTrue($contest['recommended']);
         }
     }
 
@@ -622,7 +622,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
             ])
         );
-        $this->assertEquals(
+        $this->assertSame(
             $numberOfPrivateContests,
             count($response['contests'])
         );
@@ -674,7 +674,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
             ])
         );
-        $this->assertEquals(
+        $this->assertSame(
             $numberOfPrivateContests,
             count($response['contests'])
         );
@@ -736,7 +736,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
                 $apiListOrder[] = $contest['contest_id'];
             }
         }
-        $this->assertEquals($apiListOrder, $originalOrderContest);
+        $this->assertSame($apiListOrder, $originalOrderContest);
 
         $login = self::login($contests[1]['director']);
 
@@ -778,7 +778,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
 
-        $this->assertEquals($apiListOrder, $modifiedOrderContest);
+        $this->assertSame($apiListOrder, $modifiedOrderContest);
     }
 
     /**
