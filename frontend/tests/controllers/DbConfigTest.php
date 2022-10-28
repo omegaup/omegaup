@@ -7,13 +7,13 @@ class DbConfigTest extends \OmegaUp\Test\ControllerTestCase {
             'SELECT NOW();'
         );
 
-        $this->assertEquals(\OmegaUp\Time::get(), $dbTime->time);
+        $this->assertSame(\OmegaUp\Time::get(), $dbTime->time);
     }
 
     public function testPhpUtc() {
         $timezone = date_default_timezone_get();
 
-        $this->assertEquals('UTC', $timezone);
+        $this->assertSame('UTC', $timezone);
     }
 
     public function testDbUtc() {
@@ -24,6 +24,6 @@ class DbConfigTest extends \OmegaUp\Test\ControllerTestCase {
             'SELECT TIMEDIFF(NOW(), CONVERT_TZ(NOW(), @@session.time_zone, "+00:00")) d;'
         );
 
-        $this->assertEquals('00:00:00', $timediff);
+        $this->assertSame('00:00:00', $timediff);
     }
 }
