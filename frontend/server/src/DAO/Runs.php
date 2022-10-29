@@ -201,30 +201,26 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `p`.`alias`,
                 IFNULL(`i`.`country_id`, "xx") `country`,
                 `c`.`alias` AS `contest_alias`,
-                IFNULL(ur.classname, "user-rank-unranked") `classname` ';
-
-        $sql .= ',(
-            SELECT
-                IF(
-                    verdict IN ("OLE", "OL"), "EXCEED",
-                IF(
-                    verdict IN ("WA", "PA"), "WRG",
-                IF(
-                    verdict IN ("JE", "VE", "CE", "FO", "RFE", "RE", "RTE", "MLE", "TLE"), "INTR", verdict
-                )))
-            AS output
-            FROM
-                Runs_Groups
-            WHERE
-                run_id = `r`.`run_id`
-            GROUP BY
-                output
-            ORDER BY
-                field(output, "EXCEED", "WRG", "INTR", "AC")
-            LIMIT 1
-            ) AS output ';
-
-        $sql .= '
+                IFNULL(ur.classname, "user-rank-unranked") `classname`,
+                ( SELECT
+                    IF(
+                        verdict IN ("OLE", "OL"), "OUTPUT_EXCEEDED",
+                    IF(
+                        verdict IN ("WA", "PA"), "OUTPUT_INCORRECT",
+                    IF(
+                        verdict IN ("JE", "VE", "CE", "FO", "RFE", "RE", "RTE", "MLE", "TLE"), "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT"
+                    )))
+                AS output
+                FROM
+                    Runs_Groups
+                WHERE
+                    run_id = `r`.`run_id`
+                GROUP BY
+                    output
+                ORDER BY
+                    field(output, "OUTPUT_EXCEEDED", "OUTPUT_INCORRECT", "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT")
+                LIMIT 1
+                ) AS output
             FROM
                 Submissions s
             INNER JOIN
