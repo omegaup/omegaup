@@ -188,13 +188,13 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * User13 can't perform the restricted actions
-     * An exception throws
+     * Under13 users can't create contests.
+     * 
      */
-    public function test1User13NotAbleToPerforSomeActions() {
+    public function testUserUnder13CannotCreateContests() {
         $under13BirthDateTimestamp = strtotime('-10 years');
         $randomString = \OmegaUp\Test\Utils::createRandomString();
-      //Created User13
+        // Created User13
         \OmegaUp\Controllers\User::apiCreate(
             new \OmegaUp\Request([
               'username' => $randomString,
@@ -213,7 +213,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $identity = \OmegaUp\DAO\Identities::findByUsername($randomString);
         $identity->password = $randomString;
 
-      // Log in the user and set the auth token in the new request
+        // Log in the user and set the auth token in the new request
         $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
 
@@ -226,11 +226,14 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('U13CannotPerform', $e->getMessage());
         }
     }
-
-    public function test2User13NotAbleToPerforSomeActions() {
+    
+    /*
+     * Under13 users can't clone contests.
+     */
+    public function testUserUnder13CannotCloneContests() {
         $under13BirthDateTimestamp = strtotime('-10 years');
         $randomString = \OmegaUp\Test\Utils::createRandomString();
-      //Created User13
+        // Created User13
         \OmegaUp\Controllers\User::apiCreate(
             new \OmegaUp\Request([
               'username' => $randomString,
@@ -248,7 +251,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $identity = \OmegaUp\DAO\Identities::findByUsername($randomString);
         $identity->password = $randomString;
 
-      // Log in the user and set the auth token in the new request
+        // Log in the user and set the auth token in the new request
         $login = self::login($identity);
 
         try {
@@ -269,14 +272,17 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('U13CannotPerform', $e->getMessage());
         }
     }
-
-    public function test3User13NotAbleToPerforSomeActions() {
+     
+    /*
+     * Under13 users can't create teamsGroups.
+     */
+    public function testUserUnder13CannotCreateTeamGroups() {
         $under13BirthDateTimestamp = strtotime('-10 years');
         $randomString = \OmegaUp\Test\Utils::createRandomString();
         $name = \OmegaUp\Test\Utils::createRandomString();
         $description = \OmegaUp\Test\Utils::createRandomString();
         $alias = \OmegaUp\Test\Utils::createRandomString();
-      //Created User13
+        // Created User13
         \OmegaUp\Controllers\User::apiCreate(
             new \OmegaUp\Request([
               'username' => $randomString,
@@ -288,7 +294,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $identity = \OmegaUp\DAO\Identities::findByUsername($randomString);
         $identity->password = $randomString;
 
-      // Log in the user and set the auth token in the new request
+        // Log in the user and set the auth token in the new request
         $login = self::login($identity);
 
         try {
@@ -307,13 +313,16 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('U13CannotPerform', $e->getMessage());
         }
     }
-
-    public function test4User13NotAbleToPerforSomeActions() {
+    
+    /*
+     * Under13 users can't clone course.
+     */
+    public function testUserUnder13CannotCloneCourse() {
         $under13BirthDateTimestamp = strtotime('-10 years');
         $randomString = \OmegaUp\Test\Utils::createRandomString();
         $courseAlias = \OmegaUp\Test\Utils::createRandomString();
         $courseData = \OmegaUp\Test\Factories\Course::createCourse();
-      //Created User13
+        // Created User13
         \OmegaUp\Controllers\User::apiCreate(
             new \OmegaUp\Request([
               'username' => $randomString,
@@ -325,7 +334,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $identity = \OmegaUp\DAO\Identities::findByUsername($randomString);
         $identity->password = $randomString;
 
-      // Log in the user and set the auth token in the new request
+        // Log in the user and set the auth token in the new request
         $login = self::login($identity);
 
         try {

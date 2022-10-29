@@ -1664,4 +1664,45 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         // The number of identities per group reamin the same
         $this->assertCount(5, $identities);
     }
+
+    /*
+     * Under13 users can't create teamsGroups.
+     */
+    public function testUserUnder13CannotCreateTeamGroups() {
+        $under13BirthDateTimestamp = strtotime('-10 years');
+        $username = \OmegaUp\Test\Utils::createRandomString();
+        $name = \OmegaUp\Test\Utils::createRandomString();
+        $description = \OmegaUp\Test\Utils::createRandomString();
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+        // Created User13
+        \OmegaUp\Controllers\User::apiCreate(
+            new \OmegaUp\Request([
+              'username' => $username,
+              'password' => \OmegaUp\Test\Utils::createRandomString(),
+              'parent_email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
+              'birth_date' => $under13BirthDateTimestamp,
+            ])
+        );
+        $identity = \OmegaUp\DAO\Identities::findByUsername($username);
+        $identity->password = \OmegaUp\Test\Utils::createRandomString();
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\TeamsGroup::apiCreate(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => $name,
+                    'alias' => $alias,
+                    'description' => $description
+                ]),
+                $this->fail(
+                    'It should not fail'
+                )
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('U13CannotPerform', $e->getMessage());
+        }
+    }
 }

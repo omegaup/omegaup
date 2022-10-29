@@ -180,4 +180,50 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
     }
+
+    /*
+     * Under13 users can't clone contests.
+     */
+    public function testUserUnder13CannotCloneContests() {
+        $under13BirthDateTimestamp = strtotime('-10 years');
+        $username = \OmegaUp\Test\Utils::createRandomString();
+        // Created User13
+        \OmegaUp\Controllers\User::apiCreate(
+            new \OmegaUp\Request([
+              'username' => $username,
+              'password' => \OmegaUp\Test\Utils::createRandomString(),
+              'parent_email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
+              'birth_date' => $under13BirthDateTimestamp,
+            ])
+        );
+
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $identity = \OmegaUp\DAO\Identities::findByUsername($username);
+        $identity->password = \OmegaUp\Test\Utils::createRandomString();
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\Contest::apiClone(
+                new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['contest']->alias,
+                'title' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                'start_time' => \OmegaUp\Time::get()
+                ]),
+                $this->fail(
+                    'It should not fail'
+                )
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('U13CannotPerform', $e->getMessage());
+        }
+    }
 }

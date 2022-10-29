@@ -386,7 +386,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $name
      */
     public static function apiCreateScoreboard(\OmegaUp\Request $r) {
-        $r->ensureIdentityIsOver13();
+        $r->ensureMainUserIdentityIsOver13();
         $groupAlias = $r->ensureString(
             'group_alias',
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)

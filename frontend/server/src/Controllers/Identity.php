@@ -297,7 +297,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $team_identities
      */
     public static function apiBulkCreateForTeams(\OmegaUp\Request $r): array {
-        $r->ensureIdentityIsOver13();
+        $r->ensureMainUserIdentityIsOver13();
         if (!\OmegaUp\Authorization::isGroupIdentityCreator($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'

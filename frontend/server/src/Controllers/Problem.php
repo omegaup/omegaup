@@ -451,7 +451,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $visibility
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
-        $r->ensureIdentityIsOver13();
+        $r->ensureMainUserIdentityIsOver13();
 
         self::createProblem(
             $r->user,

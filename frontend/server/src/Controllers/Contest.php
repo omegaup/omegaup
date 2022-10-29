@@ -2218,7 +2218,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiClone(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Authenticate user
-        $r->ensureIdentityIsOver13();
+        $r->ensureMainUserIdentityIsOver13();
 
         $contestAlias = $r->ensureString(
             'contest_alias',
@@ -2533,7 +2533,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiCreate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Authenticate user
-        $r->ensureIdentityIsOver13();
+        $r->ensureMainUserIdentityIsOver13();
 
         // Validate request
         self::validateCreate($r, $r->identity);
@@ -3071,7 +3071,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiAddProblem(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Authenticate user
-        $r->ensureIdentityIsOver13();
+        $r->ensureMainUserIdentityIsOver13();
         $contestAlias = $r->ensureString(
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
@@ -3709,7 +3709,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiAddAdmin(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Authenticate logged user
-        $r->ensureIdentityIsOver13();
+        $r->ensureMainUserIdentityIsOver13();
 
         // Check contest_alias
         $contestAlias = $r->ensureString(
@@ -3797,7 +3797,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiAddGroupAdmin(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Authenticate logged user
-        $r->ensureIdentityIsOver13();
+        $r->ensureMainUserIdentityIsOver13();
 
         // Check contest_alias
         $contestAlias = $r->ensureString(

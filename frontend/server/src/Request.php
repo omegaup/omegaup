@@ -477,7 +477,7 @@ class Request extends \ArrayObject {
         }
     }
 
-         /**
+    /**
      * Ensures that an identity is logged in is Over 13 years of age.
      *
      * @throws \OmegaUp\Exceptions\UnauthorizedException
@@ -497,7 +497,7 @@ class Request extends \ArrayObject {
         }
     }
 
-     /**
+    /**
      * Ensures that an identity is logged in is Over 13 years of age, and it is the main identity of
      * its associated user.
      *

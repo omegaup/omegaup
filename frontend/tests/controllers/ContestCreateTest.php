@@ -457,4 +457,31 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals($response->score_mode, $scoreModeExpected);
     }
+
+    /**
+     * Under13 users can't create contests.
+     * 
+     */
+    public function testUserUnder13CannotCreateContests() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birth_date' => strtotime('-10 years'),
+            ]),
+        );
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ]),
+            $this->fail(
+                'It should not fail'
+            )
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('U13CannotPerform', $e->getMessage());
+        }
+    }
 }
