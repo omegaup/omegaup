@@ -476,11 +476,10 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiCreate(
                 new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                ]),
+                ]));
                 $this->fail(
                     'It should not fail'
-                )
-            );
+                );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('U13CannotPerform', $e->getMessage());
         }

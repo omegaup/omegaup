@@ -1688,11 +1688,10 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'name' => $name,
                     'alias' => $alias,
                     'description' => $description
-                ]),
+                ]));
                 $this->fail(
                     'It should not fail'
-                )
-            );
+                );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('U13CannotPerform', $e->getMessage());
         }

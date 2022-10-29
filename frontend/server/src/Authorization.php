@@ -223,7 +223,7 @@ class Authorization {
             return false;
         }
         // User's age is U13? $user->birth_date - current date then return true, otherwise return false
-        return $user->birth_date <= strtotime(
+        return $user->birth_date < strtotime(
             '-13 year',
             \OmegaUp\Time::get()
         );
