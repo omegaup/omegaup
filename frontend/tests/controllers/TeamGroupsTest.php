@@ -1688,7 +1688,9 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'alias' => $alias,
                     'description' => $description
             ]));
-            $this->fail('Creating contests should not have been allowed for U13');
+            $this->fail(
+                'Creating contests should not have been allowed for U13'
+            );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('U13CannotPerform', $e->getMessage());
         }
