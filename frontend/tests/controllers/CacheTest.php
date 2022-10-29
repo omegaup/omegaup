@@ -22,10 +22,10 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCacheEntry(\OmegaUp\CacheAdapter $cache) {
         $key = uniqid();
-        $this->assertEquals(false, $cache->fetch($key));
-        $this->assertEquals(1, $cache->entry($key, 1));
-        $this->assertEquals(1, $cache->entry($key, 2));
-        $this->assertEquals(1, $cache->fetch($key));
+        $this->assertSame(false, $cache->fetch($key));
+        $this->assertSame(1, $cache->entry($key, 1));
+        $this->assertSame(1, $cache->entry($key, 2));
+        $this->assertSame(1, $cache->fetch($key));
     }
 
     /**
@@ -33,10 +33,10 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCacheAdd(\OmegaUp\CacheAdapter $cache) {
         $key = uniqid();
-        $this->assertEquals(false, $cache->fetch($key));
-        $this->assertEquals(true, $cache->add($key, 1));
-        $this->assertEquals(false, $cache->add($key, 2));
-        $this->assertEquals(1, $cache->fetch($key));
+        $this->assertSame(false, $cache->fetch($key));
+        $this->assertSame(true, $cache->add($key, 1));
+        $this->assertSame(false, $cache->add($key, 2));
+        $this->assertSame(1, $cache->fetch($key));
     }
 
     /**
@@ -44,11 +44,11 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCacheCAS(\OmegaUp\CacheAdapter $cache) {
         $key = uniqid();
-        $this->assertEquals(false, $cache->fetch($key));
-        $this->assertEquals(false, $cache->cas($key, 0, 1));
-        $this->assertEquals(true, $cache->store($key, 0));
-        $this->assertEquals(true, $cache->cas($key, 0, 1));
-        $this->assertEquals(1, $cache->fetch($key));
+        $this->assertSame(false, $cache->fetch($key));
+        $this->assertSame(false, $cache->cas($key, 0, 1));
+        $this->assertSame(true, $cache->store($key, 0));
+        $this->assertSame(true, $cache->cas($key, 0, 1));
+        $this->assertSame(1, $cache->fetch($key));
     }
 
     /**
@@ -56,12 +56,12 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCacheDelete(\OmegaUp\CacheAdapter $cache) {
         $key = uniqid();
-        $this->assertEquals(false, $cache->fetch($key));
-        $this->assertEquals(false, $cache->delete($key));
-        $this->assertEquals(true, $cache->store($key, 1));
-        $this->assertEquals(1, $cache->fetch($key));
-        $this->assertEquals(true, $cache->delete($key));
-        $this->assertEquals(false, $cache->fetch($key));
+        $this->assertSame(false, $cache->fetch($key));
+        $this->assertSame(false, $cache->delete($key));
+        $this->assertSame(true, $cache->store($key, 1));
+        $this->assertSame(1, $cache->fetch($key));
+        $this->assertSame(true, $cache->delete($key));
+        $this->assertSame(false, $cache->fetch($key));
     }
 
     /**
@@ -69,9 +69,9 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCacheStore(\OmegaUp\CacheAdapter $cache) {
         $key = uniqid();
-        $this->assertEquals(false, $cache->fetch($key));
-        $this->assertEquals(true, $cache->store($key, 1));
-        $this->assertEquals(1, $cache->fetch($key));
+        $this->assertSame(false, $cache->fetch($key));
+        $this->assertSame(true, $cache->store($key, 1));
+        $this->assertSame(1, $cache->fetch($key));
     }
 
     /**
@@ -79,8 +79,8 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCacheInc(\OmegaUp\CacheAdapter $cache) {
         $key = uniqid();
-        $this->assertEquals(1, $cache->inc($key));
-        $this->assertEquals(2, $cache->inc($key));
+        $this->assertSame(1, $cache->inc($key));
+        $this->assertSame(2, $cache->inc($key));
     }
 
     /**
@@ -88,8 +88,8 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCacheGetOrSet(\OmegaUp\CacheAdapter $cache) {
         $key = uniqid();
-        $this->assertEquals(false, $cache->fetch($key));
-        $this->assertEquals(
+        $this->assertSame(false, $cache->fetch($key));
+        $this->assertSame(
             'hello!',
             $cache->getOrSet(
                 $key,

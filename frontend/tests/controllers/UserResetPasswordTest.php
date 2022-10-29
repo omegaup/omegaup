@@ -54,8 +54,8 @@ class UserResetPasswordTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('should have failed due to bad old password');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalid', $e->getMessage());
-            $this->assertEquals('old_password', $e->parameter);
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('old_password', $e->parameter);
         }
     }
 }

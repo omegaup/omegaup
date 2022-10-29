@@ -26,7 +26,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiCreate(clone $r);
 
         // Assert status of new contest
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Assert that the contest requested exists in the DB
         $this->assertContest($r);
@@ -70,8 +70,8 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 $response = \OmegaUp\Controllers\Contest::apiCreate($r);
                 $this->fail("Exception was expected. Parameter: {$key}");
             } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-                $this->assertEquals('parameterEmpty', $e->getMessage());
-                $this->assertEquals($key, $e->parameter);
+                $this->assertSame('parameterEmpty', $e->getMessage());
+                $this->assertSame($key, $e->parameter);
                 continue;
             }
         }
@@ -94,14 +94,14 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Call the API
         $response = \OmegaUp\Controllers\Contest::apiCreate($r);
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Call the API for the 2nd time with same alias
         try {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('aliasInUse', $e->getMessage());
+            $this->assertSame('aliasInUse', $e->getMessage());
         }
     }
 
@@ -127,7 +127,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('contestLengthTooLong', $e->getMessage());
+            $this->assertSame('contestLengthTooLong', $e->getMessage());
         }
     }
 
@@ -147,7 +147,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalid', $e->getMessage());
+            $this->assertSame('parameterInvalid', $e->getMessage());
         }
     }
 
@@ -188,7 +188,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $response = \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'contestMustBeCreatedInPrivateMode',
                 $e->getMessage()
             );
@@ -222,7 +222,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('cannotAddProb', $e->getMessage());
+            $this->assertSame('cannotAddProb', $e->getMessage());
         }
     }
 
@@ -254,7 +254,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('cannotAddProb', $e->getMessage());
+            $this->assertSame('cannotAddProb', $e->getMessage());
         }
     }
 
@@ -325,7 +325,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             );
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
-            $this->assertEquals('runNotInsideContest', $e->getMessage());
+            $this->assertSame('runNotInsideContest', $e->getMessage());
         } finally {
             \OmegaUp\Time::setTimeForTesting($originalTime);
         }
@@ -363,7 +363,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         )['templateProperties']['payload'];
 
         $this->assertTrue($response['details']['contest_for_teams']);
-        $this->assertEquals([
+        $this->assertSame([
             'alias' => $teamGroup->alias,
             'name' =>  $teamGroup->name,
         ], $response['teams_group']);
@@ -409,7 +409,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $contest['request']['alias']
         );
 
-        $this->assertEquals($response->score_mode, $scoreMode);
+        $this->assertSame($response->score_mode, $scoreMode);
     }
 
     /**
@@ -455,7 +455,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $contest['request']['alias']
         );
 
-        $this->assertEquals($response->score_mode, $scoreModeExpected);
+        $this->assertSame($response->score_mode, $scoreModeExpected);
     }
 
     /**

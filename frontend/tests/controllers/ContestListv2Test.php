@@ -486,7 +486,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
         $contest = $contestListPayload['contests']['current'][0];
 
-        $this->assertEquals($organizerUsername, $contest['organizer']);
+        $this->assertSame($organizerUsername, $contest['organizer']);
     }
 
     public function testOrganizerColumnAsCreatorUser() {
@@ -520,7 +520,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
         $contest = $contestListPayload['contests']['current'][0];
 
-        $this->assertEquals($organizerUsername, $contest['organizer']);
+        $this->assertSame($organizerUsername, $contest['organizer']);
     }
 
     public function testOrganizerColumnAsInvitedUser() {
@@ -562,7 +562,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
         $contest = $contestListPayload['contests']['current'][0];
 
-        $this->assertEquals($organizerUsername, $contest['organizer']);
+        $this->assertSame($organizerUsername, $contest['organizer']);
     }
 
     public function testOrganizerColumnAsSystemAdmin() {
@@ -599,7 +599,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
         $contest = $contestListPayload['contests']['current'][0];
 
-        $this->assertEquals($organizerUsername, $contest['organizer']);
+        $this->assertSame($organizerUsername, $contest['organizer']);
     }
 
     public function testParticipatingColumnAsUserNotLoggedIn() {
