@@ -46,7 +46,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     public static function getFacebookLoginUrl(): string {
         $scopedFacebook = new ScopedFacebook();
         return $scopedFacebook->facebook->getAuthorizationUrl([
-        'scope' => ['email'],
+            'scope' => ['email'],
         ]);
     }
 
@@ -72,8 +72,8 @@ class Session extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCurrentSession(?\OmegaUp\Request $r = null): array {
         return [
-        'session' => self::getCurrentSession($r),
-        'time' => \OmegaUp\Time::get(),
+            'session' => self::getCurrentSession($r),
+            'time' => \OmegaUp\Time::get(),
         ];
     }
 
@@ -87,9 +87,9 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
         if (strpos($token, ',') === false) {
             return [
-            'token' => $token,
-            'username' => null,
-            'cacheKey' => "api-token:{$token}",
+                'token' => $token,
+                'username' => null,
+                'cacheKey' => "api-token:{$token}",
             ];
         }
         $tokens = explode(',', $token);
@@ -109,9 +109,9 @@ class Session extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
         }
         return [
-        'token' => $authorization['Credential'],
-        'username' => $authorization['Username'],
-        'cacheKey' => "api-token:{$authorization['Credential']}:{$authorization['Username']}",
+            'token' => $authorization['Credential'],
+            'username' => $authorization['Username'],
+            'cacheKey' => "api-token:{$authorization['Credential']}:{$authorization['Username']}",
         ];
     }
 
@@ -232,18 +232,18 @@ class Session extends \OmegaUp\Controllers\Controller {
         if (is_null($identityExt) || is_null($authToken)) {
             // Means user has auth token, but does not exist in DB
             return [
-            'valid' => false,
-            'email' => null,
-            'user' => null,
-            'identity' => null,
-            'loginIdentity' => null,
-            'classname' => 'user-rank-unranked',
-            'apiTokenId' => null,
-            'auth_token' => null,
-            'cacheKey' => null,
-            'is_admin' => false,
-            'associated_identities' => [],
-            'pendingDaysForVerification' => null,
+                'valid' => false,
+                'email' => null,
+                'user' => null,
+                'identity' => null,
+                'loginIdentity' => null,
+                'classname' => 'user-rank-unranked',
+                'apiTokenId' => null,
+                'auth_token' => null,
+                'cacheKey' => null,
+                'is_admin' => false,
+                'associated_identities' => [],
+                'pendingDaysForVerification' => null,
             ];
         }
         return self::getCurrentSessionImpl(
@@ -291,8 +291,8 @@ class Session extends \OmegaUp\Controllers\Controller {
         ?int $apiTokenId
     ): array {
         [
-        'currentIdentity' => $currentIdentityExt,
-        'loginIdentity' => $loginIdentityExt,
+            'currentIdentity' => $currentIdentityExt,
+            'loginIdentity' => $loginIdentityExt,
         ] = $identityExt;
         $identityClassname = $currentIdentityExt['classname'];
         unset($currentIdentityExt['classname'], $loginIdentityExt['classname']);
@@ -306,10 +306,10 @@ class Session extends \OmegaUp\Controllers\Controller {
         if (is_null($currentIdentity->user_id)) {
             if (\OmegaUp\DAO\Identities::isMainIdentity($loginIdentity)) {
                 $associatedIdentities = [
-                [
-                    'username' => strval($loginIdentity->username),
-                    'default' => true,
-                ],
+                    [
+                        'username' => strval($loginIdentity->username),
+                        'default' => true,
+                    ],
                 ];
             }
             $teamIdentity = \OmegaUp\DAO\Identities::getTeamIdentity(
@@ -369,20 +369,20 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-        'valid' => true,
-        'email' => !empty($email) ? $email->email : '',
-        'user' => $currentUser,
-        'identity' => $currentIdentity,
-        'loginIdentity' => $loginIdentity,
-        'classname' => $identityClassname,
-        'cacheKey' => $cacheKey,
-        'apiTokenId' => $apiTokenId,
-        'auth_token' => $authToken,
-        'is_admin' => \OmegaUp\Authorization::isSystemAdmin(
-            $currentIdentity
-        ),
-        'associated_identities' => $associatedIdentities,
-        'pendingDaysForVerification' => $pendingDaysForVerification,
+            'valid' => true,
+            'email' => !empty($email) ? $email->email : '',
+            'user' => $currentUser,
+            'identity' => $currentIdentity,
+            'loginIdentity' => $loginIdentity,
+            'classname' => $identityClassname,
+            'cacheKey' => $cacheKey,
+            'apiTokenId' => $apiTokenId,
+            'auth_token' => $authToken,
+            'is_admin' => \OmegaUp\Authorization::isSystemAdmin(
+                $currentIdentity
+            ),
+            'associated_identities' => $associatedIdentities,
+            'pendingDaysForVerification' => $pendingDaysForVerification,
         ];
     }
 
