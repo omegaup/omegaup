@@ -1688,7 +1688,8 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'name' => $name,
                     'alias' => $alias,
                     'description' => $description
-                ]));
+                ])
+            );
                 $this->fail(
                     'It should not fail'
                 );

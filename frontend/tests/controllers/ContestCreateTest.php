@@ -476,7 +476,8 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiCreate(
                 new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                ]));
+                ])
+            );
                 $this->fail(
                     'It should not fail'
                 );

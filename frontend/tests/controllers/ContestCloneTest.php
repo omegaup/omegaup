@@ -204,7 +204,8 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
                 'description' => \OmegaUp\Test\Utils::createRandomString(),
                 'alias' => \OmegaUp\Test\Utils::createRandomString(),
                 'start_time' => \OmegaUp\Time::get()
-                ]));
+                ])
+            );
                 $this->fail(
                     'It should not fail'
                 );
