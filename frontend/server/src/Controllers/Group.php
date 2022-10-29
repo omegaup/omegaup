@@ -72,7 +72,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $name
      */
     public static function apiCreate(\OmegaUp\Request $r) {
-        $r->ensureIdentityIsOver13();
+        $r->ensureMainUserIdentityIsOver13();
 
         $groupAlias = $r->ensureString(
             'alias',

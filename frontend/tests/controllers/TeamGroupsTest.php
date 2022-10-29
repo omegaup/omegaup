@@ -1674,6 +1674,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $name = \OmegaUp\Test\Utils::createRandomString();
         $description = \OmegaUp\Test\Utils::createRandomString();
         $alias = \OmegaUp\Test\Utils::createRandomString();
+        $originalPassword = \OmegaUp\Test\Utils::createRandomString();
         // Created User13
         \OmegaUp\Controllers\User::apiCreate(
             new \OmegaUp\Request([
@@ -1684,7 +1685,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $identity = \OmegaUp\DAO\Identities::findByUsername($username);
-        $identity->password = \OmegaUp\Test\Utils::createRandomString();
+        $identity->password = $originalPassword;
 
         // Log in the user and set the auth token in the new request
         $login = self::login($identity);

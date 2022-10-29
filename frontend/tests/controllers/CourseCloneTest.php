@@ -770,6 +770,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $username = \OmegaUp\Test\Utils::createRandomString();
         $courseAlias = \OmegaUp\Test\Utils::createRandomString();
         $courseData = \OmegaUp\Test\Factories\Course::createCourse();
+        $originalPassword = \OmegaUp\Test\Utils::createRandomString();
         // Created User13
         \OmegaUp\Controllers\User::apiCreate(
             new \OmegaUp\Request([
@@ -780,7 +781,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $identity = \OmegaUp\DAO\Identities::findByUsername($username);
-        $identity->password = \OmegaUp\Test\Utils::createRandomString();
+        $identity->password = $originalPassword;
 
         // Log in the user and set the auth token in the new request
         $login = self::login($identity);
