@@ -196,19 +196,15 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($identity);
 
         try {
-            \OmegaUp\Controllers\Contest::apiClone(
-                new \OmegaUp\Request([
+            \OmegaUp\Controllers\Contest::apiClone(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['contest']->alias,
                 'title' => \OmegaUp\Test\Utils::createRandomString(),
                 'description' => \OmegaUp\Test\Utils::createRandomString(),
                 'alias' => \OmegaUp\Test\Utils::createRandomString(),
                 'start_time' => \OmegaUp\Time::get()
-                ])
-            );
-                $this->fail(
-                    'It should not fail'
-                );
+            ]));
+            $this->fail('Creating contests should not have been allowed for U13');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('U13CannotPerform', $e->getMessage());
         }
