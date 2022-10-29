@@ -11,9 +11,16 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
      *
      */
     public function testCreateContestPositive() {
+        // Added User whose DOB is !3 years
+        $user = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birth_date' => strtotime('-10 years'),
+            ]),
+        );
         // Create a valid contest Request object
         $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
-            ['admissionMode' => 'private']
+            ['admissionMode' => 'private'],
+            ['user' => $user]
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
