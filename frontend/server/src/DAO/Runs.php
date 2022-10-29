@@ -201,33 +201,42 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `p`.`alias`,
                 IFNULL(`i`.`country_id`, "xx") `country`,
                 `c`.`alias` AS `contest_alias`,
-                IFNULL(ur.classname, "user-rank-unranked") `classname` ';
-
-        $sql .= ',(
-            SELECT
-                IF(
-                    verdict IN ("OF", "RFE"), "RFE",
-                IF(
-                    verdict IN ("RE", "RTE"), "RE",
-                IF(
-                    verdict IN ("ML", "MLE", "TLE", "OLE", "TO", "OL"), "INTR",
-                IF(
-                    verdict IN ("WA", "AC", "PA"), "FIN", verdict)
-                ))
-            ) AS execution
-            FROM
-                Runs_Groups
-            WHERE
-                run_id = `r`.`run_id`
-            GROUP BY
-                execution
-            ORDER BY
-                field(execution, "JE", "VE", "CE", "RFE", "RE", "INTR", "FIN")
-            LIMIT 1
-            ) AS
-                execution ';
-
-        $sql .= '
+                IFNULL(ur.classname, "user-rank-unranked") `classname`,
+                ( SELECT
+                    IF(
+                        verdict = "JE", "EXECUTION_JUDGE_ERROR",
+                    IF(
+                        verdict = "VE", "EXECUTION_VALIDATOR_ERROR",
+                    IF(
+                        verdict = "CE", "EXECUTION_COMPILATION_ERROR",
+                    IF(
+                        verdict IN ("OF", "RFE"), "EXECUTION_RUNTIME_FUNCTION_ERROR",
+                    IF(
+                        verdict IN ("RE", "RTE"), "EXECUTION_RUNTIME_ERROR",
+                    IF(
+                        verdict IN ("ML", "MLE", "TLE", "OLE", "TO", "OL"), "EXECUTION_INTERRUPTED", "EXECUTION_FINISHED")
+                    )))))
+                    AS execution
+                FROM
+                    Runs_Groups
+                WHERE
+                    run_id = `r`.`run_id`
+                GROUP BY
+                    execution
+                ORDER BY
+                    field(
+                        execution,
+                        "EXECUTION_JUDGE_ERROR",
+                        "EXECUTION_VALIDATOR_ERROR",
+                        "EXECUTION_COMPILATION_ERROR",
+                        "EXECUTION_RUNTIME_FUNCTION_ERROR",
+                        "EXECUTION_RUNTIME_ERROR",
+                        "EXECUTION_INTERRUPTED",
+                        "EXECUTION_FINISHED"
+                    )
+                LIMIT 1
+                ) AS
+                    execution
             FROM
                 Submissions s
             INNER JOIN
