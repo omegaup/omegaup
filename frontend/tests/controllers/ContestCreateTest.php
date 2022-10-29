@@ -21,6 +21,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Log in the user and set the auth token in the new request
         $login = self::login($contestDirector);
         $r['auth_token'] = $login->auth_token;
+        $r['birth_date'] = strtotime('-13 years');
 
         // Call the API
         $response = \OmegaUp\Controllers\Contest::apiCreate(clone $r);
