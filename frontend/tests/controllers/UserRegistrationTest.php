@@ -189,7 +189,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Under13 users can't create contests.
-     * 
+     *
      */
     public function testUserUnder13CannotCreateContests() {
         $under13BirthDateTimestamp = strtotime('-10 years');
@@ -226,7 +226,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('U13CannotPerform', $e->getMessage());
         }
     }
-    
+
     /*
      * Under13 users can't clone contests.
      */
@@ -272,7 +272,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('U13CannotPerform', $e->getMessage());
         }
     }
-     
+
     /*
      * Under13 users can't create teamsGroups.
      */
@@ -313,7 +313,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('U13CannotPerform', $e->getMessage());
         }
     }
-    
+
     /*
      * Under13 users can't clone course.
      */
