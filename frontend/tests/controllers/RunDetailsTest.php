@@ -183,7 +183,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         foreach ($outputFilesContent as $file => $fileContent) {
-            $this->assertEquals($zip->statName($file)['name'], $file);
+            $this->assertSame($zip->statName($file)['name'], $file);
             $fp = $zip->getStream($file);
             if (!$fp) {
                 throw new \OmegaUp\Exceptions\NotFoundException();
@@ -194,7 +194,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             }
             fclose($fp);
 
-            $this->assertEquals($content, $fileContent);
+            $this->assertSame($content, $fileContent);
         }
     }
 
@@ -280,7 +280,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Asserts contest alias in problem details is the same that the provided
-        $this->assertEquals(
+        $this->assertSame(
             $this->contestData['request']['alias'],
             $acRunData['details']['runs'][0]['contest_alias']
         );
@@ -356,7 +356,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Asserts contest alias in problem details is the same that the provided
-        $this->assertEquals(
+        $this->assertSame(
             $this->contestData['request']['alias'],
             $acRunData['details']['runs'][0]['contest_alias']
         );
@@ -428,7 +428,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($response['cases'], $cases);
+        $this->assertSame($response['cases'], $cases);
     }
 
     public function testRunDetailsCasesAreHiddenWhenFileIsLargerThan4KB() {
@@ -472,7 +472,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Cases are not visible, because of the size file restrictions
-        $this->assertEquals($response['show_diff'], 'none');
-        $this->assertEquals($response['cases'], []);
+        $this->assertSame($response['show_diff'], 'none');
+        $this->assertSame($response['cases'], []);
     }
 }

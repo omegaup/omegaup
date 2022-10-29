@@ -58,7 +58,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             'start_time' => \OmegaUp\Time::get()
         ]));
 
-        $this->assertEquals($courseAlias, $courseClonedData['alias']);
+        $this->assertSame($courseAlias, $courseClonedData['alias']);
         $this->assertArrayContainsWithPredicateExactlyOnce(
             \OmegaUp\DAO\CourseCloneLog::getAll(),
             fn (\OmegaUp\DAO\VO\CourseCloneLog $courseLog) =>
@@ -70,7 +70,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $courseData['course_alias']
         ]));
         foreach ($assignments['assignments'] as $key => $assignment) {
-            $this->assertEquals(
+            $this->assertSame(
                 $courseData['assignment_aliases'][$key],
                 $assignment['alias']
             );
@@ -80,7 +80,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $adminLogin->auth_token
             ]));
             foreach ($problems['problems'] as $index => $problem) {
-                $this->assertEquals(
+                $this->assertSame(
                     $problemAssignmentsMap[$courseData[
                     'assignment_aliases'][$key]][$index]['problem']->alias,
                     $problem['alias']
@@ -150,7 +150,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('aliasInUse', $e->getMessage());
+            $this->assertSame('aliasInUse', $e->getMessage());
         }
     }
 
@@ -210,7 +210,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalid', $e->getMessage());
+            $this->assertSame('parameterInvalid', $e->getMessage());
         }
     }
 
@@ -256,7 +256,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                     'problem_alias' => $problem['problem']->alias,
                 ]));
 
-                $this->assertEquals(
+                $this->assertSame(
                     2,
                     $problem['visibility'],
                     'Problem visibility must be public'
@@ -281,7 +281,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                 $this->fail('Only creator can see private problem');
             } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
                 // Expected
-                $this->assertEquals('problemIsPrivate', $e->getMessage());
+                $this->assertSame('problemIsPrivate', $e->getMessage());
             }
 
             $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
@@ -289,7 +289,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problems[0]['problem']->alias,
             ]));
 
-            $this->assertEquals(
+            $this->assertSame(
                 0,
                 $problem['visibility'],
                 'Problem visibility must be private'
@@ -306,7 +306,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             'start_time' => \OmegaUp\Time::get()
         ]));
 
-        $this->assertEquals($courseAlias, $clonedCourseData['alias']);
+        $this->assertSame($courseAlias, $clonedCourseData['alias']);
 
         $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -321,7 +321,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
 
             // All cloned assignments must have the same number of problems than the original ones
-            $this->assertEquals(
+            $this->assertSame(
                 $problemsPerAssignment,
                 count(
                     $problems['problems']
@@ -350,7 +350,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should handle error');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -379,7 +379,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($courseAlias, $courseClonedData['alias']);
+        $this->assertSame($courseAlias, $courseClonedData['alias']);
     }
 
     public function testCloneCourseWithExtraProblems() {
@@ -427,7 +427,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                 'start_time' => \OmegaUp\Time::get(),
             ])
         );
-        $this->assertEquals($courseAlias, $courseClonedData['alias']);
+        $this->assertSame($courseAlias, $courseClonedData['alias']);
 
         [
             'assignments' => $assignmentsForClonedCourse,
@@ -447,7 +447,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $this->assertCount(1, $problems);
-        $this->assertEquals(
+        $this->assertSame(
             $problemData['problem']->alias,
             $problems[0]['alias']
         );
@@ -571,7 +571,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($clonedCourse['alias'], $newAlias);
+        $this->assertSame($clonedCourse['alias'], $newAlias);
     }
 
     public function testUseExpiredToken() {
@@ -597,7 +597,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('It should fail');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'tokenDecodeExpired');
+            $this->assertSame($e->getMessage(), 'tokenDecodeExpired');
         }
     }
 
@@ -622,7 +622,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('It should fail');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'tokenDecodeInvalid');
+            $this->assertSame($e->getMessage(), 'tokenDecodeInvalid');
         }
     }
 
@@ -646,7 +646,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('It should fail');
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            $this->assertEquals($e->getMessage(), 'tokenDecodeCorrupted');
+            $this->assertSame($e->getMessage(), 'tokenDecodeCorrupted');
         }
     }
 
@@ -711,7 +711,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         foreach ($problems as $index => $problem) {
-            $this->assertEquals(
+            $this->assertSame(
                 $problem['alias'],
                 $orderedProblems[$index]['alias']
             );
@@ -729,7 +729,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($newCourseAlias, $clonedCourseData['alias']);
+        $this->assertSame($newCourseAlias, $clonedCourseData['alias']);
 
         [
             'assignments' => $assignments,
@@ -751,10 +751,10 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($problemsAssignment, count($problems));
+        $this->assertSame($problemsAssignment, count($problems));
 
         foreach ($problems as $index => $problem) {
-            $this->assertEquals(
+            $this->assertSame(
                 $problem['alias'],
                 $orderedProblems[$index]['alias'],
                 'Problems order should be the same as the original course'

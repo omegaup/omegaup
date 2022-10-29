@@ -7,7 +7,7 @@ class ResetUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Request should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             // Verify that the cause of the exception was the expected.
-            $this->assertEquals('parameterEmpty', $expected->getMessage());
+            $this->assertSame('parameterEmpty', $expected->getMessage());
         }
     }
 
@@ -20,7 +20,7 @@ class ResetUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Reset::apiUpdate($r);
             $this->fail('Request should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
-            $this->assertEquals('invalidResetToken', $expected->getMessage());
+            $this->assertSame('invalidResetToken', $expected->getMessage());
         }
     }
 
@@ -35,7 +35,7 @@ class ResetUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Reset::apiUpdate($r);
             $this->fail('Request should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
-            $this->assertEquals('passwordMismatch', $expected->getMessage());
+            $this->assertSame('passwordMismatch', $expected->getMessage());
         }
     }
 
@@ -52,7 +52,7 @@ class ResetUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Reset::apiUpdate($r);
             $this->fail('Request should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
-            $this->assertEquals(
+            $this->assertSame(
                 'parameterStringTooShort',
                 $expected->getMessage()
             );
@@ -65,7 +65,7 @@ class ResetUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Reset::apiUpdate($r);
             $this->fail('Request should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
-            $this->assertEquals(
+            $this->assertSame(
                 'parameterStringTooLong',
                 $expected->getMessage()
             );
@@ -92,7 +92,7 @@ class ResetUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Reset::apiUpdate($r);
             $this->fail('Request should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
-            $this->assertEquals(
+            $this->assertSame(
                 'passwordResetResetExpired',
                 $expected->getMessage()
             );
