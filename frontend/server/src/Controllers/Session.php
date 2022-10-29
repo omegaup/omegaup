@@ -359,8 +359,8 @@ class Session extends \OmegaUp\Controllers\Controller {
                 }
             }
             $email = !is_null($currentUser->main_email_id) ?
-            \OmegaUp\DAO\Emails::getByPK($currentUser->main_email_id) :
-            null;
+                \OmegaUp\DAO\Emails::getByPK($currentUser->main_email_id) :
+                 null;
             if ($currentUser->main_identity_id === $loginIdentity->identity_id) {
                 $associatedIdentities = \OmegaUp\DAO\Identities::getAssociatedIdentities(
                     $currentIdentity
