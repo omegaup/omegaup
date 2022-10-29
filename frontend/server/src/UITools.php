@@ -155,7 +155,7 @@ class UITools {
             'pendingDaysForVerification' => $pendingDaysForVerification,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
         return [
-            'omegaUpLockDown' => OMEGAUP_LOCKDOWN,
+            'omegaUpLockDown' => boolval(OMEGAUP_LOCKDOWN),
             'inContest' => $inContest,
             'isLoggedIn' => !is_null($identity),
             'isReviewer' => (

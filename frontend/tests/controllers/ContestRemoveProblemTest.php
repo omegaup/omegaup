@@ -80,7 +80,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 'contest_alias' => $contestData['request']['alias'],
             ]),
         );
-        $this->assertEquals(false, $details['problems'][0]['has_submissions']);
+        $this->assertSame(false, $details['problems'][0]['has_submissions']);
 
         \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
@@ -117,8 +117,8 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotFound', $e->getMessage());
-            $this->assertEquals('problem_alias', $e->parameter);
+            $this->assertSame('parameterNotFound', $e->getMessage());
+            $this->assertSame('problem_alias', $e->parameter);
         }
     }
 
@@ -150,8 +150,8 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotFound', $e->getMessage());
-            $this->assertEquals('contest_alias', $e->parameter);
+            $this->assertSame('parameterNotFound', $e->getMessage());
+            $this->assertSame('contest_alias', $e->parameter);
         }
     }
 
@@ -182,7 +182,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('cannotRemoveProblem', $e->getMessage());
+            $this->assertSame('cannotRemoveProblem', $e->getMessage());
         }
     }
 
@@ -241,7 +241,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Validate
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         $this->assertProblemRemovedFromContest($problemData1, $contestData);
         $this->assertProblemExistsInContest($problemData2, $contestData);
@@ -278,7 +278,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Validate
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         $this->assertProblemRemovedFromContest($problemData2, $contestData);
         $this->assertProblemExistsInContest($problemData1, $contestData);
@@ -311,7 +311,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'contestPublicRequiresProblem',
                 $e->getMessage()
             );
@@ -346,7 +346,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData1,
             $contestData
         );
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         try {
             \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
@@ -355,7 +355,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'contestPublicRequiresProblem',
                 $e->getMessage()
             );
@@ -400,7 +400,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Validate
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
         $this->assertProblemRemovedFromContest($problemData, $contestData);
     }
 
@@ -454,7 +454,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Validate
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
         $this->assertProblemRemovedFromContest($problemData, $contestData);
     }
 
@@ -495,7 +495,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 'contest_alias' => $contestData['request']['alias'],
             ]),
         );
-        $this->assertEquals(true, $details['problems'][0]['has_submissions']);
+        $this->assertSame(true, $details['problems'][0]['has_submissions']);
 
         try {
             \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
@@ -504,7 +504,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'cannotRemoveProblemWithSubmissions',
                 $e->getMessage()
             );
@@ -548,7 +548,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'cannotRemoveProblemWithSubmissions',
                 $e->getMessage()
             );
@@ -587,7 +587,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData
         );
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
     }
 
     /**
@@ -626,7 +626,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'cannotRemoveProblemWithSubmissions',
                 $e->getMessage()
             );

@@ -33,7 +33,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         foreach ($assignments as $index => $assignment) {
-            $this->assertEquals($assignment['order'], $index + 1);
+            $this->assertSame($assignment['order'], $index + 1);
         }
     }
 
@@ -87,7 +87,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'alias' => $assignments['assignments'][$index]['alias'],
                 'order' => $assignments['assignments'][$index]['order']
             ];
-            $this->assertEquals(
+            $this->assertSame(
                 $assignments['assignments'][$index]['order'],
                 $i++
             );
@@ -164,13 +164,13 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             'assignment_alias' => $courseData['assignment']->alias,
         ]))['templateProperties']['payload'];
 
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['course']->name,
             $adminPayload['courseDetails']['name']
         );
         $this->assertEmpty($adminPayload['courseDetails']['clarifications']);
 
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['assignment']->alias,
             $adminPayload['currentAssignment']['alias']
         );
@@ -207,11 +207,11 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         ]))['templateProperties']['payload'];
 
         // Admin should not have problems even when the assignment has not started yet
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['course']->name,
             $adminPayload['courseDetails']['name']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['assignment']->alias,
             $adminPayload['currentAssignment']['alias']
         );
@@ -226,7 +226,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'assignmentNotStarted');
+            $this->assertSame($e->getMessage(), 'assignmentNotStarted');
         }
 
         try {
@@ -241,7 +241,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'assignmentNotStarted');
+            $this->assertSame($e->getMessage(), 'assignmentNotStarted');
         }
 
         try {
@@ -254,7 +254,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('assignmentNotStarted', $e->getMessage());
+            $this->assertSame('assignmentNotStarted', $e->getMessage());
         }
 
         // User not registered in course should throw an exception
@@ -269,7 +269,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
 
         try {
@@ -284,7 +284,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
 
         try {
@@ -297,7 +297,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
     }
 
@@ -326,20 +326,20 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'assignment_alias' => $courseData['assignment']->alias,
             ])
         )['templateProperties']['payload'];
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['course']->name,
             $payload['course']['name']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['assignment']->alias,
             $payload['assignment']['alias']
         );
         $this->assertCount(2, $payload['problems']);
-        $this->assertEquals(
+        $this->assertSame(
             $problemsData[0]['problem']->alias,
             $payload['problems'][0]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemsData[1]['problem']->alias,
             $payload['problems'][1]['alias']
         );
@@ -371,24 +371,24 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problemsData[0]['problem']->alias,
             ])
         )['templateProperties']['payload'];
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['course']->name,
             $payload['course']['name']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['assignment']->alias,
             $payload['assignment']['alias']
         );
         $this->assertCount(2, $payload['problems']);
-        $this->assertEquals(
+        $this->assertSame(
             $problemsData[0]['problem']->alias,
             $payload['problems'][0]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemsData[1]['problem']->alias,
             $payload['problems'][1]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemsData[0]['problem']->alias,
             $payload['currentProblem']['alias']
         );
@@ -404,24 +404,24 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problemsData[0]['problem']->alias,
             ])
         )['templateProperties']['payload'];
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['course']->name,
             $payload['course']['name']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['assignment']->alias,
             $payload['assignment']['alias']
         );
         $this->assertCount(2, $payload['problems']);
-        $this->assertEquals(
+        $this->assertSame(
             $problemsData[0]['problem']->alias,
             $payload['problems'][0]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemsData[1]['problem']->alias,
             $payload['problems'][1]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemsData[0]['problem']->alias,
             $payload['currentProblem']['alias']
         );

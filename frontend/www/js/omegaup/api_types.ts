@@ -70,7 +70,7 @@ export namespace dao {
     is_private?: boolean;
     main_email_id?: number;
     main_identity_id?: number;
-    parent_email_id?: string;
+    parent_email_id?: number;
     parent_email_verification_deadline?: Date;
     parent_email_verification_initial?: Date;
     parent_verified?: boolean;

@@ -53,7 +53,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals(0, $response['verified']);
+        $this->assertFalse($response['verified']);
 
         // Call apiVerifyEmail
         \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
@@ -69,7 +69,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals(1, $response['verified']);
+        $this->assertTrue($response['verified']);
     }
 
     public function testVerifyUserViaUrl() {
@@ -182,7 +182,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
         } catch (\OmegaUp\Exceptions\InvalidCredentialsException $e) {
-            $this->assertEquals('usernameOrPassIsWrong', $e->getMessage());
+            $this->assertSame('usernameOrPassIsWrong', $e->getMessage());
         }
     }
 
@@ -211,7 +211,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -239,7 +239,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
             'email' => $email
         ]));
 
-        $this->assertEquals(0, $response['within_last_day']);
+        $this->assertFalse($response['within_last_day']);
 
         // Now, user makes a password change request
         \OmegaUp\Controllers\Reset::apiCreate(new \OmegaUp\Request([
@@ -299,6 +299,6 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
             'email' => $email
         ]));
 
-        $this->assertEquals(0, $response['within_last_day']);
+        $this->assertFalse($response['within_last_day']);
     }
 }

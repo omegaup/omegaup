@@ -71,7 +71,7 @@ class ContestListClarificationsTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiClarifications($r);
 
         // Check that we got all clarifications
-        $this->assertEquals(
+        $this->assertSame(
             count(
                 $clarificationData1
             ),
@@ -82,21 +82,21 @@ class ContestListClarificationsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Check that the clarifications came in the order we expect
         // First we expect clarifications not answered
-        $this->assertEquals(
+        $this->assertSame(
             $clarificationData1[3]['request']['message'],
             $response['clarifications'][0]['message']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $clarificationData1[1]['request']['message'],
             $response['clarifications'][1]['message']
         );
 
         // Then clarifications answered, newer first
-        $this->assertEquals(
+        $this->assertSame(
             $clarificationData1[2]['request']['message'],
             $response['clarifications'][2]['message']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $clarificationData1[0]['request']['message'],
             $response['clarifications'][3]['message']
         );
@@ -169,11 +169,11 @@ class ContestListClarificationsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $this->assertCount(2, $response['clarifications']);
-        $this->assertEquals(
+        $this->assertSame(
             $firstProblemClarifications[0]['request']['message'],
             $response['clarifications'][0]['message']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $firstProblemClarifications[1]['request']['message'],
             $response['clarifications'][1]['message']
         );
@@ -187,7 +187,7 @@ class ContestListClarificationsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $this->assertCount(1, $response['clarifications']);
-        $this->assertEquals(
+        $this->assertSame(
             $secondProblemClarification['request']['message'],
             $response['clarifications'][0]['message']
         );
