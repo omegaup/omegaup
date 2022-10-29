@@ -114,7 +114,7 @@ class RunRejudgeTest extends \OmegaUp\Test\ControllerTestCase {
             'run_alias' => $runData['response']['guid'],
         ]));
 
-        $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(1, $detourGrader->getGraderCallCount());
+        $this->assertSame('ok', $response['status']);
+        $this->assertSame(1, $detourGrader->getGraderCallCount());
     }
 }

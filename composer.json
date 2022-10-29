@@ -4,7 +4,7 @@
   "license": "BSD-3-Clause",
   "config": {
     "platform": {
-      "php": "8.0.14"
+      "php": "8.1.2"
     },
     "process-timeout": 1200,
     "allow-plugins": {
@@ -13,7 +13,7 @@
     }
   },
   "require-dev": {
-    "vimeo/psalm": "^3.18",
+    "vimeo/psalm": "^4.29",
     "jetbrains/phpstorm-stubs": "^2019.3",
     "phpunit/phpunit": "^9",
     "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
@@ -24,7 +24,10 @@
     "test": "./stuff/mysql_types.sh"
   },
   "autoload": {
-    "psr-4": {"OmegaUp\\": "frontend/server/src"}
+    "psr-4": {
+      "OmegaUp\\": "frontend/server/src",
+      "OmegaUp\\Test\\": "frontend/tests"
+    }
   },
   "require": {
     "google/apiclient": "^v2.12.6",

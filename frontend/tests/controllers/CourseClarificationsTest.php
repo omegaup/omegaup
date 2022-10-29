@@ -76,7 +76,7 @@ class CourseClarificationsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($message, $clarification['message']);
+        $this->assertSame($message, $clarification['message']);
 
         // Verify notification for admin
         $adminUser = \OmegaUp\DAO\Users::getByPK(
@@ -91,15 +91,15 @@ class CourseClarificationsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(1, $notifications);
 
         $contents = json_decode($notifications[0]['contents'], true);
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_REQUEST,
             $contents['type']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $this->course->name,
             $contents['body']['localizationParams']['courseName']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $this->problems[0]['problem']->alias,
             $contents['body']['localizationParams']['problemAlias']
         );
@@ -192,7 +192,7 @@ class CourseClarificationsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -273,7 +273,7 @@ class CourseClarificationsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 }

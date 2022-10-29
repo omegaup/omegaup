@@ -95,13 +95,13 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Check that we have entries in the log.
-        $this->assertEquals(1, count($response['events']));
-        $this->assertEquals(
+        $this->assertSame(1, count($response['events']));
+        $this->assertSame(
             $identity->username,
             $response['events'][0]['username']
         );
-        $this->assertEquals(0, $response['events'][0]['ip']);
-        $this->assertEquals('open', $response['events'][0]['event']['name']);
+        $this->assertSame(0, $response['events'][0]['ip']);
+        $this->assertSame('open', $response['events'][0]['event']['name']);
     }
 
     public function testFutureContestIntro() {
@@ -138,7 +138,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertEquals(
+        $this->assertSame(
             $contestDetails['contest']['start_time']->time,
             $startTime->time
         );
@@ -225,7 +225,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertEquals(
+        $this->assertSame(
             $contestData['director']->username,
             $contestDetails['contest']['director']
         );
@@ -251,10 +251,10 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiContestants($r);
 
         // There are three participants in the current contest
-        $this->assertEquals(3, count($response['contestants']));
+        $this->assertSame(3, count($response['contestants']));
 
         // But only one participant has accepted share user information
-        $this->assertEquals(1, self::numberOfUsersSharingBasicInformation(
+        $this->assertSame(1, self::numberOfUsersSharingBasicInformation(
             $response['contestants']
         ));
 
@@ -274,7 +274,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiContestants($r);
 
         // The number of participants sharing their information still remains the same
-        $this->assertEquals(1, self::numberOfUsersSharingBasicInformation(
+        $this->assertSame(1, self::numberOfUsersSharingBasicInformation(
             $response['contestants']
         ));
 
@@ -294,7 +294,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiContestants($r);
 
         // Now there are two participants sharing their information
-        $this->assertEquals(2, self::numberOfUsersSharingBasicInformation(
+        $this->assertSame(2, self::numberOfUsersSharingBasicInformation(
             $response['contestants']
         ));
     }
@@ -371,7 +371,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertEquals(
+        $this->assertSame(
             $contestData['director']->username,
             $contestDetails['contest']['director']
         );
@@ -401,7 +401,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertEquals(
+        $this->assertSame(
             $contestData['director']->username,
             $contestDetails['contest']['director']
         );
@@ -454,7 +454,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                     'contest_alias' => $contestData['request']['alias'],
                 ])
             );
-            $this->assertEquals($problemDetails['alias'], $problem['alias']);
+            $this->assertSame($problemDetails['alias'], $problem['alias']);
         }
 
         // But they are not included in the original contest scoreboard
@@ -519,7 +519,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'User should not have access to contest in practice mode when it is private'
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -547,7 +547,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('originalContestHasNotEnded', $e->getMessage());
+            $this->assertSame('originalContestHasNotEnded', $e->getMessage());
         }
     }
 

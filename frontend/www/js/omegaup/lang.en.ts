@@ -812,6 +812,8 @@ const translations: { [key: string]: string; } = {
   parameterStringTooLong: "Parameter is longer than %(max_length) characters.",
   parameterStringTooShort: "Parameter is shorter than %(min_length) characters.",
   parameterUsernameInUse: "Username already in use.",
+  parentEmailBody: "Enter this token to link your child's account https://omegaup.com/user/parentalverification/token/$(token)/",
+  parentEmailSubject: "Generated Token",
   passwordAddRequestSuccess: "Your password has been added.",
   passwordCopyToken: "Copy token",
   passwordGenerateToken: "Generate token",

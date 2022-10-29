@@ -30,7 +30,7 @@ class TranslationString implements \JsonSerializable {
         return $this->message;
     }
 
-    public function jsonSerialize(): string {
+    public function jsonSerialize(): mixed {
         return $this->message;
     }
 }
