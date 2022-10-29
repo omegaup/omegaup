@@ -1669,23 +1669,14 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
      * Under13 users can't create teamsGroups.
      */
     public function testUserUnder13CannotCreateTeamGroups() {
-        $under13BirthDateTimestamp = strtotime('-10 years');
-        $username = \OmegaUp\Test\Utils::createRandomString();
         $name = \OmegaUp\Test\Utils::createRandomString();
         $description = \OmegaUp\Test\Utils::createRandomString();
         $alias = \OmegaUp\Test\Utils::createRandomString();
-        $originalPassword = \OmegaUp\Test\Utils::createRandomString();
-        // Created User13
-        \OmegaUp\Controllers\User::apiCreate(
-            new \OmegaUp\Request([
-              'username' => $username,
-              'password' => \OmegaUp\Test\Utils::createRandomString(),
-              'parent_email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
-              'birth_date' => $under13BirthDateTimestamp,
-            ])
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birth_date' => strtotime('-10 years'),
+            ]),
         );
-        $identity = \OmegaUp\DAO\Identities::findByUsername($username);
-        $identity->password = $originalPassword;
 
         // Log in the user and set the auth token in the new request
         $login = self::login($identity);

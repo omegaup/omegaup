@@ -185,26 +185,12 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
      * Under13 users can't clone contests.
      */
     public function testUserUnder13CannotCloneContests() {
-        $under13BirthDateTimestamp = strtotime('-10 years');
-        $username = \OmegaUp\Test\Utils::createRandomString();
-        $originalPassword = \OmegaUp\Test\Utils::createRandomString();
-        // Created User13
-        \OmegaUp\Controllers\User::apiCreate(
-            new \OmegaUp\Request([
-              'username' => $username,
-              'password' => \OmegaUp\Test\Utils::createRandomString(),
-              'parent_email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
-              'birth_date' => $under13BirthDateTimestamp,
-            ])
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birth_date' => strtotime('-10 years'),
+            ]),
         );
-
-        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(
-            new \OmegaUp\Test\Factories\ContestParams(
-                ['admissionMode' => 'private']
-            )
-        );
-        $identity = \OmegaUp\DAO\Identities::findByUsername($username);
-        $identity->password = $originalPassword;
 
         // Log in the user and set the auth token in the new request
         $login = self::login($identity);

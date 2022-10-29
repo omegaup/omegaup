@@ -766,22 +766,13 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
      * Under13 users can't clone course.
      */
     public function testUserUnder13CannotCloneCourse() {
-        $under13BirthDateTimestamp = strtotime('-10 years');
-        $username = \OmegaUp\Test\Utils::createRandomString();
         $courseAlias = \OmegaUp\Test\Utils::createRandomString();
         $courseData = \OmegaUp\Test\Factories\Course::createCourse();
-        $originalPassword = \OmegaUp\Test\Utils::createRandomString();
-        // Created User13
-        \OmegaUp\Controllers\User::apiCreate(
-            new \OmegaUp\Request([
-              'username' => $username,
-              'password' => \OmegaUp\Test\Utils::createRandomString(),
-              'parent_email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
-              'birth_date' => $under13BirthDateTimestamp,
-            ])
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birth_date' => strtotime('-10 years'),
+            ]),
         );
-        $identity = \OmegaUp\DAO\Identities::findByUsername($username);
-        $identity->password = $originalPassword;
 
         // Log in the user and set the auth token in the new request
         $login = self::login($identity);
