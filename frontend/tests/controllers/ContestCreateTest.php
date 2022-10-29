@@ -12,7 +12,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCreateContestPositive() {
         // Added User whose DOB is 13 years
-        $user = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams([
                 'birth_date' => strtotime('-13 years'),
             ]),
@@ -20,15 +20,12 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Create a valid contest Request object
         $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
             ['admissionMode' => 'private'],
-            ['user' => $user]
         ));
         $r = $contestData['request'];
-        $contestDirector = $contestData['director'];
 
         // Log in the user and set the auth token in the new request
-        $login = self::login($contestDirector);
+        $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
-        $r['birth_date'] = strtotime('-13 years');
 
         // Call the API
         $response = \OmegaUp\Controllers\Contest::apiCreate(clone $r);
