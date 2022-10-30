@@ -8,6 +8,8 @@
   - [`/api/badge/myBadgeAssignationTime/`](#apibadgemybadgeassignationtime)
   - [`/api/badge/myList/`](#apibadgemylist)
   - [`/api/badge/userList/`](#apibadgeuserlist)
+- [Certificate](#certificate)
+  - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
   - [`/api/clarification/details/`](#apiclarificationdetails)
@@ -386,6 +388,28 @@ Returns a list of badges owned by a certain user
 | Name     | Type            |
 | -------- | --------------- |
 | `badges` | `types.Badge[]` |
+
+# Certificate
+
+CertificateController
+
+## `/api/certificate/generateContestCertificates/`
+
+### Description
+
+Creates a Clarification for a contest or an assignment of a course
+
+### Parameters
+
+| Name         | Type    | Description |
+| ------------ | ------- | ----------- |
+| `contest_id` | `mixed` |             |
+
+### Returns
+
+```typescript
+types.Clarification;
+```
 
 # Clarification
 

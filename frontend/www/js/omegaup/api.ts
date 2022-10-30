@@ -203,6 +203,17 @@ export const Badge = {
   }),
 };
 
+export const Certificate = {
+  generateContestCertificates: apiCall<
+    messages.CertificateGenerateContestCertificatesRequest,
+    messages._CertificateGenerateContestCertificatesServerResponse,
+    messages.CertificateGenerateContestCertificatesResponse
+  >('/api/certificate/generateContestCertificates/', (x) => {
+    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    return x;
+  }),
+};
+
 export const Clarification = {
   create: apiCall<
     messages.ClarificationCreateRequest,
