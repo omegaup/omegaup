@@ -118,7 +118,6 @@ try_define(
 # ####################################
 try_define('OMEGAUP_GA_TRACK', false);
 try_define('OMEGAUP_GA_ID', 'xxxxx');
-try_define('OMEGAUP_GA_V4_ID', 'xxxxx');
 
 # ####################################
 # GOOGLE RECAPTCHA

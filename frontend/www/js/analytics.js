@@ -1,3 +1,4 @@
+// Univeral Analytics
 (function (i, s, o, g, r, a, m) {
   i['GoogleAnalyticsObject'] = r;
   (i[r] =
@@ -14,3 +15,11 @@
 
 ga('create', 'UA-20989675-1', 'auto');
 ga('send', 'pageview');
+
+// Google Analytics V4
+window.dataLayer = window.dataLayer || [];
+function gtag() {
+  dataLayer.push(arguments);
+}
+gtag('js', new Date());
+gtag('config', 'G-PBDCQK1GEQ');
