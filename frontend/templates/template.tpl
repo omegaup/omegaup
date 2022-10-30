@@ -70,7 +70,7 @@
     </main>
     {% if OMEGAUP_GA_TRACK == 1 %}
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-PBDCQK1GEQ"></script>
-      <script type="text/javascript" src="{% versionHash '/js/analytics.js' %}">
+      <script type="text/javascript" src="{% versionHash '/js/analytics.js' %}"></script>
     {% endif %}
     {% if not headerPayload.inContest and not hideFooterAndHeader %}
     <div id="common-footer"></div>
