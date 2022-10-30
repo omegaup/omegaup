@@ -470,7 +470,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     \OmegaUp\DAO\VO\Problems::FIELD_NAMES
                 )
             );
-            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, visibility: int,quality_histogram: list<int>, difficulty_histogram: list<int>, quality_seal: bool, problem_id: int} */
+            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, accepted: int, visibility: int,quality_histogram: list<int>, difficulty_histogram: list<int>, quality_seal: bool, submissions: int, problem_id: int} */
             $problem = $problemObject->asFilteredArray($filters);
 
             // score, points and ratio are not actually fields of a Problems object.
