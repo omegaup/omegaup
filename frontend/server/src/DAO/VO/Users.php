@@ -208,9 +208,9 @@ class Users extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['parent_email_id'])) {
-            $this->parent_email_id = is_scalar(
+            $this->parent_email_id = intval(
                 $data['parent_email_id']
-            ) ? strval($data['parent_email_id']) : '';
+            );
         }
     }
 
@@ -394,7 +394,7 @@ class Users extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var string|null
+     * @var int|null
      */
     public $parent_email_id = null;
 }

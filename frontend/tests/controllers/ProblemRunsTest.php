@@ -44,7 +44,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
             ]));
             $this->assertCount(1, $response['runs']);
-            $this->assertEquals(
+            $this->assertSame(
                 $runs[$i]['response']['guid'],
                 $response['runs'][0]['guid']
             );
@@ -60,7 +60,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
                 'username' => $contestants[$i]->username,
             ]));
             $this->assertCount(1, $response['runs']);
-            $this->assertEquals(
+            $this->assertSame(
                 $runs[$i]['response']['guid'],
                 $response['runs'][0]['guid']
             );
@@ -75,7 +75,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(2, $response['runs']);
         // Runs are sorted in reverse order.
         for ($i = 0; $i < count($contestants); ++$i) {
-            $this->assertEquals(
+            $this->assertSame(
                 $runs[$i]['response']['guid'],
                 $response['runs'][count($contestants) - $i - 1]['guid']
             );

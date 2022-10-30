@@ -63,7 +63,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 'alias' => $problems['problems'][$i]['alias'],
                 'order' => $problems['problems'][$i]['order']
             ];
-            $this->assertEquals($problems['problems'][$i]['order'], ($i + 1));
+            $this->assertSame($problems['problems'][$i]['order'], ($i + 1));
         }
 
         $aliases = [
@@ -167,7 +167,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $course->alias,
             'problem_alias' => $problemData[0]['problem']->alias,
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             [$identityStudent->username],
             $response['identities']
         );
@@ -176,7 +176,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $course->alias,
             'problem_alias' => $problemData[1]['problem']->alias,
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             [$identityStudent->username],
             $response['identities']
         );
@@ -185,6 +185,6 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $course->alias,
             'problem_alias' => $problemData[2]['problem']->alias,
         ]));
-        $this->assertEquals([], $response['identities']);
+        $this->assertSame([], $response['identities']);
     }
 }

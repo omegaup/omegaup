@@ -81,18 +81,18 @@ class ProblemLibinteractiveGenTest extends \OmegaUp\Test\ControllerTestCase {
                 ];
             }
         }
-        $this->assertEquals(
+        $this->assertSame(
             $response['language'],
             $defaultValuesParameters['language']
         );
-        $this->assertEquals($response['os'], $defaultValuesParameters['os']);
-        $this->assertEquals(
+        $this->assertSame($response['os'], $defaultValuesParameters['os']);
+        $this->assertSame(
             $response['name'],
             $defaultValuesParameters['name']
         );
-        $this->assertEquals($response['idl'], $defaultValuesParameters['idl']);
+        $this->assertSame($response['idl'], $defaultValuesParameters['idl']);
         if (!empty($missingParameters)) {
-            $this->assertEquals($response['error'], $error);
+            $this->assertSame($response['error'], $error);
         }
     }
 }
