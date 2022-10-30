@@ -67,6 +67,8 @@ $contentSecurityPolicy = [
         'https://js-agent.newrelic.com',
         'https://bam.nr-data.net',
         'https://*.googletagmanager.com',
+        'https://ssl.google-analytics.com',
+        'https://www.google-analytics.com',
         'https://connect.facebook.net',
         'https://platform.twitter.com',
     ],
