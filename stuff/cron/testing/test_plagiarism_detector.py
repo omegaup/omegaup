@@ -5,6 +5,7 @@ import pytest
 import datetime
 import string
 import time
+import itertools
 import sys
 import unittest
 import os
@@ -23,68 +24,7 @@ import cron.plagiarism_detector  # type: ignore
 
 _OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..'))
 LOCAL_DOWNLOADER_DIR = os.path.join(_OMEGAUP_ROOT, "testdata")
-current_time = datetime.datetime.now()
-start_time = current_time - datetime.timedelta(minutes=30)
-finish_time = current_time - datetime.timedelta(minutes=5)
-alias: str = ''.join(random.choices(string.digits, k=8))
-description: str = "For Plagiarism tests"
-problemset_id: int
-acl_id: int = 65551  # Maybe create a New ACL
-check_plagiarism: int = 1
-scoreboard_url: str = ''.join(random.choices(string.ascii_letters, k=30))
-scoreboard_url_admin: str = ''.join(random.choices(string.ascii_letters, k=30))
-submission_id: int = random.randint(100, 500)  # counter for submission_id
-guid: int = 1  #counter for GUID LIST
-language: str = "cpp20-gcc"
-status: str = "ready"
-verdict: str = "AC"
-ttype: str = "test"
-GUID: List[str] = []  # needed for assertions
-no_of_users: int = 3  # we can increase the number of user of further testing
-no_of_problems: int = 3  # same as above case
 
-# SQL Queries
-CREATE_A_TEST_CONTEST = '''
-                            INSERT INTO `Contests`
-                            (`title`, `alias`,
-                             `description`, 
-                            `start_time`, `finish_time`,
-                             `check_plagiarism`, `problemset_id`,
-                             `acl_id`
-                            )
-                            VALUES
-                            (%s, %s, %s, %s, %s, %s, %s, %s)
-                            '''
-CREATE_PROBLEMSET = '''
-                    INSERT INTO `Problemsets`
-                        (`acl_id`, `scoreboard_url`, 
-                        `scoreboard_url_admin`)
-                    VALUES
-                          (%s, %s, %s)
-                    '''
-ADD_PROBLEMS_TO_PROBLEMSET = '''
-                                INSERT INTO `Problemset_Problems`
-                                (`problemset_id`, `problem_id`, `version`)
-                                VALUES
-                                (%s, %s, %s)
-'''
-ADD_A_SUBMISSION_TO_THE_CONTEST = '''
-                                INSERT INTO `Submissions`
-                                (`identity_id`,
-                                  `problem_id`, `problemset_id`, 
-                                   `guid`, `language`, `status`, 
-                                   `verdict`, `type`
-                                )
-                                VALUES
-                                (%s, %s, %s, %s, %s, %s, %s,
-                                %s)
-                            '''
-GET_PLAGIARISM_DETAILS = '''
-                        SELECT `submission_id_1`,
-                               `submission_id_2`
-                        FROM `Plagiarisms`
-                        WHERE `contest_id` =  %s; 
-'''
 SubmissionDownloader = Callable[[str, str, str], None]
 
 
@@ -101,147 +41,197 @@ def dbconn() -> lib.db.Connection:
     return dbconn
 
 
+# global variables
+contest_id: int = 0
+GUID: List[str] = []
+first_submission_id: int = 0
+
+
 def create_contest(dbconn: lib.db.Connection) -> None:
+
+    current_time = datetime.datetime.now()
+    start_time = current_time - datetime.timedelta(minutes=30)
+    finish_time = current_time - datetime.timedelta(minutes=5)
+    alias: str = ''.join(random.choices(string.digits, k=8))
+    description: str = "For Plagiarism tests"
+    acl_id: int = 65551  # Maybe create a New ACL
+    check_plagiarism: int = 1
+    scoreboard_url: str = ''.join(random.choices(string.ascii_letters, k=30))
+    scoreboard_url_admin: str = ''.join(
+        random.choices(string.ascii_letters, k=30))
+    submission_id: int = random.randint(100, 500)  # counter for submission_id
+    guid: int = 1  #counter for GUID LIST
+    language: str = "cpp20-gcc"
+    status: str = "ready"
+    verdict: str = "AC"
+    ttype: str = "test"
+    global GUID  # needed for assertions
+    no_of_users: int = 3  # we can increase the number of user of further testing
+    no_of_problems: int = 3  # same as above case
+    global contest_id
 
     # create Problemset for contest
     with dbconn.cursor() as cur:
-        cur.execute(CREATE_PROBLEMSET, (
-            acl_id,
-            scoreboard_url,
-            scoreboard_url_admin,
-        ))
-    dbconn.conn.commit()
-
-    # get the problemset_id of the recently created problemset
-    with dbconn.cursor() as cur:
         cur.execute(
             '''
-                    SELECT `problemset_id`
-                    FROM `Problemsets`
-                    WHERE `scoreboard_url` = %s;
-        ''', (scoreboard_url, ))
-        problemsets_id: List[List[int]] = typing.cast(List[List[int]],
-                                                      cur.fetchall())
-
-    # notice we will only get 1 id so using 0
-    problemset_id = problemsets_id[0][0]
+                    INSERT INTO `Problemsets`
+                        (`acl_id`, `scoreboard_url`, 
+                        `scoreboard_url_admin`)
+                    VALUES
+                        (%s, %s, %s);
+                    ''', (
+                acl_id,
+                scoreboard_url,
+                scoreboard_url_admin,
+            ))
+        problemset_id: int = cur.lastrowid
+    dbconn.conn.commit()
 
     # add 3 problems to problemset
     for problem in range(1, no_of_problems + 1):
         version = ''.join(random.choices(string.ascii_letters, k=40))
         with dbconn.cursor() as cur:
-            cur.execute(ADD_PROBLEMS_TO_PROBLEMSET,
-                        (problemset_id, problem, version))
-        dbconn.conn.commit()
+            cur.execute(
+                '''
+                INSERT INTO `Problemset_Problems`
+                (`problemset_id`, `problem_id`, `version`)
+                VALUES
+                (%s, %s, %s)
+                ''', (
+                    problemset_id,
+                    problem,
+                    version,
+                ))
+    dbconn.conn.commit()
 
     # create a contest
     with dbconn.cursor() as cur:
-        cur.execute(CREATE_A_TEST_CONTEST, (
-            alias,
-            alias,
-            description,
-            start_time,
-            finish_time,
-            check_plagiarism,
-            problemset_id,
-            acl_id,
-        ))
+        cur.execute(
+            '''
+                    INSERT INTO `Contests`
+                    (`title`, `alias`,
+                        `description`, 
+                    `start_time`, `finish_time`,
+                        `check_plagiarism`, `problemset_id`,
+                        `acl_id`
+                    )
+                    VALUES
+                    (%s, %s, %s, %s, %s, %s, %s, %s)
+                    ''', (
+                alias,
+                alias,
+                description,
+                start_time,
+                finish_time,
+                check_plagiarism,
+                problemset_id,
+                acl_id,
+            ))
+        global contest_id
+        contest_id = cur.lastrowid
     dbconn.conn.commit()
 
     # add problemset to contest
     with dbconn.cursor() as cur:
         cur.execute(
             '''
-                        UPDATE `Problemsets`
-                        SET `contest_id` = (
-                            SELECT `contest_id` FROM
-                            `Contests` 
-                            WHERE `alias` = %s
-                        )
-                        WHERE problemset_id = %s;
+                UPDATE `Problemsets`
+                SET `contest_id` = (
+                    SELECT `contest_id` FROM
+                    `Contests` 
+                    WHERE `alias` = %s
+                )
+                WHERE problemset_id = %s;
                     ''', (
                 alias,
                 problemset_id,
             ))
-
     dbconn.conn.commit()
+
+    # setting foreign key check = 0 because of dependencies
+    with dbconn.cursor() as cur:
+        cur.execute('''
+                SET foreign_key_checks = 0;
+                ''')
+
+    with dbconn.cursor() as cur:
+        cur.execute('''
+                TRUNCATE TABLE Plagiarisms;
+                ''')
+
+    with dbconn.cursor() as cur:
+        cur.execute('''
+                TRUNCATE TABLE Submission_Log;
+                ''')
+
+    # setting foreign key check = 1
+    with dbconn.cursor() as cur:
+        cur.execute('''
+                SET foreign_key_checks = 1;
+                ''')
 
     # replacing the guid name for new tests to run.
     guid = 1
     for user in range(1, no_of_users + 1):
         for problem in range(1, no_of_problems + 1):
-            gguid: str = f'{guid:032x}'
-            replace: str = f'{guid:032x}'
-            replace_with: str = ''.join(
-                random.choices(string.ascii_letters, k=32))
+            gguid = f'{guid:032x}'
             with dbconn.cursor(buffered=True) as cur:
                 cur.execute(
-                    '''
-                        UPDATE `Submissions`
-                        SET `guid` = REPLACE(%s, %s, %s)
-                        WHERE `guid` = %s;
-                        ''', (
-                        gguid,
-                        gguid,
-                        replace_with,
-                        gguid,
-                    ))
+                    ''' 
+                        DELETE FROM `Submissions`
+                        WHERE `guid` = %s
+                        ;
+                        ''', (gguid, ))
             guid += 1
-            dbconn.conn.commit()
+        dbconn.conn.commit()
 
     # add submissions to the contest
     guid = 1
     for identity in range(1, no_of_users + 1):
         for problem in range(1, no_of_problems + 1):
             with dbconn.cursor() as cur:
-                cur.execute(ADD_A_SUBMISSION_TO_THE_CONTEST, (
-                    identity,
-                    problem,
-                    problemset_id,
-                    f'{guid:032x}',
-                    language,
-                    status,
-                    verdict,
-                    ttype,
-                ))
+                cur.execute(
+                    '''
+                        INSERT INTO `Submissions`
+                        (`identity_id`,
+                            `problem_id`, `problemset_id`, 
+                            `guid`, `language`, `status`, 
+                            `verdict`, `type`
+                        )
+                        VALUES
+                        (%s, %s, %s, %s, %s, %s, %s,
+                        %s)
+                            ''', (
+                        identity,
+                        problem,
+                        problemset_id,
+                        f'{guid:032x}',
+                        language,
+                        status,
+                        verdict,
+                        ttype,
+                    ))
                 GUID.append(f'{guid:032x}')
                 guid += 1
 
-            dbconn.conn.commit()
+    dbconn.conn.commit()
 
 
-def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
+def test_get_contests(dbconn: lib.db.Connection) -> None:
 
     create_contest(dbconn)
     get_contests_detector = cron.plagiarism_detector.get_contests(dbconn)
 
-    # Some contest that don't meet the criterias
-    with dbconn.cursor(dictionary=True) as cur:
-        cur.execute('''
-                    SELECT `alias`
-                    FROM `Contests`
-                    WHERE `check_plagiarism`= 0 OR
-                    `finish_time` <= NOW() - INTERVAL 20 MINUTE OR
-                    `finish_time` > NOW()
-        ''')
-        result_false_contest_ids = cur.fetchall()
-
-    assert result_false_contest_ids
-    assert get_contests_detector
-
-    true_aliases: List[str] = [res['alias'] for res in get_contests_detector]
-    false_aliases: List[str] = [
-        res['alias'] for res in result_false_contest_ids
+    contests: List[int] = [
+        contest['contest_id'] for contest in get_contests_detector
     ]
+    assert contest_id in contests
 
-    assert alias in true_aliases
-    assert alias not in false_aliases
 
-    # we just want to run for current contest in the test.
-    # any better idea how we can get the current contest_id apart from executing a sql query?
+def test_submission_ids(dbconn: lib.db.Connection) -> None:
 
-    contest_id: int = get_contests_detector[len(get_contests_detector) -
-                                            1]['contest_id']
+    global GUID
+    global contest_id
     submissions = cron.plagiarism_detector.get_submissions_for_contest(
         dbconn, contest_id)
 
@@ -250,6 +240,13 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
         assert submission['guid'] in GUID
         submission_ids_for_contest.append(submission['submission_id'])
 
+    global first_submission_id
+    first_submission_id = submission_ids_for_contest[0]
+
+
+def test_plagiarism_detector_result(dbconn: lib.db.Connection) -> None:
+
+    global contest_id
     download: SubmissionDownloader = cron.plagiarism_detector.LocalSubmissionDownloader(
         LOCAL_DOWNLOADER_DIR)
 
@@ -257,32 +254,50 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
                                                       contest_id)
 
     with dbconn.cursor() as cur:
-        cur.execute(GET_PLAGIARISM_DETAILS, (contest_id, ))
-        plag = cur.fetchall()
+        cur.execute(
+            '''
+            SELECT `submission_id_1`,
+                    `submission_id_2`
+            FROM `Plagiarisms`
+            WHERE `contest_id` =  %s; 
+                    ''', (contest_id, ))
+        plagiarized_matches = cur.fetchall()
+        plagiarized_submission_ids = set(
+            itertools.chain.from_iterable(
+                (submission_id1, submission_id2)
+                for (submission_id1, submission_id2) in plagiarized_matches))
 
-    assert plag
-
-    start_sub_id = submission_ids_for_contest[0]
-    end_sub_id = start_sub_id + no_of_problems * no_of_users
-    bad_sub_id = [
-        start_sub_id + 2 * no_of_problems,
-        start_sub_id + 2 * no_of_problems + 1
+    # hardcoded
+    bad_submission_ids: List[int] = [
+        first_submission_id + 6, first_submission_id + 7
     ]
+    good_submission_ids: List[int] = []
 
-    good_sub_ids: Set[Tuple[int, int]] = set()  # expected submission_ids
-    bad_sub_ids: Set[Tuple[int, int]] = set()  # not expected submission_ids
+    for submission_id in range(first_submission_id, first_submission_id + 9):
+        if (submission_id not in bad_submission_ids):
+            good_submission_ids.append(submission_id)
 
-    for sub_id_1 in range(start_sub_id, end_sub_id - no_of_problems):
-        for sub_id_2 in range(sub_id_1 + no_of_problems, end_sub_id,
-                              no_of_problems):
-            if sub_id_2 not in bad_sub_id:
-                if (abs(sub_id_1 - sub_id_2) % no_of_problems == 0):
-                    good_sub_ids.add((sub_id_1, sub_id_2), )
-                    good_sub_ids.add((sub_id_2, sub_id_1), )
-                else:
-                    bad_sub_ids.add((sub_id_1, sub_id_2), )
-                    bad_sub_ids.add((sub_id_2, sub_id_1), )
+    for submission_id in good_submission_ids:
+        assert submission_id in plagiarized_submission_ids
+    for submission_id in bad_submission_ids:
+        assert submission_id not in plagiarized_submission_ids
 
-    for p in plag:
-        assert p in good_sub_ids
-        assert p not in bad_sub_ids
+    # hardcoded
+    good_matches: List[Tuple[int, int]] = [
+        (first_submission_id, first_submission_id + 3),
+        (first_submission_id + 1, first_submission_id + 4),
+        (first_submission_id + 2, first_submission_id + 5),
+        (first_submission_id + 2, first_submission_id + 8),
+        (first_submission_id + 5, first_submission_id + 8),
+    ]
+    bad_matches: List[Tuple[int, int]] = []
+    for submission_id1 in range(first_submission_id, first_submission_id + 9):
+        for submission_id2 in range(submission_id1 + 1,
+                                    first_submission_id + 9):
+            if (submission_id1, submission_id2) not in good_matches:
+                bad_matches.append((submission_id1, submission_id2))
+
+    for match in good_matches:
+        assert match in plagiarized_matches
+    for match in bad_matches:
+        assert match not in plagiarized_matches

@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 ''' Main Plagiairism Detector Script. 
 
-This script gets all the contest that finised in the last 15 minutes and acesses those contests and gets
-runs copydetect on submissions recieved. 
-
-Finally it pushes the necessary data to the database
+This script gets all the contest that finished in the last 15 minutes, runs
+copydetect on their submissions, and inserts the reports into the database.
 
 '''
 
@@ -159,11 +157,10 @@ def get_range(code: Sequence[str]) -> Sequence[int]:
 def filter_and_format_result(dbconn: lib.db.Connection, contest_id: int,
                              submissions: Iterable[Submission],
                              results: Iterable[CopyDetectorResult]) -> None:
-    """
-        For inserting the result in database we need submission_id, but the result
-        contains guid[2:](the only thing we can have access to from detector). 
-        so we make a dict to map the guid to submission_id from the submissions. 
-    """
+
+    # For inserting the result in database we need submission_id, but the result
+    # contains guid (the only thing we can have access to from detector).
+    # so we make a dict to map the guid to submission_id from the submissions.
 
     guid_and_submission_id_dict: Dict[str, int] = {}
 
@@ -173,15 +170,20 @@ def filter_and_format_result(dbconn: lib.db.Connection, contest_id: int,
 
     updated_result: List[Results] = []
     for result in results:
+        temp_submission_id_1 = guid_and_submission_id_dict[os.path.splitext(
+            os.path.basename(result.test_filename))[0]]
+        temp_submission_id_2 = guid_and_submission_id_dict[os.path.splitext(
+            os.path.basename(result.reference_filename))[0]]
+        if (temp_submission_id_1 > temp_submission_id_2):
+            temp_submission_id_1, temp_submission_id_2 = temp_submission_id_2, temp_submission_id_1
+
         updated_result.append(
             Results(
                 contest_id=contest_id,
                 score_1=int(100 * result[0]),
                 score_2=int(100 * result[1]),
-                submission_id_1=guid_and_submission_id_dict[os.path.splitext(
-                    os.path.basename(result.test_filename))[0]],
-                submission_id_2=guid_and_submission_id_dict[os.path.splitext(
-                    os.path.basename(result.reference_filename))[0]],
+                submission_id_1=temp_submission_id_1,
+                submission_id_2=temp_submission_id_2,
                 contents=json.dumps({
                     'file1': get_range(result[4].split('\n')),
                     'file2': get_range(result[5].split('\n'))
