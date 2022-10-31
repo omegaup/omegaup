@@ -3742,9 +3742,9 @@ Create a new run
 | Name            | Type     | Description |
 | --------------- | -------- | ----------- |
 | `contest_alias` | `string` |             |
+| `language`      | `string` |             |
 | `problem_alias` | `string` |             |
 | `source`        | `string` |             |
-| `language`      | `mixed`  |             |
 | `problemset_id` | `mixed`  |             |
 
 ### Returns
@@ -3823,10 +3823,10 @@ Re-sends a problem to Grader.
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
-| `debug`     | `mixed`  |             |
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| `run_alias` | `string`     |             |
+| `debug`     | `bool\|null` |             |
 
 ### Returns
 

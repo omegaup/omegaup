@@ -76,7 +76,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'User should have not been able to be created because the email already exists in the data base'
             );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('mailInUse', $e->getMessage());
+            $this->assertSame('mailInUse', $e->getMessage());
         }
     }
 
@@ -94,8 +94,8 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
         // Asserts that user has the initial username and email
-        $this->assertEquals($identity->username, $username);
-        $this->assertEquals($email, $email_user->email);
+        $this->assertSame($identity->username, $username);
+        $this->assertSame($email, $email_user->email);
 
         // Inflate request
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
@@ -113,7 +113,77 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'User should have not been able to be created because the email already exists in the data base'
             );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('mailInUse', $e->getMessage());
+            $this->assertSame('mailInUse', $e->getMessage());
+        }
+    }
+
+     /**
+     * user13 logged in and a parental Token is generated
+     *
+     */
+    public function testUser13ToGenerateParentalTokenAtTimeOfRegistration() {
+        // Verify that the token is generated.
+        $under13BirthDateTimestamp = strtotime('-10 years');
+        $randomString = \OmegaUp\Test\Utils::createRandomString();
+        \OmegaUp\Controllers\User::apiCreate(
+            new \OmegaUp\Request([
+                'username' => $randomString,
+                'password' => $randomString,
+                'parent_email' => $randomString . '@' . $randomString . '.com',
+                'birth_date' => $under13BirthDateTimestamp,
+            ]),
+            $this->assertNotNull($under13BirthDateTimestamp)
+        );
+        $response = \OmegaUp\DAO\Users::FindByUsername($randomString);
+
+        $this->assertNotNull($response->parental_verification_token);
+    }
+
+    /**
+     * user logged in and a parental Token is not generated
+     *
+     */
+    public function testUserDoToGenerateParentalTokenAtTimeOfRegistration() {
+         //Verify that the token is not generated.
+         $over13BirthDateTimestamp = strtotime('-15 years');
+         $randomString = \OmegaUp\Test\Utils::createRandomString();
+        \OmegaUp\Controllers\User::apiCreate(
+            new \OmegaUp\Request([
+                 'username' => $randomString,
+                 'password' => $randomString,
+                 'email' => $randomString . '@' . $randomString . '.com',
+                 'birth_date' => $over13BirthDateTimestamp,
+            ]),
+            $this->assertNotNull($over13BirthDateTimestamp)
+        );
+
+         $response = \OmegaUp\DAO\Users::FindByUsername($randomString);
+
+         $this->assertNull($response->parental_verification_token);
+    }
+
+    /**
+     *  User registration fails due to both email address were provided
+     *
+     */
+    public function testUserParentalTokenNotGeneratedDueInvalidParameters() {
+        $over13BirthDateTimestamp = strtotime('-15 years');
+        $randomString = \OmegaUp\Test\Utils::createRandomString();
+        try {
+            \OmegaUp\Controllers\User::apiCreate(
+                new \OmegaUp\Request([
+                    'username' => $randomString,
+                    'password' => $randomString,
+                    'email' => $randomString . '@' . $randomString . '.com',
+                    'parent_email' => $randomString . '@' . $randomString . '.com',
+                    'birth_date' => $over13BirthDateTimestamp,
+                ])
+            );
+            $this->fail(
+                'User should have not been able to be created because it is not valid provide both email and parent_email'
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
         }
     }
 }

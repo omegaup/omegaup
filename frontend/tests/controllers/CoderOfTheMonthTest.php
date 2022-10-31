@@ -116,11 +116,11 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
 
-        $this->assertEquals($r['name'], $identityDb['name']);
-        $this->assertEquals($r['country_id'], $identityDb['country_id']);
-        $this->assertEquals($r['state_id'], $identityDb['state_id']);
-        $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
-        $this->assertEquals(
+        $this->assertSame($r['name'], $identityDb['name']);
+        $this->assertSame($r['country_id'], $identityDb['country_id']);
+        $this->assertSame($r['state_id'], $identityDb['state_id']);
+        $this->assertSame($r['scholar_degree'], $userDb->scholar_degree);
+        $this->assertSame(
             gmdate(
                 'Y-m-d',
                 $r['birth_date']
@@ -129,7 +129,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
         // Graduation date without school is not saved on database.
         $this->assertNull($graduationDate);
-        $this->assertEquals($locale->language_id, $identityDb['language_id']);
+        $this->assertSame($locale->language_id, $identityDb['language_id']);
     }
 
     /**
@@ -176,7 +176,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request(['category' => $category])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $response['coderinfo']['username']
         );
@@ -187,13 +187,13 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request(['category' => $category])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $response['coderinfo']['username']
         );
 
         // CoderOfTheMonth school_id should match with identity school_id
-        $this->assertEquals(
+        $this->assertSame(
             $school->school_id,
             $response['coderinfo']['school_id']
         );
@@ -206,11 +206,11 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         // Now check if the third user has not participated in the coder of the
         // month in that category.
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $response['coders'][0]['username']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $extraIdentity->username,
             $response['coders'][1]['username']
         );
@@ -274,7 +274,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request(['category' => $category])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $response['coderinfo']['username']
         );
@@ -285,13 +285,13 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request(['category' => $category])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $response['coderinfo']['username']
         );
 
         // CoderOfTheMonth school_id should match with identity school_id
-        $this->assertEquals(
+        $this->assertSame(
             $school->school_id,
             $response['coderinfo']['school_id']
         );
@@ -303,11 +303,11 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'category' => $category,
         ]));
 
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $response['coders'][0]['username']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $extraIdentity->username,
             $response['coders'][1]['username']
         );
@@ -428,7 +428,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 1231
             );
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertEquals($e->getMessage(), 'schoolNotFound');
+            $this->assertSame($e->getMessage(), 'schoolNotFound');
         }
 
         // Now run function with valid school_id
@@ -553,7 +553,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             '-12 month',
             $category
         );
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $responseCoder['coderinfo']['username']
         );
@@ -564,7 +564,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $category
         );
         // IdentityB is the CotM as Identity has already been selected.
-        $this->assertEquals(
+        $this->assertSame(
             $identityB->username,
             $responseCoder['coderinfo']['username']
         );
@@ -574,7 +574,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             '1 month',
             $category
         );
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $responseCoder['coderinfo']['username']
         );
@@ -708,7 +708,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 'Exception was expected, because date is not in the range to select coder'
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 $e->getMessage(),
                 'coderOfTheMonthIsNotInPeriodToBeChosen'
             );
@@ -754,7 +754,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $response['coderinfo'],
             'A user has been selected by a mentor'
         );
-        $this->assertEquals(
+        $this->assertSame(
             $response['coderinfo']['username'],
             $identity3->username
         );
@@ -762,7 +762,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request(['category' => $category])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $firstDayOfNextMonth->format(
                 'Y-m-d'
             ),
@@ -891,7 +891,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         // Now check if the third user has not participated in the coder of the
         // month female.
         if (isset($coderAll['coderinfo']['username'])) {
-            $this->assertEquals(
+            $this->assertSame(
                 $coderAll['coderinfo']['username'],
                 $coderFemale['coderinfo']['username']
             );

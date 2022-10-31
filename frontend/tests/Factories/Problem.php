@@ -92,7 +92,7 @@ class ProblemParams {
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
         $this->problemLevel = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
         $this->qualitySeal = $params['quality_seal'] ?? false;
-        $this->selectedTags = $params['selected_tags'] ?? $params['selected_tags'] ?? json_encode([
+        $this->selectedTags = $params['selected_tags'] ?? json_encode([
             [
                 'tagname' => 'problemLevelBasicIntroductionToProgramming',
                 'public' => true,
@@ -110,17 +110,18 @@ class ProblemParams {
             \OmegaUp\Validators::ALIAS_MAX_LENGTH
         );
         $this->alias = $params['alias'] ?? $problemAlias;
-        if (!empty($params['author']) && !empty($params['authorUser'])) {
-            $this->author = $params['author'];
-            $this->authorUser = $params['authorUser'];
-        } else {
+        $author = $params['author'] ?? null;
+        $authorUser = $params['authorUser'] ?? null;
+        if (empty($author) || empty($authorUser)) {
             [
                 'user' => $user,
                 'identity' => $identity,
             ] = \OmegaUp\Test\Factories\User::createUser();
-            $this->author = $params['author'] ?? $identity;
-            $this->authorUser = $params['authorUser'] ?? $user;
+            $author = $author ?? $identity;
+            $authorUser = $authorUser ?? $user;
         }
+        $this->author = $author;
+        $this->authorUser = $authorUser;
     }
 }
 
@@ -161,10 +162,10 @@ class Problem {
             'problem_alias' => $params->alias,
             'author_username' => $params->author->username,
             'validator' => $params->validator,
-            'time_limit' => 5000,
-            'overall_wall_time_limit' => 60000,
+            'time_limit' => 5000.0,
+            'overall_wall_time_limit' => 60000.0,
             'validator_time_limit' => 30000,
-            'extra_wall_time' => 0,
+            'extra_wall_time' => 0.0,
             'memory_limit' => 32000,
             'source' => 'yo',
             'order' => 'normal',
