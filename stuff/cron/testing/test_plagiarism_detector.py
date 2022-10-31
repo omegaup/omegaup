@@ -59,7 +59,6 @@ def create_contest(dbconn: lib.db.Connection) -> None:
     scoreboard_url: str = ''.join(random.choices(string.ascii_letters, k=30))
     scoreboard_url_admin: str = ''.join(
         random.choices(string.ascii_letters, k=30))
-    submission_id: int = random.randint(100, 500)  # counter for submission_id
     guid: int = 1  #counter for GUID LIST
     language: str = "cpp20-gcc"
     status: str = "ready"
