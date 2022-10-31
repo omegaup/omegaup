@@ -6,7 +6,7 @@
 
 class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
     /**
-     * @return array{virtualContest: \OmegaUp\DAO\VO\Contests, originalContest: \OmegaUp\DAO\VO\Contests, idnetity: \OmegaUp\DAO\VO\Identities}
+     * @return array{virtualContest: \OmegaUp\DAO\VO\Contests, originalContest: \OmegaUp\DAO\VO\Contests, identity: \OmegaUp\DAO\VO\Identities}
      */
     private static function createVirtualContest() {
         // create a real contest
