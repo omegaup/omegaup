@@ -204,7 +204,7 @@
             </td>
             <td v-else class="text-center align-middle">—</td>
             <td class="text-right align-middle">
-              {{ (100.0 * problem.ratio).toFixed(2) }}% <br />({{
+              {{ (100.0 * problem.ratio).toFixed(2) }}%<br />({{
                 problem.accepted
               }}/{{ problem.submissions }})
             </td>
