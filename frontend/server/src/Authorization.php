@@ -431,23 +431,28 @@ class Authorization {
 
     public static function isCertificateGenerator(\OmegaUp\DAO\VO\Identities $identity): bool {
         if (is_null(self::$_certificateGeneratorGroup)) {
-            self::$_certificateGeneratorGroup = \OmegaUp\DAO\Groups::findByAlias(
+            $certificateGeneratorGroup = \OmegaUp\DAO\Groups::findByAlias(
                 self::CERTIFICATE_GENERATOR_GROUP_ALIAS
             );
-            if (is_null(self::$_certificateGeneratorGroup)) {
+            if (
+                is_null($certificateGeneratorGroup)
+                || is_null($certificateGeneratorGroup->acl_id)
+            ) {
                 return false;
             }
+            self::$_certificateGeneratorGroup = $certificateGeneratorGroup;
+        } else {
+            $certificateGeneratorGroup = self::$_certificateGeneratorGroup;
         }
-        return !is_null(
-            self::$_certificateGeneratorGroup
-        ) && (self::isGroupMember(
+        /** @var int $certificateGeneratorGroup->acl_id */
+        return self::isGroupMember(
             $identity,
-            self::$_certificateGeneratorGroup
+            $certificateGeneratorGroup
         ) || self::hasRole(
             $identity,
-            self::$_certificateGeneratorGroup->acl_id,
+            $certificateGeneratorGroup->acl_id,
             self::CERTIFICATE_GENERATOR_ROLE
-        ));
+        );
     }
 
     public static function isTeachingAssistant(
@@ -560,13 +565,13 @@ class Authorization {
         \OmegaUp\DAO\VO\Groups $group
     ): bool {
         if (self::isSystemAdmin($identity)) {
+            error_log(print_r('hola soy systemAdmin', true));
             return true;
         }
         $groupUsers = \OmegaUp\DAO\GroupsIdentities::getByPK(
             $group->group_id,
             $identity->identity_id
         );
-
         return !empty($groupUsers);
     }
 

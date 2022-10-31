@@ -855,8 +855,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-        $course = new \OmegaUp\DAO\VO\Courses(
-            [
+        $course = new \OmegaUp\DAO\VO\Courses([
             'name' => $courseParams->name,
             'alias' => $courseParams->courseAlias,
             'level' => $courseParams->level,
@@ -874,8 +873,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             'admission_mode' => $courseParams->admissionMode,
             'show_scoreboard' => $courseParams->showScoreboard,
             'needs_basic_information' => $courseParams->needsBasicInformation,
-            'requests_user_information' => $courseParams->requestsUserInformation]
-        );
+            'requests_user_information' => $courseParams->requestsUserInformation,
+            ]);
 
         if (\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
             $course->minimum_progress_for_certificate = $courseParams->minimumProgressForCertificate;
