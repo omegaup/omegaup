@@ -52,15 +52,11 @@ def update_problem_accepted_stats(
                 FROM
                     `Submissions` AS `s`
                 INNER JOIN
-                    `Runs` AS `r`
-                ON
-                    `r`.run_id = `s`.current_run_id
-                INNER JOIN
                     `Identities` AS `i`
                 ON
                     `i`.`identity_id` = `s`.`identity_id`
                 WHERE
-                    `s`.`problem_id` = `p`.`problem_id` AND `r`.verdict = 'AC'
+                    `s`.`problem_id` = `p`.`problem_id` AND `s`.verdict = 'AC'
                     AND NOT EXISTS (
                         SELECT
                             `pf`.`problem_id`, `pf`.`user_id`
