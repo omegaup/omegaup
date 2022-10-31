@@ -313,23 +313,19 @@ def update_schools_solved_problems(
         INNER JOIN
             `Schools` AS `sc` ON `sc`.`school_id` = `su`.`school_id`
         INNER JOIN
-            `Runs` AS `r` ON `r`.`run_id` = `su`.`current_run_id`
-        INNER JOIN
             `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
         WHERE
             `su`.`time` >= CURDATE() - INTERVAL %(months)s MONTH
-            AND `r`.`verdict` = "AC" AND `p`.`visibility` >= 1
+            AND `su`.`verdict` = "AC" AND `p`.`visibility` >= 1
             AND NOT EXISTS (
                 SELECT
                     *
                 FROM
                     `Submissions` AS `sub`
-                INNER JOIN
-                    `Runs` AS `ru` ON `ru`.`run_id` = `sub`.`current_run_id`
                 WHERE
                     `sub`.`problem_id` = `su`.`problem_id`
                     AND `sub`.`identity_id` = `su`.`identity_id`
-                    AND `ru`.`verdict` = "AC"
+                    AND `sub`.`verdict` = "AC"
                     AND `sub`.`time` < `su`.`time`
             )
         GROUP BY
@@ -360,11 +356,9 @@ def update_school_rank(cur: mysql.connector.cursor.MySQLCursorDict) -> None:
                 FROM
                     `Submissions` AS `su`
                 INNER JOIN
-                    `Runs` AS `r` ON `r`.run_id = `su`.current_run_id
-                INNER JOIN
                     `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
                 WHERE
-                    `r`.verdict = "AC"
+                    `su`.verdict = "AC"
                     AND `p`.visibility >= 1
                     AND `su`.`school_id` IS NOT NULL
                 GROUP BY
@@ -463,11 +457,9 @@ def update_school_of_the_month_candidates(
                 FROM
                     `Submissions` AS `su`
                 INNER JOIN
-                    `Runs` AS `r` ON `r`.`run_id` = `su`.`current_run_id`
-                INNER JOIN
                     `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
                 WHERE
-                    `r`.`verdict` = "AC"
+                    `su`.`verdict` = "AC"
                     AND `p`.`visibility` >= 1
                     AND `su`.`school_id` IS NOT NULL
                 GROUP BY
@@ -612,12 +604,8 @@ def update_coder_of_the_month_candidates(
                 s.identity_id, s.problem_id
               FROM
                 Submissions s
-              INNER JOIN
-                Runs r
-              ON
-                r.run_id = s.current_run_id
               WHERE
-                r.verdict = 'AC' AND s.type= 'normal' AND
+                s.verdict = 'AC' AND s.type= 'normal' AND
                 s.time >= %s AND s.time <= %s
             ) AS up
           INNER JOIN
