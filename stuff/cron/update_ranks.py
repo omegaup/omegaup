@@ -105,15 +105,11 @@ def update_user_rank(
             FROM
                 `Submissions` AS `s`
             INNER JOIN
-                `Runs` AS `r`
-            ON
-                `r`.run_id = `s`.current_run_id
-            INNER JOIN
                 `Identities` AS `iu`
             ON
                 `iu`.identity_id = `s`.identity_id
             WHERE
-                `r`.verdict = 'AC' AND
+                `s`.verdict = 'AC' AND
                 `s`.type = 'normal' AND
                 `iu`.user_id IS NOT NULL
             GROUP BY
