@@ -1199,10 +1199,11 @@ Returns the Scoreboard events
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `token`         | `null\|string` |             |
+| Name                    | Type           | Description |
+| ----------------------- | -------------- | ----------- |
+| `contest_alias`         | `string`       |             |
+| `token`                 | `null\|string` |             |
+| `virtual_problemset_id` | `int\|null`    |             |
 
 ### Returns
 
@@ -3442,15 +3443,16 @@ Returns the Scoreboard events
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `assignment`    | `string` |             |
-| `contest_alias` | `string` |             |
-| `course`        | `string` |             |
-| `problemset_id` | `int`    |             |
-| `auth_token`    | `mixed`  |             |
-| `token`         | `mixed`  |             |
-| `tokens`        | `mixed`  |             |
+| Name                    | Type        | Description |
+| ----------------------- | ----------- | ----------- |
+| `assignment`            | `string`    |             |
+| `contest_alias`         | `string`    |             |
+| `course`                | `string`    |             |
+| `problemset_id`         | `int`       |             |
+| `auth_token`            | `mixed`     |             |
+| `token`                 | `mixed`     |             |
+| `tokens`                | `mixed`     |             |
+| `virtual_problemset_id` | `int\|null` |             |
 
 ### Returns
 

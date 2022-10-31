@@ -457,6 +457,9 @@ OmegaUp.on('ready', async () => {
   const socket = new EventsSocket({
     disableSockets: false,
     problemsetAlias: payload.courseDetails.alias,
+    isVirtual: false,
+    startTime: payload.currentAssignment.start_time,
+    finishTime: payload.currentAssignment.finish_time,
     locationProtocol: window.location.protocol,
     locationHost: window.location.host,
     problemsetId: payload.currentAssignment.problemset_id,

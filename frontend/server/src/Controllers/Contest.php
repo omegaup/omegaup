@@ -473,9 +473,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     private static function validateAccessContest(
         \OmegaUp\DAO\VO\Contests $contest,
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity,
+        ?int $virtualProblemsetId = null
     ): void {
-        if (self::canAccessContest($contest, $identity)) {
+        if (
+            self::canAccessContest(
+                $contest,
+                $identity,
+                virtualProblemsetId: $virtualProblemsetId
+            )
+        ) {
             return;
         }
         if ($contest->admission_mode === 'private') {
@@ -497,7 +504,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     private static function canAccessContest(
         \OmegaUp\DAO\VO\Contests $contest,
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity,
+        ?int $virtualProblemsetId = null
     ): bool {
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
@@ -507,6 +515,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\DAO\ProblemsetIdentities::existsByPK(
                     $identity->identity_id,
                     $contest->problemset_id
+                ) ||
+                (
+                    !is_null($virtualProblemsetId) &&
+                    \OmegaUp\DAO\ProblemsetIdentities::existsByPK(
+                        $identity->identity_id,
+                        $virtualProblemsetId
+                    )
                 )
             ) {
                 return true;
@@ -908,7 +923,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'scoreboard' => self::getScoreboard(
                         $originalContest,
                         $originalProblemset,
-                        $r->identity
+                        $r->identity,
+                        virtualProblemsetId: $contest->problemset_id,
                     ),
                     'scoreboardEvents' => self::getScoreboardEvents(
                         $originalContest,
@@ -1523,7 +1539,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function validateDetails(
         string $contestAlias,
         ?\OmegaUp\DAO\VO\Identities $identity,
-        ?string $token = null
+        ?string $token = null,
+        ?int $virtualProblemsetId = null,
     ): array {
         [
             'contest' => $contest,
@@ -1539,7 +1556,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\UnauthorizedException();
             }
-            self::validateAccessContest($contest, $identity);
+            self::validateAccessContest(
+                $contest,
+                $identity,
+                virtualProblemsetId: $virtualProblemsetId
+            );
 
             $contestAdmin = \OmegaUp\Authorization::isContestAdmin(
                 $identity,
@@ -3970,6 +3991,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param null|string $token
+     * @omegaup-request-param int|null $virtual_problemset_id
      */
     public static function apiScoreboardEvents(\OmegaUp\Request $r): array {
         // Get the current user
@@ -3984,9 +4006,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $token = $r->ensureOptionalString('token');
+        $virtualProblemsetId = $r->ensureOptionalInt('virtual_problemset_id');
         [
             'contest' => $contest,
-        ] = self::validateDetails($contestAlias, $r->identity, $token);
+        ] = self::validateDetails(
+            $contestAlias,
+            $r->identity,
+            $token,
+            virtualProblemsetId: $virtualProblemsetId
+        );
 
         return [
             'events' => self::getScoreboardEvents($contest, $r->identity),
@@ -4080,7 +4108,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Problemsets $problemset,
         ?\OmegaUp\DAO\VO\Identities $identity,
-        ?string $token = null
+        ?string $token = null,
+        ?int $virtualProblemsetId = null
     ) {
         // If true, will override Scoreboard Percentage to 100%
         $showAllRuns = false;
@@ -4091,7 +4120,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\UnauthorizedException();
             }
 
-            self::validateAccessContest($contest, $identity);
+            self::validateAccessContest(
+                $contest,
+                $identity,
+                virtualProblemsetId: $virtualProblemsetId
+            );
 
             if (
                 \OmegaUp\Authorization::isContestAdmin(
