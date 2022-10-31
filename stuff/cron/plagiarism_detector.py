@@ -186,13 +186,13 @@ def filter_and_format_result(dbconn: lib.db.Connection, contest_id: int,
         updated_result.append(
             Results(
                 contest_id=contest_id,
-                score_1=int(100 * result[0]),
-                score_2=int(100 * result[1]),
-                submission_id_1=temp_submission_id_1,
-                submission_id_2=temp_submission_id_2,
+                score_1=int(100 * score_1),
+                score_2=int(100 * score_2),
+                submission_id_1=submission_id_1,
+                submission_id_2=submission_id_2,
                 contents=json.dumps({
-                    'file1': get_range(result[4].split('\n')),
-                    'file2': get_range(result[5].split('\n'))
+                    'file1': get_range(code_1.split('\n')),
+                    'file2': get_range(code_2.split('\n'))
                 }),
             ))
     # add to the database.
