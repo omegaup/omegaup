@@ -3397,15 +3397,16 @@ and the number of solutions already seen
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `assignment`    | `string`       |             |
-| `contest_alias` | `string`       |             |
-| `course`        | `string`       |             |
-| `problemset_id` | `int`          |             |
-| `auth_token`    | `mixed`        |             |
-| `token`         | `null\|string` |             |
-| `tokens`        | `mixed`        |             |
+| Name                    | Type           | Description |
+| ----------------------- | -------------- | ----------- |
+| `assignment`            | `string`       |             |
+| `contest_alias`         | `string`       |             |
+| `course`                | `string`       |             |
+| `problemset_id`         | `int`          |             |
+| `auth_token`            | `mixed`        |             |
+| `token`                 | `null\|string` |             |
+| `tokens`                | `mixed`        |             |
+| `virtual_problemset_id` | `int\|null`    |             |
 
 ### Returns
 
@@ -3419,15 +3420,16 @@ types.Problemset;
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `assignment`    | `string` |             |
-| `contest_alias` | `string` |             |
-| `course`        | `string` |             |
-| `problemset_id` | `int`    |             |
-| `auth_token`    | `mixed`  |             |
-| `token`         | `mixed`  |             |
-| `tokens`        | `mixed`  |             |
+| Name                    | Type        | Description |
+| ----------------------- | ----------- | ----------- |
+| `assignment`            | `string`    |             |
+| `contest_alias`         | `string`    |             |
+| `course`                | `string`    |             |
+| `problemset_id`         | `int`       |             |
+| `auth_token`            | `mixed`     |             |
+| `token`                 | `mixed`     |             |
+| `tokens`                | `mixed`     |             |
+| `virtual_problemset_id` | `int\|null` |             |
 
 ### Returns
 
@@ -4962,15 +4964,16 @@ contest updates with an access token.
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `filter`        | `string`       |             |
-| `problemset_id` | `int`          |             |
-| `auth_token`    | `null\|string` |             |
-| `contest_admin` | `null\|string` |             |
-| `contest_alias` | `null\|string` |             |
-| `token`         | `null\|string` |             |
-| `tokens`        | `mixed`        |             |
+| Name                    | Type           | Description |
+| ----------------------- | -------------- | ----------- |
+| `filter`                | `string`       |             |
+| `problemset_id`         | `int`          |             |
+| `auth_token`            | `null\|string` |             |
+| `contest_admin`         | `null\|string` |             |
+| `contest_alias`         | `null\|string` |             |
+| `token`                 | `null\|string` |             |
+| `tokens`                | `mixed`        |             |
+| `virtual_problemset_id` | `int\|null`    |             |
 
 ### Returns
 

@@ -140,6 +140,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $problemset_id
      * @omegaup-request-param null|string $token
      * @omegaup-request-param mixed $tokens
+     * @omegaup-request-param int|null $virtual_problemset_id
      */
     public static function apiDetails(\OmegaUp\Request $r) {
         [
@@ -176,6 +177,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
+     * @omegaup-request-param int|null $virtual_problemset_id
      */
     public static function apiScoreboard(\OmegaUp\Request $r): array {
         [
@@ -262,7 +264,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
-     * @return array{problemset: array{assignment: null|string, contest_alias: null|string, course: null|string, type: string}, request: \OmegaUp\Request, virtualProblemsetId: int}
+     * @return array{problemset: array{assignment: null|string, contest_alias: null|string, course: null|string, type: string}, request: \OmegaUp\Request, virtualProblemsetId: int|null}
      *
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param int $problemset_id
