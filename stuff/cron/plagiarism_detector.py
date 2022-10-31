@@ -174,11 +174,11 @@ def filter_and_format_result(dbconn: lib.db.Connection, contest_id: int,
             os.path.basename(result.test_filename))[0]]
         submission_id_2 = guid_and_submission_id_dict[os.path.splitext(
             os.path.basename(result.reference_filename))[0]]
-        score_1 = result.test_score
-        score_2 = result.reference_score
+        score_1 = result.test_similarity
+        score_2 = result.reference_similarity
         code_1 = result.highlighted_test_code
         code_2 = result.highlighted_reference_code
-        if submission_id_1 > submission_id_2):
+        if submission_id_1 > submission_id_2:
             submission_id_1, submission_id_2 = submission_id_2, submission_id_1
             score_1, score_2 = score_2, score_1
             code_1, code_2 = code_2, code_1

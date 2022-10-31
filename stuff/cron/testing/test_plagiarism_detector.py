@@ -2,6 +2,7 @@
 
 from typing import (List, Callable, Tuple, Iterable, Set)
 import pytest
+import dataclasses
 import datetime
 import string
 import time
@@ -28,6 +29,12 @@ LOCAL_DOWNLOADER_DIR = os.path.join(_OMEGAUP_ROOT, "testdata")
 SubmissionDownloader = Callable[[str, str, str], None]
 
 
+@dataclasses.dataclass()
+class Contest:
+    contest_id: int = 0
+    GUID: List[str] = dataclasses.field(default_factory=list)
+
+
 @pytest.fixture(scope='session')
 def dbconn() -> lib.db.Connection:
     dbconn = lib.db.connect(
@@ -41,13 +48,7 @@ def dbconn() -> lib.db.Connection:
     return dbconn
 
 
-# global variables
-contest_id: int = 0
-GUID: List[str] = []
-first_submission_id: int = 0
-
-
-def create_contest(dbconn: lib.db.Connection) -> None:
+def create_contest(dbconn: lib.db.Connection) -> Contest:
 
     current_time = datetime.datetime.now()
     start_time = current_time - datetime.timedelta(minutes=30)
@@ -64,10 +65,10 @@ def create_contest(dbconn: lib.db.Connection) -> None:
     status: str = "ready"
     verdict: str = "AC"
     ttype: str = "test"
-    global GUID  # needed for assertions
     no_of_users: int = 3  # we can increase the number of user of further testing
     no_of_problems: int = 3  # same as above case
-    global contest_id
+    GUID: List[str] = []
+    contest = Contest()
 
     # create Problemset for contest
     with dbconn.cursor() as cur:
@@ -126,8 +127,7 @@ def create_contest(dbconn: lib.db.Connection) -> None:
                 problemset_id,
                 acl_id,
             ))
-        global contest_id
-        contest_id = cur.lastrowid
+        contest.contest_id = cur.lastrowid
     dbconn.conn.commit()
 
     # add problemset to contest
@@ -151,8 +151,18 @@ def create_contest(dbconn: lib.db.Connection) -> None:
     with dbconn.cursor() as cur:
         cur.execute('''
                 SET foreign_key_checks = 0;
+                ''')
+    with dbconn.cursor() as cur:
+        cur.execute('''
                 TRUNCATE TABLE Plagiarisms;
+                ''')
+    with dbconn.cursor() as cur:
+        cur.execute('''
                 TRUNCATE TABLE Submission_Log;
+                ''')
+    # setting foreign key check = 1
+    with dbconn.cursor() as cur:
+        cur.execute('''
                 SET foreign_key_checks = 1;
                 ''')
 
@@ -165,8 +175,7 @@ def create_contest(dbconn: lib.db.Connection) -> None:
                 cur.execute(
                     ''' 
                         DELETE FROM `Submissions`
-                        WHERE `guid` = %s
-                        ;
+                        WHERE `guid` = %s;
                         ''', (gguid, ))
             guid += 1
         dbconn.conn.commit()
@@ -201,11 +210,16 @@ def create_contest(dbconn: lib.db.Connection) -> None:
                 guid += 1
 
     dbconn.conn.commit()
+    contest.GUID = GUID
+    return contest
 
 
-def test_get_contests(dbconn: lib.db.Connection) -> None:
+def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
 
-    create_contest(dbconn)
+    contest = create_contest(dbconn)
+    contest_id = contest.contest_id
+    GUID = contest.GUID
+
     get_contests_detector = cron.plagiarism_detector.get_contests(dbconn)
 
     contests: List[int] = [
@@ -213,26 +227,14 @@ def test_get_contests(dbconn: lib.db.Connection) -> None:
     ]
     assert contest_id in contests
 
-
-def test_submission_ids(dbconn: lib.db.Connection) -> None:
-
-    global GUID
-    global contest_id
     submissions = cron.plagiarism_detector.get_submissions_for_contest(
         dbconn, contest_id)
 
-    submission_ids_for_contest: List[int] = []
+    submission_ids = {}
     for submission in submissions:
         assert submission['guid'] in GUID
-        submission_ids_for_contest.append(submission['submission_id'])
+        submission_ids[submission['guid']] = submission['submission_id']
 
-    global first_submission_id
-    first_submission_id = submission_ids_for_contest[0]
-
-
-def test_plagiarism_detector_result(dbconn: lib.db.Connection) -> None:
-
-    global contest_id
     download: SubmissionDownloader = cron.plagiarism_detector.LocalSubmissionDownloader(
         LOCAL_DOWNLOADER_DIR)
 
@@ -253,37 +255,16 @@ def test_plagiarism_detector_result(dbconn: lib.db.Connection) -> None:
                 (submission_id1, submission_id2)
                 for (submission_id1, submission_id2) in plagiarized_matches))
 
-    # hardcoded
-    bad_submission_ids: List[int] = [
-        first_submission_id + 6, first_submission_id + 7
-    ]
-    good_submission_ids: List[int] = []
+    # TODO: Convert the graph of plagiarized submissions into disjoint sets and
+    # check groups of plagiarized submissions instead of only whether a submission
+    # was plagiarized or not.
 
-    for submission_id in range(first_submission_id, first_submission_id + 9):
-        if (submission_id not in bad_submission_ids):
-            good_submission_ids.append(submission_id)
-
-    for submission_id in good_submission_ids:
-        assert submission_id in plagiarized_submission_ids
-    for submission_id in bad_submission_ids:
-        assert submission_id not in plagiarized_submission_ids
-
-    # hardcoded
-    good_matches: List[Tuple[int, int]] = [
-        (first_submission_id, first_submission_id + 3),
-        (first_submission_id + 1, first_submission_id + 4),
-        (first_submission_id + 2, first_submission_id + 5),
-        (first_submission_id + 2, first_submission_id + 8),
-        (first_submission_id + 5, first_submission_id + 8),
-    ]
-    bad_matches: List[Tuple[int, int]] = []
-    for submission_id1 in range(first_submission_id, first_submission_id + 9):
-        for submission_id2 in range(submission_id1 + 1,
-                                    first_submission_id + 9):
-            if (submission_id1, submission_id2) not in good_matches:
-                bad_matches.append((submission_id1, submission_id2))
-
-    for match in good_matches:
-        assert match in plagiarized_matches
-    for match in bad_matches:
-        assert match not in plagiarized_matches
+    assert plagiarized_submission_ids == set((
+        submission_ids[f'{1:032x}'],
+        submission_ids[f'{2:032x}'],
+        submission_ids[f'{3:032x}'],
+        submission_ids[f'{4:032x}'],
+        submission_ids[f'{5:032x}'],
+        submission_ids[f'{6:032x}'],
+        submission_ids[f'{9:032x}'],
+    ))
