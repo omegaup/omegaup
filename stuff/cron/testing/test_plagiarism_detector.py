@@ -151,21 +151,8 @@ def create_contest(dbconn: lib.db.Connection) -> None:
     with dbconn.cursor() as cur:
         cur.execute('''
                 SET foreign_key_checks = 0;
-                ''')
-
-    with dbconn.cursor() as cur:
-        cur.execute('''
                 TRUNCATE TABLE Plagiarisms;
-                ''')
-
-    with dbconn.cursor() as cur:
-        cur.execute('''
                 TRUNCATE TABLE Submission_Log;
-                ''')
-
-    # setting foreign key check = 1
-    with dbconn.cursor() as cur:
-        cur.execute('''
                 SET foreign_key_checks = 1;
                 ''')
 
