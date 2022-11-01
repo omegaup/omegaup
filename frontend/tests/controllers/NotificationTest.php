@@ -29,8 +29,8 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
             'user' => $user,
         ]));
         $notifications = $results['notifications'];
-        $this->assertEquals(1, sizeof($notifications));
-        $this->assertEquals(
+        $this->assertSame(1, sizeof($notifications));
+        $this->assertSame(
             'testUnread',
             $notifications[0]['contents']['badge']
         );
@@ -98,8 +98,8 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have thrown NotFoundException');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'parameterEmpty');
-            $this->assertEquals($e->parameter, 'notifications');
+            $this->assertSame($e->getMessage(), 'parameterEmpty');
+            $this->assertSame($e->parameter, 'notifications');
         }
         try {
             \OmegaUp\Controllers\Notification::apiReadNotifications(new \OmegaUp\Request([
@@ -109,7 +109,7 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have thrown NotFoundException');
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertEquals($e->getMessage(), 'notificationNotFound');
+            $this->assertSame($e->getMessage(), 'notificationNotFound');
         }
     }
 
@@ -134,7 +134,7 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have thrown ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
     }
 }

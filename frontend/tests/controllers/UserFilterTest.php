@@ -12,7 +12,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalid', $e->getMessage());
+            $this->assertSame('parameterInvalid', $e->getMessage());
         }
     }
 
@@ -23,7 +23,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -38,7 +38,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -50,7 +50,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
             'filter' => '/all-events',
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(true, $response['admin']);
+        $this->assertSame(true, $response['admin']);
     }
 
     public function testMyEvents() {
@@ -61,8 +61,8 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
             'filter' => "/user/{$identity->username}",
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals($identity->username, $response['user']);
-        $this->assertEquals(false, $response['admin']);
+        $this->assertSame($identity->username, $response['user']);
+        $this->assertSame(false, $response['admin']);
         $this->assertEmpty($response['problem_admin']);
         $this->assertEmpty($response['contest_admin']);
         $this->assertEmpty($response['problemset_admin']);
@@ -80,7 +80,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -93,7 +93,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
             'filter' => "/user/{$identity->username}",
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(true, $response['admin']);
+        $this->assertSame(true, $response['admin']);
     }
 
     public function testPublicProblemsetAccess() {
@@ -127,7 +127,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('should have failed');
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            $this->assertEquals('loginRequired', $e->getMessage());
+            $this->assertSame('loginRequired', $e->getMessage());
         }
     }
 
@@ -140,7 +140,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('should have failed');
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            $this->assertEquals('loginRequired', $e->getMessage());
+            $this->assertSame('loginRequired', $e->getMessage());
         }
     }
 
@@ -157,7 +157,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('should have failed');
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            $this->assertEquals('loginRequired', $e->getMessage());
+            $this->assertSame('loginRequired', $e->getMessage());
         }
     }
 
@@ -174,7 +174,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('should have failed');
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            $this->assertEquals('loginRequired', $e->getMessage());
+            $this->assertSame('loginRequired', $e->getMessage());
         }
     }
 
@@ -263,7 +263,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
             'filter' => "/problem/{$problem->alias}",
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals($identity->username, $response['user']);
+        $this->assertSame($identity->username, $response['user']);
     }
 
     public function testAnonymousPublicProblemAccess() {
@@ -286,7 +286,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('problemIsPrivate', $e->getMessage());
+            $this->assertSame('problemIsPrivate', $e->getMessage());
         }
     }
 }

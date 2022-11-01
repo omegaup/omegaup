@@ -40,11 +40,11 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'course' => $courseAlias,
         ]));
 
-        $this->assertEquals($updatedStartTime, $response['start_time']->time);
-        $this->assertEquals($updatedFinishTime, $response['finish_time']->time);
+        $this->assertSame($updatedStartTime, $response['start_time']->time);
+        $this->assertSame($updatedFinishTime, $response['finish_time']->time);
 
-        $this->assertEquals('some new name', $response['name']);
-        $this->assertEquals(
+        $this->assertSame('some new name', $response['name']);
+        $this->assertSame(
             'some meaningful description',
             $response['description']
         );
@@ -72,7 +72,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have thrown exception.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'courseDoesNotHaveUnlimitedDuration',
                 $e->getMessage()
             );
@@ -106,7 +106,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'course' => $courseAlias,
         ]));
 
-        $this->assertEquals($updatedStartTime, $response['start_time']->time);
+        $this->assertSame($updatedStartTime, $response['start_time']->time);
         $this->assertNull($response['finish_time']);
 
         \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
@@ -123,7 +123,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'course' => $courseAlias,
         ]));
 
-        $this->assertEquals(
+        $this->assertSame(
             'some new meaningful description',
             $response['description']
         );
@@ -144,7 +144,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'Updating assignment should have failed due to missing parameter'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterEmpty', $e->getMessage());
+            $this->assertSame('parameterEmpty', $e->getMessage());
         }
 
         try {
@@ -157,7 +157,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'Updating assignment should have failed due to missing parameter'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterEmpty', $e->getMessage());
+            $this->assertSame('parameterEmpty', $e->getMessage());
         }
     }
 
@@ -178,7 +178,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'Assignment should not have been updated because finish time is earlier than start time'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('courseInvalidStartTime', $e->getMessage());
+            $this->assertSame('courseInvalidStartTime', $e->getMessage());
         }
     }
 
@@ -205,7 +205,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Expected ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -231,14 +231,14 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'Assignment should not have been updated because the date falls outside of valid range'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterDateTooLarge', $e->getMessage());
+            $this->assertSame('parameterDateTooLarge', $e->getMessage());
 
             $responseArray =  $e->asResponseArray();
-            $this->assertEquals(
+            $this->assertSame(
                 'parameterDateTooLarge',
                 $responseArray['errorname']
             );
-            $this->assertEquals(
+            $this->assertSame(
                 self::$courseData['course']->finish_time->time,
                 $responseArray['payload']['upper_bound']
             );
@@ -301,7 +301,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have thrown exception.');
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'runNotInsideContest',
                 $e->getMessage()
             );
@@ -386,7 +386,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have thrown exception due invalid start time.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'courseAssignmentStartDateBeforeCourseStartDate',
                 $e->getMessage()
             );
@@ -413,7 +413,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'Updating assignment should have failed due assignment end date incorrect'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'courseAssignmentEndDateBeforeCourseStartDate',
                 $e->getMessage()
             );
@@ -490,7 +490,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'Updating assignment should have failed due to assignment already has student runs'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'courseUpdateAlreadyHasRuns',
                 $e->getMessage()
             );
@@ -555,10 +555,10 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             self::$courseData['request']['start_time']->time,
             $response['start_time']->time
         );
-        $this->assertEquals($updatedFinishTime, $response['finish_time']->time);
+        $this->assertSame($updatedFinishTime, $response['finish_time']->time);
     }
 }
