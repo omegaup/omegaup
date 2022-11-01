@@ -31,8 +31,13 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
             'username' => $username,
             'role' => 'Mentor'
         ]));
+        \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $username,
+            'role' => 'CertificateGenerator'
+        ]));
 
-        $selectedRolesMapping = ['Admin', 'Reviewer', 'Mentor'];
+        $selectedRolesMapping = ['CertificateGenerator','Admin', 'Reviewer', 'Mentor'];
 
         $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
         foreach ($selectedRolesMapping as $role) {
