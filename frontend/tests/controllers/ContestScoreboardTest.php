@@ -1257,7 +1257,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for the contest with max_per_group mode.
      *
-     * @return array{0: int, 1: list<array: {runs: int, score: float, execution: string}>, 2: list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}>}
+     * @return array{0: int, 1: list<array: {runs: int, score: float, execution: string, output: string}>, 2: list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}>}
      */
     public function runsMappingProvider(): array {
         $runsMapping = [
@@ -1291,30 +1291,30 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             [
                 100,
                 [
-                    ['runs' => 1, 'score' => 40.0, 'execution' => 'EXECUTION_FINISHED'],
-                    ['runs' => 2, 'score' => 73.33, 'execution' => 'EXECUTION_FINISHED'],
-                    ['runs' => 3, 'score' => 80.0, 'execution' => 'EXECUTION_FINISHED'],
+                    ['runs' => 1, 'score' => 40.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT'],
+                    ['runs' => 2, 'score' => 73.33, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT'],
+                    ['runs' => 3, 'score' => 80.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT'],
                 ],
                 $runsMapping
             ],
             [
                 60,
                 [
-                    ['runs' => 1, 'score' => 40.0, 'execution' => 'EXECUTION_FINISHED'],
-                    ['runs' => 2, 'score' => 73.33, 'execution' => 'EXECUTION_FINISHED'],
+                    ['runs' => 1, 'score' => 40.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT'],
+                    ['runs' => 2, 'score' => 73.33, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT'],
                     // Only the number of runs should be updated, because of the
                     // contest's settings
-                    ['runs' => 3, 'score' => 73.33, 'execution' => 'EXECUTION_FINISHED'],
+                    ['runs' => 3, 'score' => 73.33, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT'],
                 ],
                 $runsMapping
             ],
             [
                 100,
                 [
-                    ['runs' => 1, 'score' => 0.0, 'execution' => 'EXECUTION_COMPILATION_ERROR'],
-                    ['runs' => 2, 'score' => 50.0, 'execution' => 'EXECUTION_JUDGE_ERROR'],
-                    ['runs' => 3, 'score' => 83.33, 'execution' => 'EXECUTION_INTERRUPTED'],
-                    ['runs' => 4, 'score' => 100.0, 'execution' => 'EXECUTION_FINISHED'],
+                    ['runs' => 1, 'score' => 0.0, 'execution' => 'EXECUTION_COMPILATION_ERROR', 'output' => 'OUTPUT_INCORRECT'],
+                    ['runs' => 2, 'score' => 50.0, 'execution' => 'EXECUTION_JUDGE_ERROR', 'output' => 'OUTPUT_EXCEEDED'],
+                    ['runs' => 3, 'score' => 83.33, 'execution' => 'EXECUTION_INTERRUPTED', 'output' => 'OUTPUT_INTERRUPTED'],
+                    ['runs' => 4, 'score' => 100.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_CORRECT'],
                 ],
                 [
 
@@ -1337,7 +1337,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                     [
                         'total' => 0.7,
                         'points_per_group' => [
-                            ['group_name' => 'easy', 'score' => (0.8 / 3), 'verdict' => 'PA'],    // 0.26
+                            ['group_name' => 'easy', 'score' => (0.8 / 3), 'verdict' => 'TLE'],    // 0.26
                             ['group_name' => 'medium', 'score' => (0.3 / 3), 'verdict' => 'TLE'], // 0.10
                             ['group_name' => 'hard', 'score' => (1.0 / 3),'verdict' => 'AC'],     // 0.33
                         ],
@@ -1345,9 +1345,9 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                     [
                         'total' => 0.6,
                         'points_per_group' => [
-                            ['group_name' => 'easy', 'score' => (0.4 / 3), 'verdict' => 'PA'],    // 0.13
+                            ['group_name' => 'easy', 'score' => (0.4 / 3), 'verdict' => 'AC'],    // 0.13
                             ['group_name' => 'medium', 'score' => (1.0 / 3), 'verdict' => 'AC'],  // 0.33
-                            ['group_name' => 'hard', 'score' => (0.4 / 3),'verdict' => 'PA'],     // 0.13
+                            ['group_name' => 'hard', 'score' => (0.4 / 3),'verdict' => 'AC'],     // 0.13
                         ],
                     ],
                 ],
@@ -1356,7 +1356,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * @param list<array: {runs: int, score: float, execution: string}> $expectedResultsInEverySubmission
+     * @param list<array: {runs: int, score: float, execution: string, output: string}> $expectedResultsInEverySubmission
      * @param list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}> $runsMapping
      *
      * @dataProvider runsMappingProvider
@@ -1442,6 +1442,10 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame(
                 $runsList[0]['execution'],
                 $expectedResultsInEverySubmission[$index]['execution']
+            );
+            $this->assertSame(
+                $runsList[0]['output'],
+                $expectedResultsInEverySubmission[$index]['output']
             );
         }
     }
