@@ -180,7 +180,7 @@ export default class Signup extends Vue {
       ui.error(T.loginPasswordTooShort);
       return;
     }
-      const registerParameters = {
+    const registerParameters = {
       username: this.username,
       password: this.password,
       recaptcha: this.recaptchaResponse,
