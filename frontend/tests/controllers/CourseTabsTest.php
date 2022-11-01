@@ -59,7 +59,7 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             1,
             $response['templateProperties']['payload']['courses']['public']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $coursesAliases['public'][0],
             $response['templateProperties']['payload']['courses']['public'][0]['alias']
         );
@@ -164,25 +164,25 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             2,
             $response['templateProperties']['payload']['courses']['public']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $coursesAliases['public'][0],
             $response['templateProperties']['payload']['courses']['public'][0]['alias']
         );
         $this->assertTrue(
             $response['templateProperties']['payload']['courses']['public'][0]['alreadyStarted']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $coursesAliases['public'][1],
             $response['templateProperties']['payload']['courses']['public'][1]['alias']
         );
         $this->assertFalse(
             $response['templateProperties']['payload']['courses']['public'][1]['alreadyStarted']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $coursesAliases['enrolled'][0],
             $response['templateProperties']['payload']['courses']['enrolled'][0]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $coursesAliases['finished'][0],
             $response['templateProperties']['payload']['courses']['finished'][0]['alias']
         );
@@ -251,7 +251,7 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             1,
             $response['templateProperties']['payload']['courses']['finished']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['course_alias'],
             $response['templateProperties']['payload']['courses']['finished'][0]['alias']
         );

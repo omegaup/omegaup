@@ -5149,8 +5149,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 );
                 $run['score'] = round(floatval($run['score']), 4);
             } elseif ($scoreMode === 'all_or_nothing') {
-                $run['contest_score'] = 0;
-                $run['score'] = 0;
+                $run['contest_score'] = 0.0;
+                $run['score'] = 0.0;
             }
             $allRuns[] = $run;
         }

@@ -51,7 +51,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
         )['templateProperties']['payload'];
 
         foreach ($payload['userSystemRoles'] as $userRole) {
-            $this->assertEquals(
+            $this->assertSame(
                 $userRole['value'],
                 in_array(
                     $userRole['name'],
@@ -83,7 +83,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
         )['templateProperties']['payload'];
 
         foreach ($payload['userSystemRoles'] as $userRole) {
-            $this->assertEquals(
+            $this->assertSame(
                 $userRole['value'],
                 in_array(
                     $userRole['name'],
@@ -160,7 +160,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('should not have been able to add the same role');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             // Exception expected
-            $this->assertEquals($e->getMessage(), 'userAlreadyHasSelectedRole');
+            $this->assertSame($e->getMessage(), 'userAlreadyHasSelectedRole');
         }
     }
 
@@ -213,7 +213,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
         )['templateProperties']['payload'];
 
         foreach ($payload['userSystemGroups'] as $userGroup) {
-            $this->assertEquals(
+            $this->assertSame(
                 $userGroup['value'],
                 in_array(
                     $userGroup['name'],
@@ -242,7 +242,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
         )['templateProperties']['payload'];
 
         foreach ($payload['userSystemGroups'] as $userGroup) {
-            $this->assertEquals(
+            $this->assertSame(
                 $userGroup['value'],
                 in_array(
                     $userGroup['name'],
@@ -326,7 +326,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('should not have been able to create identites');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Exception expected
-            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
     }
 }

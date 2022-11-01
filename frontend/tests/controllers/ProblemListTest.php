@@ -306,11 +306,11 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'order_by' => 'submissions',
         ]));
         $this->assertCount(2, $response['results']);
-        $this->assertEquals(
+        $this->assertSame(
             $problemData[2]['request']['problem_alias'],
             $response['results'][0]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemData[4]['request']['problem_alias'],
             $response['results'][1]['alias']
         );
@@ -327,7 +327,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'order_by' => 'quality',
         ]));
         $this->assertCount(5, $response['results']);
-        $this->assertEquals(
+        $this->assertSame(
             $problemData[0]['request']['problem_alias'],
             $response['results'][0]['alias']
         );
@@ -480,7 +480,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'offset' => 1,
         ]));
         $this->assertCount(1, $response['results']);
-        $this->assertEquals(
+        $this->assertSame(
             $problemData[1]['request']['problem_alias'],
             $response['results'][0]['alias']
         );
@@ -814,14 +814,14 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(3, count($response['problems']));
+        $this->assertSame(3, count($response['problems']));
 
         $response = \OmegaUp\Controllers\Problem::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'query' => $problemData[2]['request']['problem_alias'],
         ]));
-        $this->assertEquals(1, count($response['problems']));
-        $this->assertEquals(
+        $this->assertSame(1, count($response['problems']));
+        $this->assertSame(
             $problemData[2]['request']['problem_alias'],
             $response['problems'][0]['title']
         );
@@ -884,8 +884,8 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Validate results
         foreach ($response['results'] as $responseProblem) {
-            $this->assertEquals(
-                '0',
+            $this->assertSame(
+                0.0,
                 $responseProblem['score'],
                 'Expecting score to be not set for non-logged in users'
             );
@@ -1053,7 +1053,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                         $last = $response['results'];
 
                         // Test number of problems per page
-                        $this->assertEquals($pageSize, count($first));
+                        $this->assertSame($pageSize, count($first));
                     } else {
                         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                             'auth_token' => $login->auth_token,
@@ -1180,7 +1180,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         /* -------- VALIDATE RESULTS -------*/
 
         // Expected to have only two problems as response although one same problem hasn't been accepted two times.
-        $this->assertEquals(
+        $this->assertSame(
             count(
                 $response['problems']
             ),
@@ -1197,14 +1197,14 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                     break;
 
                 case $problemDataPE['problem']->title:
-                    $this->assertEquals(
+                    $this->assertSame(
                         $responseProblem['title'],
                         $problemDataPE['problem']->title
                     );
                     break;
 
                 case $problemDataWA['problem']->title:
-                    $this->assertEquals(
+                    $this->assertSame(
                         $responseProblem['title'],
                         $problemDataWA['problem']->title
                     );
@@ -1269,7 +1269,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
         // Asserting the number of non-repeated problems is the same than the total
-        $this->assertEquals(
+        $this->assertSame(
             count(
                 array_unique(
                     $problems
@@ -1354,7 +1354,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         )['templateProperties']['payload']['problems'];
 
         foreach ($result as $problem) {
-            $this->assertEquals(
+            $this->assertSame(
                 $problem['tags'][0]['name'],
                 'problemLevelBasicIntroductionToProgramming'
             );
@@ -1367,7 +1367,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload']['problems'];
 
-        $this->assertEquals(
+        $this->assertSame(
             $result[0]['tags'][0]['name'],
             'problemLevelBasicKarel'
         );
@@ -1381,7 +1381,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals(2, $apiListResponse['total']);
+        $this->assertSame(2, $apiListResponse['total']);
 
         $apiListResponse = \OmegaUp\Controllers\Problem::apiList(
             new \OmegaUp\Request([
@@ -1391,7 +1391,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals(1, $apiListResponse['total']);
+        $this->assertSame(1, $apiListResponse['total']);
     }
 
     /**
@@ -1607,7 +1607,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
             $this->assertCount(1, $response['results']);
-            $this->assertEquals($response['results'][0]['key'], $query);
+            $this->assertSame($response['results'][0]['key'], $query);
         }
     }
 
@@ -1651,7 +1651,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             fn ($problem) => $problem['key'],
             $response['results']
         );
-        $this->assertEquals($sortedAliases, $expectedSortedAliases);
+        $this->assertSame($sortedAliases, $expectedSortedAliases);
     }
 
     public function testProblemListSearchWithNoSearchType() {
@@ -1677,7 +1677,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterEmpty', $e->getMessage());
+            $this->assertSame('parameterEmpty', $e->getMessage());
         }
     }
 
@@ -1704,7 +1704,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterEmpty', $e->getMessage());
+            $this->assertSame('parameterEmpty', $e->getMessage());
         }
     }
 
@@ -1732,7 +1732,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
+            $this->assertSame('parameterNotInExpectedSet', $e->getMessage());
         }
     }
 }
