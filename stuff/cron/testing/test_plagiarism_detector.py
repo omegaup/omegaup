@@ -32,8 +32,7 @@ SubmissionDownloader = Callable[[str, str, str], None]
 @dataclasses.dataclass()
 class Contest:
     contest_id: int = 0
-    GUID: List[str] = dataclasses.field(default_factory=list)
-    submission_ids: Dict[str, int] = dataclasses.field(default_factory=dict)
+    guids: List[str] = dataclasses.field(default_factory=list)
 
 
 @pytest.fixture(scope='session')
@@ -49,7 +48,7 @@ def dbconn() -> lib.db.Connection:
     return dbconn
 
 
-def create_contest(dbconn: lib.db.Connection) -> None:
+def create_contest(dbconn: lib.db.Connection) -> Contest:
 
     current_time = datetime.datetime.now()
     start_time = current_time - datetime.timedelta(minutes=30)
@@ -68,8 +67,8 @@ def create_contest(dbconn: lib.db.Connection) -> None:
     ttype: str = "test"
     no_of_users: int = 3  # we can increase the number of user of further testing
     no_of_problems: int = 3  # same as above case
-    GUID: List[str] = []
-    # contest = Contest()
+    guids: List[str] = []
+    contest = Contest()
 
     # create Problemset for contest
     with dbconn.cursor() as cur:
@@ -128,7 +127,7 @@ def create_contest(dbconn: lib.db.Connection) -> None:
                 problemset_id,
                 acl_id,
             ))
-        Contest.contest_id = cur.lastrowid
+        contest.contest_id = cur.lastrowid
     dbconn.conn.commit()
 
     # add problemset to contest
@@ -150,26 +149,11 @@ def create_contest(dbconn: lib.db.Connection) -> None:
 
     # setting foreign key check = 0 because of dependencies
     with dbconn.cursor() as cur:
-        cur.execute('''
-                SET foreign_key_checks = 0;
-                TRUNCATE TABLE Plagiarisms;
-                TRUNCATE TABLE Submission_Log;
-                SET foreign_key_checks = 1;
-                ''')
-
-    # replacing the guid name for new tests to run.
-    guid = 1
-    for user in range(1, no_of_users + 1):
-        for problem in range(1, no_of_problems + 1):
-            gguid = f'{guid:032x}'
-            with dbconn.cursor(buffered=True) as cur:
-                cur.execute(
-                    ''' 
-                        DELETE FROM `Submissions`
-                        WHERE `guid` = %s;
-                        ''', (gguid, ))
-            guid += 1
-        dbconn.conn.commit()
+        cur.execute('''SET foreign_key_checks = 0;''')
+        cur.execute('''TRUNCATE TABLE Plagiarisms;''')
+        cur.execute('''TRUNCATE TABLE Submission_Log;''')
+        cur.execute('''TRUNCATE TABLE Submissions;''')
+        cur.execute('''SET foreign_key_checks = 1;''')
 
     # add submissions to the contest
     guid = 1
@@ -197,46 +181,49 @@ def create_contest(dbconn: lib.db.Connection) -> None:
                         verdict,
                         ttype,
                     ))
-                GUID.append(f'{guid:032x}')
+                guids.append(f'{guid:032x}')
                 guid += 1
 
     dbconn.conn.commit()
-    Contest.GUID = GUID
+    contest.guids = guids
+    return contest
 
 
 def test_get_contest(dbconn: lib.db.Connection) -> None:
 
-    create_contest(dbconn)
-    contest_id = Contest.contest_id
-    GUID = Contest.GUID
+    contest = create_contest(dbconn)
 
     get_contests_detector = cron.plagiarism_detector.get_contests(dbconn)
 
-    contests: List[int] = [
-        contest['contest_id'] for contest in get_contests_detector
-    ]
-    assert contest_id in contests
+    contests: List[int] = [c['contest_id'] for c in get_contests_detector]
+
+    assert contest.contest_id in contests
+
 
 def test_submission_ids(dbconn: lib.db.Connection) -> None:
 
+    contest = create_contest(dbconn)
     submissions = cron.plagiarism_detector.get_submissions_for_contest(
-        dbconn, Contest.contest_id)
-    
-    submission_ids: Dict[str, int] = {}
+        dbconn, contest.contest_id)
     for submission in submissions:
-        submission_ids[submission['guid']] = submission['submission_id']
-        assert submission['guid'] in Contest.GUID
-    Contest.submission_ids = submission_ids
+        assert submission['guid'] in contest.guids
+
 
 def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
 
-    contest_id = Contest.contest_id
-    submission_ids = Contest.submission_ids
+    contest = create_contest(dbconn)
+    submission_ids: Dict[str, int] = {}
+
+    submissions = cron.plagiarism_detector.get_submissions_for_contest(
+        dbconn, contest.contest_id)
+    for submission in submissions:
+        submission_ids[submission['guid']] = submission['submission_id']
+
     download: SubmissionDownloader = cron.plagiarism_detector.LocalSubmissionDownloader(
         LOCAL_DOWNLOADER_DIR)
 
     cron.plagiarism_detector.run_detector_for_contest(dbconn, download,
-                                                      contest_id)
+                                                      contest.contest_id)
 
     with dbconn.cursor() as cur:
         cur.execute(
@@ -245,7 +232,7 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
                     `submission_id_2`
             FROM `Plagiarisms`
             WHERE `contest_id` =  %s; 
-                    ''', (contest_id, ))
+                    ''', (contest.contest_id, ))
         plagiarized_matches = cur.fetchall()
         plagiarized_submission_ids = set(
             itertools.chain.from_iterable(
