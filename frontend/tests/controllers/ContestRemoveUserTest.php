@@ -23,7 +23,7 @@ class ContestRemoveUserTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
         ]);
         $response = \OmegaUp\Controllers\Contest::apiUsers($r);
-        $this->assertEquals(1, count($response['users']));
+        $this->assertSame(1, count($response['users']));
 
         // Remove user
         $r = new \OmegaUp\Request([
@@ -39,6 +39,6 @@ class ContestRemoveUserTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
         ]);
         $response = \OmegaUp\Controllers\Contest::apiUsers($r);
-        $this->assertEquals(0, count($response['users']));
+        $this->assertSame(0, count($response['users']));
     }
 }

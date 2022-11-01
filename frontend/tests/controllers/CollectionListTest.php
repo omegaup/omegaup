@@ -193,7 +193,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload']['frequentTags'];
 
-        $this->assertEquals('problemTagMatrices', $result[0]['name']);
+        $this->assertSame('problemTagMatrices', $result[0]['name']);
         $this->assertCount(6, $result);
     }
 
@@ -454,10 +454,10 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         )['templateProperties']['payload']['problems'];
 
         $this->assertCount(4, $result);
-        $this->assertEquals('problem_0', $result[0]['alias']);
-        $this->assertEquals('problem_1', $result[1]['alias']);
-        $this->assertEquals('problem_2', $result[2]['alias']);
-        $this->assertEquals('problem_3', $result[3]['alias']);
+        $this->assertSame('problem_0', $result[0]['alias']);
+        $this->assertSame('problem_1', $result[1]['alias']);
+        $this->assertSame('problem_2', $result[2]['alias']);
+        $this->assertSame('problem_3', $result[3]['alias']);
 
         // Call getCollectionsDetailsByLevelForTypeScript with 2 as rowcount and 1 as page
         $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
@@ -471,8 +471,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         )['templateProperties']['payload']['problems'];
 
         $this->assertCount(2, $result);
-        $this->assertEquals('problem_0', $result[0]['alias']);
-        $this->assertEquals('problem_1', $result[1]['alias']);
+        $this->assertSame('problem_0', $result[0]['alias']);
+        $this->assertSame('problem_1', $result[1]['alias']);
 
         // Call getCollectionsDetailsByLevelForTypeScript with 2 as rowcount and 2 as page
         $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
@@ -486,8 +486,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         )['templateProperties']['payload']['problems'];
 
         $this->assertCount(2, $result);
-        $this->assertEquals('problem_2', $result[0]['alias']);
-        $this->assertEquals('problem_3', $result[1]['alias']);
+        $this->assertSame('problem_2', $result[0]['alias']);
+        $this->assertSame('problem_3', $result[1]['alias']);
     }
 
     /**

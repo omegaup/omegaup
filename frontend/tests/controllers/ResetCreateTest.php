@@ -6,8 +6,8 @@ class ResetCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Reset::apiCreate(new \OmegaUp\Request());
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterEmpty', $e->getMessage());
-            $this->assertEquals('email', $e->parameter);
+            $this->assertSame('parameterEmpty', $e->getMessage());
+            $this->assertSame('email', $e->parameter);
         }
     }
 
@@ -18,7 +18,7 @@ class ResetCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('invalidUser', $e->getMessage());
+            $this->assertSame('invalidUser', $e->getMessage());
         }
     }
 
@@ -32,7 +32,7 @@ class ResetCreateTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('unverifiedUser', $e->getMessage());
+            $this->assertSame('unverifiedUser', $e->getMessage());
         }
     }
 
@@ -48,7 +48,7 @@ class ResetCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('passwordResetMinWait', $e->getMessage());
+            $this->assertSame('passwordResetMinWait', $e->getMessage());
         }
 
         // time travel
