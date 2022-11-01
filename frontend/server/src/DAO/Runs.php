@@ -278,7 +278,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ';
         $val[] = $offset * $rowCount;
         $val[] = $rowCount;
-        
+
         /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
         $runs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
 
