@@ -140,7 +140,6 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $problemset_id
      * @omegaup-request-param null|string $token
      * @omegaup-request-param mixed $tokens
-     * @omegaup-request-param int|null $virtual_problemset_id
      */
     public static function apiDetails(\OmegaUp\Request $r) {
         [
@@ -177,7 +176,6 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
-     * @omegaup-request-param int|null $virtual_problemset_id
      */
     public static function apiScoreboard(\OmegaUp\Request $r): array {
         [
@@ -226,7 +224,6 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param string $course
      * @omegaup-request-param int $problemset_id
-     * @omegaup-request-param int|null $virtual_problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
      */
@@ -234,18 +231,15 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         [
             'problemset' => $problemset,
             'request' => $r,
-            'virtualProblemsetId' => $virtualProblemsetId,
         ] = self::wrapRequest($r);
 
         if ($problemset['type'] == 'Contest') {
-            $request = new \OmegaUp\Request([
-                'auth_token' => $r['auth_token'],
-                'contest_alias' => $problemset['contest_alias'],
-            ]);
-            if (!is_null($virtualProblemsetId)) {
-                $request['virtual_problemset_id'] = $virtualProblemsetId;
-            }
-            return \OmegaUp\Controllers\Contest::apiScoreboardEvents($request);
+            return \OmegaUp\Controllers\Contest::apiScoreboardEvents(
+                new \OmegaUp\Request([
+                    'auth_token' => $r['auth_token'],
+                    'contest_alias' => $problemset['contest_alias'],
+                ])
+            );
         } elseif ($problemset['type'] == 'Assignment') {
             return \OmegaUp\Controllers\Course::apiAssignmentScoreboardEvents(
                 new \OmegaUp\Request([
@@ -264,11 +258,10 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
-     * @return array{problemset: array{assignment: null|string, contest_alias: null|string, course: null|string, type: string}, request: \OmegaUp\Request, virtualProblemsetId: int|null}
+     * @return array{problemset: array{assignment: null|string, contest_alias: null|string, course: null|string, type: string}, request: \OmegaUp\Request}
      *
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param int $problemset_id
-     * @omegaup-request-param int|null $virtual_problemset_id
      * @omegaup-request-param null|string $token
      * @omegaup-request-param mixed $tokens
      */
@@ -282,7 +275,6 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         $problemsetId = $r->ensureInt('problemset_id');
 
         $problemset = \OmegaUp\DAO\Problemsets::getWithTypeByPK($problemsetId);
-        $virtualProblemsetId = $r->ensureOptionalInt('virtual_problemset_id');
         if (is_null($problemset)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
@@ -316,20 +308,17 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             $response = \OmegaUp\Controllers\Contest::validateDetails(
                 $problemset['contest_alias'],
                 $r->identity,
-                $token,
-                virtualProblemsetId: $virtualProblemsetId
+                $token
             );
             $request['contest_alias'] = $response['contest_alias'];
             $request['contest_admin'] = $response['contest_admin'];
             return [
                 'problemset' => $problemset,
-                'virtualProblemsetId' => $virtualProblemsetId,
                 'request' => $request,
             ];
         }
         return [
             'problemset' => $problemset,
-            'virtualProblemsetId' => $virtualProblemsetId,
             'request' => $r,
         ];
     }

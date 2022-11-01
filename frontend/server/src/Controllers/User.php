@@ -2953,7 +2953,6 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $problemset_id
      * @omegaup-request-param null|string $token
      * @omegaup-request-param mixed $tokens
-     * @omegaup-request-param int|null $virtual_problemset_id
      */
     public static function apiValidateFilter(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateStringNonEmpty($r['filter'], 'filter');

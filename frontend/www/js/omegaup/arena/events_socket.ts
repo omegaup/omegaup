@@ -128,7 +128,6 @@ export class EventsSocket {
       if (this.isVirtual) {
         api.Problemset.scoreboardEvents({
           problemset_id: this.originalProblemsetId,
-          virtual_problemset_id: this.problemsetId,
           token: this.scoreboardToken,
         })
           .then((response) => {

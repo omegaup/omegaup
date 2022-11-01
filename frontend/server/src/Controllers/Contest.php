@@ -3991,7 +3991,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param null|string $token
-     * @omegaup-request-param int|null $virtual_problemset_id
      */
     public static function apiScoreboardEvents(\OmegaUp\Request $r): array {
         // Get the current user
@@ -4006,15 +4005,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $token = $r->ensureOptionalString('token');
-        $virtualProblemsetId = $r->ensureOptionalInt('virtual_problemset_id');
         [
             'contest' => $contest,
-        ] = self::validateDetails(
-            $contestAlias,
-            $r->identity,
-            $token,
-            virtualProblemsetId: $virtualProblemsetId
-        );
+        ] = self::validateDetails($contestAlias, $r->identity, $token);
 
         return [
             'events' => self::getScoreboardEvents($contest, $r->identity),

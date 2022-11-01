@@ -6,9 +6,11 @@
 
 class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
     /**
-     * @return array{virtualContest: \OmegaUp\DAO\VO\Contests, originalContest: \OmegaUp\DAO\VO\Contests, identity: \OmegaUp\DAO\VO\Identities}
+     * @return array{virtualContests: list<\OmegaUp\DAO\VO\Contests>, originalContest: \OmegaUp\DAO\VO\Contests, identity: \OmegaUp\DAO\VO\Identities}
      */
-    private static function createVirtualContest() {
+    private static function createVirtualContest(
+        int $numberOfVirtualContests = 1
+    ) {
         // create a real contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
@@ -29,26 +31,30 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($identity);
 
-        $response = \OmegaUp\Controllers\Contest::apiCreateVirtual(
-            new \OmegaUp\Request([
-                'alias' => $contestData['request']['alias'],
-                'auth_token' => $login->auth_token,
-            ])
-        );
+        // Create two more virtual contests
+        $virtualContests = [];
+        foreach (range(0, $numberOfVirtualContests - 1) as $virtualIndex) {
+            $response = \OmegaUp\Controllers\Contest::apiCreateVirtual(
+                new \OmegaUp\Request([
+                    'alias' => $contestData['request']['alias'],
+                    'auth_token' => $login->auth_token,
+                ])
+            );
 
-        // Get generated virtual contest alias
-        $virtualContestAlias = $response['alias'];
+            // Get generated virtual contest alias
+            $virtualContestAlias = $response['alias'];
 
-        $virtualContest = \OmegaUp\DAO\Contests::getByAlias(
-            $virtualContestAlias
-        );
+            $virtualContests[$virtualIndex] = \OmegaUp\DAO\Contests::getByAlias(
+                $virtualContestAlias
+            );
+        }
 
         $originalContest = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
 
         return [
-            'virtualContest' => $virtualContest,
+            'virtualContests' => $virtualContests,
             'originalContest' => $originalContest,
             'identity' => $identity,
         ];
@@ -56,10 +62,12 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testCreateVirtualContest() {
         [
-            'virtualContest' => $virtualContest,
+            'virtualContests' => $virtualContests,
             'originalContest' => $originalContest,
             'identity' => $identity,
         ] = self::createVirtualContest();
+
+        $virtualContest = $virtualContests[0];
 
         $this->assertNull($originalContest->rerun_id);
 
@@ -158,9 +166,11 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testAddParticipantsInVirtualContest() {
         [
-            'virtualContest' => $virtualContest,
+            'virtualContests' => $virtualContests,
             'identity' => $identity,
         ] = self::createVirtualContest();
+
+        $virtualContest = $virtualContests[0];
 
         // Create 5 participants for the virtual contest
         $numberOfParticipants = 5;
@@ -199,11 +209,11 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testAddedParticipantJoinsToVirtualContest() {
         [
-            'virtualContest' => $virtualContest,
+            'virtualContests' => $virtualContests,
             'identity' => $identity,
         ] = self::createVirtualContest();
 
-        $virtualContests = [$virtualContest];
+        $virtualContest = $virtualContests[0];
 
         $login = self::login($identity);
 
@@ -211,7 +221,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
 
         \OmegaUp\Controllers\Contest::apiAddUser(new \OmegaUp\Request([
-            'contest_alias' => $virtualContests[0]->alias,
+            'contest_alias' => $virtualContest->alias,
             'usernameOrEmail' => $participant->username,
             'auth_token' => $login->auth_token,
         ]));
@@ -254,12 +264,10 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testParticipantCanNotJoinToVirtualContestWithoutRegister() {
         [
-            'virtualContest' => $virtualContest,
+            'virtualContests' => $virtualContests,
             'originalContest' => $originalContest,
             'identity' => $identity,
         ] = self::createVirtualContest();
-
-        $virtualContests = [$virtualContest];
 
         $login = self::login($identity);
 
@@ -302,6 +310,67 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'userNotAllowed');
+        }
+    }
+
+    public function testUserCanNotGetScoreboardsFromUnregisteredVirtualContests() {
+        // Creating several virtual contests from different users
+        [
+            'virtualContests' => $virtualContests1,
+            'identity' => $identity1,
+        ] = self::createVirtualContest(numberOfVirtualContests: 3);
+        [
+            'virtualContests' => $virtualContests2,
+        ] = self::createVirtualContest(numberOfVirtualContests: 3);
+        $virtualContests = array_merge($virtualContests1, $virtualContests2);
+
+        $virtualContest = $virtualContests[0];
+
+        // Create a new participant and add them to virtual contest
+        ['identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity1);
+
+        \OmegaUp\Controllers\Contest::apiAddUser(new \OmegaUp\Request([
+            'contest_alias' => $virtualContest->alias,
+            'usernameOrEmail' => $participant->username,
+            'auth_token' => $login->auth_token,
+        ]));
+
+        // User tries to join the virtual contest where they was not assigned
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $virtualContest,
+            $participant
+        );
+
+        $login = self::login($participant);
+
+        $response = \OmegaUp\Controllers\Problemset::apiScoreboardEvents(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problemset_id' => $virtualContests[0]->problemset_id,
+            ])
+        );
+
+        $this->assertArrayHasKey('events', $response);
+
+        // The rest of virtual contests are unaccessible for the contestant
+        foreach ($virtualContests as $index => $vc) {
+            if ($index == 0) {
+                continue;
+            }
+            try {
+                \OmegaUp\Controllers\Problemset::apiScoreboardEvents(
+                    new \OmegaUp\Request([
+                        'auth_token' => $login->auth_token,
+                        'problemset_id' => $vc->problemset_id,
+                    ])
+                );
+
+                $this->fail('Should have thrown a ForbiddenAccessException');
+            } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+                $this->assertEquals($e->getMessage(), 'userNotAllowed');
+            }
         }
     }
 

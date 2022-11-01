@@ -1199,11 +1199,10 @@ Returns the Scoreboard events
 
 ### Parameters
 
-| Name                    | Type           | Description |
-| ----------------------- | -------------- | ----------- |
-| `contest_alias`         | `string`       |             |
-| `token`                 | `null\|string` |             |
-| `virtual_problemset_id` | `int\|null`    |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `contest_alias` | `string`       |             |
+| `token`         | `null\|string` |             |
 
 ### Returns
 
@@ -3397,16 +3396,15 @@ and the number of solutions already seen
 
 ### Parameters
 
-| Name                    | Type           | Description |
-| ----------------------- | -------------- | ----------- |
-| `assignment`            | `string`       |             |
-| `contest_alias`         | `string`       |             |
-| `course`                | `string`       |             |
-| `problemset_id`         | `int`          |             |
-| `auth_token`            | `mixed`        |             |
-| `token`                 | `null\|string` |             |
-| `tokens`                | `mixed`        |             |
-| `virtual_problemset_id` | `int\|null`    |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `assignment`    | `string`       |             |
+| `contest_alias` | `string`       |             |
+| `course`        | `string`       |             |
+| `problemset_id` | `int`          |             |
+| `auth_token`    | `mixed`        |             |
+| `token`         | `null\|string` |             |
+| `tokens`        | `mixed`        |             |
 
 ### Returns
 
@@ -3420,16 +3418,15 @@ types.Problemset;
 
 ### Parameters
 
-| Name                    | Type        | Description |
-| ----------------------- | ----------- | ----------- |
-| `assignment`            | `string`    |             |
-| `contest_alias`         | `string`    |             |
-| `course`                | `string`    |             |
-| `problemset_id`         | `int`       |             |
-| `auth_token`            | `mixed`     |             |
-| `token`                 | `mixed`     |             |
-| `tokens`                | `mixed`     |             |
-| `virtual_problemset_id` | `int\|null` |             |
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `assignment`    | `string` |             |
+| `contest_alias` | `string` |             |
+| `course`        | `string` |             |
+| `problemset_id` | `int`    |             |
+| `auth_token`    | `mixed`  |             |
+| `token`         | `mixed`  |             |
+| `tokens`        | `mixed`  |             |
 
 ### Returns
 
@@ -3445,16 +3442,15 @@ Returns the Scoreboard events
 
 ### Parameters
 
-| Name                    | Type        | Description |
-| ----------------------- | ----------- | ----------- |
-| `assignment`            | `string`    |             |
-| `contest_alias`         | `string`    |             |
-| `course`                | `string`    |             |
-| `problemset_id`         | `int`       |             |
-| `auth_token`            | `mixed`     |             |
-| `token`                 | `mixed`     |             |
-| `tokens`                | `mixed`     |             |
-| `virtual_problemset_id` | `int\|null` |             |
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `assignment`    | `string` |             |
+| `contest_alias` | `string` |             |
+| `course`        | `string` |             |
+| `problemset_id` | `int`    |             |
+| `auth_token`    | `mixed`  |             |
+| `token`         | `mixed`  |             |
+| `tokens`        | `mixed`  |             |
 
 ### Returns
 
@@ -4964,16 +4960,15 @@ contest updates with an access token.
 
 ### Parameters
 
-| Name                    | Type           | Description |
-| ----------------------- | -------------- | ----------- |
-| `filter`                | `string`       |             |
-| `problemset_id`         | `int`          |             |
-| `auth_token`            | `null\|string` |             |
-| `contest_admin`         | `null\|string` |             |
-| `contest_alias`         | `null\|string` |             |
-| `token`                 | `null\|string` |             |
-| `tokens`                | `mixed`        |             |
-| `virtual_problemset_id` | `int\|null`    |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `filter`        | `string`       |             |
+| `problemset_id` | `int`          |             |
+| `auth_token`    | `null\|string` |             |
+| `contest_admin` | `null\|string` |             |
+| `contest_alias` | `null\|string` |             |
+| `token`         | `null\|string` |             |
+| `tokens`        | `mixed`        |             |
 
 ### Returns
 

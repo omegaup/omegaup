@@ -76,7 +76,6 @@ OmegaUp.on('ready', async () => {
       .then((scoreboard) => {
         api.Problemset.scoreboardEvents({
           problemset_id: originalContest?.problemset_id,
-          virtual_problemset_id: contest.problemset_id,
         })
           .then((response) => {
             onVirtualRankingChanged({
