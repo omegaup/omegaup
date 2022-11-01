@@ -49,6 +49,23 @@ if (!defined('OMEGAUP_LOCKDOWN')) {
 }
 
 $contentSecurityPolicy = [
+    'connect-src' => [
+        '\'self\'',
+        'https://*.google-analytics.com',
+        'https://*.analytics.google.com',
+        'https://*.googletagmanager.com',
+    ],
+    'img-src' => [
+        // Problems can embed images from anywhere in the internet, so we need
+        // to be permissive here.
+        '*',
+        '\'self\'',
+        'data:',
+        'blob:',
+        'https://*.google-analytics.com',
+        'https://*.googletagmanager.com',
+        'https://secure.gravatar.com',
+    ],
     'script-src' => [
         '\'self\'',
         'https://www.google.com',
@@ -56,6 +73,7 @@ $contentSecurityPolicy = [
         'https://www.gstatic.com',
         'https://js-agent.newrelic.com',
         'https://bam.nr-data.net',
+        'https://*.googletagmanager.com',
         'https://ssl.google-analytics.com',
         'https://www.google-analytics.com',
         'https://connect.facebook.net',
