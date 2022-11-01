@@ -1,4 +1,4 @@
-U13HasNotBeenVerifiedForTheirParent = "Esta es una cuenta para menores y no ha sido verificada por su figura parental. La cuenta se bloqueará y no podrá acceder al contenido"
+U13HasNotBeenVerifiedForTheirParent = "Esta es una cuenta para menores y no ha sido verificada por su figura parental. La cuenta se bloqueará y no podrá acceder al contenido."
 aboutToStart = "Estás a punto de iniciar el concurso. Una vez que hagas clic en entrar, tu tiempo iniciará."
 acceptPrivacyPolicy = "He leído y acepto la [Política de Uso y Privacidad](http://blog.omegaup.com/privacy-policy/) del sitio, así como el [Código de Conducta](https://blog.omegaup.com/codigo-de-conducta-en-omegaup/)."
 accountDeletionConfirmEmailBody = "El usuario %(username) confirmó eliminar su cuenta."
