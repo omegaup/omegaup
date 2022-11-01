@@ -1,11 +1,11 @@
-U13HasNotBeenVerifiedForTheirParent = "O usuário U13 não foi verificado por seu pai, então a conta será bloqueada e não poderá consumir conteúdo"
+U13HasNotBeenVerifiedForTheirParent = "Esta é uma conta para menores e não foi verificada por um dos pais. A conta será bloqueada e não poderá ver o conteúdo.
 aboutToStart = "Você está prestes a iniciar o concurso. Seu tempo começará depois de clicar em Começar Concurso."
 acceptPrivacyPolicy = "Li e aceito a [Política de Uso e Privacidade](http://blog.omegaup.com/privacy-policy/) do site, bem como o [Código de Conduta](https://blog.omegaup.com/codigo-de-conducta-en-omegaup/)."
 accountDeletionConfirmEmailBody = "O usuário %(username) confirmado para excluir sua conta."
 accountDeletionConfirmEmailSubject = "Confirmação de exclusão de conta omegaUp"
 accountDeletionRequestEmailBody = "O usuário %(username) está solicitando a exclusão de sua conta."
 accountDeletionRequestEmailSubject = "Solicitação de exclusão de conta omegaUp"
-accountVerifyWarning = "Seu pai ou responsável deve aprovar sua conta, caso contrário ela será excluída em %(days) dias"
+accountVerifyWarning = "Seus pais deve aprovar esta conta, caso contrário ela será excluída em %(days) dias"
 activityReport = "Relatório de atividade"
 activityReportDuplicatesForOriginsDescription = "Origens com mais do que um usuário"
 activityReportDuplicatesForUsersDescription = "Usuários com mais de uma origem"
