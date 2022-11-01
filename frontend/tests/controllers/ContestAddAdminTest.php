@@ -366,7 +366,7 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 }

@@ -320,7 +320,7 @@ class Course {
      * @param \OmegaUp\DAO\VO\Identities[] $students
      * @param string[] $assignmentAliases
      * @param array<string, list<array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}>> $problemAssignmentsMap
-     * @return array<string, array<string, int>>
+     * @return array<string, array<string, float>>
      */
     public static function submitRunsToAssignmentsInCourse(
         array $courseData,
@@ -359,7 +359,7 @@ class Course {
                     );
                 }
 
-                $expectedScores[$studentUsername][$assignmentAlias] = 0;
+                $expectedScores[$studentUsername][$assignmentAlias] = 0.0;
 
                 foreach ($problemAssignmentsMap[$assignmentAlias] as $problemData) {
                     $p++;
@@ -379,7 +379,7 @@ class Course {
                             null,
                             $runResponsePA['guid']
                         );
-                        $expectedScores[$studentUsername][$assignmentAlias] += 50;
+                        $expectedScores[$studentUsername][$assignmentAlias] += 50.0;
 
                         if ((intval($s) + $p) % 3 == 0) {
                             // 100 pts run
@@ -397,7 +397,7 @@ class Course {
                                 null,
                                 $runResponseAC['guid']
                             );
-                            $expectedScores[$studentUsername][$assignmentAlias] += 50;
+                            $expectedScores[$studentUsername][$assignmentAlias] += 50.0;
                         }
                     }
                 }

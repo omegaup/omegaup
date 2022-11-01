@@ -129,7 +129,7 @@ class SchoolCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $actualSchools = array_map(fn ($school) => $school['value'], $schools);
         $this->assertCount(count($expectedSchools), $actualSchools);
-        $this->assertEquals($actualSchools, $expectedSchools);
+        $this->assertSame($actualSchools, $expectedSchools);
     }
 
     public function testSchoolsListWithNoSearchParam() {
@@ -153,7 +153,7 @@ class SchoolCreateTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterEmpty', $e->getMessage());
+            $this->assertSame('parameterEmpty', $e->getMessage());
         }
     }
 }

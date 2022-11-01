@@ -181,7 +181,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
             ])
         )['templateProperties'];
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\Controllers\Problem::SOLUTION_UNLOCKED,
             $result['payload']['solutionStatus']
         );
@@ -198,7 +198,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
             ])
         )['templateProperties'];
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\Controllers\Problem::SOLUTION_LOCKED,
             $result['payload']['solutionStatus']
         );
@@ -215,7 +215,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
             ])
         )['templateProperties'];
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\Controllers\Problem::SOLUTION_NOT_FOUND,
             $result['payload']['solutionStatus']
         );
@@ -244,7 +244,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
             ])
         )['templateProperties'];
-        $this->assertEquals(
+        $this->assertSame(
             'py3',
             $result['payload']['problem']['preferred_language']
         );

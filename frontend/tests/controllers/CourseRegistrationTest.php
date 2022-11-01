@@ -66,7 +66,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testCreateCourseWithRegistrationMode() {
         $course = self::createCourseWithRegistrationMode()['course'];
-        $this->assertEquals($course->admission_mode, 'registration');
+        $this->assertSame($course->admission_mode, 'registration');
     }
 
     public function testRequestIsShownInIntroDetails() {
@@ -166,11 +166,11 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         $this->assertCount(1, $response['notifications']);
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REQUEST,
             $response['notifications'][0]['contents']['type']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $course->name,
             $response['notifications'][0]['contents']['body']['localizationParams']['courseName']
         );
@@ -269,7 +269,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token
             ]))['notifications'];
 
-            $this->assertEquals(
+            $this->assertSame(
                 \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED,
                 $notifications[0]['contents']['type']
             );
@@ -281,7 +281,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token
             ]))['notifications'];
 
-            $this->assertEquals(
+            $this->assertSame(
                 \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED,
                 $notifications[0]['contents']['type']
             );
@@ -329,15 +329,15 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'course_alias' => $course->alias,
             ])
         );
-        $this->assertEquals(
+        $this->assertSame(
             $students[0]->username,
             $response['students'][0]['username']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $students[1]->username,
             $response['students'][1]['username']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $students[3]->username,
             $response['students'][2]['username']
         );
@@ -407,7 +407,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -419,12 +419,12 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             if (is_null($expectedRequest['accepted'])) {
                 continue;
             }
-            $this->assertEquals(
+            $this->assertSame(
                 $expectedRequest['accepted'],
                 $result[$id]['accepted']
             );
             if ($expectedRequest['admin'] === 'main') {
-                $this->assertEquals(
+                $this->assertSame(
                     self::$curator->username,
                     $result[$id]['admin']['username']
                 );
