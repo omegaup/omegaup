@@ -874,7 +874,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'show_scoreboard' => $courseParams->showScoreboard,
             'needs_basic_information' => $courseParams->needsBasicInformation,
             'requests_user_information' => $courseParams->requestsUserInformation,
-            ]);
+          ]);
 
         if (\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
             $course->minimum_progress_for_certificate = $courseParams->minimumProgressForCertificate;
