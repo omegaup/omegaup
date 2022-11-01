@@ -10,8 +10,6 @@
           <omegaup-datepicker
             v-model="birthDate"
             name="reg_birthdate"
-            data-signup-birthdate
-            :required="false"
             :max="new Date()"
           ></omegaup-datepicker>
         </div>
@@ -114,7 +112,7 @@
                 data-signup-submit
                 class="btn btn-primary form-control"
                 name="sign_up"
-                :disabled="!birthDate"
+                :disabled="!birthDate || !privacyPolicyAccepted"
                 @click.prevent="registerAndLogin"
               >
                 {{ T.loginSignUp }}
@@ -128,7 +126,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import omegaup_Markdown from '../Markdown.vue';
 import T from '../../lang';
 import * as time from '../../time';
@@ -151,17 +149,20 @@ export default class Signup extends Vue {
   recaptchaResponse: string = '';
   birthDate: null | Date = null;
   privacyPolicyAccepted = false;
+
   get loginEmailDescriptionText(): string {
     if (!this.userAge) {
       return T.loginEmail;
     }
     return this.userAge > 13 ? T.loginEmail : T.loginEmailParent;
   }
-  get userAge(): number | null {
+  get isU13(): boolean {
     if (this.birthDate === null) {
-      return null;
+      // Most users are not going to be U13. So until they fill out their
+      // birthdate, assume they aren't so that they can see the default form.
+      return false;
     }
-    return time.getDifferenceInCalendarYears(this.birthDate);
+    return time.getDifferenceInCalendarYears(this.birthDate) < 13;
   }
 
   verify(response: string): void {
@@ -179,28 +180,20 @@ export default class Signup extends Vue {
       ui.error(T.loginPasswordTooShort);
       return;
     }
-    this.$emit('register-and-login', {
+      const registerParameters = {
       username: this.username,
-      email: this.email,
-      parent_email: this.parentEmail,
       password: this.password,
       recaptcha: this.recaptchaResponse,
       birth_date: this.birthDate,
-    });
-  }
-  @Watch('email')
-  onEmailChanged(newValue: null | string): void {
-    if (!newValue) {
-      return;
+    };
+    if (this.isU13) {
+      // NOTE: validate the parent email here.
+      registerParameters.parent_email = this.parentEmail;
+    } else {
+      // NOTE: validate the email here.
+      registerParameters.email = this.email;
     }
-    this.parentEmail = null;
-  }
-  @Watch('parentEmail')
-  onParentEmailChanged(newValue: null | string): void {
-    if (!newValue) {
-      return;
-    }
-    this.email = null;
+    this.$emit('register-and-login', registerParameters);
   }
 }
 </script>
