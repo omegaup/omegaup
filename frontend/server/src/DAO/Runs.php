@@ -220,7 +220,42 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 ORDER BY
                     field(output, "OUTPUT_EXCEEDED", "OUTPUT_INCORRECT", "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT")
                 LIMIT 1
-                ) AS output
+                ) AS output,
+                ( SELECT
+                    IF(
+                        verdict = "JE", "EXECUTION_JUDGE_ERROR",
+                    IF(
+                        verdict = "VE", "EXECUTION_VALIDATOR_ERROR",
+                    IF(
+                        verdict = "CE", "EXECUTION_COMPILATION_ERROR",
+                    IF(
+                        verdict IN ("OF", "RFE"), "EXECUTION_RUNTIME_FUNCTION_ERROR",
+                    IF(
+                        verdict IN ("RE", "RTE"), "EXECUTION_RUNTIME_ERROR",
+                    IF(
+                        verdict IN ("ML", "MLE", "TLE", "OLE", "TO", "OL"), "EXECUTION_INTERRUPTED", "EXECUTION_FINISHED")
+                    )))))
+                    AS execution
+                FROM
+                    Runs_Groups
+                WHERE
+                    run_id = `r`.`run_id`
+                GROUP BY
+                    execution
+                ORDER BY
+                    field(
+                        execution,
+                        "EXECUTION_JUDGE_ERROR",
+                        "EXECUTION_VALIDATOR_ERROR",
+                        "EXECUTION_COMPILATION_ERROR",
+                        "EXECUTION_RUNTIME_FUNCTION_ERROR",
+                        "EXECUTION_RUNTIME_ERROR",
+                        "EXECUTION_INTERRUPTED",
+                        "EXECUTION_FINISHED"
+                    )
+                LIMIT 1
+                ) AS
+                    execution
             FROM
                 Submissions s
             INNER JOIN
@@ -243,8 +278,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ';
         $val[] = $offset * $rowCount;
         $val[] = $rowCount;
-
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
+        
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
         $runs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
 
         return [
