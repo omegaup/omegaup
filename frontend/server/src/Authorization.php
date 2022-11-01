@@ -565,7 +565,6 @@ class Authorization {
         \OmegaUp\DAO\VO\Groups $group
     ): bool {
         if (self::isSystemAdmin($identity)) {
-            error_log(print_r('hola soy systemAdmin', true));
             return true;
         }
         $groupUsers = \OmegaUp\DAO\GroupsIdentities::getByPK(
