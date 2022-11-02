@@ -474,12 +474,16 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]),
         );
 
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
         // Log in the user and set the auth token in the new request
         $login = self::login($identity);
 
         try {
             \OmegaUp\Controllers\Contest::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'description' => 'description',
             ]));
             $this->fail(
                 'Creating contests should not have been allowed for U13'
