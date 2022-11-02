@@ -8,7 +8,7 @@ import random
 import string
 import sys
 
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Set
 
 import pytest
 
@@ -87,9 +87,7 @@ def create_contest(dbconn: lib.db.Connection) -> Contest:
                 VALUES
                     (%s);
             ''',
-            (
-                owner_user_id,
-            ),
+            (owner_user_id, ),
         )
         acl_id: int = cur.lastrowid
 
@@ -156,7 +154,7 @@ def create_contest(dbconn: lib.db.Connection) -> Contest:
             ))
 
         problem_ids: List[int] = []
-        no_of_problems: int = 3  # same as above case
+        no_of_problems: int = 3
         for _ in range(no_of_problems):
             problem_commit = ''.join(random.choices('0123456789abcdef', k=40))
             problem_version = ''.join(random.choices('0123456789abcdef', k=40))
@@ -240,13 +238,12 @@ def test_get_contest(dbconn: lib.db.Connection) -> None:
 
     get_contests_detector = cron.plagiarism_detector.get_contests(dbconn)
 
-    contests: List[int] = [c['contest_id'] for c in get_contests_detector]
+    contests: Set[int] = set(c['contest_id'] for c in get_contests_detector)
 
     assert contest.contest_id in contests
 
 
 def test_submission_ids(dbconn: lib.db.Connection) -> None:
-
     contest = create_contest(dbconn)
     submissions = cron.plagiarism_detector.get_submissions_for_contest(
         dbconn, contest.contest_id)
@@ -255,7 +252,6 @@ def test_submission_ids(dbconn: lib.db.Connection) -> None:
 
 
 def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
-
     contest = create_contest(dbconn)
     submission_ids: Dict[str, int] = {}
 
@@ -273,11 +269,12 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
     with dbconn.cursor() as cur:
         cur.execute(
             '''
-            SELECT `submission_id_1`,
+                SELECT
+                    `submission_id_1`,
                     `submission_id_2`
-            FROM `Plagiarisms`
-            WHERE `contest_id` =  %s;
-                    ''', (contest.contest_id, ))
+                FROM `Plagiarisms`
+                WHERE `contest_id` = %s;
+            ''', (contest.contest_id, ))
         plagiarized_matches = cur.fetchall()
         plagiarized_submission_ids = set(
             itertools.chain.from_iterable(
@@ -285,8 +282,8 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
                 for (submission_id1, submission_id2) in plagiarized_matches))
 
     # TODO: Convert the graph of plagiarized submissions into disjoint sets and
-    # check groups of plagiarized submissions instead of only whether a submission
-    # was plagiarized or not.
+    # check groups of plagiarized submissions instead of only whether a
+    # submission was plagiarized or not.
 
     assert plagiarized_submission_ids == set((
         submission_ids[f'{1:032x}'],
