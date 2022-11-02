@@ -483,6 +483,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Log in the user and set the auth token in the new request
         $login = self::login($identity);
+        $r['auth_token'] = $login->auth_token;
 
         try {
             \OmegaUp\Controllers\Contest::apiCreate($r);
@@ -490,7 +491,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'Creating contests should not have been allowed for U13'
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('U13CannotPerform', $e->getMessage());
+            $this->assertSame('U13CannotPerform', $e->getMessage());
         }
     }
 }
