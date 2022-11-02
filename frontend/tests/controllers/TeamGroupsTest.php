@@ -1683,10 +1683,10 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             \OmegaUp\Controllers\TeamsGroup::apiCreate(new \OmegaUp\Request([
-                    'auth_token' => $login->auth_token,
-                    'name' => $name,
-                    'alias' => $alias,
-                    'description' => $description
+                'auth_token' => $login->auth_token,
+                'name' => $name,
+                'alias' => $alias,
+                'description' => $description,
             ]));
             $this->fail(
                 'Creating contests should not have been allowed for U13'
