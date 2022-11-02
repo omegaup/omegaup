@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 
-from typing import (List, Callable, Tuple, Iterable, Set, Dict)
-import pytest
 import dataclasses
 import datetime
-import string
-import time
 import itertools
-import sys
-import unittest
 import os
-import typing
 import random
+import string
+import sys
+
+from typing import Callable, Dict, List
+
+import pytest
 
 sys.path.insert(
     0,
@@ -37,160 +36,206 @@ class Contest:
 
 @pytest.fixture(scope='session')
 def dbconn() -> lib.db.Connection:
-    dbconn = lib.db.connect(
+    return lib.db.connect(
         lib.db.DatabaseConnectionArguments(
             user='root',
             password='omegaup',
             host='mysql',
-            database='omegaup',
+            database='omegaup-test',
             port=13306,
             mysql_config_file=lib.db.default_config_file_path() or ''))
-    return dbconn
 
 
 def create_contest(dbconn: lib.db.Connection) -> Contest:
-
-    current_time = datetime.datetime.now()
-    start_time = current_time - datetime.timedelta(minutes=30)
-    finish_time = current_time - datetime.timedelta(minutes=5)
-    alias: str = ''.join(random.choices(string.digits, k=8))
-    description: str = "For Plagiarism tests"
-    acl_id: int = 65551  # Maybe create a New ACL
-    check_plagiarism: int = 1
-    scoreboard_url: str = ''.join(random.choices(string.ascii_letters, k=30))
-    scoreboard_url_admin: str = ''.join(
-        random.choices(string.ascii_letters, k=30))
-    guid: int = 1  #counter for GUID LIST
-    language: str = "cpp20-gcc"
-    status: str = "ready"
-    verdict: str = "AC"
-    ttype: str = "test"
-    no_of_users: int = 3  # we can increase the number of user of further testing
-    no_of_problems: int = 3  # same as above case
-    guids: List[str] = []
     contest = Contest()
 
-    # create Problemset for contest
     with dbconn.cursor() as cur:
+        # setting foreign key check = 0 because of dependencies
+        cur.execute('SET foreign_key_checks = 0;')
+        cur.execute('TRUNCATE TABLE Plagiarisms;')
+        cur.execute('TRUNCATE TABLE Submission_Log;')
+        cur.execute('TRUNCATE TABLE Submissions;')
+        cur.execute('SET foreign_key_checks = 1;')
+
+        owner_username = ''.join(random.choices(string.ascii_letters, k=20))
         cur.execute(
             '''
-                    INSERT INTO `Problemsets`
-                        (`acl_id`, `scoreboard_url`, 
-                        `scoreboard_url_admin`)
-                    VALUES
-                        (%s, %s, %s);
-                    ''', (
+                INSERT INTO `Identities`
+                    (`username`)
+                VALUES
+                    (%s);
+            ''',
+            (owner_username, ),
+        )
+        owner_identity_id: int = cur.lastrowid
+
+        cur.execute(
+            '''
+                INSERT INTO `Users`
+                    (`main_identity_id`)
+                VALUES
+                    (%s);
+            ''',
+            (owner_identity_id, ),
+        )
+        owner_user_id: int = cur.lastrowid
+
+        cur.execute(
+            '''
+                INSERT INTO `ACLs`
+                    (`owner_id`)
+                VALUES
+                    (%s);
+            ''',
+            (
+                owner_user_id,
+            ),
+        )
+        acl_id: int = cur.lastrowid
+
+        scoreboard_url: str = ''.join(
+            random.choices(string.ascii_letters, k=30))
+        scoreboard_url_admin: str = ''.join(
+            random.choices(string.ascii_letters, k=30))
+        cur.execute(
+            '''
+                INSERT INTO `Problemsets`
+                    (`acl_id`, `scoreboard_url`,
+                    `scoreboard_url_admin`)
+                VALUES
+                    (%s, %s, %s);
+            ''',
+            (
                 acl_id,
                 scoreboard_url,
                 scoreboard_url_admin,
-            ))
+            ),
+        )
         problemset_id: int = cur.lastrowid
-    dbconn.conn.commit()
 
-    # add 3 problems to problemset
-    for problem in range(1, no_of_problems + 1):
-        version = ''.join(random.choices(string.ascii_letters, k=40))
-        with dbconn.cursor() as cur:
-            cur.execute(
-                '''
-                INSERT INTO `Problemset_Problems`
-                (`problemset_id`, `problem_id`, `version`)
-                VALUES
-                (%s, %s, %s)
-                ''', (
-                    problemset_id,
-                    problem,
-                    version,
-                ))
-    dbconn.conn.commit()
-
-    # create a contest
-    with dbconn.cursor() as cur:
+        # create a contest
+        current_time = datetime.datetime.now()
+        start_time = current_time - datetime.timedelta(minutes=30)
+        finish_time = current_time - datetime.timedelta(minutes=5)
+        alias: str = ''.join(random.choices(string.digits, k=8))
         cur.execute(
             '''
-                    INSERT INTO `Contests`
-                    (`title`, `alias`,
-                        `description`, 
+                INSERT INTO `Contests`
+                (
+                    `title`, `alias`,
+                    `description`,
                     `start_time`, `finish_time`,
-                        `check_plagiarism`, `problemset_id`,
-                        `acl_id`
-                    )
-                    VALUES
-                    (%s, %s, %s, %s, %s, %s, %s, %s)
-                    ''', (
+                    `check_plagiarism`, `problemset_id`,
+                    `acl_id`
+                )
+                VALUES
+                (%s, %s, %s, %s, %s, %s, %s, %s);
+            ''',
+            (
                 alias,
                 alias,
-                description,
+                "For Plagiarism tests",
                 start_time,
                 finish_time,
-                check_plagiarism,
+                1,
                 problemset_id,
                 acl_id,
-            ))
+            ),
+        )
         contest.contest_id = cur.lastrowid
-    dbconn.conn.commit()
 
-    # add problemset to contest
-    with dbconn.cursor() as cur:
+        # add problemset to contest
         cur.execute(
             '''
                 UPDATE `Problemsets`
-                SET `contest_id` = (
-                    SELECT `contest_id` FROM
-                    `Contests` 
-                    WHERE `alias` = %s
-                )
+                SET `contest_id` = %s
                 WHERE problemset_id = %s;
-                    ''', (
-                alias,
+            ''', (
+                contest.contest_id,
                 problemset_id,
             ))
-    dbconn.conn.commit()
 
-    # setting foreign key check = 0 because of dependencies
-    with dbconn.cursor() as cur:
-        cur.execute('''SET foreign_key_checks = 0;''')
-        cur.execute('''TRUNCATE TABLE Plagiarisms;''')
-        cur.execute('''TRUNCATE TABLE Submission_Log;''')
-        cur.execute('''TRUNCATE TABLE Submissions;''')
-        cur.execute('''SET foreign_key_checks = 1;''')
+        problem_ids: List[int] = []
+        no_of_problems: int = 3  # same as above case
+        for _ in range(no_of_problems):
+            problem_commit = ''.join(random.choices('0123456789abcdef', k=40))
+            problem_version = ''.join(random.choices('0123456789abcdef', k=40))
+            problem_alias = ''.join(random.choices(string.ascii_letters, k=20))
+            cur.execute(
+                '''
+                    INSERT INTO `Problems`
+                    (`acl_id`, `title`, `alias`, `commit`, `current_version`)
+                    VALUES
+                    (%s, %s, %s, %s, %s)
+                ''', (
+                    acl_id,
+                    problem_alias,
+                    problem_alias,
+                    problem_commit,
+                    problem_version,
+                ))
+            problem_id = cur.lastrowid
+            cur.execute(
+                '''
+                    INSERT INTO `Problemset_Problems`
+                    (`problemset_id`, `problem_id`, `version`)
+                    VALUES
+                    (%s, %s, %s)
+                ''', (
+                    problemset_id,
+                    problem_id,
+                    problem_version,
+                ))
+            problem_ids.append(problem_id)
 
-    # add submissions to the contest
-    guid = 1
-    for identity in range(1, no_of_users + 1):
-        for problem in range(1, no_of_problems + 1):
-            with dbconn.cursor() as cur:
+        # add submissions to the contest
+        guid = 1
+        no_of_users: int = 3
+        guids: List[str] = []
+        for _ in range(no_of_users):
+            username = ''.join(random.choices(string.ascii_letters, k=20))
+            cur.execute(
+                '''
+                    INSERT INTO `Identities`
+                        (`username`)
+                    VALUES
+                        (%s);
+                ''',
+                (username, ),
+            )
+            identity_id: int = cur.lastrowid
+
+            for problem_id in problem_ids:
                 cur.execute(
                     '''
                         INSERT INTO `Submissions`
                         (`identity_id`,
-                            `problem_id`, `problemset_id`, 
-                            `guid`, `language`, `status`, 
+                            `problem_id`, `problemset_id`,
+                            `guid`, `language`, `status`,
                             `verdict`, `type`
                         )
                         VALUES
                         (%s, %s, %s, %s, %s, %s, %s,
-                        %s)
-                            ''', (
-                        identity,
-                        problem,
+                        %s);
+                    ''', (
+                        identity_id,
+                        problem_id,
                         problemset_id,
                         f'{guid:032x}',
-                        language,
-                        status,
-                        verdict,
-                        ttype,
+                        "cpp20-gcc",
+                        "ready",
+                        "AC",
+                        "test",
                     ))
                 guids.append(f'{guid:032x}')
                 guid += 1
-
+        contest.guids = guids
     dbconn.conn.commit()
-    contest.guids = guids
+
     return contest
 
 
 def test_get_contest(dbconn: lib.db.Connection) -> None:
-
     contest = create_contest(dbconn)
 
     get_contests_detector = cron.plagiarism_detector.get_contests(dbconn)
@@ -231,7 +276,7 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
             SELECT `submission_id_1`,
                     `submission_id_2`
             FROM `Plagiarisms`
-            WHERE `contest_id` =  %s; 
+            WHERE `contest_id` =  %s;
                     ''', (contest.contest_id, ))
         plagiarized_matches = cur.fetchall()
         plagiarized_submission_ids = set(
