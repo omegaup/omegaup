@@ -247,8 +247,8 @@ def test_submission_ids(dbconn: lib.db.Connection) -> None:
     contest = create_contest(dbconn)
     submissions = cron.plagiarism_detector.get_submissions_for_contest(
         dbconn, contest.contest_id)
-    for submission in submissions:
-        assert submission['guid'] in contest.guids
+    guids = set(submission['guid'] for submission in submissions)
+    assert guids == set(contest.guids)
 
 
 def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
