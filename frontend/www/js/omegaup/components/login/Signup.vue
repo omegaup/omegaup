@@ -33,7 +33,7 @@
                 loginEmailDescriptionText
               }}</label>
               <input
-                v-if="userAge > 13"
+                v-if="!isU13"
                 v-model="email"
                 data-signup-email
                 name="reg_email"
@@ -149,12 +149,12 @@ export default class Signup extends Vue {
   recaptchaResponse: string = '';
   birthDate: null | Date = null;
   privacyPolicyAccepted = false;
-
+  
   get loginEmailDescriptionText(): string {
-    if (!this.userAge) {
+    if (!this.isU13) {
       return T.loginEmail;
     }
-    return this.userAge > 13 ? T.loginEmail : T.loginEmailParent;
+    return !this.isU13 ? T.loginEmail : T.loginEmailParent;
   }
   get isU13(): boolean {
     if (this.birthDate === null) {
@@ -180,11 +180,18 @@ export default class Signup extends Vue {
       ui.error(T.loginPasswordTooShort);
       return;
     }
-    const registerParameters = {
+    if (this.email || this.parentEmail == null)
+    {
+      ui.error(T.fillEmailCorrectly)
+      return;
+    }
+      const registerParameters = {
       username: this.username,
       password: this.password,
       recaptcha: this.recaptchaResponse,
       birth_date: this.birthDate,
+      email: this.email,
+      parent_email: this.parentEmail,
     };
     if (this.isU13) {
       // NOTE: validate the parent email here.
