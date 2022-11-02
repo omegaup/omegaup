@@ -21,7 +21,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ListItem=array{key: string, value: string}
- * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}
+ * @psalm-type ProblemListItem=array{accepted: int, alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}
  * @psalm-type Statements=array<string, string>
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type ArenaProblemDetails=array{accepts_submissions: bool, alias: string, commit: string, input_limit: int, languages: list<string>, letter?: string, points: float, problem_id?: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>,  settings?: ProblemSettingsDistrib, source?: string, statement?: ProblemStatement, title: string, visibility: int}
@@ -4142,21 +4142,23 @@ class Problem extends \OmegaUp\Controllers\Controller {
         foreach ($problems as $problem) {
             /** @var ProblemListItem */
             $problemArray = $problem->asFilteredArray([
+                'accepted',
                 'alias',
                 'difficulty',
                 'difficulty_histogram',
-                'problem_id',
                 'points',
+                'problem_id',
                 'quality',
                 'quality_histogram',
                 'ratio',
                 'score',
+                'submissions',
                 'tags',
                 'title',
                 'visibility',
                 'quality_seal',
             ]);
-            $problemArray['tags'] = $hiddenTags ? []  : \OmegaUp\DAO\Problems::getTagsForProblem(
+            $problemArray['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problem,
                 public: false,
                 showUserTags: $problem->allow_user_add_tags
@@ -4220,6 +4222,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         foreach ($problems as $problem) {
             /** @var ProblemListItem */
             $problemArray = $problem->asFilteredArray([
+                'accepted',
                 'alias',
                 'difficulty',
                 'difficulty_histogram',
@@ -4229,6 +4232,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'quality_histogram',
                 'ratio',
                 'score',
+                'submissions',
                 'tags',
                 'title',
                 'visibility',

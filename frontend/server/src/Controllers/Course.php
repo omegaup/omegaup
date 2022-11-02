@@ -331,7 +331,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'finish_time'
             );
         }
-
         return $originalCourse;
     }
 
@@ -369,7 +368,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             'languages' => $r->ensureOptionalString('languages'),
             'level' => $r->ensureOptionalString('level'),
             'minimum_progress_for_certificate' => $r->ensureOptionalInt(
-                'minimum_progress_for_certificate'
+                'minimum_progress_for_certificate',
+                lowerBound: 0,
+                upperBound: 100
             ),
             'name' => $r->ensureString('name'),
             'needs_basic_information' => $r->ensureOptionalBool(
@@ -854,8 +855,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-
-        self::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
+        $course = new \OmegaUp\DAO\VO\Courses([
             'name' => $courseParams->name,
             'alias' => $courseParams->courseAlias,
             'level' => $courseParams->level,
@@ -874,7 +874,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             'show_scoreboard' => $courseParams->showScoreboard,
             'needs_basic_information' => $courseParams->needsBasicInformation,
             'requests_user_information' => $courseParams->requestsUserInformation,
-        ]), $r->user);
+          ]);
+
+        if (\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
+            $course->minimum_progress_for_certificate = $courseParams->minimumProgressForCertificate;
+        }
+
+        self::createCourseAndGroup($course, $r->user);
 
         return [
             'status' => 'ok',
@@ -5909,6 +5915,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             'requests_user_information',
             'admission_mode',
         ];
+
+        if (\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
+            array_push($valueProperties, 'minimum_progress_for_certificate');
+        }
+
         $importantChange = self::updateValueProperties(
             $r,
             $course,

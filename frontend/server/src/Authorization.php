@@ -95,7 +95,7 @@ class Authorization {
     const IDENTITY_CREATOR_GROUP_ALIAS = 'omegaup:group-identity-creator';
 
     // Group for certificate generators.
-    const CERTIFICATE_GENERATOR_GROUP_ALIAS = 'omegaup:group-certificate-generator';
+    const CERTIFICATE_GENERATOR_GROUP_ALIAS = 'omegaup:certificate-generator';
 
     // Group for teaching assitants.
     const TEACHING_ASSISTANT_GROUP_ALIAS = 'omegaup:teaching-assistant';
@@ -443,16 +443,27 @@ class Authorization {
 
     public static function isCertificateGenerator(\OmegaUp\DAO\VO\Identities $identity): bool {
         if (is_null(self::$_certificateGeneratorGroup)) {
-            self::$_certificateGeneratorGroup = \OmegaUp\DAO\Groups::findByAlias(
+            $certificateGeneratorGroup = \OmegaUp\DAO\Groups::findByAlias(
                 self::CERTIFICATE_GENERATOR_GROUP_ALIAS
             );
-            if (is_null(self::$_certificateGeneratorGroup)) {
+            if (
+                is_null($certificateGeneratorGroup)
+                || is_null($certificateGeneratorGroup->acl_id)
+            ) {
                 return false;
             }
+            self::$_certificateGeneratorGroup = $certificateGeneratorGroup;
+        } else {
+            $certificateGeneratorGroup = self::$_certificateGeneratorGroup;
         }
+        /** @var int $certificateGeneratorGroup->acl_id */
         return self::isGroupMember(
             $identity,
-            self::$_certificateGeneratorGroup
+            $certificateGeneratorGroup
+        ) || self::hasRole(
+            $identity,
+            $certificateGeneratorGroup->acl_id,
+            self::CERTIFICATE_GENERATOR_ROLE
         );
     }
 
