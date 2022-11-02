@@ -512,16 +512,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
         if ($contest->admission_mode === 'private') {
             if (
-                \OmegaUp\DAO\ProblemsetIdentities::existsByPK(
+                \OmegaUp\DAO\ProblemsetIdentities::canAccessNormalOrVirtualContest(
                     $identity->identity_id,
-                    $contest->problemset_id
-                ) ||
-                (
-                    !is_null($virtualProblemsetId) &&
-                    \OmegaUp\DAO\ProblemsetIdentities::existsByPK(
-                        $identity->identity_id,
-                        $virtualProblemsetId
-                    )
+                    $contest->problemset_id,
+                    $virtualProblemsetId
                 )
             ) {
                 return true;
@@ -1539,8 +1533,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function validateDetails(
         string $contestAlias,
         ?\OmegaUp\DAO\VO\Identities $identity,
-        ?string $token = null,
-        ?int $virtualProblemsetId = null,
+        ?string $token = null
     ): array {
         [
             'contest' => $contest,
@@ -1556,11 +1549,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\UnauthorizedException();
             }
-            self::validateAccessContest(
-                $contest,
-                $identity,
-                virtualProblemsetId: $virtualProblemsetId
-            );
+            self::validateAccessContest($contest, $identity);
 
             $contestAdmin = \OmegaUp\Authorization::isContestAdmin(
                 $identity,
@@ -4097,7 +4086,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @return Scoreboard
      */
-    public static function getScoreboard(
+    private static function getScoreboard(
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Problemsets $problemset,
         ?\OmegaUp\DAO\VO\Identities $identity,
