@@ -10,7 +10,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     private static function createVirtualContest(
         int $numberOfVirtualContests = 1,
-        string $admissionMode = 'private'
+        string $admissionMode = 'public'
     ) {
         // create a real contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -264,6 +264,34 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
 
         // User joins to the virtual contest
         $this->assertSame($result['entrypoint'], 'arena_contest_virtual');
+    }
+
+    public function testParticipantsCanNotBeAddedToVirtualContestWhenOriginalContestIsPrivate() {
+        [
+            'virtualContests' => $virtualContests,
+            'identity' => $identity,
+        ] = self::createVirtualContest(admissionMode: 'private');
+
+        $virtualContest = $virtualContests[0];
+
+        $login = self::login($identity);
+
+        // Create a new participant and add them to virtual contest
+        ['identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
+
+        try {
+            \OmegaUp\Controllers\Contest::apiAddUser(new \OmegaUp\Request([
+                'contest_alias' => $virtualContest->alias,
+                'usernameOrEmail' => $participant->username,
+                'auth_token' => $login->auth_token,
+            ]));
+            $this->fail('Should have thrown a InvalidParameterException');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                $e->getMessage(),
+                'usersCanNotBeAddedInVirtualContestWhenOriginalContestIsPrivate'
+            );
+        }
     }
 
     public function testParticipantCanNotJoinToVirtualContestWithoutRegister() {

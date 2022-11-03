@@ -1452,6 +1452,7 @@
 	"usernameInUse": "Este nombre de usuario ya ha sido utilizado.",
 	"usernameOrPassIsWrong": "El nombre de usuario o la contrase\u00f1a son incorrectos. Por favor verifica tus credenciales.",
 	"usersCanNotBeAddedInContestForTeams": "No se pueden agregar usuarios en concursos para equipos",
+	"usersCanNotBeAddedInVirtualContestWhenOriginalContestIsPrivate": "No se puede agregar usuarios en un concurso virtual cuando el concurso original es privado",
 	"verdictAC": "Respuesta correcta",
 	"verdictCE": "Error de compilaci\u00f3n",
 	"verdictFO": "Error de ejecuci\u00f3n (funci\u00f3n restringida)",

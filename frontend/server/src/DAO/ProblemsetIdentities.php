@@ -19,54 +19,6 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         return self::existsByPK($identityId, $problemsetId);
     }
 
-    public static function canAccessNormalOrVirtualContest(
-        ?int $identityId,
-        int $problemsetId,
-        ?int $virtualProblemsetId
-    ): bool {
-        $sql = '
-            SELECT SUM(matches) FROM (
-                (
-                    SELECT
-                        COUNT(*) AS matches
-                    FROM
-                        Contests c
-                    INNER JOIN
-                        Contests oc
-                    ON
-                        c.rerun_id = oc.contest_id
-                    INNER JOIN
-                        Problemset_Identities pi
-                    ON
-                        pi.problemset_id = c.problemset_id
-                    WHERE
-                        pi.identity_id = ? AND
-                        oc.problemset_id = ? AND
-                        c.problemset_id = ?
-                ) UNION ALL (
-                    SELECT
-                        COUNT(*) AS matches
-                    FROM
-                        Problemset_Identities
-                    WHERE
-                        identity_id = ? AND
-                        problemset_id = ?
-                )
-            ) t;';
-
-        $params = [
-            $identityId,
-            $problemsetId,
-            $virtualProblemsetId,
-            $identityId,
-            $problemsetId,
-        ];
-
-        /** @var float|null */
-        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
-        return $count > 0;
-    }
-
     /**
      * @param \OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments $container
      */
