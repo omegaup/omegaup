@@ -7,7 +7,6 @@ import { OmegaUp } from '../omegaup';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestVirtualDetailsPayload();
-  console.log(payload.contest.admission_mode);
 
   new Vue({
     el: '#main-container',
