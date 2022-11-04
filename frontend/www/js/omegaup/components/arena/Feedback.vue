@@ -7,13 +7,13 @@
       <textarea
         v-if="!saved"
         ref="feedback-form"
-        v-model="text"
+        v-model="feedback.text"
         :placeholder="T.runDetailsFeedbackPlaceholder"
         class="w-100"
       ></textarea>
       <omegaup-markdown
         v-else
-        :markdown="text"
+        :markdown="feedback.text"
         :full-width="true"
       ></omegaup-markdown>
     </div>
@@ -21,7 +21,7 @@
       <div class="form-group my-2">
         <button
           data-button-submit
-          :disabled="!text"
+          :disabled="!feedback.text"
           class="btn btn-primary mx-2"
           @click.prevent="onSubmitFeedback"
         >
@@ -67,7 +67,6 @@ export default class Feedback extends Vue {
 
   FeedbackStatus = FeedbackStatus;
   T = T;
-  text = this.feedback.text;
   saved: boolean = false;
 
   mounted() {
@@ -76,11 +75,7 @@ export default class Feedback extends Vue {
 
   onSubmitFeedback() {
     this.saved = true;
-    this.$emit('submit', {
-      ...this.feedback,
-      text: this.text,
-      status: FeedbackStatus.InProgress,
-    });
+    this.$emit('submit', this);
   }
 
   onCancelFeedback() {
