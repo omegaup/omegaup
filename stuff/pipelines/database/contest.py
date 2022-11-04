@@ -52,5 +52,4 @@ def get_contests(
             contest_id=row['contest_id'],
         )
         data.append(contest)
-    print(data)
     return data
