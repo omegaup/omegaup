@@ -57,7 +57,7 @@ describe('Edit.vue', () => {
     users: [],
     originalContestAdmissionMode: null,
   };
-  it('Should handle a normal contest', async () => {
+  it('Should handle a normal contest', () => {
     const wrapper = shallowMount(contest_Edit, {
       propsData,
     });
@@ -65,10 +65,9 @@ describe('Edit.vue', () => {
     expect(wrapper.text()).toContain(T.contestDetailsGoToContest);
 
     expect(wrapper.vm.showTab).toBe('new_form');
-    //expect(wrapper.vm.showTab).toBe('contestants');
   });
 
-  it('Should handle a virtual contest', async () => {
+  it('Should handle a virtual contest', () => {
     propsData.details.rerun_id = 2;
     const wrapper = shallowMount(contest_Edit, {
       propsData,
@@ -77,7 +76,7 @@ describe('Edit.vue', () => {
     expect(wrapper.vm.showTab).toBe('contestants');
   });
 
-  it('Should handle a virtual contest from an original private contest', async () => {
+  it('Should handle a virtual contest from an original private contest', () => {
     propsData.details.rerun_id = 2;
     propsData.originalContestAdmissionMode = 'private';
     const wrapper = shallowMount(contest_Edit, {

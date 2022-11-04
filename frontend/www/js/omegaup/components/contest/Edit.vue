@@ -336,9 +336,10 @@ export default class Edit extends Vue {
   T = T;
   ui = ui;
   virtual = ui.isVirtual(this.details);
+  showTab = this.selectedTab();
   alreadyArchived = this.details.archived;
 
-  get showTab(): string {
+  selectedTab(): string {
     if (!ui.isVirtual(this.details)) {
       return 'new_form';
     }
