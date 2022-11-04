@@ -21,9 +21,6 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($contestDirector);
         $r['auth_token'] = $login->auth_token;
         $r['certificates_status'] = 'uninitiated';
-        $r['certificate_cutoff'] = 3;
-
-        //error_log(print_r($r,true));
 
         // Call the API
         $response = \OmegaUp\Controllers\Contest::apiCreate(
@@ -35,17 +32,25 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         );
         //error_log(print_r($contest,true));
 
+        $certificates_cutoff = 3;
+
         //preguntar si certificates status es uninitiated (contest_id, certificate_cutoff)
         \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_id' => $contest->contest_id,
-                'certificates_cutoff' => $r['certificates_cutoff']
+                'certificates_cutoff' => $certificates_cutoff
             ])
         );
 
         // Assert status of new contest
         $this->assertSame('ok', $response['status']);
+
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+
+        error_log(print_r($contest, true));
 
         // Assert that the contest requested exists in the DB
         //$this->assertContest($r);

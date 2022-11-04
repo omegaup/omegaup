@@ -2,6 +2,10 @@
 
 namespace OmegaUp\Controllers;
 
+require_once __DIR__ . '/vendor/autoload.php';
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+
 /**
  * CertificateController
 
@@ -38,20 +42,26 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
-        //error_log(print_r('hoka',true));
-        //error_log(print_r($r,true));
-        //error_log(print_r('hola',true));
-        // solo certficates generator podran utilizar esta api
-        // checar que sean certificates generator
 
         // obtain the contest
         $contest = \OmegaUp\DAO\Contests::getByPK($r['contest_id']);
 
         if ($contest->certificates_status === 'uninitiated' || $contest->certificates_status === 'retryable_error') {
-            // se guarda certificate_cutoff en la tabla de concursos y se envía
-            //un mensaje a la cola contest_certificate
-        }
+            // add certificates_cutoff value to the course
+            $contest->certificate_cutoff = $r['certificates_cutoff'];
 
+            // update contest with the new value
+            \OmegaUp\DAO\Contests::update($contest);
+
+            //send message to rabbitmq]
+            $connection = new AMQPStreamConnection(
+                'localhost',
+                8001,
+                'guest',
+                'guest'
+            );
+            $channel = $connection->channel();
+        }
         return [
             'status' => 'ok',
         ];
