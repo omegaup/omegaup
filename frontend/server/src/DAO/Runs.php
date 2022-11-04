@@ -335,12 +335,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 COUNT(*)
             FROM
                 Submissions s
-            INNER JOIN
-                Runs r
-            ON
-                r.run_id = s.current_run_id
             WHERE
-                s.problemset_id = ? AND r.verdict = ? AND r.status = "ready" AND s.`type` = "normal";
+                s.problemset_id = ? AND s.verdict = ? AND s.status = "ready" AND s.`type` = "normal";
         ';
         $val = [$problemsetId, $verdict];
 
@@ -360,12 +356,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 COUNT(*)
             FROM
                 Submissions s
-            INNER JOIN
-                Runs r
-            ON
-                s.current_run_id = r.run_id
             WHERE
-                s.problem_id = ? AND r.status = "ready" AND r.verdict = ? AND s.`type` = "normal";
+                s.problem_id = ? AND s.status = "ready" AND s.verdict = ? AND s.`type` = "normal";
         ';
         $val = [$problemId, $verdict];
 
@@ -384,16 +376,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $sql = '
             SELECT
                 DATE(s.time) AS date,
-                r.verdict AS verdict,
+                s.verdict AS verdict,
                 COUNT(*) AS runs
             FROM
                 Submissions s
-            INNER JOIN
-                Runs r
-            ON
-                r.run_id = s.current_run_id
             WHERE
-                s.identity_id = ? AND r.status = "ready" AND s.`type` = "normal"
+                s.identity_id = ? AND s.status = "ready" AND s.`type` = "normal"
             GROUP BY
                 date, verdict
             ORDER BY
@@ -637,12 +625,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     COUNT(1) AS total
                 FROM
                     Submissions s
-                INNER JOIN
-                    Runs r
-                ON
-                    s.current_run_id = r.run_id
                 WHERE
-                    r.verdict NOT IN (\'CE\', \'JE\', \'VE\')
+                    s.verdict NOT IN (\'CE\', \'JE\', \'VE\')
                     AND s.problem_id = ?
                     AND s.identity_id = ?
                 ) AS tried,
@@ -651,12 +635,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     COUNT(1) AS total
                 FROM
                     Submissions s
-                INNER JOIN
-                    Runs r
-                ON
-                    s.current_run_id = r.run_id
                 WHERE
-                    r.verdict IN (\'AC\')
+                    s.verdict IN (\'AC\')
                     AND s.problem_id = ?
                     AND s.identity_id = ?
                 ) AS solved;
@@ -807,7 +787,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             SELECT
                 s.guid,
                 s.language,
-                r.verdict,
+                s.verdict,
                 IF(
                     COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
                         0,
@@ -922,8 +902,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 p.alias,
                 s.guid,
                 s.language,
-                r.status,
-                r.verdict,
+                s.status,
+                s.verdict,
                 r.runtime,
                 r.penalty,
                 r.memory,
@@ -961,13 +941,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             ON
                 p.problem_id = s.problem_id
             LEFT JOIN
-                Problemsets ps
-            ON
-                ps.problemset_id = s.problemset_id
-            LEFT JOIN
                 Contests c
             ON
-                c.problemset_id = ps.problemset_id
+                c.problemset_id = s.problemset_id
             WHERE
                 s.problem_id = ? AND s.identity_id = ?
         ';
@@ -993,8 +969,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 p.alias,
                 s.guid,
                 s.language,
-                r.status,
-                r.verdict,
+                s.status,
+                s.verdict,
                 r.runtime,
                 r.penalty,
                 r.memory,
@@ -1062,13 +1038,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             ON
                 ii.identity_id = sf.identity_id
             LEFT JOIN
-                Problemsets ps
-            ON
-                ps.problemset_id = s.problemset_id
-            LEFT JOIN
                 Contests c
             ON
-                c.problemset_id = ps.problemset_id
+                c.problemset_id = s.problemset_id
             WHERE
                 s.problem_id = ? AND s.identity_id = ?
         ';
@@ -1131,10 +1103,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                         0,
                         r.score
                 ) AS score,
-                r.status,
+                s.status,
                 r.submission_id,
                 r.time,
-                r.verdict,
+                s.verdict,
                 r.version
             FROM
                 Submissions s
