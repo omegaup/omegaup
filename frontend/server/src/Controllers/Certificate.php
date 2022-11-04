@@ -42,22 +42,36 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         // obtain the contest
         $contest = \OmegaUp\DAO\Contests::getByPK($r['contest_id']);
 
-        if ($contest->certificates_status === 'uninitiated' || $contest->certificates_status === 'retryable_error') {
-            // add certificates_cutoff value to the course
-            $contest->certificate_cutoff = $r['certificates_cutoff'];
+        //check if is a certificate generator
+        if (\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
+            if ($contest->certificates_status === 'uninitiated' || $contest->certificates_status === 'retryable_error') {
+                // add certificates_cutoff value to the course
+                $contest->certificate_cutoff = $r['certificates_cutoff'];
 
-            // update contest with the new value
-            \OmegaUp\DAO\Contests::update($contest);
+                // update contest with the new value
+                \OmegaUp\DAO\Contests::update($contest);
 
-            //send message to rabbitmq
-            $connection = new \PhpAmqpLib\Connection\AMQPStreamConnection(
-                'localhost',
-                8001,
-                'guest',
-                'guest'
-            );
-            $channel = $connection->channel();
+                //connection to rabbitmq
+                $connection = new \PhpAmqpLib\Connection\AMQPStreamConnection(
+                    'rabbitmq',
+                    5672,
+                    'omegaup',
+                    'omegaup'
+                );
+
+                $channel = $connection->channel();
+
+                $channel->queue_declare('hello', false, false, false, false);
+                $msg = new \PhpAmqpLib\Message\AMQPMessage(
+                    'Message to contest_certificates queue!'
+                );
+                $channel->basic_publish($msg, '', 'hello');
+                echo " [x] Message to contest_certificates queue!'\n";
+                $channel->close();
+                $connection->close();
+            }
         }
+
         return [
             'status' => 'ok',
         ];
