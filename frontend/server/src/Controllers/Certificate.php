@@ -2,10 +2,6 @@
 
 namespace OmegaUp\Controllers;
 
-require_once __DIR__ . '/vendor/autoload.php';
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
-
 /**
  * CertificateController
 
@@ -53,8 +49,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             // update contest with the new value
             \OmegaUp\DAO\Contests::update($contest);
 
-            //send message to rabbitmq]
-            $connection = new AMQPStreamConnection(
+            //send message to rabbitmq
+            $connection = new \PhpAmqpLib\Connection\AMQPStreamConnection(
                 'localhost',
                 8001,
                 'guest',
