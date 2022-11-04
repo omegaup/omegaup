@@ -257,11 +257,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 ) AS
                     execution,
                 ( SELECT
-					IF(
-						verdict IN ("JE", "CE"), "MEMORY_NOT_AVAILABLE",
-					IF(
-						verdict IN ("ML", "MLE"), "MEMORY_EXCEEDED", "MEMORY_AVAILABLE"
-					))
+                    IF(
+                        verdict IN ("JE", "CE"), "MEMORY_NOT_AVAILABLE",
+                    IF(
+                        verdict IN ("ML", "MLE"), "MEMORY_EXCEEDED", "MEMORY_AVAILABLE"
+                    ))
                 AS status_memory
                 FROM
                     Runs_Groups
