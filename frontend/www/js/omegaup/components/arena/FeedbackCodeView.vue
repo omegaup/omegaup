@@ -22,6 +22,8 @@ import CodeMirror from 'codemirror';
 import { EditorOptions, languageModeMap, modeList } from './CodeView.vue';
 import Feedback, { ArenaCourseFeedback, FeedbackStatus } from './Feedback.vue';
 
+const FeedbackClass = Vue.extend(Feedback);
+
 for (const mode of modeList) {
   require(`codemirror/mode/${mode}/${mode}.js`);
 }
@@ -32,7 +34,7 @@ for (const mode of modeList) {
 export default class FeedbackCodeView extends Vue {
   @Prop() language!: string;
   @Prop() value!: string;
-  @Prop({ default: () => new Map() }) feedbackList!: Map<
+  @Prop({ default: () => new Map<number, FeedbackClass>() }) feedbackMap!: Map<
     number,
     ArenaCourseFeedback
   >;
@@ -41,10 +43,6 @@ export default class FeedbackCodeView extends Vue {
   T = T;
   mode = languageModeMap[this.language] ?? languageModeMap['cpp17-gcc'];
   numberOfComments = 0;
-
-  get feedbackListEmpty(): number {
-    return this.feedbackList.size;
-  }
 
   get editorOptions(): EditorOptions {
     return {
@@ -56,56 +54,49 @@ export default class FeedbackCodeView extends Vue {
     };
   }
 
-  recalculateNumberOfComments(num: number): number {
-    return num;
-  }
-
   mounted() {
     const editor = CodeMirror.fromTextArea(this.cmEditor, this.editorOptions);
-    let lineWidget: null | CodeMirror.LineWidget = null;
 
     editor.on(
       'gutterClick',
-      (codeMirror: CodeMirror.Editor, numberOfLine: number) => {
-        if (this.feedbackList.get(numberOfLine)) {
-          return;
-        }
-        lineWidget = codeMirror.addLineWidget(
-          numberOfLine,
-          showFeedbackForm(numberOfLine),
+      (codeMirror: CodeMirror.Editor, lineNumber: number) => {
+        codeMirror.addLineWidget(
+          lineNumber,
+          showFeedbackForm(lineNumber, this),
         );
 
-        this.feedbackList.set(numberOfLine, {
-          line: numberOfLine,
+        this.feedbackMap.set(lineNumber, {
+          line: lineNumber,
           text: null,
           status: FeedbackStatus.New,
         });
-        this.numberOfComments = this.recalculateNumberOfComments(
-          this.feedbackList.size,
-        );
+        this.numberOfComments = this.feedbackMap.size;
       },
     );
 
-    const showFeedbackForm = (numberOfLine: number): HTMLDivElement => {
+    const showFeedbackForm = (
+      lineNumber: number,
+      lineWidget: any,
+    ): HTMLDivElement => {
       const marker = document.createElement('div');
       marker.classList.add('px-2');
 
       const feedback: ArenaCourseFeedback = {
         text: null,
-        line: numberOfLine,
+        line: lineNumber,
         status: FeedbackStatus.New,
       };
-      const componentClass = Vue.extend(Feedback);
-      const feedbackForm = new componentClass({
+      const feedbackForm = new FeedbackClass({
         propsData: {
           feedback,
         },
       });
+      this.feedbackMap.set(lineNumber, feedbackForm);
 
       feedbackForm.$mount();
 
       feedbackForm.$on('submit', (feedback: ArenaCourseFeedback) => {
-        this.feedbackList.set(feedback.line, {
+        this.feedbackMap.set(feedback.line, {
           line: feedback.line,
           text: feedback.text,
           status: FeedbackStatus.InProgress,
@@ -113,12 +104,10 @@ export default class FeedbackCodeView extends Vue {
       });
 
       feedbackForm.$on('cancel', (feedback: ArenaCourseFeedback) => {
-        this.feedbackList.delete(feedback.line);
-        if (lineWidget == null) {
-          return;
-        }
+        this.feedbackMap.delete(feedback.line);
         editor.removeLineWidget(lineWidget);
         marker.removeChild(feedbackForm.$el);
+        feedbackForm.$destroy();
       });
 
       marker.appendChild(feedbackForm.$el);
@@ -127,7 +116,7 @@ export default class FeedbackCodeView extends Vue {
   }
 
   saveFeedbackList(): void {
-    this.$emit('save-feedback-list', this.feedbackList);
+    this.$emit('save-feedback-list', this.feedbackMap);
   }
 }
 </script>
