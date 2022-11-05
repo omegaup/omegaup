@@ -6,7 +6,7 @@
     <div class="container-fluid text-right py-2">
       <button
         class="btn btn-primary mx-2"
-        :disabled="!mapChangeTracker"
+        :disabled="!numberOfComments"
         @click.prevent="saveFeedbackList"
       >
         {{ T.submissionSendFeedback }}
@@ -34,16 +34,23 @@ for (const mode of modeList) {
 export default class FeedbackCodeView extends Vue {
   @Prop() language!: string;
   @Prop() value!: string;
-  @Prop({ default: () => new Map<number, typeof FeedbackClass>() })
-  feedbackMap!: Map<number, Feedback>;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackMap!: Map<number, ArenaCourseFeedback>;
   @Ref('cm-editor') private readonly cmEditor!: HTMLTextAreaElement;
 
   T = T;
   mode = languageModeMap[this.language] ?? languageModeMap['cpp17-gcc'];
-  mapChangeTracker = 0;
+  mapChangeTracker = 1;
 
-  get mapAsList(): 0 | [number, Feedback][] {
-    return this.mapChangeTracker && Array.from(this.feedbackMap);
+  get mapAsList(): 0 | [number, ArenaCourseFeedback][] {
+    if (!this.mapChangeTracker) {
+      throw new Error('unreachable code');
+    }
+    return Array.from(this.feedbackMap);
+  }
+
+  get numberOfComments(): number {
+    return this.mapAsList != 0 ? this.mapAsList.length : 0;
   }
 
   get editorOptions(): EditorOptions {
@@ -66,6 +73,12 @@ export default class FeedbackCodeView extends Vue {
           lineNumber,
           showFeedbackForm(lineNumber, this),
         );
+
+        this.setFeedback({
+          lineNumber,
+          text: null,
+          status: FeedbackStatus.New,
+        });
       },
     );
 
@@ -78,7 +91,7 @@ export default class FeedbackCodeView extends Vue {
 
       const feedback: ArenaCourseFeedback = {
         text: null,
-        line: lineNumber,
+        lineNumber,
         status: FeedbackStatus.New,
       };
       const feedbackForm = new FeedbackClass({
@@ -89,13 +102,12 @@ export default class FeedbackCodeView extends Vue {
 
       feedbackForm.$mount();
 
-      feedbackForm.$on('submit', (feedback: Feedback) => {
-        this.feedbackMap.set(feedback.$props.feedback.line, feedback);
-        this.mapChangeTracker += 1;
+      feedbackForm.$on('submit', (feedback: ArenaCourseFeedback) => {
+        this.setFeedback(feedback);
       });
 
       feedbackForm.$on('cancel', (feedback: ArenaCourseFeedback) => {
-        this.feedbackMap.delete(feedback.line);
+        this.deleteFeedback({ lineNumber: feedback.lineNumber });
         editor.removeLineWidget(lineWidget);
         marker.removeChild(feedbackForm.$el);
         feedbackForm.$destroy();
@@ -106,12 +118,34 @@ export default class FeedbackCodeView extends Vue {
     };
   }
 
+  setFeedback({
+    lineNumber,
+    text = null,
+    status,
+  }: {
+    lineNumber: number;
+    text: string | null;
+    status: FeedbackStatus;
+  }): void {
+    this.feedbackMap.set(lineNumber, {
+      lineNumber,
+      text,
+      status,
+    });
+    this.mapChangeTracker++;
+  }
+
+  deleteFeedback({ lineNumber }: { lineNumber: number }): void {
+    this.feedbackMap.delete(lineNumber);
+    this.mapChangeTracker--;
+  }
+
   saveFeedbackList(): void {
     this.$emit(
       'save-feedback-list',
-      Array.from(this.feedbackMap, ([line, feedbackComponent]) => ({
-        line,
-        feedback: feedbackComponent.feedback.text,
+      Array.from(this.feedbackMap, ([lineNumber, feedback]) => ({
+        lineNumber,
+        feedback: feedback.text,
       })),
     );
   }

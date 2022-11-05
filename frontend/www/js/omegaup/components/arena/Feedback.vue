@@ -7,13 +7,13 @@
       <textarea
         v-if="!saved"
         ref="feedback-form"
-        v-model="feedback.text"
+        v-model="currentFeedback.text"
         :placeholder="T.runDetailsFeedbackPlaceholder"
         class="w-100"
       ></textarea>
       <omegaup-markdown
         v-else
-        :markdown="feedback.text"
+        :markdown="currentFeedback.text"
         :full-width="true"
       ></omegaup-markdown>
     </div>
@@ -21,7 +21,7 @@
       <div class="form-group my-2">
         <button
           data-button-submit
-          :disabled="!feedback.text"
+          :disabled="!currentFeedback.text"
           class="btn btn-primary mx-2"
           @click.prevent="onSubmitFeedback"
         >
@@ -51,7 +51,7 @@ export enum FeedbackStatus {
 }
 
 export interface ArenaCourseFeedback {
-  line: number;
+  lineNumber: number;
   text: null | string;
   status: FeedbackStatus;
 }
@@ -68,6 +68,7 @@ export default class Feedback extends Vue {
   FeedbackStatus = FeedbackStatus;
   T = T;
   saved: boolean = false;
+  currentFeedback = this.feedback;
 
   mounted() {
     this.$nextTick(() => this.feedbackForm.focus());
@@ -75,11 +76,13 @@ export default class Feedback extends Vue {
 
   onSubmitFeedback() {
     this.saved = true;
-    this.$emit('submit', this);
+    this.currentFeedback.status = FeedbackStatus.InProgress;
+    this.$emit('submit', this.currentFeedback);
   }
 
   onCancelFeedback() {
-    this.$emit('cancel', this.feedback);
+    this.currentFeedback.text = null;
+    this.$emit('cancel', this.currentFeedback);
   }
 }
 </script>
