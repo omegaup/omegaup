@@ -42,7 +42,7 @@ export default class FeedbackCodeView extends Vue {
   mode = languageModeMap[this.language] ?? languageModeMap['cpp17-gcc'];
   mapChangeTracker = 1;
 
-  get mapAsList(): 0 | [number, ArenaCourseFeedback][] {
+  get mapAsList(): [number, ArenaCourseFeedback][] {
     if (!this.mapChangeTracker) {
       throw new Error('unreachable code');
     }
@@ -50,7 +50,7 @@ export default class FeedbackCodeView extends Vue {
   }
 
   get numberOfComments(): number {
-    return this.mapAsList != 0 ? this.mapAsList.length : 0;
+    return this.mapAsList.length;
   }
 
   get editorOptions(): EditorOptions {
@@ -73,12 +73,6 @@ export default class FeedbackCodeView extends Vue {
           lineNumber,
           showFeedbackForm(lineNumber, this),
         );
-
-        this.setFeedback({
-          lineNumber,
-          text: null,
-          status: FeedbackStatus.New,
-        });
       },
     );
 
@@ -137,7 +131,7 @@ export default class FeedbackCodeView extends Vue {
 
   deleteFeedback({ lineNumber }: { lineNumber: number }): void {
     this.feedbackMap.delete(lineNumber);
-    this.mapChangeTracker--;
+    this.mapChangeTracker++;
   }
 
   saveFeedbackList(): void {
