@@ -222,15 +222,14 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         if (is_null($row)) {
             return [
                 'quality_seal' => false,
-                'qualitynomination_id' => 0,
+                'qualitynomination_id' => null,
             ];
         }
 
-        /** @var array{quality_seal: bool} */
-        $contents = json_decode($row['contents'], true);
+        $contents = self::getContents($row['contents']);
         return [
-            'quality_seal' => boolval($contents['quality_seal']),
-            'qualitynomination_id' => intval($row['qualitynomination_id']),
+            'quality_seal' => $contents['quality_seal'] ?? false,
+            'qualitynomination_id' => $row['qualitynomination_id'],
         ];
     }
 
@@ -240,7 +239,26 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     public static function updateQualityNominations(
         int $qualityNominationsId,
         string $contents
-    ): array {
+    ): void {
+        $sqlContens = '
+            SELECT
+                contents
+            FROM
+                QualityNominations
+            WHERE
+                qualitynomination_id = ?
+            FOR UPDATE;';
+
+        $newContens = self::getContents($contents);
+        $contentsAll = self::getContents(
+            \OmegaUp\MySQLConnection::getInstance()->GetOne(
+                $sqlContens,
+                [$qualityNominationsId]
+            )
+        );
+
+        $result = json_encode(array_merge($contentsAll, $newContens));
+
         $sql = '
             UPDATE
                 QualityNominations
@@ -252,12 +270,17 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         \OmegaUp\MySQLConnection::getInstance()->Execute(
             $sql,
             [
-                $contents,
+                $result,
                 $qualityNominationsId
             ]
         );
+    }
 
-        return ['status' => 'ok'];
+    public static function getContents(string $contents): ?array {
+        /**
+        * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, quality_seal?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed}
+        */
+        return json_decode($contents, associative: true);
     }
 
     /**

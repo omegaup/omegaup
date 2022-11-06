@@ -390,8 +390,9 @@ OmegaUp.on('ready', async () => {
             qualitynomination_id: string,
             qualitySeal: boolean,
           ) => {
-            const contents: { quality_seal?: boolean } = {};
-            contents.quality_seal = qualitySeal;
+            const contents: { quality_seal: boolean } = {
+              quality_seal: qualitySeal,
+            };
             api.QualityNomination.update({
               contents: JSON.stringify(contents),
               qualitynomination_id,

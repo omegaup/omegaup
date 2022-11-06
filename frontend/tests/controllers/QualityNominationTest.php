@@ -521,22 +521,19 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
         );
 
-        $getReviewedDataReviewer = \OmegaUp\DAO\QualityNominations::getReviewedData(
-            $problemData['problem']->problem_id,
-            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id
-        );
-        $this->assertFalse($getReviewedDataReviewer['quality_seal']);
-        $this->assertEquals(
-            0,
-            $getReviewedDataReviewer['qualitynomination_id'],
-        );
-
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'quality_tag',
             'contents' => json_encode([
-                 'quality_seal' => false,
+                'quality_seal' => false,
+                'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                ],
+                'source' => 'omegaUp',
+                'tags' => ['problemTagRecursion'],
             ]),
         ]));
 
@@ -552,18 +549,26 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $getReviewedDataReviewer = \OmegaUp\DAO\QualityNominations::getReviewedData(
-            $problemData['problem']->problem_id,
-            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id
-        );
-
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
         ]));
 
+        $getReviewedDataReviewer = \OmegaUp\DAO\QualityNominations::getReviewedData(
+            $problemData['problem']->problem_id,
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id
+        );
+
         $this->assertTrue($details['contents']['quality_seal']);
         $this->assertTrue($getReviewedDataReviewer['quality_seal']);
+        $this->assertEquals(
+            $details['contents']['source'],
+            'omegaUp'
+        );
+        $this->assertEquals(
+            $details['contents']['tags'][0],
+            'problemTagRecursion'
+        );
         $this->assertEquals(
             $details['qualitynomination_id'],
             $getReviewedDataReviewer['qualitynomination_id'],

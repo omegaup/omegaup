@@ -473,13 +473,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            if (
-                !isset($contents['quality_seal']) ||
-                (
-                    $contents['quality_seal'] &&
-                    !isset($contents['tag'])
-                )
-            ) {
+            if (!isset($contents['quality_seal'])) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
                     'contents'
@@ -643,10 +637,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
-        /**
-         * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
-         */
-        $contents = json_decode($r['contents'], associative: true);
+        $contents = \OmegaUp\DAO\QualityNominations::getContents(
+            $r['contents']
+        );
         if (!is_array($contents)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
@@ -850,11 +843,22 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         self::validateMemberOfReviewerGroup($r);
 
         $qualityNominationId = $r->ensureInt('qualitynomination_id');
-        \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
+        $rawContents = $r->ensureString(
+            'contents',
+            fn (string $alias) => \OmegaUp\Validators::stringNonEmpty($alias),
+        );
+
+        $contents = \OmegaUp\DAO\QualityNominations::getContents($rawContents);
+        if (!is_array($contents)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'contents'
+            );
+        }
 
         \OmegaUp\DAO\QualityNominations::updateQualityNominations(
             $qualityNominationId,
-            $r['contents']
+            $rawContents,
         );
 
         return ['status' => 'ok'];
