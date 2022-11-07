@@ -541,6 +541,7 @@ feedbackNotSentYet = "Ainda não se tem enviado o feedback para esta submissão.
 feedbackSuccesfullyAdded = "O feedback tem sido satisfatóriamente adicionado."
 feedbackSuccesfullyUpdated = "O feedback tem sido satisfatóriamente atualizado."
 feedbackTitle = "Feedback sobre a submissão"
+fillEmailCorrectly = "Por favor, verifique o endereço de e-mail de entrada"
 firstSumbissionWithIdentity = "Tenha em mente que você está tentando enviar uma solução com uma conta de identidade"
 forSelectedItems = "Para os itens selecionados"
 forbiddenInVirtualContest = "Proibido em concurso virtual"

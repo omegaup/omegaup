@@ -542,6 +542,7 @@
 	"feedbackSuccesfullyAdded": "The feedback has been succesfully added.",
 	"feedbackSuccesfullyUpdated": "The feedback has been succesfully updated.",
 	"feedbackTitle": "Submission feedback",
+	"fillEmailCorrectly": "Please check the input email address",
 	"firstSumbissionWithIdentity": "Note that you are trying to send a submission with an identity account",
 	"forSelectedItems": "For selected items",
 	"forbiddenInVirtualContest": "Forbidden in virtual contest",

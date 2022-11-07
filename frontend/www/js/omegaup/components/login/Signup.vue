@@ -149,7 +149,7 @@ export default class Signup extends Vue {
   recaptchaResponse: string = '';
   birthDate: null | Date = null;
   privacyPolicyAccepted = false;
-  
+
   get loginEmailDescriptionText(): string {
     if (!this.isU13) {
       return T.loginEmail;
@@ -180,12 +180,11 @@ export default class Signup extends Vue {
       ui.error(T.loginPasswordTooShort);
       return;
     }
-    if (this.email || this.parentEmail == null)
-    {
-      ui.error(T.fillEmailCorrectly)
+    if (this.email || this.parentEmail == null) {
+      ui.error(T.fillEmailCorrectly);
       return;
     }
-      const registerParameters = {
+    const registerParameters = {
       username: this.username,
       password: this.password,
       recaptcha: this.recaptchaResponse,

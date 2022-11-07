@@ -541,6 +541,7 @@ feedbackNotSentYet = "Aún no se ha enviado la retroalimentación para este env�
 feedbackSuccesfullyAdded = "La retroalimentación se agregó correctamente."
 feedbackSuccesfullyUpdated = "La retroalimentación se actualizó correctamente."
 feedbackTitle = "Retroalimentación sobre el envío"
+fillEmailCorrectly = "Por favor, compruebe la dirección de correo electrónico de entrada"
 firstSumbissionWithIdentity = "Ten en cuenta que estás intentando enviar una solución con una cuenta de identidad"
 forSelectedItems = "Para los items seleccionados"
 forbiddenInVirtualContest = "Prohibido en concurso virtual"

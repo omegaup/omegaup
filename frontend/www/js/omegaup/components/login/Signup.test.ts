@@ -10,9 +10,8 @@ describe('signup.vue', () => {
     password: '',
     passwordConfirmation: '',
     recaptchaResponse: '',
-    birthDate: "946684800",
+    birthDate: '946684800',
     privacyPolicyAccepted: true,
-    
   };
 
   it('should handle register and login', async () => {
@@ -22,7 +21,7 @@ describe('signup.vue', () => {
         isAdmin: true,
       },
     });
-  
+
     await wrapper.find('button[type="register-and-login"]').trigger('click');
     expect(wrapper.emitted('register-and-login')).toEqual([
       [
@@ -33,11 +32,10 @@ describe('signup.vue', () => {
           password: '',
           passwordConfirmation: '',
           recaptchaResponse: '',
-          birthDate: "946684800",
+          birthDate: '946684800',
           privacyPolicyAccepted: true,
         },
       ],
     ]);
+  });
 });
-});
-
