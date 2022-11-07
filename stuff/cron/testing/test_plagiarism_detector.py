@@ -5,6 +5,7 @@ import datetime
 import itertools
 import os
 import random
+import json
 import string
 import sys
 
@@ -24,6 +25,7 @@ import cron.plagiarism_detector  # type: ignore
 
 _OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..'))
 LOCAL_DOWNLOADER_DIR = os.path.join(_OMEGAUP_ROOT, "testdata")
+PLAGIARISM_THRESHOLD = 90
 
 SubmissionDownloader = Callable[[str, str, str], None]
 
@@ -275,11 +277,10 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
                 FROM `Plagiarisms`
                 WHERE `contest_id` = %s;
             ''', (contest.contest_id, ))
-        plagiarized_matches = cur.fetchall()
         plagiarized_submission_ids = set(
             itertools.chain.from_iterable(
                 (submission_id1, submission_id2)
-                for (submission_id1, submission_id2) in plagiarized_matches))
+                for (submission_id1, submission_id2) in cur.fetchall()))
 
     # TODO: Convert the graph of plagiarized submissions into disjoint sets and
     # check groups of plagiarized submissions instead of only whether a
@@ -294,3 +295,40 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
         submission_ids[f'{6:032x}'],
         submission_ids[f'{9:032x}'],
     ))
+
+    # Either one of the score should be >= threshold value
+    with dbconn.cursor(dictionary=True) as cur:
+        cur.execute(
+            '''
+                SELECT
+                    `score_1`,
+                    `score_2`
+                FROM `Plagiarisms`
+                WHERE `contest_id` = %s;
+            ''', (contest.contest_id, ))
+        match_scores = cur.fetchall()
+
+    for score in match_scores:
+        assert score['score_1'] >= PLAGIARISM_THRESHOLD or score[
+            'score_2'] >= PLAGIARISM_THRESHOLD
+
+    # Range of Lines Test.
+
+    # hardcoded expected ranges.
+    # notice both ranges are same due to exact same files being present
+    expected_ranges_1 = [[0, 41], [0, 33, 33, 39, 39, 76],
+                         [0, 33, 33, 35, 39, 46, 48, 64]]
+    expected_ranges_2 = [[0, 41], [0, 33, 33, 39, 39, 76],
+                         [0, 33, 33, 35, 39, 46, 48, 64]]
+    with dbconn.cursor(dictionary=True, buffered=True) as cur:
+        cur.execute(
+            '''
+                SELECT
+                    `contents`
+                FROM `Plagiarisms`
+                WHERE `contest_id` = %s;
+            ''', (contest.contest_id, ))
+    contents = cur.fetchall()
+    for content in contents:
+        assert json.loads(content['contents'])['file1'] in expected_ranges_1
+        assert json.loads(content['contents'])['file2'] in expected_ranges_2
