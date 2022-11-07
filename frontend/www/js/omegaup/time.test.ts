@@ -2,7 +2,7 @@ import * as time from './time';
 
 describe('getDifferenceInCalendarYears', () => {
   // Setting an specific datetime to avoid flakiness in a leap-year
-  const now = new Date(0).getDate();
+  const now = new Date('2000-01-01T00:00:00Z').getTime();
   let dateNowSpy: jest.SpyInstance<number, []> | null = null;
 
   beforeEach(() => {
