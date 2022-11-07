@@ -3,7 +3,6 @@ import { shallowMount } from '@vue/test-utils';
 import login_Signup from './Signup.vue';
 
 describe('signup.vue', () => {
-  const registerAndLogin = 'register-and-login';
   const registerParameters = {
     username: 'Omegaup',
     email: 'U13@gmail.com',
@@ -23,7 +22,6 @@ describe('signup.vue', () => {
         isAdmin: true,
       },
     });
-    expect(wrapper.text()).toContain(registerAndLogin);
     expect(wrapper.find('registerAndLogin').trigger('click'));
 });
 });
