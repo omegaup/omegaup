@@ -3,6 +3,7 @@ import { shallowMount } from '@vue/test-utils';
 import login_Signup from './Signup.vue';
 
 describe('signup.vue', () => {
+  const registerAndLogin = 'register-and-login';
   const registerParameters = {
     username: 'Omegaup',
     email: 'U13@gmail.com',
@@ -15,14 +16,14 @@ describe('signup.vue', () => {
     
   };
 
-  it('Should handle contest clarification', async () => {
+  it('should handle register and login', async () => {
     const wrapper = shallowMount(login_Signup, {
       propsData: {
         registerParameters,
         isAdmin: true,
       },
     });
-    expect(wrapper.text()).toContain(registerParameters.birthDate);
+    expect(wrapper.text()).toContain(registerAndLogin);
     expect(wrapper.find('registerAndLogin').trigger('click'));
 });
 });
