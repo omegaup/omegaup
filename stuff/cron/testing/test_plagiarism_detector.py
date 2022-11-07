@@ -9,7 +9,7 @@ import json
 import string
 import sys
 
-from typing import Callable, Dict, List, Set
+from typing import Callable, Dict, List, Set, Tuple
 
 import pytest
 
@@ -302,7 +302,8 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
             '''
                 SELECT
                     `score_1`,
-                    `score_2`
+                    `score_2`, 
+                    `contents`
                 FROM `Plagiarisms`
                 WHERE `contest_id` = %s;
             ''', (contest.contest_id, ))
@@ -316,19 +317,19 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
 
     # hardcoded expected ranges.
     # notice both ranges are same due to exact same files being present
-    expected_ranges_1 = [[0, 41], [0, 33, 33, 39, 39, 76],
-                         [0, 33, 33, 35, 39, 46, 48, 64]]
-    expected_ranges_2 = [[0, 41], [0, 33, 33, 39, 39, 76],
-                         [0, 33, 33, 35, 39, 46, 48, 64]]
-    with dbconn.cursor(dictionary=True, buffered=True) as cur:
-        cur.execute(
-            '''
-                SELECT
-                    `contents`
-                FROM `Plagiarisms`
-                WHERE `contest_id` = %s;
-            ''', (contest.contest_id, ))
-    contents = cur.fetchall()
-    for content in contents:
-        assert json.loads(content['contents'])['file1'] in expected_ranges_1
-        assert json.loads(content['contents'])['file2'] in expected_ranges_2
+    
+    expected_pair_range = set((
+        ((0, 41),), 
+        ((0,33), (33,39), (39, 76)), 
+        ((0, 33), (33, 35), (39, 46), (48, 64))
+    ))
+    
+    found_pair_ranges = set()
+    for content in match_scores:
+        range_of_lines = json.loads(content['contents'])['file1']
+        match_pair_of_lines: Tuple[Tuple[int, int], ...] = ()
+        for i in range(0, len(range_of_lines), 2):
+            match_pair_of_lines+=((range_of_lines[i], range_of_lines[i+1]),)
+        found_pair_ranges.add(match_pair_of_lines)
+
+    assert expected_pair_range == found_pair_ranges
