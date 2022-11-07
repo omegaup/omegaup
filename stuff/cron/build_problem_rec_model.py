@@ -89,15 +89,11 @@ def load_mysql(args: argparse.Namespace) -> pd.DataFrame:
                 MIN(s.time) `time`
             FROM
                 Submissions s
-            INNER JOIN
-                Runs r
-            ON
-                r.run_id = s.current_run_id
             WHERE
                 s.problemset_id IS NULL AND
                 s.type = "normal" AND
-                r.status = "ready" AND
-                r.verdict = "AC"
+                s.status = "ready" AND
+                s.verdict = "AC"
             GROUP BY
                 s.identity_id,
                 s.problem_id
