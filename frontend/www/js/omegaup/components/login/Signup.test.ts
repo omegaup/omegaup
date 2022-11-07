@@ -22,7 +22,22 @@ describe('signup.vue', () => {
         isAdmin: true,
       },
     });
-    expect(wrapper.find('registerAndLogin').trigger('click'));
+  
+    await wrapper.find('button[type="register-and-login"]').trigger('click');
+    expect(wrapper.emitted('register-and-login')).toEqual([
+      [
+        {
+          username: 'Omegaup',
+          email: 'U13@gmail.com',
+          parentEmail: 'parentEmail@gmail.com',
+          password: '',
+          passwordConfirmation: '',
+          recaptchaResponse: '',
+          birthDate: "946684800",
+          privacyPolicyAccepted: true,
+        },
+      ],
+    ]);
 });
 });
 
