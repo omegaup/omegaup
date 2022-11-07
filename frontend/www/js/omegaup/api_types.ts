@@ -2367,7 +2367,7 @@ export namespace types {
 
   export interface AlreadyReviewedPayload {
     quality_seal: boolean;
-    qualitynomination_id: number;
+    qualitynomination_id?: number;
   }
 
   export interface ArenaAssignment {

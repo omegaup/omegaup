@@ -193,7 +193,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     /**
      * Returns the quality seal and id of a nomination for a given problem and user.
      *
-     * @return array{quality_seal: bool, qualitynomination_id: int}
+     * @return array{quality_seal: bool, qualitynomination_id: int|null}
      */
     public static function getReviewedData(
         int $problemId,
@@ -228,7 +228,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
 
         $contents = self::getContents($row['contents']);
         return [
-            'quality_seal' => $contents['quality_seal'] ?? false,
+            'quality_seal' => $contents['quality_seal'],
             'qualitynomination_id' => $row['qualitynomination_id'],
         ];
     }
@@ -240,7 +240,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         int $qualityNominationsId,
         string $contents
     ): void {
-        $sqlContens = '
+        $sqlContents = '
             SELECT
                 contents
             FROM
@@ -249,15 +249,17 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 qualitynomination_id = ?
             FOR UPDATE;';
 
-        $newContens = self::getContents($contents);
-        $contentsAll = self::getContents(
-            \OmegaUp\MySQLConnection::getInstance()->GetOne(
-                $sqlContens,
-                [$qualityNominationsId]
-            )
+        $newContents = self::getContents($contents);
+        $rowContents = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlContents,
+            [$qualityNominationsId]
         );
+        if (!is_array($newContents) || is_null($rowContents)) {
+            return;
+        }
+        $contentsAll = self::getContents($rowContents);
 
-        $result = json_encode(array_merge($contentsAll, $newContens));
+        $result = json_encode(array_merge($contentsAll, $newContents));
 
         $sql = '
             UPDATE
@@ -278,7 +280,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
 
     public static function getContents(string $contents): ?array {
         /**
-        * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, quality_seal?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed}
+        * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, quality_seal?: bool, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed}
         */
         return json_decode($contents, associative: true);
     }
