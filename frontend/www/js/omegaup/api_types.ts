@@ -4695,8 +4695,7 @@ export namespace messages {
   export type CertificateGenerateContestCertificatesRequest = {
     [key: string]: any;
   };
-  export type _CertificateGenerateContestCertificatesServerResponse = any;
-  export type CertificateGenerateContestCertificatesResponse = types.Clarification;
+  export type CertificateGenerateContestCertificatesResponse = {};
 
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };

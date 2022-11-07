@@ -30,8 +30,11 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     /**
      * Creates a Clarification for a contest or an assignment of a course
      *
-     * @return Clarification
+     * @throws \OmegaUp\Exceptions\NotFoundException
      *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param mixed $certificates_cutoff
      * @omegaup-request-param mixed $contest_id
      */
     public static function apiGenerateContestCertificates(\OmegaUp\Request $r) {
@@ -41,13 +44,17 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
         // obtain the contest
         $contest = \OmegaUp\DAO\Contests::getByPK($r['contest_id']);
+        if (is_null($contest)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
 
         //check if is a certificate generator
         if (\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
             if ($contest->certificates_status === 'uninitiated' || $contest->certificates_status === 'retryable_error') {
                 // add certificates_cutoff value to the course
-                $contest->certificate_cutoff = $r['certificates_cutoff'];
-
+                if (!is_null($r['certificates_cutoff'])) {
+                    $contest->certificate_cutoff = $r['certificates_cutoff'];
+                }
                 // update contest with the new value
                 \OmegaUp\DAO\Contests::update($contest);
 

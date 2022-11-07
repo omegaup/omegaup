@@ -401,15 +401,14 @@ Creates a Clarification for a contest or an assignment of a course
 
 ### Parameters
 
-| Name         | Type    | Description |
-| ------------ | ------- | ----------- |
-| `contest_id` | `mixed` |             |
+| Name                  | Type    | Description |
+| --------------------- | ------- | ----------- |
+| `certificates_cutoff` | `mixed` |             |
+| `contest_id`          | `mixed` |             |
 
 ### Returns
 
-```typescript
-types.Clarification;
-```
+_Nothing_
 
 # Clarification
 
