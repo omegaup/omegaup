@@ -317,19 +317,14 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
 
     # hardcoded expected ranges.
     # notice both ranges are same due to exact same files being present
-    
-    expected_pair_range = set((
-        ((0, 41),), 
-        ((0,33), (33,39), (39, 76)), 
-        ((0, 33), (33, 35), (39, 46), (48, 64))
-    ))
-    
+
+    expected_pair_range = set((((0, 41), ), ((0, 33), (33, 39), (39, 76)),
+                               ((0, 33), (33, 35), (39, 46), (48, 64))))
+
     found_pair_ranges = set()
     for content in match_scores:
-        range_of_lines = json.loads(content['contents'])['file1']
-        match_pair_of_lines: Tuple[Tuple[int, int], ...] = ()
-        for i in range(0, len(range_of_lines), 2):
-            match_pair_of_lines+=((range_of_lines[i], range_of_lines[i+1]),)
-        found_pair_ranges.add(match_pair_of_lines)
+        range_of_lines = tuple(
+            tuple(sub) for sub in json.loads(content['contents'])['file1'])
+        found_pair_ranges.add(range_of_lines)
 
     assert expected_pair_range == found_pair_ranges
