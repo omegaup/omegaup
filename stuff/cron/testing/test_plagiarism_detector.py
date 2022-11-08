@@ -268,63 +268,56 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
     cron.plagiarism_detector.run_detector_for_contest(dbconn, download,
                                                       contest.contest_id)
 
-    with dbconn.cursor() as cur:
-        cur.execute(
-            '''
-                SELECT
-                    `submission_id_1`,
-                    `submission_id_2`
-                FROM `Plagiarisms`
-                WHERE `contest_id` = %s;
-            ''', (contest.contest_id, ))
-        plagiarized_submission_ids = set(
-            itertools.chain.from_iterable(
-                (submission_id1, submission_id2)
-                for (submission_id1, submission_id2) in cur.fetchall()))
-
-    # TODO: Convert the graph of plagiarized submissions into disjoint sets and
-    # check groups of plagiarized submissions instead of only whether a
-    # submission was plagiarized or not.
-
-    assert plagiarized_submission_ids == set((
-        submission_ids[f'{1:032x}'],
-        submission_ids[f'{2:032x}'],
-        submission_ids[f'{3:032x}'],
-        submission_ids[f'{4:032x}'],
-        submission_ids[f'{5:032x}'],
-        submission_ids[f'{6:032x}'],
-        submission_ids[f'{9:032x}'],
-    ))
-
-    # Either one of the score should be >= threshold value
     with dbconn.cursor(dictionary=True) as cur:
         cur.execute(
             '''
                 SELECT
+                    `submission_id_1`,
+                    `submission_id_2`,
                     `score_1`,
-                    `score_2`, 
+                    `score_2`,
                     `contents`
                 FROM `Plagiarisms`
                 WHERE `contest_id` = %s;
             ''', (contest.contest_id, ))
-        match_scores = cur.fetchall()
 
-    for score in match_scores:
-        assert score['score_1'] >= PLAGIARISM_THRESHOLD or score[
-            'score_2'] >= PLAGIARISM_THRESHOLD
+        plagiarized_result = cur.fetchall()
+        plagiarized_submission_ids = set(
+            itertools.chain.from_iterable(
+                (result['submission_id_1'], result['submission_id_2'])
+                for result in plagiarized_result))
 
-    # Range of Lines Test.
+        # TODO: Convert the graph of plagiarized submissions into disjoint sets and
+        # check groups of plagiarized submissions instead of only whether a
+        # submission was plagiarized or not.
 
-    # hardcoded expected ranges.
-    # notice both ranges are same due to exact same files being present
+        assert plagiarized_submission_ids == set((
+            submission_ids[f'{1:032x}'],
+            submission_ids[f'{2:032x}'],
+            submission_ids[f'{3:032x}'],
+            submission_ids[f'{4:032x}'],
+            submission_ids[f'{5:032x}'],
+            submission_ids[f'{6:032x}'],
+            submission_ids[f'{9:032x}'],
+        ))
 
-    expected_pair_range = set((((0, 41), ), ((0, 33), (33, 39), (39, 76)),
-                               ((0, 33), (33, 35), (39, 46), (48, 64))))
+        # Either one of the score should be >= threshold value
+        for score in plagiarized_result:
+            assert score['score_1'] >= PLAGIARISM_THRESHOLD or score[
+                'score_2'] >= PLAGIARISM_THRESHOLD
 
-    found_pair_ranges = set()
-    for content in match_scores:
-        range_of_lines = tuple(
-            tuple(sub) for sub in json.loads(content['contents'])['file1'])
-        found_pair_ranges.add(range_of_lines)
+        # # Range of Lines Test.
 
-    assert expected_pair_range == found_pair_ranges
+        # # hardcoded expected ranges.
+        # # notice both ranges are same due to exact same files being present
+
+        expected_pair_range = set((((0, 41), ), ((0, 33), (33, 39), (39, 76)),
+                                    ((0, 33), (33, 35), (39, 46), (48, 64))))
+
+        found_pair_ranges = set()
+        for content in plagiarized_result:
+            range_of_lines = tuple(
+                tuple(sub) for sub in json.loads(content['contents'])['file1'])
+            found_pair_ranges.add(range_of_lines)
+
+        assert expected_pair_range == found_pair_ranges
