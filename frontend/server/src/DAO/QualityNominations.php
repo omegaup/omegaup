@@ -707,7 +707,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * @return list<string>
      */
     public static function mostVotedTags(array $tags, float $threshold): array {
-        if (array_sum($tags) < 5) {
+        if (empty($tags) || array_sum($tags) < 5) {
             return [];
         }
 

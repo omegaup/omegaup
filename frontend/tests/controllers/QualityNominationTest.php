@@ -65,7 +65,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
         self::assertArrayHasKey('author', $nomination);
         self::assertArrayHasKey('nominator', $nomination);
-        self::assertEquals(
+        self::assertSame(
             $identity->username,
             $nomination['nominator']['username']
         );
@@ -104,23 +104,23 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals(
+        $this->assertSame(
             'demotion',
             $details['nomination'],
             'Should have set demotion'
         );
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $details['nominator']['username'],
             'Should have set user'
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemData['request']['problem_alias'],
             $details['problem']['alias'],
             'Should have set problem'
         );
         $this::assertArrayHasKey('author', $details);
-        $this->assertEquals(
+        $this->assertSame(
             json_decode(
                 $contents,
                 true
@@ -128,12 +128,12 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             $details['contents'],
             'Should have set contents'
         );
-        $this->assertEquals(
+        $this->assertSame(
             true,
             $details['reviewer'],
             'Should have set reviewer'
         );
-        $this->assertEquals(
+        $this->assertSame(
             $qualitynomination['qualitynomination_id'],
             $details['qualitynomination_id'],
             'Should have set qualitynomination_id'
@@ -182,17 +182,17 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\QualityNomination::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(1, count($response['nominations']));
+        $this->assertSame(1, count($response['nominations']));
         $nomination = $response['nominations'][0];
-        $this->assertEquals(
+        $this->assertSame(
             $problemData['request']['problem_alias'],
             $nomination['problem']['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemData['request']['problem_alias'],
             $nomination['problem']['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\Controllers\QualityNomination::REVIEWERS_PER_NOMINATION,
             count($nomination['votes'])
         );
@@ -201,7 +201,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'qualitynomination_id' => $nomination['qualitynomination_id'],
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $details['nominator']['username']
         );
@@ -230,7 +230,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('The user must be a reviewer.');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
 
         $reviewerLogin = self::login(
@@ -249,7 +249,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('The tag should be one of the level tags group.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalid', $e->getMessage());
+            $this->assertSame('parameterInvalid', $e->getMessage());
         }
 
         try {
@@ -265,7 +265,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('The tag should be one of the public tags group.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalid', $e->getMessage());
+            $this->assertSame('parameterInvalid', $e->getMessage());
         }
 
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
@@ -292,7 +292,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'Reviewer can not send again a nomination for the same problem'
             );
         } catch (\Omegaup\Exceptions\PreconditionFailedException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'qualityNominationReviewerHasAlreadySentNominationForProblem',
                 $e->getMessage()
             );
@@ -338,7 +338,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $r['qualitynomination_id'] = $response['qualitynomination_id'];
         $nomination = \OmegaUp\Controllers\QualityNomination::apiDetails($r);
-        $this->assertEquals(
+        $this->assertSame(
             $problemData['request']['problem_alias'],
             $nomination['problem']['alias']
         );
@@ -379,7 +379,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             $actualOutput = \OmegaUp\Controllers\QualityNomination::extractAliasFromArgument(
                 $input
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $expectedOutput,
                 $actualOutput,
                 'Incorrect alias was extracted from URL.'
@@ -465,7 +465,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             $status,
             $details['nomination_status'],
             "qualitynomination should have been marked as {$status}"
@@ -475,7 +475,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             $visibility,
             $problem['visibility'],
             "Problem should have been public {$status}"
@@ -496,7 +496,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             'resolved',
             $details['nomination_status'],
             'qualitynomination should have been marked as resolved'
@@ -506,7 +506,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             $problem['visibility'],
             'Problem should have been made public'
@@ -634,7 +634,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             $status,
             $details['nomination_status'],
             "qualitynomination should have been marked as {$status}"
@@ -645,7 +645,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'qualitynomination_id' => $qualitynomination1['qualitynomination_id'],
             ])
         );
-        $this->assertEquals(
+        $this->assertSame(
             $status,
             $details1['nomination_status'],
             "qualitynomination should have been marked as {$status}"
@@ -655,7 +655,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             $visibility,
             $problem['visibility'],
             "Problem should have been public {$status}"
@@ -677,7 +677,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             'resolved',
             $details['nomination_status'],
             'qualitynomination should have been marked as resolved'
@@ -688,7 +688,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'qualitynomination_id' => $qualitynomination1['qualitynomination_id'],
             ])
         );
-        $this->assertEquals(
+        $this->assertSame(
             'resolved',
             $details1['nomination_status'],
             'qualitynomination should have been marked as resolved'
@@ -698,7 +698,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             $problem['visibility'],
             'Problem should have been made public'
@@ -893,20 +893,20 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
         ]));
-        $this->assertEquals($rationale, $details['contents']['rationale']);
+        $this->assertSame($rationale, $details['contents']['rationale']);
 
         $logs = \OmegaUp\DAO\QualityNominationLog::getAllLogsForNomination(
             $qualitynomination['qualitynomination_id']
         );
 
         $this->assertCount(1, $logs);
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id,
             $logs[0]->user_id
         );
-        $this->assertEquals('open', $logs[0]->from_status);
-        $this->assertEquals($status, $logs[0]->to_status);
-        $this->assertEquals($rationale, $logs[0]->rationale);
+        $this->assertSame('open', $logs[0]->from_status);
+        $this->assertSame($status, $logs[0]->to_status);
+        $this->assertSame($rationale, $logs[0]->rationale);
 
         // Revert ban.
         $rationale = 'problem solved';
@@ -924,20 +924,20 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
         ]));
-        $this->assertEquals($rationale, $details['contents']['rationale']);
+        $this->assertSame($rationale, $details['contents']['rationale']);
 
         $logs = \OmegaUp\DAO\QualityNominationLog::getAllLogsForNomination(
             $qualitynomination['qualitynomination_id']
         );
 
         $this->assertCount(2, $logs);
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id,
             $logs[1]->user_id
         );
-        $this->assertEquals($status, $logs[1]->from_status);
-        $this->assertEquals('resolved', $logs[1]->to_status);
-        $this->assertEquals($rationale, $logs[1]->rationale);
+        $this->assertSame($status, $logs[1]->from_status);
+        $this->assertSame('resolved', $logs[1]->to_status);
+        $this->assertSame($rationale, $logs[1]->rationale);
     }
 
     /**
@@ -980,14 +980,14 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals(
+        $this->assertSame(
             'resolved',
             $details['nomination_status'],
             'qualitynomination should have been marked as resolved'
         );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             $problem['visibility'],
             'Problem should have remained public'
@@ -1113,14 +1113,14 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals(
+        $this->assertSame(
             $status,
             $details['nomination_status'],
             'qualitynomination should have been marked as banned'
         );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
-        $this->assertEquals(
+        $this->assertSame(
             $visibility,
             $problem['visibility'],
             "Problem should have been public {$status}"
@@ -1139,14 +1139,14 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals(
+        $this->assertSame(
             'open',
             $details['nomination_status'],
             'qualitynomination should have been re-opened'
         );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
-        $this->assertEquals(
+        $this->assertSame(
             $visibility,
             $problem['visibility'],
             "Problem should have remained public {$status}"
@@ -1198,14 +1198,14 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals(
+        $this->assertSame(
             $status,
             $details['nomination_status'],
             "qualitynomination should have been marked as {$status}"
         );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
-        $this->assertEquals(
+        $this->assertSame(
             // To transform from public to private (banned or warning).
             $visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED ? \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED : \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING,
             $problem['visibility'],
@@ -1225,14 +1225,14 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals(
+        $this->assertSame(
             'resolved',
             $details['nomination_status'],
             'qualitynomination should have been re-opened'
         );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             $problem['visibility'],
             'Problem should have been private'
@@ -1263,7 +1263,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Must have tried to solve the problem first.');
         } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 $e->getMessage(),
                 'qualityNominationMustHaveTriedToSolveProblem'
             );
@@ -1318,7 +1318,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Must not have solved the problem.');
         } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 $e->getMessage(),
                 'qualityNominationMustNotHaveSolvedProblem'
             );
@@ -1430,7 +1430,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             fn ($nomination) => $nomination['problem']['alias'] == $problemData['request']['problem_alias']
         );
         $this->assertNotNull($nomination);
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\Controllers\QualityNomination::REVIEWERS_PER_NOMINATION,
             count($nomination['votes'])
         );
@@ -1697,7 +1697,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         try {
-            $this->assertEquals(
+            $this->assertSame(
                 0,
                 count(
                     $problemDismissed
@@ -1739,7 +1739,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $expectedGlobals = [23 / 13 /*quality*/, 54 / 16 /*difficulty*/];
 
-        $this->assertEquals($expectedGlobals, $actualGlobals);
+        $this->assertSame($expectedGlobals, $actualGlobals);
     }
 
     public function testGetSuggestionRowMap() {
@@ -1786,7 +1786,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'problemTopicDynamicProgramming' => 2,
             ],
         ];
-        $this->assertEquals($expectedResult, $actualResult);
+        $this->assertSame($expectedResult, $actualResult);
     }
 
     /*
@@ -1841,12 +1841,12 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             0.001,
             'Wrong quality.'
         );
-        $this->assertEquals(
+        $this->assertSame(
             '[0, 0, 2, 2, 1]',
             $newProblem[0]->difficulty_histogram,
             'Wrong difficulty histogram'
         );
-        $this->assertEquals(
+        $this->assertSame(
             '[1, 1, 0, 1, 2]',
             $newProblem[0]->quality_histogram,
             'Wrong quality histogram'
@@ -2276,7 +2276,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'easy'
         );
         $this->assertCount(1, $problemOfTheWeek);
-        $this->assertEquals(
+        $this->assertSame(
             $syntheticProblems[1]['problem']->problem_id,
             $problemOfTheWeek[0]->problem_id
         );
@@ -2578,27 +2578,27 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'problemTopicGreedy' => 1,
         ];
 
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.25),
             ['problemTopicDynamicProgramming', 'problemTopicGraphTheory', 'problemTopicBinarySearch']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.5),
             ['problemTopicDynamicProgramming', 'problemTopicGraphTheory']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.9),
             ['problemTopicDynamicProgramming']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.9),
             ['problemTopicDynamicProgramming']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.01),
             ['problemTopicDynamicProgramming', 'problemTopicGraphTheory', 'problemTopicBinarySearch', 'problemTopicMath', 'problemTopicGreedy']
         );
@@ -2608,7 +2608,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'problemTopicGraphTheory' => 1,
         ];
 
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\QualityNominations::mostVotedTags(
                 $tagsWithLittleVotes,
                 0.25
@@ -2621,7 +2621,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'T1' => 9, 'T2' => 9, 'T3' => 9, 'T4' => 9, 'T5' => 9, 'T6' => 9,
             'T7' => 9, 'T8' => 9, 'T9' => 9, 'T10' => 9, 'T11' => 9, 'T12' => 9];
 
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\QualityNominations::mostVotedTags(
                 $tooManyTagsWithMaxVotes,
                 0.25
@@ -2760,7 +2760,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             $status,
             $details['nomination_status'],
             "qualitynomination should have been marked as {$status}"
@@ -2770,7 +2770,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             $intVisibility,
             $problem['visibility'],
             "Problem should have been public {$status}"
@@ -2796,7 +2796,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                         "Normal user should be able to update to problem warning to other visibility {$status}"
                     );
                 }
-                $this->assertEquals(
+                $this->assertSame(
                     $e->getMessage(),
                     $errorMessage
                 );

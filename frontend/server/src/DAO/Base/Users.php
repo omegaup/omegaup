@@ -55,7 +55,8 @@ abstract class Users {
                 `creation_timestamp` = ?,
                 `parental_verification_token` = ?,
                 `parent_email_verification_initial` = ?,
-                `parent_email_verification_deadline` = ?
+                `parent_email_verification_deadline` = ?,
+                `parent_email_id` = ?
             WHERE
                 (
                     `user_id` = ?
@@ -125,6 +126,11 @@ abstract class Users {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Users->parent_email_verification_deadline
             ),
+            (
+                is_null($Users->parent_email_id) ?
+                null :
+                intval($Users->parent_email_id)
+            ),
             intval($Users->user_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -170,7 +176,8 @@ abstract class Users {
                 `Users`.`creation_timestamp`,
                 `Users`.`parental_verification_token`,
                 `Users`.`parent_email_verification_initial`,
-                `Users`.`parent_email_verification_deadline`
+                `Users`.`parent_email_verification_deadline`,
+                `Users`.`parent_email_id`
             FROM
                 `Users`
             WHERE
@@ -305,7 +312,8 @@ abstract class Users {
                 `Users`.`creation_timestamp`,
                 `Users`.`parental_verification_token`,
                 `Users`.`parent_email_verification_initial`,
-                `Users`.`parent_email_verification_deadline`
+                `Users`.`parent_email_verification_deadline`,
+                `Users`.`parent_email_id`
             FROM
                 `Users`
         ';
@@ -379,8 +387,10 @@ abstract class Users {
                     `creation_timestamp`,
                     `parental_verification_token`,
                     `parent_email_verification_initial`,
-                    `parent_email_verification_deadline`
+                    `parent_email_verification_deadline`,
+                    `parent_email_id`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -470,6 +480,11 @@ abstract class Users {
             ),
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Users->parent_email_verification_deadline
+            ),
+            (
+                is_null($Users->parent_email_id) ?
+                null :
+                intval($Users->parent_email_id)
             ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

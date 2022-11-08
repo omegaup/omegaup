@@ -17,7 +17,7 @@ class CreateUserParams {
 
     /**
      * @readonly
-     * @var string
+     * @var null|string
      */
     public $email;
 
@@ -57,7 +57,19 @@ class CreateUserParams {
     public $recaptcha = null;
 
     /**
-     * @param array{username?: string, name?: string, email?: string, password?: string, scholar_degree?: string, is_private?: string, gender?: string, recaptcha?: string} $params
+     * @readonly
+     * @var int|null
+     */
+    public $birthDate = null;
+
+     /**
+     * @readonly
+     * @var null|string
+     */
+    public $parentEmail = null;
+
+    /**
+     * @param array{username?: string, name?: string, email?: string, password?: string, scholar_degree?: string, is_private?: string, gender?: string, recaptcha?: string, birth_date?: int, parent_email?: string} $params
      */
     public function __construct($params = []) {
         \OmegaUp\Validators::validateValidUsername(
@@ -68,9 +80,25 @@ class CreateUserParams {
 
         $this->name = $params['name'] ?? null;
 
-        \OmegaUp\Validators::validateEmail($params['email'] ?? null, 'email');
-        $this->email = $params['email'] ?? '';
-
+        $this->email = null;
+        if (isset($params['email'])) {
+            \OmegaUp\Validators::validateEmail($params['email'], 'email');
+            if (isset($params['parent_email'])) {
+                // It's not valid to provide both email and parent_email.
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'parent_email'
+                );
+            }
+            $this->email = $params['email'];
+        } elseif (isset($params['parent_email'])) {
+            $this->parentEmail = $params['parent_email'];
+        } else {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'email'
+            );
+        }
         $this->password = $params['password'] ?? null;
 
         \OmegaUp\Validators::validateInEnum(
@@ -87,5 +115,9 @@ class CreateUserParams {
         $this->gender = $params['gender'] ?? null;
 
         $this->recaptcha = $params['recaptcha'] ?? null;
+
+         // TODO: Assert that the birth date is always passed, and if and only if the user is U13,
+        // the parent email is passed.
+        $this->birthDate = $params['birth_date'] ?? null;
     }
 }

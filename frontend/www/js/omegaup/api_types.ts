@@ -70,6 +70,7 @@ export namespace dao {
     is_private?: boolean;
     main_email_id?: number;
     main_identity_id?: number;
+    parent_email_id?: number;
     parent_email_verification_deadline?: Date;
     parent_email_verification_initial?: Date;
     parent_verified?: boolean;
@@ -3841,6 +3842,7 @@ export namespace types {
   }
 
   export interface ProblemListItem {
+    accepted: number;
     alias: string;
     difficulty?: number;
     difficulty_histogram: number[];
@@ -3851,6 +3853,7 @@ export namespace types {
     quality_seal: boolean;
     ratio: number;
     score: number;
+    submissions: number;
     tags: { name: string; source: string }[];
     title: string;
     visibility: number;

@@ -16,8 +16,8 @@ import os
 import os.path
 import sqlite3
 import sys
-from typing import (DefaultDict, Dict, List, Mapping, Optional, Sequence, Set,
-                    Tuple)
+from typing import (cast, DefaultDict, Dict, List, Mapping, Optional, Sequence,
+                    Set, Tuple)
 
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
@@ -45,8 +45,10 @@ def mean_average_precision(predicted: ProblemList,
     if not predicted or not expected:
         return None
     num_problems = min(len(predicted), k)
-    return sum((predicted[:num_problems] == expected[:num_problems]) *
-               (1. / np.arange(1, num_problems + 1)))
+    return cast(
+        float,
+        sum((predicted[:num_problems] == expected[:num_problems]) *
+            (1. / np.arange(1, num_problems + 1))))
 
 
 def load_sqlite(database: str) -> pd.DataFrame:
@@ -87,15 +89,11 @@ def load_mysql(args: argparse.Namespace) -> pd.DataFrame:
                 MIN(s.time) `time`
             FROM
                 Submissions s
-            INNER JOIN
-                Runs r
-            ON
-                r.run_id = s.current_run_id
             WHERE
                 s.problemset_id IS NULL AND
                 s.type = "normal" AND
-                r.status = "ready" AND
-                r.verdict = "AC"
+                s.status = "ready" AND
+                s.verdict = "AC"
             GROUP BY
                 s.identity_id,
                 s.problem_id

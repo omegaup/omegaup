@@ -41,6 +41,7 @@ class Users extends \OmegaUp\DAO\VO\VO {
         'parental_verification_token' => true,
         'parent_email_verification_initial' => true,
         'parent_email_verification_deadline' => true,
+        'parent_email_id' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -204,6 +205,11 @@ class Users extends \OmegaUp\DAO\VO\VO {
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
                     $data['parent_email_verification_deadline']
                 )
+            );
+        }
+        if (isset($data['parent_email_id'])) {
+            $this->parent_email_id = intval(
+                $data['parent_email_id']
             );
         }
     }
@@ -384,4 +390,11 @@ class Users extends \OmegaUp\DAO\VO\VO {
      * @var \OmegaUp\Timestamp|null
      */
     public $parent_email_verification_deadline = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $parent_email_id = null;
 }

@@ -331,7 +331,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'finish_time'
             );
         }
-
         return $originalCourse;
     }
 
@@ -369,7 +368,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             'languages' => $r->ensureOptionalString('languages'),
             'level' => $r->ensureOptionalString('level'),
             'minimum_progress_for_certificate' => $r->ensureOptionalInt(
-                'minimum_progress_for_certificate'
+                'minimum_progress_for_certificate',
+                lowerBound: 0,
+                upperBound: 100
             ),
             'name' => $r->ensureString('name'),
             'needs_basic_information' => $r->ensureOptionalBool(
@@ -854,8 +855,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-
-        self::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
+        $course = new \OmegaUp\DAO\VO\Courses([
             'name' => $courseParams->name,
             'alias' => $courseParams->courseAlias,
             'level' => $courseParams->level,
@@ -874,7 +874,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             'show_scoreboard' => $courseParams->showScoreboard,
             'needs_basic_information' => $courseParams->needsBasicInformation,
             'requests_user_information' => $courseParams->requestsUserInformation,
-        ]), $r->user);
+          ]);
+
+        if (\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
+            $course->minimum_progress_for_certificate = $courseParams->minimumProgressForCertificate;
+        }
+
+        self::createCourseAndGroup($course, $r->user);
 
         return [
             'status' => 'ok',
@@ -3976,11 +3982,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
             $courseAlias,
             function () use ($course) {
-                if (is_null($course->course_id) || is_null($course->group_id)) {
-                    throw new \OmegaUp\Exceptions\NotFoundException(
-                        'courseNotFound'
-                    );
-                }
                 return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
                     $course->course_id,
                     $course->group_id
@@ -4072,11 +4073,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
             $courseAlias,
             function () use ($course) {
-                if (is_null($course->course_id) || is_null($course->group_id)) {
-                    throw new \OmegaUp\Exceptions\NotFoundException(
-                        'courseNotFound'
-                    );
-                }
                 return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
                     $course->course_id,
                     $course->group_id
@@ -4455,7 +4451,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @param array{userRegistrationAccepted?: bool|null, userRegistrationAnswered: bool, userRegistrationRequested: bool} $registrationResponse
+     * @param array{userRegistrationAccepted?: bool|null, userRegistrationAnswered: bool, userRegistrationRequested: bool}|array<empty, empty> $registrationResponse
      *
      * @return array{entrypoint: string, templateProperties: array{coursePayload?: IntroDetailsPayload, payload: IntroCourseDetails|IntroDetailsPayload, title: \OmegaUp\TranslationString}}
      *
@@ -5919,6 +5915,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             'requests_user_information',
             'admission_mode',
         ];
+
+        if (\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
+            array_push($valueProperties, 'minimum_progress_for_certificate');
+        }
+
         $importantChange = self::updateValueProperties(
             $r,
             $course,

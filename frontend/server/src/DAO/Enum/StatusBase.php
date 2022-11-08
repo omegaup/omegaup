@@ -55,10 +55,16 @@ class StatusBase {
             /** @var array<string, int> */
             $constants = $reflection->getConstants();
             $values = array_values($constants);
+            $min = 0;
+            $max = 0;
+            if (!empty($values)) {
+                $max = max($values);
+                $min = min($values);
+            }
             self::$_constCache[$className] = [
                 'constants' => $constants,
-                'min' => min($values),
-                'max' => max($values),
+                'min' => $min,
+                'max' => $max,
             ];
         }
         return self::$_constCache[$className];
