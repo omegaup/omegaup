@@ -255,7 +255,22 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     )
                 LIMIT 1
                 ) AS
-                    execution
+                    execution,
+                ( SELECT
+                    IF(
+                        verdict IN ("JE", "CE"), "MEMORY_NOT_AVAILABLE",
+                    IF(
+                        verdict IN ("ML", "MLE"), "MEMORY_EXCEEDED", "MEMORY_AVAILABLE"
+                    ))
+                AS status_memory
+                FROM
+                    Runs_Groups
+                WHERE
+                    run_id = `r`.`run_id`
+                ORDER BY
+                    field(status_memory, "MEMORY_NOT_AVAILABLE", "MEMORY_EXCEEDED", "MEMORY_AVAILABLE")
+                LIMIT 1
+                ) AS status_memory
             FROM
                 Submissions s
             INNER JOIN
@@ -279,7 +294,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val[] = $offset * $rowCount;
         $val[] = $rowCount;
 
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
         $runs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
 
         return [
