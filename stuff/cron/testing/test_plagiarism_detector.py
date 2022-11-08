@@ -306,10 +306,10 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
             assert score['score_1'] >= PLAGIARISM_THRESHOLD or score[
                 'score_2'] >= PLAGIARISM_THRESHOLD
 
-        # # Range of Lines Test.
+        # Range of Lines Test.
 
-        # # hardcoded expected ranges.
-        # # notice both ranges are same due to exact same files being present
+        # hardcoded expected ranges.
+        # notice both ranges are same due to exact same files being present
 
         expected_pair_range = set((((0, 41), ), ((0, 33), (33, 39), (39, 76)),
                                     ((0, 33), (33, 35), (39, 46), (48, 64))))
