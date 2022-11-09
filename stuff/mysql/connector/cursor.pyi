@@ -3,6 +3,8 @@ from typing import Any, Iterator, Iterable, Mapping, Optional, Sequence, Text, T
 
 
 class BaseCursor:
+    lastrowid: int
+
     def close(self) -> None:
         ...
 
