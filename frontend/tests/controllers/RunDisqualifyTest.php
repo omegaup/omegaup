@@ -107,7 +107,7 @@ class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
             'run_alias' => $runData['response']['guid']
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
     }
 
     public function testDisqualifyScoreboard() {
@@ -158,24 +158,24 @@ class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiScoreboard($r);
 
         // Contestant 2 should not be changed
-        $this->assertEquals(
+        $this->assertSame(
             $identity2->username,
             $response['ranking'][0]['username']
         );
-        $this->assertEquals(
-            100,
+        $this->assertSame(
+            100.0,
             $response['ranking'][0]['problems'][0]['points']
         );
-        $this->assertEquals(1, $response['ranking'][0]['problems'][0]['runs']);
+        $this->assertSame(1, $response['ranking'][0]['problems'][0]['runs']);
         // Contestant 1 should be changed
-        $this->assertEquals(
+        $this->assertSame(
             $identity1->username,
             $response['ranking'][1]['username']
         );
-        $this->assertEquals(
-            0,
+        $this->assertSame(
+            0.0,
             $response['ranking'][1]['problems'][0]['points']
         );
-        $this->assertEquals(0, $response['ranking'][1]['problems'][0]['runs']);
+        $this->assertSame(0, $response['ranking'][1]['problems'][0]['runs']);
     }
 }

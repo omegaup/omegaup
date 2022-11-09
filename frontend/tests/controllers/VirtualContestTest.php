@@ -76,49 +76,49 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNull($originalContest->rerun_id);
 
         // Assert virtual contest
-        $this->assertEquals(
+        $this->assertSame(
             $originalContest->contest_id,
             $virtualContest->rerun_id
         );
-        $this->assertEquals($originalContest->title, $virtualContest->title);
-        $this->assertEquals(
+        $this->assertSame($originalContest->title, $virtualContest->title);
+        $this->assertSame(
             $originalContest->description,
             $virtualContest->description
         );
-        $this->assertEquals('private', $virtualContest->admission_mode); // Virtual contest must be private
-        $this->assertEquals(
+        $this->assertSame('private', $virtualContest->admission_mode); // Virtual contest must be private
+        $this->assertSame(
             $originalContest->scoreboard,
             $virtualContest->scoreboard
         );
-        $this->assertEquals(
+        $this->assertSame(
             $originalContest->points_decay_factor,
             $virtualContest->points_decay_factor
         );
-        $this->assertEquals(
+        $this->assertSame(
             $originalContest->partial_score,
             $virtualContest->partial_score
         );
-        $this->assertEquals(
+        $this->assertSame(
             $originalContest->submissions_gap,
             $virtualContest->submissions_gap
         );
-        $this->assertEquals(
+        $this->assertSame(
             $originalContest->feedback,
             $virtualContest->feedback
         );
-        $this->assertEquals(
+        $this->assertSame(
             $originalContest->penalty,
             $virtualContest->penalty
         );
-        $this->assertEquals(
+        $this->assertSame(
             $originalContest->penalty_type,
             $virtualContest->penalty_type
         );
-        $this->assertEquals(
+        $this->assertSame(
             $originalContest->penalty_calc_policy,
             $virtualContest->penalty_calc_policy
         );
-        $this->assertEquals(
+        $this->assertSame(
             $originalContest->languages,
             $virtualContest->languages
         );
@@ -133,10 +133,10 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
             needSubmissions: false
         );
         // Number of problems must be equal
-        $this->assertEquals(count($originalProblems), count($virtualProblems));
+        $this->assertSame(count($originalProblems), count($virtualProblems));
 
         // Because we only put one problem in contest we can assert only the first element
-        $this->assertEquals($originalProblems[0], $virtualProblems[0]);
+        $this->assertSame($originalProblems[0], $virtualProblems[0]);
 
         \OmegaUp\Test\Factories\Contest::openContest(
             $virtualContest,
@@ -161,11 +161,11 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertArrayHasKey('scoreboard', $response['original']);
         $this->assertArrayHasKey('scoreboardEvents', $response['original']);
 
-        $this->assertEquals(
+        $this->assertSame(
             $originalContest->alias,
             $response['original']['contest']->alias
         );
-        $this->assertEquals('arena_contest_virtual', $result['entrypoint']);
+        $this->assertSame('arena_contest_virtual', $result['entrypoint']);
     }
 
     public function testAddParticipantsInVirtualContest() {
@@ -407,7 +407,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiCreateVirtual($r);
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'originalContestHasNotEnded');
+            $this->assertSame($e->getMessage(), 'originalContestHasNotEnded');
         }
     }
 
@@ -427,7 +427,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiCreateVirtual($r);
             $this->fail('Should have thrown a InvalidParameterException');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'parameterInvalid');
+            $this->assertSame($e->getMessage(), 'parameterInvalid');
         }
     }
 
@@ -462,7 +462,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'forbiddenInVirtualContest');
+            $this->assertSame($e->getMessage(), 'forbiddenInVirtualContest');
         }
     }
 
@@ -502,7 +502,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'forbiddenInVirtualContest');
+            $this->assertSame($e->getMessage(), 'forbiddenInVirtualContest');
         }
     }
 
@@ -534,7 +534,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'forbiddenInVirtualContest');
+            $this->assertSame($e->getMessage(), 'forbiddenInVirtualContest');
         }
     }
 }

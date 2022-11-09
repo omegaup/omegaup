@@ -51,7 +51,7 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($contestAlias, $contestClonedData['alias']);
+        $this->assertSame($contestAlias, $contestClonedData['alias']);
 
         // Call API
         $clonedContestProblemsResponse = \OmegaUp\Controllers\Contest::apiProblems(new \OmegaUp\Request([
@@ -103,7 +103,7 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('aliasInUse', $e->getMessage());
+            $this->assertSame('aliasInUse', $e->getMessage());
         }
     }
     /**
@@ -177,7 +177,7 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 }

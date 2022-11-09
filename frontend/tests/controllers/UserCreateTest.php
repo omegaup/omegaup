@@ -24,14 +24,14 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // Check response
-        $this->assertEquals($r['username'], $response['username']);
+        $this->assertSame($r['username'], $response['username']);
 
         // Verify DB
         $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
         $this->assertNotNull($user);
 
         // Verify users are not in mailing list by default
-        $this->assertEquals(0, $user->in_mailing_list);
+        $this->assertFalse($user->in_mailing_list);
 
         // Check user profile progress. It should be less than 50%
         $profileProgress = \OmegaUp\Controllers\User::getProfileProgress(
@@ -56,17 +56,17 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Call API twice.
         $response = \OmegaUp\Controllers\User::apiCreate($r);
-        $this->assertEquals($r['username'], $response['username']);
+        $this->assertSame($r['username'], $response['username']);
 
         $response = \OmegaUp\Controllers\User::apiCreate($r);
-        $this->assertEquals($r['username'], $response['username']);
+        $this->assertSame($r['username'], $response['username']);
 
         $r['password'] = 'a wrong password';
         try {
             \OmegaUp\Controllers\User::apiCreate($r);
             $this->fail('User creation should have failed');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('mailInUse', $e->getMessage());
+            $this->assertSame('mailInUse', $e->getMessage());
         }
     }
 
@@ -94,7 +94,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\User::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('usernameInUse', $e->getMessage());
+            $this->assertSame('usernameInUse', $e->getMessage());
         }
     }
 
@@ -123,7 +123,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\User::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('mailInUse', $e->getMessage());
+            $this->assertSame('mailInUse', $e->getMessage());
         }
     }
 
@@ -142,8 +142,8 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterStringTooShort', $e->getMessage());
-            $this->assertEquals('password', $e->parameter);
+            $this->assertSame('parameterStringTooShort', $e->getMessage());
+            $this->assertSame('password', $e->parameter);
         }
     }
 
@@ -162,8 +162,8 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterEmpty', $e->getMessage());
-            $this->assertEquals('email', $e->parameter);
+            $this->assertSame('parameterEmpty', $e->getMessage());
+            $this->assertSame('email', $e->parameter);
         }
     }
 
@@ -181,8 +181,8 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterEmpty', $e->getMessage());
-            $this->assertEquals('username', $e->parameter);
+            $this->assertSame('parameterEmpty', $e->getMessage());
+            $this->assertSame('username', $e->parameter);
         }
     }
 
@@ -210,7 +210,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             true
         );
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Verify DB
         $user = \OmegaUp\DAO\Users::FindByUsername($_REQUEST['username']);
@@ -232,8 +232,8 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalidAlias', $e->getMessage());
-            $this->assertEquals('username', $e->parameter);
+            $this->assertSame('parameterInvalidAlias', $e->getMessage());
+            $this->assertSame('username', $e->parameter);
         }
     }
 
@@ -253,8 +253,8 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
             $this->fail('Expected because of the invalid group name');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalidAlias', $e->getMessage());
-            $this->assertEquals('username', $e->parameter);
+            $this->assertSame('parameterInvalidAlias', $e->getMessage());
+            $this->assertSame('username', $e->parameter);
         }
     }
 
@@ -280,8 +280,8 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Get user from db again to pick up verification changes
         $userdb = \OmegaUp\DAO\Users::FindByUsername($identity->username);
 
-        $this->assertEquals(1, $userdb->verified);
-        $this->assertEquals('ok', $response['status']);
+        $this->assertTrue($userdb->verified);
+        $this->assertSame('ok', $response['status']);
     }
 
     /**
@@ -301,7 +301,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertEquals('userOrMailNotFound', $e->getMessage());
+            $this->assertSame('userOrMailNotFound', $e->getMessage());
         }
     }
 
@@ -329,7 +329,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -349,7 +349,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -378,7 +378,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
         ]));
 
-        $this->assertEquals(
+        $this->assertSame(
             true,
             $response['users'][$unregisteredIdentity->username]
         );

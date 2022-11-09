@@ -151,7 +151,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Session::apiCurrentSession();
             $this->fail('Should not have been able to access the API');
         } catch (\OmegaUp\Exceptions\RateLimitExceededException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'apiTokenRateLimitExceeded',
                 $e->getMessage(),
             );
@@ -186,7 +186,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
         $_SERVER['HTTP_AUTHORIZATION'] = "token Credential={$apiToken->token},Username={$identity->username}";
         $session = \OmegaUp\Controllers\Session::apiCurrentSession();
         $this->assertTrue($session['session']['valid']);
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $session['session']['identity']->username,
         );
@@ -260,11 +260,11 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
         $_SERVER['HTTP_AUTHORIZATION'] = "token Credential={$apiToken->token},Username={$username}";
         $session = \OmegaUp\Controllers\Session::apiCurrentSession();
         $this->assertTrue($session['session']['valid']);
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $session['session']['loginIdentity']->username,
         );
-        $this->assertEquals(
+        $this->assertSame(
             $username,
             $session['session']['identity']->username,
         );
@@ -319,7 +319,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Session::apiCurrentSession();
             $this->fail('Should not have been able to access the API');
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'loginRequired',
                 $e->getMessage(),
             );
@@ -347,7 +347,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Session::apiCurrentSession();
             $this->fail('Should not have been able to access the API');
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'loginRequired',
                 $e->getMessage(),
             );
@@ -377,7 +377,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
                 'Should not have been able to create a duplicate token name'
             );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'apiTokenNameAlreadyInUse',
                 $e->getMessage(),
             );
@@ -407,7 +407,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should not have been able to create a sixth token');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'apiTokenLimitExceeded',
                 $e->getMessage(),
             );
@@ -445,7 +445,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
         $_SERVER['HTTP_AUTHORIZATION'] = "token {$token}";
         $session = \OmegaUp\Controllers\Session::apiCurrentSession();
         $this->assertTrue($session['session']['valid']);
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $session['session']['identity']->username,
         );
@@ -469,7 +469,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Session::apiCurrentSession();
             $this->fail('Should not have been able to access the API');
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'loginRequired',
                 $e->getMessage()
             );
@@ -491,7 +491,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
                 ]),
             );
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'recordNotFound',
                 $e->getMessage()
             );

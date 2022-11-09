@@ -3829,6 +3829,7 @@ export namespace types {
   }
 
   export interface ProblemListItem {
+    accepted: number;
     alias: string;
     difficulty?: number;
     difficulty_histogram: number[];
@@ -3839,6 +3840,7 @@ export namespace types {
     quality_seal: boolean;
     ratio: number;
     score: number;
+    submissions: number;
     tags: { name: string; source: string }[];
     title: string;
     visibility: number;
