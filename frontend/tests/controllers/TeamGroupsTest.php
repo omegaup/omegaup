@@ -1668,11 +1668,11 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
     /*
      * Under13 users can't create teamsGroups.
      */
-    public function testUserUnder13CannotCreateTeamGroups() {
+    public function testUserUnder13CannotCreateTeamGroups(\OmegaUp\Request $r) {
         $name = \OmegaUp\Test\Utils::createRandomString();
         $description = \OmegaUp\Test\Utils::createRandomString();
         $alias = \OmegaUp\Test\Utils::createRandomString();
-        $createUserParams = new OmegaUp\CreateUserParams();
+        $createUserParams = new OmegaUp\CreateUserParams($r->toStringArray());
         $defaultDate = strtotime('2022-09-10T00:00:00Z');
         \OmegaUp\Time::setTimeForTesting($defaultDate);
         // Create a 10 years-old user

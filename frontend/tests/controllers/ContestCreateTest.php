@@ -467,9 +467,9 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * Under13 users can't create contests.
      *
      */
-    public function testUserUnder13CannotCreateContests() {
+    public function testUserUnder13CannotCreateContests(\OmegaUp\Request $r) {
         $defaultDate = strtotime('2022-09-10T00:00:00Z');
-        $createUserParams = new OmegaUp\CreateUserParams();
+        $createUserParams = new OmegaUp\CreateUserParams($r->toStringArray());
         \OmegaUp\Time::setTimeForTesting($defaultDate);
         // Create a 10 years-old user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
