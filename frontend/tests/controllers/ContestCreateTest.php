@@ -469,11 +469,13 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUserUnder13CannotCreateContests() {
         $defaultDate = strtotime('2022-09-10T00:00:00Z');
+        $createUserParams = new OmegaUp\CreateUserParams();
         \OmegaUp\Time::setTimeForTesting($defaultDate);
         // Create a 10 years-old user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams([
                 'birthDate' => strtotime('2012-09-20T00:00:00Z'),
+                'birth_date' => \OmegaUp\DAO\DAO::toMySQLTimestamp(intval($createUserParams->birthDate)),
             ]),
         );
 

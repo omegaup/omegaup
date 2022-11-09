@@ -768,12 +768,14 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
     public function testUserUnder13CannotCloneCourse() {
         $courseAlias = \OmegaUp\Test\Utils::createRandomString();
         $courseData = \OmegaUp\Test\Factories\Course::createCourse();
+        $createUserParams = new \OmegaUp\CreateUserParams();
         $defaultDate = strtotime('2022-09-10T00:00:00Z');
         \OmegaUp\Time::setTimeForTesting($defaultDate);
         // Create a 10 years-old user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams([
                 'birthDate' => strtotime('2012-09-20T00:00:00Z'),
+                'birth_date' => \OmegaUp\DAO\DAO::toMySQLTimestamp(intval($createUserParams->birthDate)),
             ]),
         );;
 
