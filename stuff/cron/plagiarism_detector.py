@@ -146,7 +146,8 @@ def get_range(code: Sequence[str]) -> Tuple[Tuple[int, int], ...]:
         if START_RED in line or START_GREEN in line:
             code_range_list.append(line_number)
 
-        # We have to check for END separetly so that there is always a end for a start
+        # TODO: replace this with
+        # code_range_list.append((last_start_line, line_number))
         if END in line:
             code_range_list.append(line_number)
 
