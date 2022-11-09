@@ -199,7 +199,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
 
-            // New added users should appear in the lit
+            // New added users should appear in the list
             $this->assertCount($index + 1, $response['users']);
 
             foreach ($response['users'] as $p) {

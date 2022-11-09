@@ -28,7 +28,6 @@ describe('Edit.vue', () => {
     penalty_type: 'none',
     points_decay_factor: 0,
     problemset_id: 1,
-    //rerun_id: 2,
     requests_user_information: 'no',
     scoreboard: 100,
     show_penalty: true,
