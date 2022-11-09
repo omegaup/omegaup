@@ -186,9 +186,12 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUserUnder13CannotCloneContests() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $defaultDate = strtotime('10 September 2022');
+        \OmegaUp\Time::setTimeForTesting($defaultDate);
+        // Create a 10 years-old user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams([
-                'birth_date' => strtotime('-10 years'),
+                'birthDate' => strtotime('20 September 2012'),
             ]),
         );
 
