@@ -1,6 +1,11 @@
 #!/usr/bin/python3
 
-'''Processing contest messages.'''
+'''
+Processing contest messages for certificates. Once  the connection with
+rabbitmq is established, an exchange is created and then, the queue is created
+and declarated, so the queue is binded to the specified exchange. Finally, the
+queue is consumed for the consumer_tag to the consumer callback.
+'''
 
 import argparse
 import logging
@@ -22,7 +27,11 @@ import lib.logs  # pylint: disable=wrong-import-position
 
 
 def main() -> None:
-    '''Main entrypoint.'''
+    '''
+    Main entrypoint for the client contest.
+
+    When API token and URL are given, it is possible to process the messages.
+    '''
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
