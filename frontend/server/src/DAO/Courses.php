@@ -1425,10 +1425,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     LEFT JOIN
                         Submissions s ON s.problemset_id = cp.problemset_id
                         AND s.problem_id = cp.problem_id
-                    LEFT JOIN
-                        Runs r ON r.run_id = s.current_run_id
                     WHERE
-                        r.verdict = "AC"
+                        s.verdict = "AC"
                         AND s.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?)
                     GROUP BY s.identity_id
                     HAVING
