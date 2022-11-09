@@ -156,6 +156,7 @@ export default class Signup extends Vue {
     }
     return !this.isU13 ? T.loginEmail : T.loginEmailParent;
   }
+
   get isU13(): boolean {
     if (this.birthDate === null) {
       // Most users are not going to be U13. So until they fill out their
@@ -171,8 +172,9 @@ export default class Signup extends Vue {
   expired(): void {
     this.recaptchaResponse = '';
   }
+
   registerAndLogin(): void {
-    if (this.password != this.passwordConfirmation) {
+    if (this.password !== this.passwordConfirmation) {
       ui.error(T.passwordMismatch);
       return;
     }
@@ -180,8 +182,11 @@ export default class Signup extends Vue {
       ui.error(T.loginPasswordTooShort);
       return;
     }
-    if (this.email || this.parentEmail == null) {
-      ui.error(T.fillEmailCorrectly);
+    if (!this.isU13 && this.email === null) {
+      ui.error(T.loginEmailMissing);
+      return;
+    } else if(this.isU13 && this.parentEmail === null) {
+      ui.error(T.loginParentEmailMissing);
       return;
     }
     const registerParameters = {

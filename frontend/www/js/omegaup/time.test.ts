@@ -24,14 +24,14 @@ describe('getDifferenceInCalendarYears', () => {
       time.getDifferenceInCalendarYears(new Date('2001-01-01T00:00:00Z')),
     ).toEqual(1);
     expect(
-      time.getDifferenceInCalendarYears(new Date('2002-02-02T00:00:00Z')),
+      time.getDifferenceInCalendarYears(new Date('2002-01-01T00:00:00Z')),
     ).toEqual(2);
     expect(
-      time.getDifferenceInCalendarYears(new Date('2000-01-01T23:59:59Z')),
-    ).toEqual(3);
-    expect(
-      time.getDifferenceInCalendarYears(new Date('2000-12-31T00:00:00Z')),
+      time.getDifferenceInCalendarYears(new Date('2003-12-31T23:59:59Z')),
     ).toEqual(4);
+    expect(
+      time.getDifferenceInCalendarYears(new Date('2004-01-01T00:00:00Z')),
+    ).toEqual(5);
   });
 });
 
