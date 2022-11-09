@@ -775,7 +775,11 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams([
                 'birthDate' => strtotime('2012-09-20T00:00:00Z'),
-                'birth_date' => \OmegaUp\DAO\DAO::toMySQLTimestamp(intval($createUserParams->birthDate)),
+                'birth_date' => \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                    intval(
+                        $createUserParams->birthDate
+                    )
+                ),
             ]),
         );
 
