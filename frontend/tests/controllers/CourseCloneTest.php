@@ -777,7 +777,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                 'birthDate' => strtotime('2012-09-20T00:00:00Z'),
                 'birth_date' => \OmegaUp\DAO\DAO::toMySQLTimestamp(intval($createUserParams->birthDate)),
             ]),
-        );;
+        );
 
         // Log in the user and set the auth token in the new request
         $login = self::login($identity);
