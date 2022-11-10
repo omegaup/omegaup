@@ -168,7 +168,11 @@ class User extends \OmegaUp\Controllers\Controller {
             'verified' => 0,
             'verification_id' => \OmegaUp\SecurityTools::randomString(50),
             'is_private' => boolval($createUserParams->isPrivate),
-            'birth_date' => \OmegaUp\DAO\DAO::toMySQLTimestamp(intval($createUserParams->birthDate)),
+            'birth_date' => \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                intval(
+                    $createUserParams->birthDate
+                )
+            ),
         ];
         if (
             $createUserParams->birthDate >= strtotime(
