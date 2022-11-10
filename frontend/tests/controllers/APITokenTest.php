@@ -193,6 +193,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testAPITokensWithAssociatedIdentityWork() {
+        \OmegaUp\Time::setTimeForTesting(strtotime('2022-09-10T00:00:00Z'));
         [
             'user' => $creator,
             'identity' => $creatorIdentity,
@@ -271,6 +272,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testAPITokensWithNonAssociatedIdentityFails() {
+        \OmegaUp\Time::setTimeForTesting(strtotime('2022-09-10T00:00:00Z'));
         [
             'user' => $creator,
             'identity' => $creatorIdentity,
