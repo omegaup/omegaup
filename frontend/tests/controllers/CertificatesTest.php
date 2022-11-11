@@ -22,35 +22,15 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             'role' => 'CertificateGenerator'
         ]));
 
-        // Create a valid contest Request object
-        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
-            ['admissionMode' => 'private']
-        ));
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
-        $r = $contestData['request'];
-        $contestDirector = $contestData['director'];
+        $certificatesCutoff = 3;
 
-        // Log in the user and set the auth token in the new request
-        $login = self::login($contestDirector);
-        $r['auth_token'] = $login->auth_token;
-        $r['certificates_status'] = 'uninitiated';
-
-        // Call the API
-        $response = \OmegaUp\Controllers\Contest::apiCreate(
-            $r
-        );
-
-        $contest = \OmegaUp\DAO\Contests::getByAlias(
-            $contestData['request']['alias']
-        );
-
-        $certificates_cutoff = 3;
-
-        \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
+        $response = \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
             new \OmegaUp\Request([
                 'auth_token' => $loginIdentity->auth_token,
-                'contest_id' => $contest->contest_id,
-                'certificates_cutoff' => $certificates_cutoff
+                'contest_id' => $contestData['contest']->contest_id,
+                'certificates_cutoff' => $certificatesCutoff
             ])
         );
 
@@ -62,5 +42,33 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals(3, $contest->certificate_cutoff);
+    }
+
+    /**
+     * try to generate certificates in a contest as a normal user
+     *
+     */
+    public function testGenerateContestCertificatesAsNormalUser() {
+        //Create user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        //login
+        $loginIdentity = self::login($identity);
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        $certificatesCutoff = 3;
+
+        try {
+            \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
+                new \OmegaUp\Request([
+                    'auth_token' => $loginIdentity->auth_token,
+                    'contest_id' => $contestData['contest']->contest_id,
+                    'certificates_cutoff' => $certificatesCutoff
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
     }
 }

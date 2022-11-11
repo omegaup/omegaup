@@ -49,36 +49,28 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         }
 
         //check if is a certificate generator
-        if (\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
-            if ($contest->certificates_status === 'uninitiated' || $contest->certificates_status === 'retryable_error') {
-                // add certificates_cutoff value to the course
-                if (!is_null($r['certificates_cutoff'])) {
-                    $contest->certificate_cutoff = $r['certificates_cutoff'];
-                }
-                // update contest with the new value
-                \OmegaUp\DAO\Contests::update($contest);
-
-                //connection to rabbitmq
-                $connection = new \PhpAmqpLib\Connection\AMQPStreamConnection(
-                    'rabbitmq',
-                    5672,
-                    'omegaup',
-                    'omegaup'
-                );
-
-                $channel = $connection->channel();
-
-                $channel->queue_declare('hello', false, false, false, false);
-                $msg = new \PhpAmqpLib\Message\AMQPMessage(
-                    'Message to contest_certificates queue!'
-                );
-                $channel->basic_publish($msg, '', 'hello');
-                echo " [x] Message to contest_certificates queue!'\n";
-                $channel->close();
-                $connection->close();
-            }
+        if (!\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
+        if ($contest->certificates_status === 'uninitiated' || $contest->certificates_status === 'retryable_error') {
+            // add certificates_cutoff value to the course
+            if (!is_null($r['certificates_cutoff'])) {
+                $contest->certificate_cutoff = $r['certificates_cutoff'];
+            }
+            // update contest with the new value
+            \OmegaUp\DAO\Contests::update($contest);
 
+            //connection to rabbitmq
+            $channel = \OmegaUp\RabbitMQConnection::getInstance()->channel();
+
+            $channel->queue_declare('hello', false, false, false, false);
+            $msg = new \PhpAmqpLib\Message\AMQPMessage(
+                'Message to contest_certificates queue!'
+            );
+            $channel->basic_publish($msg, '', 'hello');
+            echo " [x] Message to contest_certificates queue!'\n";
+            $channel->close();
+        }
         return [
             'status' => 'ok',
         ];
