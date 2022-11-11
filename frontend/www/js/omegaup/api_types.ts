@@ -4146,13 +4146,17 @@ export namespace types {
     contest_score?: number;
     country: string;
     details?: types.RunDetailsV2;
+    execution?: string;
     guid: string;
     language: string;
     memory: number;
+    output?: string;
     penalty: number;
     runtime: number;
     score: number;
     status: string;
+    status_memory?: string;
+    status_runtime?: string;
     submit_delay: number;
     time: Date;
     type?: string;
