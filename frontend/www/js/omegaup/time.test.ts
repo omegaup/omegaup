@@ -28,10 +28,10 @@ describe('getDifferenceInCalendarYears', () => {
     ).toEqual(2);
     expect(
       time.getDifferenceInCalendarYears(new Date('2003-12-31T23:59:59Z')),
-    ).toEqual(3);
+    ).toEqual(4);
     expect(
       time.getDifferenceInCalendarYears(new Date('2004-01-01T00:00:00Z')),
-    ).toEqual(4);
+    ).toEqual(5);
   });
 });
 

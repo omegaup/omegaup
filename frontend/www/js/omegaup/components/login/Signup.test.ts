@@ -3,25 +3,26 @@ import { mount } from '@vue/test-utils';
 import login_Signup from './Signup.vue';
 import omegaup_DatePicker from '../DatePicker.vue';
 
-describe('signup.vue', () => {
-  // Setting an specific datetime to avoid flakiness in a leap-year
-  const now = new Date('2022-01-01T00:00:00Z').getTime();
-  let dateNowSpy: jest.SpyInstance<number, []> | null = null;
-  beforeEach(() => {
-    dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
-  });
-  afterEach(() => {
-    if (dateNowSpy) {
-      dateNowSpy.mockRestore();
-    }
-  });
+
+  describe('signup.vue', () => {
+    // Setting an specific datetime to avoid flakiness in a leap-year
+    const now = new Date('2022-01-01T00:00:00Z').getTime();
+    let dateNowSpy: jest.SpyInstance<number, []> | null = null;
+    beforeEach(() => {
+      dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
+    });
+    afterEach(() => {
+      if (dateNowSpy) {
+        dateNowSpy.mockRestore();
+      }
+    });
   const expectedValues: {
-    username: string;
-    email: null | string;
-    parent_email: null | string;
-    password: string;
-    recaptcha: string;
-    birth_date: Date;
+    username: string,
+    email: null | string,
+    parent_email: null | string,
+    password: string,
+    recaptcha: string,
+    birth_date: Date,
   } = {
     username: 'Omegaup',
     email: null,
@@ -64,6 +65,7 @@ describe('signup.vue', () => {
       wrapper.find('input[name="reg_birthdate"]').attributes().disabled,
     ).toBeFalsy();
   });
+
 
   it('should handle an uncomplete registration for Under13 user', async () => {
     const wrapper = mount(login_Signup, {
@@ -117,6 +119,7 @@ describe('signup.vue', () => {
     // An warning should be displayed, but there is no status div
   });
 
+  
   it('should handle a complete registration for Under13 user', async () => {
     const wrapper = mount(login_Signup, {
       propsData: {
@@ -145,6 +148,7 @@ describe('signup.vue', () => {
     expect(wrapper.emitted('register-and-login')).toEqual([[expectedValues]]);
   });
 
+  
   it('should handle an uncomplete registration for Over13 user', async () => {
     const wrapper = mount(login_Signup, {
       propsData: {
@@ -197,6 +201,8 @@ describe('signup.vue', () => {
     // An warning should be displayed, but there is no status div
   });
 
+
+  
   it('should handle a complete registration for Over13 user', async () => {
     const wrapper = mount(login_Signup, {
       propsData: {
