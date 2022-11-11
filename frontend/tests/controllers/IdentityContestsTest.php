@@ -146,12 +146,12 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // User has been invited to contests
-        $this->assertEquals(
+        $this->assertSame(
             count($contests),
             $contestsList['number_of_results']
         );
         foreach ($contests as $index => $contest) {
-            $this->assertEquals(
+            $this->assertSame(
                 $contest,
                 $contestsList['results'][$index]['title']
             );
@@ -265,7 +265,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
                 'Only invited identities can access to private contest'
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
     }
 
@@ -313,7 +313,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('identity does not have access to see apiMyList');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
 
         // This account can select the main identity
@@ -359,7 +359,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
                 'identity should not have been able to switch identities'
             );
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -389,7 +389,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'usersCanNotBeAddedInContestForTeams',
                 $e->getMessage()
             );
@@ -425,7 +425,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'groupsCanNotBeAddedInContestForTeams',
                 $e->getMessage()
             );

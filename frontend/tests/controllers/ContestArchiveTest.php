@@ -29,7 +29,7 @@ class ContestArchiveTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Only 4 contests should remain visible
-        $this->assertEquals(4, $response['number_of_results']);
+        $this->assertSame(4, $response['number_of_results']);
     }
 
     public function testArchiveContestAsNonDirector() {
@@ -48,7 +48,7 @@ class ContestArchiveTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 }

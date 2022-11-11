@@ -225,10 +225,8 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 COUNT(s.submission_id)
             FROM
                 Submissions s
-            INNER JOIN
-                Runs r ON r.run_id = s.current_run_id
             WHERE
-                r.verdict = "AC"
+                s.verdict = "AC"
                 AND s.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?);
 ';
         /** @var int */
@@ -258,7 +256,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 p.alias,
                 p.title,
                 s.language,
-                r.verdict,
+                s.verdict,
                 r.runtime,
                 r.memory,
                 IFNULL(ur.classname, 'user-rank-unranked') AS classname

@@ -55,8 +55,8 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // User has one default associated identity when joins omegaUp
-        $this->assertEquals(1, count($associatedIdentities['identities']));
-        $this->assertEquals(
+        $this->assertSame(1, count($associatedIdentities['identities']));
+        $this->assertSame(
             $identity->username,
             $associatedIdentities['identities'][0]['username']
         );
@@ -72,7 +72,7 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // User now has two associated identities
-        $this->assertEquals(2, count($associatedIdentities['identities']));
+        $this->assertSame(2, count($associatedIdentities['identities']));
         $this->assertUsernameInArray(
             $username,
             $associatedIdentities['identities']
@@ -93,7 +93,7 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // apiProfile must show associated user's info
-        $this->assertEquals(
+        $this->assertSame(
             $details['username'],
             $identity->username
         );
@@ -148,7 +148,7 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
                         'username does not match');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // Exception expected
-            $this->assertEquals($e->getMessage(), 'parameterInvalid');
+            $this->assertSame($e->getMessage(), 'parameterInvalid');
         }
     }
 
@@ -209,7 +209,7 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
                         'has been already used');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             // Exception expected
-            $this->assertEquals($e->getMessage(), 'identityAlreadyInUse');
+            $this->assertSame($e->getMessage(), 'identityAlreadyInUse');
         }
     }
 
@@ -259,7 +259,7 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
                         'password does not match');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // Exception expected
-            $this->assertEquals($e->getMessage(), 'parameterInvalid');
+            $this->assertSame($e->getMessage(), 'parameterInvalid');
         }
     }
 
@@ -319,7 +319,7 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
                         'already another identity of the same group');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             // Exception expected
-            $this->assertEquals($e->getMessage(), 'identityAlreadyAssociated');
+            $this->assertSame($e->getMessage(), 'identityAlreadyAssociated');
         }
     }
 }
