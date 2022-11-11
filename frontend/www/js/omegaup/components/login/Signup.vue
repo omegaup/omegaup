@@ -66,7 +66,7 @@
               <div class="form-group">
                 <validation-provider
                   v-slot="{ errors }"
-                  rules="required|min:8"
+                  rules="required"
                   vid="password"
                 >
                   <label class="control-label">{{
