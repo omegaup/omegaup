@@ -14,7 +14,7 @@ class ContestCertificate(NamedTuple):
     certificate_cutoff: int
     alias: str
     scoreboard_url: str
-    contest_id: str
+    contest_id: int
 
 
 def get_contests(
