@@ -1,7 +1,10 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <form class="form" @submit.prevent="$emit('add-group-admin', groupAlias)">
+      <form
+        class="form"
+        @submit.prevent="$emit('add-group-admin', groupAlias.key)"
+      >
         <div class="form-group mb-0">
           <label class="font-weight-bold w-100"
             >{{ T.wordsGroupAdmin }}
@@ -54,7 +57,7 @@
               type="button"
               @click="$emit('remove-group-admin', groupAdmin.alias)"
             >
-              ×
+              <font-awesome-icon :icon="['fas', 'trash']" size="xs" />
             </button>
           </td>
         </tr>
@@ -86,12 +89,12 @@ library.add(fas);
     'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
-export default class GroupAdminv2 extends Vue {
+export default class GroupAdmin extends Vue {
   @Prop() groupAdmins!: types.ContestGroupAdmin[];
   @Prop() searchResultGroups!: types.ListItem[];
 
   T = T;
-  groupAlias: null | string = null;
+  groupAlias: null | types.ListItem = null;
 
   @Watch('groupAdmins')
   ongroupAdminsChange(): void {

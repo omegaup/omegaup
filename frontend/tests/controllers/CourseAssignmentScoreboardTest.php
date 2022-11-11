@@ -72,12 +72,12 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 $lastScore = $score;
             }
 
-            $this->assertEquals(
+            $this->assertSame(
                 $username,
                 $response['ranking'][$i]['username'],
                 'Scoreboard is not properly sorted by username.'
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $expectedPlace,
                 $response['ranking'][$i]['place'],
                 'Course scoreboard place information is wrong.'
@@ -104,12 +104,12 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 $lastScore = $score;
             }
 
-            $this->assertEquals(
+            $this->assertSame(
                 $username,
                 $scoreboard['ranking'][$i]['username'],
                 'Scoreboard is not properly sorted by username.'
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $expectedPlace,
                 $scoreboard['ranking'][$i]['place'],
                 'Course scoreboard place information is wrong.'
@@ -189,7 +189,7 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Score result and expected score must contain the same value
         foreach ($results as $username => $student) {
-            $this->assertEquals(
+            $this->assertSame(
                 array_sum($student[$courseData['assignment_alias']]),
                 $expectedScores[$username][$courseData['assignment_alias']],
                 'Scoreboard is not properly matched with the expected scores.'

@@ -18,6 +18,7 @@ import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 
 OmegaUp.on('ready', async () => {
   const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
+  const searchResultEmpty: types.ListItem[] = [];
   let runDetails: null | types.RunDetails = null;
   try {
     ({ runDetails } = await getProblemAndRunDetails({
@@ -32,7 +33,8 @@ OmegaUp.on('ready', async () => {
       'omegaup-arena-runs': arena_Runs,
     },
     data: () => ({
-      searchResultUsers: [] as types.ListItem[],
+      searchResultUsers: searchResultEmpty,
+      searchResultProblems: searchResultEmpty,
       popupDisplayed,
       guid,
       runDetailsData: runDetails,
@@ -52,6 +54,7 @@ OmegaUp.on('ready', async () => {
           showUser: true,
           guid: this.guid,
           searchResultUsers: this.searchResultUsers,
+          searchResultProblems: this.searchResultProblems,
           runDetailsData: this.runDetailsData,
           totalRuns: runsStore.state.totalRuns,
         },
@@ -128,6 +131,23 @@ OmegaUp.on('ready', async () => {
                     value: `${ui.escape(key)} (<strong>${ui.escape(
                       value,
                     )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-problems': (query: string) => {
+            api.Problem.listForTypeahead({
+              query,
+              search_type: 'all',
+            })
+              .then((data) => {
+                this.searchResultProblems = data.results.map(
+                  ({ key, value }, index) => ({
+                    key,
+                    value: `${String(index + 1).padStart(2, '0')}.- ${ui.escape(
+                      value,
+                    )} (<strong>${ui.escape(key)}</strong>)`,
                   }),
                 );
               })

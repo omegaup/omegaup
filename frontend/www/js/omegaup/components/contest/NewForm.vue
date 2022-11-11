@@ -220,6 +220,7 @@
             <omegaup-common-typeahead
               v-if="currentContestForTeams && !hasSubmissions"
               :existing-options="searchResultTeamsGroups"
+              :options="searchResultTeamsGroups"
               :value.sync="currentTeamsGroupAlias"
               @update-existing-options="
                 (query) => $emit('update-search-result-teams-groups', query)
@@ -230,7 +231,7 @@
               v-else
               class="form-control"
               disabled
-              :value="currentTeamsGroupAlias"
+              :value="teamsGroupName"
             />
             <p class="help-block">{{ T.contestNewFormForTeamsDesc }}</p>
           </div>
@@ -393,7 +394,7 @@ export default class NewForm extends Vue {
   @Prop({ default: '' }) initialTitle!: string;
   @Prop({ default: null }) initialWindowLength!: null | number;
   @Prop({ default: null }) invalidParameterName!: null | string;
-  @Prop({ default: null }) teamsGroupAlias!: null | string;
+  @Prop({ default: null }) teamsGroupAlias!: null | types.ListItem;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop({ default: false }) contestForTeams!: boolean;
   @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
@@ -537,6 +538,10 @@ export default class NewForm extends Vue {
       return;
     }
     this.$emit('create-contest', request);
+  }
+
+  get teamsGroupName(): null | string {
+    return this.currentTeamsGroupAlias?.value ?? null;
   }
 
   get catLanguageBlocked(): boolean {

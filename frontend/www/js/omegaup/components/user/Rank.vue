@@ -21,7 +21,7 @@
         @update-existing-options="
           (query) => $emit('update-search-result-users', query)
         "
-      />
+      ></omegaup-common-typeahead>
       <template v-if="Object.keys(availableFilters).length > 0">
         <select
           v-model="filter"
@@ -146,12 +146,12 @@ export default class UserRank extends Vue {
 
   T = T;
   ui = ui;
-  searchedUsername: null | string = null;
+  searchedUsername: null | types.ListItem = null;
 
   onSubmit(): void {
     if (!this.searchedUsername) return;
     window.location.href = `/profile/${encodeURIComponent(
-      this.searchedUsername,
+      this.searchedUsername.key,
     )}`;
   }
 

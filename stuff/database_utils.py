@@ -4,6 +4,7 @@
 '''Library of utilities to work with MySQL.'''
 
 
+import logging
 import os
 import shlex
 import subprocess
@@ -107,7 +108,13 @@ def mysql(query: str,
         args.append(dbname)
     args.append('-NBe')
     args.append(query)
-    return subprocess.check_output(args, universal_newlines=True)
+    try:
+        return subprocess.check_output(args,
+                                       universal_newlines=True,
+                                       stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError as e:
+        logging.exception('failed to run %r: %s', query, e.stderr)
+        raise
 
 
 def mysqldump(*,

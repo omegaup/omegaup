@@ -2,18 +2,14 @@
   <form role="form" class="card-body" @submit.prevent="onUpdateUserSchools">
     <div class="form-group">
       <label>{{ T.profileSchool }}</label>
-      <omegaup-autocomplete
-        v-model="school"
-        class="form-control"
-        :init="
-          (el) =>
-            typeahead.schoolTypeahead(el, (event, val) => {
-              school = val.value;
-              schoolId = val.id;
-            })
+      <omegaup-common-typeahead
+        :existing-options="searchResultSchools"
+        :options="searchResultSchools"
+        :value.sync="school"
+        @update-existing-options="
+          (query) => $emit('update-search-result-schools', query)
         "
-      ></omegaup-autocomplete>
-      <input v-model="schoolId" type="hidden" />
+      ></omegaup-common-typeahead>
     </div>
     <div class="form-group">
       <label>{{ T.userEditSchoolGrade }}</label>
@@ -65,29 +61,27 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
 import * as time from '../../time';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 import DatePicker from '../DatePicker.vue';
 import OmegaupRadioSwitch from '../RadioSwitch.vue';
 
 @Component({
   components: {
     'omegaup-datepicker': DatePicker,
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-radio-switch': OmegaupRadioSwitch,
   },
 })
 export default class UserManageSchools extends Vue {
   @Prop() profile!: types.UserProfileInfo;
+  @Prop() searchResultSchools!: types.SchoolListItem[];
 
   T = T;
-  typeahead = typeahead;
   graduationDate = this.profile.graduation_date
     ? time.convertLocalDateToGMTDate(this.profile.graduation_date)
     : new Date('');
-  school = this.profile.school;
-  schoolId = this.profile.school_id;
+  school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
   scholarDegree = this.profile.scholar_degree;
   isCurrentlyEnrolled = !this.profile.graduation_date;
 
@@ -98,11 +92,12 @@ export default class UserManageSchools extends Vue {
           ? null
           : this.graduationDate,
       school_id:
-        this.schoolId === this.profile.school_id &&
-        this.school !== this.profile.school
+        !this.school ||
+        (this.school.key === this.profile.school_id &&
+          this.school.value !== this.profile.school)
           ? null
-          : this.schoolId,
-      school_name: this.school,
+          : this.school.key,
+      school_name: this.school?.value,
       scholar_degree: this.scholarDegree,
     });
   }

@@ -13,7 +13,11 @@ namespace OmegaUp\DAO;
  */
 class Groups extends \OmegaUp\DAO\Base\Groups {
     public static function findByAlias(string $alias): ?\OmegaUp\DAO\VO\Groups {
-        $sql = 'SELECT `g`.* FROM `Groups_` AS `g` WHERE `g`.`alias` = ? LIMIT 1;';
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Groups::FIELD_NAMES,
+            'g'
+        );
+        $sql = "SELECT {$fields} FROM `Groups_` `g` WHERE `g`.`alias` = ? LIMIT 1;";
         $params = [$alias];
         /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
@@ -27,7 +31,11 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
      * @return list<\OmegaUp\DAO\VO\Groups>
      */
     public static function searchByName(string $name) {
-        $sql = "SELECT `g`.* FROM `Groups_` AS `g` WHERE `g`.`name` LIKE CONCAT('%', ?, '%') LIMIT 100;";
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Groups::FIELD_NAMES,
+            'g'
+        );
+        $sql = "SELECT {$fields} FROM `Groups_` `g` WHERE `g`.`name` LIKE CONCAT('%', ?, '%') LIMIT 100;";
 
         /** @var list<array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$name]);
@@ -39,7 +47,10 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
     }
 
     public static function getByName(string $name): ?\OmegaUp\DAO\VO\Groups {
-        $sql = 'SELECT `g`.* FROM `Groups_` AS `g` WHERE `g`.`name` = ? LIMIT 1;';
+        $sql = 'SELECT ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Groups::FIELD_NAMES,
+            'g'
+        ) . ' FROM `Groups_` AS `g` WHERE `g`.`name` = ? LIMIT 1;';
 
         /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);

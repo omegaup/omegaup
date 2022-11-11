@@ -20,7 +20,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserInfoForProblem=array{loggedIn: bool, admin: bool, reviewer: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
- * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}
+ * @psalm-type ListItem=array{key: string, value: string}
+ * @psalm-type ProblemListItem=array{accepted: int, alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}
  * @psalm-type Statements=array<string, string>
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type ArenaProblemDetails=array{accepts_submissions: bool, alias: string, commit: string, input_limit: int, languages: list<string>, letter?: string, points: float, problem_id?: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>,  settings?: ProblemSettingsDistrib, source?: string, statement?: ProblemStatement, title: string, visibility: int}
@@ -113,6 +114,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
     // Number of rows shown in problems list
     const PAGE_SIZE = 100;
 
+    // quality values
+    const QUALITY_VALUES = ['onlyQualityProblems', 'all'];
+
     /**
      * Returns a ProblemParams instance from the Request values.
      *
@@ -158,11 +162,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!is_null($r['input_limit'])) {
             $params['input_limit'] = intval($r['input_limit']);
         }
-        if (!is_null($r['languages'])) {
-            if (is_array($r['languages'])) {
-                $params['languages'] = implode(',', $r['languages']);
-            } elseif (is_scalar($r['languages'])) {
-                $params['languages'] = strval($r['languages']);
+        /** @var null|array<string>|scalar $languages */
+        $languages = $r['languages'];
+        if (!is_null($languages)) {
+            if (is_array($languages)) {
+                $params['languages'] = implode(',', $languages);
+            } else {
+                $params['languages'] = strval($languages);
             }
         }
         if (!is_null($r['memory_limit'])) {
@@ -2097,11 +2103,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 )
             ) {
                 // If the problem is requested outside a contest, we need to
-                // check that it is not private
+                // check that it is not private and the user is logged in
                 if (!\OmegaUp\DAO\Problems::isVisible($problem)) {
-                    throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                        'problemIsPrivate'
-                    );
+                    if (is_null($identity)) {
+                        throw new \OmegaUp\Exceptions\UnauthorizedException(
+                            'userNotAllowed'
+                        );
+                    } else {
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                            'problemIsPrivate'
+                        );
+                    }
                 }
             }
         }
@@ -3859,6 +3871,49 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * List of public problems shown in the typeahead component
+     *
+     * @return array{results: list<ListItem>}
+     *
+     * @omegaup-request-param int|null $offset
+     * @omegaup-request-param string $query
+     * @omegaup-request-param int|null $rowcount
+     * @omegaup-request-param string $search_type
+     */
+    public static function apiListForTypeahead(\OmegaUp\Request $r) {
+        // Authenticate request
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing, we allow unauthenticated users to use this API
+        }
+
+        // Default values for offset and rowcount
+        $offset = $r->ensureOptionalInt('offset') ?? 0;
+        $rowcount = $r->ensureOptionalInt(
+            'rowcount'
+        ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
+
+        $searchType = $r->ensureEnum(
+            'search_type',
+            ['all', 'alias', 'title', 'problem_id']
+        );
+        $query = substr($r->ensureString('query'), 0, 256);
+
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEMS_LIST,
+            "{$query}-{$searchType}-{$offset}-{$rowcount}",
+            fn () => \OmegaUp\DAO\Problems::byIdentityTypeForTypeahead(
+                $offset,
+                $rowcount,
+                $query,
+                $searchType
+            ),
+            APC_USER_CACHE_PROBLEM_LIST_TIMEOUT
+        );
+    }
+
+    /**
      * List of public and user's private problems
      *
      * @return array{results: list<ProblemListItem>, total: int}
@@ -3866,21 +3921,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param mixed $language
+     * @omegaup-request-param null|string $level
      * @omegaup-request-param int|null $max_difficulty
      * @omegaup-request-param int|null $min_difficulty
      * @omegaup-request-param int|null $min_visibility
-     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param int|null $offset
      * @omegaup-request-param mixed $only_karel
+     * @omegaup-request-param bool $only_quality_seal
      * @omegaup-request-param mixed $order_by
-     * @omegaup-request-param mixed $page
+     * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
-     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
-     * @omegaup-request-param bool $only_quality_seal
-     * @omegaup-request-param null|string $level
      */
     public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
@@ -3891,19 +3946,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         // Defaults for offset and rowcount
+        $page = $r->ensureOptionalInt('page');
         $offset = null;
-        $rowcount = \OmegaUp\Controllers\Problem::PAGE_SIZE;
+        if (is_null($page)) {
+            $offset = $r->ensureOptionalInt('offset') ?? 0;
+        }
+        $rowcount = $r->ensureOptionalInt(
+            'rowcount'
+        ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
+
+        $keyword = substr($r->ensureOptionalString('query') ?? '', 0, 256);
 
         $onlyQualitySeal = $r->ensureOptionalBool('only_quality_seal') ?? false;
-        $level = $r->ensureOptionalString('level');
         $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
-
-        if (is_null($r['page'])) {
-            $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
-        }
-        if (!is_null($r['rowcount'])) {
-            $rowcount = intval($r['rowcount']);
-        }
+        $level = $r->ensureOptionalString('level');
 
         [
             'sortOrder' => $sortOrder,
@@ -4086,21 +4142,23 @@ class Problem extends \OmegaUp\Controllers\Controller {
         foreach ($problems as $problem) {
             /** @var ProblemListItem */
             $problemArray = $problem->asFilteredArray([
+                'accepted',
                 'alias',
                 'difficulty',
                 'difficulty_histogram',
-                'problem_id',
                 'points',
+                'problem_id',
                 'quality',
                 'quality_histogram',
                 'ratio',
                 'score',
+                'submissions',
                 'tags',
                 'title',
                 'visibility',
                 'quality_seal',
             ]);
-            $problemArray['tags'] = $hiddenTags ? []  : \OmegaUp\DAO\Problems::getTagsForProblem(
+            $problemArray['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problem,
                 public: false,
                 showUserTags: $problem->allow_user_add_tags
@@ -4164,6 +4222,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         foreach ($problems as $problem) {
             /** @var ProblemListItem */
             $problemArray = $problem->asFilteredArray([
+                'accepted',
                 'alias',
                 'difficulty',
                 'difficulty_histogram',
@@ -4173,6 +4232,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'quality_histogram',
                 'ratio',
                 'score',
+                'submissions',
                 'tags',
                 'title',
                 'visibility',
@@ -4845,6 +4905,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (is_null($tag->name)) {
                 continue;
             }
+            if (!$tag->public) {
+                continue;
+            }
             $tags[] = ['name' => $tag->name];
         }
         return [
@@ -5488,55 +5551,52 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param null|string $commit
+     * @omegaup-request-param string $commit
      * @omegaup-request-param string $filename
      * @omegaup-request-param string $problem_alias
      */
-    public static function apiTemplate(\OmegaUp\Request $r): void {
+    public static function getTemplate(\OmegaUp\Request $r): void {
         $problemAlias = $r->ensureString(
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringOfLengthInRange(
-            $r['commit'],
+        $commit = $r->ensureString(
             'commit',
-            40,
-            40
+            fn (string $commit) => \OmegaUp\Validators::objectId($commit)
         );
-        if (
-            preg_match(
-                '/^[0-9a-f]{40}$/',
-                $r['commit']
-            ) !== 1
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'commit'
-            );
-        }
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['filename'],
-            'filename'
+        $filename = $r->ensureString(
+            'filename',
+            fn (string $name) => \OmegaUp\Validators::filename($name)
         );
-        if (
-            preg_match(
-                '/^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+$/',
-                $r['filename']
-            ) !== 1
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'filename'
+
+        $fileDirectory = TEMPLATES_PATH . "/{$problemAlias}/{$commit}";
+        if (is_dir($fileDirectory)) {
+            // The generation of templates has happened before. We're never
+            // going to find this.
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
             );
         }
 
-        self::regenerateTemplates($problemAlias, $r['commit']);
-
-        //The noredirect=1 part lets nginx know to not call us again if the file is not found.
-        header(
-            'Location: ' . TEMPLATES_URL_PATH . "{$problemAlias}/{$r['commit']}/{$r['filename']}?noredirect=1"
-        );
-        header('HTTP/1.1 303 See Other');
+        self::regenerateTemplates($problemAlias, $commit);
+        $filePath = "{$fileDirectory}/{$filename}";
+        $fileSize = @filesize($filePath);
+        if ($fileSize === false) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
+            );
+        }
+        if (str_ends_with($filePath, '.tar.gz')) {
+            header('Content-Type: application/tar+gzip');
+        } elseif (str_ends_with($filePath, '.tar.bz2')) {
+            header('Content-Type: application/tar+bzip2');
+        } elseif (str_ends_with($filePath, '.zip')) {
+            header('Content-Type: application/zip');
+        } else {
+            header('Content-Type: application/octet-stream');
+        }
+        header("Content-Length: {$fileSize}");
+        readfile($filePath);
 
         // Since all the headers and response have been sent, make the API
         // caller to exit quietly.
@@ -5564,7 +5624,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $filename
      * @omegaup-request-param string $problem_alias
      */
-    public static function apiInput(\OmegaUp\Request $r): void {
+    public static function getInput(\OmegaUp\Request $r): void {
         $commit = $r->ensureString(
             'commit',
             fn (string $commit) => preg_match(
@@ -5583,14 +5643,27 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
         $filename = $r->ensureString('filename');
+        $zipDirectory = INPUTS_PATH . "{$problem->alias}/{$commit}";
+        if (is_dir($zipDirectory)) {
+            // The generation of problems has happened before. We're never
+            // going to find this.
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
+            );
+        }
 
         self::generateInputZip($problem, $commit, $filename);
 
-        //The noredirect=1 part lets nginx know to not call us again if the file is not found.
-        header(
-            'Location: ' . INPUTS_URL_PATH . "{$problem->alias}/{$commit}/{$filename}?noredirect=1"
-        );
-        header('HTTP/1.1 303 See Other');
+        $zipPath = "{$zipDirectory}/{$problem->alias}-input.zip";
+        $fileSize = @filesize($zipPath);
+        if ($fileSize === false) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
+            );
+        }
+        header('Content-Type: application/zip');
+        header("Content-Length: {$fileSize}");
+        readfile($zipPath);
 
         // Since all the headers and response have been sent, make the API
         // caller to exit quietly.
@@ -5624,7 +5697,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $tmpDir = \OmegaUp\FileHandler::tempDir(
-            '/tmp',
+            INPUTS_PATH,
             'InputZip',
             0755
         );
@@ -5655,9 +5728,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             $zipArchive->close();
 
-            $zipPath = INPUTS_PATH . "{$problem->alias}/{$commit}/{$problem->alias}-input.zip";
-            @mkdir(dirname($zipPath), 0755, true);
-            rename($tmpPath, $zipPath);
+            $zipDir = INPUTS_PATH . "{$problem->alias}/{$commit}";
+            @mkdir(dirname($zipDir), 0755, true);
+            rename($tmpDir, $zipDir);
         } catch (\Exception $e) {
             self::$log->error(
                 "Failed to create input .zip for {$problem->alias}",
@@ -5674,47 +5747,29 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * @omegaup-request-param 'bmp'|'gif'|'ico'|'jpe'|'jpeg'|'jpg'|'png'|'svg'|'svgz'|'tif'|'tiff' $extension
-     * @omegaup-request-param null|string $object_id
+     * @omegaup-request-param string $object_id
      * @omegaup-request-param string $problem_alias
      */
-    public static function apiImage(\OmegaUp\Request $r): void {
+    public static function getImage(\OmegaUp\Request $r): void {
         $problemAlias = $r->ensureString(
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringOfLengthInRange(
-            $r['object_id'],
+
+        $objectId = $r->ensureString(
             'object_id',
-            40,
-            40
-        );
-        if (
-            preg_match(
-                '/^[0-9a-f]{40}$/',
-                $r['object_id']
-            ) !== 1
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'object_id'
-            );
-        }
-        $extension = $r->ensureEnum(
-            'extension',
-            self::IMAGE_EXTENSIONS
+            fn (string $objectId) => \OmegaUp\Validators::objectId($objectId)
         );
 
-        self::regenerateImage(
-            $problemAlias,
-            $r['object_id'],
-            $extension
-        );
+        $extension = $r->ensureEnum('extension', self::IMAGE_EXTENSIONS);
 
-        //The noredirect=1 part lets nginx know to not call us again if the file is not found.
-        header(
-            'Location: ' . IMAGES_URL_PATH . "{$problemAlias}/{$r['object_id']}.{$extension}?noredirect=1"
-        );
-        header('HTTP/1.1 303 See Other');
+        self::regenerateImage($problemAlias, $objectId, $extension);
+
+        $imagePath = IMAGES_PATH . "{$problemAlias}/{$objectId}.{$extension}";
+        $filesize = filesize($imagePath);
+        header("Content-Type: image/{$extension}");
+        header("Content-Length: $filesize");
+        readfile($imagePath);
 
         // Since all the headers and response have been sent, make the API
         // caller to exit quietly.
@@ -5742,10 +5797,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             IMAGES_PATH . "{$problem->alias}/{$objectId}.{$extension}"
         );
         @mkdir(IMAGES_PATH . $problem->alias, 0755, true);
-        file_put_contents(
-            $imagePath,
-            $problemArtifacts->getByRevision()
-        );
+        $imageContents = $problemArtifacts->getByRevision();
+        file_put_contents($imagePath, $imageContents);
     }
 
     /**
@@ -5900,7 +5953,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 \RecursiveIteratorIterator::LEAVES_ONLY
             );
 
-            /** @var \SplFileInfo $file */
+            /**
+             * @var string $name
+             * @var \SplFileInfo $file
+             */
             foreach ($files as $name => $file) {
                 if ($file->isDir()) {
                     continue;
@@ -5957,6 +6013,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
+     * @omegaup-request-param 'all'|'onlyQualityProblems'|null $quality
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
      * @omegaup-request-param int|null $rowcount
@@ -5981,6 +6038,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
         $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
+        $quality = $r->ensureOptionalEnum(
+            'quality',
+            self::QUALITY_VALUES
+        ) ?? 'onlyQualityProblems';
         if ($offset < 0) {
             $offset = 0;
         }
@@ -6014,7 +6075,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            onlyQualitySeal: true,
+            onlyQualitySeal: ($quality === 'onlyQualityProblems'),
             url: "/problem/collection/{$collectionLevel}/",
             level: $collectionLevel,
             difficulty: $difficulty,
@@ -6154,7 +6215,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (is_null($tag->name)) {
                 continue;
             }
-            if ($tag->public == 0) {
+            if (!$tag->public) {
                 continue;
             }
             $tagData[] = ['name' => $tag->name];
@@ -6196,6 +6257,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
+     * @omegaup-request-param 'all'|'onlyQualityProblems'|null $quality
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
      * @omegaup-request-param int|null $rowcount
@@ -6218,6 +6280,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
         $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
+        $quality = $r->ensureOptionalEnum(
+            'quality',
+            self::QUALITY_VALUES
+        ) ?? 'onlyQualityProblems';
         if ($offset < 0) {
             $offset = 0;
         }
@@ -6251,7 +6317,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            onlyQualitySeal: true,
+            onlyQualitySeal: ($quality === 'onlyQualityProblems'),
             url: '/problem/collection/author/',
             level: null,
             difficulty: $difficulty,

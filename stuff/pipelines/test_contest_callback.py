@@ -104,7 +104,7 @@ def test_insert_contest_certificate() -> None:
         )
         body = contest_callback.ContestCertificate(
             contest_id=contest_id,
-            certificate_cutoff=3, # mocking a default value
+            certificate_cutoff=3, # setting a default value
             alias=alias,
             scoreboard_url=scoreboard_url,
         )

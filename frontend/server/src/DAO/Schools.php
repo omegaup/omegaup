@@ -21,7 +21,10 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     public static function findByName($name) {
         $sql = '
             SELECT
-                s.*
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Schools::FIELD_NAMES,
+            's'
+        ) . '
             FROM
                 Schools s
             WHERE
@@ -81,6 +84,8 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         $sqlFrom = '
             FROM
                 Schools s
+            WHERE
+                s.score != 0
             ORDER BY
                 s.`ranking` IS NULL, s.`ranking` ASC
         ';

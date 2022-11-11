@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <psalm
-    totallyTyped="true"
     autoloader="frontend/server/bootstrap.php"
-    cacheDirectory="/tmp/psalm"
+    cacheDirectory="./.psalm"
     hoistConstants="true"
     resolveFromConfigFile="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

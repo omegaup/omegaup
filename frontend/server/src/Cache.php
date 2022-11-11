@@ -200,6 +200,7 @@ class RedisCacheAdapter extends CacheAdapter {
         }
         while (true) {
             $this->redis->watch($key);
+            /** @var string|false $current */
             $current = $this->redis->get($key);
             if ($current !== false) {
                 $this->redis->unwatch();
@@ -230,12 +231,14 @@ class RedisCacheAdapter extends CacheAdapter {
         if ($ttl > 0) {
             $flags['ex'] = $ttl;
         }
+        /** @var bool */
         return $this->redis->set($key, serialize($var), $flags);
     }
 
     public function cas(string $key, int $old, int $new): bool {
         while (true) {
             $this->redis->watch($key);
+            /** @var string|false $current */
             $current = $this->redis->get($key);
             if ($current === false || unserialize($current) !== $old) {
                 $this->redis->unwatch();
@@ -259,9 +262,9 @@ class RedisCacheAdapter extends CacheAdapter {
 
     /**
      * @param string $key
-     * @return mixed
      */
-    public function fetch(string $key) {
+    public function fetch(string $key): mixed {
+        /** @var string|false $ret */
         $ret = $this->redis->get($key);
         if ($ret === false) {
             return false;
@@ -279,6 +282,7 @@ class RedisCacheAdapter extends CacheAdapter {
         if ($ttl > 0) {
             $flags['ex'] = $ttl;
         }
+        /** @var bool */
         return $this->redis->set($key, serialize($var), $flags);
     }
 
@@ -286,6 +290,7 @@ class RedisCacheAdapter extends CacheAdapter {
         $current = 0;
         while (true) {
             $this->redis->watch($key);
+            /** @var string|false $current */
             $current = $this->redis->get($key);
             if ($current !== false) {
                 /** @var int */
@@ -531,6 +536,7 @@ class Cache {
     const PROBLEM_SOLUTION = 'solution-';
     const PROBLEM_SOLUTION_EXISTS = 'solution-exists-';
     const PROBLEM_STATS = 'problem-stats-';
+    const PROBLEMS_LIST = 'problems-list-';
     const RUN_ADMIN_DETAILS = 'run-admin-details-';
     const RUN_COUNTS = 'run-counts-';
     const RUN_TOTAL_COUNTS = 'run-total-counts';
@@ -577,7 +583,8 @@ class Cache {
      *
      * @param mixed $value
      * @param int $timeout (seconds)
-     * @return boolean
+     *
+     * @return bool
      */
     public function set($value, int $timeout = APC_USER_CACHE_TIMEOUT): bool {
         if (!self::isEnabled()) {
@@ -602,7 +609,7 @@ class Cache {
      *
      * Si el cache esta prendido, invalida el key del cache
      *
-     * @return boolean
+     * @return bool
      */
     public function delete(): bool {
         if (!self::isEnabled()) {

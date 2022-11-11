@@ -150,7 +150,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @return array{isPractice: bool, problem: \OmegaUp\DAO\VO\Problems, contest: null|\OmegaUp\DAO\VO\Contests, problemsetContainer: null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments, problemset: null|\OmegaUp\DAO\VO\Problemsets}
      *
      * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param mixed $language
+     * @omegaup-request-param string $language
      * @omegaup-request-param string $problem_alias
      * @omegaup-request-param mixed $problemset_id
      */
@@ -185,12 +185,15 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
+        /** @var list<string> $allowedLanguages */
         $allowedLanguages = array_intersect(
             array_keys(self::SUPPORTED_LANGUAGES),
             explode(',', $problem->languages)
         );
+        $language = $r->ensureString('language');
+        /** @psalm-suppress RedundantCondition don't know how to express "this is in the enum" */
         \OmegaUp\Validators::validateInEnum(
-            $r['language'],
+            $language,
             'language',
             $allowedLanguages
         );
@@ -235,6 +238,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
             // Update list of valid languages.
             if (!is_null($contest->languages)) {
+                /** @var list<string> $allowedLanguages */
                 $allowedLanguages = array_intersect(
                     $allowedLanguages,
                     explode(',', $contest->languages)
@@ -286,13 +290,14 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         // Validate the language.
         if (!is_null($problemset->languages)) {
+            /** @var list<string> $allowedLanguages */
             $allowedLanguages = array_intersect(
                 $allowedLanguages,
                 explode(',', $problemset->languages)
             );
         }
         \OmegaUp\Validators::validateInEnum(
-            $r['language'],
+            $r->ensureString('language'),
             'language',
             $allowedLanguages
         );
@@ -372,7 +377,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @return array{guid: string, submit_delay: int, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}
      *
      * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param mixed $language
+     * @omegaup-request-param string $language
      * @omegaup-request-param string $problem_alias
      * @omegaup-request-param mixed $problemset_id
      * @omegaup-request-param string $source
@@ -478,7 +483,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'problem_id' => $problem->problem_id,
             'problemset_id' => $problemsetId,
             'guid' => md5(uniqid(strval(rand()), true)),
-            'language' => $r['language'],
+            'language' => $r->ensureString('language'),
             'time' => \OmegaUp\Time::get(),
             'status' => 'uploading',
             'verdict' => 'JE',
@@ -734,8 +739,8 @@ class Run extends \OmegaUp\Controllers\Controller {
                     2
                 );
             } else {
-                $result['contest_score'] = 0;
-                $result['score'] = 0;
+                $result['contest_score'] = 0.0;
+                $result['score'] = 0.0;
             }
         }
         return $result;
@@ -746,7 +751,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $debug
+     * @omegaup-request-param bool|null $debug
      * @omegaup-request-param string $run_alias
      */
     public static function apiRejudge(\OmegaUp\Request $r): array {
@@ -782,12 +787,19 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         // Reset fields.
         $run->status = 'new';
-        \OmegaUp\DAO\Runs::update($run);
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            \OmegaUp\DAO\Runs::update($run);
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
 
         try {
             \OmegaUp\Grader::getInstance()->rejudge(
                 [$run],
-                $r['debug'] || false
+                $r->ensureOptionalBool('debug') ?? false
             );
         } catch (\Exception $e) {
             self::$log->error(
@@ -1000,7 +1012,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'guid' => strval($submission->guid),
             'language' => strval($submission->language),
             'alias' => strval($problem->alias),
-            'feedback' => \OmegaUp\DAO\Submissions::getSubmissionFeedback(
+            'feedback' => \OmegaUp\DAO\SubmissionFeedback::getSubmissionFeedback(
                 $submission
             ),
         ];
@@ -1282,8 +1294,11 @@ class Run extends \OmegaUp\Controllers\Controller {
             $response['compile_error'] = $details['compile_error'];
         }
         if (!is_null($contest) && !$contest->partial_score && $run->score < 1) {
-            $details['contest_score'] = 0;
-            $details['score'] = 0;
+            $details['contest_score'] = 0.0;
+            $details['score'] = 0.0;
+        } else {
+            $details['contest_score'] = floatval($details['contest_score']);
+            $details['score'] = floatval($details['score']);
         }
         if (!OMEGAUP_LOCKDOWN && $showDetails) {
             $response['details'] = $details;

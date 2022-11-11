@@ -74,9 +74,9 @@
                 data-add-problem
                 class="btn btn-primary mr-2"
                 type="submit"
-                :disabled="problemAlias.length == 0"
+                :disabled="!problemAlias"
                 @click.prevent="
-                  onAddProblem({ alias: problemAlias, points: points })
+                  onAddProblem({ alias: problemAlias.key, points: points })
                 "
               >
                 {{ addButtonLabel }}
@@ -126,7 +126,7 @@ export default class CourseScheduledProblemList extends Vue {
   assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
   problems: types.AddedProblem[] = this.assignmentProblems;
   taggedProblemAlias = '';
-  problemAlias = '';
+  problemAlias: null | types.ListItem = null;
   points = 100;
   showTopicsAndDifficulty = false;
 
@@ -185,9 +185,9 @@ export default class CourseScheduledProblemList extends Vue {
   }
 
   onAddProblem(problem: types.AddedProblem): void {
-    const problemAlias = problem.alias;
+    const problemAlias = { key: problem.alias, value: problem.alias };
     const currentProblem = this.problems.find(
-      (problem) => problem.alias === problemAlias,
+      (problem) => problem.alias === problemAlias.key,
     );
     if (!currentProblem) {
       this.problems.push(problem);
@@ -197,9 +197,9 @@ export default class CourseScheduledProblemList extends Vue {
   }
 
   onRemoveProblem(problem: types.AddedProblem): void {
-    const problemAlias = problem.alias;
+    const problemAlias = { key: problem.alias, value: problem.alias };
     this.problems = this.problems.filter(
-      (problem) => problem.alias !== problemAlias,
+      (problem) => problem.alias !== problemAlias.key,
     );
   }
 
@@ -224,12 +224,12 @@ export default class CourseScheduledProblemList extends Vue {
   }
 
   @Watch('taggedProblemAlias')
-  onTaggedProblemAliasChange() {
-    this.problemAlias = this.taggedProblemAlias;
+  onTaggedProblemAliasChange(newValue: string) {
+    this.problemAlias = { key: newValue, value: newValue };
   }
 
   reset(): void {
-    this.problemAlias = '';
+    this.problemAlias = null;
     this.points = 100;
   }
 }

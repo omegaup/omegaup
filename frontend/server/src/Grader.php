@@ -64,7 +64,7 @@ class Grader {
     /**
      * Call /run/grade/ endpoint in rejudge mode.
      *
-     * @param array $runs  the array of runs to be graded.
+     * @param list<\OmegaUp\DAO\VO\Runs> $runs the array of runs to be graded.
      * @param bool  $debug whether this is a debug-rejudge.
      *
      * @throws \Exception
@@ -316,7 +316,7 @@ class Grader {
             );
             throw $e;
         } finally {
-            if (is_resource($curl)) {
+            if (is_object($curl)) {
                 curl_close($curl);
             }
         }

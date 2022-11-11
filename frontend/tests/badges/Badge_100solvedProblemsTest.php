@@ -29,7 +29,7 @@ class Badge_100solvedProblemsTest extends \OmegaUp\Test\BadgesTestCase {
         $queryPath = static::OMEGAUP_BADGES_ROOT . '/100solvedProblems/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = [$user101->user_id];
-        $this->assertEquals($expected, $results);
+        $this->assertSame($expected, $results);
     }
 
     public function test100RunsToSameProblem(): void {
@@ -45,6 +45,6 @@ class Badge_100solvedProblemsTest extends \OmegaUp\Test\BadgesTestCase {
         $queryPath = static::OMEGAUP_BADGES_ROOT . '/100solvedProblems/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = [];
-        $this->assertEquals($expected, $results);
+        $this->assertSame($expected, $results);
     }
 }

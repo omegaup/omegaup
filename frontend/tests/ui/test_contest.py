@@ -256,7 +256,8 @@ def check_ranking(driver, problem, user, *, scores):
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR, '.omegaup-scoreboard')))
 
-    ranking_problem = driver.browser.find_element_by_xpath(
+    ranking_problem = driver.browser.find_element(
+        By.XPATH,
         '//tr[@class = "%s"]/td[contains(@class, "%s")]/div[@class = "points"]'
         % (user, problem))
 
@@ -318,14 +319,16 @@ def create_contest_admin(driver, contest_alias, problem, users, user,
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, 'input[data-title]'))).send_keys('(Updated)')
 
-        driver.browser.find_element_by_css_selector(
+        driver.browser.find_element(
+            By.CSS_SELECTOR,
             'form.contest-form').submit()
 
         message_link = driver.wait.until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, '#status span.message a')))
 
-        contest_title = driver.browser.find_element_by_css_selector(
+        contest_title = driver.browser.find_element(
+            By.CSS_SELECTOR,
             '.page-header h1')
 
         assert '(Updated)' in contest_title.text, 'Update contest failed'
@@ -402,10 +405,12 @@ def create_clarification_user(driver, problem, question):
             (By.CSS_SELECTOR,
              '[data-new-clarification-message]'))).send_keys(question)
 
-    driver.browser.find_element_by_css_selector(
+    driver.browser.find_element(
+        By.CSS_SELECTOR,
         '[data-new-clarification]').submit()
 
-    clarifications = driver.browser.find_elements_by_css_selector(
+    clarifications = driver.browser.find_elements(
+        By.CSS_SELECTOR,
         '[data-tab-clarifications] table tbody tr')
 
     assert len(clarifications) == 1, len(clarifications)
@@ -427,7 +432,8 @@ def answer_clarification_admin(driver, answer):
             (By.CSS_SELECTOR,
              '[data-select-answer]')))).select_by_value(answer)
 
-    driver.browser.find_element_by_css_selector(
+    driver.browser.find_element(
+        By.CSS_SELECTOR,
         '[data-form-clarification-answer]').submit()
 
     resolved = driver.wait.until(
@@ -474,15 +480,16 @@ def create_contest(driver, alias, scoreboard_time_percent=100):
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR, 'input[data-title]'))).send_keys(alias)
-    driver.browser.find_element_by_name('alias').send_keys(alias)
-    driver.browser.find_element_by_name('description').send_keys(
+    driver.browser.find_element(By.NAME, 'alias').send_keys(alias)
+    driver.browser.find_element(By.NAME, 'description').send_keys(
         'contest description')
-    scoreboard_element = driver.browser.find_element_by_name('scoreboard')
+    scoreboard_element = driver.browser.find_element(By.NAME, 'scoreboard')
     scoreboard_element.clear()
     scoreboard_element.send_keys(scoreboard_time_percent)
 
     with driver.page_transition():
-        driver.browser.find_element_by_css_selector(
+        driver.browser.find_element(
+            By.CSS_SELECTOR,
             'form.contest-form').submit()
 
 
@@ -551,7 +558,7 @@ def add_problem_to_contest(driver, problem):
             (By.CSS_SELECTOR,
              'a.problems'))).click()
 
-    driver.typeahead_helper_v2('.problems-container', problem)
+    driver.typeahead_helper('.problems-container', problem)
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH,
@@ -632,7 +639,7 @@ def change_contest_admission_mode(driver, contest_admission_mode):
 def compare_contestants_list(driver, users_set):
     ''' Compares list of contestants toggle scoreboard filter.'''
 
-    contestants_list = driver.browser.find_elements_by_xpath(
+    contestants_list = driver.browser.find_elements(By.XPATH,
         '//*[@data-table-scoreboard]/tbody/tr/td[@class="user"]')
     # Considering only the username. All unassociated identities are created
     # with a name, which is appended after the username, like:
@@ -648,7 +655,8 @@ def compare_contestants_list(driver, users_set):
 def assert_run_verdict(driver, user, problem, *, classname):
     ''' Asserts that run verdict matches with expected classname. '''
 
-    run_verdict = driver.browser.find_element_by_xpath(
+    run_verdict = driver.browser.find_element(
+        By.XPATH,
         '//tr[contains(concat(" ", normalize-space(@class), " "), " %s ")]'
         '/td[contains(concat(" ", normalize-space(@class), " "), " %s ")]'
         % (user, problem))

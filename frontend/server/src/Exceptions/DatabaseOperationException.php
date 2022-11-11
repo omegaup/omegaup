@@ -22,4 +22,8 @@ class DatabaseOperationException extends \OmegaUp\Exceptions\ApiException {
     public function isDuplicate(): bool {
         return $this->_errno == 1062;
     }
+
+    public function isGoneAway(): bool {
+        return $this->_errno == 2006;
+    }
 }

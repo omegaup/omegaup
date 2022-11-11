@@ -48,7 +48,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             $identity,
             $contestData['contest']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $showIntro,
             \OmegaUp\Controllers\Contest::SHOW_INTRO
         );
@@ -68,7 +68,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             $identity,
             $contestData['contest']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $showIntro,
             \OmegaUp\Controllers\Contest::SHOW_INTRO
         );
@@ -86,7 +86,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             $identity,
             $contestData['contest']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $showIntro,
             !\OmegaUp\Controllers\Contest::SHOW_INTRO
         );
@@ -167,7 +167,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
         ]);
         $result = \OmegaUp\Controllers\Contest::apiRequests($r3);
-        $this->assertEquals(sizeof($result['users']), 1);
+        $this->assertSame(sizeof($result['users']), 1);
 
         self::log('admin rejects registration');
         $r3['username'] = $identity->username;
@@ -291,7 +291,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'contestBasicInformationNeeded',
                 $e->getMessage()
             );
@@ -338,7 +338,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $contestantLogin->auth_token,
         ]));
 
-        $this->assertEquals('ok', $contest['status']);
+        $this->assertSame('ok', $contest['status']);
     }
 
     /**
@@ -389,7 +389,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['contest']->problemset_id
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             count(
                 $problemsetIdentities
             ),
@@ -454,7 +454,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('contestNotRegistered', $e->getMessage());
+            $this->assertSame('contestNotRegistered', $e->getMessage());
         }
     }
 
@@ -502,7 +502,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
                     'auth_token' => $login->auth_token,
                 ])
             );
-            $this->assertEquals($result['status'], 'ok');
+            $this->assertSame($result['status'], 'ok');
         }
 
         // Uninvited user should not have access
@@ -515,7 +515,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('contestNotRegistered', $e->getMessage());
+            $this->assertSame('contestNotRegistered', $e->getMessage());
         }
     }
 

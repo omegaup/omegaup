@@ -98,10 +98,22 @@ class Scoreboard {
                 $this->params->problemset_id
             );
 
-        $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
-            $this->params->problemset_id,
-            $this->params->only_ac
+        $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitTimestamp(
+            $this->params
         );
+
+        if ($this->params->score_mode === 'max_per_group') {
+            // The way to calculate the score is different in this mode
+            $contestRuns = \OmegaUp\DAO\RunsGroups::getProblemsetRunsGroups(
+                $this->params->problemset_id,
+                $scoreboardTimeLimit
+            );
+        } else {
+            $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
+                $this->params->problemset_id,
+                $this->params->only_ac
+            );
+        }
 
         /** @var array<int, array{order: int, alias: string}> */
         $problemMapping = [];
@@ -116,10 +128,6 @@ class Scoreboard {
             ];
         }
 
-        $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitTimestamp(
-            $this->params
-        );
-
         $result = \OmegaUp\Scoreboard::getScoreboardFromRuns(
             $contestRuns,
             $rawContestIdentities,
@@ -132,6 +140,7 @@ class Scoreboard {
             $this->params->finish_time,
             $this->params->admin,
             $this->params->scoreboard_pct,
+            $this->params->score_mode,
             $sortByName,
             $withRunDetails,
             $this->params->auth_token
@@ -354,6 +363,7 @@ class Scoreboard {
             $params->finish_time,
             $params->admin,
             $params->scoreboard_pct,
+            $params->score_mode,
             sortByName: false,
         );
 
@@ -390,6 +400,7 @@ class Scoreboard {
             $params->finish_time,
             $params->admin,
             $params->scoreboard_pct,
+            $params->score_mode,
             sortByName: false,
         );
         $adminScoreboardCache->set($adminScoreboard, $timeout);
@@ -501,7 +512,7 @@ class Scoreboard {
     }
 
     /**
-     * @param list<array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: \OmegaUp\Timestamp, submit_delay: int, guid: string}> $contestRuns
+     * @param list<array{contest_score: float, guid?: string, identity_id: int, penalty: float|int, problem_id: int, score: float, submit_delay?: int, submission_count?: int, time?: \OmegaUp\Timestamp, type: string}> $contestRuns
      * @param list<array{identity_id: int, username: string, name: string|null, country_id: null|string, is_invited: bool, classname: string}> $rawContestIdentities
      * @param array<int, array{order: int, alias: string}> $problemMapping
      * @param int $contestPenalty
@@ -526,6 +537,7 @@ class Scoreboard {
         ?\OmegaUp\Timestamp $contestFinishTime,
         bool $showAllRuns,
         int $scoreboardPct,
+        string $scoreMode,
         bool $sortByName,
         bool $withRunDetails = false,
         ?string $authToken = null
@@ -602,6 +614,7 @@ class Scoreboard {
                 }
                 if (
                     !is_null($scoreboardTimeLimit)
+                    && !empty($run['time'])
                     && $run['time']->time >= $scoreboardTimeLimit->time
                 ) {
                     $problem['runs']++;
@@ -621,7 +634,7 @@ class Scoreboard {
                 $problem['percent'] = round($score * 100, 2);
                 $problem['penalty'] = $totalPenalty;
 
-                if ($withRunDetails === true) {
+                if ($withRunDetails === true && !empty($run['guid'])) {
                     $runDetails = [];
 
                     $runDetailsRequest = new \OmegaUp\Request([
@@ -635,7 +648,11 @@ class Scoreboard {
                     $problem['run_details'] = $runDetails;
                 }
             }
-            $problem['runs']++;
+            if ($scoreMode == 'max_per_group') {
+                $problem['runs'] = $run['submission_count'] ?? 0;
+            } else {
+                $problem['runs']++;
+            }
         }
 
         /** @var list<ScoreboardRankingEntry> */
