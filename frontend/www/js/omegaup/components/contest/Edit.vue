@@ -134,7 +134,7 @@
           :initial-scoreboard="details.scoreboard"
           :initial-penalty-type="details.penalty_type"
           :initial-show-scoreboard-after="details.show_scoreboard_after"
-          :initial-partial-score="details.partial_score"
+          :score-mode="details.score_mode"
           :initial-needs-basic-information="details.needs_basic_information"
           :initial-requests-user-information="details.requests_user_information"
           :all-languages="details.available_languages"
@@ -156,7 +156,7 @@
       <div v-if="showTab === 'problems'" class="tab-pane active">
         <omegaup-contest-add-problem
           :contest-alias="details.alias"
-          :initial-points="details.partial_score ? 100 : 1"
+          :initial-points="details.score_mode !== 'all_or_nothing' ? 100 : 1"
           :initial-problems="problems"
           :search-result-problems="searchResultProblems"
           @add-problem="(request) => $emit('add-problem', request)"

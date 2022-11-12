@@ -469,6 +469,7 @@ OmegaUp.on('ready', async () => {
     navbarProblems: arenaCourse.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
+    isContestModeMaxPerGroup: false,
   });
   socket.connect();
 

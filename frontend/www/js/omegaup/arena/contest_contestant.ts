@@ -392,6 +392,7 @@ OmegaUp.on('ready', async () => {
     navbarProblems: payload.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
+    isContestModeMaxPerGroup: payload.contest.score_mode === 'max_per_group',
   });
   socket.connect();
 

@@ -2758,7 +2758,7 @@ export namespace types {
     opened: boolean;
     original_contest_alias?: string;
     original_problemset_id?: number;
-    partial_score: boolean;
+    partial_score?: boolean;
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
@@ -2767,6 +2767,7 @@ export namespace types {
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
@@ -2805,6 +2806,7 @@ export namespace types {
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
@@ -2959,6 +2961,7 @@ export namespace types {
     points_decay_factor: number;
     problemset_id: number;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     show_penalty: boolean;
     show_scoreboard_after: boolean;

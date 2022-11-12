@@ -22,7 +22,7 @@ describe('Edit.vue', () => {
     languages: ['py2'],
     needs_basic_information: true,
     opened: false,
-    partial_score: true,
+    score_mode: 'partial',
     penalty: 0,
     penalty_calc_policy: 'sum',
     penalty_type: 'none',

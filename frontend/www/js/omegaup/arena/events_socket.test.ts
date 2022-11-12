@@ -47,6 +47,7 @@ const options: SocketOptions = {
   navbarProblems: navbarProblems,
   currentUsername: 'omegaUp',
   intervalInMilliseconds: 500,
+  isContestModeMaxPerGroup: false,
 };
 describe('EventsSocket', () => {
   let server: WS | null = null;

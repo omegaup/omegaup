@@ -38,6 +38,7 @@ export interface SocketOptions {
   currentUsername: string;
   navbarProblems: types.NavbarProblemsetProblem[];
   intervalInMilliseconds: number;
+  isContestModeMaxPerGroup: boolean;
 }
 
 export class EventsSocket {
@@ -63,6 +64,7 @@ export class EventsSocket {
   private readonly currentUsername: string;
   private readonly navbarProblems: types.NavbarProblemsetProblem[];
   private readonly intervalInMilliseconds: number;
+  private readonly isContestModeMaxPerGroup: boolean;
 
   constructor({
     disableSockets = false,
@@ -80,6 +82,7 @@ export class EventsSocket {
     currentUsername,
     navbarProblems,
     intervalInMilliseconds = 5 * 60 * 1000,
+    isContestModeMaxPerGroup,
   }: SocketOptions) {
     this.socket = null;
 
@@ -99,6 +102,7 @@ export class EventsSocket {
     this.clarificationInterval = null;
     this.rankingInterval = null;
     this.intervalInMilliseconds = intervalInMilliseconds;
+    this.isContestModeMaxPerGroup = isContestModeMaxPerGroup;
 
     const protocol = locationProtocol === 'https:' ? 'wss:' : 'ws:';
     const host = locationHost;
@@ -118,57 +122,87 @@ export class EventsSocket {
       data.clarification.time = time.remoteTime(data.clarification.time * 1000);
       clarificationStore.commit('addClarification', data.clarification);
     } else if (data.message == '/scoreboard/update/') {
-      data.scoreboard.time = time.remoteTime(data.scoreboard.time * 1000);
-      data.scoreboard.start_time = time.remoteTime(
-        data.scoreboard.start_time * 1000,
-      );
-      data.scoreboard.finish_time = time.remoteTime(
-        data.scoreboard.finish_time * 1000,
-      );
-      if (this.isVirtual) {
-        api.Problemset.scoreboardEvents({
-          problemset_id: this.originalProblemsetId,
-          token: this.scoreboardToken,
-        })
-          .then((response) => {
-            onVirtualRankingChanged({
-              scoreboard: data.scoreboard,
-              currentUsername: this.currentUsername,
-              scoreboardEvents: response.events,
-              problems: this.navbarProblems,
-              startTime: this.startTime,
-              finishTime: this.finishTime,
+      if (this.isContestModeMaxPerGroup) {
+        api.Contest.scoreboard({ contest_alias: this.problemsetAlias })
+          .then((result: types.Scoreboard) => {
+            this.processRankings({
+              scoreboard: result,
+              currentTime: result.time.getTime(),
+              startTime: result.start_time.getTime(),
+              finishTime: result.finish_time?.getTime() ?? 0,
             });
           })
-          .catch(ui.ignoreError);
-        return;
+          .catch(ui.apiError);
+      } else {
+        this.processRankings({
+          scoreboard: data.scoreboard,
+          currentTime: data.scoreboard.time,
+          startTime: data.scoreboard.start_time,
+          finishTime: data.scoreboard.finish_time,
+        });
       }
-      const {
-        currentRanking,
-        ranking,
-        users,
-        lastTimeUpdated,
-      } = onRankingChanged({
-        scoreboard: data.scoreboard,
-        currentUsername: this.currentUsername,
-        navbarProblems: this.navbarProblems,
-      });
-      rankingStore.commit('updateRanking', ranking);
-      rankingStore.commit('updateMiniRankingUsers', users);
-      rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
+    }
+  }
 
+  private processRankings({
+    scoreboard,
+    currentTime,
+    startTime,
+    finishTime,
+  }: {
+    scoreboard: types.Scoreboard;
+    currentTime: number;
+    startTime: number;
+    finishTime: number;
+  }) {
+    scoreboard.time = time.remoteTime(currentTime * 1000);
+    scoreboard.start_time = time.remoteTime(startTime * 1000);
+    if (scoreboard.finish_time != null) {
+      scoreboard.finish_time = time.remoteTime(finishTime * 1000);
+    }
+    if (this.isVirtual) {
       api.Problemset.scoreboardEvents({
-        problemset_id: this.problemsetId,
+        problemset_id: this.originalProblemsetId,
         token: this.scoreboardToken,
       })
-        .then((response) =>
-          onRankingEvents({
-            events: response.events,
-            currentRanking,
-          }),
-        )
+        .then((response) => {
+          onVirtualRankingChanged({
+            scoreboard,
+            currentUsername: this.currentUsername,
+            scoreboardEvents: response.events,
+            problems: this.navbarProblems,
+            startTime: this.startTime,
+            finishTime: this.finishTime,
+          });
+        })
         .catch(ui.ignoreError);
+      return;
     }
+    const {
+      currentRanking,
+      ranking,
+      users,
+      lastTimeUpdated,
+    } = onRankingChanged({
+      scoreboard,
+      currentUsername: this.currentUsername,
+      navbarProblems: this.navbarProblems,
+    });
+    rankingStore.commit('updateRanking', ranking);
+    rankingStore.commit('updateMiniRankingUsers', users);
+    rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
+
+    api.Problemset.scoreboardEvents({
+      problemset_id: this.problemsetId,
+      token: this.scoreboardToken,
+    })
+      .then((response) =>
+        onRankingEvents({
+          events: response.events,
+          currentRanking,
+        }),
+      )
+      .catch(ui.ignoreError);
   }
 
   private onclose() {
