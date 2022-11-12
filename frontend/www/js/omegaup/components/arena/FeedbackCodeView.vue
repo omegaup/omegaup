@@ -68,48 +68,37 @@ export default class FeedbackCodeView extends Vue {
 
     editor.on(
       'gutterClick',
-      (codeMirror: CodeMirror.Editor, lineNumber: number) => {
-        codeMirror.addLineWidget(
+      (editor: CodeMirror.Editor, lineNumber: number) => {
+        this.mapChangeTracker++;
+        const marker = document.createElement('div');
+        marker.classList.add('px-2');
+
+        const feedback: ArenaCourseFeedback = {
+          text: null,
           lineNumber,
-          showFeedbackForm(lineNumber, this),
-        );
+          status: FeedbackStatus.New,
+        };
+        const feedbackForm = new FeedbackClass({
+          propsData: {
+            feedback,
+          },
+        });
+        feedbackForm.$mount();
+        marker.appendChild(feedbackForm.$el);
+        const lineWidget = editor.addLineWidget(lineNumber, marker);
+
+        feedbackForm.$on('submit', (feedback: ArenaCourseFeedback) => {
+          this.setFeedback(feedback);
+        });
+
+        feedbackForm.$on('cancel', (feedback: ArenaCourseFeedback) => {
+          this.deleteFeedback({ lineNumber: feedback.lineNumber });
+          editor.removeLineWidget(lineWidget);
+          marker.removeChild(feedbackForm.$el);
+          feedbackForm.$destroy();
+        });
       },
     );
-
-    const showFeedbackForm = (
-      lineNumber: number,
-      lineWidget: any,
-    ): HTMLDivElement => {
-      const marker = document.createElement('div');
-      marker.classList.add('px-2');
-
-      const feedback: ArenaCourseFeedback = {
-        text: null,
-        lineNumber,
-        status: FeedbackStatus.New,
-      };
-      const feedbackForm = new FeedbackClass({
-        propsData: {
-          feedback,
-        },
-      });
-
-      feedbackForm.$mount();
-
-      feedbackForm.$on('submit', (feedback: ArenaCourseFeedback) => {
-        this.setFeedback(feedback);
-      });
-
-      feedbackForm.$on('cancel', (feedback: ArenaCourseFeedback) => {
-        this.deleteFeedback({ lineNumber: feedback.lineNumber });
-        editor.removeLineWidget(lineWidget);
-        marker.removeChild(feedbackForm.$el);
-        feedbackForm.$destroy();
-      });
-
-      marker.appendChild(feedbackForm.$el);
-      return marker;
-    };
   }
 
   setFeedback({
