@@ -727,6 +727,10 @@ class Run extends \OmegaUp\Controllers\Controller {
                 : ''
             ),
             'classname' => 'user-rank-unranked',
+            'execution' => null,
+            'output' => null,
+            'status_memory' => null,
+            'status_runtime' => null,
         ];
         if (!is_null($filtered['contest_score'])) {
             if (
