@@ -29,7 +29,7 @@ class UserGetTypesTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\User::getUserTypes($user, $identityUser2);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
 
         //Admin can get user types

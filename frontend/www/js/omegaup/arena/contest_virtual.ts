@@ -82,7 +82,8 @@ OmegaUp.on('ready', async () => {
               scoreboard,
               scoreboardEvents: response.events,
               problems,
-              contest,
+              startTime: contest.start_time,
+              finishTime: contest.finish_time,
               currentUsername,
             });
           })
@@ -105,7 +106,8 @@ OmegaUp.on('ready', async () => {
       scoreboard: payload.scoreboard,
       scoreboardEvents: payload.original.scoreboardEvents,
       problems: payload.problems,
-      contest: payload.contest,
+      startTime: payload.contest.start_time,
+      finishTime: payload.contest.finish_time,
       currentUsername: commonPayload.currentUsername,
     });
     virtualContestRefreshInterval = setInterval(() => {
@@ -307,6 +309,10 @@ OmegaUp.on('ready', async () => {
   const socket = new EventsSocket({
     disableSockets: false,
     problemsetAlias: payload.contest.alias,
+    isVirtual: true,
+    originalProblemsetId: payload.original?.contest.problemset_id,
+    startTime: payload.contest.start_time,
+    finishTime: payload.contest.finish_time,
     locationProtocol: window.location.protocol,
     locationHost: window.location.host,
     problemsetId: payload.contest.problemset_id,

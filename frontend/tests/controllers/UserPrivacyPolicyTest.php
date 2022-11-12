@@ -52,7 +52,7 @@ class UserPrivacyPolicyTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($response['status'], 'ok');
+        $this->assertSame($response['status'], 'ok');
 
         $response = \OmegaUp\Controllers\User::apiLastPrivacyPolicyAccepted(
             new \OmegaUp\Request([
@@ -90,7 +90,7 @@ class UserPrivacyPolicyTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($response['status'], 'ok');
+        $this->assertSame($response['status'], 'ok');
 
         try {
             \OmegaUp\Controllers\User::apiAcceptPrivacyPolicy(
@@ -144,7 +144,7 @@ class UserPrivacyPolicyTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($response['status'], 'ok');
+        $this->assertSame($response['status'], 'ok');
 
         // Create other privacy policy
         \OmegaUp\Test\Factories\User::createPrivacyStatement();

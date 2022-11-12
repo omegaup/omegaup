@@ -75,11 +75,11 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
 
         $submissions = \OmegaUp\DAO\Submissions::getLatestSubmissions();
         $this->assertCount(1, $submissions);
-        $this->assertEquals(
+        $this->assertSame(
             $identities[0]->username,
             $submissions[0]['username']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problems[0]['problem']->alias,
             $submissions[0]['alias']
         );
@@ -112,11 +112,11 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
 
         $submissions = \OmegaUp\DAO\Submissions::getLatestSubmissions();
         $this->assertCount(1, $submissions);
-        $this->assertEquals(
+        $this->assertSame(
             $identities[0]->username,
             $submissions[0]['username']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problems[0]['problem']->alias,
             $submissions[0]['alias']
         );
@@ -142,11 +142,11 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
             $identity->identity_id,
         );
         $this->assertCount(2, $submissions);
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $submissions[0]['username']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $submissions[1]['username']
         );

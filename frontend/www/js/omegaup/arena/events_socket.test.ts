@@ -35,6 +35,9 @@ const navbarProblems: types.NavbarProblemsetProblem[] = [
 const options: SocketOptions = {
   disableSockets: false,
   problemsetAlias: 'hello',
+  isVirtual: false,
+  startTime: new Date(0),
+  finishTime: new Date(1),
   locationProtocol: 'http',
   locationHost: 'localhost:1234',
   problemsetId: 1,
