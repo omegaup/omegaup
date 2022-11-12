@@ -113,7 +113,7 @@ services:
       MYSQL_ROOT_PASSWORD: 'omegaup'
       MYSQL_TCP_PORT: 13306
     command:
-      - --max_execution_time=30
+      - --max_execution_time=30000
       - --lock_wait_timeout=10
       - --wait_timeout=20
     expose:
