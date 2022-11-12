@@ -201,7 +201,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // New added users should appear in the list
-        $this->assertCount($index + 1, $response['users']);
+        $this->assertCount($numberOfParticipants, $response['users']);
 
         foreach ($response['users'] as $p) {
             $this->assertArrayContainsWithPredicate(
