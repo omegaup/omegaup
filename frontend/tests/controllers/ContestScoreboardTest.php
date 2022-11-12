@@ -1291,20 +1291,20 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             [
                 100,
                 [
-                    ['runs' => 1, 'score' => 40.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
-                    ['runs' => 2, 'score' => 73.33, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
-                    ['runs' => 3, 'score' => 80.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
+                    ['runs' => 1, 'score' => 0.4, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
+                    ['runs' => 2, 'score' => 0.73, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
+                    ['runs' => 3, 'score' => 0.8, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                 ],
                 $runsMapping
             ],
             [
                 60,
                 [
-                    ['runs' => 1, 'score' => 40.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
-                    ['runs' => 2, 'score' => 73.33, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
+                    ['runs' => 1, 'score' => 0.4, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
+                    ['runs' => 2, 'score' => 0.73, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                     // Only the number of runs should be updated, because of the
                     // contest's settings
-                    ['runs' => 3, 'score' => 73.33, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
+                    ['runs' => 3, 'score' => 0.73, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                 ],
                 $runsMapping
             ],
@@ -1312,9 +1312,9 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 100,
                 [
                     ['runs' => 1, 'score' => 0.0, 'execution' => 'EXECUTION_COMPILATION_ERROR', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_NOT_AVAILABLE', 'status_runtime' => 'RUNTIME_NOT_AVAILABLE'],
-                    ['runs' => 2, 'score' => 50.0, 'execution' => 'EXECUTION_JUDGE_ERROR', 'output' => 'OUTPUT_EXCEEDED', 'status_memory' => 'MEMORY_NOT_AVAILABLE', 'status_runtime' => 'RUNTIME_NOT_AVAILABLE'],
-                    ['runs' => 3, 'score' => 83.33, 'execution' => 'EXECUTION_INTERRUPTED', 'output' => 'OUTPUT_INTERRUPTED', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_EXCEEDED'],
-                    ['runs' => 4, 'score' => 100.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_CORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
+                    ['runs' => 2, 'score' => 0.5, 'execution' => 'EXECUTION_JUDGE_ERROR', 'output' => 'OUTPUT_EXCEEDED', 'status_memory' => 'MEMORY_NOT_AVAILABLE', 'status_runtime' => 'RUNTIME_NOT_AVAILABLE'],
+                    ['runs' => 3, 'score' => 0.83, 'execution' => 'EXECUTION_INTERRUPTED', 'output' => 'OUTPUT_INTERRUPTED', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_EXCEEDED'],
+                    ['runs' => 4, 'score' => 1.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_CORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                 ],
                 [
 

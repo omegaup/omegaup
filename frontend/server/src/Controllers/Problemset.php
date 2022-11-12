@@ -272,11 +272,9 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             // Do nothing.
             $r->identity = null;
         }
-        $r->ensureInt('problemset_id');
+        $problemsetId = $r->ensureInt('problemset_id');
 
-        $problemset = \OmegaUp\DAO\Problemsets::getWithTypeByPK(
-            intval($r['problemset_id'])
-        );
+        $problemset = \OmegaUp\DAO\Problemsets::getWithTypeByPK($problemsetId);
         if (is_null($problemset)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
@@ -291,7 +289,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             $token = $r->ensureOptionalString('token');
             $request = new \OmegaUp\Request([
                 'token' => $token,
-                'problemset_id' => $r['problemset_id'],
+                'problemset_id' => $problemsetId,
                 'contest_alias' => $problemset['contest_alias'],
             ]);
             if (isset($r['auth_token']) && is_string($r['auth_token'])) {

@@ -36,6 +36,7 @@ describe('Contest.vue', () => {
     finish_time: futureDate,
     languages: 'py3',
     partial_score: true,
+    score_mode: 'partial',
     penalty: 1,
     penalty_calc_policy: 'sum',
     penalty_type: 'contest_start',
