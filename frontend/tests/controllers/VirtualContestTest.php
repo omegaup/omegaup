@@ -185,7 +185,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($identity);
 
-        foreach ($participants as $index => $participant) {
+        foreach ($participants as $participant) {
             \OmegaUp\Controllers\Contest::apiAddUser(new \OmegaUp\Request([
                 'contest_alias' => $virtualContest->alias,
                 'usernameOrEmail' => $participant->username,
