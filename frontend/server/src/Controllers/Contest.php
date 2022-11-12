@@ -3370,7 +3370,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $originalContest = \OmegaUp\DAO\Contests::getByPK($contest->rerun_id);
 
-        if ($originalContest?->admission_mode === 'private') {
+        if (is_null($originalContest)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+
+        if ($originalContest->admission_mode === 'private') {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'usersCanNotBeAddedInVirtualContestWhenOriginalContestIsPrivate'
             );

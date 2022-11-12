@@ -191,23 +191,23 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
                 'usernameOrEmail' => $participant->username,
                 'auth_token' => $login->auth_token,
             ]));
+        }
 
-            $response = \OmegaUp\Controllers\Contest::apiUsers(
-                new \OmegaUp\Request([
-                    'contest_alias' => $virtualContest->alias,
-                    'auth_token' => $login->auth_token,
-                ])
+        $response = \OmegaUp\Controllers\Contest::apiUsers(
+            new \OmegaUp\Request([
+                'contest_alias' => $virtualContest->alias,
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        // New added users should appear in the list
+        $this->assertCount($index + 1, $response['users']);
+
+        foreach ($response['users'] as $p) {
+            $this->assertArrayContainsWithPredicate(
+                $participants,
+                fn ($value) => $value->username == $p['username']
             );
-
-            // New added users should appear in the list
-            $this->assertCount($index + 1, $response['users']);
-
-            foreach ($response['users'] as $p) {
-                $this->assertArrayContainsWithPredicate(
-                    $participants,
-                    fn ($value) => $value->username == $p['username']
-                );
-            }
         }
     }
 
