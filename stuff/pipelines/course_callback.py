@@ -49,7 +49,7 @@ class CourseCallback:
                  _method: Optional[pika.spec.Basic.Deliver],
                  _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
-        '''Function to stores the certificates by a given course'''
+        '''Function to store the certificates by a given course'''
         data = CourseCertificate(**json.loads(body))
 
         result = self.client.course.studentsProgress(

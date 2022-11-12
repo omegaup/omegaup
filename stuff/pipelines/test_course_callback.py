@@ -2,7 +2,6 @@
 
 '''test course_callback module.'''
 
-from ast import alias
 import dataclasses
 import datetime
 import json
@@ -35,7 +34,6 @@ def test_insert_course_certificate() -> None:
     client = omegaup.api.Client(api_token=test_constants.API_TOKEN,
                                 url=test_constants.OMEGAUP_API_ENDPOINT)
     current_time = datetime.datetime.now()
-    past_time = current_time - datetime.timedelta(hours=5)
     future_time = current_time + datetime.timedelta(hours=5)
     course_alias = ''.join(random.choices(string.digits, k=8))
     assignment_alias = ''.join(random.choices(string.digits, k=8))
@@ -155,7 +153,7 @@ def test_insert_course_certificate() -> None:
                 cs.course_id = c.course_id
             WHERE
                 cs.alias = %s;
-            ''', (alias,))
+            ''', (course_alias,))
         certificates = cur.fetchall()
         assert certificates
 

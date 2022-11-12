@@ -15,9 +15,9 @@ from typing import List
 import omegaup.api
 
 import contest_callback
+import test_constants
 import test_credentials
 import rabbitmq_connection
-import test_constants
 
 
 sys.path.insert(
