@@ -1453,6 +1453,7 @@ const translations: { [key: string]: string; } = {
   usernameInUse: "Username already exists.",
   usernameOrPassIsWrong: "Username or password is wrong. Please check your credentials.",
   usersCanNotBeAddedInContestForTeams: "Users cannot be added in contests for teams",
+  usersCanNotBeAddedInVirtualContestWhenOriginalContestIsPrivate: "Users can not be added in virtual contest when original contest is private",
   verdictAC: "Accepted",
   verdictCE: "Compilation error",
   verdictFO: "Runtime error (restricted function)",

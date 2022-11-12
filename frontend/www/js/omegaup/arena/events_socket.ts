@@ -6,7 +6,11 @@ import {
   refreshContestClarifications,
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
-import { onRankingChanged, onRankingEvents } from './ranking';
+import {
+  onRankingChanged,
+  onRankingEvents,
+  onVirtualRankingChanged,
+} from './ranking';
 import { updateRun } from './submissions';
 import { types } from '../api_types';
 import rankingStore from './rankingStore';
@@ -21,6 +25,10 @@ export enum SocketStatus {
 export interface SocketOptions {
   disableSockets: boolean;
   problemsetAlias: string;
+  isVirtual: boolean;
+  originalProblemsetId?: number;
+  startTime: Date;
+  finishTime?: Date;
   locationProtocol: string;
   locationHost: string;
   problemsetId: number;
@@ -41,6 +49,10 @@ export class EventsSocket {
 
   private readonly disableSockets: boolean;
   private readonly problemsetAlias: string;
+  private readonly isVirtual: boolean;
+  private readonly originalProblemsetId?: number;
+  private readonly startTime: Date;
+  private readonly finishTime?: Date;
   private readonly problemsetId: number;
   private readonly scoreboardToken: null | string;
   socketStatus: SocketStatus = SocketStatus.Waiting;
@@ -55,6 +67,10 @@ export class EventsSocket {
   constructor({
     disableSockets = false,
     problemsetAlias,
+    isVirtual = false,
+    originalProblemsetId,
+    startTime,
+    finishTime,
     locationProtocol,
     locationHost,
     problemsetId,
@@ -69,6 +85,10 @@ export class EventsSocket {
 
     this.disableSockets = disableSockets;
     this.problemsetAlias = problemsetAlias;
+    this.isVirtual = isVirtual;
+    this.originalProblemsetId = originalProblemsetId;
+    this.startTime = startTime;
+    this.finishTime = finishTime;
     this.problemsetId = problemsetId;
     this.scoreboardToken = scoreboardToken;
     this.clarificationsOffset = clarificationsOffset;
@@ -105,12 +125,24 @@ export class EventsSocket {
       data.scoreboard.finish_time = time.remoteTime(
         data.scoreboard.finish_time * 1000,
       );
-      // TODO: Uncomment next block when virtual contest is migrated
-      /*if (problemsetAdmin && data.scoreboard_type != 'admin') {
-        if (options.originalContestAlias == null) return;
-        virtualRankingChange(data.scoreboard);
+      if (this.isVirtual) {
+        api.Problemset.scoreboardEvents({
+          problemset_id: this.originalProblemsetId,
+          token: this.scoreboardToken,
+        })
+          .then((response) => {
+            onVirtualRankingChanged({
+              scoreboard: data.scoreboard,
+              currentUsername: this.currentUsername,
+              scoreboardEvents: response.events,
+              problems: this.navbarProblems,
+              startTime: this.startTime,
+              finishTime: this.finishTime,
+            });
+          })
+          .catch(ui.ignoreError);
         return;
-      }*/
+      }
       const {
         currentRanking,
         ranking,

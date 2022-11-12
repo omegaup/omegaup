@@ -1453,6 +1453,7 @@ const translations: { [key: string]: string; } = {
   usernameInUse: "Nome de usu\u00e1rio j\u00e1 existe.",
   usernameOrPassIsWrong: "Nome de usu\u00e1rio ou senha est\u00e1 errada. Por favor verifique suas credenciais.",
   usersCanNotBeAddedInContestForTeams: "Os usu\u00e1rios n\u00e3o podem ser adicionados em concursos para equipes",
+  usersCanNotBeAddedInVirtualContestWhenOriginalContestIsPrivate: "Os usu\u00e1rios n\u00e3o podem ser adicionados ao concurso virtual quando o concurso original \u00e9 privado",
   verdictAC: "Aceitado",
   verdictCE: "Erro de compila\u00e7\u00e3o",
   verdictFO: "Erro de execu\u00e7\u00e3o (fun\u00e7\u00e3o restrita)",

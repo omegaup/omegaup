@@ -28,7 +28,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int|null, scoreboard: int, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null, window_length: int|null}
  * @psalm-type ContestVirtualDetailsPayload=array{contest: ContestPublicDetails}
- * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<ProblemsetProblemWithVersions>, users: list<ContestUser>, groups: list<ContestGroup>, teams_group: ContestGroup|null, requests: list<ContestRequest>, admins: list<ContestAdmin>, group_admins: list<ContestGroupAdmin>}
+ * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<ProblemsetProblemWithVersions>, users: list<ContestUser>, groups: list<ContestGroup>, teams_group: ContestGroup|null, requests: list<ContestRequest>, admins: list<ContestAdmin>, group_admins: list<ContestGroupAdmin>, original_contest_admission_mode: null|string}
  * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestList=array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}
@@ -1362,6 +1362,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $originalContest = null;
+        if (!is_null($contest->rerun_id)) {
+            $originalContest = \OmegaUp\DAO\Contests::getByPK(
+                $contest->rerun_id
+            );
+        }
+
         $problemset = \OmegaUp\DAO\Problemsets::getByPK(
             $contest->problemset_id
         );
@@ -1426,7 +1433,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     ),
                     'group_admins' => \OmegaUp\DAO\GroupRoles::getContestAdmins(
                         $contest
-                    )
+                    ),
+                    'original_contest_admission_mode' => $originalContest?->admission_mode,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleContestEdit'
@@ -3351,11 +3359,28 @@ class Contest extends \OmegaUp\Controllers\Controller {
         string $usernameOrEmail,
         \OmegaUp\DAO\VO\Identities $identity
     ): array {
-        $identityToRemove = \OmegaUp\Controllers\Identity::resolveIdentity(
+        $identityToAddOrRemove = \OmegaUp\Controllers\Identity::resolveIdentity(
             $usernameOrEmail
         );
         $contest = self::validateContestAdmin($contestAlias, $identity);
-        return [$identityToRemove, $contest];
+
+        if (is_null($contest->rerun_id)) {
+            return [$identityToAddOrRemove, $contest];
+        }
+
+        $originalContest = \OmegaUp\DAO\Contests::getByPK($contest->rerun_id);
+
+        if (is_null($originalContest)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+
+        if ($originalContest->admission_mode === 'private') {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'usersCanNotBeAddedInVirtualContestWhenOriginalContestIsPrivate'
+            );
+        }
+
+        return [$identityToAddOrRemove, $contest];
     }
 
     /**
@@ -4076,7 +4101,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @return Scoreboard
      */
-    public static function getScoreboard(
+    private static function getScoreboard(
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Problemsets $problemset,
         ?\OmegaUp\DAO\VO\Identities $identity,

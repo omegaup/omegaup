@@ -57,7 +57,10 @@
             >{{ T.contestNewFormAdmissionMode }}</a
           >
           <a
-            v-if="!details.contest_for_teams"
+            v-if="
+              originalContestAdmissionMode != 'private' &&
+              !details.contest_for_teams
+            "
             href="#"
             data-toggle="tab"
             data-nav-contestant
@@ -77,6 +80,7 @@
             >{{ T.contestAddgroupAddGroup }}</a
           >
           <a
+            v-if="!virtual"
             href="#"
             data-toggle="tab"
             class="dropdown-item"
@@ -327,12 +331,23 @@ export default class Edit extends Vue {
   @Prop() teamsGroup!: types.ContestGroup | null;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop() searchResultGroups!: types.ListItem[];
+  @Prop({ default: null }) originalContestAdmissionMode!: null | string;
 
   T = T;
   ui = ui;
-  showTab = ui.isVirtual(this.details) ? 'contestants' : 'new_form';
   virtual = ui.isVirtual(this.details);
+  showTab = this.selectedTab();
   alreadyArchived = this.details.archived;
+
+  selectedTab(): string {
+    if (!ui.isVirtual(this.details)) {
+      return 'new_form';
+    }
+    if (this.originalContestAdmissionMode != 'private') {
+      return 'contestants';
+    }
+    return 'links';
+  }
 
   get activeTab(): string {
     switch (this.showTab) {
