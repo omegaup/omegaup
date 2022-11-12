@@ -13,11 +13,12 @@ import pika
 import pytest_mock
 import contest_callback
 
-import test_credentials
-import rabbitmq_connection
+import database.contest
 import producer_contest
+import rabbitmq_connection
 import rabbitmq_client
 import rabbitmq_connection
+import test_credentials
 
 sys.path.insert(
     0,
@@ -45,22 +46,36 @@ class MessageSavingCallback:
     'params, expected',
     [
         (
-            {
-                'certificate_cutoff': 1,
-                'contest_id': 1,
-                'alias': 'contest1',
-                'scoreboard_url': 'abcdef',
-            },
-            'certificate_cutoff',
+            [
+                database.contest.ContestCertificate(
+                    certificate_cutoff=1,
+                    alias='contest1',
+                    scoreboard_url='abcdef',
+                    contest_id=1,
+                ),
+            ],
+            database.contest.ContestCertificate(
+                certificate_cutoff=1,
+                alias='contest1',
+                scoreboard_url='abcdef',
+                contest_id=1,
+            )._asdict(),
         ),
         (
-            {
-                'certificate_cutoff': 1,
-                'contest_id': 2,
-                'alias': 'contest2',
-                'scoreboard_url': '123456',
-            },
-            'certificate_cutoff',
+            [
+                database.contest.ContestCertificate(
+                    certificate_cutoff=1,
+                    alias='contest2',
+                    scoreboard_url='123456',
+                    contest_id=2,
+                ),
+            ],
+            database.contest.ContestCertificate(
+                certificate_cutoff=1,
+                alias='contest2',
+                scoreboard_url='123456',
+                contest_id=2,
+            )._asdict(),
         ),
     ],
 )  # type: ignore
