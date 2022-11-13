@@ -2,6 +2,7 @@
   <div class="card">
     <div class="card-header">
       {{ !saved ? T.runDetailsNewFeedback : T.runDetailsFeedbackCreated }}
+      <button v-if="saved" @click.prevent="onDeleteFeedback">❌</button>
     </div>
     <div class="card-body">
       <textarea
@@ -82,7 +83,12 @@ export default class Feedback extends Vue {
 
   onCancelFeedback() {
     this.currentFeedback.text = null;
-    this.$emit('cancel', this.currentFeedback);
+    this.$emit('cancel');
+  }
+
+  onDeleteFeedback() {
+    this.currentFeedback.text = null;
+    this.$emit('delete', this.currentFeedback);
   }
 }
 </script>

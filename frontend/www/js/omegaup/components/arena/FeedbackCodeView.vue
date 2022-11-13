@@ -42,7 +42,7 @@ export default class FeedbackCodeView extends Vue {
   mode = languageModeMap[this.language] ?? languageModeMap['cpp17-gcc'];
   mapChangeTracker = 1;
 
-  get mapAsList(): [number, ArenaCourseFeedback][] {
+  get feedbackList(): [number, ArenaCourseFeedback][] {
     if (!this.mapChangeTracker) {
       throw new Error('unreachable code');
     }
@@ -50,7 +50,7 @@ export default class FeedbackCodeView extends Vue {
   }
 
   get numberOfComments(): number {
-    return this.mapAsList.length;
+    return this.feedbackList.length;
   }
 
   get editorOptions(): EditorOptions {
@@ -69,33 +69,55 @@ export default class FeedbackCodeView extends Vue {
     editor.on(
       'gutterClick',
       (editor: CodeMirror.Editor, lineNumber: number) => {
-        this.mapChangeTracker++;
-        const marker = document.createElement('div');
-        marker.classList.add('px-2');
+        if (editor.lineInfo(lineNumber).widgets?.length ?? 0 > 0) {
+          // There's already a widget in this line, so avoid creating another one.
+          return;
+        }
 
-        const feedback: ArenaCourseFeedback = {
-          text: null,
-          lineNumber,
-          status: FeedbackStatus.New,
-        };
         const feedbackForm = new FeedbackClass({
           propsData: {
-            feedback,
+            feedback: {
+              text: null,
+              lineNumber,
+              status: FeedbackStatus.New,
+            },
           },
         });
         feedbackForm.$mount();
-        marker.appendChild(feedbackForm.$el);
-        const lineWidget = editor.addLineWidget(lineNumber, marker);
+        const lineWidget = editor.addLineWidget(
+          lineNumber,
+          feedbackForm.$el as HTMLElement,
+          {
+            className: 'px-2',
+          },
+        );
 
         feedbackForm.$on('submit', (feedback: ArenaCourseFeedback) => {
+          Vue.nextTick(() => {
+            // Now that the DOM has changed, we need to tell CodeMirror to
+            // recalculate the height of the line widget so that it knows which
+            // y coordinate corresponds to which line.
+            lineWidget.changed();
+          });
           this.setFeedback(feedback);
         });
 
-        feedbackForm.$on('cancel', (feedback: ArenaCourseFeedback) => {
+        feedbackForm.$on('cancel', () => {
+          editor.removeLineWidget(lineWidget);
+          feedbackForm.$destroy();
+        });
+
+        feedbackForm.$on('delete', (feedback: ArenaCourseFeedback) => {
           this.deleteFeedback({ lineNumber: feedback.lineNumber });
           editor.removeLineWidget(lineWidget);
-          marker.removeChild(feedbackForm.$el);
           feedbackForm.$destroy();
+        });
+
+        Vue.nextTick(() => {
+          // Now that the DOM has changed, we need to tell CodeMirror to
+          // recalculate the height of the line widget so that it knows which y
+          // coordinate corresponds to which line.
+          lineWidget.changed();
         });
       },
     );
@@ -126,7 +148,7 @@ export default class FeedbackCodeView extends Vue {
   saveFeedbackList(): void {
     this.$emit(
       'save-feedback-list',
-      Array.from(this.feedbackMap, ([lineNumber, feedback]) => ({
+      this.feedbackList.map(([lineNumber, feedback]) => ({
         lineNumber,
         feedback: feedback.text,
       })),
@@ -149,19 +171,24 @@ export default class FeedbackCodeView extends Vue {
       min-height: 100% !important;
     }
 
-    .CodeMirror-linenumbers {
-      width: 39px !important;
+    .CodeMirror-linenumber {
+      width: 4em !important;
+      cursor: pointer;
     }
 
-    .CodeMirror-linenumber:hover::after {
+    .CodeMirror-linenumber::after {
       font: var(--fa-font-solid);
-      content: '\f0fe';
+      width: 1em;
+      content: '';
       display: inline-block;
       vertical-align: middle;
       font-weight: 900;
-      cursor: pointer;
       color: var(--btn-ok-background-color);
       font-size: x-large;
+    }
+
+    .CodeMirror-linenumber:hover::after {
+      content: '\f0fe';
     }
 
     .CodeMirror {
