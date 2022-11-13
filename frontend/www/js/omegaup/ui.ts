@@ -255,18 +255,24 @@ export function copyToClipboard(value: string): void {
 declare global {
   interface Window {
     ga?: (command: string, ...fields: any[]) => void;
+    gtag?: (command: string, ...fields: any[]) => void;
   }
 }
 
 export function reportEvent(
   category: string,
-  action?: string,
+  action: string,
   label?: string,
 ): void {
-  if (typeof window.ga !== 'function') {
-    return;
+  if (typeof window.ga === 'function') {
+    window.ga('send', 'event', category, action, label);
   }
-  window.ga('send', 'event', category, action, label);
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', action, {
+      event_category: category,
+      event_label: label,
+    });
+  }
 }
 
 export function reportPageView(page: string): void {
