@@ -70,14 +70,6 @@ describe('Feedback.vue', () => {
 
     await button.trigger('click');
 
-    expect(wrapper.emitted('cancel')).toEqual([
-      [
-        {
-          lineNumber: 2,
-          status: FeedbackStatus.New,
-          text: null,
-        },
-      ],
-    ]);
+    expect(wrapper.emitted('cancel')).toEqual([[]]);
   });
 });
