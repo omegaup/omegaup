@@ -155,7 +155,7 @@ export default class ContestCard extends Vue {
   }
 
   getVirtualContestURL(alias: string): string {
-    return `/arena/${encodeURIComponent(alias)}/virtual/`;
+    return `/contest/${encodeURIComponent(alias)}/virtual/`;
   }
 
   getPracticeContestURL(alias: string): string {

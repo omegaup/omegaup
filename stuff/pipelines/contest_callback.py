@@ -51,7 +51,8 @@ class ContestsCallback:
                  _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
         '''Function to store the certificates by a given contest'''
-        data = ContestCertificate(**json.loads(body))
+        response = json.loads(body)
+        data = ContestCertificate(**response)
 
         scoreboard = self.client.contest.scoreboard(
             contest_alias=data.alias,
@@ -67,7 +68,7 @@ class ContestsCallback:
             certificates.append(Certificate(
                 certificate_type='contest',
                 contest_id=data.contest_id,
-                verification_code=verification_code.generate_code(),
+                verification_code=generate_contest_code(),
                 contest_place=contest_place,
                 username=str(user.username)
             ))
@@ -104,9 +105,13 @@ class ContestsCallback:
                     if err.errno != errorcode.ER_DUP_ENTRY:
                         raise
                     for certificate in certificates:
-                        certificate.verification_code = verification_code.generate_code()
+                        certificate.verification_code = generate_contest_code()
                     logging.exception(
                         'At least one of the verification codes had a conflict'
                     )
+
+
+def generate_contest_code()  -> str:
+    return verification_code.generate_code()
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
