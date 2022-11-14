@@ -418,52 +418,6 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * A PHPUnit data provider for all the partial score to get profile details.
-     *
-     * @return list<array{0:bool, 1:string}>
-     */
-    public function partialScoreProvider(): array {
-        return [
-            [true, 'partial'],
-            [false, 'all_or_nothing'],
-        ];
-    }
-
-    /**
-     * @dataProvider partialScoreProvider
-     */
-    public function testCreateContestWithPartialScore(
-        bool $partialScore,
-        string $scoreModeExpected
-    ) {
-        // Get a problem
-        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
-
-        // Create contest with 2 hours and a window length 30 of minutes
-        $contest = \OmegaUp\Test\Factories\Contest::createContest(
-            new \OmegaUp\Test\Factories\ContestParams([
-                'partialScore' => $partialScore,
-                ])
-        );
-
-        // Add the problem to the contest
-        \OmegaUp\Test\Factories\Contest::addProblemToContest(
-            $problem,
-            $contest
-        );
-
-        // Create a contestant
-        $login = self::login($contest['director']);
-
-        // Create a contest request
-        $response = \OmegaUp\DAO\Contests::getByAlias(
-            $contest['request']['alias']
-        );
-
-        $this->assertSame($response->score_mode, $scoreModeExpected);
-    }
-
-    /**
      * Under13 users can't create contests.
      *
      */

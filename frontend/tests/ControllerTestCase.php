@@ -175,10 +175,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
             floatval($r['points_decay_factor']),
             $contest->points_decay_factor
         );
-        $this->assertSame(
-            boolval($r['partial_score']),
-            $contest->partial_score
-        );
+        $this->assertSame($r['score_mode'], $contest->score_mode);
         $this->assertSame(
             intval(
                 $r['submissions_gap']

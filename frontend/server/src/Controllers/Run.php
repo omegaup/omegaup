@@ -735,7 +735,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         if (!is_null($filtered['contest_score'])) {
             if (
                 is_null($contest)
-                || $contest->partial_score
+                || $contest->score_mode == 'partial'
                 || $filtered['score'] == 1
             ) {
                 $result['contest_score'] = round(
@@ -1297,7 +1297,11 @@ class Run extends \OmegaUp\Controllers\Controller {
         ) {
             $response['compile_error'] = $details['compile_error'];
         }
-        if (!is_null($contest) && !$contest->partial_score && $run->score < 1) {
+        if (
+            !is_null(
+                $contest
+            ) && $contest->score_mode != 'partial' && $run->score < 1
+        ) {
             $details['contest_score'] = 0.0;
             $details['score'] = 0.0;
         } else {
