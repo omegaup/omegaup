@@ -24,13 +24,19 @@ export interface CourseOptions {
   description?: string;
 }
 
+declare enum ScoreMode {
+  AllOrNothing = 'all_or_nothing',
+  Partial = 'partial',
+  MaxPerGroup = 'max_per_group',
+}
+
 export interface ContestOptions {
   contestAlias: string;
   description?: string;
   startDate: Date;
   endDate: Date;
   showScoreboard?: boolean;
-  partialPoints?: boolean;
+  scoreMode: ScoreMode;
   basicInformation?: boolean;
   requestParticipantInformation?: RequestParticipantInformation;
   admissionMode: AdmissionModeOptions;

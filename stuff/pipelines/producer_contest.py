@@ -53,7 +53,7 @@ def send_contest_message_to_client(
     )
 
     for data in contestants:
-        message = json.dumps(data)
+        message = json.dumps(data._asdict())
         contest_producer.send_message(message)
 
 

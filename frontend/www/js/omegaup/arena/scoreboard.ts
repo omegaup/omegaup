@@ -80,6 +80,9 @@ OmegaUp.on('ready', () => {
   const socket = new EventsSocket({
     disableSockets: false,
     problemsetAlias: payload.contest.alias,
+    isVirtual: false,
+    startTime: payload.contest.start_time,
+    finishTime: payload.contest.finish_time,
     locationProtocol: window.location.protocol,
     locationHost: window.location.host,
     problemsetId: payload.contest.problemset_id,
@@ -89,6 +92,7 @@ OmegaUp.on('ready', () => {
     navbarProblems: payload.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
+    isContestModeMaxPerGroup: payload.contest.score_mode === 'max_per_group',
   });
 
   socket.connect();
