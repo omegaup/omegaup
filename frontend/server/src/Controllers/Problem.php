@@ -451,7 +451,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $visibility
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
-        $r->ensureMainUserIdentity();
+        $r->ensureMainUserIdentityIsOver13();
 
         self::createProblem(
             $r->user,
@@ -622,7 +622,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Authenticate logged user
-        $r->ensureIdentity();
+        $r->ensureIdentityIsOver13();
 
         // Check problem_alias
         $problemAlias = $r->ensureString(
@@ -670,7 +670,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Authenticate logged user
-        $r->ensureIdentity();
+        $r->ensureIdentityIsOver13();
         $problemAlias = $r->ensureString(
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)

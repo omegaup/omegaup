@@ -233,7 +233,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $numberOfContestants
      */
     public static function apiCreate(\OmegaUp\Request $r) {
-        $r->ensureMainUserIdentity();
+        $r->ensureMainUserIdentityIsOver13();
 
         $teamGroupAlias = $r->ensureString(
             'alias',
