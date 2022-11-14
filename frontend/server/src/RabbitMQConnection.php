@@ -42,12 +42,7 @@ class RabbitMQConnection {
         );
     }
 
-    /**
-     * @return mixed
-     */
-    public function channel() {
-        if (!is_null(self::$_instance)) {
-            return self::$_instance->connection->channel();
-        }
+    public function channel(): \PhpAmqpLib\Channel\AMQPChannel {
+        return $this->connection->channel();
     }
 }
