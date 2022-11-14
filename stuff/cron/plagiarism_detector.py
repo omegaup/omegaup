@@ -1,25 +1,20 @@
 #!/usr/bin/env python3
-''' Main Plagiairism Detector Script. 
+'''Main Plagiairism Detector Script.
 
 This script gets all the contest that finished in the last 15 minutes, runs
 copydetect on their submissions, and inserts the reports into the database.
-
 '''
 
 import argparse
-import calendar
-import collections
-import datetime
 import json
 import logging
-import operator
 import os
 import shutil
 import sys
 import tempfile
 import typing
-from typing import (Callable, DefaultDict, Dict, Iterable, List, Mapping,
-                    NamedTuple, Optional, Sequence, Set, Tuple, TypedDict)
+from typing import (Callable, Dict, Iterable, List, NamedTuple, Sequence,
+                    Tuple, TypedDict)
 
 import boto3  # type: ignore
 import copydetect  # type: ignore
@@ -52,16 +47,17 @@ class CopyDetectorResult(NamedTuple):
 
 # SQL Queries
 
-CONTESTS_TO_RUN_PLAGIARISM_ON = """ SELECT c.`contest_id`, c.`problemset_id`, c.`alias`
-                                    FROM `Contests` as c
-                                    WHERE
-                                        c.`check_plagiarism` = 1 AND
-                                        c.`finish_time` > NOW() - INTERVAL 20 MINUTE AND
-                                        c.`finish_time` < NOW() AND
-                                        c.`contest_id` NOT IN
-                                            (SELECT p.`contest_id` 
-                                            FROM `Plagiarisms` as p);
-                                """
+CONTESTS_TO_RUN_PLAGIARISM_ON = """
+    SELECT c.`contest_id`, c.`problemset_id`, c.`alias`
+    FROM `Contests` as c
+    WHERE
+        c.`check_plagiarism` = 1 AND
+        c.`finish_time` > NOW() - INTERVAL 20 MINUTE AND
+        c.`finish_time` < NOW() AND
+        c.`contest_id` NOT IN
+            (SELECT p.`contest_id`
+            FROM `Plagiarisms` as p);
+"""
 
 
 class Contest(TypedDict):
@@ -69,14 +65,15 @@ class Contest(TypedDict):
     problemset_id: int
 
 
-GET_CONTEST_SUBMISSION_IDS = """ SELECT c.contest_id, s.identity_id,
-                                s.submission_id, s.problemset_id,
-                                s.problem_id, s.verdict, s.guid, s.language
-                                FROM Submissions as s 
-                                INNER JOIN Contests c ON c.problemset_id = s.problemset_id 
-                                WHERE c.contest_id = %s AND
-                                s.verdict = "AC";
-                            """
+GET_CONTEST_SUBMISSION_IDS = """
+    SELECT
+        c.contest_id, s.identity_id,
+        s.submission_id, s.problemset_id,
+        s.problem_id, s.verdict, s.guid, s.language
+    FROM Submissions as s
+    INNER JOIN Contests c ON c.problemset_id = s.problemset_id
+    WHERE c.contest_id = %s AND s.verdict = "AC";
+"""
 
 
 class Submission(TypedDict):
@@ -89,12 +86,12 @@ class Submission(TypedDict):
     language: str
 
 
-INSERT_INTO_PLAGIARISMS = """  
-                                INSERT INTO `Plagiarisms`
-                                (`contest_id`, `score_1`, `score_2` , `submission_id_1` , `submission_id_2`, `contents`)
-                                VALUES
-                                (%s, %s, %s, %s, %s, %s)
-                            """
+INSERT_INTO_PLAGIARISMS = """
+    INSERT INTO `Plagiarisms`
+        (`contest_id`, `score_1`, `score_2` , `submission_id_1` , `submission_id_2`, `contents`)
+    VALUES
+        (%s, %s, %s, %s, %s, %s)
+"""
 
 # Constants
 START_RED = "<span class='highlight-red'>"
@@ -111,13 +108,11 @@ SubmissionDownloader = Callable[[str, str], None]
 class S3SubmissionDownloader:
     ''' A SubmissionDownloader that can download files from an S3 bucket.  '''
 
-    def __init__(self, bucket_name: str = 'omegaup-backup') -> None:
+    def __init__(self, bucket_name: str = 'omegaup-submissions') -> None:
         self._bucket = boto3.client('s3').Bucket(bucket_name)
 
     def __call__(self, guid: str, destination_dir: str) -> None:
-        self._bucket.download_file(
-            f'omegaup/submissions/{guid[:2]}/{guid[2:]}',
-            os.path.join(destination_dir))
+        self._bucket.download_file(guid, os.path.join(destination_dir))
 
 
 class LocalSubmissionDownloader:
@@ -132,9 +127,9 @@ class LocalSubmissionDownloader:
 
 def get_range(code: Sequence[str]) -> Tuple[Tuple[int, int], ...]:
     """
-    Function to get the range of lines that are plagiarised. 
-    The length of each list should be even. 
-    [1, 4, 7, 9] So, the ranges are 1-4 and 7-9. 
+    Function to get the range of lines that are plagiarised.
+    The length of each list should be even.
+    [1, 4, 7, 9] So, the ranges are 1-4 and 7-9.
     """
 
     code_range_list: List[int] = []
@@ -267,10 +262,10 @@ def run_detector_for_contest(dbconn: lib.db.Connection,
                              download: SubmissionDownloader,
                              contest_id: int) -> None:
 
-    with tempfile.TemporaryDirectory(prefix='plagiarism_detector') as dir:
+    with tempfile.TemporaryDirectory(prefix='plagiarism_detector') as tempdir:
         submissions = get_submissions_for_contest(dbconn, contest_id)
-        download_submission_files(dbconn, dir, download, submissions)
-        run_copy_detect(dbconn, dir, contest_id, submissions)
+        download_submission_files(dbconn, tempdir, download, submissions)
+        run_copy_detect(dbconn, tempdir, contest_id, submissions)
 
 
 def main() -> None:
@@ -289,7 +284,7 @@ def main() -> None:
     logging.info('started')
     dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
 
-    if args.local_downloader_dir != None:
+    if args.local_downloader_dir is not None:
         download: SubmissionDownloader = LocalSubmissionDownloader(
             args.local_downloader_dir)
     else:

@@ -36,25 +36,28 @@ def _parse_date(s: str) -> datetime.date:
 
 
 def update_problem_accepted_stats(
-        cur: mysql.connector.cursor.MySQLCursorDict) -> None:
+    cur: mysql.connector.cursor.MySQLCursorDict,
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    dbconn: mysql.connector.MySQLConnection,
+) -> None:
     '''Updates the problem accepted stats'''
 
     logging.info('Updating accepted stats for problems...')
-    cur.execute('''
-        UPDATE
-            `Problems` AS `p`
-        SET
-            `p`.accepted = (
+    # This is using a subquery so that even problems that don't have a single
+    # AC run emit a row.
+    cur_readonly.execute('''
+        SELECT
+            `p`.`problem_id`,
+            (
                 SELECT
                     COUNT(DISTINCT `s`.`identity_id`)
                 FROM
                     `Submissions` AS `s`
                 INNER JOIN
-                    `Identities` AS `i`
-                ON
-                    `i`.`identity_id` = `s`.`identity_id`
+                    `Identities` AS `i` ON `i`.`identity_id` = `s`.`identity_id`
                 WHERE
-                    `s`.`problem_id` = `p`.`problem_id` AND `s`.verdict = 'AC'
+                    `s`.`problem_id` = `p`.`problem_id`
+                    AND `s`.verdict = 'AC'
                     AND NOT EXISTS (
                         SELECT
                             `pf`.`problem_id`, `pf`.`user_id`
@@ -73,8 +76,21 @@ def update_problem_accepted_stats(
                             `a`.`acl_id` = `p`.`acl_id` AND
                             `a`.`owner_id` = `i`.`user_id`
                     )
-            );
+            ) AS `accepted`
+        FROM
+            `Problems` AS `p`;
     ''')
+    for row in cur_readonly.fetchall():
+        cur.execute(
+            '''
+                UPDATE
+                    `Problems` AS `p`
+                SET
+                    `p`.`accepted` = %s
+                WHERE
+                    `p`.`problem_id` = %s;
+            ''', (row['accepted'], row['problem_id']))
+    dbconn.commit()
 
 
 def update_user_rank(
@@ -84,7 +100,6 @@ def update_user_rank(
     '''Updates the user ranking.'''
 
     logging.info('Updating user rank...')
-    cur.execute('DELETE FROM `User_Rank`;')
     cur_readonly.execute('''
         SELECT
             `i`.`username`,
@@ -155,6 +170,7 @@ def update_user_rank(
     # MySQL has no good way of obtaining percentiles, so we'll store the sorted
     # list of scores in order to calculate the cutoff scores later.
     scores: List[float] = []
+    cur.execute('DELETE FROM `User_Rank`;')
     for index, row in enumerate(cur_readonly.fetchall()):
         if row['score'] != prev_score:
             rank = index + 1
@@ -385,14 +401,14 @@ def update_school_rank(cur: mysql.connector.cursor.MySQLCursorDict) -> None:
         prev_score = row['score']
         cur.execute(
             '''
-                        UPDATE
-                            `Schools` AS `s`
-                        SET
-                            `s`.`score` = %s,
-                            `s`.`ranking` = %s
-                        WHERE
-                            `s`.`school_id` = %s;
-                    ''', (row['score'], rank, row['school_id']))
+                UPDATE
+                    `Schools` AS `s`
+                SET
+                    `s`.`score` = %s,
+                    `s`.`ranking` = %s
+                WHERE
+                    `s`.`school_id` = %s;
+            ''', (row['score'], rank, row['school_id']))
 
 
 def update_school_of_the_month_candidates(
@@ -782,7 +798,7 @@ def main() -> None:
         with dbconn.cursor(buffered=True,
                            dictionary=True) as cur, dbconn_readonly.cursor(
                                buffered=True, dictionary=True) as cur_readonly:
-            update_problem_accepted_stats(cur)
+            update_problem_accepted_stats(cur, cur_readonly, dbconn.conn)
             update_users_stats(cur, cur_readonly, dbconn.conn, args.date)
             update_schools_stats(cur, cur_readonly, dbconn.conn, args.date)
     finally:
