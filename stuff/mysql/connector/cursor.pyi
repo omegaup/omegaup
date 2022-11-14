@@ -47,5 +47,5 @@ class MySQLCursorBufferedDict(MySQLCursorDict):
     def __enter__(self):
         ...
 
-    def __exit__(self, exc_type: Optional[types[BaseException]], exc: Optional[BaseException], traceback: Optional[TracebackType]) -> None:
+    def __exit__(self, exc_type: Optional[types[BaseException]], exc: Optional[BaseException], traceback: Optional[types.TracebackType]) -> None:
         ...
