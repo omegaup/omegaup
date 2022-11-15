@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 ''' Assigns users badges and creates the notifications.'''
 
 import argparse
@@ -14,47 +13,43 @@ import mysql.connector.cursor
 
 sys.path.insert(
     0,
-    os.path.join(
-        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
-import lib.db   # pylint: disable=wrong-import-position
+    os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
+                 "."))
+import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
+BADGES_PATH = os.path.abspath(
+    os.path.join(__file__, '..', '..', '..', 'frontend/badges'))
 
-BADGES_PATH = os.path.abspath(os.path.join(__file__, '..', '..',
-                                           '..', 'frontend/badges'))
 
-
-def get_all_owners(badge: str, current_timestamp: Optional[datetime.datetime],
-                   cur: mysql.connector.cursor.MySQLCursorDict) -> Set[int]:
+def get_all_owners(
+    badge: str,
+    current_timestamp: Optional[datetime.datetime],
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+) -> Set[int]:
     '''Returns a set of ids of users who should receive the badge'''
     with open(os.path.join(BADGES_PATH, badge, 'query.sql')) as fd:
         query = fd.read()
     if current_timestamp is not None:
         query = query.replace(
             'NOW()', f"'{current_timestamp.strftime('%Y-%m-%d %H:%M:%S')}'")
-    cur.execute(query)
-    results = set()
-    for row in cur:
-        results.add(row['user_id'])
-    return results
+    cur_readonly.execute(query)
+    return set(row['user_id'] for row in cur_readonly)
 
 
 def get_current_owners(
-        badge: str,
-        cur: mysql.connector.cursor.MySQLCursorDict,
+    badge: str,
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
 ) -> Set[int]:
     '''Returns a set of ids of current badge owners'''
-    cur.execute('''
+    cur_readonly.execute('''
         SELECT
             ub.user_id
         FROM
             Users_Badges ub
         WHERE
             ub.badge_alias = '%s';''' % badge)
-    results = set()
-    for row in cur:
-        results.add(row['user_id'])
-    return results
+    return set(row['user_id'] for row in cur_readonly)
 
 
 def save_new_owners(badge: str, users: Set[int],
@@ -64,27 +59,35 @@ def save_new_owners(badge: str, users: Set[int],
     notifications_tuples = []
     for user in users:
         badges_tuples.append((user, badge))
-        notifications_tuples.append((
-            user, json.dumps({'type': 'badge', 'badge': badge})))
-    cur.executemany('''
+        notifications_tuples.append(
+            (user, json.dumps({
+                'type': 'badge',
+                'badge': badge,
+            })))
+    cur.executemany(
+        '''
         INSERT INTO
             Users_Badges (user_id, badge_alias)
         VALUES (%s, %s);''', badges_tuples)
-    cur.executemany('''
+    cur.executemany(
+        '''
         INSERT INTO
             Notifications (user_id, contents)
         VALUES (%s, %s)''', notifications_tuples)
 
 
-def process_badges(current_timestamp: Optional[datetime.datetime],
-                   cur: mysql.connector.cursor.MySQLCursorDict) -> None:
+def process_badges(
+    current_timestamp: Optional[datetime.datetime],
+    cur: mysql.connector.cursor.MySQLCursorDict,
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+) -> None:
     '''Processes all badges'''
     badges = [f.name for f in os.scandir(BADGES_PATH) if f.is_dir()]
     for badge in badges:
         logging.info('==== Badge %s ====', badge)
         try:
-            all_owners = get_all_owners(badge, current_timestamp, cur)
-            current_owners = get_current_owners(badge, cur)
+            all_owners = get_all_owners(badge, current_timestamp, cur_readonly)
+            current_owners = get_current_owners(badge, cur_readonly)
             new_owners = all_owners - current_owners
             logging.info('New owners: %s', new_owners)
             if new_owners:
@@ -111,9 +114,13 @@ def main() -> None:
 
     logging.info('Started')
     dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
+    dbconn_readonly = lib.db.connect_readonly(
+        lib.db.DatabaseConnectionArguments.from_args_readonly(args)) or dbconn
     try:
-        with dbconn.cursor(dictionary=True) as cur:
-            process_badges(args.current_timestamp, cur)
+        with dbconn.cursor(buffered=True,
+                           dictionary=True) as cur, dbconn_readonly.cursor(
+                               buffered=True, dictionary=True) as cur_readonly:
+            process_badges(args.current_timestamp, cur, cur_readonly)
         dbconn.conn.commit()
     finally:
         dbconn.conn.close()

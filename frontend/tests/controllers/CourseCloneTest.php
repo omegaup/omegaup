@@ -761,4 +761,38 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
     }
+
+    /*
+     * Under13 users can't clone course.
+     */
+    public function testUserUnder13CannotCloneCourse() {
+        $courseAlias = \OmegaUp\Test\Utils::createRandomString();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
+        $defaultDate = strtotime('2022-01-01T00:00:00Z');
+        \OmegaUp\Time::setTimeForTesting($defaultDate);
+        // Create a 10 years-old user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birthDate' => strtotime('2012-01-01T00:00:00Z'),
+            ]),
+        );
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => $courseAlias,
+                'start_time' => \OmegaUp\Time::get()
+            ]));
+            $this->fail(
+                'Creating contests should not have been allowed for U13'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('U13CannotPerform', $e->getMessage());
+        }
+    }
 }

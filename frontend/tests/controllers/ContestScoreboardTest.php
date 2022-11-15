@@ -1257,7 +1257,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for the contest with max_per_group mode.
      *
-     * @return array{0: int, 1: list<array: {runs: int, score: float, execution: string, output: string, status_memory: string}>, 2: list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}>}
+     * @return array{0: int, 1: list<array: {runs: int, score: float, execution: string, output: string, status_memory: string, status_runtime: string}>, 2: list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}>}
      */
     public function runsMappingProvider(): array {
         $runsMapping = [
@@ -1291,30 +1291,30 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             [
                 100,
                 [
-                    ['runs' => 1, 'score' => 40.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE'],
-                    ['runs' => 2, 'score' => 73.33, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE'],
-                    ['runs' => 3, 'score' => 80.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE'],
+                    ['runs' => 1, 'score' => 0.4, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
+                    ['runs' => 2, 'score' => 0.73, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
+                    ['runs' => 3, 'score' => 0.8, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                 ],
                 $runsMapping
             ],
             [
                 60,
                 [
-                    ['runs' => 1, 'score' => 40.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE'],
-                    ['runs' => 2, 'score' => 73.33, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE'],
+                    ['runs' => 1, 'score' => 0.4, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
+                    ['runs' => 2, 'score' => 0.73, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                     // Only the number of runs should be updated, because of the
                     // contest's settings
-                    ['runs' => 3, 'score' => 73.33, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE'],
+                    ['runs' => 3, 'score' => 0.73, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                 ],
                 $runsMapping
             ],
             [
                 100,
                 [
-                    ['runs' => 1, 'score' => 0.0, 'execution' => 'EXECUTION_COMPILATION_ERROR', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_NOT_AVAILABLE'],
-                    ['runs' => 2, 'score' => 50.0, 'execution' => 'EXECUTION_JUDGE_ERROR', 'output' => 'OUTPUT_EXCEEDED', 'status_memory' => 'MEMORY_NOT_AVAILABLE'],
-                    ['runs' => 3, 'score' => 83.33, 'execution' => 'EXECUTION_INTERRUPTED', 'output' => 'OUTPUT_INTERRUPTED', 'status_memory' => 'MEMORY_AVAILABLE'],
-                    ['runs' => 4, 'score' => 100.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_CORRECT', 'status_memory' => 'MEMORY_AVAILABLE'],
+                    ['runs' => 1, 'score' => 0.0, 'execution' => 'EXECUTION_COMPILATION_ERROR', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_NOT_AVAILABLE', 'status_runtime' => 'RUNTIME_NOT_AVAILABLE'],
+                    ['runs' => 2, 'score' => 0.5, 'execution' => 'EXECUTION_JUDGE_ERROR', 'output' => 'OUTPUT_EXCEEDED', 'status_memory' => 'MEMORY_NOT_AVAILABLE', 'status_runtime' => 'RUNTIME_NOT_AVAILABLE'],
+                    ['runs' => 3, 'score' => 0.83, 'execution' => 'EXECUTION_INTERRUPTED', 'output' => 'OUTPUT_INTERRUPTED', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_EXCEEDED'],
+                    ['runs' => 4, 'score' => 1.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_CORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                 ],
                 [
 
@@ -1356,7 +1356,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * @param list<array: {runs: int, score: float, execution: string, output: string, status_memory: string}> $expectedResultsInEverySubmission
+     * @param list<array: {runs: int, score: float, execution: string, output: string, status_memory: string, status_runtime: string}> $expectedResultsInEverySubmission
      * @param list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}> $runsMapping
      *
      * @dataProvider runsMappingProvider
@@ -1446,6 +1446,10 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame(
                 $runsList[0]['output'],
                 $expectedResultsInEverySubmission[$index]['output']
+            );
+            $this->assertSame(
+                $runsList[0]['status_runtime'],
+                $expectedResultsInEverySubmission[$index]['status_runtime']
             );
             $this->assertSame(
                 $runsList[0]['status_memory'],

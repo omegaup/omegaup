@@ -386,13 +386,15 @@ export function onVirtualRankingChanged({
   scoreboard,
   scoreboardEvents,
   problems,
-  contest,
+  startTime,
+  finishTime,
   currentUsername,
 }: {
   scoreboard: types.Scoreboard;
   scoreboardEvents: types.ScoreboardEvent[];
   problems: types.NavbarProblemsetProblem[];
-  contest: types.ContestPublicDetails;
+  startTime: Date;
+  finishTime?: Date;
   currentUsername: string;
 }): void {
   let rankingChartOptions: Highcharts.Options | null = null;
@@ -413,9 +415,9 @@ export function onVirtualRankingChanged({
   rankingStore.commit('updateMiniRankingUsers', users);
   rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
 
-  const startTimestamp = contest.start_time.getTime();
+  const startTimestamp = startTime.getTime();
   const finishTimestamp = Math.min(
-    contest.finish_time?.getTime() || Infinity,
+    finishTime?.getTime() || Infinity,
     Date.now(),
   );
   const { series, navigatorData } = onRankingEvents({
@@ -428,7 +430,7 @@ export function onVirtualRankingChanged({
     rankingChartOptions = createChart({
       series,
       navigatorData,
-      startTimestamp,
+      startTimestamp: startTimestamp ?? Date.now(),
       finishTimestamp,
       maxPoints: rankingInfo.maxPoints,
     });

@@ -57,7 +57,7 @@ class RunsGroups extends \OmegaUp\DAO\Base\RunsGroups {
                 )
                 SELECT
                     IFNULL(ROUND(SUM(mspg_limit.score), 2), 0.00) AS score,
-                    IFNULL(ROUND(SUM(mspg_limit.score) * pp.points, 2), 0.00) AS contest_score,
+                    IFNULL(ROUND(SUM(mspg_limit.score), 2), 0.00) AS contest_score,
                     IFNULL(SUM(mspg_limit.penalty), 0) AS penalty,
                     mspg_all.problem_id,
                     mspg_all.identity_id,
