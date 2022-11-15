@@ -47,7 +47,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
-        error_log(print_r($contest, true));
         //check if is a certificate generator
         if (!\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -75,49 +74,13 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             false,
             false
         );
+
         $msg = new \PhpAmqpLib\Message\AMQPMessage(
             'Message to contest_certificates queue!'
         );
         $channel->basic_publish($msg, '', 'contest_certificate');
-        ///como checo que si se le envio
-        ///como lo pruebo
         $channel->close();
 
-        $channel1 = \OmegaUp\RabbitMQConnection::getInstance()->channel();
-        error_log(print_r('hello world!', true));
-
-        /// hacer un receiver
-        $channel1->queue_declare(
-            'contest_certificate',
-            false,
-            false,
-            false,
-            false
-        );
-
-        echo " [*] Waiting for messages. To exit press CTRL+C\n";
-
-        $callback = function ($msge) {
-            error_log(print_r('hola como estan', true));
-            echo ' [x] Received ', $msge->body, "\n";
-        };
-        error_log(print_r('holaaaaaaaaaa', true));
-
-        $channel1->basic_consume(
-            'contest_certificate',
-            '',
-            false,
-            true,
-            false,
-            false,
-            $callback
-        );
-
-        while ($channel->is_open()) {
-            $channel1->wait();
-        }
-
-        $channel1->close();
         return [
             'status' => 'ok',
         ];
