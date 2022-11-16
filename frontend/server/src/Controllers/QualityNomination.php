@@ -833,9 +833,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r         The request.
      *
-     * @omegaup-request-param string $contents
-     * @omegaup-request-param int $qualitynomination_id
-     *
      * @return array{status: string}
      */
     public static function apiUpdate(\Omegaup\Request $r): array {
