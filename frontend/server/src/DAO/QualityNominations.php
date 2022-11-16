@@ -228,7 +228,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
 
         $contents = self::getContents($row['contents']);
         return [
-            'quality_seal' => $contents['quality_seal'],
+            'quality_seal' => boolval($contents['quality_seal'] ?? false),
             'qualitynomination_id' => $row['qualitynomination_id'],
         ];
     }
@@ -254,10 +254,14 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $sqlContents,
             [$qualityNominationsId]
         );
-        if (!is_array($newContents) || is_null($rowContents)) {
+        if (!is_array($newContents) || empty($rowContents)) {
             return;
         }
+
         $contentsAll = self::getContents($rowContents);
+        if (!is_array($contentsAll)) {
+            return;
+        }
 
         $result = json_encode(array_merge($contentsAll, $newContents));
 
