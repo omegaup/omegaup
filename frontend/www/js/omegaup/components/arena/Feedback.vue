@@ -2,7 +2,14 @@
   <div class="card">
     <div class="card-header">
       {{ !saved ? T.runDetailsNewFeedback : T.runDetailsFeedbackCreated }}
-      <button v-if="saved" @click.prevent="onDeleteFeedback">❌</button>
+      <button
+        v-if="saved"
+        class="close btn-sm"
+        type="button"
+        @click.prevent="onDeleteFeedback"
+      >
+        ❌
+      </button>
     </div>
     <div class="card-body">
       <textarea
