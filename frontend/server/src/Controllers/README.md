@@ -3655,13 +3655,6 @@ _Nothing_
 
 Updates a QualityNominations given an id and contents
 
-### Parameters
-
-| Name                   | Type     | Description |
-| ---------------------- | -------- | ----------- |
-| `contents`             | `string` |             |
-| `qualitynomination_id` | `int`    |             |
-
 ### Returns
 
 _Nothing_
