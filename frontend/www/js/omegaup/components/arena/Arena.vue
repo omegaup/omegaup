@@ -60,12 +60,6 @@
       >
         <slot name="arena-clarifications"></slot>
       </div>
-      <div
-        class="tab-pane fade"
-        :class="{ 'show active': selectedTab === 'plagiarisms' }"
-      >
-        <slot name="arena-plagiarisms"> Content for plagiarisms tab </slot>
-      </div>
     </div>
   </div>
 </template>
@@ -115,11 +109,6 @@ export default class Arena extends Vue {
       {
         name: 'clarifications',
         text: T.wordsClarifications,
-        visible: true,
-      },
-      {
-        name: 'plagiarisms',
-        text: 'Plagiarisms',
         visible: true,
       },
     ];
