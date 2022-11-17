@@ -250,6 +250,8 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             FOR UPDATE;';
 
         $newContents = self::getContents($contents);
+
+        /** @var null|string */
         $rowContents = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sqlContents,
             [$qualityNominationsId]
