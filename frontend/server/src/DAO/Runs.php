@@ -185,12 +185,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `r`.`penalty`,
                 `r`.`memory`,
                 IF(
-                    COALESCE(`c`.`partial_score`, 1) = 0 AND `r`.`score` <> 1,
+                    `c`.`score_mode` = \'all_or_nothing\' AND `r`.`score` <> 1,
                         0,
                         `r`.`score`
                 ) AS `score`,
                 IF(
-                    COALESCE(`c`.`partial_score`, 1) = 0 AND `r`.`score` <> 1,
+                    `c`.`score_mode` = \'all_or_nothing\' AND `r`.`score` <> 1,
                         0,
                         `r`.`contest_score`
                 ) AS `contest_score`,
@@ -698,14 +698,14 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $sql = "
             SELECT
                 IF(
-                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                    c.score_mode = 'all_or_nothing' AND r.score <> 1,
                         0,
                         r.score
                 ) AS score,
                 r.penalty,
                 IFNULL(
                     IF(
-                        COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                        c.score_mode = 'all_or_nothing' AND r.score <> 1,
                             0,
                             r.contest_score
                     ),
@@ -754,7 +754,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $sql = '
             SELECT
                 IF(
-                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                    c.score_mode = "all_or_nothing" AND r.score <> 1,
                         0,
                         r.contest_score
                 ) AS contest_score
@@ -818,7 +818,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.language,
                 s.verdict,
                 IF(
-                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                    c.score_mode = "all_or_nothing" AND r.score <> 1,
                         0,
                         r.contest_score
                 ) AS contest_score,
@@ -937,12 +937,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 r.penalty,
                 r.memory,
                 IF(
-                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                    c.score_mode = "all_or_nothing" AND r.score <> 1,
                         0,
                         r.score
                 ) AS score,
                 IF(
-                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                    c.score_mode = "all_or_nothing" AND r.score <> 1,
                         0,
                         r.contest_score
                 ) AS contest_score,
@@ -1087,12 +1087,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 r.penalty,
                 r.memory,
                 IF(
-                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                    c.score_mode = "all_or_nothing" AND r.score <> 1,
                         0,
                         r.score
                 ) AS score,
                 IF(
-                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                    c.score_mode = "all_or_nothing" AND r.score <> 1,
                         0,
                         r.contest_score
                 ) AS contest_score,
@@ -1201,7 +1201,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             SELECT
                 r.commit,
                 IF(
-                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                    c.score_mode = "all_or_nothing" AND r.score <> 1,
                         0,
                         r.contest_score
                 ) AS contest_score,
@@ -1211,7 +1211,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 r.run_id,
                 r.runtime,
                 IF(
-                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                    c.score_mode = "all_or_nothing" AND r.score <> 1,
                         0,
                         r.score
                 ) AS score,
