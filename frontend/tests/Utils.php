@@ -433,6 +433,30 @@ class Utils {
         );
     }
 
+    public static function runGenerateContestCertificates(): void {
+        // Ensure all suggestions are written to the database before invoking
+        // the external script.
+        self::commit();
+        $host_arg = '';
+        $host_chunks = explode(':', OMEGAUP_DB_HOST, 2);
+        if (count($host_chunks) == 2) {
+            [$hostname, $port] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+            $host_arg .= ' --port ' . escapeshellarg($port);
+        } else {
+            [$hostname] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+        }
+        self::shellExec(
+            ('python3 ' .
+            dirname(__DIR__, 2) . '/stuff/pipelines/client_contest.py' .
+             ' --api-token ' .
+             '92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6 ' .
+             ' --url ' .
+             escapeshellarg(OMEGAUP_URL))
+        );
+    }
+
     public static function runCheckPlagiarisms(): void {
         self::commit();
         $host_arg = '';

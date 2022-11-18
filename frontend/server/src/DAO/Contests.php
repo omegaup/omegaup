@@ -168,6 +168,35 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         return $rs;
     }
 
+    /**
+     * @return list<array{certificate_cutoff: null|int, contest_id: int, alias: string, scoreboard_url: string}>
+     */
+    public static function getContestInfo(
+        int $contestId
+    ): array {
+        $sql = '
+            SELECT
+                certificate_cutoff,
+                c.contest_id,
+                alias,
+                scoreboard_url
+            FROM
+                Contests c
+            INNER JOIN
+                Problemsets p
+            ON
+                c.problemset_id = p.problemset_id
+            WHERE
+                c.contest_id = ?
+        ';
+
+        /** @var list<array{certificate_cutoff: null|int, contest_id: int, alias: string, scoreboard_url: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$contestId]
+        )[0];
+    }
+
     final public static function getByProblemset(
         int $problemsetId
     ): ?\OmegaUp\DAO\VO\Contests {

@@ -44,6 +44,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
         // obtain the contest
         $contest = \OmegaUp\DAO\Contests::getByPK($r['contest_id']);
+
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
@@ -64,21 +65,28 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         // update contest with the new value
         \OmegaUp\DAO\Contests::update($contest);
 
+        // get contest info
+        $contest = \OmegaUp\DAO\Contests::getContestInfo($r['contest_id']);
+
+        // set RabbitMQ client parameters
+        $routing_key = 'ContestQueue';
+        $exchange = 'certificates';
+
         //connection to rabbitmq
         $channel = \OmegaUp\RabbitMQConnection::getInstance()->channel();
 
-        $channel->queue_declare(
-            'contest_certificate',
-            false,
-            false,
-            false,
-            false
-        );
+        // Prepare the meessage
+        $messageArray = [
+            'certificate_cutoff' => $contest['certificate_cutoff'],
+            'alias' => $contest['alias'],
+            'scoreboard_url' => $contest['scoreboard_url'],
+            'contest_id' => $contest['contest_id']
+        ];
+        $messageJSON = json_encode($messageArray);
+        $message = new \PhpAmqpLib\Message\AMQPMessage($messageJSON);
 
-        $msg = new \PhpAmqpLib\Message\AMQPMessage(
-            'Message to contest_certificates queue!'
-        );
-        $channel->basic_publish($msg, '', 'contest_certificate');
+        // send the message to RabbitMQ
+        $channel->basic_publish($message, $exchange, $routing_key);
         $channel->close();
 
         return [

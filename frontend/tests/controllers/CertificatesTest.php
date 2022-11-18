@@ -74,26 +74,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $channel1 = \OmegaUp\RabbitMQConnection::getInstance()->channel();
-        $callback = function ($msge) {
-            error_log(print_r('hola como estan', true));
-            echo ' [x] Received ', $msge->body, "\n";
-        };
-        $channel1->basic_consume(
-            'contest_certificate',
-            '',
-            false,
-            true,
-            false,
-            false,
-            $callback
-        );
-
-        while ($channel1->is_open()) {
-            $channel1->wait();
-        }
-
-        $channel1->close();
+        \OmegaUp\Test\Utils::runGenerateContestCertificates();
 
         // Assert status of new contest
         $this->assertSame('ok', $response['status']);
