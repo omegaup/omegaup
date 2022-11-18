@@ -85,8 +85,8 @@ class Users extends \OmegaUp\DAO\Base\Users {
             return null;
         }
         return [
-        'reset_digest' => $user->reset_digest,
-        'reset_sent_at' => $user->reset_sent_at,
+     'reset_digest' => $user->reset_digest,
+     'reset_sent_at' => $user->reset_sent_at,
         ];
     }
     /**
@@ -158,9 +158,9 @@ class Users extends \OmegaUp\DAO\Base\Users {
     final public static function getBasicProfileDataByPk(?int $userId): array {
         if (is_null($userId)) {
             return [
-            'classname' => 'user-rank-unranked',
-            'country_id' => 'xx',
-            'email' => null,
+        'classname' => 'user-rank-unranked',
+        'country_id' => 'xx',
+        'email' => null,
             ];
         }
         $sql = 'SELECT
@@ -187,9 +187,9 @@ class Users extends \OmegaUp\DAO\Base\Users {
 
         if (is_null($user)) {
             return [
-            'classname' => 'user-rank-unranked',
-            'country_id' => 'xx',
-            'email' => null,
+        'classname' => 'user-rank-unranked',
+        'country_id' => 'xx',
+        'email' => null,
             ];
         }
 

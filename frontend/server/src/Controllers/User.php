@@ -43,7 +43,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
  * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
- * @psalm-type VerificationParentalTokenDetailsPayload=array{hasparentalVerificationToken: bool}
+ * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -4699,7 +4699,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'user_verification_parental_token',
-            ];
+        ];
     }
 }
 
