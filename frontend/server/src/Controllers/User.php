@@ -4703,4 +4703,4 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 }
 
-    \OmegaUp\Controllers\User::$urlHelper = new \OmegaUp\UrlHelper();
+\OmegaUp\Controllers\User::$urlHelper = new \OmegaUp\UrlHelper();
