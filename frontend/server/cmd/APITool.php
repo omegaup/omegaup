@@ -330,7 +330,7 @@ class TypeMapper {
      * @param array<string, true> $daoTypes
      */
     public function __construct(&$daoTypes = []) {
-        $this->daoTypes = & $daoTypes;
+        $this->daoTypes =& $daoTypes;
     }
 
     /**

@@ -188,7 +188,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * User 13 and it's account link to the parent account 
+     * User 13 and its account link to the parent account 
      * on verification of parental token
      */
     public function testUse13LinkedToParentAccountWhenTokenVerificationDone() {

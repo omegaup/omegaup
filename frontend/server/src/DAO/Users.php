@@ -85,8 +85,8 @@ class Users extends \OmegaUp\DAO\Base\Users {
             return null;
         }
         return [
-     'reset_digest' => $user->reset_digest,
-     'reset_sent_at' => $user->reset_sent_at,
+            'reset_digest' => $user->reset_digest,
+            'reset_sent_at' => $user->reset_sent_at,
         ];
     }
     /**
@@ -158,9 +158,9 @@ class Users extends \OmegaUp\DAO\Base\Users {
     final public static function getBasicProfileDataByPk(?int $userId): array {
         if (is_null($userId)) {
             return [
-        'classname' => 'user-rank-unranked',
-        'country_id' => 'xx',
-        'email' => null,
+                'classname' => 'user-rank-unranked',
+                'country_id' => 'xx',
+                'email' => null,
             ];
         }
         $sql = 'SELECT
@@ -187,9 +187,9 @@ class Users extends \OmegaUp\DAO\Base\Users {
 
         if (is_null($user)) {
             return [
-        'classname' => 'user-rank-unranked',
-        'country_id' => 'xx',
-        'email' => null,
+                'classname' => 'user-rank-unranked',
+                'country_id' => 'xx',
+                'email' => null,
             ];
         }
 
@@ -236,7 +236,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
         $params = [$identityId];
 
         return boolval(
-        /** @var bool|null */
+            /** @var bool|null */
             \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params)
         );
     }
@@ -339,7 +339,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 WHERE
                     `user_id` = ?;';
             $params = [
-            $user->user_id,
+                $user->user_id,
             ];
             \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
             $randomString = \OmegaUp\SecurityTools::randomString(20);
@@ -358,8 +358,8 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 WHERE
                     `identity_id` = ?;';
             $params = [
-            "deleted_user_{$randomString}",
-            $identity->identity_id,
+                "deleted_user_{$randomString}",
+                $identity->identity_id,
             ];
             \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
             \OmegaUp\DAO\DAO::transEnd();
