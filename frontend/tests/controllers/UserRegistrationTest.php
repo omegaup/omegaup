@@ -76,7 +76,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'User should have not been able to be created because the email already exists in the data base'
             );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertSame('mailInUse', $e->getMessage());
+            $this->assertEquals('mailInUse', $e->getMessage());
         }
     }
 
@@ -94,8 +94,8 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
         // Asserts that user has the initial username and email
-        $this->assertSame($identity->username, $username);
-        $this->assertSame($email, $email_user->email);
+        $this->assertEquals($identity->username, $username);
+        $this->assertEquals($email, $email_user->email);
 
         // Inflate request
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
@@ -113,7 +113,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'User should have not been able to be created because the email already exists in the data base'
             );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertSame('mailInUse', $e->getMessage());
+            $this->assertEquals('mailInUse', $e->getMessage());
         }
     }
 
@@ -192,24 +192,25 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
      * on verification of parental token
      */
     public function testUse13LinkedToParentAccountWhenTokenVerificationDone() {
-        //Created User13
-        $under13BirthDateTimestamp = strtotime('-12 years');
-        $randomString = \OmegaUp\Test\Utils::createRandomString();
-        \OmegaUp\Controllers\User::apiCreate(
+        $defaultDate = strtotime('2022-01-01T00:00:00Z');
+        \OmegaUp\Time::setTimeForTesting($defaultDate);
+        // Create a 10 years-old user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birthDate' => strtotime('2012-01-01T00:00:00Z'),
+            ]),
+        );
+        $login = self::login($identity);
+
+        $payload = \OmegaUp\Controllers\User::getVerificationParentalTokenDetailsForTypeScript(
             new \OmegaUp\Request([
-            'username' => $randomString,
-            'password' => $randomString,
-            'birth_date' => $under13BirthDateTimestamp,
+                'auth_token' => $login->auth_token,
             ])
-        );
-        $response = \OmegaUp\DAO\Users::FindByUsername($randomString);
-        \OmegaUp\Controllers\User::getVerificationParentalTokenDetailsForTypeScript(
-            $response->parental_verification_token
-        );
+        )['templateProperties']['payload'];
         //verify token belongs to child accounts ---?
 
         //assert the message.
-        $this->assertEquals(
+        $this->assertEquals($payload['hasParentalVerificationToken'],
             "Parent's account is linked to their child's account"
         );
     }
