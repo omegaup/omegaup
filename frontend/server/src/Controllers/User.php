@@ -4699,7 +4699,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'user_verification_parental_token',
-            ];
+        ];
     }
 }
 
