@@ -210,7 +210,8 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         //verify token belongs to child accounts ---?
 
         //assert the message.
-        $this->assertEquals($payload['hasParentalVerificationToken'],
+        $this->assertEquals(
+            $payload['hasParentalVerificationToken'],
             "Parent's account is linked to their child's account"
         );
     }
