@@ -6,18 +6,18 @@ import os
 import sys
 
 # pylint indicates pytest_mock should be placed before "import mysql.connector"
-import pytest_mock
-import mysql.connector
-import mysql.connector.cursor
+import contest_callback
 import omegaup.api
 import pika
-
-import contest_callback
-import rabbitmq_connection
-import rabbitmq_client
 import producer_contest
+import pytest_mock
+import rabbitmq_client
+import rabbitmq_connection
 import test_constants
 import test_credentials
+
+import mysql.connector
+import mysql.connector.cursor
 
 sys.path.insert(
     0,
@@ -67,7 +67,7 @@ def test_client_contest() -> None:
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,
-        ) as channel:
+    ) as channel:
         rabbitmq_connection.initialize_rabbitmq(queue='contest',
                                                 exchange='certificates',
                                                 routing_key='ContestQueue',
@@ -82,7 +82,8 @@ def test_client_contest() -> None:
             api_token=test_constants.API_TOKEN,
             url=test_constants.OMEGAUP_API_ENDPOINT,
         )
-        callback = ContestsCallbackForTesting(dbconn=dbconn.conn,client=client)
+        callback = ContestsCallbackForTesting(dbconn=dbconn.conn,
+                                              client=client)
         cur.execute('TRUNCATE TABLE `Certificates`;')
         dbconn.conn.commit()
 
@@ -123,7 +124,7 @@ def test_client_contest_with_mocked_codes(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,
-        ) as channel:
+    ) as channel:
         rabbitmq_connection.initialize_rabbitmq(queue='contest',
                                                 exchange='certificates',
                                                 routing_key='ContestQueue',
@@ -137,7 +138,8 @@ def test_client_contest_with_mocked_codes(
             api_token=test_constants.API_TOKEN,
             url=test_constants.OMEGAUP_API_ENDPOINT,
         )
-        callback = ContestsCallbackForTesting(dbconn=dbconn.conn,client=client)
+        callback = ContestsCallbackForTesting(dbconn=dbconn.conn,
+                                              client=client)
         cur.execute('TRUNCATE TABLE `Certificates`;')
         dbconn.conn.commit()
 
@@ -179,7 +181,7 @@ def test_client_contest_with_duplicated_codes(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,
-        ) as channel:
+    ) as channel:
         rabbitmq_connection.initialize_rabbitmq(queue='contest',
                                                 exchange='certificates',
                                                 routing_key='ContestQueue',
@@ -193,7 +195,8 @@ def test_client_contest_with_duplicated_codes(
             api_token=test_constants.API_TOKEN,
             url=test_constants.OMEGAUP_API_ENDPOINT,
         )
-        callback = ContestsCallbackForTesting(dbconn=dbconn.conn,client=client)
+        callback = ContestsCallbackForTesting(dbconn=dbconn.conn,
+                                              client=client)
         cur.execute('TRUNCATE TABLE `Certificates`;')
         dbconn.conn.commit()
 

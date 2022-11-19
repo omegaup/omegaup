@@ -30,7 +30,7 @@ def _main() -> None:
         else:
             filename = os.path.join(_OMEGAUP_ROOT,
                                     'frontend/server/src/DAO/VO', dao.filename)
-        with open(filename, 'w') as f:
+        with open(filename, 'w', encoding='utf-8') as f:
             f.write(dao.contents)
 
 

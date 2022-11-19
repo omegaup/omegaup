@@ -6,7 +6,7 @@ import re
 
 from typing import List, Optional
 
-from hook_tools import linters
+from omegaup_hook_tools import linters
 
 _FRONTEND_RE = re.compile(r'\bT\.(\w+)')
 _TEMPLATE_RE = re.compile(r'\{#(\w+)#\}')
@@ -21,8 +21,8 @@ class TranslationStringsLinter(linters.Linter):
 
     def __init__(self, options: Optional[linters.Options] = None) -> None:
         super().__init__()
-        self.__options = options or {}
-        with open('frontend/templates/en.lang') as f:
+        del options
+        with open('frontend/templates/en.lang', encoding='utf-8') as f:
             self.__valid_strings = set(_LANG_RE.findall(
                 f.read())) | _EXCLUDED_STRINGS
 
