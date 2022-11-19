@@ -188,7 +188,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * User 13 and its account link to the parent account 
+     * User 13 and its account link to the parent account
      * on verification of parental token
      */
     public function testUse13LinkedToParentAccountWhenTokenVerificationDone() {
@@ -196,19 +196,21 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $under13BirthDateTimestamp = strtotime('-12 years');
         $randomString = \OmegaUp\Test\Utils::createRandomString();
         \OmegaUp\Controllers\User::apiCreate(
-        new \OmegaUp\Request([
+            new \OmegaUp\Request([
             'username' => $randomString,
             'password' => $randomString,
             'birth_date' => $under13BirthDateTimestamp,
-        ])
+            ])
         );
         $response = \OmegaUp\DAO\Users::FindByUsername($randomString);
-        \OmegaUp\Controllers\User::getVerificationParentalTokenDetailsForTypeScript($response->parental_verification_token);
+        \OmegaUp\Controllers\User::getVerificationParentalTokenDetailsForTypeScript(
+            $response->parental_verification_token
+        );
         //verify token belongs to child accounts ---?
 
-
         //assert the message.
-        $this->assertEquals("Parent's account is linked to their child's account");
-}
- 
+        $this->assertEquals(
+            "Parent's account is linked to their child's account"
+        );
+    }
 }
