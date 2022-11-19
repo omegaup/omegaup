@@ -103,7 +103,7 @@
                 <option value="lua">Lua (5.3)</option>
                 <option value="go">Go (1.18.beta2)</option>
                 <option value="rs">Rust (1.56.1)</option>
-                <option value="lua">JavaScript (Node.js 16)</option>
+                <option value="js">JavaScript (Node.js 16)</option>
                 <option value="kp">Karel (Pascal)</option>
                 <option value="kj">Karel (Java)</option>
                 <option value="cat">{{ T.wordsJustOutput }}</option>

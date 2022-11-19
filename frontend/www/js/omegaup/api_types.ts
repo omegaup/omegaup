@@ -2766,7 +2766,7 @@ export namespace types {
     opened: boolean;
     original_contest_alias?: string;
     original_problemset_id?: number;
-    partial_score: boolean;
+    partial_score?: boolean;
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
@@ -2775,6 +2775,7 @@ export namespace types {
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
@@ -2813,6 +2814,7 @@ export namespace types {
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
@@ -2850,6 +2852,7 @@ export namespace types {
     details: types.ContestAdminDetails;
     group_admins: types.ContestGroupAdmin[];
     groups: types.ContestGroup[];
+    original_contest_admission_mode?: string;
     problems: types.ProblemsetProblemWithVersions[];
     requests: types.ContestRequest[];
     teams_group?: types.ContestGroup;
@@ -2966,6 +2969,7 @@ export namespace types {
     points_decay_factor: number;
     problemset_id: number;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
@@ -3836,6 +3840,7 @@ export namespace types {
   }
 
   export interface ProblemListItem {
+    accepted: number;
     alias: string;
     difficulty?: number;
     difficulty_histogram: number[];
@@ -3846,6 +3851,7 @@ export namespace types {
     quality_seal: boolean;
     ratio: number;
     score: number;
+    submissions: number;
     tags: { name: string; source: string }[];
     title: string;
     visibility: number;
@@ -4056,13 +4062,17 @@ export namespace types {
     contest_alias?: string;
     contest_score?: number;
     country: string;
+    execution?: string;
     guid: string;
     language: string;
     memory: number;
+    output?: string;
     penalty: number;
     runtime: number;
     score: number;
     status: string;
+    status_memory?: string;
+    status_runtime?: string;
     submit_delay: number;
     time: Date;
     type?: string;
@@ -4148,13 +4158,17 @@ export namespace types {
     contest_score?: number;
     country: string;
     details?: types.RunDetailsV2;
+    execution?: string;
     guid: string;
     language: string;
     memory: number;
+    output?: string;
     penalty: number;
     runtime: number;
     score: number;
     status: string;
+    status_memory?: string;
+    status_runtime?: string;
     submit_delay: number;
     time: Date;
     type?: string;

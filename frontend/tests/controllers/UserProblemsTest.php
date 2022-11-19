@@ -26,16 +26,16 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
         $response = \OmegaUp\Controllers\Problem::apiMyList($r);
 
-        $this->assertEquals(count($problemData), count($response['problems']));
-        $this->assertEquals(
+        $this->assertSame(count($problemData), count($response['problems']));
+        $this->assertSame(
             $problemData[2]['request']['problem_alias'],
             $response['problems'][0]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemData[1]['request']['problem_alias'],
             $response['problems'][1]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemData[0]['request']['problem_alias'],
             $response['problems'][2]['alias']
         );
@@ -51,7 +51,7 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
         $response = \OmegaUp\Controllers\Problem::apiMyList($r);
 
-        $this->assertEquals(0, count($response['problems']));
+        $this->assertSame(0, count($response['problems']));
     }
 
     /**
@@ -99,7 +99,7 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiAdminList($r);
 
         // Problems should come ordered by problem id desc
-        $this->assertEquals(
+        $this->assertSame(
             count(
                 $problemAuthorData
             ) + count(
@@ -109,19 +109,19 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 $response['problems']
             )
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemAuthorData[1]['request']['problem_alias'],
             $response['problems'][0]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemAuthorData[0]['request']['problem_alias'],
             $response['problems'][1]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemAdminData[1]['request']['problem_alias'],
             $response['problems'][2]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemAdminData[0]['request']['problem_alias'],
             $response['problems'][3]['alias']
         );
@@ -133,7 +133,7 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $this->assertCount(1, $response['problems']);
-        $this->assertEquals(
+        $this->assertSame(
             $problemAdminData[0]['request']['problem_alias'],
             $response['problems'][0]['alias']
         );
@@ -149,7 +149,7 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         $user = $problemData['authorUser'];
 
-        $this->assertEquals(1, \OmegaUp\DAO\Problems::getPrivateCount($user));
+        $this->assertSame(1, \OmegaUp\DAO\Problems::getPrivateCount($user));
     }
 
     /**
@@ -162,7 +162,7 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         $user = $problemData['authorUser'];
 
-        $this->assertEquals(0, \OmegaUp\DAO\Problems::getPrivateCount($user));
+        $this->assertSame(0, \OmegaUp\DAO\Problems::getPrivateCount($user));
     }
 
     /**
@@ -171,6 +171,6 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testPrivateProblemsCountWithNoProblems() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $this->assertEquals(0, \OmegaUp\DAO\Problems::getPrivateCount($user));
+        $this->assertSame(0, \OmegaUp\DAO\Problems::getPrivateCount($user));
     }
 }

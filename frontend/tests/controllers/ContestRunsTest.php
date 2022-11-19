@@ -45,12 +45,12 @@ class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Assert
-        $this->assertEquals(1, count($response['runs']));
-        $this->assertEquals(
+        $this->assertSame(1, count($response['runs']));
+        $this->assertSame(
             $runData['response']['guid'],
             $response['runs'][0]['guid']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $response['runs'][0]['username']
         );
@@ -69,7 +69,7 @@ class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
         ]));
 
-        $this->assertEquals($runData['request']['source'], $response['source']);
+        $this->assertSame($runData['request']['source'], $response['source']);
     }
 
     /**
@@ -140,7 +140,7 @@ class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
 
-        $this->assertEquals($guidsExpected, $guidsActual);
+        $this->assertSame($guidsExpected, $guidsActual);
     }
 
     /**
@@ -184,7 +184,7 @@ class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals(100, $response['runs'][0]['contest_score']);
+        $this->assertSame(100.0, $response['runs'][0]['contest_score']);
 
         $r = new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
@@ -205,6 +205,6 @@ class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals(80, $response['runs'][0]['contest_score']);
+        $this->assertSame(80.0, $response['runs'][0]['contest_score']);
     }
 }

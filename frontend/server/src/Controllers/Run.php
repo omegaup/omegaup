@@ -11,7 +11,7 @@
  * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp}
  * @psalm-type RunDetailsGroup=array{cases: list<CaseResult>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}
  * @psalm-type RunDetails=array{admin: bool, alias: string, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<RunDetailsGroup>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: null|SubmissionFeedback}
- * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
+ * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string, execution: null|string, output: null|string, status_memory: null|string, status_runtime: null|string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
     // All languages that runs can have.
@@ -727,6 +727,10 @@ class Run extends \OmegaUp\Controllers\Controller {
                 : ''
             ),
             'classname' => 'user-rank-unranked',
+            'execution' => null,
+            'output' => null,
+            'status_memory' => null,
+            'status_runtime' => null,
         ];
         if (!is_null($filtered['contest_score'])) {
             if (
@@ -739,8 +743,8 @@ class Run extends \OmegaUp\Controllers\Controller {
                     2
                 );
             } else {
-                $result['contest_score'] = 0;
-                $result['score'] = 0;
+                $result['contest_score'] = 0.0;
+                $result['score'] = 0.0;
             }
         }
         return $result;
@@ -1294,8 +1298,11 @@ class Run extends \OmegaUp\Controllers\Controller {
             $response['compile_error'] = $details['compile_error'];
         }
         if (!is_null($contest) && !$contest->partial_score && $run->score < 1) {
-            $details['contest_score'] = 0;
-            $details['score'] = 0;
+            $details['contest_score'] = 0.0;
+            $details['score'] = 0.0;
+        } else {
+            $details['contest_score'] = floatval($details['contest_score']);
+            $details['score'] = floatval($details['score']);
         }
         if (!OMEGAUP_LOCKDOWN && $showDetails) {
             $response['details'] = $details;

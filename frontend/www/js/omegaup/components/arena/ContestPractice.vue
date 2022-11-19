@@ -14,7 +14,7 @@
               :problems="problems"
               :active-problem="activeProblemAlias"
               :in-assignment="false"
-              :digits-after-decimal-point="contest.partialScore ? 2 : 0"
+              :digits-after-decimal-point="digitsAfterDecimalPoint"
               @disable-active-problem="activeProblem = null"
               @navigate-to-problem="onNavigateToProblem"
             ></omegaup-arena-navbar-problems>
@@ -171,6 +171,10 @@ export default class ArenaContestPractice extends Vue {
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;
+  }
+
+  get digitsAfterDecimalPoint(): number {
+    return this.contest.score_mode !== 'all_or_nothing' ? 2 : 0;
   }
 
   onNavigateToProblem(problem: types.NavbarProblemsetProblem) {

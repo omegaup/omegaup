@@ -208,7 +208,7 @@ class AssignmentRemoveTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have thrown exception.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'courseUpdateAlreadyHasRuns',
                 $e->getMessage()
             );
