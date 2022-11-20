@@ -478,6 +478,49 @@ class Request extends \ArrayObject {
     }
 
     /**
+     * Ensures that an identity is logged in is Over 13 years of age.
+     *
+     * @throws \OmegaUp\Exceptions\UnauthorizedException
+     * @psalm-assert !null $this->identity
+     * @psalm-assert !null $this->identity->identity_id
+     * @psalm-assert !null $this->identity->username
+     */
+    public function ensureIdentityIsOver13(): void {
+        $this->ensureIdentity();
+        if (is_null($this->user)) {
+            return;
+        }
+        if (\OmegaUp\Authorization::isUnderThirteenUser($this->user)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'U13CannotPerform'
+            );
+        }
+    }
+
+    /**
+     * Ensures that an identity is logged in is Over 13 years of age, and it is the main identity of
+     * its associated user.
+     *
+     * @throws \OmegaUp\Exceptions\UnauthorizedException
+     * @psalm-assert !null $this->identity
+     * @psalm-assert !null $this->identity->identity_id
+     * @psalm-assert !null $this->identity->user_id
+     * @psalm-assert !null $this->identity->username
+     * @psalm-assert !null $this->user
+     * @psalm-assert !null $this->user->main_identity_id
+     * @psalm-assert !null $this->user->user_id
+     * @psalm-assert !null $this->user->username
+     */
+    public function ensureMainUserIdentityIsOver13(): void {
+        $this->ensureMainUserIdentity();
+        if (\OmegaUp\Authorization::isUnderThirteenUser($this->user)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'U13CannotPerform'
+            );
+        }
+    }
+
+    /**
      * Returns an array of strings from a request parameter
      * containing a single string with comma-separated values.
      *

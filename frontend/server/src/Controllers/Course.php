@@ -605,7 +605,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function apiClone(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
-        $r->ensureMainUserIdentity();
+        $r->ensureMainUserIdentityIsOver13();
         $courseAlias = $r->ensureString(
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::stringNonEmpty($alias)
@@ -832,7 +832,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function apiCreate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
-        $r->ensureMainUserIdentity();
+        $r->ensureMainUserIdentityIsOver13();
         $courseParams = self::convertRequestToCourseParams($r);
 
         if (is_null($courseParams->schoolId)) {
@@ -2721,7 +2721,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Authenticate logged user
-        $r->ensureIdentity();
+        $r->ensureIdentityIsOver13();
 
         // Check course_alias
         $courseAlias = $r->ensureString(
@@ -2863,7 +2863,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Authenticate logged user
-        $r->ensureIdentity();
+        $r->ensureIdentityIsOver13();
 
         // Check course_alias
         $courseAlias = $r->ensureString(
