@@ -220,7 +220,7 @@ export function _setRemoteDeltaTime(delta: number): void {
 /**
  * Converts a timestamp from the server clock source to the local clock source.
  *
- * @param date - The timestamp (in milliseconds) with the server clock source.
+ * @param timestamp - The timestamp (in milliseconds) with the server clock source.
  * @returns The same date, with the local clock source.
  */
 export function remoteTime(timestamp: number): Date {

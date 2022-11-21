@@ -129,6 +129,12 @@ Cypress.Commands.add(
   },
 );
 
+declare enum ScoreMode {
+  AllOrNothing = 'all_or_nothing',
+  Partial = 'partial',
+  MaxPerGroup = 'max_per_group',
+}
+
 Cypress.Commands.add(
   'createContest',
   ({
@@ -137,7 +143,7 @@ Cypress.Commands.add(
     endDate,
     description = 'Default Description',
     showScoreboard = true,
-    partialPoints = true,
+    scoreMode = ScoreMode.Partial,
     basicInformation = false,
     requestParticipantInformation = 'no',
   }) => {
@@ -148,7 +154,7 @@ Cypress.Commands.add(
     cy.get('[data-start-date]').type(getISODateTime(startDate));
     cy.get('[data-end-date]').type(getISODateTime(endDate));
     cy.get('[data-show-scoreboard-at-end]').select(`${showScoreboard}`); // "true" | "false"
-    cy.get('[data-partial-points]').select(`${partialPoints}`);
+    cy.get('[data-score-mode]').select(`${scoreMode}`);
     if (basicInformation) {
       cy.get('[data-basic-information-required]').click();
     }

@@ -267,6 +267,12 @@ describe('Basic Commands Test', () => {
 
   const now = new Date();
 
+  enum ScoreMode {
+    AllOrNothing = 'all_or_nothing',
+    Partial = 'partial',
+    MaxPerGroup = 'max_per_group',
+  }
+
   const problemAlias = 'problem-' + uuid().slice(0, 8);
   const contestOptions: ContestOptions = {
     contestAlias: 'contest' + uuid().slice(0, 5),
@@ -275,7 +281,7 @@ describe('Basic Commands Test', () => {
     endDate: addSubtractDaysToDate(now, {days: 2}),
     showScoreboard: true,
     basicInformation: false,
-    partialPoints: true,
+    scoreMode: ScoreMode.Partial,
     requestParticipantInformation: 'no',
     admissionMode: 'public',
     problems: [
@@ -330,9 +336,9 @@ describe('Basic Commands Test', () => {
       'have.value',
       `${contestOptions.showScoreboard}`,
     );
-    cy.get('[data-partial-points]').should(
+    cy.get('[data-score-mode]').should(
       'have.value',
-      `${contestOptions.partialPoints}`,
+      `${contestOptions.scoreMode}`,
     );
     cy.get('[data-basic-information-required]').should(
       contestOptions.basicInformation ? 'be.checked' : 'not.be.checked',

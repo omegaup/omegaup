@@ -51,7 +51,7 @@
         <template v-for="(user, userIndex) in ranking">
           <tr
             v-if="showUser(user.is_invited)"
-            :key="user.username"
+            :key="`${user.username}-${user.virtual}`"
             :class="user.username"
           >
             <td class="legend" :class="legendClass(userIndex)"></td>
