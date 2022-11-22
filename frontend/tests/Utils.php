@@ -450,6 +450,7 @@ class Utils {
         self::shellExec(
             ('python3 ' .
             dirname(__DIR__, 2) . '/stuff/pipelines/client_contest.py' .
+            $host_arg .
              ' --api-token ' .
              '92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6 ' .
              ' --url ' .

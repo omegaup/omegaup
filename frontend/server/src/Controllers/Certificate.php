@@ -34,16 +34,18 @@ class Certificate extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $certificates_cutoff
-     * @omegaup-request-param mixed $contest_id
+     * @omegaup-request-param int|null $certificates_cutoff
+     * @omegaup-request-param int|null $contest_id
      */
     public static function apiGenerateContestCertificates(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
 
+        $contestID = $r->ensureInt('contest_id');
+
         // obtain the contest
-        $contest = \OmegaUp\DAO\Contests::getByPK($r['contest_id']);
+        $contest = \OmegaUp\DAO\Contests::getByPK($contestID);
 
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
@@ -57,16 +59,18 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             return ['status' => 'ok'];
         }
 
+        $certificateCutoff = $r->ensureOptionalInt('certificates_cutoff');
+
         // add certificates_cutoff value to the course
-        if (!is_null($r['certificates_cutoff'])) {
-            $contest->certificate_cutoff = $r['certificates_cutoff'];
+        if (!is_null($certificateCutoff)) {
+            $contest->certificate_cutoff = $certificateCutoff;
         }
 
         // update contest with the new value
         \OmegaUp\DAO\Contests::update($contest);
 
         // get contest info
-        $contest = \OmegaUp\DAO\Contests::getContestInfo($r['contest_id']);
+        $contest = \OmegaUp\DAO\Contests::getContestInfo($contestID);
 
         // set RabbitMQ client parameters
         $routing_key = 'ContestQueue';

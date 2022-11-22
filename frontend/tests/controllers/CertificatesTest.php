@@ -22,7 +22,11 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             'role' => 'CertificateGenerator'
         ]));
 
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'alias' => 'pasado',
+            ])
+        );
 
         $certificatesCutoff = 3;
 
@@ -62,9 +66,13 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             'role' => 'CertificateGenerator'
         ]));
 
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'alias' => 'pasado',
+            ])
+        );
 
-        $certificatesCutoff = 3;
+        $certificatesCutoff = 4;
 
         $response = \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
             new \OmegaUp\Request([
@@ -97,7 +105,11 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         //login
         $loginIdentity = self::login($identity);
 
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'alias' => 'pasado',
+            ])
+        );
 
         $certificatesCutoff = 3;
 
