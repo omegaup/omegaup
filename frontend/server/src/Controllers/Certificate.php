@@ -70,7 +70,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\Contests::update($contest);
 
         // get contest info
-        $contest = \OmegaUp\DAO\Contests::getContestInfo($contestID);
+        $contestExtraInformation = \OmegaUp\DAO\Contests::getByAliasWithExtraInformation(
+            $contest->alias
+        );
 
         // set RabbitMQ client parameters
         $routing_key = 'ContestQueue';
@@ -81,10 +83,10 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
         // Prepare the meessage
         $messageArray = [
-            'certificate_cutoff' => $contest['certificate_cutoff'],
-            'alias' => $contest['alias'],
-            'scoreboard_url' => $contest['scoreboard_url'],
-            'contest_id' => $contest['contest_id']
+            'certificate_cutoff' => $contestExtraInformation['certificate_cutoff'],
+            'alias' => $contestExtraInformation['alias'],
+            'scoreboard_url' => $contestExtraInformation['scoreboard_url'],
+            'contest_id' => $contestExtraInformation['contest_id']
         ];
         $messageJSON = json_encode($messageArray);
         $message = new \PhpAmqpLib\Message\AMQPMessage($messageJSON);
