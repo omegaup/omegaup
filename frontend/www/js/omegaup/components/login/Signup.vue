@@ -4,7 +4,12 @@
       <h2 class="card-title">{{ T.loginSignupHeader }}</h2>
     </div>
     <div class="card-body">
-      <form>
+      <form
+        class="needs-validation"
+        :class="{ 'was-validated': wasValidated }"
+        novalidate
+        @submit.prevent.stop="registerAndLogin"
+      >
         <div class="form-group">
           <label>{{ T.userEditBirthDate }}</label>
           <omegaup-datepicker
@@ -16,42 +21,62 @@
         <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-2">
             <div class="form-group">
-              <label class="control-label">{{ T.wordsUser }}</label>
-              <input
-                v-model="username"
-                data-signup-username
-                name="reg_username"
-                class="form-control"
-                :disabled="!birthDate"
-                autocomplete="username"
-              />
+              <label class="control-label"
+                >{{ T.wordsUser }}
+                <input
+                  v-model="username"
+                  data-signup-username
+                  name="reg_username"
+                  class="form-control"
+                  :disabled="!birthDate"
+                  autocomplete="username"
+                  :required="true"
+                  @invalid="onInvalidateForm"
+                />
+                <div class="invalid-feedback">
+                  {{ T.loginUsernameRequired }}
+                </div>
+              </label>
             </div>
           </div>
-          <div class="col-md-4">
+          <div v-if="!isU13" class="col-md-4">
             <div class="form-group">
-              <label class="control-label">{{
-                loginEmailDescriptionText
-              }}</label>
-              <input
-                v-if="!isU13"
-                v-model="email"
-                data-signup-email
-                name="reg_email"
-                type="email"
-                class="form-control"
-                :disabled="!birthDate"
-                autocomplete="email"
-              />
-              <input
-                v-else
-                v-model="parentEmail"
-                data-signup-email
-                name="reg_parent_email"
-                type="email"
-                class="form-control"
-                :disabled="!birthDate"
-                autocomplete="email"
-              />
+              <label class="control-label"
+                >{{ T.loginEmail }}
+                <input
+                  v-model="email"
+                  data-signup-email
+                  name="reg_email"
+                  type="email"
+                  class="form-control"
+                  :disabled="!birthDate"
+                  autocomplete="email"
+                  :required="true"
+                  @invalid="onInvalidateForm"
+                />
+                <div class="invalid-feedback">{{ T.loginEmailRequired }}</div>
+              </label>
+            </div>
+          </div>
+          <div v-else class="col-md-4">
+            <div class="form-group">
+              <label class="control-label"
+                >{{ T.loginEmailParent }}
+                <input
+                  v-model="parentEmail"
+                  data-signup-email
+                  name="reg_parent_email"
+                  type="email"
+                  class="form-control"
+                  :disabled="!birthDate"
+                  autocomplete="email"
+                  :required="true"
+                  @invalid="onInvalidateForm"
+                />
+                <div class="invalid-feedback">
+                  {{ T.loginParentEmailRequired }}
+                </div>
+              </label>
             </div>
           </div>
         </div>
@@ -67,7 +92,13 @@
                 class="form-control"
                 :disabled="!birthDate"
                 autocomplete="new-password"
+                :required="true"
+                pattern="^[_a-zA-Z0-9\-]{5,15}$"
+                @invalid="onInvalidateForm"
               />
+              <div class="invalid-feedback">
+                {{ T.loginPasswordTooShort }}
+              </div>
             </div>
           </div>
           <div class="col-md-4">
@@ -81,21 +112,32 @@
                 class="form-control"
                 :disabled="!birthDate"
                 autocomplete="new-password"
+                :required="true"
+                pattern="^[_a-zA-Z0-9\-]{5,15}$"
+                @invalid="onInvalidateForm"
               />
+              <div class="invalid-feedback">
+                {{ T.passwordMismatch }}
+              </div>
             </div>
           </div>
         </div>
         <div class="row justify-content-md-center">
           <div class="col-md-8">
-            <input
-              v-model="privacyPolicyAccepted"
-              type="checkbox"
-              :disabled="!birthDate"
-            />
-            <label for="checkbox">
+            <label>
+              <input
+                v-model="privacyPolicyAccepted"
+                type="checkbox"
+                data-signup-accept_policies
+                name="reg_accept_policies"
+                :disabled="!birthDate"
+              />
               <omegaup-markdown
                 :markdown="T.acceptPrivacyPolicy"
               ></omegaup-markdown>
+              <div class="invalid-feedback">
+                {{ T.loginPrivacyPolicyRequired }}
+              </div>
             </label>
           </div>
           <div v-if="validateRecaptcha" class="col-md-4">
@@ -113,7 +155,6 @@
                 class="btn btn-primary form-control"
                 name="sign_up"
                 :disabled="!birthDate || !privacyPolicyAccepted"
-                @click.prevent="registerAndLogin"
               >
                 {{ T.loginSignUp }}
               </button>
@@ -124,14 +165,13 @@
     </div>
   </div>
 </template>
-
+​
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import omegaup_Markdown from '../Markdown.vue';
 import T from '../../lang';
 import * as time from '../../time';
 import DatePicker from '../DatePicker.vue';
-import * as ui from '../../ui';
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
@@ -149,14 +189,13 @@ export default class Signup extends Vue {
   recaptchaResponse: string = '';
   birthDate: null | Date = null;
   privacyPolicyAccepted = false;
-
+  wasValidated = false;
+  errors = false;
+​
   get loginEmailDescriptionText(): string {
-    if (!this.isU13) {
-      return T.loginEmail;
-    }
     return !this.isU13 ? T.loginEmail : T.loginEmailParent;
   }
-
+​
   get isU13(): boolean {
     if (this.birthDate === null) {
       // Most users are not going to be U13. So until they fill out their
@@ -165,30 +204,21 @@ export default class Signup extends Vue {
     }
     return time.getDifferenceInCalendarYears(this.birthDate) < 13;
   }
-
+​
   verify(response: string): void {
     this.recaptchaResponse = response;
   }
+​
   expired(): void {
     this.recaptchaResponse = '';
   }
-
+​
+  onInvalidateForm() {
+    this.errors = true;
+  }
+​
   registerAndLogin(): void {
-    if (this.password !== this.passwordConfirmation) {
-      ui.error(T.passwordMismatch);
-      return;
-    }
-    if (this.password && this.password.length < 8) {
-      ui.error(T.loginPasswordTooShort);
-      return;
-    }
-    if (!this.isU13 && this.email === null) {
-      ui.error(T.loginEmailMissing);
-      return;
-    } else if(this.isU13 && this.parentEmail === null) {
-      ui.error(T.loginParentEmailMissing);
-      return;
-    }
+    this.wasValidated = true;
     const registerParameters = {
       username: this.username,
       password: this.password,

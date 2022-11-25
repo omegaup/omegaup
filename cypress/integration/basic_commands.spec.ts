@@ -177,12 +177,13 @@ describe('Basic Commands Test', () => {
     const password = uuid();
     cy.get('[data-login-button]').click();
     now.setFullYear(now.getFullYear() - 18);
-    cy.get('[data-signup-birthdate]').type(getISODate(now));
+    cy.get('input[name="reg_birthdate"]').type(getISODate(now));
     cy.get('[data-signup-username]').type(username);
     cy.get('[data-signup-password]').type(password);
     cy.get('[data-signup-repeat-password]').type(password);
     cy.get('[data-signup-email]').type(`${username}@omegaup.com`);
     cy.get('[data-signup-submit]').click();
+    cy.get('[data-signup-accept_policies]').check();
     cy.waitUntil(() =>
       cy.get('header .username').should('have.text', username),
     );
