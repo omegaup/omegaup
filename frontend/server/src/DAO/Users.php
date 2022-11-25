@@ -467,12 +467,13 @@ class Users extends \OmegaUp\DAO\Base\Users {
                         Identities i ON u.main_identity_id = i.identity_id
                     WHERE
                       parental_verification_token = ?
-                    LIMIT 1';";
+                    LIMIT 1;";
 
-         /** @var int|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$token]
         );
+        return $result;
     }
 }

@@ -2,12 +2,10 @@ import Homepage from '../components/homepage/Homepage.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
-import * as ui from '../ui';
 import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.IndexPayload();
-  const parentPayload = types.payloadParsers.VerificationParentalTokenDetailsPayload();
 
   const ranking = payload.userRank.map((user, index) => ({
     rank: index + 1,
@@ -17,10 +15,6 @@ OmegaUp.on('ready', () => {
     score: user.score,
     problems_solved: user.problems_solved,
   }));
-
-  if (parentPayload.hasParentalVerificationToken) {
-    ui.success(T.parentalTokenVerificationSuccessful);
-  }
 
   new Vue({
     el: '#main-container',

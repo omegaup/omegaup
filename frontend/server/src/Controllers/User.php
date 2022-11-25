@@ -4665,15 +4665,15 @@ class User extends \OmegaUp\Controllers\Controller {
         $token = $r->ensureString(
             'parental_verification_token',
             validator: fn (string $token) => preg_match(
-                '/^[a-zA-Z0-9]{25}$/',
+                '/^[a-zA-Z0-9]{24}$/',
                 $token
             ) === 1
         );
         $hasParentalVerificationToken = false;
 
-        $userId = \OmegaUp\DAO\Users::findByParentalToken($token);
+        $user = \OmegaUp\DAO\Users::findByParentalToken($token);
 
-        if (is_null($userId)) {
+        if (is_null($user)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'parentalTokenNotFound'
             );
@@ -4683,18 +4683,12 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
         }
 
-        $user = \OmegaUp\DAO\Users::getByPK($userId);
-        if (is_null($user)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-        }
-
-            $user->parent_email_id = $r->user->main_email_id;
-            $user->parent_verified = true;
-            $user->parental_verification_token = null;
-
-            \OmegaUp\DAO\Users::update($user);
-
-            return [
+        $user->parent_email_id = $r->user->main_email_id;
+        $user->parent_verified = true;
+        $user->parental_verification_token = null;
+        \OmegaUp\DAO\Users::update($user);
+        $hasParentalVerificationToken = true;
+        return [
             'templateProperties' => [
                 'payload' => [
                     'hasParentalVerificationToken' => $hasParentalVerificationToken,
@@ -4704,7 +4698,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'user_verification_parental_token',
-            ];
+        ];
     }
 }
 
