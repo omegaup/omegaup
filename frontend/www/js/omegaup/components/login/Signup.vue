@@ -191,9 +191,11 @@ export default class Signup extends Vue {
   privacyPolicyAccepted = false;
   wasValidated = false;
   errors = false;
+
   get loginEmailDescriptionText(): string {
     return !this.isU13 ? T.loginEmail : T.loginEmailParent;
   }
+
   get isU13(): boolean {
     if (this.birthDate === null) {
       // Most users are not going to be U13. So until they fill out their
@@ -202,15 +204,19 @@ export default class Signup extends Vue {
     }
     return time.getDifferenceInCalendarYears(this.birthDate) < 13;
   }
+
   verify(response: string): void {
     this.recaptchaResponse = response;
   }
+
   expired(): void {
     this.recaptchaResponse = '';
   }
+
   onInvalidateForm() {
     this.errors = true;
   }
+
   registerAndLogin(): void {
     this.wasValidated = true;
     const registerParameters = {
