@@ -14,7 +14,6 @@ describe('getDifferenceInCalendarYears', () => {
       dateNowSpy.mockRestore();
     }
   });
-
   it('Should handle difference in calendar years', () => {
     // https://www.epochconverter.com/
     expect(
@@ -22,16 +21,16 @@ describe('getDifferenceInCalendarYears', () => {
     ).toEqual(0);
     expect(
       time.getDifferenceInCalendarYears(new Date('2001-01-01T00:00:00Z')),
-    ).toEqual(1);
+    ).toEqual(-1);
     expect(
       time.getDifferenceInCalendarYears(new Date('2002-01-01T00:00:00Z')),
-    ).toEqual(2);
+    ).toEqual(-2);
     expect(
       time.getDifferenceInCalendarYears(new Date('2003-12-31T23:59:59Z')),
-    ).toEqual(3);
+    ).toEqual(-3);
     expect(
       time.getDifferenceInCalendarYears(new Date('2004-01-01T00:00:00Z')),
-    ).toEqual(4);
+    ).toEqual(-4);
   });
 });
 
