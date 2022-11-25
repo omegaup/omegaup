@@ -2,7 +2,6 @@ import Homepage from '../components/homepage/Homepage.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
-import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.IndexPayload();

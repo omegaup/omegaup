@@ -469,7 +469,6 @@ class Users extends \OmegaUp\DAO\Base\Users {
                       parental_verification_token = ?
                     LIMIT 1;";
 
-
         $result = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$token]
