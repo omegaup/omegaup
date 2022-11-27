@@ -119,4 +119,109 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
             $identity->identity_id
         ));
     }
+
+    public function testUserHasTriedToSolveProblemWithDifferentVerdicts() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $pointsGroup = [
+            [
+                'execution' => 'EXECUTION_JUDGE_ERROR',
+                'output' => 'OUTPUT_INTERRUPTED',
+                'status_memory' => 'MEMORY_NOT_AVAILABLE',
+                'status_runtime' => 'RUNTIME_NOT_AVAILABLE',
+                'points_per_group' => [
+                    ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'JE'],
+                    ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'CE'],
+                    ['group_name' => 'hard', 'score' => 0.0, 'verdict' => 'CE'],
+                ],
+            ],
+            [
+                'execution' => 'EXECUTION_COMPILATION_ERROR',
+                'output' => 'OUTPUT_INTERRUPTED',
+                'status_memory' => 'MEMORY_NOT_AVAILABLE',
+                'status_runtime' => 'RUNTIME_NOT_AVAILABLE',
+                'points_per_group' => [
+                    ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'CE'],
+                    ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'CE'],
+                    ['group_name' => 'hard', 'score' => 0.0, 'verdict' => 'CE'],
+                ],
+            ],
+            [
+                'execution' => 'EXECUTION_INTERRUPTED',
+                'output' => 'OUTPUT_EXCEEDED',
+                'status_memory' => 'MEMORY_AVAILABLE',
+                'status_runtime' => 'RUNTIME_EXCEEDED',
+                'points_per_group' => [
+                    ['group_name' => 'easy', 'score' => (0.4 / 3), 'verdict' => 'AC'],
+                    ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'TLE'],
+                    ['group_name' => 'hard', 'score' => 0.0, 'verdict' => 'OLE'],
+                ],
+            ],
+            [
+                'execution' => 'EXECUTION_FINISHED',
+                'output' => 'OUTPUT_INCORRECT',
+                'status_memory' => 'MEMORY_AVAILABLE',
+                'status_runtime' => 'RUNTIME_AVAILABLE',
+                'points_per_group' => [
+                    ['group_name' => 'easy', 'score' => (0.4 / 3), 'verdict' => 'AC'],
+                    ['group_name' => 'medium', 'score' => (1.0 / 3), 'verdict' => 'AC'],
+                    ['group_name' => 'hard', 'score' => (0.2 / 3), 'verdict' => 'WA'],
+                ],
+            ],
+            [
+                'execution' => 'EXECUTION_FINISHED',
+                'output' => 'OUTPUT_CORRECT',
+                'status_memory' => 'MEMORY_AVAILABLE',
+                'status_runtime' => 'RUNTIME_AVAILABLE',
+                'points_per_group' => [
+                    ['group_name' => 'easy', 'score' => (0.4 / 3), 'verdict' => 'AC'],
+                    ['group_name' => 'medium', 'score' => (1.0 / 3), 'verdict' => 'AC'],
+                    ['group_name' => 'hard', 'score' => (0.4 / 3), 'verdict' => 'AC'],
+                ],
+            ],
+        ];
+
+        for ($i  = 0; $i < 5; ++$i) {
+            $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problemData,
+                $identity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                points: 0,
+                runData: $runData,
+                problemsetScoreMode: 'max_per_group',
+                runScoreByGroups: $pointsGroup[$i]['points_per_group']
+            );
+        }
+
+        $response = \OmegaUp\DAO\Runs::getAllRuns(
+            $problemsetId = null,
+            $status = null,
+            $verdict = null,
+            $problemId = $problemData['problem']->problem_id,
+            $language = null,
+            $identityId = $identity->identity_id,
+            $offset = null,
+            $rowCount = null,
+        );
+
+        for ($i  = 0; $i < 5; ++$i) {
+            $this->assertSame(
+                $response['runs'][4 - $i]['execution'],
+                $pointsGroup[$i]['execution']
+            );
+            $this->assertSame(
+                $response['runs'][4 - $i]['output'],
+                $pointsGroup[$i]['output']
+            );
+            $this->assertSame(
+                $response['runs'][4 - $i]['status_memory'],
+                $pointsGroup[$i]['status_memory']
+            );
+            $this->assertSame(
+                $response['runs'][4 - $i]['status_runtime'],
+                $pointsGroup[$i]['status_runtime']
+            );
+        }
+    }
 }

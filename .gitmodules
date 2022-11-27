@@ -14,9 +14,6 @@
 	path = frontend/www/third_party/js/pagedown
 	url = https://github.com/omegaup/pagedown.git
 	shallow = true
-[submodule "stuff/hook_tools"]
-	path = stuff/hook_tools
-	url = https://github.com/omegaup/hook_tools.git
 [submodule "okfn/csv.js"]
 	path = frontend/www/third_party/js/csv.js
 	url = https://github.com/okfn/csv.js/
