@@ -142,7 +142,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
      *
      */
     public function testUserDoToGenerateParentalTokenAtTimeOfRegistration() {
-        //Verify that the token is not generated.
+        // Verify that the token is not generated.
         $over13BirthDateTimestamp = strtotime('-15 years');
         $randomString = \OmegaUp\Test\Utils::createRandomString();
         \OmegaUp\Controllers\User::apiCreate(
