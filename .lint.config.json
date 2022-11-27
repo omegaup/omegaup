@@ -101,6 +101,7 @@
 		},
 		"python": {
 			"pycodestyle_config": "setup.cfg",
+			"pylint_config": ".pylintrc",
 			"mypy": true,
 			"allowlist": [
 				".*\\.py$"

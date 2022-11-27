@@ -51,7 +51,7 @@ def test_user_ranking_course(driver):
 
     run_id = driver.generate_id()
     course_alias = f'ut_rank_course_{run_id}'
-    school_name = f'Escuela curso'
+    school_name = 'Escuela curso'
     assignment_alias = f'ut_rank_hw_{run_id}'
     problem = 'ut_rc_problem_%s' % driver.generate_id()
 
@@ -135,7 +135,7 @@ def test_user_ranking_course(driver):
                  '//input[@name = "show-scoreboard"][@value="true"]'))).click()
 
         driver.browser.find_element(By.CSS_SELECTOR,
-            'form[data-course-form]').submit()
+                                    'form[data-course-form]').submit()
         assert (('/course/%s/edit/' % course_alias) in
                 driver.browser.current_url), driver.browser.current_url
 
@@ -166,7 +166,7 @@ def show_run_details_course(driver: conftest.Driver, course_alias: str,
 
     util.show_run_details(driver, code='#include <iostream>')
 
-    driver.browser.find_element(By.CSS_SELECTOR,'div[data-overlay]').click()
+    driver.browser.find_element(By.CSS_SELECTOR, 'div[data-overlay]').click()
 
 
 def test_create_identities_for_course(driver):
@@ -313,13 +313,13 @@ def create_course(driver, course_alias: str, school_name: str) -> None:
             (By.CSS_SELECTOR,
              'input[name="show-scoreboard"][value="true"]'))).click()
     driver.typeahead_helper('.omegaup-course-details', school_name)
-    driver.browser.find_element(By.CSS_SELECTOR,
-        'textarea[data-course-new-description]'
-    ).send_keys('course description')
+    driver.browser.find_element(
+        By.CSS_SELECTOR, 'textarea[data-course-new-description]').send_keys(
+            'course description')
 
     with driver.page_transition():
         driver.browser.find_element(By.CSS_SELECTOR,
-            'form[data-course-form]').submit()
+                                    'form[data-course-form]').submit()
     assert (f'/course/{course_alias}/edit/' in driver.browser.current_url
             ), driver.browser.current_url
 
@@ -348,13 +348,13 @@ def add_assignment_with_problem(driver, assignment_alias, problem_alias):
             (By.CSS_SELECTOR, ('.schedule .name')))).send_keys(
                 assignment_alias)
     assignments_tab = driver.browser.find_element(By.CSS_SELECTOR,
-        '.tab-pane.active')
+                                                  '.tab-pane.active')
     new_assignment_form = assignments_tab.find_element(By.CSS_SELECTOR,
-        '.schedule')
-    new_assignment_form.find_element(By.CSS_SELECTOR,'.alias').send_keys(
-        assignment_alias)
-    new_assignment_form.find_element(By.CSS_SELECTOR,'textarea').send_keys(
-        'homework description')
+                                                       '.schedule')
+    new_assignment_form.find_element(By.CSS_SELECTOR,
+                                     '.alias').send_keys(assignment_alias)
+    new_assignment_form.find_element(
+        By.CSS_SELECTOR, 'textarea').send_keys('homework description')
 
     driver.wait.until(
         EC.visibility_of_element_located(
@@ -371,8 +371,8 @@ def add_assignment_with_problem(driver, assignment_alias, problem_alias):
              '[data-course-problemlist] table.table-striped')))
 
     with util.dismiss_status(driver):
-        new_assignment_form.find_element(By.CSS_SELECTOR,
-            'button[data-schedule-assignment]').click()
+        new_assignment_form.find_element(
+            By.CSS_SELECTOR, 'button[data-schedule-assignment]').click()
     driver.wait.until(
         EC.invisibility_of_element_located(
             (By.CSS_SELECTOR, '.omegaup-course-assignmentdetails')))
