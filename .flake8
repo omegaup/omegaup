@@ -1,0 +1,10 @@
+[flake8]
+extend-ignore = 
+    W503,
+    W504,
+    C0209,
+    W0511,
+    R0903,
+    too-few-public-methods,
+    consider-using-f-string
+
