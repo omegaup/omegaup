@@ -109,12 +109,13 @@
         <a v-if="data.source_link" download="data.zip" :href="data.source">{{
           T.wordsDownload
         }}</a>
-        <omegaup-arena-code-view
-          v-else
-          :language="data.language"
-          :readonly="true"
-          :value="data.source"
-        ></omegaup-arena-code-view>
+        <slot v-else name="code-view">
+          <omegaup-arena-code-view
+            :language="data.language"
+            :readonly="true"
+            :value="data.source"
+          ></omegaup-arena-code-view>
+        </slot>
         <div v-if="data.compile_error" class="compile_error">
           <h3>{{ T.wordsCompilerOutput }}</h3>
           <pre class="compile_error">
