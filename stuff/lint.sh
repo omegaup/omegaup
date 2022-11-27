@@ -3,7 +3,7 @@
 set -e
 
 OMEGAUP_ROOT="$(git rev-parse --show-toplevel)"
-CONTAINER_VERSION=omegaup/hook_tools:20221023
+CONTAINER_VERSION=omegaup/hook_tools:v1.0.9
 
 if [[ $# != 0 ]]; then
 	# The caller has given us the explicit arguments.
@@ -52,6 +52,6 @@ fi
 	--env "MYPYPATH=${OMEGAUP_ROOT}/stuff" \
 	--env "VIRTUAL_ENV=${OMEGAUP_ROOT}/stuff/venv" \
 	--entrypoint='' \
-	"${CONTAINER_VERSION}" bash -c "PATH=\"${OMEGAUP_ROOT}/stuff/venv/bin:\$PATH\" exec python3 /hook_tools/lint.py --command-name=\"./stuff/lint.sh\" ${ARGS}"
+	"${CONTAINER_VERSION}" bash -c "PATH=\"${OMEGAUP_ROOT}/stuff/venv/bin:\$PATH\" exec python3 -m omegaup_hook_tools --command-name=\"./stuff/lint.sh\" ${ARGS}"
 
 echo OK

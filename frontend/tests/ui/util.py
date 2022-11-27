@@ -51,7 +51,7 @@ class StatusBarIsDismissed:
         message_class = self.status_element.get_attribute('class')
         assert self.message_class in message_class, message_class
         self.status_element.find_element(By.CSS_SELECTOR,
-            'button.close').click()
+                                         'button.close').click()
         self.clicked = True
 
     def __call__(self, driver):
@@ -161,14 +161,16 @@ def create_run(driver, problem_alias, filename):
 
     resource_path = os.path.join(OMEGAUP_ROOT,
                                  'frontend/tests/resources/%s' % filename)
-    with open(resource_path, 'r') as f:
+    with open(resource_path, 'r', encoding='utf-8') as f:
         driver.browser.execute_script(
             'document.querySelector("form[data-run-submit] .CodeMirror")'
             '.CodeMirror.setValue(arguments[0]);',
             f.read())
     original_url = driver.browser.current_url
-    driver.browser.find_element(By.CSS_SELECTOR,
-        'form[data-run-submit] button[type="submit"]').submit()
+    driver.browser.find_element(
+        By.CSS_SELECTOR,
+        'form[data-run-submit] button[type="submit"]',
+    ).submit()
     driver.wait.until(EC.url_changes(original_url))
 
     logging.debug('Run submitted.')
@@ -348,7 +350,8 @@ def create_problem(
 
     if not private:
         # Make the problem public
-        driver.browser.find_element(By.XPATH,
+        driver.browser.find_element(
+            By.XPATH,
             '//input[@type="radio" and @name="visibility" and @value="true"]'
         ).click()
 
@@ -437,7 +440,8 @@ def check_scoreboard_events(driver, alias, url, *, num_elements, scoreboard):
             (By.XPATH,
              '//*[name()="svg"]/*[contains(@class, "%s")]' % (series))))
 
-    scoreboard_events = driver.browser.find_elements(By.XPATH,
+    scoreboard_events = driver.browser.find_elements(
+        By.XPATH,
         '//*[name()="svg"]/*[contains(@class, "%s")]/*[contains(@class'
         ', "highcharts-tracker")]' % series)
     assert len(scoreboard_events) == num_elements, len(scoreboard_events)
@@ -506,10 +510,12 @@ def add_identities_group(driver, group_alias) -> List[Identity]:
     identities_element.send_keys(os.path.join(
         OMEGAUP_ROOT, 'frontend/tests/resources/identities.csv'))
 
-    username_elements = driver.browser.find_elements(By.XPATH,
+    username_elements = driver.browser.find_elements(
+        By.XPATH,
         '//table[@data-identities-table]/tbody/tr/td[contains(concat(" ", '
         'normalize-space(@class), " "), " username ")]/strong')
-    password_elements = driver.browser.find_elements(By.XPATH,
+    password_elements = driver.browser.find_elements(
+        By.XPATH,
         '//table[@data-identities-table]/tbody/tr/td[contains(concat(" ", '
         'normalize-space(@class), " "), " password ")]')
     usernames = [username.text for username in username_elements]
@@ -532,9 +538,8 @@ def add_identities_group(driver, group_alias) -> List[Identity]:
         EC.visibility_of_element_located(
             (By.XPATH, '//table[@data-table-identities]')))
 
-    identity_elements = driver.browser.find_elements(By.XPATH,
-        '//table[@data-table-identities]/tbody/tr/td/span/a'
-    )
+    identity_elements = driver.browser.find_elements(
+        By.XPATH, '//table[@data-table-identities]/tbody/tr/td/span/a')
     uploaded_identities = [identity.text for identity in identity_elements]
     for i, identity in enumerate(identities):
         assert identity.username == uploaded_identities[i], (

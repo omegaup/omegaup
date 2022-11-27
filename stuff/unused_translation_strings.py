@@ -35,7 +35,7 @@ def _get_expected_strings() -> Set[str]:
                 regex = _TEMPLATE_RE
             else:
                 regex = _FRONTEND_RE
-            with open(path) as f:
+            with open(path, encoding='utf-8') as f:
                 for line in f:
                     for linematch in regex.finditer(line):
                         if linematch[1] in _EXCLUDED_STRINGS:
@@ -46,7 +46,7 @@ def _get_expected_strings() -> Set[str]:
     for filename in os.listdir('frontend/tests/runfiles/translation_strings'):
         path = os.path.join('frontend/tests/runfiles/translation_strings',
                             filename)
-        with open(path) as f:
+        with open(path, encoding='utf-8') as f:
             for line in f:
                 expected_strings.add(line.strip())
 
@@ -61,7 +61,7 @@ def _main() -> None:
 
     # Finally, compare the expected list to the list of strings in one of the
     # translation string files.
-    with open('frontend/templates/en.lang') as f:
+    with open('frontend/templates/en.lang', encoding='utf-8') as f:
         for lineno, line in enumerate(f, start=1):
             match = _LANG_RE.match(line.strip())
             if not match:
