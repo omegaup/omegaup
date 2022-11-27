@@ -422,12 +422,6 @@ class RequestParamChecker implements
         return self::$parsedMethodTypeMapping[$functionId];
     }
 
-    /**
-     * @param  \PhpParser\Node\Expr\MethodCall|\PhpParser\Node\Expr\StaticCall $expr
-     * @param  \Psalm\FileManipulation[] $file_replacements
-     *
-     * @return void
-     */
     public static function afterMethodCallAnalysis(
         \Psalm\Plugin\EventHandler\Event\AfterMethodCallAnalysisEvent $event,
     ): void {
@@ -570,12 +564,10 @@ class RequestParamChecker implements
 
     /**
      * Called after a statement has been checked
-     *
-     * @return null|false
      */
     public static function afterStatementAnalysis(
         \Psalm\Plugin\EventHandler\Event\AfterClassLikeAnalysisEvent $event
-    ) {
+    ): ?bool {
         if (is_null($event->getClasslikeStorage()->location)) {
             return null;
         }
@@ -669,14 +661,15 @@ class RequestParamChecker implements
             ) {
                 $expected = [];
             } else {
-                if (isset(self::$methodTypeMapping[$functionId])) {
-                    $expected = self::$methodTypeMapping[$functionId];
-                } else {
-                    $expected = [];
-                }
+                $expected = self::getMethodTypeMapping($functionId);
 
-                // Now go through the callgraph, parsing any unvisited methods if needed.
-                foreach (self::$methodCallGraph[$functionId] ?? [] as $calleeMethodId => $_) {
+                // Now go through the callgraph, parsing any unvisited methods
+                // if needed.
+                foreach (
+                    self::getMethodCalls(
+                        $functionId
+                    ) as $calleeMethodId => $_
+                ) {
                     foreach (
                         self::getDocBlockReturnTypes(
                             $calleeMethodId,
@@ -773,6 +766,123 @@ class RequestParamChecker implements
             }
         }
         $event->setFileReplacements($fileReplacements);
+        return null;
+    }
+
+    /**
+     * @return array<lowercase-string, true>
+     */
+    private static function getMethodCalls(string $functionId): array {
+        $config = \Psalm\Config::getInstance();
+        $rootCacheDirectory = $config->getCacheDirectory();
+        if (!$rootCacheDirectory) {
+            throw new \UnexpectedValueException('No cache directory defined');
+        }
+        $cacheDir = (
+            $rootCacheDirectory . DIRECTORY_SEPARATOR
+            . 'omegaup-callgraph'
+        );
+        $cachePath = (
+            $cacheDir . DIRECTORY_SEPARATOR
+            . sha1($functionId)
+        );
+        if ($config->use_igbinary) {
+            $cachePath .= '-igbinary';
+        }
+        /** @var array<lowercase-string, true> */
+        $methodCalls = [];
+        if (array_key_exists($functionId, self::$methodCallGraph)) {
+            // Even though the class was analyzed, the individual
+            // methods calls inside the function might not have been.
+            // Let's see if we had cached this function's callgraph before.
+            $methodCalls = self::$methodCallGraph[$functionId];
+            if (!is_dir($cacheDir)) {
+                mkdir($cacheDir, permissions: 0755, recursive: true);
+            }
+            if ($config->use_igbinary) {
+                file_put_contents(
+                    $cachePath,
+                    \igbinary_serialize($methodCalls),
+                    LOCK_EX
+                );
+            } else {
+                file_put_contents(
+                    $cachePath,
+                    \serialize($methodCalls),
+                    LOCK_EX
+                );
+            }
+        } elseif (is_file($cachePath)) {
+            $contents = file_get_contents($cachePath);
+            if ($contents !== false) {
+                if ($config->use_igbinary) {
+                    /** @var array<lowercase-string, true> */
+                    $methodCalls = \igbinary_unserialize($contents);
+                } else {
+                    /** @var array<lowercase-string, true> */
+                    $methodCalls = \unserialize($contents);
+                }
+            }
+        }
+        return $methodCalls;
+    }
+
+    /**
+     * @return array<string, RequestParamDescription>
+     */
+    private static function getMethodTypeMapping(string $functionId): array {
+        $config = \Psalm\Config::getInstance();
+        $rootCacheDirectory = $config->getCacheDirectory();
+        if (!$rootCacheDirectory) {
+            throw new \UnexpectedValueException('No cache directory defined');
+        }
+        $cacheDir = (
+            $rootCacheDirectory . DIRECTORY_SEPARATOR
+            . 'omegaup-methodtypemapping'
+        );
+        $cachePath = (
+            $cacheDir . DIRECTORY_SEPARATOR
+            . sha1($functionId)
+        );
+        if ($config->use_igbinary) {
+            $cachePath .= '-igbinary';
+        }
+        /** @var array<string, RequestParamDescription> */
+        $methodTypeMapping = [];
+        if (array_key_exists($functionId, self::$methodTypeMapping)) {
+            // Even though the class was analyzed, the individual
+            // methods calls inside the function might not have been.
+            // Let's see if we had cached this function's callgraph before.
+            $methodTypeMapping = self::$methodTypeMapping[$functionId];
+            if (!is_dir($cacheDir)) {
+                mkdir($cacheDir, permissions: 0755, recursive: true);
+            }
+            if ($config->use_igbinary) {
+                file_put_contents(
+                    $cachePath,
+                    \igbinary_serialize($methodTypeMapping),
+                    LOCK_EX
+                );
+            } else {
+                file_put_contents(
+                    $cachePath,
+                    \serialize($methodTypeMapping),
+                    LOCK_EX
+                );
+            }
+        } elseif (is_file($cachePath)) {
+            $contents = file_get_contents($cachePath);
+            if ($contents !== false) {
+                if ($config->use_igbinary) {
+                    /** @var array<string, RequestParamDescription> */
+                    $methodTypeMapping = \igbinary_unserialize($contents);
+                } else {
+                    /** @var array<string, RequestParamDescription> */
+                    $methodTypeMapping = \unserialize($contents);
+                }
+            }
+        }
+        return $methodTypeMapping;
     }
 }
 

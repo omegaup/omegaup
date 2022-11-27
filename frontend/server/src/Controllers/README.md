@@ -748,7 +748,6 @@ Creates a new contest
 | `finish_time`               | `mixed`        |             |
 | `languages`                 | `mixed`        |             |
 | `needs_basic_information`   | `bool\|null`   |             |
-| `partial_score`             | `bool\|null`   |             |
 | `penalty`                   | `mixed`        |             |
 | `penalty_calc_policy`       | `mixed`        |             |
 | `penalty_type`              | `mixed`        |             |
@@ -1315,7 +1314,6 @@ Update a Contest
 | `feedback`                                   | `mixed`                                              |             |
 | `languages`                                  | `mixed`                                              |             |
 | `needs_basic_information`                    | `bool\|null`                                         |             |
-| `partial_score`                              | `bool\|null`                                         |             |
 | `penalty`                                    | `int\|null`                                          |             |
 | `penalty_calc_policy`                        | `mixed`                                              |             |
 | `penalty_type`                               | `mixed`                                              |             |

@@ -29,9 +29,12 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         foreach ($response['rank'] as $entry) {
             if ($entry['username'] == $contestantIdentity->username) {
                 $found = true;
-                $this->assertEquals($entry['name'], $contestantIdentity->name);
-                $this->assertEquals($entry['problems_solved'], 1);
-                $this->assertEquals($entry['score'], 100);
+                $this->assertSame(
+                    $entry['name'],
+                    $contestantIdentity->name
+                );
+                $this->assertSame($entry['problems_solved'], 1);
+                $this->assertSame($entry['score'], 100.0);
             }
         }
 
@@ -116,13 +119,18 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         foreach ($response['rank'] as $entry) {
             if ($entry['username'] === $contestantIdentity->username) {
                 $found = true;
-                $this->assertEquals($entry['name'], $contestantIdentity->name);
-                $this->assertEquals($entry['problems_solved'], 1);
-                $this->assertEquals($entry['score'], 100);
+                $this->assertSame(
+                    $entry['name'],
+                    $contestantIdentity->name
+                );
+                $this->assertSame($entry['problems_solved'], 1);
+                $this->assertSame($entry['score'], 100.0);
             }
 
             if ($entry['username'] === $identity2->username) {
-                $this->fail('User with private problem solved showed in rank.');
+                $this->fail(
+                    'User with private problem solved showed in rank.'
+                );
             }
         }
 
@@ -148,8 +156,8 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::getUserRankInfo(
             $contestantIdentity
         );
-        $this->assertEquals($response['name'], $contestantIdentity->name);
-        $this->assertEquals($response['problems_solved'], 1);
+        $this->assertSame($response['name'], $contestantIdentity->name);
+        $this->assertSame($response['problems_solved'], 1);
     }
 
     /**
@@ -166,9 +174,9 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             $contestantIdentity
         );
 
-        $this->assertEquals($response['name'], $contestantIdentity->name);
-        $this->assertEquals($response['problems_solved'], 0);
-        $this->assertEquals($response['rank'], 0);
+        $this->assertSame($response['name'], $contestantIdentity->name);
+        $this->assertSame($response['problems_solved'], 0);
+        $this->assertSame($response['rank'], 0);
     }
 
     /**
@@ -188,7 +196,9 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData,
             $identityWithNoCountry
         );
-        \OmegaUp\Test\Factories\Run::gradeRun($runDataContestantWithNoCountry);
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runDataContestantWithNoCountry
+        );
 
         // User should not have filters
         $availableFilters = \OmegaUp\Controllers\User::getRankForTypeScript(
@@ -290,13 +300,17 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             $identityFromMaranhao1,
             $maranhao1Login
         );
-        \OmegaUp\Test\Factories\Run::gradeRun($runDataContestantFromMaranhao1);
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runDataContestantFromMaranhao1
+        );
         $runDataContestantFromMaranhao1 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData[1],
             $identityFromMaranhao1,
             $maranhao1Login
         );
-        \OmegaUp\Test\Factories\Run::gradeRun($runDataContestantFromMaranhao1);
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runDataContestantFromMaranhao1
+        );
 
         [
             'identity' => $identityFromMaranhao2
@@ -315,7 +329,9 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             $identityFromMaranhao2,
             $maranhao2Login
         );
-        \OmegaUp\Test\Factories\Run::gradeRun($runDataContestantFromMaranhao2);
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runDataContestantFromMaranhao2
+        );
 
         // Create a user from Massachusetts, USA
         [
@@ -465,8 +481,8 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertTrue($firstPlaceUserRank['rank'] < $userRank['rank']);
-        $this->assertEquals(sizeof($problems), $userRank['problems_solved']);
-        $this->assertEquals(
+        $this->assertSame(sizeof($problems), $userRank['problems_solved']);
+        $this->assertSame(
             sizeof($problems) + 1 /* extraProblem */,
             $firstPlaceUserRank['problems_solved']
         );
@@ -566,11 +582,11 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             100
         )['ranking'];
 
-        $this->assertEquals(
+        $this->assertSame(
             $problem0->quality + $problem1->quality,
             $results[0]['author_score']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problem2->quality + $problem3->quality,
             $results[1]['author_score']
         );
@@ -705,17 +721,17 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Unassociated identities do not appear in user rank report
-        $this->assertEquals($response['total'], count($usersRankExpected));
+        $this->assertSame($response['total'], count($usersRankExpected));
         foreach ($response['rank'] as $i => $entry) {
-            $this->assertEquals(
+            $this->assertSame(
                 $entry['username'],
                 $usersRankExpected[$i]['username']
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $entry['problems_solved'],
                 $usersRankExpected[$i]['problems_solved']
             );
-            $this->assertEquals($entry['ranking'], $i + 1);
+            $this->assertSame($entry['ranking'], $i + 1);
         }
     }
 }

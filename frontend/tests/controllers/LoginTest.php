@@ -14,7 +14,7 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Assert the log is empty.
-        $this->assertEquals(
+        $this->assertSame(
             0,
             count(
                 \OmegaUp\DAO\IdentityLoginLog::getByIdentity(
@@ -35,7 +35,7 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertLogin($identity, $response['auth_token']);
 
         // Assert the log is not empty.
-        $this->assertEquals(
+        $this->assertSame(
             1,
             count(
                 \OmegaUp\DAO\IdentityLoginLog::getByIdentity(
@@ -80,7 +80,7 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidCredentialsException $e) {
-            $this->assertEquals('usernameOrPassIsWrong', $e->getMessage());
+            $this->assertSame('usernameOrPassIsWrong', $e->getMessage());
         }
     }
 
@@ -95,7 +95,7 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidCredentialsException $e) {
-            $this->assertEquals('usernameOrPassIsWrong', $e->getMessage());
+            $this->assertSame('usernameOrPassIsWrong', $e->getMessage());
         }
     }
 
@@ -119,7 +119,7 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidCredentialsException $e) {
-            $this->assertEquals('usernameOrPassIsWrong', $e->getMessage());
+            $this->assertSame('usernameOrPassIsWrong', $e->getMessage());
         }
     }
 
@@ -201,7 +201,7 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidCredentialsException $e) {
-            $this->assertEquals('usernameOrPassIsWrong', $e->getMessage());
+            $this->assertSame('usernameOrPassIsWrong', $e->getMessage());
         }
     }
 
@@ -238,7 +238,7 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
             self::login($identity);
             $this->fail('User should have not been able to log in');
         } catch (\OmegaUp\Exceptions\LoginDisabledException $e) {
-            $this->assertEquals('loginDisabled', $e->getMessage());
+            $this->assertSame('loginDisabled', $e->getMessage());
         }
     }
 }

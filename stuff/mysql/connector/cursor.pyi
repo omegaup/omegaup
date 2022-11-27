@@ -3,6 +3,8 @@ from typing import Any, Iterator, Iterable, Mapping, Optional, Sequence, Text, T
 
 
 class BaseCursor:
+    lastrowid: int
+
     def close(self) -> None:
         ...
 
@@ -45,5 +47,5 @@ class MySQLCursorBufferedDict(MySQLCursorDict):
     def __enter__(self):
         ...
 
-    def __exit__(self, exc_type: Optional[types[BaseException]], exc: Optional[BaseException], traceback: Optional[TracebackType]) -> None:
+    def __exit__(self, exc_type: Optional[types[BaseException]], exc: Optional[BaseException], traceback: Optional[types.TracebackType]) -> None:
         ...

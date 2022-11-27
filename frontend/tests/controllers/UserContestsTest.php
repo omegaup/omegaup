@@ -32,12 +32,12 @@ class UserContestsTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiMyList($r);
 
         // Contests should come ordered by contest id desc
-        $this->assertEquals(count($contestData), count($response['contests']));
-        $this->assertEquals(
+        $this->assertSame(count($contestData), count($response['contests']));
+        $this->assertSame(
             $contestData[1]['request']['alias'],
             $response['contests'][0]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $contestData[0]['request']['alias'],
             $response['contests'][1]['alias']
         );
@@ -128,7 +128,7 @@ class UserContestsTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiAdminList($r);
 
         // Contests should come ordered by contest id desc
-        $this->assertEquals(
+        $this->assertSame(
             count(
                 $contestDirectorData
             ) + count(
@@ -138,19 +138,19 @@ class UserContestsTest extends \OmegaUp\Test\ControllerTestCase {
                 $response['contests']
             )
         );
-        $this->assertEquals(
+        $this->assertSame(
             $contestDirectorData[1]['request']['alias'],
             $response['contests'][0]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $contestDirectorData[0]['request']['alias'],
             $response['contests'][1]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $contestAdminData[1]['request']['alias'],
             $response['contests'][2]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $contestAdminData[0]['request']['alias'],
             $response['contests'][3]['alias']
         );
@@ -169,7 +169,7 @@ class UserContestsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $user = $contestData['userDirector'];
 
-        $this->assertEquals(
+        $this->assertSame(
             1,
             \OmegaUp\DAO\Contests::getPrivateContestsCount(
                 $user
@@ -185,7 +185,7 @@ class UserContestsTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         $user = $contestData['userDirector'];
 
-        $this->assertEquals(
+        $this->assertSame(
             0,
             \OmegaUp\DAO\Contests::getPrivateContestsCount(
                 $user
@@ -200,7 +200,7 @@ class UserContestsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testPrivateContestsCountWithNoContests() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $this->assertEquals(
+        $this->assertSame(
             0,
             \OmegaUp\DAO\Contests::getPrivateContestsCount(
                 $user

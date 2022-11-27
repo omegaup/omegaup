@@ -148,7 +148,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
         $this->assertNotNull($contest->contest_id);
 
         // Assert data was correctly saved
-        $this->assertEquals($r['description'], $contest->description);
+        $this->assertSame($r['description'], $contest->description);
 
         $this->assertGreaterThanOrEqual(
             intval($r['start_time']) - 1,
@@ -168,27 +168,29 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
             $contest->finish_time->time + 1
         );
 
-        $this->assertEquals($r['window_length'], $contest->window_length);
-        $this->assertEquals($r['admission_mode'], $contest->admission_mode);
-        $this->assertEquals($r['alias'], $contest->alias);
-        $this->assertEquals(
-            $r['points_decay_factor'],
+        $this->assertSame($r['window_length'], $contest->window_length);
+        $this->assertSame($r['admission_mode'], $contest->admission_mode);
+        $this->assertSame($r['alias'], $contest->alias);
+        $this->assertSame(
+            floatval($r['points_decay_factor']),
             $contest->points_decay_factor
         );
-        $this->assertEquals(
-            boolval($r['partial_score']),
-            $contest->partial_score
+        $this->assertSame($r['score_mode'], $contest->score_mode);
+        $this->assertSame(
+            intval(
+                $r['submissions_gap']
+            ),
+            $contest->submissions_gap
         );
-        $this->assertEquals($r['submissions_gap'], $contest->submissions_gap);
-        $this->assertEquals($r['feedback'], $contest->feedback);
-        $this->assertEquals($r['penalty'], $contest->penalty);
-        $this->assertEquals($r['scoreboard'], $contest->scoreboard);
-        $this->assertEquals($r['penalty_type'], $contest->penalty_type);
-        $this->assertEquals(
+        $this->assertSame($r['feedback'], $contest->feedback);
+        $this->assertSame($r['penalty'], $contest->penalty);
+        $this->assertSame($r['scoreboard'], $contest->scoreboard);
+        $this->assertSame($r['penalty_type'], $contest->penalty_type);
+        $this->assertSame(
             $r['penalty_calc_policy'],
             $contest->penalty_calc_policy
         );
-        $this->assertEquals($r['recommended'], $contest->recommended);
+        $this->assertSame(boolval($r['recommended']), $contest->recommended);
     }
 
     /**
@@ -329,7 +331,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     /**
      * Checks that two sets (given by char delimited strings) are equal.
      */
-    public function assertEqualSets(
+    public function assertSameSets(
         string $expected,
         string $actual,
         string $delim = ','

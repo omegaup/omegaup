@@ -1,23 +1,44 @@
 [MESSAGES CONTROL]
 
+# Only show warnings with the listed confidence levels. Leave empty to show
+# all. Valid levels: HIGH, CONTROL_FLOW, INFERENCE, INFERENCE_FAILURE,
+# UNDEFINED.
+confidence=HIGH,
+           CONTROL_FLOW,
+           INFERENCE,
+           INFERENCE_FAILURE,
+           UNDEFINED
+
 # Python does not allow relative imports above main entrypoints, but are needed for cron scripts.
 #  C0413 = wrong-import-position
 #
 # We are locally disabling something because we don't want to hear about it.
-#  I0011 = Locally disabling
+#  I0011 = locally-disabled
 #
 # Too few public methods is bad for context managers.
-#  R0903 = Too few public methods
+#  R0903 = too-few-public-methods
 #
 # pylint is confused by some of our imports.
-#  E1101 = Module 'x' has no 'y' member
+#  E1101 = no-member
 #
 # pycodestyle will already catch these.
-#  W0702 = No exception type(s) specified.
+#  W0702 = bare-except
 #
 # TODOs are useful to locally indicate that something is not (yet) working.
-#  fixme = (warning notes in code comments; message varies).
-disable=C0413,I0011,R0903,E1101,W0702,fixme
+#  W0511 = fixme
+#
+# TODO: Remove all these:
+#
+# We need to do a large migration for these.
+#   C0209 = consider-using-f-string
+disable=wrong-import-position,
+        too-few-public-methods,
+        too-many-locals,
+        locally-disabled,
+        consider-using-f-string,
+        no-member,
+        bare-except,
+        fixme
 
 [BASIC]
 
@@ -26,5 +47,5 @@ attr-rgx=[a-z_][a-z0-9_]{1,64}$
 function-rgx=[a-z_][a-z0-9_]{1,64}$
 variable-rgx=[a-z_][a-z0-9_]{1,64}$
 
-# We also allow 's' (for strings) and 'f' (for files)
-good-names=i,j,k,ex,Run,_,s,f
+# We also allow 'e' (for exceptions), 's' (for strings) and 'f' (for files)
+good-names=i,j,k,ex,Run,_,e,s,f
