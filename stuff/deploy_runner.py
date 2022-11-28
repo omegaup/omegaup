@@ -152,6 +152,7 @@ class RemoteRunner:
             check=True)
         if owner is not None:
             run(['/bin/chown', owner, tmpfile])
+
         if mode is not None:
             run(['/bin/chmod', '0%o' % mode, tmpfile])
         if group is not None:
@@ -167,7 +168,7 @@ def hash_for(filename: str) -> str:
         logging.info('%s not found, returning null hash for %s',
                      sha1sum_filename, filename)
         return NULL_HASH
-    with open(sha1sum_filename) as f:
+    with open(sha1sum_filename, encoding='utf-8') as f:
         return f.read().strip()
 
 

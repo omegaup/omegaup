@@ -3,7 +3,7 @@
 '''Mysql queries to generate messages for contests'''
 
 import datetime
-from typing import Dict, List, NamedTuple
+from typing import List, NamedTuple
 
 import mysql.connector
 import mysql.connector.cursor
@@ -14,7 +14,7 @@ class ContestCertificate(NamedTuple):
     certificate_cutoff: int
     alias: str
     scoreboard_url: str
-    contest_id: str
+    contest_id: int
 
 
 def get_contests(

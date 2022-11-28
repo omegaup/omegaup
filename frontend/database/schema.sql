@@ -539,8 +539,8 @@ CREATE TABLE `Plagiarisms` (
   `contest_id` int NOT NULL,
   `submission_id_1` int NOT NULL COMMENT 'El identificador del envío del primer código plagiado',
   `submission_id_2` int NOT NULL COMMENT 'El identificador del envío del segundo código plagiado',
-  `score_1` tinyint(1) NOT NULL COMMENT 'porcentaje de plagio encontrado usando copydetect en el envío 1',
-  `score_2` tinyint(1) NOT NULL COMMENT 'porcentaje de plagio encontrado usando copydetect en el envío 2',
+  `score_1` int NOT NULL COMMENT 'porcentaje de plagio encontrado usando copydetect en el envío 1',
+  `score_2` int NOT NULL COMMENT 'porcentaje de plagio encontrado usando copydetect en el envío 2',
   `contents` text NOT NULL COMMENT 'Almacena los rangos de números de línea de las similitudes',
   PRIMARY KEY (`plagiarism_id`),
   KEY `fk_pc_contest_id` (`contest_id`),
@@ -1003,8 +1003,8 @@ CREATE TABLE `Submission_Feedback` (
   `range_bytes_start` int NOT NULL DEFAULT '0' COMMENT 'Inicio de la subcadena seleccionada (en bytes) para agregarle el comentario',
   `range_bytes_end` int NOT NULL DEFAULT '0' COMMENT 'Fin de la subcadena seleccionada (en bytes) para agregarle el comentario',
   PRIMARY KEY (`submission_feedback_id`),
-  UNIQUE KEY `submission_id` (`submission_id`),
   KEY `fk_sfi_identity_id` (`identity_id`),
+  KEY `fk_sfs_submission_id` (`submission_id`),
   CONSTRAINT `fk_sfi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_sfs_submission_id` FOREIGN KEY (`submission_id`) REFERENCES `Submissions` (`submission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Almacena el feedback dejado por los profesores para los envíos de los estudiantes.';
@@ -1215,11 +1215,14 @@ CREATE TABLE `Users` (
   `parental_verification_token` varchar(25) DEFAULT NULL COMMENT 'Token que se generará para los usuarios menores de 13 años al momento de registrar su cuenta, el cuál será enviado por correo electrónico al padre',
   `parent_email_verification_initial` timestamp NULL DEFAULT NULL COMMENT 'Almacena la hora en que se envió el correo electrónico de verificación',
   `parent_email_verification_deadline` timestamp NULL DEFAULT NULL COMMENT 'Almacena la hora y fecha límite que tienen los padres para verificar la cuenta de su hijo menor a 13 años',
+  `parent_email_id` int DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   KEY `fk_main_email_id` (`main_email_id`),
   KEY `fk_main_identity_id` (`main_identity_id`),
+  KEY `fk_parent_email_id` (`parent_email_id`),
   CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `Emails` (`email_id`),
-  CONSTRAINT `fk_main_identity_id` FOREIGN KEY (`main_identity_id`) REFERENCES `Identities` (`identity_id`)
+  CONSTRAINT `fk_main_identity_id` FOREIGN KEY (`main_identity_id`) REFERENCES `Identities` (`identity_id`),
+  CONSTRAINT `fk_parent_email_id` FOREIGN KEY (`parent_email_id`) REFERENCES `Emails` (`email_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Usuarios registrados.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

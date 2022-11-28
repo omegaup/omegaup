@@ -51,7 +51,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -69,7 +69,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotfoundException $e) {
-            $this->assertEquals('courseNotFound', $e->getMessage());
+            $this->assertSame('courseNotFound', $e->getMessage());
         }
     }
 
@@ -168,15 +168,15 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             100
         );
 
-        $this->assertEquals(3, $results['totalRows']);
-        $this->assertEquals(
+        $this->assertSame(3, $results['totalRows']);
+        $this->assertSame(
             $results['totalRows'],
             count(
                 $results['studentsProgress']
             )
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $participants[0]->name,
             $results['studentsProgress'][0]['name']
         );
@@ -184,26 +184,26 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $assignment,
             $results['studentsProgress'][0]['assignments']
         );
-        $this->assertEquals(
+        $this->assertSame(
             66,
             intval(
                 $results['studentsProgress'][0]['assignments'][$assignment]['progress']
             )
         );
-        $this->assertEquals(
-            100,
+        $this->assertSame(
+            100.0,
             $results['studentsProgress'][0]['assignments'][$assignment]['problems'][$problemsData[0]['problem']->alias]['score']
         );
-        $this->assertEquals(
-            100,
+        $this->assertSame(
+            100.0,
             $results['studentsProgress'][0]['assignments'][$assignment]['problems'][$problemsData[1]['problem']->alias]['score']
         );
-        $this->assertEquals(
-            0,
+        $this->assertSame(
+            0.0,
             $results['studentsProgress'][0]['assignments'][$assignment]['problems'][$problemsData[2]['problem']->alias]['score']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $participants[1]->name,
             $results['studentsProgress'][1]['name']
         );
@@ -211,18 +211,18 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $assignment,
             $results['studentsProgress'][1]['assignments']
         );
-        $this->assertEquals(
+        $this->assertSame(
             33,
             intval(
                 $results['studentsProgress'][1]['assignments'][$assignment]['progress']
             )
         );
-        $this->assertEquals(
-            0,
+        $this->assertSame(
+            0.0,
             $results['studentsProgress'][1]['assignments'][$assignment]['problems'][$problemsData[0]['problem']->alias]['score']
         );
-        $this->assertEquals(
-            100,
+        $this->assertSame(
+            100.0,
             $results['studentsProgress'][1]['assignments'][$assignment]['problems'][$problemsData[1]['problem']->alias]['score']
         );
         $this->assertArrayNotHasKey(
@@ -230,7 +230,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $results['studentsProgress'][1]['assignments'][$assignment]['problems']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $participants[2]->name,
             $results['studentsProgress'][2]['name']
         );
@@ -238,7 +238,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $assignment,
             $results['studentsProgress'][2]['assignments']
         );
-        $this->assertEquals(
+        $this->assertSame(
             33,
             intval(
                 $results['studentsProgress'][2]['assignments'][$assignment]['progress']
@@ -252,8 +252,8 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $problemsData[1]['problem']->alias,
             $results['studentsProgress'][2]['assignments'][$assignment]['problems']
         );
-        $this->assertEquals(
-            100,
+        $this->assertSame(
+            100.0,
             $results['studentsProgress'][2]['assignments'][$assignment]['problems'][$problemsData[2]['problem']->alias]['score']
         );
     }
@@ -357,14 +357,14 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             3,
             count(
                 $results['progress']
             )
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $participants[0]->name,
             $results['progress'][0]['name']
         );
@@ -372,26 +372,26 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $assignment,
             $results['progress'][0]['assignments']
         );
-        $this->assertEquals(
+        $this->assertSame(
             66,
             intval(
                 $results['progress'][0]['assignments'][$assignment]['progress']
             )
         );
-        $this->assertEquals(
-            100,
+        $this->assertSame(
+            100.0,
             $results['progress'][0]['assignments'][$assignment]['problems'][$problemsData[0]['problem']->alias]['score']
         );
-        $this->assertEquals(
-            100,
+        $this->assertSame(
+            100.0,
             $results['progress'][0]['assignments'][$assignment]['problems'][$problemsData[1]['problem']->alias]['score']
         );
-        $this->assertEquals(
-            0,
+        $this->assertSame(
+            0.0,
             $results['progress'][0]['assignments'][$assignment]['problems'][$problemsData[2]['problem']->alias]['score']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $participants[1]->name,
             $results['progress'][1]['name']
         );
@@ -399,18 +399,18 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $assignment,
             $results['progress'][1]['assignments']
         );
-        $this->assertEquals(
+        $this->assertSame(
             33,
             intval(
                 $results['progress'][1]['assignments'][$assignment]['progress']
             )
         );
-        $this->assertEquals(
-            0,
+        $this->assertSame(
+            0.0,
             $results['progress'][1]['assignments'][$assignment]['problems'][$problemsData[0]['problem']->alias]['score']
         );
-        $this->assertEquals(
-            100,
+        $this->assertSame(
+            100.0,
             $results['progress'][1]['assignments'][$assignment]['problems'][$problemsData[1]['problem']->alias]['score']
         );
         $this->assertArrayNotHasKey(
@@ -418,7 +418,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $results['progress'][1]['assignments'][$assignment]['problems']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $participants[2]->name,
             $results['progress'][2]['name']
         );
@@ -426,7 +426,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $assignment,
             $results['progress'][2]['assignments']
         );
-        $this->assertEquals(
+        $this->assertSame(
             33,
             intval(
                 $results['progress'][2]['assignments'][$assignment]['progress']
@@ -440,8 +440,8 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $problemsData[1]['problem']->alias,
             $results['progress'][2]['assignments'][$assignment]['problems']
         );
-        $this->assertEquals(
-            100,
+        $this->assertSame(
+            100.0,
             $results['progress'][2]['assignments'][$assignment]['problems'][$problemsData[2]['problem']->alias]['score']
         );
     }
@@ -534,53 +534,53 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // First test assignmentsProblems info
         $this->assertCount(2, $results['assignmentsProblems']);
-        $this->assertEquals(1, $results['assignmentsProblems'][0]['order']);
-        $this->assertEquals(
+        $this->assertSame(1, $results['assignmentsProblems'][0]['order']);
+        $this->assertSame(
             $assignmentAliases[0],
             $results['assignmentsProblems'][0]['alias']
         );
-        $this->assertEquals(200, $results['assignmentsProblems'][0]['points']);
+        $this->assertSame(200.0, $results['assignmentsProblems'][0]['points']);
         $this->assertCount(2, $results['assignmentsProblems'][0]['problems']);
 
-        $this->assertEquals(2, $results['assignmentsProblems'][1]['order']);
-        $this->assertEquals(
+        $this->assertSame(2, $results['assignmentsProblems'][1]['order']);
+        $this->assertSame(
             $assignmentAliases[1],
             $results['assignmentsProblems'][1]['alias']
         );
-        $this->assertEquals(200, $results['assignmentsProblems'][1]['points']);
+        $this->assertSame(200.0, $results['assignmentsProblems'][1]['points']);
         $this->assertCount(2, $results['assignmentsProblems'][0]['problems']);
 
         // Then test studentsProgress info
         $this->assertCount(1, $results['studentsProgress']);
 
-        $this->assertEquals(
+        $this->assertSame(
             $participant->username,
             $results['studentsProgress'][0]['username']
         );
-        $this->assertEquals(
-            300,
+        $this->assertSame(
+            300.0,
             $results['studentsProgress'][0]['courseScore']
         ); // 3 problems solved
-        $this->assertEquals(
-            75,
+        $this->assertSame(
+            75.0,
             $results['studentsProgress'][0]['courseProgress']
         );
 
-        $this->assertEquals(
-            200,
+        $this->assertSame(
+            200.0,
             $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['score']
         );
-        $this->assertEquals(
-            100,
+        $this->assertSame(
+            100.0,
             $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['progress']
         );
 
-        $this->assertEquals(
-            100,
+        $this->assertSame(
+            100.0,
             $results['studentsProgress'][0]['assignments'][$assignmentAliases[1]]['score']
         );
-        $this->assertEquals(
-            50,
+        $this->assertSame(
+            50.0,
             $results['studentsProgress'][0]['assignments'][$assignmentAliases[1]]['progress']
         );
 
@@ -621,46 +621,44 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // First test assignmentsProblems info
-        $this->assertEquals(
+        $this->assertSame(
             count($results['assignmentsProblems']),
             count($resultsWithExtraProblem['assignmentsProblems'])
         );
-        $this->assertEquals(
+        $this->assertSame(
             $results['assignmentsProblems'][0]['order'],
             $resultsWithExtraProblem['assignmentsProblems'][0]['order']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $results['assignmentsProblems'][0]['alias'],
             $resultsWithExtraProblem['assignmentsProblems'][0]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $results['assignmentsProblems'][0]['points'],
             $resultsWithExtraProblem['assignmentsProblems'][0]['points']
         );
-        $this->assertEquals(
-            200, // 2 extra problems
+        $this->assertSame(
+            200.0, // 2 extra problems
             $resultsWithExtraProblem['assignmentsProblems'][0]['points']
         );
-        $this->assertEquals(
+        $this->assertCount(
             count($results['assignmentsProblems'][0]['problems']) + 2,
-            count(
-                $resultsWithExtraProblem['assignmentsProblems'][0]['problems']
-            )
+            $resultsWithExtraProblem['assignmentsProblems'][0]['problems']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $results['assignmentsProblems'][1]['order'],
             $resultsWithExtraProblem['assignmentsProblems'][1]['order']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $results['assignmentsProblems'][1]['alias'],
             $resultsWithExtraProblem['assignmentsProblems'][1]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $results['assignmentsProblems'][1]['points'],
             $resultsWithExtraProblem['assignmentsProblems'][1]['points']
         );
-        $this->assertEquals(
+        $this->assertSame(
             count($results['assignmentsProblems'][1]['problems']),
             count(
                 $resultsWithExtraProblem['assignmentsProblems'][1]['problems']
@@ -668,37 +666,37 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Then test studentsProgress info
-        $this->assertEquals(
+        $this->assertSame(
             count($results['studentsProgress']),
             count($resultsWithExtraProblem['studentsProgress'])
         );
-        $this->assertEquals(
+        $this->assertSame(
             $results['studentsProgress'][0]['username'],
             $resultsWithExtraProblem['studentsProgress'][0]['username']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $results['studentsProgress'][0]['courseScore'] + 200,
             $resultsWithExtraProblem['studentsProgress'][0]['courseScore']
         );
-        $this->assertEquals(
+        $this->assertSame(
             100, // 100% (3 problems + 1 extra problem / 4 problems)
             $resultsWithExtraProblem['studentsProgress'][0]['courseProgress']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['score'] + 200, // 2 extra problems solved
             $resultsWithExtraProblem['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['score']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['progress'] + 100,
             $resultsWithExtraProblem['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['progress']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $results['studentsProgress'][0]['assignments'][$assignmentAliases[1]]['score'],
             $resultsWithExtraProblem['studentsProgress'][0]['assignments'][$assignmentAliases[1]]['score']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $results['studentsProgress'][0]['assignments'][$assignmentAliases[1]]['progress'],
             $resultsWithExtraProblem['studentsProgress'][0]['assignments'][$assignmentAliases[1]]['progress']
         );
@@ -768,15 +766,15 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             100
         );
 
-        $this->assertEquals(2, $results['totalRows']);
-        $this->assertEquals(
+        $this->assertSame(2, $results['totalRows']);
+        $this->assertSame(
             $results['totalRows'],
             count(
                 $results['studentsProgress']
             )
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $participant->name,
             $results['studentsProgress'][0]['name']
         );
@@ -784,20 +782,20 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $assignment,
             $results['studentsProgress'][0]['assignments']
         );
-        $this->assertEquals(
-            100,
+        $this->assertSame(
+            100.0,
             $results['studentsProgress'][0]['assignments'][$assignment]['problems'][$problemData['problem']->alias]['score']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $extraParticipant->name,
             $results['studentsProgress'][1]['name']
         );
-        $this->assertEquals(
+        $this->assertSame(
             0.0,
             $results['studentsProgress'][1]['courseScore']
         );
-        $this->assertEquals(
+        $this->assertSame(
             0.0,
             $results['studentsProgress'][1]['courseProgress']
         );

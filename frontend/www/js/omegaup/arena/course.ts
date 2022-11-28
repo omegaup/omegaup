@@ -95,6 +95,7 @@ OmegaUp.on('ready', async () => {
           clarifications: clarificationStore.state.clarifications,
           course: payload.courseDetails,
           currentAssignment: payload.currentAssignment,
+          isTeachingAssistant: payload.isTeachingAssistant,
           problemInfo: this.problemInfo,
           problem: this.problem,
           problemAlias: this.problemAlias,
@@ -157,6 +158,17 @@ OmegaUp.on('ready', async () => {
                     )}</strong>)`,
                   }),
                 );
+              })
+              .catch(ui.apiError);
+          },
+          'request-feedback': (guid: string) => {
+            api.Course.requestFeedback({
+              course_alias: payload.courseDetails.alias,
+              assignment_alias: payload.currentAssignment.alias,
+              guid,
+            })
+              .then(() => {
+                ui.success(T.requestFeedback);
               })
               .catch(ui.apiError);
           },
@@ -445,6 +457,9 @@ OmegaUp.on('ready', async () => {
   const socket = new EventsSocket({
     disableSockets: false,
     problemsetAlias: payload.courseDetails.alias,
+    isVirtual: false,
+    startTime: payload.currentAssignment.start_time,
+    finishTime: payload.currentAssignment.finish_time,
     locationProtocol: window.location.protocol,
     locationHost: window.location.host,
     problemsetId: payload.currentAssignment.problemset_id,
@@ -454,6 +469,7 @@ OmegaUp.on('ready', async () => {
     navbarProblems: arenaCourse.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
+    isContestModeMaxPerGroup: false,
   });
   socket.connect();
 

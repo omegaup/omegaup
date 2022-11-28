@@ -95,6 +95,7 @@
   - [`/api/course/removeProblem/`](#apicourseremoveproblem)
   - [`/api/course/removeStudent/`](#apicourseremovestudent)
   - [`/api/course/removeTeachingAssistant/`](#apicourseremoveteachingassistant)
+  - [`/api/course/requestFeedback/`](#apicourserequestfeedback)
   - [`/api/course/requests/`](#apicourserequests)
   - [`/api/course/runs/`](#apicourseruns)
   - [`/api/course/searchUsers/`](#apicoursesearchusers)
@@ -740,13 +741,13 @@ Creates a new contest
 | --------------------------- | -------------- | ----------- |
 | `admission_mode`            | `mixed`        |             |
 | `alias`                     | `mixed`        |             |
+| `check_plagiarism`          | `bool\|null`   |             |
 | `contest_for_teams`         | `bool\|null`   |             |
 | `description`               | `mixed`        |             |
 | `feedback`                  | `mixed`        |             |
 | `finish_time`               | `mixed`        |             |
 | `languages`                 | `mixed`        |             |
 | `needs_basic_information`   | `bool\|null`   |             |
-| `partial_score`             | `bool\|null`   |             |
 | `penalty`                   | `mixed`        |             |
 | `penalty_calc_policy`       | `mixed`        |             |
 | `penalty_type`              | `mixed`        |             |
@@ -1306,13 +1307,13 @@ Update a Contest
 | `window_length`                              | `int`                                                |             |
 | `admission_mode`                             | `null\|string`                                       |             |
 | `alias`                                      | `null\|string`                                       |             |
+| `check_plagiarism`                           | `bool\|null`                                         |             |
 | `contest_for_teams`                          | `bool\|null`                                         |             |
 | `default_show_all_contestants_in_scoreboard` | `bool\|null`                                         |             |
 | `description`                                | `null\|string`                                       |             |
 | `feedback`                                   | `mixed`                                              |             |
 | `languages`                                  | `mixed`                                              |             |
 | `needs_basic_information`                    | `bool\|null`                                         |             |
-| `partial_score`                              | `bool\|null`                                         |             |
 | `penalty`                                    | `int\|null`                                          |             |
 | `penalty_calc_policy`                        | `mixed`                                              |             |
 | `penalty_type`                               | `mixed`                                              |             |
@@ -2062,6 +2063,24 @@ Removes a teaching assistant from a course
 | ----------------- | -------- | ----------- |
 | `course_alias`    | `string` |             |
 | `usernameOrEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/course/requestFeedback/`
+
+### Description
+
+Request feedback
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `guid`             | `string` |             |
 
 ### Returns
 
@@ -3721,9 +3740,9 @@ Create a new run
 | Name            | Type     | Description |
 | --------------- | -------- | ----------- |
 | `contest_alias` | `string` |             |
+| `language`      | `string` |             |
 | `problem_alias` | `string` |             |
 | `source`        | `string` |             |
-| `language`      | `mixed`  |             |
 | `problemset_id` | `mixed`  |             |
 
 ### Returns
@@ -3802,10 +3821,10 @@ Re-sends a problem to Grader.
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
-| `debug`     | `mixed`  |             |
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| `run_alias` | `string`     |             |
+| `debug`     | `bool\|null` |             |
 
 ### Returns
 

@@ -84,12 +84,6 @@ class ContestParams {
      * @readonly
      * @var bool
      */
-    public $partialScore;
-
-    /**
-     * @readonly
-     * @var bool
-     */
     public $contestForTeams;
 
     /**
@@ -105,7 +99,19 @@ class ContestParams {
     public $scoreMode;
 
     /**
-     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, contestForTeams?: bool, teamsGroupAlias?: string, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, partialScore?: bool, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string, scoreMode?: string} $params
+     * @readonly
+     * @var bool
+     */
+    public $checkPlagiarism;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $scoreboardPct;
+
+    /**
+     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, contestForTeams?: bool, teamsGroupAlias?: string, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string, scoreMode?: string, checkPlagiarism?: bool, scoreboardPct?: int} $params
      */
     public function __construct($params = []) {
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
@@ -142,10 +148,11 @@ class ContestParams {
         );
         $this->penaltyCalcPolicy = $params['penaltyCalcPolicy'] ?? 'sum';
         $this->feedback = $params['feedback'] ?? 'detailed';
-        $this->partialScore = $params['partialScore'] ?? true;
         $this->contestForTeams = $params['contestForTeams'] ?? false;
         $this->teamsGroupAlias = $params['teamsGroupAlias'] ?? null;
-        $this->scoreMode = $params['scoreMode'] ?? null;
+        $this->scoreMode = $params['scoreMode'] ?? 'partial';
+        $this->checkPlagiarism = $params['checkPlagiarism'] ?? false;
+        $this->scoreboardPct = $params['scoreboardPct'] ?? 100;
     }
 }
 
@@ -184,11 +191,11 @@ class Contest {
             'admission_mode' => $params->admissionMode,
             'alias' => substr($params->title, 0, 20),
             'points_decay_factor' => '0.02',
-            'partial_score' => $params->partialScore,
+            'score_mode' => $params->scoreMode,
             'submissions_gap' => '60',
             'feedback' => $params->feedback,
             'penalty' => 100,
-            'scoreboard' => 100,
+            'scoreboard' => $params->scoreboardPct,
             'penalty_type' => 'contest_start',
             'languages' => $params->languages,
             'recommended' => 0, // This is just a default value, it is not honored by apiCreate.
@@ -196,6 +203,7 @@ class Contest {
             'requests_user_information' => $params->requestsUserInformation,
             'penalty_calc_policy' => $params->penaltyCalcPolicy,
             'contest_for_teams' => $params->contestForTeams,
+            'check_plagiarism' => $params->checkPlagiarism,
         ]);
 
         if (!is_null($params->teamsGroupAlias)) {

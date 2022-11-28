@@ -55,6 +55,9 @@ OmegaUp.on('ready', () => {
   const socket = new EventsSocket({
     disableSockets: false,
     problemsetAlias: payload.assignment.alias,
+    isVirtual: false,
+    startTime: payload.assignment.startTime,
+    finishTime: payload.assignment.finishTime,
     locationProtocol: window.location.protocol,
     locationHost: window.location.host,
     problemsetId: payload.assignment.problemsetId,
@@ -64,6 +67,7 @@ OmegaUp.on('ready', () => {
     navbarProblems: payload.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
+    isContestModeMaxPerGroup: false,
   });
 
   socket.connect();

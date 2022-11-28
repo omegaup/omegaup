@@ -26,7 +26,7 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
             ]));
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterEmpty', $e->getMessage());
+            $this->assertSame('parameterEmpty', $e->getMessage());
         }
     }
 
@@ -161,12 +161,12 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $exepectedTagsList = [
-            ['name' => 'problemTagMatrices', 'problemCount' => '4'],
-            ['name' => 'problemTagDiophantineEquations', 'problemCount' => '3'],
-            ['name' => 'problemTagInputAndOutput', 'problemCount' => '2'],
-            ['name' => 'problemTagArrays', 'problemCount' => '1'],
+            ['name' => 'problemTagMatrices', 'problemCount' => 4],
+            ['name' => 'problemTagDiophantineEquations', 'problemCount' => 3],
+            ['name' => 'problemTagInputAndOutput', 'problemCount' => 2],
+            ['name' => 'problemTagArrays', 'problemCount' => 1],
         ];
 
-        $this->assertEquals($request['frequent_tags'], $exepectedTagsList);
+        $this->assertSame($request['frequent_tags'], $exepectedTagsList);
     }
 }

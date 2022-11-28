@@ -57,7 +57,10 @@
             >{{ T.contestNewFormAdmissionMode }}</a
           >
           <a
-            v-if="!details.contest_for_teams"
+            v-if="
+              originalContestAdmissionMode != 'private' &&
+              !details.contest_for_teams
+            "
             href="#"
             data-toggle="tab"
             data-nav-contestant
@@ -77,6 +80,7 @@
             >{{ T.contestAddgroupAddGroup }}</a
           >
           <a
+            v-if="!virtual"
             href="#"
             data-toggle="tab"
             class="dropdown-item"
@@ -130,7 +134,7 @@
           :initial-scoreboard="details.scoreboard"
           :initial-penalty-type="details.penalty_type"
           :initial-show-scoreboard-after="details.show_scoreboard_after"
-          :initial-partial-score="details.partial_score"
+          :score-mode="details.score_mode"
           :initial-needs-basic-information="details.needs_basic_information"
           :initial-requests-user-information="details.requests_user_information"
           :all-languages="details.available_languages"
@@ -152,7 +156,7 @@
       <div v-if="showTab === 'problems'" class="tab-pane active">
         <omegaup-contest-add-problem
           :contest-alias="details.alias"
-          :initial-points="details.partial_score ? 100 : 1"
+          :initial-points="details.score_mode !== 'all_or_nothing' ? 100 : 1"
           :initial-problems="problems"
           :search-result-problems="searchResultProblems"
           @add-problem="(request) => $emit('add-problem', request)"
@@ -288,10 +292,10 @@ import * as ui from '../../ui';
 import contest_AddProblem from './AddProblem.vue';
 import contest_AddContestant from './AddContestant.vue';
 import contest_Clone from './Clone.vue';
-import common_Admins from '../common/Adminsv2.vue';
+import common_Admins from '../common/Admins.vue';
 import common_Archive from '../common/Archive.vue';
 import common_Requests from '../common/Requests.vue';
-import common_GroupAdmins from '../common/GroupAdminsv2.vue';
+import common_GroupAdmins from '../common/GroupAdmins.vue';
 import contest_Groups from './Groups.vue';
 import contest_TeamsGroups from './TeamsGroup.vue';
 import contest_Links from './Links.vue';
@@ -327,12 +331,23 @@ export default class Edit extends Vue {
   @Prop() teamsGroup!: types.ContestGroup | null;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop() searchResultGroups!: types.ListItem[];
+  @Prop({ default: null }) originalContestAdmissionMode!: null | string;
 
   T = T;
   ui = ui;
-  showTab = ui.isVirtual(this.details) ? 'contestants' : 'new_form';
   virtual = ui.isVirtual(this.details);
+  showTab = this.selectedTab();
   alreadyArchived = this.details.archived;
+
+  selectedTab(): string {
+    if (!ui.isVirtual(this.details)) {
+      return 'new_form';
+    }
+    if (this.originalContestAdmissionMode != 'private') {
+      return 'contestants';
+    }
+    return 'links';
+  }
 
   get activeTab(): string {
     switch (this.showTab) {

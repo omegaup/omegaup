@@ -2,7 +2,7 @@
   <omegaup-arena
     :active-tab="activeTab"
     :title="currentAssignment.name"
-    :should-show-runs="isAdmin"
+    :should-show-runs="isAdmin || isTeachingAssistant"
     :should-show-ranking="course.admission_mode !== 'public'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
@@ -72,6 +72,7 @@
                 problemInfo ? problemInfo.nominationStatus : null
               "
               :popup-displayed="problemDetailsPopup"
+              :request-feedback="true"
               :active-tab="'problems'"
               :languages="course.languages"
               :runs="runs"
@@ -79,6 +80,7 @@
               :run-details-data="runDetailsData"
               :problem-alias="problemAlias"
               :in-contest-or-course="true"
+              @request-feedback="(guid) => $emit('request-feedback', guid)"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', { selectedTab, problemAlias })
@@ -176,6 +178,12 @@
                 @set-feedback="(request) => $emit('set-feedback', request)"
               ></omegaup-submission-feedback>
             </template>
+            <template #code-view>
+              <omegaup-arena-feedback-code-view
+                :language="runDetailsData.language"
+                :value="runDetailsData.source"
+              ></omegaup-arena-feedback-code-view>
+            </template>
           </omegaup-arena-rundetails-popup>
         </template>
       </omegaup-overlay>
@@ -228,6 +236,7 @@ import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import submission_Feedback from '../submissions/Feedback.vue';
 import { SocketStatus } from '../../arena/events_socket';
 import { SubmissionRequest } from '../../arena/submissions';
+import arena_FeedbackCodeView from './FeedbackCodeView.vue';
 
 @Component({
   components: {
@@ -243,6 +252,7 @@ import { SubmissionRequest } from '../../arena/submissions';
     'omegaup-problem-details': problem_Details,
     'omegaup-submission-feedback': submission_Feedback,
     'omegaup-countdown': omegaup_Countdown,
+    'omegaup-arena-feedback-code-view': arena_FeedbackCodeView,
   },
 })
 export default class ArenaCourse extends Vue {
@@ -268,6 +278,7 @@ export default class ArenaCourse extends Vue {
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
   @Prop() totalRuns!: number;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: false }) isTeachingAssistant!: boolean;
 
   T = T;
   omegaup = omegaup;

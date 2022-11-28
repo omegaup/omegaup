@@ -103,7 +103,7 @@
                 <option value="lua">Lua (5.3)</option>
                 <option value="go">Go (1.18.beta2)</option>
                 <option value="rs">Rust (1.56.1)</option>
-                <option value="lua">JavaScript (Node.js 16)</option>
+                <option value="js">JavaScript (Node.js 16)</option>
                 <option value="kp">Karel (Pascal)</option>
                 <option value="kj">Karel (Java)</option>
                 <option value="cat">{{ T.wordsJustOutput }}</option>
@@ -156,11 +156,18 @@
                   <span class="mr-2"
                     >{{ filter.name }}: {{ filter.value }}</span
                   >
-                  <a @click="onRemoveFilter(filter.name)">
+                  <a
+                    :data-remove-filter="filter.name"
+                    @click="onRemoveFilter(filter.name)"
+                  >
                     <font-awesome-icon :icon="['fas', 'times']" />
                   </a>
                 </span>
-                <a href="#runs" @click="onRemoveFilter('all')">
+                <a
+                  href="#runs"
+                  data-remove-all-filters
+                  @click="onRemoveFilter('all')"
+                >
                   <span class="mr-2">{{ T.wordsRemoveFilter }}</span>
                 </a>
               </div>
@@ -219,14 +226,21 @@
                 <tt>{{ run.guid.substring(0, 8) }}</tt>
               </acronym>
             </td>
-            <td v-if="showUser" class="text-break-all">
+            <td
+              v-if="showUser"
+              class="text-break-all"
+              :data-username="run.username"
+            >
               <omegaup-user-username
                 :classname="run.classname"
                 :username="run.username"
                 :country="run.country_id"
                 :linkify="true"
                 :emit-click-event="true"
-                @click="(username) => (filterUsername = username)"
+                @click="
+                  (username) =>
+                    (filterUsername = { key: username, value: username })
+                "
               ></omegaup-user-username>
               <a :href="`/profile/${run.username}/`" class="ml-2">
                 <font-awesome-icon :icon="['fas', 'external-link-alt']" />
@@ -291,6 +305,16 @@
                 @click="onRunDetails(run)"
               >
                 <font-awesome-icon :icon="['fas', 'search-plus']" />
+              </button>
+              <button
+                v-if="requestFeedback"
+                class="details btn-outline-dark btn-sm"
+                @click="$emit('request-feedback', run.guid)"
+              >
+                <font-awesome-icon
+                  :title="T.courseRequestFeedback"
+                  icon="comment-dots"
+                />
               </button>
             </td>
             <td
@@ -445,6 +469,7 @@ export default class Runs extends Vue {
   @Prop({ default: false }) showAllRuns!: boolean;
   @Prop() totalRuns!: number;
   @Prop() searchResultProblems!: types.ListItem[];
+  @Prop() requestFeedback!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;

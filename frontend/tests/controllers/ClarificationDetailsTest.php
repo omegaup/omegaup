@@ -19,14 +19,14 @@ class ClarificationDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Assert status of clarification
-        $this->assertEquals($clarification->message, $response['message']);
-        $this->assertEquals($clarification->answer, $response['answer']);
-        $this->assertEquals($clarification->time, $response['time']);
-        $this->assertEquals(
+        $this->assertSame($clarification->message, $response['message']);
+        $this->assertSame($clarification->answer, $response['answer']);
+        $this->assertSame($clarification->time->time, $response['time']->time);
+        $this->assertSame(
             $clarification->problem_id,
             $response['problem_id']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $clarification->problemset_id,
             $response['problemset_id']
         );
@@ -166,7 +166,7 @@ class ClarificationDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 

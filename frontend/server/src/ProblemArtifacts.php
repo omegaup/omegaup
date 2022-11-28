@@ -284,7 +284,7 @@ class ProblemArtifacts {
 }
 
 class GitServerBrowser {
-    /** @var resource */
+    /** @var \CurlHandle */
     public $curl;
 
     /** @var list<string> */

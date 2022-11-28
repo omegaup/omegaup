@@ -71,28 +71,29 @@ def test_create_problem(driver):
 
     with driver.login_user():
         prepare_run(driver, problem_alias)
-        assert (problem_alias in driver.browser.find_element(By.XPATH,
-            '//h3[@data-problem-title]').get_attribute('innerText'))
+        assert (problem_alias in driver.browser.find_element(
+            By.XPATH, '//h3[@data-problem-title]').get_attribute('innerText'))
 
-        img = driver.browser.find_elements(By.XPATH,
+        img = driver.browser.find_elements(
+            By.XPATH,
             '//div[contains(concat(" ", normalize-space(@class), " "), " '
             'markdown ")]/div/p/img')
         assert len(img) > 0
 
-        runs_before_submit = driver.browser.find_elements(By.XPATH,
+        runs_before_submit = driver.browser.find_elements(
+            By.XPATH,
             '//div[contains(concat(" ", normalize-space(@class), " "), " '
             'active ")]/div/div/table[contains(concat(" ", normalize-space('
-            '@class), " "), " runs ")]/tbody/tr/td[@data-run-status]'
-        )
+            '@class), " "), " runs ")]/tbody/tr/td[@data-run-status]')
 
         filename = 'Main.java'
         util.create_run(driver, problem_alias, filename)
 
-        runs_after_submit = driver.browser.find_elements(By.XPATH,
+        runs_after_submit = driver.browser.find_elements(
+            By.XPATH,
             '//div[contains(concat(" ", normalize-space(@class), " "), " '
             'active ")]/div/div/table[contains(concat(" ", normalize-space('
-            '@class), " "), " runs ")]/tbody/tr/td[@data-run-status]'
-        )
+            '@class), " "), " runs ")]/tbody/tr/td[@data-run-status]')
 
         assert len(runs_before_submit) + 1 == len(runs_after_submit)
 
@@ -109,7 +110,8 @@ def test_create_problem(driver):
                  'active ")]/div[@data-overlay]/div[@data-overlay-popup]/form['
                  '@data-run-details-view]')))
 
-        textarea = driver.browser.find_element(By.XPATH,
+        textarea = driver.browser.find_element(
+            By.XPATH,
             '//div[contains(concat(" ", normalize-space(@class), " "), " '
             'active ")]/div[@data-overlay]/div[@data-overlay-popup]/form['
             '@data-run-details-view]//div[@class="CodeMirror-code"]')
@@ -120,12 +122,13 @@ def test_create_problem(driver):
                                      'frontend/tests/resources', filename)
         # The text of the CodeMirror editor contains the line number.
         # Non-exact match is needed.
-        with open(resource_path, 'r') as f:
+        with open(resource_path, 'r', encoding='utf-8') as f:
             for row in f.read().splitlines():
                 if row is not None:
                     assert (row in textarea.text), row
 
-        driver.browser.find_element(By.XPATH,
+        driver.browser.find_element(
+            By.XPATH,
             '//div[contains(concat(" ", normalize-space(@class), " "), " '
             'active ")]/div[@data-overlay]').click()
         driver.update_score(problem_alias)
@@ -169,7 +172,8 @@ def test_create_problem(driver):
                  'normalize-space(@class), " "), " show ")]/div/button['
                  '@data-actions-rejudge]'))).click()
 
-        global_run = driver.browser.find_element(By.XPATH,
+        global_run = driver.browser.find_element(
+            By.XPATH,
             '//table[contains(concat(" ", normalize-space(@class), " "), " '
             'runs ")]/tbody/tr/td[@data-run-status]/span')
 
@@ -178,8 +182,8 @@ def test_create_problem(driver):
 
 @util.annotate
 @util.no_javascript_errors()
-def prepare_run(driver, problem_alias):
-    ''' Entering to a problem page to create a submission.'''
+def prepare_run(driver, problem_alias):  # pylint: disable=redefined-outer-name
+    '''Entering to a problem page to create a submission.'''
 
     driver.wait.until(
         EC.element_to_be_clickable(
@@ -201,13 +205,16 @@ def prepare_run(driver, problem_alias):
             (By.XPATH,
              '//a[text() = "%s"]' % problem_alias))).click()
 
+
 def remove_problem_images() -> None:
+    '''Removes the problem's images.'''
+
     img_path = os.path.join(util.OMEGAUP_ROOT, 'frontend/www/img')
     is_dir = os.path.isdir(img_path)
     if is_dir is False:
         return
-    for dir in os.listdir(img_path):
-        directory = os.path.join(img_path, dir)
+    for dirname in os.listdir(img_path):
+        directory = os.path.join(img_path, dirname)
         if os.path.isdir(directory):
             for file in os.listdir(directory):
                 file_location = os.path.join(directory, file)

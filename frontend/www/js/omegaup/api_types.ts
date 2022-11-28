@@ -9,6 +9,7 @@ export namespace dao {
     archived?: boolean;
     certificate_cutoff?: number;
     certificates_status?: string;
+    check_plagiarism?: boolean;
     contest_for_teams?: boolean;
     contest_id?: number;
     default_show_all_contestants_in_scoreboard?: boolean;
@@ -69,6 +70,7 @@ export namespace dao {
     is_private?: boolean;
     main_email_id?: number;
     main_identity_id?: number;
+    parent_email_id?: number;
     parent_email_verification_deadline?: Date;
     parent_email_verification_initial?: Date;
     parent_verified?: boolean;
@@ -1264,6 +1266,45 @@ export namespace types {
                 })(x.courses);
                 return x;
               })(x.past);
+              x.teachingAssistant = ((x) => {
+                x.courses = ((x) => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map((x) => {
+                    x.assignments = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        if (
+                          typeof x.finish_time !== 'undefined' &&
+                          x.finish_time !== null
+                        )
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      });
+                    })(x.assignments);
+                    if (
+                      typeof x.finish_time !== 'undefined' &&
+                      x.finish_time !== null
+                    )
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.teachingAssistant);
               return x;
             })(x.filteredCourses);
             return x;
@@ -2312,6 +2353,7 @@ export namespace types {
         archived: types.CoursesByTimeType;
         current: types.CoursesByTimeType;
         past: types.CoursesByTimeType;
+        teachingAssistant: types.CoursesByTimeType;
       };
     };
   }
@@ -2428,6 +2470,7 @@ export namespace types {
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
     currentAssignment: types.ArenaAssignment;
+    isTeachingAssistant: boolean;
     scoreboard?: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
@@ -2673,7 +2716,6 @@ export namespace types {
     languages?: string;
     last_updated: Date;
     original_finish_time?: Date;
-    partial_score: boolean;
     penalty?: number;
     penalty_calc_policy?: string;
     penalty_type?: string;
@@ -2681,6 +2723,7 @@ export namespace types {
     problemset_id: number;
     recommended: boolean;
     rerun_id?: number;
+    score_mode: string;
     scoreboard?: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
@@ -2715,7 +2758,6 @@ export namespace types {
     opened: boolean;
     original_contest_alias?: string;
     original_problemset_id?: number;
-    partial_score: boolean;
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
@@ -2724,6 +2766,7 @@ export namespace types {
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
@@ -2753,7 +2796,6 @@ export namespace types {
     opened: boolean;
     original_contest_alias?: string;
     original_problemset_id?: number;
-    partial_score: boolean;
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
@@ -2762,6 +2804,7 @@ export namespace types {
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
@@ -2799,6 +2842,7 @@ export namespace types {
     details: types.ContestAdminDetails;
     group_admins: types.ContestGroupAdmin[];
     groups: types.ContestGroup[];
+    original_contest_admission_mode?: string;
     problems: types.ProblemsetProblemWithVersions[];
     requests: types.ContestRequest[];
     teams_group?: types.ContestGroup;
@@ -2835,15 +2879,18 @@ export namespace types {
     contest_id: number;
     contestants: number;
     description: string;
+    duration?: number;
     finish_time: Date;
     last_updated: Date;
     organizer: string;
     original_finish_time: Date;
-    partial_score: boolean;
     participating: boolean;
     problemset_id: number;
     recommended: boolean;
     rerun_id?: number;
+    score_mode?: string;
+    scoreboard_url?: string;
+    scoreboard_url_admin?: string;
     start_time: Date;
     title: string;
     window_length?: number;
@@ -2908,13 +2955,13 @@ export namespace types {
     feedback: string;
     finish_time: Date;
     languages: string;
-    partial_score: boolean;
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
     points_decay_factor: number;
     problemset_id: number;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
@@ -3096,10 +3143,12 @@ export namespace types {
     assignmentProblems: types.ProblemsetProblem[];
     course: types.CourseDetails;
     groupsAdmins: types.CourseGroupAdmin[];
+    groupsTeachingAssistants: types.CourseGroupAdmin[];
     identityRequests: types.IdentityRequest[];
     selectedAssignment?: types.CourseAssignment;
     students: types.CourseStudent[];
     tags: string[];
+    teachingAssistants: types.CourseAdmin[];
   }
 
   export interface CourseGroupAdmin {
@@ -3226,9 +3275,10 @@ export namespace types {
 
   export interface CoursesList {
     admin: types.FilteredCourse[];
-    archived?: types.FilteredCourse[];
+    archived: types.FilteredCourse[];
     public: types.FilteredCourse[];
     student: types.FilteredCourse[];
+    teachingAssistant: types.FilteredCourse[];
   }
 
   export interface CurrentSession {
@@ -3782,6 +3832,7 @@ export namespace types {
   }
 
   export interface ProblemListItem {
+    accepted: number;
     alias: string;
     difficulty?: number;
     difficulty_histogram: number[];
@@ -3792,6 +3843,7 @@ export namespace types {
     quality_seal: boolean;
     ratio: number;
     score: number;
+    submissions: number;
     tags: { name: string; source: string }[];
     title: string;
     visibility: number;
@@ -3911,7 +3963,6 @@ export namespace types {
     opened?: boolean;
     original_contest_alias?: string;
     original_problemset_id?: number;
-    partial_score?: boolean;
     penalty?: number;
     penalty_calc_policy?: string;
     penalty_type?: string;
@@ -3920,6 +3971,7 @@ export namespace types {
     problemset_id?: number;
     requests_user_information?: string;
     rerun_id?: number;
+    score_mode?: string;
     scoreboard?: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
@@ -4002,13 +4054,17 @@ export namespace types {
     contest_alias?: string;
     contest_score?: number;
     country: string;
+    execution?: string;
     guid: string;
     language: string;
     memory: number;
+    output?: string;
     penalty: number;
     runtime: number;
     score: number;
     status: string;
+    status_memory?: string;
+    status_runtime?: string;
     submit_delay: number;
     time: Date;
     type?: string;
@@ -4094,13 +4150,17 @@ export namespace types {
     contest_score?: number;
     country: string;
     details?: types.RunDetailsV2;
+    execution?: string;
     guid: string;
     language: string;
     memory: number;
+    output?: string;
     penalty: number;
     runtime: number;
     score: number;
     status: string;
+    status_memory?: string;
+    status_runtime?: string;
     submit_delay: number;
     time: Date;
     type?: string;
@@ -4218,13 +4278,13 @@ export namespace types {
     languages: string;
     last_updated: number;
     only_ac?: boolean;
-    partial_score: boolean;
     penalty: string;
     penalty_calc_policy: string;
     points_decay_factor: number;
     problemset_id: number;
     recommended: boolean;
     rerun_id: number;
+    score_mode: string;
     scoreboard: number;
     show_scoreboard_after: boolean;
     start_time: Date;
@@ -4961,6 +5021,8 @@ export namespace messages {
   export type CourseRemoveStudentResponse = {};
   export type CourseRemoveTeachingAssistantRequest = { [key: string]: any };
   export type CourseRemoveTeachingAssistantResponse = {};
+  export type CourseRequestFeedbackRequest = { [key: string]: any };
+  export type CourseRequestFeedbackResponse = {};
   export type CourseRequestsRequest = { [key: string]: any };
   export type _CourseRequestsServerResponse = any;
   export type CourseRequestsResponse = { users: types.IdentityRequest[] };
@@ -5794,6 +5856,9 @@ export namespace controllers {
     removeTeachingAssistant: (
       params?: messages.CourseRemoveTeachingAssistantRequest,
     ) => Promise<messages.CourseRemoveTeachingAssistantResponse>;
+    requestFeedback: (
+      params?: messages.CourseRequestFeedbackRequest,
+    ) => Promise<messages.CourseRequestFeedbackResponse>;
     requests: (
       params?: messages.CourseRequestsRequest,
     ) => Promise<messages.CourseRequestsResponse>;

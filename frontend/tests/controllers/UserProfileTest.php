@@ -20,7 +20,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $this->assertArrayNotHasKey('password', $response);
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
             $response['username']
         );
@@ -54,7 +54,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertArrayNotHasKey('has_learning_objective', $response);
         $this->assertArrayNotHasKey('has_scholar_objective', $response);
         $this->assertArrayNotHasKey('has_teaching_objective', $response);
-        $this->assertEquals(
+        $this->assertSame(
             $identity2->username,
             $response['username']
         );
@@ -103,7 +103,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             }
             $this->assertNull($v);
         }
-        $this->assertEquals(
+        $this->assertSame(
             $identity2->username,
             $response['username']
         );
@@ -238,9 +238,9 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Result should be 1 since user has only actually participated in 1 contest (submitted run)
-        $this->assertEquals(1, count($response['contests']));
+        $this->assertSame(1, count($response['contests']));
         $alias = $contests[0]['contest']->alias;
-        $this->assertEquals(
+        $this->assertSame(
             $alias,
             $response['contests'][$alias]['data']['alias']
         );
@@ -279,7 +279,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Result should be 0 since user was removed from the only contest who
         // participated (submitted run)
-        $this->assertEquals(0, count($response['contests']));
+        $this->assertSame(0, count($response['contests']));
     }
 
     /*
@@ -325,7 +325,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         ));
 
         // Result should be 1 since user has only actually participated in 1 contest (submitted run)
-        $this->assertEquals(1, count($response['contests']));
+        $this->assertSame(1, count($response['contests']));
     }
 
     /*
@@ -381,7 +381,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
 
         $response = \OmegaUp\Controllers\User::apiProblemsSolved($r);
 
-        $this->assertEquals(2, count($response['problems']));
+        $this->assertSame(2, count($response['problems']));
     }
 
     /*
@@ -404,7 +404,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(count($problems), count($response['problems']));
+        $this->assertSame(count($problems), count($response['problems']));
 
         // Now make one of those problems private, results must change
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
@@ -418,7 +418,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         $expectedProblemCount = count($problems) - 1;
-        $this->assertEquals(
+        $this->assertSame(
             $expectedProblemCount,
             count(
                 $response['problems']
@@ -433,7 +433,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'username' => $identity->username
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             $expectedProblemCount,
             count(
                 $response['problems']
@@ -457,7 +457,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Check email in db
         $user_in_db = \OmegaUp\DAO\Users::findByEmail('new@email.com');
-        $this->assertEquals($user->user_id, $user_in_db->user_id);
+        $this->assertSame($user->user_id, $user_in_db->user_id);
     }
 
     /**
@@ -497,7 +497,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
         ]));
         foreach (['CE', 'PA', 'AC'] as $verdict) {
-            $this->assertEquals(
+            $this->assertSame(
                 1,
                 $this->findByPredicate(
                     $response['runs'],
@@ -580,7 +580,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
         ]));
         $this->assertCount(1, $response['problems']);
-        $this->assertEquals('problem_1', $response['problems'][0]['alias']);
+        $this->assertSame('problem_1', $response['problems'][0]['alias']);
 
         // Now make one of those problems private, results must change
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
@@ -673,9 +673,9 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
 
         // User's name is hidden when private profile is set
         $identityName = $isPrivate ? null : $identity->name;
-        $this->assertEquals($identity->username, $profile['username']);
-        $this->assertEquals($identityName, $profile['name']);
-        $this->assertEquals($profile['is_own_profile'], $isOwnProfile);
-        $this->assertEquals($profile['is_private'], $isPrivate);
+        $this->assertSame($identity->username, $profile['username']);
+        $this->assertSame($identityName, $profile['name']);
+        $this->assertSame($profile['is_own_profile'], $isOwnProfile);
+        $this->assertSame($profile['is_private'], $isPrivate);
     }
 }
