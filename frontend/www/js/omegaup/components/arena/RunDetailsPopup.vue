@@ -175,10 +175,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import arena_Feedback, {
-  ArenaCourseFeedback,
-} from './Feedback.vue';
-import arena_FeedbackCodeView from './FeedbackCodeView.vue';
+import arena_CodeView from './CodeView.vue';
 import arena_DiffView from './DiffView.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
@@ -202,20 +199,17 @@ const EMPTY_FIELD = '∅';
   components: {
     FontAwesomeIcon,
     'clip-loader': ClipLoader,
-    'omegaup-arena-feedback-code-view': arena_FeedbackCodeView,
-    'omegaup-arena-feedback': arena_Feedback,
+    'omegaup-arena-code-view': arena_CodeView,
     'omegaup-arena-diff-view': arena_DiffView,
     'omegaup-overlay-popup': omegaup_OverlayPopup,
   },
 })
 export default class ArenaRunDetailsPopup extends Vue {
   @Prop() data!: types.RunDetails;
-  @Prop({ default: () => [] }) feedbackLines!: number[];
 
   EMPTY_FIELD = EMPTY_FIELD;
   T = T;
   groupVisible: GroupVisibility = {};
-  feedback: ArenaCourseFeedback[] = [];
 
   toggle(group: string): void {
     const visible = this.groupVisible[group];
