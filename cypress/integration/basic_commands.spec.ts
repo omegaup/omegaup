@@ -182,8 +182,8 @@ describe('Basic Commands Test', () => {
     cy.get('[data-signup-password]').type(password);
     cy.get('[data-signup-repeat-password]').type(password);
     cy.get('[data-signup-email]').type(`${username}@omegaup.com`);
-    cy.get('[data-signup-submit]').click();
     cy.get('[data-signup-accept_policies]').check();
+    cy.get('[data-signup-submit]').click();
     cy.waitUntil(() =>
       cy.get('header .username').should('have.text', username),
     );

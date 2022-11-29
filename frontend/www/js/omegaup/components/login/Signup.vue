@@ -8,7 +8,6 @@
         class="needs-validation"
         :class="{ 'was-validated': wasValidated }"
         novalidate
-        @submit.prevent.stop="registerAndLogin"
       >
         <div class="form-group">
           <label>{{ T.userEditBirthDate }}</label>
@@ -155,6 +154,7 @@
                 class="btn btn-primary form-control"
                 name="sign_up"
                 :disabled="!birthDate || !privacyPolicyAccepted"
+                @click.prevent.stop="registerAndLogin"
               >
                 {{ T.loginSignUp }}
               </button>

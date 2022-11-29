@@ -192,9 +192,9 @@ describe('signup.vue', () => {
       wrapper.find('button[name="sign_up"]').attributes().disabled,
     ).toBeFalsy();
 
-    //await wrapper.find('button[name="sign_up"]').trigger('click');
-
-    // An warning should be displayed, but there is no status div
+    expect(wrapper.find('form').classes('was-validated')).toBeFalsy();
+    await wrapper.find('button[name="sign_up"]').trigger('click');
+    expect(wrapper.find('form').classes('was-validated')).toBeTruthy();
   });
 
   it('should handle a complete registration for Over13 user', async () => {
