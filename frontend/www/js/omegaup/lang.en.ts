@@ -818,7 +818,6 @@ const translations: { [key: string]: string; } = {
   parentEmailBody: "Enter this token to link your child's account https://omegaup.com/user/parentalverification/token/$(token)/",
   parentEmailSubject: "Generated Token",
   parentalTokenNotFound: "Parental token not found",
-  parentalTokenVerificationSuccessful: "Parental token was validated successfully",
   passwordAddRequestSuccess: "Your password has been added.",
   passwordCopyToken: "Copy token",
   passwordGenerateToken: "Generate token",
