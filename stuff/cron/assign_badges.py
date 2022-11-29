@@ -28,7 +28,8 @@ def get_all_owners(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
 ) -> Set[int]:
     '''Returns a set of ids of users who should receive the badge'''
-    with open(os.path.join(BADGES_PATH, badge, 'query.sql')) as fd:
+    with open(os.path.join(BADGES_PATH, badge, 'query.sql'),
+              encoding='utf-8') as fd:
         query = fd.read()
     if current_timestamp is not None:
         query = query.replace(

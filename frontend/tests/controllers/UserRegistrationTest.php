@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Testing new user special cases
  */
@@ -71,7 +69,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             // Try to create new user
-            $response = \OmegaUp\Controllers\User::apiCreate($r);
+            \OmegaUp\Controllers\User::apiCreate($r);
             $this->fail(
                 'User should have not been able to be created because the email already exists in the data base'
             );
@@ -108,7 +106,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             // Call API
-            $response = \OmegaUp\Controllers\User::apiCreate($r);
+            \OmegaUp\Controllers\User::apiCreate($r);
             $this->fail(
                 'User should have not been able to be created because the email already exists in the data base'
             );
@@ -140,13 +138,13 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * user logged in and a parental Token is not generated
+     * User logged in and a parental Token is not generated
      *
      */
     public function testUserDoToGenerateParentalTokenAtTimeOfRegistration() {
-         //Verify that the token is not generated.
-         $over13BirthDateTimestamp = strtotime('-15 years');
-         $randomString = \OmegaUp\Test\Utils::createRandomString();
+        // Verify that the token is not generated.
+        $over13BirthDateTimestamp = strtotime('-15 years');
+        $randomString = \OmegaUp\Test\Utils::createRandomString();
         \OmegaUp\Controllers\User::apiCreate(
             new \OmegaUp\Request([
                  'username' => $randomString,
@@ -157,9 +155,37 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertNotNull($over13BirthDateTimestamp)
         );
 
-         $response = \OmegaUp\DAO\Users::FindByUsername($randomString);
+        $response = \OmegaUp\DAO\Users::FindByUsername($randomString);
 
-         $this->assertNull($response->parental_verification_token);
+        $this->assertNull($response->parental_verification_token);
+    }
+
+    /**
+     * User under 13 creates an account with the function in the factory, where
+     * the account does not register an email
+     */
+    public function testUserUnder13CreatesAnAccount() {
+        $defaultDate = strtotime('2022-01-01T00:00:00Z');
+        \OmegaUp\Time::setTimeForTesting($defaultDate);
+        // Creates a 10 years-old user
+        ['user' => $user] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birthDate' => strtotime('2012-01-01T00:00:00Z'),
+            ]),
+        );
+
+        $this->assertNull($user->main_email_id);
+        $this->assertNotNull($user->parental_verification_token);
+        $this->assertNotNull($user->parent_email_verification_initial);
+        $this->assertNotNull($user->parent_email_verification_deadline);
+
+        // Creates a normal user
+        ['user' => $user] = \OmegaUp\Test\Factories\User::createUser();
+
+        $this->assertNotNull($user->main_email_id);
+        $this->assertNull($user->parental_verification_token);
+        $this->assertNull($user->parent_email_verification_initial);
+        $this->assertNull($user->parent_email_verification_deadline);
     }
 
     /**
