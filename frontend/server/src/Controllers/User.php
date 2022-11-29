@@ -4670,29 +4670,29 @@ class User extends \OmegaUp\Controllers\Controller {
             ) === 1
         );
         $hasParentalVerificationToken = false;
-    try{
-        \OmegaUp\DAO\DAO::transBegin();
-        $user = \OmegaUp\DAO\Users::findByParentalToken($token);
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            $user = \OmegaUp\DAO\Users::findByParentalToken($token);
 
-        if (is_null($user)) {
-            throw new \OmegaUp\Exceptions\NotFoundException(
-                'parentalTokenNotFound'
-            );
-        }
+            if (is_null($user)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'parentalTokenNotFound'
+                );
+            }
 
-        if (is_null($r->user) || is_null($r->user->main_email_id)) {
-            throw new \OmegaUp\Exceptions\UnauthorizedException();
-        }
+            if (is_null($r->user) || is_null($r->user->main_email_id)) {
+                throw new \OmegaUp\Exceptions\UnauthorizedException();
+            }
 
-        $user->parent_email_id = $r->user->main_email_id;
-        $user->parent_verified = true;
-        $user->parental_verification_token = null;
-        \OmegaUp\DAO\Users::update($user);
-        $hasParentalVerificationToken = true;
+            $user->parent_email_id = $r->user->main_email_id;
+            $user->parent_verified = true;
+            $user->parental_verification_token = null;
+            \OmegaUp\DAO\Users::update($user);
+            $hasParentalVerificationToken = true;
 
-        \OmegaUp\DAO\DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
 
-        return [
+            return [
             'templateProperties' => [
                 'payload' => [
                     'hasParentalVerificationToken' => $hasParentalVerificationToken,
@@ -4702,11 +4702,11 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'user_verification_parental_token',
-        ];
-     }catch(\Exception $e){
-        \OmegaUp\DAO\DAO::transRollback();
+            ];
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
-      }
+        }
     }
 }
 
