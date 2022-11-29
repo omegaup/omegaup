@@ -475,7 +475,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
         );
         $result = [];
         foreach ($result as $row) {
-            $users[] = new \OmegaUp\DAO\VO\Users($row);
+            $result[] = new \OmegaUp\DAO\VO\Users($row);
         }
         return $result;
     }
