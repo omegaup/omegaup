@@ -304,7 +304,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             'email_%s@localhost.localdomain' % user)
         self.browser.find_element(By.NAME, 'reg_password').send_keys(passw)
         self.browser.find_element(By.NAME,
-            'reg_password_confirmation').send_keys(passw)
+                                  'reg_password_confirmation').send_keys(passw)
         self.browser.find_element(By.NAME, 'reg_accept_policies').click()
         with self.page_transition():
             self.browser.find_element(By.NAME, 'sign_up').click()
