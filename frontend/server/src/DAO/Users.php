@@ -448,7 +448,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return boolval($count);
     }
 
-    public static function findByParentalToken(string $token): ?\OmegaUp\DAO\VO\Users {
+    public static function findByParentalToken(string $token): array {
         $fields = join(
             ', ',
             array_map(
