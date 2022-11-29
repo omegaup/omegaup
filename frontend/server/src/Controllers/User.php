@@ -4670,7 +4670,8 @@ class User extends \OmegaUp\Controllers\Controller {
             ) === 1
         );
         $hasParentalVerificationToken = false;
-
+    try{
+        \OmegaUp\DAO\DAO::transBegin();
         $user = \OmegaUp\DAO\Users::findByParentalToken($token);
 
         if (is_null($user)) {
@@ -4688,6 +4689,9 @@ class User extends \OmegaUp\Controllers\Controller {
         $user->parental_verification_token = null;
         \OmegaUp\DAO\Users::update($user);
         $hasParentalVerificationToken = true;
+
+        \OmegaUp\DAO\DAO::transEnd();
+
         return [
             'templateProperties' => [
                 'payload' => [
@@ -4699,6 +4703,10 @@ class User extends \OmegaUp\Controllers\Controller {
             ],
             'entrypoint' => 'user_verification_parental_token',
         ];
+     }catch(\Exception $e){
+        \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+      }
     }
 }
 

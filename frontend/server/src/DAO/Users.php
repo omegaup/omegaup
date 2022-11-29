@@ -448,7 +448,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return boolval($count);
     }
 
-    public static function findByParentalToken(string $token): array {
+    public static function findByParentalToken(string $token): ?\OmegaUp\DAO\VO\Users {
         $fields = join(
             ', ',
             array_map(
@@ -467,16 +467,13 @@ class Users extends \OmegaUp\DAO\Base\Users {
                         Identities i ON u.main_identity_id = i.identity_id
                     WHERE
                       parental_verification_token = ?
-                    LIMIT 1;";
+                    LIMIT 1
+                    FOR UPDATE;";
 
-        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             [$token]
         );
-        $result = [];
-        foreach ($result as $row) {
-            $result[] = new \OmegaUp\DAO\VO\Users($row);
-        }
         return $result;
     }
 }

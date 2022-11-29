@@ -240,7 +240,6 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        //assert the message.
         $this->assertTrue($payload['hasParentalVerificationToken']);
 
         $updatedUser = \OmegaUp\DAO\Users::getByPK($user->user_id);
