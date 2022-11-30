@@ -190,25 +190,6 @@ describe('Detailsv2.vue', () => {
     expect(wrapper.vm.filteredLanguages).toEqual(problem.languages);
   });
 
-  it('Should handle the user runs', async () => {
-    const wrapper = mount(problem_Details, {
-      propsData: {
-        allRuns: runs,
-        problem,
-        user: {
-          loggedIn: true,
-          admin: true,
-          reviewer: true,
-        },
-        userRuns: runs,
-      },
-      localVue,
-    });
-
-    expect(wrapper.find('table.runs tbody').text()).toContain(runs[0].guid);
-    // TODO: Add new submission tests when the component is ready
-  });
-
   it('Should handle the runs tab', async () => {
     const wrapper = mount(problem_Details, {
       propsData: {
@@ -230,5 +211,7 @@ describe('Detailsv2.vue', () => {
     expect(runsTab.text()).toContain(T.wordsVerdict);
     expect(runsTab.text()).toContain(T.wordsStatus);
     expect(runsTab.text()).toContain(T.wordsLanguage);
+    expect(runsTab.text()).toContain(T.wordsExecution);
+    expect(runsTab.text()).toContain(T.wordsOutput);
   });
 });

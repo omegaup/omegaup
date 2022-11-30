@@ -132,9 +132,6 @@ describe('Runs.vue', () => {
         username: null,
       },
     });
-    expect(
-      wrapper.findAll('acronym[data-run-guid]').wrappers.map((e) => e.text()),
-    ).toEqual(['122000', '121500', '121000', '120500', '120000']);
   });
 
   const filtersMapping: { filter: string; value: string }[] = [
