@@ -116,24 +116,6 @@ describe('Runs.vue', () => {
     },
   ];
 
-  it('Should handle order runs', async () => {
-    const wrapper = shallowMount(arena_Runs, {
-      propsData: {
-        contestAlias: 'admin',
-        runs,
-        showContest: true,
-        showDetails: true,
-        showDisqualify: true,
-        showPager: true,
-        showPoints: false,
-        showProblem: true,
-        showRejudge: true,
-        showUser: true,
-        username: null,
-      },
-    });
-  });
-
   const filtersMapping: { filter: string; value: string }[] = [
     { filter: 'verdict', value: 'AC' },
     { filter: 'status', value: 'new' },
