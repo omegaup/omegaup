@@ -284,9 +284,10 @@ export function reportPageView(page: string): void {
 
 export function rankingUsername(
   rank: omegaup.User & { virtual?: boolean },
+  hideName?: boolean,
 ): string {
   let username = rank.username;
-  if (!!rank.name && rank.name != rank.username)
+  if (!hideName && !!rank.name && rank.name != rank.username)
     username += ` (${escapeString(rank.name)})`;
   if (rank.virtual)
     username = formatString(T.virtualSuffix, { username: username });

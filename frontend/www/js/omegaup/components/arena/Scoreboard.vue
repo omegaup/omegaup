@@ -33,6 +33,14 @@
       />
       {{ T.scoreboardShowOnlyInvitedIdentities }}</label
     >
+    <label class="float-right">
+      <input
+        v-model="showContestantsNames"
+        class="toggle-contestants"
+        type="checkbox"
+      />
+      {{ T.scoreboardShowParticipantsNames }}</label
+    >
     <table data-table-scoreboard>
       <thead>
         <tr>
@@ -57,7 +65,7 @@
             <td class="legend" :class="legendClass(userIndex)"></td>
             <td class="position">{{ user.place || '—' }}</td>
             <td class="user">
-              {{ ui.rankingUsername(user) }}
+              {{ ui.rankingUsername(user, !showContestantsNames) }}
               <img
                 v-if="user.country"
                 alt=""
@@ -141,6 +149,7 @@ export default class ArenaScoreboard extends Vue {
   INF = '∞';
   onlyShowExplicitlyInvited =
     !this.showAllContestants && this.showInvitedUsersFilter;
+  showContestantsNames = true;
 
   get lastUpdatedString(): null | string {
     if (!this.lastUpdated) return null;
