@@ -199,7 +199,7 @@ def _process_one_request(s: Session, request: Mapping[str, Any],
 
 def _run_script(path: str, args: argparse.Namespace, now: float) -> None:
     '''Runs a single script specified in |path|'''
-    with open(path, 'r') as f:
+    with open(path, 'r', encoding='utf-8') as f:
         script = json.load(f)
 
     for session in script:

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+'''Tests for the plagiarism detector.'''
+
 import dataclasses
 import datetime
 import itertools
@@ -9,7 +11,7 @@ import json
 import string
 import sys
 
-from typing import Callable, Dict, List, Set, Tuple
+from typing import Dict, List, Set
 
 import pytest
 
@@ -19,7 +21,7 @@ sys.path.insert(
                  "../"))
 
 import lib.db
-import cron.plagiarism_detector  # type: ignore
+import cron.plagiarism_detector
 
 # Constants
 
@@ -27,17 +29,19 @@ _OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..'))
 LOCAL_DOWNLOADER_DIR = os.path.join(_OMEGAUP_ROOT, "testdata")
 PLAGIARISM_THRESHOLD = 90
 
-SubmissionDownloader = Callable[[str, str, str], None]
-
 
 @dataclasses.dataclass()
 class Contest:
+    '''Represents a contest.'''
+
     contest_id: int = 0
     guids: List[str] = dataclasses.field(default_factory=list)
 
 
 @pytest.fixture(scope='session')
 def dbconn() -> lib.db.Connection:
+    '''Fixture that creates a database connection.'''
+
     return lib.db.connect(
         lib.db.DatabaseConnectionArguments(
             user='root',
@@ -48,7 +52,11 @@ def dbconn() -> lib.db.Connection:
             mysql_config_file=lib.db.default_config_file_path() or ''))
 
 
-def create_contest(dbconn: lib.db.Connection) -> Contest:
+def create_contest(
+    dbconn: lib.db.Connection,  # pylint: disable=redefined-outer-name
+) -> Contest:
+    '''Create a contest.'''
+
     contest = Contest()
 
     with dbconn.cursor() as cur:
@@ -235,7 +243,11 @@ def create_contest(dbconn: lib.db.Connection) -> Contest:
     return contest
 
 
-def test_get_contest(dbconn: lib.db.Connection) -> None:
+def test_get_contest(
+    dbconn: lib.db.Connection,  # pylint: disable=redefined-outer-name
+) -> None:
+    '''Tests getting a contest from the database.'''
+
     contest = create_contest(dbconn)
 
     get_contests_detector = cron.plagiarism_detector.get_contests(dbconn)
@@ -245,7 +257,11 @@ def test_get_contest(dbconn: lib.db.Connection) -> None:
     assert contest.contest_id in contests
 
 
-def test_submission_ids(dbconn: lib.db.Connection) -> None:
+def test_submission_ids(
+    dbconn: lib.db.Connection,  # pylint: disable=redefined-outer-name
+) -> None:
+    '''Tests getting the submission IDs from a contest.'''
+
     contest = create_contest(dbconn)
     submissions = cron.plagiarism_detector.get_submissions_for_contest(
         dbconn, contest.contest_id)
@@ -253,7 +269,11 @@ def test_submission_ids(dbconn: lib.db.Connection) -> None:
     assert guids == set(contest.guids)
 
 
-def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
+def test_plagiarism_detector(
+    dbconn: lib.db.Connection,  # pylint: disable=redefined-outer-name
+) -> None:
+    '''Test running the plagiarism detector.'''
+
     contest = create_contest(dbconn)
     submission_ids: Dict[str, int] = {}
 
@@ -262,8 +282,9 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
     for submission in submissions:
         submission_ids[submission['guid']] = submission['submission_id']
 
-    download: SubmissionDownloader = cron.plagiarism_detector.LocalSubmissionDownloader(
-        LOCAL_DOWNLOADER_DIR)
+    download: cron.plagiarism_detector.SubmissionDownloader = (
+        cron.plagiarism_detector.LocalSubmissionDownloader(
+            LOCAL_DOWNLOADER_DIR))
 
     cron.plagiarism_detector.run_detector_for_contest(dbconn, download,
                                                       contest.contest_id)
@@ -287,8 +308,8 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
                 (result['submission_id_1'], result['submission_id_2'])
                 for result in plagiarized_result))
 
-        # TODO: Convert the graph of plagiarized submissions into disjoint sets and
-        # check groups of plagiarized submissions instead of only whether a
+        # TODO: Convert the graph of plagiarized submissions into disjoint sets
+        # and check groups of plagiarized submissions instead of only whether a
         # submission was plagiarized or not.
 
         assert plagiarized_submission_ids == set((
@@ -312,7 +333,7 @@ def test_plagiarism_detector(dbconn: lib.db.Connection) -> None:
         # notice both ranges are same due to exact same files being present
 
         expected_pair_range = set((((0, 41), ), ((0, 33), (33, 39), (39, 76)),
-                                    ((0, 33), (33, 35), (39, 46), (48, 64))))
+                                   ((0, 33), (33, 35), (39, 46), (48, 64))))
 
         found_pair_ranges = set()
         for content in plagiarized_result:

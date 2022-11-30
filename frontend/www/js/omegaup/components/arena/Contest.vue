@@ -37,7 +37,7 @@
               :active-problem="activeProblemAlias"
               :in-assignment="false"
               :digits-after-decimal-point="
-                contest.partial_score ? digitsAfterDecimalPoint : 0
+                contest.score_mode == 'partial' ? digitsAfterDecimalPoint : 0
               "
               @disable-active-problem="activeProblem = null"
               @navigate-to-problem="onNavigateToProblem"

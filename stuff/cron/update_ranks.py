@@ -54,7 +54,8 @@ def update_problem_accepted_stats(
                 FROM
                     `Submissions` AS `s`
                 INNER JOIN
-                    `Identities` AS `i` ON `i`.`identity_id` = `s`.`identity_id`
+                    `Identities` AS `i` ON
+                    `i`.`identity_id` = `s`.`identity_id`
                 WHERE
                     `s`.`problem_id` = `p`.`problem_id`
                     AND `s`.verdict = 'AC'
