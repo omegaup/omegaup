@@ -180,11 +180,14 @@
               <font-awesome-icon :icon="['fas', 'calendar-alt']" />
               {{ T.wordsTime }}
             </th>
+            <th hidden>GUID</th>
             <th>{{ T.wordsLanguage }}</th>
             <th v-if="showUser">{{ T.contestParticipant }}</th>
             <th v-if="showContest">{{ T.wordsContest }}</th>
             <th v-if="showProblem">{{ T.wordsProblem }}</th>
-            <th v-if="showContest">{{ T.wordsStatus }}</th>
+            <th v-if="contestAlias != null && !showUser">
+              {{ T.wordsStatus }}
+            </th>
             <th v-if="showPoints" class="numeric">{{ T.wordsPoints }}</th>
             <th v-if="showPoints" class="numeric">{{ T.wordsPenalty }}</th>
             <th v-if="!showPoints" class="numeric">{{ T.wordsPercentage }}</th>
@@ -231,6 +234,11 @@
         <tbody>
           <tr v-for="run in filteredRuns" :key="run.guid">
             <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
+            <td hidden>
+              <acronym :title="run.guid" data-run-guid>
+                <tt>{{ run.guid.substring(0, 8) }}</tt>
+              </acronym>
+            </td>
             <td>{{ run.language }}</td>
             <td
               v-if="showUser"
@@ -280,7 +288,7 @@
               </a>
             </td>
             <td
-              v-if="showContest"
+              v-if="contestAlias != null && !showUser"
               :class="statusClass(run)"
               data-run-status
               class="text-center opacity-4 font-weight-bold"

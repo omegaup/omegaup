@@ -116,6 +116,27 @@ describe('Runs.vue', () => {
     },
   ];
 
+  it('Should handle order runs', async () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        runs,
+        showContest: true,
+        showDetails: true,
+        showDisqualify: true,
+        showPager: true,
+        showPoints: false,
+        showProblem: true,
+        showRejudge: true,
+        showUser: true,
+        username: null,
+      },
+    });
+    expect(
+      wrapper.findAll('acronym[data-run-guid]').wrappers.map((e) => e.text()),
+    ).toEqual(['122000', '121500', '121000', '120500', '120000']);
+  });
+
   const filtersMapping: { filter: string; value: string }[] = [
     { filter: 'verdict', value: 'AC' },
     { filter: 'status', value: 'new' },
