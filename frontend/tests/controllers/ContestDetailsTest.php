@@ -36,10 +36,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $contest->points_decay_factor,
             $response['points_decay_factor']
         );
-        $this->assertSame(
-            $contest->partial_score,
-            $response['partial_score']
-        );
+        $this->assertSame($contest->score_mode, $response['score_mode']);
         $this->assertSame(
             $contest->submissions_gap,
             $response['submissions_gap']

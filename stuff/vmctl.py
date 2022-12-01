@@ -37,24 +37,29 @@ class Azure:
 
     def _nsg_name(self) -> str:
         '''Returns the network security group name.'''
-        return '%s-%s-nsg' % (self._resource_group, self._location)
+        return f'{self._resource_group}-{self._location}-nsg'
 
     def _vnet_name(self) -> str:
         '''Returns the virtual network name.'''
-        return '%s-%s-vnet' % (self._resource_group, self._location)
+        return f'{self._resource_group}-{self._location}-vnet'
 
     def _nic_name(self, vm_name: str) -> str:
         '''Returns the network interface card name.'''
-        # pylint: disable=no-self-use
-        return '%s-nic' % vm_name
+        return f'{vm_name}-nic'
 
     def network_nsg_show(self) -> Optional[Mapping[str, Any]]:
         '''Returns the network security group information.'''
         result = _run([
-            'network', 'nsg', 'show', '--json', '--subscription',
-            self._subscription, '--resource-group', self._resource_group,
+            'network',
+            'nsg',
+            'show',
+            '--json',
+            '--subscription',
+            self._subscription,
+            '--resource-group',
+            self._resource_group,
             '--name',
-            self._nsg_name()
+            self._nsg_name(),
         ])
         if result.returncode != 0:
             return None
@@ -65,10 +70,18 @@ class Azure:
         '''Creates a network security group.'''
         result: Mapping[str, Any] = json.loads(
             _run([
-                'network', 'nsg', 'create', '--json', '--subscription',
-                self._subscription, '--resource-group', self._resource_group,
-                '--location', self._location, '--name',
-                self._nsg_name()
+                'network',
+                'nsg',
+                'create',
+                '--json',
+                '--subscription',
+                self._subscription,
+                '--resource-group',
+                self._resource_group,
+                '--location',
+                self._location,
+                '--name',
+                self._nsg_name(),
             ]).stdout)
         return result
 
@@ -77,23 +90,40 @@ class Azure:
         '''Creates a network security group rule.'''
         return json.loads(
             _run([
-                'network', 'nsg', 'rule', 'create', '--json', '--subscription',
-                self._subscription, '--resource-group', self._resource_group,
+                'network',
+                'nsg',
+                'rule',
+                'create',
+                '--json',
+                '--subscription',
+                self._subscription,
+                '--resource-group',
+                self._resource_group,
                 '--nsg-name',
-                self._nsg_name(), '--name',
-                'allow-%s-port-%d' % (protocol, port), '--protocol', protocol,
+                self._nsg_name(),
+                '--name',
+                f'allow-{protocol}-port-{port}',
+                '--protocol',
+                protocol,
                 '--destination-port-range',
-                str(port), '--priority',
-                str(priority)
+                str(port),
+                '--priority',
+                str(priority),
             ]).stdout)
 
     def network_vnet_show(self) -> Optional[Mapping[str, Any]]:
         '''Returns the virtual network information.'''
         result = _run([
-            'network', 'vnet', 'show', '--json', '--subscription',
-            self._subscription, '--resource-group', self._resource_group,
+            'network',
+            'vnet',
+            'show',
+            '--json',
+            '--subscription',
+            self._subscription,
+            '--resource-group',
+            self._resource_group,
             '--name',
-            self._vnet_name()
+            self._vnet_name(),
         ])
         if result.returncode != 0:
             return None
@@ -104,10 +134,18 @@ class Azure:
         '''Creates a virtual network.'''
         result: Mapping[str, Any] = json.loads(
             _run([
-                'network', 'vnet', 'create', '--json', '--subscription',
-                self._subscription, '--resource-group', self._resource_group,
-                '--location', self._location, '--name',
-                self._vnet_name()
+                'network',
+                'vnet',
+                'create',
+                '--json',
+                '--subscription',
+                self._subscription,
+                '--resource-group',
+                self._resource_group,
+                '--location',
+                self._location,
+                '--name',
+                self._vnet_name(),
             ]).stdout)
         return result
 
@@ -115,21 +153,37 @@ class Azure:
         '''Creates a virtual network subnet.'''
         return json.loads(
             _run([
-                'network', 'vnet', 'subnet', 'create', '--json',
-                '--subscription', self._subscription, '--resource-group',
-                self._resource_group, '--vnet-name',
-                self._vnet_name(), '--name', 'default', '--address-prefix',
-                '10.0.0.0/24'
+                'network',
+                'vnet',
+                'subnet',
+                'create',
+                '--json',
+                '--subscription',
+                self._subscription,
+                '--resource-group',
+                self._resource_group,
+                '--vnet-name',
+                self._vnet_name(),
+                '--name',
+                'default',
+                '--address-prefix',
+                '10.0.0.0/24',
             ]).stdout)
 
     def network_nic_show(self, vm_name: str) -> Optional[Mapping[str, Any]]:
         '''Returns the network interface card information.'''
         result: Optional[Mapping[str, Any]] = json.loads(
             _run([
-                'network', 'nic', 'show', '--json', '--subscription',
-                self._subscription, '--resource-group', self._resource_group,
+                'network',
+                'nic',
+                'show',
+                '--json',
+                '--subscription',
+                self._subscription,
+                '--resource-group',
+                self._resource_group,
                 '--name',
-                '%s-nic' % vm_name
+                f'{vm_name}-nic',
             ]).stdout)
         return result
 
@@ -205,8 +259,7 @@ def _deploy(azure: Azure, args: argparse.Namespace) -> None:
     if args.verbose:
         deploy_runner_args.append('--verbose')
 
-    runner_hostname = '%s.%s.cloudapp.azure.com' % (args.vm_name,
-                                                    args.location)
+    runner_hostname = f'{args.vm_name}.{args.location}.cloudapp.azure.com'
 
     vm = azure.vm_show(args.vm_name)
     if not vm:
@@ -216,8 +269,8 @@ def _deploy(azure: Azure, args: argparse.Namespace) -> None:
         missing_ports = set(args.ports)
         for rule in nsg['securityRules']:
             missing_ports.remove(
-                '%s:%s:%s' % (rule['protocol'].lower(),
-                              rule['destinationPortRange'], rule['priority']))
+                ':'.join((rule['protocol'].lower(),
+                          rule['destinationPortRange'], rule['priority'])))
         for port in missing_ports:
             protocol, port, priority = port.split(':')
             azure.network_nsg_rule_create(protocol, int(port), int(priority))

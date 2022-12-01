@@ -17,7 +17,6 @@ describe('ContestPractice.vue', () => {
     feedback: 'detailed',
     finish_time: date,
     languages: 'py',
-    partial_score: true,
     score_mode: 'partial',
     penalty: 1,
     penalty_calc_policy: 'sum',
