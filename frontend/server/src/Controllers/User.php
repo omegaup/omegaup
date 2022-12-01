@@ -4691,7 +4691,6 @@ class User extends \OmegaUp\Controllers\Controller {
             $hasParentalVerificationToken = true;
 
             \OmegaUp\DAO\DAO::transEnd();
-
             return [
             'templateProperties' => [
                 'payload' => [

@@ -470,10 +470,13 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     LIMIT 1
                     FOR UPDATE;";
 
-        $result = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$token]
         );
-        return $result;
+        if (is_null($result)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\Users($result);
     }
 }
