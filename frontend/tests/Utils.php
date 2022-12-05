@@ -450,11 +450,14 @@ class Utils {
         self::shellExec(
             ('python3 ' .
             dirname(__DIR__, 2) . '/stuff/pipelines/client_contest.py' .
-            $host_arg .
-             ' --api-token ' .
-             '92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6 ' .
-             ' --url ' .
-             escapeshellarg(OMEGAUP_URL))
+             ' --verbose ' .
+             ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
+             $host_arg .
+             ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+             ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+             ' --password ' . escapeshellarg(OMEGAUP_DB_PASS) .
+             ' --api-token ' . '92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6' .
+             ' --url ' . escapeshellarg(OMEGAUP_URL))
         );
     }
 
