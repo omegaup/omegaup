@@ -636,10 +636,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
-        $contents = \OmegaUp\DAO\QualityNominations::getContents(
-            $r['contents']
+        $rawContents = $r->ensureString(
+            'contents',
+            fn (string $s) => \OmegaUp\Validators::stringNonEmpty($s),
         );
+        $contents = \OmegaUp\DAO\QualityNominations::getContents($rawContents);
         if (!is_array($contents)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
@@ -665,7 +666,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'qualitynomination_id' => intval($nomination->qualitynomination_id)
         ];
     }
-
     /**
      * Marks a problem of a nomination (only the demotion type supported for now) as (resolved, banned, warning).
      *
@@ -848,21 +848,32 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $qualityNominationId = $r->ensureInt('qualitynomination_id');
         $rawContents = $r->ensureString(
             'contents',
-            fn (string $alias) => \OmegaUp\Validators::stringNonEmpty($alias),
+            fn (string $s) => \OmegaUp\Validators::stringNonEmpty($s),
         );
 
-        $contents = \OmegaUp\DAO\QualityNominations::getContents($rawContents);
-        if (!is_array($contents)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'contents'
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+
+            // _Now_ that we are in a transaction
+            $contents = \OmegaUp\DAO\QualityNominations::getContents(
+                $rawContents
             );
-        }
+            if (!is_array($contents)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'contents'
+                );
+            }
 
-        \OmegaUp\DAO\QualityNominations::updateQualityNominations(
-            $qualityNominationId,
-            $rawContents,
-        );
+            \OmegaUp\DAO\QualityNominations::updateQualityNominations(
+                $qualityNominationId,
+                $contents,
+            );
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
 
         return ['status' => 'ok'];
     }

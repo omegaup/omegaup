@@ -10,6 +10,8 @@ namespace OmegaUp\DAO;
  * {@link \OmegaUp\DAO\VO\QualityNominations}.
  *
  * @access public
+ *
+ * @psalm-type QualityNominationContents=array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, quality_seal?: bool, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed}
  */
 class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     /**
@@ -235,10 +237,12 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
 
     /**
      * Update a QualityNominations given its id and contents
+     *
+     * @param QualityNominationContents $contents
      */
     public static function updateQualityNominations(
         int $qualityNominationsId,
-        string $contents
+        array &$contents
     ): void {
         $sqlContents = '
             SELECT
@@ -249,23 +253,18 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 qualitynomination_id = ?
             FOR UPDATE;';
 
-        $newContents = self::getContents($contents);
-
         /** @var null|string */
         $rowContents = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sqlContents,
             [$qualityNominationsId]
         );
-        if (!is_array($newContents) || empty($rowContents)) {
-            return;
-        }
 
         $contentsAll = self::getContents($rowContents);
-        if (!is_array($contentsAll)) {
+        if (is_null($contentsAll)) {
             return;
         }
 
-        $result = json_encode(array_merge($contentsAll, $newContents));
+        $result = json_encode(array_merge($contentsAll, $contents));
 
         $sql = '
             UPDATE
@@ -284,11 +283,23 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         );
     }
 
+    /**
+     * @return null|QualityNominationContents
+     */
     public static function getContents(string $contents): ?array {
         /**
         * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, quality_seal?: bool, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed}
         */
-        return json_decode($contents, associative: true);
+        $contentsAll = json_decode($contents, associative: true);
+
+        if (
+            !is_array($contentsAll) ||
+            (array_is_list($contentsAll) && !empty($contentsAll))
+        ) {
+            return null;
+        }
+
+        return $contentsAll;
     }
 
     /**
