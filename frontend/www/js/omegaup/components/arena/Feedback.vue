@@ -56,6 +56,8 @@ export enum FeedbackStatus {
   New = 'New',
   InProgress = 'InProgress',
   Saved = 'Saved',
+  Updated = 'Updated',
+  Deleted = 'Deleted',
 }
 
 export interface ArenaCourseFeedback {
@@ -75,10 +77,11 @@ export default class Feedback extends Vue {
 
   FeedbackStatus = FeedbackStatus;
   T = T;
-  saved: boolean = false;
+  saved: boolean = this.feedback.status == FeedbackStatus.Saved;
   currentFeedback = this.feedback;
 
   mounted() {
+    if (this.feedback.status === FeedbackStatus.Saved) return;
     this.$nextTick(() => this.feedbackForm.focus());
   }
 

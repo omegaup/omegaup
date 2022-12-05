@@ -21,6 +21,7 @@ describe('submissions', () => {
       guid: '78099022574726af861839e1b4210188',
       language: 'py2',
       show_diff: 'none',
+      feedback: [],
     };
     const formattedRunDetails = showSubmission({ request, runDetails });
     expect(formattedRunDetails).toEqual({

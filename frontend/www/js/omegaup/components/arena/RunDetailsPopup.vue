@@ -109,7 +109,7 @@
         <a v-if="data.source_link" download="data.zip" :href="data.source">{{
           T.wordsDownload
         }}</a>
-        <slot v-else name="code-view">
+        <slot v-else name="code-view" :guid="data.guid">
           <omegaup-arena-code-view
             :language="data.language"
             :readonly="true"

@@ -107,6 +107,7 @@ Here we can add code.
     source_link: false,
     source_name: 'Main.py3',
     source_url: 'blob:http://localhost:8001/url',
+    feedback: [],
   };
 
   const user: types.UserInfoForProblem = {

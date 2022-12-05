@@ -28,6 +28,10 @@ import { EventsSocket } from './events_socket';
 import clarificationStore from './clarificationsStore';
 import socketStore from './socketStore';
 import { myRunsStore, RunFilters, runsStore } from './runsStore';
+import {
+  ArenaCourseFeedback,
+  FeedbackStatus,
+} from '../components/arena/Feedback.vue';
 
 OmegaUp.on('ready', async () => {
   time.setSugarLocale();
@@ -51,12 +55,26 @@ OmegaUp.on('ready', async () => {
   } = getOptionsFromLocation(window.location.hash);
   let runDetails: null | types.RunDetails = null;
   let problemDetails: null | types.ProblemDetails = null;
+  const feedbackMap: Map<number, ArenaCourseFeedback> = new Map();
   try {
     ({ runDetails, problemDetails } = await getProblemAndRunDetails({
       problems: payload.currentAssignment.problems,
       location: window.location.hash,
       problemsetId: payload.currentAssignment.problemset_id,
     }));
+    runDetails?.feedback
+      .filter((feedback) => feedback.range_bytes_start != 0)
+      .map((feedback) => {
+        const lineNumber =
+          feedback.range_bytes_start == null
+            ? 0
+            : feedback.range_bytes_start - 1;
+        feedbackMap.set(lineNumber, {
+          lineNumber,
+          text: feedback.feedback,
+          status: FeedbackStatus.Saved,
+        });
+      });
   } catch (e: any) {
     ui.apiError(e);
   }
@@ -88,6 +106,7 @@ OmegaUp.on('ready', async () => {
       nextSubmissionTimestamp,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
+      feedbackMap,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-course', {
@@ -115,6 +134,7 @@ OmegaUp.on('ready', async () => {
           socketStatus: socketStore.state.socketStatus,
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
+          feedbackMap: this.feedbackMap,
         },
         on: {
           'navigate-to-assignment': ({
@@ -176,6 +196,22 @@ OmegaUp.on('ready', async () => {
             api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
                 this.runDetailsData = showSubmission({ request, runDetails });
+
+                this.feedbackMap = new Map();
+                this.runDetailsData.feedback
+                  .filter((feedback) => feedback.range_bytes_start != 0)
+                  .map((feedback) => {
+                    const lineNumber =
+                      feedback.range_bytes_start == null
+                        ? 0
+                        : feedback.range_bytes_start - 1;
+                    this.feedbackMap.set(lineNumber, {
+                      lineNumber,
+                      text: feedback.feedback,
+                      status: FeedbackStatus.Saved,
+                    });
+                  });
+
                 if (request.hash) {
                   window.location.hash = request.hash;
                 }
@@ -414,6 +450,40 @@ OmegaUp.on('ready', async () => {
               this.shouldShowFirstAssociatedIdentityRunWarning = false;
               ui.warning(T.firstSumbissionWithIdentity);
             }
+          },
+          'save-feedback-list': ({
+            feedbackList,
+            guid,
+          }: {
+            feedbackList: { lineNumber: number; feedback: string }[];
+            guid: string;
+          }) => {
+            Promise.allSettled(
+              feedbackList.map(
+                (feedback: { lineNumber: number; feedback: string }) =>
+                  api.Submission.setFeedback({
+                    guid,
+                    course_alias: payload.courseDetails.alias,
+                    assignment_alias: payload.currentAssignment.alias,
+                    feedback: feedback.feedback,
+                    range_bytes_start: feedback.lineNumber,
+                  }).catch(() => feedback),
+              ),
+            )
+              .then((results) => {
+                const feedbackWithError: string[] = results
+                  .filter(
+                    (result): result is PromiseRejectedResult =>
+                      result.status === 'rejected',
+                  )
+                  .map((result) => result.reason);
+                if (!feedbackWithError.length) {
+                  ui.success(T.feedbackSuccesfullyAdded);
+                } else {
+                  ui.error('There was an error');
+                }
+              })
+              .catch(ui.ignoreError);
           },
         },
       });

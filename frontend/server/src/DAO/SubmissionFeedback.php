@@ -15,16 +15,18 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
     /**
      * Gets the feedback of a certain submission
      *
-     * @return array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string}|null
+     * @return list<array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string, range_bytes_end?: int, range_bytes_start?: int}>
      */
     public static function getSubmissionFeedback(
         \OmegaUp\DAO\VO\Submissions $submission
-    ): ?array {
+    ) {
         $sql = '
             SELECT
                 i.username as author,
                 IFNULL(ur.classname, "user-rank-unranked") AS author_classname,
                 sf.feedback,
+                sf.range_bytes_start,
+                sf.range_bytes_end,
                 sf.date
             FROM
                 Submissions s
@@ -38,8 +40,8 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
                 s.submission_id = ?
         ';
 
-        /** @var array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string}|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+        /** @var list<array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string, range_bytes_end?: int, range_bytes_start?: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
                $submission->submission_id
@@ -53,8 +55,49 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
      * @return \OmegaUp\DAO\VO\SubmissionFeedback|null
      */
     public static function getFeedbackBySubmission(
-        \OmegaUp\DAO\VO\Submissions $submission
+        string $guid,
+        int $rangeBytesStart
     ): ?\OmegaUp\DAO\VO\SubmissionFeedback {
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "sf.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\SubmissionFeedback::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "SELECT
+                    {$fields}
+                FROM
+                    Submission_Feedback sf
+                INNER JOIN
+                    Submissions s ON s.submission_id = sf.submission_id
+                WHERE
+                    s.guid = ?
+                    AND sf.range_bytes_start = ?
+                FOR UPDATE;
+        ";
+
+        /** @var array{date: \OmegaUp\Timestamp, feedback: string, identity_id: int, range_bytes_end: int, range_bytes_start: int, submission_feedback_id: int, submission_id: int}|null */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$guid, $rangeBytesStart]
+        );
+        if (is_null($rs)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\SubmissionFeedback($rs);
+    }
+
+    /**
+     * Gets the SubmissionFeedback objects of a certain submission
+     *
+     * @return list<\OmegaUp\DAO\VO\SubmissionFeedback>
+     */
+    public static function getAllFeedbackBySubmission(
+        \OmegaUp\DAO\VO\Submissions $submission
+    ) {
         $fields = join(
             ', ',
             array_map(
@@ -75,16 +118,18 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
                 FOR UPDATE;
         ";
 
-        /** @var array{date: \OmegaUp\Timestamp, feedback: string, identity_id: int, range_bytes_end: int, range_bytes_start: int, submission_feedback_id: int, submission_id: int}|null */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+        /** @var list<array{date: \OmegaUp\Timestamp, feedback: string, identity_id: int, range_bytes_end: int, range_bytes_start: int, submission_feedback_id: int, submission_id: int}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
                $submission->submission_id
             ]
         );
-        if (is_null($rs)) {
-            return null;
+
+        $result = [];
+        foreach ($rs as $record) {
+            $result[] = new \OmegaUp\DAO\VO\SubmissionFeedback($record);
         }
-        return new \OmegaUp\DAO\VO\SubmissionFeedback($rs);
+        return $result;
     }
 }
