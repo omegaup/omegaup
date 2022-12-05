@@ -666,6 +666,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'qualitynomination_id' => intval($nomination->qualitynomination_id)
         ];
     }
+
     /**
      * Marks a problem of a nomination (only the demotion type supported for now) as (resolved, banned, warning).
      *

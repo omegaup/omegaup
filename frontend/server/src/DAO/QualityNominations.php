@@ -258,6 +258,9 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $sqlContents,
             [$qualityNominationsId]
         );
+        if (empty($rowContents)) {
+            return;
+        }
 
         $contentsAll = self::getContents($rowContents);
         if (is_null($contentsAll)) {
@@ -292,10 +295,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         */
         $contentsAll = json_decode($contents, associative: true);
 
-        if (
-            !is_array($contentsAll) ||
-            (array_is_list($contentsAll) && !empty($contentsAll))
-        ) {
+        if (!is_array($contentsAll)) {
             return null;
         }
 
