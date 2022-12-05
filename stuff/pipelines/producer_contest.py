@@ -46,14 +46,14 @@ def send_contest_message_to_client(
         channel=channel
     )
 
-    contestants = get_contests_from_db(
+    contests = get_contests_from_db(
         cur=cur,
         date_lower_limit=date_lower_limit,
         date_upper_limit=date_upper_limit,
     )
 
-    for data in contestants:
-        message = json.dumps(data._asdict())
+    for contest in contests:
+        message = json.dumps(contest._asdict())
         contest_producer.send_message(message)
 
 

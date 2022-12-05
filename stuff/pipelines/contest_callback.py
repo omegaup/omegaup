@@ -10,12 +10,15 @@ from typing import List, Optional
 
 import verification_code
 
-import omegaup.api
 import pika
+
 import mysql.connector
 import mysql.connector.cursor
 from mysql.connector import errors
 from mysql.connector import errorcode
+
+import database.contest
+import omegaup.api
 
 
 @dataclasses.dataclass
@@ -26,15 +29,6 @@ class Certificate:
     verification_code: str
     contest_place: Optional[int]
     username: str
-
-
-@dataclasses.dataclass
-class ContestCertificate:
-    '''A dataclass for contest certificate.'''
-    certificate_cutoff: int
-    alias: str
-    scoreboard_url: str
-    contest_id: int
 
 
 class ContestsCallback:
@@ -53,22 +47,22 @@ class ContestsCallback:
                  body: bytes) -> None:
         '''Function to store the certificates by a given contest'''
         response = json.loads(body)
-        data = ContestCertificate(**response)
+        contest = database.contest.ContestCertificate(**response)
 
         scoreboard = self.client.contest.scoreboard(
-            contest_alias=data.alias,
-            token=data.scoreboard_url)
+            contest_alias=contest.alias,
+            token=contest.scoreboard_url)
         ranking = scoreboard.ranking
         certificates: List[Certificate] = []
 
         for user in ranking:
             contest_place: Optional[int] = None
-            if (data.certificate_cutoff and user.place
-                    and user.place <= data.certificate_cutoff):
+            if (contest.certificate_cutoff and user.place
+                    and user.place <= contest.certificate_cutoff):
                 contest_place = user.place
             certificates.append(Certificate(
                 certificate_type='contest',
-                contest_id=data.contest_id,
+                contest_id=contest.contest_id,
                 verification_code=generate_contest_code(),
                 contest_place=contest_place,
                 username=str(user.username)
