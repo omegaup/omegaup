@@ -4463,6 +4463,8 @@ export namespace types {
     author_classname: string;
     date: Date;
     feedback: string;
+    range_bytes_end?: number;
+    range_bytes_start?: number;
   }
 
   export interface SubmissionsListPayload {

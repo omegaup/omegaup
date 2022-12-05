@@ -230,7 +230,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 'run_alias' => $runData['response']['guid'],
             ])
         );
-        $this->assertNull($response['feedback']);
+        $this->assertArrayNotHasKey('feedback', $response);
 
         $feedback = 'Test feedback';
         \OmegaUp\Controllers\Submission::apiSetFeedback(
@@ -314,7 +314,8 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $initialFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
-            $submission
+            $submission->guid,
+            rangeBytesStart: 0
         );
 
         \OmegaUp\Controllers\Submission::apiSetFeedback(
@@ -327,7 +328,8 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $newFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
-            $submission
+            $submission->guid,
+            rangeBytesStart: 0
         );
 
         $this->assertNotEquals(
