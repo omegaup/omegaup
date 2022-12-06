@@ -230,7 +230,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 'run_alias' => $runData['response']['guid'],
             ])
         );
-        $this->assertArrayNotHasKey('feedback', $response);
+        $this->assertNull($response['feedback']);
 
         $feedback = 'Test feedback';
         \OmegaUp\Controllers\Submission::apiSetFeedback(
