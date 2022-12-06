@@ -191,8 +191,8 @@
             <th v-if="showPoints" class="numeric">{{ T.wordsPoints }}</th>
             <th v-if="showPoints" class="numeric">{{ T.wordsPenalty }}</th>
             <th v-if="!showPoints" class="numeric">{{ T.wordsPercentage }}</th>
-            <th>{{ T.wordsExecution }}</th>
-            <th>{{ T.wordsOutput }}</th>
+            <th>{{ T.runDetailsExecution }}</th>
+            <th>{{ T.runDetailsOutput }}</th>
             <th class="numeric">
               <font-awesome-icon :icon="['fas', 'database']" />
               {{ T.wordsMemory }}
@@ -319,12 +319,12 @@
             <td class="numeric">{{ execution(run) }}</td>
             <td class="numeric">
               <font-awesome-icon
-                v-if="statusOutput(run) === 1"
+                v-if="outputIconColorStatus(run) === 1"
                 :icon="['fas', 'check-circle']"
                 style="color: green"
               />
               <font-awesome-icon
-                v-else-if="statusOutput(run) === 2"
+                v-else-if="outputIconColorStatus(run) === 2"
                 :icon="['fas', 'times-circle']"
                 style="color: red"
               />
@@ -470,6 +470,12 @@ declare global {
   }
 }
 
+export enum OutputStatus {
+  None = 0,
+  Correct = 1,
+  Incorrect = 2,
+}
+
 export enum PopupDisplayed {
   None,
   RunSubmit,
@@ -605,7 +611,7 @@ export default class Runs extends Vue {
     if (run.status == 'ready' && run.status_memory != 'MEMORY_NOT_AVAILABLE') {
       let result = '';
       if (run.status_memory == 'MEMORY_EXCEEDED') {
-        result = T.wordsExceeded;
+        result = T.runDetailsExceeded;
       } else {
         result = `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
       }
@@ -659,7 +665,7 @@ export default class Runs extends Vue {
     ) {
       let result = '';
       if (run.status_runtime == 'RUNTIME_EXCEEDED') {
-        result = T.wordsExceeded;
+        result = T.runDetailsExceeded;
       } else {
         result = `${(run.runtime / 1000).toFixed(2)} s`;
       }
@@ -671,25 +677,29 @@ export default class Runs extends Vue {
 
   execution(run: types.Run): string {
     if (run.status == 'ready') {
-      if (run.execution == 'EXECUTION_JUDGE_ERROR') return T.wordsJudgeError;
+      if (run.execution == 'EXECUTION_JUDGE_ERROR')
+        return T.runDetailsJudgeError;
       if (run.execution == 'EXECUTION_VALIDATOR_ERROR')
-        return T.wordsValidatorError;
-      if (run.execution == 'EXECUTION_COMPILATION_ERROR') return T.verdictCE;
+        return T.runDetailsValidatorError;
+      if (run.execution == 'EXECUTION_COMPILATION_ERROR')
+        return T.runDetailsCompilationError;
       if (run.execution == 'EXECUTION_RUNTIME_FUNCTION_ERROR')
-        return T.verdictRTE;
-      if (run.execution == 'EXECUTION_RUNTIME_ERROR') return T.verdictRE;
-      if (run.execution == 'EXECUTION_INTERRUPTED') return T.wordsInterrupted;
-      return T.wordsFinished;
+        return T.runDetailsRuntimeFunctionError;
+      if (run.execution == 'EXECUTION_RUNTIME_ERROR')
+        return T.runDetailsRuntimeError;
+      if (run.execution == 'EXECUTION_INTERRUPTED')
+        return T.runDetailsInterrupted;
+      return T.runDetailsFinished;
     }
     return '—';
   }
 
   output(run: types.Run): string {
     if (run.status == 'ready') {
-      if (run.output == 'OUTPUT_EXCEEDED') return T.wordsExceeded;
-      if (run.output == 'OUTPUT_INCORRECT') return T.wordsIncorrect;
-      if (run.output == 'OUTPUT_INTERRUPTED') return T.wordsInterrupted;
-      return T.wordsCorrect;
+      if (run.output == 'OUTPUT_EXCEEDED') return T.runDetailsExceeded;
+      if (run.output == 'OUTPUT_INCORRECT') return T.runDetailsIncorrect;
+      if (run.output == 'OUTPUT_INTERRUPTED') return T.runDetailsInterrupted;
+      return T.runDetailsCorrect;
     } else {
       return '—';
     }
@@ -721,16 +731,16 @@ export default class Runs extends Vue {
     return '';
   }
 
-  statusOutput(run: types.Run): number {
+  outputIconColorStatus(run: types.Run): number {
     if (
       run.status == 'ready' &&
       run.output != 'OUTPUT_EXCEEDED' &&
       run.output != 'OUTPUT_INTERRUPTED'
     ) {
-      if (run.output != 'OUTPUT_INCORRECT') return 1;
-      else return 2;
+      if (run.output != 'OUTPUT_INCORRECT') return OutputStatus.Correct;
+      else return OutputStatus.Incorrect;
     }
-    return 0;
+    return OutputStatus.None;
   }
 
   status(run: types.Run): string {

@@ -204,7 +204,9 @@ describe('Detailsv2.vue', () => {
       },
       localVue,
     });
-
+    expect(
+      wrapper.findAll('acronym[data-run-guid]').wrappers.map((e) => e.text()),
+    ).toEqual(['abcdefg', 'abcdefg']);
     expect(wrapper.find('table.runs tbody').text()).toContain(runs[0].guid);
     // TODO: Add new submission tests when the component is ready
   });
@@ -230,7 +232,7 @@ describe('Detailsv2.vue', () => {
     expect(runsTab.text()).toContain(T.wordsVerdict);
     expect(runsTab.text()).toContain(T.wordsStatus);
     expect(runsTab.text()).toContain(T.wordsLanguage);
-    expect(runsTab.text()).toContain(T.wordsExecution);
-    expect(runsTab.text()).toContain(T.wordsOutput);
+    expect(runsTab.text()).toContain(T.runDetailsExecution);
+    expect(runsTab.text()).toContain(T.runDetailsOutput);
   });
 });
