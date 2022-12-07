@@ -230,7 +230,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 'run_alias' => $runData['response']['guid'],
             ])
         );
-        $this->assertNull($response['feedback']);
+        $this->assertEmpty($response['feedback']);
 
         $feedback = 'Test feedback';
         \OmegaUp\Controllers\Submission::apiSetFeedback(
@@ -252,11 +252,12 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 'include_feedback' => true,
             ])
         );
-        $this->assertNotNull($response['feedback']);
-        $this->assertSame($feedback, $response['feedback']['feedback']);
+        $feedbackResponse = $response['feedback'][0];
+        $this->assertNotEmpty($feedbackResponse);
+        $this->assertSame($feedback, $feedbackResponse['feedback']);
         $this->assertSame(
             $admin['identity']->username,
-            $response['feedback']['author']
+            $feedbackResponse['author']
         );
     }
 

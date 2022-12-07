@@ -4089,7 +4089,7 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback?: types.SubmissionFeedback;
+    feedback: types.SubmissionFeedback[];
     guid: string;
     judged_by?: string;
     language: string;

@@ -1589,11 +1589,15 @@ export const Run = {
     messages._RunDetailsServerResponse,
     messages.RunDetailsResponse
   >('/api/run/details/', (x) => {
-    if (typeof x.feedback !== 'undefined' && x.feedback !== null)
-      x.feedback = ((x) => {
+    x.feedback = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
         x.date = ((x: number) => new Date(x * 1000))(x.date);
         return x;
-      })(x.feedback);
+      });
+    })(x.feedback);
     return x;
   }),
   disqualify: apiCall<
