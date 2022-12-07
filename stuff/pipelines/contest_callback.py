@@ -7,15 +7,20 @@ import json
 import logging
 
 from typing import List, Optional
-
-import verification_code
-
-import omegaup.api
-import pika
 import mysql.connector
 import mysql.connector.cursor
 from mysql.connector import errors
 from mysql.connector import errorcode
+import pika
+
+import verification_code
+
+
+@dataclasses.dataclass
+class Ranking:
+    '''Relevant information for ranking users.'''
+    username: str
+    place: int
 
 
 @dataclasses.dataclass
@@ -35,16 +40,14 @@ class ContestCertificate:
     alias: str
     scoreboard_url: str
     contest_id: int
+    ranking: List[Ranking]
 
 
 class ContestsCallback:
     '''Contests callback'''
-    def __init__(self,
-                 dbconn: mysql.connector.MySQLConnection,
-                 client: omegaup.api.Client):
+    def __init__(self, dbconn: mysql.connector.MySQLConnection):
         '''Contructor for contest callback'''
         self.dbconn = dbconn
-        self.client = client
 
     def __call__(self,
                  _channel: pika.adapters.blocking_connection.BlockingChannel,
@@ -55,13 +58,9 @@ class ContestsCallback:
         response = json.loads(body)
         data = ContestCertificate(**response)
 
-        scoreboard = self.client.contest.scoreboard(
-            contest_alias=data.alias,
-            token=data.scoreboard_url)
-        ranking = scoreboard.ranking
         certificates: List[Certificate] = []
 
-        for user in ranking:
+        for user in data.ranking:
             contest_place: Optional[int] = None
             if (data.certificate_cutoff and user.place
                     and user.place <= data.certificate_cutoff):
