@@ -319,12 +319,14 @@
             <td class="numeric">{{ execution(run) }}</td>
             <td class="numeric">
               <font-awesome-icon
-                v-if="outputIconColorStatus(run) === 1"
+                v-if="outputIconColorStatus(run) === OutputStatus.Correct"
                 :icon="['fas', 'check-circle']"
                 style="color: green"
               />
               <font-awesome-icon
-                v-else-if="outputIconColorStatus(run) === 2"
+                v-else-if="
+                  outputIconColorStatus(run) === OutputStatus.Incorrect
+                "
                 :icon="['fas', 'times-circle']"
                 style="color: red"
               />
@@ -521,6 +523,7 @@ export default class Runs extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
 
+  OutputStatus = OutputStatus;
   PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
@@ -608,17 +611,10 @@ export default class Runs extends Vue {
   }
 
   memory(run: types.Run): string {
-    if (run.status == 'ready' && run.status_memory != 'MEMORY_NOT_AVAILABLE') {
-      let result = '';
-      if (run.status_memory == 'MEMORY_EXCEEDED') {
-        result = T.runDetailsExceeded;
-      } else {
-        result = `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
-      }
-      return result;
-    } else {
+    if (run.status !== 'ready' || run.status_memory === 'MEMORY_NOT_AVAILABLE')
       return '—';
-    }
+    if (run.status_memory === 'MEMORY_EXCEEDED') return T.runDetailsExceeded;
+    return `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
   }
 
   penalty(run: types.Run): string {
@@ -660,49 +656,37 @@ export default class Runs extends Vue {
 
   runtime(run: types.Run): string {
     if (
-      run.status == 'ready' &&
-      run.status_runtime != 'RUNTIME_NOT_AVAILABLE'
-    ) {
-      let result = '';
-      if (run.status_runtime == 'RUNTIME_EXCEEDED') {
-        result = T.runDetailsExceeded;
-      } else {
-        result = `${(run.runtime / 1000).toFixed(2)} s`;
-      }
-      return result;
-    } else {
+      run.status !== 'ready' ||
+      run.status_runtime === 'RUNTIME_NOT_AVAILABLE'
+    )
       return '—';
-    }
+    if (run.status_runtime === 'RUNTIME_EXCEEDED') return T.runDetailsExceeded;
+    return `${(run.runtime / 1000).toFixed(2)} s`;
   }
 
   execution(run: types.Run): string {
-    if (run.status == 'ready') {
-      if (run.execution == 'EXECUTION_JUDGE_ERROR')
-        return T.runDetailsJudgeError;
-      if (run.execution == 'EXECUTION_VALIDATOR_ERROR')
-        return T.runDetailsValidatorError;
-      if (run.execution == 'EXECUTION_COMPILATION_ERROR')
-        return T.runDetailsCompilationError;
-      if (run.execution == 'EXECUTION_RUNTIME_FUNCTION_ERROR')
-        return T.runDetailsRuntimeFunctionError;
-      if (run.execution == 'EXECUTION_RUNTIME_ERROR')
-        return T.runDetailsRuntimeError;
-      if (run.execution == 'EXECUTION_INTERRUPTED')
-        return T.runDetailsInterrupted;
-      return T.runDetailsFinished;
-    }
-    return '—';
+    if (run.status !== 'ready') return '—';
+    if (run.execution === 'EXECUTION_JUDGE_ERROR')
+      return T.runDetailsJudgeError;
+    if (run.execution === 'EXECUTION_VALIDATOR_ERROR')
+      return T.runDetailsValidatorError;
+    if (run.execution === 'EXECUTION_COMPILATION_ERROR')
+      return T.runDetailsCompilationError;
+    if (run.execution === 'EXECUTION_RUNTIME_FUNCTION_ERROR')
+      return T.runDetailsRuntimeFunctionError;
+    if (run.execution === 'EXECUTION_RUNTIME_ERROR')
+      return T.runDetailsRuntimeError;
+    if (run.execution === 'EXECUTION_INTERRUPTED')
+      return T.runDetailsInterrupted;
+    return T.runDetailsFinished;
   }
 
   output(run: types.Run): string {
-    if (run.status == 'ready') {
-      if (run.output == 'OUTPUT_EXCEEDED') return T.runDetailsExceeded;
-      if (run.output == 'OUTPUT_INCORRECT') return T.runDetailsIncorrect;
-      if (run.output == 'OUTPUT_INTERRUPTED') return T.runDetailsInterrupted;
-      return T.runDetailsCorrect;
-    } else {
-      return '—';
-    }
+    if (run.status !== 'ready') return '—';
+    if (run.output === 'OUTPUT_EXCEEDED') return T.runDetailsExceeded;
+    if (run.output === 'OUTPUT_INCORRECT') return T.runDetailsIncorrect;
+    if (run.output === 'OUTPUT_INTERRUPTED') return T.runDetailsInterrupted;
+    return T.runDetailsCorrect;
   }
 
   showVerdictHelp(ev: Event): void {
@@ -733,11 +717,11 @@ export default class Runs extends Vue {
 
   outputIconColorStatus(run: types.Run): number {
     if (
-      run.status == 'ready' &&
-      run.output != 'OUTPUT_EXCEEDED' &&
-      run.output != 'OUTPUT_INTERRUPTED'
+      run.status === 'ready' &&
+      run.output !== 'OUTPUT_EXCEEDED' &&
+      run.output !== 'OUTPUT_INTERRUPTED'
     ) {
-      if (run.output != 'OUTPUT_INCORRECT') return OutputStatus.Correct;
+      if (run.output !== 'OUTPUT_INCORRECT') return OutputStatus.Correct;
       else return OutputStatus.Incorrect;
     }
     return OutputStatus.None;
