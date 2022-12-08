@@ -77,10 +77,12 @@ export default class SubmissionFeedback extends Vue {
   showFeedbackForm = false;
   feedback = this.generalFeedback?.feedback ?? null;
 
-  get generalFeedback(): null | types.SubmissionFeedback {
-    if (!this.feedbackOptions.length) return null;
+  get generalFeedback(): void | types.SubmissionFeedback {
+    if (!this.feedbackOptions.length) return undefined;
     const [feedback] = this.feedbackOptions.filter(
-      (feedback) => feedback.range_bytes_start === 0,
+      (feedback) =>
+        feedback.range_bytes_start == null ||
+        feedback.range_bytes_start == undefined,
     );
     return feedback;
   }

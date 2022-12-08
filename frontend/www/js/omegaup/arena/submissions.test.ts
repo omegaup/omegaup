@@ -28,6 +28,7 @@ describe('submissions', () => {
       admin: false,
       alias: 'test',
       cases: { statement_001: { in: '6\n2 3 2 3 2 4', out: '10' } },
+      feedback: [],
       guid: '78099022574726af861839e1b4210188',
       judged_by: '',
       language: 'py2',

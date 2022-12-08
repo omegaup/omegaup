@@ -56,7 +56,7 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
      */
     public static function getFeedbackBySubmission(
         string $guid,
-        int $rangeBytesStart
+        ?int $rangeBytesStart
     ): ?\OmegaUp\DAO\VO\SubmissionFeedback {
         $fields = join(
             ', ',
@@ -67,6 +67,12 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
                 )
             )
         );
+        $clause = 'AND sf.range_bytes_start IS NULL';
+        $params = [$guid];
+        if (!is_null($rangeBytesStart)) {
+            $clause = 'AND sf.range_bytes_start = ?';
+            $params[] = $rangeBytesStart;
+        }
         $sql = "SELECT
                     {$fields}
                 FROM
@@ -75,15 +81,12 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
                     Submissions s ON s.submission_id = sf.submission_id
                 WHERE
                     s.guid = ?
-                    AND sf.range_bytes_start = ?
+                    {$clause}
                 FOR UPDATE;
         ";
 
         /** @var array{date: \OmegaUp\Timestamp, feedback: string, identity_id: int, range_bytes_end: int, range_bytes_start: int, submission_feedback_id: int, submission_id: int}|null */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
-            $sql,
-            [$guid, $rangeBytesStart]
-        );
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (is_null($rs)) {
             return null;
         }

@@ -221,7 +221,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
 
             $submissionFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
                 $submission->guid,
-                $rangeBytesStart ?? 0
+                $rangeBytesStart
             );
 
             if (is_null($submissionFeedback)) {
