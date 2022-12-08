@@ -47,6 +47,10 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         // obtain the contest
         $contest = \OmegaUp\DAO\Contests::getByPK($contestID);
 
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            $contest->problemset_id
+        );
+
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
@@ -81,12 +85,25 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         //connection to rabbitmq
         $channel = \OmegaUp\RabbitMQConnection::getInstance()->channel();
 
+        $scoreboard = \OmegaUp\Controllers\Contest::getScoreboard(
+            $contest,
+            $problemset,
+            $r->identity,
+            $contestExtraInformation['scoreboard_url']
+        );
+
+        $ranking = array_map(
+            fn ($rank) => ['username' => $rank['username'] , 'place' => $rank['place']],
+            $scoreboard['ranking']
+        );
+
         // Prepare the meessage
         $messageArray = [
             'certificate_cutoff' => $contestExtraInformation['certificate_cutoff'],
             'alias' => $contestExtraInformation['alias'],
             'scoreboard_url' => $contestExtraInformation['scoreboard_url'],
-            'contest_id' => $contestExtraInformation['contest_id']
+            'contest_id' => $contestExtraInformation['contest_id'],
+            'ranking' => $ranking,
         ];
         $messageJSON = json_encode($messageArray);
         $message = new \PhpAmqpLib\Message\AMQPMessage($messageJSON);
