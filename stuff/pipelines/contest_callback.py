@@ -20,7 +20,7 @@ import verification_code
 class Ranking:
     '''Relevant information for ranking users.'''
     username: str
-    place: int
+    place: Optional[int]
 
 
 @dataclasses.dataclass
