@@ -92,47 +92,4 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
         }
         return new \OmegaUp\DAO\VO\SubmissionFeedback($rs);
     }
-
-    /**
-     * Gets the SubmissionFeedback objects of a certain submission
-     *
-     * @return list<\OmegaUp\DAO\VO\SubmissionFeedback>
-     */
-    public static function getAllFeedbackBySubmission(
-        \OmegaUp\DAO\VO\Submissions $submission
-    ) {
-        $fields = join(
-            ', ',
-            array_map(
-                fn (string $field): string => "sf.{$field}",
-                array_keys(
-                    \OmegaUp\DAO\VO\SubmissionFeedback::FIELD_NAMES
-                )
-            )
-        );
-        $sql = "SELECT
-                    {$fields}
-                FROM
-                    Submission_Feedback sf
-                INNER JOIN
-                    Submissions s ON s.submission_id = sf.submission_id
-                WHERE
-                    s.submission_id = ?
-                FOR UPDATE;
-        ";
-
-        /** @var list<array{date: \OmegaUp\Timestamp, feedback: string, identity_id: int, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int, submission_id: int}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [
-               $submission->submission_id
-            ]
-        );
-
-        $result = [];
-        foreach ($rs as $record) {
-            $result[] = new \OmegaUp\DAO\VO\SubmissionFeedback($record);
-        }
-        return $result;
-    }
 }
