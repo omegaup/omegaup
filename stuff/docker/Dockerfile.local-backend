@@ -25,10 +25,10 @@ RUN useradd --create-home --uid 1000 --shell /bin/bash --user-group ubuntu
 RUN git clone --recurse-submodules https://github.com/libgit2/git2go -b v33.0.4 --depth=1 /tmp/git2go && \
     (cd /tmp/git2go && \
      git submodule update --init && \
-     ./script/build-libgit2.sh --system --static) && \
+     ./script/build-libgit2.sh --system --dynamic) && \
     rm -rf /tmp/git2go
 
-RUN mkdir -p /home/ubuntu/go/omegaup/bin
+RUN mkdir -p /home/ubuntu/go/omegaup/bin && chown -R ubuntu:ubuntu /home/ubuntu/go
 WORKDIR /home/ubuntu/go/omegaup
 
 USER ubuntu
@@ -36,35 +36,42 @@ USER ubuntu
 
 FROM base-builder AS quark-builder
 
-COPY go/go-base go-base/
-COPY go/quark quark/
+COPY --chown=ubuntu go/go.mod .
+COPY --chown=ubuntu go/go-base go-base/
+COPY --chown=ubuntu go/quark quark/
 
 RUN export QUARK_VERSION=$(cd /home/ubuntu/go/omegaup/quark && git describe --tags) && \
+    go get \
+      github.com/omegaup/quark/... \
+      && \
     go build -o bin/omegaup-grader \
       -ldflags "-X main.ProgramVersion=${QUARK_VERSION}" \
-      -tags=static \
       github.com/omegaup/quark/cmd/omegaup-grader && \
     go build -o bin/omegaup-runner \
       -ldflags "-X main.ProgramVersion=${QUARK_VERSION}" \
-      -tags=static \
       github.com/omegaup/quark/cmd/omegaup-runner && \
     go build -o bin/omegaup-broadcaster \
       -ldflags "-X main.ProgramVersion=${QUARK_VERSION}" \
-      -tags=static \
       github.com/omegaup/quark/cmd/omegaup-broadcaster
 
 
 FROM base-builder AS gitserver-builder
 
-COPY go/go-base go-base/
-COPY go/quark quark/
-COPY go/githttp githttp/
-COPY go/gitserver gitserver/
+COPY --chown=ubuntu go/go.mod .
+COPY --chown=ubuntu go/go-base go-base/
+COPY --chown=ubuntu go/quark quark/
+COPY --chown=ubuntu go/githttp githttp/
+COPY --chown=ubuntu go/gitserver gitserver/
 
 RUN export GITSERVER_VERSION=$(cd /home/ubuntu/go/omegaup/gitserver && git describe --tags) && \
+    go get \
+      github.com/omegaup/go-base/... \
+      github.com/omegaup/githttp/... \
+      github.com/omegaup/quark/... \
+      github.com/omegaup/gitserver/... \
+      && \
     go build -o bin/omegaup-gitserver \
       -ldflags "-X main.ProgramVersion=${GITSERVER_VERSION}" \
-      -tags=static \
       github.com/omegaup/gitserver/cmd/omegaup-gitserver
 
 
@@ -97,6 +104,7 @@ COPY ./etc/omegaup/grader/* /etc/omegaup/grader/
 COPY ./etc/omegaup/broadcaster/* /etc/omegaup/broadcaster/
 COPY ./etc/omegaup/gitserver/* /etc/omegaup/gitserver/
 
+COPY --from=quark-builder /usr/lib/libgit2.so* /usr/lib/
 COPY --from=quark-builder /home/ubuntu/go/omegaup/bin/omegaup-runner /usr/bin/omegaup-runner
 COPY --from=quark-builder /home/ubuntu/go/omegaup/bin/omegaup-grader /usr/bin/omegaup-grader
 COPY --from=quark-builder /home/ubuntu/go/omegaup/bin/omegaup-broadcaster /usr/bin/omegaup-broadcaster
