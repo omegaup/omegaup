@@ -15,7 +15,7 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
     /**
      * Gets the feedback of a certain submission
      *
-     * @return list<array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string, range_bytes_end: int, range_bytes_start: int}>
+     * @return list<array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string, range_bytes_end: int|null, range_bytes_start: int|null}>
      */
     public static function getSubmissionFeedback(
         \OmegaUp\DAO\VO\Submissions $submission
