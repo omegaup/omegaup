@@ -75,7 +75,7 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
                 FOR UPDATE;
         ";
 
-        /** @var array{date: \OmegaUp\Timestamp, feedback: string, identity_id: int, range_bytes_end: int, range_bytes_start: int, submission_feedback_id: int, submission_id: int}|null */
+        /** @var array{date: \OmegaUp\Timestamp, feedback: string, identity_id: int, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int, submission_id: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [
