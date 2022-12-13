@@ -61,7 +61,7 @@ def get_contests(
         for position in scoreboard.ranking:
             ranking.append(Ranking(
                 username=position.username,
-                place=position.place))
+                place=position.place)._asdict())
         contest = ContestCertificate(
             certificate_cutoff=row['certificate_cutoff'],
             alias=row['alias'],

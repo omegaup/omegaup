@@ -6,7 +6,7 @@ import dataclasses
 import json
 import logging
 
-from typing import List, Optional
+from typing import List, Optional, NamedTuple
 import mysql.connector
 import mysql.connector.cursor
 from mysql.connector import errors
@@ -16,8 +16,7 @@ import pika
 import verification_code
 
 
-@dataclasses.dataclass
-class Ranking:
+class Ranking(NamedTuple):
     '''Relevant information for ranking users.'''
     username: str
     place: Optional[int]
@@ -60,17 +59,18 @@ class ContestsCallback:
 
         certificates: List[Certificate] = []
 
-        for user in data.ranking:
+        for user_ranking in data.ranking:
+            user = Ranking(**user_ranking)
             contest_place: Optional[int] = None
-            if (data.certificate_cutoff and user.place
-                    and user.place <= data.certificate_cutoff):
+            if (data.certificate_cutoff and user_ranking.place
+                    and user_ranking.place <= data.certificate_cutoff):
                 contest_place = user.place
             certificates.append(Certificate(
                 certificate_type='contest',
                 contest_id=data.contest_id,
                 verification_code=generate_contest_code(),
                 contest_place=contest_place,
-                username=str(user.username)
+                username=user.username
             ))
         with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
             while True:

@@ -18,6 +18,8 @@ import producer_contest
 import rabbitmq_connection
 import rabbitmq_client
 import test_credentials
+import test_constants
+import omegaup.api
 
 sys.path.insert(
     0,
@@ -52,6 +54,9 @@ class MessageSavingCallback:
                     alias='contest1',
                     scoreboard_url='abcdef',
                     contest_id=1,
+                    ranking=[
+                        database.contest.Ranking(username='user_1', place=1),
+                    ],
                 ),
             ],
             database.contest.ContestCertificate(
@@ -59,6 +64,9 @@ class MessageSavingCallback:
                 alias='contest1',
                 scoreboard_url='abcdef',
                 contest_id=1,
+                ranking=[
+                    database.contest.Ranking(username='user_1', place=1),
+                ],
             )._asdict(),
         ),
         (
@@ -68,6 +76,10 @@ class MessageSavingCallback:
                     alias='contest2',
                     scoreboard_url='123456',
                     contest_id=2,
+                    ranking=[
+                        database.contest.Ranking(username='user_1', place=1),
+                    ],
+
                 ),
             ],
             database.contest.ContestCertificate(
@@ -75,6 +87,9 @@ class MessageSavingCallback:
                 alias='contest2',
                 scoreboard_url='123456',
                 contest_id=2,
+                ranking=[
+                    database.contest.Ranking(username='user_1', place=1),
+                ],
             )._asdict(),
         ),
     ],
@@ -107,8 +122,13 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
             exchange='certificates',
             routing_key='ContestQueue',
             channel=channel)
+        client = omegaup.api.Client(
+            api_token=test_constants.API_TOKEN,
+            url=test_constants.OMEGAUP_API_ENDPOINT,
+        )
         producer_contest.send_contest_message_to_client(cur=cur,
-                                                        channel=channel)
+                                                        channel=channel,
+                                                        client=client)
         callback = MessageSavingCallback()
         rabbitmq_client.receive_messages(queue='contest',
                                          exchange='certificates',

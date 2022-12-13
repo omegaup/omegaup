@@ -25,7 +25,6 @@ sys.path.insert(
     os.path.join(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
 import lib.db   # pylint: disable=wrong-import-position
-from stuff.pipelines.contest_callback import Ranking
 
 
 def test_insert_contest_certificate() -> None:
@@ -93,7 +92,7 @@ def test_insert_contest_certificate() -> None:
         result = cur.fetchone()
     contest_id = result['contest_id']
     scoreboard_url = result['scoreboard_url']
-    ranking = List[Ranking]
+    ranking = []
     with rabbitmq_connection.connect(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
@@ -106,7 +105,7 @@ def test_insert_contest_certificate() -> None:
             certificate_cutoff=3,
             alias=alias,
             scoreboard_url=scoreboard_url,
-            ranking=ranking
+            ranking=ranking,
         )
         callback(
             _channel=channel,
