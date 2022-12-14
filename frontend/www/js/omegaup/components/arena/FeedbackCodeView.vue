@@ -67,27 +67,18 @@ export default class FeedbackCodeView extends Vue {
     const editor = CodeMirror.fromTextArea(this.cmEditor, this.editorOptions);
 
     for (const [, feedback] of this.feedbackMap) {
-      Vue.nextTick(() => {
-        // Now that the DOM has changed, we need to tell CodeMirror to
-        // recalculate the height of the line widget so that it knows which
-        // y coordinate corresponds to which line.
-        lineWidget.changed();
-      });
-
       const feedbackForm = new FeedbackClass({
         propsData: { feedback },
       });
       feedbackForm.$mount();
 
-      const lineWidget = editor.addLineWidget(
-        0,
+      editor.addLineWidget(
+        feedback.lineNumber,
         feedbackForm.$el as HTMLElement,
         {
           className: 'px-2',
         },
       );
-
-      this.mapChangeTracker++;
     }
 
     editor.on(
@@ -135,13 +126,6 @@ export default class FeedbackCodeView extends Vue {
           this.deleteFeedback({ lineNumber: feedback.lineNumber });
           editor.removeLineWidget(lineWidget);
           feedbackForm.$destroy();
-        });
-
-        Vue.nextTick(() => {
-          // Now that the DOM has changed, we need to tell CodeMirror to
-          // recalculate the height of the line widget so that it knows which y
-          // coordinate corresponds to which line.
-          lineWidget.changed();
         });
       },
     );

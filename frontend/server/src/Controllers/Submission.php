@@ -146,7 +146,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $submission = \OmegaUp\DAO\Submissions::getByGuid(
             $r->ensureString('guid')
         );
-        if (is_null($submission)) {
+        if (is_null($submission) || is_null($submission->guid)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'submissionNotFound'
             );
