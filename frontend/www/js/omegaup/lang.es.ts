@@ -1705,7 +1705,6 @@ const translations: { [key: string]: string; } = {
   wordsSend: "Enviar",
   wordsShowCasesDiff: "Mostrar diferencias en los casos",
   wordsShowSiteAdmins: "Mostrar site-admins",
-  wordsSolution: "Soluci\u00f3n",
   wordsSource: "Fuente",
   wordsSpanish: "Espa\u00f1ol",
   wordsStart: "Iniciar",
