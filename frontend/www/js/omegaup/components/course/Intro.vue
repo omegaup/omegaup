@@ -89,7 +89,9 @@
           v-else
           class="btn btn-primary"
           role="button"
-          :href="`/login/?redirect=${encodeURIComponent(window.location.href)}`"
+          :href="`/login/?redirect=${encodeURIComponent(
+            window.location.pathname,
+          )}`"
           >{{ T.loginLogIn }}</a
         >
       </div>
