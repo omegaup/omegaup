@@ -7,6 +7,7 @@ import {
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
 import {
+  createChart,
   onRankingChanged,
   onRankingEvents,
   onVirtualRankingChanged,
@@ -196,12 +197,30 @@ export class EventsSocket {
       problemset_id: this.problemsetId,
       token: this.scoreboardToken,
     })
-      .then((response) =>
-        onRankingEvents({
+      .then((response) => {
+        const { series, navigatorData } = onRankingEvents({
           events: response.events,
+          startTimestamp: this.startTime.getTime(),
+          finishTimestamp: Date.now(),
           currentRanking,
-        }),
-      )
+        });
+
+        let maxPoints = 0;
+        for (const problem of this.navbarProblems) {
+          maxPoints += problem.maxScore;
+        }
+
+        if (series.length) {
+          const rankingChartOptions = createChart({
+            series,
+            navigatorData,
+            startTimestamp: this.startTime.getTime(),
+            finishTimestamp: Date.now(),
+            maxPoints,
+          });
+          rankingStore.commit('updateRankingChartOptions', rankingChartOptions);
+        }
+      })
       .catch(ui.ignoreError);
   }
 
@@ -295,12 +314,33 @@ export class EventsSocket {
           problemset_id: this.problemsetId,
           token: this.scoreboardToken,
         })
-          .then((response) =>
-            onRankingEvents({
+          .then((response) => {
+            const { series, navigatorData } = onRankingEvents({
               events: response.events,
+              startTimestamp: this.startTime.getTime(),
+              finishTimestamp: Date.now(),
               currentRanking,
-            }),
-          )
+            });
+
+            let maxPoints = 0;
+            for (const problem of this.navbarProblems) {
+              maxPoints += problem.maxScore;
+            }
+
+            if (series.length) {
+              const rankingChartOptions = createChart({
+                series,
+                navigatorData,
+                startTimestamp: this.startTime.getTime(),
+                finishTimestamp: Date.now(),
+                maxPoints,
+              });
+              rankingStore.commit(
+                'updateRankingChartOptions',
+                rankingChartOptions,
+              );
+            }
+          })
           .catch(ui.ignoreError);
       })
       .catch(ui.ignoreError);
@@ -343,12 +383,31 @@ export class EventsSocket {
               problemset_id: this.problemsetId,
               token: this.scoreboardToken,
             })
-              .then((response) =>
-                onRankingEvents({
+              .then((response) => {
+                const { series, navigatorData } = onRankingEvents({
                   events: response.events,
                   currentRanking,
-                }),
-              )
+                });
+
+                let maxPoints = 0;
+                for (const problem of this.navbarProblems) {
+                  maxPoints += problem.maxScore;
+                }
+
+                if (series.length) {
+                  const rankingChartOptions = createChart({
+                    series,
+                    navigatorData,
+                    startTimestamp: this.startTime.getTime(),
+                    finishTimestamp: Date.now(),
+                    maxPoints,
+                  });
+                  rankingStore.commit(
+                    'updateRankingChartOptions',
+                    rankingChartOptions,
+                  );
+                }
+              })
               .catch(ui.ignoreError);
           })
           .catch(ui.ignoreError);
