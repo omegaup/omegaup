@@ -27,6 +27,7 @@ interface BaseNavigation {
 type NavigationForContest = BaseNavigation & {
   type: NavigationType.ForContest;
   contestAlias: string;
+  contestMode: string;
 };
 
 type NavigationForSingleProblemOrCourse = BaseNavigation & {
@@ -41,9 +42,10 @@ export type NavigationRequest =
 export async function navigateToProblem(
   request: NavigationRequest,
 ): Promise<void> {
-  let contestAlias, problemsetId;
+  let contestAlias, problemsetId, contestMode: string;
   if (request.type === NavigationType.ForContest) {
     contestAlias = request.contestAlias;
+    contestMode = request.contestMode;
   }
   if (request.type === NavigationType.ForSingleProblemOrCourse) {
     problemsetId = request.problemsetId;
@@ -80,11 +82,17 @@ export async function navigateToProblem(
       problemInfo.title = currentProblem?.text ?? '';
       target.problemInfo = problemInfo;
       problem.alias = problemInfo.alias;
-      problem.bestScore = getMaxScore(
-        myRunsStore.state.runs.filter((run) => run.alias === problemInfo.alias),
-        problemInfo.alias,
-        0,
-      );
+      if (contestMode === 'max_per_group') {
+        problem.bestScore = problemInfo.scorePerGroup ?? 0.0;
+      } else {
+        problem.bestScore = getMaxScore(
+          myRunsStore.state.runs.filter(
+            (run) => run.alias === problemInfo.alias,
+          ),
+          problemInfo.alias,
+          0,
+        );
+      }
       problemsStore.commit('addProblem', problemInfo);
       target.problem = problem;
       if (target.popupDisplayed === PopupDisplayed.RunSubmit) {

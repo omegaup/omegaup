@@ -126,6 +126,7 @@ describe('navigation.ts', () => {
         problems: navbarProblems,
         problem: navbarProblems[0],
         contestAlias: 'contest_alias',
+        contestMode: 'partial',
       };
       await navigateToProblem(params);
       expect(setLocationHash).toHaveBeenCalledWith(
@@ -141,6 +142,7 @@ describe('navigation.ts', () => {
         problems: navbarProblems,
         problem: navbarProblems[0],
         contestAlias: 'contest_alias',
+        contestMode: 'partial',
       };
       const localVue = createLocalVue();
       localVue.use(Vuex);

@@ -3697,6 +3697,7 @@ export namespace types {
     quality_seal: boolean;
     runs?: types.RunWithDetails[];
     score: number;
+    scorePerGroup?: number;
     settings: types.ProblemSettingsDistrib;
     show_diff: string;
     solvers?: types.BestSolvers[];

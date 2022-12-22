@@ -919,7 +919,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}>
+     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}>, maxScore: float|null}
      */
     final public static function getForProblemDetails(
         int $problemId,
@@ -1033,13 +1033,19 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 ORDER BY
                     field(status_memory, "MEMORY_NOT_AVAILABLE", "MEMORY_EXCEEDED", "MEMORY_AVAILABLE")
                 LIMIT 1
-                ) AS status_memory
+                ) AS status_memory,
+                rg.group_name,
+                rg.score AS group_score
             FROM
                 Submissions s
             INNER JOIN
                 Runs r
             ON
                 r.run_id = s.current_run_id
+            LEFT JOIN
+                Runs_Groups rg
+            ON
+                r.run_id = rg.run_id
             INNER JOIN
                 Identities i
             ON
@@ -1064,8 +1070,53 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ' AND s.problemset_id = ?';
             $params[] = $problemsetId;
         }
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, group_name: null|string, group_score: float|null, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
+
+        /** @var array<string, array<string, float>> $groups */
+        $groups = [];
+        $groupNames = [];
+        $response = [];
+        foreach ($rs as $row) {
+            if (is_null($row['group_name'])) {
+                continue;
+            }
+            if (!isset($groups[$row['guid']])) {
+                $groups[$row['guid']] = [];
+                $result = $row;
+                unset($result['group_name']);
+                unset($result['group_score']);
+                $response[] = $result;
+            }
+
+            $groups[$row['guid']][$row['group_name']] = $row['group_score'];
+
+            if (!isset($groupNames[$row['group_name']])) {
+                $groupNames[$row['group_name']] = null;
+            }
+        }
+
+        $scorePerGroup = null;
+        if (!empty($groupNames)) {
+            $maxScorePerGroup = [];
+            foreach (array_keys($groupNames) as $groupName) {
+                $maxScorePerGroup[$groupName] = max(
+                    array_column(
+                        $groups,
+                        $groupName
+                    )
+                );
+            }
+            $scorePerGroup = array_sum($maxScorePerGroup);
+        }
+
+        return [
+            'runs' => $response,
+            'maxScore' => $scorePerGroup,
+        ];
     }
 
     /**

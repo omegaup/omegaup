@@ -31,7 +31,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp}
  * @psalm-type RunDetailsV2=array{admin: bool, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, groups?: list<RunDetailsGroup>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, judged_by?: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: null|SubmissionFeedback}
  * @psalm-type RunWithDetails=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string, details: null|RunDetailsV2, execution: null|string, output: null|string, status_memory: null|string, status_runtime: null|string}
- * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<RunWithDetails>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<RunWithDetails>, score: float, scorePerGroup: float|null, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
  * @psalm-type ProblemAdmin=array{role: string, username: string}
@@ -2793,7 +2793,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         if (!is_null($loggedIdentity)) {
             // Get all the available runs done by the current_user
-            $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
+            [
+                'runs' => $runsArray,
+                'maxScore' => $scorePerGroup,
+            ] = \OmegaUp\DAO\Runs::getForProblemDetails(
                 intval($problem->problem_id),
                 $isPracticeMode ? null : $problemsetId,
                 intval($loggedIdentity->identity_id)
@@ -2808,6 +2811,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $results[] = $run;
             }
             $response['runs'] = $results;
+            $response['scorePerGroup'] = $scorePerGroup;
 
             \OmegaUp\DAO\ProblemViewed::MarkProblemViewed(
                 intval($loggedIdentity->identity_id),
@@ -3503,7 +3507,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
         // Get all the available runs
-        $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
+        [
+            'runs' => $runsArray,
+        ] = \OmegaUp\DAO\Runs::getForProblemDetails(
             intval($problem->problem_id),
             null,
             intval($r->identity->identity_id)
@@ -4722,7 +4728,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        $runsPayload = \OmegaUp\DAO\Runs::getForProblemDetails(
+        [
+            'runs' => $runsPayload,
+        ] = \OmegaUp\DAO\Runs::getForProblemDetails(
             intval($problem->problem_id),
             problemsetId: null,
             identityId: intval($r->identity->identity_id)
