@@ -9,6 +9,12 @@ import problemsStore from './problemStore';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { trackRun } from './submissions';
 
+export enum ScoreMode {
+  AllOrNothing = 'all_or_nothing',
+  Partial = 'partial',
+  MaxPerGroup = 'max_per_group',
+}
+
 export enum NavigationType {
   ForContest,
   ForSingleProblemOrCourse,
@@ -27,7 +33,7 @@ interface BaseNavigation {
 type NavigationForContest = BaseNavigation & {
   type: NavigationType.ForContest;
   contestAlias: string;
-  contestMode: string;
+  contestMode: ScoreMode;
 };
 
 type NavigationForSingleProblemOrCourse = BaseNavigation & {
@@ -39,10 +45,16 @@ export type NavigationRequest =
   | NavigationForContest
   | NavigationForSingleProblemOrCourse;
 
+export function getScoreModeEnum(scoreMode: string): ScoreMode {
+  if (scoreMode === 'partial') return ScoreMode.Partial;
+  if (scoreMode === 'all_or_nothing') return ScoreMode.AllOrNothing;
+  return ScoreMode.MaxPerGroup;
+}
+
 export async function navigateToProblem(
   request: NavigationRequest,
 ): Promise<void> {
-  let contestAlias, problemsetId, contestMode: string;
+  let contestAlias, problemsetId, contestMode: ScoreMode;
   if (request.type === NavigationType.ForContest) {
     contestAlias = request.contestAlias;
     contestMode = request.contestMode;
@@ -82,7 +94,7 @@ export async function navigateToProblem(
       problemInfo.title = currentProblem?.text ?? '';
       target.problemInfo = problemInfo;
       problem.alias = problemInfo.alias;
-      if (contestMode === 'max_per_group') {
+      if (contestMode === ScoreMode.MaxPerGroup) {
         problem.bestScore = problemInfo.scorePerGroup ?? 0.0;
       } else {
         problem.bestScore = getMaxScore(

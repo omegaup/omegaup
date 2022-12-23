@@ -9,6 +9,7 @@ import {
   NavigationRequest,
   NavigationType,
   navigateToProblem,
+  ScoreMode,
 } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { storeConfig } from './problemStore';
@@ -126,7 +127,7 @@ describe('navigation.ts', () => {
         problems: navbarProblems,
         problem: navbarProblems[0],
         contestAlias: 'contest_alias',
-        contestMode: 'partial',
+        contestMode: ScoreMode.Partial,
       };
       await navigateToProblem(params);
       expect(setLocationHash).toHaveBeenCalledWith(
@@ -142,7 +143,7 @@ describe('navigation.ts', () => {
         problems: navbarProblems,
         problem: navbarProblems[0],
         contestAlias: 'contest_alias',
-        contestMode: 'partial',
+        contestMode: ScoreMode.Partial,
       };
       const localVue = createLocalVue();
       localVue.use(Vuex);

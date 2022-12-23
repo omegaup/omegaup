@@ -14,7 +14,11 @@ import {
   refreshContestClarifications,
   trackClarifications,
 } from './clarifications';
-import { navigateToProblem, NavigationType } from './navigation';
+import {
+  getScoreModeEnum,
+  navigateToProblem,
+  NavigationType,
+} from './navigation';
 import clarificationStore from './clarificationsStore';
 import {
   onRefreshRuns,
@@ -174,7 +178,7 @@ OmegaUp.on('ready', async () => {
               target: contestContestant,
               problems: this.problems,
               contestAlias: payload.contest.alias,
-              contestMode: payload.contest.score_mode,
+              contestMode: getScoreModeEnum(payload.contest.score_mode),
             });
           },
           'update-search-result-users-contest': ({
