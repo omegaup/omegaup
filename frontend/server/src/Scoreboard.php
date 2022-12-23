@@ -181,14 +181,14 @@ class Scoreboard {
 
         // If cache is turned on and we're not looking for admin-only runs
         if ($canUseContestantCache) {
-            /** @var list<ScoreboardEvent> */
+            /** @var list<ScoreboardEvent>|null */
             $result = $contestantEventsCache->get();
         } elseif ($canUseAdminCache) {
-            /** @var list<ScoreboardEvent> */
+            /** @var list<ScoreboardEvent>|null */
             $result = $adminEventsCache->get();
         }
 
-        if (!empty($result)) {
+        if (!is_null($result) && !$this->params->admin) {
             \OmegaUp\Scoreboard::setIsLastRunFromCacheForTesting(true);
             return $result;
         }
