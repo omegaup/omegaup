@@ -35,10 +35,14 @@
     >
     <label class="float-right"
       >{{ T.scoreboardShowParticipantsNames }}:
-      <select v-model="showContestantsNames" class="form-control">
-        <option value="NameDisplayOptions.Name">{{ T.wordsName }}</option>
-        <option value="NameDisplayOptions.Username">{{ T.wordsUser }}</option>
-        <option value="NameDisplayOptions.NameAndUsername">{{ T.wordsNameAndUsername }}</option>
+      <select v-model="nameDisplayOptions" class="form-control">
+        <option :value="ui.NameDisplayOptions.Name">{{ T.wordsName }}</option>
+        <option :value="ui.NameDisplayOptions.Username">
+          {{ T.wordsUser }}
+        </option>
+        <option :value="ui.NameDisplayOptions.NameAndUsername">
+          {{ T.wordsNameAndUsername }}
+        </option>
       </select>
     </label>
     <table data-table-scoreboard>
@@ -65,7 +69,7 @@
             <td class="legend" :class="legendClass(userIndex)"></td>
             <td class="position">{{ user.place || '—' }}</td>
             <td class="user">
-              {{ ui.rankingUsername(user, !showContestantsNames) }}
+              {{ ui.rankingUsername(user, nameDisplayOptions) }}
               <img
                 v-if="user.country"
                 alt=""
@@ -124,13 +128,6 @@ import * as time from '../../time';
 import omegaup_Countdown from '../Countdown.vue';
 import { SocketStatus } from '../../arena/events_socket';
 
-enum NameDisplayOptions {
-  None,
-  Name,
-  Username,
-  NameAndUsername,
-}
-
 @Component({
   components: {
     highcharts: Chart,
@@ -156,7 +153,8 @@ export default class ArenaScoreboard extends Vue {
   INF = '∞';
   onlyShowExplicitlyInvited =
     !this.showAllContestants && this.showInvitedUsersFilter;
-  showContestantsNames: NameDisplayOptions = NameDisplayOptions.NameAndUsername;
+  nameDisplayOptions: ui.NameDisplayOptions =
+    ui.NameDisplayOptions.NameAndUsername;
 
   get lastUpdatedString(): null | string {
     if (!this.lastUpdated) return null;

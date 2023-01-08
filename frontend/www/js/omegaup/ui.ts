@@ -282,13 +282,31 @@ export function reportPageView(page: string): void {
   window.ga('send', 'pageview', page);
 }
 
+export enum NameDisplayOptions {
+  None = 0,
+  Name = 1,
+  Username = 2,
+  NameAndUsername = Name | Username,
+}
+
 export function rankingUsername(
   rank: omegaup.User & { virtual?: boolean },
-  hideName?: boolean,
+  displayOptions: NameDisplayOptions = NameDisplayOptions.NameAndUsername,
 ): string {
-  let username = rank.username;
-  if (!hideName && !!rank.name && rank.name != rank.username)
+  let username = '';
+  if (
+    (displayOptions & NameDisplayOptions.Username) ==
+    NameDisplayOptions.Username
+  ) {
+    username = rank.username;
+  }
+  if (
+    (displayOptions & NameDisplayOptions.Name) == NameDisplayOptions.Name &&
+    !!rank.name &&
+    rank.name != rank.username
+  ) {
     username += ` (${escapeString(rank.name)})`;
+  }
   if (rank.virtual)
     username = formatString(T.virtualSuffix, { username: username });
   return username;
