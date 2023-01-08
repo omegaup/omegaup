@@ -33,14 +33,14 @@
       />
       {{ T.scoreboardShowOnlyInvitedIdentities }}</label
     >
-    <label class="float-right">
-      <input
-        v-model="showContestantsNames"
-        class="toggle-contestants"
-        type="checkbox"
-      />
-      {{ T.scoreboardShowParticipantsNames }}</label
-    >
+    <label class="float-right"
+      >{{ T.scoreboardShowParticipantsNames }}:
+      <select v-model="showContestantsNames" class="form-control">
+        <option value="NameDisplayOptions.Name">{{ T.wordsName }}</option>
+        <option value="NameDisplayOptions.Username">{{ T.wordsUser }}</option>
+        <option value="NameDisplayOptions.NameAndUsername">{{ T.wordsNameAndUsername }}</option>
+      </select>
+    </label>
     <table data-table-scoreboard>
       <thead>
         <tr>
@@ -124,6 +124,13 @@ import * as time from '../../time';
 import omegaup_Countdown from '../Countdown.vue';
 import { SocketStatus } from '../../arena/events_socket';
 
+enum NameDisplayOptions {
+  None,
+  Name,
+  Username,
+  NameAndUsername,
+}
+
 @Component({
   components: {
     highcharts: Chart,
@@ -149,7 +156,7 @@ export default class ArenaScoreboard extends Vue {
   INF = '∞';
   onlyShowExplicitlyInvited =
     !this.showAllContestants && this.showInvitedUsersFilter;
-  showContestantsNames = true;
+  showContestantsNames: NameDisplayOptions = NameDisplayOptions.NameAndUsername;
 
   get lastUpdatedString(): null | string {
     if (!this.lastUpdated) return null;

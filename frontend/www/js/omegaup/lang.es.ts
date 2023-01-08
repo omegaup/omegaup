@@ -1631,6 +1631,7 @@ const translations: { [key: string]: string; } = {
   wordsMyContests: "Mis Concursos",
   wordsMyScore: "Mi puntaje",
   wordsName: "Nombre",
+  wordsNameAndUsername: "Name y usuario",
   wordsNewClarification: "Nueva clarificaci\u00f3n",
   wordsNewSubmissions: "Nuevo env\u00edo",
   wordsNext: "Siguiente",
