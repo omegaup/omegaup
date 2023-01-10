@@ -1081,8 +1081,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $groupNames = [];
         $response = [];
         foreach ($rs as $row) {
-            if (is_null($row['group_name'])) {
-                continue;
+            $groupName = '';
+            if (!is_null($row['group_name'])) {
+                $groupName = $row['group_name'];
             }
             if (!isset($groups[$row['guid']])) {
                 $groups[$row['guid']] = [];
@@ -1092,10 +1093,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 $response[] = $result;
             }
 
-            $groups[$row['guid']][$row['group_name']] = $row['group_score'];
+            $groups[$row['guid']][$groupName] = $row['group_score'];
 
-            if (!isset($groupNames[$row['group_name']])) {
-                $groupNames[$row['group_name']] = null;
+            if (!isset($groupNames[$groupName])) {
+                $groupNames[$groupName] = null;
             }
         }
 
