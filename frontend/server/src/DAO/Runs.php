@@ -1076,7 +1076,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $params
         );
 
-        /** @var array<string, array<string, float>> $groups */
+        /** @var array<string, array<string|int, float>> $groups */
         $groups = [];
         $groupNames = [];
         $response = [];
@@ -1104,12 +1104,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         if (!empty($groupNames)) {
             $maxScorePerGroup = [];
             foreach (array_keys($groupNames) as $groupName) {
-                $maxScorePerGroup[$groupName] = max(
-                    array_column(
-                        $groups,
-                        $groupName
-                    )
-                );
+                /** @var non-empty-array<int|string, float> $groupColumns */
+                $groupColumns = array_column($groups, $groupName);
+                $maxScorePerGroup[$groupName] = max($groupColumns);
             }
             $scorePerGroup = array_sum($maxScorePerGroup);
         }
