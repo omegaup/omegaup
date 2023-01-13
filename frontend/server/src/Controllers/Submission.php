@@ -190,12 +190,6 @@ class Submission extends \OmegaUp\Controllers\Controller {
         // Default values for a general feedback
         $rangeBytesStart = $r->ensureOptionalInt('range_bytes_start');
         $rangeBytesEnd = $r->ensureOptionalInt('range_bytes_end');
-        if (!is_null($rangeBytesStart)) {
-            $rangeBytesStart += 1;
-        }
-        if (!is_null($rangeBytesEnd)) {
-            $rangeBytesEnd += 1;
-        }
 
         if (
             !is_null(
@@ -227,7 +221,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
 
             $submissionFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
                 $submission->guid,
-                $rangeBytesStart ?? 0
+                $rangeBytesStart
             );
 
             if (is_null($submissionFeedback)) {
