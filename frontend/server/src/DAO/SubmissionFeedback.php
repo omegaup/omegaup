@@ -15,7 +15,8 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
     /**
      * Gets the feedback of a certain submission
      *
-     * @return array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string}|null
+     * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp}
+     * @return SubmissionFeedback
      */
     public static function getSubmissionFeedback(
         \OmegaUp\DAO\VO\Submissions $submission
