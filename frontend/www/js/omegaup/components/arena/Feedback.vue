@@ -3,7 +3,7 @@
     <div class="card-header">
       {{ !saved ? T.runDetailsNewFeedback : T.runDetailsFeedbackCreated }}
       <button
-        v-if="saved"
+        v-if="currentFeedback.status === FeedbackStatus.InProgress"
         class="close btn-sm"
         type="button"
         @click.prevent="onDeleteFeedback"

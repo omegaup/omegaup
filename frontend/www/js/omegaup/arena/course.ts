@@ -198,17 +198,16 @@ OmegaUp.on('ready', async () => {
 
                 this.feedbackMap = new Map();
                 this.runDetailsData.feedback
-                  .filter((feedback) => feedback.range_bytes_start != 0)
+                  .filter((feedback) => feedback.range_bytes_start != null)
                   .map((feedback) => {
-                    const lineNumber =
-                      feedback.range_bytes_start == null
-                        ? 0
-                        : feedback.range_bytes_start - 1;
-                    this.feedbackMap.set(lineNumber, {
-                      lineNumber,
-                      text: feedback.feedback,
-                      status: FeedbackStatus.Saved,
-                    });
+                    const lineNumber = feedback.range_bytes_start ?? null;
+                    if (lineNumber != null) {
+                      this.feedbackMap.set(lineNumber, {
+                        lineNumber,
+                        text: feedback.feedback,
+                        status: FeedbackStatus.Saved,
+                      });
+                    }
                   });
 
                 if (request.hash) {
