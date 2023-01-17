@@ -63,17 +63,16 @@ OmegaUp.on('ready', async () => {
       problemsetId: payload.currentAssignment.problemset_id,
     }));
     runDetails?.feedback
-      .filter((feedback) => feedback.range_bytes_start != 0)
+      .filter((feedback) => feedback.range_bytes_start != null)
       .map((feedback) => {
-        const lineNumber =
-          feedback.range_bytes_start == null
-            ? 0
-            : feedback.range_bytes_start - 1;
-        feedbackMap.set(lineNumber, {
-          lineNumber,
-          text: feedback.feedback,
-          status: FeedbackStatus.Saved,
-        });
+        const lineNumber = feedback.range_bytes_start ?? null;
+        if (lineNumber != null) {
+          feedbackMap.set(lineNumber, {
+            lineNumber,
+            text: feedback.feedback,
+            status: FeedbackStatus.Saved,
+          });
+        }
       });
   } catch (e: any) {
     ui.apiError(e);
