@@ -19,7 +19,7 @@ def _find_files(search: str) -> Iterable[str]:
 
 
 def _sed(filename: str, search: str, fqcn: str) -> None:
-    with open(filename) as f:
+    with open(filename, encoding='utf-8') as f:
         original_contents = f.read()
     contents = original_contents
     contents = re.sub(r'(?<!\\)\b{}(?=::|\()'.format(re.escape(search)), fqcn,
@@ -35,7 +35,7 @@ def _sed(filename: str, search: str, fqcn: str) -> None:
                       contents)
     if contents == original_contents:
         return
-    with open(filename, 'w') as f:
+    with open(filename, 'w', encoding='utf-8') as f:
         f.write(contents)
 
 

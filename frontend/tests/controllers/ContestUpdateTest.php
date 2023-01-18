@@ -1604,7 +1604,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-        /**
+    /**
      * A PHPUnit data provider for all the score mode to get profile details.
      *
      * @return list<array{0:string}>

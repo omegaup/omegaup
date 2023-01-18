@@ -1300,7 +1300,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         if (
             !is_null(
                 $contest
-            ) && $contest->score_mode != 'partial' && $run->score < 1
+            ) && $contest->score_mode == 'all_or_nothing' && $run->score < 1
         ) {
             $details['contest_score'] = 0.0;
             $details['score'] = 0.0;
