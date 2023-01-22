@@ -299,7 +299,7 @@ const translations: { [key: string]: string; } = {
   contestNewFormScheduleVirtualContest: "Schedule virtual contest",
   contestNewFormScoreMode: "Score mode",
   contestNewFormScoreModeAllOrNothing: "All or nothing",
-  contestNewFormScoreModeDesc: "The score for the submissions will be 100% of the points for that problem when the verdict is AC. Otherwise, the score will be 0 whether at least one case is incorrect.",
+  contestNewFormScoreModeDesc: "Choose \"All or nothing\" if you want the contestants to have to solve all the cases of the problems to get points. Choose \"Partial\" if you want contestants to the get points corresponding to the submission that solved the most test cases. Choose \"Max per group\" if you want the contestants to obtain the points corresponding to all the cases that they managed to solve with any of their submissions.",
   contestNewFormScoreModeMaxPerGroup: "Max per group",
   contestNewFormScoreModePartial: "Partial",
   contestNewFormScoreboardAtContestEnd: "The scoreboard will be visible at the end of the contest.",
