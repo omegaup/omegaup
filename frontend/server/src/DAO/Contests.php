@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  *
  * @psalm-type Contest=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, score_mode: string, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type Contestv2=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, score_mode: string, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
- * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, score_mode: string, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration?: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  */
 class Contests extends \OmegaUp\DAO\Base\Contests {
     /** @var string */
@@ -395,7 +395,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     /**
      * Returns all contests owned by a user.
      *
-score_mode: string,      * @return array{contests: list<Contest>, count: int}
+     * @return array{contests: list<Contest>, count: int}
      */
     final public static function getAllContestsOwnedByUser(
         int $identityId,

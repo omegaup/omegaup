@@ -30,7 +30,6 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         'alias' => true,
         'scoreboard' => true,
         'points_decay_factor' => true,
-        'partial_score' => true,
         'submissions_gap' => true,
         'feedback' => true,
         'penalty' => true,
@@ -158,11 +157,6 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         if (isset($data['points_decay_factor'])) {
             $this->points_decay_factor = floatval(
                 $data['points_decay_factor']
-            );
-        }
-        if (isset($data['partial_score'])) {
-            $this->partial_score = boolval(
-                $data['partial_score']
             );
         }
         if (isset($data['submissions_gap'])) {
@@ -351,13 +345,6 @@ class Contests extends \OmegaUp\DAO\VO\VO {
      * @var float
      */
     public $points_decay_factor = 0.00;
-
-    /**
-     * Verdadero si el usuario recibirá puntaje parcial para problemas no resueltos en todos los casos
-     *
-     * @var bool
-     */
-    public $partial_score = true;
 
     /**
      * Tiempo mínimo en segundos que debe de esperar un usuario despues de realizar un envío para hacer otro

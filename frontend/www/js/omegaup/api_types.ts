@@ -18,7 +18,6 @@ export namespace dao {
     finish_time?: Date;
     languages?: string;
     last_updated?: Date;
-    partial_score?: boolean;
     penalty?: number;
     penalty_calc_policy?: string;
     penalty_type?: string;
@@ -2879,6 +2878,7 @@ export namespace types {
     contest_id: number;
     contestants: number;
     description: string;
+    duration?: number;
     finish_time: Date;
     last_updated: Date;
     organizer: string;
@@ -2888,6 +2888,8 @@ export namespace types {
     recommended: boolean;
     rerun_id?: number;
     score_mode: string;
+    scoreboard_url?: string;
+    scoreboard_url_admin?: string;
     start_time: Date;
     title: string;
     window_length?: number;
@@ -3968,7 +3970,7 @@ export namespace types {
     problemset_id?: number;
     requests_user_information?: string;
     rerun_id?: number;
-    scoreMode?: string;
+    score_mode?: string;
     scoreboard?: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
