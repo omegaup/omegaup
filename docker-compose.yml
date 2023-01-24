@@ -67,7 +67,7 @@ services:
       - '22291'
 
   grader:
-    image: omegaup/backend:v1.9.43
+    image: omegaup/backend:v1.9.35
     entrypoint: ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-grader"]
     user: "${UID_GID}"
     restart: always

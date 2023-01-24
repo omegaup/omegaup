@@ -2887,7 +2887,7 @@ export namespace types {
     problemset_id: number;
     recommended: boolean;
     rerun_id?: number;
-    score_mode: string;
+    score_mode?: string;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
     start_time: Date;
