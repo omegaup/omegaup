@@ -198,30 +198,52 @@ export class EventsSocket {
       token: this.scoreboardToken,
     })
       .then((response) => {
-        const { series, navigatorData } = onRankingEvents({
+        this.calculateRankingEvents({
           events: response.events,
           startTimestamp: this.startTime.getTime(),
           finishTimestamp: Date.now(),
           currentRanking,
         });
-
-        let maxPoints = 0;
-        for (const problem of this.navbarProblems) {
-          maxPoints += problem.maxScore;
-        }
-
-        if (series.length) {
-          const rankingChartOptions = createChart({
-            series,
-            navigatorData,
-            startTimestamp: this.startTime.getTime(),
-            finishTimestamp: Date.now(),
-            maxPoints,
-          });
-          rankingStore.commit('updateRankingChartOptions', rankingChartOptions);
-        }
       })
       .catch(ui.ignoreError);
+  }
+
+  private calculateRankingEvents({
+    events,
+    currentRanking,
+    startTimestamp = 0,
+    finishTimestamp = Date.now(),
+    placesToShowInChart = 10,
+  }: {
+    events: types.ScoreboardEvent[];
+    currentRanking: { [username: string]: number };
+    startTimestamp?: number;
+    finishTimestamp?: number;
+    placesToShowInChart?: number;
+  }) {
+    const { series, navigatorData } = onRankingEvents({
+      events,
+      startTimestamp,
+      finishTimestamp,
+      currentRanking,
+      placesToShowInChart,
+    });
+
+    let maxPoints = 0;
+    for (const problem of this.navbarProblems) {
+      maxPoints += problem.maxScore;
+    }
+
+    if (series.length) {
+      const rankingChartOptions = createChart({
+        series,
+        navigatorData,
+        startTimestamp: this.startTime.getTime(),
+        finishTimestamp: Date.now(),
+        maxPoints,
+      });
+      rankingStore.commit('updateRankingChartOptions', rankingChartOptions);
+    }
   }
 
   private onclose() {
@@ -315,31 +337,12 @@ export class EventsSocket {
           token: this.scoreboardToken,
         })
           .then((response) => {
-            const { series, navigatorData } = onRankingEvents({
+            this.calculateRankingEvents({
               events: response.events,
               startTimestamp: this.startTime.getTime(),
               finishTimestamp: Date.now(),
               currentRanking,
             });
-
-            let maxPoints = 0;
-            for (const problem of this.navbarProblems) {
-              maxPoints += problem.maxScore;
-            }
-
-            if (series.length) {
-              const rankingChartOptions = createChart({
-                series,
-                navigatorData,
-                startTimestamp: this.startTime.getTime(),
-                finishTimestamp: Date.now(),
-                maxPoints,
-              });
-              rankingStore.commit(
-                'updateRankingChartOptions',
-                rankingChartOptions,
-              );
-            }
           })
           .catch(ui.ignoreError);
       })
@@ -384,29 +387,10 @@ export class EventsSocket {
               token: this.scoreboardToken,
             })
               .then((response) => {
-                const { series, navigatorData } = onRankingEvents({
+                this.calculateRankingEvents({
                   events: response.events,
                   currentRanking,
                 });
-
-                let maxPoints = 0;
-                for (const problem of this.navbarProblems) {
-                  maxPoints += problem.maxScore;
-                }
-
-                if (series.length) {
-                  const rankingChartOptions = createChart({
-                    series,
-                    navigatorData,
-                    startTimestamp: this.startTime.getTime(),
-                    finishTimestamp: Date.now(),
-                    maxPoints,
-                  });
-                  rankingStore.commit(
-                    'updateRankingChartOptions',
-                    rankingChartOptions,
-                  );
-                }
               })
               .catch(ui.ignoreError);
           })

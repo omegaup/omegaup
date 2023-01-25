@@ -234,7 +234,7 @@ describe('EventsSocket', () => {
     await server?.connected;
 
     const onRankingChangedMock = mocked(onRankingChanged, true);
-    const onRankingEventsMock = mocked(onRankingEvents, true);
+    const onRankingEventsMock = mocked(onRankingEvents, false);
     onRankingChangedMock.mockReturnValueOnce({
       users: [],
       ranking: [],
