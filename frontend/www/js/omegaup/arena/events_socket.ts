@@ -337,7 +337,7 @@ export class EventsSocket {
           token: this.scoreboardToken,
         })
           .then((response) =>
-            this.calculateRankingEvents({
+            onRankingEvents({
               events: response.events,
               startTimestamp: this.startTime.getTime(),
               finishTimestamp: Date.now(),
@@ -387,7 +387,7 @@ export class EventsSocket {
               token: this.scoreboardToken,
             })
               .then((response) =>
-                this.calculateRankingEvents({
+                onRankingEvents({
                   events: response.events,
                   currentRanking,
                 }),
