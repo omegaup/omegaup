@@ -197,14 +197,14 @@ export class EventsSocket {
       problemset_id: this.problemsetId,
       token: this.scoreboardToken,
     })
-      .then((response) => {
+      .then((response) =>
         this.calculateRankingEvents({
           events: response.events,
           startTimestamp: this.startTime.getTime(),
           finishTimestamp: Date.now(),
           currentRanking,
-        });
-      })
+        }),
+      )
       .catch(ui.ignoreError);
   }
 
@@ -336,14 +336,14 @@ export class EventsSocket {
           problemset_id: this.problemsetId,
           token: this.scoreboardToken,
         })
-          .then((response) => {
+          .then((response) =>
             this.calculateRankingEvents({
               events: response.events,
               startTimestamp: this.startTime.getTime(),
               finishTimestamp: Date.now(),
               currentRanking,
-            });
-          })
+            }),
+          )
           .catch(ui.ignoreError);
       })
       .catch(ui.ignoreError);
@@ -386,12 +386,12 @@ export class EventsSocket {
               problemset_id: this.problemsetId,
               token: this.scoreboardToken,
             })
-              .then((response) => {
+              .then((response) =>
                 this.calculateRankingEvents({
                   events: response.events,
                   currentRanking,
-                });
-              })
+                }),
+              )
               .catch(ui.ignoreError);
           })
           .catch(ui.ignoreError);
