@@ -339,8 +339,6 @@ export class EventsSocket {
           .then((response) =>
             onRankingEvents({
               events: response.events,
-              startTimestamp: this.startTime.getTime(),
-              finishTimestamp: Date.now(),
               currentRanking,
             }),
           )
