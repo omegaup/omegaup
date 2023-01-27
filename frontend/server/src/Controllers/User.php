@@ -4693,12 +4693,12 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transEnd();
             return [
             'templateProperties' => [
-            'payload' => [
-            'hasParentalVerificationToken' => $hasParentalVerificationToken,
-            ],
-            'title' => new \OmegaUp\TranslationString(
-                'omegaupTitleParentalVerificationToken'
-            ),
+                'payload' => [
+                    'hasParentalVerificationToken' => $hasParentalVerificationToken,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleParentalVerificationToken'
+                ),
             ],
             'entrypoint' => 'user_verification_parental_token',
             ];
