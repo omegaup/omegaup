@@ -4691,17 +4691,17 @@ class User extends \OmegaUp\Controllers\Controller {
             $hasParentalVerificationToken = true;
 
             \OmegaUp\DAO\DAO::transEnd();
-        return [
+            return [
             'templateProperties' => [
             'payload' => [
             'hasParentalVerificationToken' => $hasParentalVerificationToken,
             ],
             'title' => new \OmegaUp\TranslationString(
                 'omegaupTitleParentalVerificationToken'
-                ),
+            ),
             ],
             'entrypoint' => 'user_verification_parental_token',
-        ];
+            ];
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
