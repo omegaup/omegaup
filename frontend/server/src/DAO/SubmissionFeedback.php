@@ -67,8 +67,8 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
                 )
             )
         );
-        $clause = 'AND sf.range_bytes_start IS NULL';
         $params = [$guid];
+        $clause = 'AND sf.range_bytes_start IS NULL';
         if (!is_null($rangeBytesStart)) {
             $clause = 'AND sf.range_bytes_start = ?';
             $params[] = $rangeBytesStart;
