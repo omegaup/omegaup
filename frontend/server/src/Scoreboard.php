@@ -188,7 +188,7 @@ class Scoreboard {
             $result = $adminEventsCache->get();
         }
 
-        if (!is_null($result)) {
+        if (!is_null($result) && !$this->params->admin) {
             \OmegaUp\Scoreboard::setIsLastRunFromCacheForTesting(true);
             return $result;
         }
