@@ -989,16 +989,20 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
 
         $response1 = \OmegaUp\Controllers\Problemset::$testApi($r);
-        $this->assertSame(
-            false,
+        $this->assertFalse(
             \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting()
         );
 
         $response2 = \OmegaUp\Controllers\Problemset::$testApi($r);
-        $this->assertSame(
-            true,
-            \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting()
-        );
+        if ($isAdmin && $testApi == 'apiScoreboardEvents') {
+            $this->assertFalse(
+                \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting()
+            );
+        } else {
+            $this->assertTrue(
+                \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting()
+            );
+        }
 
         $this->assertSame($response1, $response2);
 
@@ -1026,10 +1030,15 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
         $response4 = \OmegaUp\Controllers\Problemset::$testApi($r);
-        $this->assertSame(
-            true,
-            \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting()
-        );
+        if ($isAdmin && $testApi == 'apiScoreboardEvents') {
+            $this->assertFalse(
+                \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting()
+            );
+        } else {
+            $this->assertTrue(
+                \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting()
+            );
+        }
         $this->assertEquals($response3, $response4);
     }
 

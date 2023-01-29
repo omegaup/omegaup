@@ -7,6 +7,7 @@ import {
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
 import {
+  createChart,
   onRankingChanged,
   onRankingEvents,
   onVirtualRankingChanged,
@@ -197,12 +198,52 @@ export class EventsSocket {
       token: this.scoreboardToken,
     })
       .then((response) =>
-        onRankingEvents({
+        this.calculateRankingEvents({
           events: response.events,
+          startTimestamp: this.startTime.getTime(),
+          finishTimestamp: Date.now(),
           currentRanking,
         }),
       )
       .catch(ui.ignoreError);
+  }
+
+  private calculateRankingEvents({
+    events,
+    currentRanking,
+    startTimestamp = 0,
+    finishTimestamp = Date.now(),
+    placesToShowInChart = 10,
+  }: {
+    events: types.ScoreboardEvent[];
+    currentRanking: { [username: string]: number };
+    startTimestamp?: number;
+    finishTimestamp?: number;
+    placesToShowInChart?: number;
+  }) {
+    const { series, navigatorData } = onRankingEvents({
+      events,
+      startTimestamp,
+      finishTimestamp,
+      currentRanking,
+      placesToShowInChart,
+    });
+
+    let maxPoints = 0;
+    for (const problem of this.navbarProblems) {
+      maxPoints += problem.maxScore;
+    }
+
+    if (series.length) {
+      const rankingChartOptions = createChart({
+        series,
+        navigatorData,
+        startTimestamp: this.startTime.getTime(),
+        finishTimestamp: Date.now(),
+        maxPoints,
+      });
+      rankingStore.commit('updateRankingChartOptions', rankingChartOptions);
+    }
   }
 
   private onclose() {
