@@ -1020,6 +1020,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 $submission
             ),
         ];
+
         $showRunDetails = !$response['admin'] ? self::shouldShowRunDetails(
             $r->identity->identity_id,
             $problem,
