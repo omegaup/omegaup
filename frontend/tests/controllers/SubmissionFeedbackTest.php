@@ -185,7 +185,24 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    public function testGetCourseSubmissionFeedback() {
+    /**
+     * A PHPUnit data provider for submission feedback.
+     *
+     * @return list<list<null|string>>
+     */
+    public function submissionFeedbackLineProvider(): array {
+        return [
+            [null], // A general feedback
+            [1],
+            [3],
+            [5],
+        ];
+    }
+
+    /**
+     * @dataProvider submissionFeedbackLineProvider
+     */
+    public function testGetCourseSubmissionFeedback(?int $rangeBytesStart) {
         $admin = \OmegaUp\Test\Factories\User::createUser();
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $admin['identity'],
@@ -230,17 +247,23 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 'run_alias' => $runData['response']['guid'],
             ])
         );
-        $this->assertNull($response['feedback']);
+        $this->assertEmpty($response['feedback']);
 
         $feedback = 'Test feedback';
+        $submissionFeedback = [
+            'auth_token' => self::login($admin['identity'])->auth_token,
+            'guid' => $runData['response']['guid'],
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment_alias'],
+            'feedback' => $feedback,
+        ];
+
+        if (!is_null($rangeBytesStart)) {
+            $submissionFeedback['range_bytes_start'] = $rangeBytesStart;
+        }
+
         \OmegaUp\Controllers\Submission::apiSetFeedback(
-            new \OmegaUp\Request([
-                'auth_token' => self::login($admin['identity'])->auth_token,
-                'guid' => $runData['response']['guid'],
-                'course_alias' => $courseData['course_alias'],
-                'assignment_alias' => $courseData['assignment_alias'],
-                'feedback' => $feedback,
-            ])
+            new \OmegaUp\Request($submissionFeedback)
         );
 
         // After adding the feedback
@@ -252,11 +275,19 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 'include_feedback' => true,
             ])
         );
-        $this->assertNotNull($response['feedback']);
-        $this->assertSame($feedback, $response['feedback']['feedback']);
+        $foundKey = array_search(
+            $rangeBytesStart,
+            array_column(
+                $response['feedback'],
+                'range_bytes_start'
+            )
+        );
+        $feedbackResponse = $response['feedback'][$foundKey];
+        $this->assertNotEmpty($feedbackResponse);
+        $this->assertSame($feedback, $feedbackResponse['feedback']);
         $this->assertSame(
             $admin['identity']->username,
-            $response['feedback']['author']
+            $feedbackResponse['author']
         );
     }
 
@@ -314,7 +345,8 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $initialFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
-            $submission
+            $submission->guid,
+            rangeBytesStart: null
         );
 
         \OmegaUp\Controllers\Submission::apiSetFeedback(
@@ -327,7 +359,8 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $newFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
-            $submission
+            $submission->guid,
+            rangeBytesStart: null
         );
 
         $this->assertNotEquals(

@@ -933,6 +933,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.language,
                 s.status,
                 s.verdict,
+                r.run_id,
                 r.runtime,
                 r.penalty,
                 r.memory,
@@ -1033,19 +1034,14 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 ORDER BY
                     field(status_memory, "MEMORY_NOT_AVAILABLE", "MEMORY_EXCEEDED", "MEMORY_AVAILABLE")
                 LIMIT 1
-                ) AS status_memory,
-                rg.group_name,
-                rg.score AS group_score
+                ) AS status_memory
             FROM
                 Submissions s
             INNER JOIN
                 Runs r
             ON
                 r.run_id = s.current_run_id
-            LEFT JOIN
-                Runs_Groups rg
-            ON
-                r.run_id = rg.run_id
+
             INNER JOIN
                 Identities i
             ON
@@ -1070,50 +1066,46 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ' AND s.problemset_id = ?';
             $params[] = $problemsetId;
         }
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, group_name: null|string, group_score: float|null, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            $params
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+
+        if (empty($rs)) {
+            return [
+                'runs' => $rs,
+                'maxScore' => null,
+            ];
+        }
+        $runsIDs = array_map(
+            /**
+             * @param array{run_id: int} $run
+             */
+            fn ($run): int =>$run['run_id'],
+            $rs
         );
 
-        /** @var array<string, array<string|int, float>> $groups */
-        $groups = [];
-        $groupNames = [];
-        $response = [];
-        foreach ($rs as $row) {
-            $groupName = '';
-            if (!is_null($row['group_name'])) {
-                $groupName = $row['group_name'];
-            }
-            if (!isset($groups[$row['guid']])) {
-                $groups[$row['guid']] = [];
-                $result = $row;
-                unset($result['group_name']);
-                unset($result['group_score']);
-                $response[] = $result;
-            }
+        $runsIDsAsString = join(', ', $runsIDs);
 
-            $groups[$row['guid']][$groupName] = $row['group_score'];
+        // For score mode contests with subtasks, we need to calculate de max
+        // score per group for getting the max score
+        $sqlMaxScore = "SELECT
+                    group_name,
+                    MAX(score) AS max_score
+                FROM
+                    Runs_Groups
+                WHERE
+                    run_id IN ({$runsIDsAsString})
+                GROUP BY
+                    group_name";
 
-            if (!isset($groupNames[$groupName])) {
-                $groupNames[$groupName] = null;
-            }
-        }
-
-        $scorePerGroup = null;
-        if (!empty($groupNames)) {
-            $maxScorePerGroup = [];
-            foreach (array_keys($groupNames) as $groupName) {
-                /** @var non-empty-array<int|string, float> $groupColumns */
-                $groupColumns = array_column($groups, $groupName);
-                $maxScorePerGroup[$groupName] = max($groupColumns);
-            }
-            $scorePerGroup = array_sum($maxScorePerGroup);
-        }
+        /** @var list<array{group_name: string, max_score: float|null}> */
+        $maxScorePerGroup = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sqlMaxScore,
+            []
+        );
 
         return [
-            'runs' => $response,
-            'maxScore' => $scorePerGroup,
+            'runs' => $rs,
+            'maxScore' => array_sum($maxScorePerGroup),
         ];
     }
 

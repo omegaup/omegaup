@@ -2961,7 +2961,7 @@ export namespace types {
     points_decay_factor: number;
     problemset_id: number;
     rerun_id?: number;
-    score_mode: string;
+    score_mode: string | string | string;
     scoreboard: number;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
@@ -4090,7 +4090,7 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback?: types.SubmissionFeedback;
+    feedback: types.SubmissionFeedback[];
     guid: string;
     judged_by?: string;
     language: string;
@@ -4464,6 +4464,8 @@ export namespace types {
     author_classname: string;
     date: Date;
     feedback: string;
+    range_bytes_end?: number;
+    range_bytes_start?: number;
   }
 
   export interface SubmissionsListPayload {
