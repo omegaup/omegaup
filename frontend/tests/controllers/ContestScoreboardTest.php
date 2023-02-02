@@ -1466,4 +1466,107 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
     }
+
+    public function testScoreboardEventsForContestInMaxPerGroupMode() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get a contest scoreMode
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'scoreMode' => 'max_per_group',
+                'scoreboardPct' => 100,
+            ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Create our contestant
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $time = \OmegaUp\Time::get();
+
+        // Create and grade some runs every five minutes
+        $runsMapping = [
+            [
+                'total' => 0.25,
+                'expectedScore' => 0.25,
+                'points_per_group' => [
+                    ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                    ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                    ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'JE'],
+                    ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'OLE'],
+                ],
+            ],
+            [
+                'total' => 0.25,
+                'expectedScore' => 0.50,
+                'points_per_group' => [
+                    ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                    ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'TLE'],
+                    ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'TLE'],
+                    ['group_name' => 'hard', 'score' => 0.25,'verdict' => 'AC'],
+                ],
+            ],
+            [
+                'total' => 0.25,
+                'expectedScore' => 0.75,
+                'points_per_group' => [
+                    ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                    ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
+                    ['group_name' => 'medium', 'score' => 0.25, 'verdict' => 'AC'],
+                    ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                ],
+            ],
+        ];
+
+        foreach ($runsMapping as $run) {
+            \OmegaUp\Time::setTimeForTesting($time + (5 * 60));
+
+            $runData = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $identity
+            );
+
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                runData: $runData,
+                points: $run['total'],
+                verdict: 'PA',
+                submitDelay: null,
+                runGuid: null,
+                runId: null,
+                problemsetPoints: 100,
+                outputFilesContent: null,
+                problemsetScoreMode: 'max_per_group',
+                runScoreByGroups: $run['points_per_group']
+            );
+            $time = \OmegaUp\Time::get();
+        }
+
+        // Create request as a contestant
+        $login = self::login($identity);
+        $eventsResponse = \OmegaUp\Controllers\Contest::apiScoreboardEvents(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        )['events'];
+
+        $delta = $eventsResponse[0]['delta'];
+
+        foreach ($eventsResponse as $index => $event) {
+            $this->assertSame(
+                $runsMapping[$index]['expectedScore'],
+                $event['total']['points']
+            );
+            // Assert every 5 seconds one run was submitted
+            $this->assertSame($delta, $event['delta']);
+            $delta += 5;
+        }
+    }
 }
