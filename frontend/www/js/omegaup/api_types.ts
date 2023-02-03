@@ -2961,7 +2961,7 @@ export namespace types {
     points_decay_factor: number;
     problemset_id: number;
     rerun_id?: number;
-    score_mode: string | string | string;
+    score_mode: string;
     scoreboard: number;
     show_penalty: boolean;
     show_scoreboard_after: boolean;

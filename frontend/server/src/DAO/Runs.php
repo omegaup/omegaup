@@ -1085,7 +1085,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
 
         $runsIDsAsString = join(', ', $runsIDs);
 
-        // For score mode contests with subtasks, we need to calculate de max
+        // For score mode contests with subtasks, we need to calculate the max
         // score per group for getting the max score
         $sqlMaxScore = "SELECT
                     group_name,
