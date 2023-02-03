@@ -824,39 +824,12 @@ class Scoreboard {
             if ($params->score_mode !== 'max_per_group') {
                 $contestScore = $run['contest_score'];
             } else {
-                if (is_null($run['score_by_group'])) {
-                    $contestScore = 0.0;
-                } else {
-                    $scoreByGroup = json_decode(
-                        $run['score_by_group'],
-                        associative: true
-                    );
-
-                    $groupNames = array_keys($scoreByGroup);
-
-                    if (!isset($identityProblemsScoreByGroup[$identityId])) {
-                        $identityProblemsScoreByGroup[$identityId] = [
-                            $problemId => $scoreByGroup,
-                        ];
-                    } elseif (
-                        !isset(
-                            $identityProblemsScoreByGroup[$identityId][$problemId]
-                        )
-                    ) {
-                        $identityProblemsScoreByGroup[$identityId][$problemId] = $scoreByGroup;
-                    }
-
-                    foreach ($groupNames as $groupName) {
-                        $identityProblemsScoreByGroup[$identityId][$problemId][$groupName] = max(
-                            $scoreByGroup[$groupName],
-                            $identityProblemsScoreByGroup[$identityId][$problemId][$groupName]
-                        );
-                    }
-
-                    $contestScore = array_sum(
-                        $identityProblemsScoreByGroup[$identityId][$problemId]
-                    );
-                }
+                $contestScore = self::getMaxPerGroupScore(
+                    $identityProblemsScoreByGroup,
+                    $run['score_by_group'],
+                    $identityId,
+                    $problemId
+                );
             }
 
             if (!isset($identityProblemsScore[$identityId])) {
@@ -939,6 +912,47 @@ class Scoreboard {
             return;
         }
         \OmegaUp\Scoreboard::$isLastRunFromCache = $value;
+    }
+
+    /**
+     * @param list<list<array<string, float>>>
+     * Get the max score when a contest has subtasks
+     */
+    private static function getMaxPerGroupScore(
+        array &$identityProblemsScoreByGroup,
+        ?string $scoreByGroup,
+        int $identityId,
+        int $problemId
+    ): float {
+        if (is_null($scoreByGroup)) {
+            return 0.0;
+        }
+        $scoreByGroup = json_decode($scoreByGroup, associative: true);
+
+        $groupNames = array_keys($scoreByGroup);
+
+        if (!isset($identityProblemsScoreByGroup[$identityId])) {
+            $identityProblemsScoreByGroup[$identityId] = [
+                $problemId => $scoreByGroup,
+            ];
+        } elseif (
+            !isset(
+                $identityProblemsScoreByGroup[$identityId][$problemId]
+            )
+        ) {
+            $identityProblemsScoreByGroup[$identityId][$problemId] = $scoreByGroup;
+        }
+
+        foreach ($groupNames as $groupName) {
+            $identityProblemsScoreByGroup[$identityId][$problemId][$groupName] = max(
+                $scoreByGroup[$groupName],
+                $identityProblemsScoreByGroup[$identityId][$problemId][$groupName]
+            );
+        }
+
+        return array_sum(
+            $identityProblemsScoreByGroup[$identityId][$problemId]
+        );
     }
 
     /**
