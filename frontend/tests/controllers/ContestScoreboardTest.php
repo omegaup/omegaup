@@ -1467,7 +1467,130 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    public function testScoreboardEventsForContestInMaxPerGroupMode() {
+    /**
+     * A PHPUnit data provider for the contest with max_per_group mode.
+     *
+     * @return array{0: bool, 1: list<array: {total: float, expectedScore: float, points_per_group: list<array: {group_name: string, score: float, verdict: string}>}>}
+     */
+    public function runsMappingPerGroupProvider(): array {
+        return [
+            [
+                true,
+                [
+                    [
+                        'total' => 0.25,
+                        'expectedScore' => 0.25,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'JE'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'OLE'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.25,
+                        'expectedScore' => 0.50,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'TLE'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'TLE'],
+                            ['group_name' => 'hard', 'score' => 0.25,'verdict' => 'AC'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.50,
+                        'expectedScore' => 0.75,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'medium', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                true,
+                [
+                    [
+                        'total' => 0.25,
+                        'expectedScore' => 0.25,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'JE'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'OLE'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.75,
+                        'expectedScore' => 0.75,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'TLE'],
+                            ['group_name' => 'hard', 'score' => 0.25,'verdict' => 'AC'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.5,
+                        'expectedScore' => 1.0,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'medium', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                false, // No events should be generated for this case
+                [
+                    [
+                        'total' => 0.0,
+                        'expectedScore' => 0.0,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'JE'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'OLE'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.0,
+                        'expectedScore' => 0.0,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'TLE'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.0,
+                        'expectedScore' => 0.0,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param list<array: {total: float, expectedScore: float, points_per_group: list<array: {group_name: string, score: float, verdict: string}>}> $runsMapping
+     *
+     * @dataProvider runsMappingPerGroupProvider
+     */
+    public function testScoreboardEventsForContestInMaxPerGroupMode(
+        bool $hasEvents,
+        array $runsMapping
+    ) {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
@@ -1491,39 +1614,6 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         $time = \OmegaUp\Time::get();
 
         // Create and grade some runs every five minutes
-        $runsMapping = [
-            [
-                'total' => 0.25,
-                'expectedScore' => 0.25,
-                'points_per_group' => [
-                    ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
-                    ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
-                    ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'JE'],
-                    ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'OLE'],
-                ],
-            ],
-            [
-                'total' => 0.25,
-                'expectedScore' => 0.50,
-                'points_per_group' => [
-                    ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
-                    ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'TLE'],
-                    ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'TLE'],
-                    ['group_name' => 'hard', 'score' => 0.25,'verdict' => 'AC'],
-                ],
-            ],
-            [
-                'total' => 0.25,
-                'expectedScore' => 0.75,
-                'points_per_group' => [
-                    ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
-                    ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
-                    ['group_name' => 'medium', 'score' => 0.25, 'verdict' => 'AC'],
-                    ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
-                ],
-            ],
-        ];
-
         foreach ($runsMapping as $run) {
             \OmegaUp\Time::setTimeForTesting($time + (5 * 60));
 
@@ -1557,16 +1647,21 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['events'];
 
+        if (!$hasEvents) {
+            $this->assertEmpty($eventsResponse);
+            return;
+        }
         $delta = $eventsResponse[0]['delta'];
-
-        foreach ($eventsResponse as $index => $event) {
-            $this->assertSame(
-                $runsMapping[$index]['expectedScore'],
-                $event['total']['points']
-            );
+        $lastExpectedScore = 0.0;
+        foreach ($runsMapping as $index => $run) {
+            $event = $eventsResponse[$index];
+            $this->assertSame($run['expectedScore'], $event['total']['points']);
             // Assert every 5 seconds one run was submitted
             $this->assertSame($delta, $event['delta']);
             $delta += 5;
+            if ($lastExpectedScore != $run['expectedScore']) {
+                $lastExpectedScore = $run['expectedScore'];
+            }
         }
     }
 }
