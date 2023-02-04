@@ -162,6 +162,9 @@ OmegaUp.on('ready', async () => {
               .catch(ui.apiError);
           },
           'request-feedback': (guid: string) => {
+            if (!window.confirm(T.requestFeedbackConfirm)) {
+              return;
+            }
             api.Course.requestFeedback({
               course_alias: payload.courseDetails.alias,
               assignment_alias: payload.currentAssignment.alias,
