@@ -188,7 +188,7 @@ class Scoreboard {
             $result = $adminEventsCache->get();
         }
 
-        if (!is_null($result)) {
+        if (!is_null($result) && !$this->params->admin) {
             \OmegaUp\Scoreboard::setIsLastRunFromCacheForTesting(true);
             return $result;
         }
@@ -496,7 +496,6 @@ class Scoreboard {
         $totalPoints = 0.0;
         $totalPenalty = 0.0;
         // Get final scores
-        //error_log(print_r($scores, true));
         foreach ($scores as $score) {
             $totalPoints += $score['points'];
             if ($contestPenaltyCalcPolicy == 'sum') {
