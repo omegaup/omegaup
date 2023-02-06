@@ -264,7 +264,6 @@ describe('ranking', () => {
         startTime: new Date(0),
         finishTime: new Date(1),
         currentUsername: 'omegaUp',
-        isContestModeMaxPerGroup: false,
       });
 
       expect(store.state.ranking).toEqual([
@@ -385,7 +384,6 @@ describe('ranking', () => {
         currentUsername: 'omegaUp',
         scoreboard: scoreboard,
         navbarProblems: navbarProblems,
-        isContestModeMaxPerGroup: false,
       };
       const { ranking, users } = onRankingChanged(params);
       expect(ranking[0].total.points).toEqual(200);
@@ -397,7 +395,6 @@ describe('ranking', () => {
         currentUsername: 'omegaUp',
         scoreboard: scoreboard,
         navbarProblems: navbarProblems,
-        isContestModeMaxPerGroup: false,
       });
       const params = {
         events: scoreboardEvents,
@@ -429,7 +426,6 @@ describe('ranking', () => {
         currentUsername: 'omegaUp',
         scoreboard: scoreboard,
         navbarProblems: navbarProblems,
-        isContestModeMaxPerGroup: false,
       });
       const params = {
         events: scoreboardEvents,

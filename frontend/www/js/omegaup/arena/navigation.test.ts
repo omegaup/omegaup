@@ -9,7 +9,6 @@ import {
   NavigationRequest,
   NavigationType,
   navigateToProblem,
-  ScoreMode,
 } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { storeConfig } from './problemStore';
@@ -17,22 +16,7 @@ import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import fetchMock from 'jest-fetch-mock';
 
-const problemDetails: types.ProblemDetails = {
-  accepted: 1,
-  allow_user_add_tags: true,
-  creation_date: new Date(),
-  email_clarifications: true,
-  nominationStatus: {
-    alreadyReviewed: true,
-    canNominateProblem: true,
-    dismissed: true,
-    dismissedBeforeAc: true,
-    language: 'py3',
-    nominated: true,
-    nominatedBeforeAc: true,
-    solved: true,
-    tried: true,
-  },
+const problemDetails: types.ProblemInfo = {
   accepts_submissions: true,
   commit: 'abcdef',
   alias: 'problem_alias',
@@ -46,12 +30,6 @@ const problemDetails: types.ProblemDetails = {
     overall_wall_time_limit: '1s',
     time_limit: '1s',
   },
-  order: 'asc',
-  score: 100,
-  show_diff: 'no',
-  submissions: 1,
-  visits: 1,
-  version: '',
   points: 100,
   preferred_language: 'kp',
   problem_id: 1,
@@ -148,7 +126,6 @@ describe('navigation.ts', () => {
         problems: navbarProblems,
         problem: navbarProblems[0],
         contestAlias: 'contest_alias',
-        contestMode: ScoreMode.Partial,
       };
       await navigateToProblem(params);
       expect(setLocationHash).toHaveBeenCalledWith(
@@ -162,9 +139,8 @@ describe('navigation.ts', () => {
         type: NavigationType.ForContest,
         target: vueInstance,
         problems: navbarProblems,
-        problem: navbarProblems[1],
+        problem: navbarProblems[0],
         contestAlias: 'contest_alias',
-        contestMode: ScoreMode.MaxPerGroup,
       };
       const localVue = createLocalVue();
       localVue.use(Vuex);

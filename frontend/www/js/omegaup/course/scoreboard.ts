@@ -22,7 +22,6 @@ OmegaUp.on('ready', () => {
       scoreboard: payload.scoreboard,
       currentUsername: commonPayload.currentUsername,
       navbarProblems: payload.problems,
-      isContestModeMaxPerGroup: false,
     });
     ranking = rankingInfo.ranking;
     lastTimeUpdated = rankingInfo.lastTimeUpdated;
@@ -84,7 +83,6 @@ OmegaUp.on('ready', () => {
           scoreboard,
           currentUsername: commonPayload.currentUsername,
           navbarProblems: payload.problems,
-          isContestModeMaxPerGroup: false,
         });
         ranking = rankingInfo.ranking;
         lastTimeUpdated = rankingInfo.lastTimeUpdated;

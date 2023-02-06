@@ -14,12 +14,7 @@ import {
   refreshContestClarifications,
   trackClarifications,
 } from './clarifications';
-import {
-  getScoreModeEnum,
-  navigateToProblem,
-  NavigationType,
-  ScoreMode,
-} from './navigation';
+import { navigateToProblem, NavigationType } from './navigation';
 import clarificationStore from './clarificationsStore';
 import {
   showSubmission,
@@ -90,8 +85,6 @@ OmegaUp.on('ready', async () => {
               startTime: contest.start_time,
               finishTime: contest.finish_time,
               currentUsername,
-              isContestModeMaxPerGroup:
-                contest.score_mode === ScoreMode.MaxPerGroup,
             });
           })
           .catch(ui.apiError);
@@ -116,8 +109,6 @@ OmegaUp.on('ready', async () => {
       startTime: payload.contest.start_time,
       finishTime: payload.contest.finish_time,
       currentUsername: commonPayload.currentUsername,
-      isContestModeMaxPerGroup:
-        payload.contest.score_mode === ScoreMode.MaxPerGroup,
     });
     virtualContestRefreshInterval = setInterval(() => {
       loadVirtualRanking({
@@ -191,7 +182,6 @@ OmegaUp.on('ready', async () => {
               target: contestContestant,
               problems: this.problems,
               contestAlias: payload.contest.alias,
-              contestMode: getScoreModeEnum(payload.contest.score_mode),
             });
           },
           'show-run': (request: SubmissionRequest) => {
