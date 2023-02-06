@@ -2,7 +2,7 @@ import * as ui from '../ui';
 import { types } from '../api_types';
 import { myRunsStore } from './runsStore';
 import { omegaup } from '../omegaup';
-import { getMaxScore } from './navigation';
+import { getMaxPerGroupScore, getMaxScore } from './navigation';
 import T from '../lang';
 import rankingStore from './rankingStore';
 
@@ -203,10 +203,12 @@ export function onRankingChanged({
   scoreboard,
   currentUsername,
   navbarProblems,
+  isContestModeMaxPerGroup,
 }: {
   scoreboard: types.Scoreboard;
   currentUsername: string;
   navbarProblems: types.NavbarProblemsetProblem[];
+  isContestModeMaxPerGroup: boolean;
 }): {
   ranking: types.ScoreboardRankingEntry[];
   users: omegaup.UserRank[];
@@ -248,6 +250,14 @@ export function onRankingChanged({
         const currentProblem = problems[alias];
 
         currentProblem.hasRuns = problem.runs > 0;
+        if (isContestModeMaxPerGroup) {
+          currentProblem.bestScore = getMaxPerGroupScore(
+            myRunsStore.state.runs.filter((run) => run.alias === problem.alias),
+            alias,
+            problem.points,
+          );
+          continue;
+        }
         currentProblem.bestScore = getMaxScore(
           myRunsStore.state.runs.filter((run) => run.alias === problem.alias),
           alias,
@@ -389,6 +399,7 @@ export function onVirtualRankingChanged({
   startTime,
   finishTime,
   currentUsername,
+  isContestModeMaxPerGroup,
 }: {
   scoreboard: types.Scoreboard;
   scoreboardEvents: types.ScoreboardEvent[];
@@ -396,6 +407,7 @@ export function onVirtualRankingChanged({
   startTime: Date;
   finishTime?: Date;
   currentUsername: string;
+  isContestModeMaxPerGroup: boolean;
 }): void {
   let rankingChartOptions: Highcharts.Options | null = null;
   const { mergedScoreboard, originalContestEvents } = mergeRankings({
@@ -407,6 +419,7 @@ export function onVirtualRankingChanged({
     scoreboard: mergedScoreboard,
     currentUsername: currentUsername,
     navbarProblems: problems,
+    isContestModeMaxPerGroup,
   });
   const ranking = rankingInfo.ranking;
   const users = rankingInfo.users;

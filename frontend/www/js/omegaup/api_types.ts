@@ -3697,7 +3697,6 @@ export namespace types {
     quality_seal: boolean;
     runs?: types.RunWithDetails[];
     score: number;
-    scorePerGroup?: number;
     settings: types.ProblemSettingsDistrib;
     show_diff: string;
     solvers?: types.BestSolvers[];
@@ -4063,6 +4062,7 @@ export namespace types {
     penalty: number;
     runtime: number;
     score: number;
+    score_by_group?: { [key: string]: null | number };
     status: string;
     status_memory?: string;
     status_runtime?: string;
@@ -4159,6 +4159,7 @@ export namespace types {
     penalty: number;
     runtime: number;
     score: number;
+    score_by_group?: { [key: string]: null | number };
     status: string;
     status_memory?: string;
     status_runtime?: string;

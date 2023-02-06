@@ -95,7 +95,13 @@ export async function navigateToProblem(
       target.problemInfo = problemInfo;
       problem.alias = problemInfo.alias;
       if (contestMode === ScoreMode.MaxPerGroup) {
-        problem.bestScore = problemInfo.scorePerGroup ?? 0.0;
+        problem.bestScore = getMaxPerGroupScore(
+          myRunsStore.state.runs.filter(
+            (run) => run.alias === problemInfo.alias,
+          ),
+          problemInfo.alias,
+          0,
+        );
       } else {
         problem.bestScore = getMaxScore(
           myRunsStore.state.runs.filter(
@@ -133,4 +139,36 @@ export function getMaxScore(
     maxScore = Math.max(maxScore, run.contest_score || 0);
   }
   return maxScore;
+}
+
+export function getMaxPerGroupScore(
+  runs: types.Run[],
+  alias: string,
+  previousScore: number,
+): number {
+  let maxPerGroupScore: number = previousScore;
+  if (!runs.length) {
+    return maxPerGroupScore;
+  }
+  const scoreByGroup = Object.keys(runs[0].score_by_group || {}).reduce(
+    (acc: Record<string, number>, key) => {
+      const values = runs
+        .filter((run) => run.alias === alias)
+        .filter((run) => run.score_by_group)
+        .map((run) => (run.score_by_group ? run.score_by_group[key] : 0.0))
+        .filter((value) => value !== null)
+        .map((value) => Number(value));
+      acc[key] = Math.max(...values);
+      return acc;
+    },
+    {},
+  );
+
+  const values = Object.values(scoreByGroup);
+  maxPerGroupScore = Math.max(
+    maxPerGroupScore,
+    values.reduce((acc, value) => acc + value, 0),
+  );
+
+  return maxPerGroupScore;
 }

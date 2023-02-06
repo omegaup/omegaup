@@ -18,6 +18,7 @@ import {
   getScoreModeEnum,
   navigateToProblem,
   NavigationType,
+  ScoreMode,
 } from './navigation';
 import clarificationStore from './clarificationsStore';
 import {
@@ -76,6 +77,8 @@ OmegaUp.on('ready', async () => {
       scoreboard: payload.scoreboard,
       currentUsername: commonPayload.currentUsername,
       navbarProblems: payload.problems,
+      isContestModeMaxPerGroup:
+        payload.contest.score_mode === ScoreMode.MaxPerGroup,
     });
     ranking = rankingInfo.ranking;
     users = rankingInfo.users;
