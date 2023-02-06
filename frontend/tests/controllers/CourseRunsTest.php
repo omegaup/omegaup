@@ -84,6 +84,6 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         $this->assertSame($runData['request']['source'], $response['source']);
-        $this->assertNull($response['feedback']); // Feedback should be null
+        $this->assertEmpty($response['feedback']); // Feedback should be empty
     }
 }
