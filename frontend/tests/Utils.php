@@ -433,7 +433,9 @@ class Utils {
         );
     }
 
-    public static function runCheckPlagiarisms(): void {
+    public static function runCheckPlagiarisms(
+        string $local_downloader_dir
+    ): void {
         self::commit();
         $host_arg = '';
         $host_chunks = explode(':', OMEGAUP_DB_HOST, 2);
@@ -454,7 +456,7 @@ class Utils {
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
              ' --password ' . escapeshellarg(OMEGAUP_DB_PASS) .
-             ' --local-downloader-dir ' . escapeshellarg(OMEGAUP_TEST_ROOT))
+             ' --local-downloader-dir ' . escapeshellarg($local_downloader_dir))
         );
     }
 
