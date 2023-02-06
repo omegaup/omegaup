@@ -48,7 +48,6 @@ const problemDetails: types.ProblemDetails = {
   },
   order: 'asc',
   score: 100,
-  //scorePerGroup: 75,
   show_diff: 'no',
   submissions: 1,
   visits: 1,
@@ -174,7 +173,6 @@ describe('navigation.ts', () => {
       expect(setLocationHash).toHaveBeenCalledWith(
         `#problems/${params.problem.alias}/new-run`,
       );
-      //expect(vueInstance.problem?.bestScore).toBe(problemDetails.scorePerGroup);
     });
   });
 });

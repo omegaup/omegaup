@@ -313,6 +313,7 @@ describe('EventsSocket', () => {
 
     expect(onRankingChanged).toHaveBeenCalledWith({
       currentUsername: 'omegaUp',
+      isContestModeMaxPerGroup: false,
       navbarProblems: [
         {
           acceptsSubmissions: true,

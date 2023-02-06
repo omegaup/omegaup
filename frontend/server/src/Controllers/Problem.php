@@ -4716,6 +4716,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         foreach ($details['runs'] ?? [] as $run) {
             if ($run['verdict'] === 'AC') {
                 $nominationPayload['solved'] = true;
+                $nominationPayload['tried'] = true;
                 break;
             } elseif ($run['verdict'] !== 'JE' && $run['verdict'] !== 'VE' && $run['verdict'] !== 'CE') {
                 $nominationPayload['tried'] = true;
