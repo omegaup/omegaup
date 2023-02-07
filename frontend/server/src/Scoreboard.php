@@ -821,15 +821,15 @@ class Scoreboard {
 
             $identityId = $run['identity_id'];
             $problemId = $run['problem_id'];
-            if ($params->score_mode !== 'max_per_group') {
-                $contestScore = $run['contest_score'];
-            } else {
+            if ($params->score_mode === 'max_per_group') {
                 $contestScore = self::getMaxPerGroupScore(
                     $identityProblemsScoreByGroup,
                     $run['score_by_group'],
                     $identityId,
                     $problemId
                 );
+            } else {
+                $contestScore = $run['contest_score'];
             }
 
             if (!isset($identityProblemsScore[$identityId])) {
@@ -915,8 +915,10 @@ class Scoreboard {
     }
 
     /**
+     * Get the max score when a contest has subtasks updated to the given
+     * $scoreByGroup.
+     *
      * @param list<list<array<string, float>>>
-     * Get the max score when a contest has subtasks
      */
     private static function getMaxPerGroupScore(
         array &$identityProblemsScoreByGroup,
