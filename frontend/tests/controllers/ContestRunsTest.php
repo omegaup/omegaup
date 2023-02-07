@@ -348,7 +348,7 @@ class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['runs'];
 
-        $maxPerGroupScore = \OmegaUp\Test\Factories\Run::maxPerGroupScore(
+        $maxPerGroupScore = \OmegaUp\Test\Factories\Run::getMaxPerGroupScore(
             $runs
         );
 
