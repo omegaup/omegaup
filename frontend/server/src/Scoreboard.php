@@ -915,10 +915,9 @@ class Scoreboard {
     }
 
     /**
+     * @param list<list<array<string, float>>>
      * Get the max score when a contest has subtasks updated to the given
      * $scoreByGroup.
-     *
-     * @param list<list<array<string, float>>>
      */
     private static function getMaxPerGroupScore(
         array &$identityProblemsScoreByGroup,
