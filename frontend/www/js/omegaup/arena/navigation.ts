@@ -9,6 +9,12 @@ import problemsStore from './problemStore';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { trackRun } from './submissions';
 
+export enum ScoreMode {
+  AllOrNothing = 'all_or_nothing',
+  Partial = 'partial',
+  MaxPerGroup = 'max_per_group',
+}
+
 export enum NavigationType {
   ForContest,
   ForSingleProblemOrCourse,
@@ -27,6 +33,7 @@ interface BaseNavigation {
 type NavigationForContest = BaseNavigation & {
   type: NavigationType.ForContest;
   contestAlias: string;
+  contestMode: ScoreMode;
 };
 
 type NavigationForSingleProblemOrCourse = BaseNavigation & {
@@ -38,12 +45,19 @@ export type NavigationRequest =
   | NavigationForContest
   | NavigationForSingleProblemOrCourse;
 
+export function getScoreModeEnum(scoreMode: string): ScoreMode {
+  if (scoreMode === 'partial') return ScoreMode.Partial;
+  if (scoreMode === 'all_or_nothing') return ScoreMode.AllOrNothing;
+  return ScoreMode.MaxPerGroup;
+}
+
 export async function navigateToProblem(
   request: NavigationRequest,
 ): Promise<void> {
-  let contestAlias, problemsetId;
+  let contestAlias, problemsetId, contestMode: ScoreMode;
   if (request.type === NavigationType.ForContest) {
     contestAlias = request.contestAlias;
+    contestMode = request.contestMode;
   }
   if (request.type === NavigationType.ForSingleProblemOrCourse) {
     problemsetId = request.problemsetId;
@@ -80,11 +94,23 @@ export async function navigateToProblem(
       problemInfo.title = currentProblem?.text ?? '';
       target.problemInfo = problemInfo;
       problem.alias = problemInfo.alias;
-      problem.bestScore = getMaxScore(
-        myRunsStore.state.runs.filter((run) => run.alias === problemInfo.alias),
-        problemInfo.alias,
-        0,
-      );
+      if (contestMode === ScoreMode.MaxPerGroup) {
+        problem.bestScore = getMaxPerGroupScore(
+          myRunsStore.state.runs.filter(
+            (run) => run.alias === problemInfo.alias,
+          ),
+          problemInfo.alias,
+          0,
+        );
+      } else {
+        problem.bestScore = getMaxScore(
+          myRunsStore.state.runs.filter(
+            (run) => run.alias === problemInfo.alias,
+          ),
+          problemInfo.alias,
+          0,
+        );
+      }
       problemsStore.commit('addProblem', problemInfo);
       target.problem = problem;
       if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
@@ -113,4 +139,36 @@ export function getMaxScore(
     maxScore = Math.max(maxScore, run.contest_score || 0);
   }
   return maxScore;
+}
+
+export function getMaxPerGroupScore(
+  runs: types.Run[],
+  alias: string,
+  previousScore: number,
+): number {
+  let maxPerGroupScore: number = previousScore;
+  if (!runs.length) {
+    return maxPerGroupScore;
+  }
+  const scoreByGroup = Object.keys(runs[0].score_by_group || {}).reduce(
+    (acc: Record<string, number>, key) => {
+      const values = runs
+        .filter((run) => run.alias === alias)
+        .filter((run) => run.score_by_group)
+        .map((run) => (run.score_by_group ? run.score_by_group[key] : 0.0))
+        .filter((value) => value !== null)
+        .map((value) => Number(value));
+      acc[key] = Math.max(...values);
+      return acc;
+    },
+    {},
+  );
+
+  const values = Object.values(scoreByGroup);
+  maxPerGroupScore = Math.max(
+    maxPerGroupScore,
+    values.reduce((acc, value) => acc + value, 0),
+  );
+
+  return maxPerGroupScore;
 }

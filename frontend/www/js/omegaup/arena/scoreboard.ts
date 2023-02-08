@@ -9,6 +9,7 @@ import Vue from 'vue';
 import { types } from '../api_types';
 import { createChart, onRankingChanged, onRankingEvents } from './ranking';
 import rankingStore from './rankingStore';
+import { ScoreMode } from './navigation';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestScoreboardPayload();
@@ -24,6 +25,8 @@ OmegaUp.on('ready', () => {
       scoreboard: payload.scoreboard,
       currentUsername: commonPayload.currentUsername,
       navbarProblems: payload.problems,
+      isContestModeMaxPerGroup:
+        payload.contest.score_mode === ScoreMode.MaxPerGroup,
     });
     ranking = rankingInfo.ranking;
     lastTimeUpdated = rankingInfo.lastTimeUpdated;
@@ -108,6 +111,8 @@ OmegaUp.on('ready', () => {
           scoreboard,
           currentUsername: commonPayload.currentUsername,
           navbarProblems: payload.problems,
+          isContestModeMaxPerGroup:
+            payload.contest.score_mode === ScoreMode.MaxPerGroup,
         });
         ranking = rankingInfo.ranking;
         lastTimeUpdated = rankingInfo.lastTimeUpdated;

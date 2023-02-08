@@ -174,6 +174,7 @@ export class EventsSocket {
             problems: this.navbarProblems,
             startTime: this.startTime,
             finishTime: this.finishTime,
+            isContestModeMaxPerGroup: this.isContestModeMaxPerGroup,
           });
         })
         .catch(ui.ignoreError);
@@ -188,6 +189,7 @@ export class EventsSocket {
       scoreboard,
       currentUsername: this.currentUsername,
       navbarProblems: this.navbarProblems,
+      isContestModeMaxPerGroup: this.isContestModeMaxPerGroup,
     });
     rankingStore.commit('updateRanking', ranking);
     rankingStore.commit('updateMiniRankingUsers', users);
@@ -330,6 +332,7 @@ export class EventsSocket {
           scoreboard,
           currentUsername: this.currentUsername,
           navbarProblems: this.navbarProblems,
+          isContestModeMaxPerGroup: this.isContestModeMaxPerGroup,
         });
 
         api.Problemset.scoreboardEvents({
@@ -378,6 +381,7 @@ export class EventsSocket {
               scoreboard,
               currentUsername: this.currentUsername,
               navbarProblems: this.navbarProblems,
+              isContestModeMaxPerGroup: this.isContestModeMaxPerGroup,
             });
 
             api.Problemset.scoreboardEvents({
