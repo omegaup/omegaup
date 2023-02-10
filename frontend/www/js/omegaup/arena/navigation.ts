@@ -58,8 +58,7 @@ export async function navigateToProblem(
   if (request.type === NavigationType.ForContest) {
     contestAlias = request.contestAlias;
     contestMode = request.contestMode;
-  }
-  if (request.type === NavigationType.ForSingleProblemOrCourse) {
+  } else if (request.type === NavigationType.ForSingleProblemOrCourse) {
     problemsetId = request.problemsetId;
   }
   const { target, problem, problems } = request;
