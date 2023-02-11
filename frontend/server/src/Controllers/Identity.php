@@ -202,13 +202,19 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
         /** @var array<string, bool> $seenUsernames */
         $seenUsernames = [];
+        $duplicatedUsernames = [];
         foreach ($identities as $identity) {
             if (isset($seenUsernames[$identity['username']])) {
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'aliasInUse'
-                );
+                $duplicatedUsernames[] = $identity['username'];
             }
             $seenUsernames[$identity['username']] = true;
+        }
+
+        if (!empty($duplicatedUsernames)) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
+                'groupMemberUsernameInUse',
+                duplicatedItemsInArray: $duplicatedUsernames
+            );
         }
 
         // Save objects into DB

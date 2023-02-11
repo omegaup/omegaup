@@ -589,6 +589,7 @@ const translations: { [key: string]: string; } = {
   groupEditScoreboardsContestsRemoved: "Concurso removido com sucesso!",
   groupEditScoreboardsEdit: "Editar painel de avalia\u00e7\u00e3o %(scoreboard)",
   groupEditTitleWithName: "Editar grupo %(name)",
+  groupMemberUsernameInUse: "H\u00e1 pelo menos um nome de usu\u00e1rio duplicado nas identidades do grupo: <br> %(usernames) <br> Corrija as informa\u00e7\u00f5es.",
   groupNewFormCreateGroup: "Criar grupo",
   groupNewFormDescription: "Descri\u00e7\u00e3o do Grupo",
   groupNewFormOnlyAC: "Contar s\u00f3 ACs",
