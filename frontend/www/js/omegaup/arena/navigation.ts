@@ -46,9 +46,9 @@ export type NavigationRequest =
   | NavigationForSingleProblemOrCourse;
 
 export function getScoreModeEnum(scoreMode: string): ScoreMode {
-  if (scoreMode === 'partial') return ScoreMode.Partial;
+  if (scoreMode === 'max_per_group') return ScoreMode.MaxPerGroup;
   if (scoreMode === 'all_or_nothing') return ScoreMode.AllOrNothing;
-  return ScoreMode.MaxPerGroup;
+  return ScoreMode.Partial;
 }
 
 export async function navigateToProblem(

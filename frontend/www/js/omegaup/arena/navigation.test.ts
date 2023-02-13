@@ -9,7 +9,7 @@ import {
   NavigationRequest,
   NavigationType,
   navigateToProblem,
-  ScoreMode,
+  getScoreModeEnum,
 } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { storeConfig } from './problemStore';
@@ -178,7 +178,7 @@ const navbarProblems: types.NavbarProblemsetProblem[] = [
 
 describe('navigation.ts', () => {
   describe('navigateToProblem', () => {
-    it('Should change hash when contest alias is declared in practice mode', async () => {
+    beforeEach(() => {
       fetchMock.enableMocks();
       fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
         if (req.url != '/api/problem/details/') {
@@ -200,6 +200,9 @@ describe('navigation.ts', () => {
           }),
         });
       });
+    });
+
+    it('Should change hash when contest alias is declared in practice mode', async () => {
       vueInstance.popupDisplayed = PopupDisplayed.None;
       const params: NavigationRequest = {
         type: NavigationType.ForContest,
@@ -207,7 +210,7 @@ describe('navigation.ts', () => {
         problems: navbarProblems,
         problem: navbarProblems[0],
         contestAlias: 'contest_alias',
-        contestMode: ScoreMode.Partial,
+        contestMode: getScoreModeEnum('partial'),
       };
       await navigateToProblem(params);
       expect(setLocationHash).toHaveBeenCalledWith(
@@ -223,7 +226,7 @@ describe('navigation.ts', () => {
         problems: navbarProblems,
         problem: navbarProblems[1],
         contestAlias: 'contest_alias',
-        contestMode: ScoreMode.MaxPerGroup,
+        contestMode: getScoreModeEnum('max_per_group'),
       };
       const localVue = createLocalVue();
       localVue.use(Vuex);
