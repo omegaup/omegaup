@@ -235,6 +235,7 @@ describe('navigation.ts', () => {
       expect(setLocationHash).toHaveBeenCalledWith(
         `#problems/${params.problem.alias}/new-run`,
       );
+      expect(vueInstance.problem).not.toBeNull();
       expect(vueInstance.problem?.bestScore).toBe(0.8);
     });
   });
