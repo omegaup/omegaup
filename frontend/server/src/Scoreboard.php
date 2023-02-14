@@ -928,25 +928,31 @@ class Scoreboard {
         if (is_null($scoreByGroup)) {
             return 0.0;
         }
-        $scoreByGroup = json_decode($scoreByGroup, associative: true);
+        $scoreByGroupArray = json_decode($scoreByGroup, associative: true);
 
-        $groupNames = array_keys($scoreByGroup);
+        if (!is_array($scoreByGroupArray)) {
+            throw new \RuntimeException(
+                'json_decode failed with: ' . json_last_error() . "for : {$scoreByGroup}"
+            );
+        }
+
+        $groupNames = array_keys($scoreByGroupArray);
 
         if (!isset($identityProblemsScoreByGroup[$identityId])) {
             $identityProblemsScoreByGroup[$identityId] = [
-                $problemId => $scoreByGroup,
+                $problemId => $scoreByGroupArray,
             ];
         } elseif (
             !isset(
                 $identityProblemsScoreByGroup[$identityId][$problemId]
             )
         ) {
-            $identityProblemsScoreByGroup[$identityId][$problemId] = $scoreByGroup;
+            $identityProblemsScoreByGroup[$identityId][$problemId] = $scoreByGroupArray;
         }
 
         foreach ($groupNames as $groupName) {
             $identityProblemsScoreByGroup[$identityId][$problemId][$groupName] = max(
-                $scoreByGroup[$groupName],
+                $scoreByGroupArray[$groupName],
                 $identityProblemsScoreByGroup[$identityId][$problemId][$groupName]
             );
         }
