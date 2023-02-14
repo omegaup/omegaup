@@ -385,9 +385,16 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should not have allowed bulk user creation');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInArrayException $e) {
+            $localizedText = \OmegaUp\Translations::getInstance()->get(
+                'groupMemberUsernameInUse'
+            );
+            $errorMessage = \OmegaUp\ApiUtils::formatString(
+                $localizedText,
+                ['usernames' => join('<br />', $e->duplicatedItemsInArray)]
+            );
             $this->assertStringContainsString(
-                'identity_3',
-                $e->duplicatedItemsInArray[0]
+                $e->getErrorMessage(),
+                $errorMessage
             );
             $this->assertSame('groupMemberUsernameInUse', $e->getMessage());
         }
