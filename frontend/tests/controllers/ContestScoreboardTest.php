@@ -354,12 +354,13 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for all percentages of scoreboard show.
      *
-     * @return list<list<int>>
+     * @return list<array<0: int, 1: bool>>
      */
     public function contestPercentageScoreboardShowProvider(): array {
         return [
-            [0],
-            [1],
+            [1, true],
+            [0, false],
+            [1, false],
         ];
     }
 
@@ -368,12 +369,19 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
      *
      * @dataProvider contestPercentageScoreboardShowProvider
      */
-    public function testScoreboardPercentajeForContestant(int $percentage) {
+    public function testScoreboardPercentajeForContestant(
+        int $percentage,
+        bool $showScoreboardAfter
+    ) {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['showScoreboardAfter' => $showScoreboardAfter]
+            )
+        );
 
         // Set percentage of scoreboard show
         \OmegaUp\Test\Factories\Contest::setScoreboardPercentage(

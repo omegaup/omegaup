@@ -44,7 +44,7 @@ class Scoreboard {
         bool $withRunDetails = false,
         bool $sortByName = false,
         ?string $filterUsersBy = null
-    ): array {
+    ) {
         $cache = null;
         // A few scoreboard options are not cacheable.
         if (
@@ -141,6 +141,7 @@ class Scoreboard {
             $this->params->admin,
             $this->params->scoreboard_pct,
             $this->params->score_mode,
+            $this->params->show_scoreboard_after,
             $sortByName,
             $withRunDetails,
             $this->params->auth_token
@@ -364,6 +365,7 @@ class Scoreboard {
             $params->admin,
             $params->scoreboard_pct,
             $params->score_mode,
+            $params->show_scoreboard_after,
             sortByName: false,
         );
 
@@ -401,6 +403,7 @@ class Scoreboard {
             $params->admin,
             $params->scoreboard_pct,
             $params->score_mode,
+            $params->show_scoreboard_after,
             sortByName: false,
         );
         $adminScoreboardCache->set($adminScoreboard, $timeout);
@@ -538,6 +541,7 @@ class Scoreboard {
         bool $showAllRuns,
         int $scoreboardPct,
         string $scoreMode,
+        bool $showScoreboardAfter,
         bool $sortByName,
         bool $withRunDetails = false,
         ?string $authToken = null
@@ -609,7 +613,7 @@ class Scoreboard {
             }
             $noRuns[$identityId] = false;
             if (!$showAllRuns) {
-                if ($isTest || $scoreboardPct === 0) {
+                if ($isTest || ($scoreboardPct === 0 && !$showScoreboardAfter)) {
                     continue;
                 }
                 if (
