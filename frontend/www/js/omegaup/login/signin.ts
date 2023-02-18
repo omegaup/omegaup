@@ -64,9 +64,19 @@ OmegaUp.on('ready', () => {
             email?: string;
             parent_email?: string;
             password: string;
+            password_confirmation: string;
             recaptcha: string;
             birth_date: Date;
           }) => {
+            const { password, password_confirmation } = request;
+            if (password !== password_confirmation) {
+              ui.error(T.passwordMismatch);
+              return;
+            }
+            if (password.length < 8) {
+              ui.error(T.loginPasswordTooShort);
+              return;
+            }
             api.User.create(request)
               .then(() => {
                 loginAndRedirect(

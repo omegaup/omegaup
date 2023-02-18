@@ -30,7 +30,6 @@
                   :disabled="!birthDate"
                   autocomplete="username"
                   :required="true"
-                  @invalid="onInvalidateForm"
                 />
                 <div class="invalid-feedback">
                   {{ T.loginUsernameRequired }}
@@ -51,7 +50,6 @@
                   :disabled="!birthDate"
                   autocomplete="email"
                   :required="true"
-                  @invalid="onInvalidateForm"
                 />
                 <div class="invalid-feedback">{{ T.loginEmailRequired }}</div>
               </label>
@@ -70,7 +68,6 @@
                   :disabled="!birthDate"
                   autocomplete="email"
                   :required="true"
-                  @invalid="onInvalidateForm"
                 />
                 <div class="invalid-feedback">
                   {{ T.loginParentEmailRequired }}
@@ -93,7 +90,6 @@
                 autocomplete="new-password"
                 :required="true"
                 pattern="^[_a-zA-Z0-9\-]{5,15}$"
-                @invalid="onInvalidateForm"
               />
               <div class="invalid-feedback">
                 {{ T.loginPasswordTooShort }}
@@ -113,7 +109,6 @@
                 autocomplete="new-password"
                 :required="true"
                 pattern="^[_a-zA-Z0-9\-]{5,15}$"
-                @invalid="onInvalidateForm"
               />
               <div class="invalid-feedback">
                 {{ T.passwordMismatch }}
@@ -211,10 +206,6 @@ export default class Signup extends Vue {
 
   expired(): void {
     this.recaptchaResponse = '';
-  }
-
-  onInvalidateForm() {
-    this.errors = true;
   }
 
   registerAndLogin(): void {
