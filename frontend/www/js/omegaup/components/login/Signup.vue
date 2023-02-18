@@ -225,6 +225,7 @@ export default class Signup extends Vue {
       // NOTE: validate the email here.
       registerParameters.email = this.email;
     }
+
     this.$emit('register-and-login', registerParameters);
   }
 }

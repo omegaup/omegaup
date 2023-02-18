@@ -103,6 +103,9 @@ describe('signup.vue', () => {
       wrapper.find('button[name="sign_up"]').attributes().disabled,
     ).toBeTruthy();
 
+    // Check that the button is disabled until required fields are filled
+    expect(wrapper.find('button[name="sign_up"]').element).toBeDisabled();
+
     // Fill in all required fields and check the policy privacy checkbox
     await wrapper.find('input[name="reg_username"]').setValue('John Doe');
     await wrapper
@@ -119,125 +122,121 @@ describe('signup.vue', () => {
     await policyPrivacyCheckbox.click();
 
     // The button should now be enabled
-    expect(
-      wrapper.find('button[name="sign_up"]').attributes().disabled,
-    ).toBeFalsy();
+    expect(wrapper.find('button[name="sign_up"]').element).toBeEnabled();
 
     // Submit the form (optional)
     //await wrapper.find('button[name="sign_up"]').trigger('click');
 
     // There should be no warning displayed, so the following assertion should pass
     expect(wrapper.find('.status').exists()).toBe(false);
+  });
 
-    it('should handle a complete registration for Under13 user', async () => {
-      const wrapper = mount(login_Signup, {
-        propsData: {
-          validateRecaptcha: false,
-        },
-      });
-
-      await wrapper.findComponent(omegaup_DatePicker).setValue('2012-01-01');
-
-      const policyPrivacyCheckbox = wrapper.find('input[type="checkbox"]')
-        .element as HTMLInputElement;
-
-      await policyPrivacyCheckbox.click();
-
-      await wrapper.find('input[name="reg_username"]').setValue('Omegaup');
-      await wrapper
-        .find('input[name="reg_parent_email"]')
-        .setValue('parentEmail@gmail.com');
-      await wrapper.find('input[name="reg_password"]').setValue('pass12345678');
-      await wrapper
-        .find('input[name="reg_password_confirmation"]')
-        .setValue('pass12345678');
-
-      await wrapper.find('button[name="sign_up"]').trigger('click');
-
-      expect(wrapper.emitted('register-and-login')).toEqual([[expectedValues]]);
+  it('should handle a complete registration for Under13 user', async () => {
+    const wrapper = mount(login_Signup, {
+      propsData: {
+        validateRecaptcha: false,
+      },
     });
 
-    it('should handle an uncomplete registration for Over13 user', async () => {
-      const wrapper = mount(login_Signup, {
-        propsData: {
-          validateRecaptcha: false,
-        },
-      });
+    await wrapper.findComponent(omegaup_DatePicker).setValue('2012-01-01');
 
-      await wrapper.findComponent(omegaup_DatePicker).setValue('2009-01-01');
+    const policyPrivacyCheckbox = wrapper.find('input[type="checkbox"]')
+      .element as HTMLInputElement;
 
-      // All the fields in the form enabled when birthdate is filled
-      expect(
-        wrapper.find('input[name="reg_username"]').attributes().disabled,
-      ).toBeFalsy();
-      expect(
-        wrapper.find('input[name="reg_email"]').attributes().disabled,
-      ).toBeFalsy();
-      expect(
-        wrapper.find('input[name="reg_password"]').attributes().disabled,
-      ).toBeFalsy();
-      expect(
-        wrapper.find('input[name="reg_password_confirmation"]').attributes()
-          .disabled,
-      ).toBeFalsy();
-      expect(
-        wrapper.find('input[type="checkbox"]').attributes().disabled,
-      ).toBeFalsy();
-      expect(
-        wrapper.find('input[name="reg_birthdate"]').attributes().disabled,
-      ).toBeFalsy();
+    await policyPrivacyCheckbox.click();
 
-      // Now, parent email field doesn't exist because user is Over13, so they should provide their own email
-      expect(wrapper.find('input[name="reg_parent_email"]').exists()).toBe(
-        false,
-      );
+    await wrapper.find('input[name="reg_username"]').setValue('Omegaup');
+    await wrapper
+      .find('input[name="reg_parent_email"]')
+      .setValue('parentEmail@gmail.com');
+    await wrapper.find('input[name="reg_password"]').setValue('pass12345678');
+    await wrapper
+      .find('input[name="reg_password_confirmation"]')
+      .setValue('pass12345678');
 
-      // The button should be enabled until policy privacy is checked
-      expect(
-        wrapper.find('button[name="sign_up"]').attributes().disabled,
-      ).toBeTruthy();
+    await wrapper.find('button[name="sign_up"]').trigger('click');
 
-      const policyPrivacyCheckbox = wrapper.find('input[type="checkbox"]')
-        .element as HTMLInputElement;
+    expect(wrapper.emitted('register-and-login')).toEqual([[expectedValues]]);
+  });
 
-      await policyPrivacyCheckbox.click();
-
-      expect(
-        wrapper.find('button[name="sign_up"]').attributes().disabled,
-      ).toBeFalsy();
-
-      expect(wrapper.find('form').classes('was-validated')).toBeFalsy();
-      await wrapper.find('button[name="sign_up"]').trigger('click');
-      expect(wrapper.find('form').classes('was-validated')).toBeTruthy();
+  it('should handle an uncomplete registration for Over13 user', async () => {
+    const wrapper = mount(login_Signup, {
+      propsData: {
+        validateRecaptcha: false,
+      },
     });
 
-    it('should handle a complete registration for Over13 user', async () => {
-      const wrapper = mount(login_Signup, {
-        propsData: {
-          validateRecaptcha: false,
-        },
-      });
+    await wrapper.findComponent(omegaup_DatePicker).setValue('2009-01-01');
 
-      await wrapper.findComponent(omegaup_DatePicker).setValue('2009-01-01');
+    // All the fields in the form enabled when birthdate is filled
+    expect(
+      wrapper.find('input[name="reg_username"]').attributes().disabled,
+    ).toBeFalsy();
+    expect(
+      wrapper.find('input[name="reg_email"]').attributes().disabled,
+    ).toBeFalsy();
+    expect(
+      wrapper.find('input[name="reg_password"]').attributes().disabled,
+    ).toBeFalsy();
+    expect(
+      wrapper.find('input[name="reg_password_confirmation"]').attributes()
+        .disabled,
+    ).toBeFalsy();
+    expect(
+      wrapper.find('input[type="checkbox"]').attributes().disabled,
+    ).toBeFalsy();
+    expect(
+      wrapper.find('input[name="reg_birthdate"]').attributes().disabled,
+    ).toBeFalsy();
 
-      const policyPrivacyCheckbox = wrapper.find('input[type="checkbox"]')
-        .element as HTMLInputElement;
+    // Now, parent email field doesn't exist because user is Over13, so they should provide their own email
+    expect(wrapper.find('input[name="reg_parent_email"]').exists()).toBe(false);
 
-      await policyPrivacyCheckbox.click();
+    // The button should be enabled until policy privacy is checked
+    expect(
+      wrapper.find('button[name="sign_up"]').attributes().disabled,
+    ).toBeTruthy();
 
-      await wrapper.find('input[name="reg_username"]').setValue('Omegaup');
-      await wrapper.find('input[name="reg_email"]').setValue('email@gmail.com');
-      await wrapper.find('input[name="reg_password"]').setValue('pass12345678');
-      await wrapper
-        .find('input[name="reg_password_confirmation"]')
-        .setValue('pass12345678');
+    const policyPrivacyCheckbox = wrapper.find('input[type="checkbox"]')
+      .element as HTMLInputElement;
 
-      await wrapper.find('button[name="sign_up"]').trigger('click');
+    await policyPrivacyCheckbox.click();
 
-      expectedValues.parent_email = null;
-      expectedValues.email = 'email@gmail.com';
-      expectedValues.birth_date = new Date('2009-01-01');
-      expect(wrapper.emitted('register-and-login')).toEqual([[expectedValues]]);
+    expect(
+      wrapper.find('button[name="sign_up"]').attributes().disabled,
+    ).toBeFalsy();
+
+    expect(wrapper.find('form').classes('was-validated')).toBeFalsy();
+    await wrapper.find('button[name="sign_up"]').trigger('click');
+    expect(wrapper.find('form').classes('was-validated')).toBeTruthy();
+  });
+
+  it('should handle a complete registration for Over13 user', async () => {
+    const wrapper = mount(login_Signup, {
+      propsData: {
+        validateRecaptcha: false,
+      },
     });
+
+    await wrapper.findComponent(omegaup_DatePicker).setValue('2009-01-01');
+
+    const policyPrivacyCheckbox = wrapper.find('input[type="checkbox"]')
+      .element as HTMLInputElement;
+
+    await policyPrivacyCheckbox.click();
+
+    await wrapper.find('input[name="reg_username"]').setValue('Omegaup');
+    await wrapper.find('input[name="reg_email"]').setValue('email@gmail.com');
+    await wrapper.find('input[name="reg_password"]').setValue('pass12345678');
+    await wrapper
+      .find('input[name="reg_password_confirmation"]')
+      .setValue('pass12345678');
+
+    await wrapper.find('button[name="sign_up"]').trigger('click');
+
+    expectedValues.parent_email = null;
+    expectedValues.email = 'email@gmail.com';
+    expectedValues.birth_date = new Date('2009-01-01');
+    expect(wrapper.emitted('register-and-login')).toEqual([[expectedValues]]);
   });
 });
