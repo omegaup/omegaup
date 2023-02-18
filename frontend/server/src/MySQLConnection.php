@@ -217,6 +217,7 @@ class MySQLConnection {
             case MYSQLI_TYPE_MEDIUM_BLOB:
             case MYSQLI_TYPE_LONG_BLOB:
             case MYSQLI_TYPE_BLOB:
+            case MYSQLI_TYPE_JSON:
                 return FieldType::TYPE_STRING;
 
             default:
