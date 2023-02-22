@@ -10,7 +10,7 @@ import argparse
 import datetime
 import logging
 
-from typing import Any, Dict, Mapping
+from typing import Any, Dict, Mapping, Union
 
 from pythonjsonlogger import jsonlogger  # type: ignore
 
@@ -24,7 +24,7 @@ class _CustomJsonFormatter(jsonlogger.JsonFormatter):  # type: ignore
             message_dict: Mapping[str, Any],
     ) -> None:
         """Add fields to the record."""
-        super().add_fields(log_record, record, message_dict)
+        super().add_fields(log_record, record,dict(message_dict))
         if not log_record.get('time'):
             log_record['time'] = datetime.datetime.utcnow().strftime(
                 '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -65,6 +65,7 @@ def init(program: str, args: argparse.Namespace) -> None:
     '''
     log_level = (logging.DEBUG if args.verbose else
                  logging.INFO if not args.quiet else logging.ERROR)
+    formatter: Union[_CustomJsonFormatter, logging.Formatter]
     if args.log_json:
         if args.logfile:
             log_handler: logging.Handler = logging.FileHandler(args.logfile)
@@ -76,9 +77,10 @@ def init(program: str, args: argparse.Namespace) -> None:
                             handlers=[log_handler],
                             force=True)
     else:
+        formatter = logging.Formatter('%%(asctime)s:%s:%%(levelname)s:%%(message)s' % program)
         logging.basicConfig(filename=args.logfile,
-                            format='%%(asctime)s:%s:%%(message)s' % program,
-                            level=log_level)
+                        format='%%(asctime)s:%s:%%(levelname)s:%%(message)s' % program,
+                        level=log_level)
 
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
