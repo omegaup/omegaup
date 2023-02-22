@@ -87,23 +87,22 @@ describe('signup.vue', () => {
       'input[name="reg_accept_policies"]',
     ).element;
     expect(policyPrivacyCheckbox).toBeDisabled();
-    
+
     await wrapper.findComponent(omegaup_DatePicker).setValue('2012-01-01');
 
-     // Once reg_birthdate has been set, all the fields are enabled
-     expect(wrapper.find('input[name="reg_birthdate"]').element).toBeEnabled();
-     expect(wrapper.find('input[name="reg_username"]').element).toBeEnabled();
-     // Now, email field doesn't exist because user is U13, so they should provide parent's email
-     expect(wrapper.find('input[name="reg_email"]').exists()).toBeFalsy();
-     expect(
-       wrapper.find('input[name="reg_parent_email"]').element,
-     ).toBeEnabled();
-     expect(wrapper.find('input[name="reg_password"]').element).toBeEnabled();
-     expect(
-       wrapper.find('input[name="reg_password_confirmation"]').element,
-     ).toBeEnabled();
-     expect(policyPrivacyCheckbox).toBeEnabled()
-
+    // Once reg_birthdate has been set, all the fields are enabled
+    expect(wrapper.find('input[name="reg_birthdate"]').element).toBeEnabled();
+    expect(wrapper.find('input[name="reg_username"]').element).toBeEnabled();
+    // Now, email field doesn't exist because user is U13, so they should provide parent's email
+    expect(wrapper.find('input[name="reg_email"]').exists()).toBeFalsy();
+    expect(
+      wrapper.find('input[name="reg_parent_email"]').element,
+    ).toBeEnabled();
+    expect(wrapper.find('input[name="reg_password"]').element).toBeEnabled();
+    expect(
+      wrapper.find('input[name="reg_password_confirmation"]').element,
+    ).toBeEnabled();
+    expect(policyPrivacyCheckbox).toBeEnabled();
 
     // Check that the button is disabled until required fields are filled
     expect(wrapper.find('button[name="sign_up"]').element).toBeDisabled();
@@ -117,13 +116,11 @@ describe('signup.vue', () => {
     await wrapper
       .find('input[name="reg_password_confirmation"]')
       .setValue('pass12345678');
-    await wrapper.find('input[name="reg_birthdate"]').setValue('2005-01-01'); 
+    await wrapper.find('input[name="reg_birthdate"]').setValue('2005-01-01');
     await policyPrivacyCheckbox.click();
 
     // The button should now be enabled
     expect(wrapper.find('button[name="sign_up"]').element).toBeEnabled();
-
-
 
     // There should be no warning displayed, so the following assertion should pass
     expect(wrapper.find('.status').exists()).toBe(false);
