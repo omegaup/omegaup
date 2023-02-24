@@ -4062,6 +4062,7 @@ export namespace types {
     penalty: number;
     runtime: number;
     score: number;
+    score_by_group?: { [key: string]: null | number };
     status: string;
     status_memory?: string;
     status_runtime?: string;
@@ -4158,6 +4159,7 @@ export namespace types {
     penalty: number;
     runtime: number;
     score: number;
+    score_by_group?: { [key: string]: null | number };
     status: string;
     status_memory?: string;
     status_runtime?: string;
