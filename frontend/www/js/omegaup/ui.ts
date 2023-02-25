@@ -307,6 +307,11 @@ export function rankingUsername(
   ) {
     username += ` (${escapeString(rank.name)})`;
   }
+  if (username.length == 0) {
+    // In case we can't use name or don't have it available, fall back to
+    // username.
+    username = rank.username;
+  }
   if (rank.virtual)
     username = formatString(T.virtualSuffix, { username: username });
   return username;
