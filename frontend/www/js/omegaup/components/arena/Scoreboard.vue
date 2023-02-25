@@ -38,7 +38,7 @@
           {{ T.wordsUser }}
         </option>
         <option :value="ui.NameDisplayOptions.NameAndUsername">
-          {{ T.wordsNameAndUsername }}
+          {{ T.arenaNameAndUsername }}
         </option>
       </select>
     </label>
