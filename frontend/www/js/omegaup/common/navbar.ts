@@ -28,6 +28,7 @@ OmegaUp.on('ready', () => {
         props: {
           omegaUpLockDown: payload.omegaUpLockDown,
           inContest: payload.inContest,
+          hideFooterAndHeader: payload.hideFooterAndHeader,
           isLoggedIn: payload.isLoggedIn,
           isReviewer: payload.isReviewer,
           gravatarURL51: payload.gravatarURL51,

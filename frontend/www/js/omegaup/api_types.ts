@@ -1452,6 +1452,14 @@ export namespace types {
       );
     }
 
+    export function EphemeralDetailsPayload(
+      elementId: string = 'payload',
+    ): types.EphemeralDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function GroupEditPayload(
       elementId: string = 'payload',
     ): types.GroupEditPayload {
@@ -2684,6 +2692,7 @@ export namespace types {
     currentUsername: string;
     gravatarURL128: string;
     gravatarURL51: string;
+    hideFooterAndHeader: boolean;
     inContest: boolean;
     isAdmin: boolean;
     isLoggedIn: boolean;
@@ -3298,6 +3307,10 @@ export namespace types {
   export interface EmailEditDetailsPayload {
     email?: string;
     profile?: types.UserProfileInfo;
+  }
+
+  export interface EphemeralDetailsPayload {
+    theme: string;
   }
 
   export interface Event {

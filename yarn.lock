@@ -5178,6 +5178,11 @@ globjoin@^0.1.4:
   resolved "https://registry.yarnpkg.com/globjoin/-/globjoin-0.1.4.tgz#2f4494ac8919e3767c5cbb691e9f463324285d43"
   integrity sha1-L0SUrIkZ43Z8XLtpHp9GMyQoXUM=
 
+golden-layout@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/golden-layout/-/golden-layout-2.5.0.tgz#9f7425859233c4d0f3e9a08d9cce8bb75566cde6"
+  integrity sha512-HmLJLPKgKSMO+48Ro2CO5Hikk7NWQmQU5qJvpKu/PCV1Iw+mGyxRaqDGYKnx0K7DZmZs1Bk3YvWSATajjkNksw==
+
 gonzales-pe@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/gonzales-pe/-/gonzales-pe-4.3.0.tgz#fe9dec5f3c557eead09ff868c65826be54d067b3"
