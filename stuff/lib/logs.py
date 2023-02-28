@@ -15,7 +15,7 @@ from typing import Any, Dict, Mapping
 from pythonjsonlogger import jsonlogger  # type: ignore
 
 
-class _CustomJsonFormatter(jsonlogger.JsonFormatter):
+class _CustomJsonFormatter(jsonlogger.JsonFormatter):  # type: ignore
     """A JSON formatter that adds the level."""
     def add_fields(
             self,
@@ -23,8 +23,8 @@ class _CustomJsonFormatter(jsonlogger.JsonFormatter):
             record: logging.LogRecord,
             message_dict: Mapping[str, Any],
     ) -> None:
+        """Add fields to the record."""
         message_dict = dict(message_dict)  # convert Mapping to Dict
-        # Add fields to the record
         super().add_fields(log_record, record, message_dict)
         if not log_record.get('time'):
             log_record['time'] = datetime.datetime.utcnow().strftime(
@@ -72,13 +72,12 @@ def init(program: str, args: argparse.Namespace) -> None:
         else:
             log_handler = logging.StreamHandler()
         formatter: _CustomJsonFormatter = _CustomJsonFormatter()
-        formatter = _CustomJsonFormatter()
         log_handler.setFormatter(formatter)
         logging.basicConfig(level=log_level,
                             handlers=[log_handler],
                             force=True)
     else:
-        logging.basicConfig(filename=args.logfile,
+        logging.basicConfig(filename=args.logfile or '',
                             format='%%(asctime)s:%s:%%(message)s' % program,
                             level=log_level)
 
