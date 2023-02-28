@@ -71,7 +71,7 @@ def init(program: str, args: argparse.Namespace) -> None:
             log_handler: logging.Handler = logging.FileHandler(args.logfile)
         else:
             log_handler = logging.StreamHandler()
-        formatter: logging.Formatter = _CustomJsonFormatter()
+        formatter: _CustomJsonFormatter = _CustomJsonFormatter()
         log_handler.setFormatter(formatter)
         logging.basicConfig(level=log_level,
                             handlers=[log_handler],
