@@ -15,7 +15,7 @@ from typing import Any, Dict, Mapping
 from pythonjsonlogger import jsonlogger  # type: ignore
 
 
-class _CustomJsonFormatter(jsonlogger.JsonFormatter):  # type: ignore
+class _CustomJsonFormatter(jsonlogger.JsonFormatter):
     """A JSON formatter that adds the level."""
     def add_fields(
             self,
