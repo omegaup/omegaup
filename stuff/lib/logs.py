@@ -23,7 +23,8 @@ class _CustomJsonFormatter(jsonlogger.JsonFormatter):  # type: ignore
             record: logging.LogRecord,
             message_dict: Mapping[str, Any],
     ) -> None:
-        """Add fields to the record."""
+        message_dict = dict(message_dict)  # convert Mapping to Dict
+        # Add fields to the record
         super().add_fields(log_record, record, message_dict)
         if not log_record.get('time'):
             log_record['time'] = datetime.datetime.utcnow().strftime(
@@ -70,7 +71,7 @@ def init(program: str, args: argparse.Namespace) -> None:
             log_handler: logging.Handler = logging.FileHandler(args.logfile)
         else:
             log_handler = logging.StreamHandler()
-        formatter = _CustomJsonFormatter()
+        formatter: logging.Formatter = _CustomJsonFormatter()
         log_handler.setFormatter(formatter)
         logging.basicConfig(level=log_level,
                             handlers=[log_handler],
