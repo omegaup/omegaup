@@ -3,6 +3,9 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const frontendConfig = require('./webpack.config-frontend.js');
+const crypto = require("crypto");
+const crypto_orig_createHash = crypto.createHash;
+crypto.createHash = algorithm => crypto_orig_createHash(algorithm == "md4" ? "sha256" : algorithm);
 
 // Generate the JSON dependency objects.
 for (const entryname of Object.keys(frontendConfig.entry)) {
