@@ -18,9 +18,6 @@
         ></omegaup-countdown>
       </div>
     </slot>
-    <!-- id-lint off -->
-    <div id="ranking-chart"></div>
-    <!-- id-lint on -->
     <highcharts
       v-if="rankingChartOptions"
       :options="rankingChartOptions"

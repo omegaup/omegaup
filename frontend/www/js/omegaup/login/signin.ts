@@ -32,6 +32,10 @@ OmegaUp.on('ready', () => {
       window.location.href = url.toString();
       return;
     }
+    if (pathname && pathname.indexOf(document.location.origin) === 0) {
+      window.location.href = pathname;
+      return;
+    }
     const fromLoginParam = '?fromLogin';
     if (isAccountCreation) {
       window.location.href = `/profile/${fromLoginParam}`;

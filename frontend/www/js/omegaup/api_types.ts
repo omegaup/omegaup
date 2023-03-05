@@ -4062,6 +4062,7 @@ export namespace types {
     penalty: number;
     runtime: number;
     score: number;
+    score_by_group?: { [key: string]: null | number };
     status: string;
     status_memory?: string;
     status_runtime?: string;
@@ -4089,7 +4090,7 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback?: types.SubmissionFeedback;
+    feedback: types.SubmissionFeedback[];
     guid: string;
     judged_by?: string;
     language: string;
@@ -4158,6 +4159,7 @@ export namespace types {
     penalty: number;
     runtime: number;
     score: number;
+    score_by_group?: { [key: string]: null | number };
     status: string;
     status_memory?: string;
     status_runtime?: string;
@@ -4463,6 +4465,8 @@ export namespace types {
     author_classname: string;
     date: Date;
     feedback: string;
+    range_bytes_end?: number;
+    range_bytes_start?: number;
   }
 
   export interface SubmissionsListPayload {
