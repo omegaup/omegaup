@@ -1290,6 +1290,7 @@ const translations: { [key: string]: string; } = {
   searchUser: "(S3arch c0d3r)",
   selectProblemLevelDesc: "(In 0rd3r 70 add 7h3 pr0b13m, y0u mu57 70 ch0053 i75 c0rr35p0nding 13v31)",
   serviceUnavailableError: "(O0p5. Th3 53rvic3 i5 curr3n71y unavai1ab13. P13a53 7ry again.)",
+  showDefaultAllContestantsInScoreboard: "(Sh0w a11 c0n7357an75 0n 7h3 5c0r3b0ard by d3fau17.)",
   showLinks: "(Link5)",
   showTotalScoreboard: "(Sh0w 707a1 5c0r3b0ard)",
   singleUserAddSuccess: "(U5u\u00e1ri0 adici0nad0 c0m 5uc3550.)",
