@@ -18,7 +18,14 @@
             height="20"
           />
         </a>
-        <button
+        <div class="d-inline-flex d-flex-row">
+          <a
+          v-if="isLoggedIn"
+          class="navbar justify-content-end mr-2 d-lg-none"
+          href="/logout/">
+            <font-awesome-icon :icon="['fas', 'power-off']" />
+          </a>
+          <button
           class="navbar-toggler"
           type="button"
           data-toggle="collapse"
@@ -28,6 +35,8 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
+
+        </div>
         <div class="collapse navbar-collapse omegaup-navbar">
           <omegaup-navbar-items
             :omega-up-lock-down="omegaUpLockDown"
@@ -295,14 +304,14 @@
             </li>
           </ul>
         </div>
+        
+        <a
+          v-if="isLoggedIn"
+          class="navbar justify-content-end d-none d-lg-block"
+          href="/logout/">
+            <font-awesome-icon :icon="['fas', 'power-off']" />
+        </a>
       </div>
-      <a
-        v-if="isLoggedIn"
-        class="navbar d-flex justify-content-end"
-        href="/logout/"
-      >
-        <font-awesome-icon :icon="['fas', 'power-off']" />
-      </a>
     </nav>
     <omegaup-user-objectives-questions
       v-if="
