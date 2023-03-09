@@ -70,7 +70,7 @@ export namespace dao {
     is_private?: boolean;
     main_email_id?: number;
     main_identity_id?: number;
-    parent_email_id?: string;
+    parent_email_id?: number;
     parent_email_verification_deadline?: Date;
     parent_email_verification_initial?: Date;
     parent_verified?: boolean;
@@ -2716,7 +2716,6 @@ export namespace types {
     languages?: string;
     last_updated: Date;
     original_finish_time?: Date;
-    partial_score: boolean;
     penalty?: number;
     penalty_calc_policy?: string;
     penalty_type?: string;
@@ -2724,6 +2723,7 @@ export namespace types {
     problemset_id: number;
     recommended: boolean;
     rerun_id?: number;
+    score_mode: string;
     scoreboard?: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
@@ -2758,7 +2758,6 @@ export namespace types {
     opened: boolean;
     original_contest_alias?: string;
     original_problemset_id?: number;
-    partial_score: boolean;
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
@@ -2767,6 +2766,7 @@ export namespace types {
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
@@ -2796,7 +2796,6 @@ export namespace types {
     opened: boolean;
     original_contest_alias?: string;
     original_problemset_id?: number;
-    partial_score: boolean;
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
@@ -2805,6 +2804,7 @@ export namespace types {
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
@@ -2842,6 +2842,7 @@ export namespace types {
     details: types.ContestAdminDetails;
     group_admins: types.ContestGroupAdmin[];
     groups: types.ContestGroup[];
+    original_contest_admission_mode?: string;
     problems: types.ProblemsetProblemWithVersions[];
     requests: types.ContestRequest[];
     teams_group?: types.ContestGroup;
@@ -2878,15 +2879,18 @@ export namespace types {
     contest_id: number;
     contestants: number;
     description: string;
+    duration?: number;
     finish_time: Date;
     last_updated: Date;
     organizer: string;
     original_finish_time: Date;
-    partial_score: boolean;
     participating: boolean;
     problemset_id: number;
     recommended: boolean;
     rerun_id?: number;
+    score_mode?: string;
+    scoreboard_url?: string;
+    scoreboard_url_admin?: string;
     start_time: Date;
     title: string;
     window_length?: number;
@@ -2951,13 +2955,13 @@ export namespace types {
     feedback: string;
     finish_time: Date;
     languages: string;
-    partial_score: boolean;
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
     points_decay_factor: number;
     problemset_id: number;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
@@ -3828,6 +3832,7 @@ export namespace types {
   }
 
   export interface ProblemListItem {
+    accepted: number;
     alias: string;
     difficulty?: number;
     difficulty_histogram: number[];
@@ -3838,6 +3843,7 @@ export namespace types {
     quality_seal: boolean;
     ratio: number;
     score: number;
+    submissions: number;
     tags: { name: string; source: string }[];
     title: string;
     visibility: number;
@@ -3957,7 +3963,6 @@ export namespace types {
     opened?: boolean;
     original_contest_alias?: string;
     original_problemset_id?: number;
-    partial_score?: boolean;
     penalty?: number;
     penalty_calc_policy?: string;
     penalty_type?: string;
@@ -3966,6 +3971,7 @@ export namespace types {
     problemset_id?: number;
     requests_user_information?: string;
     rerun_id?: number;
+    score_mode?: string;
     scoreboard?: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
@@ -4048,13 +4054,18 @@ export namespace types {
     contest_alias?: string;
     contest_score?: number;
     country: string;
+    execution?: string;
     guid: string;
     language: string;
     memory: number;
+    output?: string;
     penalty: number;
     runtime: number;
     score: number;
+    score_by_group?: { [key: string]: null | number };
     status: string;
+    status_memory?: string;
+    status_runtime?: string;
     submit_delay: number;
     time: Date;
     type?: string;
@@ -4079,7 +4090,7 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback?: types.SubmissionFeedback;
+    feedback: types.SubmissionFeedback[];
     guid: string;
     judged_by?: string;
     language: string;
@@ -4140,13 +4151,18 @@ export namespace types {
     contest_score?: number;
     country: string;
     details?: types.RunDetailsV2;
+    execution?: string;
     guid: string;
     language: string;
     memory: number;
+    output?: string;
     penalty: number;
     runtime: number;
     score: number;
+    score_by_group?: { [key: string]: null | number };
     status: string;
+    status_memory?: string;
+    status_runtime?: string;
     submit_delay: number;
     time: Date;
     type?: string;
@@ -4264,13 +4280,13 @@ export namespace types {
     languages: string;
     last_updated: number;
     only_ac?: boolean;
-    partial_score: boolean;
     penalty: string;
     penalty_calc_policy: string;
     points_decay_factor: number;
     problemset_id: number;
     recommended: boolean;
     rerun_id: number;
+    score_mode: string;
     scoreboard: number;
     show_scoreboard_after: boolean;
     start_time: Date;
@@ -4449,6 +4465,8 @@ export namespace types {
     author_classname: string;
     date: Date;
     feedback: string;
+    range_bytes_end?: number;
+    range_bytes_start?: number;
   }
 
   export interface SubmissionsListPayload {

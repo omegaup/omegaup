@@ -45,7 +45,7 @@ describe('ScoreboardDetails.vue', () => {
         'c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js',
       last_updated: now,
       only_ac: false,
-      partial_score: true,
+      score_mode: 'partial',
       penalty: '0',
       penalty_calc_policy: 'sum',
       points_decay_factor: 0,

@@ -639,8 +639,8 @@ def change_contest_admission_mode(driver, contest_admission_mode):
 def compare_contestants_list(driver, users_set):
     ''' Compares list of contestants toggle scoreboard filter.'''
 
-    contestants_list = driver.browser.find_elements(By.XPATH,
-        '//*[@data-table-scoreboard]/tbody/tr/td[@class="user"]')
+    contestants_list = driver.browser.find_elements(
+        By.XPATH, '//*[@data-table-scoreboard]/tbody/tr/td[@class="user"]')
     # Considering only the username. All unassociated identities are created
     # with a name, which is appended after the username, like:
     #

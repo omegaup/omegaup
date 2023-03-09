@@ -122,14 +122,14 @@ class SubmissionFeedback extends \OmegaUp\DAO\VO\VO {
     /**
      * Inicio de la subcadena seleccionada (en bytes) para agregarle el comentario
      *
-     * @var int
+     * @var int|null
      */
-    public $range_bytes_start = 0;
+    public $range_bytes_start = null;
 
     /**
      * Fin de la subcadena seleccionada (en bytes) para agregarle el comentario
      *
-     * @var int
+     * @var int|null
      */
-    public $range_bytes_end = 0;
+    public $range_bytes_end = null;
 }

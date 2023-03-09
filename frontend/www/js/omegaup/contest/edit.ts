@@ -161,6 +161,7 @@ OmegaUp.on('ready', () => {
           searchResultTeamsGroups: this.searchResultTeamsGroups,
           searchResultGroups: this.searchResultGroups,
           teamsGroup: this.teamsGroup,
+          originalContestAdmissionMode: payload.original_contest_admission_mode,
         },
         on: {
           'update-search-result-problems': ({

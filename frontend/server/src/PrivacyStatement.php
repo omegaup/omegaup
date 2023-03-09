@@ -23,6 +23,7 @@ class PrivacyStatement {
         );
         $language = self::getLanguage($languageId);
 
+        /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
         return file_get_contents(
             sprintf(
                 "%s/privacy/{$problemsetType}_{$requestsUserInformation}_consent/{$language}.md",
@@ -41,6 +42,7 @@ class PrivacyStatement {
     ): string {
         $language = self::getLanguage($languageId);
 
+        /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
         return file_get_contents(
             sprintf("%s/privacy/{$type}/{$language}.md", strval(OMEGAUP_ROOT))
         );

@@ -62,7 +62,7 @@ class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {
         $queryPath = static::OMEGAUP_BADGES_ROOT . '/legacyUser/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = [$user1->user_id];
-        $this->assertEquals($expected, $results);
+        $this->assertSame($expected, $results);
     }
 
     public function testLegacyUserMix() {
@@ -94,7 +94,7 @@ class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {
 
         // Call the API
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         $user1 = $problemData['authorUser'];
         $identity1 = $problemAuthor;
@@ -136,7 +136,7 @@ class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {
             'window_length' => '0',
             'scoreboard' => 100,
             'points_decay_factor' => 0,
-            'partial_score' => 'true',
+            'score_mode' => 'partial',
             'submissions_gap' => 1200,
             'penalty' => 0,
             'feedback' => 'detailed',
@@ -150,6 +150,6 @@ class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {
         $queryPath = static::OMEGAUP_BADGES_ROOT . '/legacyUser/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = [$user1->user_id];
-        $this->assertEquals($expected, $results);
+        $this->assertSame($expected, $results);
     }
 }

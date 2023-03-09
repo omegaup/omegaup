@@ -6,7 +6,7 @@ services:
     build:
       dockerfile: ./Dockerfile.dev-php
       context: ./stuff/docker/
-    image: omegaup/dev-php:20220918
+    image: omegaup/dev-php:20221023
     user: "${UID_GID}"
     restart: always
     volumes:
@@ -112,6 +112,10 @@ services:
       MYSQL_PASSWORD: 'omegaup'
       MYSQL_ROOT_PASSWORD: 'omegaup'
       MYSQL_TCP_PORT: 13306
+    command:
+      - --max_execution_time=30000
+      - --lock_wait_timeout=10
+      - --wait_timeout=20
     expose:
       - '13306'
     volumes:

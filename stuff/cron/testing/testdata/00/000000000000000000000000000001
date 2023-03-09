@@ -1,0 +1,65 @@
+#include "extremos.h"
+#include<iostream>
+using namespace std;
+// Main
+//	bool esMenor(int i, int j)
+//	void respuesta(int posMenor, int posMayor)
+
+int a, b, x ;
+int mayor(int i, int j){
+    if(j==i){
+        return i;
+    }
+    else if(j==i+1){
+        if(esMenor(i,j)==1){
+            return j;
+        }
+        else{
+            return i;
+        }
+    }
+    else{
+        x=i+j;
+        x=x/2;
+        a=mayor(i,x-1);
+        b=mayor(x,j);
+        if(esMenor(a, b)==1){
+            return b;
+        }
+        else{
+            return a;
+        }
+    }
+}
+//*********************************************************************************
+int menor(int i, int j){
+    if(j==i){
+        return i;
+    }
+    else if(j==i+1){
+        if(esMenor(i,j)==1){
+            return i;
+        }
+        else{
+            return j;
+        }
+    }
+    else{
+        x=i+j;
+        x=x/2;
+        a=menor(i,x-1);
+        b=menor(x,j);
+        if(esMenor(a, b)==0){
+            return a;
+        }
+        else{
+            return b;
+        }
+    }
+}
+
+void buscaExtremos(int n) {
+    a=menor(1,n);
+    b=mayor(1,n);
+	respuesta(a,b);
+}

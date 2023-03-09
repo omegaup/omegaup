@@ -7,9 +7,9 @@ namespace OmegaUp\Test;
  * @psalm-suppress PropertyNotSetInConstructor For some reason psalm is complaining about some phpunit statics.
  */
 class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
-    /** @psalm-suppress MixedOperand OMEGAUP_ROOT is definitely defined. */
+    /** @psalm-suppress MixedOperand OMEGAUP_ROOT is really a string. */
     const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
-    /** @psalm-suppress MixedOperand OMEGAUP_ROOT is definitely defined. */
+    /** @psalm-suppress MixedOperand OMEGAUP_ROOT is really a string. */
     const BADGES_TESTS_ROOT = OMEGAUP_ROOT . '/tests/badges';
     const MAX_BADGE_SIZE = 20 * 1024;
     const ICON_FILE = 'icon.svg';
@@ -143,9 +143,13 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Test\Factories\Run::gradeRun($runData);
         }
 
+        /**
+         * @psalm-suppress MixedOperand OMEGAUP_BADGES_ROOT is really a string.
+         * @var string $queryPath
+         */
         $queryPath = self::OMEGAUP_BADGES_ROOT . '/' . $folderName . '/' . self::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = [$students[0]['user']->user_id];
-        $this->assertEquals($expected, $results);
+        $this->assertSame($expected, $results);
     }
 }

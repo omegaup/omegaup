@@ -162,6 +162,9 @@ OmegaUp.on('ready', async () => {
               .catch(ui.apiError);
           },
           'request-feedback': (guid: string) => {
+            if (!window.confirm(T.requestFeedbackConfirm)) {
+              return;
+            }
             api.Course.requestFeedback({
               course_alias: payload.courseDetails.alias,
               assignment_alias: payload.currentAssignment.alias,
@@ -457,6 +460,9 @@ OmegaUp.on('ready', async () => {
   const socket = new EventsSocket({
     disableSockets: false,
     problemsetAlias: payload.courseDetails.alias,
+    isVirtual: false,
+    startTime: payload.currentAssignment.start_time,
+    finishTime: payload.currentAssignment.finish_time,
     locationProtocol: window.location.protocol,
     locationHost: window.location.host,
     problemsetId: payload.currentAssignment.problemset_id,
@@ -466,6 +472,7 @@ OmegaUp.on('ready', async () => {
     navbarProblems: arenaCourse.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
+    isContestModeMaxPerGroup: false,
   });
   socket.connect();
 

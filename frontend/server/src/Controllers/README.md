@@ -748,7 +748,6 @@ Creates a new contest
 | `finish_time`               | `mixed`        |             |
 | `languages`                 | `mixed`        |             |
 | `needs_basic_information`   | `bool\|null`   |             |
-| `partial_score`             | `bool\|null`   |             |
 | `penalty`                   | `mixed`        |             |
 | `penalty_calc_policy`       | `mixed`        |             |
 | `penalty_type`              | `mixed`        |             |
@@ -1315,7 +1314,6 @@ Update a Contest
 | `feedback`                                   | `mixed`                                              |             |
 | `languages`                                  | `mixed`                                              |             |
 | `needs_basic_information`                    | `bool\|null`                                         |             |
-| `partial_score`                              | `bool\|null`                                         |             |
 | `penalty`                                    | `int\|null`                                          |             |
 | `penalty_calc_policy`                        | `mixed`                                              |             |
 | `penalty_type`                               | `mixed`                                              |             |
@@ -3742,9 +3740,9 @@ Create a new run
 | Name            | Type     | Description |
 | --------------- | -------- | ----------- |
 | `contest_alias` | `string` |             |
+| `language`      | `string` |             |
 | `problem_alias` | `string` |             |
 | `source`        | `string` |             |
-| `language`      | `mixed`  |             |
 | `problemset_id` | `mixed`  |             |
 
 ### Returns
@@ -3823,10 +3821,10 @@ Re-sends a problem to Grader.
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
-| `debug`     | `mixed`  |             |
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| `run_alias` | `string`     |             |
+| `debug`     | `bool\|null` |             |
 
 ### Returns
 
