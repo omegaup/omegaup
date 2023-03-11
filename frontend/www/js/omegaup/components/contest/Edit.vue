@@ -57,7 +57,10 @@
             >{{ T.contestNewFormAdmissionMode }}</a
           >
           <a
-            v-if="!details.contest_for_teams"
+            v-if="
+              originalContestAdmissionMode != 'private' &&
+              !details.contest_for_teams
+            "
             href="#"
             data-toggle="tab"
             data-nav-contestant
@@ -77,6 +80,7 @@
             >{{ T.contestAddgroupAddGroup }}</a
           >
           <a
+            v-if="!virtual"
             href="#"
             data-toggle="tab"
             class="dropdown-item"
@@ -130,7 +134,7 @@
           :initial-scoreboard="details.scoreboard"
           :initial-penalty-type="details.penalty_type"
           :initial-show-scoreboard-after="details.show_scoreboard_after"
-          :initial-partial-score="details.partial_score"
+          :score-mode="details.score_mode"
           :initial-needs-basic-information="details.needs_basic_information"
           :initial-requests-user-information="details.requests_user_information"
           :all-languages="details.available_languages"
@@ -152,12 +156,12 @@
       <div v-if="showTab === 'problems'" class="tab-pane active">
         <omegaup-contest-add-problem
           :contest-alias="details.alias"
-          :initial-points="details.partial_score ? 100 : 1"
+          :initial-points="details.score_mode !== 'all_or_nothing' ? 100 : 1"
           :initial-problems="problems"
           :search-result-problems="searchResultProblems"
           @add-problem="(request) => $emit('add-problem', request)"
           @update-search-result-problems="
-            (query) => $emit('update-search-result-problems', query)
+            (request) => $emit('update-search-result-problems', request)
           "
           @get-versions="(request) => $emit('get-versions', request)"
           @remove-problem="
@@ -225,7 +229,7 @@
         ></omegaup-contest-teams-groups>
       </div>
       <div v-if="showTab === 'admins'" class="tab-pane active">
-        <omegaup-contest-admins
+        <omegaup-common-admins
           :admins="admins"
           :search-result-users="searchResultUsers"
           @add-admin="(username) => $emit('add-admin', username)"
@@ -233,17 +237,21 @@
           @update-search-result-users="
             (query) => $emit('update-search-result-users', query)
           "
-        ></omegaup-contest-admins>
+        ></omegaup-common-admins>
         <div class="mt-2"></div>
-        <omegaup-contest-group-admins
+        <omegaup-common-group-admins
           :group-admins="groupAdmins"
+          :search-result-groups="searchResultGroups"
           @add-group-admin="
             (groupAlias) => $emit('add-group-admin', groupAlias)
           "
           @remove-group-admin="
             (groupAlias) => $emit('remove-group-admin', groupAlias)
           "
-        ></omegaup-contest-group-admins>
+          @update-search-result-groups="
+            (query) => $emit('update-search-result-groups', query)
+          "
+        ></omegaup-common-group-admins>
       </div>
       <div v-if="showTab === 'links'" class="tab-pane active">
         <omegaup-contest-links
@@ -284,10 +292,10 @@ import * as ui from '../../ui';
 import contest_AddProblem from './AddProblem.vue';
 import contest_AddContestant from './AddContestant.vue';
 import contest_Clone from './Clone.vue';
-import contest_Admins from '../common/Adminsv2.vue';
+import common_Admins from '../common/Admins.vue';
 import common_Archive from '../common/Archive.vue';
 import common_Requests from '../common/Requests.vue';
-import contest_GroupAdmins from '../common/GroupAdminsv2.vue';
+import common_GroupAdmins from '../common/GroupAdmins.vue';
 import contest_Groups from './Groups.vue';
 import contest_TeamsGroups from './TeamsGroup.vue';
 import contest_Links from './Links.vue';
@@ -297,14 +305,14 @@ import common_Publish from '../common/Publish.vue';
 @Component({
   components: {
     'omegaup-contest-add-problem': contest_AddProblem,
-    'omegaup-contest-admins': contest_Admins,
+    'omegaup-common-admins': common_Admins,
     'omegaup-contest-clone': contest_Clone,
     'omegaup-contest-add-contestant': contest_AddContestant,
     'omegaup-common-archive': common_Archive,
     'omegaup-common-requests': common_Requests,
     'omegaup-contest-groups': contest_Groups,
     'omegaup-contest-teams-groups': contest_TeamsGroups,
-    'omegaup-contest-group-admins': contest_GroupAdmins,
+    'omegaup-common-group-admins': common_GroupAdmins,
     'omegaup-contest-links': contest_Links,
     'omegaup-contest-new-form': contest_NewForm,
     'omegaup-common-publish': common_Publish,
@@ -323,12 +331,23 @@ export default class Edit extends Vue {
   @Prop() teamsGroup!: types.ContestGroup | null;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop() searchResultGroups!: types.ListItem[];
+  @Prop({ default: null }) originalContestAdmissionMode!: null | string;
 
   T = T;
   ui = ui;
-  showTab = ui.isVirtual(this.details) ? 'contestants' : 'new_form';
   virtual = ui.isVirtual(this.details);
+  showTab = this.selectedTab();
   alreadyArchived = this.details.archived;
+
+  selectedTab(): string {
+    if (!ui.isVirtual(this.details)) {
+      return 'new_form';
+    }
+    if (this.originalContestAdmissionMode != 'private') {
+      return 'contestants';
+    }
+    return 'links';
+  }
 
   get activeTab(): string {
     switch (this.showTab) {
@@ -369,8 +388,11 @@ export default class Edit extends Vue {
     return T.contestEditArchiveHelpText;
   }
 
-  get teamsGroupAlias(): null | string {
-    return this.teamsGroup?.alias ?? null;
+  get teamsGroupAlias(): null | types.ListItem {
+    if (!this.teamsGroup) {
+      return null;
+    }
+    return { key: this.teamsGroup?.alias, value: this.teamsGroup.name };
   }
 
   onArchiveContest(archive: boolean): void {

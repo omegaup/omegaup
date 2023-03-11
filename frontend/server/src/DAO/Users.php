@@ -14,9 +14,27 @@ namespace OmegaUp\DAO;
  */
 class Users extends \OmegaUp\DAO\Base\Users {
     public static function findByEmail(string $email): ?\OmegaUp\DAO\VO\Users {
-        $sql = 'select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id';
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "u.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Users::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "SELECT
+                    {$fields}
+                FROM
+                    `Users` u
+                INNER JOIN
+                    `Emails` e
+                ON
+                    e.user_id = u.user_id
+                WHERE
+                    e.email = ?;";
         $params = [ $email ];
-        /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
+        /** @var array{birth_date: null|string, creation_timestamp: \OmegaUp\Timestamp, deletion_token: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, parent_email_id: int|null, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_email_verification_initial: \OmegaUp\Timestamp|null, parent_verified: bool|null, parental_verification_token: null|string, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -27,8 +45,17 @@ class Users extends \OmegaUp\DAO\Base\Users {
     public static function FindByUsername(
         string $username
     ): ?\OmegaUp\DAO\VO\Users {
-        $sql = 'SELECT
-                    u.*
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "u.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Users::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "SELECT
+                    {$fields}
                 FROM
                     Users u
                 INNER JOIN
@@ -37,8 +64,8 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     i.user_id = u.user_id
                 WHERE
                     i.username = ?
-                LIMIT 1;';
-        /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
+                LIMIT 1;";
+        /** @var array{birth_date: null|string, creation_timestamp: \OmegaUp\Timestamp, deletion_token: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, parent_email_id: int|null, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_email_verification_initial: \OmegaUp\Timestamp|null, parent_verified: bool|null, parental_verification_token: null|string, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$username]
@@ -236,17 +263,16 @@ class Users extends \OmegaUp\DAO\Base\Users {
     final public static function getByVerification(
         string $verificationId
     ): ?\OmegaUp\DAO\VO\Users {
-        $sql = '
-            SELECT
-                *
-            FROM
-                Users
-            WHERE
-                verification_id = ?
-            LIMIT 1;
-        ';
+        $fields = join(', ', array_keys(\OmegaUp\DAO\VO\Users::FIELD_NAMES));
+        $sql = "SELECT
+                    {$fields}
+                FROM
+                    Users u
+                WHERE
+                    verification_id = ?
+                LIMIT 1;";
 
-        /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
+        /** @var array{birth_date: null|string, creation_timestamp: \OmegaUp\Timestamp, deletion_token: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, parent_email_id: int|null, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_email_verification_initial: \OmegaUp\Timestamp|null, parent_verified: bool|null, parental_verification_token: null|string, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$verificationId]
@@ -283,22 +309,85 @@ class Users extends \OmegaUp\DAO\Base\Users {
     }
 
     /**
+    * Delete User
+    */
+    public static function deleteUserAndIndentityInformation(
+        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): int {
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            $sql = '
+                UPDATE
+                    `Users`
+                SET
+                    `facebook_user_id` = NULL,
+                    `git_token`= NULL,
+                    `main_email_id`= NULL,
+                    `main_identity_id`= NULL,
+                    `has_learning_objective`= NULL,
+                    `has_scholar_objective`= NULL,
+                    `has_competitive_objective`= NULL,
+                    `verification_id`= NULL,
+                    `reset_digest`= NULL,
+                    `reset_sent_at`= NULL,
+                    `hide_problem_tags`= NULL,
+                    `birth_date`= NULL,
+                    verified = 0,
+                    in_mailing_list = 0,
+                    is_private = 0
+                WHERE
+                    `user_id` = ?;';
+            $params = [
+                $user->user_id,
+            ];
+            \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+            $randomString = \OmegaUp\SecurityTools::randomString(20);
+            $sql = '
+                UPDATE
+                    `Identities`
+                SET
+                    `username` = ?,
+                    `password` = NULL,
+                    `name`= NULL,
+                    `user_id`= NULL,
+                    `language_id`= NULL,
+                    `country_id`= NULL,
+                    `state_id`= NULL,
+                    `gender`= NULL
+                WHERE
+                    `identity_id` = ?;';
+            $params = [
+                "deleted_user_{$randomString}",
+                $identity->identity_id,
+            ];
+            \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+   /**
      * @return list<\OmegaUp\DAO\VO\Users>
      */
     final public static function getVerified(
         bool $verified,
         bool $inMailingList
     ): array {
-        $sql = 'SELECT
-                    *
+        $fields = join(', ', array_keys(\OmegaUp\DAO\VO\Users::FIELD_NAMES));
+        $sql = "SELECT
+                    {$fields}
                 FROM
-                    Users
+                    Users u
                 WHERE
                     verified = ?
                 AND
-                    in_mailing_list = ?';
+                    in_mailing_list = ?";
 
-        /** @var list<array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}> */
+        /** @var list<array{birth_date: null|string, creation_timestamp: \OmegaUp\Timestamp, deletion_token: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, parent_email_id: int|null, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_email_verification_initial: \OmegaUp\Timestamp|null, parent_verified: bool|null, parental_verification_token: null|string, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$verified, $inMailingList]
@@ -318,5 +407,44 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     Users;';
         /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
+    }
+
+    final public static function generateDeletionToken(
+        \OmegaUp\DAO\VO\Users $user,
+        string $token
+    ): void {
+        $sql = '
+            UPDATE
+                Users u
+            SET
+                u.deletion_token = ?
+            WHERE
+                u.user_id = ?;
+        ';
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$token, $user->user_id]
+        );
+    }
+
+    final public static function validateDeletionToken(
+        \OmegaUp\DAO\VO\Users $user,
+        string $token
+    ): bool {
+        $sql = 'SELECT
+                    COUNT(*)
+                FROM
+                    Users
+                WHERE
+                    `user_id` = ?
+                    AND `deletion_token` = ?;';
+
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$user->user_id, $token]
+        );
+
+        return boolval($count);
     }
 }

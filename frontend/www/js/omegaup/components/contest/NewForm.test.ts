@@ -120,4 +120,35 @@ describe('NewForm.vue', () => {
 
     wrapper.destroy();
   });
+
+  it('Should update score mode when', async () => {
+    const wrapper = shallowMount(contest_NewForm, {
+      propsData: {
+        update: true,
+        allLanguages: [
+          { py2: 'Python 2' },
+          { py3: 'Python 3' },
+          { cat: 'cat' },
+        ],
+        initialLanguages: ['py2', 'cat'],
+        initialFinishTime: new Date(),
+        initialStartTime: new Date(),
+        initialSubmissionsGap: 1,
+        initialAlias: 'contestAlias',
+        initialTitle: 'Contest Title',
+        initialDescription: 'Contest description.',
+        problems,
+      },
+    });
+
+    expect(wrapper.vm.currentScoreMode).toBe('partial');
+    await wrapper.find('[data-contest-icpc]').trigger('click');
+    expect(wrapper.vm.currentScoreMode).toBe('all_or_nothing');
+    await wrapper.find('[data-contest-preioi]').trigger('click');
+    expect(wrapper.vm.currentScoreMode).toBe('partial');
+    await wrapper.find('[data-contest-omi]').trigger('click');
+    expect(wrapper.vm.currentScoreMode).toBe('partial');
+    await wrapper.find('[data-contest-conacup]').trigger('click');
+    expect(wrapper.vm.currentScoreMode).toBe('partial');
+  });
 });

@@ -8,8 +8,8 @@
  * @psalm-type Identity=array{classname?: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, password?: string, school: null|string, school_id: int|null, school_name?: string, state: null|string, state_id: null|string, username: string}
  * @psalm-type GroupScoreboard=array{alias: string, create_time: string, description: null|string, name: string}
  * @psalm-type GroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, groupAlias: string, groupDescription: null|string, groupName: null|string, identities: list<Identity>, isOrganizer: bool, scoreboards: list<GroupScoreboard>}
- * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
- * @psalm-type ScoreboardContest=array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}
+ * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration?: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type ScoreboardContest=array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, score_mode: string, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}
  * @psalm-type GroupScoreboardContestsPayload=array{availableContests: list<ContestListItem>, contests: list<ScoreboardContest>, scoreboardAlias: string, groupAlias: string}
  * @psalm-type Group=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
  * @psalm-type GroupListPayload=array{groups: list<Group>}
@@ -72,7 +72,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $name
      */
     public static function apiCreate(\OmegaUp\Request $r) {
-        $r->ensureMainUserIdentity();
+        $r->ensureMainUserIdentityIsOver13();
 
         $groupAlias = $r->ensureString(
             'alias',
@@ -159,7 +159,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $usernameOrEmail
      */
     public static function apiAddUser(\OmegaUp\Request $r): array {
-        $r->ensureIdentity();
+        $r->ensureIdentityIsOver13();
         $groupAlias = $r->ensureString(
             'group_alias',
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
@@ -386,7 +386,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $name
      */
     public static function apiCreateScoreboard(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentityIsOver13();
         $groupAlias = $r->ensureString(
             'group_alias',
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
@@ -537,18 +537,20 @@ class Group extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $scoreboard
         );
-
+        [
+            'contests' => $availableContests,
+        ] = \OmegaUp\Controllers\Contest::getContestList(
+            $r->identity,
+            query: null,
+            page: 1,
+            pageSize: 20,
+            activeContests: \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+            recommended: \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+        );
         return [
             'templateProperties' => [
                 'payload' => [
-                    'availableContests' => \OmegaUp\Controllers\Contest::getContestList(
-                        $r->identity,
-                        query: null,
-                        page: 1,
-                        pageSize: 20,
-                        activeContests: \OmegaUp\DAO\Enum\ActiveStatus::ALL,
-                        recommended: \OmegaUp\DAO\Enum\RecommendedStatus::ALL
-                    ),
+                    'availableContests' => $availableContests,
                     'contests' => $contests,
                     'scoreboardAlias' => $scoreboard,
                     'groupAlias' => $groupAlias,

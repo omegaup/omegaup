@@ -10,7 +10,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank, pagerItems: list<PageItem>}
  * @psalm-type Badge=array{assignation_time: \OmegaUp\Timestamp|null, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}
  * @psalm-type AssociatedIdentity=array{username: string, default: bool}
- * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, omegaUpLockDown: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL128: string, gravatarURL51: string, currentEmail: string, currentName: null|string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string, userTypes: list<string>}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float, quality_seal: bool}
@@ -27,7 +27,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
- * @psalm-type Contest=array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}
+ * @psalm-type Contest=array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, score_mode: string, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}
  * @psalm-type Course=array{acl_id?: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time?: \OmegaUp\Timestamp|null, group_id?: int, languages?: null|string, level?: null|string, minimum_progress_for_certificate?: int|null, name: string, needs_basic_information: bool, objective?: null|string, requests_user_information: string, school_id?: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}
  * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, hasPassword: bool}
  * @psalm-type CachedExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>}
@@ -126,29 +126,31 @@ class User extends \OmegaUp\Controllers\Controller {
         $identity = \OmegaUp\DAO\Identities::findByUsername(
             $createUserParams->username
         );
-        $identityByEmail = \OmegaUp\DAO\Identities::findByEmail(
-            $createUserParams->email
-        );
-
-        if (!is_null($identityByEmail)) {
-                // Check if the same user had already tried to create this account.
-            if (
-                !is_null($identityByEmail->password) &&
-                !is_null($identity) &&
-                $identity->user_id === $identityByEmail->user_id &&
-                \OmegaUp\SecurityTools::compareHashedStrings(
-                    strval($createUserParams->password),
-                    strval($identity->password)
-                )
-            ) {
-                return;
-            }
-            // Given that the user has already been created, and we
-            // have no way of validating if this request was made by
-            // the same person, let's just bail out.
-            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                'mailInUse'
+        if (!is_null($createUserParams->email)) {
+            $identityByEmail = \OmegaUp\DAO\Identities::findByEmail(
+                $createUserParams->email
             );
+
+            if (!is_null($identityByEmail)) {
+                // Check if the same user had already tried to create this account.
+                if (
+                    !is_null($identityByEmail->password) &&
+                    !is_null($identity) &&
+                    $identity->user_id === $identityByEmail->user_id &&
+                    \OmegaUp\SecurityTools::compareHashedStrings(
+                        strval($createUserParams->password),
+                        strval($identity->password)
+                    )
+                ) {
+                    return;
+                }
+                // Given that the user has already been created, and we
+                // have no way of validating if this request was made by
+                // the same person, let's just bail out.
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'mailInUse'
+                );
+            }
         }
 
         if (!is_null($identity)) {
@@ -166,7 +168,47 @@ class User extends \OmegaUp\Controllers\Controller {
             'verified' => 0,
             'verification_id' => \OmegaUp\SecurityTools::randomString(50),
             'is_private' => boolval($createUserParams->isPrivate),
+            'birth_date' => \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                intval(
+                    $createUserParams->birthDate
+                )
+            ),
         ];
+        if (
+            $createUserParams->birthDate >= strtotime(
+                '-13 year',
+                \OmegaUp\Time::get()
+            )
+            && !is_null($createUserParams->parentEmail)
+        ) {
+            // Fill all the columns refering to user's parent
+            $userData['parental_verification_token'] = \OmegaUp\SecurityTools::randomHexString(
+                25
+            );
+            $userData['creation_timestamp'] = \OmegaUp\Time::get();
+            $userData['parent_email_verification_initial'] = \OmegaUp\Time::get();
+            $userData['parent_email_verification_deadline'] = strtotime(
+                '+7 days',
+                \OmegaUp\Time::get()
+            );
+
+            $subject = \OmegaUp\Translations::getInstance()->get(
+                'parentEmailSubject'
+            );
+            $body = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get('parentEmailBody'),
+                [
+                    'parental_verification_token' => $userData['parental_verification_token'],
+                ]
+            );
+
+            \OmegaUp\Email::sendEmail(
+                [$createUserParams->parentEmail],
+                $subject,
+                $body
+            );
+        }
+
         if (!is_null($createUserParams->name)) {
             $identityData['name'] = $createUserParams->name;
         }
@@ -234,9 +276,12 @@ class User extends \OmegaUp\Controllers\Controller {
         $user = new \OmegaUp\DAO\VO\Users($userData);
         $identity = new \OmegaUp\DAO\VO\Identities($identityData);
 
-        $email = new \OmegaUp\DAO\VO\Emails([
-            'email' => $createUserParams->email,
-        ]);
+        $email = null;
+        if (!is_null($createUserParams->email)) {
+            $email = new \OmegaUp\DAO\VO\Emails([
+                'email' => $createUserParams->email,
+            ]);
+        }
 
         // Save objects into DB
         try {
@@ -244,14 +289,16 @@ class User extends \OmegaUp\Controllers\Controller {
 
             \OmegaUp\DAO\Users::create($user);
 
-            $email->user_id = $user->user_id;
-            \OmegaUp\DAO\Emails::create($email);
-            if (empty($email->email_id)) {
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'mailInUse'
-                );
+            if (!is_null($email)) {
+                $email->user_id = $user->user_id;
+                \OmegaUp\DAO\Emails::create($email);
+                if (empty($email->email_id)) {
+                    throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                        'mailInUse'
+                    );
+                }
+                $user->main_email_id = $email->email_id;
             }
-            $user->main_email_id = $email->email_id;
 
             $identity->user_id = $user->user_id;
             \OmegaUp\DAO\Identities::create($identity);
@@ -263,7 +310,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 self::$log->info(
                     "Identity {$identity->username} created, trusting e-mail"
                 );
-            } else {
+            } elseif (is_null($createUserParams->parentEmail)) {
                 self::$log->info(
                     "Identity {$identity->username} created, sending verification mail"
                 );
@@ -550,7 +597,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $response = [
             'templateProperties' => [
                 'payload' => [
-                    'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
+                    'validateRecaptcha' => boolval(OMEGAUP_VALIDATE_CAPTCHA),
                     'verifyEmailSuccessfully' => \OmegaUp\Translations::getInstance()->get(
                         'verificationEmailSuccesfully'
                     ),
@@ -571,7 +618,7 @@ class User extends \OmegaUp\Controllers\Controller {
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             \OmegaUp\ApiCaller::logException($e);
             $response['templateProperties']['payload'] = [
-                'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
+                'validateRecaptcha' => boolval(OMEGAUP_VALIDATE_CAPTCHA),
                 'statusError' => $e->getErrorMessage(),
             ];
         } finally {
@@ -2116,12 +2163,6 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         );
         $rowcount = $r->ensureOptionalInt('rowcount') ?? 100;
-        if (is_null($term) && is_null($query)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterEmpty',
-                'query'
-            );
-        }
         $param = $term ?? $query;
         if (is_null($param)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -2281,7 +2322,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $name
      * @omegaup-request-param null|string $scholar_degree
      * @omegaup-request-param int|null $school_id
-     * @omegaup-request-param mixed $school_name
+     * @omegaup-request-param null|string $school_name
      * @omegaup-request-param string $state_id
      * @omegaup-request-param mixed $username
      */
@@ -2362,12 +2403,9 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         $newSchoolId = $currentSchoolId;
 
-        \OmegaUp\Validators::validateOptionalNumber(
-            $r['school_id'],
-            'school_id'
-        );
-        if (!is_null($r['school_id'])) {
-            $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
+        $schoolId = $r->ensureOptionalInt('school_id');
+        if (!is_null($schoolId)) {
+            $school = \OmegaUp\DAO\Schools::getByPK($schoolId);
             if (is_null($school)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
@@ -2381,10 +2419,11 @@ class User extends \OmegaUp\Controllers\Controller {
             $newSchoolId = null;
         }
 
-        if (is_null($newSchoolId) && !empty($r['school_name'])) {
+        $schoolName = $r->ensureOptionalString('school_name');
+        if (is_null($newSchoolId) && !is_null($schoolName)) {
             $response = \OmegaUp\Controllers\School::apiCreate(
                 new \OmegaUp\Request([
-                    'name' => $r['school_name'],
+                    'name' => $schoolName,
                     'country_id' => !is_null(
                         $state
                     ) ? $state->country_id : null,
@@ -2836,7 +2875,7 @@ class User extends \OmegaUp\Controllers\Controller {
             }
 
             // Add verification_id if not there
-            if ($user->verified == '0') {
+            if (!$user->verified) {
                 self::$log->info('User not verified.');
 
                 if (is_null($user->verification_id)) {
@@ -3259,6 +3298,140 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{token: string}
+     *
+     * @omegaup-request-param null|string $username
+     */
+    public static function apiDeleteRequest(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        $username = $r->ensureOptionalString(
+            'username',
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
+        );
+        if (
+            !\OmegaUp\Authorization::isSystemAdmin(
+                $r->identity
+            ) && !is_null(
+                $username
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $identity = self::resolveTargetIdentity($r);
+        $user = self::resolveTargetUser($r);
+        if (is_null($user) || is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        $token = \OmegaUp\SecurityTools::randomString(50);
+        \OmegaUp\DAO\Users::generateDeletionToken($user, $token);
+        self::$log->info(
+            "User {$identity->username} is requesting to delete their account."
+        );
+        if (is_null($user->main_email_id)) {
+            return [
+                'token' => $token,
+            ];
+        }
+        $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
+
+        if (is_null($email) || is_null($email->email)) {
+            return [
+                'token' => $token,
+            ];
+        }
+        $subject = \OmegaUp\Translations::getInstance()->get(
+            'accountDeletionRequestEmailSubject'
+        );
+        $body = \OmegaUp\ApiUtils::formatString(
+            \OmegaUp\Translations::getInstance()->get(
+                'accountDeletionRequestEmailBody'
+            ),
+            [
+                'username' => $identity->username,
+            ]
+        );
+
+        \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
+        return [
+            'token' => $token,
+        ];
+    }
+
+    /**
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $token
+     * @omegaup-request-param null|string $username
+     */
+    public static function apiDeleteConfirm(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        $username = $r->ensureOptionalString(
+            'username',
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
+        );
+        $token = $r->ensureString('token');
+        if (
+            !\OmegaUp\Authorization::isSystemAdmin(
+                $r->identity
+            ) && !is_null(
+                $username
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
+        if (is_null($user) || is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        if (!\OmegaUp\DAO\Users::validateDeletionToken($user, $token)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'token'
+            );
+        }
+        \OmegaUp\DAO\Users::deleteUserAndIndentityInformation($user, $identity);
+        self::$log->info(
+            "User {$identity->username} deleted their account successfully."
+        );
+        if (is_null($user->main_email_id)) {
+            return [
+                'status' => 'ok',
+            ];
+        }
+        $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
+
+        if (is_null($email) || is_null($email->email)) {
+            return [
+                'status' => 'ok',
+            ];
+        }
+        $subject = \OmegaUp\Translations::getInstance()->get(
+            'accountDeletionConfirmEmailSubject'
+        );
+        $body = \OmegaUp\ApiUtils::formatString(
+            \OmegaUp\Translations::getInstance()->get(
+                'accountDeletionConfirmEmailBody'
+            ),
+            [
+                'username' => $identity->username,
+            ]
+        );
+
+        \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+    /**
      * Adds the identity to the group.
      *
      * @return array{status: string}
@@ -3417,13 +3590,15 @@ class User extends \OmegaUp\Controllers\Controller {
                 'privacyStatementNotFound'
             );
         }
+        /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
+        $omegaupRoot = strval(OMEGAUP_ROOT);
         return [
             'templateProperties' => [
                 'payload' => [
                     'policy_markdown' => file_get_contents(
                         sprintf(
                             "%s/privacy/privacy_policy/{$lang}.md",
-                            strval(OMEGAUP_ROOT)
+                            $omegaupRoot,
                         )
                     ) ?: '',
                     'has_accepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
@@ -4323,9 +4498,9 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString, scripts: list<string>}}
      *
-     * @omegaup-request-param string $third_party_login
+     * @omegaup-request-param null|string $third_party_login
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
@@ -4344,7 +4519,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $response = [
             'templateProperties' => [
                 'payload' => [
-                    'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
+                    'validateRecaptcha' => boolval(OMEGAUP_VALIDATE_CAPTCHA),
                     'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
@@ -4360,7 +4535,9 @@ class User extends \OmegaUp\Controllers\Controller {
             }
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             \OmegaUp\ApiCaller::logException($e);
-            $response['templateProperties']['payload']['statusError'] = $e->getErrorMessage();
+            $response['templateProperties']['payload']['statusError'] = strval(
+                $e->getErrorMessage()
+            );
             return $response;
         }
         return $response;

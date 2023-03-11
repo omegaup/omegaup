@@ -20,7 +20,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="problem in problems">
+            <tr v-for="problem in problems" :key="problem.alias">
               <td class="align-middle">
                 <a :href="`/arena/problem/${problem.alias}/`">{{
                   problem.alias
@@ -41,7 +41,7 @@
         </table>
       </div>
     </div>
-    <div class="card-footer">
+    <div class="card-footer" data-course-add-problem>
       <form>
         <div class="row">
           <div class="col-md-12">
@@ -49,12 +49,15 @@
               <div class="form-group col-md-8">
                 <label
                   >{{ problemCardFooterLabel }}
-                  <omegaup-autocomplete
-                    v-model="problemAlias"
-                    class="form-control"
-                    :init="(el) => typeahead.problemTypeahead(el)"
-                  ></omegaup-autocomplete
-                ></label>
+                  <omegaup-common-typeahead
+                    :existing-options="searchResultProblems"
+                    :activation-threshold="2"
+                    :value.sync="problemAlias"
+                    @update-existing-options="
+                      (query) => $emit('update-search-result-problems', query)
+                    "
+                  ></omegaup-common-typeahead>
+                </label>
                 <p class="help-block">
                   {{ addCardFooterDescLabel }}
                 </p>
@@ -71,9 +74,9 @@
                 data-add-problem
                 class="btn btn-primary mr-2"
                 type="submit"
-                :disabled="problemAlias.length == 0"
+                :disabled="!problemAlias"
                 @click.prevent="
-                  onAddProblem({ alias: problemAlias, points: points })
+                  onAddProblem({ alias: problemAlias.key, points: points })
                 "
               >
                 {{ addButtonLabel }}
@@ -93,8 +96,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 
 import {
   FontAwesomeIcon,
@@ -107,7 +109,7 @@ library.add(fas);
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
@@ -118,13 +120,13 @@ export default class CourseScheduledProblemList extends Vue {
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: types.CourseAssignment;
+  @Prop() searchResultProblems!: types.ListItem[];
 
-  typeahead = typeahead;
   T = T;
   assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
   problems: types.AddedProblem[] = this.assignmentProblems;
   taggedProblemAlias = '';
-  problemAlias = '';
+  problemAlias: null | types.ListItem = null;
   points = 100;
   showTopicsAndDifficulty = false;
 
@@ -183,9 +185,9 @@ export default class CourseScheduledProblemList extends Vue {
   }
 
   onAddProblem(problem: types.AddedProblem): void {
-    const problemAlias = problem.alias;
+    const problemAlias = { key: problem.alias, value: problem.alias };
     const currentProblem = this.problems.find(
-      (problem) => problem.alias === problemAlias,
+      (problem) => problem.alias === problemAlias.key,
     );
     if (!currentProblem) {
       this.problems.push(problem);
@@ -195,9 +197,9 @@ export default class CourseScheduledProblemList extends Vue {
   }
 
   onRemoveProblem(problem: types.AddedProblem): void {
-    const problemAlias = problem.alias;
+    const problemAlias = { key: problem.alias, value: problem.alias };
     this.problems = this.problems.filter(
-      (problem) => problem.alias !== problemAlias,
+      (problem) => problem.alias !== problemAlias.key,
     );
   }
 
@@ -222,12 +224,12 @@ export default class CourseScheduledProblemList extends Vue {
   }
 
   @Watch('taggedProblemAlias')
-  onTaggedProblemAliasChange() {
-    this.problemAlias = this.taggedProblemAlias;
+  onTaggedProblemAliasChange(newValue: string) {
+    this.problemAlias = { key: newValue, value: newValue };
   }
 
   reset(): void {
-    this.problemAlias = '';
+    this.problemAlias = null;
     this.points = 100;
   }
 }

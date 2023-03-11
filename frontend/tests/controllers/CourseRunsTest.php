@@ -59,12 +59,12 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Assert
-        $this->assertEquals(1, count($response['runs']));
-        $this->assertEquals(
+        $this->assertSame(1, count($response['runs']));
+        $this->assertSame(
             $runData['response']['guid'],
             $response['runs'][0]['guid']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $participant->username,
             $response['runs'][0]['username']
         );
@@ -83,7 +83,7 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
         ]));
 
-        $this->assertEquals($runData['request']['source'], $response['source']);
-        $this->assertNull($response['feedback']); // Feedback should be null
+        $this->assertSame($runData['request']['source'], $response['source']);
+        $this->assertEmpty($response['feedback']); // Feedback should be empty
     }
 }

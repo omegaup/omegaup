@@ -55,12 +55,20 @@ OmegaUp.on('ready', async () => {
     ({ runDetails, problemDetails } = await getProblemAndRunDetails({
       problems: payload.currentAssignment.problems,
       location: window.location.hash,
+      problemsetId: payload.currentAssignment.problemset_id,
     }));
   } catch (e: any) {
     ui.apiError(e);
   }
 
   trackClarifications(payload.courseDetails.clarifications);
+
+  let nextSubmissionTimestamp: null | Date = null;
+  if (problemDetails?.nextSubmissionTimestamp != null) {
+    nextSubmissionTimestamp = time.remoteTime(
+      problemDetails?.nextSubmissionTimestamp.getTime(),
+    );
+  }
 
   const arenaCourse = new Vue({
     el: '#main-container',
@@ -77,7 +85,7 @@ OmegaUp.on('ready', async () => {
       problemAlias,
       searchResultUsers: [] as types.ListItem[],
       runDetailsData: runDetails,
-      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      nextSubmissionTimestamp,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
     }),
@@ -87,6 +95,7 @@ OmegaUp.on('ready', async () => {
           clarifications: clarificationStore.state.clarifications,
           course: payload.courseDetails,
           currentAssignment: payload.currentAssignment,
+          isTeachingAssistant: payload.isTeachingAssistant,
           problemInfo: this.problemInfo,
           problem: this.problem,
           problemAlias: this.problemAlias,
@@ -149,6 +158,20 @@ OmegaUp.on('ready', async () => {
                     )}</strong>)`,
                   }),
                 );
+              })
+              .catch(ui.apiError);
+          },
+          'request-feedback': (guid: string) => {
+            if (!window.confirm(T.requestFeedbackConfirm)) {
+              return;
+            }
+            api.Course.requestFeedback({
+              course_alias: payload.courseDetails.alias,
+              assignment_alias: payload.currentAssignment.alias,
+              guid,
+            })
+              .then(() => {
+                ui.success(T.requestFeedback);
               })
               .catch(ui.apiError);
           },
@@ -309,28 +332,22 @@ OmegaUp.on('ready', async () => {
             tried,
             quality,
             difficulty,
-            tags,
           }: {
             solved: boolean;
             tried: boolean;
             quality: string;
             difficulty: string;
-            tags: string[];
           }) => {
             const contents: {
               before_ac?: boolean;
               difficulty?: number;
               quality?: number;
-              tags?: string[];
             } = {};
             if (!solved && tried) {
               contents.before_ac = true;
             }
             if (difficulty !== '') {
               contents.difficulty = Number.parseInt(difficulty, 10);
-            }
-            if (tags.length > 0) {
-              contents.tags = tags;
             }
             if (quality !== '') {
               contents.quality = Number.parseInt(quality, 10);
@@ -443,6 +460,9 @@ OmegaUp.on('ready', async () => {
   const socket = new EventsSocket({
     disableSockets: false,
     problemsetAlias: payload.courseDetails.alias,
+    isVirtual: false,
+    startTime: payload.currentAssignment.start_time,
+    finishTime: payload.currentAssignment.finish_time,
     locationProtocol: window.location.protocol,
     locationHost: window.location.host,
     problemsetId: payload.currentAssignment.problemset_id,
@@ -452,6 +472,7 @@ OmegaUp.on('ready', async () => {
     navbarProblems: arenaCourse.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
+    isContestModeMaxPerGroup: false,
   });
   socket.connect();
 

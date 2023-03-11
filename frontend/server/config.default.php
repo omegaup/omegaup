@@ -19,10 +19,12 @@ try_define('OMEGAUP_SESSION_API_HOURLY_LIMIT', 1000);
 # ####################################
 try_define('IS_TEST', false);
 try_define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', true);
+/** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
 try_define(
     'OMEGAUP_TEST_ROOT',
     sprintf('%s/tests/controllers/', strval(OMEGAUP_ROOT))
 );
+/** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
 try_define(
     'OMEGAUP_TEST_RESOURCES_ROOT',
     sprintf('%s/tests/resources/', strval(OMEGAUP_ROOT))
@@ -72,16 +74,19 @@ try_define(
 );
 try_define('OMEGAUP_GITSERVER_SECRET_TOKEN', '');
 try_define('OMEGAUP_GRADER_SECRET', 'secret');
+/** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
 try_define(
     'IMAGES_PATH',
     sprintf('%s/www/img/', strval(OMEGAUP_ROOT))
 );
 try_define('IMAGES_URL_PATH', '/img/');
+/** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
 try_define(
     'INPUTS_PATH',
     sprintf('%s/www/probleminput/', strval(OMEGAUP_ROOT))
 );
 try_define('INPUTS_URL_PATH', '/probleminput/');
+/** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
 try_define(
     'TEMPLATES_PATH',
     sprintf('%s/www/templates/', strval(OMEGAUP_ROOT))
@@ -144,6 +149,7 @@ try_define('OMEGAUP_EMAIL_SENDY_LIST', 'xxx');
 # #########################
 try_define('APC_USER_CACHE_TIMEOUT', 7 * 24 * 3600); // in seconds
 try_define('APC_USER_CACHE_CONTEST_INFO_TIMEOUT', 10);
+try_define('APC_USER_CACHE_PROBLEM_LIST_TIMEOUT', 60 * 30); // in seconds
 try_define('APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT', 60); // in seconds
 try_define('APC_USER_CACHE_PROBLEM_STATS_TIMEOUT', 0); // in seconds
 try_define('APC_USER_CACHE_SESSION_TIMEOUT', 8 * 3600); // seconds, match OMEGAUP_EXPIRE_TOKEN_AFTER

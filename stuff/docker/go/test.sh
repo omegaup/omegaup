@@ -1,6 +1,15 @@
 #!/bin/bash
 
-DIR="$(realpath "$(dirname "$(dirname "${0}")")")"
+# Running this will open a shell where the sources for quark is
+# installed. Useful to develop quark in a jiffy. Run all tests with:
+#
+#   make
+#
+# Or only the quark tests with
+#
+#   make test-quark
+
+DIR="$(realpath "$(git rev-parse --show-toplevel)")/stuff/docker/"
 
 if [[ ! -d "${DIR}/go/go-base" ]]; then
 	git clone https://github.com/omegaup/go-base.git "${DIR}/go/go-base"
@@ -15,16 +24,16 @@ if [[ ! -d "${DIR}/go/gitserver" ]]; then
 	git clone https://github.com/omegaup/gitserver.git "${DIR}/go/gitserver"
 fi
 
-docker build \
+DOCKER_BUILDKIT=1 docker build \
 	--target=base-builder \
 	--tag=omegaup/local-backend-base-builder \
 	--file="${DIR}/Dockerfile.local-backend" \
 	"${DIR}"
-docker build \
+DOCKER_BUILDKIT=1 docker build \
 	--tag=omegaup/local-backend-test \
 	--file="${DIR}/Dockerfile.local-backend-test" \
 	"${DIR}"
-docker run \
+DOCKER_BUILDKIT=1 docker run \
 	--rm \
 	--interactive \
 	--tty \

@@ -95,9 +95,11 @@
           :update="true"
           :course="data.course"
           :all-languages="data.allLanguages"
+          :search-result-schools="searchResultSchools"
           @emit-cancel="onCancel"
-          @submit="
-            (formComponent) => $emit('submit-edit-course', formComponent)
+          @submit="(request) => $emit('submit-edit-course', request)"
+          @update-search-result-schools="
+            (query) => $emit('update-search-result-schools', query)
           "
         ></omegaup-course-form>
       </div>
@@ -217,17 +219,10 @@
       >
         <div class="col-md-6">
           <omegaup-common-admins
-            :initial-admins="data.admins"
+            :admins="data.admins"
             :search-result-users="searchResultUsers"
-            :has-parent-component="true"
-            @emit-add-admin="
-              (addAdminComponent) =>
-                $emit('add-admin', addAdminComponent.username)
-            "
-            @emit-remove-admin="
-              (addAdminComponent) =>
-                $emit('remove-admin', addAdminComponent.selected.username)
-            "
+            @add-admin="(username) => $emit('add-admin', username)"
+            @remove-admin="(username) => $emit('remove-admin', username)"
             @update-search-result-users="
               (query) => $emit('update-search-result-users', query)
             "
@@ -235,15 +230,16 @@
         </div>
         <div class="col-md-6">
           <omegaup-common-groupadmins
-            :initial-groups="data.groupsAdmins"
-            :has-parent-component="true"
-            @emit-add-group-admin="
-              (groupAdminsComponent) =>
-                $emit('add-group-admin', groupAdminsComponent.groupAlias)
+            :group-admins="data.groupsAdmins"
+            :search-result-groups="searchResultGroups"
+            @add-group-admin="
+              (groupAlias) => $emit('add-group-admin', groupAlias)
             "
-            @emit-remove-group-admin="
-              (groupAdminsComponent) =>
-                $emit('remove-group-admin', groupAdminsComponent.groupAlias)
+            @remove-group-admin="
+              (groupAlias) => $emit('remove-group-admin', groupAlias)
+            "
+            @update-search-result-groups="
+              (query) => $emit('update-search-result-groups', query)
             "
           ></omegaup-common-groupadmins>
         </div>
@@ -355,6 +351,8 @@ export default class CourseEdit extends Vue {
   @Prop() initialTab!: string;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop() searchResultProblems!: types.ListItem[];
+  @Prop() searchResultGroups!: types.ListItem[];
+  @Prop() searchResultSchools!: types.SchoolListItem[];
 
   T = T;
   showTab = this.initialTab;

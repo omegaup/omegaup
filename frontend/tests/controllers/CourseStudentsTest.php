@@ -77,13 +77,13 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         $this->assertCount(1, $response['problems']);
         $this->assertCount(1, $response['problems'][0]['runs']);
-        $this->assertEquals(
+        $this->assertSame(
             $response['problems'][0]['runs'][0]['source'],
             $submissionSource
         );
-        $this->assertEquals($response['problems'][0]['runs'][0]['score'], 0.5);
+        $this->assertSame($response['problems'][0]['runs'][0]['score'], 0.5);
         $this->assertNotNull($response['problems'][0]['runs'][0]['feedback']);
-        $this->assertEquals(
+        $this->assertSame(
             $feedback,
             $response['problems'][0]['runs'][0]['feedback']['feedback']
         );
@@ -159,7 +159,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Unassociated identity group should not join the course' .
                         'without an explicit invitation');
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
-            $this->assertEquals('runNotEvenOpened', $e->getMessage());
+            $this->assertSame('runNotEvenOpened', $e->getMessage());
         }
     }
 
@@ -251,23 +251,23 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
         }
         // In first assignment, the student only solved one of two problem with
         // submissions to achieve 50% of progress
-        $this->assertEquals(
+        $this->assertSame(
             $response['assignments'][$courseData['assignment_aliases'][0]]['score'],
-            100
+            100.0
         );
-        $this->assertEquals(
+        $this->assertSame(
             $response['assignments'][$courseData['assignment_aliases'][0]]['max_score'],
-            200
+            200.0
         );
         // In second assignment, the student solved all the problems with
         // submissions to achieve 100% of progress
-        $this->assertEquals(
+        $this->assertSame(
             $response['assignments'][$courseData['assignment_aliases'][1]]['score'],
-            100
+            100.0
         );
-        $this->assertEquals(
+        $this->assertSame(
             $response['assignments'][$courseData['assignment_aliases'][1]]['max_score'],
-            100
+            100.0
         );
     }
 
@@ -337,23 +337,133 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
         // Test results
         // The studen only get 90 points in the first problem,
         // so 90% of progress is expected
-        $this->assertEquals(
+        $this->assertSame(
             $response['templateProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[0]['problem']->alias],
-            90
+            90.0
         );
 
         // The studen got AC points in the second problem,
         // so 100% of progress is expected
-        $this->assertEquals(
+        $this->assertSame(
             $response['templateProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[1]['problem']->alias],
-            100
+            100.0
         );
 
         // The studen didn't try third problem,
         // so 0% of progress is expected
-        $this->assertEquals(
+        $this->assertSame(
             $response['templateProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[2]['problem']->alias],
-            0
+            0.0
+        );
+    }
+
+    /**
+     * Basic apiStudentProgress test.
+     */
+    public function testGiveFeedbackWithNewFields() {
+        // create course with an assignment
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $studentsInCourse = 5;
+
+        // Prepare assignment. Create problems
+        $adminLogin = self::login($courseData['admin']);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // add problem
+        \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment_alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+
+        $problem = $problemData['problem'];
+
+        // Add students to course
+        $students = [];
+        for ($i = 0; $i < $studentsInCourse; $i++) {
+            $students[] = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData
+            );
+        }
+
+        // Add one run to one of the problems.
+        $submissionSource = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+        {
+            $studentLogin = \OmegaUp\Test\ControllerTestCase::login(
+                $students[0]
+            );
+            $runResponsePA = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'problemset_id' => $courseData['assignment']->problemset_id,
+                'problem_alias' => $problem->alias,
+                'language' => 'c11-gcc',
+                'source' => $submissionSource,
+            ]));
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                null /*runData*/,
+                0.5,
+                'PA',
+                null,
+                $runResponsePA['guid']
+            );
+        }
+
+        $adminLogin = self::login($courseData['admin']);
+
+        // create normal user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // admin is able to add a teaching assistant
+        \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $identity->username,
+                'course_alias' => $courseData['course_alias'],
+             ])
+        );
+
+        $course = \OmegaUp\DAO\Courses::getByAlias(
+            $courseData['course_alias']
+        );
+
+        // login user
+        $userLogin = self::login($identity);
+
+        $this->assertTrue(
+            \OmegaUp\Authorization::isTeachingAssistant(
+                $identity,
+                $course
+            )
+        );
+
+        // Send feedback for the submission by a teaching assistant, include the new fields
+        $feedback = 'Test feedback!';
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'guid' => $runResponsePA['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback' => $feedback,
+                1,
+                89
+            ])
+        );
+
+        // Call API
+        $adminLogin = self::login($courseData['admin']);
+
+        $response = \OmegaUp\Controllers\Course::apiStudentProgress(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment_alias'],
+            'usernameOrEmail' => $students[0]->username,
+        ]));
+
+        $this->assertEquals(
+            $feedback,
+            $response['problems'][0]['runs'][0]['feedback']['feedback']
         );
     }
 }

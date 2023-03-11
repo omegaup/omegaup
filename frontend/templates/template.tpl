@@ -2,6 +2,7 @@
 <html lang="{{ LOCALE }}" class="h-100">
   <head data-locale="{{ LOCALE }}">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     {% if NEW_RELIC_SCRIPT %}
       {{ NEW_RELIC_SCRIPT|raw }}
@@ -68,6 +69,7 @@
       <div id="main-container"></div>
     </main>
     {% if OMEGAUP_GA_TRACK == 1 %}
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-PBDCQK1GEQ"></script>
       <script type="text/javascript" src="{% versionHash '/js/analytics.js' %}"></script>
     {% endif %}
     {% if not headerPayload.inContest and not hideFooterAndHeader %}

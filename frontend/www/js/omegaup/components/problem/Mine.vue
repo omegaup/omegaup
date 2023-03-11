@@ -190,7 +190,6 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
 import { types } from '../../api_types';
 import common_Paginator from '../common/Paginator.vue';
 
@@ -229,7 +228,6 @@ export default class ProblemMine extends Vue {
 
   T = T;
   currentQuery = this.query ?? '';
-  typeahead = typeahead;
   shouldShowAllProblems = false;
   selectedProblems: types.ProblemListItem[] = [];
   allProblemsVisibilityOption = -1;

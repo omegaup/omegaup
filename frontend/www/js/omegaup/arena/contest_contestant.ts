@@ -103,6 +103,13 @@ OmegaUp.on('ready', async () => {
     }
   }
 
+  let nextSubmissionTimestamp: null | Date = null;
+  if (problemDetails?.nextSubmissionTimestamp != null) {
+    nextSubmissionTimestamp = time.remoteTime(
+      problemDetails?.nextSubmissionTimestamp.getTime(),
+    );
+  }
+
   const contestContestant = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest': arena_Contest },
@@ -117,7 +124,7 @@ OmegaUp.on('ready', async () => {
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
       searchResultUsers: [] as types.ListItem[],
-      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      nextSubmissionTimestamp,
       runDetailsData: runDetails,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
@@ -153,6 +160,7 @@ OmegaUp.on('ready', async () => {
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
+          submissionDeadline: payload.submissionDeadline,
         },
         on: {
           'navigate-to-problem': ({
@@ -372,6 +380,9 @@ OmegaUp.on('ready', async () => {
   const socket = new EventsSocket({
     disableSockets: false,
     problemsetAlias: payload.contest.alias,
+    isVirtual: false,
+    startTime: payload.contest.start_time,
+    finishTime: payload.contest.finish_time,
     locationProtocol: window.location.protocol,
     locationHost: window.location.host,
     problemsetId: payload.contest.problemset_id,
@@ -381,6 +392,7 @@ OmegaUp.on('ready', async () => {
     navbarProblems: payload.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
+    isContestModeMaxPerGroup: payload.contest.score_mode === 'max_per_group',
   });
   socket.connect();
 

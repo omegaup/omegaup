@@ -90,6 +90,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $feedbackAuthor,
         \OmegaUp\DAO\VO\Submissions $submission,
         \OmegaUp\DAO\VO\Courses $course,
+        ?int $rangeBytesStart,
+        ?int $rangeBytesEnd,
         string $feedback,
         $courseSubmissionInfo
     ): void {
@@ -97,6 +99,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
             new \OmegaUp\DAO\VO\SubmissionFeedback([
                 'identity_id' => $feedbackAuthor->identity_id,
                 'submission_id' => $submission->submission_id,
+                'range_bytes_start' => $rangeBytesStart,
+                'range_bytes_end' => $rangeBytesEnd,
                 'feedback' => $feedback,
             ])
         );
@@ -131,6 +135,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $feedback
+     * @omegaup-request-param int|null $range_bytes_end
+     * @omegaup-request-param int|null $range_bytes_start
      *
      * @return array{status: string}
      */
@@ -140,7 +146,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $submission = \OmegaUp\DAO\Submissions::getByGuid(
             $r->ensureString('guid')
         );
-        if (is_null($submission)) {
+        if (is_null($submission) || is_null($submission->guid)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'submissionNotFound'
             );
@@ -181,8 +187,28 @@ class Submission extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        // Default values for a general feedback
+        $rangeBytesStart = $r->ensureOptionalInt('range_bytes_start');
+        $rangeBytesEnd = $r->ensureOptionalInt('range_bytes_end');
+
+        if (
+            !is_null(
+                $rangeBytesStart
+            ) && !is_null(
+                $rangeBytesEnd
+            ) && ($rangeBytesStart < 0
+            ||  $rangeBytesEnd < $rangeBytesStart)
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
+        }
+
         if (
             !\OmegaUp\Authorization::isCourseAdmin(
+                $r->identity,
+                $course
+            ) && !\OmegaUp\Authorization::isTeachingAssistant(
                 $r->identity,
                 $course
             )
@@ -193,8 +219,9 @@ class Submission extends \OmegaUp\Controllers\Controller {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
-            $submissionFeedback = \OmegaUp\DAO\Submissions::getFeedbackBySubmission(
-                $submission
+            $submissionFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
+                $submission->guid,
+                $rangeBytesStart
             );
 
             if (is_null($submissionFeedback)) {
@@ -202,6 +229,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
                     $r->identity,
                     $submission,
                     $course,
+                    $rangeBytesStart,
+                    $rangeBytesEnd,
                     $feedback,
                     $courseSubmissionInfo
                 );

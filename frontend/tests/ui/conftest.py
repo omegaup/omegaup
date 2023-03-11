@@ -17,6 +17,8 @@ import pytest
 
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, TimeoutException
+from selenium.webdriver import Firefox
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
@@ -40,8 +42,8 @@ def _mysql_auth() -> Sequence[str]:
 class JavaScriptLogCollector:
     '''Collects JavaScript errors from the log.'''
 
-    def __init__(self, dr):
-        self.driver = dr
+    def __init__(self, driver):  # pylint: disable=redefined-outer-name
+        self.driver = driver
         self._log_index = 0
         self._log_stack = [[]]
 
@@ -139,7 +141,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
     def page_transition(self, wait_for_ajax=True, target_url=None):
         '''Waits for a page transition to finish.'''
 
-        html_node = self.browser.find_element_by_tag_name('html')
+        html_node = self.browser.find_element(By.TAG_NAME, 'html')
         prev_url = self.browser.current_url
         logging.debug('Waiting for a page transition on %s', prev_url)
         yield
@@ -181,26 +183,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                                 'return jQuery.active;'),
                              time.time() - t0)) from ex
 
-    def typeahead_helper(self, parent_xpath, value, select_suggestion=True):
-        '''Helper to interact with Typeahead elements.'''
-
-        tt_input = self.wait.until(
-            EC.visibility_of_element_located(
-                (By.XPATH,
-                 '//%s//input[contains(@class, "tt-input")]' % parent_xpath)))
-        tt_input.click()
-        tt_input.send_keys(value)
-
-        if not select_suggestion:
-            return
-
-        self.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//%s//div[@data-value = "%s"]' %
-                 (parent_xpath, value)))).click()
-
-    def typeahead_helper_v2(self, parent_selector, value):
+    def typeahead_helper(self, parent_selector, value):
         '''Helper to interact with Typeahead elements.'''
 
         tt_input = self.wait.until(
@@ -215,7 +198,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                  '%s ul.typeahead-dropdown li:first-of-type' %
                  (parent_selector)))).click()
 
-    def send_keys(self,  # pylint: disable=no-self-use
+    def send_keys(self,
                   element: WebElement,
                   value: str,
                   retries: int = 10) -> None:
@@ -268,10 +251,12 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
         self._wait_for_page_loaded()
 
-        self.browser.find_element_by_name('login_username').send_keys(username)
-        self.browser.find_element_by_name('login_password').send_keys(password)
+        self.browser.find_element(By.NAME,
+                                  'login_username').send_keys(username)
+        self.browser.find_element(By.NAME,
+                                  'login_password').send_keys(password)
         with self.page_transition():
-            self.browser.find_element_by_name('login').click()
+            self.browser.find_element(By.NAME, 'login').click()
 
         if is_main_user_identity:
             self.wait.until(
@@ -312,14 +297,14 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                      '//a[contains(@href, "/login/")]'))).click()
 
         # Login screen
-        self.browser.find_element_by_name('reg_username').send_keys(user)
-        self.browser.find_element_by_name('reg_email').send_keys(
+        self.browser.find_element(By.NAME, 'reg_username').send_keys(user)
+        self.browser.find_element(By.NAME, 'reg_email').send_keys(
             'email_%s@localhost.localdomain' % user)
-        self.browser.find_element_by_name('reg_password').send_keys(passw)
-        self.browser.find_element_by_name(
-            'reg_password_confirmation').send_keys(passw)
+        self.browser.find_element(By.NAME, 'reg_password').send_keys(passw)
+        self.browser.find_element(By.NAME,
+                                  'reg_password_confirmation').send_keys(passw)
         with self.page_transition():
-            self.browser.find_element_by_name('sign_up').click()
+            self.browser.find_element(By.NAME, 'sign_up').click()
 
         # Enable experiment
         user_id = util.database_utils.mysql(
@@ -347,14 +332,14 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             'Invalid URL redirect. Expected %s, got %s' % (
                 home_page_url, self.browser.current_url))
 
-    def annotate(self,  # pylint: disable=no-self-use
+    def annotate(self,
                  message: str,
                  level=logging.INFO) -> None:
         '''Add an annotation to the run's log.'''
 
         logging.log(level, message)
 
-    def update_run_score(self,  # pylint: disable=no-self-use
+    def update_run_score(self,
                          run_id,
                          verdict,
                          score) -> None:
@@ -510,7 +495,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 dbname='omegaup', auth=_mysql_auth())
         return username
 
-    def enable_experiment_identities_to_user(  # pylint: disable=no-self-use
+    def enable_experiment_identities_to_user(
             self,
             user_id,
     ) -> None:
@@ -566,7 +551,7 @@ def pytest_pyfunc_call(pyfuncitem):
         current_driver.screenshot(pyfuncitem.name)
         logpath = os.path.join(results_dir,
                                'webdriver_%s.log' % pyfuncitem.name)
-        with open(logpath, 'w') as logfile:
+        with open(logpath, 'w', encoding='utf-8') as logfile:
             json.dump(logs, logfile, indent=2)
     except Exception as ex:  # pylint: disable=broad-except
         print(ex)
@@ -614,20 +599,18 @@ def _get_browser(request, browser_name):
             options=chrome_options)
         chrome_browser.set_window_size(*_WINDOW_SIZE)
         return chrome_browser
-    firefox_options = webdriver.firefox.options.Options()
+    firefox_options = Options()
     firefox_options.set_capability('marionette', True)
     firefox_options.set_capability('loggingPrefs', {'browser': 'ALL'})
-    firefox_options.profile = webdriver.FirefoxProfile()
-    firefox_options.profile.set_preference(
+    firefox_options.set_preference(
         'webdriver.log.file', '/tmp/firefox_console')
     firefox_options.headless = request.config.option.headless
-    firefox_browser = webdriver.Firefox(
-        options=firefox_options)
+    firefox_browser = Firefox(options=firefox_options)
     firefox_browser.set_window_size(*_WINDOW_SIZE)
     return firefox_browser
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def driver(request, browser_name):
     '''Run tests using the selenium webdriver.'''
 

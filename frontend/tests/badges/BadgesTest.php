@@ -44,7 +44,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
             $r->method = $req['api'];
             $r->methodName = $req['api'];
             $fullResponse = \OmegaUp\ApiCaller::call($r);
-            self::assertEquals(
+            self::assertSame(
                 'ok',
                 $fullResponse['status'],
                 'request=' . json_encode($req) .
@@ -113,7 +113,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
         }
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = self::getSortedExpectedResults($expectedResults);
-        $this->assertEquals($results, $expected);
+        $this->assertSame($results, $expected);
         \OmegaUp\Time::setTimeForTesting(null);
     }
 
@@ -263,7 +263,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
                 'user' => $userOne,
             ]));
             $results = self::getBadgesFromArray($userOneBadges['badges']);
-            $this->assertEquals(
+            $this->assertSame(
                 count(array_intersect($expectedUserOneResults, $results)),
                 count($expectedUserOneResults)
             );
@@ -279,7 +279,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
                 'target_username' => $identityTwo->username,
             ]));
             $results = self::getBadgesFromArray($userTwoBadges['badges']);
-            $this->assertEquals(
+            $this->assertSame(
                 count(array_intersect($expectedUserTwoResults, $results)),
                 count($expectedUserTwoResults)
             );
@@ -292,7 +292,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
             $results = self::getBadgesFromNotificationContents(
                 $userOneNotifications['notifications']
             );
-            $this->assertEquals(
+            $this->assertSame(
                 count(array_intersect($expectedUserOneResults, $results)),
                 count($expectedUserOneResults)
             );
@@ -312,7 +312,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
             $results = self::getBadgesFromNotificationContents(
                 $userTwoNotifications['notifications']
             );
-            $this->assertEquals(
+            $this->assertSame(
                 count(array_intersect($expectedUserTwoResults, $results)),
                 count($expectedUserTwoResults)
             );
@@ -384,12 +384,12 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
                 $this->lessThanOrEqual(\OmegaUp\Time::get())
             )
         );
-        $this->assertEquals(1, $details['owners_count']);
-        $this->assertEquals(4, $details['total_users']);
+        $this->assertSame(1, $details['owners_count']);
+        $this->assertSame(4, $details['total_users']);
         $details = \OmegaUp\Controllers\Badge::apiBadgeDetails(new \OmegaUp\Request([
             'badge_alias' => 'contestManager',
         ]));
-        $this->assertEquals(0, $details['owners_count']);
+        $this->assertSame(0, $details['owners_count']);
         $this->assertNull($details['first_assignation']);
     }
 
@@ -400,7 +400,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
             ]));
             $this->fail('Should have thrown a NotFoundException');
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertEquals($e->getMessage(), 'badgeNotExist');
+            $this->assertSame($e->getMessage(), 'badgeNotExist');
         }
     }
 }

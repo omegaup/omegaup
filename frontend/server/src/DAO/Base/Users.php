@@ -44,12 +44,19 @@ abstract class Users {
                 `birth_date` = ?,
                 `verified` = ?,
                 `verification_id` = ?,
+                `deletion_token` = ?,
                 `reset_digest` = ?,
                 `reset_sent_at` = ?,
                 `hide_problem_tags` = ?,
                 `in_mailing_list` = ?,
                 `is_private` = ?,
-                `preferred_language` = ?
+                `preferred_language` = ?,
+                `parent_verified` = ?,
+                `creation_timestamp` = ?,
+                `parental_verification_token` = ?,
+                `parent_email_verification_initial` = ?,
+                `parent_email_verification_deadline` = ?,
+                `parent_email_id` = ?
             WHERE
                 (
                     `user_id` = ?
@@ -91,6 +98,7 @@ abstract class Users {
             $Users->birth_date,
             intval($Users->verified),
             $Users->verification_id,
+            $Users->deletion_token,
             $Users->reset_digest,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Users->reset_sent_at
@@ -103,6 +111,26 @@ abstract class Users {
             intval($Users->in_mailing_list),
             intval($Users->is_private),
             $Users->preferred_language,
+            (
+                is_null($Users->parent_verified) ?
+                null :
+                intval($Users->parent_verified)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Users->creation_timestamp
+            ),
+            $Users->parental_verification_token,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Users->parent_email_verification_initial
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Users->parent_email_verification_deadline
+            ),
+            (
+                is_null($Users->parent_email_id) ?
+                null :
+                intval($Users->parent_email_id)
+            ),
             intval($Users->user_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -137,12 +165,19 @@ abstract class Users {
                 `Users`.`birth_date`,
                 `Users`.`verified`,
                 `Users`.`verification_id`,
+                `Users`.`deletion_token`,
                 `Users`.`reset_digest`,
                 `Users`.`reset_sent_at`,
                 `Users`.`hide_problem_tags`,
                 `Users`.`in_mailing_list`,
                 `Users`.`is_private`,
-                `Users`.`preferred_language`
+                `Users`.`preferred_language`,
+                `Users`.`parent_verified`,
+                `Users`.`creation_timestamp`,
+                `Users`.`parental_verification_token`,
+                `Users`.`parent_email_verification_initial`,
+                `Users`.`parent_email_verification_deadline`,
+                `Users`.`parent_email_id`
             FROM
                 `Users`
             WHERE
@@ -266,12 +301,19 @@ abstract class Users {
                 `Users`.`birth_date`,
                 `Users`.`verified`,
                 `Users`.`verification_id`,
+                `Users`.`deletion_token`,
                 `Users`.`reset_digest`,
                 `Users`.`reset_sent_at`,
                 `Users`.`hide_problem_tags`,
                 `Users`.`in_mailing_list`,
                 `Users`.`is_private`,
-                `Users`.`preferred_language`
+                `Users`.`preferred_language`,
+                `Users`.`parent_verified`,
+                `Users`.`creation_timestamp`,
+                `Users`.`parental_verification_token`,
+                `Users`.`parent_email_verification_initial`,
+                `Users`.`parent_email_verification_deadline`,
+                `Users`.`parent_email_id`
             FROM
                 `Users`
         ';
@@ -334,13 +376,27 @@ abstract class Users {
                     `birth_date`,
                     `verified`,
                     `verification_id`,
+                    `deletion_token`,
                     `reset_digest`,
                     `reset_sent_at`,
                     `hide_problem_tags`,
                     `in_mailing_list`,
                     `is_private`,
-                    `preferred_language`
+                    `preferred_language`,
+                    `parent_verified`,
+                    `creation_timestamp`,
+                    `parental_verification_token`,
+                    `parent_email_verification_initial`,
+                    `parent_email_verification_deadline`,
+                    `parent_email_id`
                 ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -397,6 +453,7 @@ abstract class Users {
             $Users->birth_date,
             intval($Users->verified),
             $Users->verification_id,
+            $Users->deletion_token,
             $Users->reset_digest,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Users->reset_sent_at
@@ -409,6 +466,26 @@ abstract class Users {
             intval($Users->in_mailing_list),
             intval($Users->is_private),
             $Users->preferred_language,
+            (
+                is_null($Users->parent_verified) ?
+                null :
+                intval($Users->parent_verified)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Users->creation_timestamp
+            ),
+            $Users->parental_verification_token,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Users->parent_email_verification_initial
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Users->parent_email_verification_deadline
+            ),
+            (
+                is_null($Users->parent_email_id) ?
+                null :
+                intval($Users->parent_email_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

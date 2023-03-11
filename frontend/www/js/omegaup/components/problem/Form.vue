@@ -228,8 +228,8 @@
                 :memory-limit="memoryLimit"
                 :output-limit="outputLimit"
                 :input-limit="inputLimit"
-                :initial-validator="validator"
                 :overall-wall-time-limit="overallWallTimeLimit"
+                :validator="validator"
                 :validator-time-limit="validatorTimeLimit"
               ></omegaup-problem-settings>
             </div>

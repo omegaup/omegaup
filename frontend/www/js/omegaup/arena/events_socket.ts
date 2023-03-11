@@ -6,7 +6,12 @@ import {
   refreshContestClarifications,
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
-import { onRankingChanged, onRankingEvents } from './ranking';
+import {
+  createChart,
+  onRankingChanged,
+  onRankingEvents,
+  onVirtualRankingChanged,
+} from './ranking';
 import { updateRun } from './submissions';
 import { types } from '../api_types';
 import rankingStore from './rankingStore';
@@ -21,6 +26,10 @@ export enum SocketStatus {
 export interface SocketOptions {
   disableSockets: boolean;
   problemsetAlias: string;
+  isVirtual: boolean;
+  originalProblemsetId?: number;
+  startTime: Date;
+  finishTime?: Date;
   locationProtocol: string;
   locationHost: string;
   problemsetId: number;
@@ -30,6 +39,7 @@ export interface SocketOptions {
   currentUsername: string;
   navbarProblems: types.NavbarProblemsetProblem[];
   intervalInMilliseconds: number;
+  isContestModeMaxPerGroup: boolean;
 }
 
 export class EventsSocket {
@@ -41,6 +51,10 @@ export class EventsSocket {
 
   private readonly disableSockets: boolean;
   private readonly problemsetAlias: string;
+  private readonly isVirtual: boolean;
+  private readonly originalProblemsetId?: number;
+  private readonly startTime: Date;
+  private readonly finishTime?: Date;
   private readonly problemsetId: number;
   private readonly scoreboardToken: null | string;
   socketStatus: SocketStatus = SocketStatus.Waiting;
@@ -51,10 +65,15 @@ export class EventsSocket {
   private readonly currentUsername: string;
   private readonly navbarProblems: types.NavbarProblemsetProblem[];
   private readonly intervalInMilliseconds: number;
+  private readonly isContestModeMaxPerGroup: boolean;
 
   constructor({
     disableSockets = false,
     problemsetAlias,
+    isVirtual = false,
+    originalProblemsetId,
+    startTime,
+    finishTime,
     locationProtocol,
     locationHost,
     problemsetId,
@@ -64,11 +83,16 @@ export class EventsSocket {
     currentUsername,
     navbarProblems,
     intervalInMilliseconds = 5 * 60 * 1000,
+    isContestModeMaxPerGroup,
   }: SocketOptions) {
     this.socket = null;
 
     this.disableSockets = disableSockets;
     this.problemsetAlias = problemsetAlias;
+    this.isVirtual = isVirtual;
+    this.originalProblemsetId = originalProblemsetId;
+    this.startTime = startTime;
+    this.finishTime = finishTime;
     this.problemsetId = problemsetId;
     this.scoreboardToken = scoreboardToken;
     this.clarificationsOffset = clarificationsOffset;
@@ -79,6 +103,7 @@ export class EventsSocket {
     this.clarificationInterval = null;
     this.rankingInterval = null;
     this.intervalInMilliseconds = intervalInMilliseconds;
+    this.isContestModeMaxPerGroup = isContestModeMaxPerGroup;
 
     const protocol = locationProtocol === 'https:' ? 'wss:' : 'ws:';
     const host = locationHost;
@@ -98,44 +123,126 @@ export class EventsSocket {
       data.clarification.time = time.remoteTime(data.clarification.time * 1000);
       clarificationStore.commit('addClarification', data.clarification);
     } else if (data.message == '/scoreboard/update/') {
-      data.scoreboard.time = time.remoteTime(data.scoreboard.time * 1000);
-      data.scoreboard.start_time = time.remoteTime(
-        data.scoreboard.start_time * 1000,
-      );
-      data.scoreboard.finish_time = time.remoteTime(
-        data.scoreboard.finish_time * 1000,
-      );
-      // TODO: Uncomment next block when virtual contest is migrated
-      /*if (problemsetAdmin && data.scoreboard_type != 'admin') {
-        if (options.originalContestAlias == null) return;
-        virtualRankingChange(data.scoreboard);
-        return;
-      }*/
-      const {
-        currentRanking,
-        ranking,
-        users,
-        lastTimeUpdated,
-      } = onRankingChanged({
-        scoreboard: data.scoreboard,
-        currentUsername: this.currentUsername,
-        navbarProblems: this.navbarProblems,
-      });
-      rankingStore.commit('updateRanking', ranking);
-      rankingStore.commit('updateMiniRankingUsers', users);
-      rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
+      if (this.isContestModeMaxPerGroup) {
+        api.Contest.scoreboard({ contest_alias: this.problemsetAlias })
+          .then((result: types.Scoreboard) => {
+            this.processRankings({
+              scoreboard: result,
+              currentTime: result.time.getTime(),
+              startTime: result.start_time.getTime(),
+              finishTime: result.finish_time?.getTime() ?? 0,
+            });
+          })
+          .catch(ui.apiError);
+      } else {
+        this.processRankings({
+          scoreboard: data.scoreboard,
+          currentTime: data.scoreboard.time,
+          startTime: data.scoreboard.start_time,
+          finishTime: data.scoreboard.finish_time,
+        });
+      }
+    }
+  }
 
+  private processRankings({
+    scoreboard,
+    currentTime,
+    startTime,
+    finishTime,
+  }: {
+    scoreboard: types.Scoreboard;
+    currentTime: number;
+    startTime: number;
+    finishTime: number;
+  }) {
+    scoreboard.time = time.remoteTime(currentTime * 1000);
+    scoreboard.start_time = time.remoteTime(startTime * 1000);
+    if (scoreboard.finish_time != null) {
+      scoreboard.finish_time = time.remoteTime(finishTime * 1000);
+    }
+    if (this.isVirtual) {
       api.Problemset.scoreboardEvents({
-        problemset_id: this.problemsetId,
+        problemset_id: this.originalProblemsetId,
         token: this.scoreboardToken,
       })
-        .then((response) =>
-          onRankingEvents({
-            events: response.events,
-            currentRanking,
-          }),
-        )
+        .then((response) => {
+          onVirtualRankingChanged({
+            scoreboard,
+            currentUsername: this.currentUsername,
+            scoreboardEvents: response.events,
+            problems: this.navbarProblems,
+            startTime: this.startTime,
+            finishTime: this.finishTime,
+          });
+        })
         .catch(ui.ignoreError);
+      return;
+    }
+    const {
+      currentRanking,
+      ranking,
+      users,
+      lastTimeUpdated,
+    } = onRankingChanged({
+      scoreboard,
+      currentUsername: this.currentUsername,
+      navbarProblems: this.navbarProblems,
+    });
+    rankingStore.commit('updateRanking', ranking);
+    rankingStore.commit('updateMiniRankingUsers', users);
+    rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
+
+    api.Problemset.scoreboardEvents({
+      problemset_id: this.problemsetId,
+      token: this.scoreboardToken,
+    })
+      .then((response) =>
+        this.calculateRankingEvents({
+          events: response.events,
+          startTimestamp: this.startTime.getTime(),
+          finishTimestamp: Date.now(),
+          currentRanking,
+        }),
+      )
+      .catch(ui.ignoreError);
+  }
+
+  private calculateRankingEvents({
+    events,
+    currentRanking,
+    startTimestamp = 0,
+    finishTimestamp = Date.now(),
+    placesToShowInChart = 10,
+  }: {
+    events: types.ScoreboardEvent[];
+    currentRanking: { [username: string]: number };
+    startTimestamp?: number;
+    finishTimestamp?: number;
+    placesToShowInChart?: number;
+  }) {
+    const { series, navigatorData } = onRankingEvents({
+      events,
+      startTimestamp,
+      finishTimestamp,
+      currentRanking,
+      placesToShowInChart,
+    });
+
+    let maxPoints = 0;
+    for (const problem of this.navbarProblems) {
+      maxPoints += problem.maxScore;
+    }
+
+    if (series.length) {
+      const rankingChartOptions = createChart({
+        series,
+        navigatorData,
+        startTimestamp: this.startTime.getTime(),
+        finishTimestamp: Date.now(),
+        maxPoints,
+      });
+      rankingStore.commit('updateRankingChartOptions', rankingChartOptions);
     }
   }
 

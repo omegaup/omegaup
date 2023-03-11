@@ -66,6 +66,6 @@ class Badge_problemOfTheWeekWithOmegaUpTest extends \OmegaUp\Test\BadgesTestCase
         $queryPath = self::OMEGAUP_BADGES_ROOT . '/problemOfTheWeekWithOmegaUp/' . self::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = [$students[0]['user']->user_id];
-        $this->assertEquals($expected, $results);
+        $this->assertSame($expected, $results);
     }
 }

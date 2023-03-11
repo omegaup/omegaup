@@ -18,9 +18,6 @@
         ></omegaup-countdown>
       </div>
     </slot>
-    <!-- id-lint off -->
-    <div id="ranking-chart"></div>
-    <!-- id-lint on -->
     <highcharts
       v-if="rankingChartOptions"
       :options="rankingChartOptions"
@@ -51,7 +48,7 @@
         <template v-for="(user, userIndex) in ranking">
           <tr
             v-if="showUser(user.is_invited)"
-            :key="user.username"
+            :key="`${user.username}-${user.virtual}`"
             :class="user.username"
           >
             <td class="legend" :class="legendClass(userIndex)"></td>

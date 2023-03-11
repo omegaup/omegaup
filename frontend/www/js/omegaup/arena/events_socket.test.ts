@@ -10,7 +10,7 @@ import { clarificationStoreConfig } from './clarificationsStore';
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import fetchMock from 'jest-fetch-mock';
-import { onRankingChanged } from './ranking';
+import { onRankingChanged, onRankingEvents } from './ranking';
 import { mocked } from 'ts-jest/utils';
 
 const navbarProblems: types.NavbarProblemsetProblem[] = [
@@ -35,6 +35,9 @@ const navbarProblems: types.NavbarProblemsetProblem[] = [
 const options: SocketOptions = {
   disableSockets: false,
   problemsetAlias: 'hello',
+  isVirtual: false,
+  startTime: new Date(0),
+  finishTime: new Date(1),
   locationProtocol: 'http',
   locationHost: 'localhost:1234',
   problemsetId: 1,
@@ -44,6 +47,7 @@ const options: SocketOptions = {
   navbarProblems: navbarProblems,
   currentUsername: 'omegaUp',
   intervalInMilliseconds: 500,
+  isContestModeMaxPerGroup: false,
 };
 describe('EventsSocket', () => {
   let server: WS | null = null;
@@ -230,12 +234,33 @@ describe('EventsSocket', () => {
     await server?.connected;
 
     const onRankingChangedMock = mocked(onRankingChanged, true);
+    const onRankingEventsMock = mocked(onRankingEvents, false);
     onRankingChangedMock.mockReturnValueOnce({
       users: [],
       ranking: [],
       currentRanking: { omegaUp: 0 },
       maxPoints: 300,
       lastTimeUpdated: new Date(0),
+    });
+    onRankingEventsMock.mockReturnValueOnce({
+      series: [
+        {
+          type: 'line',
+          rank: 0,
+          data: [
+            [1674625311000, 0],
+            [1674625378000, 0],
+            [1674625378734, 100],
+          ],
+          name: 'test-user',
+          step: 'right',
+        },
+      ],
+      navigatorData: [
+        [1674625311000, 0],
+        [1674625378000, 0],
+        [1674625378734, 100],
+      ],
     });
     server?.send({
       message: '/scoreboard/update/',

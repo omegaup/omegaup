@@ -21,6 +21,8 @@ class SubmissionFeedback extends \OmegaUp\DAO\VO\VO {
         'submission_id' => true,
         'feedback' => true,
         'date' => true,
+        'range_bytes_start' => true,
+        'range_bytes_end' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -68,6 +70,16 @@ class SubmissionFeedback extends \OmegaUp\DAO\VO\VO {
                 \OmegaUp\Time::get()
             );
         }
+        if (isset($data['range_bytes_start'])) {
+            $this->range_bytes_start = intval(
+                $data['range_bytes_start']
+            );
+        }
+        if (isset($data['range_bytes_end'])) {
+            $this->range_bytes_end = intval(
+                $data['range_bytes_end']
+            );
+        }
     }
 
     /**
@@ -106,4 +118,18 @@ class SubmissionFeedback extends \OmegaUp\DAO\VO\VO {
      * @var \OmegaUp\Timestamp
      */
     public $date;  // CURRENT_TIMESTAMP
+
+    /**
+     * Inicio de la subcadena seleccionada (en bytes) para agregarle el comentario
+     *
+     * @var int|null
+     */
+    public $range_bytes_start = null;
+
+    /**
+     * Fin de la subcadena seleccionada (en bytes) para agregarle el comentario
+     *
+     * @var int|null
+     */
+    public $range_bytes_end = null;
 }

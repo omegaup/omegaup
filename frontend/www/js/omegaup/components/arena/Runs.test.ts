@@ -1,6 +1,6 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
-import { shallowMount } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
 
 import T from '../../lang';
@@ -68,12 +68,16 @@ describe('Runs.vue', () => {
     classname: '',
     contest_score: 0,
     country: 'xx',
+    execution: 'EXECUTION_FINISHED',
     language: 'java',
     memory: 1933312,
+    output: 'OUTPUT_INCORRECT',
     penalty: 0,
     runtime: 316,
     score: 0,
     status: 'ready',
+    status_memory: 'MEMORY_AVAILABLE',
+    status_runtime: 'RUNTIME_AVAILABLE',
     submit_delay: 0,
     type: 'normal',
     username: 'username',
@@ -199,7 +203,9 @@ describe('Runs.vue', () => {
       },
     });
 
-    await wrapper.setData({ filterUsername: 'other_username' });
+    await wrapper.setData({
+      filterUsername: { key: 'other_username', value: 'other username' },
+    });
     expect(wrapper.emitted('filter-changed')).toEqual([
       [{ filter: 'username', value: 'other_username' }],
     ]);
@@ -215,7 +221,9 @@ describe('Runs.vue', () => {
       },
     });
 
-    await wrapper.setData({ filterProblem: 'other_problem' });
+    await wrapper.setData({
+      filterProblem: { key: 'other_problem', value: 'other problem' },
+    });
     expect(wrapper.emitted('filter-changed')).toEqual([
       [{ filter: 'problem', value: 'other_problem' }],
     ]);
@@ -291,5 +299,81 @@ describe('Runs.vue', () => {
         },
       ],
     ]);
+  });
+
+  it('Should handle filterUsername when username changes', async () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        runs,
+        showContest: true,
+        showDetails: true,
+        showDisqualify: true,
+        showPager: true,
+        showPoints: false,
+        showProblem: true,
+        showRejudge: true,
+        showUser: true,
+        username: null,
+      },
+    });
+
+    await wrapper.setProps({ username: 'username' });
+    expect(wrapper.vm.filterUsername?.key).toBe('username');
+
+    await wrapper.setProps({ username: null });
+    expect(wrapper.vm.filterUsername).toBeFalsy();
+  });
+
+  const usernamesToBeFiltered = ['username', 'other_username'];
+  describe.each(usernamesToBeFiltered)(`A user:`, (username) => {
+    it(`whose username is ${username} should be filtered when they are selected.`, async () => {
+      const wrapper = mount(arena_Runs, {
+        propsData: {
+          contestAlias: 'admin',
+          runs,
+          showContest: true,
+          showDetails: true,
+          showDisqualify: true,
+          showPager: true,
+          showPoints: false,
+          showProblem: true,
+          showRejudge: true,
+          showUser: true,
+          username: null,
+        },
+      });
+
+      expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
+
+      await wrapper
+        .findAll(`td[data-username="${username}"]`)
+        .at(1)
+        .find(`a[title="${username}"]`)
+        .trigger('click');
+
+      const filteredRuns = runs.filter((run) => run.username == username);
+
+      expect(wrapper.findAll('table tbody tr').length).toBe(
+        filteredRuns.length,
+      );
+
+      await wrapper.find('[data-remove-all-filters]').trigger('click');
+
+      // Now all runs should appear
+      expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
+
+      await wrapper
+        .findAll(`td[data-username="${username}"]`)
+        .at(1)
+        .find(`a[title="${username}"]`)
+        .trigger('click');
+
+      await wrapper.find('[data-remove-filter]').trigger('click');
+
+      // Now all runs should appear
+      expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
+      expect(wrapper.vm.filterUsername).toBeFalsy();
+    });
   });
 });

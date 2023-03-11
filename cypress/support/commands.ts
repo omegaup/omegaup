@@ -7,6 +7,7 @@ import {
   LoginOptions,
   ProblemOptions,
   RunOptions,
+  Status,
 } from './types';
 
 // Logins the user given a username and password
@@ -74,7 +75,7 @@ Cypress.Commands.add(
     endDate,
     showScoreboard = false,
     unlimitedDuration = true,
-    school = 'omegaup',
+    school = 'Escuela curso',
     basicInformation = false,
     requestParticipantInformation = 'no',
     problemLevel = 'introductory',
@@ -99,7 +100,8 @@ Cypress.Commands.add(
       // the end date input should be disabled
       cy.get('[name="end-date"]').should('be.disabled');
     }
-    cy.get('.tt-input').first().type(school); // If we use the data attribute, the autocomplete makes multiple elements
+    cy.get('.tags-input input[type="text"]').first().type(school); // If we use the data attribute, the autocomplete makes multiple elements
+    cy.get('.typeahead-dropdown li').first().click();
     cy.get('[name="basic-information"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
       .eq(basicInformation ? 0 : 1)
       .click();
@@ -126,6 +128,12 @@ Cypress.Commands.add(
   },
 );
 
+declare enum ScoreMode {
+  AllOrNothing = 'all_or_nothing',
+  Partial = 'partial',
+  MaxPerGroup = 'max_per_group',
+}
+
 Cypress.Commands.add(
   'createContest',
   ({
@@ -134,7 +142,7 @@ Cypress.Commands.add(
     endDate,
     description = 'Default Description',
     showScoreboard = true,
-    partialPoints = true,
+    scoreMode = ScoreMode.Partial,
     basicInformation = false,
     requestParticipantInformation = 'no',
   }) => {
@@ -145,7 +153,7 @@ Cypress.Commands.add(
     cy.get('[data-start-date]').type(getISODateTime(startDate));
     cy.get('[data-end-date]').type(getISODateTime(endDate));
     cy.get('[data-show-scoreboard-at-end]').select(`${showScoreboard}`); // "true" | "false"
-    cy.get('[data-partial-points]').select(`${partialPoints}`);
+    cy.get('[data-score-mode]').select(`${scoreMode}`);
     if (basicInformation) {
       cy.get('[data-basic-information-required]').click();
     }
@@ -153,6 +161,99 @@ Cypress.Commands.add(
       requestParticipantInformation,
     ); // no | optional | required
     cy.get('button[type="submit"]').click();
+  },
+);
+
+Cypress.Commands.add(
+  'addProblemsToContest',
+  ({
+    contestAlias,
+    problems,
+  }) => {
+    cy.visit(`contest/${contestAlias}/edit/`);
+    cy.get('a[data-nav-contest-edit]').click();
+    cy.get('a.dropdown-item.problems').click();
+
+    for (const idx in problems) {
+      cy.get('.tags-input input[type="text"]').type(problems[idx].problemAlias)
+      cy.get('.typeahead-dropdown li').first().click();
+      cy.get('.add-problem').click();
+    }
+  },
+);
+
+Cypress.Commands.add(
+  'changeAdmissionModeContest',
+  ({
+    contestAlias,
+    admissionMode,
+  }) => {
+    cy.visit(`contest/${contestAlias}/edit/`);
+    cy.get('a[data-nav-contest-edit]').click();
+    cy.get('a.dropdown-item.admission-mode').click();
+    cy.get('select[name="admission-mode"]').select(
+      admissionMode,
+    ); // private | registration | public
+    cy.get('.change-admission-mode').click();
+  },
+);
+
+Cypress.Commands.add(
+  'enterContest',
+  ({
+    contestAlias,
+  }) => {
+    cy.visit('arena/');
+    cy.get(`a[href="/arena/${contestAlias}/"]`).first().click();
+    cy.get('button[data-start-contest]').click();
+  },
+);
+
+Cypress.Commands.add(
+  'createRunsInsideContest',
+  ({
+    contestAlias,
+    problems,
+    runs,
+  }) => {
+    const problem = problems[0];
+    if (!problem) {
+      return;
+    }
+    cy.visit(`/arena/${contestAlias}/#problems`);
+    cy.get(`a[data-problem="${problem.problemAlias}"]`).click();
+
+    for (const idx in runs) {
+      // Mocking date just a few seconds after to allow create new run
+      cy.clock(new Date(), ['Date']).then((clock) => clock.tick(3000));
+      cy.get('[data-new-run]').click();
+      cy.get('[name="language"]').select(runs[idx].language);
+
+      // Only the first submission is created because of server validations
+      if (!runs[idx].valid) {
+        cy.fixture(runs[idx].fixturePath).then((fileContent) => {
+          cy.get('.CodeMirror-line').type(fileContent);
+          cy.get('[data-submit-run]').should('be.disabled');
+        });
+        break;
+      }
+
+      cy.fixture(runs[idx].fixturePath).then((fileContent) => {
+        cy.get('.CodeMirror-line').type(fileContent);
+        cy.get('[data-submit-run]').click();
+      });
+
+      const expectedStatus: Status = 'AC';
+      cy.get('[data-run-status] > span').first().should('have.text', 'new');
+      cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
+
+      cy.wait(['@runStatus'], { timeout: 10000 }).its(
+        'response.statusCode',
+      ).should('eq', 200);
+      cy.get('[data-run-status] > span')
+        .first()
+        .should('have.text', expectedStatus);
+    }
   },
 );
 
@@ -180,8 +281,11 @@ export const getISODateTime = (date: Date) => {
  * @param days number of days to add to the date
  * @returns Date Relative Date Object
  */
-export const addDaysToDate = (date: Date, { days }: { days: number }): Date => {
+export const addSubtractDaysToDate = (date: Date, { days }: { days: number }): Date => {
   if (days == 0) return date;
+  if (days < 0) {
+    return new Date(date.getTime() - 24 * 3600 * 1000);
+  }
 
   return new Date(date.getTime() + 24 * 3600 * 1000);
 };

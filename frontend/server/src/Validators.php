@@ -21,7 +21,7 @@ class Validators {
      *
      * @param mixed $parameter
      * @param string $parameterName Name of parameter that will appear en error message
-     * @psalm-assert string $parameter
+     * @psalm-assert non-empty-string $parameter
      */
     public static function validateEmail(
         $parameter,
@@ -192,6 +192,27 @@ class Validators {
     }
 
     /**
+     * @param string $objectId
+     * @return boolean
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function objectId(string $objectId): bool {
+        return preg_match('/^[0-9a-f]{40}$/', $objectId) === 1;
+    }
+
+    /**
+     * @param string $filename
+     * @return boolean
+     */
+    public static function filename(string $filename): bool {
+        return preg_match(
+            '/^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+$/',
+            $filename
+        ) === 1;
+    }
+
+    /**
      * Returns whether the alias is valid.
      *
      * @return boolean
@@ -301,7 +322,7 @@ class Validators {
      *
      * @param mixed $parameter
      * @param string $parameterName
-     * @psalm-assert string $parameter
+     * @psalm-assert non-empty-string $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateValidUsername(
@@ -597,10 +618,10 @@ class Validators {
     }
 
     /**
-     * @template T
+     * @template T of scalar
      * @param mixed $parameter
      * @param string $parameterName
-     * @param T[] $enum
+     * @param list<T> $enum
      * @param bool $required
      * @psalm-assert T $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
@@ -630,10 +651,10 @@ class Validators {
     }
 
     /**
-     * @template T
+     * @template T of scalar
      * @param mixed $parameter
      * @param string $parameterName
-     * @param T[] $enum
+     * @param list<T> $enum
      * @param bool $required
      * @psalm-assert null|T $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
@@ -651,7 +672,7 @@ class Validators {
     }
 
     /**
-     * @template T
+     * @template T of scalar
      * @param list<T> $parameter
      * @param string $parameterName
      * @param list<T> $validOptions

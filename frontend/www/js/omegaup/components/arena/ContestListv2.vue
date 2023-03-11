@@ -28,6 +28,7 @@
                       spellcheck="false"
                       :placeholder="T.wordsKeyword"
                     />
+                    <button class="btn" type="reset">&times;</button>
                     <div class="input-group-append">
                       <input
                         class="btn btn-primary btn-md active"
@@ -48,17 +49,6 @@
                   </template>
                   <b-dropdown-item
                     href="#"
-                    data-order-by-title
-                    @click="orderByTitle"
-                  >
-                    <font-awesome-icon
-                      v-if="currentOrder === ContestOrder.Title"
-                      icon="check"
-                      class="mr-1"
-                    />{{ T.contestOrderByTitle }}</b-dropdown-item
-                  >
-                  <b-dropdown-item
-                    href="#"
                     data-order-by-ends
                     @click="orderByEnds"
                   >
@@ -67,6 +57,17 @@
                       icon="check"
                       class="mr-1"
                     />{{ T.contestOrderByEnds }}</b-dropdown-item
+                  >
+                  <b-dropdown-item
+                    href="#"
+                    data-order-by-title
+                    @click="orderByTitle"
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.Title"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByTitle }}</b-dropdown-item
                   >
                   <b-dropdown-item
                     href="#"
@@ -122,23 +123,34 @@
                   </template>
                   <b-dropdown-item
                     href="#"
-                    data-filter-by-signed-up
-                    @click="toggleFilterBySignedUp"
+                    data-filter-by-all
+                    @click="filterByAll"
                   >
                     <font-awesome-icon
-                      v-if="currentFilterBySignedUp"
-                      icon="check-square"
+                      v-if="currentFilter === ContestFilter.All"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestFilterByAll }}</b-dropdown-item
+                  >
+                  <b-dropdown-item
+                    href="#"
+                    data-filter-by-signed-up
+                    @click="filterBySignedUp"
+                  >
+                    <font-awesome-icon
+                      v-if="currentFilter === ContestFilter.SignedUp"
+                      icon="check"
                       class="mr-1"
                     />{{ T.contestFilterBySignedUp }}</b-dropdown-item
                   >
                   <b-dropdown-item
                     href="#"
                     data-filter-by-recommended
-                    @click="toggleFilterByRecommended"
+                    @click="filterByRecommended"
                   >
                     <font-awesome-icon
-                      v-if="currentFilterByRecommended"
-                      icon="check-square"
+                      v-if="currentFilter === ContestFilter.OnlyRecommended"
+                      icon="check"
                       class="mr-1"
                     />{{ T.contestFilterByRecommended }}</b-dropdown-item
                   >
@@ -276,11 +288,15 @@
         </b-tab>
       </b-tabs>
       <b-pagination-nav
+        ref="paginator"
         v-model="currentPage"
+        base-url="#"
+        first-number
+        last-number
         size="lg"
         align="center"
         :link-gen="linkGen"
-        :number-of-pages="10"
+        :number-of-pages="numberOfPages(currentTab)"
       ></b-pagination-nav>
     </b-card>
   </div>
@@ -331,6 +347,12 @@ export enum ContestOrder {
   SignedUp = 'signedup',
 }
 
+export enum ContestFilter {
+  SignedUp = 'signedup',
+  OnlyRecommended = 'recommended',
+  All = 'all',
+}
+
 @Component({
   components: {
     'omegaup-contest-card': ContestCard,
@@ -338,22 +360,22 @@ export enum ContestOrder {
   },
 })
 export default class ArenaContestList extends Vue {
+  @Prop({ default: null }) countContests!: { [key: string]: number } | null;
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
   @Prop() tab!: ContestTab;
   @Prop() sortOrder!: ContestOrder;
-  @Prop() filterBySignedUp!: boolean;
-  @Prop() filterByRecommended!: boolean;
+  @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
   @Prop() page!: number;
   T = T;
   ui = ui;
   ContestTab = ContestTab;
   ContestOrder = ContestOrder;
+  ContestFilter = ContestFilter;
   currentTab: ContestTab = this.tab;
   currentQuery: string = this.query;
   currentOrder: ContestOrder = this.sortOrder;
-  currentFilterBySignedUp: boolean = this.filterBySignedUp;
-  currentFilterByRecommended: boolean = this.filterByRecommended;
+  currentFilter: ContestFilter = this.filter;
   currentPage: number = this.page;
   refreshing: boolean = false;
 
@@ -365,20 +387,28 @@ export default class ArenaContestList extends Vue {
     }
   }
 
+  numberOfPages(tab: ContestTab): number {
+    if (!this.countContests || !this.countContests[tab]) {
+      // Default value when there are no contests in the list
+      return 1;
+    }
+    const numberOfPages = Math.ceil(this.countContests[tab] / 10);
+    return numberOfPages;
+  }
+
   get queryURL(): string {
-    return `/arenav2/#${this.currentTab}`;
+    return `/arena/#${this.currentTab}`;
   }
 
   linkGen(pageNum: number) {
     return {
-      path: `/arenav2/`,
+      path: `/arena/`,
       query: {
         page: pageNum,
         tab_name: this.currentTab,
         query: this.query,
         sort_order: this.currentOrder,
-        participating: this.currentFilterBySignedUp,
-        recommended: this.currentFilterByRecommended,
+        filter: this.filter,
       },
     };
   }
@@ -419,20 +449,22 @@ export default class ArenaContestList extends Vue {
     this.currentOrder = ContestOrder.SignedUp;
   }
 
-  toggleFilterBySignedUp() {
-    this.currentFilterBySignedUp = !this.currentFilterBySignedUp;
+  filterBySignedUp() {
+    this.currentFilter = ContestFilter.SignedUp;
   }
-
-  toggleFilterByRecommended() {
-    this.currentFilterByRecommended = !this.currentFilterByRecommended;
+  filterByRecommended() {
+    this.currentFilter = ContestFilter.OnlyRecommended;
+  }
+  filterByAll() {
+    this.currentFilter = ContestFilter.All;
   }
 
   get filteredContestList(): types.ContestListItem[] {
     const filters: Array<(contestItem: types.ContestListItem) => boolean> = [];
-    if (this.currentFilterBySignedUp) {
+    if (this.currentFilter === ContestFilter.SignedUp) {
       filters.push((item) => item.participating);
     }
-    if (this.currentFilterByRecommended) {
+    if (this.currentFilter === ContestFilter.OnlyRecommended) {
       filters.push((item) => item.recommended);
     }
     return this.sortedContestList.slice().filter((contestItem) => {

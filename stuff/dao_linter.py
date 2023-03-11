@@ -6,7 +6,7 @@ import importlib
 import os
 from typing import Optional, Sequence
 
-from hook_tools import linters
+from omegaup_hook_tools import linters
 
 
 class DaoLinter(linters.Linter):
@@ -23,7 +23,7 @@ class DaoLinter(linters.Linter):
             contents_callback: linters.ContentsCallback
     ) -> linters.MultipleResults:
         '''Runs the linter against a subset of files.'''
-        # pylint: disable=no-self-use, unused-argument
+        # pylint: disable=unused-argument
 
         # Given that this file may be loaded dynamically, we need to do some
         # loader hackery to get the dao_utils module loaded.
@@ -46,7 +46,10 @@ class DaoLinter(linters.Linter):
                 path = os.path.join('frontend/server/src/DAO/Base', filename)
             else:
                 path = os.path.join('frontend/server/src/DAO/VO', filename)
-            original_contents[path] = contents_callback(path)
+            try:
+                original_contents[path] = contents_callback(path)
+            except FileNotFoundError:
+                original_contents[path] = b''
             new_contents[path] = contents.encode('utf-8')
 
         return linters.MultipleResults(new_contents, original_contents,

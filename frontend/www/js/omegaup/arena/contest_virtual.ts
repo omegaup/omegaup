@@ -82,7 +82,8 @@ OmegaUp.on('ready', async () => {
               scoreboard,
               scoreboardEvents: response.events,
               problems,
-              contest,
+              startTime: contest.start_time,
+              finishTime: contest.finish_time,
               currentUsername,
             });
           })
@@ -105,7 +106,8 @@ OmegaUp.on('ready', async () => {
       scoreboard: payload.scoreboard,
       scoreboardEvents: payload.original.scoreboardEvents,
       problems: payload.problems,
-      contest: payload.contest,
+      startTime: payload.contest.start_time,
+      finishTime: payload.contest.finish_time,
       currentUsername: commonPayload.currentUsername,
     });
     virtualContestRefreshInterval = setInterval(() => {
@@ -117,6 +119,13 @@ OmegaUp.on('ready', async () => {
         currentUsername: commonPayload.currentUsername,
       });
     }, refreshTime);
+  }
+
+  let nextSubmissionTimestamp: null | Date = null;
+  if (problemDetails?.nextSubmissionTimestamp != null) {
+    nextSubmissionTimestamp = time.remoteTime(
+      problemDetails?.nextSubmissionTimestamp.getTime(),
+    );
   }
 
   const contestContestant = new Vue({
@@ -132,7 +141,7 @@ OmegaUp.on('ready', async () => {
       problemAlias,
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
-      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      nextSubmissionTimestamp,
       runDetailsData: runDetails,
     }),
     render: function (createElement) {
@@ -300,6 +309,10 @@ OmegaUp.on('ready', async () => {
   const socket = new EventsSocket({
     disableSockets: false,
     problemsetAlias: payload.contest.alias,
+    isVirtual: true,
+    originalProblemsetId: payload.original?.contest.problemset_id,
+    startTime: payload.contest.start_time,
+    finishTime: payload.contest.finish_time,
     locationProtocol: window.location.protocol,
     locationHost: window.location.host,
     problemsetId: payload.contest.problemset_id,
@@ -309,6 +322,7 @@ OmegaUp.on('ready', async () => {
     navbarProblems: payload.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
+    isContestModeMaxPerGroup: payload.contest.score_mode === 'max_per_group',
   });
   socket.connect();
 

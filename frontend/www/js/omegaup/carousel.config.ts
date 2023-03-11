@@ -17,6 +17,7 @@ const carouselConfig: {
       pt: string;
     };
     href: string;
+    target: string;
   };
 }[] = [
   {
@@ -40,7 +41,8 @@ const carouselConfig: {
         es: 'Ve el tutorial',
         pt: 'Veja o tutorial',
       },
-      href: 'https://blog.omegaup.com/category/omegaup/omegaup-101/',
+      href: 'https://blog.omegaup.com/introduccion-a-omegaup-parte-0/',
+      target: '_blank',
     },
   },
   {
@@ -65,6 +67,7 @@ const carouselConfig: {
         pt: 'Entre aqui',
       },
       href: '/course/introduccion_a_cpp/',
+      target: '_self',
     },
   },
   {
@@ -89,6 +92,7 @@ const carouselConfig: {
         pt: 'Entre aqui',
       },
       href: 'https://omegaup.com/course/ResolviendoProblemas2022/',
+      target: '_self',
     },
   },
   {
@@ -113,6 +117,7 @@ const carouselConfig: {
         pt: 'Junte-se aqui',
       },
       href: 'https://discord.com/invite/K3JFd9d3wk',
+      target: '_blank',
     },
   },
 ];

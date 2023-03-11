@@ -18,7 +18,10 @@ class GroupsScoreboardsProblemsets extends \OmegaUp\DAO\Base\GroupsScoreboardsPr
     public static function getByGroupScoreboard(
         int $groupScoreboardId
     ): array {
-        $sql = 'SELECT * FROM Groups_Scoreboards_Problemsets WHERE group_scoreboard_id = ?;';
+        $sql = 'SELECT ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets::FIELD_NAMES,
+            'Groups_Scoreboards_Problemsets'
+        ) . ' FROM Groups_Scoreboards_Problemsets WHERE group_scoreboard_id = ?;';
         /** @var list<array{group_scoreboard_id: int, only_ac: bool, problemset_id: int, weight: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
