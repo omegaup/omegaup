@@ -915,7 +915,6 @@ const translations: { [key: string]: string; } = {
   problemEditFormFile: "Attach zip file",
   problemEditFormFirstTimeCreatingAProblem: "First time creating a problem?",
   problemEditFormHereIsHowToWriteProblems: "Here is how to write the file",
-  problemEditFormHowToWriteProblems: "How to write the file?",
   problemEditFormInputLimit: "Input size limit (bytes)",
   problemEditFormLanguages: "Problem type",
   problemEditFormLiteral: "Interpret stdout as score",
