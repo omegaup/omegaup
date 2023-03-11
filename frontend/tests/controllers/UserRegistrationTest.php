@@ -212,4 +212,42 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame('parameterInvalid', $e->getMessage());
         }
     }
+
+    /**
+     * User 13 and its account link to the parent account
+     * on verification of parental token
+     */
+    public function testUse13LinkedToParentAccountWhenTokenVerificationDone() {
+        $defaultDate = strtotime('2022-01-01T00:00:00Z');
+        \OmegaUp\Time::setTimeForTesting($defaultDate);
+        // Create a 10 years-old user
+        ['user' => $user] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birthDate' => strtotime('2012-01-01T00:00:00Z'),
+            ]),
+        );
+        [
+            'user' => $parentUser,
+            'identity' => $parentIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($parentIdentity);
+
+        $payload = \OmegaUp\Controllers\User::getVerificationParentalTokenDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'parental_verification_token' => $user->parental_verification_token,
+            ])
+        )['templateProperties']['payload'];
+
+        $this->assertTrue($payload['hasParentalVerificationToken']);
+
+        $updatedUser = \OmegaUp\DAO\Users::getByPK($user->user_id);
+
+        // Assert both accounts are linked by email_id
+        $this->assertSame(
+            $updatedUser->parent_email_id,
+            $parentUser->main_email_id
+        );
+    }
 }

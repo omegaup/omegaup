@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Tests getting runs of a problem.
  */
@@ -39,7 +37,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
             ],
         ];
         for ($i = 0; $i < 2; ++$i) {
-            ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+            ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
             $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
                 $problemData,
                 $identity
@@ -132,7 +130,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testUserHasTriedToSolvedProblem() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         // Never tried, never solved
         $this->assertFalse(\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
             $problemData['problem'],
@@ -170,7 +168,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testUserHasTriedToSolveProblemWithDifferentVerdicts() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $pointsGroup = [
             [
                 'execution' => 'EXECUTION_JUDGE_ERROR',
