@@ -354,12 +354,14 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for all percentages of scoreboard show.
      *
-     * @return list<list<int>>
+     * @return list<array<0: float, 1: bool, 2: int, 3: float>>
      */
     public function contestPercentageScoreboardShowProvider(): array {
         return [
-            [0],
-            [1],
+            [1.0, true, 1, 100.0],
+            [0.0, false, 0, 0.0],
+            [1.0, false, 1, 0.0],
+            [0.0, true, 1, 100.0],
         ];
     }
 
@@ -368,17 +370,26 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
      *
      * @dataProvider contestPercentageScoreboardShowProvider
      */
-    public function testScoreboardPercentajeForContestant(int $percentage) {
+    public function testScoreboardPercentajeForContestant(
+        float $scoreboardPct,
+        bool $showScoreboardAfter,
+        int $expectedRuns,
+        float $expectedPoints
+    ) {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['showScoreboardAfter' => $showScoreboardAfter]
+            )
+        );
 
         // Set percentage of scoreboard show
         \OmegaUp\Test\Factories\Contest::setScoreboardPercentage(
             $contestData,
-            $percentage
+            $scoreboardPct
         );
 
         // Add the problem to the contest
@@ -399,11 +410,6 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Grade the run
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        $runs = 0;
-        if ($percentage !== 0) {
-            $runs++;
-        }
 
         // Create request
         $login = self::login($identity);
@@ -437,9 +443,44 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             0.0,
             $response['ranking'][0]['problems'][0]['penalty']
         );
+        // When scoreboardPercentage is 0 and ShowScoreboardAfter is false,
+        // the number of runs is not updated in the scoreboard
         $this->assertSame(
-            $runs,
+            $expectedRuns,
             $response['ranking'][0]['problems'][0]['runs']
+        );
+
+        $time = \OmegaUp\Time::get();
+
+        // Create a new run 2 minutes after
+        \OmegaUp\Time::setTimeForTesting($time + (2 * 60));
+
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+
+        // Grade the run
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Now, the contest has finished
+        \OmegaUp\Time::setTimeForTesting($time + (5 * 60 * 60));
+
+        $login = self::login($identity);
+
+        // Create API
+        $response = \OmegaUp\Controllers\Problemset::apiScoreboard(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problemset_id' =>  $contestData['contest']->problemset_id,
+            ])
+        );
+
+        // Check data per problem
+        $this->assertSame(
+            $expectedPoints,
+            $response['ranking'][0]['problems'][0]['points']
         );
     }
 
