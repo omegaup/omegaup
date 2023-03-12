@@ -1292,6 +1292,7 @@ const translations: { [key: string]: string; } = {
   searchUser: "Buscar coder",
   selectProblemLevelDesc: "Para agregar el problema, debes elegir su nivel correspondiente",
   serviceUnavailableError: "Oops. El servicio est\u00e1 actualmente no disponible. Por favor intenta de nuevo m\u00e1s tarde.",
+  showDefaultAllContestantsInScoreboard: "Mostrar por defecto a todas las personas concursantes en el scoreboard.",
   showLinks: "Enlaces",
   showTotalScoreboard: "Ver scoreboard total",
   singleUserAddSuccess: "Usuario exitosamente agregado.",
