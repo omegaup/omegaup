@@ -43,6 +43,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
  * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
+ * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -4649,6 +4650,62 @@ class User extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\DAO\APITokens::deleteByName($r->user->user_id, $name);
         return ['status' => 'ok'];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: VerificationParentalTokenDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $parental_verification_token
+     */
+    public static function getVerificationParentalTokenDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureIdentity();
+
+        $token = $r->ensureString(
+            'parental_verification_token',
+            validator: fn (string $token) => preg_match(
+                '/^[a-zA-Z0-9]{24}$/',
+                $token
+            ) === 1
+        );
+        $hasParentalVerificationToken = false;
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            $user = \OmegaUp\DAO\Users::findByParentalToken($token);
+
+            if (is_null($user)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'parentalTokenNotFound'
+                );
+            }
+
+            if (is_null($r->user) || is_null($r->user->main_email_id)) {
+                throw new \OmegaUp\Exceptions\UnauthorizedException();
+            }
+
+            $user->parent_email_id = $r->user->main_email_id;
+            $user->parent_verified = true;
+            $user->parental_verification_token = null;
+            \OmegaUp\DAO\Users::update($user);
+            $hasParentalVerificationToken = true;
+
+            \OmegaUp\DAO\DAO::transEnd();
+            return [
+                'templateProperties' => [
+                    'payload' => [
+                        'hasParentalVerificationToken' => $hasParentalVerificationToken,
+                    ],
+                    'title' => new \OmegaUp\TranslationString(
+                        'omegaupTitleParentalVerificationToken'
+                    ),
+                ],
+                'entrypoint' => 'user_verification_parental_token',
+            ];
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
     }
 }
 
