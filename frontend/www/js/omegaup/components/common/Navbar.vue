@@ -20,22 +20,22 @@
         </a>
         <div class="d-inline-flex d-flex-row">
           <a
-          v-if="isLoggedIn"
-          class="navbar justify-content-end mr-2 d-lg-none"
-          href="/logout/">
+            v-if="isLoggedIn"
+            class="navbar justify-content-end mr-2 d-lg-none"
+            href="/logout/"
+          >
             <font-awesome-icon :icon="['fas', 'power-off']" />
           </a>
           <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target=".omegaup-navbar"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
+            class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target=".omegaup-navbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
         </div>
         <div class="collapse navbar-collapse omegaup-navbar">
           <omegaup-navbar-items
@@ -304,12 +304,13 @@
             </li>
           </ul>
         </div>
-        
+
         <a
           v-if="isLoggedIn"
           class="navbar justify-content-end d-none d-lg-block"
-          href="/logout/">
-            <font-awesome-icon :icon="['fas', 'power-off']" />
+          href="/logout/"
+        >
+          <font-awesome-icon :icon="['fas', 'power-off']" />
         </a>
       </div>
     </nav>
