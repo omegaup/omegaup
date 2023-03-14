@@ -8,9 +8,11 @@
       <span :class="{ 'text-secondary': course.archived }">
         {{ course.name }}
       </span>
+      <!--  -->
       <a v-if="course.is_admin" :href="`/course/${course.alias}/edit/`">
         <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
+      <!--  -->
     </h3>
     <div v-if="course.is_admin" class="my-5">
       <div class="my-4 markdown">
