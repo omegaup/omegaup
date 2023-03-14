@@ -171,7 +171,6 @@
                     </div>
                   </a>
                   <div class="dropdown-divider"></div>
-                  <div></div>
                   <div v-if="identitiesNotLoggedIn.length > 0" class="mb-1">
                     <div
                       v-for="identity in identitiesNotLoggedIn"
