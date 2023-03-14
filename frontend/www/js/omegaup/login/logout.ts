@@ -10,8 +10,8 @@ function redirect() {
 }
 
 function removeEphemeralSources() {
-  for (const key in sessionStorage) {
-    if (key.indexOf('ephemeral-sources-') !== 0) continue;
+  for (const key of Object.keys(sessionStorage)) {
+    if (key.startsWith('ephemeral-sources-')) continue;
     sessionStorage.removeItem(key);
   }
 }
