@@ -18,7 +18,6 @@ export namespace dao {
     finish_time?: Date;
     languages?: string;
     last_updated?: Date;
-    partial_score?: boolean;
     penalty?: number;
     penalty_calc_policy?: string;
     penalty_type?: string;
