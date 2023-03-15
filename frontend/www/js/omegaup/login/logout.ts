@@ -9,10 +9,20 @@ function redirect() {
   window.location.href = pathname;
 }
 
+function removeEphemeralSources() {
+  for (const key of Object.keys(sessionStorage)) {
+    if (key.startsWith('ephemeral-sources-')) continue;
+    sessionStorage.removeItem(key);
+  }
+}
+
 OmegaUp.on('ready', () => {
   const clientId = document.querySelector(
     'meta[name="google-signin-client_id"]',
   );
+
+  removeEphemeralSources();
+
   if (!clientId || !window.gapi) {
     redirect();
     return;
