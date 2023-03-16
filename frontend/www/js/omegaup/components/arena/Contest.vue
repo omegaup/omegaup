@@ -226,11 +226,7 @@ import { ContestClarificationType } from '../../arena/clarifications';
 import { SocketStatus } from '../../arena/events_socket';
 import { AdmissionMode } from '../common/Publish.vue';
 import { SubmissionRequest } from '../../arena/submissions';
-import {
-  FontAwesomeIcon,
-  FontAwesomeLayers,
-  FontAwesomeLayersText,
-} from '@fortawesome/vue-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
@@ -250,8 +246,6 @@ library.add(fas);
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-problem-details': problem_Details,
     'font-awesome-icon': FontAwesomeIcon,
-    'font-awesome-layers': FontAwesomeLayers,
-    'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
 export default class ArenaContest extends Vue {
