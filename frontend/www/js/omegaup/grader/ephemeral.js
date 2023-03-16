@@ -177,7 +177,7 @@ let store = new Vuex.Store({
     alias: null,
     showSubmitButton: false,
     languages: [],
-    localStorageSources: null,
+    sessionStorageSources: null,
     request: {
       input: {
         limits: {},
@@ -202,8 +202,8 @@ let store = new Vuex.Store({
     languages(state) {
       return state.languages;
     },
-    localStorageSources(state) {
-      return state.localStorageSources;
+    sessionStorageSources(state) {
+      return state.sessionStorageSources;
     },
     moduleName(state) {
       if (state.request.input.interactive) {
@@ -325,26 +325,26 @@ let store = new Vuex.Store({
   mutations: {
     alias(state, value) {
       if (state.alias) {
-        persistToLocalStorage(state.alias).flush();
+        persistToSessionStorage(state.alias).flush();
       }
       state.alias = value;
-      const itemString = localStorage.getItem(
+      const itemString = sessionStorage.getItem(
         `ephemeral-sources-${state.alias}`,
       );
-      state.localStorageSources = null;
+      state.sessionStorageSources = null;
       if (itemString) {
-        state.localStorageSources = JSON.parse(itemString);
+        state.sessionStorageSources = JSON.parse(itemString);
       }
-      if (!state.localStorageSources) {
+      if (!state.sessionStorageSources) {
         if (state.request.input.interactive) {
-          state.localStorageSources = {
+          state.sessionStorageSources = {
             language: 'cpp17-gcc',
             sources: {
               ...interactiveTemplates,
             },
           };
         } else {
-          state.localStorageSources = {
+          state.sessionStorageSources = {
             language: 'cpp17-gcc',
             sources: {
               ...sourceTemplates,
@@ -352,10 +352,10 @@ let store = new Vuex.Store({
           };
         }
       }
-      state.request.language = state.localStorageSources.language;
+      state.request.language = state.sessionStorageSources.language;
       state.request.source =
-        state.localStorageSources.sources[
-          Util.languageExtensionMapping[state.localStorageSources.language]
+        state.sessionStorageSources.sources[
+          Util.languageExtensionMapping[state.sessionStorageSources.language]
         ];
       document.getElementById('language').value = state.request.language;
     },
@@ -404,14 +404,15 @@ let store = new Vuex.Store({
         )
       ) {
         const language = Util.languageExtensionMapping[value];
-        if (state.localStorageSources) {
+        if (state.sessionStorageSources) {
           if (
             Object.prototype.hasOwnProperty.call(
-              state.localStorageSources.sources,
+              state.sessionStorageSources.sources,
               language,
             )
           ) {
-            state.request.source = state.localStorageSources.sources[language];
+            state.request.source =
+              state.sessionStorageSources.sources[language];
           }
         } else if (store.getters.isInteractive) {
           if (
@@ -421,14 +422,14 @@ let store = new Vuex.Store({
           }
         } else {
           if (Object.prototype.hasOwnProperty.call(sourceTemplates, language)) {
-            request.source = sourceTemplates[language];
+            state.request.source = sourceTemplates[language];
           }
         }
-        if (state.localStorageSources && !state.updatingSettings) {
-          state.localStorageSources.language = value;
-          persistToLocalStorage(state.alias)({
+        if (state.sessionStorageSources && !state.updatingSettings) {
+          state.sessionStorageSources.language = value;
+          persistToSessionStorage(state.alias)({
             alias: state.alias,
-            contents: state.localStorageSources,
+            contents: state.sessionStorageSources,
           });
         }
       }
@@ -436,13 +437,13 @@ let store = new Vuex.Store({
     },
     'request.source'(state, value) {
       state.request.source = value;
-      if (!state.updatingSettings && state.localStorageSources) {
-        state.localStorageSources.sources[
-          Util.languageExtensionMapping[state.localStorageSources.language]
+      if (!state.updatingSettings && state.sessionStorageSources) {
+        state.sessionStorageSources.sources[
+          Util.languageExtensionMapping[state.sessionStorageSources.language]
         ] = value;
-        persistToLocalStorage(state.alias)({
+        persistToSessionStorage(state.alias)({
           alias: state.alias,
-          contents: state.localStorageSources,
+          contents: state.sessionStorageSources,
         });
       }
       state.dirty = true;
@@ -882,6 +883,7 @@ const interactiveMainSourceSettings = {
   isClosable: false,
 };
 
+// eslint-disable-next-line no-undef
 const layout = new GoldenLayout(
   goldenLayoutSettings,
   document.getElementById('layout-root'),
@@ -963,8 +965,11 @@ RegisterVueComponent(
   componentMapping,
 );
 
-const persistToLocalStorage = Util.throttle(({ alias, contents }) => {
-  localStorage.setItem(`ephemeral-sources-${alias}`, JSON.stringify(contents));
+const persistToSessionStorage = Util.throttle(({ alias, contents }) => {
+  sessionStorage.setItem(
+    `ephemeral-sources-${alias}`,
+    JSON.stringify(contents),
+  );
 }, 10000);
 
 function initialize() {
