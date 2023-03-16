@@ -10,7 +10,21 @@
           <div class="row">
             <div class="col-xs-12 col-sm-4 text-center py-2">
               <!-- id-lint off -->
-              <div id="google-signin" :title="T.loginWithGoogle"></div>
+              <div
+                id="g_id_onload"
+                :data-client_id="googleClientId"
+                data-login_uri="http://localhost:8001/session/googleLogin/"
+                data-auto_prompt="false"
+              ></div>
+              <div
+                class="g_id_signin"
+                data-type="standard"
+                data-size="large"
+                data-theme="outline"
+                data-text="signin_with"
+                data-shape="rectangular"
+                data-logo_alignment="left"
+              ></div>
               <!-- id-lint on -->
             </div>
             <!-- FB login link deleted until privacy policy updated -->
@@ -77,6 +91,7 @@ import T from '../../lang';
 @Component
 export default class Login extends Vue {
   @Prop() facebookUrl!: string;
+  @Prop() googleClientId!: string;
   usernameOrEmail: string = '';
   password: string = '';
   T = T;

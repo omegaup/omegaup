@@ -45,6 +45,9 @@ OmegaUp.on('ready', () => {
   }
 
   const payload = types.payloadParsers.LoginDetailsPayload();
+  const googleClientId = document
+    .querySelector('meta[name="google-signin-client_id"]')
+    ?.getAttribute('content');
   if (payload.statusError) {
     ui.warning(payload.statusError);
   } else if (payload.verifyEmailSuccessfully) {
@@ -61,6 +64,7 @@ OmegaUp.on('ready', () => {
         props: {
           validateRecaptcha: payload.validateRecaptcha,
           facebookUrl: payload.facebookUrl,
+          googleClientId,
         },
         on: {
           'register-and-login': (
