@@ -769,7 +769,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             HAVING
                 MAX(r.contest_score) IS NOT NULL
             ORDER BY
-                students.name , a.`order`, psp.`order`
+                students.name, a.`order`, psp.`order`
         ';
 
         $studentsProgress = [];
