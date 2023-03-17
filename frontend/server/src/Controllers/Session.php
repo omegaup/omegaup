@@ -538,7 +538,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        return self::LoginViaGoogle(
+        self::LoginViaGoogle(
             $payload['email'],
             (isset($payload['name']) ? $payload['name'] : null)
         );
