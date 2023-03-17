@@ -642,6 +642,7 @@ const translations: { [key: string]: string; } = {
   loginFacebookEmptyEmailError: "Se necesita acceso a tu direcci\u00f3n de correo para utilizar omegaUp. Por favor permite el acceso a tu correo de Facebook para continuar.",
   loginFederated: "Cuenta en otros sitios",
   loginFederatedFailed: "El inicio de sesi\u00f3n con el sitio externo fall\u00f3.",
+  loginGoogleInvalidCSRFToken: "Token CSRF inv\u00e1lido",
   loginHeader: "Inicia sesi\u00f3n en omegaUp",
   loginLogIn: "Iniciar sesi\u00f3n",
   loginNative: "Cuenta omegaUp",

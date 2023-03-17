@@ -642,6 +642,7 @@ const translations: { [key: string]: string; } = {
   loginFacebookEmptyEmailError: "Um endere\u00e7o de e-mail \u00e9 necess\u00e1rio para utilizar omegaUp. Por favor, proporcione acesso ao e-mail de Facebook para continuar",
   loginFederated: "Conta em outros sites",
   loginFederatedFailed: "Entrar usando o site externo falhou.",
+  loginGoogleInvalidCSRFToken: "Token CSRF inv\u00e1lido",
   loginHeader: "Entrar em omegaUp",
   loginLogIn: "Entrar",
   loginNative: "Conta omegaUp",
