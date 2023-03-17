@@ -6,6 +6,7 @@
         <slot name="socket-status">
           <sup class="socket-status-error" title="WebSocket">✗</sup>
         </slot>
+        <slot name="edit-button"></slot>
       </h2>
       <slot name="clock"><div class="clock">∞</div></slot>
     </div>
