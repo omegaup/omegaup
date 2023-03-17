@@ -120,11 +120,19 @@
           <li v-if="contest.window_length !== null">
             {{ differentStartsDescription }}
           </li>
-          <li>{{ scoreboardDescription }}</li>
-          <li>{{ submissionsGapDescription }}</li>
-          <li>{{ penaltyTypes[contest.penalty_type] }}</li>
+          <li v-if="scoreboardDescription !== ''">
+            {{ scoreboardDescription }}
+          </li>
+          <li v-if="contest.submissions_gap !== 0">
+            {{ submissionsGapDescription }}
+          </li>
+          <li v-if="contest.penalty_type !== 'none'">
+            {{ penaltyTypes[contest.penalty_type] }}
+          </li>
           <li v-if="contest.penalty !== 0">{{ penaltyDescription }}</li>
-          <li>{{ feedbackTypes[contest.feedback] }}</li>
+          <li v-if="contest.feedback !== 'none'">
+            {{ feedbackTypes[contest.feedback] }}
+          </li>
           <li v-if="contest.points_decay_factor !== 0">
             {{ pointsDecayDescription }}
           </li>

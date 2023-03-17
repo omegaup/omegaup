@@ -2319,6 +2319,14 @@ export namespace types {
         (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
+
+    export function VerificationParentalTokenDetailsPayload(
+      elementId: string = 'payload',
+    ): types.VerificationParentalTokenDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
   }
 
   export interface ActivityEvent {
@@ -4663,6 +4671,10 @@ export namespace types {
     userSystemGroups: { [key: number]: { name: string; value: boolean } };
     userSystemRoles: { [key: number]: { name: string; value: boolean } };
     username: string;
+  }
+
+  export interface VerificationParentalTokenDetailsPayload {
+    hasParentalVerificationToken: boolean;
   }
 }
 

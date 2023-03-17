@@ -111,7 +111,13 @@ class ContestParams {
     public $scoreboardPct;
 
     /**
-     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, contestForTeams?: bool, teamsGroupAlias?: string, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string, scoreMode?: string, checkPlagiarism?: bool, scoreboardPct?: int} $params
+     * @readonly
+     * @var bool
+     */
+    public $showScoreboardAfter;
+
+    /**
+     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, contestForTeams?: bool, teamsGroupAlias?: string, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string, scoreMode?: string, checkPlagiarism?: bool, scoreboardPct?: int, showScoreboardAfter?: bool} $params
      */
     public function __construct($params = []) {
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
@@ -152,6 +158,7 @@ class ContestParams {
         $this->teamsGroupAlias = $params['teamsGroupAlias'] ?? null;
         $this->scoreMode = $params['scoreMode'] ?? 'partial';
         $this->checkPlagiarism = $params['checkPlagiarism'] ?? false;
+        $this->showScoreboardAfter = $params['showScoreboardAfter'] ?? false;
         $this->scoreboardPct = $params['scoreboardPct'] ?? 100;
     }
 }
@@ -204,6 +211,7 @@ class Contest {
             'penalty_calc_policy' => $params->penaltyCalcPolicy,
             'contest_for_teams' => $params->contestForTeams,
             'check_plagiarism' => $params->checkPlagiarism,
+            'show_scoreboard_after' => $params->showScoreboardAfter,
         ]);
 
         if (!is_null($params->teamsGroupAlias)) {

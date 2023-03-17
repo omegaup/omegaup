@@ -11,6 +11,14 @@
         socketStatus
       }}</sup>
     </template>
+    <template v-if="contestAdmin" #edit-button>
+      <a
+        class="edit-contest-button ml-2"
+        :href="`/contest/${contest.alias}/edit/`"
+      >
+        <font-awesome-icon icon="edit" />
+      </a>
+    </template>
     <template #clock>
       <div v-if="isContestFinished" class="alert alert-warning" role="alert">
         <a :href="urlPractice">{{ T.arenaContestEndedUsePractice }}</a>
@@ -218,6 +226,10 @@ import { ContestClarificationType } from '../../arena/clarifications';
 import { SocketStatus } from '../../arena/events_socket';
 import { AdmissionMode } from '../common/Publish.vue';
 import { SubmissionRequest } from '../../arena/submissions';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
 
 @Component({
   components: {
@@ -233,6 +245,7 @@ import { SubmissionRequest } from '../../arena/submissions';
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-problem-details': problem_Details,
+    'font-awesome-icon': FontAwesomeIcon,
   },
 })
 export default class ArenaContest extends Vue {
