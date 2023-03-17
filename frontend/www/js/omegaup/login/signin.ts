@@ -105,17 +105,6 @@ OmegaUp.on('ready', () => {
               /*isAccountCreation=*/ false,
             );
           },
-          'google-login': (idToken: string) => {
-            // Only log in if the user actually clicked the sign-in button.
-            api.Session.googleLogin({ storeToken: idToken })
-              .then((data) => {
-                redirect(data.isAccountCreation);
-              })
-              .catch(ui.apiError);
-          },
-          'google-login-failure': () => {
-            ui.error(T.loginFederatedFailed);
-          },
         },
       });
     },
