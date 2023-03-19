@@ -89,7 +89,6 @@
                 :disabled="!birthDate"
                 autocomplete="new-password"
                 :required="true"
-                pattern="^[_a-zA-Z0-9\-]{5,15}$"
               />
               <div class="invalid-feedback">
                 {{ T.loginPasswordTooShort }}
@@ -108,7 +107,6 @@
                 :disabled="!birthDate"
                 autocomplete="new-password"
                 :required="true"
-                pattern="^[_a-zA-Z0-9\-]{5,15}$"
               />
               <div class="invalid-feedback">
                 {{ T.passwordMismatch }}
