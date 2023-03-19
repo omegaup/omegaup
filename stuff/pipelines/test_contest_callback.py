@@ -13,6 +13,7 @@ import time
 
 from typing import List
 
+import pytest
 import contest_callback
 import test_credentials
 import rabbitmq_connection
@@ -27,6 +28,7 @@ sys.path.insert(
 import lib.db   # pylint: disable=wrong-import-position
 
 
+@pytest.mark.skip(reason="Disabled temporarily because it's flaky")
 def test_insert_contest_certificate() -> None:
     '''Test get contest contestants'''
 

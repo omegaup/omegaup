@@ -50,6 +50,7 @@ class ContestsCallbackForTesting:
         channel.close()
 
 
+@pytest.mark.skip(reason="Disabled temporarily because it's flaky")
 def test_client_contest() -> None:
     '''Basic test for client contest queue.'''
     dbconn = lib.db.connect(

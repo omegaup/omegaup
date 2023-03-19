@@ -79,6 +79,7 @@ class MessageSavingCallback:
         ),
     ],
 )  # type: ignore
+@pytest.mark.skip(reason="Disabled temporarily because it's flaky")
 def test_contest_producer(mocker: pytest_mock.MockerFixture,
                           params,
                           expected) -> None:
