@@ -20,6 +20,7 @@ describe('signup.vue', () => {
     email: null | string;
     parent_email: null | string;
     password: string;
+    password_confirmation: string;
     recaptcha: string;
     birth_date: Date;
   } = {
@@ -27,6 +28,7 @@ describe('signup.vue', () => {
     email: null,
     parent_email: 'parentEmail@gmail.com',
     password: 'pass12345678',
+    password_confirmation: 'pass12345678',
     recaptcha: '',
     birth_date: new Date('2012-01-01'),
   };
