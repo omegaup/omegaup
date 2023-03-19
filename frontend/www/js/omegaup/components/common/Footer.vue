@@ -18,24 +18,6 @@
           <h4>{{ T.frontPageFooterSponsors }}</h4>
           <ul>
             <li class="mt-1">
-              <a href="https://www.aboutamazon.com/" target="_blank">
-                <img
-                  class="sponsor-logo"
-                  src="/media/homepage/amazon_logo.png"
-                  alt="AmazonLogo"
-                />
-              </a>
-            </li>
-            <li class="mt-1">
-              <a href="https://www.f5.com/" target="_blank">
-                <img
-                  class="sponsor-logo"
-                  src="/media/homepage/f5_logo.png"
-                  alt="F5Logo"
-                />
-              </a>
-            </li>
-            <li class="mt-1">
               <a href="https://replit.com/" target="_blank">
                 <img
                   class="sponsor-logo"
