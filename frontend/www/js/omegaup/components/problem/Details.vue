@@ -30,7 +30,7 @@
     <div class="tab-content">
       <div
         v-if="problem"
-        class="tab-pane fade p-4"
+        class="tab-pane fade py-4 p-lg-4"
         :class="{ 'show active': selectedTab === 'problems' }"
       >
         <omegaup-problem-settings-summary
