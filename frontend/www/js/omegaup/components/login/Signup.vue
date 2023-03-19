@@ -89,6 +89,7 @@
                 :disabled="!birthDate"
                 autocomplete="new-password"
                 :required="true"
+                pattern="^[_a-zA-Z0-9\-]{5,15}$"
               />
               <div class="invalid-feedback">
                 {{ T.loginPasswordTooShort }}
@@ -107,6 +108,7 @@
                 :disabled="!birthDate"
                 autocomplete="new-password"
                 :required="true"
+                pattern="^[_a-zA-Z0-9\-]{5,15}$"
               />
               <div class="invalid-feedback">
                 {{ T.passwordMismatch }}
@@ -211,6 +213,7 @@ export default class Signup extends Vue {
     const registerParameters = {
       username: this.username,
       password: this.password,
+      password_confirmation: this.passwordConfirmation,
       recaptcha: this.recaptchaResponse,
       birth_date: this.birthDate,
       email: this.email,
