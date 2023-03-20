@@ -145,7 +145,7 @@
                   :error="errorMessage !== null"
                 ></omegaup-common-grader-badge>
               </a>
-              <div class="dropdown-menu dropdown-menu-right">
+              <div class="dropdown-menu dropdown-menu-right allow-overflow">
                 <template v-if="!omegaUpLockDown && (!inContest || isAdmin)">
                   <div class="text-center mb-1">
                     <img
@@ -411,6 +411,15 @@ nav.navbar {
 
   .collapse-submenu .btn:focus {
     box-shadow: 0 0 0 0;
+  }
+}
+
+.allow-overflow {
+  overflow-y: scroll;
+}
+@media only screen and (max-width: 992px) {
+  .allow-overflow {
+    height: 45vh;
   }
 }
 </style>
