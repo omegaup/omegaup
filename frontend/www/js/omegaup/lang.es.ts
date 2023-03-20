@@ -3,6 +3,7 @@ const translations: { [key: string]: string; } = {
   U13CannotPerform: "Usuario menor de 13 a\u00f1os no puede realizar esta acci\u00f3n.",
   aboutToStart: "Est\u00e1s a punto de iniciar el concurso. Una vez que hagas clic en entrar, tu tiempo iniciar\u00e1.",
   acceptPrivacyPolicy: "He le\u00eddo y acepto la [Pol\u00edtica de Uso y Privacidad](http://blog.omegaup.com/privacy-policy/) del sitio, as\u00ed como el [C\u00f3digo de Conducta](https://blog.omegaup.com/codigo-de-conducta-en-omegaup/).",
+  accountDelete: "Delete Account",
   accountDeletionConfirmEmailBody: "El usuario %(username) confirm\u00f3 eliminar su cuenta.",
   accountDeletionConfirmEmailSubject: "Confirmaci\u00f3n de eliminaci\u00f3n de cuenta omegaUp.",
   accountDeletionRequestEmailBody: "El usuario %(username) ha solicitado borrar su cuenta.",

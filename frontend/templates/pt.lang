@@ -1,6 +1,7 @@
 U13CannotPerform = "Usuário menor de 13 anos não pode realizar esta ação."
 aboutToStart = "Você está prestes a iniciar o concurso. Seu tempo começará depois de clicar em Começar Concurso."
 acceptPrivacyPolicy = "Li e aceito a [Política de Uso e Privacidade](http://blog.omegaup.com/privacy-policy/) do site, bem como o [Código de Conduta](https://blog.omegaup.com/codigo-de-conducta-en-omegaup/)."
+accountDelete = "Delete Account"
 accountDeletionConfirmEmailBody = "O usuário %(username) confirmado para excluir sua conta."
 accountDeletionConfirmEmailSubject = "Confirmação de exclusão de conta omegaUp"
 accountDeletionRequestEmailBody = "O usuário %(username) está solicitando a exclusão de sua conta."
