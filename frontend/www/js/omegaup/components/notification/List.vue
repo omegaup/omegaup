@@ -88,7 +88,7 @@ export default class NotificationList extends Vue {
 }
 
 .notification-dropdown {
-  width: 35rem;
+  padding: 0.25rem 1.5rem;
   max-height: 600px;
   overflow-y: auto;
 }
