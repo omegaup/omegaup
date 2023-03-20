@@ -94,5 +94,11 @@ export default class Login extends Vue {
   usernameOrEmail: string = '';
   password: string = '';
   T = T;
+
+  mounted() {
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    document.body.appendChild(script);
+  }
 }
 </script>

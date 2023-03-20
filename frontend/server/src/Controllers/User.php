@@ -604,9 +604,6 @@ class User extends \OmegaUp\Controllers\Controller {
                     ),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
-                'scripts' => [
-                    'https://accounts.google.com/gsi/client',
-                ],
             ],
             'entrypoint' => 'login_signin',
         ];
@@ -4524,9 +4521,6 @@ class User extends \OmegaUp\Controllers\Controller {
                     'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
-                'scripts' => [
-                    'https://accounts.google.com/gsi/client',
-                ],
             ],
             'entrypoint' => 'login_signin',
         ];
