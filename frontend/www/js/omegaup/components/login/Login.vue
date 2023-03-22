@@ -96,6 +96,9 @@ export default class Login extends Vue {
   T = T;
 
   mounted() {
+    // The reason for loading the script here instead of the `template.tpl` file
+    // is that sometimes the script runs after the DOM is ready, and the element
+    // may not exist yet
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     document.body.appendChild(script);

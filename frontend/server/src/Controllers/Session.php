@@ -506,6 +506,8 @@ class Session extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $credential
      */
     public static function apiGoogleLogin(\OmegaUp\Request $r): void {
+        // Verify the Google ID token on the server side:
+        // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token?hl=en
         $gCsrfToken = $r->ensureString('g_csrf_token');
         $idToken = $r->ensureString('credential');
 
