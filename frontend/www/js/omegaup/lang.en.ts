@@ -89,7 +89,7 @@ const translations: { [key: string]: string; } = {
   assignmentNotFound: "Content not found",
   assignmentNotStarted: "The assignment has not started yet",
   assignmentRemoveAlreadyHasRuns: "Content can't be removed once a solution has been judged.",
-  authorRankRangeHeader: "Authors with more score (%(lowCount) to %(highCount))",
+  authorRankRangeHeader: "Contributors with more score (%(lowCount) to %(highCount))",
   authorRankUnranked: "Unranked author",
   badgeAssignationTimeMessage: "Date you got this badge",
   badgeFirstAssignationMessage: "The first time this badge was assigned",

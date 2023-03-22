@@ -89,7 +89,7 @@ const translations: { [key: string]: string; } = {
   assignmentNotFound: "(C0n73n7 n07 f0und)",
   assignmentNotStarted: "(Th3 a55ignm3n7 ha5 n07 57ar73d y37)",
   assignmentRemoveAlreadyHasRuns: "(C0n73n7 can'7 b3 r3m0v3d 0nc3 a 501u7i0n ha5 b33n judg3d.)",
-  authorRankRangeHeader: "(Au7h0r5 wi7h m0r3 5c0r3 (%(lowCount) 70 %(highCount)))",
+  authorRankRangeHeader: "(C0n7ribu70r5 wi7h m0r3 5c0r3 (%(lowCount) 70 %(highCount)))",
   authorRankUnranked: "(Unrank3d au7h0r)",
   badgeAssignationTimeMessage: "(Da73 y0u g07 7hi5 badg3)",
   badgeFirstAssignationMessage: "(Th3 fir57 7im3 7hi5 badg3 wa5 a55ign3d)",
