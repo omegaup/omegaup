@@ -4496,7 +4496,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString, scripts: list<string>}}
+     * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $third_party_login
      */
