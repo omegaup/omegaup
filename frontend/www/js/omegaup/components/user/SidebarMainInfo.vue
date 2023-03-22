@@ -71,25 +71,7 @@
       >
         {{ url.title }}
       </a>
-      <div class="card-body text-center">
-        <!-- Add a button to delete the account -->
-        <button
-          class="btn btn-danger btn-sm my-1 w-100"
-          @click="showConfirmationModal = true"
-        >
-          {{ T.accountDelete }}
-        </button>
-      </div>
     </div>
-    <b-modal
-      v-model="showConfirmationModal"
-      title="Confirmation required"
-      ok-title="Delete"
-      cancel-title="Cancel"
-      @ok="deleteAccount"
-    >
-      <p>Are you sure you want to delete your account?</p>
-    </b-modal>
   </div>
 </template>
 
@@ -100,7 +82,6 @@ import country_Flag from '../CountryFlag.vue';
 import user_Username from './Username.vue';
 import { types } from '../../api_types';
 import { Problem } from '../../linkable_resource';
-// import { deleteRequest } from '../../api_types';
 
 export const urlMapping: { key: string; title: string; visible: boolean }[] = [
   { key: 'view-profile', title: T.userEditViewProfile, visible: true },
@@ -111,6 +92,7 @@ export const urlMapping: { key: string; title: string; visible: boolean }[] = [
   { key: 'change-password', title: T.userEditChangePassword, visible: false },
   { key: 'add-password', title: T.userEditAddPassword, visible: false },
   { key: 'change-email', title: T.userEditChangeEmail, visible: false },
+  { key: 'delete-account', title: T.userEditDeleteAccount, visible: true },
 ];
 
 @Component({
@@ -131,7 +113,6 @@ export default class UserSidebarMainInfo extends Vue {
     this.selectedTab,
     this.currentUrlMapping,
   );
-  showConfirmationModal = false;
 
   get solvedProblems(): Problem[] {
     if (!this.data?.solvedProblems) return [];
