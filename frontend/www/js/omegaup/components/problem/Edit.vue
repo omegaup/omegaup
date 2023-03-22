@@ -265,13 +265,13 @@
     </div>
     <b-modal
       v-model="showConfirmationModal"
-      title="Confirmation required"
-      ok-title="Delete"
+      :title="T.requireConfirm"
+      :ok-title="T.wordsDelete"
       ok-variant="danger"
-      cancel-title="Cancel"
+      :cancel-title="T.wordsCancel"
       @ok="$emit('remove', alias)"
     >
-      <p>Are you sure you want to delete the problem?</p>
+      <p>{{ T.deleteConfirmationMessage }}</p>
     </b-modal>
   </div>
 </template>
@@ -287,6 +287,10 @@ import common_GroupAdmins from '../common/GroupAdmins.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import omegaup_Markdown from '../Markdown.vue';
+
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import { ModalPlugin } from 'bootstrap-vue';
+Vue.use(ModalPlugin);
 
 @Component({
   components: {
