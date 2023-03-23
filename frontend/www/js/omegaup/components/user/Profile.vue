@@ -11,7 +11,6 @@
           {{ ui.info(T.userProfileIsPrivate) }}
         </h1>
       </template>
-      <h3>{hola</h3>
       <template #title>
         <h3>{{ currentTitle }}</h3>
       </template>
