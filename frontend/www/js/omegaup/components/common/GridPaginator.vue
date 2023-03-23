@@ -22,7 +22,10 @@
         </label>
       </div>
     </div>
-    <table v-if="items.length > 0" class="table table-striped mb-0 table-responsive col-12 table-typo">
+    <table
+      v-if="items.length > 0"
+      class="table table-striped mb-0 table-responsive col-12 table-typo"
+    >
       <slot name="table-header"></slot>
       <tbody>
         <tr v-for="(group, index) in paginatedItems" :key="index">
@@ -141,15 +144,17 @@ export default class GridPaginator extends Vue {
 
 <style>
 @media (max-width: 550px) {
-  .table-typo td, .table-typo th {
+  .table-typo td,
+  .table-typo th {
     display: block;
-    padding: .25rem;
+    padding: 0.25rem;
     font-size: inherit;
     line-height: 1.42857143;
     background-color: #fff;
     border: 1px solid #ddd;
   }
-  .table-typo td:before, .table-typo th:before {
+  .table-typo td:before,
+  .table-typo th:before {
     content: attr(data-label);
     float: left;
     font-weight: bold;
