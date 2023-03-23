@@ -182,11 +182,11 @@ export default class CourseIntro extends Vue {
 
   get displayCoursePrivacyBullets(): boolean {
     return (
-      this.userRegistrationAccepted ||
-      (this.userRegistrationRequested === false &&
-        (this.needsBasicInformation ||
-          this.course.requests_user_information != 'no' ||
-          this.shouldShowAcceptTeacher))
+      (this.userRegistrationAccepted ||
+        this.userRegistrationRequested === false) &&
+      (this.needsBasicInformation ||
+        this.course.requests_user_information != 'no' ||
+        this.shouldShowAcceptTeacher)
     );
   }
 
