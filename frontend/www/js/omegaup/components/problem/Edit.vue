@@ -265,13 +265,13 @@
     </div>
     <b-modal
       v-model="showConfirmationModal"
-      :title="T.requireConfirm"
-      :ok-title="T.wordsDelete"
+      :title="T.problemEditDeleteRequireConfirmation"
+      :ok-title="T.problemEditDeleteOk"
       ok-variant="danger"
-      :cancel-title="T.wordsCancel"
+      :cancel-title="T.problemEditDeleteCancel"
       @ok="$emit('remove', alias)"
     >
-      <p>{{ T.deleteConfirmationMessage }}</p>
+      <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
     </b-modal>
   </div>
 </template>
