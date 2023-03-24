@@ -77,7 +77,7 @@
         <template v-else-if="currentSelectedTab === 'delete-account'">
           <omegaup-user-delete-account
             :username="profile.username"
-            @add-password="(request) => $emit('delete-account', request)"
+            @request-delete-account="$emit('request-delete-account')"
           ></omegaup-user-delete-account>
         </template>
         <div v-else>

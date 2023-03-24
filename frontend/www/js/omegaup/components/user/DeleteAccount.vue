@@ -21,10 +21,11 @@
     </form>
     <b-modal
       v-model="showConfirmationModal"
-      title="Confirmation required"
-      ok-title="Delete"
+      title="accountDeleteRequireConfirmation"
+      ok-title="T.accountDeleteOk"
       ok-variant="danger"
-      cancel-title="Cancel"
+      cancel-title="T.accountDeleteCancel"
+      @ok="$emit('request-delete-account')"
     >
       <p>Are you sure you want to delete your account?</p>
     </b-modal>
@@ -40,5 +41,12 @@ import omegaup_Markdown from '../Markdown.vue';
 export default class UserDeleteAccount extends Vue {
   T = T;
   showConfirmationModal = false;
+  username = '';
+
+  // onConfirmDelete(): void {
+  //   this.$emit('request-delete-account'), {
+  //    username: this.username,
+  //   };
+  // }
 }
 </script>
