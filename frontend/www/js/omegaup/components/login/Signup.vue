@@ -9,70 +9,68 @@
         :class="{ 'was-validated': wasValidated }"
         novalidate
       >
-        <div class="form-group">
-          <label>{{ T.userEditBirthDate }}</label>
-          <omegaup-datepicker
-            v-model="birthDate"
-            name="reg_birthdate"
-            :max="new Date()"
-          ></omegaup-datepicker>
+      <div class="row justify-content-md-center">
+        <div class="col-md-4 col-md-offset-2">
+          <div class="form-group">
+            <label class="control-label">{{ T.userEditBirthDate }}</label>
+            <omegaup-datepicker
+              v-model="birthDate"
+              name="reg_birthdate"
+              :max="new Date()"
+            ></omegaup-datepicker>
+          </div>
         </div>
+      </div>
         <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-2">
             <div class="form-group">
-              <label class="control-label"
-                >{{ T.wordsUser }}
-                <input
-                  v-model="username"
-                  data-signup-username
-                  name="reg_username"
-                  class="form-control"
-                  :disabled="!birthDate"
-                  autocomplete="username"
-                  :required="true"
-                />
-                <div class="invalid-feedback">
-                  {{ T.loginUsernameRequired }}
-                </div>
-              </label>
+              <label class="control-label">{{ T.wordsUser }}</label>
+              <input
+                v-model="username"
+                data-signup-username
+                name="reg_username"
+                class="form-control"
+                :disabled="!birthDate"
+                autocomplete="username"
+                :required="true"
+              />
+              <div class="invalid-feedback">
+                {{ T.loginUsernameRequired }}
+              </div>
             </div>
           </div>
-          <div v-if="!isU13" class="col-md-4">
+          <div v-if="!isU13" class="col-md-4 col-md-offset-2">
             <div class="form-group">
-              <label class="control-label"
-                >{{ T.loginEmail }}
-                <input
-                  v-model="email"
-                  data-signup-email
-                  name="reg_email"
-                  type="email"
-                  class="form-control"
-                  :disabled="!birthDate"
-                  autocomplete="email"
-                  :required="true"
-                />
-                <div class="invalid-feedback">{{ T.loginEmailRequired }}</div>
-              </label>
+              <label class="control-label">{{ T.loginEmail }}</label>
+              <input
+                v-model="email"
+                data-signup-email
+                name="reg_email"
+                type="email"
+                class="form-control"
+                :disabled="!birthDate"
+                autocomplete="email"
+                :required="true"
+              />
+              <div class="invalid-feedback">{{ T.loginEmailRequired }}</div>
             </div>
           </div>
-          <div v-else class="col-md-4">
+          <div v-else class="col-md-4 col-md-offset-2">
             <div class="form-group">
-              <label class="control-label"
-                >{{ T.loginEmailParent }}
-                <input
-                  v-model="parentEmail"
-                  data-signup-email
-                  name="reg_parent_email"
-                  type="email"
-                  class="form-control"
-                  :disabled="!birthDate"
-                  autocomplete="email"
-                  :required="true"
-                />
-                <div class="invalid-feedback">
-                  {{ T.loginParentEmailRequired }}
-                </div>
-              </label>
+              <label class="control-label">{{ T.loginEmailParent }}</label>
+              <input
+                v-model="parentEmail"
+                data-signup-email
+                name="reg_parent_email"
+                type="email"
+                class="form-control"
+                :disabled="!birthDate"
+                autocomplete="email"
+                :required="true"
+              />
+              <div class="invalid-feedback">
+                {{ T.loginParentEmailRequired }}
+              </div>
             </div>
           </div>
         </div>
@@ -96,7 +94,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-4 col-md-offset-2">
             <div class="form-group">
               <label class="control-label">{{ T.loginRepeatPassword }}</label>
               <input
