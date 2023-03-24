@@ -21,13 +21,13 @@
     </form>
     <b-modal
       v-model="showConfirmationModal"
-      title="accountDeleteRequireConfirmation"
-      ok-title="T.accountDeleteOk"
+      :title="T.accountDeleteRequireConfirmation"
+      :ok-title="T.accountDeleteOk"
       ok-variant="danger"
-      cancel-title="T.accountDeleteCancel"
+      :cancel-title="T.accountDeleteCancel"
       @ok="$emit('request-delete-account')"
     >
-      <p>Are you sure you want to delete your account?</p>
+      <p>{{ T.accountDeleteConfirmationMessage }}</p>
     </b-modal>
   </div>
 </template>

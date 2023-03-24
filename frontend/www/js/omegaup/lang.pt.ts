@@ -4,6 +4,7 @@ const translations: { [key: string]: string; } = {
   aboutToStart: "Voc\u00ea est\u00e1 prestes a iniciar o concurso. Seu tempo come\u00e7ar\u00e1 depois de clicar em Come\u00e7ar Concurso.",
   acceptPrivacyPolicy: "Li e aceito a [Pol\u00edtica de Uso e Privacidade](http://blog.omegaup.com/privacy-policy/) do site, bem como o [C\u00f3digo de Conduta](https://blog.omegaup.com/codigo-de-conducta-en-omegaup/).",
   accountDeleteCancel: "Cancelar",
+  accountDeleteConfirmationMessage: "Tem certeza de que deseja excluir sua conta?",
   accountDeleteOk: "Excluir",
   accountDeleteRequireConfirmation: "Necess\u00e1ria confirma\u00e7\u00e3o",
   accountDeletionConfirmEmailBody: "O usu\u00e1rio %(username) confirmado para excluir sua conta.",
