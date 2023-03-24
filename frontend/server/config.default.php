@@ -113,11 +113,9 @@ try_define('OMEGAUP_FB_SECRET', 'xxxxx');
 # GOOGLE LOGIN CONFIG
 # ####################################
 try_define('OMEGAUP_GOOGLE_SECRET', 'acmtr0Y37vnTVJV4BwmdhOsK');
-// This client ID was created using a personal account (juan.pablo@omegaup.com)
-// and is intended solely for use in a testing environment.
 try_define(
     'OMEGAUP_GOOGLE_CLIENTID',
-    '568596222408-qf7e8lqqbrgrmo16mtou3u1nskm7fmjj.apps.googleusercontent.com'
+    '982542692060-lf9htvij4ba13fiufpqeldic0qqqvird.apps.googleusercontent.com'
 );
 
 # ####################################
