@@ -54,6 +54,7 @@ $contentSecurityPolicy = [
         'https://*.google-analytics.com',
         'https://*.analytics.google.com',
         'https://*.googletagmanager.com',
+        'https://accounts.google.com',
     ],
     'img-src' => [
         // Problems can embed images from anywhere in the internet, so we need
@@ -69,7 +70,7 @@ $contentSecurityPolicy = [
     'script-src' => [
         '\'self\'',
         'https://www.google.com',
-        'https://apis.google.com',
+        'https://accounts.google.com',
         'https://www.gstatic.com',
         'https://js-agent.newrelic.com',
         'https://bam.nr-data.net',
@@ -86,7 +87,6 @@ $contentSecurityPolicy = [
         'https://www.youtube.com',
         'https://platform.twitter.com',
         'https://www.google.com',
-        'https://apis.google.com',
         'https://accounts.google.com',
         'https://docs.google.com',
         'https://staticxx.facebook.com',
