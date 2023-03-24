@@ -9,18 +9,18 @@
         :class="{ 'was-validated': wasValidated }"
         novalidate
       >
-      <div class="row justify-content-md-center">
-        <div class="col-md-4 col-md-offset-2">
-          <div class="form-group">
-            <label class="control-label">{{ T.userEditBirthDate }}</label>
-            <omegaup-datepicker
-              v-model="birthDate"
-              name="reg_birthdate"
-              :max="new Date()"
-            ></omegaup-datepicker>
+        <div class="row justify-content-md-center">
+          <div class="col-md-4 col-md-offset-2">
+            <div class="form-group">
+              <label class="control-label">{{ T.userEditBirthDate }}</label>
+              <omegaup-datepicker
+                v-model="birthDate"
+                name="reg_birthdate"
+                :max="new Date()"
+              ></omegaup-datepicker>
+            </div>
           </div>
         </div>
-      </div>
         <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-2">
             <div class="form-group">
