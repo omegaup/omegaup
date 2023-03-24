@@ -65,6 +65,7 @@ OmegaUp.on('ready', () => {
           validateRecaptcha: payload.validateRecaptcha,
           facebookUrl: payload.facebookUrl,
           googleClientId,
+          omegaupUrl: document.location.origin,
         },
         on: {
           'register-and-login': (
