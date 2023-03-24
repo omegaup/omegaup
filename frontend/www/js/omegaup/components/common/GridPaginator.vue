@@ -147,17 +147,8 @@ export default class GridPaginator extends Vue {
   .table-typo td,
   .table-typo th {
     display: block;
-    padding: 0.25rem;
-    font-size: inherit;
-    line-height: 1.42857143;
     background-color: #fff;
     border: 1px solid #ddd;
-  }
-  .table-typo td:before,
-  .table-typo th:before {
-    content: attr(data-label);
-    float: left;
-    font-weight: bold;
   }
 }
 </style>
