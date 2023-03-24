@@ -390,7 +390,6 @@ def path_matches(message: str, path_list: Sequence[str]) -> bool:
     if not match:
         return False
     url = urlparse(match.group(1))
-    print(url)
     if not url:
         return False
 
@@ -411,7 +410,6 @@ def message_matches(message: str, message_list: Sequence[str]) -> bool:
     '''
 
     match = re.search(r'(\'(?:[^\']|\\\')*\'|"(?:[^"]|\\")*")', message)
-    print(match)
     if match:
         quoted_string = match.group(1)[1:-1]  # Removing quotes of match regex.
         for whitelisted_message in message_list:
