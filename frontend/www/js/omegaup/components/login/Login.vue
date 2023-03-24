@@ -13,7 +13,7 @@
               <div
                 id="g_id_onload"
                 :data-client_id="googleClientId"
-                data-login_uri="http://localhost:8001/api/session/googleLogin/"
+                :data-login_uri="`${omegaupUrl}/api/session/googleLogin/`"
                 data-auto_prompt="false"
               ></div>
               <div
@@ -91,6 +91,8 @@ import T from '../../lang';
 export default class Login extends Vue {
   @Prop() facebookUrl!: string;
   @Prop() googleClientId!: string;
+  @Prop() omegaupUrl!: string;
+
   usernameOrEmail: string = '';
   password: string = '';
   T = T;

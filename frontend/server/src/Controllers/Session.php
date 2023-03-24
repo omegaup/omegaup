@@ -510,8 +510,10 @@ class Session extends \OmegaUp\Controllers\Controller {
         // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token?hl=en
         $gCsrfToken = $r->ensureString('g_csrf_token');
         $idToken = $r->ensureString('credential');
+        /** @var null|string*/
+        $csrfTokenCookie = $_COOKIE['g_csrf_token'];
 
-        if ($gCsrfToken !== $_COOKIE['g_csrf_token']) {
+        if (is_null($csrfTokenCookie) || $gCsrfToken !== $csrfTokenCookie) {
             self::$log->error('Invalid CSRF token');
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'loginGoogleInvalidCSRFToken',
