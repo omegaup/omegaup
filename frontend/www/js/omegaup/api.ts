@@ -1665,10 +1665,6 @@ export const Session = {
     messages.SessionCurrentSessionRequest,
     messages.SessionCurrentSessionResponse
   >('/api/session/currentSession/'),
-  googleLogin: apiCall<
-    messages.SessionGoogleLoginRequest,
-    messages.SessionGoogleLoginResponse
-  >('/api/session/googleLogin/'),
 };
 
 export const Submission = {
