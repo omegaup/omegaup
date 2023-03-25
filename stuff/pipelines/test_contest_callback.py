@@ -14,6 +14,7 @@ import time
 from typing import List
 
 import contest_callback
+import database.contest
 import test_credentials
 import rabbitmq_connection
 import test_constants
@@ -102,7 +103,7 @@ def test_insert_contest_certificate() -> None:
             dbconn=dbconn.conn,
             client=client,
         )
-        body = contest_callback.ContestCertificate(
+        body = database.contest.ContestCertificate(
             contest_id=contest_id,
             certificate_cutoff=3,  # setting a default value
             alias=alias,
