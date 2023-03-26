@@ -94,6 +94,7 @@
                     recaptchaResponse,
                   )
                 "
+                :disabled="!checked"
               >
                 {{ T.loginSignUp }}
               </button>
@@ -124,6 +125,7 @@ export default class Signup extends Vue {
   password: string = '';
   passwordConfirmation: string = '';
   recaptchaResponse: string = '';
+  checked: boolean = false; 
 
   verify(response: string): void {
     this.recaptchaResponse = response;
