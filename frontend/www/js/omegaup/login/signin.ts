@@ -45,6 +45,9 @@ OmegaUp.on('ready', () => {
   }
 
   const payload = types.payloadParsers.LoginDetailsPayload();
+  const googleClientId = document
+    .querySelector('meta[name="google-signin-client_id"]')
+    ?.getAttribute('content');
   if (payload.statusError) {
     ui.warning(payload.statusError);
   } else if (payload.verifyEmailSuccessfully) {
@@ -61,6 +64,8 @@ OmegaUp.on('ready', () => {
         props: {
           validateRecaptcha: payload.validateRecaptcha,
           facebookUrl: payload.facebookUrl,
+          googleClientId,
+          omegaupUrl: document.location.origin,
         },
         on: {
           'register-and-login': (
@@ -100,17 +105,6 @@ OmegaUp.on('ready', () => {
               password,
               /*isAccountCreation=*/ false,
             );
-          },
-          'google-login': (idToken: string) => {
-            // Only log in if the user actually clicked the sign-in button.
-            api.Session.googleLogin({ storeToken: idToken })
-              .then((data) => {
-                redirect(data.isAccountCreation);
-              })
-              .catch(ui.apiError);
-          },
-          'google-login-failure': () => {
-            ui.error(T.loginFederatedFailed);
           },
         },
       });

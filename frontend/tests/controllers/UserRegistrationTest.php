@@ -15,44 +15,48 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $salt = \OmegaUp\Time::get();
 
         // Test users should not exist
-        $this->assertNull(\OmegaUp\DAO\Users::FindByUsername('A' . $salt));
-        $this->assertNull(
-            \OmegaUp\DAO\Users::FindByUsername(
-                'A' . $salt . '1'
-            )
-        );
-        $this->assertNull(
-            \OmegaUp\DAO\Users::FindByUsername(
-                'A' . $salt . '2'
-            )
-        );
+        $this->assertNull(\OmegaUp\DAO\Users::FindByUsername("A{$salt}"));
+        $this->assertNull(\OmegaUp\DAO\Users::FindByUsername("A{$salt}1"));
+        $this->assertNull(\OmegaUp\DAO\Users::FindByUsername("A{$salt}2"));
 
-        // Create collision
-        \OmegaUp\Controllers\Session::LoginViaGoogle('A' . $salt . '@isp1.com');
-        \OmegaUp\Controllers\Session::LoginViaGoogle('A' . $salt . '@isp2.com');
-        \OmegaUp\Controllers\Session::LoginViaGoogle('A' . $salt . '@isp3.com');
+        ob_start();
+        try {
+            // Create collision
+            \OmegaUp\Controllers\Session::LoginViaGoogle("A{$salt}@isp1.com");
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // This is expected.
+        }
+        try {
+            \OmegaUp\Controllers\Session::LoginViaGoogle("A{$salt}@isp2.com");
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // This is expected.
+        }
+        try {
+            \OmegaUp\Controllers\Session::LoginViaGoogle("A{$salt}@isp3.com");
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // This is expected.
+        }
+        ob_end_clean();
 
-        $this->assertNotNull(\OmegaUp\DAO\Users::FindByUsername('A' . $salt));
-        $this->assertNotNull(
-            \OmegaUp\DAO\Users::FindByUsername(
-                'A' . $salt . '1'
-            )
-        );
-        $this->assertNotNull(
-            \OmegaUp\DAO\Users::FindByUsername(
-                'A' . $salt . '2'
-            )
-        );
+        $this->assertNotNull(\OmegaUp\DAO\Users::FindByUsername("A{$salt}"));
+        $this->assertNotNull(\OmegaUp\DAO\Users::FindByUsername("A{$salt}1"));
+        $this->assertNotNull(\OmegaUp\DAO\Users::FindByUsername("A{$salt}2"));
     }
 
     /**
      * User logged via google, try log in with native mode
      */
     public function testUserLoggedViaGoogleAndThenNativeMode() {
-        $username = 'X' . \OmegaUp\Time::get();
+        $time = \OmegaUp\Time::get();
+        $username = "X{$time}";
         $password = \OmegaUp\Test\Utils::createRandomString();
 
-        \OmegaUp\Controllers\Session::LoginViaGoogle($username . '@isp.com');
+        try {
+            \OmegaUp\Controllers\Session::LoginViaGoogle("{$username}@isp.com");
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // This is expected.
+        }
+
         $identity = \OmegaUp\DAO\Identities::findByUsername($username);
 
         // Users logged via google, facebook
@@ -60,16 +64,15 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Inflate request
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
-        $r = new \OmegaUp\Request([
-            'username' => $username,
-            'password' => $password,
-            'email' => $username . '@isp.com',
-            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
-        ]);
 
         try {
             // Try to create new user
-            \OmegaUp\Controllers\User::apiCreate($r);
+            \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
+                'username' => $username,
+                'password' => $password,
+                'email' => "{$username}@isp.com",
+                'permission_key' => \OmegaUp\Controllers\User::$permissionKey
+            ]));
             $this->fail(
                 'User should have not been able to be created because the email already exists in the data base'
             );
@@ -83,10 +86,16 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
      * different username
      */
     public function testUserLoggedViaGoogleAndThenNativeModeWithDifferentUsername() {
-        $username = 'Y' . \OmegaUp\Time::get();
-        $email = $username . '@isp.com';
+        $time = \OmegaUp\Time::get();
+        $username = "Y{$time}";
+        $email = "{$username}@isp.com";
 
-        \OmegaUp\Controllers\Session::LoginViaGoogle($email);
+        try {
+            \OmegaUp\Controllers\Session::LoginViaGoogle($email);
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // This is expected.
+        }
+
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
         $identity = \OmegaUp\DAO\Identities::FindByUserId($user->user_id);
         $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
@@ -98,7 +107,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         // Inflate request
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
-            'username' => 'Z' . $username,
+            'username' => "Z{$username}",
             'password' => \OmegaUp\Test\Utils::createRandomString(),
             'email' => $email,
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
@@ -127,7 +136,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'username' => $randomString,
                 'password' => $randomString,
-                'parent_email' => $randomString . '@' . $randomString . '.com',
+                'parent_email' => "{$randomString}@{$randomString}.com",
                 'birth_date' => $under13BirthDateTimestamp,
             ]),
             $this->assertNotNull($under13BirthDateTimestamp)
@@ -149,7 +158,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                  'username' => $randomString,
                  'password' => $randomString,
-                 'email' => $randomString . '@' . $randomString . '.com',
+                 'email' => "{$randomString}@{$randomString}.com",
                  'birth_date' => $over13BirthDateTimestamp,
             ]),
             $this->assertNotNull($over13BirthDateTimestamp)
@@ -200,8 +209,8 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 new \OmegaUp\Request([
                     'username' => $randomString,
                     'password' => $randomString,
-                    'email' => $randomString . '@' . $randomString . '.com',
-                    'parent_email' => $randomString . '@' . $randomString . '.com',
+                    'email' => "{$randomString}@{$randomString}.com",
+                    'parent_email' => "{$randomString}@{$randomString}.com",
                     'birth_date' => $over13BirthDateTimestamp,
                 ])
             );
