@@ -12,9 +12,12 @@
           ui.formatString(T.courseIntroLevel, { level: levels[course.level] })
         }}
       </p>
-      <template
-        v-if="userRegistrationAccepted || userRegistrationRequested === false"
-      >
+      <template v-if="displayCoursePrivacyBullets">
+        <omegaup-markdown
+          :markdown="T.coursePrivacyConsent"
+          :full-width="true"
+          class="font-weight-bold h5"
+        ></omegaup-markdown>
         <omegaup-markdown
           v-if="needsBasicInformation"
           :markdown="T.courseBasicInformationNeeded"
@@ -28,9 +31,10 @@
           <omegaup-radio-switch
             :value.sync="shareUserInformation"
             :selected-value="shareUserInformation"
-            class="align-to-markdown"
+            class="align-to-markdown ml-5 mb-3"
           ></omegaup-radio-switch>
         </template>
+
         <template v-if="shouldShowAcceptTeacher">
           <omegaup-markdown
             :markdown="statements.acceptTeacher.markdown || ''"
@@ -40,7 +44,7 @@
             :value.sync="acceptTeacher"
             :selected-value="acceptTeacher"
             name="accept-teacher"
-            class="align-to-markdown"
+            class="align-to-markdown ml-5"
           ></omegaup-radio-switch>
         </template>
       </template>
@@ -173,6 +177,16 @@ export default class CourseIntro extends Vue {
       this.needsBasicInformation ||
       (this.course.requests_user_information === 'required' &&
         !this.shareUserInformation)
+    );
+  }
+
+  get displayCoursePrivacyBullets(): boolean {
+    return (
+      (this.userRegistrationAccepted ||
+        this.userRegistrationRequested === false) &&
+      (this.needsBasicInformation ||
+        this.course.requests_user_information != 'no' ||
+        this.shouldShowAcceptTeacher)
     );
   }
 
