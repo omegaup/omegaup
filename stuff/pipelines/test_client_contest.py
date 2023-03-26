@@ -102,6 +102,7 @@ def test_client_contest() -> None:
         count = cur.fetchone()
         assert count['count'] > 0
 
+
 @pytest.mark.skip(reason="Disabled temporarily because it's flaky")
 def test_client_contest_with_mocked_codes(
         mocker: pytest_mock.MockerFixture
@@ -155,6 +156,7 @@ def test_client_contest_with_mocked_codes(
             routing_key='ContestQueue',
             callback=callback)
         assert spy.call_count == 4
+
 
 @pytest.mark.skip(reason="Disabled temporarily because it's flaky")
 def test_client_contest_with_duplicated_codes(
