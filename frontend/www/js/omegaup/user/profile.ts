@@ -194,8 +194,10 @@ OmegaUp.on('ready', () => {
               .then(({ token }) => {
                 api.User.deleteConfirm({ token })
                   .then(() => {
-                    ui.success(T.requestAccountDeleted);
-                    location.reload(); // Reload the window
+                       // Reload the window
+                       location.reload();
+                    // Log out the user
+                    window.location.href = '/logout/';
                   })
                   .catch(ui.apiError);
               })

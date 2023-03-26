@@ -42,11 +42,5 @@ export default class UserDeleteAccount extends Vue {
   T = T;
   showConfirmationModal = false;
   username = '';
-
-  // onConfirmDelete(): void {
-  //   this.$emit('request-delete-account'), {
-  //    username: this.username,
-  //   };
-  // }
 }
 </script>
