@@ -13,7 +13,7 @@ class DuplicatedEntryInArrayException extends \OmegaUp\Exceptions\ApiException {
      */
     public function __construct(
         string $message,
-        array $duplicatedItemsInArray = [],
+        array $duplicatedItemsInArray,
         ?\Exception $previous = null
     ) {
         parent::__construct(

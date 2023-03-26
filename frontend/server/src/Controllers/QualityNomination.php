@@ -338,7 +338,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 }
                 if (self::hasDuplicates($contents['tags'])) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
-                        'duplicateTagsNotAllowed'
+                        'duplicateTagsNotAllowed',
+                        duplicatedItemsInArray: []
                     );
                 }
             }
@@ -372,7 +373,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
             if (self::hasDuplicates($contents['tags'])) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
-                    'duplicateTagsNotAllowed'
+                    'duplicateTagsNotAllowed',
+                    duplicatedItemsInArray: []
                 );
             }
 
