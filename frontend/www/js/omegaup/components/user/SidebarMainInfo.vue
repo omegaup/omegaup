@@ -85,7 +85,11 @@ import { Problem } from '../../linkable_resource';
 
 export const urlMapping: { key: string; title: string; visible: boolean }[] = [
   { key: 'view-profile', title: T.userEditViewProfile, visible: true },
-  { key: 'edit-basic-information', title: T.profileEdit, visible: true },
+  {
+    key: 'edit-basic-information',
+    title: T.profileBasicInformation,
+    visible: true,
+  },
   { key: 'edit-preferences', title: T.userEditPreferences, visible: true },
   { key: 'manage-schools', title: T.userEditManageSchools, visible: true },
   { key: 'manage-identities', title: T.profileManageIdentities, visible: true },

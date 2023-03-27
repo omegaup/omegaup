@@ -1,1 +1,1 @@
-Acepto que cualquier admin del curso pueda ver toda mi lista de problemas resueltos y los que he intentado resolver
+- Acepto que cualquier admin del curso pueda ver toda mi lista de problemas resueltos y los que he intentado resolver
