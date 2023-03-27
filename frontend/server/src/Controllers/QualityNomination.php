@@ -336,10 +336,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                         );
                     }
                 }
-                if (self::hasDuplicates($contents['tags'])) {
+
+                $duplicatedTags = self::hasDuplicates($contents['tags']);
+
+                if (!empty($duplicatedTags)) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
                         'duplicateTagsNotAllowed',
-                        duplicatedItemsInArray: []
+                        'tags',
+                        duplicatedItemsInArray: array_slice($duplicatedTags, 0, 20)
                     );
                 }
             }
@@ -371,10 +375,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     );
                 }
             }
-            if (self::hasDuplicates($contents['tags'])) {
+
+            $duplicatedTags = self::hasDuplicates($contents['tags']);
+
+            if (!empty($duplicatedTags)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
                     'duplicateTagsNotAllowed',
-                    duplicatedItemsInArray: []
+                    'tags',
+                    duplicatedItemsInArray: array_slice($duplicatedTags, 0, 20)
                 );
             }
 
@@ -993,9 +1001,17 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      *
      * @template T
      * @param array<T> $contents
+     * @return array{duplicates: string}
      */
-    private static function hasDuplicates(array $contents): bool {
-        return count($contents) !== count(array_unique($contents));
+    private static function hasDuplicates(array $contents): array {
+        $counts = array_count_values($lista);
+        $duplicates = array();
+        foreach ($counts as $value => $count) {
+            if ($count > 1) {
+                $duplicates[] = $value;
+            }
+        }
+        return $duplicates;
     }
 
     /**

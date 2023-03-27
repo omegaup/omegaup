@@ -9,10 +9,16 @@ class DuplicatedEntryInArrayException extends \OmegaUp\Exceptions\ApiException {
     public array $duplicatedItemsInArray;
 
     /**
+     * @var string
+     */
+    public string $duplicatedItem;
+
+    /**
      * @param string[] $duplicatedItemsInArray
      */
     public function __construct(
         string $message,
+        string $duplicatedItem,
         array $duplicatedItemsInArray,
         ?\Exception $previous = null
     ) {
@@ -23,6 +29,7 @@ class DuplicatedEntryInArrayException extends \OmegaUp\Exceptions\ApiException {
             $previous
         );
         $this->duplicatedItemsInArray = $duplicatedItemsInArray;
+        $this->$duplicatedItem = $duplicatedItem;
     }
 
     public function getErrorMessage(): string {
@@ -38,7 +45,7 @@ class DuplicatedEntryInArrayException extends \OmegaUp\Exceptions\ApiException {
         }
         return \OmegaUp\ApiUtils::formatString(
             $localizedText,
-            ['usernames' => join('<br />', $this->duplicatedItemsInArray)]
+            [$duplicatedItem => join('<br />', $this->duplicatedItemsInArray)]
         );
     }
 }
