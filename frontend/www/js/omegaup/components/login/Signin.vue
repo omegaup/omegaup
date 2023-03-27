@@ -3,6 +3,7 @@
     <omegaup-login
       :facebook-url="facebookUrl"
       :google-client-id="googleClientId"
+      :omegaup-url="omegaupUrl"
       @login="(username, password) => $emit('login', username, password)"
     >
     </omegaup-login>
@@ -42,6 +43,7 @@ export default class Signin extends Vue {
   @Prop() validateRecaptcha!: boolean;
   @Prop() facebookUrl!: string;
   @Prop() googleClientId!: string;
+  @Prop() omegaupUrl!: string;
 
   T = T;
 }
