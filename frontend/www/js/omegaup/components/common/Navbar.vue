@@ -416,10 +416,13 @@ nav.navbar {
 
 .allow-overflow {
   overflow-y: scroll;
+  height: 65vh;
+  max-width: 40vw;
 }
 @media only screen and (max-width: 992px) {
   .allow-overflow {
     height: 45vh;
+    max-width: 80vw;
   }
 }
 </style>
