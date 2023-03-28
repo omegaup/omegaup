@@ -203,6 +203,25 @@ describe('navigation.ts', () => {
         type: NavigationType.ForContest,
         target: vueInstance,
         problems: navbarProblems,
+        problem: navbarProblems[0],
+        contestAlias: 'contest_alias',
+        contestMode: getScoreModeEnum('partial'),
+      };
+      const localVue = createLocalVue();
+      localVue.use(Vuex);
+      new Vuex.Store(storeConfig);
+      await navigateToProblem(params);
+      expect(setLocationHash).toHaveBeenCalledWith(
+        `#problems/${params.problem.alias}/new-run`,
+      );
+    });
+
+    it('Should get the best score for contest with subtasks', async () => {
+      vueInstance.popupDisplayed = PopupDisplayed.RunSubmit;
+      const params: NavigationRequest = {
+        type: NavigationType.ForContest,
+        target: vueInstance,
+        problems: navbarProblems,
         problem: navbarProblems[1],
         contestAlias: 'contest_alias',
         contestMode: getScoreModeEnum('max_per_group'),

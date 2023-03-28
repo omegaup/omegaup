@@ -18,7 +18,6 @@ import {
   getScoreModeEnum,
   navigateToProblem,
   NavigationType,
-  ScoreMode,
 } from './navigation';
 import clarificationStore from './clarificationsStore';
 import {
@@ -77,8 +76,7 @@ OmegaUp.on('ready', async () => {
       scoreboard: payload.scoreboard,
       currentUsername: commonPayload.currentUsername,
       navbarProblems: payload.problems,
-      isContestModeMaxPerGroup:
-        payload.contest.score_mode === ScoreMode.MaxPerGroup,
+      scoreMode: getScoreModeEnum(payload.contest.score_mode),
     });
     ranking = rankingInfo.ranking;
     users = rankingInfo.users;
@@ -400,7 +398,7 @@ OmegaUp.on('ready', async () => {
     navbarProblems: payload.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
-    isContestModeMaxPerGroup: payload.contest.score_mode === 'max_per_group',
+    scoreMode: getScoreModeEnum(payload.contest.score_mode),
   });
   socket.connect();
 

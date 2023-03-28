@@ -18,7 +18,6 @@ import {
   getScoreModeEnum,
   navigateToProblem,
   NavigationType,
-  ScoreMode,
 } from './navigation';
 import clarificationStore from './clarificationsStore';
 import {
@@ -90,8 +89,7 @@ OmegaUp.on('ready', async () => {
               startTime: contest.start_time,
               finishTime: contest.finish_time,
               currentUsername,
-              isContestModeMaxPerGroup:
-                contest.score_mode === ScoreMode.MaxPerGroup,
+              scoreMode: getScoreModeEnum(contest.score_mode),
             });
           })
           .catch(ui.apiError);
@@ -116,8 +114,7 @@ OmegaUp.on('ready', async () => {
       startTime: payload.contest.start_time,
       finishTime: payload.contest.finish_time,
       currentUsername: commonPayload.currentUsername,
-      isContestModeMaxPerGroup:
-        payload.contest.score_mode === ScoreMode.MaxPerGroup,
+      scoreMode: getScoreModeEnum(payload.contest.score_mode),
     });
     virtualContestRefreshInterval = setInterval(() => {
       loadVirtualRanking({
@@ -332,7 +329,7 @@ OmegaUp.on('ready', async () => {
     navbarProblems: payload.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
-    isContestModeMaxPerGroup: payload.contest.score_mode === 'max_per_group',
+    scoreMode: getScoreModeEnum(payload.contest.score_mode),
   });
   socket.connect();
 
