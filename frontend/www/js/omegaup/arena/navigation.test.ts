@@ -9,14 +9,65 @@ import {
   NavigationRequest,
   NavigationType,
   navigateToProblem,
+  getScoreModeEnum,
 } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { storeConfig } from './problemStore';
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import fetchMock from 'jest-fetch-mock';
+import { OmegaUp } from '../omegaup';
 
-const problemDetails: types.ProblemInfo = {
+const run: types.RunWithDetails = {
+  alias: 'problem_alias',
+  classname: 'user-rank-unranked',
+  country: 'MX',
+  guid: 'abcdef',
+  language: 'py2',
+  memory: 1000,
+  penalty: 60,
+  runtime: 60,
+  score: 0.6,
+  score_by_group: { easy: 0.2, medium: 0.3, hard: 0.1 },
+  status: 'ready',
+  submit_delay: 1,
+  time: new Date(0),
+  type: 'normal',
+  username: 'omegaup',
+  verdict: 'PA',
+};
+
+const runs: types.RunWithDetails[] = [
+  run,
+  {
+    ...run,
+    guid: 'ffeedd',
+    score: 0.3,
+    score_by_group: { easy: 0.0, medium: 0.1, hard: 0.2 },
+  },
+  {
+    ...run,
+    guid: 'a1b2c3',
+    score_by_group: { easy: 0.3, medium: 0.3, hard: 0.0 },
+  },
+];
+
+const problemDetails: types.ProblemDetails = {
+  accepted: 1,
+  allow_user_add_tags: true,
+  creation_date: new Date(),
+  email_clarifications: true,
+  nominationStatus: {
+    alreadyReviewed: true,
+    canNominateProblem: true,
+    dismissed: true,
+    dismissedBeforeAc: true,
+    language: 'py3',
+    nominated: true,
+    nominatedBeforeAc: true,
+    solved: true,
+    tried: true,
+  },
   accepts_submissions: true,
   commit: 'abcdef',
   alias: 'problem_alias',
@@ -30,10 +81,17 @@ const problemDetails: types.ProblemInfo = {
     overall_wall_time_limit: '1s',
     time_limit: '1s',
   },
+  order: 'asc',
+  score: 100,
+  show_diff: 'no',
+  submissions: 1,
+  visits: 1,
+  version: '',
   points: 100,
   preferred_language: 'kp',
   problem_id: 1,
   quality_seal: true,
+  runs,
   settings: {
     cases: { easy: { in: '2', out: '4', weight: 1 } },
     limits: {
@@ -57,6 +115,8 @@ const problemDetails: types.ProblemInfo = {
   title: 'A. Problem',
   visibility: 2,
 };
+
+OmegaUp.username = 'omegaup';
 
 const vueInstance: Vue & {
   problemInfo: types.ProblemInfo;
@@ -97,7 +157,7 @@ const navbarProblems: types.NavbarProblemsetProblem[] = [
 
 describe('navigation.ts', () => {
   describe('navigateToProblem', () => {
-    it('Should change hash when contest alias is declared in practice mode', async () => {
+    beforeEach(() => {
       fetchMock.enableMocks();
       fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
         if (req.url != '/api/problem/details/') {
@@ -119,6 +179,9 @@ describe('navigation.ts', () => {
           }),
         });
       });
+    });
+
+    it('Should change hash when contest alias is declared in practice mode', async () => {
       vueInstance.popupDisplayed = PopupDisplayed.None;
       const params: NavigationRequest = {
         type: NavigationType.ForContest,
@@ -126,6 +189,7 @@ describe('navigation.ts', () => {
         problems: navbarProblems,
         problem: navbarProblems[0],
         contestAlias: 'contest_alias',
+        contestMode: getScoreModeEnum('partial'),
       };
       await navigateToProblem(params);
       expect(setLocationHash).toHaveBeenCalledWith(
@@ -141,6 +205,7 @@ describe('navigation.ts', () => {
         problems: navbarProblems,
         problem: navbarProblems[0],
         contestAlias: 'contest_alias',
+        contestMode: getScoreModeEnum('partial'),
       };
       const localVue = createLocalVue();
       localVue.use(Vuex);
@@ -149,6 +214,27 @@ describe('navigation.ts', () => {
       expect(setLocationHash).toHaveBeenCalledWith(
         `#problems/${params.problem.alias}/new-run`,
       );
+    });
+
+    it('Should get the best score for contest with subtasks', async () => {
+      vueInstance.popupDisplayed = PopupDisplayed.RunSubmit;
+      const params: NavigationRequest = {
+        type: NavigationType.ForContest,
+        target: vueInstance,
+        problems: navbarProblems,
+        problem: navbarProblems[1],
+        contestAlias: 'contest_alias',
+        contestMode: getScoreModeEnum('max_per_group'),
+      };
+      const localVue = createLocalVue();
+      localVue.use(Vuex);
+      new Vuex.Store(storeConfig);
+      await navigateToProblem(params);
+      expect(setLocationHash).toHaveBeenCalledWith(
+        `#problems/${params.problem.alias}/new-run`,
+      );
+      expect(vueInstance.problem).not.toBeNull();
+      expect(vueInstance.problem?.bestScore).toBe(0.8);
     });
   });
 });

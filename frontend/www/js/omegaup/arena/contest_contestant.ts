@@ -14,7 +14,11 @@ import {
   refreshContestClarifications,
   trackClarifications,
 } from './clarifications';
-import { navigateToProblem, NavigationType } from './navigation';
+import {
+  getScoreModeEnum,
+  navigateToProblem,
+  NavigationType,
+} from './navigation';
 import clarificationStore from './clarificationsStore';
 import {
   onRefreshRuns,
@@ -72,6 +76,7 @@ OmegaUp.on('ready', async () => {
       scoreboard: payload.scoreboard,
       currentUsername: commonPayload.currentUsername,
       navbarProblems: payload.problems,
+      scoreMode: getScoreModeEnum(payload.contest.score_mode),
     });
     ranking = rankingInfo.ranking;
     users = rankingInfo.users;
@@ -174,6 +179,7 @@ OmegaUp.on('ready', async () => {
               target: contestContestant,
               problems: this.problems,
               contestAlias: payload.contest.alias,
+              contestMode: getScoreModeEnum(payload.contest.score_mode),
             });
           },
           'update-search-result-users-contest': ({
@@ -392,7 +398,7 @@ OmegaUp.on('ready', async () => {
     navbarProblems: payload.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
-    isContestModeMaxPerGroup: payload.contest.score_mode === 'max_per_group',
+    scoreMode: getScoreModeEnum(payload.contest.score_mode),
   });
   socket.connect();
 
