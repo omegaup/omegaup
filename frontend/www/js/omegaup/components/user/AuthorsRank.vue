@@ -1,5 +1,5 @@
 <template>
-  <div class="container-lg p-5">
+  <div class="container-lg p-md-5">
     <div class="card">
       <h5 class="card-header">
         {{
@@ -9,7 +9,7 @@
           })
         }}
       </h5>
-      <table class="table mb-0">
+      <table class="table mb-0 table-responsive-sm">
         <thead>
           <tr>
             <th scope="col">#</th>
