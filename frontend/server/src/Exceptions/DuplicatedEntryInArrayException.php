@@ -45,7 +45,7 @@ class DuplicatedEntryInArrayException extends \OmegaUp\Exceptions\ApiException {
         }
         return \OmegaUp\ApiUtils::formatString(
             $localizedText,
-            [  $this->duplicatedItem => join('<br />', $this->duplicatedItemsInArray)]
+            [$this->duplicatedItem => join('<br />', $this->duplicatedItemsInArray)]
         );
     }
 }

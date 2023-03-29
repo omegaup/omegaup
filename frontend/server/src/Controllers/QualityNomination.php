@@ -1005,7 +1005,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      */
     private static function getDuplicatedTags(array $contents): array {
         $counts = array_count_values( $contents );
-        $duplicates = array[];
+        $duplicates = [];
         foreach ($counts as $value => $count) {
             if ($count > 1) {
                 $duplicates[] = $value;
