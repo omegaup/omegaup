@@ -337,7 +337,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     }
                 }
 
-                $duplicatedTags = self::hasDuplicates($contents['tags']);
+                $duplicatedTags = self::getDuplicatedTags($contents['tags']);
 
                 if (!empty($duplicatedTags)) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
@@ -376,7 +376,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 }
             }
 
-            $duplicatedTags = self::hasDuplicates($contents['tags']);
+            $duplicatedTags = self::getDuplicatedTags($contents['tags']);
 
             if (!empty($duplicatedTags)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
@@ -1001,11 +1001,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      *
      * @template T
      * @param array<T> $contents
-     * @return array{duplicates: string}
+     * @return list<string>
      */
-    private static function hasDuplicates(array $contents): array {
-        $counts = array_count_values($lista);
-        $duplicates = array();
+    private static function getDuplicatedTags(array $contents): array {
+        $counts = array_count_values($contents);
+        $duplicates = array[];
         foreach ($counts as $value => $count) {
             if ($count > 1) {
                 $duplicates[] = $value;
