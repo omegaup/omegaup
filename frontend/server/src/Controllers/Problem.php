@@ -40,7 +40,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemVersion=array{author: Signature, commit: string, committer: Signature, message: string, parents: list<string>, tree: array<string, string>, version: string}
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, groupScorePolicy: null|string, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
- * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, allRuns?: list<Run>, totalRuns?: int, clarifications?: list<Clarification>, histogram: Histogram, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus?: string, solvers: list<BestSolvers>, user: UserInfoForProblem}
+ * @psalm-type AlreadyReviewedPayload=array{quality_seal: bool, qualitynomination_id: int|null}
+ * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, allRuns?: list<Run>, totalRuns?: int, clarifications?: list<Clarification>, histogram: Histogram, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus?: string, solvers: list<BestSolvers>, user: UserInfoForProblem, alreadyReviewedPayload?: AlreadyReviewedPayload}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, groupScorePolicy: null|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>, query: string|null}
  * @psalm-type ProblemListPayload=array{selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
@@ -4698,11 +4699,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity->user_id
         );
 
+        $alreadyReviewed = \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
+            $r->identity,
+            $problem
+        );
+
         $nominationPayload = [
-            'alreadyReviewed' => \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
-                $r->identity,
-                $problem
-            ),
+            'alreadyReviewed' => $alreadyReviewed,
             'dismissed' => $nominationStatus['dismissed'],
             'dismissedBeforeAc' => $nominationStatus['dismissedBeforeAc'],
             'nominated' => $nominationStatus['nominated'],
@@ -4787,6 +4790,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problem,
                 public: false
             ) : []);
+        }
+
+        if ($alreadyReviewed) {
+            $response['templateProperties']['payload']['alreadyReviewedPayload'] = \OmegaUp\DAO\QualityNominations::getReviewedData(
+                $problem->problem_id,
+                $r->identity->user_id
+            );
         }
 
         return $response;

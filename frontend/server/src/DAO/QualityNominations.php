@@ -10,6 +10,8 @@ namespace OmegaUp\DAO;
  * {@link \OmegaUp\DAO\VO\QualityNominations}.
  *
  * @access public
+ *
+ * @psalm-type QualityNominationContents=array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, quality_seal?: bool, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed}
  */
 class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     /**
@@ -188,6 +190,116 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $votes[] = $vote;
         }
         return $votes;
+    }
+
+    /**
+     * Returns the quality seal and id of a nomination for a given problem and user.
+     *
+     * @return array{quality_seal: bool, qualitynomination_id: int|null}
+     */
+    public static function getReviewedData(
+        int $problemId,
+        int $userId
+    ): array {
+        $sql = "
+            SELECT
+                qn.contents,
+                qn.qualitynomination_id
+            FROM
+                QualityNominations qn
+            INNER JOIN
+                Identities i ON i.user_id = qn.user_id
+            WHERE
+                nomination = 'quality_tag' AND
+                i.user_id = ? AND
+                qn.problem_id = ?;";
+        $params = [
+            $userId,
+            $problemId,
+        ];
+
+        /** @var array{contents: string, qualitynomination_id: int}|null */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+
+        if (is_null($row)) {
+            return [
+                'quality_seal' => false,
+                'qualitynomination_id' => null,
+            ];
+        }
+
+        $contents = self::getContents($row['contents']);
+        return [
+            'quality_seal' => boolval($contents['quality_seal'] ?? false),
+            'qualitynomination_id' => $row['qualitynomination_id'],
+        ];
+    }
+
+    /**
+     * Update a QualityNominations given its id and contents
+     *
+     * @param QualityNominationContents $contents
+     */
+    public static function updateQualityNominations(
+        int $qualityNominationsId,
+        array &$contents
+    ): void {
+        $sqlContents = '
+            SELECT
+                contents
+            FROM
+                QualityNominations
+            WHERE
+                qualitynomination_id = ?
+            FOR UPDATE;';
+
+        /** @var null|string */
+        $rowContents = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlContents,
+            [$qualityNominationsId]
+        );
+        if (empty($rowContents)) {
+            return;
+        }
+
+        $contentsAll = self::getContents($rowContents);
+        if (is_null($contentsAll)) {
+            return;
+        }
+
+        $result = json_encode(array_merge($contentsAll, $contents));
+
+        $sql = '
+            UPDATE
+                QualityNominations
+            SET
+                contents = ?
+            WHERE
+                qualitynomination_id = ?;';
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [
+                $result,
+                $qualityNominationsId
+            ]
+        );
+    }
+
+    /**
+     * @return null|QualityNominationContents
+     */
+    public static function getContents(string $contents): ?array {
+        /**
+        * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, quality_seal?: bool, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed}
+        */
+        $contentsAll = json_decode($contents, associative: true);
+
+        if (!is_array($contentsAll)) {
+            return null;
+        }
+
+        return $contentsAll;
     }
 
     /**

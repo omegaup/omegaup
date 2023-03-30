@@ -58,7 +58,7 @@
               <button
                 class="btn btn-primary mr-3"
                 type="submit"
-                :disabled="qualitySeal && !tag"
+                :disabled="qualitySeal == qualitySealReviewed"
                 @click="onSubmit"
               >
                 {{ T.wordsSend }}
@@ -84,6 +84,7 @@ import { Vue, Prop, Component } from 'vue-property-decorator';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import { AvailableViews } from './DemotionPopup.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
+import { types } from '../../api_types';
 import T from '../../lang';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 
@@ -126,11 +127,13 @@ export default class ReviewerPopup extends Vue {
   @Prop() selectedPrivateTags!: string[];
   @Prop() problemAlias!: string;
   @Prop() problemTitle!: string;
+  @Prop() alreadyReviewedPayload!: types.AlreadyReviewedPayload | undefined;
 
   AvailableViews = AvailableViews;
   T = T;
   currentView: AvailableViews = AvailableViews.Content;
-  qualitySeal = true;
+  qualitySeal = this.alreadyReviewedPayload?.quality_seal ?? true;
+  qualitySealReviewed = this.alreadyReviewedPayload?.quality_seal ?? false;
   tag = '';
   publicTagsList = this.selectedPublicTags ?? [];
 

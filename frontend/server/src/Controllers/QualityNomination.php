@@ -473,13 +473,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            if (
-                !isset($contents['quality_seal']) ||
-                (
-                    $contents['quality_seal'] &&
-                    !isset($contents['tag'])
-                )
-            ) {
+            if (!isset($contents['quality_seal'])) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
                     'contents'
@@ -642,11 +636,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
-        /**
-         * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
-         */
-        $contents = json_decode($r['contents'], associative: true);
+        $rawContents = $r->ensureString(
+            'contents',
+            fn (string $s) => \OmegaUp\Validators::stringNonEmpty($s),
+        );
+        $contents = \OmegaUp\DAO\QualityNominations::getContents($rawContents);
         if (!is_array($contents)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
@@ -829,6 +823,56 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'Failed to resolve demotion request',
                 ['exception' => $e],
             );
+            throw $e;
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Updates a QualityNominations given an id and contents
+     *
+     * @param \OmegaUp\Request $r         The request.
+     *
+     * @omegaup-request-param string $contents
+     * @omegaup-request-param int $qualitynomination_id
+     *
+     * @return array{status: string}
+     */
+    public static function apiUpdate(\Omegaup\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        // Validate request
+        $r->ensureMainUserIdentity();
+        self::validateMemberOfReviewerGroup($r);
+
+        $qualityNominationId = $r->ensureInt('qualitynomination_id');
+        $rawContents = $r->ensureString(
+            'contents',
+            fn (string $s) => \OmegaUp\Validators::stringNonEmpty($s),
+        );
+
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+
+            // _Now_ that we are in a transaction
+            $contents = \OmegaUp\DAO\QualityNominations::getContents(
+                $rawContents
+            );
+            if (!is_array($contents)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'contents'
+                );
+            }
+
+            \OmegaUp\DAO\QualityNominations::updateQualityNominations(
+                $qualityNominationId,
+                $contents,
+            );
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
 
