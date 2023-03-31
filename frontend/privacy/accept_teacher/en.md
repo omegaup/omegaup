@@ -1,1 +1,1 @@
-I accept any course admin to see my entire list of problems that I have solved or attempted to solve
+- I accept any course admin to see my entire list of problems that I have solved or attempted to solve

@@ -18,7 +18,7 @@ import {
   updateRunFallback,
 } from './submissions';
 import { PopupDisplayed } from '../components/problem/Details.vue';
-import { navigateToProblem, NavigationType } from './navigation';
+import { navigateToProblem, NavigationType, ScoreMode } from './navigation';
 import {
   CourseClarificationType,
   refreshCourseClarifications,
@@ -472,7 +472,7 @@ OmegaUp.on('ready', async () => {
     navbarProblems: arenaCourse.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
-    isContestModeMaxPerGroup: false,
+    scoreMode: ScoreMode.Partial,
   });
   socket.connect();
 

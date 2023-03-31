@@ -18,16 +18,25 @@
             height="20"
           />
         </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target=".omegaup-navbar"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
+        <div class="d-inline-flex d-flex-row">
+          <a
+            v-if="isLoggedIn"
+            class="navbar justify-content-end mr-2 d-lg-none"
+            href="/logout/"
+          >
+            <font-awesome-icon :icon="['fas', 'power-off']" />
+          </a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target=".omegaup-navbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
         <div class="collapse navbar-collapse omegaup-navbar">
           <omegaup-navbar-items
             :omega-up-lock-down="omegaUpLockDown"
@@ -136,7 +145,7 @@
                   :error="errorMessage !== null"
                 ></omegaup-common-grader-badge>
               </a>
-              <div class="dropdown-menu dropdown-menu-right">
+              <div class="dropdown-menu dropdown-menu-right allow-overflow">
                 <template v-if="!omegaUpLockDown && (!inContest || isAdmin)">
                   <div class="text-center mb-1">
                     <img
@@ -295,14 +304,15 @@
             </li>
           </ul>
         </div>
+
+        <a
+          v-if="isLoggedIn"
+          class="navbar justify-content-end d-none d-lg-block"
+          href="/logout/"
+        >
+          <font-awesome-icon :icon="['fas', 'power-off']" />
+        </a>
       </div>
-      <a
-        v-if="isLoggedIn"
-        class="navbar d-flex justify-content-end"
-        href="/logout/"
-      >
-        <font-awesome-icon :icon="['fas', 'power-off']" />
-      </a>
     </nav>
     <omegaup-user-objectives-questions
       v-if="
@@ -401,6 +411,18 @@ nav.navbar {
 
   .collapse-submenu .btn:focus {
     box-shadow: 0 0 0 0;
+  }
+}
+
+.allow-overflow {
+  overflow-y: scroll;
+  height: 65vh;
+  max-width: 40vw;
+}
+@media only screen and (max-width: 992px) {
+  .allow-overflow {
+    height: 45vh;
+    max-width: 80vw;
   }
 }
 </style>

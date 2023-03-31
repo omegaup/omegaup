@@ -12,6 +12,7 @@ import Vuex from 'vuex';
 import fetchMock from 'jest-fetch-mock';
 import { onRankingChanged, onRankingEvents } from './ranking';
 import { mocked } from 'ts-jest/utils';
+import { ScoreMode } from './navigation';
 
 const navbarProblems: types.NavbarProblemsetProblem[] = [
   {
@@ -47,7 +48,7 @@ const options: SocketOptions = {
   navbarProblems: navbarProblems,
   currentUsername: 'omegaUp',
   intervalInMilliseconds: 500,
-  isContestModeMaxPerGroup: false,
+  scoreMode: ScoreMode.Partial,
 };
 describe('EventsSocket', () => {
   let server: WS | null = null;
@@ -313,6 +314,7 @@ describe('EventsSocket', () => {
 
     expect(onRankingChanged).toHaveBeenCalledWith({
       currentUsername: 'omegaUp',
+      scoreMode: ScoreMode.Partial,
       navbarProblems: [
         {
           acceptsSubmissions: true,

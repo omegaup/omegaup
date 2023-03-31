@@ -2,7 +2,7 @@ import * as ui from '../ui';
 import { types } from '../api_types';
 import { myRunsStore } from './runsStore';
 import { omegaup } from '../omegaup';
-import { getMaxScore } from './navigation';
+import { getMaxScore, getScoreForProblem, ScoreMode } from './navigation';
 import T from '../lang';
 import rankingStore from './rankingStore';
 
@@ -203,10 +203,12 @@ export function onRankingChanged({
   scoreboard,
   currentUsername,
   navbarProblems,
+  scoreMode,
 }: {
   scoreboard: types.Scoreboard;
   currentUsername: string;
   navbarProblems: types.NavbarProblemsetProblem[];
+  scoreMode: ScoreMode;
 }): {
   ranking: types.ScoreboardRankingEntry[];
   users: omegaup.UserRank[];
@@ -248,11 +250,11 @@ export function onRankingChanged({
         const currentProblem = problems[alias];
 
         currentProblem.hasRuns = problem.runs > 0;
-        currentProblem.bestScore = getMaxScore(
-          myRunsStore.state.runs.filter((run) => run.alias === problem.alias),
-          alias,
-          problem.points,
-        );
+        currentProblem.bestScore = getScoreForProblem({
+          contestMode: scoreMode,
+          problemAlias: problem.alias,
+          problemPoints: problem.points,
+        });
       }
     }
 
@@ -389,6 +391,7 @@ export function onVirtualRankingChanged({
   startTime,
   finishTime,
   currentUsername,
+  scoreMode,
 }: {
   scoreboard: types.Scoreboard;
   scoreboardEvents: types.ScoreboardEvent[];
@@ -396,6 +399,7 @@ export function onVirtualRankingChanged({
   startTime: Date;
   finishTime?: Date;
   currentUsername: string;
+  scoreMode: ScoreMode;
 }): void {
   let rankingChartOptions: Highcharts.Options | null = null;
   const { mergedScoreboard, originalContestEvents } = mergeRankings({
@@ -407,6 +411,7 @@ export function onVirtualRankingChanged({
     scoreboard: mergedScoreboard,
     currentUsername: currentUsername,
     navbarProblems: problems,
+    scoreMode,
   });
   const ranking = rankingInfo.ranking;
   const users = rankingInfo.users;
