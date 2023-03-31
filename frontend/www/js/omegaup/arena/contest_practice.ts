@@ -21,7 +21,11 @@ import {
   trackClarifications,
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
-import { navigateToProblem, NavigationType } from './navigation';
+import {
+  getScoreModeEnum,
+  navigateToProblem,
+  NavigationType,
+} from './navigation';
 import { myRunsStore } from './runsStore';
 
 OmegaUp.on('ready', async () => {
@@ -107,6 +111,7 @@ OmegaUp.on('ready', async () => {
               target: contestPractice,
               problems: this.problems,
               contestAlias: payload.contest.alias,
+              contestMode: getScoreModeEnum(payload.contest.score_mode),
             });
           },
           'show-run': (request: SubmissionRequest) => {
