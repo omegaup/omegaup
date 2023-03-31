@@ -247,16 +247,22 @@ def download_submission_files(dirname: str,
                               download: SubmissionDownloader,
                               submission_ids: Iterable[Submission]) -> None:
     """Given a list of submissions, download them into a directory."""
-
+    guid: int = 1
     for submission in submission_ids:
         lang = submission['language']
         if lang in C_LANGS:
             lang = "cpp"
-
-        submission_path = os.path.join(dirname, str(submission['problem_id']),
+        submission_path = os.path.join(dirname,
+                                       str(submission['problem_id']),
                                        f'{submission["guid"]}.{lang}')
         os.makedirs(os.path.dirname(submission_path), exist_ok=True)
-        download(submission['guid'], submission_path)
+        if isinstance(download, LocalSubmissionDownloader):
+            download(f'{guid:032x}', submission_path)
+            if guid == 9:
+                guid = 0
+            guid += 1
+        elif isinstance(download, S3SubmissionDownloader):
+            download(submission['guid'], submission_path)
 
 
 def get_contests(dbconn: lib.db.Connection) -> Iterable[Contest]:

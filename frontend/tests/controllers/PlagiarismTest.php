@@ -8,13 +8,13 @@
 class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
     public function testCheckPlagiarismsScript() {
         $originalTime = \OmegaUp\Time::get();
-        \OmegaUp\Time::setTimeForTesting($originalTime - (60 * 46));
+        \OmegaUp\Time::setTimeForTesting($originalTime - (60 * 10));
         // Create a Contest.
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'startTime' => $originalTime - 60 * 60,
-                'finishTime' => $originalTime - 60 * 45,
-                'check_plagiarism' => 1,
+                'finishTime' => $originalTime - 60 * 10,
+                'checkPlagiarism' => true,
             ])
         );
 
@@ -66,24 +66,54 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
                     $problem,
                     $identity
                 );
-
                 $runs[$index] = \OmegaUp\Test\Factories\Run::createRun(
                     $problem,
                     $contestData,
                     $identity
                 );
-
                 // Grade the run
                 \OmegaUp\Test\Factories\Run::gradeRun($runs[$index]);
             }
         }
-        \OmegaUp\Time::setTimeForTesting($originalTime - (60 * 44));
-        $local_downloader_dir = '/opt/omegaup/stuff/cron/testing/testdata';
-        \OmegaUp\Test\Utils::runCheckPlagiarisms($local_downloader_dir);
+        \OmegaUp\Test\Utils::runCheckPlagiarisms(
+            '/opt/omegaup/stuff/cron/testing/testdata/'
+        );
 
-        $sql1 = 'SELECT guid
-                FROM
-                    Submissions';
-        $rs1 = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql1);
+        $this->assertEquals(
+            3,
+            \OmegaUp\MySQLConnection::getInstance()->GetOne(
+                'SELECT COUNT(*) FROM Plagiarisms'
+            )
+        );
+        $expected_result = [[2, 5], [1,4], [3,6]];
+        $index = 0;
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            'SELECT * FROM Plagiarisms'
+        );
+        foreach ($result as $submission) {
+            $this->assertEquals(
+                'integer',
+                gettype(
+                    $submission['submission_id_1']
+                )
+            );
+            $this->assertEquals(
+                'integer',
+                gettype(
+                    $submission['submission_id_2']
+                )
+            );
+            $this->assertEquals(
+                $expected_result[$index][0],
+                $submission['submission_id_1']
+            );
+            $this->assertEquals(
+                $expected_result[$index][1],
+                $submission['submission_id_2']
+            );
+            $this->assertEquals(100, $submission['score_1']);
+            $this->assertEquals(100, $submission['scroe_2']);
+            $index += 1;
+        }
     }
 }
