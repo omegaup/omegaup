@@ -112,7 +112,7 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
                 $submission['submission_id_2']
             );
             $this->assertEquals(100, $submission['score_1']);
-            $this->assertEquals(100, $submission['scroe_2']);
+            $this->assertEquals(100, $submission['score_2']);
             $index += 1;
         }
     }
