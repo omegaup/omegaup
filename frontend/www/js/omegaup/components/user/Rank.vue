@@ -60,7 +60,7 @@
         {{ T.searchUser }}
       </button>
     </div>
-    <table class="table mb-0">
+    <table class="table mb-0 table-responsive-sm">
       <thead>
         <tr>
           <th scope="col">#</th>
