@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card table-responsive-sm">
     <h5 class="card-header">
       {{
         showHeader
