@@ -80,9 +80,6 @@
                   <label class="control-label">{{
                     T.problemEditFormFile
                   }}</label>
-                  <a :href="howToWriteProblemLink" target="_blank">
-                    <span>{{ T.problemEditFormHowToWriteProblems }}</span>
-                  </a>
                   <input
                     :required="!isUpdate"
                     name="problem_contents"

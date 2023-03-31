@@ -22,8 +22,11 @@ from selenium.webdriver.support.select import Select
 
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
-PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')
-MESSAGE_WHITELIST = ('http://staticxx.facebook.com/', '/api/grader/status/')
+PATH_WHITELIST = ('/api/grader/status/',
+                  '/js/error_handler.js',
+                  '/js/dist/npm.vue.js')
+MESSAGE_WHITELIST = ('https://accounts.google.com/gsi/',
+                     '/api/grader/status/')
 
 # This contains all the Python path-hacking to a single file instead of
 # spreading it throughout all the files.

@@ -270,4 +270,32 @@ describe('Contest.vue', () => {
       ],
     ]);
   });
+
+  it('Should display the edit button when current user is admin', () => {
+    const wrapper = mount(arena_Contest, {
+      propsData: {
+        activeTab: 'runs',
+        contestAdmin: true,
+        contest,
+        problems,
+        allRuns: [run],
+        showAllRuns: true,
+      },
+    });
+    expect(wrapper.find('.edit-contest-button')).toBeTruthy();
+  });
+
+  it('Should hide the edit button when current user is not an admin', () => {
+    const wrapper = mount(arena_Contest, {
+      propsData: {
+        activeTab: 'runs',
+        contestAdmin: false,
+        contest,
+        problems,
+        allRuns: [run],
+        showAllRuns: true,
+      },
+    });
+    expect(wrapper.find('.edit-contest-button').exists()).toBeFalsy();
+  });
 });
