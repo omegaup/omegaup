@@ -176,9 +176,9 @@ def test_create_identities_for_course(driver):
 
     run_id = driver.generate_id()
     course_alias = 'ut_rank_course_%s' % run_id
-    school_name = 'ut_rank_school_%s' % run_id
+    school_name = 'ut_rank_school'
     assignment_alias = 'ut_rank_hw_%s' % run_id
-    problem = 'sumas'
+    problem = 'Sumas'
     username = 'ut_user_%s' % driver.generate_id()
     password = 'p@ssw0rd'
     driver.register_user(username, password)
