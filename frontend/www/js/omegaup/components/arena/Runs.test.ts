@@ -53,7 +53,7 @@ describe('Runs.vue', () => {
         showPoints: false,
         showProblem: true,
         showRejudge: true,
-        showUser: true,
+        showUser: false,
         username: null,
       },
     });
