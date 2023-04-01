@@ -9,13 +9,13 @@
         pills
         card
         vertical
-        nav-wrapper-class="contest-list-nav col-sm-4 col-md-2"
+        nav-wrapper-class="contest-list-nav  col-md-2 col-sm-12 test-class"
       >
         <b-card>
           <b-container>
             <b-row class="p-1" align-v="center">
-              <b-col cols="6">
-                <form :action="queryURL" method="GET">
+              <b-col class="col-md-6 col-sm-12">
+                <form :action="queryURL" method="GET" class="form-wrapper">
                   <div class="input-group">
                     <input
                       v-model.lazy="currentQuery"
@@ -29,17 +29,17 @@
                       :placeholder="T.wordsKeyword"
                     />
                     <button class="btn" type="reset">&times;</button>
-                    <div class="input-group-append">
-                      <input
-                        class="btn btn-primary btn-md active"
-                        type="submit"
-                        :value="T.wordsSearch"
-                      />
-                    </div>
+                  </div>
+                  <div class="input-group-append">
+                    <input
+                      class="btn btn-primary btn-md active"
+                      type="submit"
+                      :value="T.wordsSearch"
+                    />
                   </div>
                 </form>
               </b-col>
-              <b-col cols="6" class="d-flex flex-row-reverse">
+              <b-col sm="12" class="d-flex col-md-6 btns-group">
                 <b-dropdown ref="dropdownOrderBy" no-caret>
                   <template #button-content>
                     <div>
@@ -566,5 +566,50 @@ export default class ArenaContestList extends Vue {
   font-size: 200%;
   margin: 1em;
   color: var(--arena-contest-list-empty-category-font-color);
+}
+
+.form-wrapper {
+  display: flex;
+}
+
+.btns-group {
+  justify-content: flex-end;
+  .dropdown {
+    margin-right: 1rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+  .tabs {
+    display: flex;
+    flex-direction: column;
+
+    .nav {
+      width: 100%;
+    }
+  }
+
+  .btns-group {
+    justify-content: flex-start;
+    .dropdown {
+      flex: 1;
+      gap: 1rem;
+      margin-right: 1rem;
+    }
+  }
+
+  .form-wrapper {
+    flex-direction: column;
+    .input-group-append {
+      margin: 1rem 0;
+      input {
+        width: 100%;
+      }
+    }
+  }
 }
 </style>
