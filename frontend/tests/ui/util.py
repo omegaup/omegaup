@@ -534,10 +534,6 @@ def add_identities_group(driver, group_alias) -> List[Identity]:
         create_identities_button.click()
 
     driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//a[contains(@href, "#members")]'))).click()
-
-    driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH, '//table[@data-table-identities]')))
 
