@@ -501,23 +501,28 @@ class Session extends \OmegaUp\Controllers\Controller {
         return "{$username}{$suffix}";
     }
 
-    /**
-     * @omegaup-request-param string $g_csrf_token
-     * @omegaup-request-param string $credential
-     */
-    public static function apiGoogleLogin(\OmegaUp\Request $r): void {
+    public static function loginViaGoogle(
+        string $idToken,
+        string $gCsrfToken
+    ): void {
         // Verify the Google ID token on the server side:
         // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token?hl=en
-        $gCsrfToken = $r->ensureString('g_csrf_token');
-        $idToken = $r->ensureString('credential');
-        /** @var null|string*/
-        $csrfTokenCookie = $_COOKIE['g_csrf_token'];
+        $csrfTokenCookie = self::getSessionManagerInstance()->getCookie(
+            'g_csrf_token'
+        );
 
-        if (is_null($csrfTokenCookie) || $gCsrfToken !== $csrfTokenCookie) {
-            self::$log->error('Invalid CSRF token');
+        if (is_null($csrfTokenCookie)) {
+            self::$log->error('Missing CSRF token cookie');
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'loginGoogleInvalidCSRFToken',
-                'token'
+                'g_csrf_token'
+            );
+        }
+        if ($gCsrfToken !== $csrfTokenCookie) {
+            self::$log->error('Invalid CSRF token: mismatch');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'loginGoogleInvalidCSRFToken',
+                'g_csrf_token'
             );
         }
 
@@ -542,13 +547,13 @@ class Session extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        self::LoginViaGoogle(
+        self::loginViaGoogleEmail(
             $payload['email'],
             (isset($payload['name']) ? $payload['name'] : null)
         );
     }
 
-    public static function LoginViaGoogle(
+    public static function loginViaGoogleEmail(
         string $email,
         ?string $name = null
     ): void {
