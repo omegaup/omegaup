@@ -194,8 +194,6 @@ OmegaUp.on('ready', () => {
               .then(({ token }) => {
                 api.User.deleteConfirm({ token })
                   .then(() => {
-                       // Reload the window
-                       location.reload();
                     // Log out the user
                     window.location.href = '/logout/';
                   })

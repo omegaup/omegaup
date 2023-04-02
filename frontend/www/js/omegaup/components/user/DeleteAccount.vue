@@ -6,7 +6,7 @@
           <h4 class="alert-heading">{{ T.wordsDangerZone }}</h4>
           <hr />
           <omegaup-markdown
-            :markdown="T.wordsDangerZoneDesc"
+            :markdown="T.accountDeleteMessage"
           ></omegaup-markdown>
           <br /><br />
           <button
