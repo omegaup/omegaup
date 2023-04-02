@@ -8,7 +8,7 @@
 class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
     public function testCheckPlagiarismsScript() {
         $originalTime = \OmegaUp\Time::get();
-        \OmegaUp\Time::setTimeForTesting($originalTime - (60 * 10));
+        \OmegaUp\Time::setTimeForTesting($originalTime - (60 * 20));
         // Create a Contest.
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
@@ -75,6 +75,7 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\Test\Factories\Run::gradeRun($runs[$index]);
             }
         }
+        \OmegaUp\Time::setTimeForTesting($originalTime - (60 * 9));
         \OmegaUp\Test\Utils::runCheckPlagiarisms(
             '/opt/omegaup/stuff/cron/testing/testdata/'
         );
@@ -88,7 +89,10 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
         $expected_result = [[2, 5], [1,4], [3,6]];
         $index = 0;
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            'SELECT * FROM Plagiarisms'
+            'SELECT * FROM Plagiarisms
+                WHERE contest_id = (SELECT contest_id FROM Contests
+                                WHERE alias = ?)',
+            [$contestData['request']['alias']]
         );
         foreach ($result as $submission) {
             $this->assertEquals(
@@ -110,6 +114,10 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals(
                 $expected_result[$index][1],
                 $submission['submission_id_2']
+            );
+            $this->assertContainsEquals(
+                $expected_result[$index][1],
+                [$submission['submission_id_2'],$submission['submission_id_1']]
             );
             $this->assertEquals(100, $submission['score_1']);
             $this->assertEquals(100, $submission['score_2']);
