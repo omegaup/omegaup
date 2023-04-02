@@ -81,7 +81,7 @@
         </tbody>
       </table>
       <div class="float-right">
-        <a class="btn btn-primary" :href="studentsProgressUrl()">{{
+        <a class="btn btn-primary" :href="studentsProgressUrl">{{
           T.courseStudentsProgress
         }}</a>
       </div>
@@ -124,7 +124,7 @@ export default class CourseAddStudents extends Vue {
     return `/course/${this.courseAlias}/student/${student.username}/`;
   }
 
-  studentsProgressUrl(): string {
+  get studentsProgressUrl(): string {
     return `/course/${this.courseAlias}/students/`;
   }
 
