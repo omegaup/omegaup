@@ -16,6 +16,7 @@ import { updateRun } from './submissions';
 import { types } from '../api_types';
 import rankingStore from './rankingStore';
 import socketStore from './socketStore';
+import { ScoreMode } from './navigation';
 
 export enum SocketStatus {
   Waiting = '↻',
@@ -39,7 +40,7 @@ export interface SocketOptions {
   currentUsername: string;
   navbarProblems: types.NavbarProblemsetProblem[];
   intervalInMilliseconds: number;
-  isContestModeMaxPerGroup: boolean;
+  scoreMode: ScoreMode;
 }
 
 export class EventsSocket {
@@ -65,7 +66,7 @@ export class EventsSocket {
   private readonly currentUsername: string;
   private readonly navbarProblems: types.NavbarProblemsetProblem[];
   private readonly intervalInMilliseconds: number;
-  private readonly isContestModeMaxPerGroup: boolean;
+  private readonly scoreMode: ScoreMode;
 
   constructor({
     disableSockets = false,
@@ -83,7 +84,7 @@ export class EventsSocket {
     currentUsername,
     navbarProblems,
     intervalInMilliseconds = 5 * 60 * 1000,
-    isContestModeMaxPerGroup,
+    scoreMode = ScoreMode.Partial,
   }: SocketOptions) {
     this.socket = null;
 
@@ -103,7 +104,7 @@ export class EventsSocket {
     this.clarificationInterval = null;
     this.rankingInterval = null;
     this.intervalInMilliseconds = intervalInMilliseconds;
-    this.isContestModeMaxPerGroup = isContestModeMaxPerGroup;
+    this.scoreMode = scoreMode;
 
     const protocol = locationProtocol === 'https:' ? 'wss:' : 'ws:';
     const host = locationHost;
@@ -123,7 +124,7 @@ export class EventsSocket {
       data.clarification.time = time.remoteTime(data.clarification.time * 1000);
       clarificationStore.commit('addClarification', data.clarification);
     } else if (data.message == '/scoreboard/update/') {
-      if (this.isContestModeMaxPerGroup) {
+      if (this.scoreMode === ScoreMode.MaxPerGroup) {
         api.Contest.scoreboard({ contest_alias: this.problemsetAlias })
           .then((result: types.Scoreboard) => {
             this.processRankings({
@@ -174,6 +175,7 @@ export class EventsSocket {
             problems: this.navbarProblems,
             startTime: this.startTime,
             finishTime: this.finishTime,
+            scoreMode: this.scoreMode,
           });
         })
         .catch(ui.ignoreError);
@@ -188,6 +190,7 @@ export class EventsSocket {
       scoreboard,
       currentUsername: this.currentUsername,
       navbarProblems: this.navbarProblems,
+      scoreMode: this.scoreMode,
     });
     rankingStore.commit('updateRanking', ranking);
     rankingStore.commit('updateMiniRankingUsers', users);
@@ -330,6 +333,7 @@ export class EventsSocket {
           scoreboard,
           currentUsername: this.currentUsername,
           navbarProblems: this.navbarProblems,
+          scoreMode: this.scoreMode,
         });
 
         api.Problemset.scoreboardEvents({
@@ -378,6 +382,7 @@ export class EventsSocket {
               scoreboard,
               currentUsername: this.currentUsername,
               navbarProblems: this.navbarProblems,
+              scoreMode: this.scoreMode,
             });
 
             api.Problemset.scoreboardEvents({
