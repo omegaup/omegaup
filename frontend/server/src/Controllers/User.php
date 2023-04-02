@@ -4498,6 +4498,8 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
      *
+     * @omegaup-request-param null|string $credential
+     * @omegaup-request-param null|string $g_csrf_token
      * @omegaup-request-param null|string $third_party_login
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
@@ -4510,6 +4512,8 @@ class User extends \OmegaUp\Controllers\Controller {
             // Do nothing.
         }
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
+        $gCsrfToken = $r->ensureOptionalString('g_csrf_token');
+        $idToken = $r->ensureOptionalString('credential');
         if ($r->offsetExists('fb')) {
             $thirdPartyLogin = 'facebook';
         }
@@ -4527,7 +4531,15 @@ class User extends \OmegaUp\Controllers\Controller {
         try {
             if ($thirdPartyLogin === 'facebook') {
                 \OmegaUp\Controllers\Session::loginViaFacebook();
+            } elseif (!is_null($gCsrfToken) && !is_null($idToken)) {
+                \OmegaUp\Controllers\Session::loginViaGoogle(
+                    $idToken,
+                    $gCsrfToken
+                );
             }
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // The controller has explicitly requested to exit.
+            exit;
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             \OmegaUp\ApiCaller::logException($e);
             $response['templateProperties']['payload']['statusError'] = strval(
