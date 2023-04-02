@@ -707,7 +707,7 @@ const translations: { [key: string]: string; } = {
   navViewContests: "Ver Concursos",
   navViewCourses: "Ver Cursos",
   navViewLatestSubmissions: "Ver \u00daltimos Env\u00edos",
-  navViewProblems: "Ver Buscador de Problemas",
+  navViewProblems: "Ver Problemas",
   navViewProblemsAll: "Ver Lista de Problemas",
   navViewProfile: "Mi perfil",
   newPublicTagsNotAllowed: "No est\u00e1 permitido agregar nuevas etiquetas p\u00fablicas",
