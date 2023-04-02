@@ -1051,7 +1051,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $query
      */
     
-
     /**
      * @return array{templateProperties: array{payload: ContestListv2Payload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
