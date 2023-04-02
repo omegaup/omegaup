@@ -22,17 +22,23 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         ob_start();
         try {
             // Create collision
-            \OmegaUp\Controllers\Session::LoginViaGoogle("A{$salt}@isp1.com");
+            \OmegaUp\Controllers\Session::loginViaGoogleEmail(
+                "A{$salt}@isp1.com"
+            );
         } catch (\OmegaUp\Exceptions\ExitException $e) {
             // This is expected.
         }
         try {
-            \OmegaUp\Controllers\Session::LoginViaGoogle("A{$salt}@isp2.com");
+            \OmegaUp\Controllers\Session::loginViaGoogleEmail(
+                "A{$salt}@isp2.com"
+            );
         } catch (\OmegaUp\Exceptions\ExitException $e) {
             // This is expected.
         }
         try {
-            \OmegaUp\Controllers\Session::LoginViaGoogle("A{$salt}@isp3.com");
+            \OmegaUp\Controllers\Session::loginViaGoogleEmail(
+                "A{$salt}@isp3.com"
+            );
         } catch (\OmegaUp\Exceptions\ExitException $e) {
             // This is expected.
         }
@@ -52,7 +58,9 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $password = \OmegaUp\Test\Utils::createRandomString();
 
         try {
-            \OmegaUp\Controllers\Session::LoginViaGoogle("{$username}@isp.com");
+            \OmegaUp\Controllers\Session::loginViaGoogleEmail(
+                "{$username}@isp.com"
+            );
         } catch (\OmegaUp\Exceptions\ExitException $e) {
             // This is expected.
         }
@@ -91,7 +99,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $email = "{$username}@isp.com";
 
         try {
-            \OmegaUp\Controllers\Session::LoginViaGoogle($email);
+            \OmegaUp\Controllers\Session::loginViaGoogleEmail($email);
         } catch (\OmegaUp\Exceptions\ExitException $e) {
             // This is expected.
         }
