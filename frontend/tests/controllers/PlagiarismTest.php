@@ -57,7 +57,7 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create one run for every problem
         $runs = [];
-        foreach ($users as $id => $identity) {
+        foreach ($users as $_ => $identity) {
             foreach ($problems as $index => $problem) {
                 \OmegaUp\Test\Factories\Contest::openProblemInContest(
                     $contestData,
