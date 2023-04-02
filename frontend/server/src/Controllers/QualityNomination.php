@@ -343,7 +343,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
                         'duplicateTagsNotAllowed',
                         'tags',
-                        duplicatedItemsInArray: array_slice($duplicatedTags, 0, 20)
+                        duplicatedItemsInArray: array_slice(
+                            $duplicatedTags,
+                            0,
+                            20
+                        )
                     );
                 }
             }
@@ -1004,7 +1008,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @return list<string>
      */
     private static function getDuplicatedTags(array $contents): array {
-        $counts = array_count_values( $contents );
+        $counts = array_count_values($contents);
         $duplicates = [];
         foreach ($counts as $value => $count) {
             if ($count > 1) {

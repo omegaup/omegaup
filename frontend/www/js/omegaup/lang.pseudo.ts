@@ -538,7 +538,7 @@ const translations: { [key: string]: string; } = {
   demotionProblemMultipleQuestion: "(D0 y0u wan7 70 d0 7hi5 f0r a11 r3p0r75 0f 7hi5 pr0b13m?)",
   demotionProblemNotificationBanned: "(Pr0b13m [%(problem_name)] ha5 b33n r3p0r73d a5 inappr0pria73. F0r m0r3 d37ai15 ch3ck y0ur 3mai1.)",
   demotionProblemNotificationWarning: "(A warning ha5 b33n pu7 0n y0ur pr0b13m %(problem_name). F0r m0r3 d37ai15 ch3ck y0ur 3mai1.)",
-  duplicateTagsNotAllowed: "(Dup1ica73d 7ag5 ar3 n07 a110w3d. 7h3r3 i5 a7 13a57 0n3 dup1ica73d 7ag in 7h3 li57: %(tags) <br> P13a53 fix 7h3 inf0rma7i0n.)",
+  duplicateTagsNotAllowed: "(Dup1ica73d 7ag5 ar3 n07 a110w3d. Th3r3 i5 a7 13a57 0n3 dup1ica73d 7ag in 7h3 1i57: %(tags) <br> P13a53 fix 7h3 inf0rma7i0n.)",
   editFieldRequired: "(Mi55ing r3quir3d fi31d)",
   email: "(E-Mai1)",
   emailNotVerified: "(Y0ur 3mai1 i5 n07 v3rifi3d y37. P13a53 100k f0r 7h3 v3rifica7i0n 3mai1 in y0ur inb0x and 5pam f01d3r. If y0u 57i11 hav3 pr0b13m5, p13a53 c0n7ac7 0m3gaup-50p0r73@g00g13gr0up5.c0m f0r 5upp0r7.)",
