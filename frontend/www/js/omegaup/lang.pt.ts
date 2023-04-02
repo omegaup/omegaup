@@ -662,7 +662,6 @@ const translations: { [key: string]: string; } = {
   loginSignupHeader: "Criar uma conta omegaUp, r\u00e1pido e f\u00e1cil!",
   loginThroughThirdParty: "Seu usu\u00e1rio foi criado por meio de um login de terceiros (Google, Facebook, etc.). Por favor, fa\u00e7a login usando esse mecanismo novamente para definir uma senha.",
   loginUsernameRequired: "O nome de usu\u00e1rio \u00e9 obrigat\u00f3rio.",
-  loginWithGoogle: "Entrar com Google",
   mailInUse: "Este e-mail j\u00e1 est\u00e1 em uso. Tente novamente.",
   makePrivate: "Tornar privado",
   makePublic: "Tornar p\u00fablico",
