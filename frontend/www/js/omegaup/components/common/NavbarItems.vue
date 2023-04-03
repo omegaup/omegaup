@@ -107,12 +107,6 @@
             }}</a>
             <a
               class="dropdown-item"
-              href="/problem/"
-              data-nav-problems-list
-              >{{ T.navViewProblemsAll }}</a
-            >
-            <a
-              class="dropdown-item"
               href="/problem/collection/"
               data-nav-problems-collection
               >{{ T.navViewProblems }}</a
