@@ -56,7 +56,7 @@
         </a>
       </li>
     </ul>
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover table-responsive-sm">
       <thead>
         <tr>
           <th scope="col" class="text-center"></th>

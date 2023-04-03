@@ -20,7 +20,7 @@ def test_create_contest(driver):
 
     run_id = driver.generate_id()
     contest_alias = 'ut_contest_%s' % run_id
-    problem = 'sumas'
+    problem = 'Sumas'
     user = 'ut_user_%s' % run_id
     password = 'P@55w0rd'
     group_title = 'ut_group_%s' % driver.generate_id()
@@ -76,7 +76,7 @@ def test_user_ranking_contest(driver):
 
     run_id = driver.generate_id()
     contest_alias = 'utrank_contest_%s' % run_id
-    problem = 'sumas'
+    problem = 'Sumas'
     user1 = 'ut_rank_user_1_%s' % run_id
     user2 = 'ut_rank_user_2_%s' % run_id
     user3 = 'ut_rank_user_3_%s' % run_id
@@ -197,7 +197,7 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
 
     run_id = driver.generate_id()
     alias = 'utrank_contest_%s' % run_id
-    problem = 'sumas'
+    problem = 'Sumas'
     user1 = 'ut_rank_user_1_%s' % run_id
     user2 = 'ut_rank_user_2_%s' % run_id
     password = 'P@55w0rd'
@@ -271,7 +271,7 @@ def test_user_clarifications_contest(driver):
 
     run_id = driver.generate_id()
     contest_alias = 'utrank_contest_%s' % run_id
-    problem = 'sumas'
+    problem = 'Sumas'
     user1 = 'ut_rank_user_1_%s' % run_id
     password = 'P@55w0rd'
 
