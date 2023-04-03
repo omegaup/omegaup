@@ -13,7 +13,7 @@
               <div
                 id="g_id_onload"
                 :data-client_id="googleClientId"
-                :data-login_uri="`${omegaupUrl}/api/session/googleLogin/`"
+                :data-login_uri="loginUri"
                 data-auto_prompt="false"
               ></div>
               <div
@@ -91,7 +91,6 @@ import T from '../../lang';
 export default class Login extends Vue {
   @Prop() facebookUrl!: string;
   @Prop() googleClientId!: string;
-  @Prop() omegaupUrl!: string;
 
   usernameOrEmail: string = '';
   password: string = '';
@@ -104,6 +103,10 @@ export default class Login extends Vue {
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     document.body.appendChild(script);
+  }
+
+  get loginUri(): string {
+    return document.location.href;
   }
 }
 </script>
