@@ -707,7 +707,7 @@ const translations: { [key: string]: string; } = {
   navViewContests: "View Contests",
   navViewCourses: "View Courses",
   navViewLatestSubmissions: "View Latest Submissions",
-  navViewProblems: "View Problems Finder",
+  navViewProblems: "View Problems Collection",
   navViewProblemsAll: "View Problems List",
   navViewProfile: "My profile",
   newPublicTagsNotAllowed: "It is not allowed to add new public tags",
