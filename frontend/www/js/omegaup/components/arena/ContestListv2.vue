@@ -15,36 +15,36 @@
           <b-container>
             <b-row class="p-1" align-v="center">
               <b-col class="col-md-6 col-sm-12">
-              <form :action="queryURL" method="GET">
-                <div class="row">
-                  <div class="col-12 col-sm-8">
-                    <div class="input-group">
-                      <input
-                        v-model.lazy="currentQuery"
-                        class="form-control"
-                        type="text"
-                        name="query"
-                        autocomplete="off"
-                        autocorrect="off"
-                        autocapitalize="off"
-                        spellcheck="false"
-                        :placeholder="T.wordsKeyword"
-                      />
-                      <button class="btn" type="reset">&times;</button>
+                <form :action="queryURL" method="GET">
+                  <div class="row">
+                    <div class="col-12 col-sm-8">
+                      <div class="input-group">
+                        <input
+                          v-model.lazy="currentQuery"
+                          class="form-control"
+                          type="text"
+                          name="query"
+                          autocomplete="off"
+                          autocorrect="off"
+                          autocapitalize="off"
+                          spellcheck="false"
+                          :placeholder="T.wordsKeyword"
+                        />
+                        <button class="btn" type="reset">&times;</button>
+                      </div>
+                    </div>
+                    <div class="px-3 px-sm-0 col-12 col-sm-4 mt-2 mt-sm-0">
+                      <div>
+                        <input
+                          class="btn btn-primary btn-md btn-block active"
+                          type="submit"
+                          :value="T.wordsSearch"
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div class="px-3 px-sm-0 col-12 col-sm-4 mt-2 mt-sm-0">
-                    <div>
-                      <input
-                        class="btn btn-primary btn-md btn-block active "
-                        type="submit"
-                        :value="T.wordsSearch"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </b-col>
+                </form>
+              </b-col>
 
               <b-col sm="12" class="d-flex col-md-6 btns-group mt-1">
                 <b-dropdown ref="dropdownOrderBy" no-caret>
@@ -599,6 +599,5 @@ export default class ArenaContestList extends Vue {
       margin-right: 0.8rem;
     }
   }
-
 }
 </style>

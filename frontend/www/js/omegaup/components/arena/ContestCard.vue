@@ -1,7 +1,7 @@
 <template>
   <b-card class="mb-2">
     <b-container>
-      <b-row class="p-1 flex-column flex-sm-row" align-v="center"> 
+      <b-row class="p-1 flex-column flex-sm-row" align-v="center">
         <b-col class="col-md-5 col-sm-12 p-1 text-center">
           <b-card-text>
             <h5>
@@ -173,5 +173,4 @@ export default class ContestCard extends Vue {
 .btn {
   color: $omegaup-white;
 }
-
 </style>
