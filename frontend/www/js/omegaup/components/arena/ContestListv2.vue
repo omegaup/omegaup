@@ -16,9 +16,7 @@
             <b-row class="p-1" align-v="center">
               <b-col class="col-md-6 col-sm-12">
                 <form :action="queryURL" method="GET">
-                  <div class="row">
-                    <div class="col-12 col-sm-8">
-                      <div class="input-group-append">
+                      <div class="input-group">
                         <input
                           v-model.lazy="currentQuery"
                           class="form-control"
@@ -31,17 +29,16 @@
                           :placeholder="T.wordsKeyword"
                         />
                         <button class="btn" type="reset">&times;</button>
+                        <div class="input-group-append">
                         <input
                           class="btn btn-primary btn-md btn-block active"
                           type="submit"
                           :value="T.wordsSearch"
                         />
-                      </div>
-                    </div>
+                        </div>
                   </div>
                 </form>
               </b-col>
-
               <b-col sm="12" class="d-flex col-md-6 btns-group mt-1">
                 <b-dropdown ref="dropdownOrderBy" no-caret>
                   <template #button-content>
