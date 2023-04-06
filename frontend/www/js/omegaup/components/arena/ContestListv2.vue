@@ -16,26 +16,26 @@
             <b-row class="p-1" align-v="center">
               <b-col class="col-md-6 col-sm-12">
                 <form :action="queryURL" method="GET">
-                      <div class="input-group">
-                        <input
-                          v-model.lazy="currentQuery"
-                          class="form-control"
-                          type="text"
-                          name="query"
-                          autocomplete="off"
-                          autocorrect="off"
-                          autocapitalize="off"
-                          spellcheck="false"
-                          :placeholder="T.wordsKeyword"
-                        />
-                        <button class="btn" type="reset">&times;</button>
-                        <div class="input-group-append">
-                        <input
-                          class="btn btn-primary btn-md btn-block active"
-                          type="submit"
-                          :value="T.wordsSearch"
-                        />
-                        </div>
+                  <div class="input-group">
+                    <input
+                      v-model.lazy="currentQuery"
+                      class="form-control"
+                      type="text"
+                      name="query"
+                      autocomplete="off"
+                      autocorrect="off"
+                      autocapitalize="off"
+                      spellcheck="false"
+                      :placeholder="T.wordsKeyword"
+                    />
+                    <button class="btn" type="reset">&times;</button>
+                    <div class="input-group-append">
+                      <input
+                        class="btn btn-primary btn-md btn-block active"
+                        type="submit"
+                        :value="T.wordsSearch"
+                      />
+                    </div>
                   </div>
                 </form>
               </b-col>
