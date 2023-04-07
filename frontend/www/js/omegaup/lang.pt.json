@@ -6,7 +6,7 @@
 	"accountDeleteConfirmationMessage": "Tem certeza de que deseja excluir sua conta?",
 	"accountDeleteMessage": "Clique no bot\u00e3o abaixo se desejar excluir sua conta e todas as suas informa\u00e7\u00f5es pessoais do omegaUp. Esta opera\u00e7\u00e3o ser\u00e1 realizada imediatamente assim que voc\u00ea confirmar que deseja realiz\u00e1-la e n\u00e3o \u00e9 revers\u00edvel.",
 	"accountDeleteOk": "Excluir",
-	"accountDeleteRequireConfirmation": "Necess\u00e1ria confirma\u00e7\u00e3o",
+	"accountDeleteRequireConfirmation": "Necess\u00e1ria Confirma\u00e7\u00e3o",
 	"accountDeletionConfirmEmailBody": "O usu\u00e1rio %(username) confirmado para excluir sua conta.",
 	"accountDeletionConfirmEmailSubject": "Confirma\u00e7\u00e3o de exclus\u00e3o de conta omegaUp",
 	"accountDeletionRequestEmailBody": "O usu\u00e1rio %(username) est\u00e1 solicitando a exclus\u00e3o de sua conta.",
