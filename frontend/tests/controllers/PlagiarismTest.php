@@ -74,8 +74,9 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
         \OmegaUp\Time::setTimeForTesting($originalTime - (60 * 9));
+        $test_path =  dirname(__DIR__, 3) . '/stuff/cron/testing/testdata';
         \OmegaUp\Test\Utils::runCheckPlagiarisms(
-            '/opt/omegaup/stuff/cron/testing/testdata/'
+            $test_path
         );
 
         $this->assertEquals(
