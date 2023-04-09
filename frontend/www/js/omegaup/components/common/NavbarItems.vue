@@ -102,15 +102,15 @@
         </a>
         <div class="dropdown-menu">
           <slot name="problems-items">
-            <a class="dropdown-item" href="/problem/" data-nav-problems-list>{{
-              T.navViewProblemsAll
-            }}</a>
             <a
               class="dropdown-item"
               href="/problem/collection/"
               data-nav-problems-collection
               >{{ T.navViewProblems }}</a
             >
+            <a class="dropdown-item" href="/problem/" data-nav-problems-list>{{
+              T.navViewProblemsAll
+            }}</a>
             <hr
               style="margin-top: 0em; margin-bottom: 0em; border-width: 2px"
             />
