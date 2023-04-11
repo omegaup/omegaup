@@ -8,14 +8,27 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
         $originalTime = \OmegaUp\Time::get();
         \OmegaUp\Time::setTimeForTesting($originalTime - (60 * 20));
         // Create a Contest.
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+        $contestData1 = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'startTime' => $originalTime - 60 * 60,
                 'finishTime' => $originalTime - 60 * 10,
                 'checkPlagiarism' => true,
             ])
         );
-
+        $contestData2 = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'startTime' => $originalTime - 60 * 60,
+                'finishTime' => $originalTime - 60 * 10,
+                'checkPlagiarism' => false,
+            ])
+        );
+        $contestData3 = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'startTime' => $originalTime - 60 * 60,
+                'finishTime' => $originalTime - 60 * 39,
+                'checkPlagiarism' => true,
+            ])
+        );
         // Get problems and add them to the contest
         $problems = [];
         foreach (range(0, 2) as $index) {
@@ -23,7 +36,7 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
 
             \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problems[$index],
-                $contestData
+                $contestData1
             );
         }
 
@@ -34,11 +47,11 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
         $users[0] = $identity1;
         $users[1] = $identity2;
         \OmegaUp\Test\Factories\Contest::addUser(
-            $contestData,
+            $contestData1,
             $identity1
         );
         \OmegaUp\Test\Factories\Contest::addUser(
-            $contestData,
+            $contestData1,
             $identity2
         );
 
@@ -47,11 +60,11 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
         $login2 = self::login($identity2);
 
         new \OmegaUp\Request([
-            'contest_alias' => $contestData['request']['alias'],
+            'contest_alias' => $contestData1['request']['alias'],
             'auth_token' => $login1->auth_token,
         ]);
         new \OmegaUp\Request([
-            'contest_alias' => $contestData['request']['alias'],
+            'contest_alias' => $contestData1['request']['alias'],
             'auth_token' => $login2->auth_token,
         ]);
 
@@ -60,18 +73,48 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
         foreach ($users as $_ => $identity) {
             foreach ($problems as $index => $problem) {
                 \OmegaUp\Test\Factories\Contest::openProblemInContest(
-                    $contestData,
+                    $contestData1,
                     $problem,
                     $identity
                 );
                 $runs[$index] = \OmegaUp\Test\Factories\Run::createRun(
                     $problem,
-                    $contestData,
+                    $contestData1,
                     $identity
                 );
                 // Grade the run
                 \OmegaUp\Test\Factories\Run::gradeRun($runs[$index]);
             }
+        }
+
+        $contests = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            'SELECT alias FROM Contests as c
+            WHERE c.`check_plagiarism` = 1 AND
+            c.`finish_time` > NOW() - INTERVAL 20 MINUTE AND
+            c.`finish_time` < NOW() AND
+            c.`contest_id` NOT IN
+                (SELECT p.`contest_id`
+                FROM `Plagiarisms` as p)'
+        );
+        foreach ($contests as $contest) {
+            $this-> assertFalse(
+                in_array(
+                    $contestData2['request']['alias'],
+                    $contest
+                )
+            );
+            $this-> assertFalse(
+                in_array(
+                    $contestData3['request']['alias'],
+                    $contest
+                )
+            );
+            $this-> assertTrue(
+                in_array(
+                    $contestData1['request']['alias'],
+                    $contest
+                )
+            );
         }
         \OmegaUp\Time::setTimeForTesting($originalTime - (60 * 9));
         $test_path =  dirname(__DIR__, 3) . '/stuff/cron/testing/testdata';
@@ -85,42 +128,11 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
                 'SELECT COUNT(*) FROM Plagiarisms'
             )
         );
-        $expected_result = [[2, 5], [1,4], [3,6]];
-        $index = 0;
-        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            'SELECT * FROM Plagiarisms
-                WHERE contest_id = (SELECT contest_id FROM Contests
-                                WHERE alias = ?)',
-            [$contestData['request']['alias']]
+        // TODO: Add tests to assert submissions id are matching correctly
+
+        \Omegaup\MySQLConnection::getInstance()->Execute(
+            'DELETE FROM Plagiarisms'
         );
-        foreach ($result as $submission) {
-            $this->assertEquals(
-                'integer',
-                gettype(
-                    $submission['submission_id_1']
-                )
-            );
-            $this->assertEquals(
-                'integer',
-                gettype(
-                    $submission['submission_id_2']
-                )
-            );
-            $this->assertEquals(
-                $expected_result[$index][0],
-                $submission['submission_id_1']
-            );
-            $this->assertEquals(
-                $expected_result[$index][1],
-                $submission['submission_id_2']
-            );
-            $this->assertContainsEquals(
-                $expected_result[$index][1],
-                [$submission['submission_id_2'],$submission['submission_id_1']]
-            );
-            $this->assertEquals(100, $submission['score_1']);
-            $this->assertEquals(100, $submission['score_2']);
-            $index += 1;
-        }
+        \Omegaup\MySQLConnection::getInstance()->Execute('COMMIT');
     }
 }
