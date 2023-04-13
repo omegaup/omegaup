@@ -189,6 +189,18 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'request-delete-account': () => {
+            api.User.deleteRequest()
+              .then(({ token }) => {
+                api.User.deleteConfirm({ token })
+                  .then(() => {
+                    // Log out the user
+                    window.location.href = '/logout/';
+                  })
+                  .catch(ui.apiError);
+              })
+              .catch(ui.apiError);
+          },
         },
       });
     },
