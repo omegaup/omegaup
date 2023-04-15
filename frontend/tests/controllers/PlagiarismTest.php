@@ -86,7 +86,7 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\Test\Factories\Run::gradeRun($runs[$index]);
             }
         }
-
+        /** @var list<array{alias: string}> */
         $contests = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             'SELECT alias FROM Contests as c
             WHERE c.`check_plagiarism` = 1 AND
@@ -121,7 +121,7 @@ class PlagiarismTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::runCheckPlagiarisms(
             $test_path
         );
-
+        /** @var int|null */
         $this->assertEquals(
             3,
             \OmegaUp\MySQLConnection::getInstance()->GetOne(
