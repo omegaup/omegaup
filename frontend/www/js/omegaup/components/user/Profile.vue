@@ -74,6 +74,12 @@
             @add-password="(request) => $emit('add-password', request)"
           ></omegaup-user-add-password>
         </template>
+        <template v-else-if="currentSelectedTab === 'delete-account'">
+          <omegaup-user-delete-account
+            :username="profile.username"
+            @request-delete-account="$emit('request-delete-account')"
+          ></omegaup-user-delete-account>
+        </template>
         <div v-else>
           {{ currentSelectedTab }}
         </div>
@@ -96,6 +102,7 @@ import user_PasswordAdd from './PasswordAdd.vue';
 import { urlMapping } from './SidebarMainInfo.vue';
 import user_ManageSchools from './ManageSchools.vue';
 import user_ManageIdentities from './ManageIdentities.vue';
+import userDeleteAccount from './DeleteAccount.vue';
 
 @Component({
   components: {
@@ -107,6 +114,7 @@ import user_ManageIdentities from './ManageIdentities.vue';
     'omegaup-user-add-password': user_PasswordAdd,
     'omegaup-user-manage-identities': user_ManageIdentities,
     'omegaup-user-manage-schools': user_ManageSchools,
+    'omegaup-user-delete-account': userDeleteAccount,
   },
 })
 export default class Profile extends Vue {
