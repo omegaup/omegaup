@@ -81,9 +81,9 @@
         </tbody>
       </table>
       <div class="float-right">
-        <a class="btn btn-primary" :href="studentsProgressUrl">{{
-          T.courseStudentsProgress
-        }}</a>
+        <a class="btn btn-primary" :href="studentsProgressUrl()">
+          {{ T.courseStudentsProgress }}
+        </a>
       </div>
     </div>
     <omegaup-common-requests
@@ -124,7 +124,7 @@ export default class CourseAddStudents extends Vue {
     return `/course/${this.courseAlias}/student/${student.username}/`;
   }
 
-  get studentsProgressUrl(): string {
+  studentsProgressUrl(): string {
     return `/course/${this.courseAlias}/students/`;
   }
 
