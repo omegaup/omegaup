@@ -108,6 +108,12 @@
               data-nav-problems-collection
               >{{ T.navViewProblems }}</a
             >
+            <a class="dropdown-item" href="/problem/" data-nav-problems-list>{{
+              T.navViewProblemsAll
+            }}</a>
+            <hr
+              style="margin-top: 0em; margin-bottom: 0em; border-width: 2px"
+            />
             <a class="dropdown-item" href="/submissions/">{{
               T.navViewLatestSubmissions
             }}</a>
