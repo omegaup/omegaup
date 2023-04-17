@@ -1,8 +1,8 @@
 <template>
   <b-card class="mb-2">
     <b-container>
-      <b-row class="p-1" align-v="center">
-        <b-col>
+      <b-row class="p-1 flex-column flex-sm-row" align-v="center">
+        <b-col class="col-md-5 col-sm-12 p-1 text-center">
           <b-card-text>
             <h5>
               <a :href="getContestURL(contest.alias)">{{ contest.title }}</a>
@@ -15,13 +15,13 @@
             </h5>
           </b-card-text>
         </b-col>
-        <b-col>
+        <b-col class="col-md-3 col-sm-12 p-1 text-center">
           <b-card-text>
             <font-awesome-icon icon="clipboard-list" />
             {{ contest.organizer }}
           </b-card-text>
         </b-col>
-        <b-col cols="3">
+        <b-col class="col-md-4 col-sm-12 p-1 text-center">
           <slot name="contest-button-scoreboard">
             <b-button
               ref="contestButtonScoreboard"
@@ -44,11 +44,11 @@
           </slot>
         </b-col>
       </b-row>
-      <b-row class="p-1" align-v="center">
-        <b-col>
+      <b-row class="p-1 flex-column flex-sm-row" align-v="center">
+        <b-col class="col-md-5 col-sm-12 p-1 text-center">
           <slot name="text-contest-date"></slot>
         </b-col>
-        <b-col>
+        <b-col class="col-md-3 col-sm-12 p-1 text-center">
           <b-card-text>
             <font-awesome-icon icon="stopwatch" />
             {{
@@ -58,13 +58,13 @@
             }}
           </b-card-text>
         </b-col>
-        <b-col>
+        <b-col class="col-md-1 col-sm-12 p-1 text-center">
           <b-card-text>
             <font-awesome-icon icon="users" />
             {{ contest.contestants }}
           </b-card-text>
         </b-col>
-        <b-col>
+        <b-col class="col-md-3 col-sm-12 p-1 text-center">
           <slot name="contest-button-enter">
             <b-button
               v-if="contest.participating"

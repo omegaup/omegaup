@@ -80,6 +80,11 @@
           </tr>
         </tbody>
       </table>
+      <div class="float-right">
+        <a class="btn btn-primary" :href="studentsProgressUrl()">
+          {{ T.courseStudentsProgress }}
+        </a>
+      </div>
     </div>
     <omegaup-common-requests
       :data="identityRequests"
@@ -117,6 +122,10 @@ export default class CourseAddStudents extends Vue {
 
   studentProgressUrl(student: types.CourseStudent): string {
     return `/course/${this.courseAlias}/student/${student.username}/`;
+  }
+
+  studentsProgressUrl(): string {
+    return `/course/${this.courseAlias}/students/`;
   }
 
   addParticipantToList(): void {
