@@ -30,6 +30,18 @@
       />
       {{ T.scoreboardShowOnlyInvitedIdentities }}</label
     >
+    <label class="float-right"
+      >{{ T.scoreboardShowParticipantsNames }}:
+      <select v-model="nameDisplayOptions" class="form-control">
+        <option :value="ui.NameDisplayOptions.Name">{{ T.wordsName }}</option>
+        <option :value="ui.NameDisplayOptions.Username">
+          {{ T.wordsUser }}
+        </option>
+        <option :value="ui.NameDisplayOptions.NameAndUsername">
+          {{ T.arenaNameAndUsername }}
+        </option>
+      </select>
+    </label>
     <table data-table-scoreboard>
       <thead>
         <tr>
@@ -54,7 +66,7 @@
             <td class="legend" :class="legendClass(userIndex)"></td>
             <td class="position">{{ user.place || '—' }}</td>
             <td class="user">
-              {{ ui.rankingUsername(user) }}
+              {{ ui.rankingUsername(user, nameDisplayOptions) }}
               <img
                 v-if="user.country"
                 alt=""
@@ -138,6 +150,8 @@ export default class ArenaScoreboard extends Vue {
   INF = '∞';
   onlyShowExplicitlyInvited =
     !this.showAllContestants && this.showInvitedUsersFilter;
+  nameDisplayOptions: ui.NameDisplayOptions =
+    ui.NameDisplayOptions.NameAndUsername;
 
   get lastUpdatedString(): null | string {
     if (!this.lastUpdated) return null;

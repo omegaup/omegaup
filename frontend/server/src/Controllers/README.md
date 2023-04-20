@@ -199,7 +199,6 @@
   - [`/api/scoreboard/refresh/`](#apiscoreboardrefresh)
 - [Session](#session)
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
-  - [`/api/session/googleLogin/`](#apisessiongooglelogin)
 - [Submission](#submission)
   - [`/api/submission/setFeedback/`](#apisubmissionsetfeedback)
 - [Tag](#tag)
@@ -3991,22 +3990,6 @@ contestant's machine and the server.
 | --------- | ---------------------- |
 | `session` | `types.CurrentSession` |
 | `time`    | `number`               |
-
-## `/api/session/googleLogin/`
-
-### Description
-
-### Parameters
-
-| Name         | Type     | Description |
-| ------------ | -------- | ----------- |
-| `storeToken` | `string` |             |
-
-### Returns
-
-| Name                | Type      |
-| ------------------- | --------- |
-| `isAccountCreation` | `boolean` |
 
 # Submission
 

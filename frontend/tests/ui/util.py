@@ -22,8 +22,11 @@ from selenium.webdriver.support.select import Select
 
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
-PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')
-MESSAGE_WHITELIST = ('http://staticxx.facebook.com/', '/api/grader/status/')
+PATH_WHITELIST = ('/api/grader/status/',
+                  '/js/error_handler.js',
+                  '/js/dist/npm.vue.js')
+MESSAGE_WHITELIST = ('https://accounts.google.com/gsi/',
+                     '/api/grader/status/')
 
 # This contains all the Python path-hacking to a single file instead of
 # spreading it throughout all the files.
@@ -529,10 +532,6 @@ def add_identities_group(driver, group_alias) -> List[Identity]:
              '//button[starts-with(@name, "create-identities")]')))
     with dismiss_status(driver, message_class='success'):
         create_identities_button.click()
-
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//a[contains(@href, "#members")]'))).click()
 
     driver.wait.until(
         EC.visibility_of_element_located(

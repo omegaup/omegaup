@@ -207,4 +207,151 @@ class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertSame(80.0, $response['runs'][0]['contest_score']);
     }
+
+    /**
+     * A PHPUnit data provider for the contest with max_per_group mode.
+     *
+     * @return array{0: float, 1: list<array: {total: float, points_per_group: list<array: {group_name: string, score: float, verdict: string}>}>}
+     */
+    public function runsMappingPerGroupProvider(): array {
+        return [
+            [
+                0.75,
+                [
+                    [
+                        'total' => 0.25,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'JE'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'OLE'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.25,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'TLE'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'TLE'],
+                            ['group_name' => 'hard', 'score' => 0.25,'verdict' => 'AC'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.50,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'medium', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                0.9,
+                [
+                    [
+                        'total' => 0.25,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'JE'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'OLE'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.25,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.1, 'verdict' => 'PA'],
+                            ['group_name' => 'easy', 'score' => 0.1, 'verdict' => 'PA'],
+                            ['group_name' => 'medium', 'score' => 0.1, 'verdict' => 'PA'],
+                            ['group_name' => 'hard', 'score' => 0.25,'verdict' => 'AC'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.50,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.2, 'verdict' => 'PA'],
+                            ['group_name' => 'easy', 'score' => 0.2, 'verdict' => 'PA'],
+                            ['group_name' => 'medium', 'score' => 0.2, 'verdict' => 'PA'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param list<array: {total: float, points_per_group: list<array: {group_name: string, score: float, verdict: string}>}> $runsMapping
+     *
+     * @dataProvider runsMappingPerGroupProvider
+     */
+    public function testScoreboardEventsForContestInMaxPerGroupMode(
+        float $expectedScore,
+        array $runsMapping
+    ) {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get a contest scoreMode
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'scoreMode' => 'max_per_group',
+                'scoreboardPct' => 100,
+            ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Create our contestant
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $time = \OmegaUp\Time::get();
+
+        // Create and grade some runs every five minutes
+        foreach ($runsMapping as $run) {
+            \OmegaUp\Time::setTimeForTesting($time + (5 * 60));
+
+            $runData = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $identity
+            );
+
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                runData: $runData,
+                points: $run['total'],
+                verdict: 'PA',
+                submitDelay: null,
+                runGuid: null,
+                runId: null,
+                problemsetPoints: 100,
+                outputFilesContent: null,
+                problemsetScoreMode: 'max_per_group',
+                runScoreByGroups: $run['points_per_group']
+            );
+            $time = \OmegaUp\Time::get();
+        }
+
+        // Create request as a contestant
+        $login = self::login($identity);
+        $runs = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'problem_alias' => $problemData['problem']->alias,
+                'auth_token' => $login->auth_token,
+            ])
+        )['runs'];
+
+        $maxPerGroupScore = \OmegaUp\Test\Factories\Run::getMaxPerGroupScore(
+            $runs
+        );
+
+        $this->assertSame($maxPerGroupScore, $expectedScore);
+    }
 }

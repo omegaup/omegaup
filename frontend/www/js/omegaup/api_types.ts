@@ -2319,6 +2319,14 @@ export namespace types {
         (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
+
+    export function VerificationParentalTokenDetailsPayload(
+      elementId: string = 'payload',
+    ): types.VerificationParentalTokenDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
   }
 
   export interface ActivityEvent {
@@ -4062,6 +4070,7 @@ export namespace types {
     penalty: number;
     runtime: number;
     score: number;
+    score_by_group?: { [key: string]: null | number };
     status: string;
     status_memory?: string;
     status_runtime?: string;
@@ -4158,6 +4167,7 @@ export namespace types {
     penalty: number;
     runtime: number;
     score: number;
+    score_by_group?: { [key: string]: null | number };
     status: string;
     status_memory?: string;
     status_runtime?: string;
@@ -4661,6 +4671,10 @@ export namespace types {
     userSystemGroups: { [key: number]: { name: string; value: boolean } };
     userSystemRoles: { [key: number]: { name: string; value: boolean } };
     username: string;
+  }
+
+  export interface VerificationParentalTokenDetailsPayload {
+    hasParentalVerificationToken: boolean;
   }
 }
 
@@ -5403,8 +5417,6 @@ export namespace messages {
     session?: types.CurrentSession;
     time: number;
   };
-  export type SessionGoogleLoginRequest = { [key: string]: any };
-  export type SessionGoogleLoginResponse = { isAccountCreation: boolean };
 
   // Submission
   export type SubmissionSetFeedbackRequest = { [key: string]: any };
@@ -6170,9 +6182,6 @@ export namespace controllers {
     currentSession: (
       params?: messages.SessionCurrentSessionRequest,
     ) => Promise<messages.SessionCurrentSessionResponse>;
-    googleLogin: (
-      params?: messages.SessionGoogleLoginRequest,
-    ) => Promise<messages.SessionGoogleLoginResponse>;
   }
 
   export interface Submission {

@@ -501,24 +501,38 @@ class Session extends \OmegaUp\Controllers\Controller {
         return "{$username}{$suffix}";
     }
 
-    /**
-     * @omegaup-request-param string $storeToken
-     *
-     * @return array{isAccountCreation: bool}
-     */
-    public static function apiGoogleLogin(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['storeToken'],
-            'storeToken'
+    public static function loginViaGoogle(
+        string $idToken,
+        string $gCsrfToken
+    ): void {
+        // Verify the Google ID token on the server side:
+        // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token?hl=en
+        $csrfTokenCookie = self::getSessionManagerInstance()->getCookie(
+            'g_csrf_token'
         );
 
-        $client = new \Google_Client();
-        $client->setClientId(OMEGAUP_GOOGLE_CLIENTID);
-        $client->setClientSecret(OMEGAUP_GOOGLE_SECRET);
+        if (is_null($csrfTokenCookie)) {
+            self::$log->error('Missing CSRF token cookie');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'loginGoogleInvalidCSRFToken',
+                'g_csrf_token'
+            );
+        }
+        if ($gCsrfToken !== $csrfTokenCookie) {
+            self::$log->error('Invalid CSRF token: mismatch');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'loginGoogleInvalidCSRFToken',
+                'g_csrf_token'
+            );
+        }
+
+        $client = new \Google_Client([
+            'client_id' => OMEGAUP_GOOGLE_CLIENTID,
+        ]);
 
         try {
             /** @var array{email: string, email_verified: int, name?: string, picture: string, locale: string} */
-            $payload = $client->verifyIdToken($r['storeToken']);
+            $payload = $client->verifyIdToken($idToken);
 
             // payload will have a superset of:
             //    [email] => johndoe@gmail.com
@@ -533,20 +547,19 @@ class Session extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        return self::LoginViaGoogle(
+        self::loginViaGoogleEmail(
             $payload['email'],
             (isset($payload['name']) ? $payload['name'] : null)
         );
     }
 
-    /**
-     * @return array{isAccountCreation: bool}
-     */
-    public static function LoginViaGoogle(
+    public static function loginViaGoogleEmail(
         string $email,
         ?string $name = null
-    ): array {
-        return self::thirdPartyLogin('Google', $email, $name);
+    ): void {
+        self::thirdPartyLogin('Google', $email, $name);
+
+        self::redirect();
     }
 
     /**

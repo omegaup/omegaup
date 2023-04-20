@@ -43,6 +43,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
  * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
+ * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -603,9 +604,6 @@ class User extends \OmegaUp\Controllers\Controller {
                     ),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
-                'scripts' => [
-                    'https://apis.google.com/js/platform.js?onload=init',
-                ],
             ],
             'entrypoint' => 'login_signin',
         ];
@@ -4498,8 +4496,10 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString, scripts: list<string>}}
+     * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
      *
+     * @omegaup-request-param null|string $credential
+     * @omegaup-request-param null|string $g_csrf_token
      * @omegaup-request-param null|string $third_party_login
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
@@ -4512,6 +4512,8 @@ class User extends \OmegaUp\Controllers\Controller {
             // Do nothing.
         }
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
+        $gCsrfToken = $r->ensureOptionalString('g_csrf_token');
+        $idToken = $r->ensureOptionalString('credential');
         if ($r->offsetExists('fb')) {
             $thirdPartyLogin = 'facebook';
         }
@@ -4523,16 +4525,21 @@ class User extends \OmegaUp\Controllers\Controller {
                     'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
-                'scripts' => [
-                    'https://apis.google.com/js/platform.js?onload=init',
-                ],
             ],
             'entrypoint' => 'login_signin',
         ];
         try {
             if ($thirdPartyLogin === 'facebook') {
                 \OmegaUp\Controllers\Session::loginViaFacebook();
+            } elseif (!is_null($gCsrfToken) && !is_null($idToken)) {
+                \OmegaUp\Controllers\Session::loginViaGoogle(
+                    $idToken,
+                    $gCsrfToken
+                );
             }
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // The controller has explicitly requested to exit.
+            exit;
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             \OmegaUp\ApiCaller::logException($e);
             $response['templateProperties']['payload']['statusError'] = strval(
@@ -4649,6 +4656,62 @@ class User extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\DAO\APITokens::deleteByName($r->user->user_id, $name);
         return ['status' => 'ok'];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: VerificationParentalTokenDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $parental_verification_token
+     */
+    public static function getVerificationParentalTokenDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureIdentity();
+
+        $token = $r->ensureString(
+            'parental_verification_token',
+            validator: fn (string $token) => preg_match(
+                '/^[a-zA-Z0-9]{24}$/',
+                $token
+            ) === 1
+        );
+        $hasParentalVerificationToken = false;
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            $user = \OmegaUp\DAO\Users::findByParentalToken($token);
+
+            if (is_null($user)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'parentalTokenNotFound'
+                );
+            }
+
+            if (is_null($r->user) || is_null($r->user->main_email_id)) {
+                throw new \OmegaUp\Exceptions\UnauthorizedException();
+            }
+
+            $user->parent_email_id = $r->user->main_email_id;
+            $user->parent_verified = true;
+            $user->parental_verification_token = null;
+            \OmegaUp\DAO\Users::update($user);
+            $hasParentalVerificationToken = true;
+
+            \OmegaUp\DAO\DAO::transEnd();
+            return [
+                'templateProperties' => [
+                    'payload' => [
+                        'hasParentalVerificationToken' => $hasParentalVerificationToken,
+                    ],
+                    'title' => new \OmegaUp\TranslationString(
+                        'omegaupTitleParentalVerificationToken'
+                    ),
+                ],
+                'entrypoint' => 'user_verification_parental_token',
+            ];
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
     }
 }
 
