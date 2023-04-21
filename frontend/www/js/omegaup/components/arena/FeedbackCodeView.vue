@@ -3,7 +3,7 @@
     <div class="container-fluid" data-feedback-code-mirror>
       <textarea v-show="false" ref="cm-editor" v-model="value"></textarea>
     </div>
-    <div class="container-fluid text-right py-2">
+    <div v-if="!readonly" class="container-fluid text-right py-2">
       <button
         class="btn btn-primary mx-2"
         :disabled="!numberOfComments"
@@ -34,6 +34,7 @@ for (const mode of modeList) {
 export default class FeedbackCodeView extends Vue {
   @Prop() language!: string;
   @Prop() value!: string;
+  @Prop({ default: true }) readonly!: boolean;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackMap!: Map<number, ArenaCourseFeedback>;
   @Ref('cm-editor') private readonly cmEditor!: HTMLTextAreaElement;
@@ -59,7 +60,7 @@ export default class FeedbackCodeView extends Vue {
       lineNumbers: true,
       mode: this.mode,
       readOnly: true,
-      gutters: ['CodeMirror-linenumbers', 'breakpoints'],
+      gutters: ['CodeMirror-linenumbers', 'custom-gutter'],
     };
   }
 
@@ -79,6 +80,10 @@ export default class FeedbackCodeView extends Vue {
           className: 'px-2',
         },
       );
+    }
+
+    if (this.readonly) {
+      return;
     }
 
     editor.on(

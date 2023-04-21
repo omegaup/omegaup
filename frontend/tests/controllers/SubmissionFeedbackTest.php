@@ -348,6 +348,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             $submission->guid,
             rangeBytesStart: null
         );
+
         \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
                 'auth_token' => self::login($admin['identity'])->auth_token,

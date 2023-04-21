@@ -347,19 +347,7 @@ OmegaUp.on('ready', async () => {
             selectedTab: string;
             alias: null | string;
           }) => {
-            if (!alias) {
-              history.replaceState(
-                { selectedTab },
-                'updateTab',
-                `#${selectedTab}`,
-              );
-              return;
-            }
-            history.replaceState(
-              { selectedTab, alias },
-              'resetHash',
-              `#${selectedTab}/${alias}`,
-            );
+            resetHash(selectedTab, alias);
           },
           'submit-promotion': ({
             solved,
@@ -392,7 +380,7 @@ OmegaUp.on('ready', async () => {
               contents: JSON.stringify(contents),
             })
               .then(() => {
-                this.popupDisplayed = PopupDisplayed.None;
+                component.currentPopupDisplayed = PopupDisplayed.None;
                 ui.reportEvent('quality-nomination', 'submit');
                 ui.dismissNotifications();
               })
@@ -437,7 +425,7 @@ OmegaUp.on('ready', async () => {
               feedback,
             })
               .then(() => {
-                this.popupDisplayed = PopupDisplayed.None;
+                component.currentPopupDisplayed = PopupDisplayed.None;
                 ui.success(
                   isUpdate
                     ? T.feedbackSuccesfullyUpdated
@@ -480,6 +468,8 @@ OmegaUp.on('ready', async () => {
                   .map((result) => result.reason);
                 if (!feedbackWithError.length) {
                   ui.success(T.feedbackSuccesfullyAdded);
+                  resetHash('runs', null);
+                  component.currentPopupDisplayed = PopupDisplayed.None;
                 } else {
                   ui.error('There was an error');
                 }
@@ -487,6 +477,7 @@ OmegaUp.on('ready', async () => {
               .catch(ui.ignoreError);
           },
         },
+        ref: 'component',
       });
     },
   });
@@ -516,6 +507,18 @@ OmegaUp.on('ready', async () => {
         onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
       })
       .catch(ui.apiError);
+  }
+
+  function resetHash(selectedTab: string, alias: null | string) {
+    if (!alias) {
+      history.replaceState({ selectedTab }, 'updateTab', `#${selectedTab}`);
+      return;
+    }
+    history.replaceState(
+      { selectedTab, alias },
+      'resetHash',
+      `#${selectedTab}/${alias}`,
+    );
   }
 
   if (payload.currentAssignment.runs) {
@@ -550,4 +553,6 @@ OmegaUp.on('ready', async () => {
       courseAlias: payload.courseDetails.alias,
     });
   }, 5 * 60 * 1000);
+
+  const component = arenaCourse.$refs.component as arena_Course;
 });

@@ -80,6 +80,7 @@
               :run-details-data="runDetailsData"
               :problem-alias="problemAlias"
               :in-contest-or-course="true"
+              :feedback-map="feedbackMap"
               @request-feedback="(guid) => $emit('request-feedback', guid)"
               @update:activeTab="
                 (selectedTab) =>
@@ -180,8 +181,9 @@
             </template>
             <template #code-view="{ guid }">
               <omegaup-arena-feedback-code-view
-                :language="runDetailsData.language"
-                :value="runDetailsData.source"
+                :language="language"
+                :value="source"
+                :readonly="false"
                 :feedback-map="feedbackMap"
                 @save-feedback-list="
                   (feedbackList) =>
@@ -375,6 +377,14 @@ export default class ArenaCourse extends Vue {
       key: problem.alias,
       value: problem.text,
     }));
+  }
+
+  get language(): string | undefined {
+    return this.runDetailsData?.language;
+  }
+
+  get source(): string | undefined {
+    return this.runDetailsData?.source;
   }
 
   onPopupDismissed(): void {
