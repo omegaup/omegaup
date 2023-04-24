@@ -1041,7 +1041,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ],
             'entrypoint' => 'arena_contest_practice',
         ];
-    }  
+    }
 
     /**
      * @return array{templateProperties: array{payload: ContestListv2Payload, title: \OmegaUp\TranslationString}, entrypoint: string}
