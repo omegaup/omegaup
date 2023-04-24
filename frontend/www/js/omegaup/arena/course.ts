@@ -55,25 +55,16 @@ OmegaUp.on('ready', async () => {
   } = getOptionsFromLocation(window.location.hash);
   let runDetails: null | types.RunDetails = null;
   let problemDetails: null | types.ProblemDetails = null;
-  const feedbackMap: Map<number, ArenaCourseFeedback> = new Map();
+  let feedbackMap: Map<number, ArenaCourseFeedback> = new Map();
   try {
     ({ runDetails, problemDetails } = await getProblemAndRunDetails({
       problems: payload.currentAssignment.problems,
       location: window.location.hash,
       problemsetId: payload.currentAssignment.problemset_id,
     }));
-    runDetails?.feedback
-      .filter((feedback) => feedback.range_bytes_start != null)
-      .map((feedback) => {
-        const lineNumber = feedback.range_bytes_start ?? null;
-        if (lineNumber != null) {
-          feedbackMap.set(lineNumber, {
-            lineNumber,
-            text: feedback.feedback,
-            status: FeedbackStatus.Saved,
-          });
-        }
-      });
+    if (runDetails != null) {
+      feedbackMap = getFeedbackMap(runDetails.feedback);
+    }
   } catch (e: any) {
     ui.apiError(e);
   }
@@ -199,19 +190,7 @@ OmegaUp.on('ready', async () => {
               .then((runDetails) => {
                 this.runDetailsData = showSubmission({ request, runDetails });
 
-                this.feedbackMap = new Map();
-                this.runDetailsData.feedback
-                  .filter((feedback) => feedback.range_bytes_start != null)
-                  .map((feedback) => {
-                    const lineNumber = feedback.range_bytes_start ?? null;
-                    if (lineNumber != null) {
-                      this.feedbackMap.set(lineNumber, {
-                        lineNumber,
-                        text: feedback.feedback,
-                        status: FeedbackStatus.Saved,
-                      });
-                    }
-                  });
+                this.feedbackMap = getFeedbackMap(this.runDetailsData.feedback);
 
                 if (request.hash) {
                   window.location.hash = request.hash;
@@ -509,6 +488,28 @@ OmegaUp.on('ready', async () => {
       .catch(ui.apiError);
   }
 
+  function getFeedbackMap(
+    runDetailsFeedback: types.SubmissionFeedback[],
+  ): Map<number, ArenaCourseFeedback> {
+    const feedbackMap: Map<number, ArenaCourseFeedback> = new Map();
+
+    runDetailsFeedback
+      .filter((feedback) => feedback.range_bytes_start != null)
+      .map((feedback) => {
+        const lineNumber = feedback.range_bytes_start ?? null;
+        if (lineNumber != null) {
+          feedbackMap.set(lineNumber, {
+            lineNumber,
+            text: feedback.feedback,
+            status: FeedbackStatus.Saved,
+          });
+        }
+      });
+    return feedbackMap;
+  }
+
+  // This function updates the state and URL of the history object in the
+  // browser based on the provided parameters
   function resetHash(selectedTab: string, alias: null | string) {
     if (!alias) {
       history.replaceState({ selectedTab }, 'updateTab', `#${selectedTab}`);

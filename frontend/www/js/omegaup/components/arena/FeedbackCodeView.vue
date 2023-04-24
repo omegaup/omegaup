@@ -16,6 +16,8 @@
 </template>
 
 <script lang="ts">
+// TODO: Only display the gutters in the component if the logged-in user is an
+// admin or teaching assistant.
 import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
 import T from '../../lang';
 import CodeMirror from 'codemirror';
