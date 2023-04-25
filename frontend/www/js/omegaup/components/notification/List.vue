@@ -87,6 +87,10 @@ export default class NotificationList extends Vue {
   display: block;
 }
 
+.navbar-expand-lg .navbar-nav .dropdown-menu {
+  width: 35rem;
+}
+
 .notification-dropdown {
   max-width: 100vw;
   max-height: 600px;
