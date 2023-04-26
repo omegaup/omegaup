@@ -73,7 +73,7 @@ export default class NotificationList extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 .notification-toggle {
   font-size: 1.4rem;
   position: relative;
