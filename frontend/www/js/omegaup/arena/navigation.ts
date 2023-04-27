@@ -28,6 +28,7 @@ interface BaseNavigation {
   };
   problem: types.NavbarProblemsetProblem;
   problems: types.NavbarProblemsetProblem[];
+  guid?: string;
 }
 
 type NavigationForContest = BaseNavigation & {
@@ -73,6 +74,10 @@ export async function navigateToProblem(
       setLocationHash(`#problems/${problem.alias}/new-run`);
       return;
     }
+    if (request.guid) {
+      setLocationHash(`#problems/${problem.alias}/show-run:${request.guid}`);
+      return;
+    }
     setLocationHash(`#problems/${problem.alias}`);
     return;
   }
@@ -102,6 +107,10 @@ export async function navigateToProblem(
       target.problem = problem;
       if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
         setLocationHash(`#problems/${problem.alias}/new-run`);
+        return;
+      }
+      if (request.guid) {
+        setLocationHash(`#problems/${problem.alias}/show-run:${request.guid}`);
         return;
       }
       setLocationHash(`#problems/${problem.alias}`);

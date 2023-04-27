@@ -131,12 +131,14 @@ OmegaUp.on('ready', async () => {
           }: {
             problem: types.NavbarProblemsetProblem;
           }) => {
+            const [, guid] = window.location.hash.split(':');
             navigateToProblem({
               type: NavigationType.ForSingleProblemOrCourse,
               problem,
               target: arenaCourse,
               problems: this.problems,
               problemsetId: payload.currentAssignment.problemset_id,
+              guid,
             });
           },
           'update-search-result-users-assignment': ({
@@ -482,4 +484,14 @@ OmegaUp.on('ready', async () => {
       courseAlias: payload.courseDetails.alias,
     });
   }, 5 * 60 * 1000);
+
+  window.addEventListener('hashchange', function () {
+    if (this.location.hash.includes('show-run-from-notification')) {
+      const [, problemAlias] = this.location.hash.split('/');
+      const problemSelector = document.querySelector(
+        `[data-problem="${problemAlias}"]`,
+      ) as HTMLAnchorElement;
+      problemSelector.click();
+    }
+  });
 });
