@@ -1273,6 +1273,7 @@ const translations: { [key: string]: string; } = {
   runDetailsFeedbackCancel: "Cancel",
   runDetailsFeedbackCreated: "Feedback created",
   runDetailsFeedbackPlaceholder: "Type your feedback here...",
+  runDetailsFeedbackThreadPlaceholder: "Reply...",
   runDetailsNewFeedback: "New feedback",
   runDisqualifyConfirm: "Do you really want to disqualify this run?",
   runGUID: "GUID",
