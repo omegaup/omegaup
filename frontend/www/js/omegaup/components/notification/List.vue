@@ -73,7 +73,7 @@ export default class NotificationList extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 .notification-toggle {
   font-size: 1.4rem;
   position: relative;
@@ -85,6 +85,10 @@ export default class NotificationList extends Vue {
   right: 0.9rem;
   font-size: 0.75rem;
   display: block;
+}
+
+.navbar-expand-lg .navbar-nav .dropdown-menu {
+  width: 35rem;
 }
 
 .notification-dropdown {
