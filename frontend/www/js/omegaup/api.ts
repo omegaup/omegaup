@@ -1248,6 +1248,17 @@ export const Problem = {
               if (typeof x.feedback !== 'undefined' && x.feedback !== null)
                 x.feedback = ((x) => {
                   x.date = ((x: number) => new Date(x * 1000))(x.date);
+                  x.feedback_thread = ((x) => {
+                    if (!Array.isArray(x)) {
+                      return x;
+                    }
+                    return x.map((x) => {
+                      x.timestamp = ((x: number) => new Date(x * 1000))(
+                        x.timestamp,
+                      );
+                      return x;
+                    });
+                  })(x.feedback_thread);
                   return x;
                 })(x.feedback);
               return x;

@@ -184,6 +184,17 @@ export namespace types {
                       )
                         x.feedback = ((x) => {
                           x.date = ((x: number) => new Date(x * 1000))(x.date);
+                          x.feedback_thread = ((x) => {
+                            if (!Array.isArray(x)) {
+                              return x;
+                            }
+                            return x.map((x) => {
+                              x.timestamp = ((x: number) => new Date(x * 1000))(
+                                x.timestamp,
+                              );
+                              return x;
+                            });
+                          })(x.feedback_thread);
                           return x;
                         })(x.feedback);
                       return x;
@@ -877,6 +888,16 @@ export namespace types {
                                 x.date = ((x: number) => new Date(x * 1000))(
                                   x.date,
                                 );
+                                x.feedback_thread = ((x) => {
+                                  if (!Array.isArray(x)) {
+                                    return x;
+                                  }
+                                  return x.map((x) => {
+                                    x.timestamp = ((x: number) =>
+                                      new Date(x * 1000))(x.timestamp);
+                                    return x;
+                                  });
+                                })(x.feedback_thread);
                                 return x;
                               })(x.feedback);
                             return x;
@@ -1857,6 +1878,17 @@ export namespace types {
                     )
                       x.feedback = ((x) => {
                         x.date = ((x: number) => new Date(x * 1000))(x.date);
+                        x.feedback_thread = ((x) => {
+                          if (!Array.isArray(x)) {
+                            return x;
+                          }
+                          return x.map((x) => {
+                            x.timestamp = ((x: number) => new Date(x * 1000))(
+                              x.timestamp,
+                            );
+                            return x;
+                          });
+                        })(x.feedback_thread);
                         return x;
                       })(x.feedback);
                     return x;
@@ -3222,7 +3254,14 @@ export namespace types {
 
   export interface CourseRun {
     contest_score?: number;
-    feedback?: types.SubmissionFeedback;
+    feedback?: {
+      author: string;
+      author_classname: string;
+      date: Date;
+      feedback: string;
+      range_bytes_end?: number;
+      range_bytes_start?: number;
+    };
     guid: string;
     language: string;
     memory: number;
@@ -4098,7 +4137,14 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback: types.SubmissionFeedback[];
+    feedback: {
+      author: string;
+      author_classname: string;
+      date: Date;
+      feedback: string;
+      range_bytes_end?: number;
+      range_bytes_start?: number;
+    }[];
     guid: string;
     judged_by?: string;
     language: string;
@@ -4473,8 +4519,15 @@ export namespace types {
     author_classname: string;
     date: Date;
     feedback: string;
+    feedback_thread: {
+      author: string;
+      authorClassname: string;
+      text: string;
+      timestamp: Date;
+    }[];
     range_bytes_end?: number;
     range_bytes_start?: number;
+    submission_feedback_id: number;
   }
 
   export interface SubmissionsListPayload {
