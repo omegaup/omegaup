@@ -213,6 +213,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         if (!empty($duplicatedUsernames)) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
                 'groupMemberUsernameInUse',
+                'usernames',
                 // Displaying only the first 20 duplicated usernames in order to
                 // prevent the error message from ruining the UI
                 duplicatedItemsInArray: array_slice($duplicatedUsernames, 0, 20)
