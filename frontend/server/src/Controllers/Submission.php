@@ -106,6 +106,10 @@ class Submission extends \OmegaUp\Controllers\Controller {
         );
 
         if (!is_null($courseSubmissionInfo['author_id'])) {
+            $courseAlias = $course->alias;
+            $assignmentAlias = $courseSubmissionInfo['assignment_alias'];
+            $problemAlias = $courseSubmissionInfo['problem_alias'];
+            $guid = $submission->guid;
             \OmegaUp\DAO\Notifications::create(
                 new \OmegaUp\DAO\VO\Notifications([
                     'user_id' => $courseSubmissionInfo['author_id'],
@@ -119,7 +123,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
                                 'problemAlias' => $courseSubmissionInfo['problem_alias'],
                                 'courseName' => $course->name,
                             ],
-                            'url' => "/course/{$course->alias}/assignment/{$courseSubmissionInfo['assignment_alias']}/#problems/{$courseSubmissionInfo['problem_alias']}/",
+                            'url' => "/course/{$courseAlias}/assignment/{$assignmentAlias}/#problems/{$problemAlias}/show-run:{$guid}",
                             'iconUrl' => '/media/info.png',
                         ]
                     ]),
