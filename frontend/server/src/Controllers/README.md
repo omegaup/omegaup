@@ -186,6 +186,7 @@
   - [`/api/run/create/`](#apiruncreate)
   - [`/api/run/details/`](#apirundetails)
   - [`/api/run/disqualify/`](#apirundisqualify)
+  - [`/api/run/getSubmissionFeedback/`](#apirungetsubmissionfeedback)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
   - [`/api/run/requalify/`](#apirunrequalify)
@@ -3786,6 +3787,24 @@ Disqualify a submission
 ### Returns
 
 _Nothing_
+
+## `/api/run/getSubmissionFeedback/`
+
+### Description
+
+Get all the comments related to a submission feedback
+
+### Parameters
+
+| Name        | Type     | Description |
+| ----------- | -------- | ----------- |
+| `run_alias` | `string` |             |
+
+### Returns
+
+```typescript
+types.Feedback[]
+```
 
 ## `/api/run/list/`
 

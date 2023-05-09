@@ -1615,6 +1615,19 @@ export const Run = {
     messages.RunDisqualifyRequest,
     messages.RunDisqualifyResponse
   >('/api/run/disqualify/'),
+  getSubmissionFeedback: apiCall<
+    messages.RunGetSubmissionFeedbackRequest,
+    messages._RunGetSubmissionFeedbackServerResponse,
+    messages.RunGetSubmissionFeedbackResponse
+  >('/api/run/getSubmissionFeedback/', (x) => {
+    if (!Array.isArray(x)) {
+      return x;
+    }
+    return x.map((x) => {
+      x.date = ((x: number) => new Date(x * 1000))(x.date);
+      return x;
+    });
+  }),
   list: apiCall<
     messages.RunListRequest,
     messages._RunListServerResponse,

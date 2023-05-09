@@ -3373,6 +3373,15 @@ export namespace types {
     unsolvedProblems: types.Problem[];
   }
 
+  export interface Feedback {
+    author: string;
+    author_classname: string;
+    date: Date;
+    feedback: string;
+    range_bytes_end?: number;
+    range_bytes_start?: number;
+  }
+
   export interface FilteredCourse {
     accept_teacher?: boolean;
     admission_mode: string;
@@ -4137,14 +4146,7 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback: {
-      author: string;
-      author_classname: string;
-      date: Date;
-      feedback: string;
-      range_bytes_end?: number;
-      range_bytes_start?: number;
-    }[];
+    feedback: types.Feedback[];
     guid: string;
     judged_by?: string;
     language: string;
@@ -5418,6 +5420,9 @@ export namespace messages {
   export type RunDetailsResponse = types.RunDetails;
   export type RunDisqualifyRequest = { [key: string]: any };
   export type RunDisqualifyResponse = {};
+  export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
+  export type _RunGetSubmissionFeedbackServerResponse = any;
+  export type RunGetSubmissionFeedbackResponse = types.Feedback[];
   export type RunListRequest = { [key: string]: any };
   export type _RunListServerResponse = any;
   export type RunListResponse = { runs: types.Run[]; totalRuns: number };
@@ -6196,6 +6201,9 @@ export namespace controllers {
     disqualify: (
       params?: messages.RunDisqualifyRequest,
     ) => Promise<messages.RunDisqualifyResponse>;
+    getSubmissionFeedback: (
+      params?: messages.RunGetSubmissionFeedbackRequest,
+    ) => Promise<messages.RunGetSubmissionFeedbackResponse>;
     list: (
       params?: messages.RunListRequest,
     ) => Promise<messages.RunListResponse>;

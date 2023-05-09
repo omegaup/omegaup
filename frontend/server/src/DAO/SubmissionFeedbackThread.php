@@ -19,7 +19,8 @@ class SubmissionFeedbackThread extends \OmegaUp\DAO\Base\SubmissionFeedbackThrea
      * @return list<array{author_id: int}>
      */
     public static function getSubmissionFeedbackThreadParticipants(
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity,
+        int $submissionFeedbackId,
     ) {
         $sql = 'SELECT
                     u.user_id AS author_id
@@ -31,13 +32,15 @@ class SubmissionFeedbackThread extends \OmegaUp\DAO\Base\SubmissionFeedbackThrea
                     Users u ON u.user_id = i.user_id
                 WHERE
                     i.identity_id <> ?
+                    AND sft.submission_feedback_id = ?
         ';
 
         /** @var list<array{author_id: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
-               $identity->identity_id
+               $identity->identity_id,
+               $submissionFeedbackId
             ]
         );
     }

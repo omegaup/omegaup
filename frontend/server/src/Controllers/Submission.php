@@ -104,7 +104,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
         );
 
         $participants = \OmegaUp\DAO\SubmissionFeedbackThread::getSubmissionFeedbackThreadParticipants(
-            $feedbackAuthor
+            $feedbackAuthor,
+            $submissionFeedbackId
         );
 
         if (!empty($participants)) {

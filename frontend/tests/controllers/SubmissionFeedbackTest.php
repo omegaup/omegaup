@@ -368,4 +368,118 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             $newFeedback->feedback
         );
     }
+
+    public function testEditSubmissionFeedbackWithThreadForCourse() {
+        $admin = \OmegaUp\Test\Factories\User::createUser();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $admin['identity'],
+            self::login($admin['identity']),
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+
+        $login = self::login($admin['identity']);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+
+        $student = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student['identity']
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $student['identity']
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($admin['identity'])->auth_token,
+                'guid' => $runData['response']['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback' => 'Initial test feedback',
+                'range_bytes_start' => 1,
+            ])
+        );
+
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($admin['identity'])->auth_token,
+                'guid' => $runData['response']['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback' => 'New feedback',
+                'range_bytes_start' => 3,
+            ])
+        );
+        $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($admin['identity'])->auth_token,
+                'run_alias' => $runData['response']['guid'],
+            ])
+        );
+
+        $expectedCommentsLines = [
+            [
+                'line' => 1,
+                'feedback_thread' => [],
+            ],
+            [
+                'line' => 3,
+                'feedback_thread' => [],
+            ],
+        ];
+
+        foreach ($feedbackList as $index => $feedback) {
+            $this->assertArrayContainsWithPredicate(
+                $expectedCommentsLines,
+                fn ($comment) => $comment['line'] == $feedback['range_bytes_start']
+            );
+            $this->assertEmpty($feedback['feedback_thread']);
+            $expectedCommentsLines[$index]['submission_feedback_id'] = $feedback['submission_feedback_id'];
+        }
+
+        // Adding a feedback thread
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($admin['identity'])->auth_token,
+                'guid' => $runData['response']['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback' => 'New feedback thread',
+                'submission_feedback_id' => $expectedCommentsLines[0]['submission_feedback_id'],
+            ])
+        );
+
+        $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($admin['identity'])->auth_token,
+                'run_alias' => $runData['response']['guid'],
+            ])
+        );
+
+        $expectedCommentsLines[0]['feedback_thread'] = 'New feedback thread';
+
+        foreach ($feedbackList as $index => $feedback) {
+            if ($index == 0) {
+                $this->assertNotEmpty($feedback['feedback_thread']);
+                $this->assertEquals(
+                    $feedback['feedback_thread'][0]['text'],
+                    $expectedCommentsLines[0]['feedback_thread']
+                );
+            } else {
+                $this->assertEmpty($feedback['feedback_thread']);
+            }
+        }
+    }
 }
