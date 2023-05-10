@@ -332,12 +332,15 @@ def update_schools_solved_problems(
         FROM
             `Submissions` AS `su`
         INNER JOIN
+            `Runs` AS `r` ON `r`.run_id = `su`.current_run_id
+        INNER JOIN
             `Schools` AS `sc` ON `sc`.`school_id` = `su`.`school_id`
         INNER JOIN
             `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
         WHERE
             `su`.`time` >= CURDATE() - INTERVAL %(months)s MONTH
-            AND `su`.`verdict` = "AC" AND `p`.`visibility` >= 1
+            AND `r`.`verdict` = "AC"
+            AND `p`.`visibility` >= 1
             AND NOT EXISTS (
                 SELECT
                     *
