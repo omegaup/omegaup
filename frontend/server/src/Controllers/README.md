@@ -3803,7 +3803,7 @@ Get all the comments related to a submission feedback
 ### Returns
 
 ```typescript
-types.Feedback[]
+types.SubmissionFeedback[]
 ```
 
 ## `/api/run/list/`

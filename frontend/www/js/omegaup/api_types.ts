@@ -3373,15 +3373,6 @@ export namespace types {
     unsolvedProblems: types.Problem[];
   }
 
-  export interface Feedback {
-    author: string;
-    author_classname: string;
-    date: Date;
-    feedback: string;
-    range_bytes_end?: number;
-    range_bytes_start?: number;
-  }
-
   export interface FilteredCourse {
     accept_teacher?: boolean;
     admission_mode: string;
@@ -4146,7 +4137,7 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback: types.Feedback[];
+    feedback: types.SubmissionFeedback[];
     guid: string;
     judged_by?: string;
     language: string;
@@ -5422,7 +5413,7 @@ export namespace messages {
   export type RunDisqualifyResponse = {};
   export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
   export type _RunGetSubmissionFeedbackServerResponse = any;
-  export type RunGetSubmissionFeedbackResponse = types.Feedback[];
+  export type RunGetSubmissionFeedbackResponse = types.SubmissionFeedback[];
   export type RunListRequest = { [key: string]: any };
   export type _RunListServerResponse = any;
   export type RunListResponse = { runs: types.Run[]; totalRuns: number };

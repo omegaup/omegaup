@@ -1606,6 +1606,15 @@ export const Run = {
       }
       return x.map((x) => {
         x.date = ((x: number) => new Date(x * 1000))(x.date);
+        x.feedback_thread = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+            return x;
+          });
+        })(x.feedback_thread);
         return x;
       });
     })(x.feedback);
@@ -1625,6 +1634,15 @@ export const Run = {
     }
     return x.map((x) => {
       x.date = ((x: number) => new Date(x * 1000))(x.date);
+      x.feedback_thread = ((x) => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map((x) => {
+          x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+          return x;
+        });
+      })(x.feedback_thread);
       return x;
     });
   }),
