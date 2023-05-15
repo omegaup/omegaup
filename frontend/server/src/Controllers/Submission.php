@@ -246,9 +246,19 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 'courseNotFound'
             );
         }
+        $group = \OmegaUp\Controllers\Course::resolveGroup($course);
 
         $submissionFeedbackId = $r->ensureOptionalInt('submission_feedback_id');
         if (!is_null($submissionFeedbackId)) {
+            if (
+                !\OmegaUp\Authorization::canViewCourse(
+                    $r->identity,
+                    $course,
+                    $group
+                )
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
             self::createFeedbackThread(
                 $r->identity,
                 $submissionFeedbackId,

@@ -412,6 +412,23 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
+        try {
+            \OmegaUp\Controllers\Submission::apiSetFeedback(
+                new \OmegaUp\Request([
+                    'auth_token' => self::login(
+                        $student['identity']
+                    )->auth_token,
+                    'guid' => $runData['response']['guid'],
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $courseData['assignment_alias'],
+                    'feedback' => 'New comment from a student',
+                    'range_bytes_start' => 2,
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+
         \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
                 'auth_token' => self::login($admin['identity'])->auth_token,
@@ -432,10 +449,12 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         $expectedCommentsLines = [
             [
                 'line' => 1,
-                'feedback_thread' => [],
+                'author' => $admin['identity']->username,
+                'feedback_thread' => ['New feedback thread'],
             ],
             [
                 'line' => 3,
+                'author' => $admin['identity']->username,
                 'feedback_thread' => [],
             ],
         ];
@@ -468,18 +487,39 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $expectedCommentsLines[0]['feedback_thread'] = 'New feedback thread';
-
         foreach ($feedbackList as $index => $feedback) {
+            $this->assertEquals(
+                $feedback['author'],
+                $expectedCommentsLines[$index]['author']
+            );
             if ($index == 0) {
                 $this->assertNotEmpty($feedback['feedback_thread']);
+
                 $this->assertEquals(
-                    $feedback['feedback_thread'][0]['text'],
-                    $expectedCommentsLines[0]['feedback_thread']
+                    $feedback['feedback_thread'][$index]['text'],
+                    $expectedCommentsLines[$index]['feedback_thread'][0]
                 );
             } else {
                 $this->assertEmpty($feedback['feedback_thread']);
             }
+        }
+
+        // Trying to add a comment with a user who does not belong to the course
+        $user = \OmegaUp\Test\Factories\User::createUser();
+
+        try {
+            \OmegaUp\Controllers\Submission::apiSetFeedback(
+                new \OmegaUp\Request([
+                    'auth_token' => self::login($user['identity'])->auth_token,
+                    'guid' => $runData['response']['guid'],
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $courseData['assignment_alias'],
+                    'feedback' => 'New feedback thread',
+                    'submission_feedback_id' => $expectedCommentsLines[0]['submission_feedback_id'],
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 }

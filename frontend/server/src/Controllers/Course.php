@@ -533,7 +533,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    private static function resolveGroup(
+    public static function resolveGroup(
         \OmegaUp\DAO\VO\Courses $course
     ): \OmegaUp\DAO\VO\Groups {
         if (is_null($course->group_id)) {
