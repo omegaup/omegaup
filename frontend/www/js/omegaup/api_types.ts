@@ -184,17 +184,20 @@ export namespace types {
                       )
                         x.feedback = ((x) => {
                           x.date = ((x: number) => new Date(x * 1000))(x.date);
-                          x.feedback_thread = ((x) => {
-                            if (!Array.isArray(x)) {
-                              return x;
-                            }
-                            return x.map((x) => {
-                              x.timestamp = ((x: number) => new Date(x * 1000))(
-                                x.timestamp,
-                              );
-                              return x;
-                            });
-                          })(x.feedback_thread);
+                          if (
+                            typeof x.feedback_thread !== 'undefined' &&
+                            x.feedback_thread !== null
+                          )
+                            x.feedback_thread = ((x) => {
+                              if (!Array.isArray(x)) {
+                                return x;
+                              }
+                              return x.map((x) => {
+                                x.timestamp = ((x: number) =>
+                                  new Date(x * 1000))(x.timestamp);
+                                return x;
+                              });
+                            })(x.feedback_thread);
                           return x;
                         })(x.feedback);
                       return x;
@@ -888,16 +891,20 @@ export namespace types {
                                 x.date = ((x: number) => new Date(x * 1000))(
                                   x.date,
                                 );
-                                x.feedback_thread = ((x) => {
-                                  if (!Array.isArray(x)) {
-                                    return x;
-                                  }
-                                  return x.map((x) => {
-                                    x.timestamp = ((x: number) =>
-                                      new Date(x * 1000))(x.timestamp);
-                                    return x;
-                                  });
-                                })(x.feedback_thread);
+                                if (
+                                  typeof x.feedback_thread !== 'undefined' &&
+                                  x.feedback_thread !== null
+                                )
+                                  x.feedback_thread = ((x) => {
+                                    if (!Array.isArray(x)) {
+                                      return x;
+                                    }
+                                    return x.map((x) => {
+                                      x.timestamp = ((x: number) =>
+                                        new Date(x * 1000))(x.timestamp);
+                                      return x;
+                                    });
+                                  })(x.feedback_thread);
                                 return x;
                               })(x.feedback);
                             return x;
@@ -1878,17 +1885,21 @@ export namespace types {
                     )
                       x.feedback = ((x) => {
                         x.date = ((x: number) => new Date(x * 1000))(x.date);
-                        x.feedback_thread = ((x) => {
-                          if (!Array.isArray(x)) {
-                            return x;
-                          }
-                          return x.map((x) => {
-                            x.timestamp = ((x: number) => new Date(x * 1000))(
-                              x.timestamp,
-                            );
-                            return x;
-                          });
-                        })(x.feedback_thread);
+                        if (
+                          typeof x.feedback_thread !== 'undefined' &&
+                          x.feedback_thread !== null
+                        )
+                          x.feedback_thread = ((x) => {
+                            if (!Array.isArray(x)) {
+                              return x;
+                            }
+                            return x.map((x) => {
+                              x.timestamp = ((x: number) => new Date(x * 1000))(
+                                x.timestamp,
+                              );
+                              return x;
+                            });
+                          })(x.feedback_thread);
                         return x;
                       })(x.feedback);
                     return x;
@@ -4512,7 +4523,7 @@ export namespace types {
     author_classname: string;
     date: Date;
     feedback: string;
-    feedback_thread: {
+    feedback_thread?: {
       author: string;
       authorClassname: string;
       text: string;

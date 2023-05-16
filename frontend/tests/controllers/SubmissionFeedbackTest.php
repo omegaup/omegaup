@@ -455,7 +455,6 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             [
                 'line' => 3,
                 'author' => $admin['identity']->username,
-                'feedback_thread' => [],
             ],
         ];
 
@@ -464,7 +463,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 $expectedCommentsLines,
                 fn ($comment) => $comment['line'] == $feedback['range_bytes_start']
             );
-            $this->assertEmpty($feedback['feedback_thread']);
+            $this->assertArrayNotHasKey('feedback_thread', $feedback);
             $expectedCommentsLines[$index]['submission_feedback_id'] = $feedback['submission_feedback_id'];
         }
 
@@ -492,7 +491,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 $feedback['author'],
                 $expectedCommentsLines[$index]['author']
             );
-            if ($index == 0) {
+            if (isset($expectedCommentsLines[$index]['feedback_thread'])) {
                 $this->assertNotEmpty($feedback['feedback_thread']);
 
                 $this->assertEquals(
@@ -500,7 +499,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                     $expectedCommentsLines[$index]['feedback_thread'][0]
                 );
             } else {
-                $this->assertEmpty($feedback['feedback_thread']);
+                $this->assertArrayNotHasKey('feedback_thread', $feedback);
             }
         }
 

@@ -15,7 +15,7 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
     /**
      * Gets the feedback of a certain submission
      *
-     * @return list<array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string, feedback_thread: list<array{author: null|string, authorClassname: string, text: string, timestamp: \OmegaUp\Timestamp|null}>, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int}>
+     * @return list<array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string, feedback_thread?: list<array{author: string, authorClassname: string, text: string, timestamp: \OmegaUp\Timestamp}>, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int}>
      */
     public static function getSubmissionFeedback(
         \OmegaUp\DAO\VO\Submissions $submission
@@ -69,10 +69,17 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
                     'range_bytes_start' => $row['range_bytes_start'],
                     'range_bytes_end' => $row['range_bytes_end'],
                     'date' => $row['date'],
-                    'feedback_thread' => [],
                 ];
             }
-            if (!is_null($row['feedback_thread'])) {
+            if (
+                !is_null(
+                    $row['feedback_thread']
+                ) && !is_null(
+                    $row['author_thread']
+                ) && !is_null(
+                    $row['date_thread']
+                )
+            ) {
                 $feedback[$row['submission_feedback_id']]['feedback_thread'][] = [
                     'author' => $row['author_thread'],
                     'authorClassname' => $row['author_classname_thread'],
