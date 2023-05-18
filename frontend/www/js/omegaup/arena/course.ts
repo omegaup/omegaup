@@ -38,12 +38,12 @@ OmegaUp.on('ready', async () => {
 
   const commonPayload = types.payloadParsers.CommonPayload();
   const payload = types.payloadParsers.AssignmentDetailsPayload();
-  const locationHash = window.location.hash.substr(1).split('/');
+  const [locationHash] = window.location.hash.substring(1).split('/');
   const courseAdmin = Boolean(
     payload.courseDetails.is_admin || payload.courseDetails.is_curator,
   );
-  const activeTab = getSelectedValidTab(locationHash[0], courseAdmin);
-  if (activeTab !== locationHash[0]) {
+  const activeTab = getSelectedValidTab(locationHash, courseAdmin);
+  if (activeTab !== locationHash) {
     window.location.hash = activeTab;
   }
   const {
@@ -556,4 +556,48 @@ OmegaUp.on('ready', async () => {
   }, 5 * 60 * 1000);
 
   const component = arenaCourse.$refs.component as arena_Course;
+
+  window.addEventListener('hashchange', async () => {
+    const { problem, guid } = getOptionsFromLocation(window.location.hash);
+    if (guid != null && problem != null) {
+      navigateToProblem({
+        type: NavigationType.ForSingleProblemOrCourse,
+        problem,
+        target: arenaCourse,
+        problems: arenaCourse.problems,
+        problemsetId: payload.currentAssignment.problemset_id,
+        guid,
+      });
+      component.activeProblem = problem;
+
+      const hash = `#problems/${problem.alias}/show-run:${guid}`;
+      api.Run.details({ run_alias: guid })
+        .then((runDetails) => {
+          arenaCourse.runDetailsData = showSubmission({
+            request: {
+              guid,
+              isAdmin: courseAdmin,
+              hash,
+            },
+            runDetails,
+          });
+
+          arenaCourse.feedbackMap = getFeedbackMap(
+            arenaCourse.runDetailsData.feedback,
+          );
+
+          if (hash) {
+            window.location.hash = hash;
+          }
+        })
+        .catch((run) => {
+          submitRunFailed({
+            error: run.error,
+            errorname: run.errorname,
+            run,
+          });
+        });
+      component.currentPopupDisplayed = PopupDisplayed.RunDetails;
+    }
+  });
 });
