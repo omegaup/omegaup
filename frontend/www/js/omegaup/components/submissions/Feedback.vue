@@ -17,11 +17,16 @@
       ></omegaup-user-username>
     </div>
     <div v-if="isAdmin" class="feedback-section">
-      <a role="button" @click="showFeedbackForm = !showFeedbackForm">{{
-        !generalFeedback
-          ? T.submissionFeedbackSendButton
-          : T.submissionFeedbackUpdateButton
-      }}</a>
+      <a
+        role="button"
+        class="btn btn-sm btn-primary"
+        @click="showFeedbackForm = !showFeedbackForm"
+        >{{
+          !generalFeedback
+            ? T.submissionFeedbackSendButton
+            : T.submissionFeedbackUpdateButton
+        }}</a
+      >
       <div v-show="showFeedbackForm" class="form-group">
         <textarea
           v-model="feedback"
@@ -78,12 +83,11 @@ export default class SubmissionFeedback extends Vue {
   feedback = this.generalFeedback?.feedback ?? null;
 
   get generalFeedback(): null | types.SubmissionFeedback {
+    if (!this.feedbackOptions.length) return null;
     const [feedback] = this.feedbackOptions.filter(
-      (feedback) =>
-        feedback.range_bytes_start === undefined ||
-        feedback.range_bytes_start === null,
+      (feedback) => feedback.range_bytes_start == null,
     );
-    return feedback ?? null;
+    return feedback;
   }
 }
 </script>

@@ -80,6 +80,7 @@
               :run-details-data="runDetailsData"
               :problem-alias="problemAlias"
               :in-contest-or-course="true"
+              :feedback-map="feedbackMap"
               @request-feedback="(guid) => $emit('request-feedback', guid)"
               @update:activeTab="
                 (selectedTab) =>
@@ -178,10 +179,16 @@
                 @set-feedback="(request) => $emit('set-feedback', request)"
               ></omegaup-submission-feedback>
             </template>
-            <template #code-view>
+            <template #code-view="{ guid }">
               <omegaup-arena-feedback-code-view
-                :language="runDetailsData.language"
-                :value="runDetailsData.source"
+                :language="language"
+                :value="source"
+                :readonly="false"
+                :feedback-map="feedbackMap"
+                @save-feedback-list="
+                  (feedbackList) =>
+                    $emit('save-feedback-list', { feedbackList, guid })
+                "
               ></omegaup-arena-feedback-code-view>
             </template>
           </omegaup-arena-rundetails-popup>
@@ -237,6 +244,7 @@ import submission_Feedback from '../submissions/Feedback.vue';
 import { SocketStatus } from '../../arena/events_socket';
 import { SubmissionRequest } from '../../arena/submissions';
 import arena_FeedbackCodeView from './FeedbackCodeView.vue';
+import { ArenaCourseFeedback } from './Feedback.vue';
 
 @Component({
   components: {
@@ -279,6 +287,8 @@ export default class ArenaCourse extends Vue {
   @Prop() totalRuns!: number;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: false }) isTeachingAssistant!: boolean;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackMap!: Map<number, ArenaCourseFeedback>;
 
   T = T;
   omegaup = omegaup;
@@ -367,6 +377,14 @@ export default class ArenaCourse extends Vue {
       key: problem.alias,
       value: problem.text,
     }));
+  }
+
+  get language(): string | undefined {
+    return this.runDetailsData?.language;
+  }
+
+  get source(): string | undefined {
+    return this.runDetailsData?.source;
   }
 
   onPopupDismissed(): void {
