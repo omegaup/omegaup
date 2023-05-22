@@ -94,6 +94,16 @@ class Submission extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Courses $course,
         $courseSubmissionInfo
     ): void {
+        $group = \OmegaUp\Controllers\Course::resolveGroup($course);
+        if (
+            !\OmegaUp\Authorization::canViewCourse(
+                $feedbackAuthor,
+                $course,
+                $group
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
         \OmegaUp\DAO\Base\SubmissionFeedbackThread::create(
             new \OmegaUp\DAO\VO\SubmissionFeedbackThread([
                 'identity_id' => $feedbackAuthor->identity_id,
@@ -104,35 +114,42 @@ class Submission extends \OmegaUp\Controllers\Controller {
         );
 
         $participants = \OmegaUp\DAO\SubmissionFeedbackThread::getSubmissionFeedbackThreadParticipants(
-            $feedbackAuthor,
             $submissionFeedbackId
         );
 
-        if (!empty($participants)) {
-            $courseAlias = $course->alias;
-            $assignmentAlias = $courseSubmissionInfo['assignment_alias'];
-            $problemAlias = $courseSubmissionInfo['problem_alias'];
-            foreach ($participants as $participant) {
-                \OmegaUp\DAO\Notifications::create(
-                    new \OmegaUp\DAO\VO\Notifications([
-                        'user_id' => $participant['author_id'],
-                        'contents' =>  json_encode([
-                            'type' => \OmegaUp\DAO\Notifications::COURSE_SUBMISSION_FEEDBACK,
-                            'body' => [
-                                'localizationString' => new \OmegaUp\TranslationString(
-                                    'notificationCourseSubmissionFeedback'
-                                ),
-                                'localizationParams' => [
-                                    'problemAlias' => $courseSubmissionInfo['problem_alias'],
-                                    'courseName' => $course->name,
-                                ],
-                                'url' => "/course/{$courseAlias}/assignment/{$assignmentAlias}/#problems/{$problemAlias}/show-run:{$guid}",
-                                'iconUrl' => '/media/info.png',
-                            ]
-                        ]),
-                    ])
-                );
-            }
+        if (empty($participants)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'submissionFeedbackParticipantsListEmpty'
+            );
+        }
+        $participantsNotifications = array_filter(
+            $participants,
+            fn ($author) => $author['author_id'] != $feedbackAuthor->user_id
+        );
+
+        $courseAlias = $course->alias;
+        $assignmentAlias = $courseSubmissionInfo['assignment_alias'];
+        $problemAlias = $courseSubmissionInfo['problem_alias'];
+        foreach ($participantsNotifications as $participant) {
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $participant['author_id'],
+                    'contents' =>  json_encode([
+                        'type' => \OmegaUp\DAO\Notifications::COURSE_SUBMISSION_FEEDBACK,
+                        'body' => [
+                            'localizationString' => new \OmegaUp\TranslationString(
+                                'notificationCourseSubmissionFeedback'
+                            ),
+                            'localizationParams' => [
+                                'problemAlias' => $courseSubmissionInfo['problem_alias'],
+                                'courseName' => $course->name,
+                            ],
+                            'url' => "/course/{$courseAlias}/assignment/{$assignmentAlias}/#problems/{$problemAlias}/show-run:{$guid}",
+                            'iconUrl' => '/media/info.png',
+                        ]
+                    ]),
+                ])
+            );
         }
     }
 
@@ -246,19 +263,9 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 'courseNotFound'
             );
         }
-        $group = \OmegaUp\Controllers\Course::resolveGroup($course);
 
         $submissionFeedbackId = $r->ensureOptionalInt('submission_feedback_id');
         if (!is_null($submissionFeedbackId)) {
-            if (
-                !\OmegaUp\Authorization::canViewCourse(
-                    $r->identity,
-                    $course,
-                    $group
-                )
-            ) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-            }
             self::createFeedbackThread(
                 $r->identity,
                 $submissionFeedbackId,
