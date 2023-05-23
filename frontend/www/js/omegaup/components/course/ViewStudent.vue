@@ -142,7 +142,7 @@
                   >
                   <div v-show="showFeedbackForm" class="form-group">
                     <textarea
-                      v-model="feedback"
+                      v-model="updatedFeedback"
                       class="form-control"
                       rows="3"
                       maxlength="200"
@@ -150,7 +150,7 @@
                     <button
                       class="btn btn-sm btn-primary mt-1"
                       data-feedback-button
-                      :disabled="!feedback || feedback.length < 2"
+                      :disabled="!updatedFeedback || updatedFeedback.length < 2"
                       @click.prevent="sendFeedback"
                     >
                       {{
@@ -226,6 +226,7 @@ export default class CourseViewStudent extends Vue {
   @Prop({ default: null }) problem!: null | types.CourseProblem;
   @Prop() problems!: types.CourseProblem[];
   @Prop() students!: types.StudentProgress[];
+  @Prop({ default: null }) feedback!: string;
 
   T = T;
   time = time;
@@ -235,7 +236,7 @@ export default class CourseViewStudent extends Vue {
   selectedStudent: string | null = this.student?.username ?? null;
   selectedRun: Partial<types.CourseRun> | null = null;
   showFeedbackForm = false;
-  feedback = '';
+  updatedFeedback: null | string = this.feedback;
 
   get problemsWithPoints(): types.CourseProblem[] {
     return this.problems.filter(
@@ -296,17 +297,17 @@ export default class CourseViewStudent extends Vue {
   }
 
   sendFeedback(): void {
-    if (this.feedback.length < 2) {
+    if (this.updatedFeedback != null && this.updatedFeedback.length < 2) {
       return;
     }
     this.$emit('set-feedback', {
       guid: this.selectedRun?.guid,
-      feedback: this.feedback,
+      feedback: this.updatedFeedback,
       isUpdate: this.selectedRun?.feedback != null,
       assignmentAlias: this.selectedAssignment,
       studentUsername: this.selectedStudent,
     });
-    this.feedback = '';
+    this.updatedFeedback = '';
     this.showFeedbackForm = false;
   }
 
@@ -369,6 +370,15 @@ export default class CourseViewStudent extends Vue {
   onSelectedProblemChange(newVal: types.CourseProblem) {
     this.selectedRun = newVal.runs?.[0] ?? null;
     window.location.hash = `#${this.selectedProblem?.alias}`;
+  }
+
+  @Watch('selectedRun')
+  onSelectedRunChanged(newVal: Partial<types.CourseRun> | null = null) {
+    if (newVal == null || newVal.feedback == null) {
+      this.updatedFeedback = null;
+      return;
+    }
+    this.updatedFeedback = newVal.feedback.feedback;
   }
 }
 </script>
