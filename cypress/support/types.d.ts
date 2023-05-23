@@ -3,6 +3,16 @@ export interface LoginOptions {
   password: string;
 }
 
+export interface Identities {
+  usernames: string;
+  passwords: string;
+}
+
+export interface GroupOptions {
+  groupTitle: string;
+  groupDescription: string;
+}
+
 export interface ProblemOptions {
   problemAlias: string;
   tag: string;
