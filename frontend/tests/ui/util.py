@@ -19,7 +19,6 @@ from typing import Iterator, List, NamedTuple, Text, Sequence
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
-from time import sleep
 
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
@@ -486,7 +485,7 @@ def create_group(driver, group_title, description):
 
     group_alias = re.search(r'/group/([^/]*)/edit/',
                             driver.browser.current_url).group(1)
-    print(group_alias)
+
     return group_alias
 
 
@@ -522,7 +521,6 @@ def add_identities_group(driver, group_alias) -> List[Identity]:
         By.XPATH,
         '//table[@data-identities-table]/tbody/tr/td[contains(concat(" ", '
         'normalize-space(@class), " "), " password ")]')
-    
     usernames = [username.text for username in username_elements]
     passwords = [password.text for password in password_elements]
 
@@ -547,8 +545,6 @@ def add_identities_group(driver, group_alias) -> List[Identity]:
             'username %s does not match with %s' % (
                 identity.username, uploaded_identities[i]))
 
-    print("Start")  
-    sleep(10)
     return identities
 
 

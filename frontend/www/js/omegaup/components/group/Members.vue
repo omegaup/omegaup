@@ -61,7 +61,7 @@
       </thead>
       <tbody>
         <tr v-for="identity in identitiesCsv" :key="identity.username">
-          <td data-members-username>
+          <td>
             <omegaup-user-username
               :classname="identity.classname"
               :linkify="true"

@@ -42,11 +42,11 @@
                 :key="identity.username"
                 :class="{ 'alert-danger': userErrorRow === identity.username }"
               >
-                <td class="username" data-identity-username>
+                <td class="username">
                   <strong>{{ identity.username }}</strong>
                 </td>
                 <td>{{ identity.name }}</td>
-                <td class="password" data-identity-password>
+                <td class="password">
                   {{ identity.password }}
                 </td>
                 <td>{{ identity.country_id }}</td>
