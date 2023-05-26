@@ -302,7 +302,7 @@ class Scoreboard {
                 'problemsetNotFound'
             );
         }
-        $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
+        $contestRunsForEvents = \OmegaUp\DAO\Runs::getProblemsetRuns(
             $params->problemset_id
         );
 
@@ -338,6 +338,16 @@ class Scoreboard {
         $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitTimestamp(
             $params
         );
+
+        if ($params->score_mode === 'max_per_group') {
+            // The way to calculate the score is different in this mode
+            $contestRuns = \OmegaUp\DAO\RunsGroups::getProblemsetRunsGroups(
+                $params->problemset_id,
+                $scoreboardTimeLimit
+            );
+        } else {
+            $contestRuns = $contestRunsForEvents;
+        }
 
         // Cache scoreboard until the contest ends (or forever if it has already ended).
         // Contestant cache
@@ -375,7 +385,7 @@ class Scoreboard {
         );
         $contestantEventCache->set(\OmegaUp\Scoreboard::calculateEvents(
             $params,
-            $contestRuns,
+            $contestRunsForEvents,
             $rawContestIdentities,
             $problemMapping
         ), $timeout);
@@ -415,7 +425,7 @@ class Scoreboard {
         );
         $adminEventCache->set(\OmegaUp\Scoreboard::calculateEvents(
             $params,
-            $contestRuns,
+            $contestRunsForEvents,
             $rawContestIdentities,
             $problemMapping
         ), $timeout);
@@ -817,15 +827,20 @@ class Scoreboard {
             }
 
             if (
-                !is_null($scoreboardTimeLimit) &&
-                $run['time']->time >= $scoreboardTimeLimit->time
+                !is_null($scoreboardTimeLimit)
+                && !empty($run['time'])
+                && $run['time']->time >= $scoreboardTimeLimit->time
             ) {
                 continue;
             }
 
             $identityId = $run['identity_id'];
             $problemId = $run['problem_id'];
-            if ($params->score_mode === 'max_per_group') {
+            if (
+                $params->score_mode === 'max_per_group' && isset(
+                    $run['score_by_group']
+                )
+            ) {
                 $contestScore = self::getMaxPerGroupScore(
                     $identityProblemsScoreByGroup,
                     $run['score_by_group'],
