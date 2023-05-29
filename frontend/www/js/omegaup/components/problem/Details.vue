@@ -121,6 +121,7 @@
             <omegaup-arena-rundetails-popup
               v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
               :data="currentRunDetailsData"
+              :feedback-map="feedbackMap"
               @dismiss="onPopupDismissed"
             >
               <template #feedback="data">
@@ -311,6 +312,7 @@ import {
   faExternalLinkAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { SubmissionRequest } from '../../arena/submissions';
+import { ArenaCourseFeedback } from '../arena/Feedback.vue';
 library.add(
   faExclamationTriangle,
   faEdit,
@@ -392,6 +394,8 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) languages!: null | string[];
   @Prop() totalRuns!: number;
   @Prop({ default: false }) requestFeedback!: boolean;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackMap!: Map<number, ArenaCourseFeedback>;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 

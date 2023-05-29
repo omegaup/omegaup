@@ -3,7 +3,7 @@
     <div class="container-fluid" data-feedback-code-mirror>
       <textarea v-show="false" ref="cm-editor" v-model="value"></textarea>
     </div>
-    <div class="container-fluid text-right py-2">
+    <div v-if="!readonly" class="container-fluid text-right py-2">
       <button
         class="btn btn-primary mx-2"
         :disabled="!numberOfComments"
@@ -16,6 +16,8 @@
 </template>
 
 <script lang="ts">
+// TODO: Only display the gutters in the component if the logged-in user is an
+// admin or teaching assistant.
 import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
 import T from '../../lang';
 import CodeMirror from 'codemirror';
@@ -34,6 +36,7 @@ for (const mode of modeList) {
 export default class FeedbackCodeView extends Vue {
   @Prop() language!: string;
   @Prop() value!: string;
+  @Prop({ default: true }) readonly!: boolean;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackMap!: Map<number, ArenaCourseFeedback>;
   @Ref('cm-editor') private readonly cmEditor!: HTMLTextAreaElement;
@@ -59,12 +62,31 @@ export default class FeedbackCodeView extends Vue {
       lineNumbers: true,
       mode: this.mode,
       readOnly: true,
-      gutters: ['CodeMirror-linenumbers', 'breakpoints'],
+      gutters: ['CodeMirror-linenumbers', 'custom-gutter'],
     };
   }
 
   mounted() {
     const editor = CodeMirror.fromTextArea(this.cmEditor, this.editorOptions);
+
+    for (const [, feedback] of this.feedbackMap) {
+      const feedbackForm = new FeedbackClass({
+        propsData: { feedback },
+      });
+      feedbackForm.$mount();
+
+      editor.addLineWidget(
+        feedback.lineNumber,
+        feedbackForm.$el as HTMLElement,
+        {
+          className: 'px-2',
+        },
+      );
+    }
+
+    if (this.readonly) {
+      return;
+    }
 
     editor.on(
       'gutterClick',
@@ -111,13 +133,6 @@ export default class FeedbackCodeView extends Vue {
           this.deleteFeedback({ lineNumber: feedback.lineNumber });
           editor.removeLineWidget(lineWidget);
           feedbackForm.$destroy();
-        });
-
-        Vue.nextTick(() => {
-          // Now that the DOM has changed, we need to tell CodeMirror to
-          // recalculate the height of the line widget so that it knows which y
-          // coordinate corresponds to which line.
-          lineWidget.changed();
         });
       },
     );
