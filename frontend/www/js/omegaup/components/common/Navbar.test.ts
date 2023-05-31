@@ -63,6 +63,14 @@ describe('Navbar.vue', () => {
     expect(wrapper.find('.navbar-right').text()).toBe(T.navLogIn);
   });
 
+  it('Should handle common navbar to logged user', () => {
+    const wrapper = mount(common_Navbar, {
+      propsData: { ...propsData },
+    });
+
+    expect(wrapper.find('[data-login-button]')).toBeTruthy();
+  });
+
   it('Should show objectives modal only when a main user identity is logged', async () => {
     const wrapper = shallowMount(common_Navbar, {
       propsData: { ...propsData, ...{ fromLogin: true } },

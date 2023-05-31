@@ -19,7 +19,7 @@
           />
         </a>
 
-        <div class="d-inline-flex d-flex-row">
+        <div class="d-inline-flex d-flex-row order-md-1">
           <a
             v-if="isLoggedIn"
             class="navbar justify-content-end mr-2 d-lg-none"
