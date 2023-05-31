@@ -27,7 +27,7 @@
           >
             <font-awesome-icon :icon="['fas', 'power-off']" />
           </a>
-          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex">
+          <ul v-else class="navbar-nav navbar-right d-lg-flex">
             <li class="nav-item">
               <a
                 class="nav-link px-2"
