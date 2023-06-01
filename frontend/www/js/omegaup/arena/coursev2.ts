@@ -15,21 +15,22 @@ import * as time from '../time';
 
 import Vue from 'vue';
 import arena_Course, { Tabs } from '../components/arena/Coursev2.vue';
+import { Tabs as ProblemTabs } from '../components/problem/Detailsv2.vue';
 
 OmegaUp.on('ready', async () => {
   const payload = types.payloadParsers.ArenaCoursePayload();
   const commonPayload = types.payloadParsers.CommonPayload();
-  const locationHash = window.location.hash.substr(1).split('/');
-  const activeTab = getSelectedValidTab(locationHash[0]);
   trackRuns();
 
-  new Vue({
+  const arenaCourse = new Vue({
     el: '#main-container',
     components: {
       'omegaup-arena-course': arena_Course,
     },
     data: () => {
       return {
+        selectedTab: null as null | string,
+        problemSelectedTab: null as null | string,
         currentRunDetails: null as types.RunDetails | null,
       };
     },
@@ -42,7 +43,8 @@ OmegaUp.on('ready', async () => {
           currentProblem: payload.currentProblem,
           currentRunDetails: this.currentRunDetails,
           problems: payload.problems,
-          selectedTab: activeTab,
+          selectedTab: this.selectedTab,
+          problemSelectedTab: this.problemSelectedTab,
           scoreboard: payload.scoreboard,
           userRuns: myRunsStore.state.runs,
           user: {
@@ -53,10 +55,8 @@ OmegaUp.on('ready', async () => {
         },
         on: {
           'show-run-details': (request: SubmissionRequest) => {
-            console.log(request);
             api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
-                console.log(runDetails);
                 this.currentRunDetails = showSubmission({
                   request,
                   runDetails,
@@ -112,19 +112,31 @@ OmegaUp.on('ready', async () => {
     },
   });
 
-  function getSelectedValidTab(tab: string): string | null {
-    if (payload.currentProblem && tab === '') {
-      return null;
+  getSelectedValidTab();
+
+  function getSelectedValidTab(): void {
+    const tab = window.location.hash.substring(1);
+    if (payload.currentProblem) {
+      arenaCourse.selectedTab = null;
+      if (Object.values<string>(ProblemTabs).includes(tab)) {
+        arenaCourse.problemSelectedTab = tab;
+        return;
+      }
+      setLocationHash('');
+      arenaCourse.problemSelectedTab = ProblemTabs.Details;
+      return;
     }
     if (tab === Tabs.Ranking && payload.scoreboard === null) {
       setLocationHash(Tabs.Summary);
-      return Tabs.Summary;
+      arenaCourse.selectedTab = Tabs.Summary;
+      return;
     }
     if (Object.values<string>(Tabs).includes(tab)) {
-      return tab;
+      arenaCourse.selectedTab = tab;
+      return;
     }
     setLocationHash(Tabs.Summary);
-    return Tabs.Summary;
+    arenaCourse.selectedTab = Tabs.Summary;
   }
 
   function trackRuns(): void {
