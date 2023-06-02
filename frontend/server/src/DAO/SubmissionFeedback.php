@@ -9,13 +9,15 @@ namespace OmegaUp\DAO;
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\SubmissionFeedback}.
  *
+ * @psalm-type SubmissionFeedbackThread=array{author: string, authorClassname: string, submission_feedback_thread_id: int, text: string, timestamp: \OmegaUp\Timestamp}
+ *
  * @access public
  */
 class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
     /**
      * Gets the feedback of a certain submission
      *
-     * @return list<array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string, feedback_thread?: list<array{author: string, authorClassname: string, text: string, timestamp: \OmegaUp\Timestamp}>, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int}>
+     * @return list<array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string, feedback_thread?: list<SubmissionFeedbackThread>, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int}>
      */
     public static function getSubmissionFeedback(
         \OmegaUp\DAO\VO\Submissions $submission
@@ -31,6 +33,7 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
                 sf.date,
                 i2.username as author_thread,
                 IFNULL(ur2.classname, "user-rank-unranked") AS author_classname_thread,
+                sft.submission_feedback_thread_id,
                 sft.contents AS feedback_thread,
                 sft.date AS date_thread
             FROM
@@ -51,7 +54,7 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
                 s.submission_id = ?
         ';
 
-        /** @var list<array{author: string, author_classname: string, author_classname_thread: string, author_thread: null|string, date: \OmegaUp\Timestamp, date_thread: \OmegaUp\Timestamp|null, feedback: string, feedback_thread: null|string, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int}> */
+        /** @var list<array{author: string, author_classname: string, author_classname_thread: string, author_thread: null|string, date: \OmegaUp\Timestamp, date_thread: \OmegaUp\Timestamp|null, feedback: string, feedback_thread: null|string, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int, submission_feedback_thread_id: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
@@ -78,11 +81,14 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
                     $row['author_thread']
                 ) && !is_null(
                     $row['date_thread']
+                ) && !is_null(
+                    $row['submission_feedback_thread_id']
                 )
             ) {
                 $feedback[$row['submission_feedback_id']]['feedback_thread'][] = [
                     'author' => $row['author_thread'],
                     'authorClassname' => $row['author_classname_thread'],
+                    'submission_feedback_thread_id' => $row['submission_feedback_thread_id'],
                     'text' => $row['feedback_thread'],
                     'timestamp' => $row['date_thread'],
                 ];

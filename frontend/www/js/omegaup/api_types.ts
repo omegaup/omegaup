@@ -4523,15 +4523,18 @@ export namespace types {
     author_classname: string;
     date: Date;
     feedback: string;
-    feedback_thread?: {
-      author: string;
-      authorClassname: string;
-      text: string;
-      timestamp: Date;
-    }[];
+    feedback_thread?: types.SubmissionFeedbackThread[];
     range_bytes_end?: number;
     range_bytes_start?: number;
     submission_feedback_id: number;
+  }
+
+  export interface SubmissionFeedbackThread {
+    author: string;
+    authorClassname: string;
+    submission_feedback_thread_id: number;
+    text: string;
+    timestamp: Date;
   }
 
   export interface SubmissionsListPayload {
