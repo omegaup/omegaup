@@ -118,10 +118,14 @@ export class EventsSocket {
     const data = JSON.parse(message.data);
 
     if (data.message == '/run/update/') {
-      data.run.time = time.remoteTime(data.run.time * 1000);
-      const run = { ...data.run, score_by_group: data.run.score_per_group };
-      delete run.score_per_group;
-      updateRun({ run });
+      const { run } = data;
+      const updatedRun = {
+        ...run,
+        time: time.remoteTime(run.time * 1000),
+        score_by_group: run.score_per_group,
+      };
+      delete updatedRun.score_per_group;
+      updateRun({ run: updatedRun });
     } else if (data.message == '/clarification/update/') {
       data.clarification.time = time.remoteTime(data.clarification.time * 1000);
       clarificationStore.commit('addClarification', data.clarification);
