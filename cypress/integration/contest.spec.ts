@@ -1,10 +1,11 @@
+import 'cypress-wait-until';
 import { v4 as uuid } from 'uuid';
 import {
   ContestOptions,
   GroupOptions,
   LoginOptions
 } from '../support/types';
-import { addIdentitiesGroup, createGroup } from '../support/utils/common'
+import { addIdentitiesGroup, addStudentsBulk, createClarificationUser, createGroup, updateScoreboardForContest } from '../support/utils/common'
 import { addSubtractDaysToDate } from '../support/commands';
 
 describe('Contest Test', () => {
@@ -30,10 +31,19 @@ describe('Contest Test', () => {
         createGroup(groupOptions);
         addIdentitiesGroup();
 
-        const userLoginOptions: LoginOptions = {
+        const userLoginOptions1: LoginOptions = {
           username: 'utGroup_' + uuid(),
           password: 'P@55w0rd',
         };
+        cy.register(userLoginOptions1);
+        cy.logout();
+
+        const userLoginOptions2: LoginOptions = {
+          username: 'utGroup_' + uuid(),
+          password: 'P@55w0rd',
+        };
+        cy.register(userLoginOptions2);
+        cy.logout();
 
         const now = new Date();
 
@@ -67,16 +77,12 @@ describe('Contest Test', () => {
               fixturePath: 'main.cpp',
               language: 'cpp11-gcc',
               valid: true,
-            },
-            {
-              problemAlias: 'sumas',
-              fixturePath: 'main.cpp',
-              language: 'cpp11-gcc',
-              valid: false,
-            },
+              status: 'AC'
+            }
           ]
         };
         
+        cy.login(adminLoginOptions);
         cy.createContest(contestOptions);
 
         cy.location('href').should('include', contestOptions.contestAlias);
@@ -88,9 +94,41 @@ describe('Contest Test', () => {
         );
 
         cy.addProblemsToContest(contestOptions);
+        const users = [userLoginOptions1.username, userLoginOptions2.username];
+        addStudentsBulk(users);
         cy.changeAdmissionModeContest(contestOptions);
-        cy.register(userLoginOptions);
+        
+        cy.get('a[data-contest-link-button]').click();
+        cy.url().should('include', '/arena/' + contestOptions.contestAlias);
+        
+        cy.get('a[href="#ranking"]').click();
+        cy.waitUntil(() =>
+          cy.get('.omegaup-scoreboard').should('be.visible')
+        );
         cy.logout();
+
+        cy.login(userLoginOptions1);
+        cy.enterContest(contestOptions);
+        cy.createRunsInsideContest(contestOptions);
+        cy.pause();
+        cy.logout();
+
+        cy.login(userLoginOptions2);
+        cy.enterContest(contestOptions);
+        contestOptions.runs[0].fixturePath = 'main_wrong.cpp';
+        contestOptions.runs[0].status = 'PA';
+        cy.createRunsInsideContest(contestOptions);
+        cy.pause();
+        cy.logout();
+
+        // updateScoreboardForContest(contestOptions.contestAlias);
+        
+        cy.login(adminLoginOptions);
+        cy.get('a[data-nav-user]').click();
+        cy.get('a[data-nav-user-contests]').click();
+
+        cy.pause();
+
 
     });
 

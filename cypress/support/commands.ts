@@ -252,7 +252,7 @@ Cypress.Commands.add(
         cy.get('[data-submit-run]').click();
       });
 
-      const expectedStatus: Status = 'AC';
+      const expectedStatus: Status = runs[idx].status;
       cy.get('[data-run-status] > span').first().should('have.text', 'new');
       cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
 
@@ -262,7 +262,7 @@ Cypress.Commands.add(
       cy.get('[data-run-status] > span')
         .first()
         .should('have.text', expectedStatus);
-    }
+    }status
   },
 );
 

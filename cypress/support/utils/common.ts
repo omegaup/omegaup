@@ -1,6 +1,6 @@
 import 'cypress-file-upload';
 import 'cypress-wait-until';
-import { GroupOptions } from "../types";
+import { ContestOptions, GroupOptions } from "../types";
 
 /**
  * Creates a group as an admin and returns a generated group alias.
@@ -76,4 +76,59 @@ export const addIdentitiesGroup = () => {
       .should('deep.equal', textArray);
    });
   
+};
+
+/**
+ * Add students to a recently created contest.
+ */
+export const addStudentsBulk = (users: Array<string>) => {
+   cy.get('a[data-nav-contest-edit]').click();
+   cy.get('a[data-nav-contestant]').click();
+
+   cy.get('textarea[data-contestant-names]').type(users.join(', '));
+   cy.get('.user-add-bulk').click();
+
+   // Extract the usernames from the table
+   cy.get('[data-uploaded-contestants]').then(($els) => {
+      // we get a list of jQuery elements
+      // let's convert the jQuery object into a plain array
+      const constestantNames: Array<string> = [];
+      Cypress.$.makeArray($els).forEach(element => {
+         cy.task("log", element.innerText);
+         constestantNames.push(element.innerText);
+      });
+
+      cy.wrap(constestantNames).as('savedConstestantNames');
+   })
+
+   cy.get('@savedConstestantNames').should('deep.equal', users);
+};
+
+/**
+ * Makes the user post a question in an specific contest and problem
+ */
+export const createClarificationUser = (contestOptions: ContestOptions, question: string) => {
+   cy.get('a[href="#clarifications"]').click();
+   cy.waitUntil(() =>
+      cy.get('[data-tab-clarifications]').should('be.visible')
+   );
+
+   cy.get('a[data-new-clarification-button]').click();
+   cy.get('[data-new-clarification-problem]').select(contestOptions.problems[0].problemAlias);
+   cy.get('[data-new-clarification-message]').should('be.visible').type(question);
+
+   cy.get('[data-new-clarification]').submit();
+   cy.get('[data-form-clarification-message]').should('have.text', question);
+};
+
+/**
+ * Updates the scoreboard for a contest.
+ */
+export const updateScoreboardForContest = (contestAlias: string) => {
+   const encodedContestAlias = encodeURIComponent(contestAlias);
+   const scoreboardRefreshUrl = `/api/scoreboard/refresh/alias/${encodedContestAlias}/token/secret`;
+
+   cy.request(scoreboardRefreshUrl)
+      .its('body')
+      .should('contain', '"status":"ok"');
 };

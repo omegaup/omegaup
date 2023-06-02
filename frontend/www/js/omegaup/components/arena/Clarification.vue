@@ -27,7 +27,7 @@
     <td class="text-center align-middle">
       {{ time.formatDateTime(clarification.time) }}
     </td>
-    <td class="align-middle">
+    <td class="align-middle" data-form-clarification-message>
       <pre>{{ clarification.message }}</pre>
     </td>
     <td v-if="isAdmin" class="align-middle">

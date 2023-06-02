@@ -296,12 +296,14 @@ describe('Basic Commands Test', () => {
         fixturePath: 'main.cpp',
         language: 'cpp11-gcc',
         valid: true,
+        status: 'AC'
       },
       {
         problemAlias: 'sumas',
         fixturePath: 'main.cpp',
         language: 'cpp11-gcc',
         valid: false,
+        status: 'AC'
       },
     ]
   };

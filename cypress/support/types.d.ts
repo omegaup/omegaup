@@ -59,6 +59,7 @@ export interface RunOptions {
   fixturePath: string;
   language: Language;
   valid: boolean;
+  status: Status;
 }
 
 export type AdmissionModeOptions = 'private' | 'registration' | 'public';
@@ -85,4 +86,4 @@ export type Language =
   | 'go'
   | 'rs'
   | 'js';
-export type Status = 'AC' | 'TLE' | 'MLE' | 'PA';
+export type Status = 'AC' | 'TLE' | 'MLE' | 'PA' | 'WA';
