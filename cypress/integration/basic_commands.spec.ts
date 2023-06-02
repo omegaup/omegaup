@@ -215,7 +215,7 @@ describe('Basic Commands Test', () => {
 
     const problemOptions: ProblemOptions = {
       problemAlias: uuid().slice(0, 10), // Too large for the alias,
-      tag: 'Recursion',
+      tag: 'Recursión',
       autoCompleteTextTag: 'recur',
       problemLevelIndex: 0,
     };
@@ -236,7 +236,7 @@ describe('Basic Commands Test', () => {
   it('Should make a run of a problem', () => {
     const problemOptions: ProblemOptions = {
       problemAlias: 'problem-' + uuid().slice(0, 8),
-      tag: 'Recursion',
+      tag: 'Recursión',
       autoCompleteTextTag: 'Recur',
       problemLevelIndex: 1,
     };
@@ -285,7 +285,7 @@ describe('Basic Commands Test', () => {
     problems: [
       {
         problemAlias: 'sumas',
-        tag: 'Recursion',
+        tag: 'Recursión',
         autoCompleteTextTag: 'Recur',
         problemLevelIndex: 1,
       },

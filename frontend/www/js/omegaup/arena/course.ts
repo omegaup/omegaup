@@ -28,18 +28,22 @@ import { EventsSocket } from './events_socket';
 import clarificationStore from './clarificationsStore';
 import socketStore from './socketStore';
 import { myRunsStore, RunFilters, runsStore } from './runsStore';
+import {
+  ArenaCourseFeedback,
+  FeedbackStatus,
+} from '../components/arena/Feedback.vue';
 
 OmegaUp.on('ready', async () => {
   time.setSugarLocale();
 
   const commonPayload = types.payloadParsers.CommonPayload();
   const payload = types.payloadParsers.AssignmentDetailsPayload();
-  const locationHash = window.location.hash.substr(1).split('/');
+  const [locationHash] = window.location.hash.substring(1).split('/');
   const courseAdmin = Boolean(
     payload.courseDetails.is_admin || payload.courseDetails.is_curator,
   );
-  const activeTab = getSelectedValidTab(locationHash[0], courseAdmin);
-  if (activeTab !== locationHash[0]) {
+  const activeTab = getSelectedValidTab(locationHash, courseAdmin);
+  if (activeTab !== locationHash) {
     window.location.hash = activeTab;
   }
   const {
@@ -51,12 +55,16 @@ OmegaUp.on('ready', async () => {
   } = getOptionsFromLocation(window.location.hash);
   let runDetails: null | types.RunDetails = null;
   let problemDetails: null | types.ProblemDetails = null;
+  let feedbackMap: Map<number, ArenaCourseFeedback> = new Map();
   try {
     ({ runDetails, problemDetails } = await getProblemAndRunDetails({
       problems: payload.currentAssignment.problems,
       location: window.location.hash,
       problemsetId: payload.currentAssignment.problemset_id,
     }));
+    if (runDetails != null) {
+      feedbackMap = getFeedbackMap(runDetails.feedback);
+    }
   } catch (e: any) {
     ui.apiError(e);
   }
@@ -88,6 +96,7 @@ OmegaUp.on('ready', async () => {
       nextSubmissionTimestamp,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
+      feedbackMap,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-course', {
@@ -115,6 +124,7 @@ OmegaUp.on('ready', async () => {
           socketStatus: socketStore.state.socketStatus,
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
+          feedbackMap: this.feedbackMap,
         },
         on: {
           'navigate-to-assignment': ({
@@ -179,6 +189,9 @@ OmegaUp.on('ready', async () => {
             api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
                 this.runDetailsData = showSubmission({ request, runDetails });
+
+                this.feedbackMap = getFeedbackMap(this.runDetailsData.feedback);
+
                 if (request.hash) {
                   window.location.hash = request.hash;
                 }
@@ -313,19 +326,7 @@ OmegaUp.on('ready', async () => {
             selectedTab: string;
             alias: null | string;
           }) => {
-            if (!alias) {
-              history.replaceState(
-                { selectedTab },
-                'updateTab',
-                `#${selectedTab}`,
-              );
-              return;
-            }
-            history.replaceState(
-              { selectedTab, alias },
-              'resetHash',
-              `#${selectedTab}/${alias}`,
-            );
+            resetHash(selectedTab, alias);
           },
           'submit-promotion': ({
             solved,
@@ -358,7 +359,7 @@ OmegaUp.on('ready', async () => {
               contents: JSON.stringify(contents),
             })
               .then(() => {
-                this.popupDisplayed = PopupDisplayed.None;
+                component.currentPopupDisplayed = PopupDisplayed.None;
                 ui.reportEvent('quality-nomination', 'submit');
                 ui.dismissNotifications();
               })
@@ -403,7 +404,7 @@ OmegaUp.on('ready', async () => {
               feedback,
             })
               .then(() => {
-                this.popupDisplayed = PopupDisplayed.None;
+                component.currentPopupDisplayed = PopupDisplayed.None;
                 ui.success(
                   isUpdate
                     ? T.feedbackSuccesfullyUpdated
@@ -418,7 +419,44 @@ OmegaUp.on('ready', async () => {
               ui.warning(T.firstSumbissionWithIdentity);
             }
           },
+          'save-feedback-list': ({
+            feedbackList,
+            guid,
+          }: {
+            feedbackList: { lineNumber: number; feedback: string }[];
+            guid: string;
+          }) => {
+            Promise.allSettled(
+              feedbackList.map(
+                (feedback: { lineNumber: number; feedback: string }) =>
+                  api.Submission.setFeedback({
+                    guid,
+                    course_alias: payload.courseDetails.alias,
+                    assignment_alias: payload.currentAssignment.alias,
+                    feedback: feedback.feedback,
+                    range_bytes_start: feedback.lineNumber,
+                  }).catch(() => feedback),
+              ),
+            )
+              .then((results) => {
+                const feedbackWithError: string[] = results
+                  .filter(
+                    (result): result is PromiseRejectedResult =>
+                      result.status === 'rejected',
+                  )
+                  .map((result) => result.reason);
+                if (!feedbackWithError.length) {
+                  ui.success(T.feedbackSuccesfullyAdded);
+                  resetHash('runs', null);
+                  component.currentPopupDisplayed = PopupDisplayed.None;
+                } else {
+                  ui.error('There was an error');
+                }
+              })
+              .catch(ui.ignoreError);
+          },
         },
+        ref: 'component',
       });
     },
   });
@@ -448,6 +486,40 @@ OmegaUp.on('ready', async () => {
         onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
       })
       .catch(ui.apiError);
+  }
+
+  function getFeedbackMap(
+    runDetailsFeedback: types.SubmissionFeedback[],
+  ): Map<number, ArenaCourseFeedback> {
+    const feedbackMap: Map<number, ArenaCourseFeedback> = new Map();
+
+    runDetailsFeedback
+      .filter((feedback) => feedback.range_bytes_start != null)
+      .map((feedback) => {
+        const lineNumber = feedback.range_bytes_start ?? null;
+        if (lineNumber != null) {
+          feedbackMap.set(lineNumber, {
+            lineNumber,
+            text: feedback.feedback,
+            status: FeedbackStatus.Saved,
+          });
+        }
+      });
+    return feedbackMap;
+  }
+
+  // This function updates the state and URL of the history object in the
+  // browser based on the provided parameters
+  function resetHash(selectedTab: string, alias: null | string) {
+    if (!alias) {
+      history.replaceState({ selectedTab }, 'updateTab', `#${selectedTab}`);
+      return;
+    }
+    history.replaceState(
+      { selectedTab, alias },
+      'resetHash',
+      `#${selectedTab}/${alias}`,
+    );
   }
 
   if (payload.currentAssignment.runs) {
@@ -482,4 +554,50 @@ OmegaUp.on('ready', async () => {
       courseAlias: payload.courseDetails.alias,
     });
   }, 5 * 60 * 1000);
+
+  const component = arenaCourse.$refs.component as arena_Course;
+
+  window.addEventListener('hashchange', async () => {
+    const { problem, guid } = getOptionsFromLocation(window.location.hash);
+    if (guid != null && problem != null) {
+      navigateToProblem({
+        type: NavigationType.ForSingleProblemOrCourse,
+        problem,
+        target: arenaCourse,
+        problems: arenaCourse.problems,
+        problemsetId: payload.currentAssignment.problemset_id,
+        guid,
+      });
+      component.activeProblem = problem;
+
+      const hash = `#problems/${problem.alias}/show-run:${guid}`;
+      api.Run.details({ run_alias: guid })
+        .then((runDetails) => {
+          arenaCourse.runDetailsData = showSubmission({
+            request: {
+              guid,
+              isAdmin: courseAdmin,
+              hash,
+            },
+            runDetails,
+          });
+
+          arenaCourse.feedbackMap = getFeedbackMap(
+            arenaCourse.runDetailsData.feedback,
+          );
+
+          if (hash) {
+            window.location.hash = hash;
+          }
+        })
+        .catch((run) => {
+          submitRunFailed({
+            error: run.error,
+            errorname: run.errorname,
+            run,
+          });
+        });
+      component.currentPopupDisplayed = PopupDisplayed.RunDetails;
+    }
+  });
 });
