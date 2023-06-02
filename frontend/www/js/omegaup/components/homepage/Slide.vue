@@ -1,5 +1,5 @@
 <template>
-  <div class="container-lg p-4">
+  <div class="container-lg p-4 bg-danger">
     <div
       class="slide d-flex align-items-center justify-content-around flex-wrap flex-lg-nowrap"
     >
@@ -50,6 +50,10 @@ export default class Slide extends Vue {
 .slide {
   @media only screen and (min-width: 767px) {
     height: 500px;
+  }
+
+  @media only screen and (max-width: 767px) {
+    height: 700px;
   }
 
   h2 {
