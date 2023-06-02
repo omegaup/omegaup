@@ -1,6 +1,8 @@
 import 'cypress-file-upload';
 import 'cypress-wait-until';
-import { ContestOptions, GroupOptions } from "../types";
+import { v4 as uuid } from 'uuid';
+import { ContestOptions, GroupOptions, LoginOptions } from "../types";
+import { addSubtractDaysToDate } from '../commands';
 
 /**
  * Creates a group as an admin and returns a generated group alias.
@@ -128,7 +130,101 @@ export const updateScoreboardForContest = (contestAlias: string) => {
    const encodedContestAlias = encodeURIComponent(contestAlias);
    const scoreboardRefreshUrl = `/api/scoreboard/refresh/alias/${encodedContestAlias}/token/secret`;
 
-   cy.request(scoreboardRefreshUrl)
-      .its('body')
-      .should('contain', '"status":"ok"');
+   cy.request(scoreboardRefreshUrl).then((resp) => {
+      expect(resp.status).to.eq(200);
+   })
+};
+
+/**
+ * Creates a contest as an admin.
+ */
+export const createContestAdmin = (contestOptions: ContestOptions, users: Array<string>) => {
+   cy.loginAdmin();
+   cy.createContest(contestOptions);
+
+   cy.location('href').should('include', contestOptions.contestAlias);
+   cy.get('[name="title"]').should('have.value', contestOptions.contestAlias);
+   cy.get('[name="alias"]').should('have.value', contestOptions.contestAlias);
+   cy.get('[name="description"]').should(
+      'have.value',
+      contestOptions.description,
+   );
+
+   cy.addProblemsToContest(contestOptions);
+
+   addStudentsBulk(users);
+   cy.changeAdmissionModeContest(contestOptions);
+   
+   cy.get('a[data-contest-link-button]').click();
+   cy.url().should('include', '/arena/' + contestOptions.contestAlias);
+   
+   cy.get('a[href="#ranking"]').click();
+   cy.waitUntil(() =>
+      cy.get('.omegaup-scoreboard').should('be.visible')
+   );
+   cy.logout();
+};
+
+/**
+ * Registers multiple users and return their details.
+ */
+export const registerMultileUsers = (noOfUsers: number): LoginOptions[] => {
+   const users: LoginOptions[] = [];
+
+   for(let i=0;i<noOfUsers;i++) {
+      const userLoginOptions: LoginOptions = {
+         username: 'utGroup_' + uuid(),
+         password: 'P@55w0rd',
+      };
+
+      cy.register(userLoginOptions);
+      cy.logout();
+      users.push(userLoginOptions);
+   }
+
+   return users;
+};
+
+/**
+ * Generates contest options for creating a contest.
+ */
+export const generateContestOptions = (): ContestOptions => {
+   const now = new Date();
+   
+   enum ScoreMode {
+     AllOrNothing = 'all_or_nothing',
+     Partial = 'partial',
+     MaxPerGroup = 'max_per_group',
+   }
+
+   const contestOptions: ContestOptions = {
+     contestAlias: 'contest' + uuid().slice(0, 5),
+     description: 'Test Description',
+     startDate: addSubtractDaysToDate(now, {days: -1}),
+     endDate: addSubtractDaysToDate(now, {days: 2}),
+     showScoreboard: true,
+     basicInformation: false,
+     scoreMode: ScoreMode.Partial,
+     requestParticipantInformation: 'no',
+     admissionMode: 'public',
+     problems: [
+       {
+         problemAlias: 'sumas',
+         tag: 'Recursion',
+         autoCompleteTextTag: 'Recur',
+         problemLevelIndex: 1,
+       },
+     ],
+     runs: [
+       {
+         problemAlias: 'sumas',
+         fixturePath: 'main.cpp',
+         language: 'cpp11-gcc',
+         valid: true,
+         status: 'AC'
+       }
+     ]
+   };
+
+   return contestOptions;
 };

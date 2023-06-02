@@ -30,7 +30,7 @@
     <td class="align-middle" data-form-clarification-message>
       <pre>{{ clarification.message }}</pre>
     </td>
-    <td v-if="isAdmin" class="align-middle">
+    <td v-if="isAdmin" class="align-middle" data-form-clarification-resolved-answer>
       <template v-if="clarification.answer">
         <pre>{{ clarification.answer }}</pre>
         <div v-if="!showUpdateAnswer" class="form-check mt-2 mt-xl-0">

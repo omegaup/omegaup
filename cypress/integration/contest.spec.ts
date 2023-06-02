@@ -1,12 +1,8 @@
-import 'cypress-wait-until';
 import { v4 as uuid } from 'uuid';
 import {
-  ContestOptions,
   GroupOptions,
-  LoginOptions
 } from '../support/types';
-import { addIdentitiesGroup, addStudentsBulk, createClarificationUser, createGroup, updateScoreboardForContest } from '../support/utils/common'
-import { addSubtractDaysToDate } from '../support/commands';
+import {  addIdentitiesGroup, createClarificationUser, createContestAdmin, createGroup, generateContestOptions, registerMultileUsers, updateScoreboardForContest } from '../support/utils/common'
 
 describe('Contest Test', () => {
     beforeEach(() => {
@@ -16,120 +12,102 @@ describe('Contest Test', () => {
     });
 
     it('Should create a contest and retrieve it', () => {
-        const adminLoginOptions: LoginOptions = {
-          username: 'omegaup',
-          password: 'omegaup',
-        };
+      const userLoginOptions = registerMultileUsers(2);
 
-        const groupOptions: GroupOptions = {
-          groupTitle: 'ut_group_' + uuid(),
-          groupDescription: 'group description', 
-        };
+      const groupOptions: GroupOptions = {
+        groupTitle: 'ut_group_' + uuid(),
+        groupDescription: 'group description', 
+      };
 
-        cy.login(adminLoginOptions);
+      cy.loginAdmin();
+      createGroup(groupOptions);
+      addIdentitiesGroup();
+      cy.logout();
 
-        createGroup(groupOptions);
-        addIdentitiesGroup();
+      const contestOptions = generateContestOptions();
 
-        const userLoginOptions1: LoginOptions = {
-          username: 'utGroup_' + uuid(),
-          password: 'P@55w0rd',
-        };
-        cy.register(userLoginOptions1);
-        cy.logout();
+      const users = [userLoginOptions[0].username, userLoginOptions[1].username];
+      createContestAdmin(contestOptions, users);
 
-        const userLoginOptions2: LoginOptions = {
-          username: 'utGroup_' + uuid(),
-          password: 'P@55w0rd',
-        };
-        cy.register(userLoginOptions2);
-        cy.logout();
+      cy.login(userLoginOptions[0]);
+      cy.enterContest(contestOptions);
+      cy.createRunsInsideContest(contestOptions);
+      cy.logout();
 
-        const now = new Date();
+      updateScoreboardForContest(contestOptions.contestAlias);
+      
+      cy.loginAdmin();
+      cy.get('a[data-nav-contests]').click();
+      cy.get('a[data-nav-contests-arena]').click();
+      cy.get(`a[href="/arena/${contestOptions.contestAlias}/"]`).first().click();
+      cy.get('a[href="#ranking"]').click();
+      cy.get('[data-table-scoreboard-username]').first().should('contain', userLoginOptions[0].username);
+      cy.get('[data-table-scoreboard-username]').last().should('contain', userLoginOptions[1].username);
+      cy.logout();
+    });
 
-        enum ScoreMode {
-          AllOrNothing = 'all_or_nothing',
-          Partial = 'partial',
-          MaxPerGroup = 'max_per_group',
-        }
+    it('Should create a contest and add a clarification.', () => {
+      const contestOptions = generateContestOptions();
+      const userLoginOptions = registerMultileUsers(1);
+
+      createContestAdmin(contestOptions, [userLoginOptions[0].username]);
+
+      cy.login(userLoginOptions[0]);
+      cy.enterContest(contestOptions);
+      createClarificationUser(contestOptions, 'Question 1');
+      cy.logout();
+
+      cy.loginAdmin();
+      cy.get('a[data-nav-contests]').click();
+      cy.get('a[data-nav-contests-arena]').click();
+      cy.get(`a[href="/arena/${contestOptions.contestAlias}/"]`).first().click();
+      cy.get('a[href="#clarifications"]').click();
+      cy.get('[data-tab-clarifications]').should('be.visible')
+      cy.get('[data-select-answer]').select('No');
+      cy.get('[data-form-clarification-answer]').submit();
+      cy.get('[data-form-clarification-resolved-answer]').should('contain', 'No');
+      cy.logout();
+    });
+    
+    it.only('Should create a contest and reviewing ranking', () => {
+      const contestOptions = generateContestOptions();
+      const userLoginOptions = registerMultileUsers(4);
   
-        const contestOptions: ContestOptions = {
-          contestAlias: 'contest' + uuid().slice(0, 5),
-          description: 'Test Description',
-          startDate: addSubtractDaysToDate(now, {days: -1}),
-          endDate: addSubtractDaysToDate(now, {days: 2}),
-          showScoreboard: true,
-          basicInformation: false,
-          scoreMode: ScoreMode.Partial,
-          requestParticipantInformation: 'no',
-          admissionMode: 'public',
-          problems: [
-            {
-              problemAlias: 'sumas',
-              tag: 'Recursion',
-              autoCompleteTextTag: 'Recur',
-              problemLevelIndex: 1,
-            },
-          ],
-          runs: [
-            {
-              problemAlias: 'sumas',
-              fixturePath: 'main.cpp',
-              language: 'cpp11-gcc',
-              valid: true,
-              status: 'AC'
-            }
-          ]
-        };
-        
-        cy.login(adminLoginOptions);
-        cy.createContest(contestOptions);
+      const groupOptions: GroupOptions = {
+        groupTitle: 'ut_group_' + uuid(),
+        groupDescription: 'group description', 
+      };
 
-        cy.location('href').should('include', contestOptions.contestAlias);
-        cy.get('[name="title"]').should('have.value', contestOptions.contestAlias);
-        cy.get('[name="alias"]').should('have.value', contestOptions.contestAlias);
-        cy.get('[name="description"]').should(
-          'have.value',
-          contestOptions.description,
-        );
+      cy.loginAdmin();
+      createGroup(groupOptions);
+      addIdentitiesGroup();
+      cy.logout();
 
-        cy.addProblemsToContest(contestOptions);
-        const users = [userLoginOptions1.username, userLoginOptions2.username];
-        addStudentsBulk(users);
-        cy.changeAdmissionModeContest(contestOptions);
-        
-        cy.get('a[data-contest-link-button]').click();
-        cy.url().should('include', '/arena/' + contestOptions.contestAlias);
-        
-        cy.get('a[href="#ranking"]').click();
-        cy.waitUntil(() =>
-          cy.get('.omegaup-scoreboard').should('be.visible')
-        );
-        cy.logout();
+      const users: Array<string> = [];
+      userLoginOptions.forEach((loginDetails) => {
+        users.push(loginDetails.username);
+      });
 
-        cy.login(userLoginOptions1);
-        cy.enterContest(contestOptions);
-        cy.createRunsInsideContest(contestOptions);
-        cy.pause();
-        cy.logout();
+      createContestAdmin(contestOptions, users);
 
-        cy.login(userLoginOptions2);
-        cy.enterContest(contestOptions);
-        contestOptions.runs[0].fixturePath = 'main_wrong.cpp';
-        contestOptions.runs[0].status = 'PA';
-        cy.createRunsInsideContest(contestOptions);
-        cy.pause();
-        cy.logout();
+      cy.login(userLoginOptions[0]);
+      cy.enterContest(contestOptions);
+      cy.createRunsInsideContest(contestOptions);
+      cy.logout();
 
-        // updateScoreboardForContest(contestOptions.contestAlias);
-        
-        cy.login(adminLoginOptions);
-        cy.get('a[data-nav-user]').click();
-        cy.get('a[data-nav-user-contests]').click();
+      cy.login(userLoginOptions[2]);
+      cy.enterContest(contestOptions);
+      cy.createRunsInsideContest(contestOptions);
+      cy.logout();
 
-        cy.pause();
+      updateScoreboardForContest(contestOptions.contestAlias);
 
-
+      cy.loginAdmin();
+      cy.get('a[data-nav-contests]').click();
+      cy.get('a[data-nav-contests-arena]').click();
+      cy.get(`a[href="/arena/${contestOptions.contestAlias}/"]`).first().click();
+      cy.get('a[href="#ranking"]').click();
+      cy.pause();
     });
 
 });

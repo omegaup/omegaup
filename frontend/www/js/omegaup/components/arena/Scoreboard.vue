@@ -64,8 +64,8 @@
             :class="user.username"
           >
             <td class="legend" :class="legendClass(userIndex)"></td>
-            <td class="position">{{ user.place || '—' }}</td>
-            <td class="user">
+            <td class="position" data-table-scoreboard-position>{{ user.place || '—' }}</td>
+            <td class="user" data-table-scoreboard-username>
               {{ ui.rankingUsername(user, nameDisplayOptions) }}
               <img
                 v-if="user.country"

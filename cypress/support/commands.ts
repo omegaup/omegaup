@@ -20,6 +20,19 @@ Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
   });
 });
 
+// Logins the user as an admin
+Cypress.Commands.add('loginAdmin', () => {
+  const username = 'omegaup';
+  const password = 'omegaup';
+
+  const URL =
+    '/api/user/login?' + buildURLQuery({ usernameOrEmail: username, password });
+  cy.request(URL).then((response) => {
+    expect(response.status).to.equal(200);
+    cy.reload();
+  });
+});
+
 // Logouts the user
 Cypress.Commands.add('logout', () => {
   const URL = '/logout/?redirect=/';
@@ -262,7 +275,7 @@ Cypress.Commands.add(
       cy.get('[data-run-status] > span')
         .first()
         .should('have.text', expectedStatus);
-    }status
+    }
   },
 );
 
