@@ -93,4 +93,9 @@ export default class Testimonials extends Vue {
     }
   }
 }
+@media only screen and (max-width: 720px) {
+  .carousel-inner {
+  min-height: 31rem;
+  }
+}
 </style>
