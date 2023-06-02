@@ -23,8 +23,10 @@ import T from '../../lang';
 import CodeMirror from 'codemirror';
 import { EditorOptions, languageModeMap, modeList } from './CodeView.vue';
 import Feedback, { ArenaCourseFeedback, FeedbackStatus } from './Feedback.vue';
+import FeedbackThread from './FeedbackThread.vue';
 
 const FeedbackClass = Vue.extend(Feedback);
+const FeedbackThreadClass = Vue.extend(FeedbackThread);
 
 for (const mode of modeList) {
   require(`codemirror/mode/${mode}/${mode}.js`);
@@ -39,7 +41,11 @@ export default class FeedbackCodeView extends Vue {
   @Prop({ default: true }) readonly!: boolean;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackMap!: Map<number, ArenaCourseFeedback>;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
   @Ref('cm-editor') private readonly cmEditor!: HTMLTextAreaElement;
+  @Prop() currentUsername!: string;
+  @Prop() currentUserClassName!: string;
 
   T = T;
   mode = languageModeMap[this.language] ?? languageModeMap['cpp17-gcc'];
@@ -69,7 +75,7 @@ export default class FeedbackCodeView extends Vue {
   mounted() {
     const editor = CodeMirror.fromTextArea(this.cmEditor, this.editorOptions);
 
-    for (const [, feedback] of this.feedbackMap) {
+    for (const [feedbackKey, feedback] of this.feedbackMap) {
       const feedbackForm = new FeedbackClass({
         propsData: { feedback },
       });
@@ -80,6 +86,69 @@ export default class FeedbackCodeView extends Vue {
         feedbackForm.$el as HTMLElement,
         {
           className: 'px-2',
+        },
+      );
+
+      const feedbackThreadMap = [...this.feedbackThreadMap]
+        .filter(
+          ([, feedbackThreadValue]) =>
+            feedbackThreadValue.lineNumber == feedbackKey,
+        )
+        .reverse();
+      for (const [, feedbackThread] of feedbackThreadMap) {
+        const feedbackThreadForm = new FeedbackThreadClass({
+          propsData: {
+            feedbackThread,
+            saved: true,
+          },
+        });
+        feedbackThreadForm.$mount();
+        editor.addLineWidget(
+          feedback.lineNumber,
+          feedbackThreadForm.$el as HTMLElement,
+          {
+            className: 'px-2',
+          },
+        );
+
+        feedbackThreadForm.$on(
+          'submit-feedback-thread',
+          (feedbackThread: ArenaCourseFeedback) => {
+            this.$emit('submit-feedback-thread', {
+              ...feedbackThread,
+              submissionFeedbackId: feedback.submissionFeedbackId,
+            });
+          },
+        );
+      }
+
+      const feedbackThreadNewForm = new FeedbackThreadClass({
+        propsData: {
+          feedbackThread: {
+            lineNumber: feedback.lineNumber,
+            text: null,
+            status: FeedbackStatus.New,
+            author: this.currentUsername,
+            authorClassname: this.currentUserClassName,
+          },
+        },
+      });
+      feedbackThreadNewForm.$mount();
+      editor.addLineWidget(
+        feedback.lineNumber,
+        feedbackThreadNewForm.$el as HTMLElement,
+        {
+          className: 'px-2',
+        },
+      );
+
+      feedbackThreadNewForm.$on(
+        'submit-feedback-thread',
+        (feedbackThread: ArenaCourseFeedback) => {
+          this.$emit('submit-feedback-thread', {
+            ...feedbackThread,
+            submissionFeedbackId: feedback.submissionFeedbackId,
+          });
         },
       );
     }
