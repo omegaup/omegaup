@@ -10,8 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 
-from ui import util  # pylint: disable=no-name-in-module
-from time import sleep
+from ui import util  # pylint: disable=no-name-in-module 
 
 @util.no_javascript_errors()
 @util.annotate
@@ -362,8 +361,6 @@ def create_contest_admin(driver, contest_alias, problem, users, user,
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, '.omegaup-scoreboard')))
-        print("End")
-        sleep(200)
         assert ((contest_url) in
                 driver.browser.current_url), driver.browser.current_url
 

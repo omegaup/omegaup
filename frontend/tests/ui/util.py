@@ -486,7 +486,6 @@ def create_group(driver, group_title, description):
 
     group_alias = re.search(r'/group/([^/]*)/edit/',
                             driver.browser.current_url).group(1)
-    print(group_alias)
     return group_alias
 
 
@@ -547,8 +546,6 @@ def add_identities_group(driver, group_alias) -> List[Identity]:
             'username %s does not match with %s' % (
                 identity.username, uploaded_identities[i]))
 
-    print("Start")  
-    sleep(10)
     return identities
 
 
