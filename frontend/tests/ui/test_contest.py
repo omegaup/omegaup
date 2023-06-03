@@ -10,7 +10,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 
-from ui import util  # pylint: disable=no-name-in-module 
+from ui import util  # pylint: disable=no-name-in-module
+
 
 @util.no_javascript_errors()
 @util.annotate
