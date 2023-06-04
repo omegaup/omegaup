@@ -1,5 +1,5 @@
 <template>
-  <div class="container-lg p-4 bg-danger">
+  <div class="container-lg p-4">
     <div
       class="slide d-flex align-items-center justify-content-around flex-wrap flex-lg-nowrap"
     >
