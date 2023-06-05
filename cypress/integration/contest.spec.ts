@@ -29,7 +29,7 @@ describe('Contest Test', () => {
     const contestOptions = contestPage.generateContestOptions();
 
     const users = [userLoginOptions[0].username, userLoginOptions[1].username];
-    contestPage.createContestAdmin(contestOptions, users);
+    contestPage.createContestAsAdmin(contestOptions, users);
 
     cy.login(userLoginOptions[0]);
     cy.enterContest(contestOptions);
@@ -52,7 +52,7 @@ describe('Contest Test', () => {
     const contestOptions = contestPage.generateContestOptions();
     const userLoginOptions = loginPage.registerMultipleUsers(1);
 
-    contestPage.createContestAdmin(contestOptions, [userLoginOptions[0].username]);
+    contestPage.createContestAsAdmin(contestOptions, [userLoginOptions[0].username]);
 
     cy.login(userLoginOptions[0]);
     cy.enterContest(contestOptions);
@@ -90,7 +90,7 @@ describe('Contest Test', () => {
       users.push(loginDetails.username);
     });
 
-    contestPage.createContestAdmin(contestOptions, users);
+    contestPage.createContestAsAdmin(contestOptions, users);
 
     cy.login(userLoginOptions[0]);
     cy.enterContest(contestOptions);
