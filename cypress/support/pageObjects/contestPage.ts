@@ -152,13 +152,7 @@ export class ContestPage {
 
     generateContestOptions(): ContestOptions {
         const now = new Date();
-   
-        enum ScoreMode {
-          AllOrNothing = 'all_or_nothing',
-          Partial = 'partial',
-          MaxPerGroup = 'max_per_group',
-        }
-     
+
         const contestOptions: ContestOptions = {
           contestAlias: 'contest' + uuid().slice(0, 5),
           description: 'Test Description',
