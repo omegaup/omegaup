@@ -485,6 +485,7 @@ def create_group(driver, group_title, description):
 
     group_alias = re.search(r'/group/([^/]*)/edit/',
                             driver.browser.current_url).group(1)
+
     return group_alias
 
 
@@ -520,7 +521,6 @@ def add_identities_group(driver, group_alias) -> List[Identity]:
         By.XPATH,
         '//table[@data-identities-table]/tbody/tr/td[contains(concat(" ", '
         'normalize-space(@class), " "), " password ")]')
-
     usernames = [username.text for username in username_elements]
     passwords = [password.text for password in password_elements]
 
