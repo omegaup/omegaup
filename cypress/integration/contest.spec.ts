@@ -14,7 +14,7 @@ describe('Contest Test', () => {
   });
 
   it('Should create a contest and retrieve it', () => {
-    const userLoginOptions = loginPage.registerMultileUsers(2);
+    const userLoginOptions = loginPage.registerMultipleUsers(2);
 
     const groupOptions: GroupOptions = {
       groupTitle: 'ut_group_' + uuid(),
@@ -50,7 +50,7 @@ describe('Contest Test', () => {
 
   it('Should create a contest and add a clarification.', () => {
     const contestOptions = contestPage.generateContestOptions();
-    const userLoginOptions = loginPage.registerMultileUsers(1);
+    const userLoginOptions = loginPage.registerMultipleUsers(1);
 
     contestPage.createContestAdmin(contestOptions, [userLoginOptions[0].username]);
 
@@ -73,7 +73,7 @@ describe('Contest Test', () => {
 
   it('Should create a contest and review ranking', () => {
     const contestOptions = contestPage.generateContestOptions();
-    const userLoginOptions = loginPage.registerMultileUsers(4);
+    const userLoginOptions = loginPage.registerMultipleUsers(4);
 
     const groupOptions: GroupOptions = {
       groupTitle: 'ut_group_' + uuid(),
