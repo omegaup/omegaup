@@ -22,9 +22,9 @@ export class ContestPage {
         cy.get('[href="#identities"]').click();
         cy.get('[name="identities"]').attachFile('identities.csv');
 
-        cy.get('[data-identity-username]').then(($els) => {
+        cy.get('[data-identity-username]').then((rawHTMLElements) => {
             const userNames: Array<string> = [];
-            Cypress.$.makeArray($els).forEach((element) => {
+            Cypress.$.makeArray(rawHTMLElements).forEach((element) => {
                 cy.task('log', element.innerText);
                 userNames.push(element.innerText);
             });
@@ -33,9 +33,9 @@ export class ContestPage {
         });
 
         const uploadedPasswords: Array<string> = [];
-        cy.get('[data-identity-password]').then(($els) => {
+        cy.get('[data-identity-password]').then((rawHTMLElements) => {
             uploadedPasswords.concat(
-                Cypress.$.makeArray($els).map((el) => el.innerText),
+                Cypress.$.makeArray(rawHTMLElements).map((el) => el.innerText),
             );
         });
 
@@ -49,8 +49,8 @@ export class ContestPage {
         cy.get('@userNamesList').then((textArray) => {
             cy.get('[data-members-username]')
                 .should('have.length', textArray.length)
-                .then(($els) => {
-                    return Cypress.$.makeArray($els).map((el) => el.innerText);
+                .then((rawHTMLElements) => {
+                    return Cypress.$.makeArray(rawHTMLElements).map((el) => el.innerText);
                 })
                 .should('deep.equal', textArray);
         });
@@ -63,9 +63,9 @@ export class ContestPage {
         cy.get('textarea[data-contestant-names]').type(users.join(', '));
         cy.get('.user-add-bulk').click();
 
-        cy.get('[data-uploaded-contestants]').then(($els) => {
+        cy.get('[data-uploaded-contestants]').then((rawHTMLElements) => {
             const constestantNames: Array<string> = [];
-            Cypress.$.makeArray($els).forEach((element) => {
+            Cypress.$.makeArray(rawHTMLElements).forEach((element) => {
                 cy.task('log', element.innerText);
                 constestantNames.push(element.innerText);
             });
