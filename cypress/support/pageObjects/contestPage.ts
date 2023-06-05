@@ -2,8 +2,14 @@ import 'cypress-file-upload';
 import 'cypress-wait-until';
 import { v4 as uuid } from 'uuid';
 
-import { ContestOptions, GroupOptions, ScoreMode } from '../types';
+import { ContestOptions, GroupOptions } from '../types';
 import { addSubtractDaysToDate } from '../commands';
+
+enum ScoreMode {
+    AllOrNothing = 'all_or_nothing',
+    Partial = 'partial',
+    MaxPerGroup = 'max_per_group',
+}
 
 export class ContestPage {
     createGroup(groupOptions: GroupOptions): void {
@@ -106,7 +112,7 @@ export class ContestPage {
         })
     };
 
-    createContestAdmin(contestOptions: ContestOptions, users: Array<string>): void {
+    createContestAsAdmin(contestOptions: ContestOptions, users: Array<string>): void {
         cy.loginAdmin();
         cy.createContest(contestOptions);
 
@@ -137,34 +143,34 @@ export class ContestPage {
         const now = new Date();
 
         const contestOptions: ContestOptions = {
-          contestAlias: 'contest' + uuid().slice(0, 5),
-          description: 'Test Description',
-          startDate: addSubtractDaysToDate(now, {days: -1}),
-          endDate: addSubtractDaysToDate(now, {days: 2}),
-          showScoreboard: true,
-          basicInformation: false,
-          scoreMode: ScoreMode.Partial,
-          requestParticipantInformation: 'no',
-          admissionMode: 'public',
-          problems: [
-            {
-              problemAlias: 'sumas',
-              tag: 'Recursion',
-              autoCompleteTextTag: 'Recur',
-              problemLevelIndex: 1,
-            },
-          ],
-          runs: [
-            {
-              problemAlias: 'sumas',
-              fixturePath: 'main.cpp',
-              language: 'cpp11-gcc',
-              valid: true,
-              status: 'AC'
-            }
-          ]
+            contestAlias: 'contest' + uuid().slice(0, 5),
+            description: 'Test Description',
+            startDate: addSubtractDaysToDate(now, { days: -1 }),
+            endDate: addSubtractDaysToDate(now, { days: 2 }),
+            showScoreboard: true,
+            basicInformation: false,
+            scoreMode: ScoreMode.Partial,
+            requestParticipantInformation: 'no',
+            admissionMode: 'public',
+            problems: [
+                {
+                    problemAlias: 'sumas',
+                    tag: 'Recursion',
+                    autoCompleteTextTag: 'Recur',
+                    problemLevelIndex: 1,
+                },
+            ],
+            runs: [
+                {
+                    problemAlias: 'sumas',
+                    fixturePath: 'main.cpp',
+                    language: 'cpp11-gcc',
+                    valid: true,
+                    status: 'AC'
+                }
+            ]
         };
-     
+
         return contestOptions;
     }
 }
