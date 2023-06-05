@@ -10,25 +10,18 @@ export class ContestPage {
         cy.get('[data-nav-user]').click();
         cy.get('[data-nav-user-groups]').click();
 
-        // Click on the button to create a new group
         cy.get('[href="/group/new/"]').click();
 
-        // Fill out the form to create a new group
         cy.get('[name="title"]').type(groupOptions.groupTitle);
         cy.get('[name="description"]').type(groupOptions.groupDescription);
 
-        // Submit the form to create the group
         cy.get('[data-group-new]').submit();
     }
 
     addIdentitiesGroup(): void {
-        // Navigate to the "Identities" tab
         cy.get('[href="#identities"]').click();
-
-        // Upload a CSV file
         cy.get('[name="identities"]').attachFile('identities.csv');
 
-        // Extract the usernames from the table
         cy.get('[data-identity-username]').then(($els) => {
             const userNames: Array<string> = [];
             Cypress.$.makeArray($els).forEach((element) => {
@@ -39,7 +32,6 @@ export class ContestPage {
             cy.wrap(userNames).as('userNamesList');
         });
 
-        // Extract the passwords from the table
         const uploadedPasswords: Array<string> = [];
         cy.get('[data-identity-password]').then(($els) => {
             uploadedPasswords.concat(
@@ -53,9 +45,7 @@ export class ContestPage {
             return cy.get('#alert-close').should('not.be.visible');
         });
 
-        // Navigate to the "Members" tab
         cy.get('[href="#members"]').click();
-
         cy.get('@userNamesList').then((textArray) => {
             cy.get('[data-members-username]')
                 .should('have.length', textArray.length)
@@ -73,7 +63,6 @@ export class ContestPage {
         cy.get('textarea[data-contestant-names]').type(users.join(', '));
         cy.get('.user-add-bulk').click();
 
-        // Extract the usernames from the table
         cy.get('[data-uploaded-contestants]').then(($els) => {
             const constestantNames: Array<string> = [];
             Cypress.$.makeArray($els).forEach((element) => {
