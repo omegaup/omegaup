@@ -48,12 +48,10 @@ export default class Slide extends Vue {
 
 <style lang="scss" scoped>
 .slide {
+  height: 700px;
+
   @media only screen and (min-width: 767px) {
     height: 500px;
-  }
-
-  @media only screen and (max-width: 767px) {
-    height: 700px;
   }
 
   h2 {
