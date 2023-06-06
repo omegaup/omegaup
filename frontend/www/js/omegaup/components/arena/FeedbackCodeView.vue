@@ -94,7 +94,12 @@ export default class FeedbackCodeView extends Vue {
           ([, feedbackThreadValue]) =>
             feedbackThreadValue.lineNumber == feedbackKey,
         )
-        .reverse();
+        .sort(
+          (
+            a: [number, ArenaCourseFeedback],
+            b: [number, ArenaCourseFeedback],
+          ) => a[0] - b[0],
+        );
       for (const [, feedbackThread] of feedbackThreadMap) {
         const feedbackThreadForm = new FeedbackThreadClass({
           propsData: {

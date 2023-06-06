@@ -194,7 +194,8 @@
                     $emit('save-feedback-list', { feedbackList, guid })
                 "
                 @submit-feedback-thread="
-                  (feedback) => $emit('submit-feedback-thread', feedback)
+                  (feedback) =>
+                    $emit('submit-feedback-thread', { feedback, guid })
                 "
               ></omegaup-arena-feedback-code-view>
             </template>

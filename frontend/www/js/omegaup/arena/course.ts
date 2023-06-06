@@ -466,7 +466,13 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.ignoreError);
           },
-          'submit-feedback-thread': (feedback: ArenaCourseFeedback) => {
+          'submit-feedback-thread': ({
+            feedback,
+            guid,
+          }: {
+            feedback: ArenaCourseFeedback;
+            guid: string;
+          }) => {
             api.Submission.setFeedback({
               guid,
               course_alias: payload.courseDetails.alias,
@@ -477,9 +483,10 @@ OmegaUp.on('ready', async () => {
             })
               .then(() => {
                 ui.success(T.feedbackSuccesfullyAdded);
+                resetHash('runs', null);
+                component.currentPopupDisplayed = PopupDisplayed.None;
               })
               .catch(ui.error);
-            console.log(feedback);
           },
         },
         ref: 'component',
