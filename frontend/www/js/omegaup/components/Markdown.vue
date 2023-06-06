@@ -211,6 +211,7 @@ export default class Markdown extends Vue {
 
   p {
     margin-bottom: 1em;
+    font-size: 1.06rem;
   }
 
   ul {
@@ -223,7 +224,7 @@ export default class Markdown extends Vue {
 
   ul li,
   ol li {
-    margin-left: 0.25em;
+    margin-bottom: 0.6em;
   }
 
   pre {
