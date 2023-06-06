@@ -302,9 +302,6 @@ class Scoreboard {
                 'problemsetNotFound'
             );
         }
-        $contestRunsForEvents = \OmegaUp\DAO\Runs::getProblemsetRuns(
-            $params->problemset_id
-        );
 
         // Get all distinct contestants participating in the contest
         $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
@@ -339,6 +336,9 @@ class Scoreboard {
             $params
         );
 
+        $contestRunsForEvents = \OmegaUp\DAO\Runs::getProblemsetRuns(
+            $params->problemset_id
+        );
         if ($params->score_mode === 'max_per_group') {
             // The way to calculate the score is different in this mode
             $contestRuns = \OmegaUp\DAO\RunsGroups::getProblemsetRunsGroups(
@@ -836,11 +836,13 @@ class Scoreboard {
 
             $identityId = $run['identity_id'];
             $problemId = $run['problem_id'];
-            if (
-                $params->score_mode === 'max_per_group' && isset(
-                    $run['score_by_group']
-                )
-            ) {
+            if ($params->score_mode === 'max_per_group') {
+                if (!isset($run['score_by_group'])) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterInvalid',
+                        'score_by_group'
+                    );
+                }
                 $contestScore = self::getMaxPerGroupScore(
                     $identityProblemsScoreByGroup,
                     $run['score_by_group'],
