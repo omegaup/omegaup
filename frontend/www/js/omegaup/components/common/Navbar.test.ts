@@ -64,8 +64,8 @@ describe('Navbar.vue', () => {
   });
 
   it('Should handle common navbar to logged user', () => {
-    const wrapper = mount(common_Navbar, {
-      propsData: { ...propsData },
+    const wrapper = shallowMount(common_Navbar, {
+      propsData,
     });
 
     expect(wrapper.find('[data-login-button]')).toBeTruthy();
