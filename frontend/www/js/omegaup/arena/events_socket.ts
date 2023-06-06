@@ -124,7 +124,6 @@ export class EventsSocket {
         time: time.remoteTime(run.time * 1000),
         score_by_group: run.score_per_group,
       };
-      delete updatedRun.score_per_group;
       updateRun({ run: updatedRun });
     } else if (data.message == '/clarification/update/') {
       data.clarification.time = time.remoteTime(data.clarification.time * 1000);
