@@ -9,7 +9,7 @@
     </div>
     <div class="col-md-6 mt-2 mt-md-0" :class="{ 'order-md-1': imageToRight }">
       <p class="section-description">{{ description }}</p>
-      <div class="d-flex justify-content-center"> 
+      <div class="d-flex justify-content-center">
         <a
           v-for="(button, index) in buttons"
           :key="index"
