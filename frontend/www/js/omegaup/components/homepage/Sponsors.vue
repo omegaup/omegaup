@@ -35,4 +35,13 @@ h3.display-4 {
 img.img-fluid {
   max-width: 332px;
 }
+
+@media only screen and (max-width: 767px) {
+  h3.display-4 {
+    font-size: 3.2em;
+  }
+  img.img-fluid {
+    max-width: 300px;
+  }
+}
 </style>
