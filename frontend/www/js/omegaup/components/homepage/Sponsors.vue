@@ -33,8 +33,8 @@ h3.display-4 {
   font-size: 1.88rem;
   margin-top: 1.88em;
 }
-
 img.img-fluid {
-  max-width: 240px;
+  max-width: 220px;
+  margin: 0 !important;
 }
 </style>

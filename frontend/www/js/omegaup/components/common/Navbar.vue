@@ -404,16 +404,13 @@ nav.navbar {
   .navbar-brand {
     background-color: var(--header-navbar-brand-background-color);
   }
-
   a.dropdown-item {
     color: var(--header-navbar-dropdown-item-font-color);
   }
-
   .collapse-submenu .btn:focus {
     box-shadow: 0 0 0 0;
   }
 }
-
 .allow-overflow {
   overflow-y: scroll;
   height: 65vh;

@@ -15,20 +15,6 @@
           </div>
         </div>
         <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
-          <h4 class="column-title">{{ T.frontPageFooterSponsors }}</h4>
-          <ul>
-            <li class="mt-1">
-              <a href="https://replit.com/" target="_blank">
-                <img
-                  class="sponsor-logo"
-                  src="/media/homepage/replit_logo.png"
-                  alt="ReplitLogo"
-                />
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
           <h4 class="column-title">{{ T.frontPageFooterSite }}</h4>
           <ul>
             <li class="mt-1">
@@ -47,6 +33,20 @@
               <a href="https://blog.omegaup.com" target="_blank">{{
                 T.navBlog
               }}</a>
+            </li>
+          </ul>
+        </div>
+        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
+          <h4 class="column-title">{{ T.frontPageFooterSponsors }}</h4>
+          <ul>
+            <li class="mt-1">
+              <a href="https://replit.com/" target="_blank">
+                <img
+                  class="sponsor-logo"
+                  src="/media/homepage/replit_logo.png"
+                  alt="ReplitLogo"
+                />
+              </a>
             </li>
           </ul>
         </div>
@@ -102,7 +102,7 @@
           </ul>
           <div class="social-icons my-0 mx-auto">
             <a
-              class="text-nowrap pt-2"
+            class="text-nowrap pt-2"
               href="https://www.facebook.com/omegaup/"
               target="_blank"
             >
@@ -110,7 +110,7 @@
               Facebook
             </a>
             <a
-              class="text-nowrap pt-2"
+            class="text-nowrap pt-2"
               href="https://discord.gg/K3JFd9d3wk"
               target="_blank"
             >
@@ -186,6 +186,10 @@ export default class Footer extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
+.common-footer a {
+  font-size: 1.08rem;
+  letter-spacing: 0.02rem;
+}
 .common-footer {
   background-color: $omegaup-primary--darker;
   color: $omegaup-white;
@@ -205,11 +209,14 @@ export default class Footer extends Vue {
 
       .footer-logo,
       .slogan {
-        margin-top: -2.5rem;
+        margin-top: -2.9rem;
       }
-
       .slogan {
+        font-size: 0.92rem;
         text-transform: uppercase;
+        letter-spacing: 0.02rem;
+        max-width: 10rem;
+        margin-top: -2.4rem;
       }
     }
 
@@ -239,7 +246,6 @@ export default class Footer extends Vue {
           }
         }
       }
-
       img.sponsor-logo {
         width: 120px;
       }
