@@ -387,6 +387,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             [ $problemData ]
         );
 
+        // Creating and adding a new user as a course student
         $student = \OmegaUp\Test\Factories\User::createUser();
 
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
@@ -401,6 +402,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
+        // Admin creates a feedback in the line number 1
         \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
                 'auth_token' => self::login($admin['identity'])->auth_token,
@@ -412,6 +414,8 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
+        // The student doesn't have the right access to create a feedback in any
+        // line
         try {
             \OmegaUp\Controllers\Submission::apiSetFeedback(
                 new \OmegaUp\Request([
@@ -450,7 +454,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             [
                 'line' => 1,
                 'author' => $admin['identity']->username,
-                'feedback_thread' => ['New feedback thread'],
+                'feedback_thread' => ['Second feedback reply', 'First feedback reply'],
             ],
             [
                 'line' => 3,
@@ -458,6 +462,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             ],
         ];
 
+        // Comparing the created feedback comments versus expected comments
         foreach ($feedbackList as $index => $feedback) {
             $this->assertArrayContainsWithPredicate(
                 $expectedCommentsLines,
@@ -467,14 +472,28 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             $expectedCommentsLines[$index]['submission_feedback_id'] = $feedback['submission_feedback_id'];
         }
 
-        // Adding a feedback thread
+        // Adding a feedback thread as admin
         \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
                 'auth_token' => self::login($admin['identity'])->auth_token,
                 'guid' => $runData['response']['guid'],
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment_alias'],
-                'feedback' => 'New feedback thread',
+                'feedback' => 'First feedback reply',
+                'submission_feedback_id' => $expectedCommentsLines[0]['submission_feedback_id'],
+            ])
+        );
+
+        // Adding a feedback thread as student
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => self::login(
+                    $student['identity']
+                )->auth_token,
+                'guid' => $runData['response']['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback' => 'Second feedback reply',
                 'submission_feedback_id' => $expectedCommentsLines[0]['submission_feedback_id'],
             ])
         );
@@ -486,6 +505,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
+        // Comparing the new feedback threads versus expected comments
         foreach ($feedbackList as $index => $feedback) {
             $this->assertEquals(
                 $feedback['author'],
