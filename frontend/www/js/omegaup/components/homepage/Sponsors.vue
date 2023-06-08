@@ -39,8 +39,8 @@ img.img-fluid {
 
 @media only screen and (min-width: 767px) {
   h3.display-4 {
-  font-size: 3.5rem;
-}
+    font-size: 3.5rem;
+  }
 
   img.img-fluid {
     max-width: 93%;
