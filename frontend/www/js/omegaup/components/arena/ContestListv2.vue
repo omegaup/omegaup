@@ -13,13 +13,13 @@
       >
         <b-card>
           <b-container>
-            <b-row class="p-1" align-v="center">
-              <b-col class="col-md-6 col-sm-12">
+            <b-row align-v="center">
+              <b-col class="col-md-6 col-sm-12 p-0">
                 <form :action="queryURL" method="GET">
                   <div class="input-group">
                     <input
                       v-model.lazy="currentQuery"
-                      class="form-control"
+                      class="form-control nav-link"
                       type="text"
                       name="query"
                       autocomplete="off"
@@ -28,10 +28,10 @@
                       spellcheck="false"
                       :placeholder="T.wordsKeyword"
                     />
-                    <button class="btn" type="reset">&times;</button>
+                    <button class="btn reset-btn nav-link" type="reset">&times;</button>
                     <div class="input-group-append">
                       <input
-                        class="btn btn-primary btn-md btn-block active"
+                        class="btn btn-primary btn-md btn-block active nav-link"
                         type="submit"
                         :value="T.wordsSearch"
                       />
@@ -39,10 +39,10 @@
                   </div>
                 </form>
               </b-col>
-              <b-col sm="12" class="d-flex col-md-6 btns-group mt-1">
+              <b-col sm="12" class="d-flex col-md-6 btns-group">
                 <b-dropdown ref="dropdownOrderBy" no-caret>
                   <template #button-content>
-                    <div>
+                    <div class="button-padding">
                       <font-awesome-icon icon="sort-amount-down" />
                       {{ T.contestOrderBy }}
                     </div>
@@ -116,7 +116,7 @@
                 </b-dropdown>
                 <b-dropdown ref="dropdownFilterBy" class="mr-1" no-caret>
                   <template #button-content>
-                    <div>
+                    <div class="button-padding">
                       <font-awesome-icon icon="filter" />
                       {{ T.contestFilterBy }}
                     </div>
@@ -535,6 +535,29 @@ export default class ArenaContestList extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
+
+.button-padding {
+  padding: 0.16rem 0.32rem;
+}
+.title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1.8rem;
+}
+
+.reset-btn {
+    line-height: 1.5;
+    color: #6C757D;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: none;
+    border-top: 1px solid #ced4da;
+    border-bottom: 1px solid #ced4da;
+    border-radius: unset;
+}
+.btn-primary {
+  background-color: #007bff !important;
+}
 
 .sidebar {
   >>> .contest-list-nav {

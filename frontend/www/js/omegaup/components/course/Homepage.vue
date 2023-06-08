@@ -43,14 +43,6 @@
           ></omegaup-markdown>
         </div>
       </div>
-      <div class="row mt-2">
-        <a
-          class="col-xs-6 col-sm-3 btn btn-primary btn-lg mx-auto custom-button"
-          role="button"
-          href="/course/"
-          >{{ T.wordsGetToKnowOurCourses }}</a
-        >
-      </div>
     </div>
   </div>
 </template>

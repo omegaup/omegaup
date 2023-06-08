@@ -100,9 +100,9 @@
               <a href="mailto:hello@omegaup.com">hello@omegaup.com</a>
             </li>
           </ul>
-          <div class="social-icons my-0 mx-auto">
+          <div class="social-icons my-0 mx-auto d-flex flex-column">
             <a
-            class="text-nowrap pt-2"
+            class="text-nowrap mt-1"
               href="https://www.facebook.com/omegaup/"
               target="_blank"
             >
@@ -110,7 +110,7 @@
               Facebook
             </a>
             <a
-            class="text-nowrap pt-2"
+            class="text-nowrap mt-1"
               href="https://discord.gg/K3JFd9d3wk"
               target="_blank"
             >
@@ -132,7 +132,7 @@
             })
           }}
         </div>
-        <ul class="m-0 list-unstyled text-right">
+        <ul class="m-0 list-unstyled text-right d-flex flex-row">
           <li>
             <a
               href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
@@ -140,7 +140,7 @@
               >{{ T.frontPageFooterCodeConduct }}</a
             >
           </li>
-          <li>
+          <li class="ml-3">
             <a
               href="https://blog.omegaup.com/privacy-policy/"
               target="_blank"
@@ -187,7 +187,7 @@ export default class Footer extends Vue {
 @import '../../../../sass/main.scss';
 
 .common-footer a {
-  font-size: 1.08rem;
+  font-size: 1.04rem;
   letter-spacing: 0.02rem;
 }
 .common-footer {
@@ -216,7 +216,7 @@ export default class Footer extends Vue {
         text-transform: uppercase;
         letter-spacing: 0.02rem;
         max-width: 10rem;
-        margin-top: -2.4rem;
+        margin-top: -2.2rem;
       }
     }
 
