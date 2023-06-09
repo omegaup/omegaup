@@ -14,85 +14,7 @@
             {{ T.frontPageFooter }}
           </div>
         </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
-          <h4>{{ T.frontPageFooterSponsors }}</h4>
-          <ul>
-            <li class="mt-1">
-              <a href="https://replit.com/" target="_blank">
-                <img
-                  class="sponsor-logo"
-                  src="/media/homepage/replit_logo.png"
-                  alt="ReplitLogo"
-                />
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
-          <h4>{{ T.frontPageFooterSite }}</h4>
-          <ul>
-            <li class="mt-1">
-              <a href="/arena/">{{ T.navContests }}</a>
-            </li>
-            <li class="mt-1">
-              <a href="/course/">{{ T.navCourses }} </a>
-            </li>
-            <li class="mt-1">
-              <a href="/problem/">{{ T.navProblems }}</a>
-            </li>
-            <li class="mt-1">
-              <a href="/rank/">{{ T.navRanking }}</a>
-            </li>
-            <li class="mt-1">
-              <a href="https://blog.omegaup.com" target="_blank">{{
-                T.navBlog
-              }}</a>
-            </li>
-          </ul>
-        </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
-          <h4>{{ T.frontPageFooterOrganization }}</h4>
-          <ul>
-            <li class="mt-1">
-              <a href="https://omegaup.org/#about" target="_blank">{{
-                T.frontPageFooterAboutUs
-              }}</a>
-            </li>
-            <li class="mt-1">
-              <a href="https://omegaup.org/#team" target="_blank">{{
-                T.frontPageFooterTeam
-              }}</a>
-            </li>
-          </ul>
-        </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
-          <h4>{{ T.frontPageDevelopers }}</h4>
-          <ul>
-            <li class="mt-1">
-              <a
-                href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar"
-                target="_blank"
-                >{{ T.frontPageFooterHelpUs }}</a
-              >
-            </li>
-            <li class="mt-1">
-              <a href="https://github.com/omegaup/omegaup" target="_blank">
-                <font-awesome-icon :icon="['fab', 'github']" />
-              </a>
-            </li>
-            <li class="mt-1">
-              <a
-                v-if="!omegaUpLockDown && isLoggedIn"
-                href="https://github.com/omegaup/omegaup/issues/new"
-                target="_blank"
-                rel="nofollow"
-                @click="$event.target.href = reportAnIssueURL()"
-                >{{ T.reportAnIssue }}</a
-              >
-            </li>
-          </ul>
-        </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
+        <div class="footer-list-section footer-contact w-50 mb-4 w-md-auto mb-lg-0 mx-auto">
           <h4>{{ T.frontPageFooterContact }}</h4>
           <ul>
             <li class="mt-1">
@@ -127,6 +49,84 @@
               Discord
             </a>
           </div>
+        </div>
+        <div class="footer-list-section footer-site w-50 mb-4 w-md-auto mb-lg-0 mx-auto">
+          <h4>{{ T.frontPageFooterSite }}</h4>
+          <ul>
+            <li class="mt-1">
+              <a href="/arena/">{{ T.navContests }}</a>
+            </li>
+            <li class="mt-1">
+              <a href="/course/">{{ T.navCourses }} </a>
+            </li>
+            <li class="mt-1">
+              <a href="/problem/">{{ T.navProblems }}</a>
+            </li>
+            <li class="mt-1">
+              <a href="/rank/">{{ T.navRanking }}</a>
+            </li>
+            <li class="mt-1">
+              <a href="https://blog.omegaup.com" target="_blank">{{
+                T.navBlog
+              }}</a>
+            </li>
+          </ul>
+        </div>
+        <div class="footer-list-section footer-sponsors w-50 mb-4 w-md-auto mb-lg-0 mx-auto">
+          <h4>{{ T.frontPageFooterSponsors }}</h4>
+          <ul>
+            <li class="mt-1">
+              <a href="https://replit.com/" target="_blank">
+                <img
+                  class="sponsor-logo"
+                  src="/media/homepage/replit_logo.png"
+                  alt="ReplitLogo"
+                />
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="footer-list-section footer-organization w-50 mb-4 w-md-auto mb-lg-0">
+          <h4>{{ T.frontPageFooterOrganization }}</h4>
+          <ul>
+            <li class="mt-1">
+              <a href="https://omegaup.org/#about" target="_blank">{{
+                T.frontPageFooterAboutUs
+              }}</a>
+            </li>
+            <li class="mt-1">
+              <a href="https://omegaup.org/#team" target="_blank">{{
+                T.frontPageFooterTeam
+              }}</a>
+            </li>
+          </ul>
+        </div>
+        <div class="footer-list-section footer-developers w-50 mb-4 w-md-auto mb-lg-0">
+          <h4>{{ T.frontPageDevelopers }}</h4>
+          <ul>
+            <li class="mt-1">
+              <a
+                href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar"
+                target="_blank"
+                >{{ T.frontPageFooterHelpUs }}</a
+              >
+            </li>
+            <li class="mt-1">
+              <a href="https://github.com/omegaup/omegaup" target="_blank">
+                <font-awesome-icon :icon="['fab', 'github']" />
+              </a>
+            </li>
+            <li class="mt-1">
+              <a
+                v-if="!omegaUpLockDown && isLoggedIn"
+                href="https://github.com/omegaup/omegaup/issues/new"
+                target="_blank"
+                rel="nofollow"
+                @click="$event.target.href = reportAnIssueURL()"
+                >{{ T.reportAnIssue }}</a
+              >
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -201,8 +201,12 @@ export default class Footer extends Vue {
   flex-grow: 1;
 
   .footer-navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     .footer-brand {
       max-width: 200px;
+      order: -3;
 
       @media only screen and (max-width: 991px) {
         max-width: 100%;
@@ -219,9 +223,26 @@ export default class Footer extends Vue {
     }
 
     .footer-list-section {
+        &.footer-organization {
+          display: inline-grid;
+        }
+        &.footer-developers {
+          display: inline-grid;
+        }
+
       // On medium sizes, this will work as an inline grid (not 100% width)
-      @media only screen and (max-width: 991px) {
-        display: inline-grid;
+      @media only screen and (min-width: 992px) {
+        display: block;
+
+        &.footer-contact {
+          order: 2;
+        }
+        &.footer-site {
+          order: -1;
+        }
+        &.footer-sponsors {
+          order: -2;
+        }        
       }
 
       ul {
