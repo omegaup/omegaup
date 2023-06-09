@@ -39,6 +39,7 @@ type NavigationForContest = BaseNavigation & {
 type NavigationForSingleProblemOrCourse = BaseNavigation & {
   type: NavigationType.ForSingleProblemOrCourse;
   problemsetId: number;
+  guid?: string;
 };
 
 export type NavigationRequest =
@@ -54,12 +55,13 @@ export function getScoreModeEnum(scoreMode: string): ScoreMode {
 export async function navigateToProblem(
   request: NavigationRequest,
 ): Promise<void> {
-  let contestAlias, problemsetId, contestMode: ScoreMode;
+  let contestAlias, problemsetId, guid, contestMode: ScoreMode;
   if (request.type === NavigationType.ForContest) {
     contestAlias = request.contestAlias;
     contestMode = request.contestMode;
   } else if (request.type === NavigationType.ForSingleProblemOrCourse) {
     problemsetId = request.problemsetId;
+    guid = request.guid;
   }
   const { target, problem, problems } = request;
   if (
@@ -71,6 +73,10 @@ export async function navigateToProblem(
     target.problemInfo = problemsStore.state.problems[problem.alias];
     if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
       setLocationHash(`#problems/${problem.alias}/new-run`);
+      return;
+    }
+    if (guid) {
+      setLocationHash(`#problems/${problem.alias}/show-run:${guid}`);
       return;
     }
     setLocationHash(`#problems/${problem.alias}`);
@@ -151,7 +157,7 @@ export function getMaxScore(
   return maxScore;
 }
 
-function getMaxPerGroupScore(
+export function getMaxPerGroupScore(
   runs: types.Run[],
   alias: string,
   previousScore: number,

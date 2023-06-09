@@ -118,31 +118,23 @@ export class EventsSocket {
     const data = JSON.parse(message.data);
 
     if (data.message == '/run/update/') {
-      data.run.time = time.remoteTime(data.run.time * 1000);
-      updateRun({ run: data.run });
+      const { run } = data;
+      const updatedRun = {
+        ...run,
+        time: time.remoteTime(run.time * 1000),
+        score_by_group: run.score_per_group,
+      };
+      updateRun({ run: updatedRun });
     } else if (data.message == '/clarification/update/') {
       data.clarification.time = time.remoteTime(data.clarification.time * 1000);
       clarificationStore.commit('addClarification', data.clarification);
     } else if (data.message == '/scoreboard/update/') {
-      if (this.scoreMode === ScoreMode.MaxPerGroup) {
-        api.Contest.scoreboard({ contest_alias: this.problemsetAlias })
-          .then((result: types.Scoreboard) => {
-            this.processRankings({
-              scoreboard: result,
-              currentTime: result.time.getTime(),
-              startTime: result.start_time.getTime(),
-              finishTime: result.finish_time?.getTime() ?? 0,
-            });
-          })
-          .catch(ui.apiError);
-      } else {
-        this.processRankings({
-          scoreboard: data.scoreboard,
-          currentTime: data.scoreboard.time,
-          startTime: data.scoreboard.start_time,
-          finishTime: data.scoreboard.finish_time,
-        });
-      }
+      this.processRankings({
+        scoreboard: data.scoreboard,
+        currentTime: data.scoreboard.time,
+        startTime: data.scoreboard.start_time,
+        finishTime: data.scoreboard.finish_time,
+      });
     }
   }
 
