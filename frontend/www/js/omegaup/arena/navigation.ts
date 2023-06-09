@@ -157,7 +157,7 @@ export function getMaxScore(
   return maxScore;
 }
 
-function getMaxPerGroupScore(
+export function getMaxPerGroupScore(
   runs: types.Run[],
   alias: string,
   previousScore: number,

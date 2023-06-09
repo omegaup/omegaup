@@ -474,6 +474,70 @@
 				}
 			},
 			{
+				"api": "/contest/create/",
+				"params": {
+					"visibility": 1,
+					"title": "Subtasks",
+					"alias": "subtasks",
+					"description": "Concurso con subtareas",
+					"start_time": "$NOW$",
+					"finish_time": "$NOW$+86400",
+					"window_length": "0",
+					"scoreboard": 100,
+					"score_mode" : "max_per_group",
+					"points_decay_factor": 0,
+					"submissions_gap": 1200,
+					"penalty": 0,
+					"feedback": "detailed",
+					"penalty_type": "contest_start",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
+					"penalty_calc_policy": "sum",
+					"admission_mode": "private",
+					"show_scoreboard_after": "true",
+					"certificate_cutoff": 2
+				}
+			},
+			{
+				"api": "/contest/addProblem/",
+				"params": {
+					"contest_alias": "subtasks",
+					"problem_alias": "triangulos",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/addProblem/",
+				"params": {
+					"contest_alias": "subtasks",
+					"problem_alias": "sumas",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/addProblem/",
+				"params": {
+					"contest_alias": "subtasks",
+					"problem_alias": "triangulos-interactive",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/addProblem/",
+				"params": {
+					"contest_alias": "subtasks",
+					"problem_alias": "colas",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/update/",
+				"params": {
+					"contest_alias": "subtasks",
+					"admission_mode": "public",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js"
+				}
+			},
+			{
 				"api": "/school/create/",
 				"params": {
 					"name": "Escuela curso",
@@ -1616,7 +1680,7 @@
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"problemset_id": 3,
+					"problemset_id": 4,
 					"language": "py3",
 					"source": "print(1)"
 				}
@@ -1638,7 +1702,7 @@
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"problemset_id": 5,
+					"problemset_id": 6,
 					"language": "py3",
 					"source": "print(1)"
 				}
