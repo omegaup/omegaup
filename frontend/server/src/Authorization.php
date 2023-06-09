@@ -132,7 +132,10 @@ class Authorization {
                 $submission->problemset_id
             );
             if (!is_null($problemset)) {
-                if (self::isAdmin($identity, $problemset)) {
+                if (
+                    self::isAdmin($identity, $problemset) ||
+                    self::isAdmin($identity, $problem)
+                ) {
                     return true;
                 }
                 if ($problemset->type === 'Assignment') {
