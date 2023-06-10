@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { GroupOptions } from '../support/types';
 import { contestPage } from '../support/pageObjects/contestPage';
 import { loginPage } from '../support/pageObjects/loginPage';
+import { addSubtractDaysToDate } from '../support/commands';
 
 describe('Contest Test', () => {
   beforeEach(() => {
@@ -116,6 +117,41 @@ describe('Contest Test', () => {
     cy.get(`.${userLoginOptions[3].username} > td:nth-child(2)`).should(
       'contain',
       '3',
+    );
+    cy.logout();
+  });
+
+  it('Should give a past contest as a virtual contest', () => {
+    const contestOptions = contestPage.generateContestOptions();
+    const now = new Date();
+    const userLoginOptions = loginPage.registerMultipleUsers(1);
+    const users = [userLoginOptions[0].username];
+    const virtualContestUrl = `/contest/${contestOptions.contestAlias}/virtual/`;
+
+    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
+    contestOptions.endDate = now;
+
+    contestPage.createContestAsAdmin(contestOptions, users);
+
+    cy.login(userLoginOptions[0]);
+    cy.visit(virtualContestUrl);
+    cy.get('[data-schedule-virtual-button]').click();
+    cy.get('[data-contest-link-button]').click();
+    cy.url().should('include', contestOptions.contestAlias);
+    cy.url().then((url) => {
+      const virtualContestCode = url.split('/')[4].split('-')[2];
+      const newContestAlias =
+        contestOptions.contestAlias + '-virtual-' + virtualContestCode;
+
+      contestOptions.contestAlias = newContestAlias;
+      cy.createRunsInsideContest(contestOptions);
+    });
+    cy.get('a[href="#ranking"]').click();
+    cy.get('[data-table-scoreboard]').should('be.visible');
+    cy.get('[data-table-scoreboard-username]').should('have.length', 1);
+    cy.get(`.${userLoginOptions[0].username} > td:nth-child(4)`).should(
+      'contain',
+      '+100.00',
     );
     cy.logout();
   });
