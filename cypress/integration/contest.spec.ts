@@ -36,9 +36,7 @@ describe('Contest Test', () => {
     contestPage.updateScoreboardForContest(contestOptions.contestAlias);
 
     cy.loginAdmin();
-    cy.get('a[data-nav-contests]').click();
-    cy.get('a[data-nav-contests-arena]').click();
-    cy.get(`a[href="/arena/${contestOptions.contestAlias}/"]`).first().click();
+    cy.visit(`/arena/${contestOptions.contestAlias}/`);
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard-username]')
       .first()
@@ -63,9 +61,7 @@ describe('Contest Test', () => {
     cy.logout();
 
     cy.loginAdmin();
-    cy.get('a[data-nav-contests]').click();
-    cy.get('a[data-nav-contests-arena]').click();
-    cy.get(`a[href="/arena/${contestOptions.contestAlias}/"]`).first().click();
+    cy.visit(`/arena/${contestOptions.contestAlias}/`);
     cy.get('a[href="#clarifications"]').click();
     cy.get('[data-tab-clarifications]').should('be.visible');
     cy.get('[data-select-answer]').select('No');
@@ -108,9 +104,7 @@ describe('Contest Test', () => {
     contestPage.updateScoreboardForContest(contestOptions.contestAlias);
 
     cy.loginAdmin();
-    cy.get('a[data-nav-contests]').click();
-    cy.get('a[data-nav-contests-arena]').click();
-    cy.get(`a[href="/arena/${contestOptions.contestAlias}/"]`).first().click();
+    cy.visit(`/arena/${contestOptions.contestAlias}/`);
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
     cy.get('[data-table-scoreboard-username]').should('have.length', 4);
