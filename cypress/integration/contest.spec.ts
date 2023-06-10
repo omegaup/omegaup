@@ -186,4 +186,41 @@ describe('Contest Test', () => {
 
     contestPage.answerClarification(contestOptions, 'No');
   });
+
+  it(
+    'Should create a contest and reviewing ranking contests when the scoreboard shows' +
+      ' time has finished',
+    () => {
+      const contestOptions = contestPage.generateContestOptions();
+      const userLoginOptions = loginPage.registerMultipleUsers(2);
+      const users = [
+        userLoginOptions[0].username,
+        userLoginOptions[1].username,
+      ];
+
+      contestPage.createContestAsAdmin(contestOptions, users);
+
+      cy.login(userLoginOptions[0]);
+      cy.enterContest(contestOptions);
+      cy.createRunsInsideContest(contestOptions);
+      cy.logout();
+
+      contestPage.updateScoreboardForContest(contestOptions.contestAlias);
+
+      cy.loginAdmin();
+      cy.visit(`/arena/${contestOptions.contestAlias}/`);
+      cy.get('a[href="#ranking"]').click();
+      cy.get('[data-table-scoreboard]').should('be.visible');
+      cy.get('[data-table-scoreboard-username]').should('have.length', 2);
+      cy.get(`.${userLoginOptions[0].username} > td:nth-child(4)`).should(
+        'contain',
+        '+100.00',
+      );
+      cy.get(`.${userLoginOptions[1].username} > td:nth-child(4)`).should(
+        'contain',
+        '-',
+      );
+      cy.logout();
+    },
+  );
 });
