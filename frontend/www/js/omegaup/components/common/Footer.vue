@@ -2,7 +2,7 @@
   <footer class="common-footer text-center">
     <div class="container-xl">
       <div
-        class="footer-navigation d-table d-lg-flex justify-content-between py-5"
+        class="footer-navigation d-table d-lg-flex justify-content-between py-5 m-auto"
       >
         <div class="footer-brand mb-4 mb-lg-0">
           <img
@@ -132,16 +132,9 @@
     </div>
     <div class="copy">
       <div
-        class="container-xl d-flex flex-wrap justify-content-between align-items-center py-3"
+        class="container-xl d-md-flex justify-content-between align-items-center py-3"
       >
-        <div>
-          {{
-            ui.formatString(T.frontPageFooterCopyright, {
-              currentYear: new Date().getFullYear(),
-            })
-          }}
-        </div>
-        <ul class="m-0 list-unstyled text-right">
+        <ul class="mb-2 m-md-0 list-unstyled text-right d-flex justify-content-around d-md-block order-md-12">
           <li>
             <a
               href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
@@ -157,6 +150,13 @@
             >
           </li>
         </ul>
+        <div>
+          {{
+            ui.formatString(T.frontPageFooterCopyright, {
+              currentYear: new Date().getFullYear(),
+            })
+          }}
+        </div>
       </div>
     </div>
   </footer>
