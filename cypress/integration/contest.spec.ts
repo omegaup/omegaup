@@ -117,5 +117,4 @@ describe('Contest Test', () => {
     cy.get(`.${userLoginOptions[3].username} > td:nth-child(2)`).contains(3);
     cy.logout();
   });
-
 });
