@@ -101,10 +101,22 @@ describe('Contest Test', () => {
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
     cy.get('[data-table-scoreboard-username]').should('have.length', 4);
-    cy.get(`.${userLoginOptions[2].username} > td:nth-child(2)`).contains(1);
-    cy.get(`.${userLoginOptions[0].username} > td:nth-child(2)`).contains(1);
-    cy.get(`.${userLoginOptions[1].username} > td:nth-child(2)`).contains(3);
-    cy.get(`.${userLoginOptions[3].username} > td:nth-child(2)`).contains(3);
+    cy.get(`.${userLoginOptions[2].username} > td:nth-child(2)`).should(
+      'contain',
+      '1',
+    );
+    cy.get(`.${userLoginOptions[0].username} > td:nth-child(2)`).should(
+      'contain',
+      '1',
+    );
+    cy.get(`.${userLoginOptions[1].username} > td:nth-child(2)`).should(
+      'contain',
+      '3',
+    );
+    cy.get(`.${userLoginOptions[3].username} > td:nth-child(2)`).should(
+      'contain',
+      '3',
+    );
     cy.logout();
   });
 });
