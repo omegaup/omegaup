@@ -155,4 +155,35 @@ describe('Contest Test', () => {
     );
     cy.logout();
   });
+
+  it('Should test practice mode in contest', () => {
+    const contestOptions = contestPage.generateContestOptions();
+    const now = new Date();
+    const userLoginOptions = loginPage.registerMultipleUsers(1);
+    const users = [userLoginOptions[0].username];
+
+    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
+    contestOptions.endDate = now;
+
+    contestPage.createContestAsAdmin(contestOptions, users);
+
+    cy.login(userLoginOptions[0]);
+    cy.visit(`/arena/${contestOptions.contestAlias}/`);
+    cy.get('[data-start-contest]').click();
+    cy.get(`a[href="/arena/${contestOptions.contestAlias}/practice/"]`)
+      .click()
+      .then(() => {
+        const newContestAlias = contestOptions.contestAlias + '/practice';
+        contestOptions.contestAlias = newContestAlias;
+        cy.createRunsInsideContest(contestOptions);
+      });
+    cy.get('a[href="#ranking"]').click();
+    cy.get('[data-markdown-statement] > p > a')
+      .should('have.attr', 'href')
+      .and('include', contestOptions.contestAlias);
+    contestPage.createClarificationUser(contestOptions, 'Question 1');
+    cy.logout();
+
+    contestPage.answerClarification(contestOptions, 'No');
+  });
 });
