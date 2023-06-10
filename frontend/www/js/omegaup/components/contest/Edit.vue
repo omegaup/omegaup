@@ -9,7 +9,7 @@
         }}
         <small>
           &ndash;
-          <a :href="ui.contestURL(details)">
+          <a :href="ui.contestURL(details)" data-contest-link-button>
             {{ T.contestDetailsGoToContest }}</a
           >
         </small>

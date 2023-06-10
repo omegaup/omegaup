@@ -290,7 +290,7 @@
                   }}</a>
                 </template>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="/logout/">
+                <a class="dropdown-item" href="/logout/" data-logout-button>
                   <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
                   {{ T.navLogOut }}
                 </a>
