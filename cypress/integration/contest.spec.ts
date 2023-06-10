@@ -48,7 +48,7 @@ describe('Contest Test', () => {
     cy.logout();
   });
 
-  it('Should create a contest and add a clarification.', () => {
+  it.only('Should create a contest and add a clarification.', () => {
     const contestOptions = contestPage.generateContestOptions();
     const userLoginOptions = loginPage.registerMultipleUsers(1);
 

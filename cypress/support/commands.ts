@@ -35,11 +35,11 @@ Cypress.Commands.add('loginAdmin', () => {
 
 // Logouts the user
 Cypress.Commands.add('logout', () => {
-  const URL = '/logout/?redirect=/';
-  cy.request(URL).then((response) => {
-    expect(response.status).to.equal(200);
-    cy.reload();
-  });
+  cy.get('a[data-nav-user]').click();
+  cy.get('a[data-logout-button]').click();
+  cy.waitUntil(() =>
+    cy.url().should('eq', 'http://127.0.0.1:8001/'),
+  );
 });
 
 // Registers and logs in a new user given a username and password.
