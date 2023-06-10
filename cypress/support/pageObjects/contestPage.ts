@@ -103,6 +103,20 @@ export class ContestPage {
     cy.get('[data-form-clarification-message]').should('have.text', question);
   }
 
+  answerClarification(contestOptions: ContestOptions, answer: string): void {
+    cy.loginAdmin();
+    cy.visit(`/arena/${contestOptions.contestAlias}/`);
+    cy.get('a[href="#clarifications"]').click();
+    cy.get('[data-tab-clarifications]').should('be.visible');
+    cy.get('[data-select-answer]').select(answer);
+    cy.get('[data-form-clarification-answer]').submit();
+    cy.get('[data-form-clarification-resolved-answer]').should(
+      'contain',
+      answer,
+    );
+    cy.logout();
+  }
+
   updateScoreboardForContest(contestAlias: string): void {
     const encodedContestAlias = encodeURIComponent(contestAlias);
     const scoreboardRefreshUrl = `/api/scoreboard/refresh/alias/${encodedContestAlias}/token/secret`;

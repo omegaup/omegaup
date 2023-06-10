@@ -60,14 +60,7 @@ describe('Contest Test', () => {
     contestPage.createClarificationUser(contestOptions, 'Question 1');
     cy.logout();
 
-    cy.loginAdmin();
-    cy.visit(`/arena/${contestOptions.contestAlias}/`);
-    cy.get('a[href="#clarifications"]').click();
-    cy.get('[data-tab-clarifications]').should('be.visible');
-    cy.get('[data-select-answer]').select('No');
-    cy.get('[data-form-clarification-answer]').submit();
-    cy.get('[data-form-clarification-resolved-answer]').should('contain', 'No');
-    cy.logout();
+    contestPage.answerClarification(contestOptions, 'No');
   });
 
   it('Should create a contest and review ranking', () => {
