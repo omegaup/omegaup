@@ -132,20 +132,21 @@ class Authorization {
                 $submission->problemset_id
             );
             if (!is_null($problemset)) {
-                if (
-                    self::isAdmin($identity, $problemset) ||
-                    self::isAdmin($identity, $problem)
-                ) {
+                if (self::isAdmin($identity, $problemset)) {
                     return true;
                 }
                 if ($problemset->type === 'Assignment') {
                     $course = \OmegaUp\DAO\Courses::getByProblemsetId(
                         $problemset
                     );
-                    return (!is_null($course) && self::isTeachingAssistant(
-                        $identity,
-                        $course
-                    ));
+                    if (
+                        !is_null($course) && self::isTeachingAssistant(
+                            $identity,
+                            $course
+                        )
+                    ) {
+                        return true;
+                    }
                 }
             }
         }
