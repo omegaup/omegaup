@@ -14,6 +14,7 @@
         <div v-if="problems.length" class="mb-3">
           <a
             href="#clarifications/all/new"
+            data-new-clarification-button
             class="btn btn-primary"
             @click="currentPopupDisplayed = PopupDisplayed.NewClarification"
           >
