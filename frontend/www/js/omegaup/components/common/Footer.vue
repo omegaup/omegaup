@@ -21,9 +21,9 @@
               <a href="mailto:hello@omegaup.com">hello@omegaup.com</a>
             </li>
           </ul>
-          <div class="social-icons my-0 mx-auto">
+          <div class="social-icons my-0 mx-auto d-flex flex-md-wrap justify-content-sm-center">
             <a
-              class="text-nowrap"
+              class="mx-1"
               href="https://github.com/omegaup/omegaup/"
               target="_blank"
             >
@@ -32,7 +32,7 @@
             </a>
             |
             <a
-              class="text-nowrap"
+              class="mx-1"
               href="https://www.facebook.com/omegaup/"
               target="_blank"
             >
@@ -41,7 +41,7 @@
             </a>
             |
             <a
-              class="text-nowrap"
+              class="mx-1"
               href="https://discord.gg/K3JFd9d3wk"
               target="_blank"
             >
