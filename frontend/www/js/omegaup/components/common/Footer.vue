@@ -14,14 +14,18 @@
             {{ T.frontPageFooter }}
           </div>
         </div>
-        <div class="footer-list-section footer-contact w-50 mb-4 w-md-auto mb-lg-0 mx-auto">
+        <div
+          class="footer-list-section footer-contact w-50 mb-4 w-md-auto mb-lg-0 mx-auto"
+        >
           <h4>{{ T.frontPageFooterContact }}</h4>
           <ul>
             <li class="mt-1">
               <a href="mailto:hello@omegaup.com">hello@omegaup.com</a>
             </li>
           </ul>
-          <div class="social-icons my-0 mx-auto d-flex flex-md-wrap justify-content-sm-center">
+          <div
+            class="social-icons my-0 mx-auto d-flex flex-md-wrap justify-content-sm-center"
+          >
             <a
               class="mx-1"
               href="https://github.com/omegaup/omegaup/"
@@ -50,7 +54,9 @@
             </a>
           </div>
         </div>
-        <div class="footer-list-section footer-site w-50 mb-4 w-md-auto mb-lg-0 mx-auto">
+        <div
+          class="footer-list-section footer-site w-50 mb-4 w-md-auto mb-lg-0 mx-auto"
+        >
           <h4>{{ T.frontPageFooterSite }}</h4>
           <ul>
             <li class="mt-1">
@@ -72,7 +78,9 @@
             </li>
           </ul>
         </div>
-        <div class="footer-list-section footer-sponsors w-50 mb-4 w-md-auto mb-lg-0 mx-auto">
+        <div
+          class="footer-list-section footer-sponsors w-50 mb-4 w-md-auto mb-lg-0 mx-auto"
+        >
           <h4>{{ T.frontPageFooterSponsors }}</h4>
           <ul>
             <li class="mt-1">
@@ -86,7 +94,9 @@
             </li>
           </ul>
         </div>
-        <div class="footer-list-section footer-organization w-50 mb-4 w-md-auto mb-lg-0">
+        <div
+          class="footer-list-section footer-organization w-50 mb-4 w-md-auto mb-lg-0"
+        >
           <h4>{{ T.frontPageFooterOrganization }}</h4>
           <ul>
             <li class="mt-1">
@@ -101,7 +111,9 @@
             </li>
           </ul>
         </div>
-        <div class="footer-list-section footer-developers w-50 mb-4 w-md-auto mb-lg-0">
+        <div
+          class="footer-list-section footer-developers w-50 mb-4 w-md-auto mb-lg-0"
+        >
           <h4>{{ T.frontPageDevelopers }}</h4>
           <ul>
             <li class="mt-1">
@@ -134,7 +146,9 @@
       <div
         class="container-xl d-md-flex justify-content-between align-items-center py-3"
       >
-        <ul class="mb-2 m-md-0 list-unstyled text-right d-flex justify-content-around d-md-block order-md-12">
+        <ul
+          class="mb-2 m-md-0 list-unstyled text-right d-flex justify-content-around d-md-block order-md-12"
+        >
           <li>
             <a
               href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
@@ -223,12 +237,12 @@ export default class Footer extends Vue {
     }
 
     .footer-list-section {
-        &.footer-organization {
-          display: inline-grid;
-        }
-        &.footer-developers {
-          display: inline-grid;
-        }
+      &.footer-organization {
+        display: inline-grid;
+      }
+      &.footer-developers {
+        display: inline-grid;
+      }
 
       // On medium sizes, this will work as an inline grid (not 100% width)
       @media only screen and (min-width: 992px) {
@@ -242,7 +256,7 @@ export default class Footer extends Vue {
         }
         &.footer-sponsors {
           order: -2;
-        }        
+        }
       }
 
       ul {
