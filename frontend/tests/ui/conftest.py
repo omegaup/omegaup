@@ -594,7 +594,6 @@ def _get_browser(request, browser_name):
         chrome_options.add_argument('--lang=en-US')
         if request.config.option.headless:
             chrome_options.add_argument('--headless')
-        chrome_options.set_capability('loggingPrefs', {'browser': 'ALL'})
         chrome_browser = webdriver.Chrome(
             options=chrome_options)
         chrome_browser.set_window_size(*_WINDOW_SIZE)

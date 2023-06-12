@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAssignmentsWithOriginalOrder() {
@@ -82,6 +80,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Asserting assignments order is the same that the original
         $i = 1;
+        $originalOrder = [];
         foreach ($assignments['assignments'] as $index => $assignment) {
             $originalOrder[$index] = [
                 'alias' => $assignments['assignments'][$index]['alias'],
@@ -486,5 +485,126 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         )['templateProperties']['payload']['course']['assignments'];
         $this->assertCount(1, $assignments);
         $this->assertTrue($assignments[0]['opened']);
+    }
+
+    /**
+     * All admins can see run details for a submission made in an assignment.
+     * It includes:
+     * - Problem admins
+     * - Course admins
+     * - Teaching Assistants
+     */
+    public function testRunDetailsInACourseAssignmentSubmission() {
+        // create course admin
+        [
+            'identity' => $courseAdmin,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        $courseAdminLogin = self::login($courseAdmin);
+
+        // Create a course
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $courseAdmin,
+            $courseAdminLogin
+        );
+        $courseAlias = $courseData['course_alias'];
+        $assignment = $courseData['assignment'];
+
+        // create admin
+        [
+            'identity' => $adminUser,
+        ] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        // login admin
+        $adminLogin = self::login($adminUser);
+
+        // adding a teaching assistant
+        ['identity' => $teachingAssistant] = \OmegaUp\Test\Factories\User::createUser();
+
+        // login teaching assistant
+        $loginTeachingAssistant = self::login($teachingAssistant);
+
+        \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $teachingAssistant->username,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        // create problem admin
+        [
+            'identity' => $problemAdmin,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        $loginProblemAdmin = self::login($problemAdmin);
+
+        // Add one problem to the assignment
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(
+            params: new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'public',
+                'author' => $problemAdmin,
+            ]),
+            login: $loginProblemAdmin
+        );
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $courseAdminLogin,
+            $courseAlias,
+            $assignment->alias,
+            [$problem]
+        );
+
+        // create student
+        [
+            'identity' => $studentUser,
+        ] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        // login student
+        $studentLogin = self::login($studentUser);
+
+        $source = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+
+        $runData = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $studentLogin->auth_token,
+            'problemset_id' => $assignment->problemset_id,
+            'problem_alias' => $problem['request']['problem_alias'],
+            'language' => 'c11-gcc',
+            'source' => $source,
+        ]));
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            null /*runData*/,
+            0.5,
+            'PA',
+            null,
+            $runData['guid']
+        );
+
+        // Problem admins, course admins and teaching assistants can see the run
+        // details
+
+        $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
+            'problemset_id' => $assignment->problemset_id,
+            'run_alias' => $runData['guid'],
+            'auth_token' => $courseAdminLogin->auth_token,
+        ]));
+
+        $this->assertSame($response['source'], $source);
+
+        $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
+            'problemset_id' => $assignment->problemset_id,
+            'run_alias' => $runData['guid'],
+            'auth_token' => $loginProblemAdmin->auth_token,
+        ]));
+
+        $this->assertSame($response['source'], $source);
+
+        $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
+            'problemset_id' => $assignment->problemset_id,
+            'run_alias' => $runData['guid'],
+            'auth_token' => $loginTeachingAssistant->auth_token,
+        ]));
+
+        $this->assertSame($response['source'], $source);
     }
 }
