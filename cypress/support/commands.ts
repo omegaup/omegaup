@@ -20,6 +20,28 @@ Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
   });
 });
 
+// Logins the user as an admin
+Cypress.Commands.add('loginAdmin', () => {
+  const username = 'omegaup';
+  const password = 'omegaup';
+
+  const URL =
+    '/api/user/login?' + buildURLQuery({ usernameOrEmail: username, password });
+  cy.request(URL).then((response) => {
+    expect(response.status).to.equal(200);
+    cy.reload();
+  });
+});
+
+// Logouts the user
+Cypress.Commands.add('logout', () => {
+  cy.get('a[data-nav-user]').click();
+  cy.get('a[data-logout-button]').click();
+  cy.waitUntil(() =>
+    cy.url().should('eq', 'http://127.0.0.1:8001/'),
+  );
+});
+
 // Registers and logs in a new user given a username and password.
 Cypress.Commands.add('register', ({ username, password }: LoginOptions) => {
   const URL =
@@ -243,7 +265,7 @@ Cypress.Commands.add(
         cy.get('[data-submit-run]').click();
       });
 
-      const expectedStatus: Status = 'AC';
+      const expectedStatus: Status = runs[idx].status;
       cy.get('[data-run-status] > span').first().should('have.text', 'new');
       cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
 
