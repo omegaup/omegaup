@@ -10,6 +10,8 @@ import {
   NavigationType,
   navigateToProblem,
   getScoreModeEnum,
+  getMaxScore,
+  getMaxPerGroupScore,
 } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { storeConfig } from './problemStore';
@@ -235,6 +237,96 @@ describe('navigation.ts', () => {
       );
       expect(vueInstance.problem).not.toBeNull();
       expect(vueInstance.problem?.bestScore).toBe(0.8);
+    });
+  });
+
+  describe('getMaxScore', () => {
+    const runs: types.Run[] = [
+      {
+        alias: 'sumas',
+        classname: 'user-rank-unranked',
+        country: 'mx',
+        guid: 'abcdef1212',
+        language: 'py3',
+        memory: 0,
+        penalty: 0,
+        runtime: 0,
+        score: 0.6,
+        contest_score: 60,
+        score_by_group: {
+          sample: 25,
+          easy: 20,
+          medium: 15,
+          hard: 0,
+        },
+        status: 'ready',
+        submit_delay: 0,
+        time: new Date(0),
+        username: 'omegaup',
+        verdict: 'PA',
+      },
+      {
+        alias: 'triangulos',
+        classname: 'user-rank-unranked',
+        country: 'mx',
+        guid: 'fefefe1211',
+        language: 'py3',
+        memory: 0,
+        penalty: 0,
+        runtime: 0,
+        score: 1.0,
+        contest_score: 100,
+        score_by_group: {
+          sample: 25,
+          easy: 25,
+          medium: 25,
+          hard: 25,
+        },
+        status: 'ready',
+        submit_delay: 0,
+        time: new Date(0),
+        username: 'omegaup',
+        verdict: 'AC',
+      },
+      {
+        alias: 'sumas',
+        classname: 'user-rank-unranked',
+        country: 'mx',
+        guid: 'efad3456334',
+        language: 'py3',
+        memory: 0,
+        penalty: 0,
+        runtime: 0,
+        score: 0.9,
+        contest_score: 70,
+        score_by_group: {
+          sample: 15,
+          easy: 25,
+          medium: 10,
+          hard: 20,
+        },
+        status: 'ready',
+        submit_delay: 0,
+        time: new Date(0),
+        username: 'omegaup',
+        verdict: 'PA',
+      },
+    ];
+
+    it('Should get the max score for a problem', () => {
+      const alias = 'sumas';
+      const previousScore = 0.0;
+      const maxScore = getMaxScore(runs, alias, previousScore);
+
+      expect(maxScore).toEqual(70);
+    });
+
+    it('Should get the max score by group for a problem', () => {
+      const alias = 'sumas';
+      const previousScore = 0.0;
+      const maxScore = getMaxPerGroupScore(runs, alias, previousScore);
+
+      expect(maxScore).toEqual(85);
     });
   });
 });
