@@ -18,7 +18,8 @@
             height="20"
           />
         </a>
-        <div class="d-inline-flex d-flex-row">
+
+        <div class="d-inline-flex d-flex-row order-md-1">
           <a
             v-if="isLoggedIn"
             class="navbar justify-content-end mr-2 d-lg-none"
@@ -26,6 +27,16 @@
           >
             <font-awesome-icon :icon="['fas', 'power-off']" />
           </a>
+          <ul v-else class="navbar-nav navbar-right d-lg-flex">
+            <li class="nav-item">
+              <a
+                class="nav-link px-2"
+                :href="formattedLoginURL"
+                data-login-button
+                >{{ T.navLogIn }}</a
+              >
+            </li>
+          </ul>
           <button
             class="navbar-toggler"
             type="button"
@@ -37,6 +48,7 @@
             <span class="navbar-toggler-icon"></span>
           </button>
         </div>
+
         <div class="collapse navbar-collapse omegaup-navbar">
           <omegaup-navbar-items
             :omega-up-lock-down="omegaUpLockDown"
@@ -104,17 +116,8 @@
             </template>
           </omegaup-navbar-items>
           <!-- in lockdown or contest mode there is no left navbar -->
-          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right">
-            <li class="nav-item">
-              <a
-                class="nav-link px-2"
-                :href="formattedLoginURL"
-                data-login-button
-                >{{ T.navLogIn }}</a
-              >
-            </li>
-          </ul>
-          <ul v-else class="navbar-nav navbar-right align-items-end">
+
+          <ul v-if="isLoggedIn" class="navbar-nav navbar-right align-items-end">
             <omegaup-notifications-clarifications
               v-if="inContest"
               :clarifications="clarifications"
