@@ -139,10 +139,14 @@ class Authorization {
                     $course = \OmegaUp\DAO\Courses::getByProblemsetId(
                         $problemset
                     );
-                    return (!is_null($course) && self::isTeachingAssistant(
-                        $identity,
-                        $course
-                    ));
+                    if (
+                        !is_null($course) && self::isTeachingAssistant(
+                            $identity,
+                            $course
+                        )
+                    ) {
+                        return true;
+                    }
                 }
             }
         }
