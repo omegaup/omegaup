@@ -1,6 +1,6 @@
 <template>
   <footer class="common-footer text-center">
-    <div class="container-xl">
+    <div class="container-xl background-color">
       <div
         class="footer-navigation d-table d-lg-flex justify-content-between py-5"
       >
@@ -21,13 +21,13 @@
               <a href="/arena/">{{ T.navContests }}</a>
             </li>
             <li class="mt-1">
-              <a href="/course/">{{ T.navCourses }} </a>
-            </li>
-            <li class="mt-1">
               <a href="/problem/">{{ T.navProblems }}</a>
             </li>
             <li class="mt-1">
               <a href="/rank/">{{ T.navRanking }}</a>
+            </li>
+            <li class="mt-1">
+              <a href="/course/">{{ T.navCourses }} </a>
             </li>
             <li class="mt-1">
               <a href="https://blog.omegaup.com" target="_blank">{{
@@ -67,7 +67,17 @@
         </div>
         <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
           <h4 class="column-title">{{ T.frontPageDevelopers }}</h4>
-          <ul>
+          <ul>            
+            <li class="mt-1">
+              <a
+                v-if="!omegaUpLockDown && isLoggedIn"
+                href="https://github.com/omegaup/omegaup/issues/new"
+                target="_blank"
+                rel="nofollow"
+                @click="$event.target.href = reportAnIssueURL()"
+                >{{ T.reportAnIssue }}</a
+              >
+            </li>
             <li class="mt-1">
               <a
                 href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar"
@@ -80,16 +90,6 @@
                 <font-awesome-icon :icon="['fab', 'github']" />
                 Github
               </a>
-            </li>
-            <li class="mt-1">
-              <a
-                v-if="!omegaUpLockDown && isLoggedIn"
-                href="https://github.com/omegaup/omegaup/issues/new"
-                target="_blank"
-                rel="nofollow"
-                @click="$event.target.href = reportAnIssueURL()"
-                >{{ T.reportAnIssue }}</a
-              >
             </li>
           </ul>
         </div>
@@ -238,7 +238,7 @@ export default class Footer extends Vue {
 
           a {
             text-decoration: none;
-            color: white;
+            color: #f2f2f2;
 
             &:hover {
               color: rgb(212, 215, 224);
@@ -254,7 +254,7 @@ export default class Footer extends Vue {
 
   a {
     text-decoration: none;
-    color: white;
+    color: #DBE2F3;
 
     &:hover {
       color: rgb(212, 215, 224);

@@ -9,12 +9,12 @@
         pills
         card
         vertical
-        nav-wrapper-class="contest-list-nav  col-md-2 col-sm-12 test-class"
+        nav-wrapper-class="contest-list-nav d-none col-md-2 col-sm-12 test-class"
       >
-        <b-card>
+        <b-card class="card-group-menu">
           <b-container>
-            <b-row align-v="center">
-              <b-col class="col-md-6 col-sm-12 p-0">
+            <b-row class="justify-content-between" align-v="center">
+              <b-col class="col-md-5 col-sm-12 p-0">
                 <form :action="queryURL" method="GET">
                   <div class="input-group">
                     <input
@@ -31,7 +31,7 @@
                     <button class="btn reset-btn nav-link" type="reset">&times;</button>
                     <div class="input-group-append">
                       <input
-                        class="btn btn-primary btn-md btn-block active nav-link"
+                        class="btn btn-primary btn-style btn-md btn-block active nav-link"
                         type="submit"
                         :value="T.wordsSearch"
                       />
@@ -39,13 +39,18 @@
                   </div>
                 </form>
               </b-col>
-              <b-col sm="12" class="d-flex col-md-6 btns-group">
+              <b-col sm="12" class="d-flex col-md-6 btns-group p-0">
+
+              <b-dropdown :text="currentTabText">
+                <b-dropdown-item @click="currentTab=ContestTab.Current"> {{ T.contestListCurrent }}</b-dropdown-item>
+                <b-dropdown-item @click="currentTab=ContestTab.Future">{{ T.contestListFuture }}</b-dropdown-item>
+                <b-dropdown-item @click="currentTab=ContestTab.Past"> {{ T.contestListPast }}</b-dropdown-item>
+              </b-dropdown>
+
                 <b-dropdown ref="dropdownOrderBy" no-caret>
                   <template #button-content>
-                    <div class="button-padding">
                       <font-awesome-icon icon="sort-amount-down" />
                       {{ T.contestOrderBy }}
-                    </div>
                   </template>
                   <b-dropdown-item
                     href="#"
@@ -114,12 +119,10 @@
                     />{{ T.contestOrderBySignedUp }}</b-dropdown-item
                   >
                 </b-dropdown>
-                <b-dropdown ref="dropdownFilterBy" class="mr-1" no-caret>
+                <b-dropdown ref="dropdownFilterBy" class="mr-0" no-caret>
                   <template #button-content>
-                    <div class="button-padding">
                       <font-awesome-icon icon="filter" />
                       {{ T.contestFilterBy }}
-                    </div>
                   </template>
                   <b-dropdown-item
                     href="#"
@@ -287,17 +290,19 @@
           </omegaup-contest-card>
         </b-tab>
       </b-tabs>
-      <b-pagination-nav
-        ref="paginator"
-        v-model="currentPage"
-        base-url="#"
-        first-number
-        last-number
-        size="lg"
-        align="center"
-        :link-gen="linkGen"
-        :number-of-pages="numberOfPages(currentTab)"
-      ></b-pagination-nav>
+      <div class="pagination-contest">
+        <b-pagination-nav
+          ref="paginator"
+          v-model="currentPage"
+          base-url="#"
+          first-number
+          last-number
+          size="lg"
+          align="center"
+          :link-gen="linkGen"
+          :number-of-pages="numberOfPages(currentTab)"
+        ></b-pagination-nav>
+      </div>
     </b-card>
   </div>
 </template>
@@ -399,6 +404,19 @@ export default class ArenaContestList extends Vue {
   get queryURL(): string {
     return `/arena/#${this.currentTab}`;
   }
+ 
+  get currentTabText(): string {
+    switch (this.currentTab) {
+      case ContestTab.Current:
+        return T.contestListCurrent;
+      case ContestTab.Future:
+        return T.contestListFuture;
+      case ContestTab.Past:
+        return T.contestListPast;
+        default:
+        return T.contestListCurrent;
+    }
+  } 
 
   linkGen(pageNum: number) {
     return {
@@ -533,16 +551,37 @@ export default class ArenaContestList extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../../../sass/main.scss';
 
-.button-padding {
-  padding: 0.16rem 0.32rem;
+.btn {
+  padding: 0.5rem 1rem !important;
 }
+
+.pagination-contest{
+
+  .pagination {  margin-bottom: 1.25rem; };
+  .page-link { padding: 0.5rem 1rem; font-size: 16px; line-height: 24px;}
+
+}
+
+.card-group-menu {
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem 0.25rem 0 0;
+}
+
 .title {
   text-align: center;
   font-size: 2rem;
   margin-bottom: 1.8rem;
+}
+
+.btn-style {
+  border-color: #007bff;
+}
+.form-control {
+  height: auto;
 }
 
 .reset-btn {

@@ -1,6 +1,6 @@
 <template>
   <header>
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top p-0 text-right">
+    <nav class="navbar navbar-expand-lg navbar-color fixed-top p-0 text-right">
       <div class="container-xl pl-0 pl-xl-3">
         <a class="navbar-brand p-3" href="/">
           <img
@@ -114,7 +114,7 @@
               >
             </li>
           </ul>
-          <ul v-else class="navbar-nav navbar-right align-items-end">
+          <ul v-else class="navbar-nav navbar-right align-items-center">
             <omegaup-notifications-clarifications
               v-if="inContest"
               :clarifications="clarifications"
@@ -134,8 +134,8 @@
                 aria-haspopup="true"
                 aria-expanded="false"
               >
-                <img :src="gravatarURL51" height="45" class="mr-2" /><span
-                  class="username"
+                <img :src="gravatarURL51" height="45" class="pt-1"/><span
+                  class="username mr-2"
                   :title="currentUsername"
                   >{{ currentUsername }}</span
                 >
@@ -143,6 +143,7 @@
                   v-show="isAdmin"
                   :queue-length="graderQueueLength"
                   :error="errorMessage !== null"
+                  class="mr-1"
                 ></omegaup-common-grader-badge>
               </a>
               <div class="dropdown-menu dropdown-menu-right allow-overflow">
@@ -396,7 +397,7 @@ export default class Navbar extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../../../sass/main.scss';
 
 nav.navbar {
@@ -407,9 +408,13 @@ nav.navbar {
   a.dropdown-item {
     color: var(--header-navbar-dropdown-item-font-color);
   }
+  a {
+    color: #DBE2F3;
+  }
   .collapse-submenu .btn:focus {
     box-shadow: 0 0 0 0;
   }
+
 }
 .allow-overflow {
   overflow-y: scroll;

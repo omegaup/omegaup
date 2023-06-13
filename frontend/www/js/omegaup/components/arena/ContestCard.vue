@@ -4,12 +4,12 @@
       <b-row class="p-1 flex-column flex-sm-row" align-v="center">
         <b-col class="col-md-5 col-sm-12 p-1 text-center">
           <b-card-text>
-            <h5>
+            <h5 class="m-0">
               <a :href="getContestURL(contest.alias)">{{ contest.title }}</a>
               <font-awesome-icon
                 v-if="contest.recommended"
                 ref="contestIconRecommended"
-                class="ml-1"
+                class="ml-1 mr-1"
                 icon="award"
               />
             </h5>
@@ -17,7 +17,7 @@
         </b-col>
         <b-col class="col-md-3 col-sm-12 p-1 text-center">
           <b-card-text>
-            <font-awesome-icon icon="clipboard-list" />
+            <font-awesome-icon class="mr-1" icon="clipboard-list" />
             {{ contest.organizer }}
           </b-card-text>
         </b-col>
@@ -28,20 +28,26 @@
               :href="getContestScoreboardURL(contest.alias)"
               variant="success"
             >
-              <font-awesome-icon icon="table" />
+              <font-awesome-icon class="mr-1" icon="table" />
               {{ T.contestButtonScoreboard }}
             </b-button>
           </slot>
-          <slot name="contest-enroll-status">
-            <b-card-text
-              v-if="contest.participating"
-              ref="contestEnrollStatus"
-              class="contest-enroll-status"
-            >
-              <font-awesome-icon icon="clipboard-check" />
-              {{ T.contestEnrollStatus }}
+          <div class="d-flex align-items-center justify-content-center">
+            <b-card-text class="pr-3 m-0">
+              <font-awesome-icon class="mr-1" icon="users" />
+              {{ contest.contestants }}
             </b-card-text>
-          </slot>
+            <slot name="contest-enroll-status">
+              <b-card-text
+                v-if="contest.participating"
+                ref="contestEnrollStatus"
+                class="contest-enroll-status"
+              >
+                <font-awesome-icon class="mr-1" icon="clipboard-check" />
+                {{ T.contestEnrollStatus }}
+              </b-card-text>
+            </slot>
+          </div>
         </b-col>
       </b-row>
       <b-row class="p-1 flex-column flex-sm-row" align-v="center">
@@ -50,7 +56,7 @@
         </b-col>
         <b-col class="col-md-3 col-sm-12 p-1 text-center">
           <b-card-text>
-            <font-awesome-icon icon="stopwatch" />
+            <font-awesome-icon class="mr-1" icon="stopwatch" />
             {{
               ui.formatString(T.contestDuration, {
                 duration: contestDuration,
@@ -58,47 +64,41 @@
             }}
           </b-card-text>
         </b-col>
-        <b-col class="col-md-1 col-sm-12 p-1 text-center">
-          <b-card-text>
-            <font-awesome-icon icon="users" />
-            {{ contest.contestants }}
-          </b-card-text>
-        </b-col>
-        <b-col class="col-md-3 col-sm-12 p-1 text-center">
-          <slot name="contest-button-enter">
-            <b-button
-              v-if="contest.participating"
-              ref="contestButtonEnter"
-              :href="getContestURL(contest.alias)"
-              variant="primary"
-            >
-              <font-awesome-icon icon="sign-in-alt" />
-              {{ T.contestButtonEnter }}
-            </b-button>
-          </slot>
-          <slot name="contest-button-singup">
-            <b-button
-              v-if="!contest.participating"
-              ref="contestButtonSingUp"
-              :href="getContestURL(contest.alias)"
-              variant="primary"
-            >
-              <font-awesome-icon icon="sign-in-alt" />
-              {{ T.contestButtonSingUp }}
-            </b-button>
-          </slot>
+        <b-col class="col-md-4 col-sm-12 p-1 text-center">
+          <div class="d-flex justify-content-center">
+            <slot name="contest-button-enter">
+              <b-button
+                v-if="contest.participating"
+                ref="contestButtonEnter"
+                :href="getContestURL(contest.alias)"
+                variant="primary"
+                class="button-style"
+              >
+                <font-awesome-icon class="mr-1" icon="sign-in-alt"/>
+                {{ T.contestButtonEnter }}
+              </b-button>
+            </slot>
+            <slot name="contest-button-singup">
+              <b-button
+                v-if="!contest.participating"
+                ref="contestButtonSingUp"
+                :href="getContestURL(contest.alias)"
+                variant="primary"
+                class="text-center"
+              >
+                <font-awesome-icon class="mr-1" icon="sign-in-alt" />
+                {{ T.contestButtonSingUp }}
+              </b-button>
+            </slot>
+          </div>
           <slot name="contest-dropdown">
             <b-dropdown variant="primary">
               <template #button-content>
-                <font-awesome-icon icon="sign-in-alt" />
+                <font-awesome-icon class="mr-1" icon="sign-in-alt" />
                 {{ T.contestButtonEnter }}
               </template>
-              <b-dropdown-item :href="getVirtualContestURL(contest.alias)">{{
-                T.contestVirtualMode
-              }}</b-dropdown-item>
-              <b-dropdown-item :href="getPracticeContestURL(contest.alias)">{{
-                T.contestPracticeMode
-              }}</b-dropdown-item>
+              <b-dropdown-item :href="getVirtualContestURL(contest.alias)">{{ T.contestVirtualMode }}</b-dropdown-item>
+              <b-dropdown-item :href="getPracticeContestURL(contest.alias)">{{ T.contestPracticeMode }}</b-dropdown-item>
             </b-dropdown>
           </slot>
         </b-col>
@@ -169,7 +169,9 @@ export default class ContestCard extends Vue {
 .contest-enroll-status {
   color: $omegaup-green;
 }
-
+.button-style {
+  padding: 0.5rem 1rem;
+}
 .btn {
   color: $omegaup-white;
 }
