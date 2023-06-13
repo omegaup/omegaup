@@ -1,6 +1,6 @@
 <template>
   <footer class="common-footer text-center">
-    <div class="container-xl background-color">
+    <div class="container-xl">
       <div
         class="footer-navigation d-table d-lg-flex justify-content-between py-5"
       >
@@ -15,28 +15,6 @@
           </div>
         </div>
         <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
-          <h4 class="column-title">{{ T.frontPageFooterSite }}</h4>
-          <ul>
-            <li class="mt-1">
-              <a href="/arena/">{{ T.navContests }}</a>
-            </li>
-            <li class="mt-1">
-              <a href="/problem/">{{ T.navProblems }}</a>
-            </li>
-            <li class="mt-1">
-              <a href="/rank/">{{ T.navRanking }}</a>
-            </li>
-            <li class="mt-1">
-              <a href="/course/">{{ T.navCourses }} </a>
-            </li>
-            <li class="mt-1">
-              <a href="https://blog.omegaup.com" target="_blank">{{
-                T.navBlog
-              }}</a>
-            </li>
-          </ul>
-        </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
           <h4 class="column-title">{{ T.frontPageFooterSponsors }}</h4>
           <ul>
             <li class="mt-1">
@@ -47,6 +25,28 @@
                   alt="ReplitLogo"
                 />
               </a>
+            </li>
+          </ul>
+        </div>
+        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
+          <h4 class="column-title">{{ T.frontPageFooterSite }}</h4>
+          <ul>
+            <li class="mt-1">
+              <a href="/arena/">{{ T.navContests }}</a>
+            </li>
+            <li class="mt-1">
+              <a href="/course/">{{ T.navCourses }} </a>
+            </li>
+            <li class="mt-1">
+              <a href="/problem/">{{ T.navProblems }}</a>
+            </li>
+            <li class="mt-1">
+              <a href="/rank/">{{ T.navRanking }}</a>
+            </li>
+            <li class="mt-1">
+              <a href="https://blog.omegaup.com" target="_blank">{{
+                T.navBlog
+              }}</a>
             </li>
           </ul>
         </div>
@@ -67,17 +67,7 @@
         </div>
         <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
           <h4 class="column-title">{{ T.frontPageDevelopers }}</h4>
-          <ul>            
-            <li class="mt-1">
-              <a
-                v-if="!omegaUpLockDown && isLoggedIn"
-                href="https://github.com/omegaup/omegaup/issues/new"
-                target="_blank"
-                rel="nofollow"
-                @click="$event.target.href = reportAnIssueURL()"
-                >{{ T.reportAnIssue }}</a
-              >
-            </li>
+          <ul>
             <li class="mt-1">
               <a
                 href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar"
@@ -91,6 +81,16 @@
                 Github
               </a>
             </li>
+            <li class="mt-1">
+              <a
+                v-if="!omegaUpLockDown && isLoggedIn"
+                href="https://github.com/omegaup/omegaup/issues/new"
+                target="_blank"
+                rel="nofollow"
+                @click="$event.target.href = reportAnIssueURL()"
+                >{{ T.reportAnIssue }}</a
+              >
+            </li>
           </ul>
         </div>
         <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
@@ -100,9 +100,9 @@
               <a href="mailto:hello@omegaup.com">hello@omegaup.com</a>
             </li>
           </ul>
-          <div class="social-icons my-0 mx-auto d-flex flex-column">
+          <div class="social-icons my-0 mx-auto">
             <a
-            class="text-nowrap mt-1"
+              class="text-nowrap pt-2"
               href="https://www.facebook.com/omegaup/"
               target="_blank"
             >
@@ -110,7 +110,7 @@
               Facebook
             </a>
             <a
-            class="text-nowrap mt-1"
+              class="text-nowrap pt-2"
               href="https://discord.gg/K3JFd9d3wk"
               target="_blank"
             >
@@ -132,7 +132,7 @@
             })
           }}
         </div>
-        <ul class="m-0 list-unstyled text-right d-flex flex-row">
+        <ul class="m-0 list-unstyled text-right">
           <li>
             <a
               href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
@@ -140,7 +140,7 @@
               >{{ T.frontPageFooterCodeConduct }}</a
             >
           </li>
-          <li class="ml-3">
+          <li>
             <a
               href="https://blog.omegaup.com/privacy-policy/"
               target="_blank"
@@ -186,10 +186,6 @@ export default class Footer extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
-.common-footer a {
-  font-size: 1.04rem;
-  letter-spacing: 0.02rem;
-}
 .common-footer {
   background-color: $omegaup-primary--darker;
   color: $omegaup-white;
@@ -209,14 +205,11 @@ export default class Footer extends Vue {
 
       .footer-logo,
       .slogan {
-        margin-top: -2.9rem;
+        margin-top: -2.5rem;
       }
+
       .slogan {
-        font-size: 0.92rem;
         text-transform: uppercase;
-        letter-spacing: 0.02rem;
-        max-width: 10rem;
-        margin-top: -2.2rem;
       }
     }
 
@@ -238,7 +231,7 @@ export default class Footer extends Vue {
 
           a {
             text-decoration: none;
-            color: #f2f2f2;
+            color: white;
 
             &:hover {
               color: rgb(212, 215, 224);
@@ -246,6 +239,7 @@ export default class Footer extends Vue {
           }
         }
       }
+
       img.sponsor-logo {
         width: 120px;
       }
@@ -254,7 +248,7 @@ export default class Footer extends Vue {
 
   a {
     text-decoration: none;
-    color: #DBE2F3;
+    color: white;
 
     &:hover {
       color: rgb(212, 215, 224);
