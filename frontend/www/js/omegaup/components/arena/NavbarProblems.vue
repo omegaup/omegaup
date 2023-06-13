@@ -33,15 +33,7 @@
           v-if="problem.acceptsSubmissions"
           class="col-xs-7 solved text-right w-50 pr-3"
         >
-          <span class="mr-1"
-            >({{
-              parseFloat(problem.bestScore).toFixed(digitsAfterDecimalPoint)
-            }}
-            /
-            {{
-              parseFloat(problem.maxScore).toFixed(digitsAfterDecimalPoint)
-            }})</span
-          >
+          <span class="mr-1">{{ getMaxScoreForProblem(problem) }}</span>
           <font-awesome-icon
             v-if="problem.bestScore == problem.maxScore"
             icon="check"
@@ -103,6 +95,12 @@ export default class ArenaNavbarProblems extends Vue {
 
   getProblemTypeTitle(acceptsSubmissions: boolean): string {
     return acceptsSubmissions ? T.wordsProblem : T.wordsLecture;
+  }
+
+  getMaxScoreForProblem(problem: types.NavbarProblemsetProblem): string {
+    return `(${problem.bestScore.toFixed(
+      this.digitsAfterDecimalPoint,
+    )} / ${problem.maxScore.toFixed(this.digitsAfterDecimalPoint)})`;
   }
 
   get urlAssignment(): string {
