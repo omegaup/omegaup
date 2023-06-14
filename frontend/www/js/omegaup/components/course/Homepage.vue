@@ -3,7 +3,7 @@
     <div class="row p-4 text-center justify-content-around align-items-center">
       <h2 class="col-12 mb-5 font-italic">{{ T.courseHomepageTitle }}</h2>
       <a
-        class="col-xs-6 col-sm-4 btn btn-primary btn-lg mx-auto custom-button"
+        class="col-xs-6 col-sm-3 btn btn-primary btn-lg mx-auto custom-button"
         role="button"
         href="/course/"
         >{{ T.wordsGetToKnowOurCourses }}</a
@@ -23,6 +23,7 @@
         <div class="col-md-6 mt-2 mt-md-0">
           <omegaup-markdown
             :markdown="T.courseHomepageTeachersSectionContent"
+            class="my-markdown"
           ></omegaup-markdown>
         </div>
       </div>
@@ -38,16 +39,9 @@
         <div class="col-md-6 mt-2 mt-md-0">
           <omegaup-markdown
             :markdown="T.courseHomepageStudentsSectionContent"
+            class="my-markdown"
           ></omegaup-markdown>
         </div>
-      </div>
-      <div class="row mt-2">
-        <a
-          class="col-xs-6 col-sm-4 btn btn-primary btn-lg mx-auto custom-button"
-          role="button"
-          href="/course/"
-          >{{ T.wordsGetToKnowOurCourses }}</a
-        >
       </div>
     </div>
   </div>
@@ -68,10 +62,20 @@ export default class Homepage extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../../../sass/main.scss';
 
 a.custom-button {
   color: $omegaup-white;
+  letter-spacing: 0.016rem;
+  font-size: 1.1rem;
+}
+
+.my-markdown p {
+  margin-bottom: 0.88em;
+  margin-left: 1em;
+  font-size: 1.2rem;
+  text-align: center;
+  letter-spacing: 0.016rem;
 }
 </style>
