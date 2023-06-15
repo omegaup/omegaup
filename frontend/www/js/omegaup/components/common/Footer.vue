@@ -2,7 +2,7 @@
   <footer class="common-footer text-center">
     <div class="container-xl">
       <div
-        class="footer-navigation d-table d-lg-flex justify-content-between align-items-start py-5 m-auto"
+        class="footer-navigation d-table d-lg-flex align-items-start py-5 m-auto"
       >
         <div class="footer-brand mb-4 mb-lg-0">
           <img
@@ -215,9 +215,6 @@ export default class Footer extends Vue {
   flex-grow: 1;
 
   .footer-navigation {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     .footer-brand {
       max-width: 200px;
       order: -3;
