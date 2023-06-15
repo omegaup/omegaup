@@ -134,7 +134,7 @@
                 aria-haspopup="true"
                 aria-expanded="false"
               >
-                <img :src="gravatarURL51" height="45" class="pt-1"/><span
+                <img :src="gravatarURL51" height="45" class="pt-1" /><span
                   class="username mr-2"
                   :title="currentUsername"
                   >{{ currentUsername }}</span
@@ -409,12 +409,11 @@ nav.navbar {
     color: var(--header-navbar-dropdown-item-font-color);
   }
   a {
-    color: #DBE2F3;
+    color: #dbe2f3;
   }
   .collapse-submenu .btn:focus {
     box-shadow: 0 0 0 0;
   }
-
 }
 .allow-overflow {
   overflow-y: scroll;
