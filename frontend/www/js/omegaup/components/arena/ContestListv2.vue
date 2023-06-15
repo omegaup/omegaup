@@ -28,7 +28,9 @@
                       spellcheck="false"
                       :placeholder="T.wordsKeyword"
                     />
-                    <button class="btn reset-btn nav-link" type="reset">&times;</button>
+                    <button class="btn reset-btn nav-link" type="reset">
+                      &times;
+                    </button>
                     <div class="input-group-append">
                       <input
                         class="btn btn-primary btn-style btn-md btn-block active nav-link"
@@ -40,17 +42,22 @@
                 </form>
               </b-col>
               <b-col sm="12" class="d-flex col-md-6 btns-group p-0">
-
-              <b-dropdown :text="currentTabText">
-                <b-dropdown-item @click="currentTab=ContestTab.Current"> {{ T.contestListCurrent }}</b-dropdown-item>
-                <b-dropdown-item @click="currentTab=ContestTab.Future">{{ T.contestListFuture }}</b-dropdown-item>
-                <b-dropdown-item @click="currentTab=ContestTab.Past"> {{ T.contestListPast }}</b-dropdown-item>
-              </b-dropdown>
+                <b-dropdown :text="currentTabText">
+                  <b-dropdown-item @click="currentTab = ContestTab.Current">
+                    {{ T.contestListCurrent }}</b-dropdown-item
+                  >
+                  <b-dropdown-item @click="currentTab = ContestTab.Future">{{
+                    T.contestListFuture
+                  }}</b-dropdown-item>
+                  <b-dropdown-item @click="currentTab = ContestTab.Past">
+                    {{ T.contestListPast }}</b-dropdown-item
+                  >
+                </b-dropdown>
 
                 <b-dropdown ref="dropdownOrderBy" no-caret>
                   <template #button-content>
-                      <font-awesome-icon icon="sort-amount-down" />
-                      {{ T.contestOrderBy }}
+                    <font-awesome-icon icon="sort-amount-down" />
+                    {{ T.contestOrderBy }}
                   </template>
                   <b-dropdown-item
                     href="#"
@@ -121,8 +128,8 @@
                 </b-dropdown>
                 <b-dropdown ref="dropdownFilterBy" class="mr-0" no-caret>
                   <template #button-content>
-                      <font-awesome-icon icon="filter" />
-                      {{ T.contestFilterBy }}
+                    <font-awesome-icon icon="filter" />
+                    {{ T.contestFilterBy }}
                   </template>
                   <b-dropdown-item
                     href="#"
@@ -404,7 +411,7 @@ export default class ArenaContestList extends Vue {
   get queryURL(): string {
     return `/arena/#${this.currentTab}`;
   }
- 
+
   get currentTabText(): string {
     switch (this.currentTab) {
       case ContestTab.Current:
@@ -413,10 +420,10 @@ export default class ArenaContestList extends Vue {
         return T.contestListFuture;
       case ContestTab.Past:
         return T.contestListPast;
-        default:
+      default:
         return T.contestListCurrent;
     }
-  } 
+  }
 
   linkGen(pageNum: number) {
     return {
@@ -558,11 +565,15 @@ export default class ArenaContestList extends Vue {
   padding: 0.5rem 1rem !important;
 }
 
-.pagination-contest{
-
-  .pagination {  margin-bottom: 1.25rem; };
-  .page-link { padding: 0.5rem 1rem; font-size: 16px; line-height: 24px;}
-
+.pagination-contest {
+  .pagination {
+    margin-bottom: 1.25rem;
+  }
+  .page-link {
+    padding: 0.5rem 1rem;
+    font-size: 16px;
+    line-height: 24px;
+  }
 }
 
 .card-group-menu {
@@ -580,20 +591,22 @@ export default class ArenaContestList extends Vue {
 .btn-style {
   border-color: #007bff;
 }
+
 .form-control {
   height: auto;
 }
 
 .reset-btn {
-    line-height: 1.5;
-    color: #6C757D;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: none;
-    border-top: 1px solid #ced4da;
-    border-bottom: 1px solid #ced4da;
-    border-radius: unset;
+  line-height: 1.5;
+  color: #6c757d;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: none;
+  border-top: 1px solid #ced4da;
+  border-bottom: 1px solid #ced4da;
+  border-radius: unset;
 }
+
 .btn-primary {
   background-color: #007bff !important;
 }
@@ -632,6 +645,7 @@ export default class ArenaContestList extends Vue {
 
 .btns-group {
   justify-content: flex-end;
+
   .dropdown {
     margin-right: 1rem;
   }
@@ -642,12 +656,14 @@ export default class ArenaContestList extends Vue {
     font-size: 1.5rem;
     text-align: center;
   }
+
   .tabs {
     flex-direction: column;
   }
 
   .btns-group {
     justify-content: flex-start;
+
     .dropdown {
       flex: 1;
       gap: 1rem;

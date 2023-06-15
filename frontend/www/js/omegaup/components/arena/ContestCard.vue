@@ -74,7 +74,7 @@
                 variant="primary"
                 class="button-style"
               >
-                <font-awesome-icon class="mr-1" icon="sign-in-alt"/>
+                <font-awesome-icon class="mr-1" icon="sign-in-alt" />
                 {{ T.contestButtonEnter }}
               </b-button>
             </slot>
@@ -97,8 +97,12 @@
                 <font-awesome-icon class="mr-1" icon="sign-in-alt" />
                 {{ T.contestButtonEnter }}
               </template>
-              <b-dropdown-item :href="getVirtualContestURL(contest.alias)">{{ T.contestVirtualMode }}</b-dropdown-item>
-              <b-dropdown-item :href="getPracticeContestURL(contest.alias)">{{ T.contestPracticeMode }}</b-dropdown-item>
+              <b-dropdown-item :href="getVirtualContestURL(contest.alias)">{{
+                T.contestVirtualMode
+              }}</b-dropdown-item>
+              <b-dropdown-item :href="getPracticeContestURL(contest.alias)">{{
+                T.contestPracticeMode
+              }}</b-dropdown-item>
             </b-dropdown>
           </slot>
         </b-col>
