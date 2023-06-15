@@ -23,7 +23,6 @@
         <div class="col-md-6 mt-2 mt-md-0">
           <omegaup-markdown
             :markdown="T.courseHomepageTeachersSectionContent"
-            class="my-markdown"
           ></omegaup-markdown>
         </div>
       </div>
@@ -39,7 +38,6 @@
         <div class="col-md-6 mt-2 mt-md-0">
           <omegaup-markdown
             :markdown="T.courseHomepageStudentsSectionContent"
-            class="my-markdown"
           ></omegaup-markdown>
         </div>
       </div>
@@ -71,11 +69,18 @@ a.custom-button {
   font-size: 1.1rem;
 }
 
-.my-markdown p {
-  margin-bottom: 0.88em;
-  margin-left: 1em;
-  font-size: 1.2rem;
-  text-align: center;
-  letter-spacing: 0.016rem;
+[data-homepage-course] [data-markdown-statement] {
+  p {
+    margin-bottom: 0.88em;
+    margin-left: 1em;
+    font-size: 1.2rem;
+    text-align: center;
+    letter-spacing: 0.016rem;
+  }
+  ul,
+  li {
+    margin-bottom: 0.6rem;
+  }
 }
+
 </style>
