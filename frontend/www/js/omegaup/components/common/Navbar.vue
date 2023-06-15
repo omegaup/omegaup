@@ -20,7 +20,6 @@
         </a>
 
         <div class="d-inline-flex d-flex-row order-md-1">
-
           <ul v-if="isLoggedIn" class="navbar-nav navbar-right">
             <omegaup-notifications-clarifications
               v-if="inContest"
@@ -32,7 +31,7 @@
               @read="readNotifications"
             ></omegaup-notification-list>
           </ul>
-          
+
           <a
             v-if="isLoggedIn"
             class="navbar justify-content-end mr-2 d-lg-none"

@@ -15,7 +15,9 @@
         >{{ notifications.length }}</span
       ></a
     >
-    <div class="dropdown-menu dropdown-menu-right notification-dropdown position-absolute mt-2">
+    <div
+      class="dropdown-menu dropdown-menu-right notification-dropdown position-absolute mt-2"
+    >
       <!--
         Trick to avoid closing on click
         The form element makes click events work inside dropdown on items that are not nav-link.
