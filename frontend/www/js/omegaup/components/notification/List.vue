@@ -15,7 +15,7 @@
         >{{ notifications.length }}</span
       ></a
     >
-    <div class="dropdown-menu dropdown-menu-right notification-dropdown">
+    <div class="dropdown-menu dropdown-menu-right notification-dropdown position-absolute mt-2">
       <!--
         Trick to avoid closing on click
         The form element makes click events work inside dropdown on items that are not nav-link.
@@ -88,7 +88,10 @@ export default class NotificationList extends Vue {
 }
 
 .navbar-expand-lg .navbar-nav .dropdown-menu {
-  width: 35rem;
+  min-width: 68vw;
+  @media only screen and (min-width: 767px) {
+    min-width: 35rem;
+  }
 }
 
 .notification-dropdown {
