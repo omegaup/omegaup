@@ -2,7 +2,7 @@
   <footer class="common-footer text-center">
     <div class="container-xl">
       <div
-        class="footer-navigation d-table d-lg-flex align-items-start py-5 m-auto"
+        class="footer-navigation d-lg-flex align-items-start py-5 m-auto"
       >
         <div class="footer-brand mb-4 mb-lg-0">
           <img
@@ -95,7 +95,7 @@
           </ul>
         </div>
         <div
-          class="footer-list-section footer-organization w-50 mb-4 w-md-auto mb-lg-0"
+          class="footer-list-section footer-organization d-inline-block w-50 mb-4 w-md-auto mb-lg-0"
         >
           <h4>{{ T.frontPageFooterOrganization }}</h4>
           <ul>
@@ -112,7 +112,7 @@
           </ul>
         </div>
         <div
-          class="footer-list-section footer-developers w-50 mb-4 w-md-auto mb-lg-0"
+          class="footer-list-section footer-developers d-inline-block w-50 mb-4 w-md-auto mb-lg-0"
         >
           <h4>{{ T.frontPageDevelopers }}</h4>
           <ul>
@@ -234,13 +234,6 @@ export default class Footer extends Vue {
     }
 
     .footer-list-section {
-      &.footer-organization {
-        display: inline-grid;
-      }
-      &.footer-developers {
-        display: inline-grid;
-      }
-
       // On medium sizes, this will work as an inline grid (not 100% width)
       @media only screen and (min-width: 992px) {
         display: block;
