@@ -100,7 +100,11 @@
             <label>{{ T.contestNewFormDifferentStarts }}</label>
             <div class="checkbox">
               <label
-                ><input v-model="windowLengthEnabled" data-different-start-check type="checkbox" />
+                ><input
+                  v-model="windowLengthEnabled"
+                  data-different-start-check
+                  type="checkbox"
+                />
                 {{ T.wordsEnable }}</label
               >
             </div>
