@@ -7,7 +7,7 @@ export class LoginPage {
 
     for (let i = 0; i < noOfUsers; i++) {
       const userLoginOptions: LoginOptions = {
-        username: 'utGroup_' + uuid(),
+        username: 'utGroup_user' + i + "_" + uuid(),
         password: 'P@55w0rd',
       };
 

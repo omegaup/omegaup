@@ -1,14 +1,91 @@
 import { v4 as uuid } from 'uuid';
-import { GroupOptions } from '../support/types';
+import { ContestOptions, GroupOptions, LoginOptions } from '../support/types';
 import { contestPage } from '../support/pageObjects/contestPage';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { addSubtractDaysToDate } from '../support/commands';
 
 describe('Contest Test', () => {
+  let virtualContestDetails: ContestOptions;
+  let contestWithHalfTimeVisibleScoreboard: ContestOptions;
+  let loginOptionstoVerify: LoginOptions;
+
+  before(() => {
+    cy.clearCookies();
+    cy.clearLocalStorage();
+    cy.visit('/');
+
+    const contestOptions = contestPage.generateContestOptions();
+    const userLoginOptions = loginPage.registerMultipleUsers(1);
+    const users = [userLoginOptions[0].username];
+
+    const now = new Date();
+
+    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
+    const milliseconds = 200 * 1000;
+    let newEndDate = new Date();
+    newEndDate = new Date(newEndDate.getTime() + milliseconds);
+    contestOptions.endDate = newEndDate;
+
+    virtualContestDetails = contestOptions;
+    contestPage.createContestAsAdmin(contestOptions, users);
+    cy.login(userLoginOptions[0]);
+    cy.enterContest(contestOptions);
+    cy.createRunsInsideContest(contestOptions);
+    cy.logout();
+  });
+
   beforeEach(() => {
     cy.clearCookies();
     cy.clearLocalStorage();
     cy.visit('/');
+  });
+
+  it('Should create a contest when the scoreboard is shown half the time', () => {
+    const contestOptions = contestPage.generateContestOptions();
+    const userLoginOptions = loginPage.registerMultipleUsers(2);
+    const users = [userLoginOptions[0].username];
+    loginOptionstoVerify = userLoginOptions[1];
+
+    contestOptions.scoreBoardVisibleTime = '50';
+    const now = new Date();
+    contestOptions.startDate = now;
+    const milliseconds = 480 * 1000;
+    let newEndDate = new Date();
+    newEndDate = new Date(newEndDate.getTime() + milliseconds);
+    contestOptions.endDate = newEndDate;
+
+    contestWithHalfTimeVisibleScoreboard = contestOptions;
+    contestPage.createContestAsAdmin(contestOptions, users);
+
+    cy.login(userLoginOptions[0]);
+    cy.enterContest(contestOptions);
+    cy.createRunsInsideContest(contestOptions);
+    cy.get('a[href="#ranking"]').click();
+    cy.get('[data-table-scoreboard]').should('be.visible');
+    cy.get('[data-table-scoreboard-username]').should('have.length', 1);
+    cy.get(`.${userLoginOptions[0].username} > td:nth-child(4)`).should(
+      'contain',
+      '+100.00',
+    );
+    cy.logout();
+  });
+
+  it('Should create a contest with different start', () => {
+    const contestOptions = contestPage.generateContestOptions();
+    const userLoginOptions = loginPage.registerMultipleUsers(1);
+    const users = [userLoginOptions[0].username];
+    const now = new Date();
+
+    contestOptions.differentStart = true;
+    contestOptions.differentStartTime = "300";
+    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
+    contestOptions.endDate = addSubtractDaysToDate(now, { days: 1 });
+    contestPage.createContestAsAdmin(contestOptions, users);
+
+    cy.login(userLoginOptions[0]);
+    cy.enterContest(contestOptions);
+    cy.get('.clock').should('contain', "5:00");
+    cy.logout();
   });
 
   it('Should create a contest and retrieve it', () => {
@@ -121,41 +198,6 @@ describe('Contest Test', () => {
     cy.logout();
   });
 
-  it('Should give a past contest as a virtual contest', () => {
-    const contestOptions = contestPage.generateContestOptions();
-    const now = new Date();
-    const userLoginOptions = loginPage.registerMultipleUsers(1);
-    const users = [userLoginOptions[0].username];
-    const virtualContestUrl = `/contest/${contestOptions.contestAlias}/virtual/`;
-
-    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
-    contestOptions.endDate = now;
-
-    contestPage.createContestAsAdmin(contestOptions, users);
-
-    cy.login(userLoginOptions[0]);
-    cy.visit(virtualContestUrl);
-    cy.get('[data-schedule-virtual-button]').click();
-    cy.get('[data-contest-link-button]').click();
-    cy.url().should('include', contestOptions.contestAlias);
-    cy.url().then((url) => {
-      const virtualContestCode = url.split('/')[4].split('-')[2];
-      const newContestAlias =
-        contestOptions.contestAlias + '-virtual-' + virtualContestCode;
-
-      contestOptions.contestAlias = newContestAlias;
-      cy.createRunsInsideContest(contestOptions);
-    });
-    cy.get('a[href="#ranking"]').click();
-    cy.get('[data-table-scoreboard]').should('be.visible');
-    cy.get('[data-table-scoreboard-username]').should('have.length', 1);
-    cy.get(`.${userLoginOptions[0].username} > td:nth-child(4)`).should(
-      'contain',
-      '+100.00',
-    );
-    cy.logout();
-  });
-
   it('Should test practice mode in contest', () => {
     const contestOptions = contestPage.generateContestOptions();
     const now = new Date();
@@ -188,7 +230,7 @@ describe('Contest Test', () => {
   });
 
   it(
-    'Should create a contest and reviewing ranking contests when the scoreboard shows' +
+    'Should create a contest and review contest ranking when the scoreboard shows' +
       ' time has finished',
     () => {
       const contestOptions = contestPage.generateContestOptions();
@@ -223,4 +265,68 @@ describe('Contest Test', () => {
       cy.logout();
     },
   );
+
+  it('Should create a contest when the scoreboard is never shown', () => {
+    const contestOptions = contestPage.generateContestOptions();
+    const userLoginOptions = loginPage.registerMultipleUsers(1);
+    const users = [userLoginOptions[0].username];
+
+    contestOptions.scoreBoardVisibleTime = '0';
+    contestPage.createContestAsAdmin(contestOptions, users);
+
+    cy.login(userLoginOptions[0]);
+    cy.enterContest(contestOptions);
+    cy.createRunsInsideContest(contestOptions);
+    cy.get('a[href="#ranking"]').click();
+    cy.pause();
+    cy.get('[data-table-scoreboard]').should('be.visible');
+    cy.get('[data-table-scoreboard-username]').should('have.length', 1);
+    cy.get(`.${userLoginOptions[0].username} > td:nth-child(4)`).should(
+      'contain',
+      '0.00',
+    );
+    cy.logout();
+  });
+
+  it('Should verify the scorebaord is not upadating after half of time', () => {
+    cy.login(loginOptionstoVerify);
+    cy.enterContest(contestWithHalfTimeVisibleScoreboard);
+    cy.createRunsInsideContest(contestWithHalfTimeVisibleScoreboard);
+    cy.get('a[href="#ranking"]').click();
+    cy.get('[data-table-scoreboard]').should('be.visible');
+    cy.get('[data-table-scoreboard-username]').should('have.length', 2);
+    cy.get(`.${loginOptionstoVerify.username} > td:nth-child(4)`).should(
+      'contain',
+      '0.00',
+    );
+    cy.logout();
+  });
+
+  it('Should give a past contest as a virtual contest', () => {
+    const contestOptions = virtualContestDetails;
+    const userLoginOptions = loginPage.registerMultipleUsers(1);
+    const virtualContestUrl = `/contest/${contestOptions.contestAlias}/virtual/`;
+
+    cy.login(userLoginOptions[0]);
+    cy.visit(virtualContestUrl);
+    cy.get('[data-schedule-virtual-button]').click();
+    cy.get('[data-contest-link-button]').click();
+    cy.url().should('include', contestOptions.contestAlias);
+    cy.url().then((url) => {
+      const virtualContestCode = url.split('/')[4].split('-')[2];
+      const newContestAlias =
+        contestOptions.contestAlias + '-virtual-' + virtualContestCode;
+
+      contestOptions.contestAlias = newContestAlias;
+      cy.createRunsInsideContest(contestOptions);
+    });
+    cy.get('a[href="#ranking"]').click();
+    cy.get('[data-table-scoreboard]').should('be.visible');
+    cy.get('[data-table-scoreboard-username]').should('have.length', 2);
+    cy.get(`.${userLoginOptions[0].username} > td:nth-child(4)`).should(
+      'contain',
+      '+100.00',
+    );
+    cy.logout();
+  });
 });
