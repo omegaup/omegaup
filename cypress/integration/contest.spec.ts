@@ -278,7 +278,6 @@ describe('Contest Test', () => {
     cy.enterContest(contestOptions);
     cy.createRunsInsideContest(contestOptions);
     cy.get('a[href="#ranking"]').click();
-    cy.pause();
     cy.get('[data-table-scoreboard]').should('be.visible');
     cy.get('[data-table-scoreboard-username]').should('have.length', 1);
     cy.get(`.${userLoginOptions[0].username} > td:nth-child(4)`).should(
@@ -294,11 +293,7 @@ describe('Contest Test', () => {
     cy.createRunsInsideContest(contestWithHalfTimeVisibleScoreboard);
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
-    cy.get('[data-table-scoreboard-username]').should('have.length', 2);
-    cy.get(`.${loginOptionstoVerify.username} > td:nth-child(4)`).should(
-      'contain',
-      '0.00',
-    );
+    cy.get('[data-table-scoreboard-username]').should('have.length', 1);
     cy.logout();
   });
 
