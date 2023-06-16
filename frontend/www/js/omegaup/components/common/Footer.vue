@@ -1,9 +1,7 @@
 <template>
   <footer class="common-footer text-center">
     <div class="container-xl">
-      <div
-        class="footer-navigation d-lg-flex align-items-start py-5 m-auto"
-      >
+      <div class="footer-navigation d-lg-flex align-items-start py-5 m-auto">
         <div class="footer-brand mb-4 mb-lg-0">
           <img
             class="footer-logo d-block mx-auto"
