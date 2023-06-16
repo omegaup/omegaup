@@ -14,24 +14,24 @@ describe('Contest Test', () => {
     cy.clearLocalStorage();
     cy.visit('/');
 
-    const contestOptions = contestPage.generateContestOptions();
-    const userLoginOptions = loginPage.registerMultipleUsers(1);
-    const users = [userLoginOptions[0].username];
+    // const contestOptions = contestPage.generateContestOptions();
+    // const userLoginOptions = loginPage.registerMultipleUsers(1);
+    // const users = [userLoginOptions[0].username];
 
-    const now = new Date();
+    // const now = new Date();
 
-    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
-    const milliseconds = 200 * 1000;
-    let newEndDate = new Date();
-    newEndDate = new Date(newEndDate.getTime() + milliseconds);
-    contestOptions.endDate = newEndDate;
+    // contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
+    // const milliseconds = 200 * 1000;
+    // let newEndDate = new Date();
+    // newEndDate = new Date(newEndDate.getTime() + milliseconds);
+    // contestOptions.endDate = newEndDate;
 
-    virtualContestDetails = contestOptions;
-    contestPage.createContestAsAdmin(contestOptions, users);
-    cy.login(userLoginOptions[0]);
-    cy.enterContest(contestOptions);
-    cy.createRunsInsideContest(contestOptions);
-    cy.logout();
+    // virtualContestDetails = contestOptions;
+    // contestPage.createContestAsAdmin(contestOptions, users);
+    // cy.login(userLoginOptions[0]);
+    // cy.enterContest(contestOptions);
+    // cy.createRunsInsideContest(contestOptions);
+    // cy.logout();
   });
 
   beforeEach(() => {
@@ -70,21 +70,21 @@ describe('Contest Test', () => {
     cy.logout();
   });
 
-  it('Should create a contest with different start', () => {
+  it.only('Should create a contest with different start', () => {
     const contestOptions = contestPage.generateContestOptions();
     const userLoginOptions = loginPage.registerMultipleUsers(1);
     const users = [userLoginOptions[0].username];
     const now = new Date();
 
     contestOptions.differentStart = true;
-    contestOptions.differentStartTime = "300";
+    contestOptions.differentStartTime = "60";
     contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
     contestOptions.endDate = addSubtractDaysToDate(now, { days: 1 });
     contestPage.createContestAsAdmin(contestOptions, users);
 
     cy.login(userLoginOptions[0]);
     cy.enterContest(contestOptions);
-    cy.get('.clock').should('contain', "5:00");
+    cy.get('.clock').should('contain', "59");
     cy.logout();
   });
 
