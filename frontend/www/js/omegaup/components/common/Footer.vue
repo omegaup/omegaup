@@ -12,7 +12,9 @@
             {{ T.frontPageFooter }}
           </div>
         </div>
-        <div class="footer-list-section footer-contact w-50 mb-4 mb-lg-0 mx-auto">
+        <div
+          class="footer-list-section footer-contact w-50 mb-4 mb-lg-0 mx-auto"
+        >
           <h4>{{ T.frontPageFooterContact }}</h4>
           <ul>
             <li class="mt-1">
@@ -72,7 +74,9 @@
             </li>
           </ul>
         </div>
-        <div class="footer-list-section footer-sponsors w-50 mb-4 mb-lg-0 mx-auto">
+        <div
+          class="footer-list-section footer-sponsors w-50 mb-4 mb-lg-0 mx-auto"
+        >
           <h4>{{ T.frontPageFooterSponsors }}</h4>
           <ul>
             <li class="mt-1">
@@ -86,7 +90,9 @@
             </li>
           </ul>
         </div>
-        <div class="footer-list-section footer-organization d-inline-block w-50 mb-4 ">
+        <div
+          class="footer-list-section footer-organization d-inline-block w-50 mb-4"
+        >
           <h4>{{ T.frontPageFooterOrganization }}</h4>
           <ul>
             <li class="mt-1">
@@ -101,7 +107,9 @@
             </li>
           </ul>
         </div>
-        <div class="footer-list-section footer-developers d-inline-block w-50 mb-4 ">
+        <div
+          class="footer-list-section footer-developers d-inline-block w-50 mb-4"
+        >
           <h4>{{ T.frontPageDevelopers }}</h4>
           <ul>
             <li class="mt-1">
