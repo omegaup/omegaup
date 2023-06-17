@@ -349,7 +349,7 @@ describe('Basic Commands Test', () => {
     );
   });
 
-  it.only('Should create runs inside contest', () => {
+  it('Should create runs inside contest', () => {
     cy.login(loginOptions);
     cy.addProblemsToContest(contestOptions);
     cy.changeAdmissionModeContest(contestOptions);
