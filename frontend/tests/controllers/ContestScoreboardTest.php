@@ -1307,7 +1307,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for the contest with max_per_group mode.
      *
-     * @return array{0: int, 1: list<array: {runs: int, score: float, execution: string, output: string, status_memory: string, status_runtime: string}>, 2: list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}>}
+     * @return array{0: int, 1: list<array: {runs: int, score: float, execution: string, output: string, status_memory: string, status_runtime: string}>, 2: list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}>, 3: int}
      */
     public function runsMappingProvider(): array {
         $runsMapping = [
@@ -1342,10 +1342,11 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 100,
                 [
                     ['runs' => 1, 'score' => 0.4, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
-                    ['runs' => 2, 'score' => 0.73, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
+                    ['runs' => 2, 'score' => 0.7333, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                     ['runs' => 3, 'score' => 0.8, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                 ],
-                $runsMapping
+                $runsMapping,
+                100,
             ],
             [
                 60,
@@ -1356,14 +1357,15 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                     // contest's settings
                     ['runs' => 3, 'score' => 0.73, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                 ],
-                $runsMapping
+                $runsMapping,
+                1
             ],
             [
                 100,
                 [
                     ['runs' => 1, 'score' => 0.0, 'execution' => 'EXECUTION_COMPILATION_ERROR', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_NOT_AVAILABLE', 'status_runtime' => 'RUNTIME_NOT_AVAILABLE'],
                     ['runs' => 2, 'score' => 0.5, 'execution' => 'EXECUTION_JUDGE_ERROR', 'output' => 'OUTPUT_EXCEEDED', 'status_memory' => 'MEMORY_NOT_AVAILABLE', 'status_runtime' => 'RUNTIME_NOT_AVAILABLE'],
-                    ['runs' => 3, 'score' => 0.83, 'execution' => 'EXECUTION_INTERRUPTED', 'output' => 'OUTPUT_INTERRUPTED', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_EXCEEDED'],
+                    ['runs' => 3, 'score' => 0.8333, 'execution' => 'EXECUTION_INTERRUPTED', 'output' => 'OUTPUT_INTERRUPTED', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_EXCEEDED'],
                     ['runs' => 4, 'score' => 1.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_CORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                 ],
                 [
@@ -1401,6 +1403,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                         ],
                     ],
                 ],
+                100,
             ],
         ];
     }
@@ -1414,7 +1417,8 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     public function testScoreboardForContestInMaxPerGroupMode(
         int $scoreboardPercentage,
         array $expectedResultsInEverySubmission,
-        array $runsMapping
+        array $runsMapping,
+        int $pointsPerProblem
     ) {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -1430,7 +1434,8 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         // Add the problem to the contest
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
-            $contestData
+            $contestData,
+            $pointsPerProblem
         );
 
         // Create our contestant
@@ -1483,7 +1488,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
 
             $this->assertSame(
                 $response[0]['problems'][0]['points'],
-                $expectedResultsInEverySubmission[$index]['score']
+                $expectedResultsInEverySubmission[$index]['score'] * $pointsPerProblem
             );
             $this->assertSame(
                 $response[0]['problems'][0]['runs'],
