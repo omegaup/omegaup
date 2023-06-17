@@ -180,7 +180,7 @@ export function getMaxPerGroupScore(
 
   const values = Object.values(scoreByGroup);
 
-  // Avoiding show NaN in bestScore value
+  // Avoid showing NaN in bestScore value
   for (const value of values) {
     if (typeof value === 'undefined') {
       return 0;
