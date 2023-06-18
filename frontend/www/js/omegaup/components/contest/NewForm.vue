@@ -100,13 +100,18 @@
             <label>{{ T.contestNewFormDifferentStarts }}</label>
             <div class="checkbox">
               <label
-                ><input v-model="windowLengthEnabled" type="checkbox" />
+                ><input
+                  v-model="windowLengthEnabled"
+                  data-different-start-check
+                  type="checkbox"
+                />
                 {{ T.wordsEnable }}</label
               >
             </div>
             <input
               v-model="windowLength"
               class="form-control"
+              data-different-start-time-input
               :class="{
                 'is-invalid': invalidParameterName === 'window_length',
               }"
@@ -122,6 +127,7 @@
             <label>{{ T.contestNewFormScoreboardTimePercent }}</label>
             <input
               v-model="scoreboard"
+              data-score-board-visible-time
               class="form-control scoreboard-time-percent"
               :class="{
                 'is-invalid': invalidParameterName === 'scoreboard',
