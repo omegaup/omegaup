@@ -103,6 +103,7 @@ export async function navigateToProblem(
         contestMode,
         problemAlias: problemInfo.alias,
         problemPoints: 0.0,
+        maxScore: problem.maxScore,
       });
       problemsStore.commit('addProblem', problemInfo);
       target.problem = problem;
@@ -123,16 +124,19 @@ export function getScoreForProblem({
   contestMode,
   problemAlias,
   problemPoints,
+  maxScore,
 }: {
   contestMode: ScoreMode;
   problemAlias: string;
   problemPoints: number;
+  maxScore: number;
 }) {
   if (contestMode === ScoreMode.MaxPerGroup) {
     return getMaxPerGroupScore(
       myRunsStore.state.runs.filter((run) => run.alias === problemAlias),
       problemAlias,
       problemPoints,
+      maxScore,
     );
   }
   return getMaxScore(
@@ -161,15 +165,24 @@ export function getMaxPerGroupScore(
   runs: types.Run[],
   alias: string,
   previousScore: number,
+  maxScore: number,
 ): number {
-  if (!runs.length) {
+  if (!runs.length || !runs[0].score_by_group) {
     return previousScore;
   }
   const scoreByGroup = Object.keys(runs[0].score_by_group || {}).reduce(
     (acc: Record<string, number>, key) => {
       const values = runs
         .filter((run) => run.alias === alias)
-        .map((run) => (run.score_by_group ? run.score_by_group[key] : 0.0))
+        .map((run) => {
+          if (!run.score_by_group) {
+            return 0.0;
+          }
+          if (run.score_by_group[key] == null) {
+            return 0.0;
+          }
+          return (run.score_by_group[key] as number) * maxScore;
+        })
         .filter((value) => value !== null)
         .map((value) => Number(value));
       acc[key] = Math.max(...values);

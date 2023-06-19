@@ -324,9 +324,82 @@ describe('navigation.ts', () => {
     it('Should get the max score by group for a problem', () => {
       const alias = 'sumas';
       const previousScore = 0.0;
-      const maxScore = getMaxPerGroupScore(runs, alias, previousScore);
+      const maxScore = 100;
+      const maxScoreForProblem = getMaxPerGroupScore(
+        runs,
+        alias,
+        previousScore,
+        maxScore,
+      );
 
-      expect(maxScore).toEqual(85);
+      expect(maxScoreForProblem).toEqual(85);
+    });
+
+    it('Should get 0 as max score for a problem when score_by_group is not provided', () => {
+      const runs: types.Run[] = [
+        {
+          alias: 'sumas',
+          classname: 'user-rank-unranked',
+          country: 'mx',
+          guid: 'abcdef1212',
+          language: 'py3',
+          memory: 0,
+          penalty: 0,
+          runtime: 0,
+          score: 0.6,
+          contest_score: 60,
+          status: 'ready',
+          submit_delay: 0,
+          time: new Date(0),
+          username: 'omegaup',
+          verdict: 'PA',
+        },
+        {
+          alias: 'triangulos',
+          classname: 'user-rank-unranked',
+          country: 'mx',
+          guid: 'fefefe1211',
+          language: 'py3',
+          memory: 0,
+          penalty: 0,
+          runtime: 0,
+          score: 1.0,
+          contest_score: 100,
+          status: 'ready',
+          submit_delay: 0,
+          time: new Date(0),
+          username: 'omegaup',
+          verdict: 'AC',
+        },
+        {
+          alias: 'sumas',
+          classname: 'user-rank-unranked',
+          country: 'mx',
+          guid: 'efad3456334',
+          language: 'py3',
+          memory: 0,
+          penalty: 0,
+          runtime: 0,
+          score: 0.9,
+          contest_score: 70,
+          status: 'ready',
+          submit_delay: 0,
+          time: new Date(0),
+          username: 'omegaup',
+          verdict: 'PA',
+        },
+      ];
+      const alias = 'sumas';
+      const previousScore = 0.0;
+      const maxScore = getMaxScore(runs, alias, previousScore);
+      const maxScoreForProblem = getMaxPerGroupScore(
+        runs,
+        alias,
+        previousScore,
+        maxScore,
+      );
+
+      expect(maxScoreForProblem).toEqual(0);
     });
   });
 });

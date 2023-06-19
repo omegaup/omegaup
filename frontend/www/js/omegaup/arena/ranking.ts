@@ -254,6 +254,7 @@ export function onRankingChanged({
           contestMode: scoreMode,
           problemAlias: problem.alias,
           problemPoints: problem.points,
+          maxScore: currentProblem.maxScore,
         });
       }
     }
