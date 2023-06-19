@@ -236,7 +236,7 @@ describe('navigation.ts', () => {
         `#problems/${params.problem.alias}/new-run`,
       );
       expect(vueInstance.problem).not.toBeNull();
-      expect(vueInstance.problem?.bestScore).toBe(0.8);
+      expect(vueInstance.problem?.bestScore).toBe(80);
     });
   });
 
@@ -254,10 +254,10 @@ describe('navigation.ts', () => {
         score: 0.6,
         contest_score: 60,
         score_by_group: {
-          sample: 25,
-          easy: 20,
-          medium: 15,
-          hard: 0,
+          sample: 0.25,
+          easy: 0.2,
+          medium: 0.15,
+          hard: 0.0,
         },
         status: 'ready',
         submit_delay: 0,
@@ -277,10 +277,10 @@ describe('navigation.ts', () => {
         score: 1.0,
         contest_score: 100,
         score_by_group: {
-          sample: 25,
-          easy: 25,
-          medium: 25,
-          hard: 25,
+          sample: 0.25,
+          easy: 0.25,
+          medium: 0.25,
+          hard: 0.25,
         },
         status: 'ready',
         submit_delay: 0,
@@ -300,10 +300,10 @@ describe('navigation.ts', () => {
         score: 0.9,
         contest_score: 70,
         score_by_group: {
-          sample: 15,
-          easy: 25,
-          medium: 10,
-          hard: 20,
+          sample: 0.15,
+          easy: 0.25,
+          medium: 0.1,
+          hard: 0.2,
         },
         status: 'ready',
         submit_delay: 0,
@@ -324,7 +324,7 @@ describe('navigation.ts', () => {
     it('Should get the max score by group for a problem', () => {
       const alias = 'sumas';
       const previousScore = 0.0;
-      const maxScore = 100;
+      const maxScore = 1;
       const maxScoreForProblem = getMaxPerGroupScore(
         runs,
         alias,
@@ -332,7 +332,7 @@ describe('navigation.ts', () => {
         maxScore,
       );
 
-      expect(maxScoreForProblem).toEqual(85);
+      expect(parseFloat(maxScoreForProblem.toFixed(2))).toEqual(0.85);
     });
 
     it('Should get 0 as max score for a problem when score_by_group is not provided', () => {

@@ -321,7 +321,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 pp.problemset_id = ?
             ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
         $val = [$problemsetId];
-        /** @var list<array{alias: string, current_version: string, points: int, problem_id: int}> */
+        /** @var list<array{alias: string, current_version: string, points: float, problem_id: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
