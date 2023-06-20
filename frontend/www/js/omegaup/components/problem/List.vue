@@ -10,8 +10,10 @@
         :keyword="keyword"
         :tags="tags"
         :search-result-problems="searchResultProblems"
-        @update-search-result-problems="(query) => $emit('update-search-result-problems', query)"
-        @show-finder-wizard="() => showFinderWizard = true"
+        @update-search-result-problems="
+          (query) => $emit('update-search-result-problems', query)
+        "
+        @show-finder-wizard="() => (showFinderWizard = true)"
       ></omegaup-problem-search-bar>
     </div>
 
@@ -92,10 +94,8 @@ export default class List extends Vue {
 </script>
 
 <style>
-
 .title {
   text-align: center;
   font-size: 2rem;
 }
-
 </style>

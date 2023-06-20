@@ -314,13 +314,12 @@ export default class BaseList extends Vue {
 </script>
 
 <style lang="scss">
-
 .sticky-offset {
   top: 4rem;
 }
 
-.sort-color{
-  color: #CCCCCC !important;
+.sort-color {
+  color: #cccccc !important;
 }
 
 .card {

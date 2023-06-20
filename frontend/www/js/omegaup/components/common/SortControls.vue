@@ -44,7 +44,7 @@ export default class SortControls extends Vue {
   @Prop() sortOrder!: omegaup.SortOrder;
   @Prop({ default: omegaup.ColumnType.Number }) columnType!: omegaup.ColumnType;
   @Prop() columnName!: string;
-  @Prop({ default:'lightgray'}) color!: string;
+  @Prop({ default: 'lightgray' }) color!: string;
 
   get iconDisplayed(): string {
     if (this.sortOrder === omegaup.SortOrder.Descending) {

@@ -666,5 +666,4 @@ export default class ProblemForm extends Vue {
   padding: 0;
   width: 100%;
 }
-
 </style>

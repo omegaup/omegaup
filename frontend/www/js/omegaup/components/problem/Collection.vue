@@ -1,10 +1,12 @@
 <template>
   <div>
     <div class="row mb-2 justify-content-center">
-        <h1 class="contest-title col-md-7">{{ T.collectionTitle }}</h1>
+      <h1 class="contest-title col-md-7">{{ T.collectionTitle }}</h1>
     </div>
     <div class="card panel panel-default">
-      <div class="card-header panel-heading d-flex justify-content-between align-items-center">
+      <div
+        class="card-header panel-heading d-flex justify-content-between align-items-center"
+      >
         <h5 class="card-title panel-title mb-0">
           {{ T.problemCollectionEducationLevel }}
         </h5>
@@ -200,11 +202,9 @@ export default class Collection extends Vue {
 </script>
 
 <style scoped>
-
 .contest-title {
   font-size: 2rem;
   margin: 0rem 0rem 2rem 0rem;
   text-align: center;
 }
-
 </style>

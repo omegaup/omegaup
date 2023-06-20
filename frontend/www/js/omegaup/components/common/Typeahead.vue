@@ -85,5 +85,4 @@ export default class Typeahead extends Vue {
   padding: 0.375rem 0.75rem !important;
   min-width: 20rem;
 }
-
 </style>
