@@ -1,8 +1,8 @@
 <template>
-  <div class="card mb-3" omegaup-collection-problem>
-    <div class="row no-gutters">
+  <div class="card align-items-center mx-3 my-3" omegaup-collection-problem>
+    <div class="row no-gutters align-items-center justify-content-center">
       <div class="col-md-4">
-        <div class="card-body">
+        <div class="card-body text-center">
           <h1>
             <slot name="icon"></slot>
           </h1>
@@ -14,7 +14,7 @@
             {{ title }}
           </h6>
           <slot name="problem-count"></slot>
-          <slot name="button"></slot>
+            <slot name="button"></slot>
         </div>
       </div>
     </div>

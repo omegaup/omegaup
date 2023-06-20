@@ -1,19 +1,18 @@
 <template>
   <div class="card">
-    <h5 class="card-header">
-      {{ T.wordsProblems }}
-    </h5>
     <div class="table-responsive mb-0">
       <table class="table table-fixed">
         <thead>
           <tr>
-            <th scope="col" class="align-middle text-nowrap">
+            <th scope="col" class="align-middle text-nowrapEXIT">
               <span
                 >{{ T.wordsID }}
                 <omegaup-common-sort-controls
                   column="problem_id"
                   :sort-order="sortOrder"
                   :column-name="columnName"
+                  class="sort-color"
+                  color="lightgray"
                   @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
@@ -38,6 +37,8 @@
                 :column-type="omegaup.ColumnType.String"
                 :sort-order="sortOrder"
                 :column-name="columnName"
+                class="sort-color"
+                color="lightgray"
                 @apply-filter="
                   (columnName, sortOrder) =>
                     $emit('apply-filter', columnName, sortOrder)
@@ -51,6 +52,8 @@
                   column="quality"
                   :sort-order="sortOrder"
                   :column-name="columnName"
+                  class="sort-color"
+                  color="lightgray"
                   @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
@@ -65,6 +68,8 @@
                   column="difficulty"
                   :sort-order="sortOrder"
                   :column-name="columnName"
+                  class="sort-color"
+                  color="lightgray"
                   @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
@@ -79,6 +84,7 @@
                   column="ratio"
                   :sort-order="sortOrder"
                   :column-name="columnName"
+                  color="lightgray"
                   @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
@@ -97,6 +103,7 @@
                   column="score"
                   :sort-order="sortOrder"
                   :column-name="columnName"
+                  color="lightgray"
                   @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
@@ -118,6 +125,7 @@
                   column="points"
                   :sort-order="sortOrder"
                   :column-name="columnName"
+                  color="lightgray"
                   @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
@@ -305,9 +313,19 @@ export default class BaseList extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+
 .sticky-offset {
   top: 4rem;
+}
+
+.sort-color{
+  color: #CCCCCC !important;
+}
+
+.card {
+  border-top: none;
+  border-radius: 0rem 0rem 0.25rem 0.25rem;
 }
 
 table {

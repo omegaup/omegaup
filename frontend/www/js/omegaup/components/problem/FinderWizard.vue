@@ -192,6 +192,7 @@ export default class ProblemFinderWizard extends Vue {
   overflow: auto;
 }
 
+
 .close {
   float: none;
   text-align: right;

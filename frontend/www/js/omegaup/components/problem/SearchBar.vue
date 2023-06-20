@@ -1,6 +1,6 @@
 <template>
-  <div class="mb-3">
-    <form action="/problem/" method="GET" class="form-inline">
+  <div class="card-header d-flex justify-content-between align-items-center container-lg">
+    <form action="/problem/" method="GET" class="form-inline d-flex justify-content-start align-items-center flex-wrap">
       <div v-if="tags.length !== 0" class="form-group mr-2">
         <div v-for="tag in tags" :key="tag" class="mr-1">
           <input type="hidden" name="tag[]" :value="tag" />
@@ -12,7 +12,7 @@
           <font-awesome-icon :icon="['fas', 'times']" />
         </a>
       </div>
-      <div class="form-group mr-2 mt-1">
+      <div class="form-group mr-2">
         <omegaup-common-typeahead
           :only-existing-tags="false"
           :max-results="10"
@@ -20,38 +20,35 @@
           :options="searchResultProblems"
           :value.sync="currentKeyword"
           :placeholder="T.wordsKeywordSearch"
-          @update-existing-options="
-            (query) => $emit('update-search-result-problems', query)
-          "
+          @update-existing-options="(query) => $emit('update-search-result-problems', query)"
         ></omegaup-common-typeahead>
         <input type="hidden" name="query" :value="currentKeywordValue" />
       </div>
-      <div class="form-group mr-2 mt-1">
+      <div class="form-group mr-2">
         <label>
           {{ T.wordsFilterByLanguage }}
-          <select
-            v-model="currentLanguage"
-            name="language"
-            class="ml-1 form-control"
-          >
-            <option
-              v-for="language in languages"
-              :key="language"
-              :value="language"
-            >
+          <select v-model="currentLanguage" name="language" class="ml-2 form-control">
+            <option v-for="language in languages" :key="language" :value="language">
               {{ getLanguageText(language) }}
             </option>
           </select>
         </label>
       </div>
-      <input
-        class="btn btn-primary mt-1"
-        type="submit"
-        :value="T.wordsSearch"
-      />
+      <input class="btn btn-primary mr-3" type="submit" :value="T.wordsSearch" />
     </form>
+    <div class="d-flex justify-content-end">
+      <button
+        class="btn btn-primary ml-2 align-self-center"
+        type="button"
+        @click="$emit('show-finder-wizard')"
+      >
+        {{ T.wizardLinkText }}
+      </button>
+    </div>
   </div>
 </template>
+
+
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -100,5 +97,9 @@ export default class ProblemSearchBar extends Vue {
   label {
     font-weight: bold;
   }
+}
+.card-header {
+  border: 1px solid rgba(0,0,0,.125);
+  border-bottom: none;
 }
 </style>

@@ -4,7 +4,7 @@
       <font-awesome-icon
         v-if="!selected"
         :icon="['fas', 'exchange-alt']"
-        color="lightgray"
+        :color="color"
         rotation="90"
       />
       <font-awesome-icon v-else :icon="['fas', iconDisplayed]" color="black" />
@@ -25,6 +25,7 @@ import {
   faSortAmountUp,
   faExchangeAlt,
 } from '@fortawesome/free-solid-svg-icons';
+import { color } from 'highcharts';
 library.add(
   faSortAlphaDown,
   faSortAlphaUp,
@@ -43,6 +44,7 @@ export default class SortControls extends Vue {
   @Prop() sortOrder!: omegaup.SortOrder;
   @Prop({ default: omegaup.ColumnType.Number }) columnType!: omegaup.ColumnType;
   @Prop() columnName!: string;
+  @Prop({ default:'lightgray'}) color!: string;
 
   get iconDisplayed(): string {
     if (this.sortOrder === omegaup.SortOrder.Descending) {
