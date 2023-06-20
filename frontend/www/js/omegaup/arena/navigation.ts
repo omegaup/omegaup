@@ -123,26 +123,26 @@ export async function navigateToProblem(
 export function getScoreForProblem({
   contestMode,
   problemAlias,
-  problemPoints,
+  previousScore,
   maxScore,
 }: {
   contestMode: ScoreMode;
   problemAlias: string;
-  problemPoints: number;
+  previousScore: number;
   maxScore: number;
 }) {
   if (contestMode === ScoreMode.MaxPerGroup) {
     return getMaxPerGroupScore(
       myRunsStore.state.runs.filter((run) => run.alias === problemAlias),
       problemAlias,
-      problemPoints,
+      previousScore,
       maxScore,
     );
   }
   return getMaxScore(
     myRunsStore.state.runs.filter((run) => run.alias === problemAlias),
     problemAlias,
-    problemPoints,
+    previousScore,
   );
 }
 
@@ -167,29 +167,28 @@ export function getMaxPerGroupScore(
   previousScore: number,
   maxScore: number,
 ): number {
-  if (!runs.length || !runs[0].score_by_group) {
+  const runsWithScoreByGroup = runs
+    .filter((run) => run.alias === alias)
+    .filter((run) => run.score_by_group != undefined);
+  if (!runsWithScoreByGroup.length) {
     return previousScore;
   }
-  const scoreByGroup = Object.keys(runs[0].score_by_group || {}).reduce(
-    (acc: Record<string, number>, key) => {
-      const values = runs
-        .filter((run) => run.alias === alias)
-        .map((run) => {
-          if (!run.score_by_group) {
-            return 0.0;
-          }
-          if (run.score_by_group[key] == null) {
-            return 0.0;
-          }
-          return (run.score_by_group[key] as number) * maxScore;
-        })
-        .filter((value) => value !== null)
-        .map((value) => Number(value));
-      acc[key] = Math.max(...values);
-      return acc;
-    },
-    {},
-  );
+
+  const scoreByGroup = Object.keys(
+    runsWithScoreByGroup[0].score_by_group || {},
+  ).reduce((acc: Record<string, number>, key) => {
+    const values = runsWithScoreByGroup
+      .map((run) => {
+        if (!run.score_by_group) {
+          return 0.0;
+        }
+        return (run.score_by_group[key] as number) * maxScore;
+      })
+      .filter((value) => value !== null)
+      .map((value) => Number(value));
+    acc[key] = Math.max(...values);
+    return acc;
+  }, {});
 
   const values = Object.values(scoreByGroup);
 
