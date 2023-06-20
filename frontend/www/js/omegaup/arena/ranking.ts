@@ -253,7 +253,7 @@ export function onRankingChanged({
         currentProblem.bestScore = getScoreForProblem({
           contestMode: scoreMode,
           problemAlias: problem.alias,
-          problemPoints: problem.points,
+          previousScore: problem.points,
           maxScore: currentProblem.maxScore,
         });
       }

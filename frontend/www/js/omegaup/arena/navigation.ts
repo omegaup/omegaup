@@ -102,7 +102,7 @@ export async function navigateToProblem(
       problem.bestScore = getScoreForProblem({
         contestMode,
         problemAlias: problemInfo.alias,
-        problemPoints: 0.0,
+        previousScore: 0.0,
         maxScore: problem.maxScore,
       });
       problemsStore.commit('addProblem', problemInfo);
