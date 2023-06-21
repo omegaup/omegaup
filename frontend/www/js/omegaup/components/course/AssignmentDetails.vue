@@ -13,8 +13,8 @@
               >{{ T.wordsTitle }}
               <input
                 ref="name"
-                data-course-assignment-name
                 v-model="name"
+                data-course-assignment-name
                 class="form-control name"
                 :class="{ 'is-invalid': invalidParameterName === 'name' }"
                 size="30"
@@ -77,8 +77,8 @@
                 :title="T.courseAssignmentNewFormStartDateDesc"
                 icon="info-circle" />
               <omegaup-datetimepicker
-                data-course-start-date
                 v-model="startTime"
+                data-course-start-date
                 :enabled="!assignment.has_runs"
                 :finish="finishTimeCourse"
                 :start="startTimeCourse"
@@ -131,8 +131,8 @@
                 :title="T.courseAssignmentNewFormEndDateDesc"
                 icon="info-circle" />
               <omegaup-datetimepicker
-                data-course-end-date
                 v-model="finishTime"
+                data-course-end-date
                 :enabled="!unlimitedDuration"
                 :readonly="false"
                 :finish="finishTimeCourse"

@@ -334,8 +334,8 @@
                 </button>
                 <div class="dropdown-menu">
                   <button
-                    data-runs-show-details-button
                     v-if="showDetails"
+                    data-runs-show-details-button
                     :data-run-details="run.guid"
                     class="btn-link dropdown-item"
                     @click="onRunDetails(run)"

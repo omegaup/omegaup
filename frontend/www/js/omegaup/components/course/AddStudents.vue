@@ -32,8 +32,8 @@
         <div class="form-group">
           <label>{{ T.wordsMultipleUser }}</label>
           <textarea
-            data-course-multiple-students-add
             v-model="participants"
+            data-course-multiple-students-add
             class="form-control pariticipants"
             rows="4"
           ></textarea>
