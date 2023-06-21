@@ -68,10 +68,7 @@ export class CoursePage {
     cy.get('#alert-close').click();
   }
 
-  enterCourse(
-    courseAlias: string,
-    firstTime: boolean = true,
-  ): void {
+  enterCourse(courseAlias: string, firstTime: boolean = true): void {
     cy.get('a[data-nav-courses]').click();
     cy.get('a[data-nav-courses-all]').click();
 
@@ -167,9 +164,7 @@ export class CoursePage {
     );
 
     cy.get('a[data-new-clarification-button]').click();
-    cy.get('[data-new-clarification-problem]').select(
-      problemAlias,
-    );
+    cy.get('[data-new-clarification-problem]').select(problemAlias);
     cy.get('[data-new-clarification-message]')
       .should('be.visible')
       .type(question);
@@ -209,7 +204,7 @@ export class CoursePage {
   }
 
   editCourse(courseOptions: CourseOptions): void {
-    const editContestUrl =  `/course/${courseOptions.courseAlias}/edit/`;
+    const editContestUrl = `/course/${courseOptions.courseAlias}/edit/`;
     cy.visit(editContestUrl);
     cy.get('[data-course-edit-content]').click();
     cy.get('div[data-content-tab]').should('be.visible');
@@ -224,7 +219,6 @@ export class CoursePage {
       'be.visible',
     );
     cy.get('button[data-schedule-assignment]').click();
-    cy.pause();
   }
 }
 

@@ -13,6 +13,7 @@
               >{{ T.wordsTitle }}
               <input
                 ref="name"
+                data-course-assignment-name
                 v-model="name"
                 class="form-control name"
                 :class="{ 'is-invalid': invalidParameterName === 'name' }"
@@ -29,6 +30,7 @@
                 icon="info-circle" />
               <input
                 v-model="alias"
+                data-course-assignment-alias
                 class="form-control alias"
                 :class="{
                   'is-invalid': invalidParameterName === 'alias',
@@ -75,6 +77,7 @@
                 :title="T.courseAssignmentNewFormStartDateDesc"
                 icon="info-circle" />
               <omegaup-datetimepicker
+                data-course-start-date
                 v-model="startTime"
                 :enabled="!assignment.has_runs"
                 :finish="finishTimeCourse"
@@ -128,6 +131,7 @@
                 :title="T.courseAssignmentNewFormEndDateDesc"
                 icon="info-circle" />
               <omegaup-datetimepicker
+                data-course-end-date
                 v-model="finishTime"
                 :enabled="!unlimitedDuration"
                 :readonly="false"
@@ -144,6 +148,7 @@
               >{{ T.courseNewFormDescription }}
               <textarea
                 v-model="description"
+                data-course-assignment-description
                 class="form-control"
                 :class="{
                   'is-invalid': invalidParameterName === 'description',

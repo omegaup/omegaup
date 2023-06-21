@@ -323,6 +323,7 @@
             >
               <div class="dropdown">
                 <button
+                  data-runs-actions-button
                   class="btn-secondary dropdown-toggle"
                   type="button"
                   data-toggle="dropdown"
@@ -333,6 +334,7 @@
                 </button>
                 <div class="dropdown-menu">
                   <button
+                    data-runs-show-details-button
                     v-if="showDetails"
                     :data-run-details="run.guid"
                     class="btn-link dropdown-item"
