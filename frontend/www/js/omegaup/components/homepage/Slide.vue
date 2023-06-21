@@ -3,7 +3,7 @@
     <div
       class="slide d-flex align-items-center justify-content-around flex-wrap flex-lg-nowrap"
     >
-      <div style="max-width: 640px">
+      <div class="titles-width">
         <h2>{{ title }}</h2>
         <p>{{ description }}</p>
         <a
@@ -18,10 +18,9 @@
       </div>
       <div>
         <img
-          class="d-block"
+          class="d-block image-width"
           height="320"
           :src="imageSrc"
-          style="max-width: 480px"
         />
       </div>
     </div>
@@ -73,4 +72,13 @@ a.slide-button {
   letter-spacing: 0.03rem;
   font-size: 1.08rem;
 }
+
+.image-width {
+  max-width: 480px;
+}
+
+.titles-width {
+  max-width: 640px;
+}
+
 </style>

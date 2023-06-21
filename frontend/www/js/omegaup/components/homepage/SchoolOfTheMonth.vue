@@ -5,7 +5,7 @@
         {{ T.schoolOfTheMonth }}
       </h5>
       <a
-        class="card-header-help max-w-8 !mportant"
+        class="card-header-help max-w-8"
         href="https://blog.omegaup.com/el-nuevo-ranking-de-escuelas-de-omegaup/"
       >
         <font-awesome-icon :icon="['fas', 'info-circle']" />
