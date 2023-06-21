@@ -129,20 +129,6 @@ export class CoursePage {
       .should('have.text', expectedStatus);
   }
 
-  updateScoreboardForAssignment(
-    courseAlias: string,
-    assignmentAlias: string,
-  ): void {
-    const encodedCourseAlias = encodeURIComponent(courseAlias);
-    const encodedAssignmenttAlias = encodeURIComponent(assignmentAlias);
-    const scoreboardRefreshUrl = `/api/scoreboard/refresh/alias/${encodedAssignmenttAlias}/course_alias/${encodedCourseAlias}/token/secret`;
-
-    cy.request(scoreboardRefreshUrl).then((resp) => {
-      expect(resp.status).to.eq(200);
-      expect(resp.body.status).to.eq('ok');
-    });
-  }
-
   closePopup(problemOptions: ProblemOptions): void {
     cy.reload();
     cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).click();

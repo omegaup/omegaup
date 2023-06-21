@@ -10,7 +10,7 @@ describe('Course Test', () => {
     cy.visit('/');
   });
 
-  it('Should create a course and add students to it as participate make submits to problems', () => {
+  it('Should create a course and add students to it as participants make submits to problems', () => {
     const loginOptions = loginPage.registerMultipleUsers(2);
     const users = [loginOptions[0].username];
     const courseOptions = coursePage.generateCourseOptions();
@@ -59,7 +59,7 @@ describe('Course Test', () => {
     cy.logout();
   });
 
-  it('Should create a course add and answer a clarification', () => {
+  it('Should create a course, add and answer a clarification', () => {
     const loginOptions = loginPage.registerMultipleUsers(2);
     const users = [loginOptions[0].username];
     const courseOptions = coursePage.generateCourseOptions();
@@ -92,7 +92,7 @@ describe('Course Test', () => {
     cy.logout();
   });
 
-  it('Should create a course and leave a feedback for the submisson', () => {
+  it('Should create a course and leave feedback for the submission', () => {
     const loginOptions = loginPage.registerMultipleUsers(2);
     const users = [loginOptions[0].username];
     const courseOptions = coursePage.generateCourseOptions();
