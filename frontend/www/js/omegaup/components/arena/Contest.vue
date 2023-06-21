@@ -45,7 +45,9 @@
               :active-problem="activeProblemAlias"
               :in-assignment="false"
               :digits-after-decimal-point="
-                contest.score_mode == 'partial' ? digitsAfterDecimalPoint : 0
+                contest.score_mode == 'all_or_nothing'
+                  ? 0
+                  : digitsAfterDecimalPoint
               "
               @disable-active-problem="activeProblem = null"
               @navigate-to-problem="onNavigateToProblem"

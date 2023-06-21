@@ -3,6 +3,7 @@
 import {
   ContestOptions,
   CourseOptions,
+  GroupOptions,
   LoginOptions,
   ProblemOptions,
   RunOptions,
@@ -17,6 +18,8 @@ declare global {
 
     interface Chainable {
       login(loginOptions: LoginOptions): void;
+      logout(): void;
+      loginAdmin(): void;
       register(loginOptions: LoginOptions): void;
       createProblem(problemOptions: ProblemOptions): void;
       createCourse(
@@ -32,6 +35,8 @@ declare global {
       changeAdmissionModeContest(contestOptions: ContestOptions): void;
       enterContest(contestOptions: ContestOptions): void;
       createRunsInsideContest(contestOptions: ContestOptions): void;
+      createGroup(groupOptions: GroupOptions): string;
+      addIdentitiesGroup(groupAlias: string): Array<string>;
     }
   }
 }
