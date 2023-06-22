@@ -17,11 +17,7 @@
         </a>
       </div>
       <div>
-        <img
-          class="d-block image-width"
-          height="320"
-          :src="imageSrc"
-        />
+        <img class="d-block image-width" height="320" :src="imageSrc" />
       </div>
     </div>
   </div>
@@ -80,5 +76,4 @@ a.slide-button {
 .titles-width {
   max-width: 640px;
 }
-
 </style>
