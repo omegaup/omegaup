@@ -192,9 +192,8 @@ export default class UserRank extends Vue {
 </script>
 
 <style lang="scss">
-
 [data-user-rank] .tags-input-wrapper-default {
-  padding: .35rem .25rem 0.7rem 0.25rem;
+  padding: 0.35rem 0.25rem 0.7rem 0.25rem;
 }
 
 [data-user-rank] {
@@ -205,5 +204,4 @@ export default class UserRank extends Vue {
 .column-width {
   max-width: 1rem;
 }
-
 </style>
