@@ -115,16 +115,16 @@ class Scoreboard {
             );
         }
 
-        /** @var array<int, array{order: int, alias: string}> */
+        /** @var array<int, array{order: int, alias: string, maxScore: int}> */
         $problemMapping = [];
 
         $order = 0;
-        /** @var \OmegaUp\DAO\VO\Problems $problem */
         foreach ($rawProblemsetProblems as $problem) {
-            /** @var int $problem->problem_id */
-            $problemMapping[$problem->problem_id] = [
+            /** @var int $problem['problem_id'] */
+            $problemMapping[$problem['problem_id']] = [
                 'order' => $order++,
-                'alias' => strval($problem->alias),
+                'alias' => strval($problem['alias']),
+                'maxScore' => intval($problem['points']),
             ];
         }
 
@@ -228,12 +228,12 @@ class Scoreboard {
         $problemMapping = [];
 
         $order = 0;
-        /** @var \OmegaUp\DAO\VO\Problems $problem */
         foreach ($rawProblemsetProblems as $problem) {
-            /** @var int $problem->problem_id */
-            $problemMapping[$problem->problem_id] = [
+            /** @var int $problem['problem_id'] */
+            $problemMapping[$problem['problem_id']] = [
                 'order' => $order++,
-                'alias' => strval($problem->alias),
+                'alias' => strval($problem['alias']),
+                'maxScore' => intval($problem['points']),
             ];
         }
 
@@ -244,7 +244,7 @@ class Scoreboard {
             $problemMapping
         );
 
-        $timeout =  is_null($this->params->finish_time) ?
+        $timeout = is_null($this->params->finish_time) ?
             0 :
             max(
                 0,
@@ -323,12 +323,12 @@ class Scoreboard {
         $problemMapping = [];
 
         $order = 0;
-        /** @var \OmegaUp\DAO\VO\Problems $problem */
         foreach ($rawProblemsetProblems as $problem) {
-            /** @var int $problem->problem_id */
-            $problemMapping[$problem->problem_id] = [
+            /** @var int $problem['problem_id'] */
+            $problemMapping[$problem['problem_id']] = [
                 'order' => $order++,
-                'alias' => strval($problem->alias),
+                'alias' => strval($problem['alias']),
+                'maxScore' => intval($problem['points']),
             ];
         }
 
@@ -794,7 +794,7 @@ class Scoreboard {
      * @param \OmegaUp\ScoreboardParams $params
      * @param list<array{contest_score: float, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}> $contestRuns
      * @param list<array{identity_id: int, username: string, classname: string, name: string|null, country_id: null|string, is_invited: bool}> $rawContestIdentities
-     * @param array<int, array{order: int, alias: string}> $problemMapping
+     * @param array<int, array{order: int, alias: string, maxScore: int}> $problemMapping
      * @return list<ScoreboardEvent>
      */
     private static function calculateEvents(
@@ -847,7 +847,8 @@ class Scoreboard {
                     $identityProblemsScoreByGroup,
                     $run['score_by_group'],
                     $identityId,
-                    $problemId
+                    $problemId,
+                    $problemMapping[$problemId]['maxScore']
                 );
             } else {
                 $contestScore = $run['contest_score'];
@@ -944,7 +945,8 @@ class Scoreboard {
         array &$identityProblemsScoreByGroup,
         ?string $scoreByGroup,
         int $identityId,
-        int $problemId
+        int $problemId,
+        int $maxScore
     ): float {
         if (is_null($scoreByGroup)) {
             return 0.0;
@@ -980,7 +982,7 @@ class Scoreboard {
 
         return array_sum(
             $identityProblemsScoreByGroup[$identityId][$problemId]
-        );
+        ) * $maxScore;
     }
 
     /**
