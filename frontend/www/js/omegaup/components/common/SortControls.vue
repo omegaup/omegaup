@@ -4,7 +4,7 @@
       <font-awesome-icon
         v-if="!selected"
         :icon="['fas', 'exchange-alt']"
-        :color="color"
+        color="lightgray"
         rotation="90"
       />
       <font-awesome-icon v-else :icon="['fas', iconDisplayed]" color="black" />
@@ -44,7 +44,6 @@ export default class SortControls extends Vue {
   @Prop() sortOrder!: omegaup.SortOrder;
   @Prop({ default: omegaup.ColumnType.Number }) columnType!: omegaup.ColumnType;
   @Prop() columnName!: string;
-  @Prop({ default: 'lightgray' }) color!: string;
 
   get iconDisplayed(): string {
     if (this.sortOrder === omegaup.SortOrder.Descending) {

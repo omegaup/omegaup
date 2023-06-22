@@ -12,7 +12,6 @@
                   :sort-order="sortOrder"
                   :column-name="columnName"
                   class="sort-color"
-                  color="lightgray"
                   @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
@@ -37,8 +36,7 @@
                 :column-type="omegaup.ColumnType.String"
                 :sort-order="sortOrder"
                 :column-name="columnName"
-                class="sort-color"
-                color="lightgray"
+
                 @apply-filter="
                   (columnName, sortOrder) =>
                     $emit('apply-filter', columnName, sortOrder)
@@ -52,8 +50,6 @@
                   column="quality"
                   :sort-order="sortOrder"
                   :column-name="columnName"
-                  class="sort-color"
-                  color="lightgray"
                   @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
@@ -68,8 +64,6 @@
                   column="difficulty"
                   :sort-order="sortOrder"
                   :column-name="columnName"
-                  class="sort-color"
-                  color="lightgray"
                   @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
@@ -84,7 +78,6 @@
                   column="ratio"
                   :sort-order="sortOrder"
                   :column-name="columnName"
-                  color="lightgray"
                   @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
@@ -103,7 +96,6 @@
                   column="score"
                   :sort-order="sortOrder"
                   :column-name="columnName"
-                  color="lightgray"
                   @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
@@ -125,7 +117,6 @@
                   column="points"
                   :sort-order="sortOrder"
                   :column-name="columnName"
-                  color="lightgray"
                   @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
@@ -316,10 +307,6 @@ export default class BaseList extends Vue {
 <style lang="scss">
 .sticky-offset {
   top: 4rem;
-}
-
-.sort-color {
-  color: #cccccc !important;
 }
 
 .card {
