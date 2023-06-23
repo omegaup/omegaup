@@ -171,6 +171,15 @@ export class CoursePage {
     );
   }
 
+  verifyCalrification(answer: string): void {
+    cy.get('a[href="#clarifications"]').click();
+    cy.get('[data-tab-clarifications]').should('be.visible');
+    cy.get('[data-clarification-answer-text]').should(
+      'contain',
+      answer,
+    );
+  }
+
   leaveFeedbackOnSolution(feedback: string): void {
     cy.get('[data-course-submisson-button]').click();
     cy.get('[data-runs-actions-button]').click();

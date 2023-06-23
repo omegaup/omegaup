@@ -11,8 +11,11 @@ describe('Course Test', () => {
   });
 
   it('Should create a course and add students to it as participants make submits to problems', () => {
-    const loginOptions = loginPage.registerMultipleUsers(2);
-    const users = [loginOptions[0].username];
+    const loginOptions = loginPage.registerMultipleUsers(4);
+    const users: Array<string> = [];
+    loginOptions.forEach((loginDetails) => {
+      users.push(loginDetails.username);
+    });
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const problemOptions: ProblemOptions = {
@@ -42,8 +45,34 @@ describe('Course Test', () => {
     coursePage.closePopup(problemOptions);
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
-    cy.get('[data-table-scoreboard-username]').should('have.length', 1);
+    cy.get('[data-table-scoreboard-username]').should('have.length', 3);
     cy.get(`.${loginOptions[0].username} > td:nth-child(4)`).should(
+      'contain',
+      '+100.00',
+    );
+    cy.logout();
+
+    cy.login(loginOptions[2]);
+    coursePage.enterCourse(courseOptions.courseAlias);
+    coursePage.createSubmission(problemOptions, runOptions);
+    coursePage.closePopup(problemOptions);
+    cy.get('a[href="#ranking"]').click();
+    cy.get('[data-table-scoreboard]').should('be.visible');
+    cy.get('[data-table-scoreboard-username]').should('have.length', 3);
+    cy.get(`.${loginOptions[2].username} > td:nth-child(4)`).should(
+      'contain',
+      '+100.00',
+    );
+    cy.logout();
+
+    cy.login(loginOptions[3]);
+    coursePage.enterCourse(courseOptions.courseAlias);
+    coursePage.createSubmission(problemOptions, runOptions);
+    coursePage.closePopup(problemOptions);
+    cy.get('a[href="#ranking"]').click();
+    cy.get('[data-table-scoreboard]').should('be.visible');
+    cy.get('[data-table-scoreboard-username]').should('have.length', 3);
+    cy.get(`.${loginOptions[3].username} > td:nth-child(4)`).should(
       'contain',
       '+100.00',
     );
@@ -89,6 +118,11 @@ describe('Course Test', () => {
     cy.login(loginOptions[1]);
     coursePage.enterCourseAssignmentPage(courseOptions.courseAlias);
     coursePage.answerClarification('No');
+    cy.logout();
+
+    cy.login(loginOptions[0]);
+    coursePage.enterCourse(courseOptions.courseAlias, false);
+    coursePage.verifyCalrification('No');
     cy.logout();
   });
 
