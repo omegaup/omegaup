@@ -124,8 +124,12 @@
                   nomination.author.username
                 }}</a>
               </td>
-              <td class="align-middle">{{ nomination.time.toLocaleDateString(T.locale) }}</td>
-              <td v-if="!myView" class="align-middle">{{ nomination.contents.reason }}</td>
+              <td class="align-middle">
+                {{ nomination.time.toLocaleDateString(T.locale) }}
+              </td>
+              <td v-if="!myView" class="align-middle">
+                {{ nomination.contents.reason }}
+              </td>
               <td class="text-center align-middle">{{ nomination.status }}</td>
               <td class="align-middle">
                 <a
