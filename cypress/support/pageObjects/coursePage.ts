@@ -132,6 +132,8 @@ export class CoursePage {
   closePopup(problemOptions: ProblemOptions): void {
     cy.reload();
     cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).click();
+    cy.get('[data-dificulty-radio-button]').last().click();
+    cy.get('[data-submit-feedback-button]').click();
     cy.get('[data-overlay-popup] button.close')
       .should('be.visible')
       .first()
@@ -191,6 +193,16 @@ export class CoursePage {
 
     cy.get('[data-runs-actions-button]').click();
     cy.get('[data-runs-show-details-button]').click();
+    cy.get('[data-run-feedback]').should('contain', feedback);
+    cy.get('[data-overlay-popup] button.close')
+      .should('be.visible')
+      .first()
+      .click({ force: true });
+  }
+
+  verifyFeedback(feedback: string): void {
+    cy.get('.notification-toggle').click();
+    cy.get('[data-notification-list]').last().click();
     cy.get('[data-run-feedback]').should('contain', feedback);
     cy.get('[data-overlay-popup] button.close')
       .should('be.visible')

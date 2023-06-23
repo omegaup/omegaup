@@ -35,6 +35,7 @@
         </a>
         <transition-group name="list"
           ><omegaup-notification
+            data-notification-list
             v-for="notification in notifications"
             :key="notification.notification_id"
             :notification="notification"

@@ -162,6 +162,10 @@ describe('Course Test', () => {
     coursePage.enterCourseAssignmentPage(courseOptions.courseAlias);
     coursePage.leaveFeedbackOnSolution('Solution is not optimal');
     cy.logout();
+
+    cy.login(loginOptions[0]);
+    coursePage.verifyFeedback('Solution is not optimal');
+    cy.logout();
   });
 
   it('Should create a course and edit the assignment', () => {
