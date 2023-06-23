@@ -1261,7 +1261,6 @@ const translations: { [key: string]: string; } = {
   runCannotBeRequalified: "The run cannot be requalified",
   runDetailsFeedbackAddReview: "Add feedback",
   runDetailsFeedbackCancel: "Cancel",
-  runDetailsFeedbackCreated: "Feedback created",
   runDetailsFeedbackPlaceholder: "Type your feedback here...",
   runDetailsFeedbackThreadPlaceholder: "Reply...",
   runDetailsNewFeedback: "New feedback",

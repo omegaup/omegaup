@@ -1261,7 +1261,6 @@ const translations: { [key: string]: string; } = {
   runCannotBeRequalified: "(Th3 run cann07 b3 r3qua1ifi3d)",
   runDetailsFeedbackAddReview: "(Add f33dback)",
   runDetailsFeedbackCancel: "(Canc31)",
-  runDetailsFeedbackCreated: "(F33dback cr3a73d)",
   runDetailsFeedbackPlaceholder: "(Typ3 y0ur f33dback h3r3...)",
   runDetailsFeedbackThreadPlaceholder: "(R3p1y...)",
   runDetailsNewFeedback: "(N3w f33dback)",
