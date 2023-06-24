@@ -1525,7 +1525,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 [
                     [
                         'total' => 0.25,
-                        'expectedScore' => 0.25,
+                        'expectedScore' => 25.0,
                         'points_per_group' => [
                             ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
                             ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
@@ -1535,7 +1535,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                     ],
                     [
                         'total' => 0.25,
-                        'expectedScore' => 0.50,
+                        'expectedScore' => 50.0,
                         'points_per_group' => [
                             ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
                             ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'TLE'],
@@ -1545,7 +1545,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                     ],
                     [
                         'total' => 0.50,
-                        'expectedScore' => 0.75,
+                        'expectedScore' => 75.0,
                         'points_per_group' => [
                             ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
                             ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
@@ -1560,7 +1560,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 [
                     [
                         'total' => 0.25,
-                        'expectedScore' => 0.25,
+                        'expectedScore' => 25.0,
                         'points_per_group' => [
                             ['group_name' => 'sample', 'score' => 0.25, 'verdict' => 'AC'],
                             ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
@@ -1570,7 +1570,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                     ],
                     [
                         'total' => 0.75,
-                        'expectedScore' => 0.75,
+                        'expectedScore' => 75.0,
                         'points_per_group' => [
                             ['group_name' => 'sample', 'score' => 0.25, 'verdict' => 'AC'],
                             ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
@@ -1580,7 +1580,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                     ],
                     [
                         'total' => 0.5,
-                        'expectedScore' => 1.0,
+                        'expectedScore' => 100.0,
                         'points_per_group' => [
                             ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
                             ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
