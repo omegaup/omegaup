@@ -49,7 +49,6 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
             INNER JOIN
                 Schools s ON s.school_id = sotm.school_id
             WHERE
-                sotm.time = ? AND
                 sotm.selected_by IS NULL
             ORDER BY
                 sotm.`ranking` ASC
@@ -59,7 +58,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         /** @var list<array{country_id: string, name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}> */
         return \OmegaUp\MySQLConnection::getInstance()->getAll(
             $sql,
-            [ $firstDayOfMonth, $rowcount ]
+            [ $rowcount ]
         );
     }
 

@@ -114,7 +114,7 @@ import country_Flag from '../CountryFlag.vue';
     'omegaup-country-flag': country_Flag,
   },
 })
-export default class SchoolOfTheMonth extends Vue {
+export default class SchoolOfTheMonthList extends Vue {
   @Prop() schoolsOfPreviousMonths!: omegaup.SchoolOfTheMonth[];
   @Prop() schoolsOfPreviousMonth!: omegaup.SchoolOfTheMonth[];
   @Prop() candidatesToSchoolOfTheMonth!: omegaup.SchoolOfTheMonth[];

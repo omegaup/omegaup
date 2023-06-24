@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <ul class="nav nav-tabs" role="tablist">
+  <div class="card ranking-width">
+    <ul class="nav nav-tabs justify-content-arround" role="tablist">
       <li class="nav-item">
         <a
           href="#"
@@ -59,11 +59,12 @@
     <table class="table table-striped table-hover table-responsive-sm">
       <thead>
         <tr>
-          <th scope="col" class="text-center"></th>
+          <th scope="col" class="text-center">
+            {{ T.codersOfTheMonthUser }}
+          </th>
           <th scope="col" class="text-center">
             {{ T.codersOfTheMonthCountry }}
           </th>
-          <th scope="col" class="text-center">{{ T.codersOfTheMonthUser }}</th>
           <th
             v-if="selectedTab == 'codersOfTheMonth'"
             scope="col"
@@ -74,14 +75,14 @@
           <th
             v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
             scope="col"
-            class="text-right"
+            class="text-center"
           >
             {{ T.profileStatisticsNumberOfSolvedProblems }}
           </th>
           <th
             v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
             scope="col"
-            class="text-right"
+            class="text-center"
           >
             {{ T.rankScore }}
           </th>
@@ -96,39 +97,37 @@
       </thead>
       <tbody>
         <tr v-for="(coder, index) in visibleCoders" :key="index">
-          <td class="text-center">
-            <img :src="coder.gravatar_32" />
-          </td>
-          <td class="text-center">
-            <omegaup-countryflag
-              :country="coder.country_id"
-            ></omegaup-countryflag>
-          </td>
-          <td class="text-center">
+          <td class="text-center align-middle">
+            <img :src="coder.gravatar_32" class="pr-3"/>
             <omegaup-user-username
               :classname="coder.classname"
               :linkify="true"
               :username="coder.username"
             ></omegaup-user-username>
           </td>
-          <td v-if="selectedTab == 'codersOfTheMonth'" class="text-center">
+          <td class="text-center align-middle">
+            <omegaup-countryflag
+              :country="coder.country_id"
+            ></omegaup-countryflag>
+          </td>
+          <td v-if="selectedTab == 'codersOfTheMonth'" class="text-center align-middle">
             {{ coder.date }}
           </td>
           <td
             v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
-            class="text-right"
+            class="text-center align-middle"
           >
             {{ coder.problems_solved }}
           </td>
           <td
             v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
-            class="text-right"
+            class="text-center align-middle"
           >
             {{ coder.score }}
           </td>
           <td
             v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
-            class="text-center"
+            class="text-center align-middle"
           >
             <button
               v-if="canChooseCoder && !coderIsSelected"
@@ -186,3 +185,32 @@ export default class CoderOfTheMonthList extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.nav-link.active, .nav-link:hover {
+  border: none;
+  border-left: 0.0625rem solid #dee2e6;
+  border-right: 0.0625rem solid #dee2e6;
+  border-top-left-radius: 0rem;
+  border-top-right-radius: 0rem;
+}
+.nav .nav-tabs{
+  border-bottom: 0rem;
+}
+
+.ranking-width {
+  max-width: 55rem;
+  margin: 0 auto;
+}
+
+.nav-link{
+  font-weight: medium;
+  letter-spacing: 0.022rem;
+  padding: 0.65rem 1rem;
+}
+
+td {
+  padding-top: 0.9;
+}
+
+</style>
