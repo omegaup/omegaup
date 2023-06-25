@@ -201,6 +201,17 @@ export class CoursePage {
     cy.get('.notification-toggle').click();
     cy.get('[data-notification-list]').last().click();
     cy.get('[data-run-feedback]').should('contain', feedback);
+    cy.get('.CodeMirror-lines').should('be.visible');
+    cy.get('.CodeMirror-line').then((rawHTMLElements) => {
+      const userCode: Array<string> = [];
+      Cypress.$.makeArray(rawHTMLElements).forEach((element) => {
+        cy.task('log', element.innerText);
+        userCode.push(element.innerText);
+      });
+
+      cy.wrap(userCode).as('userCodeLines');
+    })
+    cy.get('@userCodeLines').should('have.length', 12);
     cy.get('[data-overlay-popup] button.close')
       .should('be.visible')
       .first()
