@@ -18,8 +18,8 @@
                   >
                     <label class="form-check-label">
                       <input
-                        data-dificulty-radio-button
                         v-model="difficulty"
+                        data-dificulty-radio-button
                         type="radio"
                         :value="difficultyLevel.id"
                       />
