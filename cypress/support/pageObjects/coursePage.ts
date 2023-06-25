@@ -55,7 +55,7 @@ export class CoursePage {
 
     cy.get('.omegaup-course-assignmentdetails').should('be.visible');
     cy.get('[data-course-assignment-name]').type(assignmentAlias);
-    cy.get('[data-course-assignment-alias]').type(assignmentAlias.slice(0, 10));
+    cy.get('[data-course-assignment-alias]').type(assignmentAlias.slice(0, 12));
     cy.get('[data-course-add-problem]').should('be.visible');
     cy.get('[data-course-assignment-description]').type('Homework Description');
 

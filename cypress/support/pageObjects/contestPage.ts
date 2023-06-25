@@ -2,7 +2,12 @@ import 'cypress-file-upload';
 import 'cypress-wait-until';
 import { v4 as uuid } from 'uuid';
 
-import { ContestOptions, GroupOptions } from '../types';
+import {
+  ContestOptions,
+  GroupOptions,
+  ProblemOptions,
+  RunOptions,
+} from '../types';
 import { addSubtractDaysToDate } from '../commands';
 
 enum ScoreMode {
@@ -187,6 +192,23 @@ export class ContestPage {
     };
 
     return contestOptions;
+  }
+
+  generateProblemOptions(noOfProblems: number): ProblemOptions[] {
+    const problems: ProblemOptions[] = [];
+
+    for (let i = 0; i < noOfProblems; i++) {
+      const userLoginOptions: ProblemOptions = {
+        problemAlias: uuid().slice(0, 10),
+        tag: 'Recursion',
+        autoCompleteTextTag: 'recur',
+        problemLevelIndex: 0,
+      };
+
+      problems.push(userLoginOptions);
+    }
+
+    return problems;
   }
 }
 
