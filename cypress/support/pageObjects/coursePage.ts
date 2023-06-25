@@ -176,10 +176,7 @@ export class CoursePage {
   verifyCalrification(answer: string): void {
     cy.get('a[href="#clarifications"]').click();
     cy.get('[data-tab-clarifications]').should('be.visible');
-    cy.get('[data-clarification-answer-text]').should(
-      'contain',
-      answer,
-    );
+    cy.get('[data-clarification-answer-text]').should('contain', answer);
   }
 
   leaveFeedbackOnSolution(feedback: string): void {
@@ -213,6 +210,19 @@ export class CoursePage {
   editCourse(courseOptions: CourseOptions): void {
     const editContestUrl = `/course/${courseOptions.courseAlias}/edit/`;
     cy.visit(editContestUrl);
+    if (courseOptions.description != undefined) {
+      cy.get('textarea[data-course-new-description]')
+        .should('be.visible')
+        .clear()
+        .type(courseOptions.description);
+    }
+    if (courseOptions.objective != undefined) {
+      cy.get('textarea[data-course-objective]')
+        .should('be.visible')
+        .clear()
+        .type(courseOptions.objective);
+    }
+    cy.get('form[data-course-form]').submit();
     cy.get('[data-course-edit-content]').click();
     cy.get('div[data-content-tab]').should('be.visible');
     cy.get('[data-course-edit-content-button]').click();
@@ -226,6 +236,18 @@ export class CoursePage {
       'be.visible',
     );
     cy.get('button[data-schedule-assignment]').click();
+  }
+
+  verifyCourseDetails(courseOptions: CourseOptions, problemOptions: ProblemOptions): void {
+    const courseUrl = `/course/${courseOptions.courseAlias}/`;
+    cy.visit(courseUrl);
+    cy.get('button[name="start-course-submit"]').click();
+    cy.get('a[href="#information"]').click();
+    cy.get('[data-markdown-statement]').should('contain', courseOptions.description);
+    cy.get('a[href="#content"]').click();
+    cy.get('[data-course-start-assignment-button]').click();
+    cy.get('a[data-problem="sumas"]').should('be.visible');
+    cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).should('be.visible');
   }
 }
 

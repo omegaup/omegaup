@@ -169,8 +169,8 @@ describe('Course Test', () => {
   });
 
   it('Should create a course and edit the assignment', () => {
-    const loginOptions = loginPage.registerMultipleUsers(1);
-    const users = [loginOptions[0].username];
+    const loginOptions = loginPage.registerMultipleUsers(2);
+    const users = [loginOptions[1].username];
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const problemOptions: ProblemOptions = {
@@ -187,9 +187,15 @@ describe('Course Test', () => {
     coursePage.addAssignmentWithProblem(assignmentAlias, problemOptions);
     cy.logout();
 
+    courseOptions.description = "Changed Desciption";
+    courseOptions.objective = "New Objective";
     cy.login(loginOptions[0]);
     coursePage.enterCourseAssignmentPage(courseOptions.courseAlias);
     coursePage.editCourse(courseOptions);
+    cy.logout();
+
+    cy.login(loginOptions[1]);
+    coursePage.verifyCourseDetails(courseOptions, problemOptions);
     cy.logout();
   });
 });
