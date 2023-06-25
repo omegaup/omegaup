@@ -34,7 +34,11 @@ describe('Course Test', () => {
     cy.createProblem(problemOptions);
     coursePage.createCourse(courseOptions);
     coursePage.addStudents(users);
-    coursePage.addAssignmentWithProblem(assignmentAlias, problemOptions, true);
+    coursePage.addAssignmentWithProblem(
+      assignmentAlias,
+      problemOptions,
+      'past',
+    );
     cy.logout();
   });
 
@@ -304,6 +308,38 @@ describe('Course Test', () => {
       '+100.00',
     );
     coursePage.toggleScoreboardFilter(users[0], 'User 1');
+    cy.logout();
+  });
+
+  it('Should test student is not able to access a future assignment', () => {
+    const loginOptions = loginPage.registerMultipleUsers(2);
+    const users = [loginOptions[1].username];
+    const courseOptions = coursePage.generateCourseOptions();
+    const assignmentAlias = 'ut_rank_hw_' + uuid();
+    const problemOptions: ProblemOptions = {
+      problemAlias: uuid().slice(0, 10),
+      tag: 'Recursión',
+      autoCompleteTextTag: 'recur',
+      problemLevelIndex: 0,
+    };
+
+    cy.login(loginOptions[0]);
+    cy.createProblem(problemOptions);
+    cy.createProblem(problemOptions);
+    coursePage.createCourse(courseOptions);
+    coursePage.addStudents(users);
+    coursePage.addAssignmentWithProblem(
+      assignmentAlias,
+      problemOptions,
+      'future',
+    );
+    cy.logout();
+
+    cy.login(loginOptions[1]);
+    const courseUrl = '/course/' + courseOptions.courseAlias;
+    cy.visit(courseUrl);
+    cy.get('button[name="start-course-submit"]').click();
+    cy.get('[data-course-start-assignment-button]').should('not.exist');;
     cy.logout();
   });
 });

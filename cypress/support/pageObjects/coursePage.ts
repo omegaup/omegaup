@@ -46,7 +46,7 @@ export class CoursePage {
   addAssignmentWithProblem(
     assignmentAlias: string,
     problemOptions: ProblemOptions,
-    pastAssignment: boolean = false,
+    assignmentType: string = 'now',
   ): void {
     cy.get('[data-course-edit-content]').click();
     cy.get('div[data-content-tab]').should('be.visible');
@@ -59,14 +59,22 @@ export class CoursePage {
     cy.get('[data-course-add-problem]').should('be.visible');
     cy.get('[data-course-assignment-description]').type('Homework Description');
 
-    if (pastAssignment == true) {
+    if (assignmentType == 'past') {
       const now = new Date();
-      const startDate = new Date(now.getTime() + 60*100);
-      const milliseconds = 200 * 1000;
-      const endDate = new Date(now.getTime() + milliseconds);
+      const startDate = new Date(now.getTime() + 120 * 1000);
+      const endDate = new Date(now.getTime() + 240 * 1000);
       cy.get('[data-course-start-date]').type(getISODateTime(startDate));
       cy.get('[data-course-end-date]').type(getISODateTime(endDate));
     }
+
+    if (assignmentType == 'future') {
+      const now = new Date();
+      const startDate = new Date(now.getTime() + 600 * 1000);
+      const endDate = new Date(now.getTime() + 1200 * 1000);
+      cy.get('[data-course-start-date]').type(getISODateTime(startDate));
+      cy.get('[data-course-end-date]').type(getISODateTime(endDate));
+    }
+
     cy.get('.tags-input input[type="text"]').type(problemOptions.problemAlias);
     cy.get('.typeahead-dropdown li').first().click();
     cy.get('button[data-add-problem]').click();
@@ -149,7 +157,7 @@ export class CoursePage {
       .its('response.statusCode')
       .should('eq', 200);
     cy.get('[data-run-status] > span')
-      .first({timeout: 10000})
+      .first({ timeout: 10000 })
       .should('have.text', expectedStatus);
   }
 
