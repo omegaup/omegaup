@@ -1,9 +1,43 @@
 import { v4 as uuid } from 'uuid';
 import { coursePage } from '../support/pageObjects/coursePage';
-import { ProblemOptions, RunOptions } from '../support/types';
+import {
+  CourseOptions,
+  LoginOptions,
+  ProblemOptions,
+  RunOptions,
+} from '../support/types';
 import { loginPage } from '../support/pageObjects/loginPage';
 
 describe('Course Test', () => {
+  let loginOptions: LoginOptions[] = [];
+  let courseOptions: CourseOptions;
+  let problemOptions: ProblemOptions;
+
+  before(() => {
+    cy.clearCookies();
+    cy.clearLocalStorage();
+    cy.visit('/');
+
+    loginOptions = loginPage.registerMultipleUsers(2);
+    courseOptions = coursePage.generateCourseOptions();
+
+    const users = [loginOptions[0].username];
+    const assignmentAlias = 'ut_rank_hw_' + uuid();
+    problemOptions = {
+      problemAlias: uuid().slice(0, 10),
+      tag: 'Recursión',
+      autoCompleteTextTag: 'recur',
+      problemLevelIndex: 0,
+    };
+
+    cy.login(loginOptions[1]);
+    cy.createProblem(problemOptions);
+    coursePage.createCourse(courseOptions);
+    coursePage.addStudents(users);
+    coursePage.addAssignmentWithProblem(assignmentAlias, problemOptions, true);
+    cy.logout();
+  });
+
   beforeEach(() => {
     cy.clearCookies();
     cy.clearLocalStorage();
@@ -187,8 +221,8 @@ describe('Course Test', () => {
     coursePage.addAssignmentWithProblem(assignmentAlias, problemOptions);
     cy.logout();
 
-    courseOptions.description = "Changed Desciption";
-    courseOptions.objective = "New Objective";
+    courseOptions.description = 'Changed Desciption';
+    courseOptions.objective = 'New Objective';
     cy.login(loginOptions[0]);
     coursePage.enterCourseAssignmentPage(courseOptions.courseAlias);
     coursePage.editCourse(courseOptions);
@@ -196,6 +230,21 @@ describe('Course Test', () => {
 
     cy.login(loginOptions[1]);
     coursePage.verifyCourseDetails(courseOptions, problemOptions);
+    cy.logout();
+  });
+
+  it('Should not be able to submit a past assignment', () => {
+    const runOptions: RunOptions = {
+      problemAlias: problemOptions.problemAlias,
+      fixturePath: 'main.cpp',
+      language: 'cpp11-gcc',
+      valid: true,
+      status: 'AC',
+    };
+
+    cy.login(loginOptions[0]);
+    coursePage.enterCourse(courseOptions.courseAlias);
+    coursePage.createInvalidSubmission(problemOptions, runOptions);
     cy.logout();
   });
 });

@@ -46,6 +46,7 @@ export class CoursePage {
   addAssignmentWithProblem(
     assignmentAlias: string,
     problemOptions: ProblemOptions,
+    pastAssignment: boolean = false,
   ): void {
     cy.get('[data-course-edit-content]').click();
     cy.get('div[data-content-tab]').should('be.visible');
@@ -57,6 +58,15 @@ export class CoursePage {
     cy.get('[data-course-assignment-alias]').type(assignmentAlias.slice(0, 10));
     cy.get('[data-course-add-problem]').should('be.visible');
     cy.get('[data-course-assignment-description]').type('Homework Description');
+
+    if (pastAssignment == true) {
+      const startDate = new Date();
+      let endDate = new Date();
+      const milliseconds = 200 * 1000;
+      endDate = new Date(endDate.getTime() + milliseconds);
+      cy.get('[data-course-start-date]').type(getISODateTime(startDate));
+      cy.get('[data-course-end-date]').type(getISODateTime(endDate));
+    }
     cy.get('.tags-input input[type="text"]').type(problemOptions.problemAlias);
     cy.get('.typeahead-dropdown li').first().click();
     cy.get('button[data-add-problem]').click();
@@ -107,6 +117,20 @@ export class CoursePage {
     cy.url().should('include', `/course/${courseOptions.courseAlias}/edit/`);
   }
 
+  createInvalidSubmission(
+    problemOptions: ProblemOptions,
+    runOptions: RunOptions,
+  ): void {
+    cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).click();
+    cy.get('[data-new-run]').click();
+    cy.get('[name="language"]').select(runOptions.language);
+    cy.fixture(runOptions.fixturePath).then((fileContent) => {
+      cy.get('.CodeMirror-line').type(fileContent);
+      cy.get('[data-submit-run]').click();
+    });
+    cy.get('.alert-danger').should('be.visible');
+  }
+
   createSubmission(
     problemOptions: ProblemOptions,
     runOptions: RunOptions,
@@ -119,7 +143,7 @@ export class CoursePage {
       cy.get('[data-submit-run]').click();
     });
     const expectedStatus: Status = runOptions.status;
-    cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
+    cy.intercept({ method: 'POST', url: '/api/run/create/' }).as('runStatus');
 
     cy.wait(['@runStatus'], { timeout: 10000 })
       .its('response.statusCode')
@@ -210,7 +234,7 @@ export class CoursePage {
       });
 
       cy.wrap(userCode).as('userCodeLines');
-    })
+    });
     cy.get('@userCodeLines').should('have.length', 12);
     cy.get('[data-overlay-popup] button.close')
       .should('be.visible')
@@ -249,16 +273,24 @@ export class CoursePage {
     cy.get('button[data-schedule-assignment]').click();
   }
 
-  verifyCourseDetails(courseOptions: CourseOptions, problemOptions: ProblemOptions): void {
+  verifyCourseDetails(
+    courseOptions: CourseOptions,
+    problemOptions: ProblemOptions,
+  ): void {
     const courseUrl = `/course/${courseOptions.courseAlias}/`;
     cy.visit(courseUrl);
     cy.get('button[name="start-course-submit"]').click();
     cy.get('a[href="#information"]').click();
-    cy.get('[data-markdown-statement]').should('contain', courseOptions.description);
+    cy.get('[data-markdown-statement]').should(
+      'contain',
+      courseOptions.description,
+    );
     cy.get('a[href="#content"]').click();
     cy.get('[data-course-start-assignment-button]').click();
     cy.get('a[data-problem="sumas"]').should('be.visible');
-    cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).should('be.visible');
+    cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).should(
+      'be.visible',
+    );
   }
 }
 
