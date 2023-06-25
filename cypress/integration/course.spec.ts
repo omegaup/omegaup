@@ -20,7 +20,7 @@ describe('Course Test', () => {
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const problemOptions: ProblemOptions = {
       problemAlias: uuid().slice(0, 10),
-      tag: 'Recursion',
+      tag: 'Recursión',
       autoCompleteTextTag: 'recur',
       problemLevelIndex: 0,
     };
@@ -95,7 +95,7 @@ describe('Course Test', () => {
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const problemOptions: ProblemOptions = {
       problemAlias: uuid().slice(0, 10),
-      tag: 'Recursion',
+      tag: 'Recursión',
       autoCompleteTextTag: 'recur',
       problemLevelIndex: 0,
     };
@@ -133,7 +133,7 @@ describe('Course Test', () => {
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const problemOptions: ProblemOptions = {
       problemAlias: uuid().slice(0, 10),
-      tag: 'Recursion',
+      tag: 'Recursión',
       autoCompleteTextTag: 'recur',
       problemLevelIndex: 0,
     };
@@ -175,7 +175,7 @@ describe('Course Test', () => {
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const problemOptions: ProblemOptions = {
       problemAlias: uuid().slice(0, 10),
-      tag: 'Recursion',
+      tag: 'Recursión',
       autoCompleteTextTag: 'recur',
       problemLevelIndex: 0,
     };
