@@ -186,6 +186,7 @@
   - [`/api/run/create/`](#apiruncreate)
   - [`/api/run/details/`](#apirundetails)
   - [`/api/run/disqualify/`](#apirundisqualify)
+  - [`/api/run/getSubmissionFeedback/`](#apirungetsubmissionfeedback)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
   - [`/api/run/requalify/`](#apirunrequalify)
@@ -3787,6 +3788,24 @@ Disqualify a submission
 
 _Nothing_
 
+## `/api/run/getSubmissionFeedback/`
+
+### Description
+
+Get all the comments related to a submission feedback
+
+### Parameters
+
+| Name        | Type     | Description |
+| ----------- | -------- | ----------- |
+| `run_alias` | `string` |             |
+
+### Returns
+
+```typescript
+types.SubmissionFeedback[]
+```
+
 ## `/api/run/list/`
 
 ### Description
@@ -4003,14 +4022,15 @@ Updates the admin feedback for a submission
 
 ### Parameters
 
-| Name                | Type        | Description |
-| ------------------- | ----------- | ----------- |
-| `assignment_alias`  | `string`    |             |
-| `course_alias`      | `string`    |             |
-| `feedback`          | `string`    |             |
-| `guid`              | `string`    |             |
-| `range_bytes_end`   | `int\|null` |             |
-| `range_bytes_start` | `int\|null` |             |
+| Name                     | Type        | Description |
+| ------------------------ | ----------- | ----------- |
+| `assignment_alias`       | `string`    |             |
+| `course_alias`           | `string`    |             |
+| `feedback`               | `string`    |             |
+| `guid`                   | `string`    |             |
+| `range_bytes_end`        | `int\|null` |             |
+| `range_bytes_start`      | `int\|null` |             |
+| `submission_feedback_id` | `int\|null` |             |
 
 ### Returns
 

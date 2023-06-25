@@ -1248,6 +1248,21 @@ export const Problem = {
               if (typeof x.feedback !== 'undefined' && x.feedback !== null)
                 x.feedback = ((x) => {
                   x.date = ((x: number) => new Date(x * 1000))(x.date);
+                  if (
+                    typeof x.feedback_thread !== 'undefined' &&
+                    x.feedback_thread !== null
+                  )
+                    x.feedback_thread = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        x.timestamp = ((x: number) => new Date(x * 1000))(
+                          x.timestamp,
+                        );
+                        return x;
+                      });
+                    })(x.feedback_thread);
                   return x;
                 })(x.feedback);
               return x;
@@ -1595,6 +1610,19 @@ export const Run = {
       }
       return x.map((x) => {
         x.date = ((x: number) => new Date(x * 1000))(x.date);
+        if (
+          typeof x.feedback_thread !== 'undefined' &&
+          x.feedback_thread !== null
+        )
+          x.feedback_thread = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+              return x;
+            });
+          })(x.feedback_thread);
         return x;
       });
     })(x.feedback);
@@ -1604,6 +1632,32 @@ export const Run = {
     messages.RunDisqualifyRequest,
     messages.RunDisqualifyResponse
   >('/api/run/disqualify/'),
+  getSubmissionFeedback: apiCall<
+    messages.RunGetSubmissionFeedbackRequest,
+    messages._RunGetSubmissionFeedbackServerResponse,
+    messages.RunGetSubmissionFeedbackResponse
+  >('/api/run/getSubmissionFeedback/', (x) => {
+    if (!Array.isArray(x)) {
+      return x;
+    }
+    return x.map((x) => {
+      x.date = ((x: number) => new Date(x * 1000))(x.date);
+      if (
+        typeof x.feedback_thread !== 'undefined' &&
+        x.feedback_thread !== null
+      )
+        x.feedback_thread = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+            return x;
+          });
+        })(x.feedback_thread);
+      return x;
+    });
+  }),
   list: apiCall<
     messages.RunListRequest,
     messages._RunListServerResponse,
