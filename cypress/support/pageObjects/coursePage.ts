@@ -60,10 +60,10 @@ export class CoursePage {
     cy.get('[data-course-assignment-description]').type('Homework Description');
 
     if (pastAssignment == true) {
-      const startDate = new Date();
-      let endDate = new Date();
+      const now = new Date();
+      const startDate = new Date(now.getTime() + 60*100);
       const milliseconds = 200 * 1000;
-      endDate = new Date(endDate.getTime() + milliseconds);
+      const endDate = new Date(now.getTime() + milliseconds);
       cy.get('[data-course-start-date]').type(getISODateTime(startDate));
       cy.get('[data-course-end-date]').type(getISODateTime(endDate));
     }
@@ -143,13 +143,13 @@ export class CoursePage {
       cy.get('[data-submit-run]').click();
     });
     const expectedStatus: Status = runOptions.status;
-    cy.intercept({ method: 'POST', url: '/api/run/create/' }).as('runStatus');
+    cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
 
     cy.wait(['@runStatus'], { timeout: 10000 })
       .its('response.statusCode')
       .should('eq', 200);
     cy.get('[data-run-status] > span')
-      .first()
+      .first({timeout: 10000})
       .should('have.text', expectedStatus);
   }
 
@@ -291,6 +291,18 @@ export class CoursePage {
     cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).should(
       'be.visible',
     );
+  }
+
+  toggleScoreboardFilter(user: string, userName: string) {
+    cy.get('[data-scoreboard-options]').select('1');
+    cy.get('[data-table-scoreboard-username]').should('contain', userName);
+    cy.get('[data-table-scoreboard-username]').should('not.contain', user);
+    cy.get('[data-scoreboard-options]').select('2');
+    cy.get('[data-table-scoreboard-username]').should('not.contain', userName);
+    cy.get('[data-table-scoreboard-username]').should('contain', user);
+    cy.get('[data-scoreboard-options]').select('3');
+    cy.get('[data-table-scoreboard-username]').should('contain', userName);
+    cy.get('[data-table-scoreboard-username]').should('contain', user);
   }
 }
 
