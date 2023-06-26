@@ -266,6 +266,7 @@ export class CoursePage {
         .type(courseOptions.objective);
     }
     cy.get('form[data-course-form]').submit();
+    cy.get('#alert-close').click();
     cy.get('[data-course-edit-content]').click();
     cy.get('div[data-content-tab]').should('be.visible');
     cy.get('[data-course-edit-content-button]').click();
@@ -274,6 +275,7 @@ export class CoursePage {
     cy.get('[data-course-start-date]').type(getISODateTime(now));
     cy.get('.tags-input input[type="text"]').type('Sumas');
     cy.get('.typeahead-dropdown li').first().click();
+    cy.wait(3000);
     cy.get('button[data-add-problem]').click();
     cy.get('[data-course-problemlist] table.table-striped').should(
       'be.visible',

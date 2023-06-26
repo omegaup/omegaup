@@ -2,12 +2,7 @@ import 'cypress-file-upload';
 import 'cypress-wait-until';
 import { v4 as uuid } from 'uuid';
 
-import {
-  ContestOptions,
-  GroupOptions,
-  ProblemOptions,
-  RunOptions,
-} from '../types';
+import { ContestOptions, GroupOptions, ProblemOptions } from '../types';
 import { addSubtractDaysToDate } from '../commands';
 
 enum ScoreMode {
@@ -200,7 +195,7 @@ export class ContestPage {
     for (let i = 0; i < noOfProblems; i++) {
       const userLoginOptions: ProblemOptions = {
         problemAlias: uuid().slice(0, 10),
-        tag: 'Recursion',
+        tag: 'Recursión',
         autoCompleteTextTag: 'recur',
         problemLevelIndex: 0,
       };

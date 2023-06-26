@@ -305,10 +305,11 @@ describe('Course Test', () => {
     cy.visit(courseUrl);
     cy.get('button[name="start-course-submit"]').click();
     cy.get('[data-course-start-assignment-button]').should('not.exist');
+    cy.visit('/');
     cy.logout();
   });
 
-  it.only('Should verify progress of students in the course', () => {
+  it('Should verify progress of students in the course', () => {
     const loginOptions = loginPage.registerMultipleUsers(4);
     const users: Array<string> = [];
     loginOptions.forEach((loginDetails) => {
@@ -371,13 +372,14 @@ describe('Course Test', () => {
       'contain',
       '0%',
     );
+    cy.get('[data-scorecard-csv-download-button]').click();
+    cy.wait(3000);
     cy.get('[data-scorecard-csv-download-button]')
-      .click()
-      .then((href) => {
-        const filename = 'cypress\\Downloads\\' + href;
+      .should('have.attr', 'download')
+      .then((download) => {
+        const filename = 'cypress/downloads/' + download;
         cy.readFile(filename).should('exist');
       });
-    cy.pause();
     cy.logout();
   });
 });
