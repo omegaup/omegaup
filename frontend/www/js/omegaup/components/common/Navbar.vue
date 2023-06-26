@@ -20,7 +20,7 @@
         </a>
 
         <div class="d-inline-flex d-flex-row order-md-1">
-          <ul v-if="isLoggedIn" class="navbar-nav navbar-right align-items-end">
+          <div v-if="isLoggedIn" class="navbar-nav navbar-right align-items-end d-lg-none">
             <omegaup-notifications-clarifications
               v-if="inContest"
               :clarifications="clarifications"
@@ -30,7 +30,7 @@
               :notifications="notifications"
               @read="readNotifications"
             ></omegaup-notification-list>
-          </ul>
+          </div>
           <a
             v-if="isLoggedIn"
             class="navbar justify-content-end mr-2 d-lg-none"
@@ -129,6 +129,17 @@
           <!-- in lockdown or contest mode there is no left navbar -->
 
           <ul v-if="isLoggedIn" class="navbar-nav navbar-right align-items-end">
+            <li class="d-none d-lg-block">
+              <omegaup-notifications-clarifications
+                v-if="inContest"
+                :clarifications="clarifications"
+              ></omegaup-notifications-clarifications>
+              <omegaup-notification-list
+                v-else
+                :notifications="notifications"
+                @read="readNotifications"
+              ></omegaup-notification-list>
+            </li>
             <li class="nav-item dropdown nav-user" data-nav-right>
               <a
                 class="nav-link px-2 dropdown-toggle nav-user-link"
