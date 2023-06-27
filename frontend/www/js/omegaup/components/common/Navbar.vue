@@ -427,7 +427,7 @@ nav.navbar {
 }
 @media only screen and (min-width: 385px) {
   .text-navLogIn {
-    font-size: inherit; 
+    font-size: inherit;
   }
 }
 @media only screen and (max-width: 992px) {
