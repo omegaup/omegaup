@@ -1,9 +1,7 @@
 <template>
   <footer class="common-footer text-center">
     <div class="container-xl">
-      <div
-        class="footer-navigation d-table d-lg-flex justify-content-between py-5"
-      >
+      <div class="footer-navigation d-lg-flex align-items-start py-5 m-auto">
         <div class="footer-brand mb-4 mb-lg-0">
           <img
             class="footer-logo d-block mx-auto"
@@ -14,21 +12,47 @@
             {{ T.frontPageFooter }}
           </div>
         </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
-          <h4>{{ T.frontPageFooterSponsors }}</h4>
+        <div
+          class="footer-list-section footer-contact w-50 mb-4 mb-lg-0 mx-auto"
+        >
+          <h4>{{ T.frontPageFooterContact }}</h4>
           <ul>
             <li class="mt-1">
-              <a href="https://replit.com/" target="_blank">
-                <img
-                  class="sponsor-logo"
-                  src="/media/homepage/replit_logo.png"
-                  alt="ReplitLogo"
-                />
-              </a>
+              <a href="mailto:hello@omegaup.com">hello@omegaup.com</a>
             </li>
           </ul>
+          <div
+            class="social-icons my-0 mx-auto d-flex flex-md-wrap justify-content-sm-center"
+          >
+            <a
+              class="mx-1"
+              href="https://github.com/omegaup/omegaup/"
+              target="_blank"
+            >
+              <font-awesome-icon :icon="['fab', 'github']" />
+              GitHub
+            </a>
+            |
+            <a
+              class="mx-1"
+              href="https://www.facebook.com/omegaup/"
+              target="_blank"
+            >
+              <font-awesome-icon :icon="['fab', 'facebook']" />
+              Facebook
+            </a>
+            |
+            <a
+              class="mx-1"
+              href="https://discord.gg/K3JFd9d3wk"
+              target="_blank"
+            >
+              <font-awesome-icon :icon="['fab', 'discord']" />
+              Discord
+            </a>
+          </div>
         </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
+        <div class="footer-list-section footer-site w-50 mb-4 mb-lg-0 mx-auto">
           <h4>{{ T.frontPageFooterSite }}</h4>
           <ul>
             <li class="mt-1">
@@ -50,7 +74,25 @@
             </li>
           </ul>
         </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
+        <div
+          class="footer-list-section footer-sponsors w-50 mb-4 mb-lg-0 mx-auto"
+        >
+          <h4>{{ T.frontPageFooterSponsors }}</h4>
+          <ul>
+            <li class="mt-1">
+              <a href="https://replit.com/" target="_blank">
+                <img
+                  class="sponsor-logo"
+                  src="/media/homepage/replit_logo.png"
+                  alt="ReplitLogo"
+                />
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          class="footer-list-section footer-organization d-inline-block w-50 mb-4"
+        >
           <h4>{{ T.frontPageFooterOrganization }}</h4>
           <ul>
             <li class="mt-1">
@@ -65,7 +107,9 @@
             </li>
           </ul>
         </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
+        <div
+          class="footer-list-section footer-developers d-inline-block w-50 mb-4"
+        >
           <h4>{{ T.frontPageDevelopers }}</h4>
           <ul>
             <li class="mt-1">
@@ -92,56 +136,15 @@
             </li>
           </ul>
         </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
-          <h4>{{ T.frontPageFooterContact }}</h4>
-          <ul>
-            <li class="mt-1">
-              <a href="mailto:hello@omegaup.com">hello@omegaup.com</a>
-            </li>
-          </ul>
-          <div class="social-icons my-0 mx-auto">
-            <a
-              class="text-nowrap"
-              href="https://github.com/omegaup/omegaup/"
-              target="_blank"
-            >
-              <font-awesome-icon :icon="['fab', 'github']" />
-              GitHub
-            </a>
-            |
-            <a
-              class="text-nowrap"
-              href="https://www.facebook.com/omegaup/"
-              target="_blank"
-            >
-              <font-awesome-icon :icon="['fab', 'facebook']" />
-              Facebook
-            </a>
-            |
-            <a
-              class="text-nowrap"
-              href="https://discord.gg/K3JFd9d3wk"
-              target="_blank"
-            >
-              <font-awesome-icon :icon="['fab', 'discord']" />
-              Discord
-            </a>
-          </div>
-        </div>
       </div>
     </div>
     <div class="copy">
       <div
-        class="container-xl d-flex flex-wrap justify-content-between align-items-center py-3"
+        class="container-xl d-md-flex justify-content-between align-items-center py-3"
       >
-        <div>
-          {{
-            ui.formatString(T.frontPageFooterCopyright, {
-              currentYear: new Date().getFullYear(),
-            })
-          }}
-        </div>
-        <ul class="m-0 list-unstyled text-right">
+        <ul
+          class="mb-2 m-md-0 list-unstyled text-right d-flex justify-content-around d-md-block order-md-12"
+        >
           <li>
             <a
               href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
@@ -157,6 +160,13 @@
             >
           </li>
         </ul>
+        <div>
+          {{
+            ui.formatString(T.frontPageFooterCopyright, {
+              currentYear: new Date().getFullYear(),
+            })
+          }}
+        </div>
       </div>
     </div>
   </footer>
@@ -203,6 +213,7 @@ export default class Footer extends Vue {
   .footer-navigation {
     .footer-brand {
       max-width: 200px;
+      order: -3;
 
       @media only screen and (max-width: 991px) {
         max-width: 100%;
@@ -220,8 +231,18 @@ export default class Footer extends Vue {
 
     .footer-list-section {
       // On medium sizes, this will work as an inline grid (not 100% width)
-      @media only screen and (max-width: 991px) {
-        display: inline-grid;
+      @media only screen and (min-width: 992px) {
+        display: block;
+
+        &.footer-contact {
+          order: 2;
+        }
+        &.footer-site {
+          order: -1;
+        }
+        &.footer-sponsors {
+          order: -2;
+        }
       }
 
       ul {
