@@ -26,6 +26,9 @@ describe('Course Test', () => {
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     problemOptions = contestPage.generateProblemOptions(1)[0];
 
+    // We are creating an course with assignment that end after two minutes
+    // so that it can be used as a past assignment which will be tested later
+    // on in the test.
     cy.login(loginOptions[1]);
     cy.createProblem(problemOptions);
     coursePage.createCourse(courseOptions);
@@ -237,8 +240,8 @@ describe('Course Test', () => {
   });
 
   it('Should test the working of filters on scoreboard page', () => {
-    const loginOptions = loginPage.registerMultipleUsers(2);
-    const users = [loginOptions[1].username];
+    const loginOptions = loginPage.registerMultipleUsers(3);
+    const users = [loginOptions[1].username, loginOptions[2].username];
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const problemOptions = contestPage.generateProblemOptions(1);
@@ -264,8 +267,22 @@ describe('Course Test', () => {
     coursePage.closePopup(problemOptions[0]);
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
-    cy.get('[data-table-scoreboard-username]').should('have.length', 1);
+    cy.get('[data-table-scoreboard-username]').should('have.length', 2);
     cy.get(`.${loginOptions[1].username} > td:nth-child(4)`).should(
+      'contain',
+      '+100.00',
+    );
+    cy.logout();
+
+    cy.login(loginOptions[2]);
+    loginPage.addUsername('User 2');
+    coursePage.enterCourse(courseOptions.courseAlias);
+    coursePage.createSubmission(problemOptions[0], runOptions);
+    coursePage.closePopup(problemOptions[0]);
+    cy.get('a[href="#ranking"]').click();
+    cy.get('[data-table-scoreboard]').should('be.visible');
+    cy.get('[data-table-scoreboard-username]').should('have.length', 2);
+    cy.get(`.${loginOptions[2].username} > td:nth-child(4)`).should(
       'contain',
       '+100.00',
     );
@@ -278,12 +295,16 @@ describe('Course Test', () => {
       'contain',
       '+100.00',
     );
-    coursePage.toggleScoreboardFilter(users[0], 'User 1');
+    cy.get(`.${loginOptions[2].username} > td:nth-child(4)`).should(
+      'contain',
+      '+100.00',
+    );
+    coursePage.toggleScoreboardFilter(users, ['User 1', 'User 2']);
     cy.logout();
   });
 
   it('Should test student is not able to access a future assignment', () => {
-    const loginOptions = loginPage.registerMultipleUsers(2);
+    const loginOptions = loginPage.registerMultipleUsers(3);
     const users = [loginOptions[1].username];
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
