@@ -1,6 +1,6 @@
 <template>
-  <div class="card table-responsive-sm">
-    <h5 class="card-header">
+  <div>
+    <h5 class="text-center mb-5 mt-1 school-rank-title">
       {{
         showHeader
           ? ui.formatString(T.schoolRankOfTheMonthHeader, {
@@ -12,20 +12,21 @@
             })
       }}
     </h5>
+  <div class="card table-responsive-sm table-width">
     <table class="table mb-0">
       <thead>
         <tr>
-          <th scope="col">#</th>
-          <th scope="col">{{ T.profileSchool }}</th>
-          <th class="text-right" scope="col">{{ T.wordsScore }}</th>
+          <th class="text-center" scope="col">#</th>
+          <th class="text-center" scope="col">{{ T.profileSchool }}</th>
+          <th class="text-center" scope="col">{{ T.wordsScore }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(school, index) in rank" :key="index">
-          <th scope="row">
+          <th class="text-center" scope="row">
             {{ showHeader ? index + 1 : school.ranking || '' }}
           </th>
-          <td class="text-truncate">
+          <td class="text-truncate text-center">
             <omegaup-countryflag
               :country="school.country_id"
             ></omegaup-countryflag>
@@ -33,7 +34,7 @@
               school.name
             }}</a>
           </td>
-          <td class="text-right">
+          <td class="text-center">
             {{ school.score }}
           </td>
         </tr>
@@ -48,6 +49,7 @@
       ></omegaup-common-paginator>
     </div>
   </div>
+</div>
 </template>
 
 <script lang="ts">
@@ -87,4 +89,14 @@ export default class SchoolRank extends Vue {
 .text-truncate {
   max-width: 250px;
 }
+
+.table-width {
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.school-rank-title {
+  font-size: 1.6rem;
+}
+
 </style>
