@@ -20,7 +20,10 @@
         </a>
 
         <div class="d-inline-flex d-flex-row order-md-1">
-          <div v-if="isLoggedIn" class="navbar-nav navbar-right align-items-end d-lg-none">
+          <div
+            v-if="isLoggedIn"
+            class="navbar-nav navbar-right align-items-end d-lg-none"
+          >
             <omegaup-notifications-clarifications
               v-if="inContest"
               :clarifications="clarifications"
