@@ -30,7 +30,7 @@
           <ul v-else class="navbar-nav navbar-right d-lg-flex">
             <li class="nav-item">
               <a
-                class="nav-link px-2 text-navLogIn"
+                class="nav-link text-navLogIn"
                 :href="formattedLoginURL"
                 data-login-button
                 >{{ T.navLogIn }}</a
@@ -424,10 +424,12 @@ nav.navbar {
 }
 .text-navLogIn {
   font-size: 14px;
+  padding: auto;
 }
 @media only screen and (min-width: 385px) {
   .text-navLogIn {
     font-size: inherit;
+    padding: 0.5rem;
   }
 }
 @media only screen and (max-width: 992px) {
