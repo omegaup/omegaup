@@ -243,6 +243,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                 'cacheKey' => null,
                 'is_admin' => false,
                 'associated_identities' => [],
+                'api_tokens' => [],
             ];
         }
         return self::getCurrentSessionImpl(
@@ -301,6 +302,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         $associatedIdentities = [];
         $currentUser = null;
         $email = null;
+        $apiTokens = [];
         if (is_null($currentIdentity->user_id)) {
             if (\OmegaUp\DAO\Identities::isMainIdentity($loginIdentity)) {
                 $associatedIdentities = [
@@ -334,6 +336,9 @@ class Session extends \OmegaUp\Controllers\Controller {
                 $associatedIdentities = \OmegaUp\DAO\Identities::getAssociatedIdentities(
                     $currentIdentity
                 );
+                $apiTokens = \OmegaUp\DAO\APITokens::getAllByUser(
+                    $currentIdentity->user_id
+                );
             }
         }
 
@@ -351,6 +356,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                 $currentIdentity
             ),
             'associated_identities' => $associatedIdentities,
+            'api_tokens' => $apiTokens,
         ];
     }
 
