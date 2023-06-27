@@ -19,7 +19,7 @@
           />
         </a>
 
-        <div class="d-inline-flex d-flex-row order-md-1">
+        <div class="d-inline-flex d-flex-row order-lg-1">
           <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex">
             <li class="nav-item">
               <a
