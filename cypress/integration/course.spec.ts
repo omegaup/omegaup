@@ -327,14 +327,11 @@ describe('Course Test', () => {
     cy.get('button[name="start-course-submit"]').click();
     cy.get('[data-course-start-assignment-button]').should('not.exist');
     const assignmentUrl =
-      '/course/' +
-      courseOptions.courseAlias +
-      '/assignment/' +
-      assignmentAlias.slice(0, 12) +
-      '#problems';
+      courseUrl + '/assignment/' + assignmentAlias.slice(0, 12) + '#problems';
     cy.request({ url: assignmentUrl, failOnStatusCode: false }).then((resp) => {
       expect(resp.status).to.eq(404);
     });
+    cy.visit('/');
     cy.logout();
   });
 
