@@ -179,12 +179,11 @@ table.submissions-table > tbody > tr > td {
   width: 180px;
 }
 
-.submissions-title h2{
+.submissions-title h2 {
   font-size: 1.8rem;
 }
 
 [submissions-problem] .tags-input-wrapper-default {
   padding: 0.35rem 0.25rem 0.7rem 0.25rem;
 }
-
 </style>
