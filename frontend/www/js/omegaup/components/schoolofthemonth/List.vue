@@ -140,19 +140,19 @@ export default class SchoolOfTheMonthList extends Vue {
 </script>
 
 <style scoped>
-
-.nav-link.active, .nav-link:hover {
-border: none;
+.nav-link.active,
+.nav-link:hover {
+  border: none;
   border-left: 0.0625rem solid #dee2e6;
   border-right: 0.0625rem solid #dee2e6;
   border-top-left-radius: 0rem;
   border-top-right-radius: 0rem;
 }
-.nav .nav-tabs{
+.nav .nav-tabs {
   border-bottom: 0rem;
 }
 
-.nav-link{
+.nav-link {
   font-weight: medium;
   letter-spacing: 0.022rem;
   padding: 0.65rem 1rem;
@@ -161,5 +161,4 @@ border: none;
   max-width: 55rem;
   margin: 0 auto;
 }
-
 </style>
