@@ -24,6 +24,7 @@ describe('Course Test', () => {
 
     const users = [loginOptions[0].username];
     const assignmentAlias = 'ut_rank_hw_' + uuid();
+    const shortAlias = assignmentAlias.slice(0, 12);
     problemOptions = contestPage.generateProblemOptions(1)[0];
 
     // We are creating an course with assignment that end after two minutes
@@ -35,6 +36,7 @@ describe('Course Test', () => {
     coursePage.addStudents(users);
     coursePage.addAssignmentWithProblem(
       assignmentAlias,
+      shortAlias,
       problemOptions,
       'past',
     );
@@ -55,6 +57,7 @@ describe('Course Test', () => {
     });
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
+    const shortAlias = assignmentAlias.slice(0, 12);
     const problemOptions = contestPage.generateProblemOptions(1);
     const runOptions: RunOptions = {
       problemAlias: problemOptions[0].problemAlias,
@@ -68,7 +71,11 @@ describe('Course Test', () => {
     cy.createProblem(problemOptions[0]);
     coursePage.createCourse(courseOptions);
     coursePage.addStudents(users);
-    coursePage.addAssignmentWithProblem(assignmentAlias, problemOptions[0]);
+    coursePage.addAssignmentWithProblem(
+      assignmentAlias,
+      shortAlias,
+      problemOptions[0],
+    );
     cy.logout();
 
     cy.login(loginOptions[0]);
@@ -133,13 +140,18 @@ describe('Course Test', () => {
     const users = [loginOptions[0].username];
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
+    const shortAlias = assignmentAlias.slice(0, 12);
     const problemOptions = contestPage.generateProblemOptions(1);
 
     cy.login(loginOptions[1]);
     cy.createProblem(problemOptions[0]);
     coursePage.createCourse(courseOptions);
     coursePage.addStudents(users);
-    coursePage.addAssignmentWithProblem(assignmentAlias, problemOptions[0]);
+    coursePage.addAssignmentWithProblem(
+      assignmentAlias,
+      shortAlias,
+      problemOptions[0],
+    );
     cy.logout();
 
     cy.login(loginOptions[0]);
@@ -166,6 +178,7 @@ describe('Course Test', () => {
     const users = [loginOptions[0].username];
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
+    const shortAlias = assignmentAlias.slice(0, 12);
     const problemOptions = contestPage.generateProblemOptions(1);
     const runOptions: RunOptions = {
       problemAlias: problemOptions[0].problemAlias,
@@ -179,7 +192,11 @@ describe('Course Test', () => {
     cy.createProblem(problemOptions[0]);
     coursePage.createCourse(courseOptions);
     coursePage.addStudents(users);
-    coursePage.addAssignmentWithProblem(assignmentAlias, problemOptions[0]);
+    coursePage.addAssignmentWithProblem(
+      assignmentAlias,
+      shortAlias,
+      problemOptions[0],
+    );
     cy.logout();
 
     cy.login(loginOptions[0]);
@@ -203,13 +220,18 @@ describe('Course Test', () => {
     const users = [loginOptions[1].username];
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
+    const shortAlias = assignmentAlias.slice(0, 12);
     const problemOptions = contestPage.generateProblemOptions(1);
 
     cy.login(loginOptions[0]);
     cy.createProblem(problemOptions[0]);
     coursePage.createCourse(courseOptions);
     coursePage.addStudents(users);
-    coursePage.addAssignmentWithProblem(assignmentAlias, problemOptions[0]);
+    coursePage.addAssignmentWithProblem(
+      assignmentAlias,
+      shortAlias,
+      problemOptions[0],
+    );
     cy.logout();
 
     courseOptions.description = 'Changed Desciption';
@@ -244,6 +266,7 @@ describe('Course Test', () => {
     const users = [loginOptions[1].username, loginOptions[2].username];
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
+    const shortAlias = assignmentAlias.slice(0, 12);
     const problemOptions = contestPage.generateProblemOptions(1);
     const runOptions: RunOptions = {
       problemAlias: problemOptions[0].problemAlias,
@@ -257,7 +280,11 @@ describe('Course Test', () => {
     cy.createProblem(problemOptions[0]);
     coursePage.createCourse(courseOptions);
     coursePage.addStudents(users);
-    coursePage.addAssignmentWithProblem(assignmentAlias, problemOptions[0]);
+    coursePage.addAssignmentWithProblem(
+      assignmentAlias,
+      shortAlias,
+      problemOptions[0],
+    );
     cy.logout();
 
     cy.login(loginOptions[1]);
@@ -308,6 +335,7 @@ describe('Course Test', () => {
     const users = [loginOptions[1].username];
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
+    const shortAlias = assignmentAlias.slice(0, 12);
     const problemOptions = contestPage.generateProblemOptions(1);
 
     cy.login(loginOptions[0]);
@@ -316,6 +344,7 @@ describe('Course Test', () => {
     coursePage.addStudents(users);
     coursePage.addAssignmentWithProblem(
       assignmentAlias,
+      shortAlias,
       problemOptions[0],
       'future',
     );
@@ -326,8 +355,7 @@ describe('Course Test', () => {
     cy.visit(courseUrl);
     cy.get('button[name="start-course-submit"]').click();
     cy.get('[data-course-start-assignment-button]').should('not.exist');
-    const assignmentUrl =
-      courseUrl + '/assignment/' + assignmentAlias.slice(0, 12) + '#problems';
+    const assignmentUrl = courseUrl + '/assignment/' + shortAlias + '#problems';
     cy.request({ url: assignmentUrl, failOnStatusCode: false }).then((resp) => {
       expect(resp.status).to.eq(404);
     });
@@ -343,7 +371,9 @@ describe('Course Test', () => {
     });
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias1 = 'ut_rank_hw_1' + uuid();
+    const shortAlias1 = assignmentAlias1.slice(0, 12);
     const assignmentAlias2 = 'ut_rank_hw_2' + uuid();
+    const shortAlias2 = assignmentAlias2.slice(0, 12);
     const problemOptions = contestPage.generateProblemOptions(2);
     const courseUrl = '/course/' + courseOptions.courseAlias;
     const studentsProgressUrl =
@@ -361,8 +391,16 @@ describe('Course Test', () => {
     cy.createProblem(problemOptions[1]);
     coursePage.createCourse(courseOptions);
     coursePage.addStudents(users);
-    coursePage.addAssignmentWithProblem(assignmentAlias1, problemOptions[0]);
-    coursePage.addAssignmentWithProblem(assignmentAlias2, problemOptions[1]);
+    coursePage.addAssignmentWithProblem(
+      assignmentAlias1,
+      shortAlias1,
+      problemOptions[0],
+    );
+    coursePage.addAssignmentWithProblem(
+      assignmentAlias2,
+      shortAlias2,
+      problemOptions[1],
+    );
     cy.logout();
 
     // 100% Course completion

@@ -45,6 +45,7 @@ export class CoursePage {
 
   addAssignmentWithProblem(
     assignmentAlias: string,
+    shortAlias: string,
     problemOptions: ProblemOptions,
     assignmentType: string = 'now',
   ): void {
@@ -55,7 +56,7 @@ export class CoursePage {
 
     cy.get('.omegaup-course-assignmentdetails').should('be.visible');
     cy.get('[data-course-assignment-name]').type(assignmentAlias);
-    cy.get('[data-course-assignment-alias]').type(assignmentAlias.slice(0, 12));
+    cy.get('[data-course-assignment-alias]').type(shortAlias);
     cy.get('[data-course-add-problem]').should('be.visible');
     cy.get('[data-course-assignment-description]').type('Homework Description');
 
