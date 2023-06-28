@@ -98,7 +98,7 @@
       <tbody>
         <tr v-for="(coder, index) in visibleCoders" :key="index">
           <td class="text-center align-middle">
-            <img :src="coder.gravatar_32" class="pr-3"/>
+            <img :src="coder.gravatar_32" class="pr-3" />
             <omegaup-user-username
               :classname="coder.classname"
               :linkify="true"
@@ -110,7 +110,10 @@
               :country="coder.country_id"
             ></omegaup-countryflag>
           </td>
-          <td v-if="selectedTab == 'codersOfTheMonth'" class="text-center align-middle">
+          <td
+            v-if="selectedTab == 'codersOfTheMonth'"
+            class="text-center align-middle"
+          >
             {{ coder.date }}
           </td>
           <td
@@ -187,18 +190,19 @@ export default class CoderOfTheMonthList extends Vue {
 </script>
 
 <style scoped>
-.nav-link.active, .nav-link:hover {
+.nav-link.active,
+.nav-link:hover {
   border: none;
   border-left: 0.0625rem solid #dee2e6;
   border-right: 0.0625rem solid #dee2e6;
   border-top-left-radius: 0rem;
   border-top-right-radius: 0rem;
 }
-.nav .nav-tabs{
+.nav .nav-tabs {
   border-bottom: 0rem;
 }
 
-.nav-link{
+.nav-link {
   font-weight: medium;
   letter-spacing: 0.022rem;
   padding: 0.65rem 1rem;
