@@ -1,13 +1,13 @@
 <template>
   <div class="container-lg">
     <h5 class="rank-title mb-5">
-        {{
-          ui.formatString(T.authorRankRangeHeader, {
-            lowCount: (page - 1) * length + 1,
-            highCount: page * length,
-          })
-        }}
-      </h5>
+      {{
+        ui.formatString(T.authorRankRangeHeader, {
+          lowCount: (page - 1) * length + 1,
+          highCount: page * length,
+        })
+      }}
+    </h5>
     <div class="card max-width-rank">
       <table class="table mb-0 table-responsive-sm">
         <thead>
@@ -19,7 +19,9 @@
         </thead>
         <tbody>
           <tr v-for="(author, index) in rankingData.ranking" :key="index">
-            <th scope="row" class="text-center">{{ author.author_ranking || index }}</th>
+            <th scope="row" class="text-center">
+              {{ author.author_ranking || index }}
+            </th>
             <td class="text-center">
               <omegaup-countryflag
                 :country="author.country_id"
@@ -77,7 +79,6 @@ export default class AuthorsRank extends Vue {
 </script>
 
 <style scoped>
-
 .max-width-rank {
   max-width: 52rem;
   margin: 0 auto;
@@ -99,5 +100,4 @@ export default class AuthorsRank extends Vue {
 .table td.text-center:nth-child(2) {
   width: 60%;
 }
-
 </style>
