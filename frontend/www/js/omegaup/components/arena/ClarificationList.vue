@@ -80,7 +80,7 @@
     <div class="table-responsive">
       <table class="table mb-0">
         <thead>
-          <tr>
+          <tr class="text-nowrap">
             <slot name="table-title">
               <th class="text-center" scope="col">{{ T.wordsProblem }}</th>
             </slot>

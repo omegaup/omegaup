@@ -27,16 +27,16 @@
     <td class="text-center align-middle">
       {{ time.formatDateTime(clarification.time) }}
     </td>
-    <td class="align-middle" data-form-clarification-message>
-      <pre>{{ clarification.message }}</pre>
+    <td class="column-message align-middle text-monospace text-dark" data-form-clarification-message>
+      {{ clarification.message }}
     </td>
     <td
       v-if="isAdmin"
-      class="align-middle"
+      class="column-answer align-middle"
       data-form-clarification-resolved-answer
     >
       <template v-if="clarification.answer">
-        <pre>{{ clarification.answer }}</pre>
+        <span class="text-monospace text-dark">{{ clarification.answer }}</span>
         <div v-if="!showUpdateAnswer" class="form-check mt-2 mt-xl-0">
           <label class="form-check-label">
             <input
@@ -54,7 +54,7 @@
         data-form-clarification-answer
         @submit.prevent="sendClarificationResponse"
       >
-        <div class="form-group">
+        <div class="form-group mb-0">
           <select
             v-model="selectedResponse"
             class="form-control"
@@ -71,27 +71,29 @@
         </div>
         <div
           v-if="selectedResponse === 'other'"
-          class="form-group mt-2 mt-xl-0"
+          class="form-group mt-1 mb-0"
         >
           <textarea v-model="message" :placeholder="T.wordsAnswer"> </textarea>
         </div>
-        <div class="form-check mt-2 mt-xl-0">
-          <label class="form-check-label">
-            <input
-              v-model="isPublic"
-              class="form-check-input"
-              type="checkbox"
-            />
-            {{ T.wordsPublic }}
-          </label>
+        <div class="d-flex justify-content-between w-100">
+          <div class="form-check mt-2 mt-xl-0">
+            <label class="form-check-label">
+              <input
+                v-model="isPublic"
+                class="form-check-input"
+                type="checkbox"
+              />
+              {{ T.wordsPublic }}
+            </label>
+          </div>
+          <button class="btn btn-primary btn-sm mt-2" type="submit">
+            {{ T.wordsSend }}
+          </button>
         </div>
-        <button class="btn btn-primary btn-sm mt-2 mt-lg-2" type="submit">
-          {{ T.wordsSend }}
-        </button>
       </form>
     </td>
-    <td v-else class="align-middle" data-clarification-answer-text>
-      <pre v-if="clarification.answer">{{ clarification.answer }}</pre>
+    <td v-else class="column-answer align-middle" data-clarification-answer-text>
+      <span class="text-monospace text-dark" v-if="clarification.answer">{{ clarification.answer }}</span>
     </td>
   </tr>
 </template>
@@ -204,5 +206,16 @@ export default class ArenaClarification extends Vue {
 
 .border {
   border-width: 3px !important;
+}
+
+span {
+  font-size: 14px;
+}
+.column-message {
+  min-width: 25rem;
+  font-size: 14px;
+}
+.column-answer{
+  min-width: 15rem;
 }
 </style>
