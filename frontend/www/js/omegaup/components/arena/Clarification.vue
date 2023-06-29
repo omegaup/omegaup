@@ -27,7 +27,10 @@
     <td class="text-center align-middle">
       {{ time.formatDateTime(clarification.time) }}
     </td>
-    <td class="column-message align-middle text-monospace text-dark" data-form-clarification-message>
+    <td
+      class="column-message align-middle text-monospace text-dark"
+      data-form-clarification-message
+    >
       {{ clarification.message }}
     </td>
     <td
@@ -69,10 +72,7 @@
             </option>
           </select>
         </div>
-        <div
-          v-if="selectedResponse === 'other'"
-          class="form-group mt-1 mb-0"
-        >
+        <div v-if="selectedResponse === 'other'" class="form-group mt-1 mb-0">
           <textarea v-model="message" :placeholder="T.wordsAnswer"> </textarea>
         </div>
         <div class="d-flex justify-content-between w-100">
@@ -92,8 +92,14 @@
         </div>
       </form>
     </td>
-    <td v-else class="column-answer align-middle" data-clarification-answer-text>
-      <span class="text-monospace text-dark" v-if="clarification.answer">{{ clarification.answer }}</span>
+    <td
+      v-else
+      class="column-answer align-middle"
+      data-clarification-answer-text
+    >
+      <span v-if="clarification.answer" class="text-monospace text-dark">{{
+        clarification.answer
+      }}</span>
     </td>
   </tr>
 </template>
@@ -215,7 +221,7 @@ span {
   min-width: 25rem;
   font-size: 14px;
 }
-.column-answer{
+.column-answer {
   min-width: 15rem;
 }
 </style>
