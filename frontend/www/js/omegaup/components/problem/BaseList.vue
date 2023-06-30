@@ -36,7 +36,6 @@
                 :column-type="omegaup.ColumnType.String"
                 :sort-order="sortOrder"
                 :column-name="columnName"
-
                 @apply-filter="
                   (columnName, sortOrder) =>
                     $emit('apply-filter', columnName, sortOrder)
