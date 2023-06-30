@@ -291,7 +291,7 @@
                   }}</a>
                 </template>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="/logout/">
+                <a class="dropdown-item" href="/logout/" data-logout-button>
                   <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
                   {{ T.navLogOut }}
                 </a>
@@ -409,7 +409,7 @@ nav.navbar {
     color: var(--header-navbar-dropdown-item-font-color);
   }
   a {
-    color: #dbe2f3;
+    color: var(--header-navbar-primary-link-color);
   }
   .collapse-submenu .btn:focus {
     box-shadow: 0 0 0 0;
