@@ -330,6 +330,68 @@ describe('Course Test', () => {
     cy.logout();
   });
 
+  it('Should test the working of filter on submissions page', () => {
+    const loginOptions = loginPage.registerMultipleUsers(3);
+    const users = [loginOptions[1].username, loginOptions[2].username];
+    const courseOptions = coursePage.generateCourseOptions();
+    const assignmentAlias = 'ut_rank_hw_' + uuid();
+    const shortAlias = assignmentAlias.slice(0, 12);
+    const problemOptions = contestPage.generateProblemOptions(1);
+    const runOptions: RunOptions = {
+      problemAlias: problemOptions[0].problemAlias,
+      fixturePath: 'main.cpp',
+      language: 'cpp11-gcc',
+      valid: true,
+      status: 'AC',
+    };
+
+    cy.login(loginOptions[0]);
+    cy.createProblem(problemOptions[0]);
+    coursePage.createCourse(courseOptions);
+    coursePage.addStudents(users);
+    coursePage.addAssignmentWithProblem(
+      assignmentAlias,
+      shortAlias,
+      problemOptions[0],
+    );
+    cy.logout();
+
+    cy.login(loginOptions[1]);
+    loginPage.addUsername('User 1');
+    coursePage.enterCourse(courseOptions.courseAlias);
+    coursePage.createSubmission(problemOptions[0], runOptions);
+    coursePage.closePopup(problemOptions[0]);
+    cy.get('a[href="#ranking"]').click();
+    cy.get('[data-table-scoreboard]').should('be.visible');
+    cy.get('[data-table-scoreboard-username]').should('have.length', 2);
+    cy.get(`.${loginOptions[1].username} > td:nth-child(4)`).should(
+      'contain',
+      '+100.00',
+    );
+    cy.logout();
+
+    cy.login(loginOptions[2]);
+    loginPage.addUsername('User 2');
+    coursePage.enterCourse(courseOptions.courseAlias);
+    coursePage.createSubmission(problemOptions[0], runOptions);
+    coursePage.closePopup(problemOptions[0]);
+    cy.get('a[href="#ranking"]').click();
+    cy.get('[data-table-scoreboard]').should('be.visible');
+    cy.get('[data-table-scoreboard-username]').should('have.length', 2);
+    cy.get(`.${loginOptions[2].username} > td:nth-child(4)`).should(
+      'contain',
+      '+100.00',
+    );
+    cy.logout();
+
+    cy.login(loginOptions[0]);
+    coursePage.enterCourseAssignmentPage(courseOptions.courseAlias);
+    cy.pause();
+    cy.get('[data-course-submisson-button]').click();
+    coursePage.verifySubmissionsFilter(users);
+    cy.logout();
+  });
+
   it('Should test student is not able to access a future assignment', () => {
     const loginOptions = loginPage.registerMultipleUsers(3);
     const users = [loginOptions[1].username];

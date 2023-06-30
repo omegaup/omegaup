@@ -135,6 +135,7 @@
               <label
                 >{{ T.contestParticipant }}:
                 <omegaup-common-typeahead
+                  data-search-username
                   :existing-options="searchResultUsers"
                   :value.sync="filterUsername"
                   :max-results="10"

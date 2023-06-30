@@ -335,6 +335,22 @@ export class CoursePage {
       );
     }
   }
+
+  verifySubmissionsFilter(users: string[]): void {
+    cy.get('[data-search-username]').type(users[0]);
+    cy.get('.tags-input-typeahead-item-highlighted-default').click();
+    cy.get(`td[data-username=${users[0]}]`).should('be.visible');
+    cy.get(`td[data-username=${users[1]}]`).should('not.exist');
+
+    cy.get('[data-remove-all-filters]').click();
+    cy.get(`td[data-username=${users[0]}]`).should('be.visible');
+    cy.get(`td[data-username=${users[1]}]`).should('be.visible');
+
+    cy.get('[data-search-username]').type(users[1]);
+    cy.get('.tags-input-typeahead-item-highlighted-default').click();
+    cy.get(`td[data-username=${users[1]}]`).should('be.visible');
+    cy.get(`td[data-username=${users[0]}]`).should('not.exist');
+  }
 }
 
 export const coursePage = new CoursePage();
