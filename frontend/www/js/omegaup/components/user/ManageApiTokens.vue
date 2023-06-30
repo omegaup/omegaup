@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form class="form add-identity-form" @submit.prevent="handleCreateApiToken">
+    <form class="form" @submit.prevent="handleCreateApiToken">
       <div class="form-group">
         <p>
           {{ T.apiTokenDescription }}
