@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-homepage-course>
     <div class="row p-4 text-center justify-content-around align-items-center">
       <h2 class="col-12 mb-5 font-italic">{{ T.courseHomepageTitle }}</h2>
       <a
