@@ -239,7 +239,7 @@ OmegaUp.on('ready', () => {
   }
   function refreshApiTokensList() {
     api.User.listAPITokens({})
-      .then(function (data) {
+      .then((data) => {
         userProfile.apiTokens = data.tokens;
       })
       .catch(ui.apiError);
