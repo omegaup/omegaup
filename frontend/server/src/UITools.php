@@ -155,7 +155,6 @@ class UITools {
             'associated_identities' => $associatedIdentities,
             'api_tokens' => $apiTokens,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
-        /** @var CommonPayload */
         return [
             'omegaUpLockDown' => boolval(OMEGAUP_LOCKDOWN),
             'inContest' => $inContest,
