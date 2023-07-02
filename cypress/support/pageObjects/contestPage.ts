@@ -104,7 +104,6 @@ export class ContestPage {
   }
 
   answerClarification(contestOptions: ContestOptions, answer: string): void {
-    cy.loginAdmin();
     cy.visit(`/arena/${contestOptions.contestAlias}/`);
     cy.get('a[href="#clarifications"]').click();
     cy.get('[data-tab-clarifications]').should('be.visible');
@@ -114,7 +113,6 @@ export class ContestPage {
       'contain',
       answer,
     );
-    cy.logout();
   }
 
   updateScoreboardForContest(contestAlias: string): void {
@@ -126,11 +124,10 @@ export class ContestPage {
     });
   }
 
-  createContestAsAdmin(
+  createContest(
     contestOptions: ContestOptions,
     users: Array<string>,
   ): void {
-    cy.loginAdmin();
     cy.createContest(contestOptions);
 
     cy.location('href').should('include', contestOptions.contestAlias);
@@ -151,7 +148,6 @@ export class ContestPage {
 
     cy.get('a[href="#ranking"]').click();
     cy.waitUntil(() => cy.get('[data-table-scoreboard]').should('be.visible'));
-    cy.logout();
   }
 
   generateContestOptions(): ContestOptions {

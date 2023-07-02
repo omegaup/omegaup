@@ -43,6 +43,7 @@
                 :checked="hasRole(role.name)"
                 :disabled="role == 'Admin'"
                 @change.prevent="onChangeRole($event, role)"
+                :class="role.name"
               />
             </td>
 
