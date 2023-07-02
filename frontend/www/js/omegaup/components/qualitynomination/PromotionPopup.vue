@@ -19,6 +19,7 @@
                     <label class="form-check-label">
                       <input
                         v-model="difficulty"
+                        data-dificulty-radio-button
                         type="radio"
                         :value="difficultyLevel.id"
                       />
@@ -48,6 +49,7 @@
               </div>
               <div class="text-right w-100">
                 <button
+                  data-submit-feedback-button
                   class="col-md-4 mr-2 mb-1 btn btn-primary"
                   type="submit"
                   :disabled="!quality && !difficulty"

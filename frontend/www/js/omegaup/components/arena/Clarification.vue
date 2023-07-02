@@ -27,10 +27,14 @@
     <td class="text-center align-middle">
       {{ time.formatDateTime(clarification.time) }}
     </td>
-    <td class="align-middle">
+    <td class="align-middle" data-form-clarification-message>
       <pre>{{ clarification.message }}</pre>
     </td>
-    <td v-if="isAdmin" class="align-middle">
+    <td
+      v-if="isAdmin"
+      class="align-middle"
+      data-form-clarification-resolved-answer
+    >
       <template v-if="clarification.answer">
         <pre>{{ clarification.answer }}</pre>
         <div v-if="!showUpdateAnswer" class="form-check mt-2 mt-xl-0">
@@ -86,7 +90,7 @@
         </button>
       </form>
     </td>
-    <td v-else class="align-middle">
+    <td v-else class="align-middle" data-clarification-answer-text>
       <pre v-if="clarification.answer">{{ clarification.answer }}</pre>
     </td>
   </tr>
