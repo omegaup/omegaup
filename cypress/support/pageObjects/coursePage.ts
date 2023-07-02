@@ -354,6 +354,11 @@ export class CoursePage {
     cy.get(`td[data-username=${users[1]}]`).should('be.visible');
     cy.get(`td[data-username=${users[0]}]`).should('not.exist');
     cy.get('[data-remove-all-filters]').click();
+
+    cy.get(`a[title=${users[0]}]`).first().click();
+    cy.get(`td[data-username=${users[0]}]`).should('be.visible');
+    cy.get(`td[data-username=${users[1]}]`).should('not.exist');
+    cy.get('[data-remove-all-filters]').click();
   }
 
   verifySubmissionsFilterUsingProblems(problems: string[]): void {
