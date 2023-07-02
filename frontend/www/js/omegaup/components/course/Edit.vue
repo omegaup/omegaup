@@ -27,7 +27,7 @@
           >{{ T.courseEdit }}</a
         >
       </li>
-      <li class="nav-item" role="presentation">
+      <li class="nav-item" role="presentation" data-course-edit-content>
         <a
           href="#content"
           class="nav-link"
@@ -47,7 +47,7 @@
           >{{ T.contestNewFormAdmissionMode }}</a
         >
       </li>
-      <li class="nav-item" role="presentation">
+      <li class="nav-item" role="presentation" data-course-edit-students>
         <a
           href="#students"
           class="nav-link"

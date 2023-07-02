@@ -30,9 +30,11 @@ export default class Sponsors extends Vue {
 h3.display-4 {
   color: $omegaup-primary--darker;
   font-weight: normal;
+  font-size: 1.88rem;
+  margin-top: 1.88em;
 }
-
 img.img-fluid {
-  max-width: 332px;
+  max-width: 200px;
+  margin: -0.2rem !important;
 }
 </style>

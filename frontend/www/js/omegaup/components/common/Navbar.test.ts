@@ -50,6 +50,7 @@ describe('Navbar.vue', () => {
     expect(wrapper.find('.nav-courses').exists()).toBe(true);
     expect(wrapper.find('.nav-problems').exists()).toBe(true);
     expect(wrapper.find('.nav-rank').exists()).toBe(true);
+    expect(wrapper.find('[data-login-button]').exists()).toBe(false);
   });
 
   it('Should handle common navbar to not-logged user', () => {
@@ -60,6 +61,7 @@ describe('Navbar.vue', () => {
     expect(wrapper.find('.nav-problems').exists()).toBe(true);
     expect(wrapper.find('[data-nav-course]').exists()).toBe(true);
     expect(wrapper.find('.nav-rank').exists()).toBe(true);
+    expect(wrapper.find('[data-login-button]').exists()).toBe(true);
     expect(wrapper.find('.navbar-right').text()).toBe(T.navLogIn);
   });
 
