@@ -66,4 +66,21 @@ describe('MultiUserAddArea.vue', () => {
             [['test_user_1', 'test_user_2']],
         ]);
     });
+
+    it('should parse users when user paste them in the textarea', async () => {
+        // Given: A textarea without users
+        const wrapper = mount(MultiUserAddArea, {
+            propsData: {
+                users: [],
+            },
+        });
+
+        // When: The user pastes a list of users
+        await wrapper.find('textarea').setValue('test_user_1,test_user_2,test_user_3');
+
+        // Then: The users are parsed and added to the list
+        expect(wrapper.emitted('update-users')).toEqual([
+            [['test_user_1', 'test_user_2', 'test_user_3']],
+        ]);
+    });
 });
