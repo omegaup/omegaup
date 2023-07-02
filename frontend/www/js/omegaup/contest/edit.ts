@@ -403,8 +403,7 @@ OmegaUp.on('ready', () => {
                 api.Contest.addUser({
                   contest_alias: payload.details.alias,
                   usernameOrEmail: user,
-                })
-                .catch(() => Promise.reject(user)),
+                }).catch(() => Promise.reject(user)),
               ),
             )
               .then((results) => {
