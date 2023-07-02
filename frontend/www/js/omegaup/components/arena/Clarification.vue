@@ -90,7 +90,7 @@
         </button>
       </form>
     </td>
-    <td v-else class="align-middle">
+    <td v-else class="align-middle" data-clarification-answer-text>
       <pre v-if="clarification.answer">{{ clarification.answer }}</pre>
     </td>
   </tr>

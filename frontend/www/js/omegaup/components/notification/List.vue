@@ -31,6 +31,7 @@
         ><omegaup-notification
           v-for="notification in notifications"
           :key="notification.notification_id"
+          data-notification-list
           :notification="notification"
           @remove="readSingleNotification"
         ></omegaup-notification

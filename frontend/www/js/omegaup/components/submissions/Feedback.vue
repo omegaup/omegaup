@@ -1,7 +1,7 @@
 <template>
   <div v-if="isAdmin || generalFeedback" data-submission-feedback>
     <h3>{{ T.feedbackTitle }}</h3>
-    <pre><code>{{
+    <pre data-run-feedback><code>{{
       generalFeedback ? generalFeedback.feedback : T.feedbackNotSentYet
     }}</code></pre>
     <div v-if="generalFeedback">
@@ -18,6 +18,7 @@
     </div>
     <div v-if="isAdmin" class="feedback-section">
       <a
+        data-run-leave-feedback-button
         role="button"
         class="btn btn-sm btn-primary"
         @click="showFeedbackForm = !showFeedbackForm"
@@ -30,11 +31,13 @@
       <div v-show="showFeedbackForm" class="form-group">
         <textarea
           v-model="feedback"
+          data-run-feedback-text
           class="form-control"
           rows="3"
           maxlength="200"
         ></textarea>
         <button
+          data-run-send-feedback-button
           class="btn btn-sm btn-primary"
           :disabled="!feedback"
           @click.prevent="
