@@ -166,7 +166,7 @@ export class ContestPage {
       problems: [
         {
           problemAlias: 'sumas',
-          tag: 'Recursion',
+          tag: 'Recursión',
           autoCompleteTextTag: 'Recur',
           problemLevelIndex: 1,
         },
