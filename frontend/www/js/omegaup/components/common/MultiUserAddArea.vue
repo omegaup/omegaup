@@ -1,29 +1,37 @@
 <template>
-    <div class="multi-user-add-area">
-        <textarea v-if="isFocused || !usersList.length" v-model="bulkContestants" class="form-control contestants"
-            @input.prevent="onBulkContestantsChanged" @blur.prevent="isFocused = false">
-        </textarea>
-        <div v-else class="form-control contestants">
-            <span href="#" class="edit-icon" @click.prevent="isFocused = true">Editar</span>
-            <div class="users-list">
-                <div v-for="user in usersList" :key="user" class="users-list__item">
-                    <span class="tags-input-badge tags-input-badge-pill tags-input-badge-selected-default">{{ user }}</span>
-                    <a href="#" class="tags-input-remove" @click.prevent="removeUser(user)"></a>
-                </div>
+<div class="multi-user-add-area">
+    <textarea
+        v-if="isFocused || !usersList.length"
+        v-model="bulkContestants"
+        class="form-control contestants"
+        @input.prevent="onBulkContestantsChanged"
+        @blur.prevent="isFocused = false"
+    >
+    </textarea>
+    <div
+        v-else
+        class="form-control contestants"
+    >
+        <span href="#" class="edit-icon" @click.prevent="isFocused = true">Editar</span>
+        <div class="users-list">
+            <div v-for="user in usersList" :key="user" class="users-list__item">
+                <span class="tags-input-badge tags-input-badge-pill tags-input-badge-selected-default">{{ user }}</span>
+                <a href="#" class="tags-input-remove" @click.prevent="removeUser(user)"></a>
             </div>
         </div>
-    </div>
+    </div> 
+</div>
 </template>
 
 <script lang="ts">
-const debounce = (fn: (event: Event) => void, waitTime: number) => {
+const debounce =  (fn: (event: Event) => void, waitTime: number) => {
     let timer: any = null;
 
     return (...args: any) => {
         if (timer) {
             clearTimeout(timer);
         }
-
+        
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const context = this;
 
@@ -69,7 +77,7 @@ export default class MultiUserAddArea extends Vue {
 
         this.usersList = Array.from(new Set([...users])); // Removes duplicates
         this.bulkContestants = this.usersList.join(',');
-
+    
         this.isFocused = false;
     }
 
@@ -128,7 +136,7 @@ export default class MultiUserAddArea extends Vue {
     position: relative;
 }
 
-.users-list>div {
+.users-list > div {
     margin: 0.25rem;
 }
 
