@@ -46,6 +46,7 @@
             <td class="text-center">
               <button
                 v-tooltip="T.courseAssignmentEdit"
+                data-course-edit-content-button
                 class="btn btn-link"
                 @click="$emit('emit-edit', assignment)"
               >
@@ -100,6 +101,7 @@
           <div class="form-group col-md-12 mb-0">
             <div class="text-right">
               <button
+                data-course-add-new-content
                 class="btn btn-primary"
                 type="submit"
                 @click.prevent="$emit('emit-new')"
