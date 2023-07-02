@@ -114,6 +114,7 @@
               <label
                 >{{ T.wordsProblem }}:
                 <omegaup-common-typeahead
+                  data-search-problem
                   :existing-options="searchResultProblems"
                   :value.sync="filterProblem"
                   @update-existing-options="
