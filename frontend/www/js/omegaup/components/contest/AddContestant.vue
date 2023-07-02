@@ -148,6 +148,11 @@ export default class AddContestant extends Vue {
       users = [...users, ...this.typeaheadContestants.map((user) => user.key)];
     }
 
+    // If no users were added, do nothing
+    if (users.length === 0) {
+      return;
+    }
+
     this.$emit(
       'add-user',
       users.map((user) => user.trim()),

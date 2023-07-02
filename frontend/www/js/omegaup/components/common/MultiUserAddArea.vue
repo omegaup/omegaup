@@ -24,16 +24,15 @@
 </template>
 
 <script lang="ts">
-function debounce (fn: any, waitTime: number) {
+function debounce (fn: (event: Event) => void, waitTime: number) {
     let timer: any = null;
 
-    return function(...args: any[]) {
+    return function(...args: any) {
         if (timer) {
             clearTimeout(timer);
         }
-
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const context: any = this;
+        
+        const context = this;
 
         timer = setTimeout(() => {
             fn.apply(context, args);
@@ -51,15 +50,17 @@ export default class MultiUserAddArea extends Vue {
     bulkContestants: string | null = '';
     usersList: string[] = [];
 
-    // TODO: Add debounce to this method
-    onBulkContestantsChanged = debounce(function (event: Event) {
+    onBulkContestantsChanged = debounce(this.onTextAreaChange, WAIT_TIME);
+
+    onTextAreaChange(event: Event) {
         const target = event.target as HTMLTextAreaElement;
         const { value } = target;
 
-        // Split the value by lines, then by commas, then by spaces
-        // and convert into a single array
+        // 1. Separate original string by new lines
         const users = value.split('\n').reduce((acc, line) => {
+            // 2. Separate each line by commas
             const lineUsers = line.split(',').reduce((acc, token) => {
+                // 3. Separate each token by spaces
                 const tokenUsers = token.split(' ').reduce((acc, token) => {
                     if (token.trim() !== '') {
                         acc.push(token.trim());
@@ -77,7 +78,7 @@ export default class MultiUserAddArea extends Vue {
         this.bulkContestants = this.usersList.join(',');
     
         this.isFocused = false;
-    }, WAIT_TIME);
+    }
 
     removeUser(user: string) {
         this.usersList = this.usersList.filter(u => u !== user);
@@ -87,7 +88,6 @@ export default class MultiUserAddArea extends Vue {
 
     @Watch('users')
     onUsersChange() {
-        console.log({ propsUsers: this.users, usersList: this.usersList })
         // We need to keep the usersList without any user that is part of the users prop
         this.usersList = this.usersList.filter(user => !this.users.includes(user));
         this.bulkContestants = this.usersList.join(',');
