@@ -4,6 +4,7 @@
       v-if="isFocused || !usersList.length"
       v-model="bulkContestants"
       class="form-control contestants"
+      data-contestant-names
       @input.prevent="onBulkContestantsChanged"
       @blur.prevent="isFocused = false"
     >
