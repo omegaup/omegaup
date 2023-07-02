@@ -47,9 +47,11 @@ import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
 @Component
 export default class MultiUserAddArea extends Vue {
     @Prop() users!: string[];
-    isFocused: boolean = true;
+    isFocused: boolean = false;
     bulkContestants: string | null = '';
-    usersList: string[] = [];
+
+    // if the users prop is not empty, we need to keep track of those users in the usersList
+    usersList: string[] = this.users || [];
 
     onBulkContestantsChanged = debounce(this.onTextAreaChange, WAIT_TIME);
 

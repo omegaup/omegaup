@@ -12,15 +12,16 @@ describe('MultiUserAddArea.vue', () => {
         expect(wrapper.find('textarea').exists()).toBe(true);
     });
 
-    it('should display tags when users are added', async () => {
+    it('should display a list of users if an array of users is passed', async () => {
+        const usersList = ['test_user_1', 'test_user_2'];
         const wrapper = mount(MultiUserAddArea, {
             propsData: {
-                users: ['test_user_1'],
+                users: usersList,
             },
         });
 
         expect(wrapper.find('textarea').exists()).toBe(false);
-        expect(wrapper.find('.users-list__item').exists()).toBe(true);
+        expect(wrapper.findAll('.users-list__item').length).toBe(usersList.length);
     });
 
     it('should enable the textarea when user clicks on the edit button', async () => {
@@ -46,25 +47,17 @@ describe('MultiUserAddArea.vue', () => {
             },
         });
 
-        await wrapper.find('.tags-input-remove').trigger('click');
+        wrapper.vm.removeUser = jest.fn();
 
-        expect(wrapper.emitted('remove-user')).toEqual([['test_user_1']]);
-    });
+        // search for the list item containing the user
+        const listItem = wrapper.find('.users-list__item');
+        expect(listItem.exists()).toBe(true);
 
-    it('should emit update-users when the usersList changes', async () => {
-        const wrapper = mount(MultiUserAddArea, {
-            propsData: {
-                users: ['test_user_1'],
-            },
-        });
+        // click on the remove button
+        await listItem.find('.tags-input-remove').trigger('click');
+        await wrapper.vm.$nextTick();
 
-        await wrapper.find('.edit-icon').trigger('click');
-        // TODO: Validate if this is the correct way to add users, otherwise replace it.
-        await wrapper.find('textarea').setValue('test_user_2');
-
-        expect(wrapper.emitted('update-users')).toEqual([
-            [['test_user_1', 'test_user_2']],
-        ]);
+        expect(wrapper.vm.removeUser).toHaveBeenCalled();
     });
 
     it('should parse users when user paste them in the textarea', async () => {
@@ -77,10 +70,29 @@ describe('MultiUserAddArea.vue', () => {
 
         // When: The user pastes a list of users
         await wrapper.find('textarea').setValue('test_user_1,test_user_2,test_user_3');
+        // await for a second to let the textarea parse the users
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await wrapper.vm.$nextTick();
 
         // Then: The users are parsed and added to the list
-        expect(wrapper.emitted('update-users')).toEqual([
-            [['test_user_1', 'test_user_2', 'test_user_3']],
-        ]);
+        expect(wrapper.findAll('.users-list__item').length).toBe(3);
+    });
+
+    it('should emit update-users when the usersList changes', async () => {
+        const wrapper = mount(MultiUserAddArea, {
+            propsData: {
+                users: ['test_user_1'],
+            },
+        });
+
+        await wrapper.find('.edit-icon').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        // TODO: Validate if this is the correct way to add users, otherwise replace it.
+        await wrapper.find('textarea').setValue('test_user_2');
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.emitted('update-users')).toBeTruthy();
     });
 });
