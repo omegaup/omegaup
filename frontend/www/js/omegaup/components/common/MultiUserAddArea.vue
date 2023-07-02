@@ -73,8 +73,6 @@ export default class MultiUserAddArea extends Vue {
             return acc.concat(lineUsers);
         }, [] as string[]);
 
-        console.log({ users })
-
         this.usersList = Array.from(new Set([...users])); // Removes duplicates
         this.bulkContestants = this.usersList.join(',');
     
