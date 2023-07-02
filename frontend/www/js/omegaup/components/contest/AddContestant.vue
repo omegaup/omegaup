@@ -139,7 +139,6 @@ export default class AddContestant extends Vue {
 
   onSubmit(): void {
     let users: string[] = [];
-    // TODO: First to parse all string by spaces or commas
     // Add each token as a new username chip component
     if (this.bulkContestants !== '') {
       users = this.bulkContestants.split(',');
