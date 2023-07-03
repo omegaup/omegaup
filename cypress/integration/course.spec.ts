@@ -440,7 +440,8 @@ describe('Course Test', () => {
     const shortAlias1 = assignmentAlias1.slice(0, 12);
     const assignmentAlias2 = 'ut_rank_hw_2' + uuid();
     const shortAlias2 = assignmentAlias2.slice(0, 12);
-    const problemOptions = contestPage.generateProblemOptions(1);
+    const problemOptions1 = contestPage.generateProblemOptions(1);
+    const problemOptions2 = contestPage.generateProblemOptions(1);
     const courseUrl = '/course/' + courseOptions.courseAlias;
     const studentsProgressUrl =
       '/course/' + courseOptions.courseAlias + '/students/';
@@ -453,18 +454,19 @@ describe('Course Test', () => {
     };
 
     cy.login(loginOptions[0]);
-    cy.createProblem(problemOptions[0]);
+    cy.createProblem(problemOptions1[0]);
+    cy.createProblem(problemOptions2[0]);
     coursePage.createCourse(courseOptions);
     coursePage.addStudents(users);
     coursePage.addAssignmentWithProblems(
       assignmentAlias1,
       shortAlias1,
-      problemOptions,
+      problemOptions1,
     );
     coursePage.addAssignmentWithProblems(
       assignmentAlias2,
       shortAlias2,
-      problemOptions,
+      problemOptions2,
     );
     cy.logout();
 
@@ -473,10 +475,10 @@ describe('Course Test', () => {
     cy.visit(courseUrl);
     cy.get('button[name="start-course-submit"]').click();
     cy.get('[data-course-start-assignment-button]').first().click();
-    coursePage.createSubmission(problemOptions[0], runOptions);
+    coursePage.createSubmission(problemOptions1[0], runOptions);
     cy.visit(courseUrl);
     cy.get('[data-course-start-assignment-button]').last().click();
-    coursePage.createSubmission(problemOptions[0], runOptions);
+    coursePage.createSubmission(problemOptions2[0], runOptions);
     cy.logout();
 
     // 50% Course completion
@@ -484,7 +486,7 @@ describe('Course Test', () => {
     cy.visit(courseUrl);
     cy.get('button[name="start-course-submit"]').click();
     cy.get('[data-course-start-assignment-button]').first().click();
-    coursePage.createSubmission(problemOptions[0], runOptions);
+    coursePage.createSubmission(problemOptions1[0], runOptions);
     cy.logout();
 
     cy.login(loginOptions[0]);
