@@ -43,10 +43,10 @@ export class CoursePage {
     cy.get('#alert-close').click();
   }
 
-  addAssignmentWithProblem(
+  addAssignmentWithProblems(
     assignmentAlias: string,
     shortAlias: string,
-    problemOptions: ProblemOptions,
+    problemOptions: ProblemOptions[],
     assignmentType: string = 'now',
   ): void {
     cy.get('[data-course-edit-content]').click();
@@ -75,13 +75,16 @@ export class CoursePage {
       cy.get('[data-course-start-date]').type(getISODateTime(startDate));
       cy.get('[data-course-end-date]').type(getISODateTime(endDate));
     }
-
-    cy.get('.tags-input input[type="text"]').type(problemOptions.problemAlias);
-    cy.get('.typeahead-dropdown li').first().click();
-    cy.get('button[data-add-problem]').click();
-    cy.get('[data-course-problemlist] table.table-striped').should(
-      'be.visible',
-    );
+    for (let i = 0; i < problemOptions.length; i++) {
+      cy.get('.tags-input input[type="text"]').type(
+        problemOptions[i].problemAlias,
+      );
+      cy.get('.typeahead-dropdown li').first().click();
+      cy.get('button[data-add-problem]').click();
+      cy.get('[data-course-problemlist] table.table-striped').should(
+        'be.visible',
+      );
+    }
     cy.get('button[data-schedule-assignment]').click();
     cy.get('.omegaup-course-assignmentdetails').should('not.be.visible');
     cy.get('#alert-close').click();
@@ -334,6 +337,44 @@ export class CoursePage {
         users[i],
       );
     }
+  }
+
+  verifySubmissionsFilterUsingNames(users: string[]): void {
+    cy.get('[data-search-username]').type(users[0]);
+    cy.get('.tags-input-typeahead-item-highlighted-default').click();
+    cy.get(`td[data-username=${users[0]}]`).should('be.visible');
+    cy.get(`td[data-username=${users[1]}]`).should('not.exist');
+
+    cy.get('[data-remove-all-filters]').click();
+    cy.get(`td[data-username=${users[0]}]`).should('be.visible');
+    cy.get(`td[data-username=${users[1]}]`).should('be.visible');
+
+    cy.get('[data-search-username]').type(users[1]);
+    cy.get('.tags-input-typeahead-item-highlighted-default').click();
+    cy.get(`td[data-username=${users[1]}]`).should('be.visible');
+    cy.get(`td[data-username=${users[0]}]`).should('not.exist');
+    cy.get('[data-remove-all-filters]').click();
+
+    cy.get(`a[title=${users[0]}]`).first().click();
+    cy.get(`td[data-username=${users[0]}]`).should('be.visible');
+    cy.get(`td[data-username=${users[1]}]`).should('not.exist');
+    cy.get('[data-remove-all-filters]').click();
+  }
+
+  verifySubmissionsFilterUsingProblems(problems: string[]): void {
+    cy.get('[data-search-problem]').type(problems[0]);
+    cy.get('.tags-input-typeahead-item-highlighted-default').click();
+    cy.get(`a[href="/arena/problem/${problems[0]}/"]`).should('be.visible');
+    cy.get(`a[href="/arena/problem/${problems[1]}/"]`).should('not.exist');
+
+    cy.get('[data-remove-all-filters]').click();
+    cy.get(`a[href="/arena/problem/${problems[0]}/"]`).should('be.visible');
+    cy.get(`a[href="/arena/problem/${problems[1]}/"]`).should('be.visible');
+
+    cy.get('[data-search-problem]').type(problems[1]);
+    cy.get('.tags-input-typeahead-item-highlighted-default').click();
+    cy.get(`a[href="/arena/problem/${problems[1]}/"]`).should('be.visible');
+    cy.get(`a[href="/arena/problem/${problems[0]}/]"`).should('not.exist');
   }
 }
 
