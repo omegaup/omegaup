@@ -19,15 +19,8 @@
           />
         </a>
 
-        <div class="d-inline-flex d-flex-row order-md-1">
-          <a
-            v-if="isLoggedIn"
-            class="navbar justify-content-end mr-2 d-lg-none"
-            href="/logout/"
-          >
-            <font-awesome-icon :icon="['fas', 'power-off']" />
-          </a>
-          <ul v-else class="navbar-nav navbar-right d-lg-flex">
+        <div class="d-inline-flex d-flex-row order-lg-1">
+          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex">
             <li class="nav-item">
               <a
                 class="nav-link nav-login-text"
@@ -306,6 +299,14 @@
               </div>
             </li>
           </ul>
+
+          <a
+            v-if="isLoggedIn"
+            class="navbar justify-content-end mb-2 d-lg-none"
+            href="/logout/"
+          >
+            <font-awesome-icon :icon="['fas', 'power-off']" />
+          </a>
         </div>
 
         <a
