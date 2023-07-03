@@ -15,7 +15,7 @@ describe('Contest Test', () => {
     cy.visit('/');
 
     const contestOptions = contestPage.generateContestOptions();
-    const userLoginOptions = loginPage.registerMultipleUsers(1);
+    const userLoginOptions = loginPage.registerMultipleUsers(2);
     const users = [userLoginOptions[0].username];
 
     const now = new Date();
@@ -27,7 +27,10 @@ describe('Contest Test', () => {
     contestOptions.endDate = newEndDate;
 
     virtualContestDetails = contestOptions;
-    contestPage.createContestAsAdmin(contestOptions, users);
+    cy.login(userLoginOptions[1]);
+    contestPage.createContest(contestOptions, users);
+    cy.logout();
+
     cy.login(userLoginOptions[0]);
     cy.enterContest(contestOptions);
     cy.createRunsInsideContest(contestOptions);
@@ -42,7 +45,7 @@ describe('Contest Test', () => {
 
   it('Should create a contest when the scoreboard is shown half the time', () => {
     const contestOptions = contestPage.generateContestOptions();
-    const userLoginOptions = loginPage.registerMultipleUsers(2);
+    const userLoginOptions = loginPage.registerMultipleUsers(3);
     const users = [userLoginOptions[0].username];
     loginOptionstoVerify = userLoginOptions[1];
 
@@ -55,7 +58,9 @@ describe('Contest Test', () => {
     contestOptions.endDate = newEndDate;
 
     contestWithHalfTimeVisibleScoreboard = contestOptions;
-    contestPage.createContestAsAdmin(contestOptions, users);
+    cy.login(userLoginOptions[2]);
+    contestPage.createContest(contestOptions, users);
+    cy.logout();
 
     cy.login(userLoginOptions[0]);
     cy.enterContest(contestOptions);
@@ -72,7 +77,7 @@ describe('Contest Test', () => {
 
   it('Should create a contest with different start', () => {
     const contestOptions = contestPage.generateContestOptions();
-    const userLoginOptions = loginPage.registerMultipleUsers(1);
+    const userLoginOptions = loginPage.registerMultipleUsers(2);
     const users = [userLoginOptions[0].username];
     const now = new Date();
 
@@ -80,7 +85,9 @@ describe('Contest Test', () => {
     contestOptions.differentStartTime = "60";
     contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
     contestOptions.endDate = addSubtractDaysToDate(now, { days: 1 });
-    contestPage.createContestAsAdmin(contestOptions, users);
+    cy.login(userLoginOptions[1]);
+    contestPage.createContest(contestOptions, users);
+    cy.logout();
 
     cy.login(userLoginOptions[0]);
     cy.enterContest(contestOptions);
@@ -89,68 +96,84 @@ describe('Contest Test', () => {
   });
 
   it('Should create a contest and retrieve it', () => {
-    const userLoginOptions = loginPage.registerMultipleUsers(2);
+    const userLoginOptions = loginPage.registerMultipleUsers(3);
 
     const groupOptions: GroupOptions = {
       groupTitle: 'ut_group_' + uuid(),
       groupDescription: 'group description',
     };
 
-    cy.loginAdmin();
+    loginPage.giveAdminPrivilage(
+      'GroupIdentityCreator',
+      userLoginOptions[0].username,
+    );
+  
+    cy.login(userLoginOptions[0]);
     contestPage.createGroup(groupOptions);
     contestPage.addIdentitiesGroup();
     cy.logout();
 
     const contestOptions = contestPage.generateContestOptions();
 
-    const users = [userLoginOptions[0].username, userLoginOptions[1].username];
-    contestPage.createContestAsAdmin(contestOptions, users);
+    const users = [userLoginOptions[1].username, userLoginOptions[2].username];
+    cy.login(userLoginOptions[0])
+    contestPage.createContest(contestOptions, users);
+    cy.logout();
 
-    cy.login(userLoginOptions[0]);
+    cy.login(userLoginOptions[1]);
     cy.enterContest(contestOptions);
     cy.createRunsInsideContest(contestOptions);
     cy.logout();
 
     contestPage.updateScoreboardForContest(contestOptions.contestAlias);
 
-    cy.loginAdmin();
+    cy.login(userLoginOptions[0])
     cy.visit(`/arena/${contestOptions.contestAlias}/`);
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard-username]')
       .first()
-      .should('contain', userLoginOptions[0].username);
+      .should('contain', userLoginOptions[1].username);
     cy.get('[data-table-scoreboard-username]')
       .last()
-      .should('contain', userLoginOptions[1].username);
+      .should('contain', userLoginOptions[2].username);
     cy.logout();
   });
 
   it('Should create a contest and add a clarification.', () => {
     const contestOptions = contestPage.generateContestOptions();
-    const userLoginOptions = loginPage.registerMultipleUsers(1);
+    const userLoginOptions = loginPage.registerMultipleUsers(2);
 
-    contestPage.createContestAsAdmin(contestOptions, [
+    cy.login(userLoginOptions[1]);
+    contestPage.createContest(contestOptions, [
       userLoginOptions[0].username,
     ]);
+    cy.logout();
 
     cy.login(userLoginOptions[0]);
     cy.enterContest(contestOptions);
     contestPage.createClarificationUser(contestOptions, 'Question 1');
     cy.logout();
 
+    cy.login(userLoginOptions[1]);
     contestPage.answerClarification(contestOptions, 'No');
+    cy.logout();
   });
 
   it('Should create a contest and review ranking', () => {
     const contestOptions = contestPage.generateContestOptions();
-    const userLoginOptions = loginPage.registerMultipleUsers(4);
+    const userLoginOptions = loginPage.registerMultipleUsers(5);
 
     const groupOptions: GroupOptions = {
       groupTitle: 'ut_group_' + uuid(),
       groupDescription: 'group description',
     };
 
-    cy.loginAdmin();
+    loginPage.giveAdminPrivilage(
+      'GroupIdentityCreator',
+      userLoginOptions[4].username,
+    );
+  
+    cy.login(userLoginOptions[4]);
     contestPage.createGroup(groupOptions);
     contestPage.addIdentitiesGroup();
     cy.logout();
@@ -160,7 +183,9 @@ describe('Contest Test', () => {
       users.push(loginDetails.username);
     });
 
-    contestPage.createContestAsAdmin(contestOptions, users);
+    cy.login(userLoginOptions[4]);
+    contestPage.createContest(contestOptions, users);
+    cy.logout();
 
     cy.login(userLoginOptions[0]);
     cy.enterContest(contestOptions);
@@ -174,7 +199,7 @@ describe('Contest Test', () => {
 
     contestPage.updateScoreboardForContest(contestOptions.contestAlias);
 
-    cy.loginAdmin();
+    cy.login(userLoginOptions[4]);
     cy.visit(`/arena/${contestOptions.contestAlias}/`);
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
@@ -201,13 +226,15 @@ describe('Contest Test', () => {
   it('Should test practice mode in contest', () => {
     const contestOptions = contestPage.generateContestOptions();
     const now = new Date();
-    const userLoginOptions = loginPage.registerMultipleUsers(1);
+    const userLoginOptions = loginPage.registerMultipleUsers(2);
     const users = [userLoginOptions[0].username];
 
     contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
     contestOptions.endDate = now;
 
-    contestPage.createContestAsAdmin(contestOptions, users);
+    cy.login(userLoginOptions[1]);
+    contestPage.createContest(contestOptions, users);
+    cy.logout();
 
     cy.login(userLoginOptions[0]);
     cy.visit(`/arena/${contestOptions.contestAlias}/`);
@@ -226,7 +253,9 @@ describe('Contest Test', () => {
     contestPage.createClarificationUser(contestOptions, 'Question 1');
     cy.logout();
 
+    cy.login(userLoginOptions[1]);
     contestPage.answerClarification(contestOptions, 'No');
+    cy.logout();
   });
 
   it(
@@ -234,13 +263,15 @@ describe('Contest Test', () => {
       ' time has finished',
     () => {
       const contestOptions = contestPage.generateContestOptions();
-      const userLoginOptions = loginPage.registerMultipleUsers(2);
+      const userLoginOptions = loginPage.registerMultipleUsers(3);
       const users = [
         userLoginOptions[0].username,
         userLoginOptions[1].username,
       ];
 
-      contestPage.createContestAsAdmin(contestOptions, users);
+      cy.login(userLoginOptions[2]);
+      contestPage.createContest(contestOptions, users);
+      cy.logout();
 
       cy.login(userLoginOptions[0]);
       cy.enterContest(contestOptions);
@@ -249,7 +280,7 @@ describe('Contest Test', () => {
 
       contestPage.updateScoreboardForContest(contestOptions.contestAlias);
 
-      cy.loginAdmin();
+      cy.login(userLoginOptions[2]);
       cy.visit(`/arena/${contestOptions.contestAlias}/`);
       cy.get('a[href="#ranking"]').click();
       cy.get('[data-table-scoreboard]').should('be.visible');
@@ -268,11 +299,13 @@ describe('Contest Test', () => {
 
   it('Should create a contest when the scoreboard is never shown', () => {
     const contestOptions = contestPage.generateContestOptions();
-    const userLoginOptions = loginPage.registerMultipleUsers(1);
+    const userLoginOptions = loginPage.registerMultipleUsers(2);
     const users = [userLoginOptions[0].username];
 
     contestOptions.scoreBoardVisibleTime = '0';
-    contestPage.createContestAsAdmin(contestOptions, users);
+    cy.login(userLoginOptions[1])
+    contestPage.createContest(contestOptions, users);
+    cy.logout();
 
     cy.login(userLoginOptions[0]);
     cy.enterContest(contestOptions);
