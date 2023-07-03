@@ -15,7 +15,9 @@
         >{{ notifications.length }}</span
       ></a
     >
-    <div class="dropdown-menu dropdown-menu-right notification-dropdown position-absolute mt-2">
+    <div
+      class="dropdown-menu dropdown-menu-right notification-dropdown position-absolute mt-2"
+    >
       <div v-if="notifications.length === 0" class="text-center">
         {{ T.notificationsNoNewNotifications }}
       </div>
