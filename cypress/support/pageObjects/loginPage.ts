@@ -19,6 +19,15 @@ export class LoginPage {
     return users;
   }
 
+  giveAdminPrivilage(roleName: string, user: string) {
+    cy.loginAdmin();
+    const userAdminUrl = '/admin/user/' + user;
+    cy.visit(userAdminUrl);
+    cy.get(`.${roleName}`).check();
+    cy.get('#alert-close').click();
+    cy.logout();
+  }
+
   addUsername(userName: string): void {
     cy.get('[data-nav-user]').click();
     cy.get('[data-nav-profile]').click();
