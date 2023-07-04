@@ -4632,9 +4632,9 @@ Returns a list of all the API tokens associated with the user.
 
 ### Returns
 
-| Name     | Type                                                                                                                    |
-| -------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `tokens` | `{ last_used: Date; name: string; rate_limit: { limit: number; remaining: number; reset: Date; }; timestamp: Date; }[]` |
+| Name     | Type               |
+| -------- | ------------------ |
+| `tokens` | `types.ApiToken[]` |
 
 ## `/api/user/listAssociatedIdentities/`
 
