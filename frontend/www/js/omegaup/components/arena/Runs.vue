@@ -114,6 +114,7 @@
               <label
                 >{{ T.wordsProblem }}:
                 <omegaup-common-typeahead
+                  data-search-problem
                   :existing-options="searchResultProblems"
                   :value.sync="filterProblem"
                   @update-existing-options="
@@ -135,6 +136,7 @@
               <label
                 >{{ T.contestParticipant }}:
                 <omegaup-common-typeahead
+                  data-search-username
                   :existing-options="searchResultUsers"
                   :value.sync="filterUsername"
                   :max-results="10"
@@ -323,6 +325,7 @@
             >
               <div class="dropdown">
                 <button
+                  data-runs-actions-button
                   class="btn-secondary dropdown-toggle"
                   type="button"
                   data-toggle="dropdown"
@@ -334,6 +337,7 @@
                 <div class="dropdown-menu">
                   <button
                     v-if="showDetails"
+                    data-runs-show-details-button
                     :data-run-details="run.guid"
                     class="btn-link dropdown-item"
                     @click="onRunDetails(run)"
