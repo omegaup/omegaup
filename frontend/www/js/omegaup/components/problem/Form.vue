@@ -15,7 +15,7 @@
         </strong>
       </p>
     </div>
-    <div class="card-body">
+    <div class="card-body px-2 px-sm-4">
       <form ref="form" method="POST" class="form" enctype="multipart/form-data">
         <div class="accordion mb-3">
           <div class="card">
@@ -34,7 +34,7 @@
                 </button>
               </h2>
             </div>
-            <div class="collapse show card-body basic-info">
+            <div class="collapse show card-body px-2 px-sm-4 basic-info">
               <div class="row">
                 <div class="form-group col-md-6">
                   <label class="control-label">{{ T.wordsTitle }}</label>
@@ -112,7 +112,7 @@
                   </button>
                 </h2>
               </div>
-              <div class="collapse show card-body tags">
+              <div class="collapse show card-body px-2 px-sm-4 tags">
                 <div
                   v-show="selectedTags.length === 0"
                   class="alert alert-info"
@@ -161,7 +161,7 @@
                 </button>
               </h2>
             </div>
-            <div class="card-body validation">
+            <div class="card-body px-2 px-sm-4 validation">
               <div class="row">
                 <div class="form-group col-md-6">
                   <label>{{ T.problemEditFormLanguages }}</label>
@@ -219,7 +219,7 @@
                 </button>
               </h2>
             </div>
-            <div class="collapse card-body limits">
+            <div class="collapse card-body px-2 px-sm-4 limits">
               <omegaup-problem-settings
                 :errors="errors"
                 :current-languages="currentLanguages"
@@ -249,7 +249,7 @@
                 </button>
               </h2>
             </div>
-            <div class="collapse card-body access">
+            <div class="collapse card-body px-2 px-sm-4 access">
               <div class="row">
                 <div class="form-group col-md-6">
                   <label>{{ T.problemEditEmailClarifications }}</label>
@@ -326,7 +326,7 @@
                   </button>
                 </h2>
               </div>
-              <div class="collapse card-body evaluation">
+              <div class="collapse card-body px-2 px-sm-4 evaluation">
                 <div class="row">
                   <div class="form-group col-md-6">
                     <label>{{ T.wordsShowCasesDiff }}</label>
