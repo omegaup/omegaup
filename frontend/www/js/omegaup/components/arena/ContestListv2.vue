@@ -9,7 +9,7 @@
         pills
         card
         vertical
-        nav-wrapper-class="contest-list-nav d-none col-md-2 col-sm-12 test-class"
+        nav-wrapper-class="contest-list-nav col-md-2 col-sm-12 test-class"
       >
         <b-card class="card-group-menu">
           <b-container>
@@ -42,22 +42,12 @@
                 </form>
               </b-col>
               <b-col sm="12" class="d-flex col-md-6 btns-group p-0">
-                <b-dropdown :text="currentTabText">
-                  <b-dropdown-item @click="currentTab = ContestTab.Current">
-                    {{ T.contestListCurrent }}</b-dropdown-item
-                  >
-                  <b-dropdown-item @click="currentTab = ContestTab.Future">{{
-                    T.contestListFuture
-                  }}</b-dropdown-item>
-                  <b-dropdown-item @click="currentTab = ContestTab.Past">
-                    {{ T.contestListPast }}</b-dropdown-item
-                  >
-                </b-dropdown>
-
                 <b-dropdown ref="dropdownOrderBy" no-caret>
                   <template #button-content>
+                    <div>
                     <font-awesome-icon icon="sort-amount-down" />
                     {{ T.contestOrderBy }}
+                    </div>
                   </template>
                   <b-dropdown-item
                     href="#"
@@ -296,20 +286,18 @@
             </template>
           </omegaup-contest-card>
         </b-tab>
-      </b-tabs>
-      <div class="pagination-contest">
-        <b-pagination-nav
-          ref="paginator"
-          v-model="currentPage"
-          base-url="#"
-          first-number
-          last-number
-          size="lg"
-          align="center"
-          :link-gen="linkGen"
-          :number-of-pages="numberOfPages(currentTab)"
-        ></b-pagination-nav>
-      </div>
+      </b-tabs>      
+      <b-pagination-nav
+        ref="paginator"
+        v-model="currentPage"
+        base-url="#"
+        first-number
+        last-number
+        size="lg"
+        align="center"
+        :link-gen="linkGen"
+        :number-of-pages="numberOfPages(currentTab)"
+      ></b-pagination-nav>
     </b-card>
   </div>
 </template>
@@ -420,7 +408,7 @@ export default class ArenaContestList extends Vue {
         return T.contestListFuture;
       case ContestTab.Past:
         return T.contestListPast;
-      default:
+        default:
         return T.contestListCurrent;
     }
   }
