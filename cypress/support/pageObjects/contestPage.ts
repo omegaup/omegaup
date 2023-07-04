@@ -191,7 +191,7 @@ export class ContestPage {
     for (let i = 0; i < noOfProblems; i++) {
       const userLoginOptions: ProblemOptions = {
         problemAlias: uuid().slice(0, 10),
-        tag: 'Recursion',
+        tag: 'Recursión',
         autoCompleteTextTag: 'recur',
         problemLevelIndex: 0,
       };
