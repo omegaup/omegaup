@@ -29,7 +29,7 @@ describe('Group Test', () => {
     cy.logout();
   });
 
-  it('Should create a group with identities', () => {
+  it('Should create a team group with identities', () => {
     const loginOptions = loginPage.registerMultipleUsers(1);
     const teamGroupOptions: TeamGroupOptions = {
       groupTitle: 'ut_group_' + uuid(),
