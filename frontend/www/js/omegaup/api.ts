@@ -1717,8 +1717,29 @@ export const Scoreboard = {
 export const Session = {
   currentSession: apiCall<
     messages.SessionCurrentSessionRequest,
+    messages._SessionCurrentSessionServerResponse,
     messages.SessionCurrentSessionResponse
-  >('/api/session/currentSession/'),
+  >('/api/session/currentSession/', (x) => {
+    if (typeof x.session !== 'undefined' && x.session !== null)
+      x.session = ((x) => {
+        x.api_tokens = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.last_used = ((x: number) => new Date(x * 1000))(x.last_used);
+            x.rate_limit = ((x) => {
+              x.reset = ((x: number) => new Date(x * 1000))(x.reset);
+              return x;
+            })(x.rate_limit);
+            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+            return x;
+          });
+        })(x.api_tokens);
+        return x;
+      })(x.session);
+    return x;
+  }),
 };
 
 export const Submission = {
