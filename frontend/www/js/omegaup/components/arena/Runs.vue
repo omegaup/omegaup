@@ -114,6 +114,7 @@
               <label
                 >{{ T.wordsProblem }}:
                 <omegaup-common-typeahead
+                  data-search-problem
                   :existing-options="searchResultProblems"
                   :value.sync="filterProblem"
                   @update-existing-options="
@@ -135,6 +136,7 @@
               <label
                 >{{ T.contestParticipant }}:
                 <omegaup-common-typeahead
+                  data-search-username
                   :existing-options="searchResultUsers"
                   :value.sync="filterUsername"
                   :max-results="10"
