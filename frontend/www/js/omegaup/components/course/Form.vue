@@ -1,6 +1,6 @@
 <template>
   <div class="omegaup-course-details card">
-    <div v-if="!update" class="card-header">
+    <div v-if="!update" class="card-header px-2 px-sm-4">
       <h3 class="card-title">{{ T.courseNew }}</h3>
     </div>
     <div class="card-body px-2 px-sm-4">
