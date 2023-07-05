@@ -29,8 +29,7 @@
     </td>
     <td
       class="column-message align-middle text-monospace text-dark"
-      data-form-clarification-message
-    >{{ clarification.message }}</td>
+      data-form-clarification-message>{{ clarification.message }}</td>
     <td
       v-if="isAdmin"
       class="column-answer align-middle"
