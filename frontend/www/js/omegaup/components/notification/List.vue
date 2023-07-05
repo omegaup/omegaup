@@ -33,6 +33,7 @@
         ><omegaup-notification
           v-for="notification in notifications"
           :key="notification.notification_id"
+          data-notification-list
           :notification="notification"
           @remove="readSingleNotification"
         ></omegaup-notification
@@ -83,7 +84,7 @@ export default class NotificationList extends Vue {
 }
 
 .navbar-expand-lg .navbar-nav .dropdown-menu {
-  min-width: 68vw;
+  min-width: 84vw;
   @media only screen and (min-width: 767px) {
     min-width: 35rem;
   }

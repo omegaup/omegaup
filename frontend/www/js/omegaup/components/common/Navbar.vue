@@ -34,13 +34,6 @@
               @read="readNotifications"
             ></omegaup-notification-list>
           </div>
-          <a
-            v-if="isLoggedIn"
-            class="navbar justify-content-end mr-2 d-lg-none"
-            href="/logout/"
-          >
-            <font-awesome-icon :icon="['fas', 'power-off']" />
-          </a>
           <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex">
             <li class="nav-item">
               <a
