@@ -2,7 +2,7 @@
   <header>
     <nav class="navbar navbar-expand-lg navbar-color fixed-top p-0 text-right">
       <div class="container-xl pl-0 pl-xl-3">
-        <a class="navbar-brand p-3" href="/">
+        <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/">
           <img
             alt="omegaUp"
             src="/media/omegaup_curves.png"
@@ -18,24 +18,17 @@
             height="20"
           />
         </a>
-        <div class="d-inline-flex d-flex-row">
-          <a
-            v-if="isLoggedIn"
-            class="navbar justify-content-end mr-2 d-lg-none"
-            href="/logout/"
-          >
-            <font-awesome-icon :icon="['fas', 'power-off']" />
-          </a>
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target=".omegaup-navbar"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
+        <div class="d-inline-flex d-flex-row order-lg-1">
+          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex">
+            <li class="nav-item">
+              <a
+                class="nav-link nav-login-text"
+                :href="formattedLoginURL"
+                data-login-button
+                >{{ T.navLogIn }}</a
+              >
+            </li>
+          </ul>
         </div>
         <div class="collapse navbar-collapse omegaup-navbar">
           <omegaup-navbar-items
@@ -104,6 +97,7 @@
             </template>
           </omegaup-navbar-items>
           <!-- in lockdown or contest mode there is no left navbar -->
+
           <ul v-if="!isLoggedIn" class="navbar-nav navbar-right">
             <li class="nav-item">
               <a
@@ -114,6 +108,7 @@
               >
             </li>
           </ul>
+
           <ul v-else class="navbar-nav navbar-right align-items-center">
             <omegaup-notifications-clarifications
               v-if="inContest"
@@ -134,7 +129,7 @@
                 aria-haspopup="true"
                 aria-expanded="false"
               >
-                <img :src="gravatarURL51" height="45" class="pt-1" /><span
+                <img :src="gravatarURL51" height="45" class="pr-1" /><span
                   class="username mr-2"
                   :title="currentUsername"
                   >{{ currentUsername }}</span
