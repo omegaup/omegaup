@@ -314,7 +314,6 @@ export default class BaseList extends Vue {
 .sticky-offset {
   top: 4rem;
 }
-
 .table-responsive {
   max-height: 80vh;
 }
