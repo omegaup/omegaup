@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card" data-table-grid-paginator>
     <h5 v-if="title" class="card-header">
       {{ title }} <span class="badge badge-secondary">{{ items.length }}</span>
       <slot name="header-link"></slot>
@@ -24,15 +24,15 @@
     </div>
     <table
       v-if="items.length > 0"
-      class="table table-striped mb-0 table-responsive col-12 table-typo"
+      class="table table-striped mb-0 table-responsive col-12 table-typo table-bordered table-no-outer-border"
     >
       <slot name="table-header"></slot>
-      <tbody>
+      <tbody class="d-table col-12">
         <tr v-for="(group, index) in paginatedItems" :key="index">
-          <th v-if="showPageOffset" scope="row" class="text-center">
+          <th v-if="showPageOffset" scope="row" class="text-center align-middle" :class="bootstrapColumns">
             {{ currentPageNumber * rowsPerPage + (index + 1) }}
           </th>
-          <td v-for="(item, itemIndex) in group" :key="itemIndex">
+          <td v-for="(item, itemIndex) in group" :key="itemIndex" class="align-middle" :class="bootstrapColumns">
             <slot name="item-data" :item="item">
               <a :href="item.getUrl()">
                 <img
@@ -44,7 +44,7 @@
               </a>
             </slot>
           </td>
-          <td v-if="!group[0].getBadge().isEmpty()" class="text-right">
+          <td v-if="!group[0].getBadge().isEmpty()" class="text-right align-middle" :class="bootstrapColumns">
             <strong>{{ group[0].getBadge().get() }}</strong>
           </td>
         </tr>
@@ -117,6 +117,11 @@ export default class GridPaginator extends Vue {
     return Math.ceil(totalRows / this.rowsPerPage);
   }
 
+  get bootstrapColumns(): string {
+    const cols = 12/this.columns;
+    return `col-${cols}`;
+  }
+
   private get rowsPerPage(): number {
     return Math.floor(this.itemsPerPage / this.columns);
   }
@@ -151,4 +156,13 @@ export default class GridPaginator extends Vue {
     border: 1px solid #ddd;
   }
 }
+
+[data-table-grid-paginator] .table td {
+  padding: 0.75rem 1.25rem;
+}
+
+.table-bordered.table-no-outer-border {
+    border: none;
+  }
+
 </style>
