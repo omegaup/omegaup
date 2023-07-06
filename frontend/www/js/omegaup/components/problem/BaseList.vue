@@ -315,11 +315,6 @@ export default class BaseList extends Vue {
   top: 4rem;
 }
 
-table {
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
 .table-responsive {
   max-height: 80vh;
 }
