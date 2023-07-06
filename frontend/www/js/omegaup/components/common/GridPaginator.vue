@@ -29,10 +29,20 @@
       <slot name="table-header"></slot>
       <tbody class="d-table col-12">
         <tr v-for="(group, index) in paginatedItems" :key="index">
-          <th v-if="showPageOffset" scope="row" class="text-center align-middle" :class="bootstrapColumns">
+          <th
+            v-if="showPageOffset"
+            scope="row"
+            class="text-center align-middle"
+            :class="bootstrapColumns"
+          >
             {{ currentPageNumber * rowsPerPage + (index + 1) }}
           </th>
-          <td v-for="(item, itemIndex) in group" :key="itemIndex" class="align-middle" :class="bootstrapColumns">
+          <td
+            v-for="(item, itemIndex) in group"
+            :key="itemIndex"
+            class="align-middle"
+            :class="bootstrapColumns"
+          >
             <slot name="item-data" :item="item">
               <a :href="item.getUrl()">
                 <img
@@ -44,7 +54,11 @@
               </a>
             </slot>
           </td>
-          <td v-if="!group[0].getBadge().isEmpty()" class="text-right align-middle" :class="bootstrapColumns">
+          <td
+            v-if="!group[0].getBadge().isEmpty()"
+            class="text-right align-middle"
+            :class="bootstrapColumns"
+          >
             <strong>{{ group[0].getBadge().get() }}</strong>
           </td>
         </tr>
@@ -118,7 +132,7 @@ export default class GridPaginator extends Vue {
   }
 
   get bootstrapColumns(): string {
-    const cols = 12/this.columns;
+    const cols = 12 / this.columns;
     return `col-${cols}`;
   }
 
@@ -162,7 +176,6 @@ export default class GridPaginator extends Vue {
 }
 
 .table-bordered.table-no-outer-border {
-    border: none;
-  }
-
+  border: none;
+}
 </style>

@@ -313,13 +313,13 @@ export default class ViewProfile extends Vue {
     return this.data.unsolvedProblems.map((problem) => new Problem(problem));
   }
 
-  get columnNames(): Array<{name: string, style: string}> {
+  get columnNames(): Array<{ name: string; style: string }> {
     return [
-    { name: T.profileContestsTableContest, style: 'text-left' },
-    { name: T.profileContestsTablePlace, style: 'text-right' },
+      { name: T.profileContestsTableContest, style: 'text-left' },
+      { name: T.profileContestsTablePlace, style: 'text-right' },
     ];
   }
-  
+
   get solvedProblems(): Problem[] {
     if (!this.data?.solvedProblems) return [];
     return this.data.solvedProblems.map((problem) => new Problem(problem));

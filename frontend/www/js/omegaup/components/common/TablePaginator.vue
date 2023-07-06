@@ -26,17 +26,23 @@
       v-if="items.length > 0"
       class="table table-striped mb-0 table-responsive col-12 table-typo p-0"
     >
-    <thead class="d-table col-12">
-      <tr>
-        <template v-for="column in columnNames"><th :class="column.style"> {{ column.name }} </th></template>
-      </tr>
+      <thead class="d-table col-12">
+        <tr>
+          <template v-for="column in columnNames"
+            ><th :class="column.style">{{ column.name }}</th></template
+          >
+        </tr>
       </thead>
       <tbody class="d-table col-12">
         <tr v-for="(group, index) in paginatedItems" :key="index">
           <th v-if="showPageOffset" scope="row" class="text-left align-middle">
             {{ currentPageNumber * rowsPerPage + (index + 1) }}
           </th>
-          <td v-for="(item, itemIndex) in group" :key="itemIndex" class="align-middle">
+          <td
+            v-for="(item, itemIndex) in group"
+            :key="itemIndex"
+            class="align-middle"
+          >
             <slot name="item-data" :item="item">
               <a :href="item.getUrl()">
                 <img
@@ -48,7 +54,10 @@
               </a>
             </slot>
           </td>
-          <td v-if="!group[0].getBadge().isEmpty()" class="text-right align-middle">
+          <td
+            v-if="!group[0].getBadge().isEmpty()"
+            class="text-right align-middle"
+          >
             <strong>{{ group[0].getBadge().get() }}</strong>
           </td>
         </tr>
@@ -97,7 +106,7 @@ interface SortOption {
 export default class TablePaginator extends Vue {
   @Prop() items!: LinkableResource[];
   @Prop() itemsPerPage!: number;
-  @Prop() columnNames!: Array<{name: string, style: string}>;
+  @Prop() columnNames!: Array<{ name: string; style: string }>;
   @Prop() title!: string;
   @Prop({ default: false }) showPageOffset!: boolean;
   @Prop({ default: () => [] }) sortOptions!: SortOption[];
@@ -159,7 +168,6 @@ export default class TablePaginator extends Vue {
 }
 
 .table-bordered.table-no-outer-border {
-    border: none;
-  }
-
+  border: none;
+}
 </style>

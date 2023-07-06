@@ -17,7 +17,7 @@
           </li>
         </ul>
         <omegaup-table-paginator
-          :columnNames="columnNames"
+          :column-names="columnNames"
           :items="codersOfTheMonth"
           :items-per-page="3"
           :title="T.codersOfTheMonth"
@@ -35,7 +35,7 @@
     <div class="row">
       <div class="col-md-12">
         <omegaup-table-paginator
-          :columnNames="userColumnNames"
+          :column-names="userColumnNames"
           :show-page-offset="true"
           :items="schoolUsers"
           :items-per-page="30"
@@ -106,18 +106,18 @@ export default class SchoolProfile extends Vue {
     },
   ];
 
-  get columnNames(): Array<{name: string, style: string}> {
+  get columnNames(): Array<{ name: string; style: string }> {
     return [
-    { name: T.codersOfTheMonthUser, style: '' },
-    { name: T.codersOfTheMonthDate, style: 'text-right' },
+      { name: T.codersOfTheMonthUser, style: '' },
+      { name: T.codersOfTheMonthDate, style: 'text-right' },
     ];
   }
 
-  get userColumnNames(): Array<{name: string, style: string}> {
+  get userColumnNames(): Array<{ name: string; style: string }> {
     return [
-    { name: T.profileContestsTablePlace, style: 'col-1 text-left' },
-    { name: T.username, style: 'text-center' },
-    { name: this.sortByTableTitle, style: 'text-right' },
+      { name: T.profileContestsTablePlace, style: 'col-1 text-left' },
+      { name: T.username, style: 'text-center' },
+      { name: this.sortByTableTitle, style: 'text-right' },
     ];
   }
 
@@ -163,5 +163,4 @@ h2 {
   font-size: 1.8rem;
   letter-spacing: 0.01rem;
 }
-
 </style>
