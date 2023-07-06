@@ -19,8 +19,7 @@
       <h5 class="card-header">{{ T.myproblemsListMyProblems }}</h5>
       <div class="card-body px-2 px-sm-4">
         <div class="row align-items-center mb-3">
-          <div class="col-9
-           col-lg-6">
+          <div class="col-9 col-lg-6">
             <input
               v-model="currentQuery"
               class="typeahead form-control px-1 px-sm-3"
@@ -58,7 +57,10 @@
         </div>
         <div class="row mt-3">
           <div class="col-8 col-md-6">
-            <select v-model="allProblemsVisibilityOption" class="custom-select pl-1 pl-sm-3">
+            <select
+              v-model="allProblemsVisibilityOption"
+              class="custom-select pl-1 pl-sm-3"
+            >
               <option selected value="-1">{{ T.forSelectedItems }}</option>
               <option value="1">{{ T.makePublic }}</option>
               <option value="0">{{ T.makePrivate }}</option>
