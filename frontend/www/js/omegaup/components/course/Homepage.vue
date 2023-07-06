@@ -82,5 +82,4 @@ a.custom-button {
     margin-bottom: 0.6rem;
   }
 }
-
 </style>
