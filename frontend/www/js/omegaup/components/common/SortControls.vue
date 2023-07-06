@@ -25,7 +25,6 @@ import {
   faSortAmountUp,
   faExchangeAlt,
 } from '@fortawesome/free-solid-svg-icons';
-import { color } from 'highcharts';
 library.add(
   faSortAlphaDown,
   faSortAlphaUp,
