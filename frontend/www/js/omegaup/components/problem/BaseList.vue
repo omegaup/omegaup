@@ -27,9 +27,10 @@
                 class="badge custom-badge custom-badge-quality mr-1 ml-1 p-1 p-lg-2"
                 >{{ T.tagSourceLevel }}</span
               >
-              <span class="badge custom-badge custom-badge-owner mr-1 p-1 p-lg-2">{{
-                T.tagSourceOwner
-              }}</span>
+              <span
+                class="badge custom-badge custom-badge-owner mr-1 p-1 p-lg-2"
+                >{{ T.tagSourceOwner }}</span
+              >
               <span class="badge custom-badge custom-badge-voted p-1 p-lg-2">{{
                 T.tagSourceVoted
               }}</span>
@@ -128,7 +129,11 @@
           </tr>
         </thead>
         <tbody data-problems>
-          <tr class="text-center" v-for="problem in problems" :key="problem.problem_id">
+          <tr
+            v-for="problem in problems"
+            :key="problem.problem_id"
+            class="text-center"
+          >
             <td class="align-middle">{{ problem.problem_id }}</td>
             <td class="text-left align-middle">
               <a :href="`/arena/problem/${problem.alias}/`">{{
