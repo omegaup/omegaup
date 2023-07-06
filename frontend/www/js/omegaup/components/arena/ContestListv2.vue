@@ -45,8 +45,8 @@
                 <b-dropdown ref="dropdownOrderBy" no-caret>
                   <template #button-content>
                     <div>
-                    <font-awesome-icon icon="sort-amount-down" />
-                    {{ T.contestOrderBy }}
+                      <font-awesome-icon icon="sort-amount-down" />
+                      {{ T.contestOrderBy }}
                     </div>
                   </template>
                   <b-dropdown-item
@@ -286,7 +286,7 @@
             </template>
           </omegaup-contest-card>
         </b-tab>
-      </b-tabs>      
+      </b-tabs>
       <b-pagination-nav
         ref="paginator"
         v-model="currentPage"
@@ -408,7 +408,7 @@ export default class ArenaContestList extends Vue {
         return T.contestListFuture;
       case ContestTab.Past:
         return T.contestListPast;
-        default:
+      default:
         return T.contestListCurrent;
     }
   }
