@@ -400,19 +400,6 @@ export default class ArenaContestList extends Vue {
     return `/arena/#${this.currentTab}`;
   }
 
-  get currentTabText(): string {
-    switch (this.currentTab) {
-      case ContestTab.Current:
-        return T.contestListCurrent;
-      case ContestTab.Future:
-        return T.contestListFuture;
-      case ContestTab.Past:
-        return T.contestListPast;
-      default:
-        return T.contestListCurrent;
-    }
-  }
-
   linkGen(pageNum: number) {
     return {
       path: `/arena/`,
@@ -546,27 +533,16 @@ export default class ArenaContestList extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
 .btn {
   padding: 0.5rem 1rem !important;
 }
 
-.pagination-contest {
-  .pagination {
-    margin-bottom: 1.25rem;
-  }
-  .page-link {
-    padding: 0.5rem 1rem;
-    font-size: 16px;
-    line-height: 24px;
-  }
-}
-
 .card-group-menu {
   border: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  border-bottom: 1px solid var(--arena-scoreboard-hover-color);
   border-radius: 0.25rem 0.25rem 0 0;
 }
 
@@ -577,7 +553,7 @@ export default class ArenaContestList extends Vue {
 }
 
 .btn-style {
-  border-color: #007bff;
+  border-color: var(--arena-button-border-color);
 }
 
 .form-control {
@@ -587,16 +563,16 @@ export default class ArenaContestList extends Vue {
 .reset-btn {
   line-height: 1.5;
   color: #6c757d;
-  background-color: #fff;
+  background-color: var(--arena-runs-table-status-je-ve-font-color);
   background-clip: padding-box;
   border: none;
-  border-top: 1px solid #ced4da;
-  border-bottom: 1px solid #ced4da;
+  border-top: 1px solid var(--arena-reset-border-color);
+  border-bottom: 1px solid var(--arena-reset-border-color);
   border-radius: unset;
 }
 
 .btn-primary {
-  background-color: #007bff !important;
+  background-color: var(--arenat-button-border-color) !important;
 }
 
 .sidebar {
