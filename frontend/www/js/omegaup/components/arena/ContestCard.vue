@@ -22,30 +22,23 @@
           </b-card-text>
         </b-col>
 
-
-
         <b-col class="col-md-4 col-sm-12 p-1 text-center">
-
           <slot name="contest-button-scoreboard">
-
             <div class="justify-content-center d-flex align-items-center">
+              <b-card-text class="mr-3 m-0">
+                <font-awesome-icon class="mr-1" icon="users" />
+                {{ contest.contestants }}
+              </b-card-text>
 
-            <b-card-text class="mr-3 m-0">
-              <font-awesome-icon class="mr-1" icon="users" />
-              {{ contest.contestants }}
-            </b-card-text>
-
-            <b-button
-              ref="contestButtonScoreboard"
-              :href="getContestScoreboardURL(contest.alias)"
-              variant="success"
-            >
-              <font-awesome-icon class="mr-1" icon="table" />
-              {{ T.contestButtonScoreboard }}
-            </b-button>
-
+              <b-button
+                ref="contestButtonScoreboard"
+                :href="getContestScoreboardURL(contest.alias)"
+                variant="success"
+              >
+                <font-awesome-icon class="mr-1" icon="table" />
+                {{ T.contestButtonScoreboard }}
+              </b-button>
             </div>
-
           </slot>
 
           <div class="d-flex align-items-center justify-content-center">
@@ -61,9 +54,6 @@
             </slot>
           </div>
         </b-col>
-
-
-
       </b-row>
       <b-row class="p-1 flex-column flex-sm-row" align-v="center">
         <b-col class="col-md-5 col-sm-12 p-1 text-center">
