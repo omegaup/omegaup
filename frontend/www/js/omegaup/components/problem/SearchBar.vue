@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-3">
+  <div class="mb-0 mb-sm-3">
     <form action="/problem/" method="GET" class="form-inline">
       <div v-if="tags.length !== 0" class="form-group mr-2">
         <div v-for="tag in tags" :key="tag" class="mr-1">
