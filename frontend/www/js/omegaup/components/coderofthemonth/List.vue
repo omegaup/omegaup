@@ -59,6 +59,7 @@
     <table class="table table-striped table-hover table-responsive-sm">
       <thead>
         <tr>
+          <th scope="col" class="text-center"></th>
           <th scope="col" class="text-center">
             {{ T.codersOfTheMonthUser }}
           </th>
@@ -72,33 +73,26 @@
           >
             {{ T.codersOfTheMonthDate }}
           </th>
-          <th
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
-            scope="col"
-            class="text-center"
-          >
-            {{ T.profileStatisticsNumberOfSolvedProblems }}
-          </th>
-          <th
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
-            scope="col"
-            class="text-center"
-          >
-            {{ T.rankScore }}
-          </th>
-          <th
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
-            scope="col"
-            class="text-center"
-          >
-            {{ T.wordsActions }}
-          </th>
+
+          <template v-if="selectedTab == 'candidatesToCoderOfTheMonth'">
+            <th scope="col" class="text-center">
+              {{ T.profileStatisticsNumberOfSolvedProblems }}
+            </th>
+            <th scope="col" class="text-center">
+              {{ T.rankScore }}
+            </th>
+            <th v-if="isMentor" scope="col" class="text-center">
+              {{ T.wordsActions }}
+            </th>
+          </template>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(coder, index) in visibleCoders" :key="index">
+          <td class="text-center">
+            <img :src="coder.gravatar_32" />
+          </td>
           <td class="text-center align-middle">
-            <img :src="coder.gravatar_32" class="pr-3" />
             <omegaup-user-username
               :classname="coder.classname"
               :linkify="true"
@@ -152,10 +146,10 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
 import country_Flag from '../CountryFlag.vue';
+import { types } from '../../api_types';
 
 @Component({
   components: {
@@ -164,9 +158,9 @@ import country_Flag from '../CountryFlag.vue';
   },
 })
 export default class CoderOfTheMonthList extends Vue {
-  @Prop() codersOfCurrentMonth!: omegaup.CoderOfTheMonth[];
-  @Prop() codersOfPreviousMonth!: omegaup.CoderOfTheMonth[];
-  @Prop() candidatesToCoderOfTheMonth!: omegaup.CoderOfTheMonth[];
+  @Prop() codersOfCurrentMonth!: types.CoderOfTheMonthList[];
+  @Prop() codersOfPreviousMonth!: types.CoderOfTheMonthList[];
+  @Prop() candidatesToCoderOfTheMonth!: types.CoderOfTheMonthList[];
   @Prop() canChooseCoder!: boolean;
   @Prop() coderIsSelected!: boolean;
   @Prop() isMentor!: boolean;
@@ -175,7 +169,7 @@ export default class CoderOfTheMonthList extends Vue {
   T = T;
   selectedTab = 'codersOfTheMonth';
 
-  get visibleCoders(): omegaup.CoderOfTheMonth[] {
+  get visibleCoders(): types.CoderOfTheMonthList[] {
     switch (this.selectedTab) {
       case 'codersOfTheMonth':
       default:

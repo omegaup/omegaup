@@ -126,16 +126,6 @@ export namespace omegaup {
     verdict: string;
   }
 
-  export interface CoderOfTheMonth extends Profile {
-    date?: string;
-    ProblemsSolved?: number;
-    score?: number;
-    country?: string;
-    state?: string;
-    school?: string;
-    school_id?: number;
-  }
-
   export interface ContestGroup {
     alias: string;
     name: string;
