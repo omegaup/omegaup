@@ -12,7 +12,7 @@
           <font-awesome-icon :icon="['fas', 'times']" />
         </a>
       </div>
-      <div class="form-group mr-3 mt-1 col-12 col-md-6 px-0">
+      <div class="form-group mr-3 mt-1 col-12 col-md-6 mb-1 mb-sm-0 px-0">
         <omegaup-common-typeahead
           class="w-100"
           :only-existing-tags="false"
