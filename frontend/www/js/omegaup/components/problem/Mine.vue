@@ -57,10 +57,7 @@
         </div>
         <div class="row mt-3">
           <div class="col-6">
-            <select
-              v-model="allProblemsVisibilityOption"
-              class="custom-select"
-            >
+            <select v-model="allProblemsVisibilityOption" class="custom-select">
               <option selected value="-1">{{ T.forSelectedItems }}</option>
               <option value="1">{{ T.makePublic }}</option>
               <option value="0">{{ T.makePrivate }}</option>
