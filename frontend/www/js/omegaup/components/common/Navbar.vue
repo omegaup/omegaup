@@ -299,6 +299,14 @@
               </div>
             </li>
           </ul>
+
+          <a
+            v-if="isLoggedIn"
+            class="navbar justify-content-end mb-2 d-lg-none"
+            href="/logout/"
+          >
+            <font-awesome-icon :icon="['fas', 'power-off']" />
+          </a>
         </div>
 
         <a
@@ -414,6 +422,16 @@ nav.navbar {
   overflow-y: scroll;
   height: 65vh;
   max-width: 40vw;
+}
+.nav-login-text {
+  font-size: 14px;
+  padding: auto;
+}
+@media only screen and (min-width: 385px) {
+  .nav-login-text {
+    font-size: inherit;
+    padding: 0.5rem;
+  }
 }
 @media only screen and (max-width: 992px) {
   .allow-overflow {
