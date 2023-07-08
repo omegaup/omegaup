@@ -572,7 +572,7 @@ export default class ArenaContestList extends Vue {
 }
 
 .btn-primary {
-  background-color: var(--arenat-button-border-color) !important;
+  background-color: var(--arena-button-border-color) !important;
 }
 
 .sidebar {

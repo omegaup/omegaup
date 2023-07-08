@@ -24,12 +24,6 @@
 
         <b-col class="col-md-4 col-sm-12 p-1 text-center">
           <slot name="contest-button-scoreboard">
-            <div class="justify-content-center d-flex align-items-center">
-              <b-card-text class="mr-3 m-0">
-                <font-awesome-icon class="mr-1" icon="users" />
-                {{ contest.contestants }}
-              </b-card-text>
-
               <b-button
                 ref="contestButtonScoreboard"
                 :href="getContestScoreboardURL(contest.alias)"
@@ -38,7 +32,6 @@
                 <font-awesome-icon class="mr-1" icon="table" />
                 {{ T.contestButtonScoreboard }}
               </b-button>
-            </div>
           </slot>
 
           <div class="d-flex align-items-center justify-content-center">
@@ -71,7 +64,12 @@
         </b-col>
         <b-col class="col-md-4 col-sm-12 p-1 text-center">
           <div class="d-flex justify-content-center">
+            <div class="justify-content-center d-flex align-items-center">          
             <slot name="contest-button-enter">
+              <b-card-text class="mr-3 m-0">
+                <font-awesome-icon icon="users" />
+                {{ contest.contestants }}
+              </b-card-text>
               <b-button
                 v-if="contest.participating"
                 ref="contestButtonEnter"
@@ -83,6 +81,7 @@
                 {{ T.contestButtonEnter }}
               </b-button>
             </slot>
+            </div>  
             <slot name="contest-button-singup">
               <b-button
                 v-if="!contest.participating"
