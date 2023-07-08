@@ -62,14 +62,16 @@
             }}
           </b-card-text>
         </b-col>
-        <b-col class="col-md-4 col-sm-12 p-1 text-center">
-          <div class="d-flex justify-content-center">
-            <div class="justify-content-center d-flex align-items-center">          
-            <slot name="contest-button-enter">
+        <b-col class="col-md-4 col-sm-12 p-1 text-center d-flex justify-content-center">
+          <div class="d-flex align-items-center justify-content-center">  
+            
+            <slot>
               <b-card-text class="mr-3 m-0">
                 <font-awesome-icon icon="users" />
                 {{ contest.contestants }}
               </b-card-text>
+            </slot>
+            <slot name="contest-button-enter">
               <b-button
                 v-if="contest.participating"
                 ref="contestButtonEnter"
@@ -81,7 +83,6 @@
                 {{ T.contestButtonEnter }}
               </b-button>
             </slot>
-            </div>  
             <slot name="contest-button-singup">
               <b-button
                 v-if="!contest.participating"
