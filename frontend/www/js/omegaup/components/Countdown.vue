@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <span data-count-down-timer>
     {{ formattedTimeLeft }}
   </span>
 </template>
