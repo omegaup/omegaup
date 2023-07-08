@@ -78,7 +78,7 @@
         </div>
 
         <div class="form-group">
-          <button type="submit" class="btn btn-primary">
+          <button type="submit" class="btn btn-primary" data-create-teams-group>
             <slot name="teams-group-submit-button">
               {{ T.teamsGroupFormCreate }}
             </slot>

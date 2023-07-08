@@ -1,0 +1,6 @@
+username,name,country_id,state_id,gender,school_name,usernames
+team_1,Team One,MX,AGU,decline,School Group,test_user_0;test_user_1
+team_2,Team Two,MX,BCN,other,School Group,test_user_2;test_user_3
+team_3,Team Three,MX,BCS,female,School Group,test_user_4;test_user_5
+team_4,Team Four,MX,CHH,male,School Group,test_user_6;test_user_7
+team_5,Team Five,MX,CHP,decline,School Group,test_user_8;test_user_9
