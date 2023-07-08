@@ -1,26 +1,28 @@
 <template>
-  <div class="container-lg p-md-5">
-    <div class="card">
-      <h5 class="card-header">
-        {{
-          ui.formatString(T.authorRankRangeHeader, {
-            lowCount: (page - 1) * length + 1,
-            highCount: page * length,
-          })
-        }}
-      </h5>
+  <div class="container-lg">
+    <h5 class="rank-title mb-5">
+      {{
+        ui.formatString(T.authorRankRangeHeader, {
+          lowCount: (page - 1) * length + 1,
+          highCount: page * length,
+        })
+      }}
+    </h5>
+    <div class="card max-width-rank">
       <table class="table mb-0 table-responsive-sm">
         <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">{{ T.contentCreator }}</th>
-            <th scope="col" class="text-right">{{ T.rankScore }}</th>
+            <th scope="col" class="text-center">#</th>
+            <th scope="col" class="text-center">{{ T.contentCreator }}</th>
+            <th scope="col" class="text-center">{{ T.rankScore }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(author, index) in rankingData.ranking" :key="index">
-            <th scope="row">{{ author.author_ranking || index }}</th>
-            <td>
+            <th scope="row" class="text-center">
+              {{ author.author_ranking || index }}
+            </th>
+            <td class="text-center">
               <omegaup-countryflag
                 :country="author.country_id"
               ></omegaup-countryflag>
@@ -34,7 +36,7 @@
                 {{ author.name }}
               </span>
             </td>
-            <td class="text-right">
+            <td class="text-center">
               {{ author.author_score.toFixed(2) }}
             </td>
           </tr>
@@ -75,3 +77,27 @@ export default class AuthorsRank extends Vue {
   ui = ui;
 }
 </script>
+
+<style scoped>
+.max-width-rank {
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.rank-title {
+  font-size: 1.6rem;
+  text-align: center;
+}
+
+.table th.text-center:nth-child(1),
+.table td.text-center:nth-child(1),
+.table th.text-center:nth-child(3),
+.table td.text-center:nth-child(3) {
+  width: 20%;
+}
+
+.table th.text-center:nth-child(2),
+.table td.text-center:nth-child(2) {
+  width: 60%;
+}
+</style>
