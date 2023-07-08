@@ -4465,7 +4465,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @param list<array{classname: string, country_id: string, email: null|string, problems_solved: int, rank?: int, score: float, time: string, user_id?: int, username: string}> $coders
+     * @param list<array{category?: string, classname: string, coder_of_the_month_id?: int, country_id: string, description?: null|string, email: null|string, interview_url?: null|string, problems_solved?: int, rank?: int, ranking?: int, school_id?: int|null, score?: float, selected_by?: int|null, time: string, user_id?: int, username: string}> $coders
      *
      * @return CoderOfTheMonthList
      */
