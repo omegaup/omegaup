@@ -16,32 +16,26 @@
       ></a
     >
     <div class="dropdown-menu dropdown-menu-right notification-dropdown">
-      <!--
-        Trick to avoid closing on click
-        The form element makes click events work inside dropdown on items that are not nav-link.
-        TODO: Try another way to allow this behaviour.
-      -->
-      <form>
-        <div v-if="notifications.length === 0" class="text-center">
-          {{ T.notificationsNoNewNotifications }}
-        </div>
-        <a
-          v-else
-          class="dropdown-item"
-          href="#"
-          @click="$emit('read', notifications, null)"
-        >
-          {{ T.notificationsMarkAllAsRead }} ✔️
-        </a>
-        <transition-group name="list"
-          ><omegaup-notification
-            v-for="notification in notifications"
-            :key="notification.notification_id"
-            :notification="notification"
-            @remove="readSingleNotification"
-          ></omegaup-notification
-        ></transition-group>
-      </form>
+      <div v-if="notifications.length === 0" class="text-center">
+        {{ T.notificationsNoNewNotifications }}
+      </div>
+      <a
+        v-else
+        class="dropdown-item"
+        href="#"
+        @click="$emit('read', notifications, null)"
+      >
+        {{ T.notificationsMarkAllAsRead }} ✔️
+      </a>
+      <transition-group name="list"
+        ><omegaup-notification
+          v-for="notification in notifications"
+          :key="notification.notification_id"
+          data-notification-list
+          :notification="notification"
+          @remove="readSingleNotification"
+        ></omegaup-notification
+      ></transition-group>
     </div>
   </li>
 </template>

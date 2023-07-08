@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card" data-user-rank>
     <h5 class="card-header">
       {{
         isIndex
@@ -14,7 +14,7 @@
     </h5>
     <div v-if="!isIndex" class="card-body form-row">
       <omegaup-common-typeahead
-        class="col-md-4"
+        class="col-md-3 pl-0 pr-2"
         :existing-options="searchResultUsers"
         :value.sync="searchedUsername"
         :max-results="10"
@@ -22,6 +22,13 @@
           (query) => $emit('update-search-result-users', query)
         "
       ></omegaup-common-typeahead>
+      <button
+        class="btn btn-primary form-control col-md-2 mr-2"
+        type="button"
+        @click="onSubmit"
+      >
+        {{ T.searchUser }}
+      </button>
       <template v-if="Object.keys(availableFilters).length > 0">
         <select
           v-model="filter"
@@ -42,38 +49,31 @@
       </template>
       <template v-else-if="!isLogged &amp;&amp; !isIndex">
         <span
-          class="badge badge-info col-md-5 d-flex align-items-center justify-content-center"
+          class="badge badge-info col-md-6 d-flex align-items-center justify-content-center"
           >{{ T.mustLoginToFilterUsers }}</span
         >
       </template>
       <template v-else-if="!isIndex">
         <span
-          class="badge badge-info col-md-5 d-flex align-items-center justify-content-center"
+          class="badge badge-info col-md-6 d-flex align-items-center justify-content-center"
           >{{ T.mustUpdateBasicInfoToFilterUsers }}</span
         >
       </template>
-      <button
-        class="btn btn-primary form-control col-md-2 ml-auto"
-        type="button"
-        @click="onSubmit"
-      >
-        {{ T.searchUser }}
-      </button>
     </div>
     <table class="table mb-0 table-responsive-sm">
       <thead>
         <tr>
-          <th scope="col">#</th>
+          <th scope="col" class="pl-4 column-width">#</th>
           <th scope="col">{{ T.contestParticipant }}</th>
           <th scope="col" class="text-right">{{ T.rankScore }}</th>
-          <th v-if="!isIndex" scope="col" class="text-right">
+          <th v-if="!isIndex" scope="col" class="text-right pr-4">
             {{ T.rankSolved }}
           </th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(user, index) in ranking" :key="index">
-          <th scope="row">{{ user.rank }}</th>
+          <th scope="row" class="pl-4 column-width">{{ user.rank }}</th>
           <td>
             <omegaup-countryflag :country="user.country"></omegaup-countryflag>
             <omegaup-user-username
@@ -87,7 +87,7 @@
             >
           </td>
           <td class="text-right">{{ user.score }}</td>
-          <td v-if="!isIndex" class="text-right">
+          <td v-if="!isIndex" class="text-right pr-4">
             {{ user.problems_solved }}
           </td>
         </tr>
@@ -190,3 +190,18 @@ export default class UserRank extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+[data-user-rank] .tags-input-wrapper-default {
+  padding: 0.35rem 0.25rem 0.7rem 0.25rem;
+}
+
+[data-user-rank] {
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.column-width {
+  max-width: 1rem;
+}
+</style>

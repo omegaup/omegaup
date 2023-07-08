@@ -2,7 +2,7 @@
   <header>
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top p-0 text-right">
       <div class="container-xl pl-0 pl-xl-3">
-        <a class="navbar-brand p-3" href="/">
+        <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/">
           <img
             alt="omegaUp"
             src="/media/omegaup_curves.png"
@@ -19,18 +19,11 @@
           />
         </a>
 
-        <div class="d-inline-flex d-flex-row order-md-1">
-          <a
-            v-if="isLoggedIn"
-            class="navbar justify-content-end mr-2 d-lg-none"
-            href="/logout/"
-          >
-            <font-awesome-icon :icon="['fas', 'power-off']" />
-          </a>
-          <ul v-else class="navbar-nav navbar-right d-lg-flex">
+        <div class="d-inline-flex d-flex-row order-lg-1">
+          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex">
             <li class="nav-item">
               <a
-                class="nav-link px-2"
+                class="nav-link nav-login-text"
                 :href="formattedLoginURL"
                 data-login-button
                 >{{ T.navLogIn }}</a
@@ -306,6 +299,14 @@
               </div>
             </li>
           </ul>
+
+          <a
+            v-if="isLoggedIn"
+            class="navbar justify-content-end mb-2 d-lg-none"
+            href="/logout/"
+          >
+            <font-awesome-icon :icon="['fas', 'power-off']" />
+          </a>
         </div>
 
         <a
@@ -421,6 +422,16 @@ nav.navbar {
   overflow-y: scroll;
   height: 65vh;
   max-width: 40vw;
+}
+.nav-login-text {
+  font-size: 14px;
+  padding: auto;
+}
+@media only screen and (min-width: 385px) {
+  .nav-login-text {
+    font-size: inherit;
+    padding: 0.5rem;
+  }
 }
 @media only screen and (max-width: 992px) {
   .allow-overflow {
