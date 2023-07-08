@@ -8,6 +8,7 @@ import {
 } from '../support/types';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { contestPage } from '../support/pageObjects/contestPage';
+import { profilePage } from '../support/pageObjects/profilePage';
 
 describe('Course Test', () => {
   let loginOptions: LoginOptions[] = [];
@@ -288,7 +289,7 @@ describe('Course Test', () => {
     cy.logout();
 
     cy.login(loginOptions[1]);
-    loginPage.addUsername('User 1');
+    profilePage.addUsername('User 1');
     coursePage.enterCourse(courseOptions.courseAlias);
     coursePage.createSubmission(problemOptions[0], runOptions);
     coursePage.closePopup(problemOptions[0]);
@@ -302,7 +303,7 @@ describe('Course Test', () => {
     cy.logout();
 
     cy.login(loginOptions[2]);
-    loginPage.addUsername('User 2');
+    profilePage.addUsername('User 2');
     coursePage.enterCourse(courseOptions.courseAlias);
     coursePage.createSubmission(problemOptions[0], runOptions);
     coursePage.closePopup(problemOptions[0]);
@@ -359,7 +360,7 @@ describe('Course Test', () => {
     cy.logout();
 
     cy.login(loginOptions[1]);
-    loginPage.addUsername('User 1');
+    profilePage.addUsername('User 2');
     coursePage.enterCourse(courseOptions.courseAlias);
     coursePage.createSubmission(problemOptions[0], runOptions);
     coursePage.createSubmission(problemOptions[1], runOptions);
@@ -374,7 +375,7 @@ describe('Course Test', () => {
     cy.logout();
 
     cy.login(loginOptions[2]);
-    loginPage.addUsername('User 2');
+    profilePage.addUsername('User 2');
     coursePage.enterCourse(courseOptions.courseAlias);
     coursePage.createSubmission(problemOptions[0], runOptions);
     coursePage.createSubmission(problemOptions[1], runOptions);
