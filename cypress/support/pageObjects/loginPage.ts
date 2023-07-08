@@ -19,13 +19,13 @@ export class LoginPage {
     return users;
   }
 
-  addUsername(userName: string): void {
-    cy.get('[data-nav-user]').click();
-    cy.get('[data-nav-profile]').click();
-    cy.get('a[href="/profile/#edit-basic-information"]').click();
-    cy.get('[data-name]').type(userName);
-    cy.get('[data-save-profile-changes-button]').click();
+  giveAdminPrivilage(roleName: string, user: string) {
+    cy.loginAdmin();
+    const userAdminUrl = '/admin/user/' + user;
+    cy.visit(userAdminUrl);
+    cy.get(`.${roleName}`).check();
     cy.get('#alert-close').click();
+    cy.logout();
   }
 }
 

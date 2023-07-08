@@ -3,7 +3,7 @@
     <div v-if="!update" class="card-header bg-primary text-white panel-heading">
       <h3 class="card-title mb-0">{{ T.contestNew }}</h3>
     </div>
-    <div class="card-body">
+    <div class="card-body px-2 px-sm-4">
       <div class="btn-group d-block mb-3 text-center">
         <button class="btn btn-secondary" data-contest-omi @click="fillOmi">
           {{ T.contestNewFormOmiStyle }}

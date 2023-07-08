@@ -73,68 +73,74 @@
           </label>
         </div>
       </div>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>
-              {{ T.wordsAlias }}
-              <omegaup-common-sort-controls
-                ref="sortControlByTitle"
-                column="title"
-                :sort-order="sortOrder"
-                :column-name="columnName"
-                @apply-filter="onApplyFilter"
-              ></omegaup-common-sort-controls>
-            </th>
-            <th v-if="!myView">{{ T.qualityNominationNominatedBy }}</th>
-            <th>{{ T.qualityNominationCreatedBy }}</th>
-            <th>
-              {{ T.wordsSubmissionDate }}
-              <omegaup-common-sort-controls
-                ref="sortControlByTime"
-                column="time"
-                :sort-order="sortOrder"
-                :column-name="columnName"
-                @apply-filter="onApplyFilter"
-              ></omegaup-common-sort-controls>
-            </th>
-            <th v-if="!myView" data-name="reason">{{ T.wordsReason }}</th>
-            <th class="text-center">{{ T.wordsStatus }}</th>
-            <th><!-- view button --></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="nomination in orderedNominations"
-            :key="`nomination-${nomination.qualitynomination_id}`"
-          >
-            <td>
-              <a :href="problemUrl(nomination.problem.alias)">{{
-                nomination.problem.title
-              }}</a>
-            </td>
-            <td v-if="!myView">
-              <a :href="userUrl(nomination.nominator.username)">{{
-                nomination.nominator.username
-              }}</a>
-            </td>
-            <td>
-              <a :href="userUrl(nomination.author.username)">{{
-                nomination.author.username
-              }}</a>
-            </td>
-            <td>{{ nomination.time.toLocaleDateString(T.locale) }}</td>
-            <td v-if="!myView">{{ nomination.contents.reason }}</td>
-            <td class="text-center">{{ nomination.status }}</td>
-            <td>
-              <a
-                :href="nominationDetailsUrl(nomination.qualitynomination_id)"
-                >{{ T.wordsDetails }}</a
-              >
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr class="text-nowrap">
+              <th>
+                {{ T.wordsAlias }}
+                <omegaup-common-sort-controls
+                  ref="sortControlByTitle"
+                  column="title"
+                  :sort-order="sortOrder"
+                  :column-name="columnName"
+                  @apply-filter="onApplyFilter"
+                ></omegaup-common-sort-controls>
+              </th>
+              <th v-if="!myView">{{ T.qualityNominationNominatedBy }}</th>
+              <th>{{ T.qualityNominationCreatedBy }}</th>
+              <th>
+                {{ T.wordsSubmissionDate }}
+                <omegaup-common-sort-controls
+                  ref="sortControlByTime"
+                  column="time"
+                  :sort-order="sortOrder"
+                  :column-name="columnName"
+                  @apply-filter="onApplyFilter"
+                ></omegaup-common-sort-controls>
+              </th>
+              <th v-if="!myView" data-name="reason">{{ T.wordsReason }}</th>
+              <th class="text-center">{{ T.wordsStatus }}</th>
+              <th><!-- view button --></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="nomination in orderedNominations"
+              :key="`nomination-${nomination.qualitynomination_id}`"
+            >
+              <td class="align-middle">
+                <a :href="problemUrl(nomination.problem.alias)">{{
+                  nomination.problem.title
+                }}</a>
+              </td>
+              <td v-if="!myView" class="align-middle">
+                <a :href="userUrl(nomination.nominator.username)">{{
+                  nomination.nominator.username
+                }}</a>
+              </td>
+              <td class="align-middle">
+                <a :href="userUrl(nomination.author.username)">{{
+                  nomination.author.username
+                }}</a>
+              </td>
+              <td class="align-middle">
+                {{ nomination.time.toLocaleDateString(T.locale) }}
+              </td>
+              <td v-if="!myView" class="align-middle">
+                {{ nomination.contents.reason }}
+              </td>
+              <td class="text-center align-middle">{{ nomination.status }}</td>
+              <td class="align-middle">
+                <a
+                  :href="nominationDetailsUrl(nomination.qualitynomination_id)"
+                  >{{ T.wordsDetails }}</a
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <omegaup-common-paginator
         :pager-items="pagerItems"
         @page-changed="
