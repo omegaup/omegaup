@@ -142,7 +142,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
     /**
      * Get all coder of the months based on month
-     * @return list<array{classname: string, country_id: string, email: null|string, problems_solved: int, rank?: int, score: float, time: string, user_id?: int, username: string}>
+     * @return list<array{classname: string, country_id: string, email: null|string, ranking: int, time: string, user_id: int, username: string}>
      */
     final public static function getMonthlyList(
         string $firstDay,
