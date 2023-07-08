@@ -39,7 +39,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             Identities AS i ON i.user_id = cm.user_id
           LEFT JOIN
             User_Rank ur ON ur.user_id = cm.user_id
-            WHERE
+          WHERE
             `time` = ? AND
             category = ?
           LIMIT ?;
