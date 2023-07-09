@@ -419,8 +419,26 @@ export namespace types {
     export function CommonPayload(
       elementId: string = 'payload',
     ): types.CommonPayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
+      return ((x) => {
+        x.apiTokens = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.last_used = ((x: number) => new Date(x * 1000))(x.last_used);
+            x.rate_limit = ((x) => {
+              x.reset = ((x: number) => new Date(x * 1000))(x.reset);
+              return x;
+            })(x.rate_limit);
+            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+            return x;
+          });
+        })(x.apiTokens);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -2409,6 +2427,13 @@ export namespace types {
     };
   }
 
+  export interface ApiToken {
+    last_used: Date;
+    name: string;
+    rate_limit: { limit: number; remaining: number; reset: Date };
+    timestamp: Date;
+  }
+
   export interface ArenaAssignment {
     alias?: string;
     assignment_type: string;
@@ -2729,6 +2754,7 @@ export namespace types {
   }
 
   export interface CommonPayload {
+    apiTokens: types.ApiToken[];
     associatedIdentities: types.AssociatedIdentity[];
     currentEmail: string;
     currentName?: string;
@@ -3341,6 +3367,7 @@ export namespace types {
 
   export interface CurrentSession {
     apiTokenId?: number;
+    api_tokens: types.ApiToken[];
     associated_identities: types.AssociatedIdentity[];
     auth_token?: string;
     cacheKey?: string;
@@ -5476,6 +5503,7 @@ export namespace messages {
 
   // Session
   export type SessionCurrentSessionRequest = { [key: string]: any };
+  export type _SessionCurrentSessionServerResponse = any;
   export type SessionCurrentSessionResponse = {
     session?: types.CurrentSession;
     time: number;
@@ -5580,14 +5608,7 @@ export namespace messages {
   export type UserListResponse = { results: types.ListItem[] };
   export type UserListAPITokensRequest = { [key: string]: any };
   export type _UserListAPITokensServerResponse = any;
-  export type UserListAPITokensResponse = {
-    tokens: {
-      last_used: Date;
-      name: string;
-      rate_limit: { limit: number; remaining: number; reset: Date };
-      timestamp: Date;
-    }[];
-  };
+  export type UserListAPITokensResponse = { tokens: types.ApiToken[] };
   export type UserListAssociatedIdentitiesRequest = { [key: string]: any };
   export type UserListAssociatedIdentitiesResponse = {
     identities: types.AssociatedIdentity[];
