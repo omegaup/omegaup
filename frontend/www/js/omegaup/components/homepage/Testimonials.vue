@@ -28,7 +28,7 @@
         <div class="container-lg py-4 px-5">
           <blockquote class="blockquote text-center">
             <p class="mb-0">{{ testimonial.text[T.locale] }}</p>
-            <footer class="blockquote-footer mt-2">
+            <footer class="blockquote-footer mt-3">
               {{ testimonial.author.name }},
               <cite :title="testimonial.author.title[T.locale]">{{
                 testimonial.author.title[T.locale]
@@ -80,7 +80,7 @@ export default class Testimonials extends Vue {
 }
 
 .carousel-inner {
-  min-height: 31rem;
+  min-height: 12rem;
 
   .carousel-item {
     blockquote.blockquote {
@@ -91,11 +91,6 @@ export default class Testimonials extends Vue {
         color: wheat;
       }
     }
-  }
-}
-@media only screen and (min-width: 767px) {
-  .carousel-inner {
-    min-height: 12rem;
   }
 }
 </style>
