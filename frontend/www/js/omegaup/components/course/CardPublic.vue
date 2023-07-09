@@ -19,7 +19,7 @@
               </p>
             </div>
             <div class="card-text course-data">
-              <p class="mb-0">
+              <p class="mb-2">
                 {{
                   ui.formatString(T.publicCourseCardMetrics, {
                     lessonCount: course.lessonCount,
@@ -30,7 +30,7 @@
                   })
                 }}
               </p>
-              <p class="mb-0">{{ courseLevelText(course.level) }}</p>
+              <p class="mb-2">{{ courseLevelText(course.level) }}</p>
               <div v-if="loggedIn" class="text-center mt-1">
                 <a
                   class="btn btn-primary text-white"
