@@ -1,7 +1,7 @@
 <template>
   <div class="omegaup-course-details card">
     <div v-if="!update" class="card-header px-2 px-sm-4">
-      <h3 class="card-title">{{ T.courseNew }}</h3>
+      <h3 class="card-title mb-0">{{ T.courseNew }}</h3>
     </div>
     <div class="card-body px-2 px-sm-4">
       <form class="form" data-course-form @submit.prevent="onSubmit">
