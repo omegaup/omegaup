@@ -27,15 +27,6 @@ export class LoginPage {
     cy.get('#alert-close').click();
     cy.logout();
   }
-
-  addUsername(userName: string): void {
-    cy.get('[data-nav-user]').click();
-    cy.get('[data-nav-profile]').click();
-    cy.get('a[href="/profile/#edit-basic-information"]').click();
-    cy.get('[data-name]').type(userName);
-    cy.get('[data-save-profile-changes-button]').click();
-    cy.get('#alert-close').click();
-  }
 }
 
 export const loginPage = new LoginPage();
