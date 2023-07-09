@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid p-5">
+  <div class="container-fluid max-width card pr-0 pl-0">
     <ul class="nav nav-tabs" role="tablist">
       <li
         v-for="(tabName, tabKey) in tabNames"
@@ -25,7 +25,7 @@
     </ul>
     <div class="tab-content">
       <div class="row m-0 mt-4">
-        <div class="col-md-6 col-lg-3 p-0">
+        <div class="col-md-6 col-lg-3 p-0 ml-4">
           <input
             v-model="searchText"
             class="form-control"
@@ -37,7 +37,7 @@
       <div
         v-for="(tabName, tabKey) in tabNames"
         :key="tabKey"
-        class="tab-pane fade py-4 px-2"
+        class="tab-pane fade"
         :class="{
           show: currentSelectedTab === tabKey,
           active: currentSelectedTab === tabKey,
@@ -46,7 +46,7 @@
       >
         <div
           v-if="tabKey === Tab.Public"
-          class="row row-cols-1 row-cols-md-2 row-cols-xl-3"
+          class="row row-cols-1 row-cols-md-2 row-cols-xl-3 p-4"
         >
           <omegaup-course-card-public
             v-for="course in filteredCards"
@@ -59,7 +59,7 @@
           v-if="tabKey === Tab.Enrolled"
           class="row"
           :class="{
-            'row-cols-1 row-cols-md-2 row-cols-xl-3':
+            'row-cols-1 row-cols-md-2 row-cols-xl-3 p-4':
               loggedIn && filteredCards.length,
             'justify-content-center': !loggedIn || !filteredCards.length,
           }"
@@ -84,7 +84,7 @@
           v-if="tabKey === Tab.Finished"
           class="row"
           :class="{
-            'row-cols-1 row-cols-md-2 row-cols-xl-3':
+            'row-cols-1 row-cols-md-2 row-cols-xl-3 p-4':
               loggedIn && filteredCards.length,
             'justify-content-center': !loggedIn || !filteredCards.length,
           }"
@@ -240,4 +240,20 @@ export default class CourseTabs extends Vue {
   font-size: 2.25rem;
   color: var(--arena-contest-list-empty-category-font-color);
 }
+
+.max-width {
+  max-width: 68.8rem;
+  margin: 4rem auto;
+}
+
+.nav-link {
+  padding: 0.6rem 1.2rem;
+}
+
+.nav-tabs, .nav-link, .nav-link-active, .nav-link-hover {
+  border-top: none !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
 </style>
