@@ -250,10 +250,12 @@ export default class CourseTabs extends Vue {
   padding: 0.6rem 1.2rem;
 }
 
-.nav-tabs, .nav-link, .nav-link-active, .nav-link-hover {
+.nav-tabs,
+.nav-link,
+.nav-link-active,
+.nav-link-hover {
   border-top: none !important;
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
 }
-
 </style>
