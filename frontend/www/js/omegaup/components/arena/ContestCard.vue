@@ -24,14 +24,14 @@
 
         <b-col class="col-md-4 col-sm-12 p-1 text-center">
           <slot name="contest-button-scoreboard">
-              <b-button
-                ref="contestButtonScoreboard"
-                :href="getContestScoreboardURL(contest.alias)"
-                variant="success"
-              >
-                <font-awesome-icon class="mr-1" icon="table" />
-                {{ T.contestButtonScoreboard }}
-              </b-button>
+            <b-button
+              ref="contestButtonScoreboard"
+              :href="getContestScoreboardURL(contest.alias)"
+              variant="success"
+            >
+              <font-awesome-icon class="mr-1" icon="table" />
+              {{ T.contestButtonScoreboard }}
+            </b-button>
           </slot>
 
           <div class="d-flex align-items-center justify-content-center">
@@ -62,9 +62,10 @@
             }}
           </b-card-text>
         </b-col>
-        <b-col class="col-md-4 col-sm-12 p-1 text-center d-flex justify-content-center">
-          <div class="d-flex align-items-center justify-content-center">  
-            
+        <b-col
+          class="col-md-4 col-sm-12 p-1 text-center d-flex justify-content-center"
+        >
+          <div class="d-flex align-items-center justify-content-center">
             <slot>
               <b-card-text class="mr-3 m-0">
                 <font-awesome-icon icon="users" />
