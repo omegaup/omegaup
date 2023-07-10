@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <ul class="nav nav-tabs">
+  <div class="card ranking-width">
+    <ul class="nav nav-tabs justify-content-arround">
       <li class="nav-item">
         <a
           href="#"
@@ -59,7 +59,7 @@
             {{ T.wordsDate }}
           </th>
           <template v-else-if="selectedTab === 'candidatesToSchoolOfTheMonth'">
-            <th scope="col" class="text-right">
+            <th scope="col" class="text-center">
               {{ T.rankScore }}
             </th>
             <th v-if="isMentor" scope="col" class="text-center">
@@ -84,7 +84,7 @@
             {{ school.time }}
           </td>
           <template v-else-if="selectedTab === 'candidatesToSchoolOfTheMonth'">
-            <td class="text-right">
+            <td class="text-center">
               {{ school.score }}
             </td>
             <td v-if="isMentor" class="text-center">
@@ -114,7 +114,7 @@ import country_Flag from '../CountryFlag.vue';
     'omegaup-country-flag': country_Flag,
   },
 })
-export default class SchoolOfTheMonth extends Vue {
+export default class SchoolOfTheMonthList extends Vue {
   @Prop() schoolsOfPreviousMonths!: omegaup.SchoolOfTheMonth[];
   @Prop() schoolsOfPreviousMonth!: omegaup.SchoolOfTheMonth[];
   @Prop() candidatesToSchoolOfTheMonth!: omegaup.SchoolOfTheMonth[];
@@ -138,3 +138,27 @@ export default class SchoolOfTheMonth extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.nav-link.active,
+.nav-link:hover {
+  border: none;
+  border-left: 0.0625rem solid #dee2e6;
+  border-right: 0.0625rem solid #dee2e6;
+  border-top-left-radius: 0rem;
+  border-top-right-radius: 0rem;
+}
+.nav .nav-tabs {
+  border-bottom: 0rem;
+}
+
+.nav-link {
+  font-weight: medium;
+  letter-spacing: 0.022rem;
+  padding: 0.65rem 1rem;
+}
+.ranking-width {
+  max-width: 55rem;
+  margin: 0 auto;
+}
+</style>
