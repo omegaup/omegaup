@@ -90,7 +90,7 @@
             <th
               v-if="loggedIn"
               scope="col"
-              class="text-right align-middle text-nowrap"
+              class="align-middle text-nowrap"
             >
               <span
                 >{{ T.wordsMyScore }}
@@ -132,10 +132,9 @@
           <tr
             v-for="problem in problems"
             :key="problem.problem_id"
-            class="text-center"
           >
             <td class="align-middle">{{ problem.problem_id }}</td>
-            <td class="text-left align-middle">
+            <td class="align-middle">
               <a :href="`/arena/problem/${problem.alias}/`">{{
                 problem.title
               }}</a>
@@ -192,7 +191,7 @@
                 {{ QUALITY_TAGS[Math.round(problem.quality)] }}
               </span>
             </td>
-            <td v-else class="align-middle">—</td>
+            <td v-else class="text-right align-middle">—</td>
             <td
               v-if="problem.difficulty !== null"
               class="text-center align-middle"
@@ -207,16 +206,16 @@
                 {{ DIFFICULTY_TAGS[Math.round(problem.difficulty)] }}
               </span>
             </td>
-            <td v-else class="align-middle">—</td>
-            <td class="align-middle">
+            <td v-else class="text-center align-middle">—</td>
+            <td class="text-right align-middle">
               {{ (100.0 * problem.ratio).toFixed(2) }}%<br />({{
                 problem.accepted
               }}/{{ problem.submissions }})
             </td>
-            <td v-if="loggedIn" class="align-middle">
+            <td v-if="loggedIn" class="text-right align-middle">
               {{ problem.score.toFixed(2) }}
             </td>
-            <td class="align-middle">
+            <td class="text-right align-middle">
               {{ problem.points.toFixed(2) }}
             </td>
           </tr>
