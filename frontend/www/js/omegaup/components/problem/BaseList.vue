@@ -87,11 +87,7 @@
                 ></omegaup-common-sort-controls
               ></span>
             </th>
-            <th
-              v-if="loggedIn"
-              scope="col"
-              class="align-middle text-nowrap"
-            >
+            <th v-if="loggedIn" scope="col" class="align-middle text-nowrap">
               <span
                 >{{ T.wordsMyScore }}
                 <omegaup-common-sort-controls
@@ -129,10 +125,7 @@
           </tr>
         </thead>
         <tbody data-problems>
-          <tr
-            v-for="problem in problems"
-            :key="problem.problem_id"
-          >
+          <tr v-for="problem in problems" :key="problem.problem_id">
             <td class="align-middle">{{ problem.problem_id }}</td>
             <td class="align-middle">
               <a :href="`/arena/problem/${problem.alias}/`">{{
