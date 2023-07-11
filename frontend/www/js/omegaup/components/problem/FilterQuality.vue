@@ -53,10 +53,7 @@ export default class FilterQuality extends Vue {
 </script>
 
 <style scoped>
-
 .section-font-size {
   font-size: 1.44rem;
 }
-
 </style>
-

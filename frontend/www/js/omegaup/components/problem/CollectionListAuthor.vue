@@ -143,7 +143,6 @@ export default class CollectionList extends Vue {
 </script>
 
 <style scoped>
-
 .title-font {
   font-size: 2rem;
   letter-spacing: 0.01rem;
@@ -153,5 +152,4 @@ export default class CollectionList extends Vue {
   max-width: 75rem;
   margin: 0 auto;
 }
-
 </style>

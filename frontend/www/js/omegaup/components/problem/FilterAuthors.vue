@@ -1,7 +1,9 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <h3 class="section-font-size text-center">{{ T.problemCollectionAuthors }}</h3>
+      <h3 class="section-font-size text-center">
+        {{ T.problemCollectionAuthors }}
+      </h3>
       <div
         v-for="author in authors.ranking"
         :key="author.username"
@@ -54,12 +56,7 @@ export default class FilterAuthors extends Vue {
 </script>
 
 <style scoped>
-
 .section-font-size {
   font-size: 1.44rem;
 }
-
 </style>
-
-
-
