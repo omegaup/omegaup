@@ -1,16 +1,14 @@
 <template>
   <div class="card">
     <div class="card-header">
-      <omegaup-countryflag
-        v-if="profile.country_id"
-        class="m-1"
-        :country="profile.country_id"
-      />
-      <div class="text-center rounded-circle bottom-margin">
+      <div class="text-center rounded-circle bottom-margin mt-3">
         <img class="rounded-circle" :src="profile.gravatar_92" />
       </div>
-
-      <div class="mb-3 text-center">
+      <div class="mb-3 text-center mt-2">
+        <omegaup-countryflag
+          v-if="profile.country_id"
+          :country="profile.country_id"
+        />
         <omegaup-user-username
           :classname="profile.classname"
           :username="profile.username"
@@ -93,7 +91,6 @@ export const urlMapping: { key: string; title: string; visible: boolean }[] = [
   { key: 'edit-preferences', title: T.userEditPreferences, visible: true },
   { key: 'manage-schools', title: T.userEditManageSchools, visible: true },
   { key: 'manage-identities', title: T.profileManageIdentities, visible: true },
-  { key: 'manage-api-tokens', title: T.profileManageApiTokens, visible: true },
   { key: 'change-password', title: T.userEditChangePassword, visible: false },
   { key: 'add-password', title: T.userEditAddPassword, visible: false },
   { key: 'change-email', title: T.userEditChangeEmail, visible: false },
