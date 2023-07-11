@@ -1,17 +1,17 @@
 <template>
-  <div class="container-fluid p-5">
+  <div class="container-fluid p-5 max-width">
     <div class="row">
       <div class="col col-md-4 d-flex align-items-center">
         <a href="/problem/collection/" data-nav-problems-collection>{{
           T.problemCollectionBackCollections
         }}</a>
       </div>
-      <div class="col">
-        <h1>{{ T.omegaupTitleCollectionsByAuthor }}</h1>
+      <div class="col mb-4">
+        <h1 class="title-font">{{ T.omegaupTitleCollectionsByAuthor }}</h1>
       </div>
     </div>
     <div class="row">
-      <div class="col col-md-4">
+      <div class="col col-md-3">
         <omegaup-problem-filter-authors
           :authors="authors"
           :selected-authors="selectedAuthors"
@@ -56,7 +56,7 @@
           "
         ></omegaup-problem-filter-quality>
       </div>
-      <div class="col">
+      <div class="col p-0">
         <div v-if="!problems || problems.length == 0" class="card-body">
           <div class="empty-table-message">
             {{ T.courseAssignmentProblemsEmpty }}
@@ -141,3 +141,17 @@ export default class CollectionList extends Vue {
   authors = this.data.authorsRanking;
 }
 </script>
+
+<style scoped>
+
+.title-font {
+  font-size: 2rem;
+  letter-spacing: 0.01rem;
+}
+
+.max-width {
+  max-width: 75rem;
+  margin: 0 auto;
+}
+
+</style>
