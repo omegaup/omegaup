@@ -24,24 +24,24 @@
     </div>
     <table
       v-if="items.length > 0"
-      class="table table-striped mb-0 table-responsive col-12 table-typo table-bordered table-no-outer-border"
+      class="table table-striped mb-0 table-responsive col-12 table-typo p-0"
     >
-      <slot name="table-header"></slot>
+      <thead class="d-table col-12">
+        <tr>
+          <template v-for="column in columnNames"
+            ><th :class="column.style">{{ column.name }}</th></template
+          >
+        </tr>
+      </thead>
       <tbody class="d-table col-12">
         <tr v-for="(group, index) in paginatedItems" :key="index">
-          <th
-            v-if="showPageOffset"
-            scope="row"
-            class="text-center align-middle"
-            :class="bootstrapColumns"
-          >
+          <th v-if="showPageOffset" scope="row" class="text-left align-middle">
             {{ currentPageNumber * rowsPerPage + (index + 1) }}
           </th>
           <td
             v-for="(item, itemIndex) in group"
             :key="itemIndex"
             class="align-middle"
-            :class="bootstrapColumns"
           >
             <slot name="item-data" :item="item">
               <a :href="item.getUrl()">
@@ -57,7 +57,6 @@
           <td
             v-if="!group[0].getBadge().isEmpty()"
             class="text-right align-middle"
-            :class="bootstrapColumns"
           >
             <strong>{{ group[0].getBadge().get() }}</strong>
           </td>
@@ -100,15 +99,14 @@ interface SortOption {
 }
 
 /**
- * Creates a two-dimensional paginated table, with the number of columns passed
- * as a prop and the number of rows being calculated taking into account the number
- * of items per page, total items and the number of columns.
+ * Creates a two-dimensional paginated table, with the number of rows being
+ * calculated taking into account the number of items per page, total items.
  */
 @Component
-export default class GridPaginator extends Vue {
+export default class TablePaginator extends Vue {
   @Prop() items!: LinkableResource[];
   @Prop() itemsPerPage!: number;
-  @Prop({ default: 3 }) columns!: number;
+  @Prop() columnNames!: Array<{ name: string; style: string }>;
   @Prop() title!: string;
   @Prop({ default: false }) showPageOffset!: boolean;
   @Prop({ default: () => [] }) sortOptions!: SortOption[];
@@ -127,23 +125,17 @@ export default class GridPaginator extends Vue {
   }
 
   private get totalPagesCount(): number {
-    const totalRows = Math.ceil(this.items.length / this.columns);
-    return Math.ceil(totalRows / this.rowsPerPage);
-  }
-
-  get bootstrapColumns(): string {
-    const cols = 12 / this.columns;
-    return `col-${cols}`;
+    return Math.ceil(this.items.length / this.rowsPerPage);
   }
 
   private get rowsPerPage(): number {
-    return Math.floor(this.itemsPerPage / this.columns);
+    return Math.floor(this.itemsPerPage);
   }
 
   private get itemsRows(): LinkableResource[][] {
     const groups = [];
-    for (let i = 0; i < this.items.length; i += this.columns) {
-      groups.push(this.items.slice(i, i + this.columns));
+    for (let i = 0; i < this.items.length; i++) {
+      groups.push(this.items.slice(i, i + 1));
     }
     return groups;
   }
