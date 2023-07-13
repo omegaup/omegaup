@@ -920,7 +920,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'password' => $identityPassword,
             'country_id' => 'MX',
             'state_id' => 'QUE',
-            'gender' => 'male',
+            'gender' => $gender,
             'school_name' => \OmegaUp\Test\Utils::createRandomString(),
             'group_alias' => $group['group']->alias,
         ]));
@@ -941,6 +941,26 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertSame(
             $user3->username,
+            $response['coderinfo']['username']
+        );
+
+        $login = self::login($user2);
+        \OmegaUp\Controllers\User::apiAssociateIdentity(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $identity->username,
+                'password' => $identityPassword,
+            ])
+        );
+
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
+            new \OmegaUp\Request(['category' => $category])
+        );
+
+        // Now user2 is the coder of the month
+        $this->assertSame(
+            $user2->username,
             $response['coderinfo']['username']
         );
     }
