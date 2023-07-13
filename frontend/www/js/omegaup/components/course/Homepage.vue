@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div data-homepage-course>
     <div class="row p-4 text-center justify-content-around align-items-center">
       <h2 class="col-12 mb-5 font-italic">{{ T.courseHomepageTitle }}</h2>
       <a
-        class="col-xs-6 col-sm-4 btn btn-primary btn-lg mx-auto custom-button"
+        class="col-xs-6 col-sm-3 btn btn-primary btn-lg mx-auto custom-button"
         role="button"
         href="/course/"
         >{{ T.wordsGetToKnowOurCourses }}</a
@@ -41,14 +41,6 @@
           ></omegaup-markdown>
         </div>
       </div>
-      <div class="row mt-2">
-        <a
-          class="col-xs-6 col-sm-4 btn btn-primary btn-lg mx-auto custom-button"
-          role="button"
-          href="/course/"
-          >{{ T.wordsGetToKnowOurCourses }}</a
-        >
-      </div>
     </div>
   </div>
 </template>
@@ -68,10 +60,26 @@ export default class Homepage extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../../../sass/main.scss';
 
 a.custom-button {
   color: $omegaup-white;
+  letter-spacing: 0.016rem;
+  font-size: 1.1rem;
+}
+
+[data-homepage-course] [data-markdown-statement] {
+  p {
+    margin-bottom: 0.88em;
+    margin-left: 1em;
+    font-size: 1.2rem;
+    text-align: center;
+    letter-spacing: 0.016rem;
+  }
+  ul,
+  li {
+    margin-bottom: 0.6rem;
+  }
 }
 </style>

@@ -43,13 +43,13 @@ class RunsGroups extends \OmegaUp\DAO\Base\RunsGroups {
                     FROM
                         Runs_Groups rg
                     INNER JOIN
-                        Runs r
-                    ON
-                        rg.run_id = r.run_id
-                    INNER JOIN
                         Submissions s
                     ON
-                        s.submission_id = r.submission_id
+                        s.current_run_id = rg.run_id
+                    INNER JOIN
+                        Runs r
+                    ON
+                        s.current_run_id = r.run_id
                     WHERE
                         s.problemset_id = ? AND
                         s.status = 'ready' AND
