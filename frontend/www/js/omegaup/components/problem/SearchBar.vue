@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-3">
+  <div class="mb-0 mb-sm-3">
     <form action="/problem/" method="GET" class="form-inline">
       <div v-if="tags.length !== 0" class="form-group mr-2">
         <div v-for="tag in tags" :key="tag" class="mr-1">
@@ -12,8 +12,9 @@
           <font-awesome-icon :icon="['fas', 'times']" />
         </a>
       </div>
-      <div class="form-group mr-2 mt-1">
+      <div class="form-group mr-3 mt-1 col-12 col-md-6 mb-1 mb-sm-0 px-0">
         <omegaup-common-typeahead
+          class="w-100"
           :only-existing-tags="false"
           :max-results="10"
           :existing-options="searchResultProblems"
