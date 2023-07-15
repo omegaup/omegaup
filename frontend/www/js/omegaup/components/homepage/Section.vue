@@ -51,7 +51,7 @@ h3.display-4 {
   letter-spacing: 0.01rem;
 }
 
-p.section-description{
+p.section-description {
   font-size: 1.24rem;
 }
 
@@ -61,7 +61,7 @@ img.img-fluid {
 
 a.section-link {
   color: $omegaup-white;
-    padding: 0.44em 0.88em;
+  padding: 0.44em 0.88em;
   margin-top: 0.5em;
   letter-spacing: 0.03rem;
   font-size: 1.08rem;
