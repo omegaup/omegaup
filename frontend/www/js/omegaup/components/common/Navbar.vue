@@ -124,7 +124,10 @@
           </omegaup-navbar-items>
           <!-- in lockdown or contest mode there is no left navbar -->
 
-          <ul v-if="isLoggedIn" class="navbar-nav navbar-right align-items-right">
+          <ul
+            v-if="isLoggedIn"
+            class="navbar-nav navbar-right align-items-right"
+          >
             <li class="d-none d-lg-flex">
               <omegaup-notifications-clarifications
                 v-if="inContest"
@@ -421,11 +424,11 @@ export default class Navbar extends Vue {
 @import '../../../../sass/main.scss';
 
 .navbar-color .navbar-toggler {
-    color: var(--header-navbar-primary-link-color);
-    border-color: var(--header-navbar-primary-link-color);
-  }
+  color: var(--header-navbar-primary-link-color);
+  border-color: var(--header-navbar-primary-link-color);
+}
 
-.navbar-color .navbar-toggler-icon{
+.navbar-color .navbar-toggler-icon {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.5%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
@@ -440,7 +443,7 @@ nav.navbar {
     color: var(--header-navbar-dropdown-item-font-color);
   }
 
-  a{
+  a {
     color: var(--header-navbar-primary-link-color);
   }
 
