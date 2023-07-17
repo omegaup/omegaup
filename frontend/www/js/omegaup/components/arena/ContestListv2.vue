@@ -9,17 +9,17 @@
         pills
         card
         vertical
-        nav-wrapper-class="contest-list-nav  col-md-2 col-sm-12 test-class"
+        nav-wrapper-class="contest-list-nav col-md-2 col-sm-12 test-class"
       >
-        <b-card>
+        <b-card class="card-group-menu">
           <b-container>
-            <b-row class="p-1" align-v="center">
-              <b-col class="col-md-6 col-sm-12">
+            <b-row class="justify-content-between" align-v="center">
+              <b-col class="col-md-5 col-sm-12 p-0">
                 <form :action="queryURL" method="GET">
                   <div class="input-group">
                     <input
                       v-model.lazy="currentQuery"
-                      class="form-control"
+                      class="form-control nav-link"
                       type="text"
                       name="query"
                       autocomplete="off"
@@ -28,10 +28,12 @@
                       spellcheck="false"
                       :placeholder="T.wordsKeyword"
                     />
-                    <button class="btn" type="reset">&times;</button>
+                    <button class="btn reset-btn nav-link" type="reset">
+                      &times;
+                    </button>
                     <div class="input-group-append">
                       <input
-                        class="btn btn-primary btn-md btn-block active"
+                        class="btn btn-primary btn-style btn-md btn-block active nav-link"
                         type="submit"
                         :value="T.wordsSearch"
                       />
@@ -39,7 +41,7 @@
                   </div>
                 </form>
               </b-col>
-              <b-col sm="12" class="d-flex col-md-6 btns-group mt-1">
+              <b-col sm="12" class="d-flex col-md-6 btns-group p-0">
                 <b-dropdown ref="dropdownOrderBy" no-caret>
                   <template #button-content>
                     <div>
@@ -114,12 +116,10 @@
                     />{{ T.contestOrderBySignedUp }}</b-dropdown-item
                   >
                 </b-dropdown>
-                <b-dropdown ref="dropdownFilterBy" class="mr-1" no-caret>
+                <b-dropdown ref="dropdownFilterBy" class="mr-0" no-caret>
                   <template #button-content>
-                    <div>
-                      <font-awesome-icon icon="filter" />
-                      {{ T.contestFilterBy }}
-                    </div>
+                    <font-awesome-icon icon="filter" />
+                    {{ T.contestFilterBy }}
                   </template>
                   <b-dropdown-item
                     href="#"
@@ -536,6 +536,45 @@ export default class ArenaContestList extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
+.btn {
+  padding: 0.5rem 1rem !important;
+}
+
+.card-group-menu {
+  border: none;
+  border-bottom: 1px solid var(--arena-scoreboard-hover-color);
+  border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1.8rem;
+}
+
+.btn-style {
+  border-color: var(--arena-button-border-color);
+}
+
+.form-control {
+  height: auto;
+}
+
+.reset-btn {
+  line-height: 1.5;
+  color: #6c757d;
+  background-color: var(--arena-runs-table-status-je-ve-font-color);
+  background-clip: padding-box;
+  border: none;
+  border-top: 1px solid var(--arena-reset-border-color);
+  border-bottom: 1px solid var(--arena-reset-border-color);
+  border-radius: unset;
+}
+
+.btn-primary {
+  background-color: var(--arena-button-border-color) !important;
+}
+
 .sidebar {
   >>> .contest-list-nav {
     background-color: var(
@@ -570,6 +609,7 @@ export default class ArenaContestList extends Vue {
 
 .btns-group {
   justify-content: flex-end;
+
   .dropdown {
     margin-right: 1rem;
   }
@@ -580,12 +620,14 @@ export default class ArenaContestList extends Vue {
     font-size: 1.5rem;
     text-align: center;
   }
+
   .tabs {
     flex-direction: column;
   }
 
   .btns-group {
     justify-content: flex-start;
+
     .dropdown {
       flex: 1;
       gap: 1rem;
