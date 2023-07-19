@@ -84,7 +84,7 @@
             <!-- <slot name="table-title">
               <th class="text-center" scope="col">{{ T.wordsProblem }}</th>
             </slot> -->
-            <th class="text-center" scope="col">Info</th>
+            <th class="text-center" scope="col">{{ T.clarificationInfo }}</th>
             <!-- <th class="text-center" scope="col">{{ T.clarificationsAskedBy }}</th>
             <th class="text-center" scope="col">{{ T.wordsTime }}</th> -->
             <th class="text-center" scope="col">{{ T.wordsMessage }}</th>

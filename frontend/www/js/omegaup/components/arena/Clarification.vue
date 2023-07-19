@@ -12,25 +12,24 @@
           'assignment_alias' in clarification && clarification.assignment_alias
         "
       >
-        <span class="font-weight-bold">Tarea:</span>
+        <span class="font-weight-bold">{{ T.clarificationHomework }}</span>
         {{ clarification.assignment_alias }}
       </span>
-      <span class="font-weight-bold">Problema:</span>
+      <span class="font-weight-bold">{{ T.clarificationProblem }}</span>
       {{
         'contest_alias' in clarification && clarification.contest_alias
           ? clarification.contest_alias
           : clarification.problem_alias
       }}
       <span data-author>
-        <span class="font-weight-bold">Preguntado por:</span>
+        <span class="font-weight-bold">{{ T.clarificationsAskedBy }}</span>
         {{ clarificationAuthorReceiver }}
       </span>
-      <span class="font-weight-bold">Fecha y Hora:</span>
+      <span class="font-weight-bold">{{ T.clarificationTime }}</span>
       {{ time.formatDateTime(clarification.time) }}
     </td>
 
     <!-- <td class="text-center align-middle">
-
       <span class="font-weight-bold">Problema:</span>
       {{
         'contest_alias' in clarification && clarification.contest_alias
