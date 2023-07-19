@@ -7,7 +7,11 @@
     }"
   >
     <td class="column-info text-center align-middle">
-      <span v-if="'assignment_alias' in clarification && clarification.assignment_alias">
+      <span
+        v-if="
+          'assignment_alias' in clarification && clarification.assignment_alias
+        "
+      >
         <span class="font-weight-bold">Tarea:</span>
         {{ clarification.assignment_alias }}
       </span>
@@ -24,7 +28,6 @@
       <span class="font-weight-bold">Fecha y Hora:</span>
       {{ time.formatDateTime(clarification.time) }}
     </td>
-
 
     <!-- <td class="text-center align-middle">
 
