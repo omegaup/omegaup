@@ -175,8 +175,9 @@ def update_user_rank(
     for index, row in enumerate(cur_readonly.fetchall()):
         if row['score'] != prev_score:
             rank = index + 1
-        scores.append(row['score'])
-        prev_score = row['score']
+        score = row.get('score', 0)
+        scores.append(score)
+        prev_score = score
         cur.execute(
             '''
                     INSERT INTO
@@ -185,7 +186,7 @@ def update_user_rank(
                                      `username`, `name`, `country_id`,
                                      `state_id`, `school_id`)
                     VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);''',
-            (row['user_id'], rank, row['problems_solved_count'], row['score'],
+            (row['user_id'], rank, row['problems_solved_count'], score,
              row['username'], row['name'], row['country_id'], row['state_id'],
              row['school_id']))
     return scores
