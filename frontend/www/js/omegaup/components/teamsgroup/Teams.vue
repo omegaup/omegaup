@@ -23,7 +23,7 @@
               :username="identity.username"
             ></omegaup-user-username>
           </td>
-          <td>{{ identity.name }}</td>
+          <td data-group-team-name>{{ identity.name }}</td>
           <td>{{ identity.country }}</td>
           <td>{{ identity.state }}</td>
           <td>{{ identity.school }}</td>

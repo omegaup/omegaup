@@ -13,6 +13,12 @@ export interface GroupOptions {
   groupDescription: string;
 }
 
+export interface TeamGroupOptions {
+  groupTitle: string;
+  groupDescription: string;
+  noOfContestants: string;
+}
+
 export interface ProblemOptions {
   problemAlias: string;
   tag: string;
