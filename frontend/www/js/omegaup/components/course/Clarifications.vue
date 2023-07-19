@@ -11,8 +11,9 @@
     "
   >
     <template #table-title>
-      <th class="text-center" scope="col">{{ T.wordsHomework }}</th>
-      <th class="text-center" scope="col">{{ T.wordsProblem }}</th>
+      <th class="text-center" scope="col">Info</th>
+      <!-- <th class="text-center" scope="col">{{ T.wordsHomework }}</th>
+      <th class="text-center" scope="col">{{ T.wordsProblem }}</th> -->
     </template>
   </omegaup-clarification-list>
 </template>

@@ -6,27 +6,44 @@
       'border border-primary': selected,
     }"
   >
-    <td
-      v-if="
-        'assignment_alias' in clarification && clarification.assignment_alias
-      "
-      class="text-center align-middle"
-    >
-      {{ clarification.assignment_alias }}
-    </td>
-    <td class="text-center align-middle">
+    <td class="column-info text-center align-middle">
+      <span v-if="'assignment_alias' in clarification && clarification.assignment_alias">
+        <span class="font-weight-bold">Tarea:</span>
+        {{ clarification.assignment_alias }}
+      </span>
+      <span class="font-weight-bold">Problema:</span>
       {{
         'contest_alias' in clarification && clarification.contest_alias
           ? clarification.contest_alias
           : clarification.problem_alias
       }}
-    </td>
-    <td class="text-center align-middle" data-author>
-      {{ clarificationAuthorReceiver }}
-    </td>
-    <td class="text-center align-middle">
+      <span data-author>
+        <span class="font-weight-bold">Preguntado por:</span>
+        {{ clarificationAuthorReceiver }}
+      </span>
+      <span class="font-weight-bold">Fecha y Hora:</span>
       {{ time.formatDateTime(clarification.time) }}
     </td>
+
+
+    <!-- <td class="text-center align-middle">
+
+      <span class="font-weight-bold">Problema:</span>
+      {{
+        'contest_alias' in clarification && clarification.contest_alias
+          ? clarification.contest_alias
+          : clarification.problem_alias
+      }}
+    </td> -->
+    <!-- <td class="text-center align-middle" data-author>
+      <span class="font-weight-bold">Preguntado por:</span>
+      {{ clarificationAuthorReceiver }}
+    </td> -->
+    <!-- <td class="text-center align-middle">
+      <span class="font-weight-bold">Fecha y Hora:</span>
+      {{ time.formatDateTime(clarification.time) }}
+    </td> -->
+
     <td class="column-message align-middle" data-form-clarification-message>
       <span class="text-monospace text-dark">{{ clarification.message }}</span>
     </td>
@@ -213,6 +230,10 @@ export default class ArenaClarification extends Vue {
 
 span {
   font-size: 14px;
+}
+.column-info {
+  min-width: 13rem;
+  max-width: 14rem;
 }
 .column-message {
   min-width: 25rem;

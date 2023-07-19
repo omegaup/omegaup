@@ -81,13 +81,12 @@
       <table class="table mb-0">
         <thead>
           <tr class="text-nowrap">
-            <slot name="table-title">
+            <!-- <slot name="table-title">
               <th class="text-center" scope="col">{{ T.wordsProblem }}</th>
-            </slot>
-            <th class="text-center" scope="col">
-              {{ T.clarificationsAskedBy }}
-            </th>
-            <th class="text-center" scope="col">{{ T.wordsTime }}</th>
+            </slot> -->
+            <th class="text-center" scope="col">Info</th>
+            <!-- <th class="text-center" scope="col">{{ T.clarificationsAskedBy }}</th>
+            <th class="text-center" scope="col">{{ T.wordsTime }}</th> -->
             <th class="text-center" scope="col">{{ T.wordsMessage }}</th>
             <th class="text-center" scope="col">{{ T.wordsResult }}</th>
           </tr>
