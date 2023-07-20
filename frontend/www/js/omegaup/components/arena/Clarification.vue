@@ -33,23 +33,6 @@
       {{ time.formatDateTime(clarification.time) }}
     </td>
 
-    <!-- <td class="text-center align-middle">
-      <span class="font-weight-bold">Problema:</span>
-      {{
-        'contest_alias' in clarification && clarification.contest_alias
-          ? clarification.contest_alias
-          : clarification.problem_alias
-      }}
-    </td> -->
-    <!-- <td class="text-center align-middle" data-author>
-      <span class="font-weight-bold">Preguntado por:</span>
-      {{ clarificationAuthorReceiver }}
-    </td> -->
-    <!-- <td class="text-center align-middle">
-      <span class="font-weight-bold">Fecha y Hora:</span>
-      {{ time.formatDateTime(clarification.time) }}
-    </td> -->
-
     <td class="column-message align-middle" data-form-clarification-message>
       <span class="text-monospace text-dark">{{ clarification.message }}</span>
     </td>
