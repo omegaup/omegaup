@@ -15,7 +15,11 @@
         <span class="font-weight-bold">{{ T.clarificationHomework }}</span>
         {{ clarification.assignment_alias }}
       </span>
-      <span class="font-weight-bold">{{ T.clarificationProblem }}</span>
+      <span class="font-weight-bold">{{
+        'contest_alias' in clarification && clarification.contest_alias
+          ? T.clarificationContest
+          : T.clarificationProblem
+      }}</span>
       {{
         'contest_alias' in clarification && clarification.contest_alias
           ? clarification.contest_alias
