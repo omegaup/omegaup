@@ -6,7 +6,7 @@
     <div class="card-body">
       <form>
         <div class="row justify-content-md-center">
-          <div class="col-md-4 col-md-offset-2">
+          <div class="col-md-4 col-md-offset-2 introjsusername">
             <div class="form-group">
               <label class="control-label">{{ T.wordsUser }}</label>
               <input
@@ -18,7 +18,7 @@
               />
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-4 introjsemail">
             <div class="form-group">
               <label class="control-label">{{ T.loginEmail }}</label>
               <input
@@ -33,7 +33,7 @@
           </div>
         </div>
         <div class="row justify-content-md-center">
-          <div class="col-md-4 col-md-offset-2">
+          <div class="col-md-4 col-md-offset-2 introjspassword">
             <div class="form-group">
               <label class="control-label">{{ T.loginPasswordCreate }}</label>
               <input
@@ -46,7 +46,7 @@
               />
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-4 introjsconfirmpassword">
             <div class="form-group">
               <label class="control-label">{{ T.loginRepeatPassword }}</label>
               <input
@@ -62,9 +62,9 @@
         </div>
 
         <div class="row justify-content-md-center">
-          <div class="col-md-8">
-            <input v-model="checked" type="checkbox" />
-            <label for="checkbox">
+          <div class="col-md-8" >
+            <input v-model="checked" type="checkbox"/>
+            <label for="checkbox" class="introjstandc">
               <omegaup-markdown
                 :markdown="T.acceptPrivacyPolicy"
               ></omegaup-markdown>
@@ -79,10 +79,10 @@
             ></vue-recaptcha>
           </div>
           <div class="col-md-4 col-md-offset-6">
-            <div class="form-group">
+            <div class="form-group introjsregister">
               <button
                 data-signup-submit
-                class="btn btn-primary form-control"
+                class="btn btn-primary form-control introjsclass"
                 name="sign_up"
                 @click.prevent="
                   $emit(
@@ -109,6 +109,8 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import omegaup_Markdown from '../Markdown.vue';
 import T from '../../lang';
+import 'intro.js/introjs.css';
+import introJs from 'intro.js';
 
 @Component({
   components: {
@@ -125,6 +127,59 @@ export default class Signup extends Vue {
   passwordConfirmation: string = '';
   recaptchaResponse: string = '';
 
+  mounted() {
+    const hasVisitedSection = localStorage.getItem('hasVisitedSignupSection');
+    const title = T.signUpFormInteractiveGuideTitle; 
+
+    if (!hasVisitedSection) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title,
+              intro: T.signUpFormInteractiveGuideWelcome,
+            },
+            {
+              element: document.querySelector('.introjsusername'),
+              title,
+              intro: T.signUpFormInteractiveGuideUsername,
+            },
+            {
+              element: document.querySelector('.introjsemail'),
+              title,
+              intro: T.signUpFormInteractiveGuideEmail,
+            },
+            {
+              element: document.querySelector('.introjspassword'),
+              title,
+              intro: T.signUpFormInteractiveGuidePassword,
+            },
+            {
+              element: document.querySelector('.introjsconfirmpassword'),
+              title,
+              intro: T.signUpFormInteractiveGuideConfirmPassword,
+            },
+            {
+              element: document.querySelector('.introjstanc'),
+              title,
+              intro: T.signUpFormInteractiveGuideTAndC,
+            },
+            {
+              element: document.querySelector('.introjsregister'),
+              title,
+              intro: T.signUpFormInteractiveGuideRegister,
+            },
+          ],
+        })
+        .start();
+
+      localStorage.setItem('hasVisitedSignupSection', 'true');
+    }
+  }
+
   verify(response: string): void {
     this.recaptchaResponse = response;
   }
@@ -134,3 +189,4 @@ export default class Signup extends Vue {
   }
 }
 </script>
+
