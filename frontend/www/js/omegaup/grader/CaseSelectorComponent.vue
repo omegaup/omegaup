@@ -1,5 +1,8 @@
 <template>
-  <div class="root d-flex flex-column h-100 bg-dark text-white">
+  <div
+    class="root d-flex flex-column h-100"
+    :class="{ 'bg-dark': theme == 'vs-dark', 'text-white': theme == 'vs-dark' }"
+  >
     <div class="summary">
       {{ summary }}
     </div>
@@ -15,6 +18,7 @@
         <template v-for="group in groups" v-else :title="name">
           <div
             v-if="group.explicit"
+            :key="group.name"
             class="list-group-item list-group-item-secondary"
           >
             <div>
@@ -32,6 +36,7 @@
           </div>
           <button
             v-for="item in group.cases"
+            :key="item.name"
             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
             type="button"
             :class="{
@@ -53,7 +58,7 @@
               <span :title="item.name">{{ item.name }}</span>
             </div>
             <button
-              v-if="item.name != 'sample'"
+              v-if="groups.length > 1"
               aria-label="Close"
               class="close"
               type="button"
@@ -100,6 +105,10 @@ export default {
     storeMapping: {
       type: Object,
       required: true,
+    },
+    theme: {
+      type: String,
+      default: 'vs-dark',
     },
   },
   data: function () {
@@ -257,18 +266,22 @@ button.in-group {
   border-left-width: 6px;
   padding-left: 15px;
 }
+
 button[type='submit'] {
   width: 2em;
 }
+
 div.summary {
   text-align: center;
   padding: 0.25em;
 }
+
 div.case-item {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 span.verdict {
   display: inline-block;
   float: left;
@@ -276,19 +289,23 @@ span.verdict {
   text-align: center;
   margin: -7px 5px -6px -10px;
 }
+
 span.verdict span.score {
   font-size: xx-small;
   display: block;
 }
+
 div.filenames {
   overflow-y: auto;
   flex: 1;
 }
+
 a.list-group-item {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 input.case-weight {
   flex: 0.3;
 }

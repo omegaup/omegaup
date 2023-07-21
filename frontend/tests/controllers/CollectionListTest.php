@@ -47,10 +47,10 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                     $identities[$i],
                     $problems[$j]['request']['problem_alias'],
-                    /*$difficulty=*/1,
-                    /*$quality=*/4,
-                    [],
-                    false
+                    difficulty: 1,
+                    quality: 4,
+                    tags: [],
+                    beforeAC: false
                 );
             }
         }
@@ -68,10 +68,10 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                     $identities[$i],
                     $problems[$j]['request']['problem_alias'],
-                    /*$difficulty=*/1,
-                    /*$quality=*/3,
-                    [],
-                    false
+                    difficulty: 1,
+                    quality: 3,
+                    tags: [],
+                    beforeAC: false
                 );
             }
         }
@@ -185,15 +185,15 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Call getCollectionsDetailsByLevelForSmarty with a level tag collection type
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript with a level tag collection type
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
             ])
-        )['smartyProperties']['payload']['frequentTags'];
+        )['templateProperties']['payload']['frequentTags'];
 
-        $this->assertEquals('problemTagMatrices', $result[0]['name']);
+        $this->assertSame('problemTagMatrices', $result[0]['name']);
         $this->assertCount(6, $result);
     }
 
@@ -207,12 +207,12 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Call getCollectionsDetailsByAuthorForSmarty with an author collection type
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript with an author collection type
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload']['authorsRanking']['ranking'];
+        )['templateProperties']['payload']['authorsRanking']['ranking'];
 
         foreach ($result as $key) {
             $this->assertArrayHasKey('author_ranking', $key);
@@ -256,10 +256,10 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                     $identities[$j],
                     $problems[$i]['request']['problem_alias'],
-                    /*$difficulty=*/$i,
-                    /*$quality=*/3,
-                    [],
-                    false
+                    difficulty: $i,
+                    quality: 3,
+                    tags: [],
+                    beforeAC: false
                 );
             }
         }
@@ -291,106 +291,106 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Call getCollectionsDetailsByLevelForSmarty with easy difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript with easy difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'difficulty' => 'easy'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(2, $result);
 
-        // Call getCollectionsDetailsByLevelForSmarty with medium difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript with medium difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'difficulty' => 'medium'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(1, $result);
 
-        // Call getCollectionsDetailsByLevelForSmarty with hard difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript with hard difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'difficulty' => 'hard'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(1, $result);
 
-        // Call getCollectionsDetailsByLevelForSmarty with all difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript with all difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'difficulty' => 'all'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(4, $result);
 
-        // Call getCollectionsDetailsByLevelForSmarty without difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript without difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(4, $result);
 
-        // Call getCollectionsDetailsByAuthorForSmarty with easy difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript with easy difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'difficulty' => 'easy'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(2, $result);
 
-        // Call getCollectionsDetailsByAuthorForSmarty with medium difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript with medium difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'difficulty' => 'medium'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(1, $result);
 
-        // Call getCollectionsDetailsByAuthorForSmarty with hard difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript with hard difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'difficulty' => 'hard'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(1, $result);
 
-        // Call getCollectionsDetailsByAuthorForSmarty with all difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript with all difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'difficulty' => 'all'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(4, $result);
 
-        // Call getCollectionsDetailsByAuthorForSmarty without difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript without difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(4, $result);
     }
@@ -444,23 +444,23 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Call getCollectionsDetailsByLevelForSmarty
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'sort_order' => 'asc'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(4, $result);
-        $this->assertEquals('problem_0', $result[0]['alias']);
-        $this->assertEquals('problem_1', $result[1]['alias']);
-        $this->assertEquals('problem_2', $result[2]['alias']);
-        $this->assertEquals('problem_3', $result[3]['alias']);
+        $this->assertSame('problem_0', $result[0]['alias']);
+        $this->assertSame('problem_1', $result[1]['alias']);
+        $this->assertSame('problem_2', $result[2]['alias']);
+        $this->assertSame('problem_3', $result[3]['alias']);
 
-        // Call getCollectionsDetailsByLevelForSmarty with 2 as rowcount and 1 as page
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript with 2 as rowcount and 1 as page
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
@@ -468,14 +468,14 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'page' => '1',
                 'sort_order' => 'asc'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(2, $result);
-        $this->assertEquals('problem_0', $result[0]['alias']);
-        $this->assertEquals('problem_1', $result[1]['alias']);
+        $this->assertSame('problem_0', $result[0]['alias']);
+        $this->assertSame('problem_1', $result[1]['alias']);
 
-        // Call getCollectionsDetailsByLevelForSmarty with 2 as rowcount and 2 as page
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript with 2 as rowcount and 2 as page
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
@@ -483,11 +483,11 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'page' => '2',
                 'sort_order' => 'asc'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(2, $result);
-        $this->assertEquals('problem_2', $result[0]['alias']);
-        $this->assertEquals('problem_3', $result[1]['alias']);
+        $this->assertSame('problem_2', $result[0]['alias']);
+        $this->assertSame('problem_3', $result[1]['alias']);
     }
 
     /**
@@ -500,35 +500,35 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Call getCollectionsDetailsByAuthorForSmarty
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(8, $result);
 
-        // Call getCollectionsDetailsByAuthorForSmarty with a username of an author
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript with a username of an author
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'author' => 'author_0'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(2, $result);
 
-        // Call getCollectionsDetailsByAuthorForSmarty with a username of an author, 1 as rowcount
+        // Call getCollectionsDetailsByAuthorForTypeScript with a username of an author, 1 as rowcount
         // and 2 as page
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'author' => 'author_0',
                 'rowcount' => 1,
                 'page' => 2
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(1, $result);
     }

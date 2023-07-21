@@ -40,6 +40,14 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         'urgent' => true,
         'languages' => true,
         'recommended' => true,
+        'archived' => true,
+        'certificate_cutoff' => true,
+        'certificates_status' => true,
+        'contest_for_teams' => true,
+        'default_show_all_contestants_in_scoreboard' => true,
+        'score_mode' => true,
+        'plagiarism_threshold' => true,
+        'check_plagiarism' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -202,6 +210,46 @@ class Contests extends \OmegaUp\DAO\VO\VO {
                 $data['recommended']
             );
         }
+        if (isset($data['archived'])) {
+            $this->archived = boolval(
+                $data['archived']
+            );
+        }
+        if (isset($data['certificate_cutoff'])) {
+            $this->certificate_cutoff = intval(
+                $data['certificate_cutoff']
+            );
+        }
+        if (isset($data['certificates_status'])) {
+            $this->certificates_status = is_scalar(
+                $data['certificates_status']
+            ) ? strval($data['certificates_status']) : '';
+        }
+        if (isset($data['contest_for_teams'])) {
+            $this->contest_for_teams = boolval(
+                $data['contest_for_teams']
+            );
+        }
+        if (isset($data['default_show_all_contestants_in_scoreboard'])) {
+            $this->default_show_all_contestants_in_scoreboard = boolval(
+                $data['default_show_all_contestants_in_scoreboard']
+            );
+        }
+        if (isset($data['score_mode'])) {
+            $this->score_mode = is_scalar(
+                $data['score_mode']
+            ) ? strval($data['score_mode']) : '';
+        }
+        if (isset($data['plagiarism_threshold'])) {
+            $this->plagiarism_threshold = boolval(
+                $data['plagiarism_threshold']
+            );
+        }
+        if (isset($data['check_plagiarism'])) {
+            $this->check_plagiarism = boolval(
+                $data['check_plagiarism']
+            );
+        }
     }
 
     /**
@@ -270,7 +318,7 @@ class Contests extends \OmegaUp\DAO\VO\VO {
     public $window_length = null;
 
     /**
-     * Este campo es para las repeticiones de algún concurso, Contiene el id del concurso original.
+     * Este campo es para las repeticiones de algún concurso, Contiene el id del concurso original o null en caso de ser un concurso original.
      *
      * @var int|null
      */
@@ -373,4 +421,60 @@ class Contests extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $recommended = false;
+
+    /**
+     * Indica si el concurso ha sido archivado por el administrador.
+     *
+     * @var bool
+     */
+    public $archived = false;
+
+    /**
+     * Número de concursantes a premiar con diplomas que mencionan su lugar en el ranking
+     *
+     * @var int|null
+     */
+    public $certificate_cutoff = null;
+
+    /**
+     * Estado de la petición de generar diplomas
+     *
+     * @var string
+     */
+    public $certificates_status = 'uninitiated';
+
+    /**
+     * Bandera que indica si el concurso es para equipos.
+     *
+     * @var bool
+     */
+    public $contest_for_teams = false;
+
+    /**
+     * Bandera que indica si en el scoreboard se mostrarán todos los concursantes por defecto.
+     *
+     * @var bool
+     */
+    public $default_show_all_contestants_in_scoreboard = false;
+
+    /**
+     * Indica el tipo de evaluación para el concurso
+     *
+     * @var string
+     */
+    public $score_mode = 'partial';
+
+    /**
+     * El porcentaje mínimo permitido de similitud entre un par de envíos. Cuando plagio Seleccionado, será 90.
+     *
+     * @var bool
+     */
+    public $plagiarism_threshold = false;
+
+    /**
+     * Indica si se debe correr el detector de plagios.
+     *
+     * @var bool
+     */
+    public $check_plagiarism = false;
 }

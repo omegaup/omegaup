@@ -4,8 +4,6 @@ namespace OmegaUp\Test;
 
 /**
  * Test utils
- *
- * @author joemmanuel
  */
 class Utils {
     /** @var bool */
@@ -25,13 +23,17 @@ class Utils {
     /**
      * Given a run guid, set a score for its run
      *
-     * @param ?int    $runID              The ID of the run.
-     * @param ?string $runGuid            The GUID of the submission.
-     * @param float   $points             The score of the run
-     * @param string  $verdict            The verdict of the run.
-     * @param ?int    $submitDelay        The number of minutes worth of penalty.
-     * @param int     $problemsetPoints   The max score of the run for the problemset.
-     * @param ?string $outputFileContents The content to compress in files.zip.
+     * @param ?int    $runID               The ID of the run.
+     * @param ?string $runGuid             The GUID of the submission.
+     * @param float   $points              The score of the run
+     * @param string  $verdict             The verdict of the run.
+     * @param ?int    $submitDelay         The number of minutes worth of penalty.
+     * @param int     $problemsetPoints    The max score of the run for the problemset.
+     * @param ?string $outputFileContents  The content to compress in files.zip.
+     * @param string  $problemsetScoreMode The score mode for a problemset. The
+     *                                     points will be calulated in a different
+     *                                     way when score mode is `max_per_group`.
+     * @param list<array{group_name: string, score: float, verdict: string}>   $runScoreByGroups    The score by groups.
      */
     public static function gradeRun(
         ?int $runId = null,
@@ -40,7 +42,9 @@ class Utils {
         string $verdict = 'AC',
         ?int $submitDelay = null,
         int $problemsetPoints = 100,
-        ?string $outputFileContents = null
+        ?string $outputFileContents = null,
+        string $problemsetScoreMode = 'partial',
+        array $runScoreByGroups = []
     ): void {
         if (!is_null($runId)) {
             $run = \OmegaUp\DAO\Runs::getByPK($runId);
@@ -73,14 +77,29 @@ class Utils {
         $run->contest_score = $points * $problemsetPoints;
         $run->status = 'ready';
         $run->judged_by = 'J1';
+        $submission->status = $run->status;
+        $submission->verdict = $run->verdict;
 
         if (!is_null($submitDelay)) {
             $submission->submit_delay = $submitDelay;
-            \OmegaUp\DAO\Submissions::update($submission);
             $run->penalty = $submitDelay;
         }
 
+        \OmegaUp\DAO\Submissions::update($submission);
         \OmegaUp\DAO\Runs::update($run);
+
+        if ($problemsetScoreMode === 'max_per_group') {
+            foreach ($runScoreByGroups as $scoreByGroup) {
+                \OmegaUp\DAO\RunsGroups::create(
+                    new \OmegaUp\DAO\VO\RunsGroups([
+                        'run_id' => $run->run_id,
+                        'group_name' => $scoreByGroup['group_name'],
+                        'score' => $scoreByGroup['score'],
+                        'verdict' => $scoreByGroup['verdict'],
+                    ])
+                );
+            }
+        }
 
         \OmegaUp\Grader::getInstance()->setGraderResourceForTesting(
             $run,
@@ -202,6 +221,7 @@ class Utils {
             'ACLs',
             'Assignments',
             'Auth_Tokens',
+            'API_Tokens',
             'Clarifications',
             'Coder_Of_The_Month',
             'Contest_Log',
@@ -242,6 +262,8 @@ class Utils {
             'School_Of_The_Month',
             'Submissions',
             'Submission_Log',
+            'Team_Groups',
+            'Teams',
             'User_Roles',
             'User_Rank',
             'Users',
@@ -312,8 +334,11 @@ class Utils {
     }
 
     private static function shellExec(string $command): void {
-        $log = \Logger::getLogger('\\OmegaUp\\Test\\Utils::shellExec()');
+        $log = \Monolog\Registry::omegaup()->withName(
+            '\\OmegaUp\\Test\\Utils::shellExec()'
+        );
         $log->info("========== Starting {$command}");
+        $pipes = [];
         /** @psalm-suppress ForbiddenCode this only runs in tests. */
         $proc = proc_open(
             $command,
@@ -359,13 +384,23 @@ class Utils {
                 $runDate
             )
         ));
+        $host_arg = '';
+        $host_chunks = explode(':', OMEGAUP_DB_HOST, 2);
+        if (count($host_chunks) == 2) {
+            [$hostname, $port] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+            $host_arg .= ' --port ' . escapeshellarg($port);
+        } else {
+            [$hostname] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+        }
         self::shellExec(
             ('python3 ' .
              dirname(__DIR__, 2) . '/stuff/cron/update_ranks.py' .
              ' --verbose ' .
-             ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              ' --update-coder-of-the-month ' .
-             ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+             ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
+             $host_arg .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
             ' --password ' . escapeshellarg(OMEGAUP_DB_PASS) .
@@ -377,27 +412,72 @@ class Utils {
         // Ensure all suggestions are written to the database before invoking
         // the external script.
         self::commit();
+        $host_arg = '';
+        $host_chunks = explode(':', OMEGAUP_DB_HOST, 2);
+        if (count($host_chunks) == 2) {
+            [$hostname, $port] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+            $host_arg .= ' --port ' . escapeshellarg($port);
+        } else {
+            [$hostname] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+        }
         self::shellExec(
             ('python3 ' .
              dirname(__DIR__, 2) . '/stuff/cron/aggregate_feedback.py' .
              ' --verbose ' .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
-             ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+             $host_arg .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
              ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))
         );
     }
 
+    public static function runCheckPlagiarisms(): void {
+        self::commit();
+        $host_arg = '';
+        $host_chunks = explode(':', OMEGAUP_DB_HOST, 2);
+        if (count($host_chunks) == 2) {
+            [$hostname, $port] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+            $host_arg .= ' --port ' . escapeshellarg($port);
+        } else {
+            [$hostname] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+        }
+        self::shellExec(
+            ('python3 ' .
+             dirname(__DIR__, 2) . '/stuff/cron/plagiarism_detector.py' .
+             ' --verbose ' .
+             ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
+             $host_arg .
+             ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+             ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+             ' --password ' . escapeshellarg(OMEGAUP_DB_PASS) .
+             ' --local-downloader-dir ' . escapeshellarg(OMEGAUP_TEST_ROOT))
+        );
+    }
+
     public static function runAssignBadges(): void {
         // Ensure everything is commited before invoking external script
         self::commit();
+        $host_arg = '';
+        $host_chunks = explode(':', OMEGAUP_DB_HOST, 2);
+        if (count($host_chunks) == 2) {
+            [$hostname, $port] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+            $host_arg .= ' --port ' . escapeshellarg($port);
+        } else {
+            [$hostname] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+        }
         self::shellExec(
             ('python3 ' .
              dirname(__DIR__, 2) . '/stuff/cron/assign_badges.py' .
              ' --verbose ' .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
-             ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+             $host_arg .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
              ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))

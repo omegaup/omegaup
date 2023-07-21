@@ -21,16 +21,27 @@ class Users extends \OmegaUp\DAO\VO\VO {
         'git_token' => true,
         'main_email_id' => true,
         'main_identity_id' => true,
+        'has_learning_objective' => true,
+        'has_teaching_objective' => true,
+        'has_scholar_objective' => true,
+        'has_competitive_objective' => true,
         'scholar_degree' => true,
         'birth_date' => true,
         'verified' => true,
         'verification_id' => true,
+        'deletion_token' => true,
         'reset_digest' => true,
         'reset_sent_at' => true,
         'hide_problem_tags' => true,
         'in_mailing_list' => true,
         'is_private' => true,
         'preferred_language' => true,
+        'parent_verified' => true,
+        'creation_timestamp' => true,
+        'parental_verification_token' => true,
+        'parent_email_verification_initial' => true,
+        'parent_email_verification_deadline' => true,
+        'parent_email_id' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -68,6 +79,26 @@ class Users extends \OmegaUp\DAO\VO\VO {
                 $data['main_identity_id']
             );
         }
+        if (isset($data['has_learning_objective'])) {
+            $this->has_learning_objective = boolval(
+                $data['has_learning_objective']
+            );
+        }
+        if (isset($data['has_teaching_objective'])) {
+            $this->has_teaching_objective = boolval(
+                $data['has_teaching_objective']
+            );
+        }
+        if (isset($data['has_scholar_objective'])) {
+            $this->has_scholar_objective = boolval(
+                $data['has_scholar_objective']
+            );
+        }
+        if (isset($data['has_competitive_objective'])) {
+            $this->has_competitive_objective = boolval(
+                $data['has_competitive_objective']
+            );
+        }
         if (isset($data['scholar_degree'])) {
             $this->scholar_degree = is_scalar(
                 $data['scholar_degree']
@@ -87,6 +118,11 @@ class Users extends \OmegaUp\DAO\VO\VO {
             $this->verification_id = is_scalar(
                 $data['verification_id']
             ) ? strval($data['verification_id']) : '';
+        }
+        if (isset($data['deletion_token'])) {
+            $this->deletion_token = is_scalar(
+                $data['deletion_token']
+            ) ? strval($data['deletion_token']) : '';
         }
         if (isset($data['reset_digest'])) {
             $this->reset_digest = is_scalar(
@@ -123,6 +159,58 @@ class Users extends \OmegaUp\DAO\VO\VO {
             $this->preferred_language = is_scalar(
                 $data['preferred_language']
             ) ? strval($data['preferred_language']) : '';
+        }
+        if (isset($data['parent_verified'])) {
+            $this->parent_verified = boolval(
+                $data['parent_verified']
+            );
+        }
+        if (isset($data['creation_timestamp'])) {
+            /**
+             * @var \OmegaUp\Timestamp|string|int|float $data['creation_timestamp']
+             * @var \OmegaUp\Timestamp $this->creation_timestamp
+             */
+            $this->creation_timestamp = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['creation_timestamp']
+                )
+            );
+        } else {
+            $this->creation_timestamp = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
+        }
+        if (isset($data['parental_verification_token'])) {
+            $this->parental_verification_token = is_scalar(
+                $data['parental_verification_token']
+            ) ? strval($data['parental_verification_token']) : '';
+        }
+        if (isset($data['parent_email_verification_initial'])) {
+            /**
+             * @var \OmegaUp\Timestamp|string|int|float $data['parent_email_verification_initial']
+             * @var \OmegaUp\Timestamp $this->parent_email_verification_initial
+             */
+            $this->parent_email_verification_initial = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['parent_email_verification_initial']
+                )
+            );
+        }
+        if (isset($data['parent_email_verification_deadline'])) {
+            /**
+             * @var \OmegaUp\Timestamp|string|int|float $data['parent_email_verification_deadline']
+             * @var \OmegaUp\Timestamp $this->parent_email_verification_deadline
+             */
+            $this->parent_email_verification_deadline = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['parent_email_verification_deadline']
+                )
+            );
+        }
+        if (isset($data['parent_email_id'])) {
+            $this->parent_email_id = intval(
+                $data['parent_email_id']
+            );
         }
     }
 
@@ -164,6 +252,34 @@ class Users extends \OmegaUp\DAO\VO\VO {
     public $main_identity_id = null;
 
     /**
+     * Dice si el usuario expresó tener el objetivo de usar omegaUp para aprender.
+     *
+     * @var bool|null
+     */
+    public $has_learning_objective = null;
+
+    /**
+     * Dice si el usuario expresó tener el objetivo de usar omegaUp para enseñar.
+     *
+     * @var bool|null
+     */
+    public $has_teaching_objective = null;
+
+    /**
+     * Dice si el usuario expresó tener el objetivo de usar omegaUp para la escuela.
+     *
+     * @var bool|null
+     */
+    public $has_scholar_objective = null;
+
+    /**
+     * Dice si el usuario expresó tener el objetivo de usar omegaUp para programación competitiva.
+     *
+     * @var bool|null
+     */
+    public $has_competitive_objective = null;
+
+    /**
      * [Campo no documentado]
      *
      * @var string|null
@@ -190,6 +306,13 @@ class Users extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $verification_id = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $deletion_token = null;
 
     /**
      * [Campo no documentado]
@@ -232,4 +355,46 @@ class Users extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $preferred_language = null;
+
+    /**
+     * Almacena la respuesta del padre cuando este verifica la cuenta de su hijo
+     *
+     * @var bool|null
+     */
+    public $parent_verified = null;
+
+    /**
+     * Almacena la hora y fecha en que se creó la cuenta de usuario
+     *
+     * @var \OmegaUp\Timestamp
+     */
+    public $creation_timestamp;  // CURRENT_TIMESTAMP
+
+    /**
+     * Token que se generará para los usuarios menores de 13 años al momento de registrar su cuenta, el cuál será enviado por correo electrónico al padre
+     *
+     * @var string|null
+     */
+    public $parental_verification_token = null;
+
+    /**
+     * Almacena la hora en que se envió el correo electrónico de verificación
+     *
+     * @var \OmegaUp\Timestamp|null
+     */
+    public $parent_email_verification_initial = null;
+
+    /**
+     * Almacena la hora y fecha límite que tienen los padres para verificar la cuenta de su hijo menor a 13 años
+     *
+     * @var \OmegaUp\Timestamp|null
+     */
+    public $parent_email_verification_deadline = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $parent_email_id = null;
 }

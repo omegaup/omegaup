@@ -1,293 +1,346 @@
 <template>
-  <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container navbar-inner">
-      <div class="navbar-header">
-        <button
-          aria-expanded="false"
-          class="navbar-toggle collapsed"
-          data-target=".navbar-collapse"
-          data-toggle="collapse"
-          type="button"
-        >
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span> <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="/"
-          ><img alt="omegaUp" src="/media/omegaup_curves.png" />
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top p-0 text-right">
+      <div class="container-xl pl-0 pl-xl-3">
+        <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/">
+          <img
+            alt="omegaUp"
+            src="/media/omegaup_curves.png"
+            height="20"
+            class="d-inline-block"
+          />
           <img
             v-show="omegaUpLockDown"
             alt="lockdown"
             title="lockdown"
             :src="lockDownImage"
-        /></a>
-      </div>
-      <div aria-expanded="false" class="navbar-collapse collapse">
-        <ul v-if="!omegaUpLockDown && !inContest" class="nav navbar-nav">
-          <li
-            v-if="isLoggedIn"
-            class="dropdown nav-contests"
-            :class="{ active: navbarSection === 'contests' }"
-          >
-            <a
-              class="dropdown-toggle"
-              data-toggle="dropdown"
-              data-nav-contests
-              href="#"
-              ><span>{{ T.wordsContests }}</span> <span class="caret"></span
-            ></a>
-            <ul class="dropdown-menu">
-              <li>
-                <a href="/arena/" data-nav-contests-arena>{{
-                  T.navAllContests
-                }}</a>
-              </li>
+            :class="{ 'd-inline-block': omegaUpLockDown }"
+            height="20"
+          />
+        </a>
 
-              <template v-if="isMainUserIdentity">
-                <li>
-                  <a href="/contest/new/" data-nav-contests-create>{{
-                    T.contestsCreateNew
-                  }}</a>
-                </li>
-                <li>
-                  <a href="/scoreboardmerge/">{{
-                    T.contestsJoinScoreboards
-                  }}</a>
-                </li>
-              </template>
-            </ul>
-          </li>
-          <li v-else :class="{ active: navbarSection === 'contests' }">
-            <a href="/arena/" data-nav-contests-arena>{{ T.wordsContests }}</a>
-          </li>
-          <li
+        <div class="d-inline-flex d-flex-row order-lg-1">
+          <div
             v-if="isLoggedIn"
-            class="dropdown nav-courses"
-            :class="{ active: navbarSection === 'courses' }"
+            class="navbar-nav navbar-right align-items-end d-lg-none"
           >
-            <a class="dropdown-toogle" data-toggle="dropdown" data-nav-courses
-              ><span>{{ T.navCourses }}</span
-              ><span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <a href="/course/" data-nav-courses-all>
-                  {{ T.navAllCourses }}
-                </a>
-              </li>
-              <template v-if="isMainUserIdentity">
-                <li>
-                  <a href="/course/new/" data-nav-courses-create>
-                    {{ T.buttonCreateCourse }}
-                  </a>
-                </li>
-              </template>
-            </ul>
-          </li>
-          <li v-else :class="{ active: navbarSection === 'courses' }">
-            <a href="/course/">{{ T.navCourses }}</a>
-          </li>
-          <li
-            class="dropdown nav-problems"
-            :class="{ active: navbarSection === 'problems' }"
+            <omegaup-notifications-clarifications
+              v-if="inContest"
+              :clarifications="clarifications"
+            ></omegaup-notifications-clarifications>
+            <omegaup-notification-list
+              v-else
+              :notifications="notifications"
+              @read="readNotifications"
+            ></omegaup-notification-list>
+          </div>
+          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex">
+            <li class="nav-item">
+              <a
+                class="nav-link nav-login-text"
+                :href="formattedLoginURL"
+                data-login-button
+                >{{ T.navLogIn }}</a
+              >
+            </li>
+          </ul>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target=".omegaup-navbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
           >
-            <a
-              class="dropdown-toggle"
-              data-toggle="dropdown"
-              data-nav-problems
-              href="#"
-            >
-              <span>{{ T.wordsProblems }}</span> <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <a href="/problem/collection/" data-nav-problems-collection>{{
-                  T.problemcollectionViewProblems
-                }}</a>
-              </li>
-              <li v-if="isLoggedIn && isMainUserIdentity">
-                <a href="/problem/new/" data-nav-problems-create>{{
-                  T.myproblemsListCreateProblem
-                }}</a>
-              </li>
-              <li>
-                <a href="/submissions/">{{ T.wordsLatestSubmissions }}</a>
-              </li>
-              <li v-if="isReviewer">
-                <a href="/nomination/">{{ T.navQualityNominationQueue }}</a>
-              </li>
-            </ul>
-          </li>
-          <li
-            class="dropdown nav-rank"
-            :class="{ active: navbarSection === 'rank' }"
-          >
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <span>{{ T.navRanking }}</span>
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <a href="/rank/">{{ T.navUserRanking }}</a>
-              </li>
-              <li>
-                <a href="/rank/authors/">{{ T.navAuthorRanking }}</a>
-              </li>
-              <li>
-                <a href="/rank/schools/">{{ T.navSchoolRanking }}</a>
-              </li>
-              <li>
-                <a href="/coderofthemonth/">{{ T.navCoderOfTheMonth }}</a>
-              </li>
-              <li>
-                <a href="/coderofthemonth/female/">{{
-                  T.navCoderOfTheMonthFemale
-                }}</a>
-              </li>
-              <li>
-                <a href="/schoolofthemonth/">{{ T.navSchoolOfTheMonth }}</a>
-              </li>
-            </ul>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <span>{{ T.navHelp }}</span>
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <a
-                  href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
-                  >{{ T.navTutorials }}</a
-                >
-              </li>
-              <li>
-                <a href="http://blog.omegaup.com/">{{ T.navBlog }}</a>
-              </li>
-            </ul>
-          </li>
-        </ul>
-        <ul v-else class="nav navbar-nav"></ul>
-        <!-- in lockdown or contest mode there is no left navbar -->
-        <ul v-if="!isLoggedIn" class="nav navbar-nav navbar-right">
-          <li>
-            <a :href="formattedLoginURL">{{ T.navLogIn }}</a>
-          </li>
-        </ul>
-        <ul v-else class="nav navbar-nav navbar-right">
-          <omegaup-notifications-clarifications
-            v-if="inContest"
-            :initial-clarifications="initialClarifications"
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+
+        <div class="collapse navbar-collapse omegaup-navbar">
+          <omegaup-navbar-items
+            :omega-up-lock-down="omegaUpLockDown"
+            :in-contest="inContest"
+            :is-logged-in="isLoggedIn"
+            :is-reviewer="isReviewer"
             :is-admin="isAdmin"
-          ></omegaup-notifications-clarifications>
-          <li
-            class="dropdown nav-user"
-            :class="{ active: navbarSection === 'users' }"
-            data-nav-right
+            :is-main-user-identity="isMainUserIdentity"
+            :navbar-section="navbarSection"
           >
-            <a
-              class="dropdown-toggle user-dropdown"
-              data-toggle="dropdown"
-              data-nav-user
-              href="#"
-              ><img :src="gravatarURL51" />
-              <span class="username" :title="currentUsername">{{
-                currentUsername
-              }}</span>
-              <omegaup-common-grader-badge
-                v-show="isAdmin"
-                :queue-length="graderQueueLength"
-                :error="errorMessage !== null"
-              ></omegaup-common-grader-badge>
-              <span class="caret"></span
-            ></a>
-            <ul class="dropdown-menu">
-              <template v-if="!omegaUpLockDown && !inContest">
-                <div class="text-center">
-                  <img
-                    :src="gravatarURL128"
-                    height="70"
-                    class="img-circle"
-                    :title="currentUsername"
-                  />
-                  <h4 v-if="currentName !== ''">
-                    <strong>{{ currentName }}</strong>
-                  </h4>
-                  <h4 v-else>
-                    <strong>{{ currentUsername }}</strong>
-                  </h4>
-                  <h5>
-                    <strong>{{ currentEmail }}</strong>
-                  </h5>
-                </div>
-                <li>
-                  <a href="/profile/" data-nav-profile class="text-center"
-                    ><span class="glyphicon glyphicon-user"></span>
-                    {{ T.navViewProfile }}</a
-                  >
-                </li>
-                <li role="separator" class="divider"></li>
-                <template v-if="identitiesNotLoggedIn.length > 0">
-                  <li
-                    v-for="identity in identitiesNotLoggedIn"
-                    :key="identity.username"
-                  >
-                    <button
-                      class="btn btn-link dropdown-item"
-                      @click="$emit('change-account', identity.username)"
-                    >
-                      <img
-                        :src="gravatarURL51"
-                        height="45"
-                        class="img-circle"
-                        :title="identity.username"
-                      />{{ identity.username }}
-                    </button>
-                  </li>
-                  <li role="separator" class="divider"></li>
-                </template>
-                <li>
-                  <a href="/badge/list/">{{ T.navViewBadges }}</a>
-                </li>
-                <li>
-                  <a href="/course/mine/" data-nav-courses-mine
-                    >{{ T.navMyCourses }}
-                  </a>
-                </li>
-                <li>
-                  <a href="/problem/mine/">{{ T.navMyProblems }}</a>
-                </li>
-                <li>
-                  <a href="/contest/mine/" data-nav-user-contests>{{
-                    T.navMyContests
-                  }}</a>
-                </li>
-                <li>
-                  <a href="/group/" data-nav-user-groups>{{ T.navMyGroups }}</a>
-                </li>
-                <li>
-                  <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
-                </li>
-              </template>
-              <li role="separator" class="divider"></li>
-              <li>
-                <a href="/logout/"
-                  ><span class="glyphicon glyphicon-log-out"></span>
-                  {{ T.navLogOut }}</a
+            <template v-if="hasTeachingObjective" #contests-items>
+              <a
+                v-if="isMainUserIdentity"
+                class="dropdown-item"
+                href="/contest/new/"
+                data-nav-contests-create
+              >
+                {{ T.contestsCreate }}
+              </a>
+              <a class="dropdown-item" href="/arena/" data-nav-contests-arena>
+                {{ T.navViewContests }}
+              </a>
+              <a
+                v-if="isMainUserIdentity"
+                class="dropdown-item"
+                href="/scoreboardmerge/"
+              >
+                {{ T.contestsJoinScoreboards }}
+              </a>
+            </template>
+            <template v-if="hasTeachingObjective" #courses-items>
+              <template v-if="isMainUserIdentity">
+                <a
+                  class="dropdown-item"
+                  href="/course/new/"
+                  data-nav-courses-create
                 >
-              </li>
-              <omegaup-common-grader-status
-                v-show="isAdmin"
-                :status="errorMessage !== null ? 'down' : 'ok'"
-                :error="errorMessage"
-                :grader-info="graderInfo"
-              ></omegaup-common-grader-status>
-            </ul>
-          </li>
-        </ul>
+                  {{ T.courseCreate }}
+                </a>
+              </template>
+              <a class="dropdown-item" href="/course/" data-nav-courses-all>
+                {{ T.navViewCourses }}
+              </a>
+            </template>
+            <template v-if="hasTeachingObjective" #problems-items>
+              <a
+                v-if="isLoggedIn && isMainUserIdentity"
+                class="dropdown-item"
+                href="/problem/new/"
+                data-nav-problems-create
+                >{{ T.myproblemsListCreateProblem }}</a
+              >
+              <a
+                class="dropdown-item"
+                href="/problem/collection/"
+                data-nav-problems-collection
+                >{{ T.navViewProblems }}</a
+              >
+              <a class="dropdown-item" href="/submissions/">{{
+                T.navViewLatestSubmissions
+              }}</a>
+              <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
+                T.navQualityNominationQueue
+              }}</a>
+            </template>
+          </omegaup-navbar-items>
+          <!-- in lockdown or contest mode there is no left navbar -->
+
+          <ul v-if="isLoggedIn" class="navbar-nav navbar-right align-items-end">
+            <li class="d-none d-lg-block">
+              <omegaup-notifications-clarifications
+                v-if="inContest"
+                :clarifications="clarifications"
+              ></omegaup-notifications-clarifications>
+              <omegaup-notification-list
+                v-else
+                :notifications="notifications"
+                @read="readNotifications"
+              ></omegaup-notification-list>
+            </li>
+            <li class="nav-item dropdown nav-user" data-nav-right>
+              <a
+                class="nav-link px-2 dropdown-toggle nav-user-link"
+                href="#"
+                role="button"
+                data-nav-user
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <img :src="gravatarURL51" height="45" class="mr-2" /><span
+                  class="username"
+                  :title="currentUsername"
+                  >{{ currentUsername }}</span
+                >
+                <omegaup-common-grader-badge
+                  v-show="isAdmin"
+                  :queue-length="graderQueueLength"
+                  :error="errorMessage !== null"
+                ></omegaup-common-grader-badge>
+              </a>
+              <div class="dropdown-menu dropdown-menu-right allow-overflow">
+                <template v-if="!omegaUpLockDown && (!inContest || isAdmin)">
+                  <div class="text-center mb-1">
+                    <img
+                      :src="gravatarURL128"
+                      height="70"
+                      class="rounded-circle mb-1"
+                      :title="currentUsername"
+                    />
+                    <h5 v-if="currentName !== ''" class="mx-2">
+                      {{ currentName }}
+                    </h5>
+                    <h5 v-else class="mx-2">{{ currentUsername }}</h5>
+                    <h6 class="mx-2">{{ currentEmail }}</h6>
+                  </div>
+                  <a
+                    v-show="!omegaUpLockDown && (!inContest || isAdmin)"
+                    class="dropdown-item text-center"
+                    data-nav-profile
+                    href="/profile/"
+                  >
+                    <font-awesome-icon :icon="['fas', 'user']" />
+                    {{ T.navViewProfile }}
+                    <div v-if="profileProgress !== 0" class="progress mt-2">
+                      <div
+                        class="progress-bar progress-bar-striped bg-info"
+                        role="progressbar"
+                        :style="{ width: `${profileProgress}%` }"
+                        :aria-valuenow="profileProgress"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                    </div>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <div v-if="identitiesNotLoggedIn.length > 0" class="mb-1">
+                    <div
+                      v-for="identity in identitiesNotLoggedIn"
+                      :key="identity.username"
+                    >
+                      <button
+                        class="btn btn-link dropdown-item"
+                        @click="$emit('change-account', identity.username)"
+                      >
+                        <img
+                          :src="gravatarURL51"
+                          height="45"
+                          class="rounded-circle mr-3"
+                          :title="identity.username"
+                        />{{ identity.username }}
+                      </button>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                  </div>
+                  <a class="dropdown-item" href="/badge/list/">{{
+                    T.navViewBadges
+                  }}</a>
+                  <template v-if="hasTeachingObjective">
+                    <a class="dropdown-item" href="/problem/mine">{{
+                      T.navMyProblems
+                    }}</a>
+                    <a
+                      class="dropdown-item"
+                      href="/course/mine"
+                      data-nav-courses-mine
+                      >{{ T.navMyCourses }}</a
+                    >
+                    <a
+                      class="dropdown-item"
+                      href="/contest/mine"
+                      data-nav-user-contests
+                      >{{ T.navMyContests }}</a
+                    >
+                    <a class="dropdown-item" href="/profile/#created-content">{{
+                      T.navMyContent
+                    }}</a>
+                  </template>
+                  <template v-else>
+                    <a class="dropdown-item" href="/profile/#problems">{{
+                      T.navProfileProblems
+                    }}</a>
+                    <a
+                      class="dropdown-item"
+                      href="/course/#enrolled"
+                      data-nav-courses-mine
+                      >{{ T.navCoursesEnrolled }}</a
+                    >
+                    <a
+                      class="dropdown-item"
+                      href="/arena/#participating"
+                      data-nav-user-contests
+                      >{{ T.navContestsEnrolled }}</a
+                    >
+                    <form class="collapse-submenu">
+                      <div class="btn-group">
+                        <a
+                          class="dropdown-item"
+                          href="/profile/#created-content"
+                          >{{ T.navMyContent }}</a
+                        >
+                        <button
+                          type="button"
+                          class="btn dropdown-item dropdown-toggle dropdown-toggle-split"
+                          data-toggle="collapse"
+                          data-target=".collapse-links"
+                          aria-expanded="false"
+                          aria-controls="collapse-links"
+                        ></button>
+                      </div>
+                      <div class="collapse collapse-links pl-3">
+                        <a class="dropdown-item" href="/problem/mine">{{
+                          T.navMyProblems
+                        }}</a>
+                        <a
+                          class="dropdown-item"
+                          href="/course/mine"
+                          data-nav-courses-mine
+                          >{{ T.navMyCourses }}</a
+                        >
+                        <a
+                          class="dropdown-item"
+                          href="/contest/mine"
+                          data-nav-user-contests
+                          >{{ T.navMyContests }}</a
+                        >
+                      </div>
+                    </form>
+                  </template>
+                  <a
+                    class="dropdown-item"
+                    href="/group/"
+                    data-nav-user-groups
+                    >{{ T.navMyGroups }}</a
+                  >
+                  <a
+                    class="dropdown-item"
+                    href="/teamsgroup/"
+                    data-nav-user-teams-groups
+                    >{{ T.navMyTeamsGroups }}</a
+                  >
+                  <a class="dropdown-item" href="/nomination/mine/">{{
+                    T.navMyQualityNomination
+                  }}</a>
+                </template>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/logout/" data-logout-button>
+                  <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+                  {{ T.navLogOut }}
+                </a>
+                <omegaup-common-grader-status
+                  v-show="isAdmin"
+                  :status="errorMessage !== null ? 'down' : 'ok'"
+                  :error="errorMessage"
+                  :grader-info="graderInfo"
+                ></omegaup-common-grader-status>
+              </div>
+            </li>
+          </ul>
+
+          <a
+            v-if="isLoggedIn"
+            class="navbar justify-content-end mb-2 d-lg-none"
+            href="/logout/"
+          >
+            <font-awesome-icon :icon="['fas', 'power-off']" />
+          </a>
+        </div>
+
+        <a
+          v-if="isLoggedIn"
+          class="navbar justify-content-end d-none d-lg-block order-1"
+          href="/logout/"
+        >
+          <font-awesome-icon :icon="['fas', 'power-off']" />
+        </a>
       </div>
-    </div>
-  </div>
+    </nav>
+    <omegaup-user-objectives-questions
+      v-if="
+        fromLogin && isLoggedIn && isMainUserIdentity && userTypes.length === 0
+      "
+      @submit="(objectives) => $emit('update-user-objectives', objectives)"
+    ></omegaup-user-objectives-questions>
+  </header>
 </template>
 
 <script lang="ts">
@@ -295,14 +348,26 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import notifications_Clarifications from '../notification/Clarifications.vue';
+import notifications_List from '../notification/List.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
 import common_GraderBadge from '../common/GraderBadge.vue';
+import user_objectives_questions from '../user/ObjectivesQuestions.vue';
+import navbar_items from './NavbarItems.vue';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons';
+library.add(faSignOutAlt, faUser);
 
 @Component({
   components: {
+    FontAwesomeIcon,
+    'omegaup-notification-list': notifications_List,
     'omegaup-notifications-clarifications': notifications_Clarifications,
     'omegaup-common-grader-status': common_GraderStatus,
     'omegaup-common-grader-badge': common_GraderBadge,
+    'omegaup-user-objectives-questions': user_objectives_questions,
+    'omegaup-navbar-items': navbar_items,
   },
 })
 export default class Navbar extends Vue {
@@ -320,14 +385,20 @@ export default class Navbar extends Vue {
   @Prop() isMainUserIdentity!: boolean;
   @Prop() lockDownImage!: string;
   @Prop() navbarSection!: string;
+  @Prop() notifications!: types.Notification[];
   @Prop() graderInfo!: types.GraderStatus | null;
   @Prop() graderQueueLength!: number;
   @Prop() errorMessage!: string | null;
-  @Prop() initialClarifications!: types.Clarification[];
+  @Prop({ default: 0 }) profileProgress!: number;
+  @Prop() clarifications!: types.Clarification[];
+  @Prop() fromLogin!: boolean;
+  @Prop() userTypes!: string[];
 
-  notifications: types.Notification[] = [];
-  clarifications: types.Clarification[] = this.initialClarifications;
   T = T;
+  teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
+  hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
+    this.userTypes.includes(teachingType),
+  );
 
   get formattedLoginURL(): string {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
@@ -338,188 +409,50 @@ export default class Navbar extends Vue {
       (identity) => identity.username !== this.currentUsername,
     );
   }
+
+  readNotifications(notifications: types.Notification[], url?: string): void {
+    this.$emit('read-notifications', notifications, url);
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
-#root .navbar-default {
-  border-color: transparent;
-  margin: 0;
-  border-bottom-width: 0;
-
-  background-color: $header-primary-color;
-
-  & .caret {
-    border-top-color: $white;
-    border-bottom-color: $white;
+nav.navbar {
+  background-color: var(--header-primary-color);
+  .navbar-brand {
+    background-color: var(--header-navbar-brand-background-color);
   }
 
-  & .active {
-    > a {
-      background-color: $header-active-color;
-    }
+  a.dropdown-item {
+    color: var(--header-navbar-dropdown-item-font-color);
   }
 
-  & .navbar-header {
-    margin: 0;
-
-    img {
-      height: 20px;
-    }
-
-    .navbar-brand {
-      background-color: #f2f2f2;
-    }
+  .collapse-submenu .btn:focus {
+    box-shadow: 0 0 0 0;
   }
+}
 
-  & .user-dropdown {
-    // Elimina el padding del elemento dropdown del nombre
-    // del usuario para la redimesion de la imagen de perfil.
-    padding: 0 12px 0 0;
-
-    span {
-      vertical-align: middle;
-
-      &.username {
-        display: inline-block;
-        max-width: 80px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
-
-    img {
-      width: 50px;
-      height: 50px;
-      margin-right: 10px;
-    }
+.allow-overflow {
+  overflow-y: scroll;
+  height: 65vh;
+  max-width: 40vw;
+}
+.nav-login-text {
+  font-size: 14px;
+  padding: auto;
+}
+@media only screen and (min-width: 385px) {
+  .nav-login-text {
+    font-size: inherit;
+    padding: 0.5rem;
   }
-
-  & .navbar-text {
-    color: $header-font-primary-color;
-  }
-
-  & .navbar-nav {
-    margin: 0;
-    li {
-      a {
-        color: $header-font-primary-color;
-
-        &:hover {
-          background-color: $header-accent-color;
-        }
-      }
-    }
-  }
-
-  & .nav {
-    li {
-      a {
-        &:hover {
-          background-color: $header-accent-color;
-        }
-
-        &:focus {
-          background-color: $header-accent-color;
-        }
-      }
-    }
-
-    .dropdown-menu {
-      li {
-        a {
-          color: $header-font-secondary-color;
-
-          &:hover {
-            background-color: $header-dropdown-active-item;
-          }
-        }
-      }
-    }
-
-    & .dropdown:hover {
-      & .dropdown-menu {
-        display: block;
-      }
-    }
-  }
-
-  & .navbar-right {
-    background-color: $header-primary-color;
-
-    & .caret {
-      border-top-color: $black;
-      border-bottom-color: $black;
-    }
-
-    a {
-      color: $black;
-
-      & .grader-error {
-        color: $status-error;
-        background-image: linear-gradient(
-          rgb(242, 222, 222) 0px,
-          rgb(231, 195, 195) 100%
-        );
-      }
-
-      & .grader-ok {
-        color: $status-success;
-        background-image: linear-gradient(
-          rgb(223, 240, 216) 0px,
-          rgb(200, 229, 188) 100%
-        );
-        background-color: rgb(223, 240, 216);
-      }
-
-      & .grader-warning {
-        color: $status-warning;
-        background-image: linear-gradient(to bottom, #fcf8e3 0, #f8efc0 100%);
-        border-color: #f5e79e;
-      }
-    }
-  }
-
-  .container {
-    @media (max-width: 991px) {
-      max-width: 100% !important;
-    }
-  }
-
-  .username {
-    @media (max-width: 991px) {
-      display: none !important;
-    }
-  }
-
-  .grader-count {
-    @media (max-width: 991px) {
-      display: none !important;
-    }
-  }
-
-  .navbar-inner {
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 0;
-    padding-right: 0;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-
-    @media (max-width: 991px) {
-      width: 100% !important;
-    }
-  }
-
-  .navbar-collapse {
-    max-height: none;
-
-    &.in {
-      overflow-y: visible;
-    }
+}
+@media only screen and (max-width: 992px) {
+  .allow-overflow {
+    height: 45vh;
+    max-width: 80vw;
   }
 }
 </style>

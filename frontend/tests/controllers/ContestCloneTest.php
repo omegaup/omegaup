@@ -1,4 +1,6 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
     /**
@@ -49,7 +51,7 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($contestAlias, $contestClonedData['alias']);
+        $this->assertSame($contestAlias, $contestClonedData['alias']);
 
         // Call API
         $clonedContestProblemsResponse = \OmegaUp\Controllers\Contest::apiProblems(new \OmegaUp\Request([
@@ -101,8 +103,42 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('aliasInUse', $e->getMessage());
+            $this->assertSame('aliasInUse', $e->getMessage());
         }
+    }
+    /**
+     * Check if the plagiarism value is stored correctly in the database when
+     * a contest is cloned
+     */
+    public function testPlagiarismThresholdValueInClonedContest() {
+        // Create a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'checkPlagiarism' => true,
+            ])
+        );
+
+        $clonedContestAlias = \OmegaUp\Test\Utils::createRandomString();
+
+        // Login with director to clone the contest
+        $login = self::login($contestData['director']);
+
+        \OmegaUp\Controllers\Contest::apiClone(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'title' => $clonedContestAlias,
+                'description' => $clonedContestAlias,
+                'alias' => $clonedContestAlias,
+                'start_time' => \OmegaUp\Time::get(),
+            ])
+        );
+
+        $response = \OmegaUp\DAO\Contests::getByAlias($clonedContestAlias);
+
+        $this->assertTrue(
+            $response->check_plagiarism
+        );
     }
 
     /**
@@ -141,7 +177,41 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+    }
+
+    /*
+     * Under13 users can't clone contests.
+     */
+    public function testUserUnder13CannotCloneContests() {
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $defaultDate = strtotime('2022-01-01T00:00:00Z');
+        \OmegaUp\Time::setTimeForTesting($defaultDate);
+        // Create a 10 years-old user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birthDate' => strtotime('2012-01-01T00:00:00Z'),
+            ]),
+        );
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\Contest::apiClone(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['contest']->alias,
+                'title' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                'start_time' => \OmegaUp\Time::get()
+            ]));
+            $this->fail(
+                'Creating contests should not have been allowed for U13'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('U13CannotPerform', $e->getMessage());
         }
     }
 }

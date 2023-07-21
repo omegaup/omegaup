@@ -1,9 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of CreateRun
- *
- * @author joemmanuel
  */
 
 class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
@@ -54,7 +53,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Our contestant has to open the contest before sending a run
         \OmegaUp\Test\Factories\Contest::openContest(
-            $this->contestData,
+            $this->contestData['contest'],
             $this->contestantIdentity
         );
 
@@ -153,28 +152,32 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias'] ?? '');
 
         // Validate data
-        $this->assertEquals($r['language'], $submission->language);
+        $this->assertSame($r['language'], $submission->language);
         $this->assertNotNull($submission->guid);
 
         // Validate file created
         $fileContent = \OmegaUp\Controllers\Submission::getSource(
             $submission->guid
         );
-        $this->assertEquals($r['source'], $fileContent);
+        $this->assertSame($r['source'], $fileContent);
 
         // Validate defaults
         $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
-        $this->assertEquals('uploading', $run->status);
-        $this->assertEquals(0, $run->runtime);
-        $this->assertEquals(0, $run->memory);
-        $this->assertEquals(0, $run->score);
-        $this->assertEquals(0, $run->contest_score);
+        $this->assertSame('uploading', $run->status);
+        $this->assertSame(0, $run->runtime);
+        $this->assertSame(0, $run->memory);
+        $this->assertSame(0.0, $run->score);
+        if (!$r['contest_alias'] && !$r['problemset_id']) {
+            $this->assertNull($run->contest_score);
+        } else {
+            $this->assertSame(0.0, $run->contest_score);
+        }
 
         // Validate next submission timestamp
         $submission_gap = isset(
             $contest->submissions_gap
         ) ? $contest->submissions_gap : \OmegaUp\Controllers\Run::$defaultSubmissionGap;
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\Time::get() + $submission_gap,
             $response['nextSubmissionTimestamp']->time
         );
@@ -182,7 +185,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $log = \OmegaUp\DAO\SubmissionLog::getByPK($submission->submission_id);
 
         $this->assertNotNull($log);
-        $this->assertEquals(ip2long('127.0.0.1'), $log->ip);
+        $this->assertSame(ip2long('127.0.0.1'), $log->ip);
 
         if (!is_null($contest)) {
             $this->assertEqualsWithDelta(
@@ -192,7 +195,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
-        $this->assertEquals('JE', $run->verdict);
+        $this->assertSame('JE', $run->verdict);
     }
 
     /**
@@ -209,10 +212,10 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Check problem submissions (1)
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
-        $this->assertEquals(1, $problem->submissions);
+        $this->assertSame(1, $problem->submissions);
 
         $run = \OmegaUp\DAO\Runs::getByGUID($response['guid']);
-        $this->assertEquals($problem->commit, $run->commit);
+        $this->assertSame($problem->commit, $run->commit);
     }
 
     /**
@@ -262,7 +265,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
 
-        $this->assertEquals(
+        $this->assertSame(
             $schoolId,
             $submission->school_id
         );
@@ -288,7 +291,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'api should have not created run, because contest has expired.'
             );
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
-            $this->assertEquals('runNotInsideContest', $e->getMessage());
+            $this->assertSame('runNotInsideContest', $e->getMessage());
         }
     }
 
@@ -330,7 +333,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Run::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
-            $this->assertEquals('runNotEvenOpened', $e->getMessage());
+            $this->assertSame('runNotEvenOpened', $e->getMessage());
         }
     }
 
@@ -355,7 +358,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
-            $this->assertEquals('runNotInsideContest', $e->getMessage());
+            $this->assertSame('runNotInsideContest', $e->getMessage());
         }
     }
 
@@ -384,7 +387,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Run::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
-            $this->assertEquals('runWaitGap', $e->getMessage());
+            $this->assertSame('runWaitGap', $e->getMessage());
         }
     }
 
@@ -440,8 +443,8 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Run::apiCreate($r2);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotFound', $e->getMessage());
-            $this->assertEquals('problem_alias', $e->parameter);
+            $this->assertSame('parameterNotFound', $e->getMessage());
+            $this->assertSame('problem_alias', $e->parameter);
         }
     }
 
@@ -471,7 +474,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\Controllers\Run::apiCreate($r);
                 $this->fail('apiCreate did not return expected exception');
             } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-                $this->assertEquals('parameterEmpty', $e->getMessage());
+                $this->assertSame('parameterEmpty', $e->getMessage());
             }
         }
     }
@@ -516,7 +519,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'Contestant should not submitted a run because windows length has expired'
             );
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
-            $this->assertEquals('runNotInsideContest', $e->getMessage());
+            $this->assertSame('runNotInsideContest', $e->getMessage());
         }
     }
 
@@ -565,7 +568,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Run::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
-            $this->assertEquals('runNotInsideContest', $e->getMessage());
+            $this->assertSame('runNotInsideContest', $e->getMessage());
         }
     }
 
@@ -663,7 +666,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('apiCreate did not return expected exception');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
+            $this->assertSame('parameterNotInExpectedSet', $e->getMessage());
         }
     }
 
@@ -690,7 +693,10 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Our contestant has to open the contest before sending a run
-        \OmegaUp\Test\Factories\Contest::openContest($contestData, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contestData['contest'],
+            $identity
+        );
 
         // Then we need to open the problem
         \OmegaUp\Test\Factories\Contest::openProblemInContest(
@@ -712,7 +718,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('apiCreate did not return expected exception');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
+            $this->assertSame('parameterNotInExpectedSet', $e->getMessage());
         }
     }
 
@@ -751,7 +757,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
-            $this->assertEquals('problemIsNotPublic', $e->getMessage());
+            $this->assertSame('problemIsNotPublic', $e->getMessage());
         }
     }
 
@@ -792,7 +798,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\Controllers\Run::apiCreate($r);
                 $this->fail('Should have failed');
             } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
-                $this->assertEquals('runWaitGap', $e->getMessage());
+                $this->assertSame('runWaitGap', $e->getMessage());
             }
         } finally {
             \OmegaUp\Controllers\Run::$defaultSubmissionGap = $originalGap;
@@ -811,7 +817,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Check problem submissions (1)
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
-        $this->assertEquals(1, $problem->submissions);
+        $this->assertSame(1, $problem->submissions);
     }
 
     /**
@@ -825,8 +831,8 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Run::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('incompatibleArgs', $e->getMessage());
-            $this->assertEquals(
+            $this->assertSame('incompatibleArgs', $e->getMessage());
+            $this->assertSame(
                 'problemset_id and contest_alias',
                 $e->parameter
             );
@@ -857,7 +863,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Run::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
-            $this->assertEquals('runNotEvenOpened', $e->getMessage());
+            $this->assertSame('runNotEvenOpened', $e->getMessage());
         }
     }
 
@@ -874,7 +880,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Run::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
-            $this->assertEquals('runNotInsideContest', $e->getMessage());
+            $this->assertSame('runNotInsideContest', $e->getMessage());
         }
     }
 
@@ -904,7 +910,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Run::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
-            $this->assertEquals('runNotInsideContest', $e->getMessage());
+            $this->assertSame('runNotInsideContest', $e->getMessage());
         }
     }
 
@@ -933,7 +939,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertEquals('problemNotFound', $e->getMessage());
+            $this->assertSame('problemNotFound', $e->getMessage());
         }
     }
 
@@ -962,7 +968,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertEquals('problemNotFound', $e->getMessage());
+            $this->assertSame('problemNotFound', $e->getMessage());
         }
     }
 

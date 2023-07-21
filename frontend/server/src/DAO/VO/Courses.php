@@ -19,9 +19,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         'course_id' => true,
         'name' => true,
         'description' => true,
+        'objective' => true,
         'alias' => true,
         'group_id' => true,
         'acl_id' => true,
+        'level' => true,
         'start_time' => true,
         'finish_time' => true,
         'admission_mode' => true,
@@ -30,6 +32,8 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         'requests_user_information' => true,
         'show_scoreboard' => true,
         'languages' => true,
+        'archived' => true,
+        'minimum_progress_for_certificate' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -57,6 +61,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
                 $data['description']
             ) ? strval($data['description']) : '';
         }
+        if (isset($data['objective'])) {
+            $this->objective = is_scalar(
+                $data['objective']
+            ) ? strval($data['objective']) : '';
+        }
         if (isset($data['alias'])) {
             $this->alias = is_scalar(
                 $data['alias']
@@ -71,6 +80,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
             $this->acl_id = intval(
                 $data['acl_id']
             );
+        }
+        if (isset($data['level'])) {
+            $this->level = is_scalar(
+                $data['level']
+            ) ? strval($data['level']) : '';
         }
         if (isset($data['start_time'])) {
             /**
@@ -128,6 +142,16 @@ class Courses extends \OmegaUp\DAO\VO\VO {
                 $data['languages']
             ) ? strval($data['languages']) : '';
         }
+        if (isset($data['archived'])) {
+            $this->archived = boolval(
+                $data['archived']
+            );
+        }
+        if (isset($data['minimum_progress_for_certificate'])) {
+            $this->minimum_progress_for_certificate = intval(
+                $data['minimum_progress_for_certificate']
+            );
+        }
     }
 
     /**
@@ -158,6 +182,13 @@ class Courses extends \OmegaUp\DAO\VO\VO {
      *
      * @var string|null
      */
+    public $objective = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
     public $alias = null;
 
     /**
@@ -173,6 +204,13 @@ class Courses extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $acl_id = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $level = null;
 
     /**
      * Hora de inicio de este curso
@@ -229,4 +267,18 @@ class Courses extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $languages = null;
+
+    /**
+     * Indica si el curso ha sido archivado por el administrador.
+     *
+     * @var bool
+     */
+    public $archived = false;
+
+    /**
+     * Progreso mínimo que debe cumplir el estudiante para que se le otorgue el diploma del curso. NULL indica que el curso no da diplomas.
+     *
+     * @var int|null
+     */
+    public $minimum_progress_for_certificate = null;
 }

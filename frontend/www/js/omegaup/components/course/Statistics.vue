@@ -50,10 +50,13 @@ export default class Statistics extends Vue {
   @Prop() verdicts!: types.CourseProblemVerdict[];
   T = T;
   // chart options
-  selected = this.verdictChartOptions;
+  selected = this.completedScoreChartOptions;
   options = [
-    { value: this.varianceChartOptions, text: T.courseStatisticsVariance },
     { value: this.averageChartOptions, text: T.courseStatisticsAverageScore },
+    {
+      value: this.completedScoreChartOptions,
+      text: T.courseStatisticsStudentsCompleted,
+    },
     {
       value: this.highScoreChartOptions,
       text: T.courseStatisticsStudentsAbove,
@@ -62,10 +65,11 @@ export default class Statistics extends Vue {
       value: this.lowScoreChartOptions,
       text: T.courseStatisticsStudentsScored,
     },
-    { value: this.minimumChartOptions, text: T.courseStatisticsMinimumScore },
-    { value: this.maximumChartOptions, text: T.courseStatisticsMaximumScore },
     { value: this.runsChartOptions, text: T.courseStatisticsAverageRuns },
     { value: this.verdictChartOptions, text: T.courseStatisticsVerdicts },
+    { value: this.varianceChartOptions, text: T.courseStatisticsVariance },
+    { value: this.minimumChartOptions, text: T.courseStatisticsMinimumScore },
+    { value: this.maximumChartOptions, text: T.courseStatisticsMaximumScore },
   ];
   // get chart options
   get varianceChartOptions() {
@@ -94,6 +98,16 @@ export default class Statistics extends Vue {
       '{y} %',
       T.wordsPercentage,
       this.getStatistic('high_score_percentage'),
+      100,
+      this.problems,
+    );
+  }
+  get completedScoreChartOptions() {
+    return this.createChartOptions(
+      T.courseStatisticsStudentsCompleted,
+      '{y} %',
+      T.wordsPercentage,
+      this.getStatistic('completed_score_percentage'),
       100,
       this.problems,
     );
@@ -274,6 +288,7 @@ export default class Statistics extends Vue {
       | 'variance'
       | 'average'
       | 'avg_runs'
+      | 'completed_score_percentage'
       | 'high_score_percentage'
       | 'low_score_percentage'
       | 'maximum'

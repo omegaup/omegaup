@@ -1,8 +1,5 @@
 <?php
-
-/**
- * @author joemmanuel
- */
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class ProblemBestScoreTest extends \OmegaUp\Test\ControllerTestCase {
     /**
@@ -34,7 +31,7 @@ class ProblemBestScoreTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problemData['request']['problem_alias']
         ]));
 
-        $this->assertEquals(100.00, $response['score']);
+        $this->assertSame(100.00, $response['score']);
     }
 
     /**
@@ -73,7 +70,7 @@ class ProblemBestScoreTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias']
         ]));
 
-        $this->assertEquals(50.00, $response['score']);
+        $this->assertSame(50.00, $response['score']);
     }
 
     /**
@@ -109,6 +106,6 @@ class ProblemBestScoreTest extends \OmegaUp\Test\ControllerTestCase {
             'username' => $contestantIdentity->username
         ]));
 
-        $this->assertEquals(100.00, $response['score']);
+        $this->assertSame(100.00, $response['score']);
     }
 }

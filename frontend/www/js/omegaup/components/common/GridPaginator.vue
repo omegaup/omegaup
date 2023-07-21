@@ -2,6 +2,7 @@
   <div class="card">
     <h5 v-if="title" class="card-header">
       {{ title }} <span class="badge badge-secondary">{{ items.length }}</span>
+      <slot name="header-link"></slot>
     </h5>
     <div v-if="sortOptions.length > 0" class="card-body text-center">
       <div class="form-check form-check-inline">
@@ -21,7 +22,10 @@
         </label>
       </div>
     </div>
-    <table v-if="items.length > 0" class="table table-striped mb-0">
+    <table
+      v-if="items.length > 0"
+      class="table table-striped mb-0 table-responsive col-12 table-typo"
+    >
       <slot name="table-header"></slot>
       <tbody>
         <tr v-for="(group, index) in paginatedItems" :key="index">
@@ -31,6 +35,11 @@
           <td v-for="(item, itemIndex) in group" :key="itemIndex">
             <slot name="item-data" :item="item">
               <a :href="item.getUrl()">
+                <img
+                  v-if="item.getLogo()"
+                  :src="item.getLogo().url"
+                  :title="item.getLogo().title"
+                />
                 {{ item.toString() }}
               </a>
             </slot>
@@ -132,3 +141,14 @@ export default class GridPaginator extends Vue {
   }
 }
 </script>
+
+<style>
+@media (max-width: 550px) {
+  .table-typo td,
+  .table-typo th {
+    display: block;
+    background-color: #fff;
+    border: 1px solid #ddd;
+  }
+}
+</style>

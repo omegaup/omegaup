@@ -1,9 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Testing synchronization between User and Identity
- *
- * @author juan.pablo
  */
 class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
     /**
@@ -16,14 +15,15 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
             'username' => \OmegaUp\Test\Utils::createRandomString(),
             'password' => \OmegaUp\Test\Utils::createRandomString(),
             'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
-            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
+            'birth_date' => 946684800, // 01-01-2000
         ]);
 
         // Call API
         $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // Check response
-        $this->assertEquals($r['username'], $response['username']);
+        $this->assertSame($r['username'], $response['username']);
 
         // Verify DB
         $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
@@ -107,11 +107,11 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
 
-        $this->assertEquals($r['name'], $identityDb->name);
-        $this->assertEquals($r['country_id'], $identityDb->country_id);
-        $this->assertEquals($r['state_id'], $identityDb->state_id);
-        $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
-        $this->assertEquals(
+        $this->assertSame($r['name'], $identityDb->name);
+        $this->assertSame($r['country_id'], $identityDb->country_id);
+        $this->assertSame($r['state_id'], $identityDb->state_id);
+        $this->assertSame($r['scholar_degree'], $userDb->scholar_degree);
+        $this->assertSame(
             gmdate(
                 'Y-m-d',
                 $r['birth_date']
@@ -120,7 +120,7 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         );
         // Graduation date without school is not saved on database.
         $this->assertNull($graduationDate);
-        $this->assertEquals($locale->language_id, $identityDb->language_id);
+        $this->assertSame($locale->language_id, $identityDb->language_id);
 
         // Edit all fields again with diff values
         $locale = \OmegaUp\DAO\Languages::getByName('pseudo');
@@ -157,11 +157,11 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
 
-        $this->assertEquals($r['name'], $identityDb->name);
-        $this->assertEquals($r['country_id'], $identityDb->country_id);
-        $this->assertEquals($r['state_id'], $identityDb->state_id);
-        $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
-        $this->assertEquals(
+        $this->assertSame($r['name'], $identityDb->name);
+        $this->assertSame($r['country_id'], $identityDb->country_id);
+        $this->assertSame($r['state_id'], $identityDb->state_id);
+        $this->assertSame($r['scholar_degree'], $userDb->scholar_degree);
+        $this->assertSame(
             gmdate(
                 'Y-m-d',
                 $r['birth_date']
@@ -170,17 +170,17 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         );
         // Graduation date without school is not saved on database.
         $this->assertNull($graduationDate);
-        $this->assertEquals($locale->language_id, $identityDb->language_id);
+        $this->assertSame($locale->language_id, $identityDb->language_id);
 
         // Double check language update with the appropiate API
-        $this->assertEquals(
+        $this->assertSame(
             $locale->name,
             \OmegaUp\Controllers\Identity::getPreferredLanguage($identityDb)
         );
 
         $identity = \OmegaUp\DAO\Identities::getByPK($userDb->main_identity_id);
-        $this->assertEquals($identity->username, $identityDb->username);
-        $this->assertEquals($identity->password, $identityDb->password);
+        $this->assertSame($identity->username, $identityDb->username);
+        $this->assertSame($identity->password, $identityDb->password);
     }
 
     /**
@@ -209,7 +209,7 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Getting identity data from db
         $identity = \OmegaUp\DAO\Identities::getByPK($userDb->main_identity_id);
-        $this->assertEquals($identity->username, $identityDb['username']);
-        $this->assertEquals($identity->password, $identityDb['password']);
+        $this->assertSame($identity->username, $identityDb['username']);
+        $this->assertSame($identity->password, $identityDb['password']);
     }
 }

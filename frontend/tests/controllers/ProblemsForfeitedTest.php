@@ -1,9 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Tests for ProblemForfeitedController
- *
- * @author carlosabcs
  */
 
 class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
@@ -33,8 +32,8 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
         ]));
 
-        $this->assertEquals(1, $results['allowed']);
-        $this->assertEquals(1, $results['seen']);
+        $this->assertSame(1, $results['allowed']);
+        $this->assertSame(1, $results['seen']);
     }
 
     public function testGetSolution() {
@@ -62,7 +61,7 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have thrown ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'problemSolutionNotVisible');
+            $this->assertSame($e->getMessage(), 'problemSolutionNotVisible');
         }
 
         $response = \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
@@ -84,8 +83,8 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
         $results = \OmegaUp\Controllers\ProblemForfeited::apiGetCounts(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(1, $results['allowed']);
-        $this->assertEquals(1, $results['seen']);
+        $this->assertSame(1, $results['allowed']);
+        $this->assertSame(1, $results['seen']);
     }
 
     public function testGetSolutionForbiddenAccessException() {
@@ -100,7 +99,7 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have thrown ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 $e->getMessage(),
                 'allowedSolutionsLimitReached'
             );
@@ -109,8 +108,8 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
         $results = \OmegaUp\Controllers\ProblemForfeited::apiGetCounts(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(0, $results['allowed']);
-        $this->assertEquals(0, $results['seen']);
+        $this->assertSame(0, $results['allowed']);
+        $this->assertSame(0, $results['seen']);
     }
 
     public function testGetNonexistentSolution() {
@@ -142,7 +141,7 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have thrown ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'problemSolutionNotVisible');
+            $this->assertSame($e->getMessage(), 'problemSolutionNotVisible');
         }
 
         $response = \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
@@ -161,7 +160,7 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
         $results = \OmegaUp\Controllers\ProblemForfeited::apiGetCounts(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(1, $results['allowed']);
-        $this->assertEquals(0, $results['seen']);
+        $this->assertSame(1, $results['allowed']);
+        $this->assertSame(0, $results['seen']);
     }
 }

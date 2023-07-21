@@ -12,6 +12,7 @@ OmegaUp.on('ready', function () {
   const headerPayload = JSON.parse(
     (document.getElementById('header-payload') as HTMLElement).innerText,
   );
+  const searchResultEmpty: types.ListItem[] = [];
 
   const nominationsList = new Vue({
     el: '#main-container',
@@ -22,6 +23,8 @@ OmegaUp.on('ready', function () {
       nominations: [] as types.NominationListItem[],
       pagerItems: [] as types.PageItem[],
       pages: 1,
+      searchResultUsers: searchResultEmpty,
+      searchResultProblems: searchResultEmpty,
     }),
     render: function (createElement) {
       return createElement('omegaup-qualitynomination-list', {
@@ -32,6 +35,8 @@ OmegaUp.on('ready', function () {
           length: payload.length,
           myView: payload.myView,
           isAdmin: headerPayload.isAdmin,
+          searchResultUsers: this.searchResultUsers,
+          searchResultProblems: this.searchResultProblems,
         },
         on: {
           'go-to-page': (
@@ -43,6 +48,37 @@ OmegaUp.on('ready', function () {
             if (pageNumber > 0) {
               showNominations(pageNumber, status, query, column);
             }
+          },
+          'update-search-result-users': (query: string) => {
+            api.User.list({ query })
+              .then(({ results }) => {
+                this.searchResultUsers = results.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-problems': (query: string) => {
+            api.Problem.listForTypeahead({
+              query,
+              search_type: 'all',
+            })
+              .then((data) => {
+                this.searchResultProblems = data.results.map(
+                  ({ key, value }, index) => ({
+                    key,
+                    value: `${String(index + 1).padStart(2, '0')}.- ${ui.escape(
+                      value,
+                    )} (<strong>${ui.escape(key)}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
           },
         },
       });

@@ -2,7 +2,9 @@
   <transition name="modal">
     <div class="modal-mask">
       <div class="modal-container">
-        <button class="close" @click="$emit('close')">❌</button>
+        <div class="d-flex justify-content-end">
+          <button class="btn" @click="$emit('close')">❌</button>
+        </div>
         <form-wizard
           color="#678DD7"
           :back-button-text="T.wordsBack"
@@ -137,11 +139,12 @@ export default class ProblemFinderWizard extends Vue {
   get tagObjects(): TagObject[] {
     const tagObjects: TagObject[] = [];
     this.possibleTags.forEach((tagObject) => {
+      if (!Object.prototype.hasOwnProperty.call(T, tagObject.name)) {
+        return;
+      }
       tagObjects.push({
         key: tagObject.name,
-        value: Object.prototype.hasOwnProperty.call(T, tagObject.name)
-          ? T[tagObject.name]
-          : tagObject.name,
+        value: T[tagObject.name],
       });
     });
     return tagObjects;
@@ -166,7 +169,8 @@ export default class ProblemFinderWizard extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .modal-mask {
   position: fixed;
   z-index: 99999;
@@ -174,15 +178,16 @@ export default class ProblemFinderWizard extends Vue {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(var(--finder-wizard-modal-mask-background-color), 0.5);
   transition: opacity 0.3s ease;
 }
 
 .modal-container {
-  background: #eee;
-  width: 800px;
+  background: var(--finder-wizard-modal-container-background-color);
+  min-width: 340px;
+  max-width: 800px;
   margin: 2.5em auto 0;
-  border: 2px solid #ccc;
+  border: 2px solid var(--finder-wizard-modal-container-border-color);
   padding: 1em;
   position: relative;
   overflow: auto;
@@ -219,11 +224,11 @@ export default class ProblemFinderWizard extends Vue {
   margin-top: 0.35em;
 }
 
-.tags-input-remove:before,
-.tags-input-remove:after,
+.tags-input-remove::before,
+.tags-input-remove::after,
 .tags-input-typeahead-item-highlighted-default,
 .vue-slider-process {
-  background-color: #678dd7;
+  background-color: var(--finder-wizard-slider-process-background-color);
 }
 
 .vue-slider {
@@ -244,16 +249,16 @@ export default class ProblemFinderWizard extends Vue {
   display: block;
   cursor: pointer;
   padding: 0.25em 1em;
-  border: 1px solid #678dd7;
+  border: 1px solid var(--finder-wizard-tab-select-el-border-color);
   flex: 1;
   text-align: center;
-  color: #678dd7;
+  color: var(--finder-wizard-tab-select-el-font-color);
 }
 
 .tab-select-el:hover,
 .tab-select-el-active {
-  color: #fff;
-  background: #678dd7;
+  color: var(--finder-wizard-tab-select-el-font-color--active);
+  background: var(--finder-wizard-tab-select-el-background-color--active);
 }
 
 .hidden-radio {

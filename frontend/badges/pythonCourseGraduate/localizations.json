@@ -1,14 +1,14 @@
 {
     "es": {
-      "name": "Graduado del Curso de Introducción a Python",
-      "description": "El usuario ha resuelto más del 90% del curso de Introducción a Python."
+      "name": "Aprobó el curso de Introducción a Python",
+      "description": "Otorgado a personas que han resuelto más del 90% del curso de Introducción a Python."
     },
     "en": {
       "name": "Introduction to Python Course Graduate",
       "description": "The user has solved more than 90% of Introduction to Python course."
     },
     "pt": {
-      "name": "Graduado do Curso Introdutório de Python",
-      "description": "O usuário tem resolvido mais de 90% do curso Introdutório de Python."
+      "name": "Aprovou o curso de Introdução ao Python",
+      "description": "Concedido a pessoas que resolveram mais do 90% do curso de Introdução ao Python."
     }
 }

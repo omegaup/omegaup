@@ -1,5 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
 
 import type { types } from '../../api_types';
 
@@ -17,6 +16,7 @@ describe('Edit.vue', () => {
           course: {
             admission_mode: 'registration',
             alias: 'test-course',
+            archived: false,
             assignments: [
               {
                 problemset_id: 1,
@@ -27,12 +27,17 @@ describe('Edit.vue', () => {
                 max_points: 0,
                 start_time: new Date(),
                 finish_time: new Date(),
+                opened: false,
                 order: 1,
                 scoreboard_url: 'sb_url',
                 scoreboard_url_admin: 'sc_url_admin',
                 assignment_type: 'test',
+                problemCount: 0,
               },
             ],
+            clarifications: [],
+            objective: '',
+            level: '',
             needs_basic_information: false,
             description: '# Test',
             finish_time: undefined,
@@ -47,12 +52,15 @@ describe('Edit.vue', () => {
             student_count: 1,
             unlimited_duration: false,
           },
+          allLanguages: { kp: 'Karel Pascal', kj: 'Karel Java' },
           assignmentProblems: [],
           selectedAssignment: undefined,
           students: [],
           identityRequests: [],
           admins: [],
           groupsAdmins: [],
+          groupsTeachingAssistants: [],
+          teachingAssistants: [],
           tags: [],
         } as types.CourseEditPayload,
         initialTab: 'course',
@@ -68,5 +76,6 @@ describe('Edit.vue', () => {
     await wrapper.find('a[data-tab-admins]').trigger('click');
     await wrapper.find('a[data-tab-clone]').trigger('click');
     await wrapper.find('a[data-tab-course]').trigger('click');
+    await wrapper.find('a[data-tab-archive]').trigger('click');
   });
 });

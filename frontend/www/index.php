@@ -7,7 +7,7 @@ if (OMEGAUP_LOCKDOWN) {
 }
 
 \OmegaUp\UITools::render(
-    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\User::getIndexDetailsForSmarty(
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\User::getIndexDetailsForTypeScript(
         $r
     )
 );

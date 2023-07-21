@@ -16,11 +16,11 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         int $identityId,
         int $problemsetId
     ): bool {
-        return !is_null(self::getByPK($identityId, $problemsetId));
+        return self::existsByPK($identityId, $problemsetId);
     }
 
     /**
-     * @param \OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews $container
+     * @param \OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments $container
      */
     public static function checkAndSaveFirstTimeAccess(
         \OmegaUp\DAO\VO\Identities $identity,

@@ -1,9 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Tests for apiCreate in ProblemController
- *
- * @author joemmanuel
  */
 
 class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
@@ -34,13 +33,13 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Validate
         // Verify response
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
-        $this->assertEquals(1, count($problems));
+        $this->assertSame(1, count($problems));
         $problem = $problems[0];
 
         // Verify contest was found
@@ -48,25 +47,32 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotNull($problem->problem_id);
 
         // Verify DB data
-        $this->assertEquals($r['title'], $problem->title);
-        $this->assertEquals(substr($r['title'], 0, 32), $problem->alias);
-        $this->assertEquals($r['order'], $problem->order);
-        $this->assertEquals($r['source'], $problem->source);
-        $this->assertEqualSets($r['languages'], $problem->languages);
+        $this->assertSame($r['title'], $problem->title);
+        $this->assertSame(
+            substr(
+                $r['title'],
+                0,
+                \OmegaUp\Validators::ALIAS_MAX_LENGTH
+            ),
+            $problem->alias
+        );
+        $this->assertSame($r['order'], $problem->order);
+        $this->assertSame($r['source'], $problem->source);
+        $this->assertSameSets($r['languages'], $problem->languages);
 
         // Verify author username -> author id conversion
         $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
         $identity = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id);
-        $this->assertEquals($identity->username, $r['author_username']);
+        $this->assertSame($identity->username, $r['author_username']);
 
         // Verify problem settings.
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($r['problem_alias']);
         $problemSettings = json_decode($problemArtifacts->get('settings.json'));
-        $this->assertEquals(false, $problemSettings->Slow);
-        $this->assertEquals($r['validator'], $problemSettings->Validator->Name);
-        $this->assertEquals(5000, $r['time_limit']);
-        $this->assertEquals('5s', $problemSettings->Limits->TimeLimit);
-        $this->assertEquals(
+        $this->assertSame(false, $problemSettings->Slow);
+        $this->assertSame($r['validator'], $problemSettings->Validator->Name);
+        $this->assertSame(5000.0, $r['time_limit']);
+        $this->assertSame('5s', $problemSettings->Limits->TimeLimit);
+        $this->assertSame(
             $r['memory_limit'] * 1024,
             $problemSettings->Limits->MemoryLimit
         );
@@ -77,29 +83,46 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue($problemArtifacts->exists('statements/en.markdown'));
 
         // Default data
-        $this->assertEquals(0, $problem->visits);
-        $this->assertEquals(0, $problem->submissions);
-        $this->assertEquals(0, $problem->accepted);
-        $this->assertEquals(0, $problem->difficulty);
+        $this->assertSame(0, $problem->visits);
+        $this->assertSame(0, $problem->submissions);
+        $this->assertSame(0, $problem->accepted);
+        $this->assertNull($problem->difficulty);
     }
 
-    public function testCreateWithInvlaidAlias() {
+    /**
+     * A PHPUnit data provider for testCreateWithInvalidAlias.
+     *
+     * @return list<list<string>>
+     */
+    public function invalidAliasValueProvider(): array {
+        return [
+            ['this has a space'],
+            ['this-alias-is-way-too-long-and-should-be-rejected'],
+            ['colons:are-disallowed'],
+            ['new'],  // restricted alias
+        ];
+    }
+
+    /**
+     * @dataProvider invalidAliasValueProvider
+     */
+    public function testCreateWithInvalidAlias(string $alias) {
         // Get the problem data
         $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
-        $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 
         // Login user
         $login = self::login($problemAuthor);
+        $r = $problemData['request'];
         $r['auth_token'] = $login->auth_token;
-        $r['problem_alias'] = 'Invalid alias';
+        $r['problem_alias'] = $alias;
 
         // Call the API
         try {
             \OmegaUp\Controllers\Problem::apiCreate($r);
             $this->fail('Problem creation should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'parameterInvalid');
+            $this->assertSame($e->getMessage(), 'parameterInvalid');
         }
     }
 
@@ -122,13 +145,13 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Validate
         // Verify response
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
-        $this->assertEquals(1, count($problems));
+        $this->assertSame(1, count($problems));
         $problem = $problems[0];
 
         // Verify contest was found
@@ -137,7 +160,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Verify problem settings.
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($r['problem_alias']);
         $problemSettings = json_decode($problemArtifacts->get('settings.json'));
-        $this->assertEquals(true, $problemSettings->Slow);
+        $this->assertSame(true, $problemSettings->Slow);
     }
 
     /**
@@ -160,13 +183,13 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Validate
         // Verify response
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
-        $this->assertEquals(1, count($problems));
+        $this->assertSame(1, count($problems));
         $problem = $problems[0];
 
         // Verify contest was found
@@ -175,7 +198,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Verify problem settings.
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($r['problem_alias']);
         $problemSettings = json_decode($problemArtifacts->get('settings.json'));
-        $this->assertEquals(false, $problemSettings->Slow);
+        $this->assertSame(false, $problemSettings->Slow);
     }
 
     /**
@@ -198,7 +221,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Validate
         // Verify response
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Verify problem contents were copied
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($r['problem_alias']);
@@ -292,13 +315,13 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Validate
         // Verify response
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
-        $this->assertEquals(1, count($problems));
+        $this->assertSame(1, count($problems));
         $problem = $problems[0];
 
         // Verify contest was found
@@ -306,15 +329,22 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotNull($problem->problem_id);
 
         // Verify DB data
-        $this->assertEquals($r['title'], $problem->title);
-        $this->assertEquals(substr($r['title'], 0, 32), $problem->alias);
-        $this->assertEquals($r['order'], $problem->order);
-        $this->assertEquals($r['source'], $problem->source);
+        $this->assertSame($r['title'], $problem->title);
+        $this->assertSame(
+            substr(
+                $r['title'],
+                0,
+                \OmegaUp\Validators::ALIAS_MAX_LENGTH
+            ),
+            $problem->alias
+        );
+        $this->assertSame($r['order'], $problem->order);
+        $this->assertSame($r['source'], $problem->source);
 
         // Verify author username -> author id conversion
         $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
         $identity = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id);
-        $this->assertEquals($identity->username, $r['author_username']);
+        $this->assertSame($identity->username, $r['author_username']);
 
         // Verify problem contents were copied
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
@@ -323,10 +353,10 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
 
         // Default data
-        $this->assertEquals(0, $problem->visits);
-        $this->assertEquals(0, $problem->submissions);
-        $this->assertEquals(0, $problem->accepted);
-        $this->assertEquals(0, $problem->difficulty);
+        $this->assertSame(0, $problem->visits);
+        $this->assertSame(0, $problem->submissions);
+        $this->assertSame(0, $problem->accepted);
+        $this->assertNull($problem->difficulty);
     }
 
     /**
@@ -348,11 +378,11 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
         // Verify response
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Get problem info from DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
-        $this->assertEquals(1, count($problems));
+        $this->assertSame(1, count($problems));
         $problem = $problems[0];
 
         // Verify problem contents were copied
@@ -390,7 +420,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
         // Verify response
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Verify problem contents were copied
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($r['problem_alias']);
@@ -421,7 +451,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $r['problem_alias'],
         ]));
         $imagePath = "{$r['problem_alias']}/{$imageGitObjectId}.{$imageExtension}";
-        $this->assertEquals(
+        $this->assertSame(
             IMAGES_URL_PATH . $imagePath,
             $response['statement']['images']['bunny.jpg']
         );
@@ -439,7 +469,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertFileExists(IMAGES_PATH . $imagePath);
         $actualImageHash = sha1(file_get_contents(IMAGES_PATH . $imagePath));
-        $this->assertEquals($expectedImageHash, $actualImageHash);
+        $this->assertSame($expectedImageHash, $actualImageHash);
     }
 
     /**
@@ -458,14 +488,14 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Call the API
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Check that the sources are there.
         $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $r['problem_alias'],
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             $response['statement']['sources'],
             [
                 'plantilla.py' => '#!/usr/bin/python3
@@ -502,13 +532,13 @@ if __name__ == \'__main__\':
 
         // Validate
         // Verify response
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
-        $this->assertEquals(1, count($problems));
+        $this->assertSame(1, count($problems));
         $problem = $problems[0];
 
         // Verify contest was found
@@ -516,7 +546,7 @@ if __name__ == \'__main__\':
         $this->assertNotNull($problem->problem_id);
 
         // Verify DB data
-        $this->assertEquals($r['title'], $problem->title);
+        $this->assertSame($r['title'], $problem->title);
 
         // Verify problem contents were copied
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
@@ -606,19 +636,19 @@ if __name__ == \'__main__\':
 
         $problemsCount = [];
         $total = 0;
-        $response = \OmegaUp\Controllers\Problem::getProblemCollectionDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Problem::getProblemCollectionDetailsForTypeScript(
             new \OmegaUp\Request([])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
         foreach ($response['problemCount'] as $levelTag) {
             $problemsCount[] = $levelTag['problems_per_tag'];
             $total += $levelTag['problems_per_tag'];
-            $this->assertEquals(
+            $this->assertSame(
                 $problemLevelMapping[$levelTag['name']],
                 $levelTag['problems_per_tag']
             );
         }
 
-        $this->assertEquals(35, $total);
+        $this->assertSame(35, $total);
     }
 
     /**
@@ -643,7 +673,7 @@ if __name__ == \'__main__\':
             $response = \OmegaUp\Controllers\Problem::apiCreate($r);
             $this->fail('Exception was expected. Wrong attribute');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'parameterEmpty');
+            $this->assertSame($e->getMessage(), 'parameterEmpty');
         }
     }
 
@@ -667,7 +697,7 @@ if __name__ == \'__main__\':
             \OmegaUp\Controllers\Problem::apiCreate($r);
             $this->fail('Exception was expected.');
         } catch (\OmegaUp\Exceptions\ProblemDeploymentFailedException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'problemDeployerNoStatements',
                 $e->getMessage()
             );
@@ -694,7 +724,7 @@ if __name__ == \'__main__\':
             \OmegaUp\Controllers\Problem::apiCreate($r);
             $this->fail('Exception was expected.');
         } catch (\OmegaUp\Exceptions\ProblemDeploymentFailedException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'problemDeployerMismatchedInputFile',
                 $e->getMessage()
             );
@@ -721,13 +751,13 @@ if __name__ == \'__main__\':
 
         // Validate
         // Verify response
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
-        $this->assertEquals(1, count($problems));
+        $this->assertSame(1, count($problems));
         $problem = $problems[0];
 
         // Verify contest was found
@@ -735,15 +765,22 @@ if __name__ == \'__main__\':
         $this->assertNotNull($problem->problem_id);
 
         // Verify DB data
-        $this->assertEquals($r['title'], $problem->title);
-        $this->assertEquals(substr($r['title'], 0, 32), $problem->alias);
-        $this->assertEquals($r['order'], $problem->order);
-        $this->assertEquals($r['source'], $problem->source);
+        $this->assertSame($r['title'], $problem->title);
+        $this->assertSame(
+            substr(
+                $r['title'],
+                0,
+                \OmegaUp\Validators::ALIAS_MAX_LENGTH
+            ),
+            $problem->alias
+        );
+        $this->assertSame($r['order'], $problem->order);
+        $this->assertSame($r['source'], $problem->source);
 
         // Verify author username -> author id conversion
         $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
         $identity = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id);
-        $this->assertEquals($identity->username, $r['author_username']);
+        $this->assertSame($identity->username, $r['author_username']);
 
         // Verify problem contents were copied
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
@@ -769,10 +806,10 @@ if __name__ == \'__main__\':
         $this->assertArrayHasKey('Interactive', $problemSettings);
 
         // Default data
-        $this->assertEquals(0, $problem->visits);
-        $this->assertEquals(0, $problem->submissions);
-        $this->assertEquals(0, $problem->accepted);
-        $this->assertEquals(0, $problem->difficulty);
+        $this->assertSame(0, $problem->visits);
+        $this->assertSame(0, $problem->submissions);
+        $this->assertSame(0, $problem->accepted);
+        $this->assertNull($problem->difficulty);
 
         \OmegaUp\Controllers\Problem::regenerateTemplates(
             $problem->alias,
@@ -811,7 +848,7 @@ if __name__ == \'__main__\':
 
         // Call the API
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         $problem = \OmegaUp\DAO\Problems::getByTitle($r['title'])[0];
 
@@ -852,17 +889,17 @@ if __name__ == \'__main__\':
         ]);
 
         // Asserting all default values
-        $this->assertEquals(0, $problemParams->visibility);
-        $this->assertEquals(
+        $this->assertNull($problemParams->visibility);
+        $this->assertSame(
             \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
             $problemParams->updatePublished
         );
-        $this->assertEquals(null, $problemParams->validatorTimeLimit);
-        $this->assertEquals(null, $problemParams->overallWallTimeLimit);
-        $this->assertEquals(null, $problemParams->extraWallTime);
-        $this->assertEquals(null, $problemParams->outputLimit);
-        $this->assertEquals(10240, $problemParams->inputLimit);
-        $this->assertEquals(null, $problemParams->emailClarifications);
+        $this->assertSame(null, $problemParams->validatorTimeLimit);
+        $this->assertSame(null, $problemParams->overallWallTimeLimit);
+        $this->assertSame(null, $problemParams->extraWallTime);
+        $this->assertSame(null, $problemParams->outputLimit);
+        $this->assertSame(10240, $problemParams->inputLimit);
+        $this->assertSame(null, $problemParams->emailClarifications);
 
         // New object with custom values
         $titleAlias = \OmegaUp\Test\Utils::createRandomString();
@@ -875,12 +912,12 @@ if __name__ == \'__main__\':
             'email_clarifications' => true,
         ]);
 
-        $this->assertEquals($titleAlias, $problemParams->title);
-        $this->assertEquals(
+        $this->assertSame($titleAlias, $problemParams->title);
+        $this->assertSame(
             \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE,
             $problemParams->updatePublished
         );
-        $this->assertEquals(
+        $this->assertSame(
             $overallWallTimeLimit,
             $problemParams->overallWallTimeLimit
         );
@@ -900,7 +937,7 @@ if __name__ == \'__main__\':
                 str_replace(' ', '-', $title)
             ),
             0,
-            32
+            \OmegaUp\Validators::ALIAS_MAX_LENGTH
         );
 
         \OmegaUp\Controllers\Problem::apiCreate(new \OmegaUp\Request([
@@ -924,7 +961,7 @@ if __name__ == \'__main__\':
             ])
         );
 
-        $this->assertEquals(10240, $response['input_limit']);
+        $this->assertSame(10240, $response['input_limit']);
         {
             $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemAlias);
             $problemSettings = json_decode(
@@ -933,17 +970,17 @@ if __name__ == \'__main__\':
                 )
             );
 
-            $this->assertEquals('1s', $problemSettings->Limits->TimeLimit);
-            $this->assertEquals('0s', $problemSettings->Limits->ExtraWallTime);
-            $this->assertEquals(
+            $this->assertSame('1s', $problemSettings->Limits->TimeLimit);
+            $this->assertSame('0s', $problemSettings->Limits->ExtraWallTime);
+            $this->assertSame(
                 \Omegaup\Controllers\Problem::parseSize('64MiB'),
                 $problemSettings->Limits->MemoryLimit
             );
-            $this->assertEquals(
+            $this->assertSame(
                 \Omegaup\Controllers\Problem::parseSize('10240KiB'),
                 $problemSettings->Limits->OutputLimit
             );
-            $this->assertEquals(
+            $this->assertSame(
                 '30s',
                 $problemSettings->Limits->OverallWallTimeLimit
             );
@@ -977,7 +1014,7 @@ if __name__ == \'__main__\':
             ])
         );
 
-        $this->assertEquals($showDiffValue, $problem->show_diff);
+        $this->assertSame($showDiffValue, $problem->show_diff);
     }
 
     public function testCreateProblemWithInvalidShowDiffValue() {
@@ -991,7 +1028,7 @@ if __name__ == \'__main__\':
             );
             $this->fail('Exception was expected.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
+            $this->assertSame('parameterNotInExpectedSet', $e->getMessage());
         }
     }
 
@@ -1021,7 +1058,7 @@ if __name__ == \'__main__\':
             ])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $allowUserAddTagsValue,
             $problem->allow_user_add_tags
         );

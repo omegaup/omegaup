@@ -10,29 +10,30 @@
       </span>
     </div>
     <div class="summary" :class="{ active: !activeProblem }">
-      <a class="name" href="#problems">{{ T.wordsSummary }}</a>
+      <a
+        class="name"
+        href="#problems"
+        @click="$emit('disable-active-problem')"
+        >{{ T.wordsSummary }}</a
+      >
     </div>
     <div
       v-for="problem in problems"
+      :key="problem.alias"
       :class="{ active: problem.alias === activeProblem }"
       data-navbar-problem
     >
       <div class="row">
-        <div class="col-xs-5 problem-type">
+        <div class="col-xs-5 problem-type w-50 pl-4">
           <span v-if="inAssignment">{{
             getProblemTypeTitle(problem.acceptsSubmissions)
           }}</span>
         </div>
-        <div v-if="problem.acceptsSubmissions" class="col-xs-7 solved">
-          <span
-            >({{
-              parseFloat(problem.bestScore).toFixed(digitsAfterDecimalPoint)
-            }}
-            /
-            {{
-              parseFloat(problem.maxScore).toFixed(digitsAfterDecimalPoint)
-            }})</span
-          >
+        <div
+          v-if="problem.acceptsSubmissions"
+          class="col-xs-7 solved text-right w-50 pr-3"
+        >
+          <span class="mr-1">{{ getMaxScoreForProblem(problem) }}</span>
           <font-awesome-icon
             v-if="problem.bestScore == problem.maxScore"
             icon="check"
@@ -46,10 +47,13 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-12">
-          <a class="name" @click="onNavigateToProblem(problem)">{{
-            problem.text
-          }}</a>
+        <div class="col-xs-12 pl-4">
+          <a
+            :data-problem="problem.alias"
+            class="name"
+            @click="onNavigateToProblem(problem)"
+            >{{ problem.text }}</a
+          >
         </div>
       </div>
     </div>
@@ -59,6 +63,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 
 import {
@@ -78,11 +83,11 @@ library.add(fas);
   },
 })
 export default class ArenaNavbarProblems extends Vue {
-  @Prop() problems!: omegaup.ContestProblem[];
+  @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop() activeProblem!: string | null;
   @Prop() courseAlias!: string | null;
   @Prop() courseName!: string | null;
-  @Prop() inAssignment!: boolean;
+  @Prop({ default: false }) inAssignment!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   @Prop({ default: null }) currentAssignment!: omegaup.Assignment | null;
 
@@ -92,17 +97,24 @@ export default class ArenaNavbarProblems extends Vue {
     return acceptsSubmissions ? T.wordsProblem : T.wordsLecture;
   }
 
+  getMaxScoreForProblem(problem: types.NavbarProblemsetProblem): string {
+    return `(${problem.bestScore.toFixed(
+      this.digitsAfterDecimalPoint,
+    )} / ${problem.maxScore.toFixed(this.digitsAfterDecimalPoint)})`;
+  }
+
   get urlAssignment(): string {
     return `/course/${this.courseAlias}/`;
   }
 
-  onNavigateToProblem(problem: omegaup.ContestProblem) {
-    this.$emit('navigate-to-problem', problem.alias);
+  onNavigateToProblem(problem: types.NavbarProblemsetProblem) {
+    this.$emit('navigate-to-problem', problem);
   }
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .problem-list .breadcrumbs-link {
   display: inherit;
 }
@@ -111,14 +123,14 @@ export default class ArenaNavbarProblems extends Vue {
   width: 19em;
   margin-bottom: 0.5em;
   padding-top: 0.2em;
-  background: #ddd;
-  border: solid 1px #ccc;
+  background: var(--arena-contest-navbar-problem-list-background-color);
+  border: solid 1px var(--arena-contest-navbar-problem-list-border-color);
   border-width: 1px 0 1px 1px;
   position: relative;
 }
 
 .problem-list > div a {
-  color: #5588dd;
+  color: var(--arena-contest-navbar-problem-list-a-font-color);
   display: block;
   padding: 0.5em;
   width: 100%;
@@ -140,7 +152,7 @@ export default class ArenaNavbarProblems extends Vue {
 
 .problem-list .problem-type {
   font-size: 13px;
-  color: #9a9a9a;
+  color: var(--arena-contest-navbar-problem-type-font-color);
   font-weight: bold;
 }
 </style>

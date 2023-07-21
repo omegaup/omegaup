@@ -6,18 +6,22 @@
     <div class="card-body">
       <form role="form" @submit.prevent="onEditMember">
         <div class="form-row">
-          <div class="form-group col-lg-4 col-md-6 col-sm-6">
+          <div class="form-group col-lg-5 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.username }}
               <div class="input-group">
                 <div class="input-group-prepend">
                   <div class="input-group-text">{{ groupName }}:</div>
                 </div>
-                <input v-model="identityName" class="form-control" />
+                <input
+                  v-model="identityName"
+                  class="form-control"
+                  data-identity-name
+                />
               </div>
             </label>
           </div>
-          <div class="form-group col-lg-4 col-md-6 col-sm-6">
+          <div class="form-group col-lg-3 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.profile }}
               <input v-model="selectedIdentity.name" class="form-control" />
@@ -68,23 +72,21 @@
           <div class="form-group col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.profileSchool }}
-              <omegaup-autocomplete
-                v-model="selectedIdentity.school"
-                class="form-control"
-                :init="
-                  (el) =>
-                    typeahead.schoolTypeahead(el, (event, item) => {
-                      selectedIdentity.school = item.value;
-                      selectedIdentity.school_id = item.id;
-                    })
+              <omegaup-common-typeahead
+                :existing-options="searchResultSchools"
+                :options="searchResultSchools"
+                :value.sync="school"
+                @update-existing-options="
+                  (query) => $emit('update-search-result-schools', query)
                 "
-              ></omegaup-autocomplete>
-              <input type="hidden" :value="selectedIdentity.schoolId" />
+              ></omegaup-common-typeahead>
             </label>
           </div>
         </div>
         <div class="form-group float-right">
-          <button class="btn btn-primary">{{ T.wordsSaveChanges }}</button>
+          <button class="btn btn-primary" data-update-identity>
+            {{ T.wordsSaveChanges }}
+          </button>
           <button
             class="btn btn-secondary ml-2"
             type="reset"
@@ -99,24 +101,23 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import type { types } from '../../api_types';
 import T from '../../lang';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
   },
 })
 export default class IdentityEdit extends Vue {
   @Prop({ default: null }) identity!: types.Identity | null;
   @Prop() countries!: iso3166.Country[];
+  @Prop() searchResultSchools!: types.SchoolListItem[];
 
   T = T;
-  typeahead = typeahead;
   selectedIdentity = Object.assign(
     {
       username: '',
@@ -124,19 +125,27 @@ export default class IdentityEdit extends Vue {
       name: '',
       gender: '',
       school: '',
-      school_id: 0,
       country_id: 'MX',
       state_id: '',
     } as types.Identity,
     this.identity,
   );
+  school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
 
   get groupName(): string {
-    return this.selectedIdentity.username.split(':')[0];
+    const teamUsername = this.selectedIdentity.username.split(':');
+    if (teamUsername.length === 2) {
+      return teamUsername[0];
+    }
+    return `${teamUsername[0]}:${teamUsername[1]}`;
   }
 
   get identityName(): string {
-    return this.selectedIdentity.username.split(':')[1];
+    const teamUsername = this.selectedIdentity.username.split(':');
+    if (teamUsername.length === 2) {
+      return teamUsername[1];
+    }
+    return teamUsername[2];
   }
   set identityName(username: string) {
     this.selectedIdentity.username = `${this.groupName}:${username}`;
@@ -149,11 +158,18 @@ export default class IdentityEdit extends Vue {
   }
 
   onEditMember(): void {
-    this.$emit(
-      'edit-identity-member',
-      this.identity?.username,
-      this.selectedIdentity,
-    );
+    this.$emit('edit-identity-member', {
+      originalUsername: this.identity?.username,
+      identity: {
+        ...this.selectedIdentity,
+        school: this.school?.value,
+      },
+    });
+  }
+
+  @Watch('identity')
+  onIdentityChanged(newValue: types.Identity): void {
+    this.selectedIdentity = newValue;
   }
 }
 </script>

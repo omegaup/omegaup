@@ -1,7 +1,8 @@
 import { mount, shallowMount } from '@vue/test-utils';
-import expect from 'expect';
 
 import T from '../../lang';
+import * as ui from '../../ui';
+import * as time from '../../time';
 import { omegaup } from '../../omegaup';
 import type { types } from '../../api_types';
 
@@ -22,77 +23,166 @@ describe('ViewStudent.vue', () => {
     expect(wrapper.text()).toContain(T.courseStudentSelectAssignment);
   });
 
+  const submissionFeedback: types.SubmissionFeedback = {
+    author: 'omegaUp',
+    author_classname: 'user-rank-unranked',
+    date: new Date(),
+    feedback: 'Test feedback',
+    feedback_thread: [],
+    submission_feedback_id: 1,
+  };
+
+  const assignment_a: omegaup.Assignment = {
+    alias: 'assignment_a',
+    assignment_type: 'homework',
+    description: 'Assignment description A',
+    start_time: new Date(0),
+    finish_time: new Date(),
+    name: 'Assignment',
+    order: 1,
+    scoreboard_url: '',
+    scoreboard_url_admin: '',
+  };
+
+  const assignment_b: omegaup.Assignment = {
+    alias: 'assignment_b',
+    assignment_type: 'homework',
+    description: 'Assignment description B',
+    start_time: new Date(0),
+    finish_time: new Date(),
+    name: 'Assignment',
+    order: 1,
+    scoreboard_url: '',
+    scoreboard_url_admin: '',
+  };
+
+  const student_a: types.CourseStudent = {
+    name: 'student_a',
+    username: 'student_a',
+  };
+
+  const student_b: types.CourseStudent = {
+    name: 'student_b',
+    username: 'student_b',
+  };
+
+  const expectedDate = new Date('1/1/2020, 12:00:00 AM');
+
+  const run: types.CourseRun = {
+    guid: 'guid-1',
+    language: 'cpp',
+    memory: 200,
+    penalty: 0,
+    score: 1,
+    status: 'ready',
+    runtime: 1,
+    submit_delay: 1,
+    source: 'print(3)',
+    time: expectedDate,
+    verdict: 'AC',
+  };
+
+  const problem: types.CourseProblem = {
+    accepted: 1,
+    alias: 'problem_a',
+    commit: '',
+    letter: 'A',
+    order: 1,
+    points: 1,
+    runs: [
+      run,
+      { ...run, ...{ guid: 'guid-2', feedback: submissionFeedback } },
+    ],
+    submissions: 1,
+    title: 'problem_1',
+    visits: 1,
+    difficulty: 1,
+    languages: 'cpp',
+    visibility: 1,
+    version: 'abcdef',
+  };
+
   it('Should handle runs', async () => {
-    const expectedDate = new Date('1/1/2020, 12:00:00 AM');
     const wrapper = mount(course_ViewStudent, {
       propsData: {
         course: {
           alias: 'hello',
         },
-        assignments: [
-          {
-            alias: 'assignment',
-            assignment_type: 'homework',
-            description: 'Assignment description',
-            start_time: new Date(0),
-            finish_time: new Date(),
-            name: 'Assignment',
-            order: 1,
-            scoreboard_url: '',
-            scoreboard_url_admin: '',
-          } as omegaup.Assignment,
-        ],
+        assignments: [assignment_a, assignment_b],
         problems: [
-          {
-            alias: 'problem',
-            commit: '',
-            letter: 'A',
-            order: 1,
-            points: 1,
-            runs: [
-              {
-                penalty: 0,
-                score: 1,
-                source: 'print(3)',
-                time: expectedDate,
-                verdict: 'AC',
-              } as omegaup.CourseProblemRun,
-            ],
-            submissions: 1,
-            title: 'problem_1',
-            visits: 1,
-          } as types.CourseProblem,
+          problem,
+          { ...problem, ...{ alias: 'problem_b', title: 'problem_2' } },
         ],
-        students: [
-          {
-            name: 'student',
-            username: 'student',
-            progress: {
-              problem: 1,
-            },
-          } as types.CourseStudent,
-        ],
-        initialStudent: {
-          name: 'student',
-          username: 'student',
-          progress: {
-            problem: 1,
-          },
-        } as types.CourseStudent,
+        students: [student_a, student_b],
+        student: student_a,
       },
     });
 
+    const students = wrapper.find('select[data-student]')
+      .element as HTMLInputElement;
+    students.value = 'student_b';
+    await students.dispatchEvent(new Event('change'));
+    expect(wrapper.emitted('update')).toEqual([
+      [{ student: student_b.username, assignmentAlias: null }],
+    ]);
+    expect(
+      (wrapper.find('select[data-student]').element as HTMLInputElement).value,
+    ).toBe('student_b');
+
     const assignments = wrapper.find('select[data-assignment]')
       .element as HTMLInputElement;
-    assignments.value = 'assignment';
+    assignments.value = 'assignment_b';
     await assignments.dispatchEvent(new Event('change'));
     expect(wrapper.find('div[data-markdown-statement]').text()).toBe(
-      'Assignment description',
+      'Assignment description B',
     );
-    await wrapper.find('a[data-problem-alias="problem"]').trigger('click');
+
+    assignments.value = 'assignment_a';
+    await assignments.dispatchEvent(new Event('change'));
+    expect(wrapper.find('div[data-markdown-statement]').text()).toBe(
+      'Assignment description A',
+    );
+
+    await wrapper.find('a[data-problem-alias="problem_a"]').trigger('click');
 
     expect(wrapper.find('table tbody td').text()).toBe(
       expectedDate.toLocaleString(T.locale),
+    );
+
+    await wrapper.find('a[data-problem-alias="problem_b"]').trigger('click');
+
+    expect(wrapper.find('table tbody td').text()).toBe(
+      expectedDate.toLocaleString(T.locale),
+    );
+
+    await wrapper.find('tr[data-run-guid="guid-1"]').trigger('click');
+    expect(wrapper.text()).toContain(T.feedbackNotSentYet);
+
+    await wrapper.find('a[data-show-feedback-form]').trigger('click');
+    expect(wrapper.find('button[data-feedback-button]').element).toBeDisabled();
+
+    await wrapper.find('textarea').setValue(submissionFeedback.feedback);
+    expect(wrapper.find('button[data-feedback-button]').element).toBeEnabled();
+    wrapper.find('button[data-feedback-button]').trigger('click');
+    expect(wrapper.emitted('set-feedback')).toBeDefined();
+    expect(wrapper.emitted('set-feedback')).toEqual([
+      [
+        {
+          guid: 'guid-1',
+          feedback: submissionFeedback.feedback,
+          isUpdate: false,
+          assignmentAlias: assignment_a.alias,
+          studentUsername: student_b.username,
+        },
+      ],
+    ]);
+
+    await wrapper.find('tr[data-run-guid="guid-2"]').trigger('click');
+    expect(wrapper.text()).toContain(submissionFeedback.feedback);
+    expect(wrapper.text()).toContain(
+      ui.formatString(T.feedbackLeftBy, {
+        date: time.formatDate(submissionFeedback.date),
+      }),
     );
   });
 });

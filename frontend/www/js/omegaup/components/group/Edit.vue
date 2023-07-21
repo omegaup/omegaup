@@ -1,11 +1,11 @@
 <template>
   <div class="group-edit">
     <div class="page-header">
-      <h1>
+      <h2>
         {{ ui.formatString(T.groupEditTitleWithName, { name: groupName }) }}
-      </h1>
+      </h2>
     </div>
-    <ul class="nav nav-pills">
+    <ul class="nav nav-pills mt-4">
       <li class="nav-item" role="presentation">
         <a
           :href="`#${AvailableTabs.Edit}`"
@@ -75,6 +75,11 @@
           :identities-csv="currentIdentitiesCsv"
           :group-alias="groupAlias"
           :countries="countries"
+          :search-result-users="searchResultUsers"
+          :search-result-schools="searchResultSchools"
+          @update-search-result-schools="
+            (query) => $emit('update-search-result-schools', query)
+          "
           @add-member="
             (memberComponent, username) =>
               $emit('add-member', memberComponent, username)
@@ -84,27 +89,7 @@
               $emit('edit-identity', memberComponent, identity)
           "
           @edit-identity-member="
-            (
-              memberComponent,
-              originalUsername,
-              username,
-              name,
-              country,
-              state,
-              school,
-              schoolId,
-            ) =>
-              $emit(
-                'edit-identity-member',
-                memberComponent,
-                originalUsername,
-                username,
-                name,
-                country,
-                state,
-                school,
-                schoolId,
-              )
+            (request) => $emit('edit-identity-member', request)
           "
           @change-password-identity="
             (memberComponent, username) =>
@@ -122,6 +107,9 @@
           "
           @remove="(username) => $emit('remove', username)"
           @cancel="(memberComponent) => $emit('cancel', memberComponent)"
+          @update-search-result-users="
+            (query) => $emit('update-search-result-users', query)
+          "
         ></omegaup-group-members>
       </div>
 
@@ -198,6 +186,8 @@ export default class GroupEdit extends Vue {
   @Prop() identitiesCsv!: types.Identity[];
   @Prop() scoreboards!: types.GroupScoreboard[];
   @Prop() userErrorRow!: null | string;
+  @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultSchools!: types.SchoolListItem[];
 
   T = T;
   ui = ui;

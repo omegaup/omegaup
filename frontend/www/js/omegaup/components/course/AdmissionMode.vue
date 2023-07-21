@@ -3,7 +3,7 @@
     <div class="card-body">
       <form class="publish-form" @submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{ T.contestNewFormAdmissionModeSelect }}</label>
+          <label>{{ T.courseEditAdmissionModeSelect }}</label>
           <a
             data-toggle="tooltip"
             rel="tooltip"
@@ -52,9 +52,6 @@
               </span>
             </div>
           </div>
-          <omegaup-markdown
-            :markdown="admissionModeDescription"
-          ></omegaup-markdown>
         </div>
         <div class="text-right">
           <button class="btn btn-primary change-admission-mode" type="submit">

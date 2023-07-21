@@ -14,9 +14,12 @@ OmegaUp.on('ready', function () {
     render: function (createElement) {
       return createElement('omegaup-activity-feed', {
         props: {
+          page: payload.page,
+          length: payload.length,
           type: payload.type,
           alias: payload.alias,
           report: payload.events,
+          pagerItems: payload.pagerItems,
         },
       });
     },

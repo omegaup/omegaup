@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
     /**
-     * @return null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews
+     * @return null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments
      */
     public static function getProblemsetContainer(?int $problemsetId) {
         if (is_null($problemsetId)) {
@@ -36,13 +36,6 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
             return $assignment;
         }
 
-        $interview = \OmegaUp\DAO\Interviews::getInterviewForProblemset(
-            $problemsetId
-        );
-        if (!is_null($interview)) {
-            return $interview;
-        }
-
         return null;
     }
 
@@ -51,7 +44,7 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
      * If the deadline is null, the submission could be made, otherwise, no
      * one, including admins, can submit after the deadline.
      *
-     * @param \OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews $problemsetContainer
+     * @param \OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments $problemsetContainer
      */
     public static function isLateSubmission(
         $problemsetContainer,
@@ -73,26 +66,22 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
     }
 
     /**
-     * @param \OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews $problemsetContainer
+     * @param \OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments $problemsetContainer
      */
     public static function isSubmissionWindowOpen($problemsetContainer): bool {
-        if (!isset($problemsetContainer->start_time)) {
-            return false;
-        }
         /** @var \OmegaUp\Timestamp $problemsetContainer->start_time */
         return \OmegaUp\Time::get() >= $problemsetContainer->start_time->time;
     }
 
     /**
-     * @return array{assignment: null|string, contest_alias: null|string, course: null|string, interview_alias: null|string, type: string}|null
+     * @return array{assignment: null|string, contest_alias: null|string, course: null|string, type: string}|null
      */
     public static function getWithTypeByPK(int $problemsetId): ?array {
         $sql = 'SELECT
                     type,
                     c.alias AS contest_alias,
                     a.alias AS assignment,
-                    cu.alias AS course,
-                    i.alias AS interview_alias
+                    cu.alias AS course
                 FROM
                     Problemsets p
                 LEFT JOIN
@@ -107,17 +96,13 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
                     Contests c
                 ON
                     p.problemset_id = c.problemset_id
-                LEFT JOIN
-                    Interviews i
-                ON
-                    p.problemset_id = i.problemset_id
                 WHERE
                     p.problemset_id = ?
                 LIMIT
                     1;';
         $params = [$problemsetId];
 
-        /** @var array{assignment: null|string, contest_alias: null|string, course: null|string, interview_alias: null|string, type: string}|null */
+        /** @var array{assignment: null|string, contest_alias: null|string, course: null|string, type: string}|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             $params
@@ -157,5 +142,25 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
             $sql,
             [$user->user_id]
         ) == '0';
+    }
+
+    public static function hasSubmissions(
+        \OmegaUp\DAO\VO\Problemsets $problemset
+    ): bool {
+        $sql = 'SELECT
+                    COUNT(*)
+                FROM
+                    Submissions s
+                WHERE
+                    s.problemset_id = ?
+                LIMIT
+                    1;';
+
+        /** @var int */
+        $hasSubmissions = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$problemset->problemset_id]
+        );
+        return $hasSubmissions > 0;
     }
 }

@@ -5,13 +5,15 @@
         <div class="col-sm-2 col-lg-3" :class="`${type}-course-card`"></div>
         <div class="col-sm-10 col-lg-9">
           <div class="card-body">
-            <h5 class="card-title">{{ course.name }}</h5>
-            <p v-if="type === CourseType.Public" class="card-text">
-              {{ course.description }}
-            </p>
+            <h5 class="card-title text-trimmed">{{ course.name }}</h5>
+            <omegaup-markdown
+              v-if="type === CourseType.Public"
+              class="card-long-text"
+              :markdown="course.description"
+            ></omegaup-markdown>
             <omegaup-markdown
               v-if="type !== CourseType.Finished"
-              class="card-text"
+              class="card-text text-trimmed"
               :markdown="
                 ui.formatString(T.courseCardImpartedBy, {
                   school_name: course.school_name,
@@ -44,7 +46,7 @@
             >
               ⭐
             </div>
-            <div class="text-center">
+            <div class="text-center mt-1">
               <a
                 class="btn btn-primary text-white"
                 role="button"
@@ -80,7 +82,7 @@ export enum CourseType {
 })
 export default class CourseCard extends Vue {
   @Prop() course!: types.FilteredCourse;
-  @Prop() type!: string;
+  @Prop() type!: CourseType;
 
   T = T;
   ui = ui;
@@ -106,6 +108,11 @@ export default class CourseCard extends Vue {
 .card > .row.no-gutters {
   background-color: $omegaup-white;
 
+  .text-trimmed {
+    height: 50px;
+    overflow-y: hidden;
+  }
+
   .public-course-card {
     background-color: $omegaup-blue;
   }
@@ -116,6 +123,11 @@ export default class CourseCard extends Vue {
 
   .finished-course-card {
     background-color: $omegaup-grey--lighter;
+  }
+
+  .card-long-text {
+    overflow-y: scroll;
+    max-height: 250px;
   }
 }
 

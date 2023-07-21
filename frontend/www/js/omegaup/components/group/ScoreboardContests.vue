@@ -70,9 +70,7 @@
       <tbody>
         <tr v-for="contest in contests" :key="contest.alias">
           <td data-contest-alias>
-            <a :href="`/arena/${contest.alias}/`">{{
-              ui.contestTitle(contest)
-            }}</a>
+            <a :href="ui.contestURL(contest)">{{ ui.contestTitle(contest) }}</a>
           </td>
           <td data-contest-only-ac>
             {{ contest.only_ac ? T.wordsYes : T.wordsNo }}

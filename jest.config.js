@@ -32,7 +32,7 @@ module.exports = {
     '\\.(css|less)$':
       '<rootDir>/frontend/www/js/omegaup/__mocks__/styleMock.js',
   },
-  setupFiles: ['<rootDir>/frontend/www/js/omegaup/test.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/frontend/www/js/omegaup/test.setup.ts'],
   globals: {
     'vue-jest': {
       babelConfig,

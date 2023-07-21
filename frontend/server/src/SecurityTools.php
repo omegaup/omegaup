@@ -79,26 +79,17 @@ class SecurityTools {
      */
     public static function hashString(string $string): string {
         if (!defined('PASSWORD_ARGON2ID')) {
-            $hashedString = sodium_crypto_pwhash_str(
+            return sodium_crypto_pwhash_str(
                 $string,
                 SODIUM_CRYPTO_PWHASH_OPSLIMIT_MODERATE,
                 self::ARGON2ID_MEMORY_COST * 1024
             );
-        } else {
-            /** @psalm-suppress InvalidScalarArgument This misfires in PHP 7.4 */
-            $hashedString = password_hash(
-                $string,
-                PASSWORD_ARGON2ID,
-                self::PASSWORD_HASH_OPTIONS
-            );
         }
-        if ($hashedString === false || is_null($hashedString)) {
-            throw new \OmegaUp\Exceptions\InternalServerErrorException(
-                'generalError',
-                new \Exception('Hash function returned false')
-            );
-        }
-        return $hashedString;
+        return password_hash(
+            $string,
+            PASSWORD_ARGON2ID,
+            self::PASSWORD_HASH_OPTIONS
+        );
     }
 
     /**
@@ -158,7 +149,7 @@ class SecurityTools {
      * @return string The string.
      */
     public static function randomHexString(int $length): string {
-        return bin2hex(random_bytes(intval($length / 2)));
+        return bin2hex(random_bytes(max(1, intval($length / 2))));
     }
 
     /**
@@ -194,34 +185,7 @@ class SecurityTools {
         string $problem,
         string $username
     ): string {
-        // Given that we already have an autoload configured, we cannot use
-        // sodium_compat's (fast) autoloader. Instead, simulate what it does
-        // here, with the full path of the standard autoload file.
-        require_once 'libs/third_party/sodium_compat/autoload.php';
         \ParagonIE_Sodium_Compat::$fastMult = true;
-
-        require_once 'libs/third_party/constant_time_encoding/src/EncoderInterface.php';
-        require_once 'libs/third_party/constant_time_encoding/src/Base64.php';
-        require_once 'libs/third_party/constant_time_encoding/src/Base64UrlSafe.php';
-        require_once 'libs/third_party/constant_time_encoding/src/Binary.php';
-
-        require_once 'libs/third_party/paseto/src/KeyInterface.php';
-        require_once 'libs/third_party/paseto/src/SendingKey.php';
-        require_once 'libs/third_party/paseto/src/ReceivingKey.php';
-        require_once 'libs/third_party/paseto/src/Keys/AsymmetricSecretKey.php';
-        require_once 'libs/third_party/paseto/src/Keys/AsymmetricPublicKey.php';
-        require_once 'libs/third_party/paseto/src/ProtocolCollection.php';
-        require_once 'libs/third_party/paseto/src/ProtocolInterface.php';
-        require_once 'libs/third_party/paseto/src/Protocol/Version1.php';
-        require_once 'libs/third_party/paseto/src/Protocol/Version2.php';
-        require_once 'libs/third_party/paseto/src/Traits/RegisteredClaims.php';
-        require_once 'libs/third_party/paseto/src/JsonToken.php';
-        require_once 'libs/third_party/paseto/src/Purpose.php';
-        require_once 'libs/third_party/paseto/src/Builder.php';
-        require_once 'libs/third_party/paseto/src/Util.php';
-        require_once 'libs/third_party/paseto/src/Parsing/Header.php';
-        require_once 'libs/third_party/paseto/src/Parsing/PasetoMessage.php';
-        require_once 'libs/third_party/paseto/src/Exception/PasetoException.php';
 
         if (is_null(self::$_gitserverSecretKey)) {
             self::$_gitserverSecretKey = new \ParagonIE\Paseto\Keys\AsymmetricSecretKey(
@@ -273,13 +237,11 @@ class SecurityTools {
         string $token,
         string $courseAlias
     ): array {
-        require_once 'libs/third_party/paseto/src/Traits/RegisteredClaims.php';
-        require_once 'libs/third_party/paseto/src/Parser.php';
         $parser = \ParagonIE\Paseto\Parser::getLocal(
             self::getCourseCloneSecretKey(),
             \ParagonIE\Paseto\ProtocolCollection::v2()
         );
-        $parsedToken = $parser->parse($token, /*$skipValidation=*/true);
+        $parsedToken = $parser->parse($token, skipValidation: true);
         /** @var array<string, string> */
         $claims = $parsedToken->getClaims();
         if (
@@ -318,39 +280,8 @@ class SecurityTools {
      * @psalm-return \ParagonIE\Paseto\Keys\SymmetricKey
      */
     private static function getCourseCloneSecretKey() {
-        // Given that we already have an autoload configured, we cannot use
-        // sodium_compat's (fast) autoloader. Instead, simulate what it does
-        // here, with the full path of the standard autoload file.
-        require_once 'libs/third_party/sodium_compat/autoload.php';
         \ParagonIE_Sodium_Compat::$fastMult = true;
 
-        require_once 'libs/third_party/constant_time_encoding/src/EncoderInterface.php';
-        require_once 'libs/third_party/constant_time_encoding/src/Base64.php';
-        require_once 'libs/third_party/constant_time_encoding/src/Base64UrlSafe.php';
-        require_once 'libs/third_party/constant_time_encoding/src/Binary.php';
-
-        require_once 'libs/third_party/paseto/src/KeyInterface.php';
-        require_once 'libs/third_party/paseto/src/SendingKey.php';
-        require_once 'libs/third_party/paseto/src/ReceivingKey.php';
-        require_once 'libs/third_party/paseto/src/Keys/SymmetricKey.php';
-        require_once 'libs/third_party/paseto/src/Keys/AsymmetricSecretKey.php';
-        require_once 'libs/third_party/paseto/src/Keys/AsymmetricPublicKey.php';
-        require_once 'libs/third_party/paseto/src/ProtocolCollection.php';
-        require_once 'libs/third_party/paseto/src/ProtocolInterface.php';
-        require_once 'libs/third_party/paseto/src/Protocol/Version1.php';
-        require_once 'libs/third_party/paseto/src/Protocol/Version2.php';
-        require_once 'libs/third_party/paseto/src/Traits/RegisteredClaims.php';
-        require_once 'libs/third_party/paseto/src/JsonToken.php';
-        require_once 'libs/third_party/paseto/src/Purpose.php';
-        require_once 'libs/third_party/paseto/src/Builder.php';
-        require_once 'libs/third_party/paseto/src/Util.php';
-        require_once 'libs/third_party/paseto/src/ValidationRuleInterface.php';
-        require_once 'libs/third_party/paseto/src/Rules/ValidAt.php';
-        require_once 'libs/third_party/paseto/src/Parsing/Header.php';
-        require_once 'libs/third_party/paseto/src/Parsing/PasetoMessage.php';
-        require_once 'libs/third_party/paseto/src/Exception/PasetoException.php';
-        require_once 'libs/third_party/paseto/src/Exception/SecurityException.php';
-        require_once 'libs/third_party/paseto/src/Exception/NotFoundException.php';
         if (is_null(self::$_courseCloneSecretKey)) {
             self::$_courseCloneSecretKey = \ParagonIE\Paseto\Keys\SymmetricKey::fromEncodedString(
                 OMEGAUP_COURSE_CLONE_SECRET_KEY

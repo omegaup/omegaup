@@ -7,7 +7,7 @@ body {
 // darle focus.
 .nav-tabs.nav-justified > li > a:hover,
 .nav-tabs.nav-justified > li > a:focus {
-  background-color: #FFFFFF;
+  background-color: #fff;
 }
 
 // Clase para quitar el padding de algn contenedor o div tag
@@ -35,7 +35,7 @@ body {
 // navegación. Si agregamos un elemento invisible del alto del navbar, todo
 // cuadra de nuevo.
 :target::before {
-  content: "";
+  content: '';
   display: block;
   height: 51px;
   margin: -51px 0 0;
@@ -44,23 +44,39 @@ body {
 #status {
   position: -webkit-sticky; /* Safari */
   position: sticky;
-  z-index: 1;
+  z-index: 1021;
   max-width: 900px;
   margin-right: auto;
   margin-left: auto;
   top: 61px;
   width: 100%;
 }
+
 /* FIXME: TODO LO ANTERIOR DEBE IRSE CON BS3 */
 
+/* stylelint-disable-next-line no-descending-specificity */
+// FIXME: This should be re-specified, "a" selector is too general.
+// Changing this could make the two next styles disappear.
 a {
   color: $omegaup-links;
   text-decoration: none;
   transition: color 0.1 ease;
+
+  /* stylelint-disable-next-line no-descending-specificity */
   &:hover {
     color: $omegaup-links--hover;
     text-decoration: none;
   }
+}
+
+a[role='button'],
+a.btn.btn-primary,
+a.btn.btn-info {
+  color: $omegaup-white;
+}
+
+a.dropdown-item {
+  color: #212529; // This is the bootstrap's default
 }
 
 a.card-header-help {

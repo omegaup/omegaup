@@ -13,12 +13,12 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import { types } from '../../api_types';
 
 @Component
 export default class Upcoming extends Vue {
-  @Prop() contests!: omegaup.Contest[];
+  @Prop() contests!: types.ContestAdminDetails[];
 
   T = T;
 }

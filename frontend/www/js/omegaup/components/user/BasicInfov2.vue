@@ -6,15 +6,18 @@
           <strong>{{ T.profileUsername }}</strong>
         </div>
         <div class="col-sm-9 field-data">
-          https://omegaup.com/profile/<strong
-            ><omegaup-user-username
-              :classname="profile.classname"
-              :username="profile.username"
-            ></omegaup-user-username></strong
-          >/
+          <omegaup-user-username
+            :classname="profile.classname"
+            :username="profile.username"
+          >
+            <template #username-url>{{ urlUsername }}</template>
+          </omegaup-user-username>
         </div>
       </div>
-      <div class="form-group row padding-field">
+      <div
+        v-if="profile.is_own_profile || !profile.is_private"
+        class="form-group row padding-field"
+      >
         <div class="col-sm-3">
           <strong>{{ T.profile }}</strong>
         </div>
@@ -22,18 +25,16 @@
           {{ profile.name }}
         </div>
       </div>
-
-      <div v-if="profile.email">
-        <div class="form-group row padding-field">
-          <div class="col-sm-3">
-            <strong>{{ T.profileEmail }}</strong>
-          </div>
-          <div class="col-sm-9 field-data">
-            Primary: <strong data-email> {{ profile.email }}</strong
-            >&nbsp;
-          </div>
+      <div v-if="profile.is_own_profile" class="form-group row padding-field">
+        <div class="col-sm-3">
+          <strong>{{ T.profileEmail }}</strong>
         </div>
+        <div class="col-sm-9 field-data">
+          Primary: <strong data-email>{{ profile.email }}</strong>
+        </div>
+      </div>
 
+      <div v-if="profile.is_own_profile || !profile.is_private">
         <div class="form-group row padding-field">
           <div class="col-sm-3">
             <strong>{{ T.profileCountry }}</strong>
@@ -68,7 +69,7 @@
             <strong>{{ T.profileGraduationDate }}</strong>
           </div>
           <div class="col-sm-9 field-data">
-            <strong>{{ profile.graduation_date }}</strong>
+            <strong>{{ graduationDate }}</strong>
           </div>
         </div>
 
@@ -92,8 +93,15 @@
         </div>
       </div>
     </div>
-    <a v-if="!profile.is_private" :href="`/submissions/${profile.username}/`">
-      {{ T.wordsSeeLatestSubmissions }}
+    <a
+      v-if="profile.is_own_profile || !profile.is_private"
+      :href="`/submissions/${profile.username}/`"
+    >
+      {{
+        ui.formatString(T.wordsSeeLatestSubmissions, {
+          username: profile.username,
+        })
+      }}
     </a>
   </div>
 </template>
@@ -103,6 +111,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import user_Username from './Username.vue';
+import * as ui from '../../ui';
 
 @Component({
   components: {
@@ -113,19 +122,33 @@ export default class UserBasicInfo extends Vue {
   @Prop() profile!: types.UserProfile;
   @Prop() rank!: string;
   T = T;
+  ui = ui;
+
+  get urlUsername(): string {
+    return `https://omegaup.com/profile/${this.profile.username}/`;
+  }
+
+  get graduationDate(): string {
+    if (!this.profile.graduation_date) {
+      return '';
+    }
+    return this.profile.graduation_date.toLocaleDateString(T.locale);
+  }
 }
 </script>
 
-<style type="scss" scoped>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .fields-border > .form-group,
 .fields-border div > .form-group {
-  border-color: #e9e9e9 !important;
+  border-color: var(--user-basic-info-form-group-border-color) !important;
   border-style: solid !important;
   border-width: 0 0 0.05rem 0 !important;
 }
 
 .field-data {
-  color: gray;
+  color: var(--user-basic-info-field-data-font-color);
 }
 
 .padding-field {

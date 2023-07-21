@@ -1,4 +1,4 @@
-import { omegaup, OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
 import contest_Intro from '../components/contest/Intro.vue';
@@ -31,7 +31,7 @@ OmegaUp.on('ready', () => {
           statement: payload.privacyStatement,
         },
         on: {
-          'open-contest': (request: omegaup.Contest): void => {
+          'open-contest': (request: types.ContestAdminDetails): void => {
             // Explicitly join the contest.
             api.Contest.open(request)
               .then(() => {

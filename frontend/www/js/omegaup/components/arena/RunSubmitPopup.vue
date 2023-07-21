@@ -43,24 +43,29 @@
           :readonly="false"
         ></omegaup-arena-code-view>
       </div>
-      <div class="form-group row mt-3">
+      <div class="form-group row mt-3 align-items-center">
         <label class="col-sm-3 col-form-label">
           {{ T.arenaRunSubmitUpload }}
         </label>
         <div class="col-sm-7">
-          <input ref="inputFile" type="file" name="file" />
+          <input ref="inputFile" class="w-100" type="file" name="file" />
         </div>
       </div>
       <div class="form-group row">
         <div class="col-sm-10">
-          <button type="submit" class="btn btn-primary" :disabled="!canSubmit">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            data-submit-run
+            :disabled="!canSubmit"
+          >
             <omegaup-countdown
               v-if="!canSubmit"
               :target-time="nextSubmissionTimestamp"
               :countdown-format="
                 omegaup.CountdownFormat.WaitBetweenUploadsSeconds
               "
-              @emit-finish="now = Date.now()"
+              @finish="now = Date.now()"
             ></omegaup-countdown>
             <span v-else>{{ T.wordsSend }}</span>
           </button>
@@ -89,9 +94,9 @@ import omegaup_OverlayPopup from '../OverlayPopup.vue';
 export default class ArenaRunSubmitPopup extends Vue {
   @Ref() inputFile!: HTMLInputElement;
   @Prop() languages!: string[];
-  @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
+  @Prop({ required: true }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
-  @Prop() preferredLanguage!: string;
+  @Prop({ default: null }) preferredLanguage!: null | string;
 
   T = T;
   omegaup = omegaup;
@@ -113,25 +118,31 @@ export default class ArenaRunSubmitPopup extends Vue {
       { language: '', name: '' },
       { language: 'kp', name: 'Karel (Pascal)' },
       { language: 'kj', name: 'Karel (Java)' },
-      { language: 'c', name: 'C11 (gcc 9.3)' },
-      { language: 'c11-gcc', name: 'C11 (gcc 9.3)' },
+      { language: 'c', name: 'C11 (gcc 10.3)' },
+      { language: 'c11-gcc', name: 'C11 (gcc 10.3)' },
       { language: 'c11-clang', name: 'C11 (clang 10.0)' },
-      { language: 'cpp', name: 'C++03 (g++ 9.3)' },
-      { language: 'cpp11', name: 'C++11 (g++ 9.3)' },
-      { language: 'cpp11-gcc', name: 'C++11 (g++ 9.3)' },
+      { language: 'cpp', name: 'C++03 (g++ 10.3)' },
+      { language: 'cpp11', name: 'C++11 (g++ 10.3)' },
+      { language: 'cpp11-gcc', name: 'C++11 (g++ 10.3)' },
       { language: 'cpp11-clang', name: 'C++11 (clang++ 10.0)' },
-      { language: 'cpp17-gcc', name: 'C++17 (g++ 9.3)' },
+      { language: 'cpp17-gcc', name: 'C++17 (g++ 10.3)' },
       { language: 'cpp17-clang', name: 'C++17 (clang++ 10.0)' },
-      { language: 'java', name: 'Java (openjdk 14.0)' },
-      { language: 'py', name: 'Python 2.7' },
-      { language: 'py2', name: 'Python 2.7' },
-      { language: 'py3', name: 'Python 3.8' },
+      { language: 'cpp20-gcc', name: 'C++20 (g++ 10.3)' },
+      { language: 'cpp20-clang', name: 'C++20 (clang++ 10.0)' },
+      { language: 'java', name: 'Java (openjdk 16.0)' },
+      { language: 'kt', name: 'Kotlin (1.6.10)' },
+      { language: 'py', name: 'Python (2.7)' },
+      { language: 'py2', name: 'Python (2.7)' },
+      { language: 'py3', name: 'Python (3.9)' },
       { language: 'rb', name: 'Ruby (2.7)' },
-      { language: 'cs', name: 'C# (8.0, dotnet 3.1)' },
+      { language: 'cs', name: 'C# (10, dotnet 6.0)' },
       { language: 'pas', name: 'Pascal (fpc 3.0)' },
-      { language: 'cat', name: 'Output Only' },
-      { language: 'hs', name: 'Haskell (ghc 8.6)' },
+      { language: 'cat', name: T.outputOnly },
+      { language: 'hs', name: 'Haskell (ghc 8.8)' },
       { language: 'lua', name: 'Lua (5.3)' },
+      { language: 'go', name: 'Go (1.18.beta2)' },
+      { language: 'rs', name: 'Rust (1.56.1)' },
+      { language: 'js', name: 'JavaScript (Node.js 16)' },
     ];
 
     allLanguages
@@ -238,6 +249,7 @@ export default class ArenaRunSubmitPopup extends Vue {
       alert(T.arenaRunSubmitEmptyCode);
       return;
     }
+
     this.$emit('submit-run', this.code, this.selectedLanguage);
   }
 

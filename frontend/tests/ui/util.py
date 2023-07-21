@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # type: ignore
 
@@ -22,8 +22,11 @@ from selenium.webdriver.support.select import Select
 
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
-PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')
-MESSAGE_WHITELIST = ('http://staticxx.facebook.com/', '/api/grader/status/')
+PATH_WHITELIST = ('/api/grader/status/',
+                  '/js/error_handler.js',
+                  '/js/dist/npm.vue.js')
+MESSAGE_WHITELIST = ('https://accounts.google.com/gsi/',
+                     '/api/grader/status/')
 
 # This contains all the Python path-hacking to a single file instead of
 # spreading it throughout all the files.
@@ -50,8 +53,8 @@ class StatusBarIsDismissed:
             return
         message_class = self.status_element.get_attribute('class')
         assert self.message_class in message_class, message_class
-        self.status_element.find_element_by_css_selector(
-            'button.close').click()
+        self.status_element.find_element(By.CSS_SELECTOR,
+                                         'button.close').click()
         self.clicked = True
 
     def __call__(self, driver):
@@ -78,7 +81,8 @@ class StatusBarIsDismissed:
 
 # pylint: disable=too-many-arguments
 def add_students(driver, users, *, tab_xpath,
-                 container_xpath, parent_xpath, submit_locator):
+                 container_xpath, parent_selector,
+                 add_button_locator, submit_locator):
     '''Add students to a recently :instance.'''
 
     driver.wait.until(
@@ -89,7 +93,34 @@ def add_students(driver, users, *, tab_xpath,
             (By.XPATH, container_xpath)))
 
     for user in users:
-        driver.typeahead_helper(parent_xpath, user)
+        driver.typeahead_helper(parent_selector, user)
+        driver.wait.until(
+            EC.element_to_be_clickable(add_button_locator)).click()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(submit_locator)).click()
+
+    with dismiss_status(driver):
+        for user in users:
+            driver.wait.until(
+                EC.visibility_of_element_located(
+                    (By.XPATH,
+                     '%s//a[text()="%s"]' % (container_xpath, user))))
+
+
+def add_students_to_contest(driver, users, *, tab_xpath, container_xpath,
+                            parent_selector, submit_locator):
+    '''Add students to a recently created contest.'''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, tab_xpath))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH, container_xpath)))
+
+    for user in users:
+        driver.typeahead_helper(parent_selector, user)
 
         with dismiss_status(driver):
             driver.wait.until(
@@ -133,14 +164,16 @@ def create_run(driver, problem_alias, filename):
 
     resource_path = os.path.join(OMEGAUP_ROOT,
                                  'frontend/tests/resources/%s' % filename)
-    with open(resource_path, 'r') as f:
+    with open(resource_path, 'r', encoding='utf-8') as f:
         driver.browser.execute_script(
             'document.querySelector("form[data-run-submit] .CodeMirror")'
             '.CodeMirror.setValue(arguments[0]);',
             f.read())
     original_url = driver.browser.current_url
-    driver.browser.find_element_by_css_selector(
-        'form[data-run-submit] button[type="submit"]').submit()
+    driver.browser.find_element(
+        By.CSS_SELECTOR,
+        'form[data-run-submit] button[type="submit"]',
+    ).submit()
     driver.wait.until(EC.url_changes(original_url))
 
     logging.debug('Run submitted.')
@@ -282,7 +315,9 @@ def assert_no_js_errors(
 def create_problem(
         driver,
         problem_alias: str,
-        resource_path: str = 'frontend/tests/resources/triangulos.zip'
+        *,
+        resource_path: str = 'frontend/tests/resources/triangulos_imagen.zip',
+        private: bool = False,
 ) -> None:
     '''Create a problem.'''
     driver.wait.until(
@@ -294,6 +329,11 @@ def create_problem(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
                  'a[data-nav-problems-create]'))).click()
+    driver.screenshot()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'button[data-target=".access"]'))
+    ).click()
 
     with assert_js_errors(
             driver,
@@ -307,18 +347,17 @@ def create_problem(
             EC.visibility_of_element_located(
                 (By.XPATH,
                  '//input[@name = "title"]'))).send_keys(problem_alias)
-    input_limit = driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//input[@name = "input_limit"]')))
-    input_limit.clear()
-    input_limit.send_keys('1024')
+
     # Alias should be set automatically
-    driver.browser.find_element_by_name('source').send_keys('test')
-    # Make the problem public
-    driver.browser.find_element_by_xpath(
-        '//input[@type="radio" and @name="visibility" and @value="true"]'
-    ).click()
+    driver.browser.find_element(By.NAME, 'source').send_keys('test')
+
+    if not private:
+        # Make the problem public
+        driver.browser.find_element(
+            By.XPATH,
+            '//input[@type="radio" and @name="visibility" and @value="true"]'
+        ).click()
+
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH, '//input[@type = "search"]'))).send_keys('Recur')
@@ -335,8 +374,8 @@ def create_problem(
             )
         )
     ).select_by_value('problemLevelBasicKarel')
-    contents_element = driver.browser.find_element_by_name(
-        'problem_contents')
+    driver.screenshot()
+    contents_element = driver.browser.find_element(By.NAME, 'problem_contents')
     contents_element.send_keys(os.path.join(OMEGAUP_ROOT, resource_path))
     with driver.page_transition(wait_for_ajax=False):
         contents_element.submit()
@@ -404,7 +443,8 @@ def check_scoreboard_events(driver, alias, url, *, num_elements, scoreboard):
             (By.XPATH,
              '//*[name()="svg"]/*[contains(@class, "%s")]' % (series))))
 
-    scoreboard_events = driver.browser.find_elements_by_xpath(
+    scoreboard_events = driver.browser.find_elements(
+        By.XPATH,
         '//*[name()="svg"]/*[contains(@class, "%s")]/*[contains(@class'
         ', "highcharts-tracker")]' % series)
     assert len(scoreboard_events) == num_elements, len(scoreboard_events)
@@ -449,7 +489,7 @@ def create_group(driver, group_title, description):
     return group_alias
 
 
-def add_identities_group(driver, group_alias):
+def add_identities_group(driver, group_alias) -> List[Identity]:
     '''Upload csv and add identities into the group'''
 
     driver.wait.until(
@@ -469,14 +509,16 @@ def add_identities_group(driver, group_alias):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH, '//a[contains(@href, "#identities")]'))).click()
-    identities_element = driver.browser.find_element_by_name('identities')
+    identities_element = driver.browser.find_element(By.NAME, 'identities')
     identities_element.send_keys(os.path.join(
         OMEGAUP_ROOT, 'frontend/tests/resources/identities.csv'))
 
-    username_elements = driver.browser.find_elements_by_xpath(
+    username_elements = driver.browser.find_elements(
+        By.XPATH,
         '//table[@data-identities-table]/tbody/tr/td[contains(concat(" ", '
         'normalize-space(@class), " "), " username ")]/strong')
-    password_elements = driver.browser.find_elements_by_xpath(
+    password_elements = driver.browser.find_elements(
+        By.XPATH,
         '//table[@data-identities-table]/tbody/tr/td[contains(concat(" ", '
         'normalize-space(@class), " "), " password ")]')
     usernames = [username.text for username in username_elements]
@@ -492,16 +534,11 @@ def add_identities_group(driver, group_alias):
         create_identities_button.click()
 
     driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//a[contains(@href, "#members")]'))).click()
-
-    driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH, '//table[@data-table-identities]')))
 
-    identity_elements = driver.browser.find_elements_by_xpath(
-        '//table[@data-table-identities]/tbody/tr/td/span/a'
-    )
+    identity_elements = driver.browser.find_elements(
+        By.XPATH, '//table[@data-table-identities]/tbody/tr/td/span/a')
     uploaded_identities = [identity.text for identity in identity_elements]
     for i, identity in enumerate(identities):
         assert identity.username == uploaded_identities[i], (
@@ -509,3 +546,33 @@ def add_identities_group(driver, group_alias):
                 identity.username, uploaded_identities[i]))
 
     return identities
+
+
+def show_run_details(driver, *, code: str) -> None:
+    '''It shows details popup for a certain submission.'''
+
+    driver.wait.until(EC.element_to_be_clickable(
+        (By.XPATH, ('//a[contains(@href, "#runs")]')))).click()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             '//table[contains(concat(" ", normalize-space(@class), " "), "'
+             ' runs ")]/tbody/tr/td/div[contains(concat(" ", normalize-space'
+             '(@class), " "), " dropdown ")]/button'))).click()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'table.runs div button[data-run-details]'))).click()
+
+    code_element = driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR,
+             '.show form[data-run-details-view] .CodeMirror-code')))
+    code_text = code_element.get_attribute('innerText')
+
+    assert (('show-run:') in
+            driver.browser.current_url), driver.browser.current_url
+
+    assert ((code) in code_text), code_text

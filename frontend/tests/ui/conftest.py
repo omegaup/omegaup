@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # type: ignore
 
@@ -11,10 +11,14 @@ import os.path
 import time
 import urllib
 
+from typing import Optional, Sequence
+
 import pytest
 
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, TimeoutException
+from selenium.webdriver import Firefox
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
@@ -29,11 +33,17 @@ _WINDOW_SIZE = (1920, 1080)
 _BLANK = '/404.html'  # An path that returns 200 in both Firefox and Chrome.
 
 
+def _mysql_auth() -> Sequence[str]:
+    '''Gets the authentication string for MySQL.'''
+
+    return ['--defaults-file=/home/ubuntu/.my.cnf']
+
+
 class JavaScriptLogCollector:
     '''Collects JavaScript errors from the log.'''
 
-    def __init__(self, dr):
-        self.driver = dr
+    def __init__(self, driver):  # pylint: disable=redefined-outer-name
+        self.driver = driver
         self._log_index = 0
         self._log_stack = [[]]
 
@@ -82,6 +92,7 @@ class JavaScriptLogCollector:
 
 
 class Driver:  # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-public-methods
     '''Wraps the state needed to run a test.'''
 
     # pylint: disable=too-many-arguments
@@ -91,11 +102,13 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         self.wait = wait
         self._worker_id = worker_id
         self._next_id = 0
+        self._screenshot_index = 0
         self._url = url
         self.options = options
         self.user_username = self.create_user()
         self.admin_username = self.create_user(admin=True)
         self.log_collector = JavaScriptLogCollector(self)
+        self.test_name = ''
 
     def generate_id(self):
         '''Generates a relatively unique id.'''
@@ -107,13 +120,6 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         '''Gets the full url for :path.'''
 
         return urllib.parse.urljoin(self._url, path)
-
-    def mysql_auth(self):
-        '''Gets the authentication string for MySQL.'''
-
-        return util.database_utils.authentication(
-            config_file=self.options.mysql_config_file,
-            username=self.options.username, password=self.options.password)
 
     def eval_script(self, script):
         '''Returns the evaluation of the JavaScript expression |script|'''
@@ -135,7 +141,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
     def page_transition(self, wait_for_ajax=True, target_url=None):
         '''Waits for a page transition to finish.'''
 
-        html_node = self.browser.find_element_by_tag_name('html')
+        html_node = self.browser.find_element(By.TAG_NAME, 'html')
         prev_url = self.browser.current_url
         logging.debug('Waiting for a page transition on %s', prev_url)
         yield
@@ -177,26 +183,22 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                                 'return jQuery.active;'),
                              time.time() - t0)) from ex
 
-    def typeahead_helper(self, parent_xpath, value, select_suggestion=True):
+    def typeahead_helper(self, parent_selector, value):
         '''Helper to interact with Typeahead elements.'''
 
         tt_input = self.wait.until(
             EC.visibility_of_element_located(
-                (By.XPATH,
-                 '//%s//input[contains(@class, "tt-input")]' % parent_xpath)))
+                (By.CSS_SELECTOR,
+                 '%s .tags-input input[type="text"]' % parent_selector)))
         tt_input.click()
         tt_input.send_keys(value)
-
-        if not select_suggestion:
-            return
-
         self.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//%s//div[@data-value = "%s"]' %
-                 (parent_xpath, value)))).click()
+                (By.CSS_SELECTOR,
+                 '%s ul.typeahead-dropdown li:first-of-type' %
+                 (parent_selector)))).click()
 
-    def send_keys(self,  # pylint: disable=no-self-use
+    def send_keys(self,
                   element: WebElement,
                   value: str,
                   retries: int = 10) -> None:
@@ -232,7 +234,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             yield
 
     @contextlib.contextmanager
-    def login(self, username, password):
+    def login(self, username, password, is_main_user_identity=True):
         '''Logs in as :username, and logs out when out of scope.'''
 
         # Home page
@@ -249,13 +251,21 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
         self._wait_for_page_loaded()
 
-        self.browser.find_element_by_name('login_username').send_keys(username)
-        self.browser.find_element_by_name('login_password').send_keys(password)
+        self.browser.find_element(By.NAME,
+                                  'login_username').send_keys(username)
+        self.browser.find_element(By.NAME,
+                                  'login_password').send_keys(password)
         with self.page_transition():
-            self.browser.find_element_by_name('login').click()
+            self.browser.find_element(By.NAME, 'login').click()
 
+        if is_main_user_identity:
+            self.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, 'button[aria-label="Close"]'))).click()
         try:
             yield
+        except:  # noqa: bare-except
+            self.screenshot()
         finally:
             # Wait until there are no more pending requests to avoid races
             # where those requests return 401. Navigate to a blank page just
@@ -287,14 +297,14 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                      '//a[contains(@href, "/login/")]'))).click()
 
         # Login screen
-        self.browser.find_element_by_name('reg_username').send_keys(user)
-        self.browser.find_element_by_name('reg_email').send_keys(
+        self.browser.find_element(By.NAME, 'reg_username').send_keys(user)
+        self.browser.find_element(By.NAME, 'reg_email').send_keys(
             'email_%s@localhost.localdomain' % user)
-        self.browser.find_element_by_name('reg_password').send_keys(passw)
-        self.browser.find_element_by_name(
-            'reg_password_confirmation').send_keys(passw)
+        self.browser.find_element(By.NAME, 'reg_password').send_keys(passw)
+        self.browser.find_element(By.NAME,
+                                  'reg_password_confirmation').send_keys(passw)
         with self.page_transition():
-            self.browser.find_element_by_name('sign_up').click()
+            self.browser.find_element(By.NAME, 'sign_up').click()
 
         # Enable experiment
         user_id = util.database_utils.mysql(
@@ -310,7 +320,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             WHERE
                 `i`.`username` = '%s';
             ''') % (user),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
         self.enable_experiment_identities_to_user(user_id)
 
         # Home screen
@@ -322,14 +332,17 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             'Invalid URL redirect. Expected %s, got %s' % (
                 home_page_url, self.browser.current_url))
 
-    def annotate(self,  # pylint: disable=no-self-use
+    def annotate(self,
                  message: str,
                  level=logging.INFO) -> None:
         '''Add an annotation to the run's log.'''
 
         logging.log(level, message)
 
-    def update_run_score(self, run_id, verdict, score):
+    def update_run_score(self,
+                         run_id,
+                         verdict,
+                         score) -> None:
         '''Set verdict and score of specified run'''
 
         util.database_utils.mysql(
@@ -344,7 +357,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             WHERE
                 `run_id` = %s;
             ''') % (str(score), str(score * 100), verdict, str(run_id)),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
 
     def update_score_in_course(self, problem_alias, assignment_alias,
                                verdict='AC', score=1):
@@ -371,7 +384,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 `p`.`alias` = '%s'
                 AND `a`.`alias` = '%s';
             ''') % (problem_alias, assignment_alias),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
         self.update_run_score(int(run_id.strip()), verdict, score)
 
     def update_score_in_contest(self, problem_alias, contest_alias,
@@ -399,7 +412,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 `p`.`alias` = '%s'
                 AND `c`.`alias` = '%s';
             ''') % (problem_alias, contest_alias),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
         self.update_run_score(int(run_id.strip()), verdict, score)
 
     def update_score(self, problem_alias, verdict='AC', score=1):
@@ -420,7 +433,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             WHERE
                 `p`.`alias` = '%s';
             ''') % (problem_alias),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
         self.update_run_score(int(run_id.strip()), verdict, score)
 
     def create_user(self, admin=False):
@@ -447,7 +460,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 ('%s', '%s', '%s');
             SELECT LAST_INSERT_ID();
             ''') % (username, password, username),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
         user_id = util.database_utils.mysql(
             ('''
             INSERT INTO
@@ -456,7 +469,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 (%s, 1);
             SELECT LAST_INSERT_ID();
             ''') % (identity_id),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
         util.database_utils.mysql(
             ('''
             UPDATE
@@ -466,7 +479,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             WHERE
                 identity_id = %s;
             ''') % (user_id, identity_id),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
 
         # Enable experiment
         self.enable_experiment_identities_to_user(user_id)
@@ -479,10 +492,13 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 VALUES
                     (%s, 1, 1);
                 ''') % (user_id,),
-                dbname='omegaup', auth=self.mysql_auth())
+                dbname='omegaup', auth=_mysql_auth())
         return username
 
-    def enable_experiment_identities_to_user(self, user_id):
+    def enable_experiment_identities_to_user(
+            self,
+            user_id,
+    ) -> None:
         ''' Enable identities experiment to users can use functions of
         identity refactor
         '''
@@ -493,7 +509,17 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             VALUES
                 ('%s', 'identities');
             ''') % (user_id),
-            dbname='omegaup', auth=self.mysql_auth())
+            dbname='omegaup', auth=_mysql_auth())
+
+    def screenshot(self, name: Optional[str] = None) -> None:
+        '''Takes a screenshot.'''
+        results_dir = os.path.join(_DIRNAME, 'results')
+        os.makedirs(results_dir, exist_ok=True)
+        idx = self._screenshot_index
+        self._screenshot_index += 1
+        self.browser.get_screenshot_as_file(
+            os.path.join(results_dir,
+                         f'webdriver_{name or self.test_name}.{idx:03}.png'))
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -502,15 +528,18 @@ def pytest_pyfunc_call(pyfuncitem):
 
     global _SUCCESS  # pylint: disable=global-statement
 
+    current_driver: Optional[Driver] = pyfuncitem.funcargs.get('driver')
+    if current_driver:
+        current_driver.test_name = pyfuncitem.name
+
     outcome = yield
 
     if not outcome.excinfo:
         return
     _SUCCESS = False
-    if 'driver' not in pyfuncitem.funcargs:
+    if not current_driver:
         return
     try:
-        current_driver = pyfuncitem.funcargs['driver']
         try:
             logs = current_driver.browser.get_log('browser')
         except:  # noqa: bare-except
@@ -519,11 +548,10 @@ def pytest_pyfunc_call(pyfuncitem):
             logs = []
         results_dir = os.path.join(_DIRNAME, 'results')
         os.makedirs(results_dir, exist_ok=True)
-        current_driver.browser.get_screenshot_as_file(
-            os.path.join(results_dir, 'webdriver_%s.png' % pyfuncitem.name))
+        current_driver.screenshot(pyfuncitem.name)
         logpath = os.path.join(results_dir,
                                'webdriver_%s.log' % pyfuncitem.name)
-        with open(logpath, 'w') as logfile:
+        with open(logpath, 'w', encoding='utf-8') as logfile:
             json.dump(logs, logfile, indent=2)
     except Exception as ex:  # pylint: disable=broad-except
         print(ex)
@@ -566,25 +594,22 @@ def _get_browser(request, browser_name):
         chrome_options.add_argument('--lang=en-US')
         if request.config.option.headless:
             chrome_options.add_argument('--headless')
-        chrome_options.set_capability('loggingPrefs', {'browser': 'ALL'})
         chrome_browser = webdriver.Chrome(
             options=chrome_options)
         chrome_browser.set_window_size(*_WINDOW_SIZE)
         return chrome_browser
-    firefox_options = webdriver.firefox.options.Options()
+    firefox_options = Options()
     firefox_options.set_capability('marionette', True)
     firefox_options.set_capability('loggingPrefs', {'browser': 'ALL'})
-    firefox_options.profile = webdriver.FirefoxProfile()
-    firefox_options.profile.set_preference(
+    firefox_options.set_preference(
         'webdriver.log.file', '/tmp/firefox_console')
     firefox_options.headless = request.config.option.headless
-    firefox_browser = webdriver.Firefox(
-        options=firefox_options)
+    firefox_browser = Firefox(options=firefox_options)
     firefox_browser.set_window_size(*_WINDOW_SIZE)
     return firefox_browser
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def driver(request, browser_name):
     '''Run tests using the selenium webdriver.'''
 

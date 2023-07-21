@@ -27,19 +27,31 @@ OmegaUp.on('ready', () => {
     const params = new URL(document.location.toString()).searchParams;
     const pathname = params.get('redirect');
     if (pathname && pathname.indexOf('/') === 0) {
+      const url = new URL(document.location.origin + pathname);
+      url.searchParams.set('fromLogin', '');
+      window.location.href = url.toString();
+      return;
+    }
+    if (pathname && pathname.indexOf(document.location.origin) === 0) {
       window.location.href = pathname;
       return;
     }
+    const fromLoginParam = '?fromLogin';
     if (isAccountCreation) {
-      window.location.href = '/profile/';
+      window.location.href = `/profile/${fromLoginParam}`;
       return;
     }
-    window.location.href = '/';
+    window.location.href = `/${fromLoginParam}`;
   }
 
   const payload = types.payloadParsers.LoginDetailsPayload();
+  const googleClientId = document
+    .querySelector('meta[name="google-signin-client_id"]')
+    ?.getAttribute('content');
   if (payload.statusError) {
-    ui.error(payload.statusError);
+    ui.warning(payload.statusError);
+  } else if (payload.verifyEmailSuccessfully) {
+    ui.success(payload.verifyEmailSuccessfully);
   }
   new Vue({
     el: '#main-container',
@@ -52,7 +64,7 @@ OmegaUp.on('ready', () => {
         props: {
           validateRecaptcha: payload.validateRecaptcha,
           facebookUrl: payload.facebookUrl,
-          linkedinUrl: payload.linkedinUrl,
+          googleClientId,
         },
         on: {
           'register-and-login': (
@@ -92,17 +104,6 @@ OmegaUp.on('ready', () => {
               password,
               /*isAccountCreation=*/ false,
             );
-          },
-          'google-login': (idToken: string) => {
-            // Only log in if the user actually clicked the sign-in button.
-            api.Session.googleLogin({ storeToken: idToken })
-              .then((data) => {
-                redirect(data.isAccountCreation);
-              })
-              .catch(ui.apiError);
-          },
-          'google-login-failure': () => {
-            ui.error(T.loginFederatedFailed);
           },
         },
       });

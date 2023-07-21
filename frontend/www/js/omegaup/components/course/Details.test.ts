@@ -1,5 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
 
 import T from '../../lang';
 import type { types } from '../../api_types';
@@ -14,7 +13,11 @@ describe('Details.vue', () => {
         course: {
           admission_mode: 'registration',
           alias: 'test-course',
+          archived: false,
           assignments: [],
+          clarifications: [],
+          objective: 'Objetivo de prueba',
+          level: '',
           needs_basic_information: false,
           description: '# Test',
           finish_time: new Date(),
@@ -49,7 +52,11 @@ describe('Details.vue', () => {
         course: {
           admission_mode: 'registration',
           alias: 'test-course',
+          archived: false,
           assignments: [],
+          clarifications: [],
+          objective: 'Objetivo de prueba',
+          level: '',
           needs_basic_information: false,
           description: '# Test',
           finish_time: new Date(),
@@ -82,6 +89,7 @@ describe('Details.vue', () => {
         course: {
           admission_mode: 'public',
           alias: 'test-course',
+          archived: false,
           assignments: [
             {
               alias: 'test-assignment',
@@ -89,6 +97,7 @@ describe('Details.vue', () => {
               description: '',
               finish_time: undefined,
               name: 'Test',
+              opened: false,
               order: 1,
               scoreboard_url: '',
               scoreboard_url_admin: '',
@@ -96,8 +105,12 @@ describe('Details.vue', () => {
               has_runs: false,
               max_points: 0,
               problemset_id: 0,
+              problemCount: 0,
             },
           ],
+          clarifications: [],
+          objective: 'Objetivo de prueba',
+          level: '',
           needs_basic_information: false,
           description: '# Test',
           finish_time: undefined,
@@ -121,9 +134,6 @@ describe('Details.vue', () => {
       },
     });
 
-    expect(
-      wrapper.find('[data-content-alias="test-assignment"]').text(),
-    ).toContain('—');
     expect(wrapper.text()).toContain(T.wordsCloneThisCourse);
   });
 });

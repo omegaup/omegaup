@@ -1,9 +1,5 @@
 <?php
-
-/**
- *
- * @author carlosabcs
- */
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
     public function testSubmissionsFeed() {
@@ -77,20 +73,15 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Submissions::getLatestSubmissions(
-            1,
-            100,
-            null
-        );
-        $this->assertCount(1, $results['submissions']);
-        $this->assertEquals(1, $results['totalRows']);
-        $this->assertEquals(
+        $submissions = \OmegaUp\DAO\Submissions::getLatestSubmissions();
+        $this->assertCount(1, $submissions);
+        $this->assertSame(
             $identities[0]->username,
-            $results['submissions'][0]['username']
+            $submissions[0]['username']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problems[0]['problem']->alias,
-            $results['submissions'][0]['alias']
+            $submissions[0]['alias']
         );
 
         // Now add a new submission from User0 to Problem0, but out of the 30-day interval
@@ -113,20 +104,21 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Timestamp(strtotime($runCreationDate))
         );
 
-        $results = \OmegaUp\DAO\Submissions::getLatestSubmissions(
-            1,
-            100,
-            null
+        // Also add a submissing in the 30-day interval but that hasn't been graded yet.
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[0],
+            $identities[0]
         );
-        $this->assertCount(1, $results['submissions']);
-        $this->assertEquals(1, $results['totalRows']);
-        $this->assertEquals(
+
+        $submissions = \OmegaUp\DAO\Submissions::getLatestSubmissions();
+        $this->assertCount(1, $submissions);
+        $this->assertSame(
             $identities[0]->username,
-            $results['submissions'][0]['username']
+            $submissions[0]['username']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problems[0]['problem']->alias,
-            $results['submissions'][0]['alias']
+            $submissions[0]['alias']
         );
     }
 
@@ -146,20 +138,17 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Submissions::getLatestSubmissions(
-            1,
-            100,
-            $identity->identity_id
+        $submissions = \OmegaUp\DAO\Submissions::getLatestSubmissions(
+            $identity->identity_id,
         );
-        $this->assertEquals(2, $results['totalRows']);
-        $this->assertCount(2, $results['submissions']);
-        $this->assertEquals(
+        $this->assertCount(2, $submissions);
+        $this->assertSame(
             $identity->username,
-            $results['submissions'][0]['username']
+            $submissions[0]['username']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $identity->username,
-            $results['submissions'][1]['username']
+            $submissions[1]['username']
         );
     }
 
@@ -183,14 +172,9 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        try {
-            $results = \OmegaUp\DAO\Submissions::getLatestSubmissions(
-                1,
-                100,
-                $identity->identity_id
-            );
-        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userInformationIsPrivate', $e->getMessage());
-        }
+        $submissions = \OmegaUp\DAO\Submissions::getLatestSubmissions(
+            $identity->identity_id,
+        );
+        $this->assertEmpty($submissions);
     }
 }

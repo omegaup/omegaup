@@ -1,18 +1,40 @@
 <template>
-  <tr :class="{ resolved: clarification.answer }">
+  <tr
+    :class="{
+      resolved: clarification.answer,
+      'direct-message': isDirectMessage,
+      'border border-primary': selected,
+    }"
+  >
+    <td
+      v-if="
+        'assignment_alias' in clarification && clarification.assignment_alias
+      "
+      class="text-center align-middle"
+    >
+      {{ clarification.assignment_alias }}
+    </td>
     <td class="text-center align-middle">
       {{
-        inContest ? clarification.contest_alias : clarification.problem_alias
+        'contest_alias' in clarification && clarification.contest_alias
+          ? clarification.contest_alias
+          : clarification.problem_alias
       }}
     </td>
-    <td class="text-center align-middle">{{ clarification.author }}</td>
+    <td class="text-center align-middle" data-author>
+      {{ clarificationAuthorReceiver }}
+    </td>
     <td class="text-center align-middle">
       {{ time.formatDateTime(clarification.time) }}
     </td>
-    <td class="align-middle">
+    <td class="align-middle" data-form-clarification-message>
       <pre>{{ clarification.message }}</pre>
     </td>
-    <td class="align-middle">
+    <td
+      v-if="isAdmin"
+      class="align-middle"
+      data-form-clarification-resolved-answer
+    >
       <template v-if="clarification.answer">
         <pre>{{ clarification.answer }}</pre>
         <div v-if="!showUpdateAnswer" class="form-check mt-2 mt-xl-0">
@@ -29,9 +51,15 @@
       <form
         v-if="!clarification.answer || showUpdateAnswer"
         class="form-inline justify-content-between"
+        data-form-clarification-answer
+        @submit.prevent="sendClarificationResponse"
       >
         <div class="form-group">
-          <select v-model="selectedResponse" class="form-control">
+          <select
+            v-model="selectedResponse"
+            class="form-control"
+            data-select-answer
+          >
             <option
               v-for="response in responses"
               :key="response.value"
@@ -57,14 +85,13 @@
             {{ T.wordsPublic }}
           </label>
         </div>
-        <button
-          class="btn btn-primary btn-sm mt-2 mt-lg-2"
-          type="submit"
-          @click.prevent="sendClarificationResponse"
-        >
+        <button class="btn btn-primary btn-sm mt-2 mt-lg-2" type="submit">
           {{ T.wordsSend }}
         </button>
       </form>
+    </td>
+    <td v-else class="align-middle" data-clarification-answer-text>
+      <pre v-if="clarification.answer">{{ clarification.answer }}</pre>
     </td>
   </tr>
 </template>
@@ -74,11 +101,13 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
+import * as ui from '../../ui';
 
 @Component
-export default class ArenaClarificationForm extends Vue {
+export default class ArenaClarification extends Vue {
   @Prop() clarification!: types.Clarification;
-  @Prop() inContest!: boolean;
+  @Prop({ default: false }) isAdmin!: boolean;
+  @Prop({ default: false }) selected!: boolean;
 
   T = T;
   time = time;
@@ -110,6 +139,22 @@ export default class ArenaClarificationForm extends Vue {
     },
   ];
 
+  get clarificationAuthorReceiver(): string {
+    if (this.clarification.receiver) {
+      return ui.formatString(T.clarificationsOnBehalf, {
+        author: this.clarification.author,
+        receiver: this.clarification.receiver,
+      });
+    }
+    return this.clarification.author;
+  }
+
+  get isDirectMessage(): boolean {
+    return (
+      this.clarification.answer == null && this.clarification.receiver != null
+    );
+  }
+
   get responseText(): string {
     const response = this.responses.find(
       (response) => response.value === this.selectedResponse,
@@ -121,33 +166,43 @@ export default class ArenaClarificationForm extends Vue {
   }
 
   sendClarificationResponse(): void {
-    this.$emit(
-      'clarification-response',
-      this.clarification.clarification_id,
-      this.responseText,
-      this.isPublic,
-    );
+    const response: types.Clarification = {
+      clarification_id: this.clarification.clarification_id,
+      author: this.clarification.author,
+      answer: this.responseText,
+      public: this.isPublic,
+      message: this.message,
+      problem_alias: this.clarification.problem_alias,
+      time: new Date(),
+    };
     this.showUpdateAnswer = false;
+    this.$emit('clarification-response', response);
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .resolved {
-  color: rgb(70, 136, 71);
+  color: var(--clarification-resolved-font-color);
   background-image: linear-gradient(
-    rgb(223, 240, 216) 0px,
-    rgb(200, 229, 188) 100%
+    var(--clarification-resolved-gradient-from-background-color),
+    var(--clarification-resolved-gradient-to-background-color)
   );
-  background-color: rgb(223, 240, 216);
+  background-color: var(--clarification-resolved-background-color);
 }
 
 .direct-message {
-  color: rgb(125, 117, 18);
+  color: var(--clarification-direct-message-font-color);
   background-image: linear-gradient(
-    rgb(253, 245, 154) 0px,
-    rgba(255, 249, 181, 0.5) 100%
+    var(--clarification-direct-message-gradient-from-background-color),
+    rgba(var(--clarification-direct-message-gradient-to-background-color), 0.5)
   );
-  background-color: rgb(223, 240, 216);
+  background-color: var(--clarification-direct-message-background-color);
+}
+
+.border {
+  border-width: 3px !important;
 }
 </style>

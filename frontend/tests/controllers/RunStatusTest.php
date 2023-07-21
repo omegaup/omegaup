@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of DetailsRunTest
@@ -36,9 +37,9 @@ class RunStatusTest extends \OmegaUp\Test\ControllerTestCase {
             'run_alias' => $runData['response']['guid'],
         ]));
 
-        $this->assertEquals($runData['response']['guid'], $response['guid']);
-        $this->assertEquals('JE', $response['verdict']);
-        $this->assertEquals('uploading', $response['status']);
+        $this->assertSame($runData['response']['guid'], $response['guid']);
+        $this->assertSame('JE', $response['verdict']);
+        $this->assertSame('uploading', $response['status']);
     }
 
     /**
@@ -74,11 +75,11 @@ class RunStatusTest extends \OmegaUp\Test\ControllerTestCase {
             'run_alias' => $runData['response']['guid'],
         ]));
 
-        $this->assertEquals($runData['response']['guid'], $response['guid']);
-        $this->assertEquals('PA', $response['verdict']);
-        $this->assertEquals('ready', $response['status']);
-        $this->assertEquals(5, $response['contest_score']);
-        $this->assertEquals(0.05, $response['score']);
+        $this->assertSame($runData['response']['guid'], $response['guid']);
+        $this->assertSame('PA', $response['verdict']);
+        $this->assertSame('ready', $response['status']);
+        $this->assertSame(5.0, $response['contest_score']);
+        $this->assertSame(0.05, $response['score']);
     }
 
     /**
@@ -105,7 +106,7 @@ class RunStatusTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should not have allowed to download submission');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
 
         $submissionZip = \OmegaUp\Controllers\Run::downloadSubmission(

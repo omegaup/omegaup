@@ -5,8 +5,7 @@
 /**
  * SchoolController
  *
- * @author joemmanuel
- *
+ * @psalm-type SchoolListItem=array{key: int, value: string}
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type School=array{country_id: string|null, name: string, ranking: int|null, school_id: int, score: float}
  * @psalm-type SchoolCoderOfTheMonth=array{time: string, username: string, classname: string}
@@ -20,20 +19,19 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of schools
      *
-     * @omegaup-request-param mixed $query
-     * @omegaup-request-param mixed $term
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param null|string $term
      *
-     * @return list<array{id: int, label: string, value: string}>
+     * @return array{results: list<SchoolListItem>}
      */
     public static function apiList(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
-        $param = '';
-        if (is_string($r['term'])) {
-            $param = $r['term'];
-        } elseif (is_string($r['query'])) {
-            $param = $r['query'];
-        } else {
+        $param = $r->ensureOptionalString('query');
+        if (is_null($param)) {
+            $param = $r->ensureOptionalString('term');
+        }
+        if (is_null($param)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 'query'
@@ -43,13 +41,14 @@ class School extends \OmegaUp\Controllers\Controller {
         $response = [];
         foreach (\OmegaUp\DAO\Schools::findByName($param) as $school) {
             $response[] = [
-                'label' => strval($school->name),
+                'key' => intval($school->school_id),
                 'value' => strval($school->name),
-                'id' => intval($school->school_id),
             ];
         }
 
-        return $response;
+        return [
+            'results' => $response,
+        ];
     }
 
     /**
@@ -57,11 +56,11 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: SchoolProfileDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: SchoolProfileDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param int $school_id
      */
-    public static function getSchoolProfileDetailsForSmarty(\OmegaUp\Request $r): array {
+    public static function getSchoolProfileDetailsForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
         $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
 
@@ -111,7 +110,7 @@ class School extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => $payload,
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleSchoolProfile'
@@ -176,7 +175,6 @@ class School extends \OmegaUp\Controllers\Controller {
             'state_id' => !is_null($state) ? $state->state_id : null,
         ]);
 
-        $school_id = 0;
         $existing = \OmegaUp\DAO\Schools::findByName($name);
         if (!empty($existing)) {
             /** @var int $existing[0]->school_id */
@@ -268,12 +266,12 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details for historical rank of schools with pagination
      *
-     * @return array{smartyProperties: array{payload: SchoolRankPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: SchoolRankPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
-    public static function getRankForSmarty(\OmegaUp\Request $r): array {
+    public static function getRankForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('length');
 
@@ -288,7 +286,7 @@ class School extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'page' => $page,
                     'length' => $length,
@@ -313,11 +311,11 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Gets all the information to be sent to smarty for the tabs
+     * Gets all the information to be sent to TypeScript for the tabs
      * of School of the Month
-     * @return array{smartyProperties: array{payload: SchoolOfTheMonthPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: SchoolOfTheMonthPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getSchoolOfTheMonthDetailsForSmarty(\OmegaUp\Request $r): array {
+    public static function getSchoolOfTheMonthDetailsForTypeScript(\OmegaUp\Request $r): array {
         try {
             $r->ensureIdentity();
             $identity = $r->identity;
@@ -335,7 +333,7 @@ class School extends \OmegaUp\Controllers\Controller {
         $currentDate = date('Y-m-d', $currentTimestamp);
 
         $response = [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'schoolsOfPreviousMonths' => \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfTheMonth(),
                     'schoolsOfPreviousMonth' => \OmegaUp\DAO\SchoolOfTheMonth::getMonthlyList(
@@ -359,7 +357,7 @@ class School extends \OmegaUp\Controllers\Controller {
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
-        $response['smartyProperties']['payload']['options'] = [
+        $response['templateProperties']['payload']['options'] = [
             'canChooseSchool' =>
                 \OmegaUp\Authorization::canChooseCoderOrSchool(
                     $currentTimestamp

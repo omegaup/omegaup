@@ -1,10 +1,9 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Any admin can accept / reject participant requests for a public contest with
  * registration
- *
- * @author juan.pablo@omegaup.com
  */
 class ContestRequestsTest extends \OmegaUp\Test\ControllerTestCase {
     private function preparePublicContestWithRegistration(): array {
@@ -81,7 +80,7 @@ class ContestRequestsTest extends \OmegaUp\Test\ControllerTestCase {
                 if (in_array($contestants[$i]->username, $acceptedUsers)) {
                     $this->assertTrue($result['users'][$i]['accepted']);
                 }
-                $this->assertEquals(
+                $this->assertSame(
                     $result['users'][$i]['admin']['username'],
                     $mainAdmin->username
                 );
@@ -111,7 +110,7 @@ class ContestRequestsTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
         ]));
-        $this->assertEquals(count($result['users']), 1);
+        $this->assertSame(count($result['users']), 1);
         [$userRequest] = $result['users'];
 
         $this->assertDefaultParamsInRequest($userRequest);
@@ -157,7 +156,7 @@ class ContestRequestsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
         ]);
         $result = \OmegaUp\Controllers\Contest::apiRequests($contestRequest);
-        $this->assertEquals(count($result['users']), $numberOfContestants);
+        $this->assertSame(count($result['users']), $numberOfContestants);
 
         for ($i = 0; $i < $numberOfContestants; $i++) {
             $this->assertDefaultParamsInRequest($result['users'][$i]);

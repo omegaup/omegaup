@@ -1,9 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of ContestStatsTest
- *
- * @author joemmanuel
  */
 class ContestStatsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
@@ -85,7 +84,7 @@ class ContestStatsTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiStats($r);
 
         // Check number of pending runs
-        $this->assertEquals(
+        $this->assertSame(
             count(
                 $pendingRunsData
             ) + 1 /* max wait run */,
@@ -93,29 +92,29 @@ class ContestStatsTest extends \OmegaUp\Test\ControllerTestCase {
                 $response['pending_runs']
             )
         );
-        $this->assertEquals(
+        $this->assertSame(
             count(
                 $ACRunsData
             ),
             ($response['verdict_counts']['AC'])
         );
-        $this->assertEquals(
+        $this->assertSame(
             count(
                 $WARunsData
             ),
             ($response['verdict_counts']['WA'])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $maxWaitRunData['response']['guid'],
             $response['max_wait_time_guid']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $pendingRunsCount + $ACRunsCount + $WARunsCount + 1,
             $response['total_runs']
         );
-        $this->assertEquals(1, $response['distribution'][100]);
+        $this->assertSame(1, $response['distribution'][100]);
     }
 
     /**
@@ -162,8 +161,8 @@ class ContestStatsTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiStats($r);
 
         // Check number of pending runs
-        $this->assertEquals($ACRunsCount, $response['total_runs']);
-        $this->assertEquals(0, $response['max_wait_time']);
-        $this->assertEquals(0, $response['max_wait_time_guid']);
+        $this->assertSame($ACRunsCount, $response['total_runs']);
+        $this->assertNull($response['max_wait_time']);
+        $this->assertNull($response['max_wait_time_guid']);
     }
 }

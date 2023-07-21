@@ -7,7 +7,7 @@
     </caption>
     <thead>
       <tr>
-        <th>{{ T.wordsUser }}</th>
+        <th>{{ T.contestParticipant }}</th>
         <th>{{ T.wordsLanguage }}</th>
         <th>{{ T.wordsMemory }}</th>
         <th>{{ T.wordsRuntime }}</th>
@@ -57,9 +57,10 @@ export default class Solvers extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 table {
   width: 100%;
-  border: 1px solid #ccc;
+  border: 1px solid var(--arena-solvers-table-border-color);
   margin-top: 2em;
 }
 
@@ -72,7 +73,7 @@ caption {
 
 td,
 th {
-  border: 1px solid #ccc;
+  border: 1px solid var(--arena-solvers-td-border-color);
   border-width: 1px 0;
   text-align: center;
 }

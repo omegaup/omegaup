@@ -1,9 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of ContestStatsTest
- *
- * @author joemmanuel
  */
 class ProblemStatsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
@@ -77,7 +76,7 @@ class ProblemStatsTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiStats($r);
 
         // Check number of pending runs
-        $this->assertEquals(
+        $this->assertSame(
             count(
                 $pendingRunsData
             ),
@@ -85,20 +84,20 @@ class ProblemStatsTest extends \OmegaUp\Test\ControllerTestCase {
                 $response['pending_runs']
             )
         );
-        $this->assertEquals(
+        $this->assertSame(
             count(
                 $ACRunsData
             ),
             ($response['verdict_counts']['AC'])
         );
-        $this->assertEquals(
+        $this->assertSame(
             count(
                 $WARunsData
             ),
             ($response['verdict_counts']['WA'])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $pendingRunsCount + $ACRunsCount + $WARunsCount,
             $response['total_runs']
         );

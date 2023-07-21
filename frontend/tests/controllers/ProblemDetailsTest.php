@@ -1,9 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of DetailsProblem
- *
- * @author joemmanuel
  */
 
 class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
@@ -53,33 +52,36 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Assert data
-        $this->assertEquals($problemDAO->title, $response['title']);
-        $this->assertEquals($problemDAO->alias, $response['alias']);
-        $this->assertEquals(100, $response['points']);
-        $this->assertEquals(
+        $this->assertSame($problemDAO->title, $response['title']);
+        $this->assertSame($problemDAO->alias, $response['alias']);
+        $this->assertSame(100.0, $response['points']);
+        $this->assertSame(
             $response['problemsetter']['username'],
             $authorIdentity->username
         );
-        $this->assertEquals(
+        $this->assertSame(
             $response['problemsetter']['name'],
             $authorIdentity->name
         );
-        $this->assertEquals($problemDAO->source, $response['source']);
+        $this->assertSame($problemDAO->source, $response['source']);
         $this->assertStringContainsString(
             '# Entrada',
             $response['statement']['markdown']
         );
-        $this->assertEquals($problemDAO->order, $response['order']);
-        $this->assertEquals(0, $response['score']);
+        $this->assertSame($problemDAO->order, $response['order']);
+        $this->assertSame(0.0, $response['score']);
 
         // Default data
-        $this->assertEquals(0, $problemDAO->visits);
-        $this->assertEquals(0, $problemDAO->submissions);
-        $this->assertEquals(0, $problemDAO->accepted);
-        $this->assertEquals(0, $problemDAO->difficulty);
+        $this->assertSame(0, $problemDAO->visits);
+        $this->assertSame(0, $problemDAO->submissions);
+        $this->assertSame(0, $problemDAO->accepted);
+        $this->assertNull($problemDAO->difficulty);
+
+        // Verify that we have the nomination status
+        $this->assertArrayHasKey('nominationStatus', $response);
 
         // Verify that we have an empty array of runs
-        $this->assertEquals(0, count($response['runs']));
+        $this->assertSame(0, count($response['runs']));
 
         // Verify that problem was marked as Opened
         $problemOpened = \OmegaUp\DAO\ProblemsetProblemOpened::getByPK(
@@ -90,7 +92,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotNull($problemOpened);
 
         // Verify open time
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\Time::get(),
             $problemOpened->open_time->time
         );
@@ -128,6 +130,20 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $expected_text,
             $response['statement']['markdown']
         );
+
+        // We can get problem details with following function
+        $details = \OmegaUp\Controllers\Problem::getProblemPrintDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        )['templateProperties']['payload']['details'];
+
+        // Assert data
+        $this->assertStringContainsString(
+            $expected_text,
+            $details['statement']['markdown']
+        );
     }
 
     /**
@@ -142,7 +158,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->internalViewProblemStatement('not_html_or_markdown', '');
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertEquals('invalidStatementType', $e->getMessage());
+            $this->assertSame('invalidStatementType', $e->getMessage());
         }
     }
 
@@ -162,15 +178,15 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
 
-        $this->assertEquals(
+        $this->assertSame(
             $response['alias'],
             $problemData['request']['problem_alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $response['commit'],
             $problemData['problem']->commit
         );
-        $this->assertEquals(
+        $this->assertSame(
             $response['version'],
             $problemData['problem']->current_version
         );
@@ -196,7 +212,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('problemIsPrivate', $e->getMessage());
+            $this->assertSame('problemIsPrivate', $e->getMessage());
         }
     }
 
@@ -214,8 +230,8 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problemData['request']['problem_alias'],
             ]));
             $this->fail('Should have failed');
-        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('problemIsPrivate', $e->getMessage());
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -248,7 +264,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problemData['request']['problem_alias']
         ]));
 
-        $this->assertEquals(100.00, $response['score']);
+        $this->assertSame(100.00, $response['score']);
     }
 
     /**
@@ -287,7 +303,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias']
         ]));
 
-        $this->assertEquals(50.00, $response['score']);
+        $this->assertSame(50.00, $response['score']);
     }
 
     /**
@@ -331,8 +347,8 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Verify that the only run returned is the one that was sent in the
         // contest.
-        $this->assertEquals(1, count($response['runs']));
-        $this->assertEquals(
+        $this->assertSame(1, count($response['runs']));
+        $this->assertSame(
             $runDataInContest['response']['guid'],
             $response['runs'][0]['guid']
         );
@@ -379,7 +395,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'show_solvers' => true,
             ]));
             $this->assertCount(1, $response['solvers']);
-            $this->assertEquals(
+            $this->assertSame(
                 $identity->username,
                 $response['solvers'][0]['username']
             );
@@ -436,7 +452,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('User should not have been able to view solution');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'allowedSolutionsLimitReached',
                 $e->getMessage()
             );

@@ -1,8 +1,6 @@
 <?php
 /**
  * Description of UpdateContest
- *
- * @author joemmanuel
  */
 class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
@@ -10,7 +8,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUserUpdate() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         $locale = \OmegaUp\DAO\Languages::getByName('pt');
@@ -43,11 +41,11 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
 
-        $this->assertEquals($r['name'], $identityDb['name']);
-        $this->assertEquals($r['country_id'], $identityDb['country_id']);
-        $this->assertEquals($r['state_id'], $identityDb['state_id']);
-        $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
-        $this->assertEquals(
+        $this->assertSame($r['name'], $identityDb['name']);
+        $this->assertSame($r['country_id'], $identityDb['country_id']);
+        $this->assertSame($r['state_id'], $identityDb['state_id']);
+        $this->assertSame($r['scholar_degree'], $userDb->scholar_degree);
+        $this->assertSame(
             gmdate(
                 'Y-m-d',
                 $r['birth_date']
@@ -56,7 +54,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         // Graduation date without school is not saved on database.
         $this->assertNull($graduationDate);
-        $this->assertEquals($locale->language_id, $identityDb['language_id']);
+        $this->assertSame($locale->language_id, $identityDb['language_id']);
 
         // Edit all fields again with diff values
         $locale = \OmegaUp\DAO\Languages::getByName('pseudo');
@@ -90,11 +88,11 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
 
-        $this->assertEquals($r['name'], $identityDb['name']);
-        $this->assertEquals($r['country_id'], $identityDb['country_id']);
-        $this->assertEquals($r['state_id'], $identityDb['state_id']);
-        $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
-        $this->assertEquals(
+        $this->assertSame($r['name'], $identityDb['name']);
+        $this->assertSame($r['country_id'], $identityDb['country_id']);
+        $this->assertSame($r['state_id'], $identityDb['state_id']);
+        $this->assertSame($r['scholar_degree'], $userDb->scholar_degree);
+        $this->assertSame(
             gmdate(
                 'Y-m-d',
                 $r['birth_date']
@@ -103,7 +101,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         // Graduation date without school is not saved on database.
         $this->assertNull($graduationDate);
-        $this->assertEquals($locale->language_id, $identityDb['language_id']);
+        $this->assertSame($locale->language_id, $identityDb['language_id']);
 
         // Double check language update with the appropiate API
         $identity = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
@@ -111,7 +109,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         )['loginIdentity'];
         unset($identity['acting_identity_id']);
         unset($identity['classname']);
-        $this->assertEquals(
+        $this->assertSame(
             $locale->name,
             \OmegaUp\Controllers\Identity::getPreferredLanguage(
                 new \OmegaUp\DAO\VO\Identities($identity)
@@ -146,14 +144,10 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $user = \OmegaUp\DAO\Users::getByPK($user->user_id);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
-        $profile = \OmegaUp\Controllers\User::getProfileImpl(
-            $user,
-            $identity
-        );
         $profileProgress = \OmegaUp\Controllers\User::getProfileProgress(
             $user
         );
-        $this->assertEquals(100.0, $profileProgress);
+        $this->assertSame(100.0, $profileProgress);
     }
 
     /**
@@ -161,7 +155,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      * on each user information update
      */
     public function testUpdateUserSchool() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // On user creation, no IdentitySchool is created
@@ -180,7 +174,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
             $identity->current_identity_school_id
         );
-        $this->assertEquals($identitySchool->school_id, $school->school_id);
+        $this->assertSame($identitySchool->school_id, $school->school_id);
         $this->assertNull($identitySchool->graduation_date);
         $this->assertNull($identitySchool->end_time);
 
@@ -197,8 +191,8 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
             $identity->current_identity_school_id
         );
-        $this->assertEquals($identitySchool->school_id, $school->school_id);
-        $this->assertEquals($identitySchool->graduation_date, $graduationDate);
+        $this->assertSame($identitySchool->school_id, $school->school_id);
+        $this->assertSame($identitySchool->graduation_date, $graduationDate);
         $this->assertNull($identitySchool->end_time);
 
         // Now assign a new School to User
@@ -220,8 +214,8 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
             $identity->current_identity_school_id
         );
-        $this->assertEquals($identitySchool->school_id, $newSchool->school_id);
-        $this->assertEquals($identitySchool->graduation_date, $graduationDate);
+        $this->assertSame($identitySchool->school_id, $newSchool->school_id);
+        $this->assertSame($identitySchool->graduation_date, $graduationDate);
         $this->assertNull($identitySchool->end_time);
 
         // Update the school one more time, set the first school again
@@ -242,7 +236,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
             $identity->current_identity_school_id
         );
-        $this->assertEquals($identitySchool->school_id, $school->school_id);
+        $this->assertSame($identitySchool->school_id, $school->school_id);
         $this->assertNull($identitySchool->end_time);
     }
 
@@ -260,15 +254,15 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $user = \OmegaUp\DAO\AuthTokens::getUserByToken($login->auth_token);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
-        $this->assertEquals($identity->username, $newUsername);
+        $this->assertSame($identity->username, $newUsername);
     }
 
     /**
      * Update profile username with existed username
      */
     public function testDuplicateUsernameUpdate() {
-        ['user' => $oldUser, 'identity' => $oldIdentity] = \OmegaUp\Test\Factories\User::createUser();
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $oldIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         try {
             \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
@@ -278,7 +272,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should not have been able to use duplicate username');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('usernameInUse', $e->getMessage());
+            $this->assertSame('usernameInUse', $e->getMessage());
         }
     }
 
@@ -286,7 +280,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      * Request parameter name cannot be too long
      */
     public function testNameUpdateTooLong() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
 
@@ -298,8 +292,8 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Update should have failed due to name too long');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterStringTooLong', $e->getMessage());
-            $this->assertEquals('name', $e->parameter);
+            $this->assertSame('parameterStringTooLong', $e->getMessage());
+            $this->assertSame('name', $e->parameter);
         }
     }
 
@@ -307,7 +301,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      * Request parameter name cannot be empty
      */
     public function testEmptyNameUpdate() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
 
@@ -318,14 +312,14 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Update should have failed due to empty name');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterStringTooShort', $e->getMessage());
-            $this->assertEquals('name', $e->parameter);
+            $this->assertSame('parameterStringTooShort', $e->getMessage());
+            $this->assertSame('name', $e->parameter);
         }
     }
 
     public function testFutureBirthday() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         try {
@@ -335,8 +329,8 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Update should have failed due to future birthday');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('birthdayInTheFuture', $e->getMessage());
-            $this->assertEquals('birth_date', $e->parameter);
+            $this->assertSame('birthdayInTheFuture', $e->getMessage());
+            $this->assertSame('birth_date', $e->parameter);
         }
     }
 
@@ -346,7 +340,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUpdateCountryWithNoStateData() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         try {
@@ -358,8 +352,8 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'All countries now have state information, so it must be provided.'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterEmpty', $e->getMessage());
-            $this->assertEquals('state_id', $e->parameter);
+            $this->assertSame('parameterEmpty', $e->getMessage());
+            $this->assertSame('state_id', $e->parameter);
         }
     }
 
@@ -369,7 +363,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testGenderWithInvalidOption() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         try {
@@ -379,8 +373,8 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Please select a valid gender option');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
-            $this->assertEquals('gender', $e->parameter);
+            $this->assertSame('parameterNotInExpectedSet', $e->getMessage());
+            $this->assertSame('gender', $e->parameter);
         }
     }
 
@@ -390,14 +384,14 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testGenderWithValidOption() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         $response = \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'gender' => 'female',
         ]));
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
     }
 
     /**
@@ -406,14 +400,14 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testGenderWithNull() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         $response = \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'gender' => null,
         ]));
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
     }
 
     /**
@@ -422,7 +416,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testGenderWithEmptyString() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         try {
@@ -432,8 +426,8 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Please select a valid gender option');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
-            $this->assertEquals('gender', $e->parameter);
+            $this->assertSame('parameterNotInExpectedSet', $e->getMessage());
+            $this->assertSame('gender', $e->parameter);
         }
     }
 
@@ -491,5 +485,195 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // the exact same password.
         $identity->password = 'omegaup';
         self::login($identity);
+    }
+
+    /**
+     * Test update objectives
+     */
+    public function testUpdateObjectives() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'has_competitive_objective' => true,
+            'has_learning_objective' => true,
+            'has_scholar_objective' => false,
+            'has_teaching_objective' => false,
+        ]);
+        \OmegaUp\Controllers\User::apiUpdate($r);
+
+        // Check user from db
+        $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
+        $this->assertSame(
+            $r['has_competitive_objective'],
+            $userDb->has_competitive_objective
+        );
+        $this->assertSame(
+            $r['has_learning_objective'],
+            $userDb->has_learning_objective
+        );
+        $this->assertSame(
+            $r['has_scholar_objective'],
+            $userDb->has_scholar_objective
+        );
+        $this->assertSame(
+            $r['has_teaching_objective'],
+            $userDb->has_teaching_objective
+        );
+
+        // Edit objectives again with diff values
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'has_competitive_objective' => false,
+            'has_learning_objective' => false,
+            'has_scholar_objective' => true,
+            'has_teaching_objective' => true,
+        ]);
+        \OmegaUp\Controllers\User::apiUpdate($r);
+
+        // Check user from apiProfile
+        $r2 = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $identity->username
+        ]);
+        $response = \OmegaUp\Controllers\User::apiProfile($r2);
+
+        $this->assertSame(
+            $r['has_competitive_objective'],
+            $response['has_competitive_objective']
+        );
+        $this->assertSame(
+            $r['has_learning_objective'],
+            $response['has_learning_objective']
+        );
+        $this->assertSame(
+            $r['has_scholar_objective'],
+            $response['has_scholar_objective']
+        );
+        $this->assertSame(
+            $r['has_teaching_objective'],
+            $response['has_teaching_objective']
+        );
+    }
+
+    /**
+     * Test objectives cannot be null
+     */
+    public function testObjectivesWithNull() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'has_competitive_objective' => true,
+                'has_learning_objective' => true,
+                'has_scholar_objective' => true,
+                'has_teaching_objective' => null,
+            ]));
+            $this->fail('Update should have failed due to empty objectives');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterEmpty', $e->getMessage());
+            $this->assertSame('has_teaching_objective', $e->parameter);
+        }
+    }
+
+    public function testGetSelfEmailDetailsForTypeScript() {
+        $userInformation = [
+            'username' => 'original_username',
+            'name' => 'Original Name',
+            'email' => 'original@email.com',
+        ];
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams($userInformation)
+        );
+
+        $login = self::login($identity);
+
+        $payload = \OmegaUp\Controllers\User::getEmailEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['templateProperties']['payload'];
+
+        $this->assertSame($payload['email'], $userInformation['email']);
+        $this->assertSame(
+            $payload['profile']['username'],
+            $userInformation['username']
+        );
+        $this->assertSame(
+            $payload['profile']['name'],
+            $userInformation['name']
+        );
+    }
+
+    public function testUpdateUserMainEmailAsNonSysAdmin() {
+        $userToGetInformation = [
+            'username' => 'username_to_get_info',
+            'name' => 'Name To Get Info',
+            'email' => 'email_to_get_info@email.com',
+        ];
+        [
+            'identity' => $identityToGetInformation,
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams($userToGetInformation)
+        );
+
+        // Create user who attempts get the information of previously registered
+        // user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\User::getEmailEditDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'username' => $identityToGetInformation->username,
+                ])
+            );
+            $this->fail(
+                'Non-admin user should not be able to get user details'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+    }
+
+    public function testUpdateUserMainEmailAsSysAdmin() {
+        //createAdminUser
+        $userToGetInformation = [
+            'username' => 'username_to_get_info',
+            'name' => 'Name To Get Info',
+            'email' => 'email_to_get_info@email.com',
+        ];
+        [
+            'identity' => $identityToGetInformation,
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams($userToGetInformation)
+        );
+
+        // Create user with sysadmin privileges
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = self::login($identity);
+
+        $payload = \OmegaUp\Controllers\User::getEmailEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $identityToGetInformation->username,
+            ])
+        )['templateProperties']['payload'];
+
+        $this->assertSame($payload['email'], $userToGetInformation['email']);
+        $this->assertSame(
+            $payload['profile']['username'],
+            $identityToGetInformation->username
+        );
+        $this->assertSame(
+            $payload['profile']['name'],
+            $identityToGetInformation->name
+        );
     }
 }

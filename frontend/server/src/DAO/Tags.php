@@ -8,8 +8,6 @@ namespace OmegaUp\DAO;
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Tags}.
- *
- * @author alanboy
  * @access public
  * @package docs
  *
@@ -17,7 +15,10 @@ namespace OmegaUp\DAO;
  */
 class Tags extends \OmegaUp\DAO\Base\Tags {
     final public static function getByName(string $name): ?\OmegaUp\DAO\VO\Tags {
-        $sql = 'SELECT * FROM Tags WHERE name = ? LIMIT 1;';
+        $sql = 'SELECT ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Tags::FIELD_NAMES,
+            'Tags'
+        ) . ' FROM Tags WHERE name = ? LIMIT 1;';
 
         /** @var array{name: string, public: bool, tag_id: int}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
@@ -31,7 +32,11 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
      * @return list<\OmegaUp\DAO\VO\Tags>
      */
     public static function findByName(string $name): array {
-        $sql = "SELECT * FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 100";
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Tags::FIELD_NAMES,
+            'Tags'
+        );
+        $sql = "SELECT {$fields} FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 100";
         $args = [$name];
 
         $result = [];

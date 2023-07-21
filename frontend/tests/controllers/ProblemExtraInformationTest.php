@@ -1,9 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of Problem With Extra Information
- *
- * @author juan.pablo
  */
 
 class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
@@ -21,9 +20,9 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         $r = new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
         ]);
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             $r
-        )['smartyProperties'];
+        )['templateProperties'];
 
         $this->assertFalse($result['payload']['user']['loggedIn']);
         $this->assertFalse($result['payload']['problem']['karel_problem']);
@@ -36,9 +35,9 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         ] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             $r
-        )['smartyProperties'];
+        )['templateProperties'];
 
         $this->assertTrue($result['payload']['user']['loggedIn']);
         $this->assertFalse($result['payload']['problem']['karel_problem']);
@@ -54,12 +53,12 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($identity);
 
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
         $payload = $result['payload']['nominationStatus'];
         $this->assertFalse($payload['nominated']);
         $this->assertFalse($payload['nominatedBeforeAc']);
@@ -75,12 +74,12 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA', 60);
         $login = self::login($identity);
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
         $payload = $result['payload']['nominationStatus'];
         $this->assertFalse($payload['nominated']);
         $this->assertFalse($payload['nominatedBeforeAc']);
@@ -98,12 +97,12 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'contents' => json_encode(['before_ac' => true]),
             ])
         );
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
         $payload = $result['payload']['nominationStatus'];
         $this->assertFalse($payload['nominated']);
         $this->assertFalse($payload['nominatedBeforeAc']);
@@ -128,12 +127,12 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'contents' => json_encode([]),
             ])
         );
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
         $payload = $result['payload']['nominationStatus'];
         $this->assertFalse($payload['nominated']);
         $this->assertTrue($payload['dismissed']);
@@ -151,12 +150,12 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 ]),
             ])
         );
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
         $payload = $result['payload']['nominationStatus'];
         $this->assertTrue($payload['nominated']);
         $this->assertTrue($payload['dismissed']);
@@ -176,13 +175,13 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Problem author should get the problem as unlocked
         $login = self::login($problemData['author']);
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties'];
-        $this->assertEquals(
+        )['templateProperties'];
+        $this->assertSame(
             \OmegaUp\Controllers\Problem::SOLUTION_UNLOCKED,
             $result['payload']['solutionStatus']
         );
@@ -193,13 +192,13 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
             'identity' => $identity,
         ] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties'];
-        $this->assertEquals(
+        )['templateProperties'];
+        $this->assertSame(
             \OmegaUp\Controllers\Problem::SOLUTION_LOCKED,
             $result['payload']['solutionStatus']
         );
@@ -210,15 +209,44 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'imagetest.zip',
             ])
         );
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties'];
-        $this->assertEquals(
+        )['templateProperties'];
+        $this->assertSame(
             \OmegaUp\Controllers\Problem::SOLUTION_NOT_FOUND,
             $result['payload']['solutionStatus']
+        );
+    }
+
+    /**
+     * Test that users' preferred language is used.
+     */
+    public function testPreferredLanguage() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
+            ])
+        );
+
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
+            'preferredLanguage' => 'py3'
+        ]));
+        $login = self::login($identity);
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        )['templateProperties'];
+        $this->assertSame(
+            'py3',
+            $result['payload']['problem']['preferred_language']
         );
     }
 }

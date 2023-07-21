@@ -9,15 +9,17 @@
     </div>
     <div class="col-md-6 mt-2 mt-md-0" :class="{ 'order-md-1': imageToRight }">
       <p class="section-description">{{ description }}</p>
-      <a
-        v-for="(button, index) in buttons"
-        :key="index"
-        class="btn btn-primary section-link mx-2 mb-3"
-        role="button"
-        :href="button.href"
-      >
-        {{ button.text }}
-      </a>
+      <div class="d-flex justify-content-center">
+        <a
+          v-for="(button, index) in buttons"
+          :key="index"
+          class="btn btn-primary section-link mx-2 mb-3"
+          role="button"
+          :href="button.href"
+        >
+          {{ button.text }}
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -40,6 +42,7 @@ export default class Homepage extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
+
 h3.display-4 {
   color: $omegaup-primary--darker;
   font-weight: normal;

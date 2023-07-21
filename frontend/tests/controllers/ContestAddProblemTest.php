@@ -1,9 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of ContestAddProblemTest
- *
- * @author joemmanuel
  */
 
 class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
@@ -33,8 +32,8 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problem->problem_id
         );
         self::assertNotNull($problemset_problems);
-        self::assertEquals($r['points'], $problemset_problems->points);
-        self::assertEquals($r['order_in_contest'], $problemset_problems->order);
+        self::assertSame($r['points'], $problemset_problems->points);
+        self::assertSame($r['order_in_contest'], $problemset_problems->order);
     }
 
     /**
@@ -61,7 +60,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
 
         // Validate
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         self::assertProblemAddedToContest($problemData, $contestData, $r);
     }
@@ -87,9 +86,8 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 'order_in_contest' => 1,
             ]));
             $this->fail('Should have failed');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotFound', $e->getMessage());
-            $this->assertEquals('problem_alias', $e->parameter);
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            $this->assertSame('problemNotFound', $e->getMessage());
         }
     }
 
@@ -116,9 +114,8 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 'order_in_contest' => 1,
             ]));
             $this->fail('Should have failed');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotFound', $e->getMessage());
-            $this->assertEquals('contest_alias', $e->parameter);
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            $this->assertSame('contestNotFound', $e->getMessage());
         }
     }
 
@@ -147,7 +144,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('cannotAddProb', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -172,7 +169,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 'order_in_contest' => $i + 1,
             ]);
             $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
-            $this->assertEquals('ok', $response['status']);
+            $this->assertSame('ok', $response['status']);
             self::assertProblemAddedToContest($problemData, $contestData, $r);
         }
 
@@ -191,7 +188,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed adding the problem to the contest');
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 $e->getMessage(),
                 'contestAddproblemTooManyProblems'
             );
@@ -203,10 +200,12 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddBannedProblemToContest() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 'public',
-            'author' => $contestData['director']
-        ]));
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'public',
+                'author' => $contestData['director']
+            ])
+        );
         $problem = $problemData['problem'];
 
         // Ban the problem.
@@ -226,7 +225,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 'Banned problems should not be able to be added to a contest'
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('problemIsBanned', $e->getMessage());
+            $this->assertSame('problemIsBanned', $e->getMessage());
         }
 
         // Make it private. Now it should be possible to add it.
@@ -241,7 +240,83 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             'order_in_contest' => 1,
         ]);
         $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
         self::assertProblemAddedToContest($problemData, $contestData, $r);
+    }
+
+    public function testInvitedAdminAddPrivateProblem() {
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'public']
+            )
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'private',
+                'author' => $contestData['director']
+            ])
+        );
+
+        $login = self::login($contestData['director']);
+        [
+            'identity' => $invitedAdmin,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        $response = \OmegaUp\Controllers\Contest::apiAddAdmin(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'usernameOrEmail' => $invitedAdmin->username,
+                'contest_alias' => $contestData['request']['alias'],
+                ])
+        );
+
+        // Invited admin tries to add a private problem into the contest
+        $invitedAdminLogin = self::login($invitedAdmin);
+
+        try {
+            \OmegaUp\Controllers\Contest::apiAddProblem(
+                new \OmegaUp\Request([
+                    'auth_token' => $invitedAdminLogin->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                    'problem_alias' => $problemData['request']['problem_alias'],
+                    'points' => 100,
+                    'order_in_contest' => 1,
+                ])
+            );
+            $this->fail('It should fail because of the privileges');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+
+        \OmegaUp\Controllers\Contest::apiAddProblem(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'points' => 100,
+                'order_in_contest' => 1,
+            ])
+        );
+
+        // But the invited admin can update the problem in the same contest
+        \OmegaUp\Controllers\Contest::apiAddProblem(
+            new \OmegaUp\Request([
+                'auth_token' => $invitedAdminLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'points' => 50,
+                'order_in_contest' => 2,
+            ])
+        );
+
+        $response = \OmegaUp\Controllers\Contest::apiProblems(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        self::assertSame($response['problems'][0]['points'], 50.0);
+        self::assertSame($response['problems'][0]['order'], 2);
     }
 }

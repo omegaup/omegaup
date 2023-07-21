@@ -1,9 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * ContestCreateTest
- *
- * @author joemmanuel
  */
 
 class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
@@ -12,22 +11,27 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
      *
      */
     public function testCreateContestPositive() {
+        // Added User whose DOB is 13 years
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birth_date' => strtotime('-13 years'),
+            ]),
+        );
         // Create a valid contest Request object
         $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
-            ['admissionMode' => 'private']
+            ['admissionMode' => 'private'],
         ));
         $r = $contestData['request'];
-        $contestDirector = $contestData['director'];
 
         // Log in the user and set the auth token in the new request
-        $login = self::login($contestDirector);
+        $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
         $response = \OmegaUp\Controllers\Contest::apiCreate(clone $r);
 
         // Assert status of new contest
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Assert that the contest requested exists in the DB
         $this->assertContest($r);
@@ -71,8 +75,8 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 $response = \OmegaUp\Controllers\Contest::apiCreate($r);
                 $this->fail("Exception was expected. Parameter: {$key}");
             } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-                $this->assertEquals('parameterEmpty', $e->getMessage());
-                $this->assertEquals($key, $e->parameter);
+                $this->assertSame('parameterEmpty', $e->getMessage());
+                $this->assertSame($key, $e->parameter);
                 continue;
             }
         }
@@ -95,14 +99,14 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Call the API
         $response = \OmegaUp\Controllers\Contest::apiCreate($r);
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Call the API for the 2nd time with same alias
         try {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('aliasInUse', $e->getMessage());
+            $this->assertSame('aliasInUse', $e->getMessage());
         }
     }
 
@@ -128,7 +132,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('contestLengthTooLong', $e->getMessage());
+            $this->assertSame('contestLengthTooLong', $e->getMessage());
         }
     }
 
@@ -148,8 +152,25 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalid', $e->getMessage());
+            $this->assertSame('parameterInvalid', $e->getMessage());
         }
+    }
+
+    /**
+     * Check if the plagiarism value is stored correctly in the database
+     * when a contest is created
+     */
+    public function testPlagiarismThresholdValue() {
+        // Create a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'checkPlagiarism' => true,
+            ])
+        );
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+        $this->assertTrue($contest->check_plagiarism);
     }
 
     /**
@@ -172,7 +193,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $response = \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'contestMustBeCreatedInPrivateMode',
                 $e->getMessage()
             );
@@ -205,11 +226,8 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
-                'contestMustBeCreatedInPrivateMode',
-                $e->getMessage()
-            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('cannotAddProb', $e->getMessage());
         }
     }
 
@@ -241,7 +259,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('problemIsPrivate', $e->getMessage());
+            $this->assertSame('cannotAddProb', $e->getMessage());
         }
     }
 
@@ -279,7 +297,10 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // User joins the contest 1 hour and 50 minutes after it starts
         $updatedTime = $originalTime + 110 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        \OmegaUp\Test\Factories\Contest::openContest($contest, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contest['contest'],
+            $identity
+        );
         \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $contest,
             $problem,
@@ -309,9 +330,125 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             );
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
-            $this->assertEquals('runNotInsideContest', $e->getMessage());
+            $this->assertSame('runNotInsideContest', $e->getMessage());
         } finally {
             \OmegaUp\Time::setTimeForTesting($originalTime);
+        }
+    }
+
+    public function testCreateContestForTeams() {
+        // Get a problem
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get a teams group
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestForTeams' => true,
+                'teamsGroupAlias' => $teamGroup->alias,
+            ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contestData
+        );
+
+        $login = self::login($contestData['director']);
+
+        $response = \OmegaUp\Controllers\Contest::getContestEditForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['templateProperties']['payload'];
+
+        $this->assertTrue($response['details']['contest_for_teams']);
+        $this->assertSame([
+            'alias' => $teamGroup->alias,
+            'name' =>  $teamGroup->name,
+        ], $response['teams_group']);
+    }
+
+    /**
+     * A PHPUnit data provider for all the score mode to get profile details.
+     *
+     * @return list<array{0:string}>
+     */
+    public function scoreModeProvider(): array {
+        return [
+            ['partial'],
+            ['all_or_nothing'],
+            ['max_per_group'],
+        ];
+    }
+
+    /**
+     * @dataProvider scoreModeProvider
+     */
+    public function testCreateContestWithScoreMode(string $scoreMode) {
+        // Get a problem
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Create contest with 2 hours and a window length 30 of minutes
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'scoreMode' => $scoreMode,])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contest
+        );
+
+        // Create a contestant
+        $login = self::login($contest['director']);
+
+        // Create a contest request
+        $response = \OmegaUp\DAO\Contests::getByAlias(
+            $contest['request']['alias']
+        );
+
+        $this->assertSame($response->score_mode, $scoreMode);
+    }
+
+    /**
+     * Under13 users can't create contests.
+     *
+     */
+    public function testUserUnder13CannotCreateContests() {
+        $defaultDate = strtotime('2022-01-01T00:00:00Z');
+        \OmegaUp\Time::setTimeForTesting($defaultDate);
+        // Create a 10 years-old user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birthDate' => strtotime('2012-01-01T00:00:00Z'),
+            ]),
+        );
+
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $r = $contestData['request'];
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($identity);
+        $r['auth_token'] = $login->auth_token;
+
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail(
+                'Creating contests should not have been allowed for U13'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('U13CannotPerform', $e->getMessage());
         }
     }
 }

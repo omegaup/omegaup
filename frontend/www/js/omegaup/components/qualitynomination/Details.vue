@@ -15,7 +15,7 @@
         </div>
         <div class="row">
           <div class="col-sm-3">
-            <strong>{{ T.wordsNominator }}</strong>
+            <strong>{{ T.qualityNominationNominatedBy }}</strong>
           </div>
           <div class="col-sm-4">
             {{ nominator.name }} (<a :href="userUrl(nominator.username)">{{
@@ -37,7 +37,7 @@
         </div>
         <div class="row">
           <div class="col-sm-3">
-            <strong>{{ T.wordsAuthor }}</strong>
+            <strong>{{ T.qualityNominationCreatedBy }}</strong>
           </div>
           <div class="col-sm-4">
             {{ author.name }} (<a :href="userUrl(author.username)">{{

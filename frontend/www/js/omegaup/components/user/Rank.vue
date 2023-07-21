@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card" data-user-rank>
     <h5 class="card-header">
       {{
         isIndex
@@ -12,19 +12,29 @@
             })
       }}
     </h5>
-    <div v-if="!isIndex" class="card-body">
-      <label
-        ><omegaup-autocomplete
-          v-model="searchedUsername"
-          class="form-control"
-          :init="(el) => typeahead.userTypeahead(el)"
-        ></omegaup-autocomplete
-      ></label>
-      <button class="btn btn-primary" type="button" @click="onSubmit">
+    <div v-if="!isIndex" class="card-body form-row">
+      <omegaup-common-typeahead
+        class="col-md-3 pl-0 pr-2"
+        :existing-options="searchResultUsers"
+        :value.sync="searchedUsername"
+        :max-results="10"
+        @update-existing-options="
+          (query) => $emit('update-search-result-users', query)
+        "
+      ></omegaup-common-typeahead>
+      <button
+        class="btn btn-primary form-control col-md-2 mr-2"
+        type="button"
+        @click="onSubmit"
+      >
         {{ T.searchUser }}
       </button>
-      <template v-if="Object.keys(availableFilters).length &gt; 0">
-        <select v-model="filter" class="filter" @change="onFilterChange">
+      <template v-if="Object.keys(availableFilters).length > 0">
+        <select
+          v-model="filter"
+          class="filter form-control col-md-4"
+          @change="onFilterChange"
+        >
           <option value="">
             {{ T.wordsSelectFilter }}
           </option>
@@ -38,28 +48,32 @@
         </select>
       </template>
       <template v-else-if="!isLogged &amp;&amp; !isIndex">
-        <span class="badge badge-info">{{ T.mustLoginToFilterUsers }}</span>
+        <span
+          class="badge badge-info col-md-6 d-flex align-items-center justify-content-center"
+          >{{ T.mustLoginToFilterUsers }}</span
+        >
       </template>
       <template v-else-if="!isIndex">
-        <span class="badge badge-info">{{
-          T.mustUpdateBasicInfoToFilterUsers
-        }}</span>
+        <span
+          class="badge badge-info col-md-6 d-flex align-items-center justify-content-center"
+          >{{ T.mustUpdateBasicInfoToFilterUsers }}</span
+        >
       </template>
     </div>
-    <table class="table mb-0">
+    <table class="table mb-0 table-responsive-sm">
       <thead>
         <tr>
-          <th scope="col">#</th>
-          <th scope="col">{{ T.wordsUser }}</th>
+          <th scope="col" class="pl-4 column-width">#</th>
+          <th scope="col">{{ T.contestParticipant }}</th>
           <th scope="col" class="text-right">{{ T.rankScore }}</th>
-          <th v-if="!isIndex" scope="col" class="text-right">
+          <th v-if="!isIndex" scope="col" class="text-right pr-4">
             {{ T.rankSolved }}
           </th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(user, index) in ranking" :key="index">
-          <th scope="row">{{ user.rank }}</th>
+          <th scope="row" class="pl-4 column-width">{{ user.rank }}</th>
           <td>
             <omegaup-countryflag :country="user.country"></omegaup-countryflag>
             <omegaup-user-username
@@ -73,7 +87,7 @@
             >
           </td>
           <td class="text-right">{{ user.score }}</td>
-          <td v-if="!isIndex" class="text-right">
+          <td v-if="!isIndex" class="text-right pr-4">
             {{ user.problems_solved }}
           </td>
         </tr>
@@ -96,11 +110,10 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
-import common_Paginator from '../common/Paginatorv2.vue';
+import common_Paginator from '../common/Paginator.vue';
 
 interface Rank {
   country: string;
@@ -113,7 +126,7 @@ interface Rank {
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-countryflag': CountryFlag,
     'omegaup-user-username': user_Username,
     'omegaup-common-paginator': common_Paginator,
@@ -129,15 +142,16 @@ export default class UserRank extends Vue {
   @Prop() ranking!: Rank[];
   @Prop() resultTotal!: number;
   @Prop() pagerItems!: types.PageItem[];
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   ui = ui;
-  typeahead = typeahead;
-  searchedUsername = '';
+  searchedUsername: null | types.ListItem = null;
 
   onSubmit(): void {
+    if (!this.searchedUsername) return;
     window.location.href = `/profile/${encodeURIComponent(
-      this.searchedUsername,
+      this.searchedUsername.key,
     )}`;
   }
 
@@ -176,3 +190,18 @@ export default class UserRank extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+[data-user-rank] .tags-input-wrapper-default {
+  padding: 0.35rem 0.25rem 0.7rem 0.25rem;
+}
+
+[data-user-rank] {
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.column-width {
+  max-width: 1rem;
+}
+</style>

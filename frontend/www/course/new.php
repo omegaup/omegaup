@@ -7,7 +7,7 @@ if (OMEGAUP_LOCKDOWN) {
 }
 
 \OmegaUp\UITools::render(
-    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Course::getCourseNewDetailsForSmarty(
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Course::getCourseNewDetailsForTypeScript(
         $r
     )
 );

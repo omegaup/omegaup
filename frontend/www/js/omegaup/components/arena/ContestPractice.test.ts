@@ -1,39 +1,39 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
 import { mount } from '@vue/test-utils';
-import expect from 'expect';
 import type { types } from '../../api_types';
 import * as time from '../../time';
 
 import arena_ContestPractice from './ContestPractice.vue';
 
-describe('Details.vue', () => {
+describe('ContestPractice.vue', () => {
   const date = new Date();
 
-  const contestDetails = {
+  const contest: types.ContestPublicDetails = {
     admission_mode: 'public',
     alias: 'omegaUp',
     description: 'hello omegaUp',
+    director: 'omegaUpDirector',
     feedback: 'detailed',
     finish_time: date,
     languages: 'py',
-    partial_score: true,
+    score_mode: 'partial',
     penalty: 1,
     penalty_calc_policy: 'sum',
     penalty_type: 'contest_start',
     points_decay_factor: 0,
     problemset_id: 1,
-    rerun_id: 0,
     scoreboard: 100,
     show_penalty: true,
+    default_show_all_contestants_in_scoreboard: false,
     show_scoreboard_after: true,
     start_time: date,
     submissions_gap: 1200,
     title: 'hello omegaUp',
-  } as types.ContestPublicDetails;
+  };
 
-  const sampleProblem = {
-    alias: 'triangulos',
+  const problemInfo: types.ProblemInfo = {
+    alias: 'problemOmegaUp',
     accepts_submissions: true,
     karel_problem: false,
     commit: 'abc',
@@ -84,80 +84,97 @@ describe('Details.vue', () => {
     title: 'Triangulos',
     visibility: 2,
     input_limit: 1000,
-    guid: '80bbe93bc01c1d47ff9fb396dfaff741',
-    runDetailsData: {
-      admin: false,
-      alias: 'sumas',
-      cases: {},
-      details: {
-        compile_meta: {
-          Main: {
-            memory: 12091392,
-            sys_time: 0.029124,
-            time: 0.174746,
-            verdict: 'OK',
-            wall_time: 0.51659,
-          },
-        },
-        contest_score: 5,
-        groups: [],
-        judged_by: 'localhost',
-        max_score: 100,
-        memory: 10407936,
-        score: 0.05,
-        time: 0.31891,
-        verdict: 'PA',
-        wall_time: 0.699709,
-      },
-      feedback: 'none',
-      groups: [],
-      guid: '80bbe93bc01c1d47ff9fb396dfaff741',
-      judged_by: '',
-      language: 'py3',
-      logs: '',
-      show_diff: 'none',
-      source: 'print(3)',
-      source_link: false,
-      source_name: 'Main.py3',
-      source_url: 'blob:http://localhost:8001/url',
-    } as types.RunDetails,
-  } as types.ProblemInfo;
+  };
 
-  it('Should handle details for a problem in a contest, practice mode', () => {
+  const problems: types.NavbarProblemsetProblem[] = [
+    {
+      acceptsSubmissions: true,
+      alias: 'problemOmegaUp',
+      bestScore: 100,
+      hasRuns: true,
+      maxScore: 100,
+      text: 'A. hello problem omegaUp',
+    },
+    {
+      acceptsSubmissions: true,
+      alias: 'otherProblemOmegaUp',
+      bestScore: 100,
+      hasRuns: true,
+      maxScore: 100,
+      text: 'B. hello other problem omegaUp',
+    },
+  ];
+
+  it('Should handle details for a problem in a contest, practice mode', async () => {
     const wrapper = mount(arena_ContestPractice, {
       propsData: {
-        contest: contestDetails,
-        problems: [
-          {
-            acceptsSubmissions: true,
-            alias: 'problemOmegaUp',
-            bestScore: 100,
-            hasRuns: true,
-            maxScore: 100,
-            text: 'A. hello problem omegaUp',
-          },
-          {
-            acceptsSubmissions: true,
-            alias: 'otherProblemOmegaUp',
-            bestScore: 100,
-            hasRuns: true,
-            maxScore: 100,
-            text: 'B. hello other problem omegaUp',
-          },
-        ] as types.NavbarContestProblem[],
-        problem: sampleProblem,
+        contest,
+        problems,
+        problemInfo,
       },
     });
 
     expect(wrapper.find('.clock').text()).toBe('∞');
-    expect(wrapper.find('.socket-status').text()).toBe('•');
-    expect(wrapper.find('.problem-list').text()).toContain(
+    expect(wrapper.find('.socket-status-error').text()).toBe('✗');
+    expect(wrapper.find('a[data-problem=problemOmegaUp]').text()).toBe(
       'A. hello problem omegaUp',
     );
-    expect(wrapper.find('.problem-list').text()).toContain(
+    expect(wrapper.find('a[data-problem=otherProblemOmegaUp]').text()).toBe(
       'B. hello other problem omegaUp',
     );
-    expect(wrapper.text()).toContain(sampleProblem.points);
-    expect(wrapper.text()).toContain(time.formatDate(date));
+    expect(wrapper.text()).toContain(problemInfo.points);
+    expect(wrapper.text()).toContain(time.formatDateLocal(date));
+
+    await wrapper.find('a[data-problem=problemOmegaUp]').trigger('click');
+    expect(wrapper.emitted('navigate-to-problem')).toBeDefined();
+  });
+
+  it('Should handle details for a run in a contest, practice mode', async () => {
+    const run: types.Run = {
+      alias: 'problemOmegaUp',
+      classname: 'user-rank-unranked',
+      contest_score: 100,
+      country: 'xx',
+      execution: 'EXECUTION_FINISHED',
+      guid: '78099022574726af861839e1b4210188',
+      language: 'py3',
+      memory: 0,
+      output: 'OUTPUT_CORRECT',
+      penalty: 0,
+      runtime: 0,
+      score: 1,
+      status: 'ready',
+      status_memory: 'MEMORY_AVAILABLE',
+      status_runtime: 'RUNTIME_AVAILABLE',
+      submit_delay: 0,
+      time: new Date(),
+      type: 'normal',
+      username: 'test_user_1',
+      verdict: 'AC',
+    };
+
+    const wrapper = mount(arena_ContestPractice, {
+      propsData: {
+        contest,
+        problems,
+        problem: problems[0],
+        runs: [run],
+        problemInfo,
+      },
+    });
+
+    await wrapper
+      .find(`button[data-run-details="${run.guid}"]`)
+      .trigger('click');
+    expect(wrapper.emitted('show-run')).toEqual([
+      [
+        {
+          guid: '78099022574726af861839e1b4210188',
+          hash:
+            '#problems/problemOmegaUp/show-run:78099022574726af861839e1b4210188',
+          isAdmin: false,
+        },
+      ],
+    ]);
   });
 });

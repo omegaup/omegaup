@@ -4,11 +4,9 @@ namespace OmegaUp;
 
 /**
  * Class to abstract access to a problem's artifacts.
- *
- * @author lhchavez
  */
 class ProblemArtifacts {
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     private $log;
 
     /** @var string */
@@ -18,7 +16,7 @@ class ProblemArtifacts {
     private $revision;
 
     public function __construct(string $alias, string $revision = 'published') {
-        $this->log = \Logger::getLogger('ProblemArtifacts');
+        $this->log = \Monolog\Registry::omegaup()->withName('ProblemArtifacts');
         $this->alias = $alias;
         $this->revision = $revision;
     }
@@ -32,11 +30,14 @@ class ProblemArtifacts {
         $response = $browser->exec();
         /** @var int */
         $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
-        if (!is_string($response) || $httpStatusCode != 200) {
+        if ($httpStatusCode != 200) {
             $this->log->error(
                 "Failed to get contents for {$this->alias}:{$this->revision}/{$path}. " .
                 "HTTP {$httpStatusCode}: \"{$response}\""
             );
+            if ($httpStatusCode != 403 && $httpStatusCode != 404) {
+                throw new \OmegaUp\Exceptions\ServiceUnavailableException();
+            }
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'resourceNotFound'
             );
@@ -51,10 +52,21 @@ class ProblemArtifacts {
         );
         $browser->headers[] = 'Accept: application/json';
         curl_setopt($browser->curl, CURLOPT_NOBODY, 1);
-        return (
-            $browser->exec() !== false &&
-            curl_getinfo($browser->curl, CURLINFO_HTTP_CODE) == 200
-        );
+        $response = $browser->exec();
+        /** @var int */
+        $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
+        if (
+            $httpStatusCode != 200 &&
+            $httpStatusCode != 403 &&
+            $httpStatusCode != 404
+        ) {
+            $this->log->error(
+                "Failed to get existence for {$this->alias}:{$this->revision}/{$path}. " .
+                "HTTP {$httpStatusCode}: \"{$response}\""
+            );
+            throw new \OmegaUp\Exceptions\ServiceUnavailableException();
+        }
+        return $httpStatusCode == 200;
     }
 
     public function getByRevision(): string {
@@ -69,11 +81,14 @@ class ProblemArtifacts {
         $response = $browser->exec();
         /** @var int */
         $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
-        if (!is_string($response) || $httpStatusCode != 200) {
+        if ($httpStatusCode != 200) {
             $this->log->error(
                 "Failed to get contents for {$this->alias}:{$this->revision}. " .
                 "HTTP {$httpStatusCode}: \"{$response}\""
             );
+            if ($httpStatusCode != 403 && $httpStatusCode != 404) {
+                throw new \OmegaUp\Exceptions\ServiceUnavailableException();
+            }
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'resourceNotFound'
             );
@@ -101,15 +116,18 @@ class ProblemArtifacts {
         $response = $browser->exec();
         /** @var int */
         $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
-        if (!is_string($response) || $httpStatusCode != 200) {
+        if ($httpStatusCode != 200) {
             $this->log->error(
                 "Failed to get tree entries for {$this->alias}:{$this->revision}/{$path}. " .
                 "HTTP {$httpStatusCode}: \"{$response}\""
             );
+            if ($httpStatusCode != 403 && $httpStatusCode != 404) {
+                throw new \OmegaUp\Exceptions\ServiceUnavailableException();
+            }
             return [];
         }
         /** @var null|array{id: string, entries?: null|list<array{mode: int, type: string, id: string, name: string, size: int}>} */
-        $response = json_decode($response, /*assoc=*/true);
+        $response = json_decode($response, associative: true);
         if (!is_array($response) || !array_key_exists('entries', $response)) {
             $this->log->error(
                 "Failed to get entries of {$path} for problem {$this->alias} at revision {$this->revision}"
@@ -178,15 +196,18 @@ class ProblemArtifacts {
         $response = $browser->exec();
         /** @var int */
         $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
-        if (!is_string($response) || $httpStatusCode != 200) {
+        if ($httpStatusCode != 200) {
             $this->log->error(
                 "Invalid commit for problem {$this->alias} at revision {$this->revision}. " .
                 "HTTP {$httpStatusCode}: \"{$response}\""
             );
+            if ($httpStatusCode != 403 && $httpStatusCode != 404) {
+                throw new \OmegaUp\Exceptions\ServiceUnavailableException();
+            }
             return null;
         }
         /** @var null|array{commit: string, tree: string, parents: list<string>, author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string} */
-        $response = json_decode($response, /*assoc=*/true);
+        $response = json_decode($response, associative: true);
         if (!is_array($response)) {
             $this->log->error(
                 "Invalid commit for problem {$this->alias} at revision {$this->revision}"
@@ -208,15 +229,18 @@ class ProblemArtifacts {
         $response = $browser->exec();
         /** @var int */
         $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
-        if (!is_string($response) || $httpStatusCode != 200) {
+        if ($httpStatusCode != 200) {
             $this->log->error(
                 "Failed to get log for problem {$this->alias} at revision {$this->revision}. " .
                 "HTTP {$httpStatusCode}: \"{$response}\""
             );
+            if ($httpStatusCode != 403 && $httpStatusCode != 404) {
+                throw new \OmegaUp\Exceptions\ServiceUnavailableException();
+            }
             return [];
         }
         /** @var null|array{log?: null|list<array{commit: string, tree: string, parents: list<string>, author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}>, next?: string} */
-        $response = json_decode($response, /*assoc=*/true);
+        $response = json_decode($response, associative: true);
         if (!is_array($response) || !array_key_exists('log', $response)) {
             $this->log->error(
                 "Failed to get log for problem {$this->alias} at revision {$this->revision}"
@@ -238,18 +262,29 @@ class ProblemArtifacts {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildArchiveURL($this->alias, $this->revision),
-            /*passthru=*/true
+            passthru: true
         );
         $browser->headers[] = 'Accept: application/zip';
-        return (
-            $browser->exec() !== false &&
-            curl_getinfo($browser->curl, CURLINFO_HTTP_CODE) == 200
-        );
+        $response = $browser->exec();
+        /** @var int */
+        $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
+        if (
+            $httpStatusCode != 200 &&
+            $httpStatusCode != 403 &&
+            $httpStatusCode != 404
+        ) {
+            $this->log->error(
+                "Failed to download {$this->alias}:{$this->revision}. " .
+                "HTTP {$httpStatusCode}: \"{$response}\""
+            );
+            throw new \OmegaUp\Exceptions\ServiceUnavailableException();
+        }
+        return $httpStatusCode == 200;
     }
 }
 
 class GitServerBrowser {
-    /** @var resource */
+    /** @var \CurlHandle */
     public $curl;
 
     /** @var list<string> */
@@ -258,15 +293,29 @@ class GitServerBrowser {
     /** @var bool */
     private $passthru;
 
+    /**
+     * @var string
+     * @readonly
+     */
+    private $alias;
+
+    /**
+     * @var string
+     * @readonly
+     */
+    private $url;
+
     public function __construct(
         string $alias,
         string $url,
         bool $passthru = false
     ) {
+        $this->alias = $alias;
+        $this->url = $url;
         $this->curl = curl_init();
         $this->headers = [
             \OmegaUp\SecurityTools::getGitserverAuthorizationHeader(
-                $alias,
+                $this->alias,
                 'omegaup:system'
             ),
         ];
@@ -274,8 +323,10 @@ class GitServerBrowser {
         curl_setopt_array(
             $this->curl,
             [
-                CURLOPT_URL => $url,
+                CURLOPT_URL => $this->url,
                 CURLOPT_RETURNTRANSFER => !$this->passthru,
+                CURLOPT_CONNECTTIMEOUT => 2,
+                CURLOPT_TIMEOUT => 10,
             ]
         );
     }
@@ -320,11 +371,18 @@ class GitServerBrowser {
         curl_close($this->curl);
     }
 
-    /**
-     * @return bool|string
-     */
-    public function exec() {
+    public function exec(): string {
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $this->headers);
-        return curl_exec($this->curl);
+        $response = curl_exec($this->curl);
+        if (!is_string($response)) {
+            $curlErrno = curl_errno($this->curl);
+            $curlError = curl_error($this->curl);
+            \Monolog\Registry::omegaup()->withName('GitBrowser')->error(
+                "Failed to get contents for {$this->url}. " .
+                "cURL {$curlErrno}: \"{$curlError}\""
+            );
+            throw new \OmegaUp\Exceptions\ServiceUnavailableException();
+        }
+        return $response;
     }
 }

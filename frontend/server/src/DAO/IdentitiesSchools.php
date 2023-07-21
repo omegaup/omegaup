@@ -8,8 +8,6 @@ namespace OmegaUp\DAO;
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Identities_Schools}.
- *
- * @author carlosabcs
  * @access public
  */
 class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
@@ -43,5 +41,37 @@ class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
         // Create new IdentitySchool and save it
         \OmegaUp\DAO\IdentitiesSchools::create($newIdentitySchool);
         return $newIdentitySchool;
+    }
+
+    public static function getByIdentityAndSchoolId(
+        \OmegaUp\DAO\VO\Identities $identity,
+        int $schoolId
+    ): ?\OmegaUp\DAO\VO\IdentitiesSchools {
+        if (is_null($identity->identity_id)) {
+            return null;
+        }
+        $sql = 'SELECT
+                    iss.identity_school_id,
+                    iss.identity_id,
+                    iss.school_id,
+                    iss.graduation_date,
+                    iss.creation_time,
+                    iss.end_time
+                FROM
+                    Identities_Schools iss
+                WHERE
+                    iss.identity_id = ?
+                    AND iss.school_id = ?
+                LIMIT 1';
+        $args = [$identity->identity_id, $schoolId];
+
+        /** @var array{creation_time: \OmegaUp\Timestamp, end_time: \OmegaUp\Timestamp|null, graduation_date: null|string, identity_id: int, identity_school_id: int, school_id: int}|null */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
+
+        if (is_null($rs)) {
+            return null;
+        }
+
+        return new \OmegaUp\DAO\VO\IdentitiesSchools($rs);
     }
 }

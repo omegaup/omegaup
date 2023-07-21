@@ -12,7 +12,7 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  *
- * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, opened: bool, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  */
 class Assignments extends \OmegaUp\DAO\Base\Assignments {
     public static function getProblemset(
@@ -20,7 +20,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         string $assignmentAlias
     ): ?\OmegaUp\DAO\VO\Problemsets {
         $sql = 'SELECT
-                    p.*
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problemsets::FIELD_NAMES,
+            'p'
+        ) . '
                 FROM
                     Assignments a
                 INNER JOIN
@@ -44,7 +47,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     /**
      * Returns each problem with the statistics of the runs submmited by the students
      *
-     * @return list<array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}>
+     * @return list<array{assignment_alias: string, average: float, avg_runs: float, completed_score_percentage: float, high_score_percentage: float, low_score_percentage: float, max_points: float, maximum: float, minimum: float, problem_alias: string, variance: float}>
      */
     public static function getAssignmentsProblemsStatistics(
         int $courseId,
@@ -54,18 +57,21 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         SELECT
             bpr.assignment_alias,
             bpr.problem_alias,
-            VARIANCE(bpr.max_user_score_for_problem) AS variance,
-            AVG(bpr.max_user_score_for_problem) AS average,
-            AVG(
+            IFNULL(VARIANCE(bpr.max_user_score_for_problem), 0) AS variance,
+            IFNULL(AVG(bpr.max_user_score_for_problem), 0) AS average,
+            IFNULL(AVG(
+                CASE WHEN bpr.max_user_percent_for_problem >= 1 THEN 1 ELSE 0 END
+            ) * 100, 0) AS completed_score_percentage,
+            IFNULL(AVG(
                 CASE WHEN bpr.max_user_percent_for_problem > 0.6 THEN 1 ELSE 0 END
-            ) * 100 AS high_score_percentage,
-            AVG(
+            ) * 100, 0) AS high_score_percentage,
+            IFNULL(AVG(
                 CASE WHEN bpr.max_user_percent_for_problem = 0 THEN 1 ELSE 0 END
-            ) * 100 AS low_score_percentage,
-            MIN(bpr.max_user_score_for_problem) as minimum,
-            MAX(bpr.max_user_score_for_problem) as maximum,
+            ) * 100, 0) AS low_score_percentage,
+            IFNULL(MIN(bpr.max_user_score_for_problem), 0) as minimum,
+            IFNULL(MAX(bpr.max_user_score_for_problem), 0) as maximum,
             bpr.max_points,
-            AVG(bpr.run_count) AS avg_runs
+            IFNULL(AVG(bpr.run_count), 0) AS avg_runs
         FROM (
             SELECT
                 pr.assignment_id,
@@ -74,9 +80,9 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 pr.problem_id,
                 pr.order,
                 pr.max_points,
-                COALESCE(MAX(`r`.`contest_score`), 0) AS max_user_score_for_problem,
-                COALESCE(MAX(`r`.`score`), 0) AS max_user_percent_for_problem,
-                COALESCE(COUNT(`r`.`submission_id`), 0) AS run_count
+                IFNULL(MAX(`r`.`contest_score`), 0) AS max_user_score_for_problem,
+                IFNULL(MAX(`r`.`score`), 0) AS max_user_percent_for_problem,
+                IFNULL(COUNT(`r`.`submission_id`), 0) AS run_count
             FROM
                 `Groups_Identities` AS `gi`
             CROSS JOIN
@@ -92,30 +98,27 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 FROM
                     `Assignments` AS `a`
                 INNER JOIN
-                    `Problemsets` AS `ps` ON `a`.`problemset_id` = `ps`.`problemset_id`
-                INNER JOIN
-                    `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `ps`.`problemset_id`
+                    `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `a`.`problemset_id`
                 INNER JOIN
                     `Problems` AS `p` ON `p`.`problem_id` = `psp`.`problem_id`
                 WHERE
                     `a`.`course_id` = ?
+                    AND `p`.`languages` <> ""
                 GROUP BY
                     `a`.`assignment_id`, `p`.`problem_id`
                 ) AS pr
-            INNER JOIN
-                `Identities` AS `i` ON `i`.`identity_id` = `gi`.`identity_id`
             LEFT JOIN
                 `Submissions` AS `s`
             ON
                 `s`.`problem_id` = `pr`.`problem_id`
-                AND `s`.`identity_id` = `i`.`identity_id`
+                AND `s`.`identity_id` = `gi`.`identity_id`
                 AND `s`.`problemset_id` = `pr`.`problemset_id`
             LEFT JOIN
                 `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
             WHERE
                 `gi`.`group_id` = ?
             GROUP BY
-                `i`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`
+                `gi`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`
         ) AS bpr
         GROUP BY
             bpr.problem_alias, bpr.assignment_alias
@@ -123,7 +126,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             bpr.assignment_id, bpr.order, bpr.problem_id;
         ';
 
-        /** @var list<array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}> */
+        /** @var list<array{assignment_alias: string, average: float, avg_runs: float, completed_score_percentage: float, high_score_percentage: float, low_score_percentage: float, max_points: float, maximum: float, minimum: float, problem_alias: string, variance: float}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [ $courseId, $groupId ]
@@ -161,32 +164,29 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             FROM
                 `Assignments` AS `a`
             INNER JOIN
-                `Problemsets` AS `ps` ON `a`.`problemset_id` = `ps`.`problemset_id`
-            INNER JOIN
-                `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `ps`.`problemset_id`
+                `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `a`.`problemset_id`
             INNER JOIN
                 `Problems` AS `p` ON `p`.`problem_id` = `psp`.`problem_id`
             WHERE
                 `a`.`course_id` = ?
+                AND `p`.`languages` <> ""
             GROUP BY
                 `a`.`assignment_id`, `p`.`problem_id`
             ) AS pr
-        INNER JOIN
-            `Identities` AS `i` ON `i`.`identity_id` = `gi`.`identity_id`
         LEFT JOIN
             `Submissions` AS `s`
         ON
             `s`.`problem_id` = `pr`.`problem_id`
-            AND `s`.`identity_id` = `i`.`identity_id`
+            AND `s`.`identity_id` = `gi`.`identity_id`
             AND `s`.`problemset_id` = `pr`.`problemset_id`
         LEFT JOIN
             `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
         WHERE
             `gi`.`group_id` = ? AND `r`.`status` = "ready" AND `s`.`type` = "normal"
         GROUP BY
-            `i`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`, verdict
+            `gi`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`, verdict
         ORDER BY
-            pr.order, pr.problem_id, `pr`.`assignment_id`, `i`.`username`, verdict;
+            pr.order, pr.problem_id, `pr`.`assignment_id`, verdict;
         ';
 
         /** @var list<array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: null|string}> */
@@ -242,7 +242,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         int $courseId
     ): ?\OmegaUp\DAO\VO\Assignments {
         $sql = 'SELECT
-                    *
+                ' . \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Assignments::FIELD_NAMES,
+            'Assignments'
+        ) . '
                 FROM
                     Assignments
                 WHERE
@@ -323,15 +326,21 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                `a`.`max_points`,
                `a`.`publish_time_delay`,
                `a`.`order`,
+                COUNT(`psp`.`problem_id`) AS `problem_count`,
                 COUNT(`s`.`submission_id`) AS `has_runs`,
                `ps`.`scoreboard_url`,
-               `ps`.`scoreboard_url_admin`
+               `ps`.`scoreboard_url_admin`,
+                false AS opened
             FROM
                 `Assignments` `a`
             INNER JOIN
                 `Problemsets` `ps`
             ON
                 `ps`.`problemset_id` = `a`.`problemset_id`
+            LEFT JOIN
+                `Problemset_Problems` `psp`
+            ON
+                `psp`.`problemset_id` = `ps`.`problemset_id`
             LEFT JOIN
                 `Submissions` `s`
             ON
@@ -346,7 +355,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 `a`.`assignment_id` ASC;
         ';
 
-        /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, opened: int, order: int, problem_count: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId]
@@ -354,6 +363,9 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         $assignments = [];
         foreach ($rs as $row) {
             $row['has_runs'] = $row['has_runs'] > 0;
+            $row['problemCount'] = $row['problem_count'];
+            $row['opened'] = boolval($row['opened']);
+            unset($row['problem_count']);
             $assignments[] = $row;
         }
         return $assignments;

@@ -23,9 +23,15 @@ class UserParams {
 
     /**
      * @readonly
-     * @var string
+     * @var null|string
      */
     public $email;
+
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $parentEmail;
 
     /**
      * @readonly
@@ -40,15 +46,31 @@ class UserParams {
     public $verify;
 
     /**
-     * @param array{username?: string, name?: string, password?: string, email?: string, isPrivate?: bool, verify?: bool} $params
+     * @readonly
+     * @var string|null
+     */
+    public $preferredLanguage;
+
+    /**
+     * @readonly
+     * @var int
+     */
+    public $birthDate;
+
+    /**
+     * @param array{username?: string, name?: string, password?: string, email?: string, parentEmail?: string, isPrivate?: bool, verify?: bool, preferredLanguage?: string, birthDate?: int} $params
      */
     public function __construct(array $params = []) {
+        $emailBase = \OmegaUp\Test\Utils::CreateRandomString();
         $this->username = $params['username'] ?? \OmegaUp\Test\Utils::CreateRandomString();
-        $this->name = $params['name'] ?? $this->username;
+        $this->name = $params['name'] ?? \OmegaUp\Test\Utils::CreateRandomString();
         $this->password = $params['password'] ?? \OmegaUp\Test\Utils::CreateRandomString();
-        $this->email = $params['email'] ?? \OmegaUp\Test\Utils::CreateRandomString() . '@mail.com';
+        $this->email = $params['email'] ?? "{$emailBase}@mail.com";
+        $this->parentEmail = $params['email'] ?? "parent_{$emailBase}@mail.com";
         $this->isPrivate = $params['isPrivate'] ?? false;
         $this->verify = $params['verify'] ?? true;
+        $this->preferredLanguage = $params['preferredLanguage'] ?? null;
+        $this->birthDate = $params['birthDate'] ?? 946684800; // 01-01-2000
     }
 }
 
@@ -67,17 +89,27 @@ class User {
             $params = new UserParams();
         }
 
+        $createUserParams = [
+            'username' => $params->username,
+            'name' => $params->name,
+            'password' => $params->password,
+            'email' => $params->email,
+            'parent_email' => $params->parentEmail,
+            'is_private' => strval($params->isPrivate),
+            'birth_date' => $params->birthDate,
+        ];
+
+        if ($params->birthDate < strtotime('-13 year', \OmegaUp\Time::get())) {
+            unset($createUserParams['parent_email']);
+        } else {
+            unset($createUserParams['email']);
+        }
+
         // Call the API
         \OmegaUp\Controllers\User::createUser(
-            new \OmegaUp\CreateUserParams([
-                'username' => $params->username,
-                'name' => $params->name,
-                'password' => $params->password,
-                'email' => $params->email,
-                'is_private' => strval($params->isPrivate),
-            ]),
-            /*ignorePassword=*/false,
-            /*forceVerification=*/true
+            new \OmegaUp\CreateUserParams($createUserParams),
+            ignorePassword: false,
+            forceVerification: true
         );
 
         // Get user from db
@@ -90,10 +122,20 @@ class User {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
+        $needsUpdate = false;
         if ($params->verify) {
             $user = self::verifyUser($user);
         } else {
             $user->verified = false;
+            $needsUpdate = true;
+        }
+
+        if (!empty($params->preferredLanguage)) {
+            $user->preferred_language = $params->preferredLanguage;
+            $needsUpdate = true;
+        }
+
+        if ($needsUpdate) {
             \OmegaUp\DAO\Users::update($user);
         }
 
@@ -257,9 +299,11 @@ class User {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
-        \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
-            'identity_id' => $identity->identity_id,
-            'group_id' => $groupIdentityCreator->group_id,
+        $role = \OmegaUp\DAO\Roles::getByName('GroupIdentityCreator');
+        \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
+            'user_id' => $identity->user_id,
+            'role_id' => $role->role_id,
+            'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
     }
 

@@ -9,13 +9,13 @@ namespace OmegaUp\Controllers;
  */
 class Certificate extends \OmegaUp\Controllers\Controller {
     /**
-     * @return array{smartyProperties: array{payload: CertificateDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: CertificateDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $uuid
      */
-    public static function getDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getDetailsForTypeScript(\OmegaUp\Request $r) {
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'uuid' => $r->ensureString('uuid'),
                 ],

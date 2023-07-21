@@ -17,7 +17,10 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * @return list<string>
      */
     public static function getAllBadges(): array {
-        /** @psalm-suppress MixedArgument OMEGAUP_BADGES_ROOT is really a string. */
+        /**
+         * @psalm-suppress MixedArgument OMEGAUP_BADGES_ROOT is really a string.
+         * @var array<string> $aliases
+         */
         $aliases = array_diff(
             scandir(static::OMEGAUP_BADGES_ROOT),
             ['..', '.', 'default_icon.svg']
@@ -148,14 +151,14 @@ class Badge extends \OmegaUp\Controllers\Controller {
         ];
     }
     /**
-     * @return array{smartyProperties: array{payload: BadgeListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: BadgeListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getBadgeListForSmarty(\OmegaUp\Request $r) {
+    public static function getBadgeListForTypeScript(\OmegaUp\Request $r) {
         $r->ensureIdentity();
         $badges = self::apiList($r);
         $ownedBadges = self::apiMyList($r);
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'badges' => $badges,
                     'ownedBadges' => $ownedBadges['badges']
@@ -167,11 +170,11 @@ class Badge extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: BadgeDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: BadgeDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $badge_alias
      */
-    public static function getDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getDetailsForTypeScript(\OmegaUp\Request $r) {
         $r->ensureIdentity();
         $badgeAlias = $r->ensureString(
             'badge_alias',
@@ -191,7 +194,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
             );
         }
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'badge' => $details,
                 ],

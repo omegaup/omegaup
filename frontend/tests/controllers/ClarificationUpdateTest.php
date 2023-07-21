@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class ClarificationUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
@@ -42,16 +43,103 @@ class ClarificationUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Validate that clarification stays the same
-        $this->assertEquals(
+        $this->assertSame(
             $clarificationData['request']['message'],
             $clarification->message
         );
-        $this->assertEquals(
+        $this->assertSame(
             $clarificationData['request']['public'] == '1',
             $clarification->public
         );
 
         // Validate our update
-        $this->assertEquals($newAnswer, $clarification->answer);
+        $this->assertSame($newAnswer, $clarification->answer);
+    }
+
+    public function testUpdateForCourseClarification() {
+        $admin = \OmegaUp\Test\Factories\User::createUser();
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $admin['identity'],
+            self::login($admin['identity']),
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+
+        $login = self::login($admin['identity']);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+
+        $student = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student['identity']
+        );
+
+        $message = 'Test message';
+        $clarification = \OmegaUp\Controllers\Clarification::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($student['identity'])->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'problem_alias' => $problemData['problem']->alias,
+                'message' => $message,
+            ])
+        );
+
+        // Update answer
+        $newAnswer = 'new answer';
+        \OmegaUp\Controllers\Clarification::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($admin['identity'])->auth_token,
+                'answer' => $newAnswer,
+                'clarification_id' => $clarification['clarification_id'],
+                'public' => true,
+            ])
+        );
+
+        $updatedClarification = \OmegaUp\DAO\Clarifications::getByPK(
+            $clarification['clarification_id']
+        );
+
+        $this->assertSame(
+            $newAnswer,
+            $updatedClarification->answer
+        );
+        $this->assertSame(
+            $clarification['message'],
+            $updatedClarification->message,
+        );
+        $this->assertTrue($updatedClarification->public);
+
+        // Verify if notification has been created
+        $author = \Omegaup\DAO\Users::FindByUsername($clarification['author']);
+        if (is_null($author)) {
+            return;
+        }
+        $notifications = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+            $author
+        );
+        $this->assertCount(1, $notifications);
+
+        $contents = json_decode($notifications[0]['contents'], true);
+        $this->assertSame(
+            \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_RESPONSE,
+            $contents['type']
+        );
+        $this->assertSame(
+            $courseData['course']->name,
+            $contents['body']['localizationParams']['courseName']
+        );
+        $this->assertSame(
+            $problemData['problem']->alias,
+            $contents['body']['localizationParams']['problemAlias']
+        );
     }
 }

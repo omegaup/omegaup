@@ -1,6 +1,6 @@
 <template>
   <div class="mt-4">
-    <ul class="nav justify-content-center nav-tabs">
+    <ul v-if="shouldShowTabs" class="nav justify-content-center nav-tabs">
       <li
         v-for="tab in availableTabs"
         :key="tab.name"
@@ -29,7 +29,8 @@
     </ul>
     <div class="tab-content">
       <div
-        class="tab-pane fade p-4"
+        v-if="problem"
+        class="tab-pane fade py-4 p-lg-4"
         :class="{ 'show active': selectedTab === 'problems' }"
       >
         <omegaup-problem-settings-summary
@@ -55,6 +56,7 @@
           <omegaup-markdown
             ref="statement-markdown"
             :markdown="problem.statement.markdown"
+            :source-mapping="problem.statement.sources"
             :image-mapping="problem.statement.images"
             :problem-settings="problem.settings"
             @rendered="onProblemRendered"
@@ -110,33 +112,38 @@
         </div>
         <omegaup-overlay
           v-if="user.loggedIn"
-          :show-overlay="popupDisplayed !== PopupDisplayed.None"
+          :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
           @hide-overlay="onPopupDismissed"
         >
           <template #popup>
             <omegaup-arena-runsubmit-popup
-              v-show="popupDisplayed === PopupDisplayed.RunSubmit"
+              v-show="currentPopupDisplayed === PopupDisplayed.RunSubmit"
               :preferred-language="problem.preferred_language"
-              :languages="problem.languages"
+              :languages="filteredLanguages"
+              :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
               @dismiss="onPopupDismissed"
-              @submit-run="
-                (code, selectedLanguage) =>
-                  onRunSubmitted(code, selectedLanguage)
-              "
+              @submit-run="onRunSubmitted"
             ></omegaup-arena-runsubmit-popup>
             <omegaup-arena-rundetails-popup
-              v-show="popupDisplayed === PopupDisplayed.RunDetails"
+              v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
               :data="currentRunDetailsData"
+              :feedback-map="feedbackMap"
               @dismiss="onPopupDismissed"
-            ></omegaup-arena-rundetails-popup>
+            >
+              <template #feedback="data">
+                <slot
+                  name="feedback"
+                  :feedback="data.feedback"
+                  :guid="data.guid"
+                  :is-admin="data.admin"
+                ></slot>
+              </template>
+            </omegaup-arena-rundetails-popup>
             <omegaup-quality-nomination-promotion-popup
-              v-show="popupDisplayed === PopupDisplayed.Promotion"
+              v-show="currentPopupDisplayed === PopupDisplayed.Promotion"
               :solved="nominationStatus && nominationStatus.solved"
               :tried="nominationStatus && nominationStatus.tried"
-              @submit="
-                (qualityPromotionComponent) =>
-                  $emit('submit-promotion', qualityPromotionComponent)
-              "
+              @submit="(request) => $emit('submit-promotion', request)"
               @dismiss="
                 (qualityPromotionComponent, isDismissed) =>
                   onPopupPromotionDismissed(
@@ -146,15 +153,15 @@
               "
             ></omegaup-quality-nomination-promotion-popup>
             <omegaup-quality-nomination-demotion-popup
-              v-show="popupDisplayed === PopupDisplayed.Demotion"
-              @dismiss="popupDisplayed = PopupDisplayed.None"
+              v-show="currentPopupDisplayed === PopupDisplayed.Demotion"
+              @dismiss="currentPopupDisplayed = PopupDisplayed.None"
               @submit="
                 (qualityDemotionComponent) =>
                   $emit('submit-demotion', qualityDemotionComponent)
               "
             ></omegaup-quality-nomination-demotion-popup>
             <omegaup-quality-nomination-reviewer-popup
-              v-show="popupDisplayed === PopupDisplayed.Reviewer"
+              v-show="currentPopupDisplayed === PopupDisplayed.Reviewer"
               :allow-user-add-tags="allowUserAddTags"
               :level-tags="levelTags"
               :problem-level="problemLevel"
@@ -163,22 +170,43 @@
               :selected-private-tags="selectedPrivateTags"
               :problem-alias="problem.alias"
               :problem-title="problem.title"
-              @dismiss="popupDisplayed = PopupDisplayed.None"
+              @dismiss="currentPopupDisplayed = PopupDisplayed.None"
               @submit="
                 (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
               "
             ></omegaup-quality-nomination-reviewer-popup>
           </template>
         </omegaup-overlay>
-        <omegaup-arena-runs
-          data-help-runs
-          :problem-alias="problem.alias"
-          :runs="runs"
-          :show-details="true"
-          :problemset-problems="[]"
-          @details="(run) => onRunDetails(run.guid)"
-          @new-submission="onNewSubmission"
-        ></omegaup-arena-runs>
+        <template v-if="problem.accepts_submissions">
+          <omegaup-arena-ephemeral-grader
+            v-if="!problem.karel_problem"
+            :problem="problem"
+            :can-submit="user.loggedIn && !inContestOrCourse"
+            :accepted-languages="filteredLanguages"
+          ></omegaup-arena-ephemeral-grader>
+          <omegaup-arena-runs
+            data-help-runs
+            :problem-alias="problem.alias"
+            :contest-alias="contestAlias"
+            :runs="runsByProblem"
+            :show-details="true"
+            :problemset-problems="[]"
+            :request-feedback="requestFeedback"
+            :is-contest-finished="isContestFinished"
+            @request-feedback="(guid) => $emit('request-feedback', guid)"
+            @details="(request) => onRunDetails(request, 'problems')"
+            @update-search-result-users-contest="
+              (request) => $emit('update-search-result-users-contest', request)
+            "
+            @update-search-result-users="
+              (request) => $emit('update-search-result-users', request)
+            "
+            @new-submission="onNewSubmission"
+          >
+            <template #title><div></div></template>
+            <template #runs><div></div></template>
+          </omegaup-arena-runs>
+        </template>
         <omegaup-problem-feedback
           :quality-histogram="parsedQualityHistogram"
           :difficulty-histogram="parsedDifficultyHistogram"
@@ -186,22 +214,11 @@
           :difficulty-score="histogramDifficulty"
         ></omegaup-problem-feedback>
         <slot name="best-solvers-list">
-          <omegaup-arena-solvers :solvers="solvers"></omegaup-arena-solvers>
+          <omegaup-arena-solvers
+            v-if="problem.accepts_submissions"
+            :solvers="solvers"
+          ></omegaup-arena-solvers>
         </slot>
-      </div>
-      <div
-        class="tab-pane fade p-4"
-        :class="{ 'show active': selectedTab === 'solution' }"
-      >
-        <omegaup-problem-solution
-          :status="solutionStatus"
-          :solution="solution"
-          :available-tokens="availableTokens"
-          :all-tokens="allTokens"
-          @get-solution="$emit('get-solution')"
-          @get-tokens="$emit('get-tokens')"
-          @unlock-solution="$emit('unlock-solution')"
-        ></omegaup-problem-solution>
       </div>
       <div
         class="tab-pane fade p-4"
@@ -216,21 +233,35 @@
           :show-pager="true"
           :show-disqualify="true"
           :problemset-problems="[]"
-          @details="(run) => onRunDetails(run.guid)"
+          :search-result-users="searchResultUsers"
+          :search-result-problems="searchResultProblems"
+          :total-runs="totalRuns"
+          @details="(request) => onRunDetails(request, 'runs')"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
-          @filter-changed="
-            (filter, value) => $emit('apply-filter', filter, value)
+          @requalify="(run) => $emit('requalify', run)"
+          @filter-changed="(request) => $emit('apply-filter', request)"
+          @update-search-result-users-contest="
+            (request) => $emit('update-search-result-users-contest', request)
           "
-        ></omegaup-arena-runs>
+          @update-search-result-problems="
+            (request) => $emit('update-search-result-problems', request)
+          "
+          @update-search-result-users="
+            (request) => $emit('update-search-result-users', request)
+          "
+        >
+          <template #title><div></div></template>
+          <template #runs><div></div></template>
+        </omegaup-arena-runs>
         <omegaup-overlay
           v-if="user.loggedIn"
-          :show-overlay="popupDisplayed !== PopupDisplayed.None"
+          :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
           @hide-overlay="onPopupDismissed"
         >
           <template #popup>
             <omegaup-arena-rundetails-popup
-              v-show="popupDisplayed === PopupDisplayed.RunDetails"
+              v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
               :data="currentRunDetailsData"
               @dismiss="onPopupDismissed"
             ></omegaup-arena-rundetails-popup>
@@ -242,13 +273,16 @@
         :class="{ 'show active': selectedTab === 'clarifications' }"
       >
         <omegaup-arena-clarification-list
-          :clarifications="clarifications"
+          :clarifications="currentClarifications"
           :in-contest="false"
-          @clarification-response="
-            (id, responseText, isPublic) =>
-              $emit('clarification-response', id, responseText, isPublic)
-          "
-        ></omegaup-arena-clarification-list>
+          :is-admin="true"
+          @clarification-response="onClarificationResponse"
+        >
+          <template #new-clarification><div></div></template>
+          <template #table-title>
+            <th class="text-center" scope="col">{{ T.wordsContest }}</th>
+          </template>
+        </omegaup-arena-clarification-list>
       </div>
     </div>
   </div>
@@ -256,19 +290,18 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Ref, Emit, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
-import { messages, types } from '../../api_types';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
+import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
 import arena_Runs from '../arena/Runs.vue';
 import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
-import problem_SettingsSummary from './SettingsSummaryV2.vue';
-import problem_Solution from './Solution.vue';
+import problem_SettingsSummary from './SettingsSummary.vue';
 import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopup.vue';
 import qualitynomination_PromotionPopup from '../qualitynomination/PromotionPopup.vue';
 import qualitynomination_ReviewerPopup from '../qualitynomination/ReviewerPopup.vue';
@@ -285,6 +318,8 @@ import {
   faBan,
   faExternalLinkAlt,
 } from '@fortawesome/free-solid-svg-icons';
+import { SubmissionRequest } from '../../arena/submissions';
+import { ArenaCourseFeedback } from '../arena/Feedback.vue';
 library.add(
   faExclamationTriangle,
   faEdit,
@@ -295,7 +330,7 @@ library.add(
 import introJs from 'intro.js';
 import 'intro.js/minified/introjs.min.css';
 
-interface Tab {
+export interface Tab {
   name: string;
   text: string;
 }
@@ -309,36 +344,11 @@ export enum PopupDisplayed {
   Reviewer,
 }
 
-const numericSort = <T extends { [key: string]: any }>(key: string) => {
-  const isDigit = (ch: string) => '0' <= ch && ch <= '9';
-  return (x: T, y: T) => {
-    let i = 0,
-      j = 0;
-    for (; i < x[key].length && j < y[key].length; i++, j++) {
-      if (isDigit(x[key][i]) && isDigit(x[key][j])) {
-        let nx = 0,
-          ny = 0;
-        while (i < x[key].length && isDigit(x[key][i]))
-          nx = nx * 10 + parseInt(x[key][i++]);
-        while (j < y[key].length && isDigit(y[key][j]))
-          ny = ny * 10 + parseInt(y[key][j++]);
-        i--;
-        j--;
-        if (nx != ny) return nx - ny;
-      } else if (x[key][i] < y[key][j]) {
-        return -1;
-      } else if (x[key][i] > y[key][j]) {
-        return 1;
-      }
-    }
-    return x[key].length - i - (y[key].length - j);
-  };
-};
-
 @Component({
   components: {
     FontAwesomeIcon,
     'omegaup-arena-clarification-list': arena_ClarificationList,
+    'omegaup-arena-ephemeral-grader': arena_EphemeralGrader,
     'omegaup-arena-runs': arena_Runs,
     'omegaup-arena-runsubmit-popup': arena_RunSubmitPopup,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
@@ -348,7 +358,6 @@ const numericSort = <T extends { [key: string]: any }>(key: string) => {
     'omegaup-username': user_Username,
     'omegaup-problem-feedback': problem_Feedback,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
-    'omegaup-problem-solution': problem_Solution,
     'omegaup-quality-nomination-reviewer-popup': qualitynomination_ReviewerPopup,
     'omegaup-quality-nomination-demotion-popup': qualitynomination_DemotionPopup,
     'omegaup-quality-nomination-promotion-popup': qualitynomination_PromotionPopup,
@@ -361,19 +370,16 @@ export default class ProblemDetails extends Vue {
     },
   })
   allRuns!: types.Run[];
-  @Prop() initialClarifications!: types.Clarification[];
+  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() problem!: types.ProblemInfo;
   @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
   @Prop() nominationStatus!: types.NominationStatus;
   @Prop() runs!: types.Run[];
-  @Prop() solutionStatus!: string;
-  @Prop({ default: null }) solution!: types.ProblemStatement | null;
   @Prop({ default: 0 }) availableTokens!: number;
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
-  @Prop({ default: PopupDisplayed.None })
-  initialPopupDisplayed!: PopupDisplayed;
+  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
   @Prop() allowUserAddTags!: boolean;
   @Prop() levelTags!: string[];
@@ -382,10 +388,23 @@ export default class ProblemDetails extends Vue {
   @Prop() selectedPublicTags!: string[];
   @Prop() selectedPrivateTags!: string[];
   @Prop() hasBeenNominated!: boolean;
+  @Prop({ default: false }) inContestOrCourse!: boolean;
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
-  @Prop() guid!: string;
-  @Prop() isAdmin!: boolean;
+  @Prop({ default: null }) guid!: null | string;
+  @Prop({ default: null }) problemAlias!: null | string;
+  @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
+  @Prop() nextSubmissionTimestamp!: null | Date;
+  @Prop({ default: false }) shouldShowTabs!: boolean;
+  @Prop({ default: false }) isContestFinished!: boolean;
+  @Prop({ default: null }) contestAlias!: string | null;
+  @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultProblems!: types.ListItem[];
+  @Prop({ default: null }) languages!: null | string[];
+  @Prop() totalRuns!: number;
+  @Prop({ default: false }) requestFeedback!: boolean;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackMap!: Map<number, ArenaCourseFeedback>;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
@@ -394,11 +413,10 @@ export default class ProblemDetails extends Vue {
   ui = ui;
   time = time;
   selectedTab = this.activeTab;
-  clarifications = this.initialClarifications || [];
-  popupDisplayed = this.initialPopupDisplayed;
+  currentClarifications = this.clarifications;
+  currentPopupDisplayed = this.popupDisplayed;
   hasUnreadClarifications =
-    this.initialClarifications?.length > 0 &&
-    this.activeTab !== 'clarifications';
+    this.clarifications?.length > 0 && this.activeTab !== 'clarifications';
   currentRunDetailsData = this.runDetailsData;
 
   get availableTabs(): Tab[] {
@@ -407,11 +425,6 @@ export default class ProblemDetails extends Vue {
         name: 'problems',
         text: T.wordsProblem,
         visible: true,
-      },
-      {
-        name: 'solution',
-        text: T.wordsSolution,
-        visible: this.user.loggedIn,
       },
       {
         name: 'runs',
@@ -428,9 +441,9 @@ export default class ProblemDetails extends Vue {
   }
 
   get clarificationsCount(): string {
-    if (this.clarifications.length === 0) return '';
-    if (this.clarifications.length > 9) return '(9+)';
-    return `(${this.clarifications.length})`;
+    if (this.currentClarifications.length === 0) return '';
+    if (this.currentClarifications.length > 9) return '(9+)';
+    return `(${this.currentClarifications.length})`;
   }
 
   get visibilityOfPromotionButton(): boolean {
@@ -464,17 +477,36 @@ export default class ProblemDetails extends Vue {
     return this.histogram?.difficulty ?? 0;
   }
 
+  get runsByProblem(): types.Run[] {
+    return this.runs.filter((run) => run.alias === this.problem.alias);
+  }
+
+  get filteredLanguages(): string[] {
+    if (!this.languages) {
+      return this.problem.languages;
+    }
+    const languagesSet = new Set(this.languages);
+    return this.problem.languages.filter((language) =>
+      languagesSet.has(language),
+    );
+  }
+
   onNewSubmission(): void {
     if (!this.user.loggedIn) {
       this.$emit('redirect-login-page');
       return;
     }
-    this.popupDisplayed = PopupDisplayed.RunSubmit;
+    this.currentPopupDisplayed = PopupDisplayed.RunSubmit;
+    this.$emit('new-submission-popup-displayed');
   }
 
-  onRunDetails(guid: string): void {
-    this.$emit('show-run', this, guid);
-    this.popupDisplayed = PopupDisplayed.RunDetails;
+  onRunDetails(request: SubmissionRequest, tab: string): void {
+    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+    this.$emit('show-run', {
+      ...request,
+      hash: `#${tab}/${this.problemAlias}/show-run:${request.guid}`,
+      isAdmin: this.isAdmin,
+    });
   }
 
   onNewPromotion(): void {
@@ -482,19 +514,20 @@ export default class ProblemDetails extends Vue {
       this.$emit('redirect-login-page');
       return;
     }
-    this.popupDisplayed = PopupDisplayed.Promotion;
+    this.currentPopupDisplayed = PopupDisplayed.Promotion;
   }
 
   onNewPromotionAsReviewer(): void {
-    this.popupDisplayed = PopupDisplayed.Reviewer;
+    this.currentPopupDisplayed = PopupDisplayed.Reviewer;
   }
 
   onReportInappropriateProblem(): void {
-    this.popupDisplayed = PopupDisplayed.Demotion;
+    this.currentPopupDisplayed = PopupDisplayed.Demotion;
   }
 
   onPopupDismissed(): void {
-    this.popupDisplayed = PopupDisplayed.None;
+    this.currentPopupDisplayed = PopupDisplayed.None;
+    this.currentRunDetailsData = null;
     this.$emit('update:activeTab', this.selectedTab);
   }
 
@@ -588,57 +621,20 @@ export default class ProblemDetails extends Vue {
   }
 
   onRunSubmitted(code: string, selectedLanguage: string): void {
-    this.$emit('submit-run', code, selectedLanguage);
+    this.$emit('submit-run', {
+      code,
+      language: selectedLanguage,
+      runs: this.runs,
+      nominationStatus: this.nominationStatus,
+    });
     this.onPopupDismissed();
   }
 
-  displayRunDetails(guid: string, data: messages.RunDetailsResponse): void {
-    let sourceHTML,
-      sourceLink = false;
-    if (data.source?.indexOf('data:') === 0) {
-      sourceLink = true;
-      sourceHTML = data.source;
-    } else if (data.source == 'lockdownDetailsDisabled') {
-      sourceHTML =
-        (typeof sessionStorage !== 'undefined' &&
-          sessionStorage.getItem(`run:${guid}`)) ||
-        T.lockdownDetailsDisabled;
-    } else {
-      sourceHTML = data.source;
-    }
-
-    const detailsGroups = data.details && data.details.groups;
-    let groups = undefined;
-    if (detailsGroups && detailsGroups.length) {
-      detailsGroups.sort(numericSort('group'));
-      for (const detailGroup of detailsGroups) {
-        if (!detailGroup.cases) {
-          continue;
-        }
-        detailGroup.cases.sort(numericSort('name'));
-      }
-      groups = detailsGroups;
-    }
-
-    Vue.set(
-      this,
-      'currentRunDetailsData',
-      Object.assign({}, data, {
-        logs: data.logs || '',
-        judged_by: data.judged_by || '',
-        source: sourceHTML,
-        source_link: sourceLink,
-        source_url: window.URL.createObjectURL(
-          new Blob([data.source || ''], { type: 'text/plain' }),
-        ),
-        source_name: `Main.${data.language}`,
-        groups: groups,
-        show_diff: this.isAdmin ? data.show_diff : 'none',
-        feedback: omegaup.SubmissionFeedback.None as omegaup.SubmissionFeedback,
-      }),
-    );
-
-    this.$emit('change-show-run-location', guid);
+  onClarificationResponse(response: types.Clarification): void {
+    this.$emit('clarification-response', {
+      clarification: response,
+      target: this,
+    });
   }
 
   start() {
@@ -678,14 +674,14 @@ export default class ProblemDetails extends Vue {
     return this.selectedTab;
   }
 
-  @Watch('initialClarifications')
+  @Watch('clarifications')
   onInitialClarificationsChanged(newValue: types.Clarification[]): void {
-    this.clarifications = newValue;
+    this.currentClarifications = newValue;
   }
 
-  @Watch('initialPopupDisplayed')
+  @Watch('popupDisplayed')
   onPopupDisplayedChanged(newValue: PopupDisplayed): void {
-    this.popupDisplayed = newValue;
+    this.currentPopupDisplayed = newValue;
     if (newValue === PopupDisplayed.None) return;
     if (newValue === PopupDisplayed.RunSubmit) {
       this.onNewSubmission();
@@ -695,15 +691,17 @@ export default class ProblemDetails extends Vue {
       ui.reportEvent('quality-nomination', 'shown');
       return;
     }
-    if (newValue === PopupDisplayed.RunDetails && this.guid) {
-      this.onRunDetails(this.guid);
-    }
   }
 
-  @Watch('clarifications')
+  @Watch('currentClarifications')
   onClarificationsChanged(newValue: types.Clarification[]): void {
     if (this.selectedTab === 'clarifications' || newValue.length === 0) return;
     this.hasUnreadClarifications = true;
+  }
+
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 }
 </script>
@@ -712,12 +710,13 @@ export default class ProblemDetails extends Vue {
 @import '../../../../sass/main.scss';
 
 .karel-js-link {
-  border: 1px solid #eee;
+  border: 1px solid var(--arena-problem-details-karel-link-border-color);
   border-left: 0;
   border-radius: 3px;
 
   a {
-    border-left: 5px solid #1b809e;
+    border-left: 5px solid
+      var(--arena-problem-details-karel-link-border-left-color);
     display: block;
   }
 }

@@ -1,28 +1,22 @@
+import { OmegaUp } from '../omegaup';
+import { types } from '../api_types';
 import Vue from 'vue';
+import omegaup_ProblemPrint from '../components/problem/Print.vue';
 
-import type { types } from '../api_types';
-
-import omegaup_Markdown from '../components/Markdown.vue';
-
-(() => {
-  const problemDetails = JSON.parse(
-    (document.getElementById('payload') as HTMLElement).innerText,
-  ) as types.ProblemDetails;
+OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.ProblemPrintDetailsPayload();
 
   new Vue({
-    el: document.querySelector('div.statement') as HTMLElement,
+    el: '#main-container',
     components: {
-      'omegaup-markdown': omegaup_Markdown,
+      'omegaup-problem-print': omegaup_ProblemPrint,
     },
     render: function (createElement) {
-      return createElement('omegaup-markdown', {
+      return createElement('omegaup-problem-print', {
         props: {
-          markdown: problemDetails.statement.markdown,
-          imageMapping: problemDetails.statement.images,
-          sourceMapping: problemDetails.statement.sources,
-          problemSettings: problemDetails.settings,
+          problem: payload.details,
         },
       });
     },
   });
-})();
+});

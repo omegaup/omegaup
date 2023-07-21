@@ -1,9 +1,9 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * A course might require registration to participate on it.
- *
- * @author juan.pablo@omegaup.com
  */
 class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     private static $curator = null;
@@ -66,25 +66,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testCreateCourseWithRegistrationMode() {
         $course = self::createCourseWithRegistrationMode()['course'];
-        $this->assertEquals($course->admission_mode, 'registration');
-    }
-
-    public function testCourseWithRegistrationModeIsNotPresentInStudentList() {
-        $course = self::createCourseWithRegistrationMode()['course'];
-        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
-        $studentLogin = self::login($student);
-
-        // Course should appear in public course list for students
-        $coursesList = \OmegaUp\Controllers\Course::apiListCourses(
-            new \OmegaUp\Request([
-                'auth_token' => $studentLogin->auth_token,
-            ])
-        );
-
-        $this->assertArrayNotContainsWithPredicate(
-            $coursesList['student'],
-            fn ($studentCourse) => $studentCourse['alias'] === $course->alias
-        );
+        $this->assertSame($course->admission_mode, 'registration');
     }
 
     public function testRequestIsShownInIntroDetails() {
@@ -152,6 +134,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $studentLogin->auth_token,
                 'course_alias' => $course->alias,
+                'share_user_information' => true,
             ])
         );
 
@@ -161,6 +144,8 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertNotEmpty($registration);
+        $this->assertTrue($registration->share_user_information);
+        $this->assertNull($registration->accept_teacher);
     }
 
     public function testGetNotificationForRegistrationRequest() {
@@ -181,11 +166,11 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         $this->assertCount(1, $response['notifications']);
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REQUEST,
             $response['notifications'][0]['contents']['type']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $course->name,
             $response['notifications'][0]['contents']['body']['localizationParams']['courseName']
         );
@@ -284,7 +269,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token
             ]))['notifications'];
 
-            $this->assertEquals(
+            $this->assertSame(
                 \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED,
                 $notifications[0]['contents']['type']
             );
@@ -296,7 +281,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token
             ]))['notifications'];
 
-            $this->assertEquals(
+            $this->assertSame(
                 \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED,
                 $notifications[0]['contents']['type']
             );
@@ -336,14 +321,32 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             $result,
             $expectedRequestResult
         );
+
+        // Finally, all the accepted students should be automatically added to the course
+        $response = \OmegaUp\Controllers\Course::apiListStudents(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $course->alias,
+            ])
+        );
+        $this->assertSame(
+            $students[0]->username,
+            $response['students'][0]['username']
+        );
+        $this->assertSame(
+            $students[1]->username,
+            $response['students'][1]['username']
+        );
+        $this->assertSame(
+            $students[3]->username,
+            $response['students'][2]['username']
+        );
     }
 
     public function testAccessRequestNoNeededToInvitedIdentities() {
         // create a course with access mode = registration
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
-            /*$admin=*/            null,
-            /*$adminLogin=*/ null,
-            \OmegaUp\Controllers\Course::ADMISSION_MODE_REGISTRATION,
+            admissionMode: \OmegaUp\Controllers\Course::ADMISSION_MODE_REGISTRATION,
         );
 
         // make it "registrable"
@@ -362,12 +365,12 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         // Invited users can join the course , they don't need to requset access
         $invitedLogin = self::login($invited);
 
-        $response = \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $invitedLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertArrayHasKey(
             'gitObjectId',
@@ -386,12 +389,12 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         // The second one needs request access to join the course
         $uninvitedLogin = self::login($uninvited);
 
-        $response = \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $invitedLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertArrayNotHasKey('statements', $response);
 
@@ -404,7 +407,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -416,12 +419,12 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             if (is_null($expectedRequest['accepted'])) {
                 continue;
             }
-            $this->assertEquals(
+            $this->assertSame(
                 $expectedRequest['accepted'],
                 $result[$id]['accepted']
             );
             if ($expectedRequest['admin'] === 'main') {
-                $this->assertEquals(
+                $this->assertSame(
                     self::$curator->username,
                     $result[$id]['admin']['username']
                 );

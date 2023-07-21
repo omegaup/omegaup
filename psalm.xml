@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <psalm
-    totallyTyped="true"
     autoloader="frontend/server/bootstrap.php"
-    cacheDirectory="/tmp/psalm"
+    cacheDirectory="./.psalm"
     hoistConstants="true"
     resolveFromConfigFile="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -28,29 +27,12 @@
 
     <stubs>
        <file name="frontend/server/stubs.php" />
-
-       <!-- For PASSWORD_ARGON2ID -->
-       <file name="vendor/jetbrains/phpstorm-stubs/standard/password.php" />
-
-       <file name="frontend/server/libs/third_party/stubs/facebook.php" />
-       <file name="frontend/server/libs/third_party/stubs/google.php" />
-       <file name="frontend/server/libs/third_party/stubs/paragonie_sodium_compat.php" />
-       <file name="frontend/server/libs/third_party/stubs/phpunit.php" />
-       <file name="frontend/server/libs/third_party/stubs/smarty.php" />
     </stubs>
 
     <plugins>
         <plugin filename="frontend/server/src/Psalm/RequestParamChecker.php" />
         <plugin filename="frontend/server/src/Psalm/TranslationStringChecker.php" />
     </plugins>
-
-    <issueHandlers>
-        <InvalidDocblock>
-            <errorLevel type="suppress">
-                <file name="frontend/server/libs/third_party/paseto/src/Parsing/PasetoMessage.php" />
-            </errorLevel>
-        </InvalidDocblock>
-    </issueHandlers>
 
     <globals>
         <var name="_FILES" type="array&lt;string, array{tmp_name?: string}&gt;" />

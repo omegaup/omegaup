@@ -12,13 +12,11 @@
         <template v-if="isLoggedIn">
           <!-- Wait for contest start -->
           <div v-if="now < contest.start_time.getTime()">
-            <p>
-              {{ T.contestWillBeginIn }}
-              <omegaup-countdown
-                :target-time="contest.start_time"
-                @emit-finish="now = Date.now()"
-              ></omegaup-countdown>
-            </p>
+            <omegaup-countdown
+              :target-time="contest.start_time"
+              :countdown-format="omegaup.CountdownFormat.ContestHasNotStarted"
+              @finish="now = Date.now()"
+            ></omegaup-countdown>
           </div>
 
           <div v-if="now > contest.start_time.getTime()">
@@ -122,11 +120,19 @@
           <li v-if="contest.window_length !== null">
             {{ differentStartsDescription }}
           </li>
-          <li>{{ scoreboardDescription }}</li>
-          <li>{{ submissionsGapDescription }}</li>
-          <li>{{ penaltyTypes[contest.penalty_type] }}</li>
+          <li v-if="scoreboardDescription !== ''">
+            {{ scoreboardDescription }}
+          </li>
+          <li v-if="contest.submissions_gap !== 0">
+            {{ submissionsGapDescription }}
+          </li>
+          <li v-if="contest.penalty_type !== 'none'">
+            {{ penaltyTypes[contest.penalty_type] }}
+          </li>
           <li v-if="contest.penalty !== 0">{{ penaltyDescription }}</li>
-          <li>{{ feedbackTypes[contest.feedback] }}</li>
+          <li v-if="contest.feedback !== 'none'">
+            {{ feedbackTypes[contest.feedback] }}
+          </li>
           <li v-if="contest.points_decay_factor !== 0">
             {{ pointsDecayDescription }}
           </li>
@@ -138,10 +144,10 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+import { omegaup } from '../../omegaup';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_Markdown from '../Markdown.vue';
 
@@ -152,7 +158,7 @@ import omegaup_Markdown from '../Markdown.vue';
   },
 })
 export default class ContestIntro extends Vue {
-  @Prop() contest!: omegaup.Contest;
+  @Prop() contest!: types.ContestAdminDetails;
   @Prop() isLoggedIn!: boolean;
   @Prop() requestsUserInformation!: string;
   @Prop() needsBasicInformation!: boolean;
@@ -160,6 +166,7 @@ export default class ContestIntro extends Vue {
 
   T = T;
   ui = ui;
+  omegaup = omegaup;
   penaltyTypes = {
     none: T.contestNewFormNoPenalty,
     problem_open: T.contestNewFormByProblem,

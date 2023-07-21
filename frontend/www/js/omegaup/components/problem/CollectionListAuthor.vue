@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container-fluid p-5">
     <div class="row">
       <div class="col col-md-4 d-flex align-items-center">
         <a href="/problem/collection/" data-nav-problems-collection>{{
@@ -22,6 +22,7 @@
                 columnName,
                 sortOrder,
                 difficulty,
+                quality,
                 selectedAuthors,
               )
           "
@@ -35,10 +36,25 @@
                 columnName,
                 sortOrder,
                 difficulty,
+                quality,
                 selectedAuthors,
               )
           "
         ></omegaup-problem-filter-difficulty>
+        <omegaup-problem-filter-quality
+          :quality="quality"
+          @change-quality="
+            (quality) =>
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                quality,
+                selectedAuthors,
+              )
+          "
+        ></omegaup-problem-filter-quality>
       </div>
       <div class="col">
         <div v-if="!problems || problems.length == 0" class="card-body">
@@ -71,6 +87,7 @@
                 columnName,
                 sortOrder,
                 difficulty,
+                quality,
                 selectedAuthors,
               )
           "
@@ -87,6 +104,7 @@ import { omegaup } from '../../omegaup';
 import problem_FilterAuthors from './FilterAuthors.vue';
 import problem_BaseList from './BaseList.vue';
 import problem_FilterDifficulty from './FilterDifficulty.vue';
+import problem_FilterQuality from './FilterQuality.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 
@@ -95,6 +113,7 @@ import { types } from '../../api_types';
     'omegaup-problem-filter-authors': problem_FilterAuthors,
     'omegaup-problem-base-list': problem_BaseList,
     'omegaup-problem-filter-difficulty': problem_FilterDifficulty,
+    'omegaup-problem-filter-quality': problem_FilterQuality,
   },
 })
 export default class CollectionList extends Vue {
@@ -115,6 +134,7 @@ export default class CollectionList extends Vue {
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() difficulty!: string;
+  @Prop() quality!: string;
   @Prop({ default: () => [] }) selectedAuthors!: string;
 
   T = T;

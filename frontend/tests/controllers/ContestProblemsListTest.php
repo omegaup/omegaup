@@ -1,9 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of ContestProblemsListTest
- *
- * @author joemmanuel
  */
 
 class ContestProblemsListTest extends \OmegaUp\Test\ControllerTestCase {
@@ -85,11 +84,11 @@ class ContestProblemsListTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         foreach ($scoreboardResponse['problems'] as $index => $problem) {
-            $this->assertEquals(
+            $this->assertSame(
                 $problem['alias'],
                 $detailsResponse['problems'][$index]['alias']
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $problem['alias'],
                 $problemsResponse['problems'][$index]['alias']
             );

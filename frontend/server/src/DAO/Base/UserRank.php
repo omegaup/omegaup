@@ -56,8 +56,10 @@ abstract class UserRank {
                     `state_id`,
                     `school_id`,
                     `author_score`,
-                    `author_ranking`
+                    `author_ranking`,
+                    `classname`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -94,6 +96,7 @@ abstract class UserRank {
                 intval($User_Rank->author_ranking) :
                 null
             ),
+            $User_Rank->classname,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -122,7 +125,8 @@ abstract class UserRank {
                 `state_id` = ?,
                 `school_id` = ?,
                 `author_score` = ?,
-                `author_ranking` = ?
+                `author_ranking` = ?,
+                `classname` = ?
             WHERE
                 (
                     `user_id` = ?
@@ -150,6 +154,7 @@ abstract class UserRank {
                 null :
                 intval($User_Rank->author_ranking)
             ),
+            $User_Rank->classname,
             (
                 is_null($User_Rank->user_id) ?
                 null :
@@ -185,7 +190,8 @@ abstract class UserRank {
                 `User_Rank`.`state_id`,
                 `User_Rank`.`school_id`,
                 `User_Rank`.`author_score`,
-                `User_Rank`.`author_ranking`
+                `User_Rank`.`author_ranking`,
+                `User_Rank`.`classname`
             FROM
                 `User_Rank`
             WHERE
@@ -199,6 +205,35 @@ abstract class UserRank {
             return null;
         }
         return new \OmegaUp\DAO\VO\UserRank($row);
+    }
+
+    /**
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\UserRank} por llave primaria.
+     *
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\UserRank}
+     * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
+     *
+     * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
+     * los campos.
+     *
+     * @return bool Si existe o no tal registro.
+     */
+    final public static function existsByPK(
+        ?int $user_id
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `User_Rank`
+            WHERE
+                (
+                    `user_id` = ?
+                );';
+        $params = [$user_id];
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
     }
 
     /**
@@ -277,7 +312,8 @@ abstract class UserRank {
                 `User_Rank`.`state_id`,
                 `User_Rank`.`school_id`,
                 `User_Rank`.`author_score`,
-                `User_Rank`.`author_ranking`
+                `User_Rank`.`author_ranking`,
+                `User_Rank`.`classname`
             FROM
                 `User_Rank`
         ';
@@ -338,8 +374,10 @@ abstract class UserRank {
                     `state_id`,
                     `school_id`,
                     `author_score`,
-                    `author_ranking`
+                    `author_ranking`,
+                    `classname`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -380,6 +418,7 @@ abstract class UserRank {
                 null :
                 intval($User_Rank->author_ranking)
             ),
+            $User_Rank->classname,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

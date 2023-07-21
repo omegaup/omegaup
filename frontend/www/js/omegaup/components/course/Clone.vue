@@ -73,6 +73,7 @@ export default class CourseClone extends Vue {
 .form-group > label {
   width: 100%;
 }
+
 .faux-label {
   font-weight: bold;
 }

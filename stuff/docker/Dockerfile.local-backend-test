@@ -4,7 +4,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 USER root
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
-        curl ca-certificates openjdk-14-jre-headless && \
+        ca-certificates \
+        curl \
+        openjdk-18-jre-headless \
+        && \
     /usr/sbin/update-ca-certificates && \
     apt-get autoremove -y && \
     apt-get clean
@@ -12,7 +15,9 @@ RUN apt-get update -y && \
 RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.27/libinteractive.jar \
         -o /usr/share/java/libinteractive.jar
 
-USER ubuntu
+ADD go/go.mod /home/ubuntu/go/omegaup/
 ADD go/Makefile /home/ubuntu/go/omegaup/
+RUN chown -R ubuntu:ubuntu /home/ubuntu/go/
+USER ubuntu
 
 CMD ["/bin/bash"]

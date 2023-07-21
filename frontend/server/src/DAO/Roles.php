@@ -8,15 +8,16 @@ namespace OmegaUp\DAO;
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Roles}.
- *
- * @author alanboy
  * @access public
  * @package docs
  */
 class Roles extends \OmegaUp\DAO\Base\Roles {
     final public static function getByName(string $name): \OmegaUp\DAO\VO\Roles {
         $sql = 'SELECT
-                    *
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Roles::FIELD_NAMES,
+            'Roles'
+        ) . '
                 FROM
                     Roles
                 WHERE

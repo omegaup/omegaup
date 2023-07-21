@@ -13,7 +13,9 @@
               "params": {
                 "username": "test_user_0",
                 "email": "user_0@domain.com",
-                "password": "test_user_0"
+                "password": "test_user_0",
+                "birth_date": 946684800
+                
               }
             },
             {
@@ -21,7 +23,8 @@
               "params": {
                 "username": "test_user_1",
                 "email": "user_1@domain.com",
-                "password": "test_user_1"
+                "password": "test_user_1",
+                "birth_date": 946684800
               }
             }
           ]
@@ -45,7 +48,7 @@
                 "output_limit": 10240,
                 "input_limit": 10240,
                 "source": "omegaUp classics",
-                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
                 "email_clarifications": 1,
                 "problem_level":"problemLevelBasicIntroductionToProgramming",
                 "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"

@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="h-100">
+<html class="h-75">
 	<head>
 		<meta charset="UTF-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -21,7 +21,7 @@
 	<body class="d-flex flex-column h-100 bg-dark text-white">
 		<nav class="navbar navbar-dark bg-dark py-0">
 			<span class="navbar-brand">omegaUp ephemeral grader<sup>&alpha;</sup></span>
-			<form class="form-inline my-2 my-lg-0">
+			<form class="form-inline my-2 my-lg-0 ephemeral-form">
 				<label for="upload">
 					<a class="btn btn-secondary btn-sm mr-sm-2" role="button">
 						<span class="fa fa-upload" title="Upload" aria-hidden="true"></span>
@@ -31,20 +31,30 @@
 				<a class="btn btn-secondary btn-sm mr-sm-2" id="download" role="button">
 					<span class="fa fa-file-archive-o" title="Download" aria-hidden="true" id="download-label"></span>
 				</a>
-				<select class="form-control form-control-sm mr-sm-2" id="language">
-					<option value="cpp17-gcc">C++17 (g++ 9.3)</option>
-					<option value="cs">C# (8.0, dotnet 3.1)</option>
-					<option value="java">Java (openjdk 14.0)</option>
-					<option value="py3">Python 3.8</option>
-					<option value="rb">Ruby (2.7)</option>
+				<select class="form-control form-control-sm mr-sm-2" data-language-select id="language">
+					<option value="cpp20-gcc">C++20 (g++ 10.3)</option>
+					<option value="cs">C# (10, dotnet 6.0)</option>
+					<option value="go">Go (1.18.beta2)</option>
+					<option value="hs">Haskell (ghc 8.8)</option>
+					<option value="java">Java (openjdk 16.0)</option>
+					<option value="js">JavaScript (Node.js 16)</option>
+					<option value="kt">Kotlin (1.6.10)</option>
 					<option value="lua">Lua (5.3)</option>
+					<option value="py3">Python (3.9)</option>
+					<option value="rb">Ruby (2.7)</option>
+					<option value="rs">Rust (1.56.1)</option>
 				</select>
-				<button class="btn btn-sm btn-primary my-2 my-sm-0" type="submit" >
+				<button class="btn btn-sm btn-secondary mr-2 my-sm-0 ephemeral-button" data-run-button type="button">
 					<span>Run</span>
+					<img src="http://samherbert.net/svg-loaders/svg-loaders/tail-spin.svg" height="16" />
+				</button>
+				<button class="btn btn-sm btn-dark my-2 my-sm-0 ephemeral-button d-none" data-submit-button type="submit">
+					<span>Submit</span>
 					<img src="http://samherbert.net/svg-loaders/svg-loaders/tail-spin.svg" height="16" />
 				</button>
 			</form>
 		</nav>
 		<section id="layout-root" class="col px-0"></section>
+		<input type="hidden" id="theme" value="vs-dark">
 	</body>
 </html>

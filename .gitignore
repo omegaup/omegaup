@@ -31,10 +31,9 @@ grader/lib/
 *.srl
 
 # ignore frontend config file
-config.php
-frontend/server/config.php
-frontend/server/api/tests/config.php
-test_config.php
+/frontend/server/config.php
+/frontend/server/api/tests/config.php
+/frontend/tests/test_config.php
 
 # and log
 yarn-error.log
@@ -82,6 +81,9 @@ node_modules/
 # Ignore composer files
 vendor/
 
+# Ignore psalm cache
+/.psalm/
+
 # Ignore JavaScript build files.
 frontend/www/js/dist/
 
@@ -102,7 +104,13 @@ frontend/www/docs/java
 
 # Ignore omegaup.db
 omegaup.db
-.my.cnf
 
 # Ignore backend stuff
 stuff/docker/go/*/
+
+# Ignore the Python virtual environment
+stuff/venv/
+
+# Ignore cypress media
+cypress/videos/*
+cypress/screenshots/*

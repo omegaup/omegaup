@@ -1,11 +1,26 @@
-import { omegaup } from './omegaup';
 import { Optional } from 'typescript-optional';
 import { types } from './api_types';
+import T from './lang';
+
+export interface DataContestResult {
+  data: {
+    alias: string;
+    title: string;
+  };
+  length?: string;
+  place: number;
+}
+
+interface Logo {
+  url: string;
+  title: string;
+}
 
 export interface LinkableResource {
   toString(): string;
   getUrl(): string;
   getBadge(): Optional<string>;
+  getLogo(): Logo | null;
 }
 
 export class ContestResult implements LinkableResource {
@@ -13,7 +28,7 @@ export class ContestResult implements LinkableResource {
   title: string = '';
   place: number = 0;
 
-  constructor(contestResult: omegaup.ContestResult) {
+  constructor(contestResult: DataContestResult) {
     this.alias = contestResult.data.alias;
     this.title = contestResult.data.title;
     this.place = contestResult.place;
@@ -27,6 +42,10 @@ export class ContestResult implements LinkableResource {
     return `/arena/${this.alias}/`;
   }
 
+  getLogo(): null {
+    return null;
+  }
+
   getBadge(): Optional<string> {
     if (!this.place) {
       return Optional.ofNonNull('—');
@@ -38,14 +57,26 @@ export class ContestResult implements LinkableResource {
 export class Problem implements LinkableResource {
   alias: string = '';
   title: string = '';
+  qualitySeal: boolean = false;
 
   constructor(problem: types.Problem) {
     this.alias = problem.alias;
     this.title = problem.title;
+    this.qualitySeal = problem.quality_seal;
   }
 
   toString(): string {
     return this.title;
+  }
+
+  getLogo(): Logo | null {
+    if (!this.qualitySeal) {
+      return null;
+    }
+    return {
+      url: '/media/quality-badge.png',
+      title: T.wordsHighQualityProblem,
+    };
   }
 
   getUrl(): string {
@@ -79,6 +110,10 @@ export class SchoolCoderOfTheMonth implements LinkableResource {
   getBadge(): Optional<string> {
     return Optional.ofNonNull(this.time);
   }
+
+  getLogo(): null {
+    return null;
+  }
 }
 
 export class SchoolUser implements LinkableResource {
@@ -105,6 +140,10 @@ export class SchoolUser implements LinkableResource {
     return `/profile/${this.username}/`;
   }
 
+  getLogo(): null {
+    return null;
+  }
+
   getDisplayValue(): number {
     switch (this.displayField) {
       case 'solved_problems':
@@ -120,5 +159,57 @@ export class SchoolUser implements LinkableResource {
 
   getBadge(): Optional<string> {
     return Optional.ofNonNull(`${this.getDisplayValue()}`);
+  }
+}
+
+export class Contest implements LinkableResource {
+  alias: string;
+  title: string;
+
+  constructor(contest: types.Contest) {
+    this.alias = contest.alias;
+    this.title = contest.title;
+  }
+
+  toString(): string {
+    return this.title;
+  }
+
+  getUrl(): string {
+    return `/arena/${encodeURIComponent(this.alias)}/`;
+  }
+
+  getBadge(): Optional<string> {
+    return Optional.empty();
+  }
+
+  getLogo(): Logo | null {
+    return null;
+  }
+}
+
+export class Course implements LinkableResource {
+  alias: string;
+  name: string;
+
+  constructor(course: types.Course) {
+    this.alias = course.alias;
+    this.name = course.name;
+  }
+
+  toString(): string {
+    return this.name;
+  }
+
+  getUrl(): string {
+    return `/course/${encodeURIComponent(this.alias)}/`;
+  }
+
+  getBadge(): Optional<string> {
+    return Optional.empty();
+  }
+
+  getLogo(): Logo | null {
+    return null;
   }
 }

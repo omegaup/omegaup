@@ -6,8 +6,7 @@ namespace OmegaUp;
 if (!defined('OMEGAUP_ROOT')) {
     define('OMEGAUP_ROOT', dirname(__DIR__));
 }
-ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . __DIR__);
-require_once 'autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 // Set default time
 date_default_timezone_set('UTC');
@@ -45,19 +44,37 @@ if (!defined('OMEGAUP_LOCKDOWN')) {
     define(
         'OMEGAUP_LOCKDOWN',
         isset($_SERVER['HTTP_HOST']) &&
-        is_string($_SERVER['HTTP_HOST']) &&
         strpos($_SERVER['HTTP_HOST'], OMEGAUP_LOCKDOWN_DOMAIN) === 0
     );
 }
 
 $contentSecurityPolicy = [
+    'connect-src' => [
+        '\'self\'',
+        'https://*.google-analytics.com',
+        'https://*.analytics.google.com',
+        'https://*.googletagmanager.com',
+        'https://accounts.google.com',
+    ],
+    'img-src' => [
+        // Problems can embed images from anywhere in the internet, so we need
+        // to be permissive here.
+        '*',
+        '\'self\'',
+        'data:',
+        'blob:',
+        'https://*.google-analytics.com',
+        'https://*.googletagmanager.com',
+        'https://secure.gravatar.com',
+    ],
     'script-src' => [
         '\'self\'',
         'https://www.google.com',
-        'https://apis.google.com',
+        'https://accounts.google.com',
         'https://www.gstatic.com',
         'https://js-agent.newrelic.com',
         'https://bam.nr-data.net',
+        'https://*.googletagmanager.com',
         'https://ssl.google-analytics.com',
         'https://www.google-analytics.com',
         'https://connect.facebook.net',
@@ -70,7 +87,6 @@ $contentSecurityPolicy = [
         'https://www.youtube.com',
         'https://platform.twitter.com',
         'https://www.google.com',
-        'https://apis.google.com',
         'https://accounts.google.com',
         'https://docs.google.com',
         'https://staticxx.facebook.com',
@@ -80,8 +96,10 @@ $contentSecurityPolicy = [
         '/cspreport.php',
     ],
 ];
-if (!is_null(NEW_RELIC_SCRIPT_HASH)) {
-    array_push($contentSecurityPolicy['script-src'], NEW_RELIC_SCRIPT_HASH);
+/** @var string|null $nrsh */
+$nrsh = NEW_RELIC_SCRIPT_HASH;
+if (!is_null($nrsh)) {
+    array_push($contentSecurityPolicy['script-src'], $nrsh);
 }
 header('Content-Security-Policy: ' . implode('; ', array_map(
     fn ($k) => "{$k} " . implode(' ', $contentSecurityPolicy[$k]),
@@ -89,82 +107,20 @@ header('Content-Security-Policy: ' . implode('; ', array_map(
 )));
 header('X-Frame-Options: DENY');
 
-require_once('libs/third_party/log4php/src/main/php/Logger.php');
-\Logger::configure([
-    'rootLogger' => [
-        'appenders' => ['default'],
-        'level' => OMEGAUP_LOG_LEVEL,
-    ],
-    'loggers' => [
-        'csp' => [
-            'appenders' => ['csp'],
-            'additivity' => false,
-        ],
-        'jserror' => [
-            'appenders' => ['jserror'],
-            'additivity' => false,
-        ],
-        'mysqltypes' => [
-            'appenders' => ['mysqltypes'],
-            'additivity' => false,
-        ],
-    ],
-    'appenders' => [
-        'default' => [
-            'class' => 'LoggerAppenderFile',
-            'layout' => [
-                'class' => 'LoggerLayoutPattern',
-                'params' => [
-                    'conversionPattern' => (
-                        '%date [%level]: ' .
-                        \OmegaUp\Request::requestId() .
-                        ' %server{REQUEST_URI} %message (%F:%L) %newline'
-                    ),
-                ],
-            ],
-            'params' => [
-                'file' => OMEGAUP_LOG_FILE,
-                'append' => true,
-            ],
-        ],
-        'csp' => [
-            'class' => 'LoggerAppenderFile',
-            'layout' => [
-                'class' => 'LoggerLayoutPattern',
-                'params' => [
-                    'conversionPattern' => '%date: %message %newline',
-                ],
-            ],
-            'params' => [
-                'file' => OMEGAUP_CSP_LOG_FILE,
-                'append' => true,
-            ],
-        ],
-        'jserror' => [
-            'class' => 'LoggerAppenderFile',
-            'layout' => [
-                'class' => 'LoggerLayoutPattern',
-                'params' => [
-                    'conversionPattern' => '%date: %message %newline',
-                ],
-            ],
-            'params' => [
-                'file' => OMEGAUP_JSERROR_LOG_FILE,
-                'append' => true,
-            ],
-        ],
-        'mysqltypes' => [
-            'class' => 'LoggerAppenderFile',
-            'layout' => [
-                'class' => 'LoggerLayoutPattern',
-                'params' => [
-                    'conversionPattern' => '%message %newline',
-                ],
-            ],
-            'params' => [
-                'file' => OMEGAUP_MYSQL_TYPES_LOG_FILE,
-                'append' => true,
-            ],
-        ],
-    ],
-]);
+// Configure the root logger
+/** @psalm-suppress UndefinedDocblockClass Level is declared in a phpstan-type annotation. */
+$logLevel = \Monolog\Logger::toMonologLevel(OMEGAUP_LOG_LEVEL);
+$logFormatter = new \NewRelic\Monolog\Enricher\Formatter();
+$logHandler = new \Monolog\Handler\StreamHandler(OMEGAUP_LOG_FILE, $logLevel);
+$logHandler->setFormatter($logFormatter);
+
+$rootLogger = new \Monolog\Logger('omegaup');
+$rootLogger->pushProcessor(
+    new \Monolog\Processor\WebProcessor()
+);
+$rootLogger->pushProcessor(
+    new \NewRelic\Monolog\Enricher\Processor()
+);
+$rootLogger->pushHandler($logHandler);
+\Monolog\Registry::addLogger($rootLogger);
+\Monolog\ErrorHandler::register($rootLogger);

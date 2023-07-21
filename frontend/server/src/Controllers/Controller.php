@@ -4,11 +4,9 @@ namespace OmegaUp\Controllers;
 
 /**
  * Controllers parent class
- *
- * @author joemmanuel
  */
 class Controller {
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     public static $log;
 
     /**
@@ -74,7 +72,7 @@ class Controller {
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
-     * @omegaup-request-param string $username
+     * @omegaup-request-param null|string $username
      */
     protected static function resolveTargetIdentity(
         \OmegaUp\Request $r
@@ -82,12 +80,16 @@ class Controller {
         // By default use current identity
         $identity = $r->identity;
 
-        if (!is_null($r['username'])) {
-            \OmegaUp\Validators::validateStringNonEmpty(
-                $r['username'],
-                'username'
-            );
-            $identity = \OmegaUp\DAO\Identities::findByUsername($r['username']);
+        $username = $r->ensureOptionalString(
+            'username',
+            required: false,
+            validator: fn (string $name) => \OmegaUp\Validators::normalUsername(
+                $name
+            )
+        );
+
+        if (!is_null($username)) {
+            $identity = \OmegaUp\DAO\Identities::findByUsername($username);
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
@@ -166,8 +168,8 @@ class Controller {
                 $value = $transform($value);
             }
             // Important property, so check if it changes.
-            if ($important) {
-                $importantChange |= ($value != $object->$fieldName);
+            if ($important && !$importantChange) {
+                $importantChange = ($value != $object->$fieldName);
             }
             $object->$fieldName = $value;
         }
@@ -182,4 +184,6 @@ class Controller {
     }
 }
 
-\OmegaUp\Controllers\Controller::$log = \Logger::getLogger('controller');
+\OmegaUp\Controllers\Controller::$log = \Monolog\Registry::omegaup()->withName(
+    'controller'
+);

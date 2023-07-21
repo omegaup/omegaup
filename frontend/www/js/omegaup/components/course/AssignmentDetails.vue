@@ -14,6 +14,7 @@
               <input
                 ref="name"
                 v-model="name"
+                data-course-assignment-name
                 class="form-control name"
                 :class="{ 'is-invalid': invalidParameterName === 'name' }"
                 size="30"
@@ -29,6 +30,7 @@
                 icon="info-circle" />
               <input
                 v-model="alias"
+                data-course-assignment-alias
                 class="form-control alias"
                 :class="{
                   'is-invalid': invalidParameterName === 'alias',
@@ -52,6 +54,7 @@
                   'is-invalid': invalidParameterName === 'assignment_type',
                 }"
                 required
+                @change="onChangeSelect($event)"
               >
                 <option value="lesson">
                   {{ T.wordsLesson }}
@@ -75,6 +78,7 @@
                 icon="info-circle" />
               <omegaup-datetimepicker
                 v-model="startTime"
+                data-course-start-date
                 :enabled="!assignment.has_runs"
                 :finish="finishTimeCourse"
                 :start="startTimeCourse"
@@ -96,22 +100,28 @@
                 'is-invalid': invalidParameterName === 'unlimited_duration',
               }"
             >
-              <label class="radio-inline"
-                ><input
-                  v-model="unlimitedDuration"
-                  type="radio"
-                  :value="true"
-                  :disabled="!unlimitedDurationCourse"
-                />{{ T.wordsYes }}</label
-              >
-              <label class="radio-inline"
-                ><input
-                  v-model="unlimitedDuration"
-                  type="radio"
-                  :value="false"
-                  :disabled="!unlimitedDurationCourse"
-                />{{ T.wordsNo }}</label
-              >
+              <div class="form-check form-check-inline">
+                <label class="form-check-label"
+                  ><input
+                    v-model="unlimitedDuration"
+                    class="form-check-input"
+                    type="radio"
+                    :value="true"
+                    :disabled="!unlimitedDurationCourse"
+                  />{{ T.wordsYes }}</label
+                >
+              </div>
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input
+                    v-model="unlimitedDuration"
+                    class="form-check-input"
+                    type="radio"
+                    :value="false"
+                    :disabled="!unlimitedDurationCourse"
+                  />{{ T.wordsNo }}</label
+                >
+              </div>
             </div>
           </div>
           <div class="form-group col-md-4">
@@ -122,6 +132,7 @@
                 icon="info-circle" />
               <omegaup-datetimepicker
                 v-model="finishTime"
+                data-course-end-date
                 :enabled="!unlimitedDuration"
                 :readonly="false"
                 :finish="finishTimeCourse"
@@ -137,6 +148,7 @@
               >{{ T.courseNewFormDescription }}
               <textarea
                 v-model="description"
+                data-course-assignment-description
                 class="form-control"
                 :class="{
                   'is-invalid': invalidParameterName === 'description',
@@ -155,7 +167,11 @@
             :assignment-problems="assignmentProblems"
             :tagged-problems="taggedProblems"
             :selected-assignment="assignment"
+            :search-result-problems="searchResultProblems"
             @emit-tags="(tags) => $emit('tags-problems', tags)"
+            @update-search-result-problems="
+              (query) => $emit('update-search-result-problems', query)
+            "
           ></omegaup-course-scheduled-problem-list>
           <omegaup-course-problem-list
             v-else
@@ -163,6 +179,10 @@
             :tagged-problems="taggedProblems"
             :selected-assignment="assignment"
             :assignment-form-mode.sync="assignmentFormMode"
+            :search-result-problems="searchResultProblems"
+            @update-search-result-problems="
+              (query) => $emit('update-search-result-problems', query)
+            "
             @save-problem="
               (assignment, problem) => $emit('add-problem', assignment, problem)
             "
@@ -179,8 +199,14 @@
             "
             @emit-tags="(tags) => $emit('tags-problems', tags)"
             @change-alias="
-              (addProblemComponent, newProblemAlias) =>
-                $emit('get-versions', newProblemAlias, addProblemComponent)
+              ({ request, target }) =>
+                $emit('get-versions', {
+                  target,
+                  request: {
+                    ...request,
+                    problemsetId: assignment.problemset_id,
+                  },
+                })
             "
           ></omegaup-course-problem-list>
         </template>
@@ -230,6 +256,29 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
+interface UpdateParams {
+  name: string;
+  description: string;
+  assignment_type: string;
+  unlimited_duration?: boolean;
+  finish_time?: number;
+  start_time?: number;
+  assignment: string;
+  course: string;
+}
+
+interface AddParams {
+  name: string;
+  description: string;
+  assignment_type: string;
+  unlimited_duration?: boolean;
+  finish_time?: number;
+  start_time: number;
+  alias: string;
+  course_alias: string;
+  problems: string;
+}
+
 @Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon,
@@ -250,11 +299,14 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop() assignment!: types.CourseAssignment;
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
+  @Prop() courseAlias!: string;
+  @Prop() scheduledAssignmentProblems!: types.ProblemsetProblem[];
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop({ default: true }) shouldAddProblems!: boolean;
   @Prop({ default: false }) unlimitedDurationCourse!: boolean;
   @Prop({ default: '' }) invalidParameterName!: string;
+  @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
   AssignmentFormMode = omegaup.AssignmentFormMode;
@@ -297,6 +349,51 @@ export default class CourseAssignmentDetails extends Vue {
     }
   }
 
+  get updateParams(): UpdateParams {
+    let params: UpdateParams = {
+      name: this.name,
+      description: this.description,
+      assignment_type: this.assignmentType,
+      assignment: this.alias,
+      course: this.courseAlias,
+    };
+    if (this.unlimitedDuration) {
+      params.unlimited_duration = true;
+    } else {
+      params.finish_time = this.finishTime.getTime() / 1000;
+    }
+    if (!this.assignment.has_runs) {
+      params.start_time = this.startTime.getTime() / 1000;
+    }
+    return params;
+  }
+
+  get addParams(): AddParams {
+    let params: AddParams = {
+      name: this.name,
+      description: this.description,
+      assignment_type: this.assignmentType,
+      alias: this.alias,
+      course_alias: this.courseAlias,
+      start_time: this.startTime.getTime() / 1000,
+      problems: JSON.stringify(this.scheduledProblemList?.problems ?? []),
+    };
+    if (this.unlimitedDuration) {
+      params.unlimited_duration = true;
+    } else {
+      params.finish_time = this.finishTime.getTime() / 1000;
+    }
+    return params;
+  }
+
+  onAddSubmit(): void {
+    this.$emit('add-assignment', this.addParams);
+  }
+
+  onUpdateSubmit(): void {
+    this.$emit('update-assignment', this.updateParams);
+  }
+
   reset(): void {
     this.alias = this.assignment.alias;
     this.assignmentType = this.assignment.assignment_type || 'homework';
@@ -318,7 +415,11 @@ export default class CourseAssignmentDetails extends Vue {
   }
 
   onSubmit(): void {
-    this.$emit('submit', this, this.scheduledProblemList?.problems ?? []);
+    this.update ? this.onUpdateSubmit() : this.onAddSubmit();
+  }
+
+  onChangeSelect(event: Event): void {
+    this.assignment.assignment_type = (event.target as HTMLSelectElement).value;
   }
 }
 </script>

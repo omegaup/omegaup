@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 '''Builds the user recommendation model.
 
 This script reads user submissions and builds a recommendation model for
@@ -16,16 +16,15 @@ import os
 import os.path
 import sqlite3
 import sys
-from typing import (DefaultDict, Dict, List, Mapping, Optional, Sequence, Set,
-                    Tuple)
+from typing import (cast, DefaultDict, Dict, List, Mapping, Optional, Sequence,
+                    Set, Tuple)
 
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
 
-sys.path.insert(
-    0,
-    os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-import lib.db   # pylint: disable=wrong-import-position
+sys.path.insert(0,
+                os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 # Default training parameters.
@@ -38,15 +37,19 @@ ProblemList = List[int]
 ProblemSet = Set[int]
 
 
-def mean_average_precision(predicted: ProblemList,
-                           expected: ProblemList,
-                           k: int) -> Optional[float]:
+def mean_average_precision(
+    predicted: ProblemList,
+    expected: ProblemList,
+    k: int,
+) -> Optional[float]:
     '''Compute MAP@k - https://goo.gl/KMghXR'''
     if not predicted or not expected:
         return None
     num_problems = min(len(predicted), k)
-    return sum((predicted[:num_problems] == expected[:num_problems]) *
-               (1. / np.arange(1, num_problems + 1)))
+    return cast(
+        float,
+        sum((predicted[:num_problems] == expected[:num_problems]) *
+            (1. / np.arange(1, num_problems + 1))))
 
 
 def load_sqlite(database: str) -> pd.DataFrame:
@@ -76,7 +79,11 @@ def load_mysql(args: argparse.Namespace) -> pd.DataFrame:
     Ignoring problem sets helps remove bias in recommendations
     introduced by problem ordering in contests and tests.
     '''
-    dbconn = lib.db.connect(args)
+    dbconn = lib.db.connect_readonly(
+        lib.db.DatabaseConnectionArguments.from_args_readonly(args))
+    if not dbconn:
+        dbconn = lib.db.connect(
+            lib.db.DatabaseConnectionArguments.from_args(args))
     try:
         logging.info('Reading runs from MySQL')
         runs: pd.DataFrame = pd.read_sql_query(
@@ -87,15 +94,11 @@ def load_mysql(args: argparse.Namespace) -> pd.DataFrame:
                 MIN(s.time) `time`
             FROM
                 Submissions s
-            INNER JOIN
-                Runs r
-            ON
-                r.run_id = s.current_run_id
             WHERE
                 s.problemset_id IS NULL AND
                 s.type = "normal" AND
-                r.status = "ready" AND
-                r.verdict = "AC"
+                s.status = "ready" AND
+                s.verdict = "AC"
             GROUP BY
                 s.identity_id,
                 s.problem_id
@@ -124,13 +127,14 @@ def load_mysql(args: argparse.Namespace) -> pd.DataFrame:
         logging.info('Found %d runs', len(runs))
         return runs
     finally:
-        dbconn.close()
+        dbconn.conn.close()
 
 
-def train_test_split(runs: pd.DataFrame,
-                     train_fraction: float = _TRAIN_FRACTION,
-                     random_seed: Optional[int] = None
-                     ) -> Tuple[pd.Series, pd.Series]:
+def train_test_split(
+    runs: pd.DataFrame,
+    train_fraction: float = _TRAIN_FRACTION,
+    random_seed: Optional[int] = None,
+) -> Tuple[pd.Series, pd.Series]:
     '''Splits runs into test/train sets by user.
 
     The split is done based on `train_fraction`.
@@ -144,10 +148,11 @@ def train_test_split(runs: pd.DataFrame,
     return train_users, test_users
 
 
-def generate_model(train_ac: Mapping[int, Sequence[int]],
-                   num_followups: int = _NUM_FOLLOWUPS,
-                   followup_decay: float = _FOLLOWUP_DECAY
-                   ) -> Mapping[int, Sequence[Tuple[int, float]]]:
+def generate_model(
+    train_ac: Mapping[int, Sequence[int]],
+    num_followups: int = _NUM_FOLLOWUPS,
+    followup_decay: float = _FOLLOWUP_DECAY
+) -> Mapping[int, Sequence[Tuple[int, float]]]:
     '''Assumes runs are sorted by submission time'''
     tuples: List[Tuple[int, int, float]] = []
     for problems in train_ac.values():
@@ -159,8 +164,8 @@ def generate_model(train_ac: Mapping[int, Sequence[int]],
     weighted_pairs = pd.DataFrame(tuples,
                                   columns=('source', 'target', 'weight'))
     logging.info('Weighted pairs: %d', len(tuples))
-    model: DefaultDict[int, List[Tuple[int, float]]] = collections.defaultdict(
-        list)
+    model: DefaultDict[int, List[Tuple[int,
+                                       float]]] = collections.defaultdict(list)
     for (recommended_problem_id,
          solved_problem_id), score in weighted_pairs.groupby(
              ['source', 'target']).aggregate(sum).itertuples():
@@ -173,11 +178,14 @@ def generate_model(train_ac: Mapping[int, Sequence[int]],
 
 class TrainingConfig:
     '''A class to store the configuration for training a model.'''
-    def __init__(self,
-                 train_fraction: float = _TRAIN_FRACTION,
-                 rng_seed: int = 0,
-                 num_followups: int = _NUM_FOLLOWUPS,
-                 followup_decay: float = _FOLLOWUP_DECAY):
+
+    def __init__(
+        self,
+        train_fraction: float = _TRAIN_FRACTION,
+        rng_seed: int = 0,
+        num_followups: int = _NUM_FOLLOWUPS,
+        followup_decay: float = _FOLLOWUP_DECAY,
+    ):
         self.train_fraction: float = train_fraction
         assert 0 < self.train_fraction < 1
         self.rng_seed: Optional[int] = rng_seed
@@ -188,6 +196,7 @@ class TrainingConfig:
 class Model:
     '''A class that represents a prediction model.
     '''
+
     def __init__(self, config: TrainingConfig, runs: pd.DataFrame):
         self.config = config
 
@@ -253,8 +262,12 @@ class Model:
             finally:
                 conn.commit()
 
-    def recommend(self, latest_problem: int, banned_problems: ProblemSet,
-                  k: int) -> Optional[ProblemList]:
+    def recommend(
+        self,
+        latest_problem: int,
+        banned_problems: ProblemSet,
+        k: int,
+    ) -> Optional[ProblemList]:
         '''Recommends the a problem given that a user just solved last_problem.
 
         Args:

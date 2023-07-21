@@ -13,7 +13,8 @@
               "params": {
                 "username": "test_user_0",
                 "email": "user_0@domain.com",
-                "password": "test_user_0"
+                "password": "test_user_0",
+                "birth_date": 946684800
               }
             },
             {
@@ -21,7 +22,8 @@
               "params": {
                 "username": "test_user_1",
                 "email": "user_1@domain.com",
-                "password": "test_user_1"
+                "password": "test_user_1",
+                "birth_date": 946684800
               }
             }
           ]
@@ -42,12 +44,12 @@
                 "window_length": "0",
                 "scoreboard": 100,
                 "points_decay_factor": 0,
-                "partial_score": 1,
+                "score_mode": "partial",
                 "submissions_gap": 1200,
                 "penalty": 0,
                 "feedback": "detailed",
                 "penalty_type": "contest_start",
-                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
                 "penalty_calc_policy": "sum",
                 "admission_mode": "private",
                 "show_scoreboard_after": "true"

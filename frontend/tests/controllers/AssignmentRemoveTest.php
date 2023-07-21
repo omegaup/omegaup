@@ -1,12 +1,10 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
-/**
- * @author juan.pablo
- */
 class AssignmentRemoveTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAssignmentRemove() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
-            /*$numberOfAssignments=*/            5
+            nAssignments: 5,
         );
 
         $login = self::login($courseData['admin']);
@@ -140,7 +138,8 @@ class AssignmentRemoveTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         \OmegaUp\Test\Factories\Course::openProblemInCourseAssignment(
-            $courseData,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
             $problemData,
             $participant
         );
@@ -209,7 +208,7 @@ class AssignmentRemoveTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have thrown exception.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'courseUpdateAlreadyHasRuns',
                 $e->getMessage()
             );

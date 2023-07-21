@@ -4,8 +4,6 @@ namespace OmegaUp\Test;
 
 /**
  * Replaces some logic of ApiCaller to make it phpunit-safe
- *
- * @author joemmanuel
  */
 class ApiCallerMock extends \OmegaUp\ApiCaller {
     /**

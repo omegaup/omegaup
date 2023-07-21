@@ -4,7 +4,6 @@ namespace OmegaUp\Exceptions;
 
 class InvalidParameterException extends \OmegaUp\Exceptions\ApiException {
     /**
-     * @readonly
      * @var null|string
      */
     public $parameter;

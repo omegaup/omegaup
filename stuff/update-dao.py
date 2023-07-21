@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # pylint: disable=invalid-name
 # This program is intended to be invoked from the console, not to be used as a
 # module.
@@ -23,14 +23,14 @@ def _main() -> None:
     )
     args = parser.parse_args()
 
-    for dao in dao_utils.generate_dao(args.script.read()):  # type: ignore
+    for dao in dao_utils.generate_dao(args.script.read()):
         if dao.file_type == 'dao':
             filename = os.path.join(
                 _OMEGAUP_ROOT, 'frontend/server/src/DAO/Base', dao.filename)
         else:
             filename = os.path.join(_OMEGAUP_ROOT,
                                     'frontend/server/src/DAO/VO', dao.filename)
-        with open(filename, 'w') as f:
+        with open(filename, 'w', encoding='utf-8') as f:
             f.write(dao.contents)
 
 

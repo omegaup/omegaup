@@ -2,8 +2,6 @@
 
 /**
  * Simple test for legacy user Badge
- *
- * @author RuizYugen
  */
 // phpcs:ignore Squiz.Classes.ValidClassName.NotCamelCaps
 class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {
@@ -30,7 +28,7 @@ class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {
         \OmegaUp\Time::setTimeForTesting(strtotime($date));
 
         ['user' => $user1, 'identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
-        ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         self::addProblemRun($identity1);
         self::addProblemRun($identity2);
@@ -64,7 +62,7 @@ class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {
         $queryPath = static::OMEGAUP_BADGES_ROOT . '/legacyUser/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = [$user1->user_id];
-        $this->assertEquals($expected, $results);
+        $this->assertSame($expected, $results);
     }
 
     public function testLegacyUserMix() {
@@ -96,11 +94,11 @@ class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {
 
         // Call the API
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         $user1 = $problemData['authorUser'];
         $identity1 = $problemAuthor;
-        ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
         //Change date to today less one year
         $date = date_create($date);
         date_add(
@@ -138,7 +136,7 @@ class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {
             'window_length' => '0',
             'scoreboard' => 100,
             'points_decay_factor' => 0,
-            'partial_score' => 'true',
+            'score_mode' => 'partial',
             'submissions_gap' => 1200,
             'penalty' => 0,
             'feedback' => 'detailed',
@@ -152,6 +150,6 @@ class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {
         $queryPath = static::OMEGAUP_BADGES_ROOT . '/legacyUser/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = [$user1->user_id];
-        $this->assertEquals($expected, $results);
+        $this->assertSame($expected, $results);
     }
 }

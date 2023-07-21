@@ -8,8 +8,6 @@ namespace OmegaUp\DAO;
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\ProblemsLanguages}.
- *
- * @author alanboy
  * @access public
  * @package docs
  */
@@ -29,7 +27,10 @@ class ProblemsLanguages extends \OmegaUp\DAO\Base\ProblemsLanguages {
      */
     final public static function getByProblemId(int $problemId): array {
         $sql = 'SELECT
-                    *
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\ProblemsLanguages::FIELD_NAMES,
+            'Problems_Languages'
+        ) . '
                 FROM
                     Problems_Languages
                 WHERE

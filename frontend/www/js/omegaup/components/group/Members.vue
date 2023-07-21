@@ -5,12 +5,15 @@
         <div class="form-group">
           <label class="d-inline"
             >{{ T.wordsMember }}
-            <omegaup-autocomplete
-              v-model="searchedUsername"
-              class="form-control"
-              :init="(el) => typeahead.userTypeahead(el)"
-            ></omegaup-autocomplete
-          ></label>
+            <omegaup-common-typeahead
+              :existing-options="searchResultUsers"
+              :value.sync="searchedUsername"
+              :max-results="10"
+              @update-existing-options="
+                (query) => $emit('update-search-result-users', query)
+              "
+            ></omegaup-common-typeahead>
+          </label>
         </div>
         <button class="btn btn-primary" type="submit">
           {{ T.wordsAddMember }}
@@ -58,7 +61,7 @@
       </thead>
       <tbody>
         <tr v-for="identity in identitiesCsv" :key="identity.username">
-          <td>
+          <td data-members-username>
             <omegaup-user-username
               :classname="identity.classname"
               :linkify="true"
@@ -99,8 +102,14 @@
       v-if="showEditForm"
       :countries="countries"
       :identity="identity"
+      :search-result-schools="searchResultSchools"
       @cancel="onChildCancel"
-      @edit-identity-member="onChildEditIdentityMember"
+      @edit-identity-member="
+        (request) => $emit('edit-identity-member', { ...request, showEditForm })
+      "
+      @update-search-result-schools="
+        (query) => $emit('update-search-result-schools', query)
+      "
     ></omegaup-identity-edit>
     <omegaup-identity-change-password
       v-if="showChangePasswordForm"
@@ -115,11 +124,10 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { dao, types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
 import identity_Edit from '../identity/Edit.vue';
 import identity_ChangePassword from '../identity/ChangePassword.vue';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -129,7 +137,7 @@ library.add(faEdit, faLock, faTrashAlt);
 @Component({
   components: {
     FontAwesomeIcon,
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-user-username': user_Username,
     'omegaup-identity-edit': identity_Edit,
     'omegaup-identity-change-password': identity_ChangePassword,
@@ -140,17 +148,19 @@ export default class Members extends Vue {
   @Prop() identitiesCsv!: types.Identity[];
   @Prop() groupAlias!: string;
   @Prop() countries!: Array<dao.Countries>;
+  @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultSchools!: types.SchoolListItem[];
 
   T = T;
-  typeahead = typeahead;
   identity = {};
   username = '';
   showEditForm = false;
   showChangePasswordForm = false;
-  searchedUsername = '';
+  searchedUsername: null | types.ListItem = null;
 
   onAddMember(): void {
-    this.$emit('add-member', this, this.searchedUsername);
+    this.$emit('add-member', this, this.searchedUsername?.key);
+    this.reset();
   }
 
   onEdit(identity: types.Identity): void {
@@ -186,7 +196,7 @@ export default class Members extends Vue {
   }
 
   reset(): void {
-    this.searchedUsername = '';
+    this.searchedUsername = null;
   }
 }
 </script>

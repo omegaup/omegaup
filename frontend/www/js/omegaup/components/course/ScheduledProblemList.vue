@@ -2,25 +2,25 @@
   <div class="card" data-course-problemlist>
     <div class="card-header">
       <h5>
-        {{ T.courseAddProblemsAdd }}
+        {{ addCardHeaderTitleLabel }}
       </h5>
-      <span>{{ T.courseAddProblemsAddAssignmentDesc }}</span>
+      <span>{{ addCardHeaderDescLabel }}</span>
     </div>
     <div class="card-body">
       <div v-if="problems.length == 0" class="empty-table-message">
-        {{ T.courseAssignmentProblemsEmpty }}
+        {{ emptyTableLabel }}
       </div>
       <div v-else>
         <table class="table table-striped">
           <thead>
             <tr>
-              <th>{{ T.contestAddproblemProblemName }}</th>
-              <th>{{ T.contestAddproblemProblemPoints }}</th>
+              <th>{{ problemTableHeaderLabel }}</th>
+              <th>{{ pointsTableHeaderLabel }}</th>
               <th>{{ T.contestAddproblemProblemRemove }}</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="problem in problems">
+            <tr v-for="problem in problems" :key="problem.alias">
               <td class="align-middle">
                 <a :href="`/arena/problem/${problem.alias}/`">{{
                   problem.alias
@@ -30,7 +30,7 @@
               <td class="button-column align-middle">
                 <button
                   class="btn btn-link"
-                  :title="T.courseAssignmentProblemRemove"
+                  :title="removeButtonLabel"
                   @click.prevent="onRemoveProblem(problem)"
                 >
                   <font-awesome-icon icon="trash" />
@@ -41,22 +41,25 @@
         </table>
       </div>
     </div>
-    <div class="card-footer">
+    <div class="card-footer" data-course-add-problem>
       <form>
         <div class="row">
           <div class="col-md-12">
             <div class="row">
               <div class="form-group col-md-8">
                 <label
-                  >{{ T.wordsProblem }}
-                  <omegaup-autocomplete
-                    v-model="problemAlias"
-                    class="form-control"
-                    :init="(el) => typeahead.problemTypeahead(el)"
-                  ></omegaup-autocomplete
-                ></label>
+                  >{{ problemCardFooterLabel }}
+                  <omegaup-common-typeahead
+                    :existing-options="searchResultProblems"
+                    :activation-threshold="2"
+                    :value.sync="problemAlias"
+                    @update-existing-options="
+                      (query) => $emit('update-search-result-problems', query)
+                    "
+                  ></omegaup-common-typeahead>
+                </label>
                 <p class="help-block">
-                  {{ T.courseAddProblemsAssignmentsDesc }}
+                  {{ addCardFooterDescLabel }}
                 </p>
               </div>
               <div class="form-group col-md-4">
@@ -71,12 +74,12 @@
                 data-add-problem
                 class="btn btn-primary mr-2"
                 type="submit"
-                :disabled="problemAlias.length == 0"
+                :disabled="!problemAlias"
                 @click.prevent="
-                  onAddProblem({ alias: problemAlias, points: points })
+                  onAddProblem({ alias: problemAlias.key, points: points })
                 "
               >
-                {{ T.courseEditAddProblems }}
+                {{ addButtonLabel }}
               </button>
             </div>
           </div>
@@ -93,8 +96,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 
 import {
   FontAwesomeIcon,
@@ -107,7 +109,7 @@ library.add(fas);
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
@@ -118,20 +120,74 @@ export default class CourseScheduledProblemList extends Vue {
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: types.CourseAssignment;
+  @Prop() searchResultProblems!: types.ListItem[];
 
-  typeahead = typeahead;
   T = T;
   assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
   problems: types.AddedProblem[] = this.assignmentProblems;
   taggedProblemAlias = '';
-  problemAlias = '';
+  problemAlias: null | types.ListItem = null;
   points = 100;
   showTopicsAndDifficulty = false;
 
+  get addCardHeaderTitleLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAddLecturesAdd
+      : T.courseAddProblemsAdd;
+  }
+
+  get addCardHeaderDescLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAddLecturesAddAssignmentDesc
+      : T.courseAddProblemsAddAssignmentDesc;
+  }
+
+  get emptyTableLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAssignmentLecturesEmpty
+      : T.courseAssignmentProblemsEmpty;
+  }
+
+  get problemTableHeaderLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.contestAddlectureLectureName
+      : T.contestAddproblemProblemName;
+  }
+
+  get pointsTableHeaderLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.contestAddlectureLecturePoints
+      : T.contestAddproblemProblemPoints;
+  }
+
+  get removeButtonLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAssignmentLectureRemove
+      : T.courseAssignmentProblemRemove;
+  }
+
+  get problemCardFooterLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.wordsLecture
+      : T.wordsProblem;
+  }
+
+  get addCardFooterDescLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAddLecturesAssignmentsDesc
+      : T.courseAddProblemsAssignmentsDesc;
+  }
+
+  get addButtonLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseEditAddLectures
+      : T.courseEditAddProblems;
+  }
+
   onAddProblem(problem: types.AddedProblem): void {
-    const problemAlias = problem.alias;
+    const problemAlias = { key: problem.alias, value: problem.alias };
     const currentProblem = this.problems.find(
-      (problem) => problem.alias === problemAlias,
+      (problem) => problem.alias === problemAlias.key,
     );
     if (!currentProblem) {
       this.problems.push(problem);
@@ -141,9 +197,9 @@ export default class CourseScheduledProblemList extends Vue {
   }
 
   onRemoveProblem(problem: types.AddedProblem): void {
-    const problemAlias = problem.alias;
+    const problemAlias = { key: problem.alias, value: problem.alias };
     this.problems = this.problems.filter(
-      (problem) => problem.alias !== problemAlias,
+      (problem) => problem.alias !== problemAlias.key,
     );
   }
 
@@ -168,12 +224,12 @@ export default class CourseScheduledProblemList extends Vue {
   }
 
   @Watch('taggedProblemAlias')
-  onTaggedProblemAliasChange() {
-    this.problemAlias = this.taggedProblemAlias;
+  onTaggedProblemAliasChange(newValue: string) {
+    this.problemAlias = { key: newValue, value: newValue };
   }
 
   reset(): void {
-    this.problemAlias = '';
+    this.problemAlias = null;
     this.points = 100;
   }
 }

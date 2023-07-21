@@ -4,10 +4,11 @@ namespace OmegaUp;
 
 /**
  * Conjunto de validadores genéricos
- *
- * @author joemmanuel
  */
 class Validators {
+    // The maximum length for aliases.
+    const ALIAS_MAX_LENGTH = 32;
+
     /**
      * Check if email is valid
      */
@@ -20,13 +21,13 @@ class Validators {
      *
      * @param mixed $parameter
      * @param string $parameterName Name of parameter that will appear en error message
-     * @psalm-assert string $parameter
+     * @psalm-assert non-empty-string $parameter
      */
     public static function validateEmail(
         $parameter,
         string $parameterName
     ): void {
-        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+        if (!self::isPresent($parameter, $parameterName, required: true)) {
             return;
         }
         if (!filter_var($parameter, FILTER_VALIDATE_EMAIL)) {
@@ -48,7 +49,7 @@ class Validators {
         $parameter,
         string $parameterName
     ): void {
-        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+        if (!self::isPresent($parameter, $parameterName, required: true)) {
             return;
         }
 
@@ -112,6 +113,20 @@ class Validators {
             );
         }
 
+        self::validateLengthInRange(
+            $parameter,
+            $parameterName,
+            $minLength,
+            $maxLength
+        );
+    }
+
+    public static function validateLengthInRange(
+        string $parameter,
+        string $parameterName,
+        ?int $minLength,
+        ?int $maxLength
+    ): void {
         if (!is_null($minLength) && strlen($parameter) < $minLength) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterStringTooShort',
@@ -129,6 +144,37 @@ class Validators {
     }
 
     /**
+     * Checks whether the string parameter is of a certain length.
+     *
+     * @param string   $parameter the parameter
+     * @param int|null $minLength the (optional) minimum length
+     * @param int|null $maxLength the (optional) maximum length
+     *
+     * @return true when the parameter's length is within the specified bounds.
+     */
+    public static function stringOfLengthInRange(
+        string $parameter,
+        ?int $minLength,
+        ?int $maxLength
+    ): bool {
+        if (!is_null($minLength) && strlen($parameter) < $minLength) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterStringTooShort',
+                parameter: null,
+                additionalParameters: ['min_length' => strval($minLength)],
+            );
+        }
+        if (!is_null($maxLength) && strlen($parameter) > $maxLength) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterStringTooLong',
+                parameter: null,
+                additionalParameters: ['max_length' => strval($maxLength)],
+            );
+        }
+        return true;
+    }
+
+    /**
      * Returns whether the alias is valid.
      * The form of namespaced alias is: "namespace:alias"
      *
@@ -141,20 +187,68 @@ class Validators {
         return (
             preg_match('/^(?:[a-zA-Z0-9_-]+:)?[a-zA-Z0-9_-]+$/', $alias) === 1
             && !self::isRestrictedAlias($alias)
-            && strlen($alias) <= 32
+            && strlen($alias) <= Validators::ALIAS_MAX_LENGTH
         );
+    }
+
+    /**
+     * @param string $objectId
+     * @return boolean
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function objectId(string $objectId): bool {
+        return preg_match('/^[0-9a-f]{40}$/', $objectId) === 1;
+    }
+
+    /**
+     * @param string $filename
+     * @return boolean
+     */
+    public static function filename(string $filename): bool {
+        return preg_match(
+            '/^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+$/',
+            $filename
+        ) === 1;
     }
 
     /**
      * Returns whether the alias is valid.
      *
-     * @param string $alias
      * @return boolean
      */
-    public static function alias(string $alias): bool {
+    public static function alias(
+        string $alias,
+        int $maxLength = Validators::ALIAS_MAX_LENGTH
+    ): bool {
         return (
             preg_match('/^[a-zA-Z0-9_-]+$/', $alias) === 1
             && !self::isRestrictedAlias($alias)
+            && strlen($alias) <= $maxLength
+        );
+    }
+
+    /**
+     * Returns whether the token is valid.
+     *
+     * @return boolean
+     */
+    public static function token(string $token): bool {
+        return preg_match('/^[a-zA-Z0-9]{30}$/', $token) === 1;
+    }
+
+    /**
+     * Returns whether the username or email is valid.
+     *
+     * @param string $usernameOrEmail
+     * @return boolean
+     */
+    public static function usernameOrTeamUsernameOrEmail(string $usernameOrEmail): bool {
+        return (
+            self::email($usernameOrEmail)
+            || self::normalUsername($usernameOrEmail)
+            || self::identityUsername($usernameOrEmail)
+            || self::identityTeamUsername($usernameOrEmail)
         );
     }
 
@@ -198,6 +292,21 @@ class Validators {
     }
 
     /**
+     * Returns whether the username of an identity team is valid.
+     *
+     * @param string $username
+     * @return boolean
+     */
+    public static function identityTeamUsername(string $username): bool {
+        return (
+            preg_match(
+                '/^teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/',
+                $username
+            ) !== 0
+        );
+    }
+
+    /**
      * Returns whether the alias is restricted.
      *
      * @param string $alias the alias.
@@ -213,7 +322,7 @@ class Validators {
      *
      * @param mixed $parameter
      * @param string $parameterName
-     * @psalm-assert string $parameter
+     * @psalm-assert non-empty-string $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateValidUsername(
@@ -224,11 +333,37 @@ class Validators {
             $parameter,
             $parameterName,
             2,
-            null, /*required=*/
-            true
+            null,
+            required: true,
         );
 
         if (preg_match('/[^a-zA-Z0-9_.-]/', $parameter)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
+        }
+    }
+
+    /**
+     * Enforces username requirements
+     *
+     * @param mixed $parameter
+     * @param string $parameterName
+     * @psalm-assert string $parameter
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateAlias(
+        $parameter,
+        string $parameterName
+    ): void {
+        if (!is_string($parameter)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
+        }
+        if (!self::alias($parameter)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalidAlias',
                 $parameterName
@@ -248,7 +383,7 @@ class Validators {
         $parameter,
         string $parameterName
     ): void {
-        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+        if (!self::isPresent($parameter, $parameterName, required: true)) {
             return;
         }
         self::validateStringOfLengthInRange(
@@ -256,11 +391,48 @@ class Validators {
             $parameterName,
             2,
             null,
-            /*required=*/true
+            required: true
         );
 
         /** @psalm-suppress RedundantConditionGivenDocblockType not sure why Psalm is complaining here. */
         if (!preg_match('/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/', $parameter)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
+        }
+    }
+
+    /**
+     * Enforces username identity team requirements
+     *
+     * @param mixed $parameter
+     * @param string $parameterName
+     * @psalm-assert string $parameter
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateValidUsernameIdentityTeam(
+        $parameter,
+        string $parameterName
+    ): void {
+        if (!self::isPresent($parameter, $parameterName, required: true)) {
+            return;
+        }
+        self::validateStringOfLengthInRange(
+            $parameter,
+            $parameterName,
+            minLength: 2,
+            maxLength: null,
+            required: true
+        );
+
+        /** @psalm-suppress RedundantConditionGivenDocblockType not sure why Psalm is complaining here. */
+        if (
+            !preg_match(
+                '/^teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/',
+                $parameter
+            )
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalidAlias',
                 $parameterName
@@ -278,7 +450,7 @@ class Validators {
         $parameter,
         string $parameterName
     ): void {
-        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+        if (!self::isPresent($parameter, $parameterName, required: true)) {
             return;
         }
 
@@ -416,7 +588,7 @@ class Validators {
         $parameter,
         string $parameterName
     ): void {
-        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+        if (!self::isPresent($parameter, $parameterName, required: true)) {
             return;
         }
         if (!is_numeric($parameter)) {
@@ -446,10 +618,10 @@ class Validators {
     }
 
     /**
-     * @template T
+     * @template T of scalar
      * @param mixed $parameter
      * @param string $parameterName
-     * @param T[] $enum
+     * @param list<T> $enum
      * @param bool $required
      * @psalm-assert T $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
@@ -459,7 +631,7 @@ class Validators {
         string $parameterName,
         array $enum
     ): void {
-        if (!self::isPresent($parameter, $parameterName, /*$required=*/true)) {
+        if (!self::isPresent($parameter, $parameterName, required: true)) {
             return;
         }
         if (!in_array($parameter, $enum)) {
@@ -479,10 +651,10 @@ class Validators {
     }
 
     /**
-     * @template T
+     * @template T of scalar
      * @param mixed $parameter
      * @param string $parameterName
-     * @param T[] $enum
+     * @param list<T> $enum
      * @param bool $required
      * @psalm-assert null|T $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
@@ -500,7 +672,7 @@ class Validators {
     }
 
     /**
-     * @template T
+     * @template T of scalar
      * @param list<T> $parameter
      * @param string $parameterName
      * @param list<T> $validOptions

@@ -7,7 +7,7 @@ if (OMEGAUP_LOCKDOWN) {
 }
 
 \OmegaUp\UITools::render(
-    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Contest::getContestEditForSmarty(
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Contest::getContestEditForTypeScript(
         $r
     )
 );

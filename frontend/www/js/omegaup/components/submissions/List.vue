@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="text-center mb-4">
+  <div submissions-problem>
+    <div class="text-center mb-5 submissions-title">
       <h2>
         {{ T.submissionsListTitle }}
       </h2>
@@ -14,28 +14,21 @@
       </h4>
     </div>
     <div class="card">
-      <h5 class="card-header">
-        {{
-          ui.formatString(T.submissionsRangeHeader, {
-            lowCount: (page - 1) * length + 1,
-            highCount: page * length,
-          })
-        }}
-      </h5>
-      <div v-if="includeUser" class="card-body">
-        <label
-          ><omegaup-autocomplete
-            v-model="searchedUsername"
-            class="form-control"
-            :init="(el) => typeahead.userTypeahead(el)"
-          ></omegaup-autocomplete
-        ></label>
-        <a
-          class="btn btn-primary"
-          type="button"
-          :href="`/submissions/${encodeURIComponent(searchedUsername)}/`"
-        >
-          {{ T.searchUser }}
+      <div v-if="includeUser" class="card-body d-flex align-items-center">
+        <omegaup-common-typeahead
+          :existing-options="searchResultUsers"
+          :value.sync="searchedUsername"
+          :max-results="10"
+          class="mr-2"
+          @update-existing-options="
+            (query) => $emit('update-search-result-users', query)
+          "
+        />
+
+        <a :href="hrefSearchUser">
+          <button class="btn btn-primary" type="button">
+            {{ T.searchUser }}
+          </button>
         </a>
       </div>
       <div class="table-responsive">
@@ -92,7 +85,7 @@
               >
                 {{ T[`verdict${submission.verdict}`] }}
               </td>
-              <td class="text-right">
+              <td class="text-center">
                 {{
                   submission.runtime === 0
                     ? '—'
@@ -103,7 +96,7 @@
                       })
                 }}
               </td>
-              <td class="text-right">
+              <td class="text-center">
                 {{
                   submission.memory === 0
                     ? '—'
@@ -119,11 +112,6 @@
           </tbody>
         </table>
       </div>
-      <div class="card-footer">
-        <omegaup-common-paginator
-          :pager-items="pagerItems"
-        ></omegaup-common-paginator>
-      </div>
     </div>
   </div>
 </template>
@@ -134,57 +122,53 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
-import * as typeahead from '../../typeahead';
 import UserName from '../user/Username.vue';
-import Autocomplete from '../Autocomplete.vue';
-import common_Paginator from '../common/Paginatorv2.vue';
+import common_Typeahead from '../common/Typeahead.vue';
+import common_Paginator from '../common/Paginator.vue';
 
 @Component({
   components: {
     'omegaup-username': UserName,
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-paginator': common_Paginator,
   },
 })
 export default class SubmissionsList extends Vue {
-  @Prop() page!: number;
-  @Prop() length!: number;
   @Prop() includeUser!: boolean;
-  @Prop() totalRows!: number;
   @Prop() submissions!: types.Submission[];
-  @Prop() pagerItems!: types.PageItem[];
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   ui = ui;
   time = time;
-  typeahead = typeahead;
-  searchedUsername = '';
+  searchedUsername: null | types.ListItem = null;
 
-  get showNextPage(): boolean {
-    return this.length * this.page < this.totalRows;
-  }
-
-  get showControls(): boolean {
-    return this.showNextPage || this.page > 1;
+  get hrefSearchUser(): string {
+    if (!this.searchedUsername?.key) {
+      return '/submissions/';
+    }
+    return `/submissions/${encodeURIComponent(this.searchedUsername?.key)}/`;
   }
 }
 </script>
 
-<style>
+<style lang="scss">
+@import '../../../../sass/main.scss';
 table.submissions-table > tbody > tr > td {
   vertical-align: middle;
 }
+
 .verdict-AC {
-  background: #cf6;
+  background: var(--arena-submissions-list-verdict-ac-background-color);
 }
 
 .verdict-CE {
-  background: #f90;
+  background: --arena-submissions-list-verdict-ce-background-color;
 }
 
 .verdict-JE,
 .verdict-VE {
-  background: #f00;
+  background: var(--arena-submissions-list-verdict-je-ve-background-color);
 }
 
 .school-text {
@@ -193,5 +177,13 @@ table.submissions-table > tbody > tr > td {
 
 .fixed-width-column {
   width: 180px;
+}
+
+.submissions-title h2 {
+  font-size: 1.8rem;
+}
+
+[submissions-problem] .tags-input-wrapper-default {
+  padding: 0.35rem 0.25rem 0.7rem 0.25rem;
 }
 </style>

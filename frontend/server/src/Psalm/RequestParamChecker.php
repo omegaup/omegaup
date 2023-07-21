@@ -3,9 +3,9 @@
 namespace OmegaUp\Psalm;
 
 class RequestParamChecker implements
-    \Psalm\Plugin\Hook\AfterExpressionAnalysisInterface,
-    \Psalm\Plugin\Hook\AfterMethodCallAnalysisInterface,
-    \Psalm\Plugin\Hook\AfterClassLikeAnalysisInterface {
+    \Psalm\Plugin\EventHandler\AfterExpressionAnalysisInterface,
+    \Psalm\Plugin\EventHandler\AfterMethodCallAnalysisInterface,
+    \Psalm\Plugin\EventHandler\AfterClassLikeAnalysisInterface {
     /**
      * @var array<string, array<string, RequestParamDescription>>
      */
@@ -17,7 +17,7 @@ class RequestParamChecker implements
     private static $parsedMethodTypeMapping = [];
 
     /**
-     * @var array<string, array<string, true>>
+     * @var array<lowercase-string, array<lowercase-string, true>>
      */
     private static $methodCallGraph = [];
 
@@ -127,7 +127,7 @@ class RequestParamChecker implements
             return null;
         }
         $foundRequest = false;
-        foreach ($varType->getAtomicTypes() as $typeName => $type) {
+        foreach ($varType->getAtomicTypes() as $_typeName => $type) {
             if (
                 $type instanceof \Psalm\Type\Atomic\TNamedObject &&
                 $type->value == 'OmegaUp\\Request'
@@ -190,7 +190,7 @@ class RequestParamChecker implements
             return null;
         }
         $foundRequest = false;
-        foreach ($varType->getAtomicTypes() as $typeName => $type) {
+        foreach ($varType->getAtomicTypes() as $_typeName => $type) {
             if (
                 $type instanceof \Psalm\Type\Atomic\TNamedObject &&
                 $type->value == 'OmegaUp\\Request'
@@ -221,7 +221,7 @@ class RequestParamChecker implements
             throw new \Exception('Empty calling method/function id');
         }
 
-        if (count($expr->args) < 2) {
+        if (count($expr->getArgs()) < 2) {
             if (
                 \Psalm\IssueBuffer::accepts(
                     new EnumMissingArguments(
@@ -235,7 +235,8 @@ class RequestParamChecker implements
             }
             return null;
         }
-        if (!$expr->args[0]->value instanceof \PhpParser\Node\Scalar\String_) {
+        $stringValue = $expr->getArgs()[0]->value;
+        if (!($stringValue instanceof \PhpParser\Node\Scalar\String_)) {
             if (
                 // Methods within \OmegaUp\Request are exempt
                 strpos($functionId, 'omegaup\\request::') !== 0 &&
@@ -261,7 +262,7 @@ class RequestParamChecker implements
 
         self::processParameter(
             $functionId,
-            $expr->args[0]->value->value,
+            $stringValue->value,
             $returnType,
             $codebase
         );
@@ -271,39 +272,40 @@ class RequestParamChecker implements
     /**
      * Called after a statement has been checked
      *
-     * @param \Psalm\FileManipulation[] $file_replacements
-     *
      * @return null|false
      */
     public static function afterExpressionAnalysis(
-        \PhpParser\Node\Expr $expr,
-        \Psalm\Context $context,
-        \Psalm\StatementsSource $statements_source,
-        \Psalm\Codebase $codebase,
-        array &$file_replacements = []
-    ) {
+        \Psalm\Plugin\EventHandler\Event\AfterExpressionAnalysisEvent $event,
+    ): ?bool {
         if (
-            $context->parent !== 'OmegaUp\\Controllers\\Controller' &&
-            $context->self !== 'OmegaUp\\Controllers\\Controller'
+            $event->getContext()->parent !== 'OmegaUp\\Controllers\\Controller' &&
+            $event->getContext()->self !== 'OmegaUp\\Controllers\\Controller'
         ) {
             return null;
         }
+        $expr = $event->getExpr();
         if ($expr instanceof \PhpParser\Node\Expr\ArrayDimFetch) {
-            return self::processRequestPropertyFetch(
+            $fileReplacements = $event->getFileReplacements();
+            $result = self::processRequestPropertyFetch(
                 $expr,
-                $context,
-                $statements_source,
-                $codebase,
-                $file_replacements
+                $event->getContext(),
+                $event->getStatementsSource(),
+                $event->getCodebase(),
+                $fileReplacements,
             );
+            $event->setFileReplacements($fileReplacements);
+            return $result;
         } elseif ($expr instanceof \PhpParser\Node\Expr\MethodCall) {
-            return self::processRequestEnum(
+            $fileReplacements = $event->getFileReplacements();
+            $result = self::processRequestEnum(
                 $expr,
-                $context,
-                $statements_source,
-                $codebase,
-                $file_replacements
+                $event->getContext(),
+                $event->getStatementsSource(),
+                $event->getCodebase(),
+                $fileReplacements,
             );
+            $event->setFileReplacements($fileReplacements);
+            return $result;
         }
 
         return null;
@@ -379,6 +381,8 @@ class RequestParamChecker implements
     }
 
     /**
+     * @param lowercase-string $functionId
+     *
      * @return array<string, RequestParamDescription>
      */
     private static function getDocBlockReturnTypes(
@@ -418,42 +422,39 @@ class RequestParamChecker implements
         return self::$parsedMethodTypeMapping[$functionId];
     }
 
-    /**
-     * @param  \PhpParser\Node\Expr\MethodCall|\PhpParser\Node\Expr\StaticCall $expr
-     * @param  \Psalm\FileManipulation[] $file_replacements
-     *
-     * @return void
-     */
     public static function afterMethodCallAnalysis(
-        $expr,
-        string $method_id,
-        string $appearing_method_id,
-        string $declaring_method_id,
-        \Psalm\Context $context,
-        \Psalm\StatementsSource $statements_source,
-        \Psalm\Codebase $codebase,
-        array &$file_replacements = [],
-        \Psalm\Type\Union &$return_type_candidate = null
-    ) {
-        if (!is_null($context->calling_function_id)) {
-            $functionId = strtolower($context->calling_function_id);
-        } elseif (!is_null($context->calling_method_id)) {
-            $functionId = $context->calling_method_id;
+        \Psalm\Plugin\EventHandler\Event\AfterMethodCallAnalysisEvent $event,
+    ): void {
+        $callingFunctionId = $event->getContext()->calling_function_id;
+        $callingMethodId = $event->getContext()->calling_method_id;
+        if (!is_null($callingFunctionId)) {
+            $functionId = strtolower($callingFunctionId);
+        } elseif (!is_null($callingMethodId)) {
+            $functionId = $callingMethodId;
         } else {
             // Not being called from within a function-like.
             return;
         }
-        if (array_key_exists($method_id, self::ENSURE_TYPE_MAPPING)) {
-            if (!$expr->args[0]->value instanceof \PhpParser\Node\Scalar\String_) {
+        if (
+            array_key_exists(
+                $event->getMethodId(),
+                self::ENSURE_TYPE_MAPPING
+            )
+        ) {
+            $stringValue = $event->getExpr()->getArgs()[0]->value;
+            if (!$stringValue instanceof \PhpParser\Node\Scalar\String_) {
                 if (
                     // Methods within \OmegaUp\Request are exempt
                     strpos($functionId, 'omegaup\\request::') !== 0 &&
                     \Psalm\IssueBuffer::accepts(
                         new RequestAccessNotALiteralString(
-                            "{$method_id}() argument not a literal string",
-                            new \Psalm\CodeLocation($statements_source, $expr)
+                            "{$event->getMethodId()}() argument not a literal string",
+                            new \Psalm\CodeLocation(
+                                $event->getStatementsSource(),
+                                $event->getExpr()
+                            )
                         ),
-                        $statements_source->getSuppressedIssues()
+                        $event->getStatementsSource()->getSuppressedIssues()
                     )
                 ) {
                     // do nothing
@@ -462,63 +463,81 @@ class RequestParamChecker implements
             }
             self::processParameter(
                 $functionId,
-                $expr->args[0]->value->value,
-                \Psalm\Type::parseString(self::ENSURE_TYPE_MAPPING[$method_id]),
-                $codebase
+                $stringValue->value,
+                \Psalm\Type::parseString(
+                    self::ENSURE_TYPE_MAPPING[$event->getMethodId()]
+                ),
+                $event->getCodebase()
             );
             return;
         }
-        if (array_key_exists($method_id, self::VALIDATOR_TYPE_MAPPING)) {
-            if (!$expr->args[1]->value instanceof \PhpParser\Node\Scalar\String_) {
+        if (
+            array_key_exists(
+                $event->getMethodId(),
+                self::VALIDATOR_TYPE_MAPPING
+            )
+        ) {
+            $stringValue = $event->getExpr()->getArgs()[1]->value;
+            if (!$stringValue instanceof \PhpParser\Node\Scalar\String_) {
                 if (
                     // Methods within \OmegaUp\Request or \OmegaUp\Validators are exempt
                     strpos($functionId, 'omegaup\\request::') !== 0 &&
                     strpos($functionId, 'omegaup\\validators::') !== 0 &&
                     \Psalm\IssueBuffer::accepts(
                         new RequestAccessNotALiteralString(
-                            "{$method_id}() second argument not a literal string",
-                            new \Psalm\CodeLocation($statements_source, $expr)
+                            "{$event->getMethodId()}() second argument not a literal string",
+                            new \Psalm\CodeLocation(
+                                $event->getStatementsSource(),
+                                $event->getExpr()
+                            )
                         ),
-                        $statements_source->getSuppressedIssues()
+                        $event->getStatementsSource()->getSuppressedIssues()
                     )
                 ) {
                     // do nothing
                 }
                 return;
             }
+            $value = $event->getExpr()->getArgs()[0]->value;
             if (
-                !$expr->args[0]->value instanceof \PhpParser\Node\Expr\ArrayDimFetch ||
-                !$expr->args[0]->value->var instanceof \PhpParser\Node\Expr\Variable ||
-                $expr->args[0]->value->var->name != 'r'
+                !$value instanceof \PhpParser\Node\Expr\ArrayDimFetch ||
+                !$value->var instanceof \PhpParser\Node\Expr\Variable ||
+                $value->var->name != 'r'
             ) {
                 // This is not a Request access.
                 return;
             }
-            if (!$expr->args[0]->value->dim instanceof \PhpParser\Node\Scalar\String_) {
+            if (!$value->dim instanceof \PhpParser\Node\Scalar\String_) {
                 if (
                     // Methods within \OmegaUp\Request or \OmegaUp\Validators are exempt
                     strpos($functionId, 'omegaup\\request::') !== 0 &&
                     strpos($functionId, 'omegaup\\validators::') !== 0 &&
                     \Psalm\IssueBuffer::accepts(
                         new RequestAccessNotALiteralString(
-                            "{$method_id}() second argument not a literal string",
-                            new \Psalm\CodeLocation($statements_source, $expr)
+                            "{$event->getMethodId()}() second argument not a literal string",
+                            new \Psalm\CodeLocation(
+                                $event->getStatementsSource(),
+                                $event->getExpr()
+                            )
                         ),
-                        $statements_source->getSuppressedIssues()
+                        $event->getStatementsSource()->getSuppressedIssues()
                     )
                 ) {
                     // do nothing
                 }
                 return;
             }
-            if ($expr->args[0]->value->dim->value != $expr->args[1]->value->value) {
+            if ($value->dim->value != $stringValue->value) {
                 if (
                     \Psalm\IssueBuffer::accepts(
                         new RequestAccessNotALiteralString(
-                            "{$method_id}() second argument and \$r[] argument do not match",
-                            new \Psalm\CodeLocation($statements_source, $expr)
+                            "{$event->getMethodId()}() second argument and \$r[] argument do not match",
+                            new \Psalm\CodeLocation(
+                                $event->getStatementsSource(),
+                                $event->getExpr()
+                            )
                         ),
-                        $statements_source->getSuppressedIssues()
+                        $event->getStatementsSource()->getSuppressedIssues()
                     )
                 ) {
                     // do nothing
@@ -527,11 +546,11 @@ class RequestParamChecker implements
             }
             self::processParameter(
                 $functionId,
-                $expr->args[1]->value->value,
+                $stringValue->value,
                 \Psalm\Type::parseString(
-                    self::VALIDATOR_TYPE_MAPPING[$method_id]
+                    self::VALIDATOR_TYPE_MAPPING[$event->getMethodId()]
                 ),
-                $codebase
+                $event->getCodebase()
             );
             return;
         }
@@ -539,42 +558,45 @@ class RequestParamChecker implements
             self::$methodCallGraph[$functionId] = [];
         }
         self::$methodCallGraph[$functionId][strtolower(
-            $appearing_method_id
+            $event->getAppearingMethodId()
         )] = true;
     }
 
     /**
      * Called after a statement has been checked
-     *
-     * @param \Psalm\FileManipulation[] $file_replacements
-     *
-     * @return null|false
      */
     public static function afterStatementAnalysis(
-        \PhpParser\Node\Stmt\ClassLike $stmt,
-        \Psalm\Storage\ClassLikeStorage $classlike_storage,
-        \Psalm\StatementsSource $statements_source,
-        \Psalm\Codebase $codebase,
-        array &$file_replacements = []
-    ) {
-        if (is_null($classlike_storage->location)) {
+        \Psalm\Plugin\EventHandler\Event\AfterClassLikeAnalysisEvent $event
+    ): ?bool {
+        if (is_null($event->getClasslikeStorage()->location)) {
             return null;
         }
 
         // First go through all the methods in this class, parsing the doc
         // comment for each and saving its parsed representation to
         // self::$parsedMethodTypeMapping.
-        self::processClass($stmt, $classlike_storage->name);
-
-        $fileContents = $codebase->getFileContents(
-            $classlike_storage->location->file_name
+        self::processClass(
+            $event->getStmt(),
+            $event->getClasslikeStorage()->name
         );
-        foreach ($stmt->stmts as $methodStmt) {
+
+        $classlikeStorageLocation = $event->getClasslikeStorage()->location;
+        if (is_null($classlikeStorageLocation)) {
+            throw new \Exception(
+                'Unable to get location for  ' .
+                strval($event->getClasslikeStorage())
+            );
+        }
+        $fileContents = $event->getCodebase()->getFileContents(
+            $classlikeStorageLocation->file_name
+        );
+        $fileReplacements = $event->getFileReplacements();
+        foreach ($event->getStmt()->stmts as $methodStmt) {
             if (!$methodStmt instanceof \PhpParser\Node\Stmt\ClassMethod) {
                 continue;
             }
             $functionId = strtolower(
-                "{$classlike_storage->name}::{$methodStmt->name->name}"
+                "{$event->getClasslikeStorage()->name}::{$methodStmt->name->name}"
             );
 
             $hasRequestArgument = false;
@@ -639,18 +661,19 @@ class RequestParamChecker implements
             ) {
                 $expected = [];
             } else {
-                if (isset(self::$methodTypeMapping[$functionId])) {
-                    $expected = self::$methodTypeMapping[$functionId];
-                } else {
-                    $expected = [];
-                }
+                $expected = self::getMethodTypeMapping($functionId);
 
-                // Now go through the callgraph, parsing any unvisited methods if needed.
-                foreach (self::$methodCallGraph[$functionId] ?? [] as $calleeMethodId => $_) {
+                // Now go through the callgraph, parsing any unvisited methods
+                // if needed.
+                foreach (
+                    self::getMethodCalls(
+                        $functionId
+                    ) as $calleeMethodId => $_
+                ) {
                     foreach (
                         self::getDocBlockReturnTypes(
                             $calleeMethodId,
-                            $codebase
+                            $event->getCodebase()
                         ) as $_ => $requestParam
                     ) {
                         if (array_key_exists($requestParam->name, $expected)) {
@@ -712,8 +735,8 @@ class RequestParamChecker implements
                 ];
             }
 
-            if ($codebase->alter_code) {
-                $file_replacements[] = new \Psalm\FileManipulation(
+            if ($event->getCodebase()->alter_code) {
+                $fileReplacements[] = new \Psalm\FileManipulation(
                     $docblockStart,
                     $docblockEnd,
                     $parsedDocComment->render($indentation)
@@ -725,23 +748,141 @@ class RequestParamChecker implements
                     new MismatchingDocblockOmegaUpRequestParamAnnotation(
                         (
                         'Mismatched dockblock annotations for ' .
-                        "{$classlike_storage->name}::{$methodStmt->name->name}: Wanted:\n\n" .
+                        "{$event->getClasslikeStorage()->name}::{$methodStmt->name->name}: Wanted:\n\n" .
                         $parsedDocComment->render('')
                         ),
                         new \Psalm\CodeLocation(
-                            $statements_source,
+                            $event->getStatementsSource(),
                             $methodStmt,
                             null,
                             true
                         )
                     ),
-                    $statements_source->getSuppressedIssues(),
+                    $event->getStatementsSource()->getSuppressedIssues(),
                     true
                 )
             ) {
                 // do nothing
             }
         }
+        $event->setFileReplacements($fileReplacements);
+        return null;
+    }
+
+    /**
+     * @return array<lowercase-string, true>
+     */
+    private static function getMethodCalls(string $functionId): array {
+        $config = \Psalm\Config::getInstance();
+        $rootCacheDirectory = $config->getCacheDirectory();
+        if (!$rootCacheDirectory) {
+            throw new \UnexpectedValueException('No cache directory defined');
+        }
+        $cacheDir = (
+            $rootCacheDirectory . DIRECTORY_SEPARATOR
+            . 'omegaup-callgraph'
+        );
+        $cachePath = (
+            $cacheDir . DIRECTORY_SEPARATOR
+            . sha1($functionId)
+        );
+        if ($config->use_igbinary) {
+            $cachePath .= '-igbinary';
+        }
+        /** @var array<lowercase-string, true> */
+        $methodCalls = [];
+        if (array_key_exists($functionId, self::$methodCallGraph)) {
+            // Even though the class was analyzed, the individual
+            // methods calls inside the function might not have been.
+            // Let's see if we had cached this function's callgraph before.
+            $methodCalls = self::$methodCallGraph[$functionId];
+            if (!is_dir($cacheDir)) {
+                mkdir($cacheDir, permissions: 0755, recursive: true);
+            }
+            if ($config->use_igbinary) {
+                file_put_contents(
+                    $cachePath,
+                    \igbinary_serialize($methodCalls),
+                    LOCK_EX
+                );
+            } else {
+                file_put_contents(
+                    $cachePath,
+                    \serialize($methodCalls),
+                    LOCK_EX
+                );
+            }
+        } elseif (is_file($cachePath)) {
+            $contents = file_get_contents($cachePath);
+            if ($contents !== false) {
+                if ($config->use_igbinary) {
+                    /** @var array<lowercase-string, true> */
+                    $methodCalls = \igbinary_unserialize($contents);
+                } else {
+                    /** @var array<lowercase-string, true> */
+                    $methodCalls = \unserialize($contents);
+                }
+            }
+        }
+        return $methodCalls;
+    }
+
+    /**
+     * @return array<string, RequestParamDescription>
+     */
+    private static function getMethodTypeMapping(string $functionId): array {
+        $config = \Psalm\Config::getInstance();
+        $rootCacheDirectory = $config->getCacheDirectory();
+        if (!$rootCacheDirectory) {
+            throw new \UnexpectedValueException('No cache directory defined');
+        }
+        $cacheDir = (
+            $rootCacheDirectory . DIRECTORY_SEPARATOR
+            . 'omegaup-methodtypemapping'
+        );
+        $cachePath = (
+            $cacheDir . DIRECTORY_SEPARATOR
+            . sha1($functionId)
+        );
+        if ($config->use_igbinary) {
+            $cachePath .= '-igbinary';
+        }
+        /** @var array<string, RequestParamDescription> */
+        $methodTypeMapping = [];
+        if (array_key_exists($functionId, self::$methodTypeMapping)) {
+            // Even though the class was analyzed, the individual
+            // methods calls inside the function might not have been.
+            // Let's see if we had cached this function's callgraph before.
+            $methodTypeMapping = self::$methodTypeMapping[$functionId];
+            if (!is_dir($cacheDir)) {
+                mkdir($cacheDir, permissions: 0755, recursive: true);
+            }
+            if ($config->use_igbinary) {
+                file_put_contents(
+                    $cachePath,
+                    \igbinary_serialize($methodTypeMapping),
+                    LOCK_EX
+                );
+            } else {
+                file_put_contents(
+                    $cachePath,
+                    \serialize($methodTypeMapping),
+                    LOCK_EX
+                );
+            }
+        } elseif (is_file($cachePath)) {
+            $contents = file_get_contents($cachePath);
+            if ($contents !== false) {
+                if ($config->use_igbinary) {
+                    /** @var array<string, RequestParamDescription> */
+                    $methodTypeMapping = \igbinary_unserialize($contents);
+                } else {
+                    /** @var array<string, RequestParamDescription> */
+                    $methodTypeMapping = \unserialize($contents);
+                }
+            }
+        }
+        return $methodTypeMapping;
     }
 }
 

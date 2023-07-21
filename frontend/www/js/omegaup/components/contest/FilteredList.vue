@@ -21,9 +21,9 @@
         </thead>
         <tbody class="contest-list">
           <template v-for="contest in page">
-            <tr>
+            <tr :key="contest.alias">
               <td class="">
-                <a :href="`/arena/${contest.alias}/`">
+                <a :href="ui.contestURL(contest)">
                   <span>{{ ui.contestTitle(contest) }}</span>
                   <span
                     v-if="contest.recommended"
@@ -56,7 +56,7 @@
                 </a>
               </td>
               <td v-if="!ui.isVirtual(contest) && showVirtual">
-                <a :href="`/arena/${contest.alias}/virtual/`">
+                <a :href="`/contest/${contest.alias}/virtual/`">
                   <span>{{ T.virtualContest }}</span>
                 </a>
               </td>
@@ -64,7 +64,7 @@
                 {{ contest.last_updated.long() }}
               </td>
             </tr>
-            <tr>
+            <tr :key="`${contest.alias}-description`">
               <td colspan="5">
                 {{ contest.description }}
               </td>
@@ -74,11 +74,13 @@
         <tfoot>
           <tr v-if="hasNext || hasPrevious" align="center">
             <td class="no-wrap" :colspan="pagerColumns">
-              <a v-if="hasPrevious" href="#" @click="previous">{{
+              <a v-if="hasPrevious" href="#" class="mr-2" @click="previous">{{
                 T.wordsPrevPage
               }}</a>
               <span class="page-num">{{ pageNumber }}</span>
-              <a v-if="hasNext" href="#" @click="next">{{ T.wordsNextPage }}</a>
+              <a v-if="hasNext" href="#" class="ml-2" @click="next">{{
+                T.wordsNextPage
+              }}</a>
             </td>
           </tr>
         </tfoot>
@@ -89,14 +91,14 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
+import { types } from '../../api_types';
 
 @Component
 export default class FilteredList extends Vue {
-  @Prop() contests!: omegaup.Contest[];
+  @Prop() contests!: types.ContestAdminDetails[];
   @Prop() showTimes!: boolean;
   @Prop() showPractice!: boolean;
   @Prop() showVirtual!: boolean;
@@ -113,7 +115,7 @@ export default class FilteredList extends Vue {
     return Math.ceil(this.contests.length / this.pageSize);
   }
 
-  get page(): omegaup.Contest[] {
+  get page(): types.ContestAdminDetails[] {
     let first = (this.pageNumber - 1) * this.pageSize;
     return this.contests.slice(first, first + this.pageSize);
   }
@@ -158,3 +160,13 @@ export default class FilteredList extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+.empty-category {
+  text-align: center;
+  font-size: 200%;
+  margin: 1em;
+  color: var(--arena-contest-list-empty-category-font-color);
+}
+</style>

@@ -60,15 +60,16 @@ import carouselConfig from '../../carousel.config';
 })
 export default class Carousel extends Vue {
   T = T;
-  slides = carouselConfig;
+  // Reverse the entries so that newer ones appear first.
+  slides = carouselConfig.reverse();
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
 .carousel {
-  background: $omegaup-primary--darker;
-  color: $white;
+  background: var(--homepage-carousel-background-color) !important;
+  color: var(--homepage-carousel-font-color);
 }
 </style>

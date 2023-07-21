@@ -36,16 +36,27 @@ abstract class Users {
                 `git_token` = ?,
                 `main_email_id` = ?,
                 `main_identity_id` = ?,
+                `has_learning_objective` = ?,
+                `has_teaching_objective` = ?,
+                `has_scholar_objective` = ?,
+                `has_competitive_objective` = ?,
                 `scholar_degree` = ?,
                 `birth_date` = ?,
                 `verified` = ?,
                 `verification_id` = ?,
+                `deletion_token` = ?,
                 `reset_digest` = ?,
                 `reset_sent_at` = ?,
                 `hide_problem_tags` = ?,
                 `in_mailing_list` = ?,
                 `is_private` = ?,
-                `preferred_language` = ?
+                `preferred_language` = ?,
+                `parent_verified` = ?,
+                `creation_timestamp` = ?,
+                `parental_verification_token` = ?,
+                `parent_email_verification_initial` = ?,
+                `parent_email_verification_deadline` = ?,
+                `parent_email_id` = ?
             WHERE
                 (
                     `user_id` = ?
@@ -63,10 +74,31 @@ abstract class Users {
                 null :
                 intval($Users->main_identity_id)
             ),
+            (
+                is_null($Users->has_learning_objective) ?
+                null :
+                intval($Users->has_learning_objective)
+            ),
+            (
+                is_null($Users->has_teaching_objective) ?
+                null :
+                intval($Users->has_teaching_objective)
+            ),
+            (
+                is_null($Users->has_scholar_objective) ?
+                null :
+                intval($Users->has_scholar_objective)
+            ),
+            (
+                is_null($Users->has_competitive_objective) ?
+                null :
+                intval($Users->has_competitive_objective)
+            ),
             $Users->scholar_degree,
             $Users->birth_date,
             intval($Users->verified),
             $Users->verification_id,
+            $Users->deletion_token,
             $Users->reset_digest,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Users->reset_sent_at
@@ -79,6 +111,26 @@ abstract class Users {
             intval($Users->in_mailing_list),
             intval($Users->is_private),
             $Users->preferred_language,
+            (
+                is_null($Users->parent_verified) ?
+                null :
+                intval($Users->parent_verified)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Users->creation_timestamp
+            ),
+            $Users->parental_verification_token,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Users->parent_email_verification_initial
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Users->parent_email_verification_deadline
+            ),
+            (
+                is_null($Users->parent_email_id) ?
+                null :
+                intval($Users->parent_email_id)
+            ),
             intval($Users->user_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -105,16 +157,27 @@ abstract class Users {
                 `Users`.`git_token`,
                 `Users`.`main_email_id`,
                 `Users`.`main_identity_id`,
+                `Users`.`has_learning_objective`,
+                `Users`.`has_teaching_objective`,
+                `Users`.`has_scholar_objective`,
+                `Users`.`has_competitive_objective`,
                 `Users`.`scholar_degree`,
                 `Users`.`birth_date`,
                 `Users`.`verified`,
                 `Users`.`verification_id`,
+                `Users`.`deletion_token`,
                 `Users`.`reset_digest`,
                 `Users`.`reset_sent_at`,
                 `Users`.`hide_problem_tags`,
                 `Users`.`in_mailing_list`,
                 `Users`.`is_private`,
-                `Users`.`preferred_language`
+                `Users`.`preferred_language`,
+                `Users`.`parent_verified`,
+                `Users`.`creation_timestamp`,
+                `Users`.`parental_verification_token`,
+                `Users`.`parent_email_verification_initial`,
+                `Users`.`parent_email_verification_deadline`,
+                `Users`.`parent_email_id`
             FROM
                 `Users`
             WHERE
@@ -128,6 +191,35 @@ abstract class Users {
             return null;
         }
         return new \OmegaUp\DAO\VO\Users($row);
+    }
+
+    /**
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\Users} por llave primaria.
+     *
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\Users}
+     * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
+     *
+     * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
+     * los campos.
+     *
+     * @return bool Si existe o no tal registro.
+     */
+    final public static function existsByPK(
+        int $user_id
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `Users`
+            WHERE
+                (
+                    `user_id` = ?
+                );';
+        $params = [$user_id];
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
     }
 
     /**
@@ -201,16 +293,27 @@ abstract class Users {
                 `Users`.`git_token`,
                 `Users`.`main_email_id`,
                 `Users`.`main_identity_id`,
+                `Users`.`has_learning_objective`,
+                `Users`.`has_teaching_objective`,
+                `Users`.`has_scholar_objective`,
+                `Users`.`has_competitive_objective`,
                 `Users`.`scholar_degree`,
                 `Users`.`birth_date`,
                 `Users`.`verified`,
                 `Users`.`verification_id`,
+                `Users`.`deletion_token`,
                 `Users`.`reset_digest`,
                 `Users`.`reset_sent_at`,
                 `Users`.`hide_problem_tags`,
                 `Users`.`in_mailing_list`,
                 `Users`.`is_private`,
-                `Users`.`preferred_language`
+                `Users`.`preferred_language`,
+                `Users`.`parent_verified`,
+                `Users`.`creation_timestamp`,
+                `Users`.`parental_verification_token`,
+                `Users`.`parent_email_verification_initial`,
+                `Users`.`parent_email_verification_deadline`,
+                `Users`.`parent_email_id`
             FROM
                 `Users`
         ';
@@ -265,17 +368,39 @@ abstract class Users {
                     `git_token`,
                     `main_email_id`,
                     `main_identity_id`,
+                    `has_learning_objective`,
+                    `has_teaching_objective`,
+                    `has_scholar_objective`,
+                    `has_competitive_objective`,
                     `scholar_degree`,
                     `birth_date`,
                     `verified`,
                     `verification_id`,
+                    `deletion_token`,
                     `reset_digest`,
                     `reset_sent_at`,
                     `hide_problem_tags`,
                     `in_mailing_list`,
                     `is_private`,
-                    `preferred_language`
+                    `preferred_language`,
+                    `parent_verified`,
+                    `creation_timestamp`,
+                    `parental_verification_token`,
+                    `parent_email_verification_initial`,
+                    `parent_email_verification_deadline`,
+                    `parent_email_id`
                 ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -304,10 +429,31 @@ abstract class Users {
                 null :
                 intval($Users->main_identity_id)
             ),
+            (
+                is_null($Users->has_learning_objective) ?
+                null :
+                intval($Users->has_learning_objective)
+            ),
+            (
+                is_null($Users->has_teaching_objective) ?
+                null :
+                intval($Users->has_teaching_objective)
+            ),
+            (
+                is_null($Users->has_scholar_objective) ?
+                null :
+                intval($Users->has_scholar_objective)
+            ),
+            (
+                is_null($Users->has_competitive_objective) ?
+                null :
+                intval($Users->has_competitive_objective)
+            ),
             $Users->scholar_degree,
             $Users->birth_date,
             intval($Users->verified),
             $Users->verification_id,
+            $Users->deletion_token,
             $Users->reset_digest,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Users->reset_sent_at
@@ -320,6 +466,26 @@ abstract class Users {
             intval($Users->in_mailing_list),
             intval($Users->is_private),
             $Users->preferred_language,
+            (
+                is_null($Users->parent_verified) ?
+                null :
+                intval($Users->parent_verified)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Users->creation_timestamp
+            ),
+            $Users->parental_verification_token,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Users->parent_email_verification_initial
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Users->parent_email_verification_deadline
+            ),
+            (
+                is_null($Users->parent_email_id) ?
+                null :
+                intval($Users->parent_email_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

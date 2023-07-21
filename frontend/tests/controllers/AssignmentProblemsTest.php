@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAddProblemToAssignment() {
@@ -25,7 +26,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             [$problem]
         )[0];
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Assert that the problem was correctly added
         $getAssignmentResponse = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
@@ -33,19 +34,99 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'course' => $courseAlias,
             'assignment' => $assignmentAlias,
         ]));
-        $this->assertEquals(1, sizeof($getAssignmentResponse['problems']));
-        $this->assertEquals(
+        $this->assertSame(1, sizeof($getAssignmentResponse['problems']));
+        $this->assertSame(
             $problem['problem']->alias,
             $getAssignmentResponse['problems'][0]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problem['problem']->commit,
             $getAssignmentResponse['problems'][0]['commit']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problem['problem']->current_version,
             $getAssignmentResponse['problems'][0]['version']
         );
+    }
+
+    public function testInvitedAdminAddPrivateProblem() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = self::login($identity);
+
+        // Create a course with an assignment
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $identity,
+            $adminLogin
+        );
+        $courseAlias = $courseData['course_alias'];
+        $assignmentAlias = $courseData['assignment_alias'];
+
+        // Add one problem to the assignment
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'private',
+                'author' => $identity
+            ]),
+            $adminLogin
+        );
+
+        [
+            'identity' => $invitedAdmin,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Controllers\Course::apiAddAdmin(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $invitedAdmin->username,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        // Invited admin tries to add a private problem into the course
+        $invitedAdminLogin = self::login($invitedAdmin);
+
+        try {
+            \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
+                'auth_token' => $invitedAdminLogin->auth_token,
+                'course_alias' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'problem_alias' => $problem['problem']->alias,
+                'points' => 100,
+            ]));
+            $this->fail('It should fail because of the privileges');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+
+        \OmegaUp\Controllers\Course::apiAddProblem(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'problem_alias' => $problem['problem']->alias,
+                'points' => 100,
+            ])
+        );
+
+        // But the invited admin can update the problem in the same course
+        \OmegaUp\Controllers\Course::apiAddProblem(
+            new \OmegaUp\Request([
+                'auth_token' => $invitedAdminLogin->auth_token,
+                'course_alias' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'problem_alias' => $problem['problem']->alias,
+                'points' => 50,
+            ])
+        );
+
+        $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(
+            new \OmegaUp\Request([
+                'course' => $courseAlias,
+                'assignment' => $assignmentAlias,
+                'auth_token' => $invitedAdminLogin->auth_token,
+            ])
+        );
+
+        self::assertSame($response['problems'][0]['points'], 50.0);
     }
 
     public function testDeleteProblemFromAssignment() {
@@ -79,7 +160,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'assignment_alias' => $assignmentAlias,
             'problem_alias' => $problem['problem']->alias,
         ]));
-        $this->assertEquals('ok', $removeProblemResponse['status']);
+        $this->assertSame('ok', $removeProblemResponse['status']);
 
         // Assert that the problem was correctly removed
         $getAssignmentResponse = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
@@ -87,7 +168,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'course' => $courseAlias,
             'assignment' => $assignmentAlias,
         ]));
-        $this->assertEquals(0, sizeof($getAssignmentResponse['problems']));
+        $this->assertSame(0, sizeof($getAssignmentResponse['problems']));
     }
 
     public function testAddRemoveProblems() {
@@ -123,9 +204,9 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             $assignmentAlias,
             $problems
         );
-        $this->assertEquals('ok', $responses[0]['status']);
-        $this->assertEquals('ok', $responses[1]['status']);
-        $this->assertEquals('ok', $responses[2]['status']);
+        $this->assertSame('ok', $responses[0]['status']);
+        $this->assertSame('ok', $responses[1]['status']);
+        $this->assertSame('ok', $responses[2]['status']);
 
         // Assert that the problems were correctly added
         $getAssignmentResponse = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
@@ -133,7 +214,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'course' => $courseAlias,
             'assignment' => $assignmentAlias,
         ]));
-        $this->assertEquals(3, sizeof($getAssignmentResponse['problems']));
+        $this->assertSame(3, sizeof($getAssignmentResponse['problems']));
 
         // Remove multiple problems from the assignment
         $removeProblemResponse = \OmegaUp\Controllers\Course::apiRemoveProblem(new \OmegaUp\Request([
@@ -142,14 +223,14 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'assignment_alias' => $assignmentAlias,
             'problem_alias' => $problems[0]['problem']->alias,
         ]));
-        $this->assertEquals('ok', $removeProblemResponse['status']);
+        $this->assertSame('ok', $removeProblemResponse['status']);
         $removeProblemResponse = \OmegaUp\Controllers\Course::apiRemoveProblem(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
             'problem_alias' => $problems[2]['problem']->alias,
         ]));
-        $this->assertEquals('ok', $removeProblemResponse['status']);
+        $this->assertSame('ok', $removeProblemResponse['status']);
 
         // Assert that the problems were correctly removed
         $getAssignmentResponse = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
@@ -157,8 +238,8 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'course' => $courseAlias,
             'assignment' => $assignmentAlias,
         ]));
-        $this->assertEquals(1, sizeof($getAssignmentResponse['problems']));
-        $this->assertEquals(
+        $this->assertSame(1, sizeof($getAssignmentResponse['problems']));
+        $this->assertSame(
             $problems[1]['problem']->alias,
             $getAssignmentResponse['problems'][0]['alias']
         );
@@ -195,7 +276,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -232,7 +313,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -275,7 +356,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -320,7 +401,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -349,7 +430,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertEquals('problemNotFound', $e->getMessage());
+            $this->assertSame('problemNotFound', $e->getMessage());
         }
     }
 
@@ -420,7 +501,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA');
 
-        // Second student will solve problem1, fail on problem0 and won't try problem2
+        // Second student will solve problem1, fail (90%) on problem0 and won't try problem2
         $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
             $problemsData[1],
             $courseData,
@@ -433,43 +514,47 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             $courseData,
             $identities[1]
         );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA');
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0.9, 'PA');
 
         $results = \OmegaUp\DAO\Assignments::getAssignmentsProblemsStatistics(
             $courseData['course']->course_id,
             $courseData['course']->group_id
         );
 
-        $this->assertEquals($assignmentAlias, $results[0]['assignment_alias']);
+        $this->assertSame($assignmentAlias, $results[0]['assignment_alias']);
         // Variance of the first problem must be greater than 0
         // Variance of the second one should be 0, all users solved it
         // Variance of the third problem should be 0, no user did anything
         $this->assertGreaterThan(0, $results[0]['variance']);
-        $this->assertEquals(0, $results[1]['variance']);
-        $this->assertEquals(0, $results[2]['variance']);
+        $this->assertSame(0.0, $results[1]['variance']);
+        $this->assertSame(0.0, $results[2]['variance']);
         // Average
-        $this->assertEquals(50, $results[0]['average']);
-        $this->assertEquals(100, $results[1]['average']);
-        $this->assertEquals(0, $results[2]['average']);
+        $this->assertSame(95.0, $results[0]['average']);
+        $this->assertSame(100.0, $results[1]['average']);
+        $this->assertSame(0.0, $results[2]['average']);
         // Minimum
-        $this->assertEquals(0, $results[0]['minimum']);
-        $this->assertEquals(100, $results[1]['minimum']);
-        $this->assertEquals(0, $results[2]['minimum']);
+        $this->assertSame(90.0, $results[0]['minimum']);
+        $this->assertSame(100.0, $results[1]['minimum']);
+        $this->assertSame(0.0, $results[2]['minimum']);
         // Maximum
-        $this->assertEquals(100, $results[0]['maximum']);
-        $this->assertEquals(100, $results[1]['maximum']);
-        $this->assertEquals(0, $results[2]['maximum']);
+        $this->assertSame(100.0, $results[0]['maximum']);
+        $this->assertSame(100.0, $results[1]['maximum']);
+        $this->assertSame(0.0, $results[2]['maximum']);
+        // Percent over 100%
+        $this->assertSame(50.0, $results[0]['completed_score_percentage']);
+        $this->assertSame(100.0, $results[1]['completed_score_percentage']);
+        $this->assertSame(0.0, $results[2]['completed_score_percentage']);
         // Percent over 60%
-        $this->assertEquals(50, $results[0]['high_score_percentage']);
-        $this->assertEquals(100, $results[1]['high_score_percentage']);
-        $this->assertEquals(0, $results[2]['high_score_percentage']);
+        $this->assertSame(100.0, $results[0]['high_score_percentage']);
+        $this->assertSame(100.0, $results[1]['high_score_percentage']);
+        $this->assertSame(0.0, $results[2]['high_score_percentage']);
         // Percent at 0%
-        $this->assertEquals(50, $results[0]['low_score_percentage']);
-        $this->assertEquals(0, $results[1]['low_score_percentage']);
-        $this->assertEquals(100, $results[2]['low_score_percentage']);
+        $this->assertSame(0.0, $results[0]['low_score_percentage']);
+        $this->assertSame(0.0, $results[1]['low_score_percentage']);
+        $this->assertSame(100.0, $results[2]['low_score_percentage']);
         //average runs
         $this->assertGreaterThan(1, $results[0]['avg_runs']);
-        $this->assertEquals(1, $results[1]['avg_runs']);
+        $this->assertSame(1.0, $results[1]['avg_runs']);
         $this->assertLessThan(1, $results[2]['avg_runs']);
     }
 
@@ -603,13 +688,6 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problemsData[1]['problem']->alias,
               ],
               [
-                'verdict' => 'CE',
-                'runs' => 2,
-                'assignment_alias' => $assignmentAlias,
-                'problem_id' => $problemsData[1]['problem']->problem_id,
-                'problem_alias' => $problemsData[1]['problem']->alias,
-              ],
-              [
                 'verdict' => 'AC',
                 'runs' => 1,
                 'assignment_alias' => $assignmentAlias,
@@ -619,6 +697,13 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
               [
                 'verdict' => 'TLE',
                 'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[1]['problem']->problem_id,
+                'problem_alias' => $problemsData[1]['problem']->alias,
+              ],
+              [
+                'verdict' => 'CE',
+                'runs' => 2,
                 'assignment_alias' => $assignmentAlias,
                 'problem_id' => $problemsData[1]['problem']->problem_id,
                 'problem_alias' => $problemsData[1]['problem']->alias,

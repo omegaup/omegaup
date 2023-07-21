@@ -2,6 +2,10 @@ import Vue from 'vue';
 import problem_Details, {
   PopupDisplayed,
 } from '../components/problem/Details.vue';
+import {
+  getOptionsFromLocation,
+  getProblemAndRunDetails,
+} from '../arena/location';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../components/qualitynomination/PromotionPopup.vue';
 import { myRunsStore, runsStore, RunFilters } from '../arena/runsStore';
@@ -10,24 +14,59 @@ import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import * as time from '../time';
-import JSZip from 'jszip';
 import T from '../lang';
+import {
+  ContestClarification,
+  refreshProblemClarifications,
+  trackClarifications,
+} from '../arena/clarifications';
+import clarificationStore from '../arena/clarificationsStore';
+import {
+  onRefreshRuns,
+  onSetNominationStatus,
+  showSubmission,
+  SubmissionRequest,
+  submitRun,
+  submitRunFailed,
+  trackRun,
+  updateRunFallback,
+} from '../arena/submissions';
 
-OmegaUp.on('ready', () => {
+OmegaUp.on('ready', async () => {
   const payload = types.payloadParsers.ProblemDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
   const runs =
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
+
+  const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
+  const searchResultEmpty: types.ListItem[] = [];
+  let runDetails: null | types.RunDetails = null;
+  try {
+    ({ runDetails } = await getProblemAndRunDetails({
+      location: window.location.hash,
+    }));
+  } catch (e: any) {
+    ui.apiError(e);
+  }
+
+  trackClarifications(payload.clarifications ?? []);
+
+  let nextSubmissionTimestamp: null | Date = null;
+  if (payload.problem.nextSubmissionTimestamp != null) {
+    nextSubmissionTimestamp = time.remoteTime(
+      payload.problem.nextSubmissionTimestamp.getTime(),
+    );
+  }
+
   const problemDetailsView = new Vue({
     el: '#main-container',
     components: {
       'omegaup-problem-details': problem_Details,
     },
     data: () => ({
-      initialClarifications: payload.clarifications,
-      initialPopupDisplayed: PopupDisplayed.None,
-      runDetailsData: null as types.RunDetails | null,
+      popupDisplayed,
+      runDetailsData: runDetails,
       solutionStatus: payload.solutionStatus,
       solution: null as types.ProblemStatement | null,
       availableTokens: 0,
@@ -38,7 +77,10 @@ OmegaUp.on('ready', () => {
         payload.nominationStatus?.nominated ||
         (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
-      guid: null as null | string,
+      guid,
+      nextSubmissionTimestamp,
+      searchResultUsers: searchResultEmpty,
+      searchResultProblems: searchResultEmpty,
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
@@ -51,12 +93,12 @@ OmegaUp.on('ready', () => {
           user: payload.user,
           nominationStatus: this.nominationStatus,
           histogram: payload.histogram,
-          initialClarifications: this.initialClarifications,
+          clarifications: clarificationStore.state.clarifications,
           solutionStatus: this.solutionStatus,
           solution: this.solution,
           availableTokens: this.availableTokens,
           allTokens: this.allTokens,
-          initialPopupDisplayed: this.initialPopupDisplayed,
+          popupDisplayed: this.popupDisplayed,
           runDetailsData: this.runDetailsData,
           allowUserAddTags: payload.allowUserAddTags,
           levelTags: payload.levelTags,
@@ -66,75 +108,39 @@ OmegaUp.on('ready', () => {
           selectedPrivateTags: payload.selectedPrivateTags,
           hasBeenNominated: this.hasBeenNominated,
           guid: this.guid,
-          isAdmin: commonPayload.isAdmin,
+          isAdmin: payload.user.admin,
           showVisibilityIndicators: true,
+          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          shouldShowTabs: true,
+          searchResultUsers: this.searchResultUsers,
+          searchResultProblems: this.searchResultProblems,
+          problemAlias: payload.problem.alias,
+          totalRuns: runsStore.state.totalRuns,
         },
         on: {
-          'show-run': (source: problem_Details, guid: string) => {
-            api.Run.details({ run_alias: guid })
-              .then((data) => {
-                if (data.show_diff === 'none' || !commonPayload.isAdmin) {
-                  source.displayRunDetails(guid, data);
-                  return;
+          'show-run': (request: SubmissionRequest) => {
+            api.Run.details({ run_alias: request.guid })
+              .then((runDetails) => {
+                this.runDetailsData = showSubmission({ request, runDetails });
+                if (request.hash) {
+                  window.location.hash = request.hash;
                 }
-                fetch(`/api/run/download/run_alias/${guid}/show_diff/true/`)
-                  .then((response) => {
-                    if (!response.ok) {
-                      return Promise.reject(new Error(response.statusText));
-                    }
-                    return Promise.resolve(response.blob());
-                  })
-                  .then(JSZip.loadAsync)
-                  .then((zip: JSZip) => {
-                    const result: {
-                      cases: string[];
-                      promises: Promise<string>[];
-                    } = { cases: [], promises: [] };
-                    zip.forEach(async (relativePath, zipEntry) => {
-                      const pos = relativePath.lastIndexOf('.');
-                      const basename = relativePath.substring(0, pos);
-                      const extension = relativePath.substring(pos + 1);
-                      if (
-                        extension !== 'out' ||
-                        relativePath.indexOf('/') !== -1
-                      ) {
-                        return;
-                      }
-                      if (
-                        data.show_diff === 'examples' &&
-                        relativePath.indexOf('sample/') === 0
-                      ) {
-                        return;
-                      }
-                      result.cases.push(basename);
-                      result.promises.push(
-                        zip.file(zipEntry.name).async('text'),
-                      );
-                    });
-                    return result;
-                  })
-                  .then((response) => {
-                    Promise.allSettled(response.promises).then((results) => {
-                      results.forEach((result: any, index: number) => {
-                        if (data.cases[response.cases[index]]) {
-                          data.cases[response.cases[index]].contestantOutput =
-                            result.value;
-                        }
-                      });
-                    });
-                    source.displayRunDetails(guid, data);
-                  })
-                  .catch(ui.apiError);
               })
-              .catch((error) => {
-                ui.apiError(error);
-                source.popupDisplayed = PopupDisplayed.None;
+              .catch((run) => {
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
               });
           },
-          'apply-filter': (
-            filter: 'verdict' | 'language' | 'username' | 'status',
-            value: string,
-          ) => {
+          'apply-filter': ({
+            filter,
+            value,
+          }: {
+            filter: 'verdict' | 'language' | 'username' | 'status' | 'offset';
+            value: string;
+          }) => {
             if (value) {
               runsStore.commit('applyFilter', {
                 [filter]: value,
@@ -144,37 +150,45 @@ OmegaUp.on('ready', () => {
             }
             refreshRuns();
           },
-          'submit-run': (code: string, language: string) => {
+          'submit-run': ({
+            code,
+            language,
+            nominationStatus,
+          }: {
+            code: string;
+            language: string;
+            runs: types.Run[];
+            nominationStatus: types.NominationStatus;
+          }) => {
             api.Run.create({
               problem_alias: payload.problem.alias,
               language: language,
               source: code,
             })
+              .then(time.remoteTimeAdapter)
               .then((response) => {
-                ui.reportEvent('submission', 'submit');
+                problemDetailsView.nextSubmissionTimestamp =
+                  response.nextSubmissionTimestamp;
 
-                updateRun({
+                submitRun({
                   guid: response.guid,
-                  submit_delay: response.submit_delay,
+                  submitDelay: response.submit_delay,
+                  language,
                   username: commonPayload.currentUsername,
                   classname: commonPayload.userClassname,
-                  country: 'xx',
-                  status: 'new',
-                  alias: payload.problem.alias,
-                  time: new Date(),
-                  penalty: 0,
-                  runtime: 0,
-                  memory: 0,
-                  verdict: 'JE',
-                  score: 0,
-                  language: language,
+                  problemAlias: payload.problem.alias,
+                });
+                setNominationStatus({
+                  runs: myRunsStore.state.runs,
+                  nominationStatus,
                 });
               })
               .catch((run) => {
-                ui.error(run.error ?? run);
-                if (run.errorname) {
-                  ui.reportEvent('submission', 'submit-fail', run.errorname);
-                }
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
               });
           },
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
@@ -200,24 +214,30 @@ OmegaUp.on('ready', () => {
               }),
             }).catch(ui.apiError);
           },
-          'submit-promotion': (source: qualitynomination_Promotion) => {
+          'submit-promotion': ({
+            solved,
+            tried,
+            quality,
+            difficulty,
+          }: {
+            solved: boolean;
+            tried: boolean;
+            quality: string;
+            difficulty: string;
+          }) => {
             const contents: {
               before_ac?: boolean;
               difficulty?: number;
               quality?: number;
-              tags?: string[];
             } = {};
-            if (!source.solved && source.tried) {
+            if (!solved && tried) {
               contents.before_ac = true;
             }
-            if (source.difficulty !== '') {
-              contents.difficulty = Number.parseInt(source.difficulty, 10);
+            if (difficulty !== '') {
+              contents.difficulty = Number.parseInt(difficulty, 10);
             }
-            if (source.tags.length > 0) {
-              contents.tags = source.tags;
-            }
-            if (source.quality !== '') {
-              contents.quality = Number.parseInt(source.quality, 10);
+            if (quality !== '') {
+              contents.quality = Number.parseInt(quality, 10);
             }
             api.QualityNomination.create({
               problem_alias: payload.problem.alias,
@@ -316,45 +336,40 @@ OmegaUp.on('ready', () => {
                 });
             }
           },
-          'clarification-response': (
-            id: number,
-            responseText: string,
-            isPublic: boolean,
-          ) => {
-            api.Clarification.update({
-              clarification_id: id,
-              answer: responseText,
-              public: isPublic,
-            })
+          'clarification-response': ({
+            clarification,
+          }: ContestClarification) => {
+            api.Clarification.update(clarification)
               .then(() => {
-                api.Problem.clarifications({
-                  problem_alias: payload.problem.alias,
-                })
-                  .then(time.remoteTimeAdapter)
-                  .then(
-                    (response) =>
-                      (this.initialClarifications = response.clarifications),
-                  )
-                  .catch(ui.apiError);
+                refreshProblemClarifications({
+                  problemAlias: payload.problem.alias,
+                  rowcount: 20,
+                  offset: 0,
+                });
               })
               .catch(ui.apiError);
           },
           'update:activeTab': (tabName: string) => {
-            window.location.replace(`#${tabName}`);
+            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
           },
           'redirect-login-page': () => {
             window.location.href = `/login/?redirect=${encodeURIComponent(
               window.location.pathname,
             )}`;
           },
-          'change-show-run-location': (guid: string) => {
-            window.location.hash = `#problems/show-run:${guid}/`;
-          },
           rejudge: (run: types.Run) => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
               .then(() => {
                 run.status = 'rejudging';
-                updateRunFallback(run.guid);
+                updateRunFallback({ run });
+              })
+              .catch(ui.ignoreError);
+          },
+          requalify: (run: types.Run) => {
+            api.Run.requalify({ run_alias: run.guid })
+              .then(() => {
+                run.type = 'normal';
+                updateRunFallback({ run });
               })
               .catch(ui.ignoreError);
           },
@@ -365,56 +380,89 @@ OmegaUp.on('ready', () => {
             api.Run.disqualify({ run_alias: run.guid })
               .then(() => {
                 run.type = 'disqualified';
-                updateRunFallback(run.guid);
+                updateRunFallback({ run });
               })
               .catch(ui.ignoreError);
+          },
+          'update-search-result-users': ({ query }: { query: string }) => {
+            api.User.list({ query })
+              .then(({ results }) => {
+                this.searchResultUsers = results.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-problems': (query: string) => {
+            api.Problem.listForTypeahead({
+              query,
+              search_type: 'all',
+            })
+              .then((data) => {
+                this.searchResultProblems = data.results.map(
+                  ({ key, value }) => ({
+                    key,
+                    value,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
           },
         },
       });
     },
   });
 
-  function updateRun(run: types.Run): void {
-    trackRun(run);
+  window.addEventListener(
+    'message',
+    (e) => {
+      if (e.origin != window.location.origin || !e.data) return;
+      switch (e.data.method) {
+        case 'submitRun':
+          api.Run.create(e.data.params)
+            .then(time.remoteTimeAdapter)
+            .then((response) => {
+              problemDetailsView.nextSubmissionTimestamp =
+                response.nextSubmissionTimestamp;
+              submitRun({
+                guid: response.guid,
+                submitDelay: response.submit_delay,
+                language: e.data.params.language,
+                username: commonPayload.currentUsername,
+                classname: commonPayload.userClassname,
+                problemAlias: payload.problem.alias,
+              });
+            })
+            .catch((run) => {
+              submitRunFailed({
+                error: run.error,
+                errorname: run.errorname,
+                run,
+              });
+            });
+          break;
+      }
+    },
+    false,
+  );
 
-    // TODO: Implement websocket support
-
-    if (run.status != 'ready') {
-      updateRunFallback(run.guid);
-      return;
-    }
-  }
-
-  function updateRunFallback(guid: string): void {
-    setTimeout(() => {
-      api.Run.status({ run_alias: guid })
-        .then(time.remoteTimeAdapter)
-        .then((response) => updateRun(response))
-        .catch(ui.ignoreError);
-    }, 5000);
-  }
-
-  function trackRun(run: types.Run): void {
-    runsStore.commit('addRun', run);
-    if (run.username !== OmegaUp.username) {
-      return;
-    }
-    myRunsStore.commit('addRun', run);
-
-    if (!problemDetailsView.nominationStatus) {
-      return;
-    }
-    if (run.verdict !== 'AC' && run.verdict !== 'CE' && run.verdict !== 'JE') {
-      problemDetailsView.nominationStatus.tried = true;
-    }
-    if (run.verdict === 'AC') {
-      Vue.set(
-        problemDetailsView,
-        'nominationStatus',
-        Object.assign({}, problemDetailsView.nominationStatus, {
-          solved: true,
-        }),
-      );
+  function setNominationStatus({
+    runs,
+    nominationStatus,
+  }: {
+    runs: types.Run[];
+    nominationStatus: types.NominationStatus;
+  }) {
+    for (const run of runs) {
+      onSetNominationStatus({
+        run,
+        nominationStatus,
+      });
     }
   }
 
@@ -431,46 +479,45 @@ OmegaUp.on('ready', () => {
     })
       .then(time.remoteTimeAdapter)
       .then((response) => {
-        runsStore.commit('clear');
-        for (const run of response.runs) {
-          trackRun(run);
-        }
+        if (!problemDetailsView.nominationStatus) return;
+        onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
+        setNominationStatus({
+          runs: response.runs,
+          nominationStatus: problemDetailsView.nominationStatus,
+        });
       })
       .catch(ui.apiError);
   }
 
-  function refreshClarifications(): void {
-    api.Problem.clarifications({
-      problem_alias: payload.problem.alias,
-      offset: 0, // TODO: Updating offset is missing
-      rowcount: 0, // TODO: Updating rowcount is missing
-    })
-      .then(time.remoteTimeAdapter)
-      .then(
-        (response) =>
-          (problemDetailsView.initialClarifications = response.clarifications),
-      )
-      .catch(ui.apiError);
-  }
-
   if (runs) {
+    runsStore.commit('setTotalRuns', payload.totalRuns);
     for (const run of runs) {
-      trackRun(run);
+      trackRun({ run });
+    }
+    if (problemDetailsView.nominationStatus) {
+      setNominationStatus({
+        runs: myRunsStore.state.runs,
+        nominationStatus: problemDetailsView.nominationStatus,
+      });
     }
   }
   if (payload.user.admin) {
     setInterval(() => {
       refreshRuns();
-      refreshClarifications();
+      refreshProblemClarifications({
+        problemAlias: payload.problem.alias,
+        rowcount: 20,
+        offset: 0,
+      });
     }, 5 * 60 * 1000);
   }
   if (locationHash.includes('new-run')) {
-    problemDetailsView.initialPopupDisplayed = PopupDisplayed.RunSubmit;
+    problemDetailsView.popupDisplayed = PopupDisplayed.RunSubmit;
   } else if (locationHash[1] && locationHash[1].includes('show-run:')) {
     const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
     const showRunMatch = window.location.hash.match(showRunRegex);
     problemDetailsView.guid = showRunMatch ? showRunMatch[1] : null;
-    problemDetailsView.initialPopupDisplayed = PopupDisplayed.RunDetails;
+    problemDetailsView.popupDisplayed = PopupDisplayed.RunDetails;
   } else if (
     (payload.nominationStatus?.solved || payload.nominationStatus?.tried) &&
     !(
@@ -485,6 +532,6 @@ OmegaUp.on('ready', () => {
     ) &&
     payload.nominationStatus?.canNominateProblem
   ) {
-    problemDetailsView.initialPopupDisplayed = PopupDisplayed.Promotion;
+    problemDetailsView.popupDisplayed = PopupDisplayed.Promotion;
   }
 });

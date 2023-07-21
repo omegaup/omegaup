@@ -15,12 +15,9 @@ export class Experiments {
   }
 
   // Current frontend-available experiments:
-  static get IDENTITIES(): string {
-    return 'identities';
-  }
 
   // The list of all enabled experiments for a particular request should have
-  // been injected into the DOM by Smarty.
+  // been injected into the DOM through the template.
   static loadGlobal(): Experiments {
     const experimentsNode = document?.getElementById(
       'omegaup-enabled-experiments',
@@ -76,18 +73,14 @@ export namespace omegaup {
     AddProblem,
   }
 
-  export enum AdmissionMode {
-    Private = 'private',
-    Registration = 'registration',
-    Public = 'public',
-  }
-
   export enum ColumnType {
     Number = 'number',
     String = 'string',
   }
 
   export enum CountdownFormat {
+    AssignmentHasNotStarted,
+    ContestHasNotStarted,
     EventCountdown,
     WaitBetweenUploadsSeconds,
   }
@@ -107,10 +100,6 @@ export namespace omegaup {
     None = 'none',
     Summary = 'summary',
     Detailed = 'detailed',
-  }
-
-  export interface ArenaContests {
-    [timeType: string]: omegaup.Contest[];
   }
 
   export interface Assignment {
@@ -147,55 +136,6 @@ export namespace omegaup {
     school_id?: number;
   }
 
-  export interface Commit {
-    author: Signature;
-    commit: string;
-    commiter: Signature;
-    message: string;
-    parents: string[];
-    tree: {
-      [file: string]: string;
-    };
-    version: string;
-  }
-
-  export interface Contest {
-    alias: string;
-    title: string;
-    window_length?: null | number;
-    start_time: Date;
-    finish_time?: Date;
-    admission_mode?: AdmissionMode;
-    contestant_must_register?: boolean;
-    admin?: boolean;
-    available_languages?: omegaup.Languages;
-    description?: string;
-    director?: string;
-    feedback?: string;
-    languages?: Array<string>;
-    needs_basic_information?: boolean;
-    opened?: boolean;
-    original_contest_alias?: string;
-    original_problemset_id?: number;
-    partial_score?: boolean;
-    penalty?: number;
-    penalty_calc_policy?: string;
-    penalty_type?: string;
-    points_decay_factor?: number;
-    problems?: omegaup.Problem[];
-    problemset_id?: number;
-    requests_user_information?: string;
-    user_registration_accepted?: boolean;
-    rerun_id?: number;
-    scoreboard?: number;
-    scoreboard_url?: string;
-    scoreboard_url_admin?: string;
-    show_penalty?: boolean;
-    show_scoreboard_after?: boolean;
-    submission_deadline?: Date;
-    submissions_gap?: number;
-  }
-
   export interface ContestGroup {
     alias: string;
     name: string;
@@ -205,21 +145,6 @@ export namespace omegaup {
     role?: string;
     name?: string;
     alias?: string;
-  }
-
-  export interface ContestProblem {
-    alias: string;
-    text: string;
-    acceptsSubmissions: boolean;
-    bestScore: number;
-    maxScore: number;
-    hasRuns?: boolean;
-  }
-
-  export interface ContestResult {
-    data: omegaup.Contest;
-    length?: string;
-    place: number;
   }
 
   export interface Country {
@@ -366,14 +291,6 @@ export namespace omegaup {
     author_ranking: number | null;
   }
 
-  export interface Scoreboard {
-    contests: omegaup.Contest[];
-    name: string;
-    place: number;
-    totalPenalty: number;
-    totalPoints: number;
-  }
-
   export interface Statement {
     images: string[];
     language: string;
@@ -451,12 +368,6 @@ export namespace omegaup {
     showHeader: boolean;
     totalRows: number;
     rank: omegaup.SchoolsRank[];
-  }
-
-  export interface Signature {
-    email: string;
-    name: string;
-    time: string;
   }
 
   export interface Stats {

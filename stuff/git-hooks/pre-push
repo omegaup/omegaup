@@ -40,13 +40,13 @@ if [ $GIT_PUSH -eq 1 ]; then
 	# Fetch the remote in case we don't know the remote ref (e.g. when rebasing
 	# from the UI).
 	if [ "${REMOTE_HASH}" == "${EMPTY_HASH}" ]; then
-		MERGE_BASE="$(git fetch upstream master && git merge-base HEAD upstream/master)"
+		MERGE_BASE="$(git fetch upstream main && git merge-base HEAD upstream/main)"
 		ARGS="${MERGE_BASE}"
 		echo "New branch. Running validations across all changed files since ${MERGE_BASE}..."
 	elif ! git cat-file -e "${REMOTE_HASH}"; then
 		echo $'\e[31mUnknown remote hash ' "\"${REMOTE_HASH}\"" $'.\e[0m You may have missed to run `git pull`.'
 		confirm 'Do you still want to push? [y/N]'
-		MERGE_BASE="$(git fetch upstream master && git merge-base HEAD upstream/master)"
+		MERGE_BASE="$(git fetch upstream main && git merge-base HEAD upstream/main)"
 		ARGS="${MERGE_BASE}"
 		echo "Running validations across all files since ${MERGE_BASE}..."
 	fi
@@ -58,6 +58,16 @@ if [ $GIT_PUSH -eq 1 ]; then
 	fi
 fi
 
-/usr/bin/python3 "${OMEGAUP_ROOT}/stuff/database_schema.py" validate $ARGS
-/usr/bin/python3 "${OMEGAUP_ROOT}/stuff/policy-tool.py" validate
+if ! which docker-compose >/dev/null; then
+	echo -e "\033[0;31mERROR\033[0m: \`docker-compose\` not found. Please run \`git push\` outside the container."
+	exit 1
+fi
+
+if ! docker-compose exec -T frontend true 2>/dev/null ; then
+	echo -e "\033[0;31mERROR\033[0m: The container is not running. Please run \`docker-compose up\` and try again."
+	exit 1
+fi
+
+docker-compose exec -T frontend python3 /opt/omegaup/stuff/database_schema.py validate $ARGS
+docker-compose exec -T frontend python3 /opt/omegaup/stuff/policy-tool.py validate
 exec "${OMEGAUP_ROOT}/stuff/lint.sh" $PRE_UPLOAD_ARGS validate $ARGS

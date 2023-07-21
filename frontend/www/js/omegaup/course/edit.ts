@@ -4,10 +4,7 @@ import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
-import course_AssignmentDetails from '../components/course/AssignmentDetails.vue';
-import course_ProblemList from '../components/course/ProblemList.vue';
 import course_Edit from '../components/course/Edit.vue';
-import course_Form from '../components/course/Form.vue';
 import Sortable from 'sortablejs';
 
 Vue.directive('Sortable', {
@@ -19,6 +16,14 @@ Vue.directive('Sortable', {
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseEditPayload();
   const courseAlias = payload.course.alias;
+  const searchResultEmpty: types.ListItem[] = [];
+  const searchResultSchools: types.SchoolListItem[] = [];
+  if (payload.course.school_name && payload.course.school_id) {
+    searchResultSchools.push({
+      key: payload.course.school_id,
+      value: payload.course.school_name,
+    });
+  }
 
   const courseEdit = new Vue({
     el: '#main-container',
@@ -28,10 +33,14 @@ OmegaUp.on('ready', () => {
     data: () => ({
       data: payload,
       initialTab: window.location.hash
-        ? window.location.hash.substr(1)
+        ? window.location.hash.substring(1)
         : 'course',
       invalidParameterName: '',
       token: '',
+      searchResultUsers: searchResultEmpty,
+      searchResultProblems: searchResultEmpty,
+      searchResultGroups: searchResultEmpty,
+      searchResultSchools: searchResultSchools,
     }),
     methods: {
       refreshCourseAdminDetails: (): void => {
@@ -85,7 +94,11 @@ OmegaUp.on('ready', () => {
           note: '',
         })
           .then(() => {
-            ui.success(T.successfulOperation);
+            if (resolution) {
+              ui.success(T.arbitrateRequestAcceptSuccessfully);
+            } else {
+              ui.success(T.arbitrateRequestDenySuccessfully);
+            }
             courseEdit.refreshStudentList();
           })
           .catch(ui.apiError);
@@ -98,14 +111,61 @@ OmegaUp.on('ready', () => {
           initialTab: this.initialTab,
           invalidParameterName: this.invalidParameterName,
           token: this.token,
+          searchResultUsers: this.searchResultUsers,
+          searchResultProblems: this.searchResultProblems,
+          searchResultGroups: this.searchResultGroups,
+          searchResultSchools: this.searchResultSchools,
         },
         on: {
-          'submit-edit-course': (source: course_Form) => {
+          'update-search-result-groups': (query: string) => {
+            api.Group.list({
+              query,
+            })
+              .then((data) => {
+                // Groups previously added into the contest should not be
+                // shown in the dropdown
+                const addedGroups = new Set(
+                  this.data.groupsAdmins.map((group) => group.alias),
+                );
+                this.searchResultGroups = data
+                  .filter((group) => !addedGroups.has(group.value))
+                  .map((group) => ({
+                    key: group.value,
+                    value: `${ui.escape(group.label)} (<strong>${ui.escape(
+                      group.value,
+                    )}</strong>)`,
+                  }));
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-problems': (query: string) => {
+            api.Problem.listForTypeahead({
+              query,
+              search_type: 'all',
+            })
+              .then((data) => {
+                // Problems previously added into the assignment should not be
+                // shown in the dropdown
+                const addedProblems = new Set(
+                  component.assignmentProblems.map((problem) => problem.alias),
+                );
+                this.searchResultProblems = data.results
+                  .filter((problem) => !addedProblems.has(problem.key))
+                  .map(({ key, value }, index) => ({
+                    key,
+                    value: `${String(index + 1).padStart(2, '0')}.- ${ui.escape(
+                      value,
+                    )} (<strong>${ui.escape(key)}</strong>)`,
+                  }));
+              })
+              .catch(ui.apiError);
+          },
+          'submit-edit-course': (request: messages.CourseUpdateRequest) => {
             new Promise<number | null>((accept) => {
-              if (source.school_id !== undefined) {
-                accept(source.school_id);
-              } else if (source.school_name) {
-                api.School.create({ name: source.school_name })
+              if (request.school.key) {
+                accept(request.school.key);
+              } else if (request.school.value) {
+                api.School.create({ name: request.school.value })
                   .then((response) => {
                     accept(response.school_id);
                   })
@@ -115,30 +175,18 @@ OmegaUp.on('ready', () => {
               }
             })
               .then((schoolId) => {
-                const params: messages.CourseUpdateRequest = {
-                  name: source.name,
-                  description: source.description,
-                  start_time: source.startTime,
-                  alias: source.alias,
-                  show_scoreboard: source.showScoreboard,
-                  needs_basic_information: source.needsBasicInformation,
-                  requests_user_information: source.requests_user_information,
-                  school_id: schoolId ?? undefined,
-                  unlimited_duration: source.unlimitedDuration,
-                  finish_time: !source.unlimitedDuration
-                    ? new Date(source.finishTime).setHours(23, 59, 59, 999) /
-                      1000
-                    : null,
-                };
+                if (schoolId) {
+                  request.school_id = schoolId;
+                }
 
-                api.Course.update(params)
+                api.Course.update(request)
                   .then(() => {
                     ui.success(
                       ui.formatString(T.courseEditCourseEditedAndGoToCourse, {
-                        alias: source.alias,
+                        alias: request.alias,
                       }),
                     );
-                    this.data.course.name = source.name;
+                    this.data.course.name = request.name;
                     window.scrollTo(0, 0);
                     this.refreshCourseAdminDetails();
                   })
@@ -146,70 +194,52 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'submit-new-assignment': (
-            source: course_AssignmentDetails,
-            problems: types.AddedProblem[],
-          ) => {
-            const params = {
-              name: source.name,
-              description: source.description,
-              start_time: source.startTime.getTime() / 1000,
-              assignment_type: source.assignmentType,
-            };
-            if (source.update) {
-              Object.assign(params, {
-                assignment: source.alias,
-                course: courseAlias,
+          'add-assignment': (params: {
+            name: string;
+            description: string;
+            assignment_type: string;
+            start_time: Date;
+            alias: string;
+            course_alias: string;
+            problems: types.AddedProblem[];
+            finish_time?: Date;
+            unlimited_duration?: boolean;
+          }) => {
+            api.Course.createAssignment(params)
+              .then(() => {
+                ui.success(T.courseAssignmentAdded);
+                this.invalidParameterName = '';
+                this.refreshAssignmentsList();
+              })
+              .catch((error) => {
+                ui.apiError(error);
+                component.assignmentFormMode = omegaup.AssignmentFormMode.New;
+                this.invalidParameterName = error.parameter || '';
               });
-
-              if (source.unlimitedDuration) {
-                Object.assign(params, { unlimited_duration: true });
-              } else {
-                Object.assign(params, {
-                  finish_time: source.finishTime.getTime() / 1000,
-                });
-              }
-
-              api.Course.updateAssignment(params)
-                .then(() => {
-                  ui.success(T.courseAssignmentUpdated);
-                  this.invalidParameterName = '';
-                  this.refreshAssignmentsList();
-                })
-                .catch((error) => {
-                  ui.apiError(error);
-                  component.assignmentFormMode =
-                    omegaup.AssignmentFormMode.Edit;
-                  this.invalidParameterName = error.parameter || '';
-                });
-            } else {
-              Object.assign(params, {
-                alias: source.alias,
-                course_alias: courseAlias,
-                problems: JSON.stringify(problems),
+            window.scrollTo(0, 0);
+          },
+          'update-assignment': (params: {
+            name: string;
+            description: string;
+            assignment_type: string;
+            start_time?: Date;
+            alias: string;
+            course_alias: string;
+            problems: types.AddedProblem[];
+            finish_time?: Date;
+            unlimited_duration?: boolean;
+          }) => {
+            api.Course.updateAssignment(params)
+              .then(() => {
+                ui.success(T.courseAssignmentUpdated);
+                this.invalidParameterName = '';
+                this.refreshAssignmentsList();
+              })
+              .catch((error) => {
+                ui.apiError(error);
+                component.assignmentFormMode = omegaup.AssignmentFormMode.Edit;
+                this.invalidParameterName = error.parameter || '';
               });
-
-              if (source.unlimitedDuration) {
-                Object.assign(params, { unlimited_duration: true });
-              } else {
-                Object.assign(params, {
-                  finish_time: source.finishTime.getTime() / 1000,
-                });
-              }
-
-              api.Course.createAssignment(params)
-                .then(() => {
-                  ui.success(T.courseAssignmentAdded);
-                  this.invalidParameterName = '';
-                  this.refreshAssignmentsList();
-                })
-                .catch((error) => {
-                  ui.apiError(error);
-                  component.assignmentFormMode = omegaup.AssignmentFormMode.New;
-                  this.invalidParameterName = error.parameter || '';
-                });
-              window.scrollTo(0, 0);
-            }
           },
           'delete-assignment': (assignment: types.CourseAssignment) => {
             if (
@@ -241,23 +271,34 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'get-versions': (
-            problemAlias: string,
-            source: course_ProblemList,
-          ) => {
-            api.Problem.versions({ problem_alias: problemAlias })
+          'get-versions': ({
+            request,
+            target,
+          }: {
+            request: { problemAlias: string; problemsetId: number };
+            target: {
+              versionLog: types.ProblemVersion[];
+              problems: types.ProblemsetProblem[];
+              selectedRevision: types.ProblemVersion;
+              publishedRevision: types.ProblemVersion;
+            };
+          }) => {
+            api.Problem.versions({
+              problem_alias: request.problemAlias,
+              problemset_id: request.problemsetId,
+            })
               .then((result) => {
-                source.versionLog = result.log;
+                target.versionLog = result.log;
                 let publishedCommitHash = result.published;
-                for (const problem of source.problems) {
-                  if (problem.alias === problemAlias) {
+                for (const problem of target.problems) {
+                  if (problem.alias === request.problemAlias) {
                     publishedCommitHash = problem.commit;
                     break;
                   }
                 }
                 for (const revision of result.log) {
                   if (publishedCommitHash === revision.commit) {
-                    source.selectedRevision = source.publishedRevision = revision;
+                    target.selectedRevision = target.publishedRevision = revision;
                     break;
                   }
                 }
@@ -273,13 +314,18 @@ OmegaUp.on('ready', () => {
               assignment_alias: assignment.alias,
               problem_alias: problem.alias,
               points: problem.points,
+              is_extra_problem: problem.is_extra_problem,
             };
             if (problem.commit) {
               problemParams.commit = problem.commit;
             }
             api.Course.addProblem(problemParams)
               .then(() => {
-                ui.success(T.courseAssignmentProblemAdded);
+                if (assignment.assignment_type == 'lesson') {
+                  ui.success(T.courseAssignmentLectureAdded);
+                } else {
+                  ui.success(T.courseAssignmentProblemAdded);
+                }
                 this.refreshProblemList(assignment);
               })
               .catch(ui.apiError);
@@ -306,7 +352,11 @@ OmegaUp.on('ready', () => {
               assignment_alias: assignment.alias,
             })
               .then(() => {
-                ui.success(T.courseAssignmentProblemRemoved);
+                if (assignment.assignment_type == 'lesson') {
+                  ui.success(T.courseAssignmentLectureRemoved);
+                } else {
+                  ui.success(T.courseAssignmentProblemRemoved);
+                }
                 this.refreshProblemList(assignment);
               })
               .catch(ui.apiError);
@@ -347,13 +397,12 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'add-student': (ev: {
-            participant: string;
+            participant: null | types.ListItem;
             participants: string;
           }) => {
             let participants: string[] = [];
-            if (ev.participants !== '')
-              participants = ev.participants.split(/[\n,]/);
-            if (ev.participant !== '') participants.push(ev.participant);
+            if (ev.participants) participants = ev.participants.split(/[\n,]/);
+            if (ev.participant) participants.push(ev.participant.key);
             if (participants.length === 0) {
               ui.error(T.wordsEmptyAddStudentInput);
               return;
@@ -397,9 +446,9 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'accept-request': (username: string) =>
+          'accept-request': ({ username }: { username: string }) =>
             this.arbitrateRequest(username, true),
-          'deny-request': (username: string) =>
+          'deny-request': ({ username }: { username: string }) =>
             this.arbitrateRequest(username, false),
           'add-admin': (useradmin: string) => {
             api.Course.addAdmin({
@@ -469,6 +518,55 @@ OmegaUp.on('ready', () => {
               .then((data) => {
                 ui.success(T.courseCloneGenerateLinkSuccess);
                 component.token = data.token;
+              })
+              .catch(ui.apiError);
+          },
+          'archive-course': (alias: string, archive: boolean) => {
+            api.Course.archive({
+              course_alias: alias,
+              archive,
+            })
+              .then(() => {
+                if (archive) {
+                  ui.success(T.courseArchivedSuccess);
+                  return;
+                }
+                ui.success(T.courseUnarchivedSuccess);
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-users': (query: string) => {
+            api.User.list({ query })
+              .then(({ results }) => {
+                this.searchResultUsers = results.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-schools': (query: string) => {
+            api.School.list({ query })
+              .then(({ results }) => {
+                if (!results.length) {
+                  this.searchResultSchools = [
+                    {
+                      key: 0,
+                      value: query,
+                    },
+                  ];
+                  return;
+                }
+                this.searchResultSchools = results.map(
+                  ({ key, value }: types.SchoolListItem) => ({
+                    key,
+                    value,
+                  }),
+                );
               })
               .catch(ui.apiError);
           },

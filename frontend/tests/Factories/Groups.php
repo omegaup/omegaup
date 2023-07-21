@@ -16,7 +16,7 @@ class Groups {
         ?\OmegaUp\Test\ScopedLoginToken $login = null
     ) {
         if (is_null($owner)) {
-            ['user' => $user, 'identity' => $owner] = \OmegaUp\Test\Factories\User::createUser();
+            ['identity' => $owner] = \OmegaUp\Test\Factories\User::createUser();
         }
 
         if (is_null($name)) {
@@ -54,6 +54,68 @@ class Groups {
             'response' => $response,
             'owner' => $owner,
             'group' => $group
+        ];
+    }
+
+    /**
+     * Create teams group
+     *
+     * @return array{teamGroup: \OmegaUp\DAO\VO\TeamGroups, owner: \OmegaUp\DAO\VO\Identities|null}
+     */
+    public static function createTeamsGroup(
+        ?\OmegaUp\DAO\VO\Identities $owner = null,
+        ?string $name = null,
+        ?string $description = null,
+        ?string $alias = null,
+        ?int $numberOfContestants = null,
+        ?\OmegaUp\Test\ScopedLoginToken $login = null
+    ) {
+        if (is_null($owner)) {
+            [
+                'identity' => $owner,
+            ] = \OmegaUp\Test\Factories\User::createUser();
+        }
+
+        if (is_null($name)) {
+            $name = \OmegaUp\Test\Utils::createRandomString();
+        }
+
+        if (is_null($description)) {
+            $description = \OmegaUp\Test\Utils::createRandomString();
+        }
+
+        if (is_null($alias)) {
+            $alias = \OmegaUp\Test\Utils::createRandomString();
+        }
+
+        if (is_null($numberOfContestants)) {
+            $numberOfContestants = \OmegaUp\Controllers\TeamsGroup::NUMBER_OF_CONTESTANTS;
+        }
+
+        if (is_null($login)) {
+            $login = \OmegaUp\Test\ControllerTestCase::login($owner);
+        }
+
+        \OmegaUp\Controllers\TeamsGroup::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'alias' => $alias,
+                'name' => $name,
+                'description' => $description,
+                'numberOfContestants' => $numberOfContestants,
+            ])
+        );
+
+        $createdTeamGroup = \OmegaUp\DAO\TeamGroups::getByAlias($alias);
+        if (is_null($createdTeamGroup)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseGroupNotFound'
+            );
+        }
+
+        return [
+            'owner' => $owner,
+            'teamGroup' => $createdTeamGroup,
         ];
     }
 

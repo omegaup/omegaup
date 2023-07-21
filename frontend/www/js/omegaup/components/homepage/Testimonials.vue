@@ -72,8 +72,15 @@ export default class Testimonials extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.carousel {
+  background: var(--homepage-carousel-background-color) !important;
+  color: var(--homepage-carousel-font-color);
+}
+
 .carousel-inner {
-  min-height: 12rem;
+  min-height: 31rem;
 
   .carousel-item {
     blockquote.blockquote {
@@ -84,6 +91,11 @@ export default class Testimonials extends Vue {
         color: wheat;
       }
     }
+  }
+}
+@media only screen and (min-width: 767px) {
+  .carousel-inner {
+    min-height: 12rem;
   }
 }
 </style>

@@ -24,10 +24,11 @@ class Translations {
     /**
      * Creates a new instance of Translations.
      */
-    private function __construct() {
+    private function __construct(?\OmegaUp\DAO\VO\Identities $identity = null) {
         $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
-            /*$identity=*/            null
+            identity: $identity
         );
+        /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
         $filename = sprintf("%s/templates/{$lang}.lang", strval(OMEGAUP_ROOT));
         /** @var array<int, string> $match */
         foreach (
@@ -50,9 +51,9 @@ class Translations {
      *
      * @return \OmegaUp\Translations the singleton instance.
      */
-    public static function getInstance(): \OmegaUp\Translations {
+    public static function getInstance(?\OmegaUp\DAO\VO\Identities $identity = null): \OmegaUp\Translations {
         if (is_null(self::$_instance)) {
-            self::$_instance = new \OmegaUp\Translations();
+            self::$_instance = new \OmegaUp\Translations($identity);
         }
         return self::$_instance;
     }
@@ -66,7 +67,7 @@ class Translations {
      */
     public function get(string $key): string {
         if (!array_key_exists($key, $this->_translations)) {
-            \Logger::getLogger('Translations')->error(
+            \Monolog\Registry::omegaup()->withName('Translations')->error(
                 "Untranslated error message: {$key}"
             );
             return "{untranslated:{$key}}";

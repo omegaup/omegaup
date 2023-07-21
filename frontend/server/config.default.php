@@ -9,18 +9,22 @@ try_define('OMEGAUP_COOKIE_DOMAIN', '');
 try_define('OMEGAUP_AUTH_TOKEN_COOKIE_NAME', 'ouat');
 try_define('OMEGAUP_MD5_SALT', 'omegaup');
 try_define('OMEGAUP_URL', 'http://localhost');
+try_define('OMEGAUP_CSRF_HOSTS', []);
 try_define('OMEGAUP_ENVIRONMENT', 'production');
 try_define('OMEGAUP_MAINTENANCE', null);
+try_define('OMEGAUP_SESSION_API_HOURLY_LIMIT', 1000);
 
 # ####################################
 # TEST CONFIG
 # ####################################
 try_define('IS_TEST', false);
 try_define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', true);
+/** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
 try_define(
     'OMEGAUP_TEST_ROOT',
     sprintf('%s/tests/controllers/', strval(OMEGAUP_ROOT))
 );
+/** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
 try_define(
     'OMEGAUP_TEST_RESOURCES_ROOT',
     sprintf('%s/tests/resources/', strval(OMEGAUP_ROOT))
@@ -32,7 +36,7 @@ try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', false);
 # ####################################
 try_define('OMEGAUP_DB_USER', 'omegaup');
 try_define('OMEGAUP_DB_PASS', '');
-try_define('OMEGAUP_DB_HOST', 'localhost');
+try_define('OMEGAUP_DB_HOST', 'mysql:13306');
 try_define('OMEGAUP_DB_NAME', 'omegaup');
 
 # ####################################
@@ -70,16 +74,19 @@ try_define(
 );
 try_define('OMEGAUP_GITSERVER_SECRET_TOKEN', '');
 try_define('OMEGAUP_GRADER_SECRET', 'secret');
+/** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
 try_define(
     'IMAGES_PATH',
     sprintf('%s/www/img/', strval(OMEGAUP_ROOT))
 );
 try_define('IMAGES_URL_PATH', '/img/');
+/** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
 try_define(
     'INPUTS_PATH',
     sprintf('%s/www/probleminput/', strval(OMEGAUP_ROOT))
 );
 try_define('INPUTS_URL_PATH', '/probleminput/');
+/** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
 try_define(
     'TEMPLATES_PATH',
     sprintf('%s/www/templates/', strval(OMEGAUP_ROOT))
@@ -112,12 +119,6 @@ try_define(
 );
 
 # ####################################
-# LINKEDIN LOGIN CONFIG
-# ####################################
-try_define('OMEGAUP_LINKEDIN_SECRET', 'xxxxx');
-try_define('OMEGAUP_LINKEDIN_CLIENTID', 'xxxxx');
-
-# ####################################
 # GOOGLE ANALYTICS
 # ####################################
 try_define('OMEGAUP_GA_TRACK', false);
@@ -146,19 +147,23 @@ try_define('OMEGAUP_EMAIL_SENDY_LIST', 'xxx');
 # #########################
 # CACHE CONFIG
 # #########################
-try_define('APC_USER_CACHE_ENABLED', true);
 try_define('APC_USER_CACHE_TIMEOUT', 7 * 24 * 3600); // in seconds
 try_define('APC_USER_CACHE_CONTEST_INFO_TIMEOUT', 10);
+try_define('APC_USER_CACHE_PROBLEM_LIST_TIMEOUT', 60 * 30); // in seconds
 try_define('APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT', 60); // in seconds
 try_define('APC_USER_CACHE_PROBLEM_STATS_TIMEOUT', 0); // in seconds
 try_define('APC_USER_CACHE_SESSION_TIMEOUT', 8 * 3600); // seconds, match OMEGAUP_EXPIRE_TOKEN_AFTER
 try_define('APC_USER_CACHE_USER_RANK_TIMEOUT', 60 * 30); // in seconds, half of mysql event Refresh_User_Rank_Event
 try_define('OMEGAUP_SESSION_CACHE_ENABLED', true);
+try_define('OMEGAUP_CACHE_IMPLEMENTATION', 'apcu'); // apcu or redis
+try_define('REDIS_HOST', 'redis');
+try_define('REDIS_PORT', 6379);
+try_define('REDIS_PASS', 'redis');
 
 # #########################
-# SMARTY
+# TEMPLATES
 # #########################
-try_define('SMARTY_CACHE_DIR', '/var/tmp');
+try_define('TEMPLATE_CACHE_DIR', '/var/lib/omegaup/templates');
 
 # #########################
 # CONTEST CONSTANTS

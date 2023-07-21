@@ -1,8 +1,27 @@
 <template>
   <div class="omegaup-scoreboard">
-    <!-- id-lint off -->
-    <div id="ranking-chart"></div>
-    <!-- id-lint on -->
+    <slot name="scoreboard-header">
+      <div class="text-center mt-4 pt-2">
+        <h2 class="mb-4">
+          <span>{{ title }}</span>
+          <slot name="socket-status">
+            <sup :class="socketClass" :title="socketStatusTitle">{{
+              socketStatus
+            }}</sup>
+          </slot>
+        </h2>
+        <div v-if="!finishTime" class="clock">{{ INF }}</div>
+        <omegaup-countdown
+          v-else
+          class="clock"
+          :target-time="finishTime"
+        ></omegaup-countdown>
+      </div>
+    </slot>
+    <highcharts
+      v-if="rankingChartOptions"
+      :options="rankingChartOptions"
+    ></highcharts>
     <label v-if="showInvitedUsersFilter">
       <input
         v-model="onlyShowExplicitlyInvited"
@@ -11,12 +30,28 @@
       />
       {{ T.scoreboardShowOnlyInvitedIdentities }}</label
     >
-    <table>
+    <label class="float-right"
+      >{{ T.scoreboardShowParticipantsNames }}:
+      <select
+        v-model="nameDisplayOptions"
+        class="form-control"
+        data-scoreboard-options
+      >
+        <option :value="ui.NameDisplayOptions.Name">{{ T.wordsName }}</option>
+        <option :value="ui.NameDisplayOptions.Username">
+          {{ T.wordsUser }}
+        </option>
+        <option :value="ui.NameDisplayOptions.NameAndUsername">
+          {{ T.arenaNameAndUsername }}
+        </option>
+      </select>
+    </label>
+    <table data-table-scoreboard>
       <thead>
         <tr>
           <th><!-- legend --></th>
           <th><!-- position --></th>
-          <th>{{ T.wordsUser }}</th>
+          <th>{{ T.contestParticipant }}</th>
           <th v-for="(problem, index) in problems" :key="problem.alias">
             <a :href="'#problems/' + problem.alias" :title="problem.alias">{{
               ui.columnName(index)
@@ -29,16 +64,15 @@
         <template v-for="(user, userIndex) in ranking">
           <tr
             v-if="showUser(user.is_invited)"
-            :key="user.username"
+            :key="`${user.username}-${user.virtual}`"
             :class="user.username"
           >
-            <td
-              class="legend"
-              :style="{ backgroundColor: legendColor(userIndex) }"
-            ></td>
-            <td class="position">{{ user.place || '—' }}</td>
-            <td class="user">
-              {{ ui.rankingUsername(user) }}
+            <td class="legend" :class="legendClass(userIndex)"></td>
+            <td class="position" data-table-scoreboard-position>
+              {{ user.place || '—' }}
+            </td>
+            <td class="user" data-table-scoreboard-username>
+              {{ ui.rankingUsername(user, nameDisplayOptions) }}
               <img
                 v-if="user.country"
                 alt=""
@@ -87,33 +121,73 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
+import * as Highcharts from 'highcharts/highstock';
+import { Chart } from 'highcharts-vue';
 import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
+import * as time from '../../time';
+import omegaup_Countdown from '../Countdown.vue';
+import { SocketStatus } from '../../arena/events_socket';
 
-@Component
+@Component({
+  components: {
+    highcharts: Chart,
+    'omegaup-countdown': omegaup_Countdown,
+  },
+})
 export default class ArenaScoreboard extends Vue {
-  @Prop() scoreboardColors!: string[];
+  @Prop({ default: 10 }) numberOfPositions!: number;
   @Prop() problems!: omegaup.Problem[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
+  @Prop({ default: null }) rankingChartOptions!: Highcharts.Options | null;
   @Prop() lastUpdated!: Date;
   @Prop({ default: true }) showInvitedUsersFilter!: boolean;
   @Prop({ default: true }) showPenalty!: boolean;
+  @Prop({ default: false }) showAllContestants!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
+  @Prop() title!: string;
+  @Prop({ default: null }) finishTime!: null | Date;
+  @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
 
   T = T;
   ui = ui;
-  onlyShowExplicitlyInvited = true;
+  INF = '∞';
+  onlyShowExplicitlyInvited =
+    !this.showAllContestants && this.showInvitedUsersFilter;
+  nameDisplayOptions: ui.NameDisplayOptions =
+    ui.NameDisplayOptions.NameAndUsername;
 
-  get lastUpdatedString(): string {
-    return !this.lastUpdated ? '' : this.lastUpdated.toString();
+  get lastUpdatedString(): null | string {
+    if (!this.lastUpdated) return null;
+    return ui.formatString(T.scoreboardLastUpdated, {
+      datetime: time.formatDateTime(this.lastUpdated),
+    });
   }
 
-  legendColor(idx: number): string {
-    return this.scoreboardColors && idx < this.scoreboardColors.length
-      ? this.scoreboardColors[idx]
-      : '';
+  get socketClass(): string {
+    if (this.socketStatus === SocketStatus.Connected) {
+      return 'socket-status socket-status-ok';
+    }
+    if (this.socketStatus === SocketStatus.Failed) {
+      return 'socket-status socket-status-error';
+    }
+    return 'socket-status';
+  }
+
+  get socketStatusTitle(): string {
+    if (this.socketStatus === SocketStatus.Connected) {
+      return T.socketStatusConnected;
+    }
+    if (this.socketStatus === SocketStatus.Failed) {
+      return T.socketStatusFailed;
+    }
+    return T.socketStatusWaiting;
+  }
+
+  legendClass(idx: number): string {
+    return idx < this.numberOfPositions ? `legend-${idx + 1}` : '';
   }
 
   renderPoints(p: types.ScoreboardRankingProblem): string {
@@ -151,59 +225,132 @@ export default class ArenaScoreboard extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .omegaup-scoreboard {
   max-width: 900px;
   margin: 0 auto;
+
   a {
-    color: #5588dd;
+    color: var(--arena-scoreboard-a-font-color);
   }
+
   .footer {
     padding: 1em;
     text-align: right;
     font-size: 70%;
-    color: grey;
+    color: var(--arena-scoreboard-footer-font-color);
   }
+
   table {
     border-collapse: collapse;
     width: 100%;
   }
+
   th {
     padding: 0.2em;
     text-align: center;
   }
+
   td {
     text-align: center;
     vertical-align: middle;
-    border: 1px solid #000;
+    border: 1px solid var(--arena-scoreboard-td-border-color);
     padding: 0.2em;
+
     .points {
       font-weight: bold;
     }
+
     .penalty {
       font-size: 70%;
     }
   }
+
   .accepted {
-    background: #dfd;
+    background: var(--arena-scoreboard-accepted-background-color);
   }
+
   .pending {
-    background: #ddf;
+    background: var(--arena-scoreboard-pending-background-color);
   }
+
   .wrong {
-    background: #fdd;
+    background: var(--arena-scoreboard-wrong-background-color);
   }
+
   .position.recent-event {
     font-weight: bold;
-    background: #dfd;
+    background: var(--arena-scoreboard-position-recent-event-background-color);
   }
+
   .accepted.recent-event {
-    background: #8f8;
+    background: var(--arena-scoreboard-accepted-recent-event-background-color);
   }
+
   .position {
     width: 3.5em;
   }
+
+  .legend-1 {
+    background-color: var(--arena-scoreboard-legend-1-background-color);
+  }
+
+  .legend-2 {
+    background-color: var(--arena-scoreboard-legend-2-background-color);
+  }
+
+  .legend-3 {
+    background-color: var(--arena-scoreboard-legend-3-background-color);
+  }
+
+  .legend-4 {
+    background-color: var(--arena-scoreboard-legend-4-background-color);
+  }
+
+  .legend-5 {
+    background-color: var(--arena-scoreboard-legend-5-background-color);
+  }
+
+  .legend-6 {
+    background-color: var(--arena-scoreboard-legend-6-background-color);
+  }
+
+  .legend-7 {
+    background-color: var(--arena-scoreboard-legend-7-background-color);
+  }
+
+  .legend-8 {
+    background-color: var(--arena-scoreboard-legend-8-background-color);
+  }
+
+  .legend-9 {
+    background-color: var(--arena-scoreboard-legend-9-background-color);
+  }
+
+  .legend-10 {
+    background-color: var(--arena-scoreboard-legend-10-background-color);
+  }
+
   .legend {
     width: 0.5em;
+    opacity: 0.8;
+  }
+
+  .socket-status-error {
+    color: var(--arena-socket-status-error-color);
+  }
+
+  .socket-status-ok {
+    color: var(--arena-socket-status-ok-color);
+  }
+
+  .socket-status {
+    cursor: help;
+  }
+
+  .clock {
+    font-size: 3em;
+    line-height: 0.4em;
   }
 }
 </style>

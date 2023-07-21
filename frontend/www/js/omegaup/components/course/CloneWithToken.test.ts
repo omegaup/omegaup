@@ -1,5 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
 
 import type { types } from '../../api_types';
 
@@ -13,9 +12,13 @@ describe('CloneWithToken.vue', () => {
         course: {
           admission_mode: 'private',
           alias: 'test-course',
+          archived: false,
           assignments: [],
+          clarifications: [],
           needs_basic_information: false,
           description: '# Test',
+          objective: 'Objetivo de prueba',
+          level: '',
           finish_time: new Date(),
           is_curator: true,
           is_admin: true,

@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class ExperimentsTest extends \OmegaUp\Test\ControllerTestCase {
     const TEST = 'experiment_test';
@@ -31,7 +32,7 @@ class ExperimentsTest extends \OmegaUp\Test\ControllerTestCase {
                 self::$kKnownExperiments
             );
 
-        $this->assertEquals(
+        $this->assertSame(
             self::$kKnownExperiments,
             $experiments->getEnabledExperiments()
         );
@@ -47,7 +48,7 @@ class ExperimentsTest extends \OmegaUp\Test\ControllerTestCase {
                 self::$kKnownExperiments
             );
 
-        $this->assertEquals(
+        $this->assertSame(
             self::$kKnownExperiments,
             $experiments->getEnabledExperiments()
         );
@@ -108,7 +109,7 @@ class ExperimentsTest extends \OmegaUp\Test\ControllerTestCase {
                 self::$kKnownExperiments
             );
 
-        $this->assertEquals(
+        $this->assertSame(
             self::$kKnownExperiments,
             $experiments->getEnabledExperiments()
         );

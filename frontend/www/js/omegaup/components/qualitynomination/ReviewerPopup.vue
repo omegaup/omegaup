@@ -18,27 +18,6 @@
               ></omegaup-radio-switch>
             </div>
             <div class="form-group w-100">
-              <label class="control-label w-100">
-                {{ T.reviewerNominationCategory }}
-                <ul class="tag-select">
-                  <li
-                    v-for="problemTopic in sortedProblemTags"
-                    :key="problemTopic.value"
-                    class="tag-select"
-                  >
-                    <label class="tag-label"
-                      ><input
-                        v-model="tag"
-                        type="radio"
-                        :value="problemTopic.value"
-                      />
-                      {{ problemTopic.text }}</label
-                    >
-                  </li>
-                </ul></label
-              >
-            </div>
-            <div class="form-group w-100">
               <vue-typeahead-bootstrap
                 :data="publicTags"
                 :serializer="publicTagsSerializer"
@@ -205,13 +184,15 @@ export default class ReviewerPopup extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 ul.tag-select {
   height: 225px;
   overflow: auto;
-  border: 1px solid #ccc;
-  background: #fff;
+  border: 1px solid var(--quality-nomination-tag-select-border-color);
+  background: var(--quality-nomination-tag-select-background-color);
   list-style-type: none;
 }
+
 .tag-label {
   width: -webkit-fill-available;
   margin-bottom: 0;

@@ -14,6 +14,7 @@ import TextEditorComponent from './TextEditorComponent.vue';
 import ZipViewerComponent from './ZipViewerComponent.vue';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
+const theme = document.getElementById('theme').value;
 const defaultValidatorSource = `#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
@@ -70,18 +71,19 @@ const sourceTemplates = {
 #include <stdint.h>
 
 int main() {
-  int64_t a, b;
-  scanf("%" SCNd64 " %" SCNd64, &a, &b);
-  printf("%" PRId64 "\\n", a + b);
+  // TODO: fixme.
+
+  return 0;
 }`,
   cpp: `#include <iostream>
 
 int main() {
   std::cin.tie(nullptr);
   std::ios_base::sync_with_stdio(false);
-  int64_t a, b;
-  std::cin >> a >> b;
-  std::cout << a + b << '\\n';
+
+  // TODO: fixme.
+
+  return 0;
 }`,
   cs: `using System.Collections.Generic;
 using System.Linq;
@@ -91,45 +93,33 @@ class Program
 {
   static void Main(string[] args)
   {
-    List<long> l = new List<long>();
-    foreach (String token in Console.ReadLine().Trim().Split(' ')) {
-      l.Add(Int64.Parse(token));
-    }
-    Console.WriteLine(l.Sum(x => x));
+    // TODO: fixme.
   }
 }`,
   java: `import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
 
 public class Main {
   public static void main(String[] args) throws IOException {
     BufferedReader br = new BufferedReader(
                           new InputStreamReader(System.in));
-
-    StringTokenizer st = new StringTokenizer(br.readLine());
-    long a = Long.parseLong(st.nextToken());
-    long b = Long.parseLong(st.nextToken());
-    System.out.println(a + b);
+    // TODO: fixme.
   }
 }`,
-  lua: `a = io.read("*n");
-b = io.read("*n");
-io.write(a + b);`,
+  lua: `-- TODO: fixme.`,
   py: `#!/usr/bin/python3
 
 def _main() -> None:
-  a, b = (int(num) for num in input().strip().split())
-  print(a + b)
+  # TODO: fixme.
+  pass
 
 if __name__ == '__main__':
   _main()`,
-  rb: `a, b = gets.chomp.split(' ').map!{ |num| num.to_i }
-print a + b`,
+  rb: `# TODO: fixme.`,
 };
 
-const interactiveTemplates = {
+const originalInteractiveTemplates = {
   c: `#include "sumas.h"
 
 long long sumas(long long a, long long b) {
@@ -179,10 +169,15 @@ def sumas(a: int, b: int) -> int:
     return 0`,
   rb: '# not supported',
 };
+const interactiveTemplates = { ...originalInteractiveTemplates };
 
 Vue.use(Vuex);
 let store = new Vuex.Store({
   state: {
+    alias: null,
+    showSubmitButton: false,
+    languages: [],
+    sessionStorageSources: null,
     request: {
       input: {
         limits: {},
@@ -198,6 +193,18 @@ let store = new Vuex.Store({
     compilerOutput: '',
   },
   getters: {
+    alias(state) {
+      return state.alias;
+    },
+    showSubmitButton(state) {
+      return state.showSubmitButton;
+    },
+    languages(state) {
+      return state.languages;
+    },
+    sessionStorageSources(state) {
+      return state.sessionStorageSources;
+    },
     moduleName(state) {
       if (state.request.input.interactive) {
         return state.request.input.interactive.module_name;
@@ -280,6 +287,9 @@ let store = new Vuex.Store({
       });
       return result;
     },
+    'request.source'(state) {
+      return state.request.source;
+    },
     'request.language'(state) {
       return state.request.language;
     },
@@ -313,6 +323,63 @@ let store = new Vuex.Store({
     },
   },
   mutations: {
+    alias(state, value) {
+      if (state.alias) {
+        persistToSessionStorage(state.alias).flush();
+      }
+      state.alias = value;
+      const itemString = sessionStorage.getItem(
+        `ephemeral-sources-${state.alias}`,
+      );
+      state.sessionStorageSources = null;
+      if (itemString) {
+        state.sessionStorageSources = JSON.parse(itemString);
+      }
+      if (!state.sessionStorageSources) {
+        if (state.request.input.interactive) {
+          state.sessionStorageSources = {
+            language: 'cpp17-gcc',
+            sources: {
+              ...interactiveTemplates,
+            },
+          };
+        } else {
+          state.sessionStorageSources = {
+            language: 'cpp17-gcc',
+            sources: {
+              ...sourceTemplates,
+            },
+          };
+        }
+      }
+      state.request.language = state.sessionStorageSources.language;
+      state.request.source =
+        state.sessionStorageSources.sources[
+          Util.languageExtensionMapping[state.sessionStorageSources.language]
+        ];
+      document.getElementById('language').value = state.request.language;
+    },
+    showSubmitButton(state, value) {
+      state.problemsetId = value;
+      const submitButton = document.querySelector('button[data-submit-button]');
+      if (value) {
+        submitButton.classList.remove('d-none');
+      } else {
+        submitButton.classList.add('d-none');
+      }
+    },
+    languages(state, value) {
+      state.languages = value;
+      document
+        .querySelectorAll('select[data-language-select] option')
+        .forEach((option) => {
+          if (!state.languages.includes(option.value)) {
+            option.classList.add('d-none');
+          } else {
+            option.classList.remove('d-none');
+          }
+        });
+    },
     currentCase(state, value) {
       state.currentCase = value;
     },
@@ -326,11 +393,59 @@ let store = new Vuex.Store({
       Vue.set(state, 'request', value);
     },
     'request.language'(state, value) {
+      if (state.request.language == value) {
+        return;
+      }
       state.request.language = value;
+      if (
+        Object.prototype.hasOwnProperty.call(
+          Util.languageExtensionMapping,
+          value,
+        )
+      ) {
+        const language = Util.languageExtensionMapping[value];
+        if (state.sessionStorageSources) {
+          if (
+            Object.prototype.hasOwnProperty.call(
+              state.sessionStorageSources.sources,
+              language,
+            )
+          ) {
+            state.request.source =
+              state.sessionStorageSources.sources[language];
+          }
+        } else if (store.getters.isInteractive) {
+          if (
+            Object.prototype.hasOwnProperty.call(interactiveTemplates, language)
+          ) {
+            state.request.source = interactiveTemplates[language];
+          }
+        } else {
+          if (Object.prototype.hasOwnProperty.call(sourceTemplates, language)) {
+            state.request.source = sourceTemplates[language];
+          }
+        }
+        if (state.sessionStorageSources && !state.updatingSettings) {
+          state.sessionStorageSources.language = value;
+          persistToSessionStorage(state.alias)({
+            alias: state.alias,
+            contents: state.sessionStorageSources,
+          });
+        }
+      }
       state.dirty = true;
     },
     'request.source'(state, value) {
       state.request.source = value;
+      if (!state.updatingSettings && state.sessionStorageSources) {
+        state.sessionStorageSources.sources[
+          Util.languageExtensionMapping[state.sessionStorageSources.language]
+        ] = value;
+        persistToSessionStorage(state.alias)({
+          alias: state.alias,
+          contents: state.sessionStorageSources,
+        });
+      }
       state.dirty = true;
     },
     inputIn(state, value) {
@@ -475,8 +590,6 @@ let store = new Vuex.Store({
         !Object.prototype.hasOwnProperty.call(state.request.input.cases, name)
       )
         return;
-      if (name == 'sample') return;
-      if (name == state.currentCase) state.currentCase = 'sample';
       Vue.delete(state.request.input.cases, name);
       state.dirty = true;
     },
@@ -549,6 +662,7 @@ const goldenLayoutSettings = {
                       language: 'request.language',
                       module: 'moduleName',
                     },
+                    theme,
                   },
                   id: 'source',
                   isClosable: false,
@@ -579,6 +693,7 @@ const goldenLayoutSettings = {
                     readOnly: true,
                     module: 'compiler',
                     extension: 'out/err',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -593,6 +708,7 @@ const goldenLayoutSettings = {
                     readOnly: true,
                     module: 'logs',
                     extension: 'txt',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -602,6 +718,7 @@ const goldenLayoutSettings = {
                   componentState: {
                     storeMapping: {},
                     id: 'zipviewer',
+                    theme,
                   },
                   title: 'files.zip',
                   isClosable: false,
@@ -630,6 +747,7 @@ const goldenLayoutSettings = {
                     id: 'in',
                     readOnly: false,
                     extension: 'in',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -644,6 +762,7 @@ const goldenLayoutSettings = {
                     id: 'out',
                     readOnly: false,
                     extension: 'out',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -663,6 +782,7 @@ const goldenLayoutSettings = {
                     id: 'stdout',
                     readOnly: false,
                     extension: 'out',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -677,6 +797,7 @@ const goldenLayoutSettings = {
                     id: 'stderr',
                     readOnly: false,
                     extension: 'err',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -689,6 +810,7 @@ const goldenLayoutSettings = {
                       modifiedContents: 'outputStdout',
                     },
                     id: 'diff',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -707,6 +829,7 @@ const goldenLayoutSettings = {
               currentCase: 'currentCase',
             },
             id: 'source',
+            theme,
           },
           title: 'cases/',
           width: 15,
@@ -725,6 +848,7 @@ const validatorSettings = {
       language: 'request.input.validator.custom_validator.language',
     },
     initialModule: 'validator',
+    theme,
   },
   id: 'validator',
   isClosable: false,
@@ -739,6 +863,7 @@ const interactiveIdlSettings = {
     },
     initialLanguage: 'idl',
     readOnly: isEmbedded,
+    theme,
   },
   id: 'interactive-idl',
   isClosable: false,
@@ -752,11 +877,13 @@ const interactiveMainSourceSettings = {
       language: 'request.input.interactive.language',
     },
     initialModule: 'Main',
+    theme,
   },
   id: 'interactive-main-source',
   isClosable: false,
 };
 
+// eslint-disable-next-line no-undef
 const layout = new GoldenLayout(
   goldenLayoutSettings,
   document.getElementById('layout-root'),
@@ -838,33 +965,56 @@ RegisterVueComponent(
   componentMapping,
 );
 
+const persistToSessionStorage = Util.throttle(({ alias, contents }) => {
+  sessionStorage.setItem(
+    `ephemeral-sources-${alias}`,
+    JSON.stringify(contents),
+  );
+}, 10000);
+
 function initialize() {
   layout.init();
 
   let sourceAndSettings = layout.root.getItemsById('source-and-settings')[0];
-  if (store.getters.isCustomValidator)
+  if (store.getters.isCustomValidator) {
+    const activeContentItem = sourceAndSettings.getActiveContentItem();
     sourceAndSettings.addChild(validatorSettings);
+    if (activeContentItem) {
+      sourceAndSettings.setActiveContentItem(activeContentItem);
+    }
+  }
   store.watch(
     Object.getOwnPropertyDescriptor(store.getters, 'isCustomValidator').get,
     function (value) {
-      if (value) sourceAndSettings.addChild(validatorSettings);
-      else layout.root.getItemsById(validatorSettings.id)[0].remove();
+      if (value) {
+        const activeContentItem = sourceAndSettings.getActiveContentItem();
+        sourceAndSettings.addChild(validatorSettings);
+        if (activeContentItem) {
+          sourceAndSettings.setActiveContentItem(activeContentItem);
+        }
+      } else {
+        layout.root.getItemsById(validatorSettings.id)[0].remove();
+      }
     },
   );
   if (store.getters.isInteractive) {
+    const activeContentItem = sourceAndSettings.getActiveContentItem();
     sourceAndSettings.addChild(interactiveIdlSettings);
     sourceAndSettings.addChild(interactiveMainSourceSettings);
-    let sourceItem = layout.root.getItemsById('source')[0];
-    sourceItem.parent.setActiveContentItem(sourceItem);
+    if (activeContentItem) {
+      sourceAndSettings.setActiveContentItem(activeContentItem);
+    }
   }
   store.watch(
     Object.getOwnPropertyDescriptor(store.getters, 'isInteractive').get,
     function (value) {
       if (value) {
+        const activeContentItem = sourceAndSettings.getActiveContentItem();
         sourceAndSettings.addChild(interactiveIdlSettings);
         sourceAndSettings.addChild(interactiveMainSourceSettings);
-        let sourceItem = layout.root.getItemsById('source')[0];
-        sourceItem.parent.setActiveContentItem(sourceItem);
+        if (activeContentItem) {
+          sourceAndSettings.setActiveContentItem(activeContentItem);
+        }
       } else {
         layout.root.getItemsById(interactiveIdlSettings.id)[0].remove();
         layout.root.getItemsById(interactiveMainSourceSettings.id)[0].remove();
@@ -937,24 +1087,6 @@ onResized();
 
 document.getElementById('language').addEventListener('change', function () {
   store.commit('request.language', this.value);
-  document.getElementById('language').value = this.value;
-  if (
-    !Object.prototype.hasOwnProperty.call(
-      Util.languageExtensionMapping,
-      this.value,
-    )
-  )
-    return;
-  let language = Util.languageExtensionMapping[this.value];
-  if (store.getters.isInteractive) {
-    if (!Object.prototype.hasOwnProperty.call(interactiveTemplates, language))
-      return;
-    store.commit('request.source', interactiveTemplates[language]);
-  } else {
-    if (!Object.prototype.hasOwnProperty.call(sourceTemplates, language))
-      return;
-    store.commit('request.source', sourceTemplates[language]);
-  }
 });
 
 function onDetailsJsonReady(results) {
@@ -1291,9 +1423,26 @@ document.getElementById('download').addEventListener('click', (e) => {
     .catch(Util.asyncError);
 });
 
-document.getElementsByTagName('form')[0].addEventListener('submit', (e) => {
-  e.preventDefault();
-  document.getElementsByTagName('button')[0].setAttribute('disabled', '');
+const submitButton = document.querySelector('button[data-submit-button]');
+document
+  .querySelector('form.ephemeral-form')
+  .addEventListener('submit', (e) => {
+    e.preventDefault();
+    submitButton.setAttribute('disabled', '');
+    parent.postMessage({
+      method: 'submitRun',
+      params: {
+        problem_alias: store.state.alias,
+        language: store.state.request.language,
+        source: store.state.request.source,
+      },
+    });
+    submitButton.removeAttribute('disabled');
+  });
+
+const runButton = document.querySelector('button[data-run-button]');
+runButton.addEventListener('click', () => {
+  runButton.setAttribute('disabled', '');
   fetch('run/new/', {
     method: 'POST',
     headers: new Headers({
@@ -1311,7 +1460,7 @@ document.getElementsByTagName('form')[0].addEventListener('submit', (e) => {
       return response.formData();
     })
     .then((formData) => {
-      document.getElementsByTagName('button')[0].removeAttribute('disabled');
+      runButton.removeAttribute('disabled');
       if (!formData) {
         onDetailsJsonReady({
           verdict: 'JE',
@@ -1354,9 +1503,31 @@ document.getElementsByTagName('form')[0].addEventListener('submit', (e) => {
     .catch(Util.asyncError);
 });
 
-function setSettings(settings) {
-  store.commit('reset');
+function setSettings({ alias, settings, languages, showSubmitButton }) {
+  if (!settings) {
+    return;
+  }
+  if (settings.interactive) {
+    for (let language in settings.interactive.templates) {
+      if (
+        Object.prototype.hasOwnProperty.call(
+          settings.interactive.templates,
+          language,
+        )
+      ) {
+        interactiveTemplates[language] =
+          settings.interactive.templates[language];
+      } else {
+        interactiveTemplates[language] = originalInteractiveTemplates[language];
+      }
+    }
+  }
+  store.commit('languages', languages);
   store.commit('updatingSettings', true);
+  store.commit('reset');
+  store.commit('Interactive', !!settings.interactive);
+  store.commit('alias', alias);
+  store.commit('showSubmitButton', showSubmitButton);
   store.commit('removeCase', 'long');
   store.commit('MemoryLimit', settings.limits.MemoryLimit * 1024);
   store.commit('OutputLimit', settings.limits.OutputLimit);
@@ -1367,19 +1538,7 @@ function setSettings(settings) {
   store.commit('Validator', settings.validator.name);
   store.commit('Tolerance', settings.validator.tolerance);
 
-  store.commit('Interactive', !!settings.interactive);
   if (settings.interactive) {
-    for (let language in settings.interactive.templates) {
-      if (
-        !Object.prototype.hasOwnProperty.call(
-          settings.interactive.templates,
-          language,
-        )
-      )
-        continue;
-      interactiveTemplates[language] = settings.interactive.templates[language];
-    }
-    store.commit('request.source', interactiveTemplates.cpp);
     store.commit('InteractiveLanguage', settings.interactive.language);
     store.commit('InteractiveModuleName', settings.interactive.module_name);
     store.commit('request.input.interactive.idl', settings.interactive.idl);
@@ -1388,6 +1547,10 @@ function setSettings(settings) {
       settings.interactive.main_source,
     );
   }
+
+  // If there are cases for a problem, then delete the sample case
+  if (Object.keys(settings.cases).length) store.commit('removeCase', 'sample');
+
   for (let caseName in settings.cases) {
     if (!Object.prototype.hasOwnProperty.call(settings.cases, caseName))
       continue;
@@ -1399,6 +1562,7 @@ function setSettings(settings) {
     store.commit('inputIn', caseData['in']);
     store.commit('inputOut', caseData.out);
   }
+
   // Given that the current case will change several times, schedule the
   // flag to avoid swapping into the cases view for the next tick.
   //
@@ -1420,7 +1584,12 @@ window.addEventListener(
 
     switch (e.data.method) {
       case 'setSettings':
-        setSettings(...e.data.params);
+        setSettings({
+          alias: e.data.params.alias,
+          settings: e.data.params.settings,
+          showSubmitButton: e.data.params.showSubmitButton,
+          languages: e.data.params.languages,
+        });
         break;
     }
   },

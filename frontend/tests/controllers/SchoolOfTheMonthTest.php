@@ -1,10 +1,9 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Tests API/DAO functions for getting and selecting the
  * Schools of the Month.
- *
- * @author carlosabcs
  */
 class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     /**
@@ -175,15 +174,15 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Time::setTimeForTesting(strtotime($runDate));
         $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();
         $this->assertCount(3, $schools);
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[1]['request']['name'],
             $schools[0]['name']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[0]['request']['name'],
             $schools[1]['name']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[2]['request']['name'],
             $schools[2]['name']
         );
@@ -211,11 +210,11 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::runUpdateRanks($runDate);
         $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();
         $this->assertCount(2, $schools);
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[1]['request']['name'],
             $schools[0]['name']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[0]['request']['name'],
             $schools[1]['name']
         );
@@ -233,15 +232,15 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::runUpdateRanks($runDate);
         $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();
         $this->assertCount(3, $schools);
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[1]['request']['name'],
             $schools[0]['name']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[0]['request']['name'],
             $schools[1]['name']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[2]['request']['name'],
             $schools[2]['name']
         );
@@ -257,15 +256,15 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
         $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();
         $this->assertCount(3, $schools);
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[1]['request']['name'],
             $schools[0]['name']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[0]['request']['name'],
             $schools[1]['name']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[2]['request']['name'],
             $schools[2]['name']
         );
@@ -289,7 +288,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // API should return school1
         $response = \OmegaUp\Controllers\School::getSchoolOfTheMonth();
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[1]['school']->name,
             $response['schoolinfo']['name']
         );
@@ -298,7 +297,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             date('Y-m-d', \OmegaUp\Time::get())
         );
         $this->assertCount(count($schoolsData), $results);
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[1]['school']->name,
             $results[0]['name']
         );
@@ -315,7 +314,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $nextMonthDate
         );
         $this->assertCount(count($schoolsData) - 1, $results);
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[0]['school']->name,
             $results[0]['name']
         );
@@ -324,7 +323,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         // it is a calculation for the future.
         $results = \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfTheMonth();
         $this->assertCount(1, $results);
-        $this->assertEquals(
+        $this->assertSame(
             $results[0]['school_id'],
             $schoolsData[1]['school']->school_id
         );
@@ -337,11 +336,11 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         // Finally verify that both best schools of each month are retrieved
         $results = \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfTheMonth();
         $this->assertCount(2, $results);
-        $this->assertEquals(
+        $this->assertSame(
             $results[0]['school_id'],
             $schoolsData[0]['school']->school_id
         );
-        $this->assertEquals(
+        $this->assertSame(
             $results[1]['school_id'],
             $schoolsData[1]['school']->school_id
         );
@@ -378,7 +377,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 'school_id' => $schoolsData[0]['school']->school_id,
             ]));
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'schoolOfTheMonthIsNotInPeriodToBeChosen',
                 $e->getMessage()
             );
@@ -393,7 +392,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'school_id' => $schoolsData[2]['school']->school_id
         ]));
-        $this->assertEquals('ok', $result['status']);
+        $this->assertSame('ok', $result['status']);
 
         $nextMonth = $lastDayOfMonth;
         $nextMonth->modify('last day of next month');
@@ -402,7 +401,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         $results = \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfTheMonth();
         $this->assertCount(1, $results);
-        $this->assertEquals(
+        $this->assertSame(
             $schoolsData[2]['school']->name,
             $results[0]['name']
         );

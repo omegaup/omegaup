@@ -8,9 +8,18 @@ import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import * as CSV from '@/third_party/js/csv.js/csv.js';
+import {
+  downloadCsvFile,
+  generateHumanReadablePassword,
+  generatePassword,
+  getCSVRecords,
+  identityOptionalFields,
+  identityRequiredFields,
+} from '../groups';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.GroupEditPayload();
+  const searchResultSchools: types.SchoolListItem[] = [];
   const groupEdit = new Vue({
     el: '#main-container',
     components: {
@@ -18,7 +27,7 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       tab: window.location.hash
-        ? window.location.hash.substr(1)
+        ? window.location.hash.substring(1)
         : AvailableTabs.Members,
       identities: payload.identities.filter(
         (identity) => !identity.username.includes(':'),
@@ -28,6 +37,8 @@ OmegaUp.on('ready', () => {
       ),
       scoreboards: payload.scoreboards,
       userErrorRow: null,
+      searchResultUsers: [] as types.ListItem[],
+      searchResultSchools: searchResultSchools,
     }),
     methods: {
       refreshGroupScoreboards: (): void => {
@@ -63,6 +74,8 @@ OmegaUp.on('ready', () => {
           identitiesCsv: this.identitiesCsv,
           scoreboards: this.scoreboards,
           userErrorRow: this.userErrorRow,
+          searchResultUsers: this.searchResultUsers,
+          searchResultSchools: this.searchResultSchools,
         },
         on: {
           'update-group': (name: string, description: string) => {
@@ -115,21 +128,28 @@ OmegaUp.on('ready', () => {
             source.showChangePasswordForm = false;
             source.identity = identity;
             source.username = identity.username;
+            if (identity.school && identity.school_id) {
+              searchResultSchools.splice(0, searchResultSchools.length);
+              searchResultSchools.push({
+                key: identity.school_id,
+                value: identity.school,
+              });
+            }
           },
-          'edit-identity-member': (
-            membersSource: group_Members,
-            originalUsername: string,
-            user: types.Identity,
-          ) => {
-            const request = Object.assign({}, user, {
+          'edit-identity-member': (request: {
+            originalUsername: string;
+            identity: types.Identity;
+            showEditForm: boolean;
+          }) => {
+            api.Identity.update({
+              ...request.identity,
+              original_username: request.originalUsername,
               group_alias: payload.groupAlias,
-              original_username: originalUsername,
-              school_name: user.school,
-            });
-            api.Identity.update(request)
+              school_name: request.identity.school,
+            })
               .then(() => {
                 ui.success(T.groupEditMemberUpdated);
-                membersSource.showEditForm = false;
+                request.showEditForm = false;
                 this.refreshMemberList();
               })
               .catch(ui.apiError);
@@ -200,66 +220,55 @@ OmegaUp.on('ready', () => {
               });
           },
           'download-identities': (identities: types.Identity[]) => {
-            const dialect = {
-              dialect: {
-                csvddfVersion: 1.2,
-                delimiter: ',',
-                doubleQuote: true,
-                lineTerminator: '\r\n',
-                quoteChar: '"',
-                skipInitialSpace: true,
-                header: true,
-                commentChar: '#',
-              },
-            };
-            const csv = CSV.serialize(
-              {
-                fields: [
-                  { id: 'username' },
-                  { id: 'name' },
-                  { id: 'password' },
-                  { id: 'country_id' },
-                  { id: 'state_id' },
-                  { id: 'gender' },
-                  { id: 'school_name' },
-                ],
-                records: identities,
-              },
-              dialect,
-            );
-            const hiddenElement = document.createElement('a');
-            hiddenElement.href = `data:text/csv;charset=utf-8,${window.encodeURIComponent(
-              csv,
-            )}`;
-            hiddenElement.target = '_blank';
-            hiddenElement.download = 'identities.csv';
-            hiddenElement.click();
+            downloadCsvFile({
+              fileName: `identities_${payload.groupAlias}.csv`,
+              columns: [
+                'username',
+                'name',
+                'password',
+                'country_id',
+                'state_id',
+                'gender',
+                'school_name',
+              ],
+              records: identities,
+            });
           },
           'read-csv': ({
             identities,
             file,
+            humanReadable,
           }: {
             identities: types.Identity[];
             file: File;
+            humanReadable: boolean;
           }) => {
             CSV.fetch({ file })
               .done((dataset: CSV.Dataset) => {
-                if (!dataset.fields || dataset.fields.length != 6) {
+                if (!dataset.fields) {
                   ui.error(T.groupsInvalidCsv);
                   return;
                 }
-                for (const [
+                const records = getCSVRecords<types.Identity>({
+                  fields: dataset.fields,
+                  records: dataset.records,
+                  requiredFields: identityRequiredFields,
+                  optionalFields: identityOptionalFields,
+                });
+                for (const {
                   username,
                   name,
                   country_id,
                   state_id,
                   gender,
                   school_name,
-                ] of cleanRecords(dataset.records)) {
+                } of records) {
                   identities.push({
                     username: `${payload.groupAlias}:${username}`,
                     name,
-                    password: generatePassword(),
+                    password: humanReadable
+                      ? generateHumanReadablePassword()
+                      : generatePassword(),
                     country_id,
                     state_id,
                     gender,
@@ -276,49 +285,43 @@ OmegaUp.on('ready', () => {
           'invalid-file': () => {
             ui.error(T.groupsInvalidCsv);
           },
+          'update-search-result-users': (query: string) => {
+            api.User.list({ query })
+              .then(({ results }) => {
+                this.searchResultUsers = results.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-schools': (query: string) => {
+            api.School.list({ query })
+              .then(({ results }) => {
+                if (!results.length) {
+                  this.searchResultSchools = [
+                    {
+                      key: 0,
+                      value: query,
+                    },
+                  ];
+                  return;
+                }
+                this.searchResultSchools = results.map(
+                  ({ key, value }: types.SchoolListItem) => ({
+                    key,
+                    value,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
         },
       });
     },
   });
-
-  function cleanRecords(
-    records: (null | number | string)[][],
-  ): (undefined | string)[][] {
-    return records.map((row) =>
-      row.map((cell) => {
-        if (cell === null) {
-          return undefined;
-        }
-        if (typeof cell !== 'string') {
-          return String(cell);
-        }
-        return cell;
-      }),
-    );
-  }
-
-  function generatePassword(): string {
-    const validChars = 'acdefhjkmnpqruvwxyACDEFHJKLMNPQRUVWXY346';
-    const len = 8;
-    // Browser supports window.crypto
-    if (typeof window.crypto == 'object') {
-      const arr = new Uint8Array(2 * len);
-      window.crypto.getRandomValues(arr);
-      return Array.from(
-        arr.filter((value) => value <= 255 - (255 % validChars.length)),
-        (value) => validChars[value % validChars.length],
-      )
-        .join('')
-        .substr(0, len);
-    }
-
-    // Browser does not support window.crypto
-    let password = '';
-    for (let i = 0; i < len; i++) {
-      password += validChars.charAt(
-        Math.floor(Math.random() * validChars.length),
-      );
-    }
-    return password;
-  }
 });

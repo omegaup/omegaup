@@ -159,13 +159,19 @@ class ProblemParams {
 
     /**
      * @readonly
+     * @var string|null
+     */
+    public $groupScorePolicy;
+
+    /**
+     * @readonly
      * @var bool
      */
     public $allowUserAddTags;
 
     /**
      * @psalm-suppress RedundantConditionGivenDocblockType
-     * @param array{allow_user_add_tags?: bool, email_clarifications?: bool, extra_wall_time?: int, input_limit?: int, languages?: string, memory_limit?: int, order?: string, output_limit?: int, overall_wall_time_limit?: int, problem_alias: string, problem_level?: string, selected_tags?: string, show_diff?: string, source?: string, time_limit?: int, title?: string, update_published?: \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS, validator?: \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL, validator_time_limit?: int, visibility?: \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED} $params
+     * @param array{allow_user_add_tags?: bool, email_clarifications?: bool, extra_wall_time?: int, group_score_policy?: string, input_limit?: int, languages?: string, memory_limit?: int, order?: string, output_limit?: int, overall_wall_time_limit?: int, problem_alias: string, problem_level?: string, selected_tags?: string, show_diff?: string, source?: string, time_limit?: int, title?: string, update_published?: \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS, validator?: \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL, validator_time_limit?: int, visibility?: \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED} $params
      */
     public function __construct($params, bool $isRequired = true) {
         $isUpdate = !$isRequired;
@@ -195,6 +201,13 @@ class ProblemParams {
                 ['none', 'examples', 'all']
             );
         }
+        if (isset($params['group_score_policy'])) {
+            \OmegaUp\Validators::validateInEnum(
+                $params['group_score_policy'],
+                'group_score_policy',
+                ['sum-if-not-zero', 'min']
+            );
+        }
         if (isset($params['validator'])) {
             \OmegaUp\Validators::validateInEnum(
                 $params['validator'],
@@ -212,54 +225,54 @@ class ProblemParams {
             \OmegaUp\Validators::validateNumberInRange(
                 $params['time_limit'],
                 'time_limit',
-                /*$lowerBound=*/ 0,
-                /*$uppperBound=*/ null,
-                $isRequired
+                lowerBound: 0,
+                upperBound: null,
+                required: $isRequired
             );
         }
         if (isset($params['memory_limit'])) {
             \OmegaUp\Validators::validateNumberInRange(
                 $params['memory_limit'],
                 'memory_limit',
-                /*$lowerBound=*/ 0,
-                /*$uppperBound=*/ null,
-                $isRequired
+                lowerBound: 0,
+                upperBound: null,
+                required: $isRequired
             );
         }
         if (isset($params['validator_time_limit'])) {
             \OmegaUp\Validators::validateNumberInRange(
                 $params['validator_time_limit'],
                 'validator_time_limit',
-                /*$lowerBound=*/ 0,
-                /*$uppperBound=*/ null,
-                $isRequired
+                lowerBound: 0,
+                upperBound: null,
+                required: $isRequired
             );
         }
         if (isset($params['overall_wall_time_limit'])) {
             \OmegaUp\Validators::validateNumberInRange(
                 $params['overall_wall_time_limit'],
                 'overall_wall_time_limit',
-                /*$lowerBound=*/ 0,
-                /*$uppperBound=*/ 60000,
-                $isRequired
+                lowerBound: 0,
+                upperBound: 60000,
+                required: $isRequired
             );
         }
         if (isset($params['extra_wall_time'])) {
             \OmegaUp\Validators::validateNumberInRange(
                 $params['extra_wall_time'],
                 'extra_wall_time',
-                /*$lowerBound=*/ 0,
-                /*$uppperBound=*/ 5000,
-                $isRequired
+                lowerBound: 0,
+                upperBound: 5000,
+                required: $isRequired
             );
         }
         if (isset($params['output_limit'])) {
             \OmegaUp\Validators::validateNumberInRange(
                 $params['output_limit'],
                 'output_limit',
-                /*$lowerBound=*/ 0,
-                /*$uppperBound=*/ null,
-                $isRequired
+                lowerBound: 0,
+                upperBound: null,
+                required: $isRequired
             );
         }
         $this->problemAlias = $params['problem_alias'];
@@ -287,6 +300,7 @@ class ProblemParams {
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
         $this->order = $params['order'] ?? 'normal';
         $this->showDiff = $params['show_diff'] ?? 'none';
+        $this->groupScorePolicy = $params['group_score_policy'] ?? null;
     }
 
     /**
@@ -305,7 +319,6 @@ class ProblemParams {
             /** @var null|callable(mixed):mixed */
             $transform = null;
             $important = false;
-            $fieldAlias = null;
             if (is_int($source)) {
                 $thisFieldName = $info;
                 $objectFieldName = $info;
@@ -334,8 +347,8 @@ class ProblemParams {
                 $value = $transform($value);
             }
             // Important property, so check if it changes.
-            if ($important) {
-                $importantChange |= ($value != $object->$objectFieldName);
+            if ($important && !$importantChange) {
+                $importantChange = ($value != $object->$objectFieldName);
             }
             $object->$objectFieldName = $value;
         }

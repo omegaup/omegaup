@@ -8,12 +8,35 @@ namespace OmegaUp\DAO;
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\UserRoles}.
- *
- * @author alanboy
  * @access public
  * @package docs
  */
 class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
+    /**
+     * Gets the username of the owner of an ACL
+     *
+     * @return null|string
+     */
+    public static function getOwner(int $aclId): ?string {
+        $sql = '
+            SELECT
+                i.username
+            FROM
+                ACLs a
+            INNER JOIN
+                Users u ON u.user_id = a.owner_id
+            INNER JOIN
+                Identities i ON u.main_identity_id = i.identity_id
+            WHERE
+                a.acl_id = ?;';
+
+        /** @var string|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [ $aclId ]
+        );
+    }
+
     /**
      * @return list<array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string}>
      */
@@ -101,9 +124,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             FROM
                 User_Roles ur
             INNER JOIN
-                Users u ON u.user_id = ur.user_id
-            INNER JOIN
-                Identities i ON u.user_id = i.user_id
+                Identities i ON ur.user_id = i.user_id
             WHERE
                 i.identity_id = ? AND ur.role_id = ? AND ur.acl_id IN (?, ?);';
         $params = [
@@ -119,6 +140,98 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
                 $params
             )
         ) > 0;
+    }
+
+    /**
+     * @return list<array{role: 'teaching_assistant', user_id: int|null, username: string}>
+     */
+    public static function getCourseTeachingAssistants(
+        \OmegaUp\DAO\VO\Courses $course
+    ): array {
+        $sql = '
+            SELECT
+                i.username, ur.acl_id AS acl, i.user_id
+            FROM
+                User_Roles ur
+            INNER JOIN
+                Identities i ON i.user_id = ur.user_id
+            WHERE
+                ur.role_id = ? AND ur.acl_id IN (?);';
+        $params = [
+            \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE,
+            $course->acl_id,
+        ];
+
+        /** @var list<array{acl: int, user_id: int|null, username: string}> */
+        $rawTeachingAssistants = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
+
+        $teachingAssistants = [];
+        foreach ($rawTeachingAssistants as $teachingAssistant) {
+                $teachingAssistants[] = [
+                    'username' => $teachingAssistant['username'],
+                    'role' => 'teaching_assistant',
+                    'user_id' => $teachingAssistant['user_id'],
+                ];
+        }
+
+        return $teachingAssistants;
+    }
+
+    /**
+     * @return list<array{acl: int, user_id: int|null, username: string}>
+     */
+    public static function getCourseAdministrators(
+        \OmegaUp\DAO\VO\Courses $course
+    ): array {
+        $sql = '
+            (SELECT DISTINCT
+                i.user_id,
+                i.username,
+                ur.acl_id AS acl
+                FROM
+                    User_Roles ur
+                INNER JOIN
+                    Identities i ON i.user_id = ur.user_id
+                WHERE
+                    ur.role_id IN (?,?) AND ur.acl_id IN (?))
+            UNION DISTINCT
+            (SELECT DISTINCT
+                i.user_id,
+                i.username,
+                gr.acl_id as acl
+                FROM
+                    `Group_Roles` gr
+                INNER JOIN
+                    `Groups_` g ON gr.group_id = g.group_id
+                INNER JOIN
+                    `Groups_Identities` gi ON g.group_id = gi.group_id
+                INNER JOIN
+                    `Identities` i ON gi.identity_id = i.identity_id
+                INNER JOIN
+                    `User_Roles` ur ON gr.acl_id = ur.acl_id
+                INNER JOIN
+                `Users` u ON u.user_id = i.user_id
+                WHERE
+                    gr.role_id IN (?,?)
+                    AND gr.acl_id IN (?));
+            ';
+        $params = [
+            \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            $course->acl_id,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE,
+            $course->acl_id,
+        ];
+
+        /** @var list<array{acl: int, user_id: int|null, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
     }
 
     /**

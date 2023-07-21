@@ -1,5 +1,4 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import expect from 'expect';
 import Sortable from 'sortablejs';
 
 import T from '../../lang';

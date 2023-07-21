@@ -3,8 +3,8 @@
     <h5 class="card-header">
       {{ T.wordsProblems }}
     </h5>
-    <div class="table-responsive">
-      <table class="table mb-0">
+    <div class="table-responsive mb-0">
+      <table class="table table-fixed">
         <thead>
           <tr>
             <th scope="col" class="align-middle text-nowrap">
@@ -129,8 +129,8 @@
         </thead>
         <tbody data-problems>
           <tr v-for="problem in problems" :key="problem.problem_id">
-            <td>{{ problem.problem_id }}</td>
-            <td>
+            <td class="align-middle">{{ problem.problem_id }}</td>
+            <td class="align-middle">
               <a :href="`/arena/problem/${problem.alias}/`">{{
                 problem.title
               }}</a>
@@ -175,7 +175,7 @@
             </td>
             <td
               v-if="problem.quality !== null"
-              class="text-center tooltip_column"
+              class="text-center align-middle tooltip_column"
             >
               <span
                 v-tooltip="
@@ -187,8 +187,11 @@
                 {{ QUALITY_TAGS[Math.round(problem.quality)] }}
               </span>
             </td>
-            <td v-else class="text-right">—</td>
-            <td v-if="problem.difficulty !== null" class="text-center">
+            <td v-else class="text-right align-middle">—</td>
+            <td
+              v-if="problem.difficulty !== null"
+              class="text-center align-middle"
+            >
               <span
                 v-tooltip="
                   `${ui.formatString(T.wordsOutOf4, {
@@ -199,14 +202,18 @@
                 {{ DIFFICULTY_TAGS[Math.round(problem.difficulty)] }}
               </span>
             </td>
-            <td v-else class="text-center">—</td>
-            <td class="text-right">
-              {{ (100.0 * problem.ratio).toFixed(2) }}%
+            <td v-else class="text-center align-middle">—</td>
+            <td class="text-right align-middle">
+              {{ (100.0 * problem.ratio).toFixed(2) }}%<br />({{
+                problem.accepted
+              }}/{{ problem.submissions }})
             </td>
-            <td v-if="loggedIn" class="text-right">
+            <td v-if="loggedIn" class="text-right align-middle">
               {{ problem.score.toFixed(2) }}
             </td>
-            <td class="text-right">{{ problem.points.toFixed(2) }}</td>
+            <td class="text-right align-middle">
+              {{ problem.points.toFixed(2) }}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -226,7 +233,7 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 
-import common_Paginator from '../common/Paginatorv2.vue';
+import common_Paginator from '../common/Paginator.vue';
 import common_SortControls from '../common/SortControls.vue';
 
 import 'v-tooltip/dist/v-tooltip.css';
@@ -297,3 +304,43 @@ export default class BaseList extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.sticky-offset {
+  top: 4rem;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-responsive {
+  max-height: 80vh;
+}
+
+.table-fixed {
+  overflow: auto;
+  thead {
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: white;
+      border-bottom: 0;
+      &:nth-child(2) {
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 3;
+      }
+    }
+  }
+  tbody td:nth-child(2) {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 1;
+  }
+}
+</style>

@@ -1,8 +1,6 @@
 <template>
   <div class="omegaup-course-clone card">
-    <div class="card-header">
-      <h2>{{ T.wordsCloneCourse }}</h2>
-    </div>
+    <h2 class="card-header">{{ T.wordsCloneCourse }}</h2>
     <div class="card-body">
       <div class="mb-4">
         <p>

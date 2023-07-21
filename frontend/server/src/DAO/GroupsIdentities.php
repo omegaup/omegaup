@@ -27,40 +27,21 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 s.state_id,
                 sc.name as school,
                 sc.school_id as school_id,
-                IFNULL(
-                    (
-                        SELECT `urc`.classname FROM
-                            `User_Rank_Cutoffs` urc
-                        WHERE
-                            `urc`.score <= (
-                                    SELECT
-                                        `ur`.`score`
-                                    FROM
-                                        `User_Rank` `ur`
-                                    WHERE
-                                        `ur`.user_id = `i`.`user_id`
-                                )
-                        ORDER BY
-                            `urc`.percentile ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) `classname`
+                IFNULL(ur.classname, "user-rank-unranked") AS classname
             FROM
                 Groups_Identities gi
             INNER JOIN
                 Identities i ON i.identity_id = gi.identity_id
             LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
+            LEFT JOIN
                 States s ON s.state_id = i.state_id AND s.country_id = i.country_id
             LEFT JOIN
-                Countries c ON c.country_id = s.country_id
+                Countries c ON c.country_id = i.country_id
             LEFT JOIN
                 Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
             LEFT JOIN
                 Schools sc ON sc.school_id = isc.school_id
-            LEFT JOIN
-                Users u ON u.user_id = i.user_id
             WHERE
                 gi.group_id = ?;';
 
@@ -136,7 +117,10 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
     final public static function getByGroupId(int $groupId): array {
         $sql = '
             SELECT
-                *
+            ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\GroupsIdentities::FIELD_NAMES,
+            'i'
+        ) . '
             FROM
                 Groups_Identities i
             WHERE

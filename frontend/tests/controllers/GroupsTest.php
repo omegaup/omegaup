@@ -1,9 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * GroupsTest
- *
- * @author joemmanuel
  */
 
 class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
@@ -24,11 +23,11 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'description' => $description
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         $group = \OmegaUp\DAO\Groups::getByName($name);
         $this->assertNotNull($group);
-        $this->assertEquals($description, $group->description);
+        $this->assertSame($description, $group->description);
         $this->assertTrue(
             \OmegaUp\Authorization::isGroupAdmin(
                 $identity,
@@ -64,13 +63,13 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'description' => $updatedDescription,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         $group = \OmegaUp\DAO\Groups::findByAlias($alias);
 
         $this->assertNotNull($group);
-        $this->assertEquals($updatedDescription, $group->description);
-        $this->assertEquals($updatedName, $group->name);
+        $this->assertSame($updatedDescription, $group->description);
+        $this->assertSame($updatedName, $group->name);
     }
 
     /**
@@ -104,7 +103,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'Group update should have failed because user is not the owner'
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -124,7 +123,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Group creation should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalid', $e->getMessage());
+            $this->assertSame('parameterInvalid', $e->getMessage());
         }
     }
 
@@ -141,7 +140,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Group creation should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalid', $e->getMessage());
+            $this->assertSame('parameterInvalid', $e->getMessage());
         }
     }
 
@@ -158,7 +157,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'usernameOrEmail' => $identity->username,
             'group_alias' => $group['group']->alias
         ]));
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         $group_users = \OmegaUp\DAO\GroupsIdentities::getByPK(
             $group['group']->group_id,
@@ -184,7 +183,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -203,7 +202,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'group_alias' => $groupData['group']->alias
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         $group_users = \OmegaUp\DAO\GroupsIdentities::getByPK(
             $groupData['group']->group_id,
@@ -228,8 +227,8 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotFound', $e->getMessage());
-            $this->assertEquals('User', $e->parameter);
+            $this->assertSame('parameterNotFound', $e->getMessage());
+            $this->assertSame('User', $e->parameter);
         }
     }
 
@@ -249,7 +248,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -274,7 +273,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
         ]));
 
-        $this->assertEquals($n, count($response['groups']));
+        $this->assertSame($n, count($response['groups']));
     }
 
     /**
@@ -300,7 +299,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['group']->alias,
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             $groupData['group']->alias,
             $response['group']['alias']
         );
@@ -309,7 +308,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['group']->alias
         ]));
-        $this->assertEquals($nUsers, count($response['identities']));
+        $this->assertSame($nUsers, count($response['identities']));
     }
 
     /**
@@ -330,13 +329,13 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'description' => $description
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         $groupScoreboard = \OmegaUp\DAO\GroupsScoreboards::getByAlias($alias);
 
         $this->assertNotNull($groupScoreboard);
-        $this->assertEquals($description, $groupScoreboard->description);
-        $this->assertEquals(
+        $this->assertSame($description, $groupScoreboard->description);
+        $this->assertSame(
             $groupData['group']->group_id,
             $groupScoreboard->group_id
         );
@@ -361,7 +360,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Group creation should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalid', $e->getMessage());
+            $this->assertSame('parameterInvalid', $e->getMessage());
         }
     }
 
@@ -389,7 +388,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'only_ac' => 0
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         $gsc = \OmegaUp\DAO\GroupsScoreboardsProblemsets::getByPK(
             $scoreboardData['scoreboard']->group_scoreboard_id,
@@ -423,7 +422,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -455,7 +454,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias']
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         $gscs = \OmegaUp\DAO\GroupsScoreboardsProblemsets::getByPK(
             $scoreboardData['scoreboard']->group_scoreboard_id,
@@ -526,15 +525,15 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'scoreboard_alias' => $scoreboardData['request']['alias'],
         ]));
 
-        $this->assertEquals($n, count($response['contests']));
-        $this->assertEquals(
+        $this->assertSame($n, count($response['contests']));
+        $this->assertSame(
             $scoreboardData['request']['alias'],
             $response['scoreboard']['alias']
         );
 
         // Only 1 user in the merged scoreboard is expected
-        $this->assertEquals(1, count($response['ranking']));
-        $this->assertEquals($n, count($response['ranking'][0]['contests']));
+        $this->assertSame(1, count($response['ranking']));
+        $this->assertSame($n, count($response['ranking'][0]['contests']));
     }
 
     /**
@@ -556,7 +555,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'group_alias' => $groupData['request']['alias'],
         ]));
 
-        $this->assertEquals($n, count($response['scoreboards']));
+        $this->assertSame($n, count($response['scoreboards']));
     }
 
     /**
@@ -626,31 +625,131 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'scoreboard_alias' => $scoreboardData['request']['alias'],
         ]));
 
-        $this->assertEquals($n, count($response['contests']));
-        $this->assertEquals(
+        $this->assertSame($n, count($response['contests']));
+        $this->assertSame(
             $scoreboardData['request']['alias'],
             $response['scoreboard']['alias']
         );
 
         // 2 users in the merged scoreboard is expected
-        $this->assertEquals(2, count($response['ranking']));
-        $this->assertEquals($n, count($response['ranking'][0]['contests']));
+        $this->assertSame(2, count($response['ranking']));
+        $this->assertSame($n, count($response['ranking'][0]['contests']));
 
         // Only AC is expected
-        $this->assertEquals(
-            100,
+        $this->assertSame(
+            100.0,
             $response['ranking'][0]['contests'][$contestsData[1]['request']['alias']]['points']
         );
-        $this->assertEquals(
-            0,
+        $this->assertSame(
+            0.0,
             $response['ranking'][1]['contests'][$contestsData[1]['request']['alias']]['points']
         );
 
         // Weight x3 in the first contest for 1st user
-        $this->assertEquals(
-            300,
+        $this->assertSame(
+            300.0,
             $response['ranking'][0]['contests'][$contestsData[0]['request']['alias']]['points']
         );
-        $this->assertEquals(700, $response['ranking'][0]['total']['points']);
+        $this->assertSame(700.0, $response['ranking'][0]['total']['points']);
+    }
+
+    /**
+     * apiDetails with only AC and Weights
+     */
+    public function testScoreboardDetailsForTypescript() {
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
+        $scoreboardData = \OmegaUp\Test\Factories\Groups::createGroupScoreboard(
+            $groupData
+        );
+        $contestsData = [];
+
+        // Create contestants to submit runs
+        ['identity' => $identityInGroup] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $groupData,
+            $identityInGroup
+        );
+        ['identity' => $identityInGroupNoAc] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $groupData,
+            $identityInGroupNoAc
+        );
+
+        $numberOfContests = 5;
+        // Create five contests
+        foreach (range(0, $numberOfContests - 1) as $id) {
+            $contestsData[] = \OmegaUp\Test\Factories\Contest::createContest();
+            \OmegaUp\Test\Factories\Contest::addAdminUser(
+                $contestsData[$id],
+                $groupData['owner']
+            );
+            \OmegaUp\Test\Factories\Groups::addContestToScoreboard(
+                $contestsData[$id],
+                $scoreboardData,
+                $groupData,
+                1 /*onlyAC*/,
+                ($id === 0 ? 3 : 1)
+            );
+
+            // Create a problem to solve
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
+                $problemData,
+                $contestsData[$id]
+            );
+
+            // Submit runs
+            $run1 = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestsData[$id],
+                $identityInGroup
+            );
+            $run2 = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestsData[$id],
+                $identityInGroupNoAc
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run1);
+            \OmegaUp\Test\Factories\Run::gradeRun($run2, 0.5, 'PA');
+        }
+
+        $login = self::login($groupData['owner']);
+        $response = \OmegaUp\Controllers\GroupScoreboard::getGroupScoreboardDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'group' => $groupData['request']['alias'],
+                'scoreboard' => $scoreboardData['request']['alias'],
+            ])
+        )['templateProperties']['payload']['details'];
+
+        $this->assertCount($numberOfContests, $response['contests']);
+        $this->assertSame(
+            $scoreboardData['request']['alias'],
+            $response['scoreboard']['alias']
+        );
+
+        // 2 users in the merged scoreboard is expected
+        $this->assertCount(2, $response['ranking']);
+        $this->assertCount(
+            $numberOfContests,
+            $response['ranking'][0]['contests']
+        );
+
+        // Only AC is expected
+        $this->assertSame(
+            100.0,
+            $response['ranking'][0]['contests'][$contestsData[1]['request']['alias']]['points']
+        );
+        $this->assertSame(
+            0.0,
+            $response['ranking'][1]['contests'][$contestsData[1]['request']['alias']]['points']
+        );
+
+        // Weight x3 in the first contest for 1st user
+        $this->assertSame(
+            300.0,
+            $response['ranking'][0]['contests'][$contestsData[0]['request']['alias']]['points']
+        );
+        $this->assertSame(700.0, $response['ranking'][0]['total']['points']);
     }
 }

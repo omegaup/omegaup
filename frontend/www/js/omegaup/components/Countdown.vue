@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <span data-count-down-timer>
     {{ formattedTimeLeft }}
   </span>
 </template>
@@ -29,10 +29,27 @@ export default class Countdown extends Vue {
   get formattedTimeLeft(): string {
     switch (this.countdownFormat) {
       case omegaup.CountdownFormat.EventCountdown:
+        if (this.timeLeft < 0) {
+          return '00:00:00';
+        }
         return time.formatDelta(this.timeLeft);
       case omegaup.CountdownFormat.WaitBetweenUploadsSeconds:
         return ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
           submissionGap: Math.ceil(this.timeLeft / 1000),
+        });
+      case omegaup.CountdownFormat.ContestHasNotStarted:
+        if (this.timeLeft < 0) {
+          return T.arenaContestHasAlreadyStarted;
+        }
+        return ui.formatString(T.contestWillBeginIn, {
+          time: time.formatDelta(this.timeLeft),
+        });
+      case omegaup.CountdownFormat.AssignmentHasNotStarted:
+        if (this.timeLeft < 0) {
+          return T.arenaCourseAssignmentHasAlreadyStarted;
+        }
+        return ui.formatString(T.arenaCourseAssignmentWillBeginIn, {
+          time: time.formatDelta(this.timeLeft),
         });
       default:
         return '';
@@ -45,7 +62,7 @@ export default class Countdown extends Vue {
     if (!this.timerInterval) return;
     clearInterval(this.timerInterval);
     this.timerInterval = 0;
-    this.$emit('emit-finish');
+    this.$emit('finish');
   }
 
   mounted() {

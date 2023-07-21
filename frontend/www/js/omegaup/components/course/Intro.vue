@@ -1,86 +1,61 @@
 <template>
-  <div class="card">
-    <div class="card-header">
-      <h2 class="card-title">{{ T.courseDetails }}</h2>
-    </div>
-    <div class="card-body text-center">
-      <h2 name="name">{{ name }}</h2>
-      <omegaup-markdown :markdown="description"></omegaup-markdown>
-      <div v-if="course !== null" class="my-4 card align-to-markdown">
-        <h5 class="card-header">{{ T.wordsContent }}</h5>
-        <div class="table-responsive">
-          <table class="table table-striped table-hover mb-0">
-            <thead>
-              <tr>
-                <th class="text-center" scope="col">
-                  {{ T.wordsContentType }}
-                </th>
-                <th class="text-center" scope="col">{{ T.wordsName }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="!course.assignments.length">
-                <td class="empty-table-message" colspan="2">
-                  {{ T.courseContentEmpty }}
-                </td>
-              </tr>
-              <tr
-                v-for="assignment in course.assignments"
-                v-else
-                :key="assignment.alias"
-              >
-                <td class="text-center">
-                  <template v-if="assignment.assignment_type === 'homework'">
-                    <font-awesome-icon icon="file-alt" />
-                    <span class="ml-2">{{ T.wordsHomework }}</span>
-                  </template>
-                  <template v-else-if="assignment.assignment_type === 'lesson'">
-                    <font-awesome-icon icon="chalkboard-teacher" />
-                    <span class="ml-2">{{ T.wordsLesson }}</span>
-                  </template>
-                  <template v-else>
-                    <font-awesome-icon icon="list-alt" />
-                    <span class="ml-2">{{ T.wordsExam }}</span>
-                  </template>
-                </td>
-                <td>
-                  <span>{{ assignment.name }}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <template
-        v-if="userRegistrationRequested === null || userRegistrationAccepted"
-      >
+  <div>
+    <div class="card-header pb-4 px-5 pt-5">
+      <h2 class="text-center mb-4">{{ course.name }}</h2>
+      <omegaup-markdown
+        :full-width="true"
+        :markdown="course.description"
+      ></omegaup-markdown>
+      <!-- TODO: Here goes the estimated time for course -->
+      <p v-if="course.level" class="text-center course-level">
+        {{
+          ui.formatString(T.courseIntroLevel, { level: levels[course.level] })
+        }}
+      </p>
+      <template v-if="displayCoursePrivacyBullets">
+        <omegaup-markdown
+          :markdown="T.coursePrivacyConsent"
+          :full-width="true"
+          class="font-weight-bold h5"
+        ></omegaup-markdown>
         <omegaup-markdown
           v-if="needsBasicInformation"
           :markdown="T.courseBasicInformationNeeded"
+          :full-width="true"
         ></omegaup-markdown>
-        <template v-if="requestsUserInformation != 'no'">
+        <template v-if="course.requests_user_information != 'no'">
           <omegaup-markdown
             :markdown="statements.privacy.markdown || ''"
+            :full-width="true"
           ></omegaup-markdown>
           <omegaup-radio-switch
             :value.sync="shareUserInformation"
             :selected-value="shareUserInformation"
-            class="align-to-markdown"
+            class="align-to-markdown ml-5 mb-3"
           ></omegaup-radio-switch>
         </template>
+
         <template v-if="shouldShowAcceptTeacher">
           <omegaup-markdown
             :markdown="statements.acceptTeacher.markdown || ''"
+            :full-width="true"
           ></omegaup-markdown>
           <omegaup-radio-switch
             :value.sync="acceptTeacher"
             :selected-value="acceptTeacher"
             name="accept-teacher"
-            class="align-to-markdown"
+            class="align-to-markdown ml-5"
           ></omegaup-radio-switch>
         </template>
-        <div class="text-center mt-3">
-          <form v-if="loggedIn" @submit.prevent="onSubmit">
+      </template>
+      <div class="text-center mt-3">
+        <template v-if="loggedIn">
+          <form
+            v-if="
+              userRegistrationRequested === null || userRegistrationAccepted
+            "
+            @submit.prevent="onSubmit"
+          >
             <button
               class="btn btn-primary btn-lg"
               name="start-course-submit"
@@ -90,37 +65,53 @@
               {{ T.startCourse }}
             </button>
           </form>
-          <a
-            v-else
-            class="btn btn-primary"
-            :href="`/login/?redirect=${encodeURIComponent(
-              window.location.pathname,
-            )}`"
-            >{{ T.loginLogIn }}</a
+          <form
+            v-else-if="!userRegistrationRequested"
+            class="text-center"
+            @submit.prevent="onRequestAccess"
           >
-        </div>
-      </template>
-      <template v-else>
-        <form
-          v-if="!userRegistrationRequested"
-          @submit.prevent="$emit('request-access-course')"
-        >
+            <omegaup-markdown
+              :markdown="T.mustRegisterToJoinCourse"
+              :full-width="true"
+            ></omegaup-markdown>
+            <button type="submit" class="btn btn-primary btn-lg">
+              {{ T.registerForCourse }}
+            </button>
+          </form>
           <omegaup-markdown
-            :markdown="T.mustRegisterToJoinCourse"
+            v-else-if="!userRegistrationAnswered"
+            :markdown="T.registrationPendingCourse"
+            :full-width="true"
           ></omegaup-markdown>
-          <button type="submit" class="btn btn-primary btn-lg">
-            {{ T.registerForCourse }}
-          </button>
-        </form>
-        <omegaup-markdown
-          v-else-if="!userRegistrationAnswered"
-          :markdown="T.registrationPendingCourse"
-        ></omegaup-markdown>
-        <omegaup-markdown
+          <omegaup-markdown
+            v-else
+            :markdown="T.registrationDenied"
+            :full-width="true"
+          ></omegaup-markdown>
+        </template>
+        <a
           v-else
-          :markdown="T.registrationDenied"
+          class="btn btn-primary"
+          role="button"
+          :href="`/login/?redirect=${encodeURIComponent(
+            window.location.pathname,
+          )}`"
+          >{{ T.loginLogIn }}</a
+        >
+      </div>
+    </div>
+    <div class="mt-4">
+      <div v-if="course.objective" class="mb-4">
+        <h5 class="intro-subtitle pb-1">{{ T.courseIntroWhatYouWillLearn }}</h5>
+        <omegaup-markdown
+          :markdown="course.objective"
+          :full-width="true"
         ></omegaup-markdown>
-      </template>
+      </div>
+      <div v-if="course.school_id && course.school_name">
+        <h5 class="intro-subtitle pb-1 mb-2">{{ T.courseIntroImpartedBy }}</h5>
+        {{ course.school_name }}
+      </div>
     </div>
   </div>
 </template>
@@ -128,6 +119,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import * as ui from '../../ui';
 import { types } from '../../api_types';
 
 import omegaup_Markdown from '../Markdown.vue';
@@ -140,6 +132,12 @@ import {
   faListAlt,
 } from '@fortawesome/free-solid-svg-icons';
 library.add(faChalkboardTeacher, faFileAlt, faListAlt);
+
+const levels = {
+  introductory: T.courseLevelIntroductory,
+  intermediate: T.courseLevelIntermediate,
+  advanced: T.courseLevelAdvanced,
+};
 
 interface Statement {
   [name: string]: {
@@ -157,11 +155,8 @@ interface Statement {
   },
 })
 export default class CourseIntro extends Vue {
-  @Prop({ default: null }) course!: types.CourseDetails | null;
-  @Prop() name!: string;
-  @Prop() description!: string;
+  @Prop() course!: types.CourseDetails;
   @Prop() needsBasicInformation!: boolean;
-  @Prop() requestsUserInformation!: string;
   @Prop() shouldShowAcceptTeacher!: boolean;
   @Prop() statements!: Statement;
   @Prop({ default: null }) userRegistrationRequested!: boolean;
@@ -170,6 +165,9 @@ export default class CourseIntro extends Vue {
   @Prop() loggedIn!: boolean;
 
   T = T;
+  ui = ui;
+  levels = levels;
+
   shareUserInformation = false;
   acceptTeacher = false;
   window = window;
@@ -177,20 +175,46 @@ export default class CourseIntro extends Vue {
   get isButtonDisabled(): boolean {
     return (
       this.needsBasicInformation ||
-      (this.requestsUserInformation === 'required' &&
+      (this.course.requests_user_information === 'required' &&
         !this.shareUserInformation)
     );
   }
 
+  get displayCoursePrivacyBullets(): boolean {
+    return (
+      (this.userRegistrationAccepted ||
+        this.userRegistrationRequested === false) &&
+      (this.needsBasicInformation ||
+        this.course.requests_user_information != 'no' ||
+        this.shouldShowAcceptTeacher)
+    );
+  }
+
   onSubmit(): void {
-    this.$emit('submit', this);
+    this.$emit('submit', {
+      shareUserInformation: this.shareUserInformation,
+      acceptTeacher: this.acceptTeacher,
+    });
+  }
+
+  onRequestAccess(): void {
+    this.$emit('request-access-course', {
+      shareUserInformation: this.shareUserInformation,
+      acceptTeacher: this.acceptTeacher,
+    });
   }
 }
 </script>
 
-<style scoped>
-.align-to-markdown {
-  max-width: 50em;
-  margin: 0 auto;
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+.course-level {
+  color: $omegaup-pink;
+}
+
+h5.intro-subtitle {
+  color: $omegaup-grey;
+  width: 20rem;
+  border-bottom: 4px solid $omegaup-primary--accent;
 }
 </style>

@@ -20,7 +20,10 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
         int $identityId
     ): array {
         $sql = 'SELECT
-                    *
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\ProblemsetAccessLog::FIELD_NAMES,
+            'Problemset_Access_Log'
+        ) . '
                 FROM
                     Problemset_Access_Log
                 WHERE

@@ -1,9 +1,5 @@
 <?php
-
-/**
- *
- * @author alan
- */
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetCourseDetailsValid() {
@@ -28,7 +24,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals($courseData['course_alias'], $response['alias']);
+        $this->assertSame($courseData['course_alias'], $response['alias']);
         \OmegaUp\Validators::validateNumber(
             $response['start_time']->time,
             'start_time'
@@ -40,8 +36,8 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Both assignments added should be visible since the caller is an
         // admin.
-        $this->assertEquals(true, $response['is_admin']);
-        $this->assertEquals(2, count($response['assignments']));
+        $this->assertSame(true, $response['is_admin']);
+        $this->assertSame(2, count($response['assignments']));
 
         foreach ($response['assignments'] as $assignment) {
             $this->assertNotNull($assignment['name']);
@@ -88,7 +84,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals($courseData['course_alias'], $response['alias']);
+        $this->assertSame($courseData['course_alias'], $response['alias']);
         \OmegaUp\Validators::validateNumber(
             $response['start_time']->time,
             'start_time'
@@ -99,9 +95,9 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Only the course that has started should be visible.
-        $this->assertEquals(false, $response['is_admin']);
-        $this->assertEquals(1, count($response['assignments']));
-        $this->assertEquals(
+        $this->assertSame(false, $response['is_admin']);
+        $this->assertSame(1, count($response['assignments']));
+        $this->assertSame(
             $courseData['assignment_alias'],
             $response['assignments'][0]['alias']
         );
@@ -125,7 +121,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -148,7 +144,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -166,7 +162,10 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals($courseData['request']['name'], $response['name']);
+        $this->assertSame(
+            $courseData['request']['name'],
+            $response['course']['name']
+        );
         $this->assertArrayNotHasKey('assignments', $response);
     }
 
@@ -180,7 +179,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals(false, $response['is_admin']);
+        $this->assertSame(false, $response['is_admin']);
     }
 
     public function testGetAssignmentAsStudent() {
@@ -238,5 +237,38 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // OK!
         }
+    }
+
+    /**
+     * Tests the API to archive or desarchive a course
+     */
+    public function testArchiveCourse() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $adminLogin = self::login($courseData['admin']);
+
+        $course = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['course']->course_id
+        );
+        $this->assertFalse($course->archived);
+
+        \OmegaUp\Controllers\Course::apiArchive(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $course->alias,
+            'archive' => true
+        ]));
+        $course = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['course']->course_id
+        );
+        $this->assertTrue($course->archived);
+
+        \OmegaUp\Controllers\Course::apiArchive(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $course->alias,
+            'archive' => false
+        ]));
+        $course = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['course']->course_id
+        );
+        $this->assertFalse($course->archived);
     }
 }

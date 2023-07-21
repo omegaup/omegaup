@@ -1,5 +1,5 @@
 .btn-cancel {
   margin-left: 5px;
-  background-color: $btn-cancel-color;
-  color: $black;
+  background-color: var(--btn-cancel-background-color);
+  color: var(--btn-cancel-font-color);
 }

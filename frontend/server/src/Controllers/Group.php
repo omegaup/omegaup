@@ -8,13 +8,12 @@
  * @psalm-type Identity=array{classname?: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, password?: string, school: null|string, school_id: int|null, school_name?: string, state: null|string, state_id: null|string, username: string}
  * @psalm-type GroupScoreboard=array{alias: string, create_time: string, description: null|string, name: string}
  * @psalm-type GroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, groupAlias: string, groupDescription: null|string, groupName: null|string, identities: list<Identity>, isOrganizer: bool, scoreboards: list<GroupScoreboard>}
- * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
- * @psalm-type ScoreboardContest=array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}
+ * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration?: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type ScoreboardContest=array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, score_mode: string, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}
  * @psalm-type GroupScoreboardContestsPayload=array{availableContests: list<ContestListItem>, contests: list<ScoreboardContest>, scoreboardAlias: string, groupAlias: string}
  * @psalm-type Group=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
  * @psalm-type GroupListPayload=array{groups: list<Group>}
- *
- * @author joemmanuel
+ * @psalm-type GroupListItem=array{label: string, value: string}
  */
 
 class Group extends \OmegaUp\Controllers\Controller {
@@ -68,12 +67,12 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param null|string $alias
+     * @omegaup-request-param string $alias
      * @omegaup-request-param string $description
      * @omegaup-request-param string $name
      */
     public static function apiCreate(\OmegaUp\Request $r) {
-        $r->ensureMainUserIdentity();
+        $r->ensureMainUserIdentityIsOver13();
 
         $groupAlias = $r->ensureString(
             'alias',
@@ -160,7 +159,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $usernameOrEmail
      */
     public static function apiAddUser(\OmegaUp\Request $r): array {
-        $r->ensureIdentity();
+        $r->ensureIdentityIsOver13();
         $groupAlias = $r->ensureString(
             'group_alias',
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
@@ -181,10 +180,10 @@ class Group extends \OmegaUp\Controllers\Controller {
         );
 
         if (
-            !is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
+            \OmegaUp\DAO\GroupsIdentities::existsByPK(
                 $group->group_id,
                 $resolvedIdentity->identity_id
-            ))
+            )
         ) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                 'identityInGroup'
@@ -273,7 +272,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return list<array{label: string, value: string}>
+     * @return list<GroupListItem>
      *
      * @omegaup-request-param null|string $query
      */
@@ -283,11 +282,11 @@ class Group extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['query'],
             'query',
-            /*$minLength=*/2,
-            /*$maxLength=*/null
+            minLength: 2,
+            maxLength: null
         );
 
-        $groups = \OmegaUp\DAO\Groups::SearchByName($r['query']);
+        $groups = \OmegaUp\DAO\Groups::searchByName($r['query']);
 
         $response = [];
         foreach ($groups as $group) {
@@ -351,7 +350,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{identities: list<array{classname: string, country?: null|string, country_id?: null|string, name?: null|string, school?: null|string, school_id?: int|null, state?: null|string, state_id?: null|string, username: string}>}
+     * @return array{identities: list<Identity>}
      *
      * @omegaup-request-param string $group_alias
      */
@@ -370,7 +369,7 @@ class Group extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'identities' => \OmegaUp\DAO\GroupsIdentities::GetMemberIdentities(
+            'identities' => \OmegaUp\DAO\GroupsIdentities::getMemberIdentities(
                 $group
             ),
         ];
@@ -387,7 +386,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $name
      */
     public static function apiCreateScoreboard(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentityIsOver13();
         $groupAlias = $r->ensureString(
             'group_alias',
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
@@ -424,21 +423,15 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: GroupEditPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: GroupEditPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $group
      */
-    public static function getGroupEditDetailsForSmarty(
+    public static function getGroupEditDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         // Authenticate user
         $r->ensureMainUserIdentity();
-
-        $isOrganizer = \OmegaUp\Experiments::getInstance()->isEnabled(
-            \OmegaUp\Experiments::IDENTITIES
-        ) && \OmegaUp\Authorization::canCreateGroupIdentities(
-            $r->identity
-        );
 
         $groupAlias = $r->ensureString(
             'group',
@@ -468,7 +461,7 @@ class Group extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'groupAlias' => $groupAlias,
                     'groupName' => $group->name,
@@ -481,9 +474,7 @@ class Group extends \OmegaUp\Controllers\Controller {
                     'identities' => \OmegaUp\DAO\GroupsIdentities::getMemberIdentities(
                         $group
                     ),
-                    'isOrganizer' => \OmegaUp\Experiments::getInstance()->isEnabled(
-                        \OmegaUp\Experiments::IDENTITIES
-                    ) && \OmegaUp\Authorization::canCreateGroupIdentities(
+                    'isOrganizer' => \OmegaUp\Authorization::canCreateGroupIdentities(
                         $r->identity
                     ),
                     'scoreboards' => $scoreboards,
@@ -497,14 +488,14 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: GroupListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: GroupListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getGroupListForSmarty(\OmegaUp\Request $r): array {
+    public static function getGroupListForTypeScript(\OmegaUp\Request $r): array {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'groups' => \OmegaUp\DAO\Groups::getAllGroupsAdminedByUser(
                         $r->user->user_id,
@@ -523,9 +514,9 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $group
      * @omegaup-request-param string $scoreboard
      *
-     * @return array{smartyProperties: array{payload: GroupScoreboardContestsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: GroupScoreboardContestsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getGroupScoreboardEditForSmarty(
+    public static function getGroupScoreboardEditForTypeScript(
         \OmegaUp\Request $r
     ): array {
         // Authenticate user
@@ -546,18 +537,20 @@ class Group extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $scoreboard
         );
-
+        [
+            'contests' => $availableContests,
+        ] = \OmegaUp\Controllers\Contest::getContestList(
+            $r->identity,
+            query: null,
+            page: 1,
+            pageSize: 20,
+            activeContests: \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+            recommended: \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+        );
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
-                    'availableContests' => \OmegaUp\Controllers\Contest::getContestList(
-                        $r->identity,
-                        /*$query=*/ null,
-                        /*$page=*/ 1,
-                        /*$pageSize=*/ 20,
-                        \OmegaUp\DAO\Enum\ActiveStatus::ALL,
-                        \OmegaUp\DAO\Enum\RecommendedStatus::ALL
-                    ),
+                    'availableContests' => $availableContests,
                     'contests' => $contests,
                     'scoreboardAlias' => $scoreboard,
                     'groupAlias' => $groupAlias,

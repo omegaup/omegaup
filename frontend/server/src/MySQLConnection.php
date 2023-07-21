@@ -46,6 +46,9 @@ class MySQLConnection {
      */
     private static $_instance = null;
 
+    /** @var \Monolog\Logger|null */
+    private static $_typesLogger = null;
+
     /**
      * Returns the singleton instance of this class. It also registers a
      * shutdown function to flush any outstanding queries upon script
@@ -72,8 +75,8 @@ class MySQLConnection {
 
     private function connect(): void {
         $this->_connection = \mysqli_init();
-        $this->_connection->options(MYSQLI_READ_DEFAULT_GROUP, false);
-        $this->_connection->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
+        $this->_connection->options(MYSQLI_READ_DEFAULT_GROUP, 0);
+        $this->_connection->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, 1);
 
         if (
             !@$this->_connection->real_connect(
@@ -85,7 +88,7 @@ class MySQLConnection {
         ) {
             throw new \OmegaUp\Exceptions\DatabaseOperationException(
                 'Failed to connect to MySQL (' . \mysqli_connect_errno() . '): '
-                . \mysqli_connect_error(),
+                . strval(\mysqli_connect_error()),
                 \mysqli_connect_errno()
             );
         }
@@ -214,6 +217,7 @@ class MySQLConnection {
             case MYSQLI_TYPE_MEDIUM_BLOB:
             case MYSQLI_TYPE_LONG_BLOB:
             case MYSQLI_TYPE_BLOB:
+            case MYSQLI_TYPE_JSON:
                 return FieldType::TYPE_STRING;
 
             default:
@@ -319,7 +323,7 @@ class MySQLConnection {
             $fieldTypes[] = "{$field->name}: " . self::PsalmType($field);
         }
         sort($fieldTypes);
-        \Logger::getLogger('mysqltypes')->info(
+        MySQLConnection::getTypesLogger()->info(
             "{$caller['file']}:{$caller['line']} array{" .
             join(', ', $fieldTypes) .
             '}'
@@ -328,10 +332,56 @@ class MySQLConnection {
 
     private function DumpMySQLQueryResultTypeSingleField(\mysqli_result $result): void {
         $caller = debug_backtrace()[1];
-        \Logger::getLogger('mysqltypes')->info(
+        MySQLConnection::getTypesLogger()->info(
             "{$caller['file']}:{$caller['line']} " .
             self::PsalmType($result->fetch_field_direct(0))
         );
+    }
+
+    private static function getTypesLogger(): \Monolog\Logger {
+        if (is_null(MySQLConnection::$_typesLogger)) {
+            MySQLConnection::$_typesLogger = new \Monolog\Logger('mysqltypes');
+            MySQLConnection::$_typesLogger->pushHandler(
+                (new \Monolog\Handler\StreamHandler(
+                    OMEGAUP_MYSQL_TYPES_LOG_FILE
+                ))->
+                    setFormatter(
+                        new \Monolog\Formatter\LineFormatter(
+                            "%message%\n"
+                        )
+                    )
+            );
+        }
+        return MySQLConnection::$_typesLogger;
+    }
+
+    /**
+     * Attempts to executes a MySQL query.
+     */
+    private function QueryAttempt(
+        string $query,
+        int $resultmode
+    ): ?\mysqli_result {
+        try {
+            $result = $this->_connection->query($query, $resultmode);
+            if ($result === false) {
+                $errorMessage = "Failed to query MySQL ({$this->_connection->errno}): {$this->_connection->error}";
+                throw new \OmegaUp\Exceptions\DatabaseOperationException(
+                    $errorMessage,
+                    intval($this->_connection->errno)
+                );
+            } elseif ($result === true) {
+                return null;
+            }
+            /** @var \mysqli_result */
+            return $result;
+        } catch (\mysqli_sql_exception $e) {
+            $errorMessage = "Failed to query MySQL ({$e->getCode()}): {$e->getMessage()}";
+            throw new \OmegaUp\Exceptions\DatabaseOperationException(
+                $errorMessage,
+                $e->getCode()
+            );
+        }
     }
 
     /**
@@ -343,29 +393,25 @@ class MySQLConnection {
         int $resultmode
     ): ?\mysqli_result {
         $query = $this->BindQueryParams($sql, $params);
-        $result = $this->_connection->query($query, $resultmode);
-        if (
-            $result === false &&
-            $this->_needsFlushing === false &&
-            $this->_connection->errno == 2006
-        ) {
-            // If there have not been any non-committed updates to the
-            // database, let's try to reconnect and do this one more time.
-            $this->connect();
-            $result = $this->_connection->query($query, $resultmode);
-        }
-        if ($result === false) {
-            $errorMessage = "Failed to query MySQL ({$this->_connection->errno}): {$this->_connection->error}";
-            \Logger::getLogger('mysql')->debug($errorMessage);
-            throw new \OmegaUp\Exceptions\DatabaseOperationException(
-                $errorMessage,
-                intval($this->_connection->errno)
+        try {
+            return $this->QueryAttempt($query, $resultmode);
+        } catch (\OmegaUp\Exceptions\DatabaseOperationException $e) {
+            if (
+                $this->_needsFlushing === false &&
+                $e->isGoneAway()
+            ) {
+                // If there have not been any non-committed updates to the
+                // database, let's try to reconnect and do this one more time.
+                $this->connect();
+                return $this->QueryAttempt($query, $resultmode);
+            }
+            \Monolog\Registry::omegaup()->withName(
+                'mysql'
+            )->debug(
+                $e->getMessage()
             );
-        } elseif ($result === true) {
-            return null;
+            throw $e;
         }
-        /** @var \mysqli_result */
-        return $result;
     }
 
     /**

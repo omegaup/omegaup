@@ -1,14 +1,22 @@
-import { omegaup, OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
 import T from '../lang';
 import contest_Edit from '../components/contest/Edit.vue';
+import SearchTypes from '../components/contest/AddProblem.vue';
 import * as ui from '../ui';
 import * as api from '../api';
+import { toCsv, TableCell } from '../csv';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestEditPayload();
-
+  const searchResultTeamsGroups: types.ListItem[] = [];
+  if (payload.teams_group) {
+    searchResultTeamsGroups.push({
+      key: payload.teams_group.alias,
+      value: payload.teams_group.name,
+    });
+  }
   const contestEdit = new Vue({
     el: '#main-container',
     components: {
@@ -22,6 +30,11 @@ OmegaUp.on('ready', () => {
       problems: payload.problems,
       requests: payload.requests,
       users: payload.users,
+      searchResultProblems: [] as types.ListItem[],
+      searchResultUsers: [] as types.ListItem[],
+      searchResultTeamsGroups,
+      searchResultGroups: [] as types.ListItem[],
+      teamsGroup: payload.teams_group,
     }),
     methods: {
       arbitrateRequest: (username: string, resolution: boolean): void => {
@@ -33,7 +46,11 @@ OmegaUp.on('ready', () => {
           note: resolutionText,
         })
           .then(() => {
-            ui.success(T.successfulOperation);
+            if (resolution) {
+              ui.success(T.arbitrateRequestAcceptSuccessfully);
+            } else {
+              ui.success(T.arbitrateRequestDenySuccessfully);
+            }
             contestEdit.refreshRequests();
           })
           .catch(ui.apiError);
@@ -56,12 +73,29 @@ OmegaUp.on('ready', () => {
           })
           .catch(ui.apiError);
       },
-      refreshProblems: (): void => {
+      refreshProblems: (problemAdded: boolean): void => {
         api.Contest.problems({
           contest_alias: payload.details.alias,
         })
           .then((response) => {
             contestEdit.problems = response.problems;
+            if (
+              problemAdded &&
+              !contestEdit.details.languages.includes('cat') &&
+              contestEdit.problems.some((problem) =>
+                problem.languages.split(',').includes('cat'),
+              )
+            ) {
+              api.Contest.update({
+                contest_alias: contestEdit.details.alias,
+                languages: contestEdit.details.languages.concat(['cat']),
+              })
+                .then(() => {
+                  contestEdit.details.languages.push('cat');
+                  ui.warning(T.contestEditCatLanguageAddedWarning);
+                })
+                .catch(ui.apiError);
+            }
           })
           .catch(ui.apiError);
       },
@@ -101,6 +135,16 @@ OmegaUp.on('ready', () => {
           })
           .catch(ui.apiError);
       },
+      downloadCsvFile: (fileName: string, table: TableCell[][]): void => {
+        const blob = new Blob([toCsv(table)], {
+          type: 'text/csv;charset=utf-8;',
+        });
+        const hiddenElement = document.createElement('a');
+        hiddenElement.href = window.URL.createObjectURL(blob);
+        hiddenElement.target = '_blank';
+        hiddenElement.download = fileName;
+        hiddenElement.click();
+      },
     },
     render: function (createElement) {
       return createElement('omegaup-contest-edit', {
@@ -112,23 +156,137 @@ OmegaUp.on('ready', () => {
           problems: this.problems,
           requests: this.requests,
           users: this.users,
+          searchResultProblems: this.searchResultProblems,
+          searchResultUsers: this.searchResultUsers,
+          searchResultTeamsGroups: this.searchResultTeamsGroups,
+          searchResultGroups: this.searchResultGroups,
+          teamsGroup: this.teamsGroup,
+          originalContestAdmissionMode: payload.original_contest_admission_mode,
         },
         on: {
-          'update-contest': function (contest: omegaup.Contest) {
-            api.Contest.update(
-              Object.assign({}, contest, {
-                contest_alias: contest.alias,
-                alias: null,
-              }),
-            )
-              .then(() => {
+          'update-search-result-problems': ({
+            query,
+            searchType,
+          }: {
+            query: string;
+            searchType: SearchTypes;
+          }) => {
+            api.Problem.listForTypeahead({
+              query,
+              search_type: searchType,
+            })
+              .then((data) => {
+                // Problems previously added into the contest should not be
+                // shown in the dropdown
+                const addedProblems = new Set(
+                  this.problems.map((problem) => problem.alias),
+                );
+                this.searchResultProblems = data.results
+                  .filter((problem) => !addedProblems.has(problem.key))
+                  .map(({ key, value }, index) => ({
+                    key: key,
+                    value: `${String(index + 1).padStart(
+                      2,
+                      '0',
+                    )}.-  ${ui.escape(value)} (<strong>${ui.escape(
+                      key,
+                    )}</strong>)`,
+                  }));
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-groups': (query: string) => {
+            api.Group.list({
+              query,
+            })
+              .then((data) => {
+                // Groups previously added into the contest should not be
+                // shown in the dropdown
+                const addedGroups = new Set(
+                  this.groups.map((group) => group.alias),
+                );
+                this.searchResultGroups = data
+                  .filter((group) => !addedGroups.has(group.value))
+                  .map((group) => ({
+                    key: group.value,
+                    value: `${ui.escape(group.label)} (<strong>${ui.escape(
+                      group.value,
+                    )}</strong>)`,
+                  }));
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-users': (query: string) => {
+            api.User.list({ query })
+              .then(({ results }) => {
+                // Users previously invited to the contest should not be shown
+                // in the dropdown
+                const addedUsers = new Set(
+                  this.users.map((user) => user.username),
+                );
+
+                this.searchResultUsers = results
+                  .filter((user) => !addedUsers.has(user.key))
+                  .map(({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }));
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-teams-groups': (query: string) => {
+            api.TeamsGroup.list({
+              query,
+            })
+              .then((data) => {
+                this.searchResultTeamsGroups = data.map(
+                  ({ key, value }: { key: string; value: string }) => ({
+                    key,
+                    value: `${ui.escape(value)} (<strong>${ui.escape(
+                      key,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'update-contest': ({
+            contest,
+            teamsGroupAlias,
+          }: {
+            contest: types.ContestAdminDetails;
+            teamsGroupAlias?: string;
+          }): void => {
+            api.Contest.update({
+              ...contest,
+              contest_alias: contest.alias,
+              alias: null,
+              teams_group_alias: teamsGroupAlias,
+              contest_for_teams: !!teamsGroupAlias,
+            })
+              .then((data) => {
+                if (teamsGroupAlias && data.teamsGroupName) {
+                  this.teamsGroup = {
+                    alias: teamsGroupAlias,
+                    name: data.teamsGroupName,
+                  };
+                }
+                this.details.title = data.title;
                 ui.success(`
                   ${T.contestEditContestEdited} <a href="/arena/${contest.alias}/">${T.contestEditGoToContest}</a>
                 `);
               })
               .catch(ui.apiError);
           },
-          'add-problem': (problem: types.ContestProblem) => {
+          'add-problem': ({
+            problem,
+            isUpdate = false,
+          }: {
+            problem: types.ProblemsetProblem;
+            isUpdate: boolean;
+          }) => {
             api.Contest.addProblem({
               contest_alias: payload.details.alias,
               order_in_contest: problem.order,
@@ -137,28 +295,36 @@ OmegaUp.on('ready', () => {
               commit: problem.commit,
             })
               .then(() => {
+                this.refreshProblems(true);
+                if (isUpdate) {
+                  ui.success(T.problemSuccessfullyUpdated);
+                  return;
+                }
                 ui.success(T.problemSuccessfullyAdded);
-                this.refreshProblems();
               })
               .catch(ui.apiError);
           },
-          'get-versions': (
-            problemAlias: string,
-            addProblemComponent: {
+          'get-versions': ({
+            request,
+            target,
+          }: {
+            request: { problemAlias: string };
+            target: {
               versionLog: types.ProblemVersion[];
-              problems: types.ContestProblem[];
+              problems: types.ProblemsetProblem[];
               selectedRevision: types.ProblemVersion;
               publishedRevision: types.ProblemVersion;
-            },
-          ) => {
+            };
+          }) => {
             api.Problem.versions({
-              problem_alias: problemAlias,
+              problem_alias: request.problemAlias,
+              problemset_id: payload.details.problemset_id,
             })
               .then((result) => {
-                addProblemComponent.versionLog = result.log;
+                target.versionLog = result.log;
                 let currentProblem = null;
-                for (const problem of addProblemComponent.problems) {
-                  if (problem.alias === problemAlias) {
+                for (const problem of target.problems) {
+                  if (problem.alias === request.problemAlias) {
                     currentProblem = problem;
                     break;
                   }
@@ -169,7 +335,7 @@ OmegaUp.on('ready', () => {
                 }
                 for (const revision of result.log) {
                   if (publishedCommitHash === revision.commit) {
-                    addProblemComponent.selectedRevision = addProblemComponent.publishedRevision = revision;
+                    target.selectedRevision = target.publishedRevision = revision;
                     break;
                   }
                 }
@@ -183,14 +349,14 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.problemSuccessfullyRemoved);
-                this.refreshProblems();
+                this.refreshProblems(false);
               })
               .catch(ui.apiError);
           },
           'runs-diff': (
             problemAlias: string,
             versionsComponent: types.CommitRunsDiff,
-            selectedCommit: omegaup.Commit,
+            selectedCommit: types.ProblemVersion,
           ) => {
             api.Contest.runsDiff({
               problem_alias: problemAlias,
@@ -206,12 +372,21 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'update-admission-mode': (admissionMode: string) => {
+          'update-admission-mode': ({
+            admissionMode,
+            defaultShowAllContestantsInScoreboard,
+          }: {
+            admissionMode: string;
+            defaultShowAllContestantsInScoreboard: boolean;
+          }) => {
             api.Contest.update({
               contest_alias: payload.details.alias,
               admission_mode: admissionMode,
+              default_show_all_contestants_in_scoreboard: defaultShowAllContestantsInScoreboard,
             })
               .then(() => {
+                contestEdit.details.admission_mode = admissionMode;
+                contestEdit.details.default_show_all_contestants_in_scoreboard = defaultShowAllContestantsInScoreboard;
                 ui.success(`
                   ${T.contestEditContestEdited} <a href="/arena/${payload.details.alias}/">${T.contestEditGoToContest}</a>
                 `);
@@ -241,7 +416,11 @@ OmegaUp.on('ready', () => {
                 this.refreshUsers();
                 this.refreshRequests();
                 if (!contestantsWithError.length) {
-                  ui.success(T.bulkUserAddSuccess);
+                  ui.success(
+                    contestants.length === 1
+                      ? T.singleUserAddSuccess
+                      : T.bulkUserAddSuccess,
+                  );
                 } else {
                   ui.error(
                     ui.formatString(T.bulkUserAddError, {
@@ -277,10 +456,10 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'accept-request': (username: string) => {
+          'accept-request': ({ username }: { username: string }) => {
             this.arbitrateRequest(username, true);
           },
-          'deny-request': (username: string) => {
+          'deny-request': ({ username }: { username: string }) => {
             this.arbitrateRequest(username, false);
           },
           'add-admin': (username: string) => {
@@ -364,6 +543,75 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.contestEditContestClonedSuccessfully);
+              })
+              .catch(ui.apiError);
+          },
+          'archive-contest': (contestAlias: string, archive: string) => {
+            api.Contest.archive({ contest_alias: contestAlias, archive })
+              .then(() => {
+                if (archive) {
+                  ui.success(T.contestEditArchivedSuccess);
+                  return;
+                }
+                ui.success(T.contestEditUnarchivedSuccess);
+              })
+              .catch(ui.apiError);
+          },
+          'replace-teams-group': ({
+            alias,
+            name,
+          }: {
+            alias: string;
+            name: string;
+          }) => {
+            api.Contest.replaceTeamsGroup({
+              contest_alias: payload.details.alias,
+              teams_group_alias: alias,
+            })
+              .then(() => {
+                this.teamsGroup = { alias, name };
+                ui.success(T.contestEditTeamsGroupReplaced);
+              })
+              .catch(ui.apiError);
+          },
+          'language-remove-blocked': (language: string) => {
+            ui.warning(
+              ui.formatString(T.contestNewFormLanguageRemoveBlockedWarning, {
+                language: language,
+              }),
+            );
+          },
+          'download-csv-scoreboard': (contestAlias: string) => {
+            api.Contest.scoreboard({ contest_alias: contestAlias })
+              .then((result) => {
+                const table: TableCell[][] = [];
+                const header = [
+                  T.profileContestsTablePlace,
+                  T.profileUsername,
+                  T.profileName,
+                ];
+                for (let index = 0; index < result.problems.length; index++) {
+                  header.push(ui.columnName(index));
+                }
+                header.push('Total');
+                table.push(header);
+                for (const user of result.ranking) {
+                  const row: TableCell[] = [
+                    user.place || '',
+                    user.username,
+                    user.name || '',
+                  ];
+                  for (const problem of user.problems) {
+                    if (problem.runs > 0) {
+                      row.push(problem.points.toFixed(2));
+                    } else {
+                      row.push('');
+                    }
+                  }
+                  row.push(user.total.points.toFixed(2));
+                  table.push(row);
+                }
+                this.downloadCsvFile(`${contestAlias}_scoreboard.csv`, table);
               })
               .catch(ui.apiError);
           },

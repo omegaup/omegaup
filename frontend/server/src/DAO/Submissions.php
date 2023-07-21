@@ -13,10 +13,12 @@ namespace OmegaUp\DAO;
  */
 class Submissions extends \OmegaUp\DAO\Base\Submissions {
     final public static function getByGuid(string $guid): ?\OmegaUp\DAO\VO\Submissions {
-        $sql = 'SELECT * FROM Submissions WHERE (guid = ?) LIMIT 1;';
+        $sql = 'SELECT ' .
+            join(', ', array_keys(\OmegaUp\DAO\VO\Submissions::FIELD_NAMES)) .
+            ' FROM Submissions WHERE (guid = ?) LIMIT 1;';
         $params = [$guid];
 
-        /** @var array{current_run_id: int|null, guid: string, identity_id: int, language: string, problem_id: int, problemset_id: int|null, school_id: int|null, submission_id: int, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string}|null */
+        /** @var array{current_run_id: int|null, guid: string, identity_id: int, language: string, problem_id: int, problemset_id: int|null, school_id: int|null, status: string, submission_id: int, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, verdict: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -25,16 +27,38 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         return new \OmegaUp\DAO\VO\Submissions($rs);
     }
 
-    final public static function disqualify(string $guid): void {
+    final public static function disqualify(
+        \OmegaUp\DAO\VO\Submissions $submission
+    ): void {
         $sql = '
             UPDATE
                 Submissions s
             SET
                 s.type = "disqualified"
             WHERE
-                s.guid = ?;
+                s.submission_id = ?;
         ';
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$guid]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$submission->submission_id]
+        );
+    }
+
+    final public static function requalify(
+        \OmegaUp\DAO\VO\Submissions $submission
+    ): void {
+        $sql = '
+            UPDATE
+                Submissions s
+            SET
+                s.type = "normal"
+            WHERE
+                s.submission_id = ?;
+        ';
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$submission->submission_id]
+        );
     }
 
     /**
@@ -102,10 +126,42 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     }
 
     /**
+     * Gets the count of total runs sent by students (non-admins) to a given problemset
+     *
+     * @param list<int> $adminsIds
+     */
+    final public static function countTotalStudentsSubmissionsOfProblemset(
+        int $problemsetId,
+        array $adminsIds
+    ): int {
+        $placeholder = join(',', array_fill(0, count($adminsIds), '?'));
+        $sql = "
+            SELECT
+                COUNT(*)
+            FROM
+                Submissions s
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            WHERE
+                s.problemset_id = ? AND
+                s.`type` = 'normal' AND
+                i.user_id NOT IN ($placeholder);
+        ";
+        $args = array_merge(
+            [ $problemsetId ],
+            $adminsIds,
+        );
+
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $args);
+    }
+
+    /**
      * Get whether the to-be-created submission is within the allowed
      * submission gap.
      */
     final public static function isInsideSubmissionGap(
+        \OmegaUp\DAO\VO\Submissions $submission,
         ?int $problemsetId,
         ?\OmegaUp\DAO\VO\Contests $contest,
         int $problemId,
@@ -120,11 +176,9 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 SELECT
                     MAX(s.time)
                 FROM
-                    Identities AS i
-                LEFT JOIN
-                    Submissions s ON s.identity_id = i.identity_id
+                    Submissions s
                 WHERE
-                    i.identity_id = ? AND s.problem_id = ?
+                    s.identity_id = ? AND s.problem_id = ?
                 FOR UPDATE;
             ';
             $val = [$identityId, $problemId];
@@ -133,11 +187,9 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 SELECT
                     MAX(s.time)
                 FROM
-                    Identities AS i
-                LEFT JOIN
-                    Submissions s ON s.identity_id = i.identity_id
+                    Submissions s
                 WHERE
-                    i.identity_id = ? AND s.problem_id = ? AND s.problemset_id = ?
+                    s.identity_id = ? AND s.problem_id = ? AND s.problemset_id = ?
                 FOR UPDATE;
             ';
             $val = [$identityId, $problemId, $problemsetId];
@@ -161,7 +213,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             );
         }
 
-        return \OmegaUp\Time::get() >= ($lastRunTime->time + $submissionGap);
+        return $submission->time->time >= ($lastRunTime->time + $submissionGap);
     }
 
     public static function countAcceptedSubmissions(
@@ -173,10 +225,8 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 COUNT(s.submission_id)
             FROM
                 Submissions s
-            INNER JOIN
-                Runs r ON r.run_id = s.current_run_id
             WHERE
-                r.verdict = "AC"
+                s.verdict = "AC"
                 AND s.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?);
 ';
         /** @var int */
@@ -187,21 +237,35 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     }
 
     /**
-     * @return array{submissions: list<array{alias: string, classname: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}>, totalRows: int}
+     * @return list<array{alias: string, classname: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}>
      */
     public static function getLatestSubmissions(
-        int $page,
-        int $rowcount,
         int $identityId = null,
-        int $seconds = 3600 * 24
     ): array {
-        $offset = ($page - 1) * $rowcount;
-
-        $sqlFrom = '
+        if (is_null($identityId)) {
+            $indexHint = 'USE INDEX(PRIMARY)';
+        } else {
+            $indexHint = '';
+        }
+        $sql = "
+            SELECT
+                s.`time`,
+                i.username,
+                s.school_id,
+                sc.name as school_name,
+                p.alias,
+                p.title,
+                s.language,
+                s.verdict,
+                r.runtime,
+                r.memory,
+                IFNULL(ur.classname, 'user-rank-unranked') AS classname
             FROM
-                Submissions s
+                Submissions s $indexHint
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
             INNER JOIN
                 Problems p ON p.problem_id = s.problem_id
             INNER JOIN
@@ -215,102 +279,90 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             LEFT JOIN
                 Contests c ON c.contest_id = ps.contest_id
             WHERE
-                TIMESTAMPDIFF(SECOND, s.time, NOW()) <= ?
+                TIMESTAMPDIFF(SECOND, s.time, NOW()) <= 24 * 3600
+                AND s.status = 'ready'
                 AND u.is_private = 0
                 AND p.visibility >= ?
                 AND (
                     s.problemset_id IS NULL
-                    OR ps.access_mode = "public"
+                    OR ps.access_mode = 'public'
                 )
                 AND (
                     c.contest_id IS NULL
                     OR c.finish_time < s.time
                 )
-        ';
-
-        $filterByUser = '
-                AND i.identity_id = ?
-        ';
-
-        $sqlOrderBy = '
-            ORDER BY
-                s.time DESC
-        ';
-
-        $sqlCount = '
-            SELECT
-                COUNT(*)
-        ';
-
-        $sql = '
-            SELECT
-                s.`time`,
-                i.username,
-                s.school_id,
-                sc.name as school_name,
-                p.alias,
-                p.title,
-                s.language,
-                r.verdict,
-                r.runtime,
-                r.memory,
-                IFNULL(
-                    (
-                        SELECT urc.classname
-                        FROM User_Rank_Cutoffs urc
-                        WHERE
-                            urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = i.user_id
-                            )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT 1
-                    ),
-                    "user-rank-unranked"
-                ) AS classname
-        ';
-
-        $sqlLimit = 'LIMIT ?, ?;';
-
-        $query = $sql . $sqlFrom;
-        $countQuery = $sqlCount . $sqlFrom;
-
+        ";
         $params = [
-            $seconds,
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
         ];
 
         if (!is_null($identityId)) {
-            $countQuery .= $filterByUser;
-            $query .= $filterByUser;
+            $sql .= '
+                    AND i.identity_id = ?
+            ';
             $params[] = $identityId;
         }
 
-        /** @var int */
-        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            $countQuery,
-            $params
-        ) ?? 0;
-
-        $params[] = $offset;
-        $params[] = $rowcount;
-
-        $query .=  $sqlOrderBy . $sqlLimit;
+        $sql .= '
+            ORDER BY
+                s.submission_id DESC
+            LIMIT 0, 100;
+        ';
 
         /** @var list<array{alias: string, classname: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}> */
-        $submissions = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $query,
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
             $params
         );
+    }
 
-        return [
-            'totalRows' => $totalRows,
-            'submissions' => $submissions,
-        ];
+    /**
+     * Gets the alias of the problem, assignment
+     * and course, along with the author's user_id
+     * for a certain course submission
+     *
+     * @return array{assignment_alias: string, author_id: int|null, course_alias: string, course_id: int, problem_alias: string}|null
+     */
+    public static function getCourseSubmissionInfo(
+        \OmegaUp\DAO\VO\Submissions $submission,
+        string $assignmentAlias,
+        string $courseAlias
+    ): ?array {
+        $sql = '
+            SELECT
+                a.alias as assignment_alias,
+                c.course_id,
+                c.alias as course_alias,
+                p.alias as problem_alias,
+                i.user_id as author_id
+            FROM
+                Submissions s
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            INNER JOIN
+                Problems p ON p.problem_id = s.problem_id
+            INNER JOIN
+                Problemsets ps ON ps.problemset_id = s.problemset_id
+            INNER JOIN
+                Problemset_Problems pp ON pp.problemset_id = ps.problemset_id AND pp.problem_id = p.problem_id
+            INNER JOIN
+                Assignments a ON a.problemset_id = ps.problemset_id
+            INNER JOIN
+                Courses c ON c.course_id = a.course_id
+            WHERE
+                s.submission_id = ?
+                AND a.alias = ?
+                AND c.alias = ?
+        ';
+
+        /** @var array{assignment_alias: string, author_id: int|null, course_alias: string, course_id: int, problem_alias: string}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->getRow(
+            $sql,
+            [
+                $submission->submission_id,
+                $assignmentAlias,
+                $courseAlias
+            ]
+        );
     }
 }

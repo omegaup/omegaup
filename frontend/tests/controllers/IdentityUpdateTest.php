@@ -1,9 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Tests for apiUpdate and apiChangePassword in IdentityController
- *
- * @author juan.pablo
  */
 
 class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
@@ -39,11 +38,11 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
 
-        $this->assertEquals($username, $identity->username);
-        $this->assertEquals($identityName, $identity->name);
-        $this->assertEquals('MX', $identity->country_id);
-        $this->assertEquals('QUE', $identity->state_id);
-        $this->assertEquals('male', $identity->gender);
+        $this->assertSame($username, $identity->username);
+        $this->assertSame($identityName, $identity->name);
+        $this->assertSame('MX', $identity->country_id);
+        $this->assertSame('QUE', $identity->state_id);
+        $this->assertSame('male', $identity->gender);
 
         $newIdentityName = substr(
             \OmegaUp\Test\Utils::createRandomString(),
@@ -112,7 +111,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
             $identity->current_identity_school_id
         );
-        $this->assertEquals($school[0]->school_id, $identitySchool->school_id);
+        $this->assertSame($school[0]->school_id, $identitySchool->school_id);
         $this->assertNull($identitySchool->end_time);
 
         // Update the Identity, but preserve the same school
@@ -136,7 +135,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
             $identity->current_identity_school_id
         );
-        $this->assertEquals($school[0]->school_id, $identitySchool->school_id);
+        $this->assertSame($school[0]->school_id, $identitySchool->school_id);
         $this->assertNull($identitySchool->end_time);
 
         // Now update the school for Identity
@@ -166,7 +165,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
             $identity->current_identity_school_id
         );
-        $this->assertEquals(
+        $this->assertSame(
             $newSchool[0]->school_id,
             $identitySchool->school_id
         );
@@ -217,7 +216,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('User should not be able to change username');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
     }
 
@@ -315,7 +314,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('User shold not be able to change password');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
     }
 
@@ -370,7 +369,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $identityLogin = self::login($identity);
             $this->fail('Identity can not login with old password');
         } catch (\OmegaUp\Exceptions\InvalidCredentialsException $e) {
-            $this->assertEquals($e->getMessage(), 'usernameOrPassIsWrong');
+            $this->assertSame($e->getMessage(), 'usernameOrPassIsWrong');
         }
     }
 
@@ -425,7 +424,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'Creators are not authorized to change passwords from other groups they do not belong'
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
     }
 
@@ -479,7 +478,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('User is not allowed to change password');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
     }
 }

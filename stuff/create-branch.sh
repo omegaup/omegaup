@@ -15,8 +15,8 @@ REMOTE_NAME="${REMOTE_NAME:-origin}"
 git config --global push.default >/dev/null || \
 	git config --global push.default simple
 
-git fetch "${UPSTREAM_NAME}" master
-git checkout "${UPSTREAM_NAME}/master" -b "${BRANCH_NAME}"
+git fetch "${UPSTREAM_NAME}" main
+git checkout "${UPSTREAM_NAME}/main" -b "${BRANCH_NAME}"
 # We use --no-verify to avoid running the pre-upload hooks. Since we are just
-# cloning upstream/master, we know that it must be clean.
+# cloning upstream/main, we know that it must be clean.
 git push -u "${REMOTE_NAME}" "HEAD:${BRANCH_NAME}" -f --no-verify

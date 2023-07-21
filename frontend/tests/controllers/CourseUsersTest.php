@@ -2,8 +2,6 @@
 
 /**
  * Description of CourseUsersTest
- *
- * @author juan.pablo
  */
 
 class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
@@ -41,13 +39,103 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Check that we have entries in the log.
-        $this->assertEquals(1, count($response['events']));
-        $this->assertEquals(
+        $this->assertSame(1, count($response['events']));
+        $this->assertSame(
             $identity->username,
             $response['events'][0]['username']
         );
-        $this->assertEquals(0, $response['events'][0]['ip']);
-        $this->assertEquals('open', $response['events'][0]['event']['name']);
+        $this->assertSame(0, $response['events'][0]['ip']);
+        $this->assertSame('open', $response['events'][0]['event']['name']);
+    }
+
+    public function testSearchUsersCourse() {
+        // Create a course with 5 assignments
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+
+        // Prepare assignment. Create problem
+        $adminLogin = self::login($courseData['admin']);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment_alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+
+        // Create 10 users
+        $numberOfStudents = 10;
+        $identities = [];
+
+        [
+            'identity' => $identities[0],
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'username' => 'test_course_user_0',
+            ])
+        );
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identities[0]
+        );
+
+        [
+            'identity' => $identities[1],
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'username' => 'test_course_user_1',
+            ])
+        );
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identities[1]
+        );
+
+        foreach (range(2, $numberOfStudents - 1) as $studentIndex) {
+            [
+                'identity' => $identities[$studentIndex],
+            ] = \OmegaUp\Test\Factories\User::createUser();
+            \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData,
+                $identities[$studentIndex]
+            );
+        }
+
+        // Call the details API for the assignment that's already started and
+        // open a problem.
+        foreach (range(0, $numberOfStudents - 1) as $studentIndex) {
+            $userLogin = self::login($identities[$studentIndex]);
+            \OmegaUp\Controllers\Course::apiAssignmentDetails(
+                new \OmegaUp\Request([
+                    'auth_token' => $userLogin->auth_token,
+                    'course' => $courseData['course_alias'],
+                    'assignment' => $courseData['assignment_alias'],
+                ])
+            );
+
+            \OmegaUp\Controllers\Problem::apiDetails(
+                new \OmegaUp\Request([
+                    'auth_token' => $userLogin->auth_token,
+                    'problemset_id' => $courseData['problemset_id'],
+                    'prevent_problemset_open' => false,
+                    'problem_alias' => $problemData['request']['problem_alias'],
+                ])
+            );
+        }
+
+        // Call search API as admin
+        $adminLogin = self::login($courseData['admin']);
+        $response = \OmegaUp\Controllers\Course::apiSearchUsers(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'query' => 'test_course_user_'
+            ])
+        )['results'];
+
+        // Only two users match with the query
+        $this->assertCount(2, $response);
     }
 
     public function testNormalUserCannotAccessToDetailsCourse() {
@@ -61,7 +149,7 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($identity);
 
         try {
-            \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
+            \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                     'course_alias' => $courseData['course_alias'],
@@ -71,7 +159,7 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'Should have failed because identity has not been invited to course'
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -91,14 +179,14 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         // User login
         $login = self::login($identity);
 
-        $response = \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'course_alias' => $courseData['course_alias'],
             ])
         );
 
-        $this->assertEquals($response['entrypoint'], 'course_intro');
+        $this->assertSame($response['entrypoint'], 'course_intro');
     }
 
     public function testUserCanAccessToCourseDetailsWhenIsInvitedAsAdmin() {
@@ -123,14 +211,14 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         // User login
         $login = self::login($identity);
 
-        $response = \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'course_alias' => $courseData['course_alias'],
             ])
         );
 
-        $this->assertEquals($response['entrypoint'], 'course_details');
+        $this->assertSame($response['entrypoint'], 'course_details');
     }
 
     public function testGetNotificationForAddAdministrator() {
@@ -155,11 +243,11 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $notificationContents = $response['notifications'][0]['contents'];
 
         $this->assertCount(1, $response['notifications']);
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\Notifications::COURSE_ADMINISTRATOR_ADDED,
             $notificationContents['type']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['course_name'],
             $notificationContents['body']['localizationParams']['courseName']
         );

@@ -7,7 +7,7 @@ if (OMEGAUP_LOCKDOWN) {
 }
 
 \OmegaUp\UITools::render(
-    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Contest::getContestListMineForSmarty(
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Contest::getContestListMineForTypeScript(
         $r
     )
 );

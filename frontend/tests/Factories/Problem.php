@@ -16,6 +16,12 @@ class ProblemParams {
     public $title;
 
     /**
+     * @readonly
+     * @var string
+     */
+    public $alias;
+
+    /**
      * @var 'deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'
      */
     public $visibility;
@@ -75,7 +81,7 @@ class ProblemParams {
     public $validator;
 
     /**
-     * @param array{allow_user_add_tags?: bool, quality_seal?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, selected_tags?: string, validator?: string} $params
+     * @param array{alias?: string, allow_user_add_tags?: bool, quality_seal?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, selected_tags?: string, validator?: string} $params
      */
     public function __construct($params = []) {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
@@ -86,24 +92,36 @@ class ProblemParams {
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
         $this->problemLevel = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
         $this->qualitySeal = $params['quality_seal'] ?? false;
-        $this->selectedTags = $params['selected_tags'] ?? $params['selected_tags'] ?? json_encode([
+        $this->selectedTags = $params['selected_tags'] ?? json_encode([
             [
                 'tagname' => 'problemLevelBasicIntroductionToProgramming',
                 'public' => true,
             ],
         ]);
         $this->validator = $params['validator'] ?? 'token';
-        if (!empty($params['author']) && !empty($params['authorUser'])) {
-            $this->author = $params['author'];
-            $this->authorUser = $params['authorUser'];
-        } else {
+
+        $problemAlias = substr(
+            preg_replace(
+                '/[^a-zA-Z0-9_-]/',
+                '',
+                str_replace(' ', '-', $this->title)
+            ),
+            0,
+            \OmegaUp\Validators::ALIAS_MAX_LENGTH
+        );
+        $this->alias = $params['alias'] ?? $problemAlias;
+        $author = $params['author'] ?? null;
+        $authorUser = $params['authorUser'] ?? null;
+        if (empty($author) || empty($authorUser)) {
             [
                 'user' => $user,
                 'identity' => $identity,
             ] = \OmegaUp\Test\Factories\User::createUser();
-            $this->author = $params['author'] ?? $identity;
-            $this->authorUser = $params['authorUser'] ?? $user;
+            $author = $author ?? $identity;
+            $authorUser = $authorUser ?? $user;
         }
+        $this->author = $author;
+        $this->authorUser = $authorUser;
     }
 }
 
@@ -141,21 +159,13 @@ class Problem {
         }
         $r = new \OmegaUp\Request([
             'title' => $params->title,
-            'problem_alias' => substr(
-                preg_replace(
-                    '/[^a-zA-Z0-9_-]/',
-                    '',
-                    str_replace(' ', '-', $params->title)
-                ),
-                0,
-                32
-            ),
+            'problem_alias' => $params->alias,
             'author_username' => $params->author->username,
             'validator' => $params->validator,
-            'time_limit' => 5000,
-            'overall_wall_time_limit' => 60000,
+            'time_limit' => 5000.0,
+            'overall_wall_time_limit' => 60000.0,
             'validator_time_limit' => 30000,
-            'extra_wall_time' => 0,
+            'extra_wall_time' => 0.0,
             'memory_limit' => 32000,
             'source' => 'yo',
             'order' => 'normal',
@@ -201,7 +211,7 @@ class Problem {
     public static function createProblem(
         ?\OmegaUp\Test\Factories\ProblemParams $params = null,
         \OmegaUp\Test\ScopedLoginToken $login = null
-    ) {
+    ): array {
         if (is_null($params)) {
             $params = new \OmegaUp\Test\Factories\ProblemParams();
         }

@@ -10,19 +10,25 @@
           <div class="row">
             <div class="col-xs-12 col-sm-4 text-center py-2">
               <!-- id-lint off -->
-              <div id="google-signin" :title="T.loginWithGoogle"></div>
+              <div
+                id="g_id_onload"
+                :data-client_id="googleClientId"
+                :data-login_uri="loginUri"
+                data-auto_prompt="false"
+              ></div>
+              <div
+                class="g_id_signin"
+                data-type="standard"
+                data-size="large"
+                data-theme="outline"
+                data-text="signin_with"
+                data-shape="rectangular"
+                data-logo_alignment="left"
+              ></div>
               <!-- id-lint on -->
             </div>
-            <div class="col-xs-12 col-sm-4 text-center py-2">
-              <a :href="facebookUrl" :title="T.loginWithFacebook">
-                <img src="/css/fb-oauth.png" height="45px" width="45px" />
-              </a>
-            </div>
-            <div class="col-xs-12 col-sm-4 text-center py-2">
-              <a :href="linkedinUrl" :title="T.loginWithLinkedIn">
-                <img src="/css/ln-oauth.png" height="45px" width="45px" />
-              </a>
-            </div>
+            <!-- FB login link deleted until privacy policy updated -->
+            <div class="col-xs-12 col-sm-4 text-center py-2"></div>
           </div>
         </div>
 
@@ -33,6 +39,7 @@
               <label for="user">{{ T.loginEmailUsername }}</label>
               <input
                 v-model="usernameOrEmail"
+                data-login-username
                 name="login_username"
                 type="text"
                 class="form-control"
@@ -50,6 +57,7 @@
               >
               <input
                 v-model="password"
+                data-login-password
                 name="login_password"
                 type="password"
                 class="form-control"
@@ -60,6 +68,7 @@
 
             <div class="form-group">
               <button
+                data-login-submit
                 class="btn btn-primary form-control"
                 name="login"
                 @click.prevent="$emit('login', usernameOrEmail, password)"
@@ -75,38 +84,29 @@
 </template>
 
 <script lang="ts">
-/* global gapi */
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component
 export default class Login extends Vue {
   @Prop() facebookUrl!: string;
-  @Prop() linkedinUrl!: string;
+  @Prop() googleClientId!: string;
+
   usernameOrEmail: string = '';
   password: string = '';
   T = T;
 
   mounted() {
-    if (window.gapi) {
-      window.gapi.signin2.render('google-signin', {
-        scope: 'profile',
-        width: 45,
-        height: 45,
-        longtitle: false,
-        theme: 'light',
-        onsuccess: this.onSuccess,
-        onfailure: this.onFailure,
-      });
-    }
+    // The reason for loading the script here instead of the `template.tpl` file
+    // is that sometimes the script runs after the DOM is ready, and the element
+    // may not exist yet
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    document.body.appendChild(script);
   }
 
-  onSuccess(googleUser: gapi.auth2.GoogleUser) {
-    this.$emit('google-login', googleUser.getAuthResponse().id_token);
-  }
-
-  onFailure() {
-    this.$emit('google-login-failure');
+  get loginUri(): string {
+    return document.location.href;
   }
 }
 </script>

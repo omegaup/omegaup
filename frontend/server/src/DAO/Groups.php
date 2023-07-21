@@ -8,14 +8,16 @@ namespace OmegaUp\DAO;
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Groups}.
- *
- * @author alanboy
  * @access public
  * @package docs
  */
 class Groups extends \OmegaUp\DAO\Base\Groups {
     public static function findByAlias(string $alias): ?\OmegaUp\DAO\VO\Groups {
-        $sql = 'SELECT `g`.* FROM `Groups_` AS `g` WHERE `g`.`alias` = ? LIMIT 1;';
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Groups::FIELD_NAMES,
+            'g'
+        );
+        $sql = "SELECT {$fields} FROM `Groups_` `g` WHERE `g`.`alias` = ? LIMIT 1;";
         $params = [$alias];
         /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
@@ -26,22 +28,29 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
     }
 
     /**
-     * @return \OmegaUp\DAO\VO\Groups[]
+     * @return list<\OmegaUp\DAO\VO\Groups>
      */
-    public static function SearchByName(string $name) {
-        $sql = "SELECT `g`.* FROM `Groups_` AS `g` WHERE `g`.`name` LIKE CONCAT('%', ?, '%') LIMIT 10;";
-        $args = [$name];
+    public static function searchByName(string $name) {
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Groups::FIELD_NAMES,
+            'g'
+        );
+        $sql = "SELECT {$fields} FROM `Groups_` `g` WHERE `g`.`name` LIKE CONCAT('%', ?, '%') LIMIT 100;";
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
-        $ar = [];
+        /** @var list<array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$name]);
+        $groups = [];
         foreach ($rs as $row) {
-            array_push($ar, new \OmegaUp\DAO\VO\Groups($row));
+            $groups[] = new \OmegaUp\DAO\VO\Groups($row);
         }
-        return $ar;
+        return $groups;
     }
 
     public static function getByName(string $name): ?\OmegaUp\DAO\VO\Groups {
-        $sql = 'SELECT `g`.* FROM `Groups_` AS `g` WHERE `g`.`name` = ? LIMIT 1;';
+        $sql = 'SELECT ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Groups::FIELD_NAMES,
+            'g'
+        ) . ' FROM `Groups_` AS `g` WHERE `g`.`name` = ? LIMIT 1;';
 
         /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);

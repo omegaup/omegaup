@@ -13,10 +13,10 @@ if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
             defined('OMEGAUP_GOOGLE_CLIENTID') &&
             !empty(OMEGAUP_GOOGLE_CLIENTID)
         ) {
-            $scripts[] = 'https://apis.google.com/js/api.js';
+            $scripts[] = 'https://accounts.google.com/gsi/client';
         }
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'scripts' => $scripts,
                 'payload' => [],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogout'),

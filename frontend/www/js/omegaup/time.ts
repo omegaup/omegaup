@@ -1,26 +1,40 @@
-import * as moment from 'moment';
-
+import formatDuration from 'date-fns/formatDuration';
+import intervalToDuration from 'date-fns/intervalToDuration';
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import esLocale from 'date-fns/locale/es';
+import enLocale from 'date-fns/locale/en-US';
+import ptLocale from 'date-fns/locale/pt-BR';
 import T from './lang';
 
-let momentInitialized: boolean = false;
 let remoteDeltaTime: number = 0;
 
 export function formatFutureDateRelative(futureDate: Date): string {
-  if (!momentInitialized) {
-    moment.locale(T.locale);
-    momentInitialized = true;
+  let currentLocale;
+  switch (T.locale) {
+    case 'pt':
+      currentLocale = ptLocale;
+      break;
+    case 'en':
+      currentLocale = enLocale;
+      break;
+    default:
+      currentLocale = esLocale;
+      break;
   }
-
-  // moment is a weird library. The top-level import can be a function or an
-  // object, and it depends on whether it was processed by webpack (in regular
-  // compilation) or just babel (in tests).
-  return ((moment as any)?.default ?? moment)(futureDate).endOf().fromNow();
+  return formatDistanceToNow(futureDate, {
+    addSuffix: true,
+    locale: currentLocale,
+  });
 }
 
 export function formatDelta(delta: number): string {
+  const sign = delta < 0 ? '−' : '';
+  if (delta < 0) {
+    delta = -delta;
+  }
   const months = delta / (30 * 24 * 60 * 60 * 1000);
   if (months >= 1.0) {
-    return formatFutureDateRelative(new Date(delta + Date.now()));
+    return sign + formatFutureDateRelative(new Date(delta + Date.now()));
   }
 
   const days = Math.floor(delta / (24 * 60 * 60 * 1000));
@@ -31,14 +45,14 @@ export function formatDelta(delta: number): string {
   delta -= minutes * (60 * 1000);
   const seconds = Math.floor(delta / 1000);
 
-  let clock = '';
-
+  let clock = sign;
   if (days > 0) {
     clock += `${days}:`;
   }
-  clock += `${String(hours).padStart(2, '0')}:`;
-  clock += `${String(minutes).padStart(2, '0')}:`;
-  clock += `${String(seconds).padStart(2, '0')}`;
+  clock += `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+    2,
+    '0',
+  )}:${String(seconds).padStart(2, '0')}`;
 
   return clock;
 }
@@ -77,17 +91,18 @@ export function parseDateLocal(dateString: string): Date {
   // timezone.
   const result = new Date();
   const matches = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
-  if (matches !== null) {
-    result.setFullYear(Number.parseInt(matches[1], 10));
-    // Months in JavaScript start at 0.
-    result.setMonth(Number.parseInt(matches[2], 10) - 1);
-    result.setDate(Number.parseInt(matches[3], 10));
+  if (matches === null) {
+    result.setHours(0);
+    result.setMinutes(0);
+    result.setSeconds(0);
+    result.setMilliseconds(0);
+    return result;
   }
-  result.setHours(0);
-  result.setMinutes(0);
-  result.setSeconds(0);
-  result.setMilliseconds(0);
-  return result;
+  return new Date(
+    /*fullYear*/ Number.parseInt(matches[1], 10),
+    /*month - In JavaScript starts at 0*/ Number.parseInt(matches[2], 10) - 1,
+    /*day*/ Number.parseInt(matches[3], 10),
+  );
 }
 
 export function formatDateTimeLocal(date: Date): string {
@@ -108,17 +123,19 @@ export function parseDateTimeLocal(dateString: string): Date {
   // of the local timezone.
   const result = new Date();
   const matches = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(dateString);
-  if (matches !== null) {
-    result.setFullYear(Number.parseInt(matches[1], 10));
-    // Months in JavaScript start at 0.
-    result.setMonth(Number.parseInt(matches[2], 10) - 1);
-    result.setDate(Number.parseInt(matches[3], 10));
-    result.setHours(Number.parseInt(matches[4], 10));
-    result.setMinutes(Number.parseInt(matches[5], 10));
+  if (matches === null) {
+    result.setSeconds(0);
+    result.setMilliseconds(0);
+    return result;
   }
-  result.setSeconds(0);
-  result.setMilliseconds(0);
-  return result;
+
+  return new Date(
+    /*fullYear*/ Number.parseInt(matches[1], 10),
+    /*month - In JavaScript starts at 0*/ Number.parseInt(matches[2], 10) - 1,
+    /*day*/ Number.parseInt(matches[3], 10),
+    /*hours*/ Number.parseInt(matches[4], 10),
+    /*minutes*/ Number.parseInt(matches[5], 10),
+  );
 }
 
 export function formatDateTime(date: Date): string {
@@ -136,6 +153,13 @@ export function formatTimestamp(date: Date): string {
   )}:${String(date.getMinutes()).padStart(2, '0')}:${String(
     date.getSeconds(),
   ).padStart(2, '0')}`;
+}
+
+export function formatDateLocalHHMM(date: Date): string {
+  return `${formatDateLocal(date)} ${String(date.getHours()).padStart(
+    2,
+    '0',
+  )}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
 export function parseDuration(str: string): number | null {
@@ -192,7 +216,7 @@ export function _setRemoteDeltaTime(delta: number): void {
 /**
  * Converts a timestamp from the server clock source to the local clock source.
  *
- * @param date - The timestamp (in milliseconds) with the server clock source.
+ * @param timestamp - The timestamp (in milliseconds) with the server clock source.
  * @returns The same date, with the local clock source.
  */
 export function remoteTime(timestamp: number): Date {
@@ -243,4 +267,52 @@ export function remoteTimeAdapter<T>(value: T): T {
     }
   }
   return value;
+}
+
+/**
+ * Calculate the duration of a contest based on its start date and its end date.
+ * @param startDate - The start date of a contest
+ * @param finishDate - The finish date of a contest
+ * @returns The duration of a contest in human readable format (Locale based)
+ */
+export function formatContestDuration(
+  startDate: Date,
+  finishDate: Date,
+): string {
+  let currentLocale;
+  switch (T.locale) {
+    case 'pt':
+      currentLocale = ptLocale;
+      break;
+    case 'en':
+      currentLocale = enLocale;
+      break;
+    default:
+      currentLocale = esLocale;
+      break;
+  }
+  const delta = finishDate.getTime() - startDate.getTime();
+  const months = Math.floor(delta / (30 * 24 * 60 * 60 * 1000));
+  if (months >= 1.0) {
+    return formatDuration(
+      intervalToDuration({
+        start: startDate,
+        end: finishDate,
+      }),
+      {
+        locale: currentLocale,
+      },
+    );
+  }
+  return formatDelta(delta);
+}
+
+/**
+ * Converts a date to a GMT (UTC) date.
+ *
+ * @param date - The local date to be converted.
+ * @returns The same date, but in GMT.
+ */
+export function convertLocalDateToGMTDate(date: Date): Date {
+  return new Date(date.toUTCString().replace('GMT', ''));
 }

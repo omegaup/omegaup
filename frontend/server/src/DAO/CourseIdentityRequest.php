@@ -21,26 +21,7 @@ class CourseIdentityRequest extends \OmegaUp\DAO\Base\CourseIdentityRequest {
                 i.identity_id,
                 i.username,
                 i.name,
-                IFNULL(
-                    (
-                        SELECT urc.classname FROM
-                            User_Rank_Cutoffs urc
-                        WHERE
-                            urc.score <= (
-                                    SELECT
-                                        ur.score
-                                    FROM
-                                        User_Rank ur
-                                    WHERE
-                                        ur.user_id = i.user_id
-                                )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT
-                            1
-                    ),
-                    \'user-rank-unranked\'
-                ) AS classname,
+                IFNULL(ur.classname, "user-rank-unranked") AS classname,
                 i.country_id,
                 c.name AS country,
                 r.request_time,
@@ -49,11 +30,11 @@ class CourseIdentityRequest extends \OmegaUp\DAO\Base\CourseIdentityRequest {
                 arh.username AS admin_username,
                 arh.name AS admin_name
             FROM
-                `Course_Identity_Request` r
+                Course_Identity_Request r
             INNER JOIN
-                `Identities` i
-            ON
-                i.identity_id = r.identity_id
+                Identities i ON i.identity_id = r.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
             LEFT JOIN
                 (
                     SELECT

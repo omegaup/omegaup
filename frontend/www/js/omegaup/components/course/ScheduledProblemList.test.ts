@@ -1,5 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
 
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
@@ -22,11 +21,13 @@ describe('ScheduledProblemLists.vue', () => {
           max_points: 0,
           start_time: new Date(),
           finish_time: new Date(),
+          opened: false,
           order: 1,
           problems: [],
           scoreboard_url: '',
           scoreboard_url_admin: '',
           assignment_type: 'homework',
+          problemCount: 0,
         } as types.CourseAssignment,
         taggedProblems: [] as omegaup.Problem[],
       },

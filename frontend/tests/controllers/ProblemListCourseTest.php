@@ -1,8 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 /**
  * Class ProblemListCourse
- *
- * @author juan.pablo
  */
 class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
     public function testSolvedAndUnsolvedProblemByUsersOfACourse() {
@@ -88,7 +88,7 @@ class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
             $identity[0]->username,
             $unsolvedProblems['user_problems']
         );
-        $this->assertEquals(
+        $this->assertSame(
             1,
             count(
                 $unsolvedProblems['user_problems'][$identity[0]->username]
@@ -98,7 +98,7 @@ class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
             $identity[1]->username,
             $unsolvedProblems['user_problems']
         );
-        $this->assertEquals(
+        $this->assertSame(
             1,
             count(
                 $unsolvedProblems['user_problems'][$identity[1]->username]
@@ -108,7 +108,7 @@ class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
             $identity[1]->username,
             $solvedProblems['user_problems']
         );
-        $this->assertEquals(
+        $this->assertSame(
             1,
             count(
                 $solvedProblems['user_problems'][$identity[1]->username]
@@ -118,7 +118,7 @@ class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
             $identity[2]->username,
             $solvedProblems['user_problems']
         );
-        $this->assertEquals(
+        $this->assertSame(
             2,
             count(
                 $solvedProblems['user_problems'][$identity[2]->username]
@@ -210,8 +210,8 @@ class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $courseData['course_alias'],
         ]));
         // No one has join course
-        $this->assertEquals(0, count($solvedProblems['user_problems']));
-        $this->assertEquals(0, count($unsolvedProblems['user_problems']));
+        $this->assertSame(0, count($solvedProblems['user_problems']));
+        $this->assertSame(0, count($unsolvedProblems['user_problems']));
         // Users must join course
         for ($i = 0; $i < ($num_users - 1); $i++) {
             $userLogin[$i] = self::login($identity[$i]);
@@ -238,8 +238,8 @@ class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $courseData['course_alias'],
         ]));
         // No one has accept teacher's request
-        $this->assertEquals(0, count($solvedProblems['user_problems']));
-        $this->assertEquals(0, count($unsolvedProblems['user_problems']));
+        $this->assertSame(0, count($solvedProblems['user_problems']));
+        $this->assertSame(0, count($unsolvedProblems['user_problems']));
         // User[2] accept teacher's request
         $userLogin[2] = self::login($identity[2]);
         $details = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
@@ -267,12 +267,12 @@ class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
             $identity[2]->username,
             $solvedProblems['user_problems']
         );
-        $this->assertEquals(
+        $this->assertSame(
             2,
             count(
                 $solvedProblems['user_problems'][$identity[2]->username]
             )
         );
-        $this->assertEquals(0, count($unsolvedProblems['user_problems']));
+        $this->assertSame(0, count($unsolvedProblems['user_problems']));
     }
 }

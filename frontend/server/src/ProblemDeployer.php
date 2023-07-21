@@ -11,7 +11,7 @@ class ProblemDeployer {
     const UPDATE_STATEMENTS = 2;
     const CREATE = 3;
     const ZIP_MAX_SIZE = 100 * 1024 * 1024;  // 100 MiB
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     private $log;
 
     /** @var string */
@@ -65,7 +65,7 @@ class ProblemDeployer {
         bool $acceptsSubmissions = true,
         bool $updatePublished = true
     ) {
-        $this->log = \Logger::getLogger('ProblemDeployer');
+        $this->log = \Monolog\Registry::omegaup()->withName('ProblemDeployer');
         $this->alias = $alias;
 
         if (
@@ -144,13 +144,8 @@ class ProblemDeployer {
                 }
             }
         }
-        $updatedInteractiveFiles = false;
-        $updatedExamples = false;
         if (!empty($result['updated_files'])) {
             foreach ($result['updated_files'] as $updatedFile) {
-                if (strpos($updatedFile['path'], 'examples/') === 0) {
-                    $updatedExamples = true;
-                }
                 if (
                     preg_match(
                         '%statements/([a-z]{2})\\.markdown%',
@@ -168,14 +163,6 @@ class ProblemDeployer {
                     ) === 1
                 ) {
                     $this->updatedLanguages[] = $matches[1];
-                }
-                if (
-                    preg_match(
-                        '%interactive/(Main\\.distrib\\.[a-z0-9]+|[a-z0-9_]+\\.idl)$%',
-                        $updatedFile['path']
-                    ) === 1
-                ) {
-                    $updatedInteractiveFiles = true;
                 }
             }
         }
@@ -198,14 +185,14 @@ class ProblemDeployer {
         /** @var null|array{interactive?: array{module_name: string, language: string}, cases: array<string, mixed>} */
         $distribSettings = json_decode(
             $problemArtifacts->get('settings.distrib.json'),
-            /*assoc=*/true
+            associative: true
         );
         if (empty($distribSettings['interactive'])) {
             // oops, this was not an interactive problem.
             return;
         }
         $tmpDir = \OmegaUp\FileHandler::tempDir(
-            '/tmp',
+            TEMPLATES_PATH,
             'ProblemDeployer',
             0755
         );
@@ -223,6 +210,7 @@ class ProblemDeployer {
                     "interactive/Main.distrib.{$distribSettings['interactive']['language']}"
                 )
             );
+
             @mkdir("{$tmpDir}/examples");
             /** @var mixed $data */
             foreach ($distribSettings['cases'] as $filename => $data) {
@@ -231,13 +219,16 @@ class ProblemDeployer {
                     $problemArtifacts->get("examples/{$filename}.in")
                 );
             }
-            $target = TEMPLATES_PATH . "/{$this->alias}/{$publishedCommit}";
-            @mkdir($target, 0755, true);
+            $tmpTarget = "{$tmpDir}/target";
+            @mkdir($tmpTarget, 0755, true);
             $args = ['/usr/bin/java', '-Xmx64M', '-jar',
                 '/usr/share/java/libinteractive.jar', 'generate-all', $idlPath,
-                '--package-directory', $target, '--package-prefix',
+                '--package-directory', $tmpTarget, '--package-prefix',
                 "{$this->alias}_", '--shift-time-for-zip'];
-            $this->executeRaw($args, $target);
+            $this->executeRaw($args, $tmpTarget);
+            $target = TEMPLATES_PATH . "/{$this->alias}/{$publishedCommit}";
+            @mkdir(dirname($target), 0755, true);
+            rename($tmpTarget, $target);
         } catch (\Exception $e) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'problemDeployerLibinteractiveValidationError',
@@ -272,10 +263,12 @@ class ProblemDeployer {
                 \ZipArchive::OVERWRITE
             );
             if ($err !== true) {
-                throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
                     'problemDeployerInternalError',
                     $err
                 );
+                $this->log->error("commit loose files failed: {$error}");
+                throw $error;
             }
             foreach ($blobUpdate as $path => $contents) {
                 $zipArchive->addFromString($path, $contents);
@@ -320,6 +313,7 @@ class ProblemDeployer {
         ];
 
         $cmd = join(' ', array_map('escapeshellarg', $args));
+        $pipes = [];
         $proc = proc_open(
             $cmd,
             $descriptorspec,
@@ -435,6 +429,8 @@ class ProblemDeployer {
                     CURLOPT_INFILESIZE => $zipFileSize,
                     CURLOPT_POST => 1,
                     CURLOPT_RETURNTRANSFER => 1,
+                    CURLOPT_CONNECTTIMEOUT => 2,
+                    CURLOPT_TIMEOUT => 120,
                 ]
             );
             $output = curl_exec($curl);
@@ -463,7 +459,7 @@ class ProblemDeployer {
             $context = null;
             if (!empty($result['output'])) {
                 /** @var null|array{error: string} */
-                $output = json_decode($result['output'], /*assoc=*/true);
+                $output = json_decode($result['output'], associative: true);
                 if (is_null($output)) {
                     $context = $result['output'];
                 } else {
@@ -490,7 +486,7 @@ class ProblemDeployer {
         }
 
         /** @var array{status: string, error?: string, updated_refs?: array{name: string, from: string, to: string, from_tree: string, to_tree: string}[], updated_files: array{path: string, type: string}[]} */
-        return json_decode($result['output'], /*assoc=*/true);
+        return json_decode($result['output'], associative: true);
     }
 
     /**
@@ -525,16 +521,22 @@ class ProblemDeployer {
                     CURLOPT_POSTFIELDS => $payload,
                     CURLOPT_POST => 1,
                     CURLOPT_RETURNTRANSFER => 1,
+                    CURLOPT_CONNECTTIMEOUT => 2,
+                    CURLOPT_TIMEOUT => 120,
                 ]
             );
             $output = curl_exec($curl);
             /** @var int */
             $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             if ($output === false || $retval != 200) {
-                throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
                     'problemDeployerInternalError',
                     $retval
                 );
+                $this->log->error(
+                    "update published failed: HTTP/{$retval}: {$output}: {$error}"
+                );
+                throw $error;
             }
         } finally {
             curl_close($curl);
@@ -559,6 +561,8 @@ class ProblemDeployer {
                         ),
                     ],
                     CURLOPT_RETURNTRANSFER => 1,
+                    CURLOPT_CONNECTTIMEOUT => 2,
+                    CURLOPT_TIMEOUT => 10,
                 ]
             );
             $output = curl_exec($curl);
@@ -577,7 +581,7 @@ class ProblemDeployer {
         if ($retval != 0) {
             $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
                 'problemDeployerInternalError',
-                /*$context=*/null
+                context: null
             );
             $this->log->error(
                 "rename problem failed: HTTP/{$statusCode}: {$error}"

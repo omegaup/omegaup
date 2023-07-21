@@ -8,8 +8,6 @@ namespace OmegaUp\DAO;
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\SchoolOfTheMonth}.
- *
- * @author carlosabcs
  * @access public
  */
 class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
@@ -171,10 +169,14 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         string $time,
         bool $autoselected = false
     ): array {
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\SchoolOfTheMonth::FIELD_NAMES,
+            'School_Of_The_Month'
+        );
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
         $sql = "
             SELECT
-                *
+                {$fields}
             FROM
                 School_Of_The_Month
             WHERE
@@ -203,7 +205,10 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
     ): array {
         $sql = '
             SELECT
-                *
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\SchoolOfTheMonth::FIELD_NAMES,
+            'School_Of_The_Month'
+        ) . '
             FROM
                 School_Of_The_Month
             WHERE

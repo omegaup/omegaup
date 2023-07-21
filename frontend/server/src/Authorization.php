@@ -43,6 +43,18 @@ class Authorization {
      */
     private static $_groupIdentityCreator = null;
 
+    /**
+     * Cache for system group for certificate generators
+     * @var null|\OmegaUp\DAO\VO\Groups
+     */
+    private static $_certificateGeneratorGroup = null;
+
+    /**
+     * Cache for system group for teaching assistants.
+     * @var null|\OmegaUp\DAO\VO\Groups
+     */
+    private static $_teachingAssistantGroup = null;
+
     // Administrator for an ACL.
     const ADMIN_ROLE = 1;
 
@@ -52,14 +64,17 @@ class Authorization {
     // Problem reviewer.
     const REVIEWER_ROLE = 3;
 
-    // Interviewer.
-    const INTERVIEWER_ROLE = 4;
-
     // Mentor.
     const MENTOR_ROLE = 5;
 
     // Identity creator.
     const IDENTITY_CREATOR_ROLE = 7;
+
+    // Certificate generator.
+    const CERTIFICATE_GENERATOR_ROLE = 8;
+
+    // Teaching assitant.
+    const TEACHING_ASSISTANT_ROLE = 9;
 
     // System-level ACL.
     const SYSTEM_ACL = 1;
@@ -78,6 +93,12 @@ class Authorization {
 
     // Group identities creators.
     const IDENTITY_CREATOR_GROUP_ALIAS = 'omegaup:group-identity-creator';
+
+    // Group for certificate generators.
+    const CERTIFICATE_GENERATOR_GROUP_ALIAS = 'omegaup:certificate-generator';
+
+    // Group for teaching assitants.
+    const TEACHING_ASSISTANT_GROUP_ALIAS = 'omegaup:teaching-assistant';
 
     public static function canViewSubmission(
         \OmegaUp\DAO\VO\Identities $identity,
@@ -110,14 +131,23 @@ class Authorization {
             $problemset = \OmegaUp\DAO\Problemsets::getByPK(
                 $submission->problemset_id
             );
-            if (
-                !is_null($problemset) &&
-                self::isAdmin(
-                    $identity,
-                    $problemset
-                )
-            ) {
-                return true;
+            if (!is_null($problemset)) {
+                if (self::isAdmin($identity, $problemset)) {
+                    return true;
+                }
+                if ($problemset->type === 'Assignment') {
+                    $course = \OmegaUp\DAO\Courses::getByProblemsetId(
+                        $problemset
+                    );
+                    if (
+                        !is_null($course) && self::isTeachingAssistant(
+                            $identity,
+                            $course
+                        )
+                    ) {
+                        return true;
+                    }
+                }
             }
         }
 
@@ -145,7 +175,15 @@ class Authorization {
             return false;
         }
 
-        return self::isAdmin($identity, $problemset);
+        if (self::isAdmin($identity, $problemset)) {
+            return true;
+        }
+
+        $course = \OmegaUp\DAO\Courses::getByProblemsetId($problemset);
+        return (!is_null($course) && self::isTeachingAssistant(
+            $identity,
+            $course
+        ));
     }
 
     public static function canEditClarification(
@@ -171,8 +209,28 @@ class Authorization {
             return false;
         }
 
+        if (self::isAdmin($identity, $problemset)) {
+            return true;
+        }
+
+        $course = \OmegaUp\DAO\Courses::getByProblemsetId($problemset);
         return (self::isOwner($identity, $problem->acl_id)
-                || self::isAdmin($identity, $problemset));
+                || (!is_null($course) && self::isTeachingAssistant(
+                    $identity,
+                    $course
+                )));
+    }
+
+    public static function isUnderThirteenUser(\OmegaUp\DAO\VO\Users $user): bool {
+        // This is mostly for users who hasn't give us their birth day
+        if (is_null($user->birth_date)) {
+            return false;
+        }
+        // User's age is U13? $user->birth_date - current date then return true, otherwise return false
+        return strtotime($user->birth_date) >= strtotime(
+            '-13 year',
+            \OmegaUp\Time::get()
+        );
     }
 
     /**
@@ -193,6 +251,20 @@ class Authorization {
                 $problem->acl_id,
                 self::REVIEWER_ROLE
             );
+    }
+
+    /**
+     * Returns whether the identity can edit or remove the contest. Only contest
+     * admins can do so.
+     */
+    public static function canEditContest(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Contests $contest
+    ): bool {
+        if (is_null($contest->acl_id)) {
+            return false;
+        }
+        return self::isContestAdmin($identity, $contest);
     }
 
     /**
@@ -225,6 +297,20 @@ class Authorization {
         return self::isGroupIdentityCreator($identity);
     }
 
+    public static function canGenerateCertificates(\OmegaUp\DAO\VO\Identities $identity): bool {
+        return self::isCertificateGenerator($identity);
+    }
+
+    public static function isAdminOrTeachingAssistant(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Courses $course
+    ): bool {
+        return(
+            self::isTeachingAssistant($identity, $course) ||
+            self::isCourseAdmin($identity, $course)
+        );
+    }
+
     public static function canViewCourse(
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Courses $course,
@@ -232,7 +318,8 @@ class Authorization {
     ): bool {
         if (
             !self::isCourseAdmin($identity, $course) &&
-            !self::isGroupMember($identity, $group)
+            !self::isGroupMember($identity, $group) &&
+            !self::isTeachingAssistant($identity, $course)
         ) {
             return false;
         }
@@ -267,16 +354,6 @@ class Authorization {
             return false;
         }
         return self::isAdmin($identity, $contest);
-    }
-
-    public static function isInterviewAdmin(
-        \OmegaUp\DAO\VO\Identities $identity,
-        \OmegaUp\DAO\VO\Interviews $interview
-    ): bool {
-        if (is_null($identity->user_id)) {
-            return false;
-        }
-        return self::isAdmin($identity, $interview);
     }
 
     public static function isProblemAdmin(
@@ -368,6 +445,56 @@ class Authorization {
         return in_array($today, $availableDateToChooseCoder);
     }
 
+    public static function isCertificateGenerator(\OmegaUp\DAO\VO\Identities $identity): bool {
+        if (is_null(self::$_certificateGeneratorGroup)) {
+            $certificateGeneratorGroup = \OmegaUp\DAO\Groups::findByAlias(
+                self::CERTIFICATE_GENERATOR_GROUP_ALIAS
+            );
+            if (
+                is_null($certificateGeneratorGroup)
+                || is_null($certificateGeneratorGroup->acl_id)
+            ) {
+                return false;
+            }
+            self::$_certificateGeneratorGroup = $certificateGeneratorGroup;
+        } else {
+            $certificateGeneratorGroup = self::$_certificateGeneratorGroup;
+        }
+        /** @var int $certificateGeneratorGroup->acl_id */
+        return self::isGroupMember(
+            $identity,
+            $certificateGeneratorGroup
+        ) || self::hasRole(
+            $identity,
+            $certificateGeneratorGroup->acl_id,
+            self::CERTIFICATE_GENERATOR_ROLE
+        );
+    }
+
+    public static function isTeachingAssistant(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Courses $course
+    ): bool {
+        if (is_null($course->acl_id)) {
+            return false;
+        }
+        return self::hasRole(
+            $identity,
+            $course->acl_id,
+            self::TEACHING_ASSISTANT_ROLE
+        );
+    }
+
+    public static function isGroupTeachingAssistantMember(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Groups $group = null
+    ): bool {
+        if (is_null($group) || is_null($identity->user_id)) {
+            return false;
+        }
+        return self::isGroupMember($identity, $group);
+    }
+
     public static function isGroupIdentityCreator(\OmegaUp\DAO\VO\Identities $identity): bool {
         if (is_null(self::$_groupIdentityCreator)) {
             self::$_groupIdentityCreator = \OmegaUp\DAO\Groups::findByAlias(
@@ -377,9 +504,16 @@ class Authorization {
                 return false;
             }
         }
+        if (is_null(self::$_groupIdentityCreator->acl_id)) {
+            return false;
+        }
         return self::isGroupMember(
             $identity,
             self::$_groupIdentityCreator
+        ) || self::hasRole(
+            $identity,
+            self::$_groupIdentityCreator->acl_id,
+            self::IDENTITY_CREATOR_ROLE
         );
     }
 
@@ -406,6 +540,16 @@ class Authorization {
             return false;
         }
         return self::isAdmin($identity, $group);
+    }
+
+    public static function isTeamGroupAdmin(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\TeamGroups $teamGroup
+    ): bool {
+        if (is_null($identity->user_id)) {
+            return false;
+        }
+        return self::isAdmin($identity, $teamGroup);
     }
 
     private static function isOwner(
@@ -467,6 +611,8 @@ class Authorization {
         self::$_mentorGroup = null;
         self::$_supportGroup = null;
         self::$_groupIdentityCreator = null;
+        self::$_certificateGeneratorGroup = null;
+        self::$_teachingAssistantGroup = null;
     }
 
     public static function canSubmitToProblemset(
@@ -480,7 +626,22 @@ class Authorization {
             \OmegaUp\DAO\GroupRoles::isContestant(
                 intval($identity->identity_id),
                 $problemset->acl_id
+            ) ||
+            \OmegaUp\DAO\TeamsGroupRoles::isContestant(
+                intval($identity->identity_id),
+                $problemset->acl_id
             );
+    }
+
+    public static function canEditProblemset(
+        \OmegaUp\DAO\VO\Identities $identity,
+        int $problemsetId
+    ): bool {
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK($problemsetId);
+        if (is_null($problemset) || is_null($problemset->acl_id)) {
+            return false;
+        }
+        return self::isAdmin($identity, $problemset);
     }
 
     public static function canCreatePublicCourse(\OmegaUp\DAO\VO\Identities $identity): bool {

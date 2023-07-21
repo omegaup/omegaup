@@ -1,8 +1,6 @@
 <?php
 /**
  * Description of ProblemListTest
- *
- * @author joemmanuel
  */
 class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     public function setUp(): void {
@@ -10,7 +8,23 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Factories\QualityNomination::initQualityReviewers();
         \OmegaUp\Test\Factories\QualityNomination::initTopicTags();
+
+        $this->problemsMapping = [
+            ['alias' => 'Caminos-en-rejilla', 'title' => 'Caminos en rejilla'],
+            ['alias' => 'Caminos-', 'title' => 'Caminos'],
+            ['alias' => 'Caminos-de-Bacho', 'title' => 'Caminos de Bacho'],
+            ['alias' => 'Caminos-de-Fer-I', 'title' => 'Caminos de Fer I'],
+            ['alias' => 'Caminos-cortos', 'title' => 'Caminos cortos'],
+            ['alias' => 'Los-caminos-de-Al', 'title' => 'Los caminos de Al'],
+            ['alias' => 'Caminos-N-buenos', 'title' => 'Caminos N-buenos'],
+            ['alias' => 'Los-Caminos-de-la-Vida', 'title' => 'Los Caminos de la Vida'],
+            ['alias' => 'CaminosAB', 'title' => 'CaminosAB'],
+            ['alias' => 'S1-2020-Senior-CCC', 'title' => 'Velocidad del Correcaminos'],
+            ['alias' => 'Caminos', 'title' => 'Caminos nuevos'],
+        ];
     }
+
+    protected $problemsMapping;
 
     /**
      * Gets the list of problems
@@ -18,6 +32,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     public function testProblemList() {
         // Get 3 problems
         $n = 3;
+        $problemData = [];
         foreach (range(0, $n - 1) as $i) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(
                 new \OmegaUp\Test\Factories\ProblemParams([
@@ -109,6 +124,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'problemTagMeetInTheMiddle',
             'problemTagNumberTheory',
         ];
+        $problemData = [];
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => 'promoted'
@@ -134,7 +150,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Test one tag at a time
@@ -187,6 +203,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'problemTagMeetInTheMiddle',
             'problemTagNumberTheory',
         ];
+        $problemData = [];
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => 'promoted',
@@ -203,10 +220,10 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // 5 users are going to be created, each i user will solve i problems
         // and all users are going to send their feedback to the first problem
-        $users = [];
         $identities = [];
+        $login = [];
         for ($i = 0; $i < 5; $i++) {
-            ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
+            ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
             for ($j = 0; $j <= $i; $j++) {
                 $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
                     $problemData[$j],
@@ -289,11 +306,11 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'order_by' => 'submissions',
         ]));
         $this->assertCount(2, $response['results']);
-        $this->assertEquals(
+        $this->assertSame(
             $problemData[2]['request']['problem_alias'],
             $response['results'][0]['alias']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemData[4]['request']['problem_alias'],
             $response['results'][1]['alias']
         );
@@ -310,7 +327,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'order_by' => 'quality',
         ]));
         $this->assertCount(5, $response['results']);
-        $this->assertEquals(
+        $this->assertSame(
             $problemData[0]['request']['problem_alias'],
             $response['results'][0]['alias']
         );
@@ -335,24 +352,23 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testProblemListWithPrivateTags() {
         [
-            'user' => $admin,
             'identity' => $identityAdmin
         ] = \OmegaUp\Test\Factories\User::createAdminUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'admin']
             )
         );
-        ['user' => $userA, 'identity' => $identityA] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identityA] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'user_a']
             )
         );
-        ['user' => $userB, 'identity' => $identityB] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identityB] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'user_b']
             )
         );
-        ['user' => $otherUser, 'identity' => $otherIdentity] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $otherIdentity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'other']
             )
@@ -449,13 +465,14 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     public function testLimitOffset() {
         // Get 3 problems
         $n = 3;
+        $problemData = [];
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => 'promoted'
             ]));
         }
 
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -463,7 +480,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'offset' => 1,
         ]));
         $this->assertCount(1, $response['results']);
-        $this->assertEquals(
+        $this->assertSame(
             $problemData[1]['request']['problem_alias'],
             $response['results'][0]['alias']
         );
@@ -474,10 +491,10 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      *
      */
     public function testPrivateProblemsShowToAuthor() {
-        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        ['user' => $anotherAuthor, 'identity' => $anotherIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $anotherIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $problemDataPublic = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+        \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 'promoted',
             'author' => $identity
         ]));
@@ -485,7 +502,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'visibility' => 'private',
             'author' => $identity
         ]));
-        $anotherProblemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+        \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 'private',
             'author' => $anotherIdentity
         ]));
@@ -507,9 +524,9 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      *
      */
     public function testAllPrivateProblemsShowToAdmin() {
-        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $problemDataPublic = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+        \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 'promoted',
             'author' => $identity
         ]));
@@ -518,7 +535,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'author' => $identity
         ]));
 
-        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        ['identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         $login = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
@@ -536,14 +553,14 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      * An added admin should see those problems as well
      */
     public function testAllPrivateProblemsShowToAddedAdmin() {
-        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 'private',
             'author' => $identity
         ]));
 
-        ['user' => $addedAdmin, 'identity' => $addedIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $addedIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
         $adminLogin = self::login($addedIdentityAdmin);
         $r = new \OmegaUp\Request([
@@ -666,7 +683,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      * Authors with admin groups should only see each problem once.
      */
     public function testAuthorOnlySeesProblemsOnce() {
-        ['user' => $author, 'identity' => $authorIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $authorIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 'private',
@@ -682,7 +699,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             $authorLogin
         );
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Groups::addUserToGroup(
             $group,
             $identity,
@@ -719,12 +736,38 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testListForSysAdmin() {
+        ['identity' => $adminUserIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        $n = 3;
+        $problemData = [];
+        for ($i = 0; $i < $n; $i++) {
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        $login = self::login($adminUserIdentity);
+        $response = \OmegaUp\Controllers\Problem::apiAdminList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+        $this->assertCount($n, $response['problems']);
+
+        $response = \OmegaUp\Controllers\Problem::apiAdminList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'query' => $problemData[0]['request']['problem_alias'],
+            ])
+        );
+        $this->assertCount(1, $response['problems']);
+    }
+
     /**
      * An author that belongs to an admin group should not see repeated problems.
      */
     public function testPublicProblemsPlusAddedAdminGroup() {
-        ['user' => $author, 'identity' => $authorIdentity] = \OmegaUp\Test\Factories\User::createUser();
-        ['user' => $helper, 'identity' => $helperIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $authorIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $helperIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 'promoted',
@@ -757,8 +800,9 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testMyList() {
         // Get 3 problems
-        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $n = 3;
+        $problemData = [];
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => 'promoted',
@@ -770,10 +814,16 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(3, count($response['problems']));
-        $this->assertEquals(
+        $this->assertSame(3, count($response['problems']));
+
+        $response = \OmegaUp\Controllers\Problem::apiMyList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'query' => $problemData[2]['request']['problem_alias'],
+        ]));
+        $this->assertSame(1, count($response['problems']));
+        $this->assertSame(
             $problemData[2]['request']['problem_alias'],
-            $response['problems'][0]['alias']
+            $response['problems'][0]['title']
         );
     }
 
@@ -781,10 +831,10 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      * Logged-in users will have their best scores for all problems
      */
     public function testListContainsScores() {
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        $problemDataNoRun = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Problem::createProblem();
         $problemDataDecimal = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -826,7 +876,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      * Test that non-logged in users dont have score set
      */
     public function testListScoresForNonLoggedIn() {
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Problem::createProblem();
 
         $response = \OmegaUp\Controllers\Problem::apiList(
             new \OmegaUp\Request()
@@ -834,8 +884,8 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Validate results
         foreach ($response['results'] as $responseProblem) {
-            $this->assertEquals(
-                '0',
+            $this->assertSame(
+                0.0,
                 $responseProblem['score'],
                 'Expecting score to be not set for non-logged in users'
             );
@@ -917,7 +967,9 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testProblemListPager() {
         // Create a user and some problems with submissions for the tests.
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $problemData = [];
         for ($i = 0; $i < 6; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => 'promoted'
@@ -977,7 +1029,6 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         // pagination, for each allowed ordering and each possible order mode.
         $sortOrderTypes = ['asc', 'desc'];
         $columns = ['title', 'quality', 'difficulty', 'ratio', 'points', 'score'];
-        $counter = 0;
         for ($paging = 0; $paging <= 1; $paging++) {
             foreach ($columns as $col) {
                 foreach ($sortOrderTypes as $sortOrder) {
@@ -1002,7 +1053,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                         $last = $response['results'];
 
                         // Test number of problems per page
-                        $this->assertEquals($pageSize, count($first));
+                        $this->assertSame($pageSize, count($first));
                     } else {
                         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                             'auth_token' => $login->auth_token,
@@ -1129,7 +1180,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         /* -------- VALIDATE RESULTS -------*/
 
         // Expected to have only two problems as response although one same problem hasn't been accepted two times.
-        $this->assertEquals(
+        $this->assertSame(
             count(
                 $response['problems']
             ),
@@ -1146,14 +1197,14 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                     break;
 
                 case $problemDataPE['problem']->title:
-                    $this->assertEquals(
+                    $this->assertSame(
                         $responseProblem['title'],
                         $problemDataPE['problem']->title
                     );
                     break;
 
                 case $problemDataWA['problem']->title:
-                    $this->assertEquals(
+                    $this->assertSame(
                         $responseProblem['title'],
                         $problemDataWA['problem']->title
                     );
@@ -1172,7 +1223,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testProblemListPagerFromUrl() {
         // Create a user and some problems with submissions for the tests.
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $pageSize = 2;
@@ -1188,13 +1239,13 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $problems = [];
         $requestParams = [];
         for ($i = 1; $i <= $pages; $i++) {
-            $response = \OmegaUp\Controllers\Problem::getProblemListForSmarty(
+            $response = \OmegaUp\Controllers\Problem::getProblemListForTypeScript(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                     'rowcount' => 1000,
                     'page' => $i,
                 ] + $requestParams)
-            )['smartyProperties']['payload'];
+            )['templateProperties']['payload'];
             foreach ($response['problems'] as $problem) {
                 $this->assertArrayHasKey(
                     'problem_id',
@@ -1218,7 +1269,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
         // Asserting the number of non-repeated problems is the same than the total
-        $this->assertEquals(
+        $this->assertSame(
             count(
                 array_unique(
                     $problems
@@ -1235,6 +1286,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testQualityProblemList() {
         $n = 3;
+        $problemData = [];
         foreach (range(0, $n - 1) as $i) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
@@ -1294,28 +1346,28 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue($response['results'][1]['quality_seal']);
         $this->assertTrue($response['results'][2]['quality_seal']);
 
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         foreach ($result as $problem) {
-            $this->assertEquals(
+            $this->assertSame(
                 $problem['tags'][0]['name'],
                 'problemLevelBasicIntroductionToProgramming'
             );
         }
 
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicKarel',
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
-        $this->assertEquals(
+        $this->assertSame(
             $result[0]['tags'][0]['name'],
             'problemLevelBasicKarel'
         );
@@ -1329,7 +1381,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals(2, $apiListResponse['total']);
+        $this->assertSame(2, $apiListResponse['total']);
 
         $apiListResponse = \OmegaUp\Controllers\Problem::apiList(
             new \OmegaUp\Request([
@@ -1339,6 +1391,348 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals(1, $apiListResponse['total']);
+        $this->assertSame(1, $apiListResponse['total']);
+    }
+
+    /**
+     * A PHPUnit data provider for the test with search type values.
+     *
+     * @return array{0: string, 1: string, 2: int, 3: int[]}
+     */
+    public function problemListCollectionsProvider(): array {
+        return [
+            [
+                'level',
+                'all',
+                4,
+                [0,1,2,3],
+            ],
+            [
+                'level',
+                'onlyQualityProblems',
+                2,
+                [0,3],
+            ],
+            [
+                'author',
+                'all',
+                4,
+                [0,1,2,3],
+            ],
+            [
+                'author',
+                'onlyQualityProblems',
+                2,
+                [0,3],
+            ],
+        ];
+    }
+
+    /**
+     * Gets the list of quality problems for collections
+     * @param int[] $expectedProblemIds
+     * @dataProvider problemListCollectionsProvider
+     */
+    public function testQualityProblemListForCollections(
+        string $collectionType,
+        string $filter,
+        int $expectedTotal,
+        array $expectedProblemIds
+    ) {
+        $n = 4;
+        $problemData = [];
+        foreach (range(0, $n - 1) as $i) {
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'problem_level' => 'problemLevelBasicKarel',
+                ])
+            );
+        }
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData[0]['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicIntroductionToProgramming',
+                'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
+            ]),
+        ]));
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData[3]['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicKarel',
+                'tags' => ['problemTagMatrices', 'problemTagNumberTheory'],
+            ]),
+        ]));
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $params = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'level' => 'problemLevelBasicKarel',
+            'quality' => $filter,
+        ]);
+        if ($collectionType === 'level') {
+            $response = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
+                $params
+            )['templateProperties']['payload']['problems'];
+        } else {
+            $response = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
+                $params
+            )['templateProperties']['payload']['problems'];
+        }
+
+        $this->assertCount($expectedTotal, $response);
+        $expectedAliases = [];
+        foreach ($expectedProblemIds as $problemId) {
+            $expectedAliases[] = $problemData[$problemId]['request']['problem_alias'];
+        }
+
+        foreach ($expectedAliases as $problemAlias) {
+            $this->assertArrayContainsWithPredicate(
+                $response,
+                fn ($problem) => $problem['alias'] == $problemAlias
+            );
+        }
+    }
+
+    /**
+     * A PHPUnit data provider for the test with search type values.
+     *
+     * @return array{0: string, 1: string, 2: list<string>}
+     */
+    public function problemListWithSearchTypeProvider(): array {
+        return [
+            [
+                'Caminos',
+                'all',
+                [
+                    'Caminos-en-rejilla',
+                    'Caminos-',
+                    'Caminos-de-Bacho',
+                    'Caminos-de-Fer-I',
+                    'Caminos-cortos',
+                    'Los-caminos-de-Al',
+                    'Caminos-N-buenos',
+                    'Los-Caminos-de-la-Vida',
+                    'CaminosAB',
+                    'S1-2020-Senior-CCC',
+                    'Caminos',
+                ],
+            ],
+            ['Caminos','alias',['Caminos']],
+            ['Caminos','title',['Caminos-']],
+            ['Caminos','problem_id',['Caminos']],
+            ['CaminosAB','all',['CaminosAB']],
+            ['CaminosAB','alias',['CaminosAB']],
+            ['CaminosAB','title',['CaminosAB']],
+            ['CaminosAB','problem_id',['CaminosAB']],
+            ['Bacho','all',['Caminos-de-Bacho']],
+            ['Bacho','alias',[]],
+            ['Bacho','title',[]],
+            ['Bacho','problem_id',[]],
+        ];
+    }
+
+    /**
+     * Gets the list of problems when a search type is given
+     *
+     * @param list<string> $expectedAliases
+     *
+     * @dataProvider problemListWithSearchTypeProvider
+     */
+    public function testProblemListSearchByType(
+        string $query,
+        string $searchType,
+        array $expectedAliases
+    ) {
+        [
+            'identity' => $admin
+        ] = \OmegaUp\Test\Factories\User::createAdminUser(
+            new \OmegaUp\Test\Factories\UserParams()
+        );
+        foreach ($this->problemsMapping as $problem) {
+            \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams($problem)
+            );
+        }
+
+        $login = self::login($admin);
+
+        $params = [
+            'auth_token' => $login->auth_token,
+            'query' => $query,
+            'search_type' => $searchType,
+        ];
+
+        $problem = null;
+        if (in_array($searchType, ['all', 'problem_id'])) {
+            $problem = \OmegaUp\DAO\Problems::getByAlias($query);
+            if ($searchType === 'problem_id') {
+                if (is_null($problem)) {
+                    return;
+                }
+                $params['query'] = $problem->problem_id;
+            }
+        }
+
+        $response = \OmegaUp\Controllers\Problem::apiListForTypeahead(
+            new \OmegaUp\Request($params)
+        );
+        $this->assertCount(count($response['results']), $expectedAliases);
+
+        foreach ($expectedAliases as $problemAlias) {
+            $this->assertArrayContainsWithPredicate(
+                $response['results'],
+                fn ($problem) => $problem['key'] == $problemAlias
+            );
+        }
+
+        if ($searchType === 'all' && !is_null($problem)) {
+            $response = \OmegaUp\Controllers\Problem::apiListForTypeahead(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'query' => $problem->problem_id,
+                    'search_type' => $searchType,
+                ])
+            );
+            $this->assertCount(1, $response['results']);
+            $this->assertSame($response['results'][0]['key'], $query);
+        }
+    }
+
+    public function testProblemListSearchByBestMatch() {
+        [
+            'identity' => $admin
+        ] = \OmegaUp\Test\Factories\User::createAdminUser(
+            new \OmegaUp\Test\Factories\UserParams()
+        );
+        foreach ($this->problemsMapping as $problem) {
+            \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams($problem)
+            );
+        }
+
+        $login = self::login($admin);
+
+        $response = \OmegaUp\Controllers\Problem::apiListForTypeahead(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'query' => 'Caminos',
+                'search_type' => 'all',
+            ])
+        );
+        $this->assertCount(11, $response['results']);
+
+        $expectedSortedAliases = [
+            'Caminos',
+            'Caminos-',
+            'Caminos-en-rejilla',
+            'Caminos-de-Bacho',
+            'Caminos-de-Fer-I',
+            'Caminos-cortos',
+            'Los-caminos-de-Al',
+            'Caminos-N-buenos',
+            'Los-Caminos-de-la-Vida',
+            'CaminosAB',
+            'S1-2020-Senior-CCC',
+        ];
+        $sortedAliases = array_map(
+            fn ($problem) => $problem['key'],
+            $response['results']
+        );
+        $this->assertSame($sortedAliases, $expectedSortedAliases);
+    }
+
+    public function testProblemListSearchWithNoSearchType() {
+        [
+            'identity' => $admin
+        ] = \OmegaUp\Test\Factories\User::createAdminUser(
+            new \OmegaUp\Test\Factories\UserParams()
+        );
+        foreach ($this->problemsMapping as $problem) {
+            \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams($problem)
+            );
+        }
+
+        $login = self::login($admin);
+
+        try {
+            \OmegaUp\Controllers\Problem::apiListForTypeahead(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'query' => 'Caminos',
+                ])
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterEmpty', $e->getMessage());
+        }
+    }
+
+    public function testProblemListSearchWithNoKeyword() {
+        [
+            'identity' => $admin
+        ] = \OmegaUp\Test\Factories\User::createAdminUser(
+            new \OmegaUp\Test\Factories\UserParams()
+        );
+        foreach ($this->problemsMapping as $problem) {
+            \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams($problem)
+            );
+        }
+
+        $login = self::login($admin);
+
+        try {
+            \OmegaUp\Controllers\Problem::apiListForTypeahead(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'search_type' => 'all',
+                ])
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterEmpty', $e->getMessage());
+        }
+    }
+
+    public function testProblemListSearchWithWrongSearchType() {
+        [
+            'identity' => $admin
+        ] = \OmegaUp\Test\Factories\User::createAdminUser(
+            new \OmegaUp\Test\Factories\UserParams()
+        );
+        foreach ($this->problemsMapping as $problem) {
+            \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams($problem)
+            );
+        }
+
+        $login = self::login($admin);
+
+        try {
+            \OmegaUp\Controllers\Problem::apiListForTypeahead(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'query' => 'Caminos',
+                    'search_type' => 'invalid',
+                ])
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterNotInExpectedSet', $e->getMessage());
+        }
     }
 }

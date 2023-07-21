@@ -1,5 +1,8 @@
 <template>
-  <div class="root d-flex flex-row h-100 bg-dark text-white">
+  <div
+    class="root d-flex flex-row h-100 bg-dark text-white"
+    :class="{ 'bg-dark': theme == 'vs-dark', 'text-white': theme == 'vs-dark' }"
+  >
     <div class="filenames">
       <div class="list-group">
         <button
@@ -12,6 +15,7 @@
         <button
           v-for="(item, name) in zip.files"
           v-else
+          :key="name"
           class="list-group-item list-group-item-action"
           type="button"
           :class="{ active: active == name }"
@@ -30,6 +34,12 @@
 import * as Util from './util';
 
 export default {
+  props: {
+    theme: {
+      type: String,
+      default: 'vs',
+    },
+  },
   data: () => ({
     zip: null,
     active: null,
@@ -53,12 +63,14 @@ export default {
 div.filenames {
   overflow-y: auto;
 }
+
 button.list-group-item {
   width: 10em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 textarea {
   flex: 1;
 }

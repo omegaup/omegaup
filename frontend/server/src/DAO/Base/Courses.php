@@ -34,9 +34,11 @@ abstract class Courses {
             SET
                 `name` = ?,
                 `description` = ?,
+                `objective` = ?,
                 `alias` = ?,
                 `group_id` = ?,
                 `acl_id` = ?,
+                `level` = ?,
                 `start_time` = ?,
                 `finish_time` = ?,
                 `admission_mode` = ?,
@@ -44,7 +46,9 @@ abstract class Courses {
                 `needs_basic_information` = ?,
                 `requests_user_information` = ?,
                 `show_scoreboard` = ?,
-                `languages` = ?
+                `languages` = ?,
+                `archived` = ?,
+                `minimum_progress_for_certificate` = ?
             WHERE
                 (
                     `course_id` = ?
@@ -52,6 +56,7 @@ abstract class Courses {
         $params = [
             $Courses->name,
             $Courses->description,
+            $Courses->objective,
             $Courses->alias,
             (
                 is_null($Courses->group_id) ?
@@ -63,6 +68,7 @@ abstract class Courses {
                 null :
                 intval($Courses->acl_id)
             ),
+            $Courses->level,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Courses->start_time
             ),
@@ -79,6 +85,12 @@ abstract class Courses {
             $Courses->requests_user_information,
             intval($Courses->show_scoreboard),
             $Courses->languages,
+            intval($Courses->archived),
+            (
+                is_null($Courses->minimum_progress_for_certificate) ?
+                null :
+                intval($Courses->minimum_progress_for_certificate)
+            ),
             intval($Courses->course_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -103,9 +115,11 @@ abstract class Courses {
                 `Courses`.`course_id`,
                 `Courses`.`name`,
                 `Courses`.`description`,
+                `Courses`.`objective`,
                 `Courses`.`alias`,
                 `Courses`.`group_id`,
                 `Courses`.`acl_id`,
+                `Courses`.`level`,
                 `Courses`.`start_time`,
                 `Courses`.`finish_time`,
                 `Courses`.`admission_mode`,
@@ -113,7 +127,9 @@ abstract class Courses {
                 `Courses`.`needs_basic_information`,
                 `Courses`.`requests_user_information`,
                 `Courses`.`show_scoreboard`,
-                `Courses`.`languages`
+                `Courses`.`languages`,
+                `Courses`.`archived`,
+                `Courses`.`minimum_progress_for_certificate`
             FROM
                 `Courses`
             WHERE
@@ -127,6 +143,35 @@ abstract class Courses {
             return null;
         }
         return new \OmegaUp\DAO\VO\Courses($row);
+    }
+
+    /**
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\Courses} por llave primaria.
+     *
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\Courses}
+     * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
+     *
+     * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
+     * los campos.
+     *
+     * @return bool Si existe o no tal registro.
+     */
+    final public static function existsByPK(
+        int $course_id
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `Courses`
+            WHERE
+                (
+                    `course_id` = ?
+                );';
+        $params = [$course_id];
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
     }
 
     /**
@@ -198,9 +243,11 @@ abstract class Courses {
                 `Courses`.`course_id`,
                 `Courses`.`name`,
                 `Courses`.`description`,
+                `Courses`.`objective`,
                 `Courses`.`alias`,
                 `Courses`.`group_id`,
                 `Courses`.`acl_id`,
+                `Courses`.`level`,
                 `Courses`.`start_time`,
                 `Courses`.`finish_time`,
                 `Courses`.`admission_mode`,
@@ -208,7 +255,9 @@ abstract class Courses {
                 `Courses`.`needs_basic_information`,
                 `Courses`.`requests_user_information`,
                 `Courses`.`show_scoreboard`,
-                `Courses`.`languages`
+                `Courses`.`languages`,
+                `Courses`.`archived`,
+                `Courses`.`minimum_progress_for_certificate`
             FROM
                 `Courses`
         ';
@@ -261,9 +310,11 @@ abstract class Courses {
                 `Courses` (
                     `name`,
                     `description`,
+                    `objective`,
                     `alias`,
                     `group_id`,
                     `acl_id`,
+                    `level`,
                     `start_time`,
                     `finish_time`,
                     `admission_mode`,
@@ -271,8 +322,14 @@ abstract class Courses {
                     `needs_basic_information`,
                     `requests_user_information`,
                     `show_scoreboard`,
-                    `languages`
+                    `languages`,
+                    `archived`,
+                    `minimum_progress_for_certificate`
                 ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -290,6 +347,7 @@ abstract class Courses {
         $params = [
             $Courses->name,
             $Courses->description,
+            $Courses->objective,
             $Courses->alias,
             (
                 is_null($Courses->group_id) ?
@@ -301,6 +359,7 @@ abstract class Courses {
                 null :
                 intval($Courses->acl_id)
             ),
+            $Courses->level,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Courses->start_time
             ),
@@ -317,6 +376,12 @@ abstract class Courses {
             $Courses->requests_user_information,
             intval($Courses->show_scoreboard),
             $Courses->languages,
+            intval($Courses->archived),
+            (
+                is_null($Courses->minimum_progress_for_certificate) ?
+                null :
+                intval($Courses->minimum_progress_for_certificate)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

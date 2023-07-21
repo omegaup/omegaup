@@ -49,14 +49,17 @@ export default class Paginator extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 .mask {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(
+    var(--quality-nomination-details-confirmation-background-color),
+    0.5
+  );
   transition: opacity 0.3s ease;
   display: flex;
   justify-content: center;

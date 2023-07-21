@@ -17,7 +17,7 @@
       :class="{ 'notification-link': url }"
       @click="handleClick"
     >
-      <img class="d-block" width="80" :src="iconUrl" />
+      <img class="d-block" width="50" :src="iconUrl" />
       <template v-if="notificationMarkdown">
         <omegaup-markdown :markdown="notificationMarkdown"></omegaup-markdown>
       </template>
@@ -129,19 +129,24 @@ export default class Notification extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .close {
   font-size: inherit;
 }
 
 .notification-date {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--notifications-notification-date-font-color);
 }
 
 .notification-link {
   cursor: pointer;
+
   &:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(
+      var(--notifications-notification-link-background-color--hover),
+      0.05
+    );
   }
 }
 </style>

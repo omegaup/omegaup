@@ -2,10 +2,6 @@
 
 namespace OmegaUp;
 
-/**
- *
- * @author juan.pablo
- */
 class Time {
     /** @var int|null */
     private static $time = null;

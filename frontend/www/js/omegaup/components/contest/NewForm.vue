@@ -1,36 +1,28 @@
 <template>
-  <div class="card panel panel-primary">
+  <div class="card">
     <div v-if="!update" class="card-header bg-primary text-white panel-heading">
-      <h3 class="panel-title">{{ T.contestNew }}</h3>
+      <h3 class="card-title mb-0">{{ T.contestNew }}</h3>
     </div>
-    <div class="card-body panel-body">
-      <div class="btn-group bottom-margin mb-3">
-        <button
-          class="btn btn-default btn-secondary"
-          data-contest-omi
-          @click="fillOmi"
-        >
+    <div class="card-body px-2 px-sm-4">
+      <div class="btn-group d-block mb-3 text-center">
+        <button class="btn btn-secondary" data-contest-omi @click="fillOmi">
           {{ T.contestNewFormOmiStyle }}
         </button>
         <button
-          class="btn btn-default btn-secondary"
+          class="btn btn-secondary"
           data-contest-preioi
           @click="fillPreIoi"
         >
           {{ T.contestNewForm }}
         </button>
         <button
-          class="btn btn-default btn-secondary"
+          class="btn btn-secondary"
           data-contest-conacup
           @click="fillConacup"
         >
           {{ T.contestNewFormConacupStyle }}
         </button>
-        <button
-          class="btn btn-default btn-secondary"
-          data-contest-cpc
-          @click="fillIcpc"
-        >
+        <button class="btn btn-secondary" data-contest-icpc @click="fillIcpc">
           {{ T.contestNewFormICPCStyle }}
         </button>
       </div>
@@ -75,6 +67,7 @@
             <label>{{ T.contestNewFormStartDate }}</label>
             <omegaup-datetimepicker
               v-model="startTime"
+              data-start-date
             ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormStartDateDesc }}</p>
           </div>
@@ -82,6 +75,7 @@
             <label>{{ T.contestNewFormEndDate }}</label>
             <omegaup-datetimepicker
               v-model="finishTime"
+              data-end-date
               :is-invalid="invalidParameterName === 'finish_time'"
             ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormEndDateDesc }}</p>
@@ -106,13 +100,18 @@
             <label>{{ T.contestNewFormDifferentStarts }}</label>
             <div class="checkbox">
               <label
-                ><input v-model="windowLengthEnabled" type="checkbox" />
+                ><input
+                  v-model="windowLengthEnabled"
+                  data-different-start-check
+                  type="checkbox"
+                />
                 {{ T.wordsEnable }}</label
               >
             </div>
             <input
               v-model="windowLength"
               class="form-control"
+              data-different-start-time-input
               :class="{
                 'is-invalid': invalidParameterName === 'window_length',
               }"
@@ -128,6 +127,7 @@
             <label>{{ T.contestNewFormScoreboardTimePercent }}</label>
             <input
               v-model="scoreboard"
+              data-score-board-visible-time
               class="form-control scoreboard-time-percent"
               :class="{
                 'is-invalid': invalidParameterName === 'scoreboard',
@@ -193,7 +193,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-6">
             <label>{{ T.wordsFeedback }}</label>
             <select v-model="feedback" class="form-control">
               <option value="none">
@@ -210,9 +210,46 @@
               {{ T.contestNewFormImmediateFeedbackDesc }}
             </p>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-6">
+            <label>{{ T.contestNewFormForTeams }}</label>
+            <div class="checkbox">
+              <label>
+                <input
+                  v-model="currentContestForTeams"
+                  type="checkbox"
+                  :disabled="update"
+                />
+                {{ T.wordsEnable }}
+              </label>
+            </div>
+
+            <omegaup-common-typeahead
+              v-if="currentContestForTeams && !hasSubmissions"
+              :existing-options="searchResultTeamsGroups"
+              :options="searchResultTeamsGroups"
+              :value.sync="currentTeamsGroupAlias"
+              @update-existing-options="
+                (query) => $emit('update-search-result-teams-groups', query)
+              "
+            >
+            </omegaup-common-typeahead>
+            <input
+              v-else
+              class="form-control"
+              disabled
+              :value="teamsGroupName"
+            />
+            <p class="help-block">{{ T.contestNewFormForTeamsDesc }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-md-6">
             <label>{{ T.contestNewFormScoreboardAtEnd }}</label>
-            <select v-model="showScoreboardAfter" class="form-control">
+            <select
+              v-model="showScoreboardAfter"
+              data-show-scoreboard-at-end
+              class="form-control"
+            >
               <option :value="true">
                 {{ T.wordsYes }}
               </option>
@@ -222,17 +259,24 @@
             </select>
             <p class="help-block">{{ T.contestNewFormScoreboardAtEndDesc }}</p>
           </div>
-          <div class="form-group col-md-4">
-            <label>{{ T.contestNewFormPartialScore }}</label>
-            <select v-model="partialScore" class="form-control">
-              <option :value="true">
-                {{ T.wordsYes }}
+          <div class="form-group col-md-6">
+            <label>{{ T.contestNewFormScoreMode }}</label>
+            <select
+              v-model="currentScoreMode"
+              data-score-mode
+              class="form-control"
+            >
+              <option :value="ScoreMode.Partial">
+                {{ T.contestNewFormScoreModePartial }}
               </option>
-              <option :value="false">
-                {{ T.wordsNo }}
+              <option :value="ScoreMode.AllOrNothing">
+                {{ T.contestNewFormScoreModeAllOrNothing }}
+              </option>
+              <option :value="ScoreMode.MaxPerGroup">
+                {{ T.contestNewFormScoreModeMaxPerGroup }}
               </option>
             </select>
-            <p class="help-block">{{ T.contestNewFormPartialScoreDesc }}</p>
+            <p class="help-block">{{ T.contestNewFormScoreModeDesc }}</p>
           </div>
         </div>
         <div class="row">
@@ -256,12 +300,14 @@
             <label>{{ T.wordsLanguages }}</label
             ><br />
             <multiselect
-              v-model="languages"
+              :value="languages"
               :options="Object.keys(allLanguages)"
               :multiple="true"
               :placeholder="T.contestNewFormLanguages"
               :close-on-select="false"
               :allow-empty="false"
+              @remove="onRemove"
+              @select="onSelect"
             >
             </multiselect>
             <p class="help-block">{{ T.contestNewFormLanguages }}</p>
@@ -270,12 +316,14 @@
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormBasicInformationRequired }}</label>
-            <div class="checkbox">
-              <label
-                ><input v-model="needsBasicInformation" type="checkbox" />{{
-                  T.wordsEnable
-                }}</label
-              >
+            <div class="checkbox form-check">
+              <input
+                v-model="needsBasicInformation"
+                data-basic-information-required
+                class="form-check-input"
+                type="checkbox"
+              />
+              <label class="form-check-label"> {{ T.wordsEnable }}</label>
             </div>
             <p class="help-block">
               {{ T.contestNewFormBasicInformationRequiredDesc }}
@@ -283,7 +331,11 @@
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormUserInformationRequired }}</label>
-            <select v-model="requestsUserInformation" class="form-control">
+            <select
+              v-model="requestsUserInformation"
+              data-request-user-information
+              class="form-control"
+            >
               <option value="no">
                 {{ T.wordsNo }}
               </option>
@@ -315,13 +367,21 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import common_Typeahead from '../common/Typeahead.vue';
 import DateTimePicker from '../DateTimePicker.vue';
 import Multiselect from 'vue-multiselect';
+import { types } from '../../api_types';
+
+export enum ScoreMode {
+  AllOrNothing = 'all_or_nothing',
+  Partial = 'partial',
+  MaxPerGroup = 'max_per_group',
+}
 
 @Component({
   components: {
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-datetimepicker': DateTimePicker,
     Multiselect,
   },
@@ -329,6 +389,8 @@ import Multiselect from 'vue-multiselect';
 export default class NewForm extends Vue {
   @Prop() update!: boolean;
   @Prop() allLanguages!: string[];
+  @Prop({ default: 'private' }) admissionMode!: string;
+  @Prop({ default: false }) defaultShowAllContestantsInScoreboard!: boolean;
   @Prop({ default: '' }) initialAlias!: string;
   @Prop({ default: '' }) initialDescription!: string;
   @Prop({ default: 'none' }) initialFeedback!: string;
@@ -341,14 +403,20 @@ export default class NewForm extends Vue {
   @Prop({ default: 'no' }) initialRequestsUserInformation!: string;
   @Prop({ default: 100 }) initialScoreboard!: number;
   @Prop({ default: true }) initialShowScoreboardAfter!: boolean;
-  @Prop({ default: true }) initialPartialScore!: boolean;
+  @Prop({ default: ScoreMode.Partial }) scoreMode!: ScoreMode;
+  @Prop({ default: false }) hasSubmissions!: boolean;
   @Prop() initialStartTime!: Date;
   @Prop() initialSubmissionsGap!: number;
   @Prop({ default: '' }) initialTitle!: string;
   @Prop({ default: null }) initialWindowLength!: null | number;
   @Prop({ default: null }) invalidParameterName!: null | string;
+  @Prop({ default: null }) teamsGroupAlias!: null | types.ListItem;
+  @Prop() searchResultTeamsGroups!: types.ListItem[];
+  @Prop({ default: false }) contestForTeams!: boolean;
+  @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
 
   T = T;
+  ScoreMode = ScoreMode;
   alias = this.initialAlias;
   description = this.initialDescription;
   feedback = this.initialFeedback;
@@ -361,7 +429,7 @@ export default class NewForm extends Vue {
   requestsUserInformation = this.initialRequestsUserInformation;
   scoreboard = this.initialScoreboard;
   showScoreboardAfter = this.initialShowScoreboardAfter;
-  partialScore = this.initialPartialScore;
+  currentScoreMode = this.scoreMode;
   startTime = this.initialStartTime;
   submissionsGap = this.initialSubmissionsGap
     ? this.initialSubmissionsGap / 60
@@ -369,6 +437,8 @@ export default class NewForm extends Vue {
   title = this.initialTitle;
   windowLength = this.initialWindowLength;
   windowLengthEnabled = this.initialWindowLength !== null;
+  currentContestForTeams = this.contestForTeams;
+  currentTeamsGroupAlias = this.teamsGroupAlias;
   titlePlaceHolder = '';
 
   @Watch('windowLengthEnabled')
@@ -390,7 +460,7 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.partialScore = true;
+    this.currentScoreMode = ScoreMode.Partial;
   }
 
   fillPreIoi(): void {
@@ -405,7 +475,7 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.partialScore = true;
+    this.currentScoreMode = ScoreMode.Partial;
   }
 
   fillConacup(): void {
@@ -420,7 +490,7 @@ export default class NewForm extends Vue {
     this.penalty = 20;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.partialScore = true;
+    this.currentScoreMode = ScoreMode.Partial;
   }
 
   fillIcpc(): void {
@@ -442,17 +512,26 @@ export default class NewForm extends Vue {
     this.penalty = 20;
     this.penaltyType = 'contest_start';
     this.showScoreboardAfter = true;
-    this.partialScore = false;
+    this.currentScoreMode = ScoreMode.AllOrNothing;
   }
 
   onSubmit() {
-    const contest: omegaup.Contest = {
+    const contest: types.ContestAdminDetails = {
+      admin: true,
+      admission_mode: this.update ? this.admissionMode : 'private',
       alias: this.alias,
+      archived: false,
+      available_languages: {},
+      director: '',
+      opened: false,
+      penalty_calc_policy: 'sum',
+      problemset_id: 0,
+      show_penalty: true,
       title: this.title,
       description: this.description,
+      has_submissions: this.hasSubmissions,
       start_time: this.startTime,
       finish_time: this.finishTime,
-      window_length: !this.windowLengthEnabled ? null : this.windowLength,
       points_decay_factor: this.pointsDecayFactor,
       submissions_gap: (this.submissionsGap || 1) * 60,
       languages: this.languages,
@@ -460,24 +539,61 @@ export default class NewForm extends Vue {
       penalty: this.penalty,
       scoreboard: this.scoreboard,
       penalty_type: this.penaltyType,
+      default_show_all_contestants_in_scoreboard: this
+        .defaultShowAllContestantsInScoreboard,
       show_scoreboard_after: this.showScoreboardAfter,
-      partial_score: this.partialScore,
+      score_mode: this.currentScoreMode,
       needs_basic_information: this.needsBasicInformation,
       requests_user_information: this.requestsUserInformation,
+      contest_for_teams: this.currentContestForTeams,
     };
+    if (this.windowLengthEnabled && this.windowLength) {
+      contest.window_length = this.windowLength;
+    }
+    const request = { contest, teamsGroupAlias: this.currentTeamsGroupAlias };
     if (this.update) {
-      this.$emit('update-contest', contest);
+      this.$emit('update-contest', request);
       return;
     }
-    this.$emit('create-contest', contest);
+    this.$emit('create-contest', request);
+  }
+
+  get teamsGroupName(): null | string {
+    return this.currentTeamsGroupAlias?.value ?? null;
+  }
+
+  get catLanguageBlocked(): boolean {
+    if (!this.problems) {
+      return false;
+    }
+    for (const problem of this.problems) {
+      if (problem.languages.split(',').includes('cat')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  onRemove(language: string) {
+    if (this.catLanguageBlocked && language == 'cat') {
+      this.$emit('language-remove-blocked', language);
+      return;
+    }
+    const index = this.languages.indexOf(language);
+    this.languages.splice(index, 1);
+  }
+
+  onSelect(language: string) {
+    this.languages.push(language);
   }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 @import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
 
 .multiselect__tag {
-  background: #678dd7;
+  background: var(--multiselect-tag-background-color);
 }
 </style>

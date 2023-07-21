@@ -1,5 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
 
 import identity_ChangePassword from './ChangePassword.vue';
 

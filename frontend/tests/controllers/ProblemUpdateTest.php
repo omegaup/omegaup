@@ -1,9 +1,6 @@
 <?php
-
 /**
  * Description of ProblemUpdateTest
- *
- * @author joemmanuel
  */
 
 class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
@@ -43,7 +40,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData['problem']->problem_id
         );
         // This problem only has one language at this point
-        $this->assertEquals(1, count($problemLanguages));
+        $this->assertSame(1, count($problemLanguages));
 
         \OmegaUp\Controllers\Problem::apiUpdateStatement(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -57,7 +54,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemLanguages = \OmegaUp\DAO\ProblemsLanguages::getByProblemId(
             $problemData['problem']->problem_id
         );
-        $this->assertEquals(2, count($problemLanguages));
+        $this->assertSame(2, count($problemLanguages));
     }
 
     /**
@@ -71,7 +68,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemLevel = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
             $problemData['problem']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemLevel,
             'problemLevelBasicIntroductionToProgramming'
         );
@@ -85,7 +82,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemLevel = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
             $problemData['problem']
         );
-        $this->assertEquals($selectedLevel, $problemLevel);
+        $this->assertSame($selectedLevel, $problemLevel);
 
         $selectedLevel = 'problemLevelBasicIntroductionToProgramming';
         \OmegaUp\Controllers\Problem::apiUpdateProblemLevel(new \OmegaUp\Request([
@@ -96,7 +93,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemLevel = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
             $problemData['problem']
         );
-        $this->assertEquals($selectedLevel, $problemLevel);
+        $this->assertSame($selectedLevel, $problemLevel);
     }
 
     public function testUpdateProblemTitleAndContents() {
@@ -113,8 +110,9 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
+        $runData = [];
         // Create a run
         $runData[0] = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
@@ -153,7 +151,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $problems = \OmegaUp\DAO\Problems::getByTitle($newTitle);
 
         // Check that we only retreived 1 element
-        $this->assertEquals(1, count($problems));
+        $this->assertSame(1, count($problems));
 
         {
             $problemArtifacts = new \OmegaUp\ProblemArtifacts(
@@ -175,11 +173,11 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
             $problemDistribSettings = json_decode(
                 $problemArtifacts->get('settings.distrib.json'),
-                true /* assoc */
+                associative: true,
             );
 
             // This example comes from the problem statement.
-            $this->assertEquals(
+            $this->assertSame(
                 [
                     'statement_001' => [
                         'in' => "6\n2 3 2 3 2 4",
@@ -220,9 +218,9 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
             $problemDistribSettings = json_decode(
                 $problemArtifacts->get('settings.distrib.json'),
-                true /* assoc */
+                associative: true,
             );
-            $this->assertEquals(
+            $this->assertSame(
                 [
                     'sample' => [
                         'in' => "6\n2 3 2 3 2 4\n",
@@ -234,14 +232,15 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
-        $this->assertEquals(2, $detourGrader->getGraderCallCount());
+        $this->assertSame(2, $detourGrader->getGraderCallCount());
     }
 
     public function testUpdateProblemSettings() {
         // Get a problem with a run.
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $problemAlias = $problemData['request']['problem_alias'];
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $runData = [];
         $runData[0] = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identity
@@ -261,11 +260,11 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                     'settings.json'
                 )
             );
-            $this->assertEquals(
+            $this->assertSame(
                 3,
                 count($problemSettings->Cases)
             );
-            $this->assertEquals(
+            $this->assertSame(
                 ($problemData['request']['time_limit'] / 1000) . 's',
                 $problemSettings->Limits->TimeLimit
             );
@@ -301,17 +300,17 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                     'settings.json'
                 )
             );
-            $this->assertEquals(
+            $this->assertSame(
                 3,
                 count($problemSettings->Cases)
             );
-            $this->assertEquals(
+            $this->assertSame(
                 ($newTimeLimit / 1000.0) . 's',
                 $problemSettings->Limits->TimeLimit
             );
         }
 
-        $this->assertEquals(1, $detourGrader->getGraderCallCount());
+        $this->assertSame(1, $detourGrader->getGraderCallCount());
     }
 
     public function testUpdateValidatorTimeout() {
@@ -341,9 +340,9 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $problemArtifacts->get(
                     'settings.json'
                 ),
-                /*$assoc=*/true
+                associative: true
             );
-            $this->assertEquals(
+            $this->assertSame(
                 ($newTimeLimit / 1000.0) . 's',
                 $problemSettings['Validator']['Limits']['TimeLimit']
             );
@@ -375,7 +374,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Check that we only retrieved 1 element
         $this->assertNotNull($problem);
-        $this->assertEqualSets($languages, $problem->languages);
+        $this->assertSameSets($languages, $problem->languages);
     }
 
     public function testUpdateProblemWithInvalidLanguages() {
@@ -393,7 +392,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Expected update to fail');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'parameterNotInExpectedSet',
                 $e->getMessage()
             );
@@ -419,7 +418,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'statement' => $statement
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Check statment contents
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
@@ -452,7 +451,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'solution' => $solution,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Check solution contents
         $response = \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
@@ -477,7 +476,6 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Update statement
         $imgUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
-        $imgFilename = 'af6a4603e039cca2f6823d287f6c87e561aa6e68.png';
 
         $statement = "This is the new statement with an image omg ![Alt text]($imgUri \"Optional title\")\n";
         $login = self::login($problemData['author']);
@@ -488,7 +486,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'statement' => $statement
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Check statment contents
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
@@ -498,7 +496,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'statements/es.markdown'
         );
 
-        $this->assertEquals($statement, $statementMarkdownContents);
+        $this->assertSame($statement, $statementMarkdownContents);
     }
 
     /**
@@ -524,7 +522,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Expected update to fail');
         } catch (\OmegaUp\Exceptions\ProblemDeploymentFailedException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'problemDeployerNoStatements',
                 $e->getMessage()
             );
@@ -544,7 +542,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $statement = $problemArtifacts->get('statements/es.markdown');
         $this->assertStringContainsString('# Entrada', $statement);
 
-        $this->assertEquals(0, $detourGrader->getGraderCallCount());
+        $this->assertSame(0, $detourGrader->getGraderCallCount());
     }
 
     /**
@@ -555,7 +553,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create our new admin
-        ['user' => $problemAdmin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add admin to the problem
         $adminLogin = self::login($problemData['author']);
@@ -565,7 +563,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         //Call API
         $newTitle = 'new title coadmin';
@@ -592,7 +590,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create our new admin
-        ['user' => $user, 'identity' => $problemAdmin] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $problemAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add admin to the problem
         $adminLogin = self::login($problemData['author']);
@@ -602,7 +600,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Then remove the user
         $response = \OmegaUp\Controllers\Problem::apiRemoveAdmin(new \OmegaUp\Request([
@@ -610,7 +608,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'usernameOrEmail' => $problemAdmin->username,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         //Call API
         $login = self::login($problemAdmin);
@@ -623,7 +621,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -635,7 +633,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create our new admin
-        ['user' => $user, 'identity' => $problemAdmin] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $problemAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add admin to the problem
         $login = self::login($problemData['author']);
@@ -645,7 +643,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         // Get the list of admins
         $response = \OmegaUp\Controllers\Problem::apiAdmins(new \OmegaUp\Request([
@@ -688,7 +686,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should not have been able to see the problem');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('problemIsPrivate', $e->getMessage());
+            $this->assertSame('problemIsPrivate', $e->getMessage());
         }
 
         // Promote to reviewer, can see the problem now.
@@ -834,7 +832,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Cannot ban problem from API');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 $e->getMessage(),
                 'qualityNominationProblemHasBeenBanned'
             );
@@ -867,7 +865,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Cannot un-ban problem from API');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 $e->getMessage(),
                 'qualityNominationProblemHasBeenBanned'
             );
@@ -882,7 +880,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Cannot un-ban problem from API');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 $e->getMessage(),
                 'qualityNominationProblemHasBeenBanned'
             );
@@ -915,7 +913,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Cannot un-promote problem from API');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 $e->getMessage(),
                 'qualityNominationProblemHasBeenPromoted'
             );
@@ -930,7 +928,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Cannot un-promote problem from API');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 $e->getMessage(),
                 'qualityNominationProblemHasBeenPromoted'
             );
@@ -1019,7 +1017,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('tagPrefixRestricted', $e->getMessage());
+            $this->assertSame('tagPrefixRestricted', $e->getMessage());
         }
 
         try {
@@ -1031,7 +1029,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should not have been able to remove restricted tag');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('tagRestricted', $e->getMessage());
+            $this->assertSame('tagRestricted', $e->getMessage());
         }
 
         $testTags = [
@@ -1058,18 +1056,16 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $problemData['author'],
                 $problemData['problem']
             ),
-            /*public=*/ false
         );
-        $this->assertEquals($testTags, $privateTags);
+        $this->assertSame($testTags, $privateTags);
 
-        ['user' => $extraUser, 'identity' => $extraIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $extraIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $privateTags = \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
             $problemData['problem'],
             !\OmegaUp\Authorization::canEditProblem(
                 $extraIdentity,
                 $problemData['problem']
             ),
-            /*public=*/ false
         );
         $this->assertEmpty($privateTags);
     }
@@ -1080,7 +1076,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testProblemVersionUpdate() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $problem = $problemData['problem'];
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identity
@@ -1114,7 +1110,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'output_limit' => 20480,
             ]));
             $this->assertTrue($response['rejudged']);
-            $this->assertEquals(1, $detourGrader->getGraderCallCount());
+            $this->assertSame(1, $detourGrader->getGraderCallCount());
             unset($_FILES['problem_contents']);
         foreach ($detourGrader->getRuns() as $run) {
             \OmegaUp\Test\Factories\Run::gradeRun(
@@ -1163,7 +1159,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'output_limit' => 10240,
             ]));
             $this->assertTrue($response['rejudged']);
-            $this->assertEquals(0, $detourGrader->getGraderCallCount());
+            $this->assertSame(0, $detourGrader->getGraderCallCount());
             unset($_FILES['problem_contents']);
         }
 
@@ -1179,7 +1175,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             $originalDetails['statement'],
             $restoredDetails['statement']
         );
@@ -1197,14 +1193,14 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problem->alias,
             ]))
         );
-        $this->assertEquals(
+        $this->assertSame(
             $originalVersionData['published'],
             \OmegaUp\Controllers\Problem::apiVersions(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
             ]))['published']
         );
-        $this->assertEquals(
+        $this->assertSame(
             1.0,
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1226,14 +1222,14 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problem->alias,
             ]))
         );
-        $this->assertEquals(
+        $this->assertSame(
             $modifiedVersionData['published'],
             \OmegaUp\Controllers\Problem::apiVersions(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
             ]))['published']
         );
-        $this->assertEquals(
+        $this->assertSame(
             0.0,
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1255,14 +1251,14 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problem->alias,
             ]))
         );
-        $this->assertEquals(
+        $this->assertSame(
             $restoredVersionData['published'],
             \OmegaUp\Controllers\Problem::apiVersions(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
             ]))['published']
         );
-        $this->assertEquals(
+        $this->assertSame(
             1.0,
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1272,15 +1268,327 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    /**
+     * Tests problem version update when test cases change in a submission
+     * outside a contest.
+     */
+    public function testProblemVersionUpdateCases() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problem = $problemData['problem'];
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($problemData['author']);
+        // Change the problem to something completely different.
+        {
+            $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem_updatedcases.zip';
+            $_detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+            $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+                'message' => 'Changed to mrkareltastic',
+                'validator' => 'token',
+                'time_limit' => 1000,
+                'overall_wall_time_limit' => 30000,
+                'validator_time_limit' => 0,
+                'extra_wall_time' => 1000,
+                'memory_limit' => 64000,
+                'output_limit' => 20480,
+            ]));
+            $this->assertTrue($response['rejudged']);
+            unset($_FILES['problem_contents']);
+        }
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            runData: $runData,
+            points: 0.75,
+            verdict: 'PA',
+            submitDelay: null,
+            runGuid: null,
+            runId: null,
+            problemsetPoints: 100,
+            outputFilesContent: null,
+            problemsetScoreMode: 'max_per_group',
+            runScoreByGroups: [
+                ['group_name' => 'sample', 'score' => 0.25, 'verdict' => 'AC'],
+                ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                ['group_name' => 'medium', 'score' => 0.25, 'verdict' => 'AC'],
+                ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+            ],
+        );
+
+        $contestantLogin = self::login($identity);
+        $response = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'problem_alias' => $problem->alias,
+                'auth_token' => $contestantLogin->auth_token,
+            ])
+        );
+        $this->assertSame(75.0, $response['score']);
+
+        $login = self::login($problemData['author']);
+        $versionData = \OmegaUp\Controllers\Problem::apiVersions(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+            ])
+        );
+
+        $versions = array_map(
+            fn ($log) => [
+                'commit' => $log['commit'],
+                'version' => $log['version'],
+            ],
+            $versionData['log']
+        );
+
+        \OmegaUp\Controllers\Problem::apiSelectVersion(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'commit' => $versions[1]['commit'],
+        ]));
+
+        $response = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'problem_alias' => $problem->alias,
+                'auth_token' => $contestantLogin->auth_token,
+            ])
+        );
+
+        $this->assertSame(0.0, $response['score']);
+    }
+
+    /**
+     * A PHPUnit data provider for all the score mode contests to update problem
+     * cases.
+     *
+     * @return list<array{0:string, 1:float, 2:string, 3:int, 4:list<array{group_name: string, score: float, verdict: string}>}>
+     */
+    public function scoreModeProvider(): array {
+        return [
+            [
+                'partial',
+                0.75,
+                100,
+                'PA',
+                []
+            ],
+            [
+                'all_or_nothing',
+                1.0,
+                1,
+                'AC',
+                []
+            ],
+            [
+                'max_per_group',
+                75.0,
+                1,
+                'PA',
+                [
+                    ['group_name' => 'sample', 'score' => 0.25, 'verdict' => 'AC'],
+                    ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                    ['group_name' => 'medium', 'score' => 0.25, 'verdict' => 'AC'],
+                    ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * Tests problem version update when test cases change in a submission
+     * inside a different types of contest.
+     *
+     * @param list<array{group_name:string, score:float, verdict:string}> $scoreByGroups
+     *
+     * @dataProvider scoreModeProvider
+     */
+    public function testProblemVersionUpdateCasesInAContest(
+        string $scoreMode,
+        float $points,
+        int $problemsetPoints,
+        string $verdict,
+        $scoreByGroups
+    ) {
+        // Create an admin
+        [
+            'user' => $userAdmin,
+            'identity' => $admin,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'author' => $admin,
+                'authorUser' => $userAdmin,
+            ])
+        );
+        $problem = $problemData['problem'];
+
+        // Create a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'scoreMode' => $scoreMode,
+                'contestDirector' => $admin,
+                'contestDirectorUser' => $userAdmin,
+            ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Create a contestant
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create a run
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+
+        $login = self::login($problemData['author']);
+        // Change the problem to something completely different.
+        {
+            $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem_updatedcases.zip';
+            $_detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+            $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+                'message' => 'Changed to mrkareltastic',
+                'validator' => 'token',
+                'time_limit' => 1000,
+                'overall_wall_time_limit' => 30000,
+                'validator_time_limit' => 0,
+                'extra_wall_time' => 1000,
+                'memory_limit' => 64000,
+                'output_limit' => 20480,
+            ]));
+            $this->assertTrue($response['rejudged']);
+            unset($_FILES['problem_contents']);
+        }
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            runData: $runData,
+            points: $points,
+            verdict: $verdict,
+            submitDelay: null,
+            runGuid: null,
+            runId: null,
+            problemsetPoints: $problemsetPoints,
+            outputFilesContent: null,
+            problemsetScoreMode: $scoreMode,
+            runScoreByGroups: $scoreByGroups,
+        );
+
+        $login = self::login($problemData['author']);
+        $versionData = \OmegaUp\Controllers\Problem::apiVersions(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+            ])
+        );
+
+        $versions = array_map(
+            fn ($log) => [
+                'commit' => $log['commit'],
+                'version' => $log['version'],
+            ],
+            $versionData['log']
+        );
+
+        [
+            'ranking' => $scoreboardContestBeforeUpdate,
+        ] = \OmegaUp\Controllers\Contest::apiScoreboard(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        );
+
+        $this->assertSame(
+            $scoreboardContestBeforeUpdate[0]['total']['points'],
+            $points * $problemsetPoints
+        );
+
+        \OmegaUp\Controllers\Problem::apiSelectVersion(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'commit' => $versions[1]['commit'],
+            'update_published' => \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS
+        ]));
+
+        // Let's grade the updated run
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            runData: $runData,
+            points: 0.0,
+            verdict: 'WA',
+            submitDelay: null,
+            runGuid: null,
+            runId: null,
+            problemsetPoints: $problemsetPoints,
+            outputFilesContent: null,
+            problemsetScoreMode: $scoreMode,
+            runScoreByGroups: [
+                ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
+                ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'WA'],
+                ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+            ],
+        );
+        // After five minutes, create a new run
+        $time = \OmegaUp\Time::get();
+
+        \OmegaUp\Time::setTimeForTesting($time + (5 * 60));
+
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            runData: $runData,
+            points: 0.0,
+            verdict: 'WA',
+            submitDelay: null,
+            runGuid: null,
+            runId: null,
+            problemsetPoints: $problemsetPoints,
+            outputFilesContent: null,
+            problemsetScoreMode: $scoreMode,
+            runScoreByGroups: [
+                ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
+                ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'WA'],
+                ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+            ],
+        );
+        [
+            'ranking' => $scoreboardContestAfterUpdate,
+        ] = \OmegaUp\Controllers\Contest::apiScoreboard(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        );
+
+        $this->assertSame(
+            $scoreboardContestAfterUpdate[0]['total']['points'],
+            0.0
+        );
+    }
+
     public function testUpdateProblemInputLimitAndEmailClarifications() {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        // Create our contestant
-        [
-            'user' => $contestant,
-            'identity' => $identity,
-        ] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($problemData['author']);
 
         // Update input_limit to verify its value changes properly
@@ -1299,7 +1607,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData['request']['problem_alias']
         );
 
-        $this->assertEquals($newInputLimit, $problem->input_limit);
+        $this->assertSame($newInputLimit, $problem->input_limit);
 
         // Update email_clarifications to verify its value changes properly
         $newEmailClarifications = true;
@@ -1317,7 +1625,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData['request']['problem_alias']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $newEmailClarifications,
             $problem->email_clarifications
         );
@@ -1337,7 +1645,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData['request']['problem_alias']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $newEmailClarifications,
             $problem->email_clarifications
         );
@@ -1351,11 +1659,13 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     ) {
         $originalTime = \OmegaUp\Time::get();
         try {
-            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'author' => $problemAuthor,
-            ]));
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'author' => $problemAuthor,
+                ])
+            );
             $problem = $problemData['problem'];
-            ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+            ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
             \OmegaUp\Time::setTimeForTesting($originalTime - 30 * 60);
 
@@ -1367,11 +1677,13 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Test\Factories\Run::gradeRun($pastStandaloneRunData);
 
             // Create a contest in the past with one run.
-            $pastContestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
-                'startTime' => $originalTime - 60 * 60,
-                'finishTime' => $originalTime - 5 * 60,
-                'contestDirector' => $contestDirector,
-            ]));
+            $pastContestData = \OmegaUp\Test\Factories\Contest::createContest(
+                new \OmegaUp\Test\Factories\ContestParams([
+                    'startTime' => $originalTime - 60 * 60,
+                    'finishTime' => $originalTime - 5 * 60,
+                    'contestDirector' => $contestDirector,
+                ])
+            );
             \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData,
                 $pastContestData
@@ -1394,11 +1706,13 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Test\Factories\Run::gradeRun($pastRunData);
 
             // Now create one in the present with one more run.
-            $presentContestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
-                'startTime' => $originalTime - 60 * 60,
-                'finishTime' => $originalTime + 60 * 60,
-                'contestDirector' => $contestDirector,
-            ]));
+            $presentContestData = \OmegaUp\Test\Factories\Contest::createContest(
+                new \OmegaUp\Test\Factories\ContestParams([
+                    'startTime' => $originalTime - 60 * 60,
+                    'finishTime' => $originalTime + 60 * 60,
+                    'contestDirector' => $contestDirector,
+                ])
+            );
             \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData,
                 $presentContestData
@@ -1423,28 +1737,46 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Time::setTimeForTesting($originalTime + 5 * 60);
 
             $login = self::login($problemData['author']);
+            [
+                'ranking' => $scoreboardPastContestBeforeUpdate,
+            ] = \OmegaUp\Controllers\Contest::apiScoreboard(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $pastContestData['request']['alias'],
+                ])
+            );
+            [
+                'ranking' => $scoreboardPresentContestBeforeUpdate,
+            ] = \OmegaUp\Controllers\Contest::apiScoreboard(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $presentContestData['request']['alias'],
+                ])
+            );
             // Change the problem to something completely different.
             $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'mrkareltastic.zip';
             $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
-            $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'problem_alias' => $problem->alias,
-                'message' => 'Changed to mrkareltastic',
-                'validator' => 'token',
-                'time_limit' => 1000,
-                'overall_wall_time_limit' => 30000,
-                'validator_time_limit' => 0,
-                'extra_wall_time' => 1000,
-                'memory_limit' => 64000,
-                'output_limit' => 20480,
-                'update_published' => $updatePublished,
-            ]));
-            $this->assertEquals(
+            $response = \OmegaUp\Controllers\Problem::apiUpdate(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'problem_alias' => $problem->alias,
+                    'message' => 'Changed to mrkareltastic',
+                    'validator' => 'token',
+                    'time_limit' => 1000,
+                    'overall_wall_time_limit' => 30000,
+                    'validator_time_limit' => 0,
+                    'extra_wall_time' => 1000,
+                    'memory_limit' => 64000,
+                    'output_limit' => 20480,
+                    'update_published' => $updatePublished,
+                ])
+            );
+            $this->assertSame(
                 $response['rejudged'],
                 $updatePublished != 'none'
             );
             // Runs are only added when the publishing mode is not none.
-            $this->assertEquals(
+            $this->assertSame(
                 $updatePublished === \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE ? 0 : 3,
                 $detourGrader->getGraderCallCount()
             );
@@ -1458,6 +1790,30 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                     $run->run_id
                 );
             }
+            [
+                'ranking' => $scoreboardPastContestAfterUpdate,
+            ] = \OmegaUp\Controllers\Contest::apiScoreboard(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $pastContestData['request']['alias'],
+                ])
+            );[
+                'ranking' => $scoreboardPresentContestAfterUpdate,
+            ] = \OmegaUp\Controllers\Contest::apiScoreboard(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $presentContestData['request']['alias'],
+                ])
+            );
+            // The scoreboard should remain the same after updating problems
+            $this->assertSame(
+                $scoreboardPastContestAfterUpdate,
+                $scoreboardPastContestBeforeUpdate
+            );
+            $this->assertSame(
+                $scoreboardPresentContestAfterUpdate,
+                $scoreboardPresentContestBeforeUpdate
+            );
 
             return [
                 'pastRunData' => $pastRunData,
@@ -1481,7 +1837,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1489,7 +1845,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 )->current_run_id
             )->verdict
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1498,13 +1854,13 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             )->verdict
         );
 
-        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE,
             $identity,
             $identity
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1512,7 +1868,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 )->current_run_id
             )->verdict
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1530,7 +1886,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1538,7 +1894,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 )->current_run_id
             )->verdict
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1547,13 +1903,13 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             )->verdict
         );
 
-        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET,
             $identity,
             $identity
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1561,7 +1917,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 )->current_run_id
             )->verdict
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1577,13 +1933,13 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $result['pastProblemData']['problem']->alias,
             'version' => $result['pastProblemData']['problem']->current_version,
         ]));
-        $this->assertEquals(1, count($diffResult['diff']));
-        $this->assertEquals(
+        $this->assertSame(1, count($diffResult['diff']));
+        $this->assertSame(
             $result['pastStandaloneRunData']['response']['guid'],
             $diffResult['diff'][0]['guid']
         );
-        $this->assertEquals('WA', $diffResult['diff'][0]['old_verdict']);
-        $this->assertEquals('AC', $diffResult['diff'][0]['new_verdict']);
+        $this->assertSame('WA', $diffResult['diff'][0]['old_verdict']);
+        $this->assertSame('AC', $diffResult['diff'][0]['new_verdict']);
     }
 
     /**
@@ -1595,7 +1951,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1603,7 +1959,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 )->current_run_id
             )->verdict
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1612,13 +1968,13 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             )->verdict
         );
 
-        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
             $identity,
             $identity
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1626,7 +1982,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 )->current_run_id
             )->verdict
         );
-        $this->assertEquals(
+        $this->assertSame(
             'WA',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1646,13 +2002,13 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $result['pastContestData']['contest']->alias,
             'version' => $presentProblem->current_version,
         ]));
-        $this->assertEquals(1, count($diffResult['diff']));
-        $this->assertEquals(
+        $this->assertSame(1, count($diffResult['diff']));
+        $this->assertSame(
             $result['pastRunData']['response']['guid'],
             $diffResult['diff'][0]['guid']
         );
-        $this->assertEquals('AC', $diffResult['diff'][0]['old_verdict']);
-        $this->assertEquals('WA', $diffResult['diff'][0]['new_verdict']);
+        $this->assertSame('AC', $diffResult['diff'][0]['old_verdict']);
+        $this->assertSame('WA', $diffResult['diff'][0]['new_verdict']);
 
         // Changing the version of the problemset to whatever it is currently
         // should not have any visible effect.
@@ -1664,7 +2020,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'points' => 100,
             'order_in_contest' => 1,
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1682,7 +2038,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'points' => 100,
             'order_in_contest' => 1,
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             'WA',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1701,7 +2057,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1709,7 +2065,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 )->current_run_id
             )->verdict
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1718,14 +2074,14 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             )->verdict
         );
 
-        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
             $identity,
             null,
             $identity
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1733,7 +2089,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 )->current_run_id
             )->verdict
         );
-        $this->assertEquals(
+        $this->assertSame(
             'WA',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1742,13 +2098,13 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             )->verdict
         );
 
-        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
             $identity,
             $identity
         );
-        $this->assertEquals(
+        $this->assertSame(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1756,7 +2112,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 )->current_run_id
             )->verdict
         );
-        $this->assertEquals(
+        $this->assertSame(
             'WA',
             \OmegaUp\DAO\Runs::getByPK(
                 \OmegaUp\DAO\Submissions::getByGuid(
@@ -1770,7 +2126,6 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $problemAlias = $problemData['request']['problem_alias'];
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         {
             $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemAlias);
             $problemSettings = json_decode(
@@ -1780,27 +2135,27 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             );
 
             // Asserts default values
-            $this->assertEquals(
+            $this->assertSame(
                 $problemData['request']['time_limit'],
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->TimeLimit
                 )
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $problemData['request']['extra_wall_time'],
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->ExtraWallTime
                 )
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $problemData['request']['memory_limit'],
                 $problemSettings->Limits->MemoryLimit / 1024
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $problemData['request']['output_limit'],
                 $problemSettings->Limits->OutputLimit
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $problemData['request']['overall_wall_time_limit'],
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->OverallWallTimeLimit
@@ -1809,11 +2164,11 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Call API to update time limit.
-        $newTimeLimit = 4000;
-        $newExtraWallTime = 100;
+        $newTimeLimit = 4000.0;
+        $newExtraWallTime = 100.0;
         $newMemoryLimit = 16000;
         $newOutputLimit = 5120;
-        $newOverallWallTimeLimit = 30000;
+        $newOverallWallTimeLimit = 30000.0;
         $login = self::login($problemData['author']);
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -1834,27 +2189,27 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                     'settings.json'
                 )
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newTimeLimit,
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->TimeLimit
                 )
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newExtraWallTime,
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->ExtraWallTime
                 )
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newMemoryLimit,
                 $problemSettings->Limits->MemoryLimit / 1024
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newOutputLimit,
                 $problemSettings->Limits->OutputLimit
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newOverallWallTimeLimit,
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->OverallWallTimeLimit
@@ -1878,27 +2233,27 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                     'settings.json'
                 )
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newTimeLimit,
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->TimeLimit
                 )
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newExtraWallTime,
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->ExtraWallTime
                 )
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newMemoryLimit,
                 $problemSettings->Limits->MemoryLimit / 1024
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newOutputLimit,
                 $problemSettings->Limits->OutputLimit
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newOverallWallTimeLimit,
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->OverallWallTimeLimit
@@ -1912,14 +2267,14 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problemAlias,
             ])
         );
-        $this->assertEquals(0, $response['visibility']);
+        $this->assertSame(0, $response['visibility']);
 
         // Updated problem setttings and visibility
-        $newTimeLimit = 3000;
-        $newExtraWallTime = 200;
+        $newTimeLimit = 3000.0;
+        $newExtraWallTime = 200.0;
         $newMemoryLimit = 8000;
         $newOutputLimit = 2560;
-        $newOverallWallTimeLimit = 15000;
+        $newOverallWallTimeLimit = 15000.0;
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemAlias,
@@ -1940,27 +2295,27 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                     'settings.json'
                 )
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newTimeLimit,
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->TimeLimit
                 )
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newExtraWallTime,
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->ExtraWallTime
                 )
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newMemoryLimit,
                 $problemSettings->Limits->MemoryLimit / 1024
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newOutputLimit,
                 $problemSettings->Limits->OutputLimit
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $newOverallWallTimeLimit,
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->OverallWallTimeLimit
@@ -1974,7 +2329,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problemAlias,
             ])
         );
-        $this->assertEquals(1, $response['visibility']);
+        $this->assertSame(1, $response['visibility']);
     }
 
     /**
@@ -2004,7 +2359,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Check that we retrieved 1 element
         $this->assertNotNull($problem);
-        $this->assertEqualSets($showDiffValue, $problem->show_diff);
+        $this->assertSameSets($showDiffValue, $problem->show_diff);
     }
 
     public function testUpdateProblemWithInvalidShowDiffValue() {
@@ -2013,11 +2368,11 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $showDiffValues = ['none', 'examples', 'all', 'invalid'];
 
-        foreach ($showDiffValues as $showDiffValue) {
+        foreach ($showDiffValues as $_) {
             // Call API
             $login = self::login($problemData['author']);
             try {
-                $response = \OmegaUp\Controllers\Problem::apiUpdate(
+                \OmegaUp\Controllers\Problem::apiUpdate(
                     new \OmegaUp\Request([
                         'auth_token' => $login->auth_token,
                         'show_diff' => 'invalid',
@@ -2027,7 +2382,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 );
                 $this->fail('Exception was expected.');
             } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-                $this->assertEquals(
+                $this->assertSame(
                     'parameterNotInExpectedSet',
                     $e->getMessage()
                 );
@@ -2074,7 +2429,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Check that we retrieved 1 element
         $this->assertNotNull($problem);
-        $this->assertEqualSets(
+        $this->assertSameSets(
             $allowUserAddTagsValue,
             $problem->allow_user_add_tags
         );
@@ -2087,12 +2442,12 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Login API
         $login = self::login($problemData['author']);
 
-        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem' => $problemData['request']['problem_alias'],
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
 
         $this->assertArrayHasKey('statement', $response['payload']);
 
@@ -2109,7 +2464,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
 
         // Updating more than one statement at the same time
-        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem' => $problemData['request']['problem_alias'],
@@ -2118,7 +2473,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'directory' => 'statements',
                 'contents' => $contents,
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
 
         // Getting problem details for preferred user language('es')
         $response = \OmegaUp\Controllers\Problem::apiDetails(
@@ -2127,7 +2482,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problemData['request']['problem_alias'],
             ])
         );
-        $this->assertEquals(
+        $this->assertSame(
             $newStatement['language'],
             $response['statement']['language']
         );
@@ -2145,7 +2500,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals('pt', $response['statement']['language']);
+        $this->assertSame('pt', $response['statement']['language']);
         $this->assertStringContainsString(
             $markdownPT,
             $response['statement']['markdown']

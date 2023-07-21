@@ -1,9 +1,8 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of RunsTotalsTest
- *
- * @author joemmanuel
  */
 class RunsTotalsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testRunTotals() {

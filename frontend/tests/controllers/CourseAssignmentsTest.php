@@ -31,7 +31,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         foreach ($assignments as $index => $assignment) {
-            $this->assertEquals($assignment['order'], $index + 1);
+            $this->assertSame($assignment['order'], $index + 1);
         }
     }
 
@@ -80,12 +80,13 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Asserting assignments order is the same that the original
         $i = 1;
+        $originalOrder = [];
         foreach ($assignments['assignments'] as $index => $assignment) {
             $originalOrder[$index] = [
                 'alias' => $assignments['assignments'][$index]['alias'],
                 'order' => $assignments['assignments'][$index]['order']
             ];
-            $this->assertEquals(
+            $this->assertSame(
                 $assignments['assignments'][$index]['order'],
                 $i++
             );
@@ -123,86 +124,487 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    public function testAllAdminsCanSeeAdminMode() {
+    public function testGetAssignmentDetails() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
-        // Login admin and getting assignments list
+        // Create a problem, a student and a run
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
         $adminLogin = self::login($courseData['admin']);
-        [
-            'assignments' => $assignments,
-        ] = \OmegaUp\Controllers\Course::apiListAssignments(
-            new \OmegaUp\Request([
-                'auth_token' => $adminLogin->auth_token,
-                'course_alias' => $courseData['course_alias']
-            ])
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $adminLogin,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
         );
 
-        $details = \OmegaUp\Controllers\Course::getCourseAdminDetailsForSmarty(
-            new \OmegaUp\Request([
-                'auth_token' => $adminLogin->auth_token,
-                'course_alias' => $courseData['course_alias'],
-                'assignment_alias' => $assignments[0]['alias'],
-            ])
-        );
-
-        $this->assertArrayHasKey('smartyProperties', $details);
-        $this->assertArrayHasKey('payload', $details['smartyProperties']);
-        $this->assertArrayHasKey(
-            'details',
-            $details['smartyProperties']['payload']
-        );
-
-        // A new student is added to course
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $student = \OmegaUp\Test\Factories\User::createUser();
 
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $courseData,
-            $identity
+            $student['identity']
         );
 
-        $userLogin = self::login($identity);
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+                $problemData,
+                $courseData,
+                $student['identity']
+            )
+        );
 
-        // Student tries to access into the course in admin mode
+        // Need to re-login because of the student login for submitting the run
+        $adminLogin = self::login($courseData['admin']);
+
+        $adminPayload = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment']->alias,
+        ]))['templateProperties']['payload'];
+
+        $this->assertSame(
+            $courseData['course']->name,
+            $adminPayload['courseDetails']['name']
+        );
+        $this->assertEmpty($adminPayload['courseDetails']['clarifications']);
+
+        $this->assertSame(
+            $courseData['assignment']->alias,
+            $adminPayload['currentAssignment']['alias']
+        );
+        $this->assertCount(1, $adminPayload['currentAssignment']['problems']);
+        $this->assertCount(1, $adminPayload['currentAssignment']['runs']);
+
+        $studentLogin = self::login($student['identity']);
+        $studentPayload = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
+            'auth_token' => $studentLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment']->alias,
+        ]))['templateProperties']['payload'];
+
+        // The student should not see the runs
+        $this->assertEmpty($studentPayload['currentAssignment']['runs']);
+    }
+
+    public function testAssignmentForbiddenAccess() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            startTimeDelay: 60
+        );
+
+        $student = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student['identity']
+        );
+
+        $adminLogin = self::login($courseData['admin']);
+        $adminPayload = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment']->alias,
+        ]))['templateProperties']['payload'];
+
+        // Admin should not have problems even when the assignment has not started yet
+        $this->assertSame(
+            $courseData['course']->name,
+            $adminPayload['courseDetails']['name']
+        );
+        $this->assertSame(
+            $courseData['assignment']->alias,
+            $adminPayload['currentAssignment']['alias']
+        );
+
+        // Student should throw an exception as the assignment has not started yet
+        $studentLogin = self::login($student['identity']);
         try {
-            \OmegaUp\Controllers\Course::getCourseAdminDetailsForSmarty(
+            \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment']->alias,
+            ]));
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame($e->getMessage(), 'assignmentNotStarted');
+        }
+
+        try {
+            \OmegaUp\Controllers\Course::getAssignmentDetails(
+                $student['identity'],
+                null,
+                $courseData['course'],
+                \OmegaUp\DAO\Groups::getByPK(
+                    intval($courseData['course']->group_id)
+                ),
+                $courseData['assignment_alias'],
+            );
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame($e->getMessage(), 'assignmentNotStarted');
+        }
+
+        try {
+            \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
                 new \OmegaUp\Request([
-                    'auth_token' => $userLogin->auth_token,
+                    'auth_token' => $studentLogin->auth_token,
                     'course_alias' => $courseData['course_alias'],
-                    'assignment_alias' => $assignments[0]['alias'],
+                    'assignment_alias' => $courseData['assignment']->alias,
                 ])
             );
-            $this->fail('User should not have access to admin mode');
+            $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('assignmentNotStarted', $e->getMessage());
         }
+
+        // User not registered in course should throw an exception
+        $extraStudent = \OmegaUp\Test\Factories\User::createUser();
+        $extraStudentLogin = self::login($extraStudent['identity']);
+
+        try {
+            \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
+                'auth_token' => $extraStudentLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment']->alias,
+            ]));
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
+        }
+
+        try {
+            \OmegaUp\Controllers\Course::getAssignmentDetails(
+                $extraStudent['identity'],
+                null,
+                $courseData['course'],
+                \OmegaUp\DAO\Groups::getByPK(
+                    intval($courseData['course']->group_id)
+                ),
+                $courseData['assignment_alias'],
+            );
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
+        }
+
+        try {
+            \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $extraStudentLogin->auth_token,
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $courseData['assignment']->alias,
+                ])
+            );
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
+        }
+    }
+
+    public function testGetArenaCourseDetails() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+
+        // Create and add two problems
+        $problemsData = [
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+        ];
 
         $adminLogin = self::login($courseData['admin']);
 
-        // Making admin to the user previously created
-        \OmegaUp\Controllers\Course::apiAddAdmin(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $adminLogin,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [$problemsData[0], $problemsData[1]]
+        );
+
+        $payload = \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
-                'usernameOrEmail' => $identity->username,
                 'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment']->alias,
             ])
+        )['templateProperties']['payload'];
+        $this->assertSame(
+            $courseData['course']->name,
+            $payload['course']['name']
         );
+        $this->assertSame(
+            $courseData['assignment']->alias,
+            $payload['assignment']['alias']
+        );
+        $this->assertCount(2, $payload['problems']);
+        $this->assertSame(
+            $problemsData[0]['problem']->alias,
+            $payload['problems'][0]['alias']
+        );
+        $this->assertSame(
+            $problemsData[1]['problem']->alias,
+            $payload['problems'][1]['alias']
+        );
+        $this->assertNull($payload['currentProblem']);
+        $this->assertEmpty($payload['clarifications']);
 
-        $addedAdminLogin = self::login($identity);
+        $students = [];
+        for ($i = 0; $i < 3; $i++) {
+            $students[] = \OmegaUp\Test\Factories\User::createUser();
+            \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData,
+                $students[$i]['identity']
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+                    $problemsData[0],
+                    $courseData,
+                    $students[$i]['identity']
+                )
+            );
+        }
 
-        // Now, user is able to access into a course in admin mode
-        $details = \OmegaUp\Controllers\Course::getCourseAdminDetailsForSmarty(
+        $adminLogin = self::login($courseData['admin']);
+        $payload = \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
             new \OmegaUp\Request([
-                'auth_token' => $addedAdminLogin->auth_token,
+                'auth_token' => $adminLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],
-                'assignment_alias' => $assignments[0]['alias'],
+                'assignment_alias' => $courseData['assignment']->alias,
+                'problem_alias' => $problemsData[0]['problem']->alias,
+            ])
+        )['templateProperties']['payload'];
+        $this->assertSame(
+            $courseData['course']->name,
+            $payload['course']['name']
+        );
+        $this->assertSame(
+            $courseData['assignment']->alias,
+            $payload['assignment']['alias']
+        );
+        $this->assertCount(2, $payload['problems']);
+        $this->assertSame(
+            $problemsData[0]['problem']->alias,
+            $payload['problems'][0]['alias']
+        );
+        $this->assertSame(
+            $problemsData[1]['problem']->alias,
+            $payload['problems'][1]['alias']
+        );
+        $this->assertSame(
+            $problemsData[0]['problem']->alias,
+            $payload['currentProblem']['alias']
+        );
+        $this->assertCount(3, $payload['runs']);
+        $this->assertEmpty($payload['clarifications']);
+
+        $studentLogin = self::login($students[0]['identity']);
+        $payload = \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment']->alias,
+                'problem_alias' => $problemsData[0]['problem']->alias,
+            ])
+        )['templateProperties']['payload'];
+        $this->assertSame(
+            $courseData['course']->name,
+            $payload['course']['name']
+        );
+        $this->assertSame(
+            $courseData['assignment']->alias,
+            $payload['assignment']['alias']
+        );
+        $this->assertCount(2, $payload['problems']);
+        $this->assertSame(
+            $problemsData[0]['problem']->alias,
+            $payload['problems'][0]['alias']
+        );
+        $this->assertSame(
+            $problemsData[1]['problem']->alias,
+            $payload['problems'][1]['alias']
+        );
+        $this->assertSame(
+            $problemsData[0]['problem']->alias,
+            $payload['currentProblem']['alias']
+        );
+        $this->assertCount(1, $payload['runs']);
+        foreach ($payload['runs'] as $run) {
+            $this->assertNull($run['details']);
+        }
+        $this->assertEmpty($payload['clarifications']);
+    }
+
+    public function testAssignmentOpened() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+
+        $problemsData = [
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+        ];
+
+        $adminLogin = self::login($courseData['admin']);
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $adminLogin,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [$problemsData[0], $problemsData[1]]
+        );
+
+        // The assignment must not be opened yet
+        $assignments = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        )['templateProperties']['payload']['details']['assignments'];
+        $this->assertCount(1, $assignments);
+        $this->assertFalse($assignments[0]['opened']);
+
+        $student = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student['identity']
+        );
+
+        // Now, as a student open the assignment through getArenaCourseDetailsForTypeScript
+        $studentLogin = self::login($student['identity']);
+        \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment']->alias,
+                'problem_alias' => $problemsData[0]['problem']->alias,
             ])
         );
 
-        $this->assertArrayHasKey('smartyProperties', $details);
-        $this->assertArrayHasKey('payload', $details['smartyProperties']);
-        $this->assertArrayHasKey(
-            'details',
-            $details['smartyProperties']['payload']
+        // Now check the assignment must be opened
+        $assignments = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        )['templateProperties']['payload']['course']['assignments'];
+        $this->assertCount(1, $assignments);
+        $this->assertTrue($assignments[0]['opened']);
+    }
+
+    /**
+     * All admins can see run details for a submission made in an assignment.
+     * It includes:
+     * - Problem admins
+     * - Course admins
+     * - Teaching Assistants
+     */
+    public function testRunDetailsInACourseAssignmentSubmission() {
+        // create course admin
+        [
+            'identity' => $courseAdmin,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        $courseAdminLogin = self::login($courseAdmin);
+
+        // Create a course
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $courseAdmin,
+            $courseAdminLogin
         );
+        $courseAlias = $courseData['course_alias'];
+        $assignment = $courseData['assignment'];
+
+        // create admin
+        [
+            'identity' => $adminUser,
+        ] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        // login admin
+        $adminLogin = self::login($adminUser);
+
+        // adding a teaching assistant
+        ['identity' => $teachingAssistant] = \OmegaUp\Test\Factories\User::createUser();
+
+        // login teaching assistant
+        $loginTeachingAssistant = self::login($teachingAssistant);
+
+        \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $teachingAssistant->username,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        // create problem admin
+        [
+            'identity' => $problemAdmin,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        $loginProblemAdmin = self::login($problemAdmin);
+
+        // Add one problem to the assignment
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(
+            params: new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'public',
+                'author' => $problemAdmin,
+            ]),
+            login: $loginProblemAdmin
+        );
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $courseAdminLogin,
+            $courseAlias,
+            $assignment->alias,
+            [$problem]
+        );
+
+        // create student
+        [
+            'identity' => $studentUser,
+        ] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        // login student
+        $studentLogin = self::login($studentUser);
+
+        $source = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+
+        $runData = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $studentLogin->auth_token,
+            'problemset_id' => $assignment->problemset_id,
+            'problem_alias' => $problem['request']['problem_alias'],
+            'language' => 'c11-gcc',
+            'source' => $source,
+        ]));
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            null /*runData*/,
+            0.5,
+            'PA',
+            null,
+            $runData['guid']
+        );
+
+        // Problem admins, course admins and teaching assistants can see the run
+        // details
+
+        $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
+            'problemset_id' => $assignment->problemset_id,
+            'run_alias' => $runData['guid'],
+            'auth_token' => $courseAdminLogin->auth_token,
+        ]));
+
+        $this->assertSame($response['source'], $source);
+
+        $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
+            'problemset_id' => $assignment->problemset_id,
+            'run_alias' => $runData['guid'],
+            'auth_token' => $loginProblemAdmin->auth_token,
+        ]));
+
+        $this->assertSame($response['source'], $source);
+
+        $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
+            'problemset_id' => $assignment->problemset_id,
+            'run_alias' => $runData['guid'],
+            'auth_token' => $loginTeachingAssistant->auth_token,
+        ]));
+
+        $this->assertSame($response['source'], $source);
     }
 }

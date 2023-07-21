@@ -6,7 +6,7 @@ class FileHandler {
     /** @var null|\OmegaUp\FileUploader */
     protected static $fileUploader = null;
 
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     public static $log;
 
     public static function setFileUploaderForTesting(
@@ -33,7 +33,7 @@ class FileHandler {
 
         do {
             $path = $dir . $prefix . mt_rand(0, 9999999);
-        } while (!@mkdir($path, $mode));
+        } while (!@mkdir($path, $mode, true));
 
         return $path;
     }
@@ -91,4 +91,6 @@ class FileHandler {
     }
 }
 
-\OmegaUp\FileHandler::$log = \Logger::getLogger('FileHandler');
+\OmegaUp\FileHandler::$log = \Monolog\Registry::omegaup()->withName(
+    'FileHandler'
+);

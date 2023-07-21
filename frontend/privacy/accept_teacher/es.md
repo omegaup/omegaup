@@ -1,3 +1,1 @@
-¿Deseas agregar a los organizadores del curso como tus profesores/profesoras?
-
-Si los aceptas, podrán ver la lista de los problemas que has resuelto y de los que has intentado resolver
+- Acepto que cualquier admin del curso pueda ver toda mi lista de problemas resueltos y los que he intentado resolver

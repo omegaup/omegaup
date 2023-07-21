@@ -4,8 +4,6 @@ namespace OmegaUp;
 
 /**
  * ScoreboardParams
- *
- * @author joemmanuel
  */
 class ScoreboardParams {
     /** @var string */
@@ -56,6 +54,9 @@ class ScoreboardParams {
     /** @var bool */
     public $show_all_runs;
 
+    /** @var string */
+    public $score_mode;
+
     /**
      * @param array<string, \OmegaUp\Timestamp|null|int|string|bool> $params
      */
@@ -63,28 +64,28 @@ class ScoreboardParams {
         ScoreboardParams::validateParameter(
             'alias',
             $params,
-            true /*is_required*/
+            required: true,
         );
         $this->alias = strval($params['alias']);
 
         ScoreboardParams::validateParameter(
             'title',
             $params,
-            true /*is_required*/
+            required: true,
         );
         $this->title = strval($params['title']);
 
         ScoreboardParams::validateParameter(
             'problemset_id',
             $params,
-            true /*is_required*/
+            required: true,
         );
         $this->problemset_id = intval($params['problemset_id']);
 
         ScoreboardParams::validateParameter(
             'start_time',
             $params,
-            true /*is_required*/
+            required: true,
         );
         if ($params['start_time'] instanceof \OmegaUp\Timestamp) {
             $this->start_time = $params['start_time'];
@@ -101,7 +102,7 @@ class ScoreboardParams {
         ScoreboardParams::validateParameter(
             'finish_time',
             $params,
-            false /*is_required*/
+            required: false,
         );
         if (!is_null($params['finish_time'])) {
             if ($params['finish_time'] instanceof \OmegaUp\Timestamp) {
@@ -122,15 +123,15 @@ class ScoreboardParams {
         ScoreboardParams::validateParameter(
             'acl_id',
             $params,
-            true /*is_required*/
+            required: true,
         );
         $this->acl_id = intval($params['acl_id']);
 
         ScoreboardParams::validateParameter(
             'group_id',
             $params,
-            false /*is_required*/,
-            null
+            required: false,
+            default: null,
         );
         $this->group_id = is_null(
             $params['group_id']
@@ -141,32 +142,32 @@ class ScoreboardParams {
         ScoreboardParams::validateParameter(
             'penalty',
             $params,
-            false /*is_required*/,
-            0
+            required: false,
+            default: 0,
         );
         $this->penalty = intval($params['penalty']);
 
         ScoreboardParams::validateParameter(
             'virtual',
             $params,
-            false /*is_required */,
-            false
+            required: false,
+            default: false,
         );
         $this->virtual = boolval($params['virtual']);
 
         ScoreboardParams::validateParameter(
             'penalty_calc_policy',
             $params,
-            false /*is_required*/,
-            'sum'
+            required: false,
+            default: 'sum',
         );
         $this->penalty_calc_policy = strval($params['penalty_calc_policy']);
 
         ScoreboardParams::validateParameter(
             'show_scoreboard_after',
             $params,
-            false /*is_required*/,
-            1
+            required: false,
+            default: 1,
         );
         $this->show_scoreboard_after = boolval(
             $params['show_scoreboard_after']
@@ -175,24 +176,24 @@ class ScoreboardParams {
         ScoreboardParams::validateParameter(
             'scoreboard_pct',
             $params,
-            false /*is_required*/,
-            100
+            required: false,
+            default: 100,
         );
         $this->scoreboard_pct = intval($params['scoreboard_pct']);
 
         ScoreboardParams::validateParameter(
             'admin',
             $params,
-            false /*is_required*/,
-            false
+            required: false,
+            default: false,
         );
         $this->admin = boolval($params['admin']);
 
         ScoreboardParams::validateParameter(
             'auth_token',
             $params,
-            false /*is_required*/,
-            null
+            required: false,
+            default: null,
         );
         $this->auth_token = is_null(
             $params['auth_token']
@@ -203,18 +204,26 @@ class ScoreboardParams {
         ScoreboardParams::validateParameter(
             'only_ac',
             $params,
-            false /*is_required*/,
-            false
+            required: false,
+            default: false,
         );
         $this->only_ac = boolval($params['only_ac']);
 
         ScoreboardParams::validateParameter(
             'show_all_runs',
             $params,
-            false /*is_required*/,
-            true
+            required: false,
+            default: true,
         );
         $this->show_all_runs = boolval($params['show_all_runs']);
+
+        ScoreboardParams::validateParameter(
+            'score_mode',
+            $params,
+            required: false,
+            default: 'all_or_nothing',
+        );
+        $this->score_mode = strval($params['score_mode']);
     }
 
     public static function fromContest(
@@ -231,7 +240,8 @@ class ScoreboardParams {
             'virtual' => \OmegaUp\DAO\Contests::isVirtual($contest),
             'penalty_calc_policy' => $contest->penalty_calc_policy,
             'show_scoreboard_after' => $contest->show_scoreboard_after,
-            'scoreboard_pct' => $contest->scoreboard
+            'scoreboard_pct' => $contest->scoreboard,
+            'score_mode' => $contest->score_mode,
         ]);
     }
 
@@ -243,6 +253,7 @@ class ScoreboardParams {
         return new ScoreboardParams([
             'alias' => $assignment->alias,
             'title' => $assignment->name,
+            'admin' => $showAllRuns,
             'problemset_id' => $assignment->problemset_id,
             'start_time' => $assignment->start_time,
             'finish_time' => $assignment->finish_time,

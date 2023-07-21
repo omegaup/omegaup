@@ -1,19 +1,26 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import { types } from '../api_types';
 
 Vue.use(Vuex);
 
-interface ProblemState {
-  showOverlay: boolean;
+export interface ProblemState {
+  // The mapping of problem alias to indexes on the problems array
+  problems: Record<string, types.ProblemInfo>;
 }
 
-const problemStore = new Vuex.Store<ProblemState>({
-  state: { showOverlay: false },
+export const storeConfig = {
+  state: {
+    problems: {},
+  },
   mutations: {
-    toggleOverlay(state, showOverlay: boolean) {
-      state.showOverlay = !showOverlay;
+    addProblem(state: ProblemState, problem: types.ProblemInfo) {
+      if (Object.prototype.hasOwnProperty.call(state.problems, problem.alias)) {
+        return;
+      }
+      Vue.set(state.problems, problem.alias, problem);
     },
   },
-});
+};
 
-export default problemStore;
+export default new Vuex.Store<ProblemState>(storeConfig);

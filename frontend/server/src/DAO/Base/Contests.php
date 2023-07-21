@@ -54,7 +54,15 @@ abstract class Contests {
                 `show_scoreboard_after` = ?,
                 `urgent` = ?,
                 `languages` = ?,
-                `recommended` = ?
+                `recommended` = ?,
+                `archived` = ?,
+                `certificate_cutoff` = ?,
+                `certificates_status` = ?,
+                `contest_for_teams` = ?,
+                `default_show_all_contestants_in_scoreboard` = ?,
+                `score_mode` = ?,
+                `plagiarism_threshold` = ?,
+                `check_plagiarism` = ?
             WHERE
                 (
                     `contest_id` = ?
@@ -105,6 +113,18 @@ abstract class Contests {
             intval($Contests->urgent),
             $Contests->languages,
             intval($Contests->recommended),
+            intval($Contests->archived),
+            (
+                is_null($Contests->certificate_cutoff) ?
+                null :
+                intval($Contests->certificate_cutoff)
+            ),
+            $Contests->certificates_status,
+            intval($Contests->contest_for_teams),
+            intval($Contests->default_show_all_contestants_in_scoreboard),
+            $Contests->score_mode,
+            intval($Contests->plagiarism_threshold),
+            intval($Contests->check_plagiarism),
             intval($Contests->contest_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -149,7 +169,15 @@ abstract class Contests {
                 `Contests`.`show_scoreboard_after`,
                 `Contests`.`urgent`,
                 `Contests`.`languages`,
-                `Contests`.`recommended`
+                `Contests`.`recommended`,
+                `Contests`.`archived`,
+                `Contests`.`certificate_cutoff`,
+                `Contests`.`certificates_status`,
+                `Contests`.`contest_for_teams`,
+                `Contests`.`default_show_all_contestants_in_scoreboard`,
+                `Contests`.`score_mode`,
+                `Contests`.`plagiarism_threshold`,
+                `Contests`.`check_plagiarism`
             FROM
                 `Contests`
             WHERE
@@ -163,6 +191,35 @@ abstract class Contests {
             return null;
         }
         return new \OmegaUp\DAO\VO\Contests($row);
+    }
+
+    /**
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\Contests} por llave primaria.
+     *
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\Contests}
+     * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
+     *
+     * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
+     * los campos.
+     *
+     * @return bool Si existe o no tal registro.
+     */
+    final public static function existsByPK(
+        int $contest_id
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `Contests`
+            WHERE
+                (
+                    `contest_id` = ?
+                );';
+        $params = [$contest_id];
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
     }
 
     /**
@@ -254,7 +311,15 @@ abstract class Contests {
                 `Contests`.`show_scoreboard_after`,
                 `Contests`.`urgent`,
                 `Contests`.`languages`,
-                `Contests`.`recommended`
+                `Contests`.`recommended`,
+                `Contests`.`archived`,
+                `Contests`.`certificate_cutoff`,
+                `Contests`.`certificates_status`,
+                `Contests`.`contest_for_teams`,
+                `Contests`.`default_show_all_contestants_in_scoreboard`,
+                `Contests`.`score_mode`,
+                `Contests`.`plagiarism_threshold`,
+                `Contests`.`check_plagiarism`
             FROM
                 `Contests`
         ';
@@ -327,8 +392,24 @@ abstract class Contests {
                     `show_scoreboard_after`,
                     `urgent`,
                     `languages`,
-                    `recommended`
+                    `recommended`,
+                    `archived`,
+                    `certificate_cutoff`,
+                    `certificates_status`,
+                    `contest_for_teams`,
+                    `default_show_all_contestants_in_scoreboard`,
+                    `score_mode`,
+                    `plagiarism_threshold`,
+                    `check_plagiarism`
                 ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -399,6 +480,18 @@ abstract class Contests {
             intval($Contests->urgent),
             $Contests->languages,
             intval($Contests->recommended),
+            intval($Contests->archived),
+            (
+                is_null($Contests->certificate_cutoff) ?
+                null :
+                intval($Contests->certificate_cutoff)
+            ),
+            $Contests->certificates_status,
+            intval($Contests->contest_for_teams),
+            intval($Contests->default_show_all_contestants_in_scoreboard),
+            $Contests->score_mode,
+            intval($Contests->plagiarism_threshold),
+            intval($Contests->check_plagiarism),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

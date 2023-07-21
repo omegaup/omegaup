@@ -9,11 +9,15 @@
       <form>
         <div class="form-group col-md-3">
           <label>{{ T.courseStudentSelectStudent }}</label>
-          <select v-model="selectedStudent" class="ml-1 form-control">
+          <select
+            v-model="selectedStudent"
+            class="ml-1 form-control"
+            data-student
+          >
             <option
               v-for="student in students"
               :key="student.username"
-              :value="student"
+              :value="student.username"
             >
               {{ student.name || student.username }}
             </option>
@@ -54,25 +58,34 @@
                 :key="problem.alias"
                 class="nav-item"
                 role="presentation"
-                :class="{
-                  active:
-                    selectedProblem && problem.alias === selectedProblem.alias,
-                }"
               >
                 <a
                   aria-controls="home"
                   data-toggle="tab"
                   href="#home"
                   class="nav-link"
+                  :class="{
+                    active:
+                      selectedProblem &&
+                      problem.alias === selectedProblem.alias,
+                  }"
                   role="tab"
                   :data-problem-alias="problem.alias"
                   @click="selectedProblem = problem"
                 >
-                  <template v-if="problem.runs.length &gt; 0">
+                  <template v-if="problem.runs.length > 0">
                     {{ bestScore(problem) * problem.points }} /
-                    {{ problem.points }} - </template
-                  >{{ problem.title }} ({{ problem.runs.length }})</a
-                >
+                    {{ problem.points }}
+                  </template>
+                  <template v-if="problem.is_extra_problem">
+                    {{ T.studentProgressExtraProblem }}
+                  </template>
+                  <template
+                    v-if="problem.runs.length > 0 || problem.is_extra_problem"
+                    >-</template
+                  >
+                  {{ problem.title }} ({{ problem.runs.length }})
+                </a>
               </li>
             </ul>
           </div>
@@ -80,7 +93,7 @@
             <div class="empty-category px-10 py-10"></div>
           </div>
           <div v-else-if="selectedProblem.runs.length === 0">
-            <div class="empty-category px-10 py-10">
+            <div class="empty-table-message px-10 py-10">
               {{ T.courseAssignmentProblemRunsEmpty }}
             </div>
           </div>
@@ -89,24 +102,92 @@
               <h5 class="card-title">
                 {{ T.arenaCommonCode }}
               </h5>
-              <pre>{{ bestRunSource(selectedProblem) }}</pre>
+              <pre class="m-0"><code>{{ selectedRunSource }}</code></pre>
             </div>
             <div class="card-body pb-0">
-              <h5 class="card-title">
+              <template v-if="selectedRun">
+                <h5>{{ T.feedbackTitle }}</h5>
+                <pre
+                  class="border rounded rounded-lg p-2 m-0"
+                  :class="{ 'bg-light': selectedRun.feedback == null }"
+                  >{{
+                    selectedRun.feedback
+                      ? selectedRun.feedback.feedback
+                      : T.feedbackNotSentYet
+                  }}</pre
+                >
+                <div v-if="selectedRun.feedback && selectedRun.feedback.author">
+                  {{
+                    ui.formatString(T.feedbackLeftBy, {
+                      date: time.formatDate(selectedRun.feedback.date),
+                    })
+                  }}
+                  <omegaup-user-username
+                    :username="selectedRun.feedback.author"
+                    :classname="selectedRun.feedback.author_classname"
+                    :linkify="true"
+                  ></omegaup-user-username>
+                </div>
+                <div class="mt-3">
+                  <a
+                    class="text-primary"
+                    role="button"
+                    data-show-feedback-form
+                    @click="showFeedbackForm = !showFeedbackForm"
+                    >{{
+                      selectedRun.feedback == null
+                        ? T.submissionFeedbackSendButton
+                        : T.submissionFeedbackUpdateButton
+                    }}</a
+                  >
+                  <div v-show="showFeedbackForm" class="form-group">
+                    <textarea
+                      v-model="updatedFeedback"
+                      class="form-control"
+                      rows="3"
+                      maxlength="200"
+                    ></textarea>
+                    <button
+                      class="btn btn-sm btn-primary mt-1"
+                      data-feedback-button
+                      :disabled="!updatedFeedback || updatedFeedback.length < 2"
+                      @click.prevent="sendFeedback"
+                    >
+                      {{
+                        selectedRun.feedback == null
+                          ? T.submissionSendFeedback
+                          : T.submissionUpdateFeedback
+                      }}
+                    </button>
+                  </div>
+                </div>
+              </template>
+              <h5 class="card-title mt-3 mb-2">
                 {{ T.wordsSubmissions }}
               </h5>
-              <table class="table table-striped">
+              <table class="table table-hover student-runs-table">
                 <thead>
                   <tr>
-                    <th>{{ T.wordsTime }}</th>
-                    <th>{{ T.wordsStatus }}</th>
+                    <th class="text-center">{{ T.wordsTime }}</th>
+                    <th class="text-center">{{ T.wordsStatus }}</th>
                     <th class="numeric">{{ T.wordsPercentage }}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(run, index) in selectedProblem.runs" :key="index">
-                    <td>{{ time.formatDateTime(run.time) }}</td>
-                    <td>{{ run.verdict }}</td>
+                  <tr
+                    v-for="run in selectedProblem.runs"
+                    :key="run.guid"
+                    :class="{
+                      'table-active':
+                        selectedRun && run.guid === selectedRun.guid,
+                    }"
+                    :data-run-guid="run.guid"
+                    @click="selectedRun = run"
+                  >
+                    <td class="text-center">
+                      {{ time.formatDateTime(run.time) }}
+                    </td>
+                    <td class="text-center">{{ run.verdict }}</td>
                     <td class="numeric">{{ 100 * run.score }}</td>
                   </tr>
                 </tbody>
@@ -116,36 +197,46 @@
         </div>
       </div>
     </div>
-    <!-- card-body -->
   </div>
-  <!-- card -->
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
+
 import omegaup_Markdown from '../Markdown.vue';
+import user_Username from '../user/Username.vue';
+
 import T from '../../lang';
+import * as ui from '../../ui';
 import * as time from '../../time';
 
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class CourseViewStudent extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: types.CourseDetails;
-  @Prop() initialStudent!: types.StudentProgress;
+  @Prop() student!: types.StudentProgress;
+  @Prop() assignment!: types.CourseAssignment;
+  @Prop({ default: null }) problem!: null | types.CourseProblem;
   @Prop() problems!: types.CourseProblem[];
   @Prop() students!: types.StudentProgress[];
+  @Prop({ default: null }) feedback!: string;
 
   T = T;
   time = time;
-  selectedAssignment: string | null = null;
-  selectedProblem: Partial<types.CourseProblem> | null = null;
-  selectedStudent: Partial<types.StudentProgress> = this.initialStudent || {};
+  ui = ui;
+  selectedAssignment: string | null = this.assignment?.alias ?? null;
+  selectedProblem: Partial<types.CourseProblem> | null = this.problem;
+  selectedStudent: string | null = this.student?.username ?? null;
+  selectedRun: Partial<types.CourseRun> | null = null;
+  showFeedbackForm = false;
+  updatedFeedback: null | string = this.feedback;
 
   get problemsWithPoints(): types.CourseProblem[] {
     return this.problems.filter(
@@ -169,16 +260,12 @@ export default class CourseViewStudent extends Vue {
     return assignment?.description ?? '';
   }
 
-  data(): { [name: string]: any } {
-    return {
-      selectedProblem: null,
-    };
-  }
-
   mounted(): void {
     window.addEventListener('popstate', (ev: PopStateEvent) => {
-      this.selectedStudent =
-        (ev.state && ev.state.student) || this.initialStudent;
+      if (this.selectedStudent !== null) {
+        return;
+      }
+      this.selectedStudent = ev.state?.student ?? this.student.username;
     });
   }
 
@@ -196,9 +283,8 @@ export default class CourseViewStudent extends Vue {
     return best;
   }
 
-  bestRunSource(problem: omegaup.CourseProblem): string {
-    const best = this.bestRun(problem);
-    return (best && best.source) || '';
+  get selectedRunSource(): string {
+    return this.selectedRun?.source ?? '';
   }
 
   bestScore(problem: omegaup.CourseProblem): number {
@@ -210,25 +296,60 @@ export default class CourseViewStudent extends Vue {
     return `/course/${this.course.alias}/`;
   }
 
-  @Watch('selectedStudent')
-  onSelectedStudentChange(
-    newVal?: types.StudentProgress,
-    oldVal?: types.StudentProgress,
-  ) {
-    this.$emit('update', this.selectedStudent, this.selectedAssignment);
-    if (!newVal || newVal?.username === oldVal?.username) {
+  sendFeedback(): void {
+    if (this.updatedFeedback != null && this.updatedFeedback.length < 2) {
       return;
     }
-    window.history.pushState(
-      { student: newVal },
-      document.title,
-      `/course/${this.course.alias}/student/${newVal.username}/`,
-    );
+    this.$emit('set-feedback', {
+      guid: this.selectedRun?.guid,
+      feedback: this.updatedFeedback,
+      isUpdate: this.selectedRun?.feedback != null,
+      assignmentAlias: this.selectedAssignment,
+      studentUsername: this.selectedStudent,
+    });
+    this.updatedFeedback = '';
+    this.showFeedbackForm = false;
+  }
+
+  @Watch('selectedStudent')
+  onSelectedStudentChange(newVal?: string, oldVal?: string) {
+    this.$emit('update', {
+      student: this.selectedStudent,
+      assignmentAlias: this.selectedAssignment,
+    });
+    if (!newVal || newVal === oldVal) {
+      return;
+    }
+    let url: string = '';
+    if (this.selectedAssignment !== null) {
+      url = `/course/${this.course.alias}/student/${newVal}/assignment/${this.selectedAssignment}/#${this.selectedProblem?.alias}`;
+    } else {
+      url = `/course/${this.course.alias}/student/${newVal}/`;
+    }
+    this.$emit('push-state', { student: newVal }, document.title, url);
   }
 
   @Watch('selectedAssignment')
-  onSelectedAssignmentChange() {
-    this.$emit('update', this.selectedStudent, this.selectedAssignment);
+  onSelectedAssignmentChange(newVal?: string, oldVal?: string) {
+    this.$emit('update', {
+      student: this.selectedStudent,
+      assignmentAlias: this.selectedAssignment,
+    });
+    if (!newVal || newVal === oldVal) {
+      return;
+    }
+    let url: string = '';
+    if (this.selectedProblem !== null) {
+      url = `/course/${this.course.alias}/student/${this.selectedStudent}/assignment/${newVal}/#${this.selectedProblem?.alias}`;
+    } else {
+      url = `/course/${this.course.alias}/student/${this.selectedStudent}/assignment/${newVal}/`;
+    }
+    this.$emit(
+      'push-state',
+      { student: this.selectedStudent },
+      document.title,
+      url,
+    );
   }
 
   @Watch('problems')
@@ -242,6 +363,30 @@ export default class CourseViewStudent extends Vue {
       return;
     }
     this.selectedProblem = found;
+    this.selectedRun = found.runs?.[0] ?? null;
+  }
+
+  @Watch('selectedProblem')
+  onSelectedProblemChange(newVal: types.CourseProblem) {
+    this.selectedRun = newVal.runs?.[0] ?? null;
+    window.location.hash = `#${this.selectedProblem?.alias}`;
+  }
+
+  @Watch('selectedRun')
+  onSelectedRunChanged(newVal: Partial<types.CourseRun> | null = null) {
+    if (newVal == null || newVal.feedback == null) {
+      this.updatedFeedback = null;
+      return;
+    }
+    this.updatedFeedback = newVal.feedback.feedback;
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.student-runs-table tbody tr {
+  cursor: pointer;
+}
+</style>

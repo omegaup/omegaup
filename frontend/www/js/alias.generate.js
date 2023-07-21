@@ -891,18 +891,6 @@ omegaup.OmegaUp.on('ready', function () {
       };
       aliasLength = 50;
       break;
-
-    case 'interviews':
-      existsFn = function (alias) {
-        omegaup.API.Interview.details(
-          { interview_alias: alias },
-          { quiet: true },
-        )
-          .then(onAliasReady)
-          .catch(onAliasError);
-      };
-      aliasLength = 32;
-      break;
   }
 
   $('#title').on('blur', function () {

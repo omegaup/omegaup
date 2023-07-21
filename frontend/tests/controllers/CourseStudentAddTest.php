@@ -1,9 +1,5 @@
 <?php
-
-/**
- *
- * @author @joemmanuel
- */
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
     /**
@@ -56,11 +52,11 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         $notificationContents = $response['notifications'][0]['contents'];
 
         $this->assertCount(1, $response['notifications']);
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_MANUAL,
             $notificationContents['type']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['course_name'],
             $notificationContents['body']['localizationParams']['courseName']
         );
@@ -101,11 +97,11 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $courseData['request']['alias']
         ]));
         // Asserting isFirstTimeAccess
-        $this->assertEquals(
+        $this->assertSame(
             'optional',
-            $details['requestsUserInformation']
+            $details['course']['requests_user_information']
         );
-        $this->assertEquals(1, $details['isFirstTimeAccess']);
+        $this->assertTrue($details['isFirstTimeAccess']);
 
         $gitObjectId = $details['statements']['privacy']['gitObjectId'];
         $statementType = $details['statements']['privacy']['statementType'];
@@ -120,7 +116,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Asserting shouldShowResults is on, because admin cannot update share_user_information
-        $this->assertEquals(1, $details['isFirstTimeAccess']);
+        $this->assertTrue($details['isFirstTimeAccess']);
 
         // User join course for first time.
         \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
@@ -148,7 +144,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $courseData['request']['alias']
         ]));
         // Asserting shouldShowResults is off
-        $this->assertEquals(0, $details['shouldShowResults']);
+        $this->assertFalse($details['shouldShowResults']);
     }
 
     /**
@@ -182,7 +178,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertNotNull($studentsInGroup);
-        $this->assertEquals(0, count($studentsInGroup));
+        $this->assertSame(0, count($studentsInGroup));
     }
 
     /**
@@ -204,7 +200,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -224,7 +220,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -296,7 +292,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseDataPrivate['course_alias']
             ]));
-        $this->assertEquals(false, $details['shouldShowResults']);
+        $this->assertSame(false, $details['shouldShowResults']);
 
         // Before adding student to public course, intro should show
         $studentLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
@@ -318,7 +314,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $courseDataPublic['course_alias']
             ]));
         // After adding student to public course, intro should not show
-        $this->assertEquals(false, $details['shouldShowResults']);
+        $this->assertSame(false, $details['shouldShowResults']);
     }
 
     /**
@@ -344,7 +340,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));
-        $this->assertEquals(true, $details['shouldShowAcceptTeacher']);
+        $this->assertSame(true, $details['shouldShowAcceptTeacher']);
 
         $gitObjectId = $details['statements']['acceptTeacher']['gitObjectId'];
 
@@ -356,7 +352,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
             'accept_teacher_git_object_id' => $gitObjectId,
             'accept_teacher' => true,
         ]));
-        $details = \OmegaUp\Controllers\Course::getIntroDetails(new \OmegaUp\Request([
+        $details = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
@@ -367,14 +363,14 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testAddUserWithBasicInformation() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
-            /*$admin=*/            null,
-            /*$adminLogin=*/ null,
-            /*$admissionMode=*/ \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
-            /*$requestsUserInformation=*/ 'no',
-            /*$showScoreboard=*/ 'false',
-            /*$courseDuration=*/ 120,
-            /*$courseAlias=*/ null,
-            /*$needsBasicInformation=*/ true
+            admin: null,
+            adminLogin: null,
+            admissionMode: \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
+            requestsUserInformation: 'no',
+            showScoreboard: 'false',
+            courseDuration: 120,
+            courseAlias: null,
+            needsBasicInformation: true
         );
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 

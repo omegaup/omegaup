@@ -17,6 +17,7 @@ const carouselConfig: {
       pt: string;
     };
     href: string;
+    target: string;
   };
 }[] = [
   {
@@ -30,7 +31,7 @@ const carouselConfig: {
       en:
         'omegaUp is a free educational platform that helps you improve your programming skills, used by thousands of students and teachers in Latin America. Is this the first time you use omegaUp?',
       es:
-        'omegaUp es una plataforma educativa gratuita que te ayuda a mejorar tus habilidades de programación, usada por miles de estudiantes y profesores en Latinoamérica. ¿Es la primera vez que usas omegaUp?',
+        'omegaUp es una plataforma educativa gratuita que te ayuda a mejorar tus habilidades de programación, usada por decenas de miles de estudiantes y docentes en Latinoamérica. ¿Es la primera vez que usas omegaUp?',
       pt:
         'omegaUp é uma plataforma educacional gratuita que ajuda você a melhorar suas habilidades de programação, usada por milhares de estudantes e professores na América Latina. É a primeira vez que você usa o omegaUp?',
     },
@@ -40,7 +41,8 @@ const carouselConfig: {
         es: 'Ve el tutorial',
         pt: 'Veja o tutorial',
       },
-      href: 'https://blog.omegaup.com/category/omegaup/omegaup-101/',
+      href: 'https://blog.omegaup.com/introduccion-a-omegaup-parte-0/',
+      target: '_blank',
     },
   },
   {
@@ -65,6 +67,57 @@ const carouselConfig: {
         pt: 'Entre aqui',
       },
       href: '/course/introduccion_a_cpp/',
+      target: '_self',
+    },
+  },
+  {
+    image: '/media/homepage/carousel_slide_4.svg',
+    title: {
+      en: 'Solve a new problem every week',
+      es: 'Resuelve un problema nuevo cada semana',
+      pt: 'Resolva um novo problema a cada semana',
+    },
+    description: {
+      en:
+        'Enroll in the "Solving problems in omegaUp 2022" course, learn tips about programming contests and earn prizes.',
+      es:
+        'Únete al curso "Resolviendo problemas en omegaUp 2022", aprende tips sobre concursos de programación y gana premios.',
+      pt:
+        'Inscreva-se no curso "Resolvendo problemas no omegaUp 2022", aprenda dicas sobre concursos de programação e ganhe prêmios.',
+    },
+    button: {
+      text: {
+        en: 'Enter here',
+        es: 'Ingresa aquí',
+        pt: 'Entre aqui',
+      },
+      href: 'https://omegaup.com/course/ResolviendoProblemas2022/',
+      target: '_self',
+    },
+  },
+  {
+    image: '/media/homepage/discord_logo.svg',
+    title: {
+      en: 'Join our coders community',
+      es: 'Únete a nuestra comunidad de coders',
+      pt: 'Junte-se à nossa comunidade de coders',
+    },
+    description: {
+      en:
+        'Join omegaUp´s Discord server and hang out with your community, get help and learn about new projects.',
+      es:
+        'Únete al servidor de Discord de omegaUp y convive con la comunidad, obtén ayuda y entérate de los nuevos proyectos.',
+      pt:
+        'Junte-se ao servidor do Discord do omegaUp e convive com a comunidade, obtenha ajuda e aprenda sobre novos projetos.',
+    },
+    button: {
+      text: {
+        en: 'Join here',
+        es: 'Únete aquí',
+        pt: 'Junte-se aqui',
+      },
+      href: 'https://discord.com/invite/K3JFd9d3wk',
+      target: '_blank',
     },
   },
 ];
