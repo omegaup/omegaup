@@ -32,7 +32,7 @@
       <template v-if="Object.keys(availableFilters).length > 0">
         <select
           v-model="filter"
-          class="filter form-control col-12 col-md-5 mt-2 mt-md-0 "
+          class="filter form-control col-12 col-md-5 mt-2 mt-md-0"
           @change="onFilterChange"
         >
           <option value="">
