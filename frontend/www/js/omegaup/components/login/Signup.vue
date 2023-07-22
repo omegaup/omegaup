@@ -62,8 +62,8 @@
         </div>
 
         <div class="row justify-content-md-center">
-          <div class="col-md-8" >
-            <input v-model="checked" type="checkbox"/>
+          <div class="col-md-8">
+            <input v-model="checked" type="checkbox" />
             <label for="checkbox" class="introjstandc">
               <omegaup-markdown
                 :markdown="T.acceptPrivacyPolicy"
@@ -119,6 +119,7 @@ import introJs from 'intro.js';
 })
 export default class Signup extends Vue {
   @Prop() validateRecaptcha!: boolean;
+  @Prop() hasVisitedSection!: string;
 
   T = T;
   username: string = '';
@@ -128,10 +129,9 @@ export default class Signup extends Vue {
   recaptchaResponse: string = '';
 
   mounted() {
-    const hasVisitedSection = localStorage.getItem('hasVisitedSignupSection');
-    const title = T.signUpFormInteractiveGuideTitle; 
+    const title = T.signUpFormInteractiveGuideTitle;
 
-    if (!hasVisitedSection) {
+    if (this.hasVisitedSection !== 'true') {
       introJs()
         .setOptions({
           nextLabel: T.interactiveGuideNextButton,
@@ -175,8 +175,6 @@ export default class Signup extends Vue {
           ],
         })
         .start();
-
-      localStorage.setItem('hasVisitedSignupSection', 'true');
     }
   }
 
@@ -190,3 +188,16 @@ export default class Signup extends Vue {
 }
 </script>
 
+<style>
+
+.introjs-button.introjs-prevbutton, .introjs-button.introjs-nextbutton {
+  background-color: var(--btn-intro-js-background-color);
+  border-color: var(--btn-intro-js-border-color);
+  color: var(--btn-intro-js-font-color);
+}
+
+.introjs-wrapper a.introjs-skipbutton.introjs-button{
+  color: black !important;
+}
+
+</style>
