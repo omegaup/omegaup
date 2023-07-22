@@ -63,8 +63,8 @@
 
         <div class="row justify-content-md-center">
           <div class="col-md-8">
-            <input v-model="checked" type="checkbox" />
-            <label for="checkbox" class="introjstandc">
+            <input v-model="checked" type="checkbox" class="introjstandc"/>
+            <label for="checkbox">
               <omegaup-markdown
                 :markdown="T.acceptPrivacyPolicy"
               ></omegaup-markdown>
@@ -196,8 +196,8 @@ export default class Signup extends Vue {
   color: var(--btn-intro-js-font-color);
 }
 
-.introjs-wrapper a.introjs-skipbutton.introjs-button{
-  color: black !important;
+.introjs-skipbutton {
+  color: var(--btn-intro-js-font-color)!important;
 }
 
 </style>
