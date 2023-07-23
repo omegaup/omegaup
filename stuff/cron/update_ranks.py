@@ -702,7 +702,6 @@ def update_users_stats(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     dbconn: mysql.connector.MySQLConnection,
     date: datetime.date,
-    update_coder_of_the_month: bool
 ) -> None:
     '''Updates all the information and ranks related to users'''
     logging.info('Updating users stats...')
@@ -724,27 +723,24 @@ def update_users_stats(
         # transaction since both are stored in the same DB table.
         dbconn.commit()
 
-        if update_coder_of_the_month:
-            try:
-                update_coder_of_the_month_candidates(cur, cur_readonly, date,
-                                                     'all')
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception(
-                    'Failed to update candidates to coder of the month')
-                raise
+        try:
+            update_coder_of_the_month_candidates(cur, cur_readonly, date,
+                                                 'all')
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to update candidates to coder of the month')
+            raise
 
-            try:
-                update_coder_of_the_month_candidates(cur, cur_readonly, date,
-                                                     'female')
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception(
-                    'Failed to update candidates to coder of the month female')
-                raise
-            logging.info('Users stats updated')
-        else:
-            logging.info('Skipping updating Coder of the Month')
+        try:
+            update_coder_of_the_month_candidates(cur, cur_readonly, date,
+                                                 'female')
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to update candidates to coder of the month female')
+            raise
+        logging.info('Users stats updated')
     except:  # noqa: bare-except
         logging.exception('Failed to update all users stats')
 
@@ -795,9 +791,6 @@ def main() -> None:
                         type=_parse_date,
                         default=_default_date(),
                         help='The date the command should take as today')
-    parser.add_argument('--update-coder-of-the-month',
-                        action='store_true',
-                        help='Update the Coder of the Month')
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
@@ -810,8 +803,7 @@ def main() -> None:
                            dictionary=True) as cur, dbconn_readonly.cursor(
                                buffered=True, dictionary=True) as cur_readonly:
             update_problem_accepted_stats(cur, cur_readonly, dbconn.conn)
-            update_users_stats(cur, cur_readonly, dbconn.conn, args.date,
-                               args.update_coder_of_the_month)
+            update_users_stats(cur, cur_readonly, dbconn.conn, args.date)
             update_schools_stats(cur, cur_readonly, dbconn.conn, args.date)
     finally:
         dbconn.conn.close()
