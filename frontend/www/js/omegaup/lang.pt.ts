@@ -1279,7 +1279,6 @@ const translations: { [key: string]: string; } = {
   runCannotBeRequalified: "O envio n\u00e3o pode ser requalificado",
   runDetailsFeedbackAddReview: "Adicionar feedback",
   runDetailsFeedbackCancel: "Cancelar",
-  runDetailsFeedbackCreated: "Feedback criado",
   runDetailsFeedbackPlaceholder: "Digite seu feedback aqui...",
   runDetailsFeedbackThreadPlaceholder: "Responder...",
   runDetailsNewFeedback: "Novo feedback",
