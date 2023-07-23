@@ -202,6 +202,6 @@ export default class UserRank extends Vue {
 }
 
 .column-width {
-  max-width: 1rem;
+  max-width: 4rem;
 }
 </style>
