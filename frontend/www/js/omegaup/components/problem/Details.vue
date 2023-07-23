@@ -273,9 +273,6 @@
           @clarification-response="onClarificationResponse"
         >
           <template #new-clarification><div></div></template>
-          <template #table-title>
-            <th class="text-center" scope="col">{{ T.wordsContest }}</th>
-          </template>
         </omegaup-arena-clarification-list>
       </div>
     </div>

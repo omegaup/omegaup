@@ -343,7 +343,7 @@ Here we can add code.
     });
     await wrapper.find('a[href="#clarifications"]').trigger('click');
     expect(wrapper.find('.tab-content .show table thead tr th').text()).toBe(
-      T.wordsContest,
+      T.clarificationInfo,
     );
   });
 

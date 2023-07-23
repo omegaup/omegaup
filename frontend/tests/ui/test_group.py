@@ -24,7 +24,7 @@ def test_create_group_with_identities_and_restrictions(driver):
     with driver.login_admin():
         navbar = driver.wait.until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, '.navbar-nav:first-child')))
+                (By.CSS_SELECTOR, 'ul.navbar-nav:first-child')))
 
         navbar.find_element(By.CSS_SELECTOR,
                             'li.nav-problems a.dropdown-toggle').click()
@@ -50,7 +50,7 @@ def test_create_group_with_identities_and_restrictions(driver):
                       is_main_user_identity=False):
         navbar = driver.wait.until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, '.navbar-nav:first-child')))
+                (By.CSS_SELECTOR, 'ul.navbar-nav:first-child')))
 
         # Problems menu
         navbar.find_element(By.CSS_SELECTOR,
