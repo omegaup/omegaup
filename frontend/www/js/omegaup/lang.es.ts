@@ -1317,7 +1317,7 @@ const translations: { [key: string]: string; } = {
   showTotalScoreboard: "Ver scoreboard total",
   signUpFormInteractiveGuideConfirmPassword: "Confirma tu contrase\u00f1a",
   signUpFormInteractiveGuideEmail: "Ingresa tu correo electr\u00f3nico",
-  signUpFormInteractiveGuidePassword: "Crea tu contrase\u00f1",
+  signUpFormInteractiveGuidePassword: "Crea tu contrase\u00f1a",
   signUpFormInteractiveGuideRegister: "Completa el registro",
   signUpFormInteractiveGuideTAndC: "Acepta nuestros t\u00e9rminos y condiciones",
   signUpFormInteractiveGuideTitle: "Crear cuenta",

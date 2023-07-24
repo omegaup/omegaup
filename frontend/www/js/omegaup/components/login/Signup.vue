@@ -63,7 +63,7 @@
 
         <div class="row justify-content-md-center">
           <div class="col-md-8">
-            <input v-model="checked" type="checkbox" class="introjstandc"/>
+            <input v-model="checked" type="checkbox" class="introjstandc" />
             <label for="checkbox">
               <omegaup-markdown
                 :markdown="T.acceptPrivacyPolicy"
@@ -188,16 +188,6 @@ export default class Signup extends Vue {
 }
 </script>
 
-<style>
-
-.introjs-button.introjs-prevbutton, .introjs-button.introjs-nextbutton {
-  background-color: var(--btn-intro-js-background-color);
-  border-color: var(--btn-intro-js-border-color);
-  color: var(--btn-intro-js-font-color);
-}
-
-.introjs-skipbutton {
-  color: var(--btn-intro-js-font-color)!important;
-}
-
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 </style>

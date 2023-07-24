@@ -3,3 +3,16 @@
   background-color: var(--btn-cancel-background-color);
   color: var(--btn-cancel-font-color);
 }
+
+// INTROJS BUTTON CUSTOMIZATION
+
+.introjs-button.introjs-prevbutton,
+.introjs-button.introjs-nextbutton {
+  background-color: var(--btn-intro-js-background-color);
+  border-color: var(--btn-intro-js-border-color);
+  color: var(--btn-intro-js-font-color);
+}
+
+.introjs-skipbutton {
+  color: var(--btn-intro-js-font-color) !important;
+}
