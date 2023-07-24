@@ -114,9 +114,14 @@
             :language="language"
             :value="source"
             :feedback-map="feedbackMap"
+            :feedback-thread-map="feedbackThreadMap"
             @save-feedback-list="
               (feedbackList) =>
                 $emit('save-feedback-list', { feedbackList, guid: data.guid })
+            "
+            @submit-feedback-thread="
+              (feedback) =>
+                $emit('submit-feedback-thread', { feedback, guid: data.guid })
             "
           ></omegaup-arena-feedback-code-view>
         </slot>
@@ -215,6 +220,8 @@ export default class ArenaRunDetailsPopup extends Vue {
   @Prop() data!: types.RunDetails;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackMap!: Map<number, ArenaCourseFeedback>;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
 
   EMPTY_FIELD = EMPTY_FIELD;
   T = T;
