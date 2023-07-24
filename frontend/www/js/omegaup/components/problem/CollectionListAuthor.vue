@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid p-5 max-width">
+  <div class="container-fluid p-5 max-width mx-auto">
     <div class="row">
       <div class="col col-md-4 d-flex align-items-center">
         <a href="/problem/collection/" data-nav-problems-collection>{{
@@ -150,6 +150,5 @@ export default class CollectionList extends Vue {
 
 .max-width {
   max-width: 75rem;
-  margin: 0 auto;
 }
 </style>
