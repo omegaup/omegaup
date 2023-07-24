@@ -1,8 +1,8 @@
 <template>
   <div class="container-lg p-3">
-    <h1 class="title my-5">
+    <h2 class="text-center my-5">
       {{ T.wordsProblems }}
-    </h1>
+    </h2>
     <div class="d-flex align-items-center">
       <omegaup-problem-search-bar
         :language="language"
@@ -92,10 +92,3 @@ export default class List extends Vue {
   }
 }
 </script>
-
-<style>
-.title {
-  text-align: center;
-  font-size: 2rem;
-}
-</style>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row mb-2 justify-content-center">
-      <h1 class="contest-title col-md-7">{{ T.collectionTitle }}</h1>
+      <h2 class="text-center mb-4 col-md-7">{{ T.collectionTitle }}</h2>
     </div>
     <div class="card panel panel-default">
       <div
@@ -200,11 +200,3 @@ export default class Collection extends Vue {
   }
 }
 </script>
-
-<style scoped>
-.contest-title {
-  font-size: 2rem;
-  margin: 0rem 0rem 2rem 0rem;
-  text-align: center;
-}
-</style>

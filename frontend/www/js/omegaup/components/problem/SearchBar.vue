@@ -117,7 +117,7 @@ export default class ProblemSearchBar extends Vue {
   }
 }
 .card-header {
-  border: 1px solid rgba(0, 0, 0, 0.125);
+  border: 1px solid var(--header-problem-card-color);
   border-bottom: none;
 }
 </style>

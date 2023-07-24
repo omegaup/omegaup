@@ -4,7 +4,7 @@
       <table class="table table-fixed">
         <thead>
           <tr>
-            <th scope="col" class="align-middle text-nowrapEXIT">
+            <th scope="col" class="align-middle text-nowrap">
               <span
                 >{{ T.wordsID }}
                 <omegaup-common-sort-controls
@@ -303,7 +303,7 @@ export default class BaseList extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .sticky-offset {
   top: 4rem;
 }
