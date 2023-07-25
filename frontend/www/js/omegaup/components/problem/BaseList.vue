@@ -313,6 +313,6 @@ export default class BaseList extends Vue {
   max-height: 80vh;
 }
 thead tr th {
-  border: none; 
+  border: none;
 }
 </style>
