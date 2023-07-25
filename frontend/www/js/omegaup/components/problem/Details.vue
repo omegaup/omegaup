@@ -122,6 +122,7 @@
               v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
               :data="currentRunDetailsData"
               :feedback-map="feedbackMap"
+              :feedback-thread-map="feedbackThreadMap"
               @dismiss="onPopupDismissed"
             >
               <template #feedback="data">
@@ -272,9 +273,6 @@
           @clarification-response="onClarificationResponse"
         >
           <template #new-clarification><div></div></template>
-          <template #table-title>
-            <th class="text-center" scope="col">{{ T.wordsContest }}</th>
-          </template>
         </omegaup-arena-clarification-list>
       </div>
     </div>
@@ -396,6 +394,8 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) requestFeedback!: boolean;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackMap!: Map<number, ArenaCourseFeedback>;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
