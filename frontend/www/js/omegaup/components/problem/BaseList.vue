@@ -4,9 +4,9 @@
       {{ T.wordsProblems }}
     </h5>
     <div class="table-responsive mb-0">
-      <table class="table table-fixed">
+      <table class="table">
         <thead>
-          <tr>
+          <tr class="sticky-top bg-white text-center">
             <th scope="col" class="align-middle text-nowrap">
               <span
                 >{{ T.wordsID }}
@@ -309,38 +309,10 @@ export default class BaseList extends Vue {
 .sticky-offset {
   top: 4rem;
 }
-
-table {
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
 .table-responsive {
   max-height: 80vh;
 }
-
-.table-fixed {
-  overflow: auto;
-  thead {
-    th {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      background: white;
-      border-bottom: 0;
-      &:nth-child(2) {
-        position: sticky;
-        left: 0;
-        background: white;
-        z-index: 3;
-      }
-    }
-  }
-  tbody td:nth-child(2) {
-    position: sticky;
-    left: 0;
-    background: white;
-    z-index: 1;
-  }
+thead tr th {
+  border: none; 
 }
 </style>
