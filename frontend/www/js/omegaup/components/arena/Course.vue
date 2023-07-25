@@ -81,6 +81,7 @@
               :problem-alias="problemAlias"
               :in-contest-or-course="true"
               :feedback-map="feedbackMap"
+              :feedback-thread-map="feedbackThreadMap"
               @request-feedback="(guid) => $emit('request-feedback', guid)"
               @update:activeTab="
                 (selectedTab) =>
@@ -185,9 +186,16 @@
                 :value="source"
                 :readonly="false"
                 :feedback-map="feedbackMap"
+                :feedback-thread-map="feedbackThreadMap"
+                :current-user-class-name="currentUserClassName"
+                :current-username="currentUsername"
                 @save-feedback-list="
                   (feedbackList) =>
                     $emit('save-feedback-list', { feedbackList, guid })
+                "
+                @submit-feedback-thread="
+                  (feedback) =>
+                    $emit('submit-feedback-thread', { feedback, guid })
                 "
               ></omegaup-arena-feedback-code-view>
             </template>
@@ -289,6 +297,10 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: false }) isTeachingAssistant!: boolean;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackMap!: Map<number, ArenaCourseFeedback>;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
+  @Prop() currentUsername!: string;
+  @Prop() currentUserClassName!: string;
 
   T = T;
   omegaup = omegaup;

@@ -10,10 +10,6 @@
       (request) => $emit('clarification-response', request)
     "
   >
-    <template #table-title>
-      <th class="text-center" scope="col">{{ T.wordsHomework }}</th>
-      <th class="text-center" scope="col">{{ T.wordsProblem }}</th>
-    </template>
   </omegaup-clarification-list>
 </template>
 
