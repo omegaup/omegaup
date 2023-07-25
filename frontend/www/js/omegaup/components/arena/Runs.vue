@@ -36,7 +36,7 @@
           </div>
 
           <div class="filters row">
-            <label class="col-6 col-sm"
+            <label class="col-3 col-sm pr-0"
               >{{ T.wordsVerdict }}:
               <select
                 v-model="filterVerdict"
@@ -59,7 +59,7 @@
               </select>
             </label>
 
-            <label class="col-6 col-sm"
+            <label class="col-3 col-sm pr-0"
               >{{ T.wordsStatus }}:
               <select
                 v-model="filterStatus"
@@ -75,7 +75,7 @@
               </select>
             </label>
 
-            <label class="col-4 col-sm"
+            <label class="col-5 col-sm pr-0"
               >{{ T.wordsLanguage }}:
               <select
                 v-model="filterLanguage"
@@ -110,7 +110,7 @@
             </label>
 
             <template v-if="showProblem">
-              <label class="col-7 col-sm pr-1"
+              <label class="col-6 col-sm pr-1"
                 >{{ T.wordsProblem }}:
                 <omegaup-common-typeahead
                   data-search-problem
@@ -132,7 +132,7 @@
             </template>
 
             <template v-if="showUser">
-              <label class="col-8 col-sm"
+              <label class="col-5 col-sm"
                 >{{ T.contestParticipant }}:
                 <omegaup-common-typeahead
                   data-search-username
@@ -230,7 +230,7 @@
               </td>
               <td
                 v-if="showUser"
-                class="text-break-all"
+                class="text-break-all text-nowrap"
                 :data-username="run.username"
               >
                 <omegaup-user-username
