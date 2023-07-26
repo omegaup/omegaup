@@ -3629,6 +3629,7 @@ export namespace types {
 
   export interface LoginDetailsPayload {
     facebookUrl?: string;
+    hasVisitedSection?: string;
     statusError?: string;
     validateRecaptcha: boolean;
     verifyEmailSuccessfully?: string;

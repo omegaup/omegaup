@@ -53,7 +53,6 @@ OmegaUp.on('ready', () => {
   } else if (payload.verifyEmailSuccessfully) {
     ui.success(payload.verifyEmailSuccessfully);
   }
-  const hasVisitedSection = localStorage.getItem('hasVisitedSignupSection');
   new Vue({
     el: '#main-container',
     components: {
@@ -66,7 +65,7 @@ OmegaUp.on('ready', () => {
           validateRecaptcha: payload.validateRecaptcha,
           facebookUrl: payload.facebookUrl,
           googleClientId,
-          hasVisitedSection,
+          hasVisitedSection: payload.hasVisitedSection,
         },
         on: {
           'register-and-login': (
@@ -111,5 +110,4 @@ OmegaUp.on('ready', () => {
       });
     },
   });
-  localStorage.setItem('hasVisitedSignupSection', 'true');
 });

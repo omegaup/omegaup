@@ -111,6 +111,8 @@ import omegaup_Markdown from '../Markdown.vue';
 import T from '../../lang';
 import 'intro.js/introjs.css';
 import introJs from 'intro.js';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 @Component({
   components: {
@@ -131,7 +133,7 @@ export default class Signup extends Vue {
   mounted() {
     const title = T.signUpFormInteractiveGuideTitle;
 
-    if (this.hasVisitedSection !== 'true') {
+    if (!this.hasVisitedSection) {
       introJs()
         .setOptions({
           nextLabel: T.interactiveGuideNextButton,
@@ -175,6 +177,7 @@ export default class Signup extends Vue {
           ],
         })
         .start();
+      this.$cookies.set('has-visited-signup', true, -1);
     }
   }
 
