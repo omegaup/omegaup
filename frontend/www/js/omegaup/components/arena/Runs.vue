@@ -6,14 +6,14 @@
       </div>
     </slot>
     <div
-      class="runs px-2 px-sm-4 border-0"
+      class="px-2 px-sm-4 border-0"
       :class="{
         'single-problem-runs': !showAllRuns,
         'all-runs': showAllRuns,
       }"
     >
       <div>
-        {{ T.wordsSubmissions }}
+        <span class="font-weight-bold">{{ T.wordsSubmissions }}</span>
         <div v-if="showPager">
           <div class="pager-controls">
             <button
@@ -36,7 +36,7 @@
           </div>
 
           <div class="filters row">
-            <label class="col-3 col-sm pr-0"
+            <label class="col-3 col-sm pr-0 font-weight-bold"
               >{{ T.wordsVerdict }}:
               <select
                 v-model="filterVerdict"
@@ -59,7 +59,7 @@
               </select>
             </label>
 
-            <label class="col-3 col-sm pr-0"
+            <label class="col-3 col-sm pr-0 font-weight-bold"
               >{{ T.wordsStatus }}:
               <select
                 v-model="filterStatus"
@@ -75,7 +75,7 @@
               </select>
             </label>
 
-            <label class="col-5 col-sm pr-0"
+            <label class="col-5 col-sm pr-0 font-weight-bold"
               >{{ T.wordsLanguage }}:
               <select
                 v-model="filterLanguage"
@@ -110,7 +110,7 @@
             </label>
 
             <template v-if="showProblem">
-              <label class="col-6 col-sm pr-1"
+              <label class="col-6 col-sm pr-1 font-weight-bold"
                 >{{ T.wordsProblem }}:
                 <omegaup-common-typeahead
                   data-search-problem
@@ -132,7 +132,7 @@
             </template>
 
             <template v-if="showUser">
-              <label class="col-5 col-sm"
+              <label class="col-5 col-sm font-weight-bold"
                 >{{ T.contestParticipant }}:
                 <omegaup-common-typeahead
                   data-search-username
@@ -173,7 +173,7 @@
       </div>
 
       <div class="table-responsive">
-        <table class="table">
+        <table class="table runs">
           <thead>
             <tr>
               <th class="text-nowrap">{{ T.wordsTime }}</th>
