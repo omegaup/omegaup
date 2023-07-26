@@ -459,6 +459,9 @@ OmegaUp.on('ready', async () => {
                 if (!feedbackWithError.length) {
                   ui.success(T.feedbackSuccesfullyAdded);
                   resetHash('runs', null);
+                  component.feedbackMap.forEach((feedback) => {
+                    feedback.status = FeedbackStatus.Saved;
+                  });
                   component.currentPopupDisplayed = PopupDisplayed.None;
                 } else {
                   ui.error('There was an error');
