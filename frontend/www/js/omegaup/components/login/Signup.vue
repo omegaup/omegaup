@@ -6,7 +6,7 @@
     <div class="card-body">
       <form>
         <div class="row justify-content-md-center">
-          <div class="col-md-4 col-md-offset-2 introjsusername">
+          <div class="col-md-4 col-md-offset-2 introjs-username">
             <div class="form-group">
               <label class="control-label">{{ T.wordsUser }}</label>
               <input
@@ -18,7 +18,7 @@
               />
             </div>
           </div>
-          <div class="col-md-4 introjsemail">
+          <div class="col-md-4 introjs-email">
             <div class="form-group">
               <label class="control-label">{{ T.loginEmail }}</label>
               <input
@@ -33,7 +33,7 @@
           </div>
         </div>
         <div class="row justify-content-md-center">
-          <div class="col-md-4 col-md-offset-2 introjspassword">
+          <div class="col-md-4 col-md-offset-2 introjs-password">
             <div class="form-group">
               <label class="control-label">{{ T.loginPasswordCreate }}</label>
               <input
@@ -46,7 +46,7 @@
               />
             </div>
           </div>
-          <div class="col-md-4 introjsconfirmpassword">
+          <div class="col-md-4 introjs-confirmpassword">
             <div class="form-group">
               <label class="control-label">{{ T.loginRepeatPassword }}</label>
               <input
@@ -62,8 +62,8 @@
         </div>
 
         <div class="row justify-content-md-center">
-          <div class="col-md-8">
-            <input v-model="checked" type="checkbox" class="introjstandc" />
+          <div class="col-md-8 introjs-terms-and-conditions">
+            <input v-model="checked" type="checkbox" />
             <label for="checkbox">
               <omegaup-markdown
                 :markdown="T.acceptPrivacyPolicy"
@@ -79,10 +79,10 @@
             ></vue-recaptcha>
           </div>
           <div class="col-md-4 col-md-offset-6">
-            <div class="form-group introjsregister">
+            <div class="form-group introjs-register">
               <button
                 data-signup-submit
-                class="btn btn-primary form-control introjsclass"
+                class="btn btn-primary form-control"
                 name="sign_up"
                 @click.prevent="
                   $emit(
@@ -145,32 +145,36 @@ export default class Signup extends Vue {
               intro: T.signUpFormInteractiveGuideWelcome,
             },
             {
-              element: document.querySelector('.introjsusername'),
+              element: document.querySelector('.introjs-username') as Element,
               title,
               intro: T.signUpFormInteractiveGuideUsername,
             },
             {
-              element: document.querySelector('.introjsemail'),
+              element: document.querySelector('.introjs-email') as Element,
               title,
               intro: T.signUpFormInteractiveGuideEmail,
             },
             {
-              element: document.querySelector('.introjspassword'),
+              element: document.querySelector('.introjs-password') as Element,
               title,
               intro: T.signUpFormInteractiveGuidePassword,
             },
             {
-              element: document.querySelector('.introjsconfirmpassword'),
+              element: document.querySelector(
+                '.introjs-confirmpassword',
+              ) as Element,
               title,
               intro: T.signUpFormInteractiveGuideConfirmPassword,
             },
             {
-              element: document.querySelector('.introjstanc'),
+              element: document.querySelector(
+                '.introjs-terms-and-conditions',
+              ) as Element,
               title,
-              intro: T.signUpFormInteractiveGuideTAndC,
+              intro: T.signUpFormInteractiveGuideTermsAndConditions,
             },
             {
-              element: document.querySelector('.introjsregister'),
+              element: document.querySelector('.introjs-register') as Element,
               title,
               intro: T.signUpFormInteractiveGuideRegister,
             },
