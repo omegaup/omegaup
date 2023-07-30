@@ -121,7 +121,7 @@ Vue.use(VueCookies, { expire: -1 });
 })
 export default class Signup extends Vue {
   @Prop() validateRecaptcha!: boolean;
-  @Prop() hasVisitedSection!: string;
+  @Prop() hasVisitedSection!: boolean;
 
   T = T;
   username: string = '';
