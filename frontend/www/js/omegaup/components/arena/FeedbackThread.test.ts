@@ -4,17 +4,20 @@ import T from '../../lang';
 import arena_FeedbackThread from './FeedbackThread.vue';
 import { FeedbackStatus, ArenaCourseFeedback } from './Feedback.vue';
 
-const feedback: ArenaCourseFeedback = {
+const feedbackThread: ArenaCourseFeedback = {
   lineNumber: 2,
   text: null,
   status: FeedbackStatus.New,
+  author: 'omegaUp',
+  authorClassname: 'user-rank-unranked',
+  timestamp: new Date(0),
 };
 
 describe('FeedbackThread.vue', () => {
   it('Should handle feedback thread component when form is sumbitted', async () => {
     const wrapper = mount(arena_FeedbackThread, {
       propsData: {
-        feedback,
+        feedbackThread,
       },
     });
 
@@ -30,7 +33,11 @@ describe('FeedbackThread.vue', () => {
     const addFeedbackButton = wrapper.find('button[data-button-submit]');
     expect(addFeedbackButton.attributes().disabled).toBe('disabled');
 
-    await wrapper.find('textarea').setValue('some text');
+    await wrapper.setData({
+      currentFeedbackThread: {
+        text: 'some text',
+      },
+    });
 
     expect(wrapper.emitted('submit-feedback-thread')).not.toBeDefined();
     expect(addFeedbackButton.attributes().disabled).not.toBeDefined();
@@ -40,20 +47,24 @@ describe('FeedbackThread.vue', () => {
     expect(wrapper.emitted('submit-feedback-thread')).toEqual([
       [
         {
+          author: 'omegaUp',
+          authorClassname: 'user-rank-unranked',
           lineNumber: 2,
           status: FeedbackStatus.New,
           text: 'some text',
+          timestamp: new Date(0),
         },
       ],
     ]);
 
+    expect(wrapper.text()).toContain('omegaUp');
     expect(wrapper.text()).toContain('some text');
   });
 
-  it('Should handle feedback thread component when form is cancelled', async () => {
+  it('Should handle feedback component when form is cancelled', async () => {
     const wrapper = shallowMount(arena_FeedbackThread, {
       propsData: {
-        feedback,
+        feedbackThread,
       },
     });
 

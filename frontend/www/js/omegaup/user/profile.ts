@@ -11,6 +11,7 @@ import { ViewProfileTabs } from '../components/user/ViewProfile.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
+  const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substring(1).split('#');
   const searchResultSchools: types.SchoolListItem[] = [];
   if (payload.profile.school && payload.profile.school_id) {
@@ -45,6 +46,7 @@ OmegaUp.on('ready', () => {
         profile: payload.profile,
         data: payload.extraProfileDetails,
         identities: payload.identities,
+        apiTokens: commonPayload.apiTokens,
         hasPassword: payload.extraProfileDetails?.hasPassword,
         selectedTab,
         searchResultSchools: searchResultSchools,
@@ -63,6 +65,7 @@ OmegaUp.on('ready', () => {
           visitorBadges: new Set(payload.extraProfileDetails?.badges),
           selectedTab: this.selectedTab,
           identities: this.identities,
+          apiTokens: this.apiTokens,
           countries: payload.countries,
           programmingLanguages: payload.programmingLanguages,
           hasPassword: this.hasPassword,
@@ -201,6 +204,27 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'create-api-token': (tokenName: string) => {
+            api.User.createAPIToken({ name: tokenName })
+              .then(({ token }) => {
+                refreshApiTokensList();
+                ui.success(
+                  ui.formatString(T.apiTokenSuccessfullyCreated, {
+                    token: token,
+                  }),
+                  false,
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'revoke-api-token': (tokenName: string) => {
+            api.User.revokeAPIToken({ name: tokenName })
+              .then(() => {
+                refreshApiTokensList();
+                ui.success(T.apiTokenSuccessfullyRevoked);
+              })
+              .catch(ui.apiError);
+          },
         },
       });
     },
@@ -208,8 +232,15 @@ OmegaUp.on('ready', () => {
 
   function refreshIdentityList() {
     api.User.listAssociatedIdentities({})
-      .then(function (data) {
+      .then((data) => {
         userProfile.identities = data.identities;
+      })
+      .catch(ui.apiError);
+  }
+  function refreshApiTokensList() {
+    api.User.listAPITokens({})
+      .then((data) => {
+        userProfile.apiTokens = data.tokens;
       })
       .catch(ui.apiError);
   }

@@ -38,7 +38,7 @@ describe('Clarification.vue', () => {
       },
     });
 
-    expect(wrapper.find('td[data-author]').text()).toBe(
+    expect(wrapper.find('span[data-author]').text()).toContain(
       ui.formatString(T.clarificationsOnBehalf, {
         author: 'omegaUp',
         receiver: 'user',
