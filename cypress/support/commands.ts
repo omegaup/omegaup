@@ -250,7 +250,7 @@ Cypress.Commands.add(
       return;
     }
     cy.visit(`/arena/${contestAlias}/#problems`);
-    cy.get(`a[data-problem="${problem.problemAlias}"]`).click();
+    cy.get('a[data-problem]').contains(`${problem.problemAlias}`).click();
 
     for (const idx in runs) {
       // Mocking date just a few seconds after to allow create new run

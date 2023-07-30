@@ -3,7 +3,7 @@ import 'cypress-wait-until';
 import { v4 as uuid } from 'uuid';
 
 import { ContestOptions, GroupOptions, ProblemOptions } from '../types';
-import { addSubtractDaysToDate } from '../commands';
+import { addSubtractDaysToDate, getISODateTime } from '../commands';
 
 enum ScoreMode {
   AllOrNothing = 'all_or_nothing',
@@ -165,7 +165,7 @@ export class ContestPage {
       admissionMode: 'public',
       problems: [
         {
-          problemAlias: 'sumas',
+          problemAlias: 'Sumas',
           tag: 'Recursión',
           autoCompleteTextTag: 'Recur',
           problemLevelIndex: 1,
@@ -173,7 +173,7 @@ export class ContestPage {
       ],
       runs: [
         {
-          problemAlias: 'sumas',
+          problemAlias: 'Sumas',
           fixturePath: 'main.cpp',
           language: 'cpp11-gcc',
           valid: true,
@@ -200,6 +200,50 @@ export class ContestPage {
     }
 
     return problems;
+  }
+
+  verifyContestDetails(contestOptions: ContestOptions): void {
+    cy.get('[name="title"]').should('have.value', contestOptions.contestAlias);
+    cy.get('[name="alias"]').should('have.value', contestOptions.contestAlias);
+    cy.get('[name="description"]').should(
+      'have.value',
+      contestOptions.description,
+    );
+    cy.get('[data-start-date]').should(
+      'have.value',
+      getISODateTime(contestOptions.startDate),
+    );
+    cy.get('[data-end-date]').type(getISODateTime(contestOptions.endDate));
+    cy.get('[data-show-scoreboard-at-end]').should(
+      'have.value',
+      `${contestOptions.showScoreboard}`,
+    );
+    cy.get('[data-score-mode]').should(
+      'have.value',
+      `${contestOptions.scoreMode}`,
+    );
+    cy.get('[data-basic-information-required]').should(
+      contestOptions.basicInformation ? 'be.checked' : 'not.be.checked',
+    );
+    cy.get('[data-request-user-information]').should(
+      'have.value',
+      contestOptions.requestParticipantInformation,
+    );
+  }
+
+  mergeContests(contestAlias: string[]): void {
+    cy.visit('/scoreboardmerge');
+    cy.get('[data-merge-contest-name]').click();
+    contestAlias.forEach((contestAlias) => {
+      cy.get('[data-merge-contest-name] input').type(contestAlias + '{enter}');
+    })
+    cy.get('[data-merge-contest-button]').click();
+  }
+
+  verifyMergedScoreboard(users: string[]): void {
+    cy.get('[data-test-merged-username]').should('have.length', users.length);
+    cy.get('[data-test-merged-username]').first().should('have.text', users[0]);
+    cy.get('[data-test-merged-username]').last().should('have.text', users[1]);
   }
 }
 

@@ -19,6 +19,15 @@ export class LoginPage {
     return users;
   }
 
+  registerSingleUser(loginOptions: LoginOptions): void {
+    cy.get('[data-login-button]').click();
+    cy.get('[data-signup-username]').type(loginOptions.username);
+    cy.get('[data-signup-password]').type(loginOptions.password);
+    cy.get('[data-signup-repeat-password]').type(loginOptions.password);
+    cy.get('[data-signup-email]').type(`${loginOptions.username}@omegaup.com`);
+    cy.get('[data-signup-submit]').click();
+  }
+
   giveAdminPrivilage(roleName: string, user: string) {
     cy.loginAdmin();
     const userAdminUrl = '/admin/user/' + user;
@@ -26,6 +35,19 @@ export class LoginPage {
     cy.get(`.${roleName}`).check();
     cy.get('#alert-close').click();
     cy.logout();
+  }
+
+  verifyUsername(loginOptions: LoginOptions): void {
+    cy.waitUntil(() =>
+      cy.get('header .username').should('have.text', loginOptions.username),
+    );
+  }
+
+  loginByGUI(loginOptions: LoginOptions): void {
+    cy.get('[data-login-button]').click();
+    cy.get('[data-login-username]').type(loginOptions.username);
+    cy.get('[data-login-password]').type(loginOptions.password);
+    cy.get('[data-login-submit]').click();
   }
 }
 

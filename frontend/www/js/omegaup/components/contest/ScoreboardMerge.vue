@@ -5,7 +5,7 @@
     </div>
     <div class="card-body">
       <div class="row align-items-center">
-        <div class="form-group col-md-9">
+        <div class="form-group col-md-9" data-merge-contest-name>
           <label>{{ T.wordsContest }}:</label>
           <multiselect
             :value="selectedContests"
@@ -20,6 +20,7 @@
         </div>
         <div class="form-group col-md-3 text-right">
           <button
+            data-merge-contest-button
             class="btn btn-primary"
             type="button"
             :disabled="!selectedContests.length"
@@ -45,7 +46,7 @@
             <tr v-for="rank in scoreboard" :key="rank.username">
               <th>{{ rank.place }}</th>
               <th>
-                <div class="username">
+                <div class="username" data-test-merged-username>
                   {{ rank.username }}
                 </div>
                 <div class="name">
