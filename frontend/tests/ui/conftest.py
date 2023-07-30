@@ -251,7 +251,6 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
         self._wait_for_page_loaded()
         
-
         elements = self.browser.find_elements(
             By.XPATH,
             '//a[contains(concat(" ", normalize-space(@class), " "), " '
