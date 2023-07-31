@@ -242,8 +242,10 @@ export class ContestPage {
 
   verifyMergedScoreboard(users: string[]): void {
     cy.get('[data-test-merged-username]').should('have.length', users.length);
-    cy.get('[data-test-merged-username]').first().should('have.text', users[0]);
-    cy.get('[data-test-merged-username]').last().should('have.text', users[1]);
+    cy.get('[data-test-merged-username]').first().should('contain', users[0]);
+    cy.get('[data-test-merged-username]').last().should('contain', users[1]);
+    cy.get('[data-total-merged-score]').first().should('contain', '100');
+    cy.get('[data-total-merged-score]').last().should('contain', '100');
   }
 }
 

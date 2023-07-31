@@ -43,7 +43,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="rank in scoreboard" :key="rank.username">
+            <tr v-for="rank in scoreboard" :key="rank.username" :class = "rank.username">
               <th>{{ rank.place }}</th>
               <th>
                 <div class="username" data-test-merged-username>
@@ -64,7 +64,7 @@
                   ({{ rank.contests[alias].penalty }})
                 </span>
               </th>
-              <th class="numeric" colspan="2">
+              <th class="numeric" colspan="2" data-total-merged-score>
                 {{ rank.total.points }}
                 <span v-if="showPenalty" class="scoreboard-penalty">
                   ({{ rank.total.penalty }})

@@ -136,7 +136,7 @@ describe('Basic Commands Test', () => {
     cy.logout();
   });
 
-  it.only('Should create two contest and merge their scoreboard', () => {
+  it('Should create two contest and merge their scoreboard', () => {
     const contestOptions1 = contestPage.generateContestOptions();
     const contestOptions2 = contestPage.generateContestOptions();
     const loginOptions = loginPage.registerMultipleUsers(4);
