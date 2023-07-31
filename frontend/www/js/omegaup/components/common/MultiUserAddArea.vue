@@ -51,7 +51,7 @@ const debounce = (fn: (event: Event) => void, waitTime: number) => {
 const WAIT_TIME = 1000;
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
 
-@Component
+@Component({})
 export default class MultiUserAddArea extends Vue {
   @Prop() users!: string[];
   isFocused: boolean = false;
