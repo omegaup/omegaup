@@ -143,7 +143,7 @@ export default class AddContestant extends Vue {
     if (this.bulkContestants !== '') {
       users = this.bulkContestants.split(',');
     }
-    
+
     if (this.typeaheadContestants) {
       users = [...users, ...this.typeaheadContestants.map((user) => user.key)];
     }
