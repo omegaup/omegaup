@@ -9,7 +9,7 @@
               :existing-options="searchResultUsers"
               :value.sync="typeaheadContestants"
               @update-existing-options="
-                (query: string) => $emit('update-search-result-users', query)
+                (query) => $emit('update-search-result-users', query)
               "
             >
             </omegaup-common-multi-typeahead>
@@ -56,7 +56,7 @@
             </td>
             <td class="text-center">
               <template v-if="user.access_time !== null">
-                {{ time.formatDateTime(user.access_time as Date) }}
+                {{ time.formatDateTime(user.access_time) }}
               </template>
             </td>
             <td v-if="contest.window_length !== null" class="text-center">
