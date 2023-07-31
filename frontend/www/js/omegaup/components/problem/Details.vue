@@ -173,12 +173,17 @@
           </template>
         </omegaup-overlay>
         <template v-if="problem.accepts_submissions">
-          <omegaup-arena-ephemeral-grader
-            v-if="!problem.karel_problem"
-            :problem="problem"
-            :can-submit="user.loggedIn && !inContestOrCourse"
-            :accepted-languages="filteredLanguages"
-          ></omegaup-arena-ephemeral-grader>
+          <div class="d-none d-sm-block">
+            <omegaup-arena-ephemeral-grader
+              v-if="!problem.karel_problem"
+              :problem="problem"
+              :can-submit="user.loggedIn && !inContestOrCourse"
+              :accepted-languages="filteredLanguages"
+            ></omegaup-arena-ephemeral-grader>
+          </div>
+          <div class="bg-white text-center p-4 d-sm-none border">
+            Necesitas una pantalla de mayor tamaño para poder usar nuestro Ephemeral. Intente poner el teléfono en posición horizontal o usar otro dispositivo.
+          </div>
           <omegaup-arena-runs
             :problem-alias="problem.alias"
             :contest-alias="contestAlias"
