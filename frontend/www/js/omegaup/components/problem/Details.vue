@@ -182,7 +182,7 @@
             ></omegaup-arena-ephemeral-grader>
           </div>
           <div class="bg-white text-center p-4 d-sm-none border">
-            {{ T.ephemeralTroubleAlert }}
+            {{ T.ephemeralGraderAlert }}
           </div>
           <omegaup-arena-runs
             :problem-alias="problem.alias"
