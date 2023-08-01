@@ -1,5 +1,5 @@
 <template>
-  <div class="container-lg">
+  <div>
     <h5 class="rank-title mb-5">
       {{
         ui.formatString(T.authorRankRangeHeader, {

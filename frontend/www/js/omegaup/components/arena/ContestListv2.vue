@@ -14,7 +14,7 @@
         <b-card class="card-group-menu">
           <b-container>
             <b-row class="justify-content-between" align-v="center">
-              <b-col class="col-md-5 col-sm-12 p-0">
+              <b-col class="col-12 col-md-5 mb-2 mb-md-0 p-0">
                 <form :action="queryURL" method="GET">
                   <div class="input-group">
                     <input
