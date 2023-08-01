@@ -116,6 +116,7 @@
     "vue": "^2.5.22",
     "vue-async-computed": "^3.8.1",
     "vue-async-computed-decorator": "^0.0.5",
+    "vue-class-component": "^7.2.6",
     "vue-codemirror-lite": "^1.0.4",
     "vue-cookie-accept-decline": "5.4.0",
     "vue-cookies": "^1.8.1",
