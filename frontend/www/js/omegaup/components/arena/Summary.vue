@@ -115,8 +115,6 @@ export default class Summary extends Vue {
 .summary {
   background: var(--arena-summary-background-color);
   padding: 1em;
-  // margin-top: -1.5em;
-  // margin-right: -1em;
 }
 
 h1 {

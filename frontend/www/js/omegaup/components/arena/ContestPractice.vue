@@ -245,13 +245,10 @@ export default class ArenaContestPractice extends Vue {
 }
 
 .navleft .navbar {
-  // width: 21em;
-  // float: left;
   background: transparent;
 }
 
 .navleft .main {
-  // margin-left: 20em;
   border: 1px solid var(--arena-contest-navleft-main-border-color);
   border-width: 0 0 1px 1px;
 }
@@ -259,8 +256,6 @@ export default class ArenaContestPractice extends Vue {
 .problem {
   background: var(--arena-problem-background-color);
   padding: 1em;
-  // margin-top: -1.5em;
-  // margin-right: -1em;
 }
 
 @media only screen and (min-width: 960px) {
@@ -269,7 +264,6 @@ export default class ArenaContestPractice extends Vue {
       width: 21em;
       float: left;
     }
-
     .main {
       margin-left: 20em;
     }

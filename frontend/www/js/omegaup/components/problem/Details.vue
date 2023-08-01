@@ -182,9 +182,7 @@
             ></omegaup-arena-ephemeral-grader>
           </div>
           <div class="bg-white text-center p-4 d-sm-none border">
-            Necesitas una pantalla de mayor tamaño para poder usar nuestro
-            Ephemeral. Intente poner el teléfono en posición horizontal o usar
-            otro dispositivo.
+            {{ T.ephemeralTroubleAlert }}
           </div>
           <omegaup-arena-runs
             :problem-alias="problem.alias"

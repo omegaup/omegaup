@@ -1246,6 +1246,7 @@ rankRangeHeader = "Usuários com maior score obtido (%(lowCount) a %(highCount))
 rankScore = "Pontuação"
 rankSolved = "Problemas"
 recordNotFound = "Registro não foi encontrado."
+ephemeralTroubleAlert = "Você precisa de uma tela maior para usar nosso Ephemeral. Tente colocar o telefone na posição horizontal ou usar outro dispositivo."
 registerForContest = "cadastre-se para o concurso"
 registerForContestChallenges = "Desafio"
 registerForContestRules = "Regras"
