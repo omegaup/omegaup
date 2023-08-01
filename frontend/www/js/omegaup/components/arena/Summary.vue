@@ -123,4 +123,11 @@ h1 {
   margin: 1em auto 1em auto;
   font-size: 1.5em;
 }
+
+@media only screen and (min-width: 960px) {
+  .summary {
+    margin-top: -1.5em;
+    margin-right: -1em;
+  }
+}
 </style>

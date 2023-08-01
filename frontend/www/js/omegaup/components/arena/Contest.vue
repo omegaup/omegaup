@@ -39,7 +39,7 @@
     <template #arena-problems>
       <div data-contest>
         <div class="tab navleft">
-          <div class="navbar">
+          <div class="navbar mb-3">
             <omegaup-arena-navbar-problems
               :problems="problems"
               :active-problem="activeProblemAlias"
