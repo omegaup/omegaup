@@ -81,6 +81,79 @@ class Submission extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Creates the feedback thread for a submission and its corresponding
+     * notification, avoiding duplicating feedbacks
+     *
+     * @param array{assignment_alias: string, author_id: int|null, course_alias: string, course_id: int, problem_alias: string} $courseSubmissionInfo
+     */
+    private static function createFeedbackThread(
+        \OmegaUp\DAO\VO\Identities $feedbackAuthor,
+        int $submissionFeedbackId,
+        string $feedback,
+        string $guid,
+        \OmegaUp\DAO\VO\Courses $course,
+        $courseSubmissionInfo
+    ): void {
+        $group = \OmegaUp\Controllers\Course::resolveGroup($course);
+        if (
+            !\OmegaUp\Authorization::canViewCourse(
+                $feedbackAuthor,
+                $course,
+                $group
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        \OmegaUp\DAO\Base\SubmissionFeedbackThread::create(
+            new \OmegaUp\DAO\VO\SubmissionFeedbackThread([
+                'identity_id' => $feedbackAuthor->identity_id,
+                'submission_feedback_id' => $submissionFeedbackId,
+                'contents' => $feedback,
+                'date' => gmdate('Y-m-d H:i:s'),
+            ])
+        );
+
+        $participants = \OmegaUp\DAO\SubmissionFeedbackThread::getSubmissionFeedbackThreadParticipants(
+            $submissionFeedbackId
+        );
+
+        if (empty($participants)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'submissionFeedbackParticipantsListEmpty'
+            );
+        }
+        $participantsNotifications = array_filter(
+            $participants,
+            fn ($author) => $author['author_id'] != $feedbackAuthor->user_id
+        );
+
+        $courseAlias = $course->alias;
+        $assignmentAlias = $courseSubmissionInfo['assignment_alias'];
+        $problemAlias = $courseSubmissionInfo['problem_alias'];
+        foreach ($participantsNotifications as $participant) {
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $participant['author_id'],
+                    'contents' =>  json_encode([
+                        'type' => \OmegaUp\DAO\Notifications::COURSE_SUBMISSION_FEEDBACK,
+                        'body' => [
+                            'localizationString' => new \OmegaUp\TranslationString(
+                                'notificationCourseSubmissionFeedback'
+                            ),
+                            'localizationParams' => [
+                                'problemAlias' => $courseSubmissionInfo['problem_alias'],
+                                'courseName' => $course->name,
+                            ],
+                            'url' => "/course/{$courseAlias}/assignment/{$assignmentAlias}/#problems/{$problemAlias}/show-run:{$guid}",
+                            'iconUrl' => '/media/info.png',
+                        ]
+                    ]),
+                ])
+            );
+        }
+    }
+
+    /**
      * Creates the feedback for a submission and its corresponding
      * notification, avoiding duplicating feedbacks
      *
@@ -141,15 +214,15 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $feedback
      * @omegaup-request-param int|null $range_bytes_end
      * @omegaup-request-param int|null $range_bytes_start
+     * @omegaup-request-param int|null $submission_feedback_id
      *
      * @return array{status: string}
      */
     public static function apiSetFeedback(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
+        $guid = $r->ensureString('guid');
 
-        $submission = \OmegaUp\DAO\Submissions::getByGuid(
-            $r->ensureString('guid')
-        );
+        $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
         if (is_null($submission) || is_null($submission->guid)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'submissionNotFound'
@@ -189,6 +262,21 @@ class Submission extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseNotFound'
             );
+        }
+
+        $submissionFeedbackId = $r->ensureOptionalInt('submission_feedback_id');
+        if (!is_null($submissionFeedbackId)) {
+            self::createFeedbackThread(
+                $r->identity,
+                $submissionFeedbackId,
+                $feedback,
+                $guid,
+                $course,
+                $courseSubmissionInfo
+            );
+            return [
+                'status' => 'ok',
+            ];
         }
 
         // Default values for a general feedback

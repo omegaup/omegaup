@@ -43,21 +43,21 @@ class RunsGroups extends \OmegaUp\DAO\Base\RunsGroups {
                     FROM
                         Runs_Groups rg
                     INNER JOIN
-                        Runs r
-                    ON
-                        rg.run_id = r.run_id
-                    INNER JOIN
                         Submissions s
                     ON
-                        s.submission_id = r.submission_id
+                        s.current_run_id = rg.run_id
+                    INNER JOIN
+                        Runs r
+                    ON
+                        s.current_run_id = r.run_id
                     WHERE
                         s.problemset_id = ? AND
                         s.status = 'ready' AND
                         s.type = 'normal'
                 )
                 SELECT
-                    IFNULL(ROUND(SUM(mspg_limit.score), 2), 0.00) AS score,
-                    IFNULL(ROUND(SUM(mspg_limit.score), 2), 0.00) AS contest_score,
+                    IFNULL(ROUND((SUM(mspg_limit.score)), 2), 0.00) AS score,
+                    IFNULL(ROUND(SUM(mspg_limit.score) * pp.points, 2), 0.00) AS contest_score,
                     IFNULL(SUM(mspg_limit.penalty), 0) AS penalty,
                     mspg_all.problem_id,
                     mspg_all.identity_id,
