@@ -556,6 +556,7 @@ const translations: { [key: string]: string; } = {
   email: "(E-Mai1)",
   emailNotVerified: "(Y0ur 3mai1 i5 n07 v3rifi3d y37. P13a53 100k f0r 7h3 v3rifica7i0n 3mai1 in y0ur inb0x and 5pam f01d3r. If y0u 57i11 hav3 pr0b13m5, p13a53 c0n7ac7 0m3gaup-50p0r73@g00g13gr0up5.c0m f0r 5upp0r7.)",
   enterContest: "(En73r C0n7357)",
+  ephemeralTroubleAlert: "(Y0u n33d a 1arg3r 5cr33n 70 u53 0ur Eph3m3ra1. Try pu77ing 7h3 ph0n3 in 1and5cap3 m0d3 0r u5ing an07h3r d3vic3.)",
   errorWhileSendingMail: "(Th3r3 wa5 an 3rr0r 53nding 7h3 v3rifica7i0n 3mai1. P13a53 7ry again 1a73r 0r c0n7ac7 0m3gaup-50p0r73@g00g13gr0up5.c0m f0r 5upp0r7. Y0ur 3mai1 i5 n07 v3rifi3d y37.)",
   feedbackLeftBy: "(F33dback 13f7 0n da73 %(date), by:)",
   feedbackNotSentYet: "(Th3 f33dback f0r 7hi5 5ubmi55i0n ha5 n07 b33n 53n7 y37.)",

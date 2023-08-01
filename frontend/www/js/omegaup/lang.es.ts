@@ -556,6 +556,7 @@ const translations: { [key: string]: string; } = {
   email: "Correo electr\u00f3nico",
   emailNotVerified: "Tu direcci\u00f3n de correo a\u00fan no ha sido verificada. Busca el correo de verificaci\u00f3n en tu bandeja de entrada o de spam. Si sigues teniendo problemas, escribe a omegaup-soporte@googlegroups.com para obtener ayuda.",
   enterContest: "Entrar al concurso",
+  ephemeralTroubleAlert: "Necesitas una pantalla de mayor tama\u00f1o para poder usar nuestro Ephemeral. Intente poner el tel\u00e9fono en posici\u00f3n horizontal o usar otro dispositivo.",
   errorWhileSendingMail: "Hubo un problema al enviar el correo de verificaci\u00f3n. Por favor intenta m\u00e1s tarde o escribe a omegaup-soporte@googlegroups.com para obtener ayuda. Tu direcci\u00f3n de correo a\u00fan no ha sido verificada.",
   feedbackLeftBy: "Retroalimentaci\u00f3n dejada el d\u00eda %(date), por:",
   feedbackNotSentYet: "A\u00fan no se ha enviado la retroalimentaci\u00f3n para este env\u00edo.",
