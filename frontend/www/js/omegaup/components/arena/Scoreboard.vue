@@ -23,7 +23,7 @@
       :options="rankingChartOptions"
     ></highcharts>
     <div v-else class="bg-white text-center p-4 mb-3">
-      No tenemos datos para mostrar en el Ranking.
+      {{ T.rankingNoUsers }}
     </div>
     <label v-if="showInvitedUsersFilter">
       <input
