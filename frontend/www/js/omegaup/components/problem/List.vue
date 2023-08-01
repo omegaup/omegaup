@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid p-5">
+  <div class="container-fluid py-5 px-3 px-md-5">
     <omegaup-problem-search-bar
       :language="language"
       :languages="languages"
