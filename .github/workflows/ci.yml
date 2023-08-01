@@ -147,6 +147,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Cleans yarn cache
+        run: yarn cache clean
+
       - name: Install yarn dependencies
         run: yarn install
 
