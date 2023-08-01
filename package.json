@@ -21,6 +21,13 @@
     "@fortawesome/free-brands-svg-icons": "^5.13.0",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/vue-fontawesome": "^2.0.1",
+    "@storybook/addon-essentials": "^7.2.0",
+    "@storybook/addon-interactions": "^7.2.0",
+    "@storybook/addon-links": "^7.2.0",
+    "@storybook/blocks": "^7.2.0",
+    "@storybook/testing-library": "^0.2.0",
+    "@storybook/vue": "^7.2.0",
+    "@storybook/vue-webpack5": "^7.2.0",
     "@testing-library/jest-dom": "^5.9.5",
     "@types/bootstrap-datepicker": "0.0.13",
     "@types/bootstrap.v3.datetimepicker": "^4.17.47",
@@ -58,6 +65,7 @@
     "eslint": "^7.24",
     "eslint-config-prettier": "^6.12.0",
     "eslint-plugin-jest-dom": "^3.6.5",
+    "eslint-plugin-storybook": "^0.6.13",
     "eslint-plugin-vue": "^7.0.0",
     "eslint_d": "^10.0.4",
     "file-loader": "^6.2",
@@ -82,11 +90,14 @@
     "popper.js": "^1.16.1",
     "prettier": "^2.1.2",
     "prismjs": "^1.27.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "remove-source-webpack-plugin": "^0.1.1",
     "sass": "^1.44.0",
     "sass-loader": "^12.3.0",
     "sortablejs": "^1.7.0",
     "source-map-support": "^0.5.19",
+    "storybook": "^7.2.0",
     "stream-browserify": "^3.0.0",
     "style-loader": "^2.0",
     "stylelint": "^13.13",
@@ -134,7 +145,8 @@
     "build": "cross-env webpack --mode=production",
     "build-development": "cross-env webpack --mode=development",
     "build-development-frontend": "cross-env webpack --config-name=frontend --mode=development",
-    "refactor": "cross-env ./stuff/refactor.js"
-  },
-  "dependencies": {}
+    "refactor": "cross-env ./stuff/refactor.js",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  }
 }
