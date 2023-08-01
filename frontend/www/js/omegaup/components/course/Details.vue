@@ -153,7 +153,7 @@
                 <td>
                   <a
                     data-course-homework-button
-                    class="text-center"
+                    class="align-middle"
                     :href="`/course/${course.alias}/assignment/${assignment.alias}/`"
                   >
                     {{ assignment.name }}
@@ -215,7 +215,7 @@
           </p>
         </div>
       </div>
-      <div class="d-flex justify-content-end">
+      <div class="d-flex justify-content-end py-3 px-5 mx-3 p-sm-0 mx-sm-0">
         <div class="dropdown">
           <a
             class="btn btn-primary dropdown-toggle"
