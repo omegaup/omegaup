@@ -38,7 +38,7 @@ export default {
   render: (args: any, { argTypes }: { argTypes: any }) => ({
     props: Object.keys(argTypes),
     components: { Badge },
-    template: '<badge :badge="badge" />',
+    template:  '<badge :badge="badge" />'
   }),
   argTypes: {},
 };

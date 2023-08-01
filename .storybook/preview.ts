@@ -1,4 +1,5 @@
 import type { Preview } from '@storybook/vue';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const preview: Preview = {
   parameters: {
