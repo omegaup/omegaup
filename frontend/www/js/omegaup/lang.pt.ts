@@ -1247,6 +1247,7 @@ const translations: { [key: string]: string; } = {
   rankRangeHeader: "Usu\u00e1rios com maior score obtido (%(lowCount) a %(highCount))",
   rankScore: "Pontua\u00e7\u00e3o",
   rankSolved: "Problemas",
+  rankingNoUsers: "N\u00e3o temos dados para exibir no Ranking.",
   recordNotFound: "Registro n\u00e3o foi encontrado.",
   registerForContest: "cadastre-se para o concurso",
   registerForContestChallenges: "Desafio",
