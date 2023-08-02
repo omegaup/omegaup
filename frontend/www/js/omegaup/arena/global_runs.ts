@@ -57,6 +57,7 @@ OmegaUp.on('ready', async () => {
           searchResultProblems: this.searchResultProblems,
           runDetailsData: this.runDetailsData,
           totalRuns: runsStore.state.totalRuns,
+          hasVisitedSection: payload.hasVisitedSection,
         },
         on: {
           details: (request: SubmissionRequest) => {

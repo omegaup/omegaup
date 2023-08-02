@@ -284,6 +284,7 @@ export default class ArenaContest extends Vue {
   @Prop({ default: false }) lockdown!: boolean;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
+  @Prop() hasVisitedSection!: boolean;
 
   T = T;
   ui = ui;
