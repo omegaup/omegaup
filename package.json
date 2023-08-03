@@ -137,6 +137,9 @@
     "webpack-cli": "^4.2",
     "wrapper-webpack-plugin": "^2.1"
   },
+  "resolutions": {
+    "jackspeak": "2.1.1"
+  },
   "scripts": {
     "test": "jest 'frontend/www/js/.*test\\.ts$'",
     "test:watch": "jest --watchAll --notify 'frontend/www/js/.*test\\.ts$'",
