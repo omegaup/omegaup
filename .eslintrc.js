@@ -2,14 +2,24 @@ module.exports = {
   root: true,
   parser: 'vue-eslint-parser',
   parserOptions: {
-    parser: '@typescript-eslint/parser'
+    parser: '@typescript-eslint/parser',
   },
   env: {
     jquery: true,
-    node: true
+    node: true,
   },
   plugins: ['@typescript-eslint', 'jest-dom'],
-  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'plugin:jest-dom/recommended', 'plugin:vue/recommended', 'plugin:vue/vue3-recommended', 'prettier', 'prettier/@typescript-eslint', 'prettier/vue', 'plugin:storybook/recommended'],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:jest-dom/recommended',
+    'plugin:vue/recommended',
+    'plugin:vue/vue3-recommended',
+    'prettier',
+    'prettier/@typescript-eslint',
+    'prettier/vue',
+    'plugin:storybook/recommended',
+  ],
   rules: {
     // Disabling this rule since inferrable types are still useful to declare
     // for humans.
@@ -30,6 +40,6 @@ module.exports = {
     // TODO: Remove all these exceptions.
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/no-namespace': 'off'
-  }
+    '@typescript-eslint/no-namespace': 'off',
+  },
 };
