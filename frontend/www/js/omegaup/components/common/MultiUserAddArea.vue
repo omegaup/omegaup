@@ -136,11 +136,11 @@ export default class MultiUserAddArea extends Vue {
   top: 0;
   right: 1.5rem;
 
-  color: #8bb0d3;
+  color: var(--multi-user-add-area-edit-button-color);
 }
 
 .edit-icon:hover {
-  color: #666;
+  color: var(--multi-user-add-area-edit-button-color-hover);
   cursor: pointer;
 }
 
