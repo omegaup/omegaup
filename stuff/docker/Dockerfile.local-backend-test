@@ -6,7 +6,7 @@ RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
         ca-certificates \
         curl \
-        openjdk-16-jre-headless \
+        openjdk-18-jre-headless \
         && \
     /usr/sbin/update-ca-certificates && \
     apt-get autoremove -y && \

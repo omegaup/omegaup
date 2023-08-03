@@ -215,7 +215,7 @@ describe('Basic Commands Test', () => {
 
     const problemOptions: ProblemOptions = {
       problemAlias: uuid().slice(0, 10), // Too large for the alias,
-      tag: 'Recursion',
+      tag: 'Recursión',
       autoCompleteTextTag: 'recur',
       problemLevelIndex: 0,
     };
@@ -236,7 +236,7 @@ describe('Basic Commands Test', () => {
   it('Should make a run of a problem', () => {
     const problemOptions: ProblemOptions = {
       problemAlias: 'problem-' + uuid().slice(0, 8),
-      tag: 'Recursion',
+      tag: 'Recursión',
       autoCompleteTextTag: 'Recur',
       problemLevelIndex: 1,
     };
@@ -265,6 +265,12 @@ describe('Basic Commands Test', () => {
 
   const now = new Date();
 
+  enum ScoreMode {
+    AllOrNothing = 'all_or_nothing',
+    Partial = 'partial',
+    MaxPerGroup = 'max_per_group',
+  }
+
   const problemAlias = 'problem-' + uuid().slice(0, 8);
   const contestOptions: ContestOptions = {
     contestAlias: 'contest' + uuid().slice(0, 5),
@@ -273,13 +279,13 @@ describe('Basic Commands Test', () => {
     endDate: addSubtractDaysToDate(now, {days: 2}),
     showScoreboard: true,
     basicInformation: false,
-    partialPoints: true,
+    scoreMode: ScoreMode.Partial,
     requestParticipantInformation: 'no',
     admissionMode: 'public',
     problems: [
       {
         problemAlias: 'sumas',
-        tag: 'Recursion',
+        tag: 'Recursión',
         autoCompleteTextTag: 'Recur',
         problemLevelIndex: 1,
       },
@@ -290,12 +296,14 @@ describe('Basic Commands Test', () => {
         fixturePath: 'main.cpp',
         language: 'cpp11-gcc',
         valid: true,
+        status: 'AC'
       },
       {
         problemAlias: 'sumas',
         fixturePath: 'main.cpp',
         language: 'cpp11-gcc',
         valid: false,
+        status: 'AC'
       },
     ]
   };
@@ -328,9 +336,9 @@ describe('Basic Commands Test', () => {
       'have.value',
       `${contestOptions.showScoreboard}`,
     );
-    cy.get('[data-partial-points]').should(
+    cy.get('[data-score-mode]').should(
       'have.value',
-      `${contestOptions.partialPoints}`,
+      `${contestOptions.scoreMode}`,
     );
     cy.get('[data-basic-information-required]').should(
       contestOptions.basicInformation ? 'be.checked' : 'not.be.checked',

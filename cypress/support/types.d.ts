@@ -3,6 +3,22 @@ export interface LoginOptions {
   password: string;
 }
 
+export interface Identities {
+  usernames: string;
+  passwords: string;
+}
+
+export interface GroupOptions {
+  groupTitle: string;
+  groupDescription: string;
+}
+
+export interface TeamGroupOptions {
+  groupTitle: string;
+  groupDescription: string;
+  noOfContestants: string;
+}
+
 export interface ProblemOptions {
   problemAlias: string;
   tag: string;
@@ -24,13 +40,22 @@ export interface CourseOptions {
   description?: string;
 }
 
+declare enum ScoreMode {
+  AllOrNothing = 'all_or_nothing',
+  Partial = 'partial',
+  MaxPerGroup = 'max_per_group',
+}
+
 export interface ContestOptions {
   contestAlias: string;
   description?: string;
   startDate: Date;
   endDate: Date;
   showScoreboard?: boolean;
-  partialPoints?: boolean;
+  scoreBoardVisibleTime?: string;
+  differentStart?: boolean;
+  differentStartTime?: string;
+  scoreMode: ScoreMode;
   basicInformation?: boolean;
   requestParticipantInformation?: RequestParticipantInformation;
   admissionMode: AdmissionModeOptions;
@@ -43,6 +68,7 @@ export interface RunOptions {
   fixturePath: string;
   language: Language;
   valid: boolean;
+  status: Status;
 }
 
 export type AdmissionModeOptions = 'private' | 'registration' | 'public';
@@ -69,4 +95,4 @@ export type Language =
   | 'go'
   | 'rs'
   | 'js';
-export type Status = 'AC' | 'TLE' | 'MLE' | 'PA';
+export type Status = 'AC' | 'TLE' | 'MLE' | 'PA' | 'WA';

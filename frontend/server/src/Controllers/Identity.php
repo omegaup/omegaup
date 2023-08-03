@@ -202,13 +202,22 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
         /** @var array<string, bool> $seenUsernames */
         $seenUsernames = [];
+        $duplicatedUsernames = [];
         foreach ($identities as $identity) {
             if (isset($seenUsernames[$identity['username']])) {
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'aliasInUse'
-                );
+                $duplicatedUsernames[] = $identity['username'];
             }
             $seenUsernames[$identity['username']] = true;
+        }
+
+        if (!empty($duplicatedUsernames)) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
+                'groupMemberUsernameInUse',
+                'usernames',
+                // Displaying only the first 20 duplicated usernames in order to
+                // prevent the error message from ruining the UI
+                duplicatedItemsInArray: array_slice($duplicatedUsernames, 0, 20)
+            );
         }
 
         // Save objects into DB
@@ -297,7 +306,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $team_identities
      */
     public static function apiBulkCreateForTeams(\OmegaUp\Request $r): array {
-        $r->ensureMainUserIdentity();
+        $r->ensureMainUserIdentityIsOver13();
         if (!\OmegaUp\Authorization::isGroupIdentityCreator($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'

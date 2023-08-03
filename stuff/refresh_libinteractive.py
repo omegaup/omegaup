@@ -49,7 +49,7 @@ def generate(alias: str) -> None:
                                    _LIBINTERACTIVE_PATH, 'generate-all',
                                    idlname, '--package-directory',
                                    os.path.join(_TEMPLATES_DIR, alias),
-                                   '--package-prefix', '%s_' % alias,
+                                   '--package-prefix', f'{alias}_',
                                    '--shift-time-for-zip'], cwd=dirname)
         except subprocess.CalledProcessError:
             logging.exception('Failed to generate the packages for %s', alias)

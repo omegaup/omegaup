@@ -11,15 +11,20 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
      *
      */
     public function testCreateContestPositive() {
+        // Added User whose DOB is 13 years
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birth_date' => strtotime('-13 years'),
+            ]),
+        );
         // Create a valid contest Request object
         $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
-            ['admissionMode' => 'private']
+            ['admissionMode' => 'private'],
         ));
         $r = $contestData['request'];
-        $contestDirector = $contestData['director'];
 
         // Log in the user and set the auth token in the new request
-        $login = self::login($contestDirector);
+        $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
@@ -413,48 +418,37 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * A PHPUnit data provider for all the partial score to get profile details.
+     * Under13 users can't create contests.
      *
-     * @return list<array{0:bool, 1:string}>
      */
-    public function partialScoreProvider(): array {
-        return [
-            [true, 'partial'],
-            [false, 'all_or_nothing'],
-        ];
-    }
-
-    /**
-     * @dataProvider partialScoreProvider
-     */
-    public function testCreateContestWithPartialScore(
-        bool $partialScore,
-        string $scoreModeExpected
-    ) {
-        // Get a problem
-        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
-
-        // Create contest with 2 hours and a window length 30 of minutes
-        $contest = \OmegaUp\Test\Factories\Contest::createContest(
-            new \OmegaUp\Test\Factories\ContestParams([
-                'partialScore' => $partialScore,
-                ])
+    public function testUserUnder13CannotCreateContests() {
+        $defaultDate = strtotime('2022-01-01T00:00:00Z');
+        \OmegaUp\Time::setTimeForTesting($defaultDate);
+        // Create a 10 years-old user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birthDate' => strtotime('2012-01-01T00:00:00Z'),
+            ]),
         );
 
-        // Add the problem to the contest
-        \OmegaUp\Test\Factories\Contest::addProblemToContest(
-            $problem,
-            $contest
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
         );
+        $r = $contestData['request'];
 
-        // Create a contestant
-        $login = self::login($contest['director']);
+        // Log in the user and set the auth token in the new request
+        $login = self::login($identity);
+        $r['auth_token'] = $login->auth_token;
 
-        // Create a contest request
-        $response = \OmegaUp\DAO\Contests::getByAlias(
-            $contest['request']['alias']
-        );
-
-        $this->assertSame($response->score_mode, $scoreModeExpected);
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail(
+                'Creating contests should not have been allowed for U13'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('U13CannotPerform', $e->getMessage());
+        }
     }
 }

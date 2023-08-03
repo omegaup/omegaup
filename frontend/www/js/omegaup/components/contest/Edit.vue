@@ -9,7 +9,7 @@
         }}
         <small>
           &ndash;
-          <a :href="ui.contestURL(details)">
+          <a :href="ui.contestURL(details)" data-contest-link-button>
             {{ T.contestDetailsGoToContest }}</a
           >
         </small>
@@ -57,7 +57,10 @@
             >{{ T.contestNewFormAdmissionMode }}</a
           >
           <a
-            v-if="!details.contest_for_teams"
+            v-if="
+              originalContestAdmissionMode != 'private' &&
+              !details.contest_for_teams
+            "
             href="#"
             data-toggle="tab"
             data-nav-contestant
@@ -77,6 +80,7 @@
             >{{ T.contestAddgroupAddGroup }}</a
           >
           <a
+            v-if="!virtual"
             href="#"
             data-toggle="tab"
             class="dropdown-item"
@@ -116,6 +120,9 @@
       <div v-if="showTab === 'new_form'" class="tab-pane active">
         <omegaup-contest-new-form
           :admission-mode="details.admission_mode"
+          :default-show-all-contestants-in-scoreboard="
+            details.default_show_all_contestants_in_scoreboard
+          "
           :initial-alias="details.alias"
           :initial-title="details.title"
           :initial-description="details.description"
@@ -130,7 +137,7 @@
           :initial-scoreboard="details.scoreboard"
           :initial-penalty-type="details.penalty_type"
           :initial-show-scoreboard-after="details.show_scoreboard_after"
-          :initial-partial-score="details.partial_score"
+          :score-mode="details.score_mode"
           :initial-needs-basic-information="details.needs_basic_information"
           :initial-requests-user-information="details.requests_user_information"
           :all-languages="details.available_languages"
@@ -152,7 +159,7 @@
       <div v-if="showTab === 'problems'" class="tab-pane active">
         <omegaup-contest-add-problem
           :contest-alias="details.alias"
-          :initial-points="details.partial_score ? 100 : 1"
+          :initial-points="details.score_mode !== 'all_or_nothing' ? 100 : 1"
           :initial-problems="problems"
           :search-result-problems="searchResultProblems"
           @add-problem="(request) => $emit('add-problem', request)"
@@ -327,12 +334,23 @@ export default class Edit extends Vue {
   @Prop() teamsGroup!: types.ContestGroup | null;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop() searchResultGroups!: types.ListItem[];
+  @Prop({ default: null }) originalContestAdmissionMode!: null | string;
 
   T = T;
   ui = ui;
-  showTab = ui.isVirtual(this.details) ? 'contestants' : 'new_form';
   virtual = ui.isVirtual(this.details);
+  showTab = this.selectedTab();
   alreadyArchived = this.details.archived;
+
+  selectedTab(): string {
+    if (!ui.isVirtual(this.details)) {
+      return 'new_form';
+    }
+    if (this.originalContestAdmissionMode != 'private') {
+      return 'contestants';
+    }
+    return 'links';
+  }
 
   get activeTab(): string {
     switch (this.showTab) {

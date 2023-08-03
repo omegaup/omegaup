@@ -15,7 +15,11 @@
             </div>
             <div class="form-group col-md-4"></div>
           </div>
-          <button class="btn btn-primary" type="submit">
+          <button
+            class="btn btn-primary"
+            type="submit"
+            data-schedule-virtual-button
+          >
             {{ T.contestNewFormScheduleVirtualContest }}
           </button>
         </form>

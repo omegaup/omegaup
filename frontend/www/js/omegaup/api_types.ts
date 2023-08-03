@@ -184,6 +184,20 @@ export namespace types {
                       )
                         x.feedback = ((x) => {
                           x.date = ((x: number) => new Date(x * 1000))(x.date);
+                          if (
+                            typeof x.feedback_thread !== 'undefined' &&
+                            x.feedback_thread !== null
+                          )
+                            x.feedback_thread = ((x) => {
+                              if (!Array.isArray(x)) {
+                                return x;
+                              }
+                              return x.map((x) => {
+                                x.timestamp = ((x: number) =>
+                                  new Date(x * 1000))(x.timestamp);
+                                return x;
+                              });
+                            })(x.feedback_thread);
                           return x;
                         })(x.feedback);
                       return x;
@@ -405,8 +419,26 @@ export namespace types {
     export function CommonPayload(
       elementId: string = 'payload',
     ): types.CommonPayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
+      return ((x) => {
+        x.apiTokens = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.last_used = ((x: number) => new Date(x * 1000))(x.last_used);
+            x.rate_limit = ((x) => {
+              x.reset = ((x: number) => new Date(x * 1000))(x.reset);
+              return x;
+            })(x.rate_limit);
+            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+            return x;
+          });
+        })(x.apiTokens);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -877,6 +909,20 @@ export namespace types {
                                 x.date = ((x: number) => new Date(x * 1000))(
                                   x.date,
                                 );
+                                if (
+                                  typeof x.feedback_thread !== 'undefined' &&
+                                  x.feedback_thread !== null
+                                )
+                                  x.feedback_thread = ((x) => {
+                                    if (!Array.isArray(x)) {
+                                      return x;
+                                    }
+                                    return x.map((x) => {
+                                      x.timestamp = ((x: number) =>
+                                        new Date(x * 1000))(x.timestamp);
+                                      return x;
+                                    });
+                                  })(x.feedback_thread);
                                 return x;
                               })(x.feedback);
                             return x;
@@ -1857,6 +1903,21 @@ export namespace types {
                     )
                       x.feedback = ((x) => {
                         x.date = ((x: number) => new Date(x * 1000))(x.date);
+                        if (
+                          typeof x.feedback_thread !== 'undefined' &&
+                          x.feedback_thread !== null
+                        )
+                          x.feedback_thread = ((x) => {
+                            if (!Array.isArray(x)) {
+                              return x;
+                            }
+                            return x.map((x) => {
+                              x.timestamp = ((x: number) => new Date(x * 1000))(
+                                x.timestamp,
+                              );
+                              return x;
+                            });
+                          })(x.feedback_thread);
                         return x;
                       })(x.feedback);
                     return x;
@@ -2319,6 +2380,14 @@ export namespace types {
         (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
+
+    export function VerificationParentalTokenDetailsPayload(
+      elementId: string = 'payload',
+    ): types.VerificationParentalTokenDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
   }
 
   export interface ActivityEvent {
@@ -2356,6 +2425,13 @@ export namespace types {
         teachingAssistant: types.CoursesByTimeType;
       };
     };
+  }
+
+  export interface ApiToken {
+    last_used: Date;
+    name: string;
+    rate_limit: { limit: number; remaining: number; reset: Date };
+    timestamp: Date;
   }
 
   export interface ArenaAssignment {
@@ -2678,6 +2754,7 @@ export namespace types {
   }
 
   export interface CommonPayload {
+    apiTokens: types.ApiToken[];
     associatedIdentities: types.AssociatedIdentity[];
     currentEmail: string;
     currentName?: string;
@@ -2716,7 +2793,6 @@ export namespace types {
     languages?: string;
     last_updated: Date;
     original_finish_time?: Date;
-    partial_score: boolean;
     penalty?: number;
     penalty_calc_policy?: string;
     penalty_type?: string;
@@ -2724,6 +2800,7 @@ export namespace types {
     problemset_id: number;
     recommended: boolean;
     rerun_id?: number;
+    score_mode: string;
     scoreboard?: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
@@ -2758,7 +2835,6 @@ export namespace types {
     opened: boolean;
     original_contest_alias?: string;
     original_problemset_id?: number;
-    partial_score: boolean;
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
@@ -2767,6 +2843,7 @@ export namespace types {
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
@@ -2796,7 +2873,6 @@ export namespace types {
     opened: boolean;
     original_contest_alias?: string;
     original_problemset_id?: number;
-    partial_score: boolean;
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
@@ -2805,6 +2881,7 @@ export namespace types {
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
@@ -2842,6 +2919,7 @@ export namespace types {
     details: types.ContestAdminDetails;
     group_admins: types.ContestGroupAdmin[];
     groups: types.ContestGroup[];
+    original_contest_admission_mode?: string;
     problems: types.ProblemsetProblemWithVersions[];
     requests: types.ContestRequest[];
     teams_group?: types.ContestGroup;
@@ -2878,15 +2956,18 @@ export namespace types {
     contest_id: number;
     contestants: number;
     description: string;
+    duration?: number;
     finish_time: Date;
     last_updated: Date;
     organizer: string;
     original_finish_time: Date;
-    partial_score: boolean;
     participating: boolean;
     problemset_id: number;
     recommended: boolean;
     rerun_id?: number;
+    score_mode?: string;
+    scoreboard_url?: string;
+    scoreboard_url_admin?: string;
     start_time: Date;
     title: string;
     window_length?: number;
@@ -2951,13 +3032,13 @@ export namespace types {
     feedback: string;
     finish_time: Date;
     languages: string;
-    partial_score: boolean;
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
     points_decay_factor: number;
     problemset_id: number;
     rerun_id?: number;
+    score_mode: string;
     scoreboard: number;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
@@ -3210,7 +3291,14 @@ export namespace types {
 
   export interface CourseRun {
     contest_score?: number;
-    feedback?: types.SubmissionFeedback;
+    feedback?: {
+      author: string;
+      author_classname: string;
+      date: Date;
+      feedback: string;
+      range_bytes_end?: number;
+      range_bytes_start?: number;
+    };
     guid: string;
     language: string;
     memory: number;
@@ -3279,6 +3367,7 @@ export namespace types {
 
   export interface CurrentSession {
     apiTokenId?: number;
+    api_tokens: types.ApiToken[];
     associated_identities: types.AssociatedIdentity[];
     auth_token?: string;
     cacheKey?: string;
@@ -3959,7 +4048,6 @@ export namespace types {
     opened?: boolean;
     original_contest_alias?: string;
     original_problemset_id?: number;
-    partial_score?: boolean;
     penalty?: number;
     penalty_calc_policy?: string;
     penalty_type?: string;
@@ -3968,6 +4056,7 @@ export namespace types {
     problemset_id?: number;
     requests_user_information?: string;
     rerun_id?: number;
+    score_mode?: string;
     scoreboard?: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
@@ -4050,13 +4139,18 @@ export namespace types {
     contest_alias?: string;
     contest_score?: number;
     country: string;
+    execution?: string;
     guid: string;
     language: string;
     memory: number;
+    output?: string;
     penalty: number;
     runtime: number;
     score: number;
+    score_by_group?: { [key: string]: null | number };
     status: string;
+    status_memory?: string;
+    status_runtime?: string;
     submit_delay: number;
     time: Date;
     type?: string;
@@ -4081,7 +4175,7 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback?: types.SubmissionFeedback;
+    feedback: types.SubmissionFeedback[];
     guid: string;
     judged_by?: string;
     language: string;
@@ -4142,13 +4236,18 @@ export namespace types {
     contest_score?: number;
     country: string;
     details?: types.RunDetailsV2;
+    execution?: string;
     guid: string;
     language: string;
     memory: number;
+    output?: string;
     penalty: number;
     runtime: number;
     score: number;
+    score_by_group?: { [key: string]: null | number };
     status: string;
+    status_memory?: string;
+    status_runtime?: string;
     submit_delay: number;
     time: Date;
     type?: string;
@@ -4266,13 +4365,13 @@ export namespace types {
     languages: string;
     last_updated: number;
     only_ac?: boolean;
-    partial_score: boolean;
     penalty: string;
     penalty_calc_policy: string;
     points_decay_factor: number;
     problemset_id: number;
     recommended: boolean;
     rerun_id: number;
+    score_mode: string;
     scoreboard: number;
     show_scoreboard_after: boolean;
     start_time: Date;
@@ -4451,6 +4550,18 @@ export namespace types {
     author_classname: string;
     date: Date;
     feedback: string;
+    feedback_thread?: types.SubmissionFeedbackThread[];
+    range_bytes_end?: number;
+    range_bytes_start?: number;
+    submission_feedback_id: number;
+  }
+
+  export interface SubmissionFeedbackThread {
+    author: string;
+    authorClassname: string;
+    submission_feedback_thread_id: number;
+    text: string;
+    timestamp: Date;
   }
 
   export interface SubmissionsListPayload {
@@ -4647,6 +4758,10 @@ export namespace types {
     userSystemGroups: { [key: number]: { name: string; value: boolean } };
     userSystemRoles: { [key: number]: { name: string; value: boolean } };
     username: string;
+  }
+
+  export interface VerificationParentalTokenDetailsPayload {
+    hasParentalVerificationToken: boolean;
   }
 }
 
@@ -5337,6 +5452,9 @@ export namespace messages {
   export type RunDetailsResponse = types.RunDetails;
   export type RunDisqualifyRequest = { [key: string]: any };
   export type RunDisqualifyResponse = {};
+  export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
+  export type _RunGetSubmissionFeedbackServerResponse = any;
+  export type RunGetSubmissionFeedbackResponse = types.SubmissionFeedback[];
   export type RunListRequest = { [key: string]: any };
   export type _RunListServerResponse = any;
   export type RunListResponse = { runs: types.Run[]; totalRuns: number };
@@ -5385,12 +5503,11 @@ export namespace messages {
 
   // Session
   export type SessionCurrentSessionRequest = { [key: string]: any };
+  export type _SessionCurrentSessionServerResponse = any;
   export type SessionCurrentSessionResponse = {
     session?: types.CurrentSession;
     time: number;
   };
-  export type SessionGoogleLoginRequest = { [key: string]: any };
-  export type SessionGoogleLoginResponse = { isAccountCreation: boolean };
 
   // Submission
   export type SubmissionSetFeedbackRequest = { [key: string]: any };
@@ -5491,14 +5608,7 @@ export namespace messages {
   export type UserListResponse = { results: types.ListItem[] };
   export type UserListAPITokensRequest = { [key: string]: any };
   export type _UserListAPITokensServerResponse = any;
-  export type UserListAPITokensResponse = {
-    tokens: {
-      last_used: Date;
-      name: string;
-      rate_limit: { limit: number; remaining: number; reset: Date };
-      timestamp: Date;
-    }[];
-  };
+  export type UserListAPITokensResponse = { tokens: types.ApiToken[] };
   export type UserListAssociatedIdentitiesRequest = { [key: string]: any };
   export type UserListAssociatedIdentitiesResponse = {
     identities: types.AssociatedIdentity[];
@@ -6117,6 +6227,9 @@ export namespace controllers {
     disqualify: (
       params?: messages.RunDisqualifyRequest,
     ) => Promise<messages.RunDisqualifyResponse>;
+    getSubmissionFeedback: (
+      params?: messages.RunGetSubmissionFeedbackRequest,
+    ) => Promise<messages.RunGetSubmissionFeedbackResponse>;
     list: (
       params?: messages.RunListRequest,
     ) => Promise<messages.RunListResponse>;
@@ -6156,9 +6269,6 @@ export namespace controllers {
     currentSession: (
       params?: messages.SessionCurrentSessionRequest,
     ) => Promise<messages.SessionCurrentSessionResponse>;
-    googleLogin: (
-      params?: messages.SessionGoogleLoginRequest,
-    ) => Promise<messages.SessionGoogleLoginResponse>;
   }
 
   export interface Submission {

@@ -18,7 +18,6 @@ import pytest
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, TimeoutException
 from selenium.webdriver import Firefox
-from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -43,8 +42,8 @@ def _mysql_auth() -> Sequence[str]:
 class JavaScriptLogCollector:
     '''Collects JavaScript errors from the log.'''
 
-    def __init__(self, dr):
-        self.driver = dr
+    def __init__(self, driver):  # pylint: disable=redefined-outer-name
+        self.driver = driver
         self._log_index = 0
         self._log_stack = [[]]
 
@@ -199,7 +198,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                  '%s ul.typeahead-dropdown li:first-of-type' %
                  (parent_selector)))).click()
 
-    def send_keys(self,  # pylint: disable=no-self-use
+    def send_keys(self,
                   element: WebElement,
                   value: str,
                   retries: int = 10) -> None:
@@ -252,8 +251,10 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
         self._wait_for_page_loaded()
 
-        self.browser.find_element(By.NAME, 'login_username').send_keys(username)
-        self.browser.find_element(By.NAME, 'login_password').send_keys(password)
+        self.browser.find_element(By.NAME,
+                                  'login_username').send_keys(username)
+        self.browser.find_element(By.NAME,
+                                  'login_password').send_keys(password)
         with self.page_transition():
             self.browser.find_element(By.NAME, 'login').click()
 
@@ -301,7 +302,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             'email_%s@localhost.localdomain' % user)
         self.browser.find_element(By.NAME, 'reg_password').send_keys(passw)
         self.browser.find_element(By.NAME,
-            'reg_password_confirmation').send_keys(passw)
+                                  'reg_password_confirmation').send_keys(passw)
         with self.page_transition():
             self.browser.find_element(By.NAME, 'sign_up').click()
 
@@ -331,14 +332,14 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             'Invalid URL redirect. Expected %s, got %s' % (
                 home_page_url, self.browser.current_url))
 
-    def annotate(self,  # pylint: disable=no-self-use
+    def annotate(self,
                  message: str,
                  level=logging.INFO) -> None:
         '''Add an annotation to the run's log.'''
 
         logging.log(level, message)
 
-    def update_run_score(self,  # pylint: disable=no-self-use
+    def update_run_score(self,
                          run_id,
                          verdict,
                          score) -> None:
@@ -494,7 +495,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 dbname='omegaup', auth=_mysql_auth())
         return username
 
-    def enable_experiment_identities_to_user(  # pylint: disable=no-self-use
+    def enable_experiment_identities_to_user(
             self,
             user_id,
     ) -> None:
@@ -550,7 +551,7 @@ def pytest_pyfunc_call(pyfuncitem):
         current_driver.screenshot(pyfuncitem.name)
         logpath = os.path.join(results_dir,
                                'webdriver_%s.log' % pyfuncitem.name)
-        with open(logpath, 'w') as logfile:
+        with open(logpath, 'w', encoding='utf-8') as logfile:
             json.dump(logs, logfile, indent=2)
     except Exception as ex:  # pylint: disable=broad-except
         print(ex)
@@ -593,7 +594,6 @@ def _get_browser(request, browser_name):
         chrome_options.add_argument('--lang=en-US')
         if request.config.option.headless:
             chrome_options.add_argument('--headless')
-        chrome_options.set_capability('loggingPrefs', {'browser': 'ALL'})
         chrome_browser = webdriver.Chrome(
             options=chrome_options)
         chrome_browser.set_window_size(*_WINDOW_SIZE)

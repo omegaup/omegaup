@@ -139,10 +139,14 @@ class Authorization {
                     $course = \OmegaUp\DAO\Courses::getByProblemsetId(
                         $problemset
                     );
-                    return (!is_null($course) && self::isTeachingAssistant(
-                        $identity,
-                        $course
-                    ));
+                    if (
+                        !is_null($course) && self::isTeachingAssistant(
+                            $identity,
+                            $course
+                        )
+                    ) {
+                        return true;
+                    }
                 }
             }
         }
@@ -215,6 +219,18 @@ class Authorization {
                     $identity,
                     $course
                 )));
+    }
+
+    public static function isUnderThirteenUser(\OmegaUp\DAO\VO\Users $user): bool {
+        // This is mostly for users who hasn't give us their birth day
+        if (is_null($user->birth_date)) {
+            return false;
+        }
+        // User's age is U13? $user->birth_date - current date then return true, otherwise return false
+        return strtotime($user->birth_date) >= strtotime(
+            '-13 year',
+            \OmegaUp\Time::get()
+        );
     }
 
     /**

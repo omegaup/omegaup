@@ -9,8 +9,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
  * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank, pagerItems: list<PageItem>}
  * @psalm-type Badge=array{assignation_time: \OmegaUp\Timestamp|null, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}
+ * @psalm-type ApiToken=array{name: string, timestamp: \OmegaUp\Timestamp, last_used: \OmegaUp\Timestamp, rate_limit: array{reset: \OmegaUp\Timestamp, limit: int, remaining: int}}
  * @psalm-type AssociatedIdentity=array{username: string, default: bool}
- * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>, apiTokens: list<ApiToken>}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float, quality_seal: bool}
@@ -27,7 +28,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
- * @psalm-type Contest=array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}
+ * @psalm-type Contest=array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, score_mode: string, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}
  * @psalm-type Course=array{acl_id?: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time?: \OmegaUp\Timestamp|null, group_id?: int, languages?: null|string, level?: null|string, minimum_progress_for_certificate?: int|null, name: string, needs_basic_information: bool, objective?: null|string, requests_user_information: string, school_id?: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}
  * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, hasPassword: bool}
  * @psalm-type CachedExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>}
@@ -43,6 +44,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
  * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
+ * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -168,6 +170,11 @@ class User extends \OmegaUp\Controllers\Controller {
             'verified' => 0,
             'verification_id' => \OmegaUp\SecurityTools::randomString(50),
             'is_private' => boolval($createUserParams->isPrivate),
+            'birth_date' => \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                intval(
+                    $createUserParams->birthDate
+                )
+            ),
         ];
         if (
             $createUserParams->birthDate >= strtotime(
@@ -598,9 +605,6 @@ class User extends \OmegaUp\Controllers\Controller {
                     ),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
-                'scripts' => [
-                    'https://apis.google.com/js/platform.js?onload=init',
-                ],
             ],
             'entrypoint' => 'login_signin',
         ];
@@ -4493,8 +4497,10 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString, scripts: list<string>}}
+     * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
      *
+     * @omegaup-request-param null|string $credential
+     * @omegaup-request-param null|string $g_csrf_token
      * @omegaup-request-param null|string $third_party_login
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
@@ -4507,6 +4513,8 @@ class User extends \OmegaUp\Controllers\Controller {
             // Do nothing.
         }
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
+        $gCsrfToken = $r->ensureOptionalString('g_csrf_token');
+        $idToken = $r->ensureOptionalString('credential');
         if ($r->offsetExists('fb')) {
             $thirdPartyLogin = 'facebook';
         }
@@ -4518,16 +4526,21 @@ class User extends \OmegaUp\Controllers\Controller {
                     'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
-                'scripts' => [
-                    'https://apis.google.com/js/platform.js?onload=init',
-                ],
             ],
             'entrypoint' => 'login_signin',
         ];
         try {
             if ($thirdPartyLogin === 'facebook') {
                 \OmegaUp\Controllers\Session::loginViaFacebook();
+            } elseif (!is_null($gCsrfToken) && !is_null($idToken)) {
+                \OmegaUp\Controllers\Session::loginViaGoogle(
+                    $idToken,
+                    $gCsrfToken
+                );
             }
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // The controller has explicitly requested to exit.
+            exit;
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             \OmegaUp\ApiCaller::logException($e);
             $response['templateProperties']['payload']['statusError'] = strval(
@@ -4614,8 +4627,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Returns a list of all the API tokens associated with the user.
-     *
-     * @return array{tokens: list<array{name: string, timestamp: \OmegaUp\Timestamp, last_used: \OmegaUp\Timestamp, rate_limit: array{reset: \OmegaUp\Timestamp, limit: int, remaining: int}}>}
+     * @return array{tokens: list<ApiToken>}
      */
     public static function apiListAPITokens(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -4644,6 +4656,62 @@ class User extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\DAO\APITokens::deleteByName($r->user->user_id, $name);
         return ['status' => 'ok'];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: VerificationParentalTokenDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $parental_verification_token
+     */
+    public static function getVerificationParentalTokenDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureIdentity();
+
+        $token = $r->ensureString(
+            'parental_verification_token',
+            validator: fn (string $token) => preg_match(
+                '/^[a-zA-Z0-9]{24}$/',
+                $token
+            ) === 1
+        );
+        $hasParentalVerificationToken = false;
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            $user = \OmegaUp\DAO\Users::findByParentalToken($token);
+
+            if (is_null($user)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'parentalTokenNotFound'
+                );
+            }
+
+            if (is_null($r->user) || is_null($r->user->main_email_id)) {
+                throw new \OmegaUp\Exceptions\UnauthorizedException();
+            }
+
+            $user->parent_email_id = $r->user->main_email_id;
+            $user->parent_verified = true;
+            $user->parental_verification_token = null;
+            \OmegaUp\DAO\Users::update($user);
+            $hasParentalVerificationToken = true;
+
+            \OmegaUp\DAO\DAO::transEnd();
+            return [
+                'templateProperties' => [
+                    'payload' => [
+                        'hasParentalVerificationToken' => $hasParentalVerificationToken,
+                    ],
+                    'title' => new \OmegaUp\TranslationString(
+                        'omegaupTitleParentalVerificationToken'
+                    ),
+                ],
+                'entrypoint' => 'user_verification_parental_token',
+            ];
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
     }
 }
 
