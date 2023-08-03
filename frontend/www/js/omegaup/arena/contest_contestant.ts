@@ -14,7 +14,11 @@ import {
   refreshContestClarifications,
   trackClarifications,
 } from './clarifications';
-import { navigateToProblem, NavigationType } from './navigation';
+import {
+  getScoreModeEnum,
+  navigateToProblem,
+  NavigationType,
+} from './navigation';
 import clarificationStore from './clarificationsStore';
 import {
   onRefreshRuns,
@@ -72,6 +76,7 @@ OmegaUp.on('ready', async () => {
       scoreboard: payload.scoreboard,
       currentUsername: commonPayload.currentUsername,
       navbarProblems: payload.problems,
+      scoreMode: getScoreModeEnum(payload.contest.score_mode),
     });
     ranking = rankingInfo.ranking;
     users = rankingInfo.users;
@@ -174,6 +179,7 @@ OmegaUp.on('ready', async () => {
               target: contestContestant,
               problems: this.problems,
               contestAlias: payload.contest.alias,
+              contestMode: getScoreModeEnum(payload.contest.score_mode),
             });
           },
           'update-search-result-users-contest': ({
@@ -380,6 +386,9 @@ OmegaUp.on('ready', async () => {
   const socket = new EventsSocket({
     disableSockets: false,
     problemsetAlias: payload.contest.alias,
+    isVirtual: false,
+    startTime: payload.contest.start_time,
+    finishTime: payload.contest.finish_time,
     locationProtocol: window.location.protocol,
     locationHost: window.location.host,
     problemsetId: payload.contest.problemset_id,
@@ -389,6 +398,7 @@ OmegaUp.on('ready', async () => {
     navbarProblems: payload.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
+    scoreMode: getScoreModeEnum(payload.contest.score_mode),
   });
   socket.connect();
 

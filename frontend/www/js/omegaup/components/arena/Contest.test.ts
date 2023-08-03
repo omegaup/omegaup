@@ -35,7 +35,7 @@ describe('Contest.vue', () => {
     feedback: 'detailed',
     finish_time: futureDate,
     languages: 'py3',
-    partial_score: true,
+    score_mode: 'partial',
     penalty: 1,
     penalty_calc_policy: 'sum',
     penalty_type: 'contest_start',
@@ -199,13 +199,17 @@ describe('Contest.vue', () => {
     classname: 'user-rank-unranked',
     contest_score: 100,
     country: 'xx',
+    execution: 'EXECUTION_FINISHED',
     guid: '78099022574726af861839e1b4210188',
     language: 'py3',
     memory: 0,
+    output: 'OUTPUT_CORRECT',
     penalty: 0,
     runtime: 0,
     score: 1,
     status: 'ready',
+    status_memory: 'MEMORY_AVAILABLE',
+    status_runtime: 'RUNTIME_AVAILABLE',
     submit_delay: 0,
     time: new Date(),
     type: 'normal',
@@ -265,5 +269,33 @@ describe('Contest.vue', () => {
         },
       ],
     ]);
+  });
+
+  it('Should display the edit button when current user is admin', () => {
+    const wrapper = mount(arena_Contest, {
+      propsData: {
+        activeTab: 'runs',
+        contestAdmin: true,
+        contest,
+        problems,
+        allRuns: [run],
+        showAllRuns: true,
+      },
+    });
+    expect(wrapper.find('.edit-contest-button')).toBeTruthy();
+  });
+
+  it('Should hide the edit button when current user is not an admin', () => {
+    const wrapper = mount(arena_Contest, {
+      propsData: {
+        activeTab: 'runs',
+        contestAdmin: false,
+        contest,
+        problems,
+        allRuns: [run],
+        showAllRuns: true,
+      },
+    });
+    expect(wrapper.find('.edit-contest-button').exists()).toBeFalsy();
   });
 });

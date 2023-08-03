@@ -14,6 +14,7 @@
               <input
                 ref="name"
                 v-model="name"
+                data-course-assignment-name
                 class="form-control name"
                 :class="{ 'is-invalid': invalidParameterName === 'name' }"
                 size="30"
@@ -29,6 +30,7 @@
                 icon="info-circle" />
               <input
                 v-model="alias"
+                data-course-assignment-alias
                 class="form-control alias"
                 :class="{
                   'is-invalid': invalidParameterName === 'alias',
@@ -76,6 +78,7 @@
                 icon="info-circle" />
               <omegaup-datetimepicker
                 v-model="startTime"
+                data-course-start-date
                 :enabled="!assignment.has_runs"
                 :finish="finishTimeCourse"
                 :start="startTimeCourse"
@@ -129,6 +132,7 @@
                 icon="info-circle" />
               <omegaup-datetimepicker
                 v-model="finishTime"
+                data-course-end-date
                 :enabled="!unlimitedDuration"
                 :readonly="false"
                 :finish="finishTimeCourse"
@@ -144,6 +148,7 @@
               >{{ T.courseNewFormDescription }}
               <textarea
                 v-model="description"
+                data-course-assignment-description
                 class="form-control"
                 :class="{
                   'is-invalid': invalidParameterName === 'description',
@@ -162,7 +167,11 @@
             :assignment-problems="assignmentProblems"
             :tagged-problems="taggedProblems"
             :selected-assignment="assignment"
+            :search-result-problems="searchResultProblems"
             @emit-tags="(tags) => $emit('tags-problems', tags)"
+            @update-search-result-problems="
+              (query) => $emit('update-search-result-problems', query)
+            "
           ></omegaup-course-scheduled-problem-list>
           <omegaup-course-problem-list
             v-else
@@ -291,6 +300,7 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
   @Prop() courseAlias!: string;
+  @Prop() scheduledAssignmentProblems!: types.ProblemsetProblem[];
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop({ default: true }) shouldAddProblems!: boolean;

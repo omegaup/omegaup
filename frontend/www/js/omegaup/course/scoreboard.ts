@@ -9,6 +9,7 @@ import Vue from 'vue';
 import { types } from '../api_types';
 import { onRankingChanged } from '../arena/ranking';
 import rankingStore from '../arena/rankingStore';
+import { ScoreMode } from '../arena/navigation';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseScoreboardPayload();
@@ -22,6 +23,7 @@ OmegaUp.on('ready', () => {
       scoreboard: payload.scoreboard,
       currentUsername: commonPayload.currentUsername,
       navbarProblems: payload.problems,
+      scoreMode: ScoreMode.Partial,
     });
     ranking = rankingInfo.ranking;
     lastTimeUpdated = rankingInfo.lastTimeUpdated;
@@ -55,6 +57,9 @@ OmegaUp.on('ready', () => {
   const socket = new EventsSocket({
     disableSockets: false,
     problemsetAlias: payload.assignment.alias,
+    isVirtual: false,
+    startTime: payload.assignment.startTime,
+    finishTime: payload.assignment.finishTime,
     locationProtocol: window.location.protocol,
     locationHost: window.location.host,
     problemsetId: payload.assignment.problemsetId,
@@ -64,6 +69,7 @@ OmegaUp.on('ready', () => {
     navbarProblems: payload.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
+    scoreMode: ScoreMode.Partial,
   });
 
   socket.connect();
@@ -79,6 +85,7 @@ OmegaUp.on('ready', () => {
           scoreboard,
           currentUsername: commonPayload.currentUsername,
           navbarProblems: payload.problems,
+          scoreMode: ScoreMode.Partial,
         });
         ranking = rankingInfo.ranking;
         lastTimeUpdated = rankingInfo.lastTimeUpdated;

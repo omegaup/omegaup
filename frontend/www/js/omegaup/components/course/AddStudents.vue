@@ -19,7 +19,7 @@
               @update-existing-options="
                 (query) => $emit('update-search-result-users', query)
               "
-            />
+            ></omegaup-common-typeahead>
             <button
               class="btn btn-secondary add-participant ml-2"
               :disabled="!participant"
@@ -33,6 +33,7 @@
           <label>{{ T.wordsMultipleUser }}</label>
           <textarea
             v-model="participants"
+            data-course-multiple-students-add
             class="form-control pariticipants"
             rows="4"
           ></textarea>
@@ -63,7 +64,7 @@
         </thead>
         <tbody>
           <tr v-for="student in students" :key="student.username">
-            <td>
+            <td data-uploaded-students>
               <a :href="studentProgressUrl(student)">{{
                 student.name || student.username
               }}</a>
@@ -80,6 +81,11 @@
           </tr>
         </tbody>
       </table>
+      <div class="float-right">
+        <a class="btn btn-primary" :href="studentsProgressUrl()">
+          {{ T.courseStudentsProgress }}
+        </a>
+      </div>
     </div>
     <omegaup-common-requests
       :data="identityRequests"
@@ -111,7 +117,7 @@ export default class CourseAddStudents extends Vue {
 
   T = T;
   studentUsername = '';
-  participant: null | string = null;
+  participant: null | types.ListItem = null;
   participants = '';
   requests: types.IdentityRequest[] = [];
 
@@ -119,11 +125,15 @@ export default class CourseAddStudents extends Vue {
     return `/course/${this.courseAlias}/student/${student.username}/`;
   }
 
+  studentsProgressUrl(): string {
+    return `/course/${this.courseAlias}/students/`;
+  }
+
   addParticipantToList(): void {
     if (this.participants.length) {
       this.participants += '\n';
     }
-    this.participants += this.participant;
+    this.participants += this.participant?.key;
 
     this.participant = null;
   }

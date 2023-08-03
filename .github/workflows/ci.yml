@@ -8,7 +8,7 @@ on:
 
 jobs:
   php:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     services:
       mysql:
@@ -38,13 +38,13 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Use PHP 8.0
+      - name: Use PHP 8.1
         run: |
-          sudo update-alternatives --install /usr/bin/php php /usr/bin/php8.0 100
+          sudo update-alternatives --install /usr/bin/php php /usr/bin/php8.1 100
           # Enable APCu for tests
-          echo 'apc.enable_cli=1' | sudo tee --append /etc/php/8.0/cli/conf.d/20-apcu.ini >/dev/null
+          echo 'apc.enable_cli=1' | sudo tee --append /etc/php/8.1/cli/conf.d/20-apcu.ini >/dev/null
           # Enable coverage for XDebug so that codecov can do its magic.
-          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/8.0/cli/conf.d/20-xdebug.ini >/dev/null
+          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/8.1/cli/conf.d/20-xdebug.ini >/dev/null
 
       - name: Create default configuration files
         run: |
@@ -57,7 +57,7 @@ jobs:
 
       - name: Download gitserver
         run: |
-          DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.8.11/omegaup-gitserver.tar.xz'
+          DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.9.13/omegaup-gitserver.tar.xz'
           curl --location "${DOWNLOAD_URL}" | sudo tar -xJv -C /
 
           # omegaup-gitserver depends on libinteractive.
@@ -140,7 +140,7 @@ jobs:
           path: frontend/tests/runfiles/*/*.log
 
   javascript:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v2
@@ -161,20 +161,20 @@ jobs:
           ./codecov
 
   lint:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
 
-      - name: Use PHP 8.0
+      - name: Use PHP 8.1
         run: |
-          sudo update-alternatives --install /usr/bin/php php /usr/bin/php8.0 100
+          sudo update-alternatives --install /usr/bin/php php /usr/bin/php8.1 100
           # Enable APCu for tests
-          echo 'apc.enable_cli=1' | sudo tee --append /etc/php/8.0/cli/conf.d/20-apcu.ini >/dev/null
+          echo 'apc.enable_cli=1' | sudo tee --append /etc/php/8.1/cli/conf.d/20-apcu.ini >/dev/null
           # Enable coverage for XDebug so that codecov can do its magic.
-          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/8.0/cli/conf.d/20-xdebug.ini >/dev/null
+          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/8.1/cli/conf.d/20-xdebug.ini >/dev/null
 
       - name: Create default configuration files
         run: |
@@ -245,7 +245,7 @@ jobs:
         run: php frontend/server/cmd/APITool.php --file api.py | yapf > /dev/null
 
   cypress:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v2
@@ -375,7 +375,7 @@ jobs:
           path: cypress/videos
 
   selenium:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v2
@@ -421,6 +421,9 @@ jobs:
           define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
           define('OMEGAUP_GRADER_URL', 'https://grader:21680');
           define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
+          // This client ID was created using a personal account (juan.pablo@omegaup.com)
+          // and is intended solely for use in a testing environment.
+          define('OMEGAUP_GOOGLE_CLIENTID', '568596222408-qf7e8lqqbrgrmo16mtou3u1nskm7fmjj.apps.googleusercontent.com');
           define('REDIS_HOST', 'redis');
           define('REDIS_PASS', '');
           define('TEMPLATE_CACHE_DIR', '/tmp');
@@ -498,7 +501,7 @@ jobs:
           path: frontend/tests/runfiles/*/*.log
 
   python:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v2
@@ -592,7 +595,7 @@ jobs:
 
       - name: Run Python tests
         run: |
-          docker-compose exec -T frontend python3 -m pytest ./stuff/
+          docker-compose exec -T frontend python3 -m pytest --verbose --timeout=20 ./stuff/
 
       - name: Collect container logs
         if: ${{ always() }}

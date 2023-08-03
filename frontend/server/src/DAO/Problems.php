@@ -82,7 +82,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
      * @param list<string> $authors
-     * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int, problem_id: int}>, count: int}
+     * @return array{count: int, problems: list<array{accepted: int, alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}>}
      */
     final public static function byIdentityType(
         string $identityType,
@@ -104,6 +104,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         string $difficulty,
         array $authors
     ) {
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        );
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
             $order = 'desc';
@@ -230,9 +234,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             if (is_numeric($query)) {
                 $clauses[] = [
                     "(
-                      p.title LIKE CONCAT('%', ?, '%') OR
-                      p.alias LIKE CONCAT('%', ?, '%') OR
-                      p.problem_id = ?
+                    p.title LIKE CONCAT('%', ?, '%') OR
+                    p.alias LIKE CONCAT('%', ?, '%') OR
+                    p.problem_id = ?
                     )",
                     [$query, $query, intval($query)],
                 ];
@@ -245,14 +249,14 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         if ($identityType === IDENTITY_ADMIN) {
-            $args = [$identityId];
-            $select = '
+            $args[] = $identityId;
+            $select = "
                 SELECT
-                    ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2)   AS points,
-                    accepted / GREATEST(1, submissions)     AS ratio,
-                    ROUND(100 * IFNULL(ps.score, 0.0))      AS score,
-                    p.*
-            ';
+                    ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2) AS points,
+                    accepted / GREATEST(1, submissions) AS ratio,
+                    ROUND(100 * IFNULL(ps.score, 0.0)) AS score,
+                    {$fields}
+            ";
             $sql = '
                 FROM
                     Problems p
@@ -275,13 +279,13 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 [\OmegaUp\ProblemParams::VISIBILITY_DELETED],
             ];
         } elseif ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
-            $select = '
-                SELECT
+            $select = "
+                SELECT DISTINCT
                     ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                     p.accepted / GREATEST(1, p.submissions)     AS ratio,
                     ROUND(100 * IFNULL(ps.score, 0), 2)   AS score,
-                    p.*
-            ';
+                    {$fields}
+            ";
             $sql = '
                 FROM
                     Problems p
@@ -338,12 +342,13 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 [\OmegaUp\ProblemParams::VISIBILITY_DELETED],
             ];
         } elseif ($identityType === IDENTITY_ANONYMOUS) {
-            $select = '
-                    SELECT
+            $select = "
+                    SELECT DISTINCT
                         0.0 AS score,
                         ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                         accepted / GREATEST(1, p.submissions)  AS ratio,
-                        p.* ';
+                        {$fields}
+                    ";
             $sql = '
                     FROM
                         Problems p ' . $languageJoin . $levelJoin;
@@ -451,8 +456,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         // Only these fields (plus score, points and ratio) will be returned.
         $filters = [
-            'title', 'quality', 'difficulty', 'alias', 'visibility', 'problem_id',
-            'quality_histogram', 'difficulty_histogram', 'quality_seal',
+            'accepted', 'title', 'quality', 'difficulty', 'alias', 'visibility', 'problem_id',
+            'quality_histogram', 'difficulty_histogram', 'submissions', 'quality_seal',
         ];
         $problems = [];
         $hiddenTags = $identityType !== IDENTITY_ANONYMOUS ? \OmegaUp\DAO\Users::getHideTags(
@@ -465,7 +470,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     \OmegaUp\DAO\VO\Problems::FIELD_NAMES
                 )
             );
-            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, visibility: int,quality_histogram: list<int>, difficulty_histogram: list<int>, quality_seal: bool, problem_id: int} */
+            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, accepted: int, visibility: int,quality_histogram: list<int>, difficulty_histogram: list<int>, quality_seal: bool, submissions: int, problem_id: int} */
             $problem = $problemObject->asFilteredArray($filters);
 
             // score, points and ratio are not actually fields of a Problems object.
@@ -488,7 +493,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     final public static function getByAlias(
         string $alias
     ): ?\OmegaUp\DAO\VO\Problems {
-        $sql = 'SELECT * FROM Problems WHERE (alias = ? ) LIMIT 1;';
+        $sql = 'SELECT ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'Problems'
+        ) . ' FROM Problems WHERE (alias = ? ) LIMIT 1;';
         $params = [$alias];
 
         /** @var array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}|null */
@@ -512,7 +520,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     ): ?\OmegaUp\DAO\VO\Problems {
         $sql = '
             SELECT
-                p.*
+            ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        ) . '
             FROM
                 Problems p
             INNER JOIN
@@ -608,7 +619,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     final public static function getProblemsSolved(int $identityId): array {
         $sql = '
             SELECT
-                p.*
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        ) . '
             FROM
                 Problems p
             INNER JOIN
@@ -664,9 +678,13 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     final public static function getProblemsUnsolvedByIdentity(
         int $identityId
     ): array {
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        );
         $sql = "
             SELECT
-                p.*,
+                {$fields},
                 SUM(s.verdict = 'AC') AS solved_count
             FROM
                 Submissions s
@@ -703,7 +721,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     ): array {
         $sql = '
             SELECT DISTINCT
-                p.*
+            ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        ) . '
             FROM
                 Identities i
             INNER JOIN
@@ -951,8 +972,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         $select = '
             SELECT
-                p.*
-        ';
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        );
 
         $sql = '
             FROM
@@ -1015,7 +1038,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     ): array {
         $select = '
             SELECT
-                p.*';
+            ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        );
         $sql = '
             FROM
                 Problems AS p
@@ -1102,7 +1128,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     ) {
         $select = '
             SELECT
-                p.*';
+            ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        );
         $sql = '
             FROM
                 Problems AS p
@@ -1169,7 +1198,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         ?string $order,
         string $orderType
     ) {
-        $sql = 'SELECT * from Problems where `visibility` > ? ';
+        $sql = 'SELECT ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'Problems'
+        ) . ' from Problems p where `visibility` > ? ';
         if (!is_null($order)) {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape(
                 $order
@@ -1279,7 +1311,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      */
     final public static function getByContest(int $contestId): array {
         $sql = 'SELECT
-                    p.*
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'p'
+        ) . '
                 FROM
                     Problems p
                 INNER JOIN
@@ -1310,7 +1345,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      */
     final public static function getByTitle(string $title): array {
         $sql = 'SELECT
-                    *
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'Problems'
+        ) . '
                 FROM
                     Problems
                 WHERE
@@ -1396,5 +1434,111 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         /** @var string */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
+    }
+
+    /**
+     * @return array{results: list<array{key: string, value: string}>}
+     */
+    final public static function byIdentityTypeForTypeahead(
+        int $offset,
+        int $rowcount,
+        string $query,
+        string $searchType,
+        int $minVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC
+    ) {
+        $fields = 'alias, title';
+
+        $args = [];
+        $sql = '';
+        $select = "SELECT
+                        {$fields},";
+
+        $groupByClause = '';
+        $orderByClause = '';
+
+        if (in_array($searchType, ['alias', 'title', 'problem_id'])) {
+            $args[] = $query;
+            $select .= ' 1.0 AS relevance
+            ';
+            $sql = "FROM
+                        Problems p
+                    WHERE
+                        p.{$searchType} = ?";
+        } else {
+            $args = array_fill(0, 5, $query);
+            $curatedQuery = preg_replace('/\W+/', ' ', $query);
+            $args = array_merge($args, array_fill(0, 2, $curatedQuery));
+            $select .= ' IFNULL(SUM(relevance), 0.0) AS relevance
+            ';
+            $sql = "FROM
+                    (
+                        SELECT
+                            {$fields},
+                            2.0 AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            alias = ?
+                        UNION ALL
+                        SELECT
+                            {$fields},
+                            1.0 AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            title = ?
+                        UNION ALL
+                        SELECT
+                            {$fields},
+                            0.1 AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            (
+                                title LIKE CONCAT('%', ?, '%') OR
+                                alias LIKE CONCAT('%', ?, '%') OR
+                                problem_id = ?
+                            )
+                        UNION ALL
+                        SELECT
+                            {$fields},
+                            IFNULL(
+                                MATCH(alias, title)
+                                AGAINST (? IN BOOLEAN MODE), 0.0
+                            ) AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            MATCH(alias, title)
+                            AGAINST (? IN BOOLEAN MODE)
+                    ) AS p";
+            $groupByClause = "
+                        GROUP BY {$fields}
+            ";
+            $orderByClause = '
+                        ORDER BY relevance DESC
+            ';
+        }
+
+        $limits = ' LIMIT ?, ? ';
+        $args[] = $offset;
+        $args[] = $rowcount;
+
+        /** @var list<array{alias: string, relevance: float, title: string}> */
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            "{$select} {$sql} {$groupByClause} {$orderByClause} {$limits};",
+            $args
+        );
+
+        $problems = [];
+        foreach ($result as $problem) {
+            $problems[] = [
+                'key' => $problem['alias'],
+                'value' => $problem['title'],
+            ];
+        }
+        return [
+            'results' => $problems,
+        ];
     }
 }

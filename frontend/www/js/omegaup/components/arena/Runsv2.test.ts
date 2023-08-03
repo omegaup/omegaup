@@ -18,12 +18,16 @@ describe('Runsv2.vue', () => {
     classname: '',
     contest_score: 0,
     country: 'xx',
+    execution: 'EXECUTION_FINISHED',
     language: 'py3',
     memory: 1933312,
+    output: 'OUTPUT_CORRECT',
     penalty: 0,
     runtime: 316,
     score: 0,
     status: 'ready',
+    status_memory: 'MEMORY_AVAILABLE',
+    status_runtime: 'RUNTIME_AVAILABLE',
     submit_delay: 0,
     type: 'normal',
     username: 'username',
@@ -45,6 +49,7 @@ describe('Runsv2.vue', () => {
     source: 'print(3)',
     language: 'py3',
     show_diff: 'none',
+    feedback: [],
   };
 
   const runs: types.Run[] = [

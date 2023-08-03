@@ -112,6 +112,7 @@
           </div>
           <div class="card-body">
             <a
+              data-scorecard-csv-download-button
               class="btn btn-primary btn-sm w-100 my-1"
               :class="{ disabled: completeStudentsProgress === null }"
               :download="`${course.alias}.csv`"
@@ -182,7 +183,9 @@ export function toOds(courseName: string, table: TableCell[][] | null): string {
     result += '<table:table-row>\n';
     for (const cell of row) {
       if (cell instanceof Percentage) {
-        result += `<table:table-cell office:value-type="percentage" office:value="${cell.toString()}"><text:p>${cell.toString()}</text:p></table:table-cell>`;
+        result += `<table:table-cell office:value-type="percentage" office:value="${cell.value.toFixed(
+          4,
+        )}"><text:p>${cell.toString()}</text:p></table:table-cell>`;
       } else if (typeof cell === 'number') {
         const num: number = cell;
         result += `<table:table-cell office:value-type="float" office:value="${num}"><text:p>${num.toPrecision(

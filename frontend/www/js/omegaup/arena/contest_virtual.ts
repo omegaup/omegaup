@@ -14,7 +14,11 @@ import {
   refreshContestClarifications,
   trackClarifications,
 } from './clarifications';
-import { navigateToProblem, NavigationType } from './navigation';
+import {
+  getScoreModeEnum,
+  navigateToProblem,
+  NavigationType,
+} from './navigation';
 import clarificationStore from './clarificationsStore';
 import {
   showSubmission,
@@ -82,8 +86,10 @@ OmegaUp.on('ready', async () => {
               scoreboard,
               scoreboardEvents: response.events,
               problems,
-              contest,
+              startTime: contest.start_time,
+              finishTime: contest.finish_time,
               currentUsername,
+              scoreMode: getScoreModeEnum(contest.score_mode),
             });
           })
           .catch(ui.apiError);
@@ -105,8 +111,10 @@ OmegaUp.on('ready', async () => {
       scoreboard: payload.scoreboard,
       scoreboardEvents: payload.original.scoreboardEvents,
       problems: payload.problems,
-      contest: payload.contest,
+      startTime: payload.contest.start_time,
+      finishTime: payload.contest.finish_time,
       currentUsername: commonPayload.currentUsername,
+      scoreMode: getScoreModeEnum(payload.contest.score_mode),
     });
     virtualContestRefreshInterval = setInterval(() => {
       loadVirtualRanking({
@@ -180,6 +188,7 @@ OmegaUp.on('ready', async () => {
               target: contestContestant,
               problems: this.problems,
               contestAlias: payload.contest.alias,
+              contestMode: getScoreModeEnum(payload.contest.score_mode),
             });
           },
           'show-run': (request: SubmissionRequest) => {
@@ -307,6 +316,10 @@ OmegaUp.on('ready', async () => {
   const socket = new EventsSocket({
     disableSockets: false,
     problemsetAlias: payload.contest.alias,
+    isVirtual: true,
+    originalProblemsetId: payload.original?.contest.problemset_id,
+    startTime: payload.contest.start_time,
+    finishTime: payload.contest.finish_time,
     locationProtocol: window.location.protocol,
     locationHost: window.location.host,
     problemsetId: payload.contest.problemset_id,
@@ -316,6 +329,7 @@ OmegaUp.on('ready', async () => {
     navbarProblems: payload.problems,
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
+    scoreMode: getScoreModeEnum(payload.contest.score_mode),
   });
   socket.connect();
 

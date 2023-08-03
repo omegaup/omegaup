@@ -32,8 +32,8 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problem->problem_id
         );
         self::assertNotNull($problemset_problems);
-        self::assertEquals($r['points'], $problemset_problems->points);
-        self::assertEquals($r['order_in_contest'], $problemset_problems->order);
+        self::assertSame($r['points'], $problemset_problems->points);
+        self::assertSame($r['order_in_contest'], $problemset_problems->order);
     }
 
     /**
@@ -60,7 +60,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
 
         // Validate
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         self::assertProblemAddedToContest($problemData, $contestData, $r);
     }
@@ -87,7 +87,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertEquals('problemNotFound', $e->getMessage());
+            $this->assertSame('problemNotFound', $e->getMessage());
         }
     }
 
@@ -115,7 +115,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertEquals('contestNotFound', $e->getMessage());
+            $this->assertSame('contestNotFound', $e->getMessage());
         }
     }
 
@@ -144,7 +144,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -169,7 +169,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 'order_in_contest' => $i + 1,
             ]);
             $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
-            $this->assertEquals('ok', $response['status']);
+            $this->assertSame('ok', $response['status']);
             self::assertProblemAddedToContest($problemData, $contestData, $r);
         }
 
@@ -188,7 +188,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed adding the problem to the contest');
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 $e->getMessage(),
                 'contestAddproblemTooManyProblems'
             );
@@ -225,7 +225,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 'Banned problems should not be able to be added to a contest'
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('problemIsBanned', $e->getMessage());
+            $this->assertSame('problemIsBanned', $e->getMessage());
         }
 
         // Make it private. Now it should be possible to add it.
@@ -240,7 +240,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             'order_in_contest' => 1,
         ]);
         $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
-        $this->assertEquals('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
         self::assertProblemAddedToContest($problemData, $contestData, $r);
     }
 
@@ -285,7 +285,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('It should fail because of the privileges');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
 
         \OmegaUp\Controllers\Contest::apiAddProblem(
@@ -316,7 +316,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        self::assertEquals($response['problems'][0]['points'], 50);
-        self::assertEquals($response['problems'][0]['order'], 2);
+        self::assertSame($response['problems'][0]['points'], 50.0);
+        self::assertSame($response['problems'][0]['order'], 2);
     }
 }

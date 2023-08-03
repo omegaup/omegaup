@@ -20,6 +20,28 @@ Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
   });
 });
 
+// Logins the user as an admin
+Cypress.Commands.add('loginAdmin', () => {
+  const username = 'omegaup';
+  const password = 'omegaup';
+
+  const URL =
+    '/api/user/login?' + buildURLQuery({ usernameOrEmail: username, password });
+  cy.request(URL).then((response) => {
+    expect(response.status).to.equal(200);
+    cy.reload();
+  });
+});
+
+// Logouts the user
+Cypress.Commands.add('logout', () => {
+  cy.get('a[data-nav-user]').click();
+  cy.get('a[data-logout-button]').click();
+  cy.waitUntil(() =>
+    cy.url().should('eq', 'http://127.0.0.1:8001/'),
+  );
+});
+
 // Registers and logs in a new user given a username and password.
 Cypress.Commands.add('register', ({ username, password }: LoginOptions) => {
   const URL =
@@ -75,7 +97,7 @@ Cypress.Commands.add(
     endDate,
     showScoreboard = false,
     unlimitedDuration = true,
-    school = 'omegaup',
+    school = 'Escuela curso',
     basicInformation = false,
     requestParticipantInformation = 'no',
     problemLevel = 'introductory',
@@ -100,7 +122,8 @@ Cypress.Commands.add(
       // the end date input should be disabled
       cy.get('[name="end-date"]').should('be.disabled');
     }
-    cy.get('.tt-input').first().type(school); // If we use the data attribute, the autocomplete makes multiple elements
+    cy.get('.tags-input input[type="text"]').first().type(school); // If we use the data attribute, the autocomplete makes multiple elements
+    cy.get('.typeahead-dropdown li').first().click();
     cy.get('[name="basic-information"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
       .eq(basicInformation ? 0 : 1)
       .click();
@@ -127,6 +150,12 @@ Cypress.Commands.add(
   },
 );
 
+declare enum ScoreMode {
+  AllOrNothing = 'all_or_nothing',
+  Partial = 'partial',
+  MaxPerGroup = 'max_per_group',
+}
+
 Cypress.Commands.add(
   'createContest',
   ({
@@ -135,9 +164,12 @@ Cypress.Commands.add(
     endDate,
     description = 'Default Description',
     showScoreboard = true,
-    partialPoints = true,
+    scoreBoardVisibleTime = "100",
+    scoreMode = ScoreMode.Partial,
     basicInformation = false,
     requestParticipantInformation = 'no',
+    differentStart = false,
+    differentStartTime = "",
   }) => {
     cy.visit('contest/new/');
     cy.get('[name="title"]').type(contestAlias);
@@ -145,8 +177,13 @@ Cypress.Commands.add(
     cy.get('[name="description"]').type(description);
     cy.get('[data-start-date]').type(getISODateTime(startDate));
     cy.get('[data-end-date]').type(getISODateTime(endDate));
+    cy.get('[data-score-board-visible-time]').clear().type(scoreBoardVisibleTime);
+    if (differentStart) {
+      cy.get('[data-different-start-check]').click();
+      cy.get('[data-different-start-time-input]').type(differentStartTime);
+    }
     cy.get('[data-show-scoreboard-at-end]').select(`${showScoreboard}`); // "true" | "false"
-    cy.get('[data-partial-points]').select(`${partialPoints}`);
+    cy.get('[data-score-mode]').select(`${scoreMode}`);
     if (basicInformation) {
       cy.get('[data-basic-information-required]').click();
     }
@@ -168,8 +205,8 @@ Cypress.Commands.add(
     cy.get('a.dropdown-item.problems').click();
 
     for (const idx in problems) {
-      cy.get('input[type="text"]').type(problems[idx].problemAlias)
-      cy.get('.typeahead-dropdown').click();
+      cy.get('.tags-input input[type="text"]').type(problems[idx].problemAlias)
+      cy.get('.typeahead-dropdown li').first().click();
       cy.get('.add-problem').click();
     }
   },
@@ -196,10 +233,7 @@ Cypress.Commands.add(
   ({
     contestAlias,
   }) => {
-    cy.visit('arena/');
-    cy.get('a[data-contests]').click();
-    cy.get('a[data-list-current]').click();
-    cy.get(`a[href="/arena/${contestAlias}/"]`).click();
+    cy.visit(`arena/${contestAlias}`);
     cy.get('button[data-start-contest]').click();
   },
 );
@@ -238,8 +272,7 @@ Cypress.Commands.add(
         cy.get('[data-submit-run]').click();
       });
 
-      const expectedStatus: Status = 'AC';
-      cy.get('[data-run-status] > span').first().should('have.text', 'new');
+      const expectedStatus: Status = runs[idx].status;
       cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
 
       cy.wait(['@runStatus'], { timeout: 10000 }).its(
@@ -267,7 +300,8 @@ export const getISODate = (date: Date) => {
  * @returns ISO datetime required to type on a date input inside cypress
  */
 export const getISODateTime = (date: Date) => {
-  return date.toISOString().slice(0, 16);
+  const isoDateTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+  return isoDateTime.slice(0, 16);
 };
 
 /**

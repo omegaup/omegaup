@@ -65,7 +65,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'group_alias' => $group['group']->alias,
         ]));
 
-        $this->assertEquals(1, count($response['identities']));
+        $this->assertSame(1, count($response['identities']));
 
         // Check current school for Identity on IdentitiesSchools
         $school = \OmegaUp\DAO\Schools::findByName($schoolName);
@@ -75,7 +75,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
             $identity->current_identity_school_id
         );
-        $this->assertEquals($school[0]->school_id, $identitySchool->school_id);
+        $this->assertSame($school[0]->school_id, $identitySchool->school_id);
         $this->assertNull($identitySchool->end_time);
     }
 
@@ -384,8 +384,19 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Should not have allowed bulk user creation');
-        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('aliasInUse', $e->getMessage());
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInArrayException $e) {
+            $localizedText = \OmegaUp\Translations::getInstance()->get(
+                'groupMemberUsernameInUse'
+            );
+            $errorMessage = \OmegaUp\ApiUtils::formatString(
+                $localizedText,
+                ['usernames' => join('<br />', $e->duplicatedItemsInArray)]
+            );
+            $this->assertStringContainsString(
+                $e->getErrorMessage(),
+                $errorMessage
+            );
+            $this->assertSame('groupMemberUsernameInUse', $e->getMessage());
         }
     }
 
@@ -416,7 +427,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should not have allowed bulk user creation');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'parameterInvalidStateDoesNotBelongToCountry',
                 $e->getMessage()
             );
@@ -451,7 +462,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should not have allowed bulk user creation');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'parameterInvalidStateNeedsToBelongToCountry',
                 $e->getMessage()
             );
@@ -520,14 +531,14 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ];
 
         foreach ($membersMapping as $key => $member) {
-            $this->assertEquals($member['name'], $identities[$key]['name']);
-            $this->assertEquals(
+            $this->assertSame($member['name'], $identities[$key]['name']);
+            $this->assertSame(
                 $member['country_id'],
                 $identities[$key]['country_id']
             );
-            $this->assertEquals(
+            $this->assertSame(
                 $member['state_id'],
-                $identities[$key]['state_id']
+                $identities[$key]['state_id'] ?? ''
             );
         }
     }
@@ -574,10 +585,10 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             "{$group['group']->alias}:{$identityName}"
         );
 
-        $this->assertEquals($identityName, $identity->name);
+        $this->assertSame($identityName, $identity->name);
 
         // Assert the log is empty.
-        $this->assertEquals(
+        $this->assertSame(
             0,
             count(
                 \OmegaUp\DAO\IdentityLoginLog::getByIdentity(
@@ -595,7 +606,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertLogin($identity, $loginResponse['auth_token']);
 
         // Assert the log is not empty.
-        $this->assertEquals(
+        $this->assertSame(
             1,
             count(
                 \OmegaUp\DAO\IdentityLoginLog::getByIdentity(
@@ -610,11 +621,11 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             "{$group['group']->alias}:{$identityName}",
             $profileResponse['username']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $identityName,
             $profileResponse['name']
         );

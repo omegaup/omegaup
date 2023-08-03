@@ -12,7 +12,7 @@
               @update-existing-options="
                 (query) => $emit('update-search-result-users', query)
               "
-            />
+            ></omegaup-common-typeahead>
           </label>
         </div>
         <button class="btn btn-primary" type="submit">
@@ -61,7 +61,7 @@
       </thead>
       <tbody>
         <tr v-for="identity in identitiesCsv" :key="identity.username">
-          <td>
+          <td data-members-username>
             <omegaup-user-username
               :classname="identity.classname"
               :linkify="true"
@@ -102,8 +102,14 @@
       v-if="showEditForm"
       :countries="countries"
       :identity="identity"
+      :search-result-schools="searchResultSchools"
       @cancel="onChildCancel"
-      @edit-identity-member="onChildEditIdentityMember"
+      @edit-identity-member="
+        (request) => $emit('edit-identity-member', { ...request, showEditForm })
+      "
+      @update-search-result-schools="
+        (query) => $emit('update-search-result-schools', query)
+      "
     ></omegaup-identity-edit>
     <omegaup-identity-change-password
       v-if="showChangePasswordForm"
@@ -143,16 +149,17 @@ export default class Members extends Vue {
   @Prop() groupAlias!: string;
   @Prop() countries!: Array<dao.Countries>;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultSchools!: types.SchoolListItem[];
 
   T = T;
   identity = {};
   username = '';
   showEditForm = false;
   showChangePasswordForm = false;
-  searchedUsername: null | string = null;
+  searchedUsername: null | types.ListItem = null;
 
   onAddMember(): void {
-    this.$emit('add-member', this, this.searchedUsername);
+    this.$emit('add-member', this, this.searchedUsername?.key);
     this.reset();
   }
 

@@ -17,7 +17,10 @@ class ProblemOfTheWeek extends \OmegaUp\DAO\Base\ProblemOfTheWeek {
      */
     final public static function getByDifficulty(string $difficulty): array {
         $sql = 'SELECT
-                    *
+                    ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\ProblemOfTheWeek::FIELD_NAMES,
+            'Problem_Of_The_Week'
+        ) . '
                 FROM
                     Problem_Of_The_Week
                 WHERE

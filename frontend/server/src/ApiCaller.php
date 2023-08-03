@@ -68,10 +68,18 @@ class ApiCaller {
             return false;
         }
         $referrerHost = parse_url($httpReferer, PHP_URL_HOST);
-        if (is_null($referrerHost)) {
+        if (!is_string($referrerHost)) {
             // Malformed referrer. Fail closed and prefer to not allow this.
             self::$log->error(
                 "CSRF attempt, no referrer found in '{$httpReferer}'"
+            );
+            return true;
+        }
+        $omegaUpURLHost = parse_url(OMEGAUP_URL, PHP_URL_HOST);
+        if (!is_string($omegaUpURLHost)) {
+            // Malformed OMEGAUP_URL. Fail closed and prefer to not allow this.
+            self::$log->error(
+                "CSRF attempt, invalid OMEGAUP_URL '" . OMEGAUP_URL . "'"
             );
             return true;
         }
@@ -79,11 +87,11 @@ class ApiCaller {
         // the host is the same. Otherwise this would break tests and local
         // development environments.
         $allowedHosts = [
-            parse_url(OMEGAUP_URL, PHP_URL_HOST),
+            $omegaUpURLHost,
             OMEGAUP_LOCKDOWN_DOMAIN,
             ...OMEGAUP_CSRF_HOSTS,
         ];
-        if (!in_array($referrerHost, $allowedHosts, true)) {
+        if (!in_array($referrerHost, $allowedHosts, strict: true)) {
             self::$log->error(
                 "CSRF attempt, referrer host '{$referrerHost}' not in " .
                 json_encode($allowedHosts)
@@ -303,6 +311,7 @@ class ApiCaller {
 
         if ($apiException->getcode() == 400) {
             header('HTTP/1.1 400 Bad Request');
+            /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
             die(
                 file_get_contents(
                     sprintf('%s/www/400.html', strval(OMEGAUP_ROOT))
@@ -321,6 +330,7 @@ class ApiCaller {
             // Even though this is forbidden, we pretend the resource did not
             // exist.
             header('HTTP/1.1 404 Not Found');
+            /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
             die(
                 file_get_contents(
                     sprintf('%s/www/404.html', strval(OMEGAUP_ROOT))
@@ -329,6 +339,7 @@ class ApiCaller {
         }
         if ($apiException->getcode() == 404) {
             header('HTTP/1.1 404 Not Found');
+            /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
             die(
                 file_get_contents(
                     sprintf('%s/www/404.html', strval(OMEGAUP_ROOT))
@@ -336,6 +347,7 @@ class ApiCaller {
             );
         }
         header('HTTP/1.1 500 Internal Server Error');
+        /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
         die(
             file_get_contents(
                 sprintf('%s/www/500.html', strval(OMEGAUP_ROOT))

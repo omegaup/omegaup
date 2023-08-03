@@ -336,9 +336,18 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                         );
                     }
                 }
-                if (self::hasDuplicates($contents['tags'])) {
+
+                $duplicatedTags = self::getDuplicatedTags($contents['tags']);
+
+                if (!empty($duplicatedTags)) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
-                        'duplicateTagsNotAllowed'
+                        'duplicateTagsNotAllowed',
+                        'tags',
+                        duplicatedItemsInArray: array_slice(
+                            $duplicatedTags,
+                            0,
+                            20
+                        )
                     );
                 }
             }
@@ -370,9 +379,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     );
                 }
             }
-            if (self::hasDuplicates($contents['tags'])) {
+
+            $duplicatedTags = self::getDuplicatedTags($contents['tags']);
+
+            if (!empty($duplicatedTags)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
-                    'duplicateTagsNotAllowed'
+                    'duplicateTagsNotAllowed',
+                    'tags',
+                    duplicatedItemsInArray: array_slice($duplicatedTags, 0, 20)
                 );
             }
 
@@ -991,9 +1005,17 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      *
      * @template T
      * @param array<T> $contents
+     * @return list<string>
      */
-    private static function hasDuplicates(array $contents): bool {
-        return count($contents) !== count(array_unique($contents));
+    private static function getDuplicatedTags(array $contents): array {
+        $counts = array_count_values($contents);
+        $duplicates = [];
+        foreach ($counts as $value => $count) {
+            if ($count > 1) {
+                $duplicates[] = $value;
+            }
+        }
+        return $duplicates;
     }
 
     /**
@@ -1147,7 +1169,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: array<string, ProblemStatement>|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
+     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: array<string, ProblemStatement>|\object, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -1163,7 +1185,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: array<string, ProblemStatement>|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
+     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: array<string, ProblemStatement>|object, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
      */
     private static function getDetails(
         \OmegaUp\DAO\VO\Identities $identity,
@@ -1246,7 +1268,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{templateProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\object, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $qualitynomination_id
      */

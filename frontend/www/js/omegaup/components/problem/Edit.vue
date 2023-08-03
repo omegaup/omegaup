@@ -173,27 +173,28 @@
       </div>
 
       <div v-if="showTab === 'admins'" class="tab-pane active">
-        <omegaup-problem-admins
-          :admins="initialAdmins"
+        <omegaup-common-admins
+          :admins="admins"
           :search-result-users="searchResultUsers"
           @add-admin="(username) => $emit('add-admin', username)"
           @remove-admin="(username) => $emit('remove-admin', username)"
           @update-search-result-users="
             (query) => $emit('update-search-result-users', query)
           "
-        ></omegaup-problem-admins>
-        <omegaup-problem-groupadmins
-          :initial-groups="initialGroups"
-          :has-parent-component="true"
-          @emit-add-group-admin="
-            (groupAdminsComponent) =>
-              $emit('add-group-admin', groupAdminsComponent.groupAlias)
+        ></omegaup-common-admins>
+        <omegaup-common-groupadmins
+          :group-admins="groups"
+          :search-result-groups="searchResultGroups"
+          @add-group-admin="
+            (groupAlias) => $emit('add-group-admin', groupAlias)
           "
-          @emit-remove-group-admin="
-            (groupAdminsComponent) =>
-              $emit('remove-group-admin', groupAdminsComponent.groupAlias)
+          @remove-group-admin="
+            (groupAlias) => $emit('remove-group-admin', groupAlias)
           "
-        ></omegaup-problem-groupadmins>
+          @update-search-result-groups="
+            (query) => $emit('update-search-result-groups', query)
+          "
+        ></omegaup-common-groupadmins>
       </div>
 
       <div v-if="showTab === 'tags'" class="tab-pane active">
@@ -242,25 +243,36 @@
       <div v-if="showTab === 'delete'" class="tab-pane active">
         <div class="card">
           <div class="card-body">
-            <form class="form" @submit.prevent="$emit('remove', alias)">
-              <div class="form-group">
-                <div class="alert alert-danger">
-                  <h4 class="alert-heading">{{ T.wordsDangerZone }}</h4>
-                  <hr />
-                  <omegaup-markdown
-                    :markdown="T.wordsDangerZoneDesc"
-                  ></omegaup-markdown>
-                  <br /><br />
-                  <button class="btn btn-danger" type="submit">
-                    {{ T.wordsDelete }}
-                  </button>
-                </div>
+            <div class="form-group">
+              <div class="alert alert-danger">
+                <h4 class="alert-heading">{{ T.wordsDangerZone }}</h4>
+                <hr />
+                <omegaup-markdown
+                  :markdown="T.wordsDangerZoneDesc"
+                ></omegaup-markdown>
+                <br /><br />
+                <button
+                  class="btn btn-danger"
+                  @click.prevent="showConfirmationModal = true"
+                >
+                  {{ T.wordsDelete }}
+                </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <b-modal
+      v-model="showConfirmationModal"
+      :title="T.problemEditDeleteRequireConfirmation"
+      :ok-title="T.problemEditDeleteOk"
+      ok-variant="danger"
+      :cancel-title="T.problemEditDeleteCancel"
+      @ok="$emit('remove', alias)"
+    >
+      <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
+    </b-modal>
   </div>
 </template>
 
@@ -270,11 +282,15 @@ import problem_Form from './Form.vue';
 import problem_Tags from './Tags.vue';
 import problem_Versions from './Versions.vue';
 import problem_StatementEdit from './StatementEdit.vue';
-import problem_Admins from '../common/Adminsv2.vue';
-import problem_GroupAdmins from '../common/GroupAdmins.vue';
+import common_Admins from '../common/Admins.vue';
+import common_GroupAdmins from '../common/GroupAdmins.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import omegaup_Markdown from '../Markdown.vue';
+
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import { ModalPlugin } from 'bootstrap-vue';
+Vue.use(ModalPlugin);
 
 @Component({
   components: {
@@ -283,22 +299,24 @@ import omegaup_Markdown from '../Markdown.vue';
     'omegaup-problem-tags': problem_Tags,
     'omegaup-problem-versions': problem_Versions,
     'omegaup-problem-statementedit': problem_StatementEdit,
-    'omegaup-problem-admins': problem_Admins,
-    'omegaup-problem-groupadmins': problem_GroupAdmins,
+    'omegaup-common-admins': common_Admins,
+    'omegaup-common-groupadmins': common_GroupAdmins,
   },
 })
 export default class ProblemEdit extends Vue {
   @Prop() data!: types.ProblemEditPayload;
-  @Prop() initialAdmins!: types.ProblemAdmin[];
-  @Prop() initialGroups!: types.ProblemGroupAdmin[];
+  @Prop() admins!: types.ProblemAdmin[];
+  @Prop() groups!: types.ProblemGroupAdmin[];
   @Prop({ default: null }) solution!: types.ProblemStatement | null;
   @Prop() statement!: types.ProblemStatement;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultGroups!: types.ListItem[];
 
   T = T;
   alias = this.data.alias;
   showTab = 'edit';
   currentStatement: types.ProblemStatement = this.statement;
+  showConfirmationModal = false;
 
   get activeTab(): string {
     switch (this.showTab) {

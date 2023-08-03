@@ -1,47 +1,55 @@
 <template>
-  <div v-if="isAdmin || feedbackOptions" data-submission-feedback>
+  <div v-if="isAdmin || generalFeedback" data-submission-feedback>
     <h3>{{ T.feedbackTitle }}</h3>
-    <pre><code>{{
-      feedbackOptions ? feedbackOptions.feedback : T.feedbackNotSentYet
+    <pre data-run-feedback><code>{{
+      generalFeedback ? generalFeedback.feedback : T.feedbackNotSentYet
     }}</code></pre>
-    <div v-if="feedbackOptions">
+    <div v-if="generalFeedback">
       {{
         ui.formatString(T.feedbackLeftBy, {
-          date: time.formatDate(feedbackOptions.date),
+          date: time.formatDate(generalFeedback.date),
         })
       }}
       <omegaup-user-username
-        :username="feedbackOptions.author"
-        :classname="feedbackOptions.author_classname"
+        :username="generalFeedback.author"
+        :classname="generalFeedback.author_classname"
         :linkify="true"
       ></omegaup-user-username>
     </div>
     <div v-if="isAdmin" class="feedback-section">
-      <a role="button" @click="showFeedbackForm = !showFeedbackForm">{{
-        !feedbackOptions
-          ? T.submissionFeedbackSendButton
-          : T.submissionFeedbackUpdateButton
-      }}</a>
+      <a
+        data-run-leave-feedback-button
+        role="button"
+        class="btn btn-sm btn-primary"
+        @click="showFeedbackForm = !showFeedbackForm"
+        >{{
+          !generalFeedback
+            ? T.submissionFeedbackSendButton
+            : T.submissionFeedbackUpdateButton
+        }}</a
+      >
       <div v-show="showFeedbackForm" class="form-group">
         <textarea
           v-model="feedback"
+          data-run-feedback-text
           class="form-control"
           rows="3"
           maxlength="200"
         ></textarea>
         <button
+          data-run-send-feedback-button
           class="btn btn-sm btn-primary"
           :disabled="!feedback"
           @click.prevent="
             $emit('set-feedback', {
               guid,
               feedback,
-              isUpdate: Boolean(feedbackOptions),
+              isUpdate: Boolean(generalFeedback),
             })
           "
         >
           {{
-            !feedbackOptions
+            !generalFeedback
               ? T.submissionSendFeedback
               : T.submissionUpdateFeedback
           }}
@@ -68,14 +76,22 @@ import user_Username from '../user/Username.vue';
 export default class SubmissionFeedback extends Vue {
   @Prop() guid!: string;
   @Prop({ default: false }) isAdmin!: boolean;
-  @Prop({ default: null }) feedbackOptions!: null | types.SubmissionFeedback;
+  @Prop({ default: () => [] }) feedbackOptions!: types.SubmissionFeedback[];
 
   T = T;
   ui = ui;
   time = time;
 
   showFeedbackForm = false;
-  feedback = this.feedbackOptions?.feedback ?? null;
+  feedback = this.generalFeedback?.feedback ?? null;
+
+  get generalFeedback(): null | types.SubmissionFeedback {
+    if (!this.feedbackOptions.length) return null;
+    const [feedback] = this.feedbackOptions.filter(
+      (feedback) => feedback.range_bytes_start == null,
+    );
+    return feedback;
+  }
 }
 </script>
 

@@ -15,13 +15,15 @@
           </select>
         </div>
         <div class="col-md-4">
-          <omegaup-autocomplete
+          <omegaup-common-typeahead
             v-show="selectColumn == 'problem_alias'"
-            v-model="queryProblem"
-            :init="(el) => typeahead.problemTypeahead(el)"
+            :existing-options="searchResultProblems"
+            :value.sync="queryProblem"
             :placeholder="T.wordsKeyword"
-            class="form-control"
-          ></omegaup-autocomplete>
+            @update-existing-options="
+              (query) => $emit('update-search-result-problems', query)
+            "
+          ></omegaup-common-typeahead>
           <omegaup-common-typeahead
             v-show="
               selectColumn == 'nominator_username' ||
@@ -33,7 +35,7 @@
             @update-existing-options="
               (query) => $emit('update-search-result-users', query)
             "
-          />
+          ></omegaup-common-typeahead>
         </div>
       </div>
       <button
@@ -71,68 +73,74 @@
           </label>
         </div>
       </div>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>
-              {{ T.wordsAlias }}
-              <omegaup-common-sort-controls
-                ref="sortControlByTitle"
-                column="title"
-                :sort-order="sortOrder"
-                :column-name="columnName"
-                @apply-filter="onApplyFilter"
-              ></omegaup-common-sort-controls>
-            </th>
-            <th v-if="!myView">{{ T.qualityNominationNominatedBy }}</th>
-            <th>{{ T.qualityNominationCreatedBy }}</th>
-            <th>
-              {{ T.wordsSubmissionDate }}
-              <omegaup-common-sort-controls
-                ref="sortControlByTime"
-                column="time"
-                :sort-order="sortOrder"
-                :column-name="columnName"
-                @apply-filter="onApplyFilter"
-              ></omegaup-common-sort-controls>
-            </th>
-            <th v-if="!myView" data-name="reason">{{ T.wordsReason }}</th>
-            <th class="text-center">{{ T.wordsStatus }}</th>
-            <th><!-- view button --></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="nomination in orderedNominations"
-            :key="`nomination-${nomination.qualitynomination_id}`"
-          >
-            <td>
-              <a :href="problemUrl(nomination.problem.alias)">{{
-                nomination.problem.title
-              }}</a>
-            </td>
-            <td v-if="!myView">
-              <a :href="userUrl(nomination.nominator.username)">{{
-                nomination.nominator.username
-              }}</a>
-            </td>
-            <td>
-              <a :href="userUrl(nomination.author.username)">{{
-                nomination.author.username
-              }}</a>
-            </td>
-            <td>{{ nomination.time.toLocaleDateString(T.locale) }}</td>
-            <td v-if="!myView">{{ nomination.contents.reason }}</td>
-            <td class="text-center">{{ nomination.status }}</td>
-            <td>
-              <a
-                :href="nominationDetailsUrl(nomination.qualitynomination_id)"
-                >{{ T.wordsDetails }}</a
-              >
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr class="text-nowrap">
+              <th>
+                {{ T.wordsAlias }}
+                <omegaup-common-sort-controls
+                  ref="sortControlByTitle"
+                  column="title"
+                  :sort-order="sortOrder"
+                  :column-name="columnName"
+                  @apply-filter="onApplyFilter"
+                ></omegaup-common-sort-controls>
+              </th>
+              <th v-if="!myView">{{ T.qualityNominationNominatedBy }}</th>
+              <th>{{ T.qualityNominationCreatedBy }}</th>
+              <th>
+                {{ T.wordsSubmissionDate }}
+                <omegaup-common-sort-controls
+                  ref="sortControlByTime"
+                  column="time"
+                  :sort-order="sortOrder"
+                  :column-name="columnName"
+                  @apply-filter="onApplyFilter"
+                ></omegaup-common-sort-controls>
+              </th>
+              <th v-if="!myView" data-name="reason">{{ T.wordsReason }}</th>
+              <th class="text-center">{{ T.wordsStatus }}</th>
+              <th><!-- view button --></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="nomination in orderedNominations"
+              :key="`nomination-${nomination.qualitynomination_id}`"
+            >
+              <td class="align-middle">
+                <a :href="problemUrl(nomination.problem.alias)">{{
+                  nomination.problem.title
+                }}</a>
+              </td>
+              <td v-if="!myView" class="align-middle">
+                <a :href="userUrl(nomination.nominator.username)">{{
+                  nomination.nominator.username
+                }}</a>
+              </td>
+              <td class="align-middle">
+                <a :href="userUrl(nomination.author.username)">{{
+                  nomination.author.username
+                }}</a>
+              </td>
+              <td class="align-middle">
+                {{ nomination.time.toLocaleDateString(T.locale) }}
+              </td>
+              <td v-if="!myView" class="align-middle">
+                {{ nomination.contents.reason }}
+              </td>
+              <td class="text-center align-middle">{{ nomination.status }}</td>
+              <td class="align-middle">
+                <a
+                  :href="nominationDetailsUrl(nomination.qualitynomination_id)"
+                  >{{ T.wordsDetails }}</a
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <omegaup-common-paginator
         :pager-items="pagerItems"
         @page-changed="
@@ -151,15 +159,12 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import common_Paginator from '../common/Paginator.vue';
 import { types } from '../../api_types';
-import Autocomplete from '../Autocomplete.vue';
 import common_Typeahead from '../common/Typeahead.vue';
-import * as typeahead from '../../typeahead';
 import common_SortControls from '../common/SortControls.vue';
 
 @Component({
   components: {
     'omegaup-common-paginator': common_Paginator,
-    'omegaup-autocomplete': Autocomplete,
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-sort-controls': common_SortControls,
   },
@@ -172,17 +177,17 @@ export default class QualityNominationList extends Vue {
   @Prop() pagerItems!: types.PageItem[];
   @Prop() isAdmin!: boolean;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultProblems!: types.ListItem[];
 
   showAll = true;
   T = T;
   ui = ui;
-  typeahead = typeahead;
 
   sortOrder: omegaup.SortOrder = omegaup.SortOrder.Ascending;
   columnName = 'title';
 
-  queryProblem = '';
-  queryUsername: null | string = null;
+  queryProblem: null | types.ListItem = null;
+  queryUsername: null | types.ListItem = null;
   selectColumn = '';
   columns = {
     problem_alias: T.wordsProblem,
@@ -208,7 +213,7 @@ export default class QualityNominationList extends Vue {
 
   @Watch('selectColumn')
   onPropertyChanged() {
-    this.queryProblem = '';
+    this.queryProblem = null;
     this.queryUsername = null;
   }
 
@@ -217,9 +222,9 @@ export default class QualityNominationList extends Vue {
       this.selectColumn == 'nominator_username' ||
       this.selectColumn == 'author_username'
     ) {
-      return this.queryUsername;
+      return this.queryUsername?.key ?? null;
     } else {
-      return this.queryProblem;
+      return this.queryProblem?.key ?? null;
     }
   }
 

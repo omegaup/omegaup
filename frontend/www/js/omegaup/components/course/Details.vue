@@ -151,6 +151,7 @@
                 </td>
                 <td>
                   <a
+                    data-course-homework-button
                     class="text-center"
                     :href="`/course/${course.alias}/assignment/${assignment.alias}/`"
                   >
@@ -165,6 +166,7 @@
                 </td>
                 <td v-if="course.is_admin" class="text-center">
                   <a
+                    data-course-scoreboard-button
                     class="mr-2"
                     :href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
                   >
@@ -173,6 +175,7 @@
                     }}</a
                   >
                   <a
+                    data-course-submisson-button
                     class="mr-2"
                     :href="`/course/${course.alias}/assignment/${assignment.alias}/#runs`"
                   >

@@ -11,6 +11,14 @@
         socketStatus
       }}</sup>
     </template>
+    <template v-if="contestAdmin" #edit-button>
+      <a
+        class="edit-contest-button ml-2"
+        :href="`/contest/${contest.alias}/edit/`"
+      >
+        <font-awesome-icon icon="edit" />
+      </a>
+    </template>
     <template #clock>
       <div v-if="isContestFinished" class="alert alert-warning" role="alert">
         <a :href="urlPractice">{{ T.arenaContestEndedUsePractice }}</a>
@@ -37,7 +45,9 @@
               :active-problem="activeProblemAlias"
               :in-assignment="false"
               :digits-after-decimal-point="
-                contest.partial_score ? digitsAfterDecimalPoint : 0
+                contest.score_mode == 'all_or_nothing'
+                  ? 0
+                  : digitsAfterDecimalPoint
               "
               @disable-active-problem="activeProblem = null"
               @navigate-to-problem="onNavigateToProblem"
@@ -127,6 +137,7 @@
         :problemset-problems="Object.values(problems)"
         :is-contest-finished="isContestFinished"
         :search-result-users="searchResultUsers"
+        :search-result-problems="searchResultProblems"
         @details="(run) => onRunAdminDetails(run.guid)"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
@@ -217,6 +228,10 @@ import { ContestClarificationType } from '../../arena/clarifications';
 import { SocketStatus } from '../../arena/events_socket';
 import { AdmissionMode } from '../common/Publish.vue';
 import { SubmissionRequest } from '../../arena/submissions';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
 
 @Component({
   components: {
@@ -232,6 +247,7 @@ import { SubmissionRequest } from '../../arena/submissions';
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-problem-details': problem_Details,
+    'font-awesome-icon': FontAwesomeIcon,
   },
 })
 export default class ArenaContest extends Vue {
@@ -322,6 +338,16 @@ export default class ArenaContest extends Vue {
     return `/arena/${this.contest.alias}/practice/`;
   }
 
+  get searchResultProblems(): types.ListItem[] {
+    if (!this.problems.length) {
+      return [];
+    }
+    return this.problems.map((problem) => ({
+      key: problem.alias,
+      value: problem.text,
+    }));
+  }
+
   created() {
     if (this.lockdown) {
       window.addEventListener('beforeunload', this.beforeWindowUnload);
@@ -379,6 +405,7 @@ export default class ArenaContest extends Vue {
 
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
+    this.currentRunDetailsData = null;
     this.$emit('reset-hash', { selectedTab: 'runs', alias: null });
   }
 

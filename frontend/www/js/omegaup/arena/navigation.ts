@@ -9,6 +9,12 @@ import problemsStore from './problemStore';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { trackRun } from './submissions';
 
+export enum ScoreMode {
+  AllOrNothing = 'all_or_nothing',
+  Partial = 'partial',
+  MaxPerGroup = 'max_per_group',
+}
+
 export enum NavigationType {
   ForContest,
   ForSingleProblemOrCourse,
@@ -27,26 +33,35 @@ interface BaseNavigation {
 type NavigationForContest = BaseNavigation & {
   type: NavigationType.ForContest;
   contestAlias: string;
+  contestMode: ScoreMode;
 };
 
 type NavigationForSingleProblemOrCourse = BaseNavigation & {
   type: NavigationType.ForSingleProblemOrCourse;
   problemsetId: number;
+  guid?: string;
 };
 
 export type NavigationRequest =
   | NavigationForContest
   | NavigationForSingleProblemOrCourse;
 
+export function getScoreModeEnum(scoreMode: string): ScoreMode {
+  if (scoreMode === 'max_per_group') return ScoreMode.MaxPerGroup;
+  if (scoreMode === 'all_or_nothing') return ScoreMode.AllOrNothing;
+  return ScoreMode.Partial;
+}
+
 export async function navigateToProblem(
   request: NavigationRequest,
 ): Promise<void> {
-  let contestAlias, problemsetId;
+  let contestAlias, problemsetId, guid, contestMode: ScoreMode;
   if (request.type === NavigationType.ForContest) {
     contestAlias = request.contestAlias;
-  }
-  if (request.type === NavigationType.ForSingleProblemOrCourse) {
+    contestMode = request.contestMode;
+  } else if (request.type === NavigationType.ForSingleProblemOrCourse) {
     problemsetId = request.problemsetId;
+    guid = request.guid;
   }
   const { target, problem, problems } = request;
   if (
@@ -58,6 +73,10 @@ export async function navigateToProblem(
     target.problemInfo = problemsStore.state.problems[problem.alias];
     if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
       setLocationHash(`#problems/${problem.alias}/new-run`);
+      return;
+    }
+    if (guid) {
+      setLocationHash(`#problems/${problem.alias}/show-run:${guid}`);
       return;
     }
     setLocationHash(`#problems/${problem.alias}`);
@@ -80,11 +99,12 @@ export async function navigateToProblem(
       problemInfo.title = currentProblem?.text ?? '';
       target.problemInfo = problemInfo;
       problem.alias = problemInfo.alias;
-      problem.bestScore = getMaxScore(
-        myRunsStore.state.runs.filter((run) => run.alias === problemInfo.alias),
-        problemInfo.alias,
-        0,
-      );
+      problem.bestScore = getScoreForProblem({
+        contestMode,
+        problemAlias: problemInfo.alias,
+        previousScore: 0.0,
+        maxScore: problem.maxScore,
+      });
       problemsStore.commit('addProblem', problemInfo);
       target.problem = problem;
       if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
@@ -100,6 +120,32 @@ export async function navigateToProblem(
     });
 }
 
+export function getScoreForProblem({
+  contestMode,
+  problemAlias,
+  previousScore,
+  maxScore,
+}: {
+  contestMode: ScoreMode;
+  problemAlias: string;
+  previousScore: number;
+  maxScore: number;
+}) {
+  if (contestMode === ScoreMode.MaxPerGroup) {
+    return getMaxPerGroupScore(
+      myRunsStore.state.runs.filter((run) => run.alias === problemAlias),
+      problemAlias,
+      previousScore,
+      maxScore,
+    );
+  }
+  return getMaxScore(
+    myRunsStore.state.runs.filter((run) => run.alias === problemAlias),
+    problemAlias,
+    previousScore,
+  );
+}
+
 export function getMaxScore(
   runs: types.Run[],
   alias: string,
@@ -113,4 +159,45 @@ export function getMaxScore(
     maxScore = Math.max(maxScore, run.contest_score || 0);
   }
   return maxScore;
+}
+
+export function getMaxPerGroupScore(
+  runs: types.Run[],
+  alias: string,
+  previousScore: number,
+  maxScore: number,
+): number {
+  const runsWithScoreByGroup = runs
+    .filter((run) => run.alias === alias)
+    .filter((run) => run.score_by_group != undefined);
+  if (!runsWithScoreByGroup.length) {
+    return previousScore;
+  }
+
+  const scoreByGroup = Object.keys(
+    runsWithScoreByGroup[0].score_by_group || {},
+  ).reduce((acc: Record<string, number>, key) => {
+    const values = runsWithScoreByGroup
+      .map((run) => {
+        if (!run.score_by_group) {
+          return 0.0;
+        }
+        return (run.score_by_group[key] as number) * maxScore;
+      })
+      .filter((value) => value !== null)
+      .map((value) => Number(value));
+    acc[key] = Math.max(...values);
+    return acc;
+  }, {});
+
+  const values = Object.values(scoreByGroup);
+
+  // Avoid showing NaN in bestScore value
+  for (const value of values) {
+    if (typeof value === 'undefined') {
+      return 0;
+    }
+  }
+
+  return values.reduce((acc, value) => acc + value, 0);
 }
