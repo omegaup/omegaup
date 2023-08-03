@@ -62,8 +62,10 @@
   - [`/api/course/activityReport/`](#apicourseactivityreport)
   - [`/api/course/addAdmin/`](#apicourseaddadmin)
   - [`/api/course/addGroupAdmin/`](#apicourseaddgroupadmin)
+  - [`/api/course/addGroupTeachingAssistant/`](#apicourseaddgroupteachingassistant)
   - [`/api/course/addProblem/`](#apicourseaddproblem)
   - [`/api/course/addStudent/`](#apicourseaddstudent)
+  - [`/api/course/addTeachingAssistant/`](#apicourseaddteachingassistant)
   - [`/api/course/adminDetails/`](#apicourseadmindetails)
   - [`/api/course/admins/`](#apicourseadmins)
   - [`/api/course/arbitrateRequest/`](#apicoursearbitraterequest)
@@ -89,8 +91,11 @@
   - [`/api/course/removeAdmin/`](#apicourseremoveadmin)
   - [`/api/course/removeAssignment/`](#apicourseremoveassignment)
   - [`/api/course/removeGroupAdmin/`](#apicourseremovegroupadmin)
+  - [`/api/course/removeGroupTeachingAssistant/`](#apicourseremovegroupteachingassistant)
   - [`/api/course/removeProblem/`](#apicourseremoveproblem)
   - [`/api/course/removeStudent/`](#apicourseremovestudent)
+  - [`/api/course/removeTeachingAssistant/`](#apicourseremoveteachingassistant)
+  - [`/api/course/requestFeedback/`](#apicourserequestfeedback)
   - [`/api/course/requests/`](#apicourserequests)
   - [`/api/course/runs/`](#apicourseruns)
   - [`/api/course/searchUsers/`](#apicoursesearchusers)
@@ -140,6 +145,7 @@
   - [`/api/problem/delete/`](#apiproblemdelete)
   - [`/api/problem/details/`](#apiproblemdetails)
   - [`/api/problem/list/`](#apiproblemlist)
+  - [`/api/problem/listForTypeahead/`](#apiproblemlistfortypeahead)
   - [`/api/problem/myList/`](#apiproblemmylist)
   - [`/api/problem/randomKarelProblem/`](#apiproblemrandomkarelproblem)
   - [`/api/problem/randomLanguageProblem/`](#apiproblemrandomlanguageproblem)
@@ -180,6 +186,7 @@
   - [`/api/run/create/`](#apiruncreate)
   - [`/api/run/details/`](#apirundetails)
   - [`/api/run/disqualify/`](#apirundisqualify)
+  - [`/api/run/getSubmissionFeedback/`](#apirungetsubmissionfeedback)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
   - [`/api/run/requalify/`](#apirunrequalify)
@@ -193,7 +200,6 @@
   - [`/api/scoreboard/refresh/`](#apiscoreboardrefresh)
 - [Session](#session)
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
-  - [`/api/session/googleLogin/`](#apisessiongooglelogin)
 - [Submission](#submission)
   - [`/api/submission/setFeedback/`](#apisubmissionsetfeedback)
 - [Tag](#tag)
@@ -223,6 +229,8 @@
   - [`/api/user/contestStats/`](#apiuserconteststats)
   - [`/api/user/create/`](#apiusercreate)
   - [`/api/user/createAPIToken/`](#apiusercreateapitoken)
+  - [`/api/user/deleteConfirm/`](#apiuserdeleteconfirm)
+  - [`/api/user/deleteRequest/`](#apiuserdeleterequest)
   - [`/api/user/extraInformation/`](#apiuserextrainformation)
   - [`/api/user/generateGitToken/`](#apiusergenerategittoken)
   - [`/api/user/generateOmiUsers/`](#apiusergenerateomiusers)
@@ -733,13 +741,13 @@ Creates a new contest
 | --------------------------- | -------------- | ----------- |
 | `admission_mode`            | `mixed`        |             |
 | `alias`                     | `mixed`        |             |
+| `check_plagiarism`          | `bool\|null`   |             |
 | `contest_for_teams`         | `bool\|null`   |             |
 | `description`               | `mixed`        |             |
 | `feedback`                  | `mixed`        |             |
 | `finish_time`               | `mixed`        |             |
 | `languages`                 | `mixed`        |             |
 | `needs_basic_information`   | `bool\|null`   |             |
-| `partial_score`             | `bool\|null`   |             |
 | `penalty`                   | `mixed`        |             |
 | `penalty_calc_policy`       | `mixed`        |             |
 | `penalty_type`              | `mixed`        |             |
@@ -1291,32 +1299,33 @@ Update a Contest
 
 ### Parameters
 
-| Name                                         | Type                                 | Description |
-| -------------------------------------------- | ------------------------------------ | ----------- |
-| `contest_alias`                              | `string`                             |             |
-| `finish_time`                                | `int`                                |             |
-| `submissions_gap`                            | `int`                                |             |
-| `window_length`                              | `int`                                |             |
-| `admission_mode`                             | `null\|string`                       |             |
-| `alias`                                      | `null\|string`                       |             |
-| `contest_for_teams`                          | `bool\|null`                         |             |
-| `default_show_all_contestants_in_scoreboard` | `bool\|null`                         |             |
-| `description`                                | `null\|string`                       |             |
-| `feedback`                                   | `mixed`                              |             |
-| `languages`                                  | `mixed`                              |             |
-| `needs_basic_information`                    | `bool\|null`                         |             |
-| `partial_score`                              | `bool\|null`                         |             |
-| `penalty`                                    | `int\|null`                          |             |
-| `penalty_calc_policy`                        | `mixed`                              |             |
-| `penalty_type`                               | `mixed`                              |             |
-| `points_decay_factor`                        | `float\|null`                        |             |
-| `problems`                                   | `null\|string`                       |             |
-| `requests_user_information`                  | `'no'\|'optional'\|'required'\|null` |             |
-| `scoreboard`                                 | `float\|null`                        |             |
-| `show_scoreboard_after`                      | `bool\|null`                         |             |
-| `start_time`                                 | `\OmegaUp\Timestamp\|null`           |             |
-| `teams_group_alias`                          | `null\|string`                       |             |
-| `title`                                      | `null\|string`                       |             |
+| Name                                         | Type                                                 | Description |
+| -------------------------------------------- | ---------------------------------------------------- | ----------- |
+| `contest_alias`                              | `string`                                             |             |
+| `finish_time`                                | `int`                                                |             |
+| `submissions_gap`                            | `int`                                                |             |
+| `window_length`                              | `int`                                                |             |
+| `admission_mode`                             | `null\|string`                                       |             |
+| `alias`                                      | `null\|string`                                       |             |
+| `check_plagiarism`                           | `bool\|null`                                         |             |
+| `contest_for_teams`                          | `bool\|null`                                         |             |
+| `default_show_all_contestants_in_scoreboard` | `bool\|null`                                         |             |
+| `description`                                | `null\|string`                                       |             |
+| `feedback`                                   | `mixed`                                              |             |
+| `languages`                                  | `mixed`                                              |             |
+| `needs_basic_information`                    | `bool\|null`                                         |             |
+| `penalty`                                    | `int\|null`                                          |             |
+| `penalty_calc_policy`                        | `mixed`                                              |             |
+| `penalty_type`                               | `mixed`                                              |             |
+| `points_decay_factor`                        | `float\|null`                                        |             |
+| `problems`                                   | `null\|string`                                       |             |
+| `requests_user_information`                  | `'no'\|'optional'\|'required'\|null`                 |             |
+| `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null` |             |
+| `scoreboard`                                 | `float\|null`                                        |             |
+| `show_scoreboard_after`                      | `bool\|null`                                         |             |
+| `start_time`                                 | `\OmegaUp\Timestamp\|null`                           |             |
+| `teams_group_alias`                          | `null\|string`                                       |             |
+| `title`                                      | `null\|string`                                       |             |
 
 ### Returns
 
@@ -1422,6 +1431,23 @@ Adds an group admin to a course
 
 _Nothing_
 
+## `/api/course/addGroupTeachingAssistant/`
+
+### Description
+
+Adds an group teaching assistant to a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+| `group`        | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/course/addProblem/`
 
 ### Description
@@ -1465,6 +1491,23 @@ Add Student to Course.
 
 _Nothing_
 
+## `/api/course/addTeachingAssistant/`
+
+### Description
+
+Adds a teaching assistant to a course
+
+### Parameters
+
+| Name              | Type     | Description |
+| ----------------- | -------- | ----------- |
+| `course_alias`    | `string` |             |
+| `usernameOrEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/course/adminDetails/`
 
 ### Description
@@ -1497,10 +1540,12 @@ Returns all course administrators
 
 ### Returns
 
-| Name           | Type                                               |
-| -------------- | -------------------------------------------------- |
-| `admins`       | `{ role: string; username: string; }[]`            |
-| `group_admins` | `{ alias: string; name: string; role: string; }[]` |
+| Name                        | Type                                               |
+| --------------------------- | -------------------------------------------------- |
+| `admins`                    | `{ role: string; username: string; }[]`            |
+| `group_admins`              | `{ alias: string; name: string; role: string; }[]` |
+| `group_teaching_assistants` | `{ alias: string; name: string; role: string; }[]` |
+| `teaching_assistants`       | `{ role: string; username: string; }[]`            |
 
 ## `/api/course/arbitrateRequest/`
 
@@ -1954,6 +1999,23 @@ Removes a group admin from a course
 
 _Nothing_
 
+## `/api/course/removeGroupTeachingAssistant/`
+
+### Description
+
+Removes a group teaching assistant from a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+| `group`        | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/course/removeProblem/`
 
 ### Description
@@ -1984,6 +2046,41 @@ Remove Student from Course
 | ----------------- | -------- | ----------- |
 | `course_alias`    | `string` |             |
 | `usernameOrEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/course/removeTeachingAssistant/`
+
+### Description
+
+Removes a teaching assistant from a course
+
+### Parameters
+
+| Name              | Type     | Description |
+| ----------------- | -------- | ----------- |
+| `course_alias`    | `string` |             |
+| `usernameOrEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/course/requestFeedback/`
+
+### Description
+
+Request feedback
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `guid`             | `string` |             |
 
 ### Returns
 
@@ -2846,14 +2943,14 @@ List of public and user's private problems
 | `max_difficulty`        | `int\|null`    |             |
 | `min_difficulty`        | `int\|null`    |             |
 | `min_visibility`        | `int\|null`    |             |
-| `offset`                | `mixed`        |             |
+| `offset`                | `int\|null`    |             |
 | `only_karel`            | `mixed`        |             |
 | `order_by`              | `mixed`        |             |
-| `page`                  | `mixed`        |             |
+| `page`                  | `int\|null`    |             |
 | `programming_languages` | `null\|string` |             |
 | `query`                 | `null\|string` |             |
 | `require_all_tags`      | `mixed`        |             |
-| `rowcount`              | `mixed`        |             |
+| `rowcount`              | `int\|null`    |             |
 | `some_tags`             | `mixed`        |             |
 | `sort_order`            | `mixed`        |             |
 
@@ -2863,6 +2960,27 @@ List of public and user's private problems
 | --------- | ------------------------- |
 | `results` | `types.ProblemListItem[]` |
 | `total`   | `number`                  |
+
+## `/api/problem/listForTypeahead/`
+
+### Description
+
+List of public problems shown in the typeahead component
+
+### Parameters
+
+| Name          | Type        | Description |
+| ------------- | ----------- | ----------- |
+| `query`       | `string`    |             |
+| `search_type` | `string`    |             |
+| `offset`      | `int\|null` |             |
+| `rowcount`    | `int\|null` |             |
+
+### Returns
+
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/problem/myList/`
 
@@ -3622,9 +3740,9 @@ Create a new run
 | Name            | Type     | Description |
 | --------------- | -------- | ----------- |
 | `contest_alias` | `string` |             |
+| `language`      | `string` |             |
 | `problem_alias` | `string` |             |
 | `source`        | `string` |             |
-| `language`      | `mixed`  |             |
 | `problemset_id` | `mixed`  |             |
 
 ### Returns
@@ -3670,6 +3788,24 @@ Disqualify a submission
 
 _Nothing_
 
+## `/api/run/getSubmissionFeedback/`
+
+### Description
+
+Get all the comments related to a submission feedback
+
+### Parameters
+
+| Name        | Type     | Description |
+| ----------- | -------- | ----------- |
+| `run_alias` | `string` |             |
+
+### Returns
+
+```typescript
+types.SubmissionFeedback[]
+```
+
 ## `/api/run/list/`
 
 ### Description
@@ -3703,10 +3839,10 @@ Re-sends a problem to Grader.
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
-| `debug`     | `mixed`  |             |
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| `run_alias` | `string`     |             |
+| `debug`     | `bool\|null` |             |
 
 ### Returns
 
@@ -3799,21 +3935,16 @@ Gets a list of schools
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `query` | `mixed` |             |
-| `term`  | `mixed` |             |
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+| `term`  | `null\|string` |             |
 
 ### Returns
 
-```typescript
-{
-  id: number;
-  label: string;
-  value: string;
-}
-[];
-```
+| Name      | Type                     |
+| --------- | ------------------------ |
+| `results` | `types.SchoolListItem[]` |
 
 ## `/api/school/selectSchoolOfTheMonth/`
 
@@ -3879,22 +4010,6 @@ contestant's machine and the server.
 | `session` | `types.CurrentSession` |
 | `time`    | `number`               |
 
-## `/api/session/googleLogin/`
-
-### Description
-
-### Parameters
-
-| Name         | Type     | Description |
-| ------------ | -------- | ----------- |
-| `storeToken` | `string` |             |
-
-### Returns
-
-| Name                | Type      |
-| ------------------- | --------- |
-| `isAccountCreation` | `boolean` |
-
 # Submission
 
 SubmissionController
@@ -3907,12 +4022,15 @@ Updates the admin feedback for a submission
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
-| `feedback`         | `string` |             |
-| `guid`             | `string` |             |
+| Name                     | Type        | Description |
+| ------------------------ | ----------- | ----------- |
+| `assignment_alias`       | `string`    |             |
+| `course_alias`           | `string`    |             |
+| `feedback`               | `string`    |             |
+| `guid`                   | `string`    |             |
+| `range_bytes_end`        | `int\|null` |             |
+| `range_bytes_start`      | `int\|null` |             |
+| `submission_feedback_id` | `int\|null` |             |
 
 ### Returns
 
@@ -4373,6 +4491,37 @@ There is a limit of 5 API tokens that each user can have.
 | ------- | -------- |
 | `token` | `string` |
 
+## `/api/user/deleteConfirm/`
+
+### Description
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `token`    | `string`       |             |
+| `username` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/user/deleteRequest/`
+
+### Description
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
+
+### Returns
+
+| Name    | Type     |
+| ------- | -------- |
+| `token` | `string` |
+
 ## `/api/user/extraInformation/`
 
 ### Description
@@ -4483,9 +4632,9 @@ Returns a list of all the API tokens associated with the user.
 
 ### Returns
 
-| Name     | Type                                                                                                                    |
-| -------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `tokens` | `{ last_used: Date; name: string; rate_limit: { limit: number; remaining: number; reset: Date; }; timestamp: Date; }[]` |
+| Name     | Type               |
+| -------- | ------------------ |
+| `tokens` | `types.ApiToken[]` |
 
 ## `/api/user/listAssociatedIdentities/`
 
@@ -4753,7 +4902,7 @@ Update user profile
 | `name`                      | `null\|string`                               |             |
 | `scholar_degree`            | `null\|string`                               |             |
 | `school_id`                 | `int\|null`                                  |             |
-| `school_name`               | `mixed`                                      |             |
+| `school_name`               | `null\|string`                               |             |
 | `username`                  | `mixed`                                      |             |
 
 ### Returns

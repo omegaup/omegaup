@@ -11,7 +11,15 @@ import { ViewProfileTabs } from '../components/user/ViewProfile.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
-  const locationHash = window.location.hash.substr(1).split('#');
+  const commonPayload = types.payloadParsers.CommonPayload();
+  const locationHash = window.location.hash.substring(1).split('#');
+  const searchResultSchools: types.SchoolListItem[] = [];
+  if (payload.profile.school && payload.profile.school_id) {
+    searchResultSchools.push({
+      key: payload.profile.school_id,
+      value: payload.profile.school,
+    });
+  }
   let selectedTab = locationHash[0] || 'view-profile';
   let viewProfileSelectedTab: string | null = null;
   if (selectedTab === 'locale-changed') {
@@ -38,8 +46,10 @@ OmegaUp.on('ready', () => {
         profile: payload.profile,
         data: payload.extraProfileDetails,
         identities: payload.identities,
+        apiTokens: commonPayload.apiTokens,
         hasPassword: payload.extraProfileDetails?.hasPassword,
         selectedTab,
+        searchResultSchools: searchResultSchools,
       };
     },
     render: function (createElement) {
@@ -55,10 +65,12 @@ OmegaUp.on('ready', () => {
           visitorBadges: new Set(payload.extraProfileDetails?.badges),
           selectedTab: this.selectedTab,
           identities: this.identities,
+          apiTokens: this.apiTokens,
           countries: payload.countries,
           programmingLanguages: payload.programmingLanguages,
           hasPassword: this.hasPassword,
           viewProfileSelectedTab,
+          searchResultSchools: this.searchResultSchools,
         },
         on: {
           'update-user-basic-information': (
@@ -159,6 +171,60 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'update-search-result-schools': (query: string) => {
+            api.School.list({ query })
+              .then(({ results }) => {
+                if (!results.length) {
+                  this.searchResultSchools = [
+                    {
+                      key: 0,
+                      value: query,
+                    },
+                  ];
+                  return;
+                }
+                this.searchResultSchools = results.map(
+                  ({ key, value }: types.SchoolListItem) => ({
+                    key,
+                    value,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'request-delete-account': () => {
+            api.User.deleteRequest()
+              .then(({ token }) => {
+                api.User.deleteConfirm({ token })
+                  .then(() => {
+                    // Log out the user
+                    window.location.href = '/logout/';
+                  })
+                  .catch(ui.apiError);
+              })
+              .catch(ui.apiError);
+          },
+          'create-api-token': (tokenName: string) => {
+            api.User.createAPIToken({ name: tokenName })
+              .then(({ token }) => {
+                refreshApiTokensList();
+                ui.success(
+                  ui.formatString(T.apiTokenSuccessfullyCreated, {
+                    token: token,
+                  }),
+                  false,
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'revoke-api-token': (tokenName: string) => {
+            api.User.revokeAPIToken({ name: tokenName })
+              .then(() => {
+                refreshApiTokensList();
+                ui.success(T.apiTokenSuccessfullyRevoked);
+              })
+              .catch(ui.apiError);
+          },
         },
       });
     },
@@ -166,8 +232,15 @@ OmegaUp.on('ready', () => {
 
   function refreshIdentityList() {
     api.User.listAssociatedIdentities({})
-      .then(function (data) {
+      .then((data) => {
         userProfile.identities = data.identities;
+      })
+      .catch(ui.apiError);
+  }
+  function refreshApiTokensList() {
+    api.User.listAPITokens({})
+      .then((data) => {
+        userProfile.apiTokens = data.tokens;
       })
       .catch(ui.apiError);
   }

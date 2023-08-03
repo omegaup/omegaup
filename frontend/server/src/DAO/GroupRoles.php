@@ -111,6 +111,31 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
         );
     }
 
+    /**
+     * @return list<array{alias: string, name: string, role: string}>
+     */
+    public static function getCourseTeachingAssistants(\OmegaUp\DAO\VO\Courses $course): array {
+        $sql = "
+            SELECT
+                g.alias, g.name, 'teaching_assistant' AS role
+            FROM
+                Group_Roles gr
+            INNER JOIN
+                `Groups_` AS g ON g.group_id = gr.group_id
+            WHERE
+                gr.role_id = ? AND gr.acl_id IN (?);";
+        $params = [
+            \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE,
+            $course->acl_id,
+        ];
+
+        /** @var list<array{alias: string, name: string, role: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
+    }
+
     public static function isContestant(int $identityId, int $aclId): bool {
         $sql = '
             SELECT

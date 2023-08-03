@@ -39,13 +39,13 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Check that we have entries in the log.
-        $this->assertEquals(1, count($response['events']));
-        $this->assertEquals(
+        $this->assertSame(1, count($response['events']));
+        $this->assertSame(
             $identity->username,
             $response['events'][0]['username']
         );
-        $this->assertEquals(0, $response['events'][0]['ip']);
-        $this->assertEquals('open', $response['events'][0]['event']['name']);
+        $this->assertSame(0, $response['events'][0]['ip']);
+        $this->assertSame('open', $response['events'][0]['event']['name']);
     }
 
     public function testSearchUsersCourse() {
@@ -159,7 +159,7 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'Should have failed because identity has not been invited to course'
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -186,7 +186,7 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($response['entrypoint'], 'course_intro');
+        $this->assertSame($response['entrypoint'], 'course_intro');
     }
 
     public function testUserCanAccessToCourseDetailsWhenIsInvitedAsAdmin() {
@@ -218,7 +218,7 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($response['entrypoint'], 'course_details');
+        $this->assertSame($response['entrypoint'], 'course_details');
     }
 
     public function testGetNotificationForAddAdministrator() {
@@ -243,11 +243,11 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $notificationContents = $response['notifications'][0]['contents'];
 
         $this->assertCount(1, $response['notifications']);
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\Notifications::COURSE_ADMINISTRATOR_ADDED,
             $notificationContents['type']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['course_name'],
             $notificationContents['body']['localizationParams']['courseName']
         );

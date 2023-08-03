@@ -4,6 +4,106 @@
  * TeamGroupsTest
  */
 class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
+    public function testShowContestForTeamsInArena() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            login: $creatorLogin,
+        );
+        $numberOfUsers = 2;
+
+        $usernameAndPasswordIdentities = [];
+        foreach (range(0, $numberOfUsers - 1) as $id) {
+            $usernameAndPasswordIdentities[] = [
+                'username' => "new_user_{$id}",
+                'password' => "new_user_password_{$id}",
+            ];
+        }
+
+        $teamUsernames = \OmegaUp\Test\Factories\Identity::getUsernamesInCsvFile(
+            'team_identities.csv',
+            $teamGroup->alias,
+        );
+
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities.csv',
+                    $teamGroup->alias,
+                    forTeams: true,
+                ),
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        // Users to associate
+        foreach ($usernameAndPasswordIdentities as $id => $usernameIdentity) {
+            [
+                'identity' => $identities[$id],
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams($usernameIdentity)
+            );
+
+            $teamAlias = "teams:{$teamGroup->alias}:{$teamUsernames[$id]}";
+            \OmegaUp\Controllers\TeamsGroup::apiAddMembers(
+                new \OmegaUp\Request([
+                    'auth_token' => $creatorLogin->auth_token,
+                    'team_group_alias' => $teamAlias,
+                    'usernames' => $usernameIdentity['username'],
+                ])
+            );
+        }
+
+        // Create contest for teams
+        \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'title' => 'Contest_For_Teams',
+                'contestForTeams' => true,
+                'teamsGroupAlias' => $teamGroup->alias,
+            ])
+        );
+
+        foreach ($identities as $index => $identity) {
+            $identity->password = $usernameAndPasswordIdentities[$index]['password'];
+            $login = self::login($identity);
+
+            [
+                'identities' => $associatedIdentities,
+            ] = \OmegaUp\Controllers\User::apiListAssociatedIdentities(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                ])
+            );
+
+            // User switch the account
+            \OmegaUp\Controllers\Identity::apiSelectIdentity(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'usernameOrEmail' => $associatedIdentities[1]['username'],
+                ])
+            );
+
+            $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                ])
+            )['templateProperties']['payload'];
+
+            $this->assertSame(
+                1,
+                $contestListPayload['countContests']['current']
+            );
+        }
+    }
+
     public function testTeamGroupEditDetailsPayload() {
         [
             'owner' => $owner,
@@ -18,7 +118,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertEquals(
+        $this->assertSame(
             $response['teamGroup'],
             [
                 'alias' => $teamGroup->alias,
@@ -57,7 +157,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('It should fail because of the permissions');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -82,14 +182,14 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $teamGroup = \OmegaUp\DAO\TeamGroups::getByName($name);
         $this->assertNotNull($teamGroup);
-        $this->assertEquals($description, $teamGroup->description);
+        $this->assertSame($description, $teamGroup->description);
         $this->assertTrue(
             \OmegaUp\Authorization::isTeamGroupAdmin($identity, $teamGroup)
         );
 
         $teamGroup = \OmegaUp\DAO\TeamGroups::getByAlias($alias);
         $this->assertNotNull($teamGroup);
-        $this->assertEquals($description, $teamGroup->description);
+        $this->assertSame($description, $teamGroup->description);
     }
 
     /**
@@ -113,7 +213,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $teamsGroup = \OmegaUp\DAO\TeamGroups::getByName($originalName);
         $this->assertNotNull($teamsGroup);
-        $this->assertEquals($originalDescription, $teamsGroup->description);
+        $this->assertSame($originalDescription, $teamsGroup->description);
 
         $updatedName = \OmegaUp\Test\Utils::createRandomString();
         $updatedDescription = \OmegaUp\Test\Utils::createRandomString();
@@ -131,9 +231,9 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $teamsGroup = \OmegaUp\DAO\TeamGroups::getByAlias($alias);
         $this->assertNotNull($teamsGroup);
-        $this->assertEquals($updatedName, $teamsGroup->name);
-        $this->assertEquals($updatedDescription, $teamsGroup->description);
-        $this->assertEquals(
+        $this->assertSame($updatedName, $teamsGroup->name);
+        $this->assertSame($updatedDescription, $teamsGroup->description);
+        $this->assertSame(
             $updatedNumberOfContestants,
             $teamsGroup->number_of_contestants
         );
@@ -185,7 +285,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($displayedException, $e->getMessage());
+            $this->assertSame($displayedException, $e->getMessage());
         }
     }
 
@@ -246,7 +346,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'Teams group creation should have failed because alias is already in use'
             );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('aliasInUse', $e->getMessage());
+            $this->assertSame('aliasInUse', $e->getMessage());
         }
     }
 
@@ -315,7 +415,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             // All the teams have 2 associated users
             $this->assertCount(2, $result);
             $teamUsername = $teamUsernames[$index];
-            $this->assertEquals(
+            $this->assertSame(
                 "teams:{$teamGroup->alias}:{$teamUsername}",
                 $identity['username']
             );
@@ -398,7 +498,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             // All the teams have no associated users
             $this->assertEmpty($result);
             $teamUsername = $teamUsernames[$index];
-            $this->assertEquals(
+            $this->assertSame(
                 "teams:{$teamGroup->alias}:{$teamUsername}",
                 $identity['username']
             );
@@ -443,7 +543,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -473,7 +573,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertEquals('groupNotFound', $e->getMessage());
+            $this->assertSame('groupNotFound', $e->getMessage());
         }
     }
 
@@ -503,7 +603,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalid', $e->getMessage());
+            $this->assertSame('parameterInvalid', $e->getMessage());
         }
     }
 
@@ -533,7 +633,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('teamAliasInUse', $e->getMessage());
+            $this->assertSame('teamAliasInUse', $e->getMessage());
         }
     }
 
@@ -563,7 +663,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('teamMemberUsernameInUse', $e->getMessage());
+            $this->assertSame('teamMemberUsernameInUse', $e->getMessage());
         }
     }
 
@@ -579,7 +679,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'team_group_alias' => $teamGroup->alias,
         ]));
-        $this->assertEquals(
+        $this->assertSame(
             $teamGroup->alias,
             $response['team_group']['alias']
         );
@@ -736,7 +836,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             // All the teams have 2 associated users
             $this->assertCount(2, $result);
             $teamUsername = $teamUsernames[$index];
-            $this->assertEquals(
+            $this->assertSame(
                 "teams:{$teamGroup->alias}:{$teamUsername}",
                 $identity['username']
             );
@@ -814,7 +914,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $updatedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
                 $teamIdentity['username']
             );
-            $this->assertEquals($updatedIdentity->name, $newIdentityName);
+            $this->assertSame($updatedIdentity->name, $newIdentityName);
         }
     }
 
@@ -964,7 +1064,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     ])
                 );
             } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-                $this->assertEquals('userNotAllowed', $e->getMessage());
+                $this->assertSame('userNotAllowed', $e->getMessage());
             }
         }
     }
@@ -1034,13 +1134,13 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertCount(4, $teamsUsersChunk['teamsUsers']);
-        $this->assertEquals(10, $teamsUsersChunk['totalRows']);
+        $this->assertSame(10, $teamsUsersChunk['totalRows']);
 
         $usernames = array_map(
             fn ($user) => $user['username'],
             $teamsUsersChunk['teamsUsers']
         );
-        $this->assertEquals($usernames, ['user0', 'user1', 'user2', 'user3']);
+        $this->assertSame($usernames, ['user0', 'user1', 'user2', 'user3']);
 
         $teamsUsersChunk = \OmegaUp\Controllers\TeamsGroup::apiTeamsMembers(
             new \OmegaUp\Request([
@@ -1055,7 +1155,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             fn ($user) => $user['username'],
             $teamsUsersChunk
         );
-        $this->assertEquals($usernames, ['user4', 'user5', 'user6', 'user7']);
+        $this->assertSame($usernames, ['user4', 'user5', 'user6', 'user7']);
     }
 
     public function testRemoveMembersToTeam() {
@@ -1274,7 +1374,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('It should fail');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('teamMemberUsernameInUse', $e->getMessage());
+            $this->assertSame('teamMemberUsernameInUse', $e->getMessage());
         }
     }
 
@@ -1316,7 +1416,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('It should fail because of number of contestants');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'teamMemberExceededNumberOfContestants',
                 $e->getMessage()
             );
@@ -1395,7 +1495,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 fn ($member) => $member['username'],
                 $members
             );
-            $this->assertEquals($usernames, $expectedUsernames[$index]);
+            $this->assertSame($usernames, $expectedUsernames[$index]);
         }
 
         // Call api using identity creator group member
@@ -1457,7 +1557,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 fn ($member) => $member['username'],
                 $members
             );
-            $this->assertEquals($usernames, $expectedUsernames[$index]);
+            $this->assertSame($usernames, $expectedUsernames[$index]);
         }
     }
 
@@ -1527,7 +1627,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             // All the teams have 3 associated users
             $this->assertCount(3, $result);
             $teamUsername = $teamUsernames[$index];
-            $this->assertEquals(
+            $this->assertSame(
                 "teams:{$teamGroup->alias}:{$teamUsername}",
                 $identity['username']
             );
@@ -1563,5 +1663,39 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // The number of identities per group reamin the same
         $this->assertCount(5, $identities);
+    }
+
+    /*
+     * Under13 users can't create teamsGroups.
+     */
+    public function testUserUnder13CannotCreateTeamGroups() {
+        $name = \OmegaUp\Test\Utils::createRandomString();
+        $description = \OmegaUp\Test\Utils::createRandomString();
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+        $defaultDate = strtotime('2022-01-01T00:00:00Z');
+        \OmegaUp\Time::setTimeForTesting($defaultDate);
+        // Create a 10 years-old user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birthDate' => strtotime('2012-01-01T00:00:00Z'),
+            ]),
+        );
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\TeamsGroup::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => $name,
+                'alias' => $alias,
+                'description' => $description,
+            ]));
+            $this->fail(
+                'Creating contests should not have been allowed for U13'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('U13CannotPerform', $e->getMessage());
+        }
     }
 }

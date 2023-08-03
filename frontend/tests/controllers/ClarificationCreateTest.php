@@ -75,7 +75,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Verify our retreived clarificatoin
         $this->assertNotNull($clarification);
-        $this->assertEquals(
+        $this->assertSame(
             $clarificationData['request']['message'],
             $clarification->message
         );
@@ -89,11 +89,11 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['request']['alias']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $contest->problemset_id,
             $clarification->problemset_id
         );
-        $this->assertEquals($problem->problem_id, $clarification->problem_id);
+        $this->assertSame($problem->problem_id, $clarification->problem_id);
     }
 
     /**
@@ -127,7 +127,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $this->assertCount(1, $response['clarifications']);
-        $this->assertEquals(
+        $this->assertSame(
             $clarificationData['request']['message'],
             $response['clarifications'][0]['message']
         );
@@ -212,7 +212,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $this->assertCount(1, $response['clarifications']);
-        $this->assertEquals(
+        $this->assertSame(
             $clarificationData['request']['message'],
             $response['clarifications'][0]['message']
         );
@@ -249,7 +249,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $this->assertCount(1, $response['clarifications']);
-        $this->assertEquals(
+        $this->assertSame(
             $clarificationData['request']['message'],
             $response['clarifications'][0]['message']
         );
@@ -274,7 +274,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterStringTooLong', $e->getMessage());
+            $this->assertSame('parameterStringTooLong', $e->getMessage());
         }
     }
 
@@ -336,7 +336,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Asserts that user has three clarifications (One to all the contestants and two privates)
-        $this->assertEquals(3, count($response['clarifications']));
+        $this->assertSame(3, count($response['clarifications']));
 
         for ($i = 0; $i < $n; $i++) {
             $logins[$i] = self::login($identities[$i]);
@@ -347,7 +347,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
 
             // Asserts that user has only one clarification
-            $this->assertEquals(1, count($response['clarifications']));
+            $this->assertSame(1, count($response['clarifications']));
         }
 
         // Now, director answers one message, and it turns public
@@ -366,7 +366,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
 
             // Asserts that user has two clarifications
-            $this->assertEquals(2, count($response['clarifications']));
+            $this->assertSame(2, count($response['clarifications']));
         }
     }
 }

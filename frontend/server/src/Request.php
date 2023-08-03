@@ -54,7 +54,7 @@ class Request extends \ArrayObject {
      * @param mixed $key The key.
      * @return mixed
      */
-    public function offsetGet($key) {
+    public function offsetGet($key): mixed {
         if (parent::offsetExists($key)) {
             return parent::offsetGet($key);
         }
@@ -364,7 +364,7 @@ class Request extends \ArrayObject {
     /**
      * Ensures that the value associated with the key is in an enum.
      *
-     * @psalm-template TValue
+     * @psalm-template TValue of scalar
      * @param array<array-key, TValue> $enumValues
      * @return TValue
      */
@@ -402,7 +402,7 @@ class Request extends \ArrayObject {
     /**
      * Ensures that the value associated with the key is in an enum.
      *
-     * @psalm-template TValue
+     * @psalm-template TValue of scalar
      * @param array<int, TValue> $enumValues
      * @return TValue|null
      */
@@ -426,10 +426,12 @@ class Request extends \ArrayObject {
     /**
      * Ensures that an identity is logged in.
      *
-     * @throws \OmegaUp\Exceptions\UnauthorizedException
      * @psalm-assert !null $this->identity
      * @psalm-assert !null $this->identity->identity_id
      * @psalm-assert !null $this->identity->username
+     *
+     * @throws \OmegaUp\Exceptions\UnauthorizedException
+     * @return void
      */
     public function ensureIdentity(): void {
         if (!is_null($this->user) || !is_null($this->identity)) {
@@ -453,6 +455,52 @@ class Request extends \ArrayObject {
      * Ensures that an identity is logged in, and it is the main identity of
      * its associated user.
      *
+     * @psalm-assert !null $this->identity
+     * @psalm-assert !null $this->identity->identity_id
+     * @psalm-assert !null $this->identity->user_id
+     * @psalm-assert !null $this->identity->username
+     * @psalm-assert !null $this->user
+     * @psalm-assert !null $this->user->main_identity_id
+     * @psalm-assert !null $this->user->user_id
+     * @psalm-assert !null $this->user->username
+     *
+     * @throws \OmegaUp\Exceptions\UnauthorizedException
+     * @return void
+     */
+    public function ensureMainUserIdentity(): void {
+        $this->ensureIdentity();
+        if (
+            is_null($this->user)
+            || $this->user->main_identity_id != $this->identity->identity_id
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+    }
+
+    /**
+     * Ensures that an identity is logged in is Over 13 years of age.
+     *
+     * @throws \OmegaUp\Exceptions\UnauthorizedException
+     * @psalm-assert !null $this->identity
+     * @psalm-assert !null $this->identity->identity_id
+     * @psalm-assert !null $this->identity->username
+     */
+    public function ensureIdentityIsOver13(): void {
+        $this->ensureIdentity();
+        if (is_null($this->user)) {
+            return;
+        }
+        if (\OmegaUp\Authorization::isUnderThirteenUser($this->user)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'U13CannotPerform'
+            );
+        }
+    }
+
+    /**
+     * Ensures that an identity is logged in is Over 13 years of age, and it is the main identity of
+     * its associated user.
+     *
      * @throws \OmegaUp\Exceptions\UnauthorizedException
      * @psalm-assert !null $this->identity
      * @psalm-assert !null $this->identity->identity_id
@@ -463,16 +511,12 @@ class Request extends \ArrayObject {
      * @psalm-assert !null $this->user->user_id
      * @psalm-assert !null $this->user->username
      */
-    public function ensureMainUserIdentity(): void {
-        if (!is_null($this->user) && !is_null($this->identity)) {
-            return;
-        }
-        $this->ensureIdentity();
-        if (
-            is_null($this->user)
-            || $this->user->main_identity_id != $this->identity->identity_id
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+    public function ensureMainUserIdentityIsOver13(): void {
+        $this->ensureMainUserIdentity();
+        if (\OmegaUp\Authorization::isUnderThirteenUser($this->user)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'U13CannotPerform'
+            );
         }
     }
 
@@ -530,7 +574,10 @@ class Request extends \ArrayObject {
      */
     public function toStringArray(): array {
         $result = [];
-        /** @var mixed $value */
+        /**
+         * @var mixed $key
+         * @var mixed $value
+         */
         foreach ($this as $key => $value) {
             $result[
                 is_scalar($key) || is_object($key) ?

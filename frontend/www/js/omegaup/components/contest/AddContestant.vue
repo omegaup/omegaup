@@ -22,6 +22,7 @@
             <label>{{ T.wordsMultipleUser }}</label>
             <textarea
               v-model="bulkContestants"
+              data-contestant-names
               class="form-control contestants"
               rows="4"
             ></textarea>
@@ -48,7 +49,7 @@
         </thead>
         <tbody>
           <tr v-for="user in currentUsers" :key="user.username">
-            <td class="text-center">
+            <td class="text-center" data-uploaded-contestants>
               <omegaup-user-username
                 :linkify="true"
                 :username="user.username"

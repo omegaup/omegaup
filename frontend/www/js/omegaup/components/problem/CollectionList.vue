@@ -1,17 +1,17 @@
 <template>
-  <div class="container-fluid p-5">
+  <div class="container-fluid p-5 max-width mx-auto">
     <div class="row">
-      <div class="col col-md-4 d-flex align-items-center">
+      <div class="col col-md-3 d-flex align-items-center">
         <a href="/problem/collection/" data-nav-problems-collection>{{
           T.problemCollectionBackCollections
         }}</a>
       </div>
-      <div class="col">
-        <h1>{{ title }}</h1>
+      <div class="col mb-4">
+        <h1 class="title-font p-0">{{ title }}</h1>
       </div>
     </div>
     <div class="row">
-      <div class="col col-md-4">
+      <div class="col col-md-3">
         <omegaup-problem-filter-tags
           :selected-tags="selectedTags"
           :tags="availableTags"
@@ -23,6 +23,7 @@
                 columnName,
                 sortOrder,
                 difficulty,
+                quality,
                 selectedTags,
               )
           "
@@ -36,12 +37,27 @@
                 columnName,
                 sortOrder,
                 difficulty,
+                quality,
                 selectedTags,
               )
           "
         ></omegaup-problem-filter-difficulty>
+        <omegaup-problem-filter-quality
+          :quality="quality"
+          @change-quality="
+            (quality) =>
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                quality,
+                selectedTags,
+              )
+          "
+        ></omegaup-problem-filter-quality>
       </div>
-      <div class="col">
+      <div class="col p-0">
         <div v-if="!problems || problems.length == 0" class="card-body">
           <div class="empty-table-message">
             {{ T.courseAssignmentProblemsEmpty }}
@@ -72,6 +88,7 @@
                 columnName,
                 sortOrder,
                 difficulty,
+                quality,
                 selectedTags,
               )
           "
@@ -88,6 +105,7 @@ import { omegaup } from '../../omegaup';
 import problem_FilterTags from './FilterTags.vue';
 import problem_BaseList from './BaseList.vue';
 import problem_FilterDifficulty from './FilterDifficulty.vue';
+import problem_FilterQuality from './FilterQuality.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 
@@ -96,6 +114,7 @@ import { types } from '../../api_types';
     'omegaup-problem-filter-tags': problem_FilterTags,
     'omegaup-problem-base-list': problem_BaseList,
     'omegaup-problem-filter-difficulty': problem_FilterDifficulty,
+    'omegaup-problem-filter-quality': problem_FilterQuality,
   },
 })
 export default class CollectionList extends Vue {
@@ -116,6 +135,7 @@ export default class CollectionList extends Vue {
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() difficulty!: string;
+  @Prop() quality!: string;
 
   T = T;
   level = this.data.level;
@@ -157,3 +177,14 @@ export default class CollectionList extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.title-font {
+  font-size: 2rem;
+  letter-spacing: 0.01rem;
+}
+
+.max-width {
+  max-width: 75rem;
+}
+</style>

@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="text-center mb-4">
+  <div submissions-problem>
+    <div class="text-center mb-5 submissions-title">
       <h2>
         {{ T.submissionsListTitle }}
       </h2>
@@ -25,7 +25,7 @@
           "
         />
 
-        <a :href="`/submissions/${encodeURIComponent(searchedUsername)}/`">
+        <a :href="hrefSearchUser">
           <button class="btn btn-primary" type="button">
             {{ T.searchUser }}
           </button>
@@ -85,7 +85,7 @@
               >
                 {{ T[`verdict${submission.verdict}`] }}
               </td>
-              <td class="text-right">
+              <td class="text-center">
                 {{
                   submission.runtime === 0
                     ? '—'
@@ -96,7 +96,7 @@
                       })
                 }}
               </td>
-              <td class="text-right">
+              <td class="text-center">
                 {{
                   submission.memory === 0
                     ? '—'
@@ -141,11 +141,18 @@ export default class SubmissionsList extends Vue {
   T = T;
   ui = ui;
   time = time;
-  searchedUsername: null | string = null;
+  searchedUsername: null | types.ListItem = null;
+
+  get hrefSearchUser(): string {
+    if (!this.searchedUsername?.key) {
+      return '/submissions/';
+    }
+    return `/submissions/${encodeURIComponent(this.searchedUsername?.key)}/`;
+  }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../../../sass/main.scss';
 table.submissions-table > tbody > tr > td {
   vertical-align: middle;
@@ -170,5 +177,13 @@ table.submissions-table > tbody > tr > td {
 
 .fixed-width-column {
   width: 180px;
+}
+
+.submissions-title h2 {
+  font-size: 1.8rem;
+}
+
+[submissions-problem] .tags-input-wrapper-default {
+  padding: 0.35rem 0.25rem 0.7rem 0.25rem;
 }
 </style>

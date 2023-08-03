@@ -98,8 +98,8 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             $schoolData['school']->school_id
         );
         $this->assertCount(1, $response); // one month, the first one
-        $this->assertEquals($response[0]['month'], $firstMonthNumber);
-        $this->assertEquals(
+        $this->assertSame($response[0]['month'], $firstMonthNumber);
+        $this->assertSame(
             $response[0]['problems_solved'],
             $firstMonthExpectedCount
         );
@@ -169,13 +169,13 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             $schoolData['school']->school_id
         );
         $this->assertCount(2, $response); // two months (first and second)
-        $this->assertEquals($response[0]['month'], $firstMonthNumber);
-        $this->assertEquals(
+        $this->assertSame($response[0]['month'], $firstMonthNumber);
+        $this->assertSame(
             $response[0]['problems_solved'],
             $firstMonthExpectedCount
         );
-        $this->assertEquals($response[1]['month'], $secondMonthNumber);
-        $this->assertEquals(
+        $this->assertSame($response[1]['month'], $secondMonthNumber);
+        $this->assertSame(
             $response[1]['problems_solved'],
             $secondMonthExpectedCount
         );
@@ -282,44 +282,50 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(3, $results);
 
-        $this->assertEquals(
+        $this->assertSame(
             $identities[0]->username,
             $results[0]['username']
         );
-        $this->assertEquals(0, $results[0]['solved_problems']);
-        $this->assertEquals(0, $results[0]['organized_contests']);
-        $this->assertEquals(2, $results[0]['created_problems']);
+        $this->assertSame(0, $results[0]['solved_problems']);
+        $this->assertSame(0, $results[0]['organized_contests']);
+        $this->assertSame(2, $results[0]['created_problems']);
 
-        $this->assertEquals(
+        $this->assertSame(
             $identities[1]->username,
             $results[1]['username']
         );
-        $this->assertEquals(2, $results[1]['solved_problems']);
-        $this->assertEquals(0, $results[1]['organized_contests']);
-        $this->assertEquals(1, $results[1]['created_problems']);
+        $this->assertSame(2, $results[1]['solved_problems']);
+        $this->assertSame(0, $results[1]['organized_contests']);
+        $this->assertSame(1, $results[1]['created_problems']);
 
-        $this->assertEquals(
+        $this->assertSame(
             $identities[2]->username,
             $results[2]['username']
         );
-        $this->assertEquals(1, $results[2]['solved_problems']);
-        $this->assertEquals(1, $results[2]['organized_contests']);
-        $this->assertEquals(0, $results[2]['created_problems']);
+        $this->assertSame(1, $results[2]['solved_problems']);
+        $this->assertSame(1, $results[2]['organized_contests']);
+        $this->assertSame(0, $results[2]['created_problems']);
     }
 
     /**
-     * Tests the historical rank of schools, based on the current
+     * Tests the historical rank of schools, based on the current with
+     * schools scoring 0
      * criteria: distinct active users and distinct problems solved
+     * with schools with a score of 0 without appearing in the ranking
      */
     public function testSchoolRank() {
-        // Three schools:
+        // Four schools:
         // School0: two distinct problems solved
         // School1: three distinct problems solved
         // School2: two distinct problems solved
+        // School3: without solving problem
         // => School0 and School2 must have same rank and score
         // => School1 must have a better (lower) rank than School0 and School2
+        // => School3 must have a better (lower) score than School0
+        // => NUmber of schools in the ranking must be 3
 
         $schoolsData = [
+            \OmegaUp\Test\Factories\Schools::createSchool(),
             \OmegaUp\Test\Factories\Schools::createSchool(),
             \OmegaUp\Test\Factories\Schools::createSchool(),
             \OmegaUp\Test\Factories\Schools::createSchool()
@@ -327,7 +333,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         $users = [];
         $identities = [];
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
         }
 
@@ -351,6 +357,10 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Schools::addUserToSchool(
             $schoolsData[2],
             $identities[3]
+        );
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolsData[3],
+            $identities[4]
         );
 
         // School 0
@@ -416,15 +426,19 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $school2 = \Omegaup\DAO\Schools::getByPK(
             $schoolsData[2]['school']->school_id
         );
+        $school3 = \Omegaup\DAO\Schools::getByPK(
+            $schoolsData[3]['school']->school_id
+        );
 
-        $this->assertEquals($school0->score, $school0->score);
-        $this->assertEquals($school0->ranking, $school2->ranking);
+        $this->assertSame($school0->score, $school0->score);
+        $this->assertSame($school0->ranking, $school2->ranking);
         $this->assertGreaterThan($school1->ranking, $school0->ranking);
         $this->assertGreaterThan($school0->score, $school1->score);
+        $this->assertGreaterThan($school3->score, $school0->score);
 
         // Test apiRank
         $results = \OmegaUp\DAO\Schools::getRank(1, 100);
-        $this->assertGreaterThanOrEqual(3, count($results['rank']));
+        $this->assertEquals(3, count($results['rank']));
         $this->assertGreaterThanOrEqual(
             $results['rank'][0]['ranking'],
             $results['rank'][1]['ranking']

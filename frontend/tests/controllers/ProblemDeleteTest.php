@@ -58,7 +58,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 'problemHasBeenUsedInContestOrCourse',
                 $e->getMessage()
             );

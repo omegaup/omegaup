@@ -139,11 +139,12 @@ export default class ProblemFinderWizard extends Vue {
   get tagObjects(): TagObject[] {
     const tagObjects: TagObject[] = [];
     this.possibleTags.forEach((tagObject) => {
+      if (!Object.prototype.hasOwnProperty.call(T, tagObject.name)) {
+        return;
+      }
       tagObjects.push({
         key: tagObject.name,
-        value: Object.prototype.hasOwnProperty.call(T, tagObject.name)
-          ? T[tagObject.name]
-          : tagObject.name,
+        value: T[tagObject.name],
       });
     });
     return tagObjects;
@@ -183,7 +184,8 @@ export default class ProblemFinderWizard extends Vue {
 
 .modal-container {
   background: var(--finder-wizard-modal-container-background-color);
-  width: 800px;
+  min-width: 340px;
+  max-width: 800px;
   margin: 2.5em auto 0;
   border: 2px solid var(--finder-wizard-modal-container-border-color);
   padding: 1em;

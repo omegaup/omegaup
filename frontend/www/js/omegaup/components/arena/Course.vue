@@ -2,7 +2,8 @@
   <omegaup-arena
     :active-tab="activeTab"
     :title="currentAssignment.name"
-    :should-show-runs="isAdmin"
+    :should-show-runs="isAdmin || isTeachingAssistant"
+    :should-show-ranking="course.admission_mode !== 'public'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #socket-status>
@@ -71,6 +72,7 @@
                 problemInfo ? problemInfo.nominationStatus : null
               "
               :popup-displayed="problemDetailsPopup"
+              :request-feedback="true"
               :active-tab="'problems'"
               :languages="course.languages"
               :runs="runs"
@@ -78,6 +80,9 @@
               :run-details-data="runDetailsData"
               :problem-alias="problemAlias"
               :in-contest-or-course="true"
+              :feedback-map="feedbackMap"
+              :feedback-thread-map="feedbackThreadMap"
+              @request-feedback="(guid) => $emit('request-feedback', guid)"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', { selectedTab, problemAlias })
@@ -85,14 +90,7 @@
               @submit-run="onRunSubmitted"
               @show-run="onRunDetails"
               @submit-promotion="
-                (qualityPromotionComponent) =>
-                  $emit('submit-promotion', {
-                    solved: qualityPromotionComponent.solved,
-                    tried: qualityPromotionComponent.tried,
-                    quality: qualityPromotionComponent.quality,
-                    difficulty: qualityPromotionComponent.difficulty,
-                    tags: qualityPromotionComponent.tags,
-                  })
+                (request) => $emit('submit-promotion', request)
               "
               @dismiss-promotion="
                 (qualityPromotionComponent, isDismissed) =>
@@ -125,7 +123,7 @@
         </div>
       </div>
     </template>
-    <template #arena-scoreboard>
+    <template v-if="scoreboard" #arena-scoreboard>
       <omegaup-arena-scoreboard
         :show-invited-users-filter="false"
         :problems="scoreboard.problems"
@@ -150,6 +148,7 @@
         :show-user="true"
         :problemset-problems="Object.values(problems)"
         :search-result-users="searchResultUsers"
+        :search-result-problems="searchResultProblems"
         @details="onRunAdminDetails"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
@@ -180,6 +179,25 @@
                 :feedback-options="feedback"
                 @set-feedback="(request) => $emit('set-feedback', request)"
               ></omegaup-submission-feedback>
+            </template>
+            <template #code-view="{ guid }">
+              <omegaup-arena-feedback-code-view
+                :language="language"
+                :value="source"
+                :readonly="false"
+                :feedback-map="feedbackMap"
+                :feedback-thread-map="feedbackThreadMap"
+                :current-user-class-name="currentUserClassName"
+                :current-username="currentUsername"
+                @save-feedback-list="
+                  (feedbackList) =>
+                    $emit('save-feedback-list', { feedbackList, guid })
+                "
+                @submit-feedback-thread="
+                  (feedback) =>
+                    $emit('submit-feedback-thread', { feedback, guid })
+                "
+              ></omegaup-arena-feedback-code-view>
             </template>
           </omegaup-arena-rundetails-popup>
         </template>
@@ -233,6 +251,8 @@ import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import submission_Feedback from '../submissions/Feedback.vue';
 import { SocketStatus } from '../../arena/events_socket';
 import { SubmissionRequest } from '../../arena/submissions';
+import arena_FeedbackCodeView from './FeedbackCodeView.vue';
+import { ArenaCourseFeedback } from './Feedback.vue';
 
 @Component({
   components: {
@@ -248,6 +268,7 @@ import { SubmissionRequest } from '../../arena/submissions';
     'omegaup-problem-details': problem_Details,
     'omegaup-submission-feedback': submission_Feedback,
     'omegaup-countdown': omegaup_Countdown,
+    'omegaup-arena-feedback-code-view': arena_FeedbackCodeView,
   },
 })
 export default class ArenaCourse extends Vue {
@@ -263,7 +284,7 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
-  @Prop() scoreboard!: types.Scoreboard;
+  @Prop() scoreboard!: null | types.Scoreboard;
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) allRuns!: null | types.Run[];
@@ -273,6 +294,13 @@ export default class ArenaCourse extends Vue {
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
   @Prop() totalRuns!: number;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: false }) isTeachingAssistant!: boolean;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackMap!: Map<number, ArenaCourseFeedback>;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
+  @Prop() currentUsername!: string;
+  @Prop() currentUserClassName!: string;
 
   T = T;
   omegaup = omegaup;
@@ -353,8 +381,27 @@ export default class ArenaCourse extends Vue {
     return PopupDisplayed.Promotion;
   }
 
+  get searchResultProblems(): types.ListItem[] {
+    if (!this.problems.length) {
+      return [];
+    }
+    return this.problems.map((problem) => ({
+      key: problem.alias,
+      value: problem.text,
+    }));
+  }
+
+  get language(): string | undefined {
+    return this.runDetailsData?.language;
+  }
+
+  get source(): string | undefined {
+    return this.runDetailsData?.source;
+  }
+
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
+    this.currentRunDetailsData = null;
     this.$emit('reset-hash', { selectedTab: 'runs', alias: null });
   }
 

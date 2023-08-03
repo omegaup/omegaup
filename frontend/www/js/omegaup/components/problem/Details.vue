@@ -30,7 +30,7 @@
     <div class="tab-content">
       <div
         v-if="problem"
-        class="tab-pane fade p-4"
+        class="tab-pane fade py-4 p-lg-4"
         :class="{ 'show active': selectedTab === 'problems' }"
       >
         <omegaup-problem-settings-summary
@@ -121,6 +121,8 @@
             <omegaup-arena-rundetails-popup
               v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
               :data="currentRunDetailsData"
+              :feedback-map="feedbackMap"
+              :feedback-thread-map="feedbackThreadMap"
               @dismiss="onPopupDismissed"
             >
               <template #feedback="data">
@@ -136,10 +138,7 @@
               v-show="currentPopupDisplayed === PopupDisplayed.Promotion"
               :solved="nominationStatus && nominationStatus.solved"
               :tried="nominationStatus && nominationStatus.tried"
-              @submit="
-                (qualityPromotionComponent) =>
-                  $emit('submit-promotion', qualityPromotionComponent)
-              "
+              @submit="(request) => $emit('submit-promotion', request)"
               @dismiss="
                 (qualityPromotionComponent, isDismissed) =>
                   onPopupPromotionDismissed(
@@ -186,7 +185,9 @@
             :runs="runsByProblem"
             :show-details="true"
             :problemset-problems="[]"
+            :request-feedback="requestFeedback"
             :is-contest-finished="isContestFinished"
+            @request-feedback="(guid) => $emit('request-feedback', guid)"
             @details="(request) => onRunDetails(request, 'problems')"
             @update-search-result-users-contest="
               (request) => $emit('update-search-result-users-contest', request)
@@ -215,20 +216,6 @@
       </div>
       <div
         class="tab-pane fade p-4"
-        :class="{ 'show active': selectedTab === 'solution' }"
-      >
-        <omegaup-problem-solution
-          :status="solutionStatus"
-          :solution="solution"
-          :available-tokens="availableTokens"
-          :all-tokens="allTokens"
-          @get-solution="$emit('get-solution')"
-          @get-tokens="$emit('get-tokens')"
-          @unlock-solution="$emit('unlock-solution')"
-        ></omegaup-problem-solution>
-      </div>
-      <div
-        class="tab-pane fade p-4"
         :class="{ 'show active': selectedTab === 'runs' }"
       >
         <omegaup-arena-runs
@@ -241,6 +228,7 @@
           :show-disqualify="true"
           :problemset-problems="[]"
           :search-result-users="searchResultUsers"
+          :search-result-problems="searchResultProblems"
           :total-runs="totalRuns"
           @details="(request) => onRunDetails(request, 'runs')"
           @rejudge="(run) => $emit('rejudge', run)"
@@ -249,6 +237,9 @@
           @filter-changed="(request) => $emit('apply-filter', request)"
           @update-search-result-users-contest="
             (request) => $emit('update-search-result-users-contest', request)
+          "
+          @update-search-result-problems="
+            (request) => $emit('update-search-result-problems', request)
           "
           @update-search-result-users="
             (request) => $emit('update-search-result-users', request)
@@ -282,9 +273,6 @@
           @clarification-response="onClarificationResponse"
         >
           <template #new-clarification><div></div></template>
-          <template #table-title>
-            <th class="text-center" scope="col">{{ T.wordsContest }}</th>
-          </template>
         </omegaup-arena-clarification-list>
       </div>
     </div>
@@ -305,7 +293,6 @@ import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummary.vue';
-import problem_Solution from './Solution.vue';
 import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopup.vue';
 import qualitynomination_PromotionPopup from '../qualitynomination/PromotionPopup.vue';
 import qualitynomination_ReviewerPopup from '../qualitynomination/ReviewerPopup.vue';
@@ -323,6 +310,7 @@ import {
   faExternalLinkAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { SubmissionRequest } from '../../arena/submissions';
+import { ArenaCourseFeedback } from '../arena/Feedback.vue';
 library.add(
   faExclamationTriangle,
   faEdit,
@@ -359,7 +347,6 @@ export enum PopupDisplayed {
     'omegaup-username': user_Username,
     'omegaup-problem-feedback': problem_Feedback,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
-    'omegaup-problem-solution': problem_Solution,
     'omegaup-quality-nomination-reviewer-popup': qualitynomination_ReviewerPopup,
     'omegaup-quality-nomination-demotion-popup': qualitynomination_DemotionPopup,
     'omegaup-quality-nomination-promotion-popup': qualitynomination_PromotionPopup,
@@ -378,8 +365,6 @@ export default class ProblemDetails extends Vue {
   @Prop() user!: types.UserInfoForProblem;
   @Prop() nominationStatus!: types.NominationStatus;
   @Prop() runs!: types.Run[];
-  @Prop() solutionStatus!: string;
-  @Prop({ default: null }) solution!: types.ProblemStatement | null;
   @Prop({ default: 0 }) availableTokens!: number;
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
@@ -403,8 +388,14 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultProblems!: types.ListItem[];
   @Prop({ default: null }) languages!: null | string[];
   @Prop() totalRuns!: number;
+  @Prop({ default: false }) requestFeedback!: boolean;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackMap!: Map<number, ArenaCourseFeedback>;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
@@ -425,11 +416,6 @@ export default class ProblemDetails extends Vue {
         name: 'problems',
         text: T.wordsProblem,
         visible: true,
-      },
-      {
-        name: 'solution',
-        text: T.wordsSolution,
-        visible: this.user.loggedIn,
       },
       {
         name: 'runs',
@@ -532,6 +518,7 @@ export default class ProblemDetails extends Vue {
 
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
+    this.currentRunDetailsData = null;
     this.$emit('update:activeTab', this.selectedTab);
   }
 

@@ -4,48 +4,117 @@
  */
 
 class RunRejudgeTest extends \OmegaUp\Test\ControllerTestCase {
+    public function proveRejudgeProvider(): array {
+        return [
+            'teaching assistant can rejudge in public course' => [
+                'public',
+                'apiAddTeachingAssistant',
+                'isTeachingAssistant',
+            ],
+            'teaching assistant can rejudge in private course' => [
+                'private',
+                'apiAddTeachingAssistant',
+                'isTeachingAssistant',
+            ],
+            'admin can disqualify in rejudge course' => [
+                'public',
+                'apiAddAdmin',
+                'isCourseAdmin',
+            ],
+            'admin can disqualify in rejudge course' => [
+                'private',
+                'apiAddAdmin',
+                'isCourseAdmin',
+            ]
+        ];
+    }
+
     /**
-     * Basic test of rerun
+     * @dataProvider proveRejudgeProvider
      */
-    public function testRejudgeWithoutCompileError() {
+    public function testRejudgeWithoutCompileErrorByAdminAndTeachingAssistant(
+        string $admissionMode,
+        string $nameApi,
+        string $role
+    ) {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        // Get a contest
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        // Get a course
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            admissionMode: $admissionMode
+        );
+        $courseAlias = $courseData['course_alias'];
+        $assignmentAlias = $courseData['assignment_alias'];
 
-        // Add the problem to the contest
-        \OmegaUp\Test\Factories\Contest::addProblemToContest(
-            $problemData,
-            $contestData
+        // Login
+        $adminLogin = self::login($courseData['admin']);
+
+        // Add the problem to the assignment
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $adminLogin,
+            $courseAlias,
+            $assignmentAlias,
+            [$problemData]
         );
 
-        // Create our contestant
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        // Create our student
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
 
-        // Create a run
-        $runData = \OmegaUp\Test\Factories\Run::createRun(
+        // Add student to course
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student
+        );
+
+        // Create a run for assignment
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
             $problemData,
-            $contestData,
-            $identity
+            $courseData,
+            $student
         );
 
         // Grade the run
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
+        // Create user
+        ['identity' => $user] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Login
+        $adminLogin = self::login($courseData['admin']);
+
+        // add user like teaching assistant
+        \OmegaUp\Controllers\Course::$nameApi(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $user->username,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        $course = \OmegaUp\DAO\Courses::getByAlias(
+            $courseData['course_alias']
+        );
+
+        $this->assertTrue(
+            \OmegaUp\Authorization::$role(
+                $user,
+                $course
+            )
+        );
+
+        // login teaching assistant
+        $userLogin = self::login($user);
+
         $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
-        // Build request
-        $login = self::login($contestData['director']);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'run_alias' => $runData['response']['guid'],
-        ]);
-
         // Call API
-        $response = \OmegaUp\Controllers\Run::apiRejudge($r);
+        $response = \OmegaUp\Controllers\Run::apiRejudge(new \OmegaUp\Request([
+            'auth_token' => $userLogin->auth_token,
+            'run_alias' => $runData['response']['guid'],
+        ]));
 
-        $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(1, $detourGrader->getGraderCallCount());
+        $this->assertSame('ok', $response['status']);
+        $this->assertSame(1, $detourGrader->getGraderCallCount());
     }
 }

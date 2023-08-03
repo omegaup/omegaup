@@ -666,6 +666,10 @@ export const Course = {
     messages.CourseAddGroupAdminRequest,
     messages.CourseAddGroupAdminResponse
   >('/api/course/addGroupAdmin/'),
+  addGroupTeachingAssistant: apiCall<
+    messages.CourseAddGroupTeachingAssistantRequest,
+    messages.CourseAddGroupTeachingAssistantResponse
+  >('/api/course/addGroupTeachingAssistant/'),
   addProblem: apiCall<
     messages.CourseAddProblemRequest,
     messages.CourseAddProblemResponse
@@ -674,6 +678,10 @@ export const Course = {
     messages.CourseAddStudentRequest,
     messages.CourseAddStudentResponse
   >('/api/course/addStudent/'),
+  addTeachingAssistant: apiCall<
+    messages.CourseAddTeachingAssistantRequest,
+    messages.CourseAddTeachingAssistantResponse
+  >('/api/course/addTeachingAssistant/'),
   adminDetails: apiCall<
     messages.CourseAdminDetailsRequest,
     messages._CourseAdminDetailsServerResponse,
@@ -914,6 +922,10 @@ export const Course = {
     messages.CourseRemoveGroupAdminRequest,
     messages.CourseRemoveGroupAdminResponse
   >('/api/course/removeGroupAdmin/'),
+  removeGroupTeachingAssistant: apiCall<
+    messages.CourseRemoveGroupTeachingAssistantRequest,
+    messages.CourseRemoveGroupTeachingAssistantResponse
+  >('/api/course/removeGroupTeachingAssistant/'),
   removeProblem: apiCall<
     messages.CourseRemoveProblemRequest,
     messages.CourseRemoveProblemResponse
@@ -922,6 +934,14 @@ export const Course = {
     messages.CourseRemoveStudentRequest,
     messages.CourseRemoveStudentResponse
   >('/api/course/removeStudent/'),
+  removeTeachingAssistant: apiCall<
+    messages.CourseRemoveTeachingAssistantRequest,
+    messages.CourseRemoveTeachingAssistantResponse
+  >('/api/course/removeTeachingAssistant/'),
+  requestFeedback: apiCall<
+    messages.CourseRequestFeedbackRequest,
+    messages.CourseRequestFeedbackResponse
+  >('/api/course/requestFeedback/'),
   requests: apiCall<
     messages.CourseRequestsRequest,
     messages._CourseRequestsServerResponse,
@@ -1228,6 +1248,21 @@ export const Problem = {
               if (typeof x.feedback !== 'undefined' && x.feedback !== null)
                 x.feedback = ((x) => {
                   x.date = ((x: number) => new Date(x * 1000))(x.date);
+                  if (
+                    typeof x.feedback_thread !== 'undefined' &&
+                    x.feedback_thread !== null
+                  )
+                    x.feedback_thread = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        x.timestamp = ((x: number) => new Date(x * 1000))(
+                          x.timestamp,
+                        );
+                        return x;
+                      });
+                    })(x.feedback_thread);
                   return x;
                 })(x.feedback);
               return x;
@@ -1251,6 +1286,10 @@ export const Problem = {
   list: apiCall<messages.ProblemListRequest, messages.ProblemListResponse>(
     '/api/problem/list/',
   ),
+  listForTypeahead: apiCall<
+    messages.ProblemListForTypeaheadRequest,
+    messages.ProblemListForTypeaheadResponse
+  >('/api/problem/listForTypeahead/'),
   myList: apiCall<
     messages.ProblemMyListRequest,
     messages.ProblemMyListResponse
@@ -1565,17 +1604,60 @@ export const Run = {
     messages._RunDetailsServerResponse,
     messages.RunDetailsResponse
   >('/api/run/details/', (x) => {
-    if (typeof x.feedback !== 'undefined' && x.feedback !== null)
-      x.feedback = ((x) => {
-        x.date = ((x: number) => new Date(x * 1000))(x.date);
+    x.feedback = ((x) => {
+      if (!Array.isArray(x)) {
         return x;
-      })(x.feedback);
+      }
+      return x.map((x) => {
+        x.date = ((x: number) => new Date(x * 1000))(x.date);
+        if (
+          typeof x.feedback_thread !== 'undefined' &&
+          x.feedback_thread !== null
+        )
+          x.feedback_thread = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+              return x;
+            });
+          })(x.feedback_thread);
+        return x;
+      });
+    })(x.feedback);
     return x;
   }),
   disqualify: apiCall<
     messages.RunDisqualifyRequest,
     messages.RunDisqualifyResponse
   >('/api/run/disqualify/'),
+  getSubmissionFeedback: apiCall<
+    messages.RunGetSubmissionFeedbackRequest,
+    messages._RunGetSubmissionFeedbackServerResponse,
+    messages.RunGetSubmissionFeedbackResponse
+  >('/api/run/getSubmissionFeedback/', (x) => {
+    if (!Array.isArray(x)) {
+      return x;
+    }
+    return x.map((x) => {
+      x.date = ((x: number) => new Date(x * 1000))(x.date);
+      if (
+        typeof x.feedback_thread !== 'undefined' &&
+        x.feedback_thread !== null
+      )
+        x.feedback_thread = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+            return x;
+          });
+        })(x.feedback_thread);
+      return x;
+    });
+  }),
   list: apiCall<
     messages.RunListRequest,
     messages._RunListServerResponse,
@@ -1635,12 +1717,29 @@ export const Scoreboard = {
 export const Session = {
   currentSession: apiCall<
     messages.SessionCurrentSessionRequest,
+    messages._SessionCurrentSessionServerResponse,
     messages.SessionCurrentSessionResponse
-  >('/api/session/currentSession/'),
-  googleLogin: apiCall<
-    messages.SessionGoogleLoginRequest,
-    messages.SessionGoogleLoginResponse
-  >('/api/session/googleLogin/'),
+  >('/api/session/currentSession/', (x) => {
+    if (typeof x.session !== 'undefined' && x.session !== null)
+      x.session = ((x) => {
+        x.api_tokens = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.last_used = ((x: number) => new Date(x * 1000))(x.last_used);
+            x.rate_limit = ((x) => {
+              x.reset = ((x: number) => new Date(x * 1000))(x.reset);
+              return x;
+            })(x.rate_limit);
+            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+            return x;
+          });
+        })(x.api_tokens);
+        return x;
+      })(x.session);
+    return x;
+  }),
 };
 
 export const Submission = {
@@ -1790,6 +1889,14 @@ export const User = {
     messages.UserCreateAPITokenRequest,
     messages.UserCreateAPITokenResponse
   >('/api/user/createAPIToken/'),
+  deleteConfirm: apiCall<
+    messages.UserDeleteConfirmRequest,
+    messages.UserDeleteConfirmResponse
+  >('/api/user/deleteConfirm/'),
+  deleteRequest: apiCall<
+    messages.UserDeleteRequestRequest,
+    messages.UserDeleteRequestResponse
+  >('/api/user/deleteRequest/'),
   extraInformation: apiCall<
     messages.UserExtraInformationRequest,
     messages._UserExtraInformationServerResponse,

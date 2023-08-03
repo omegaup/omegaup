@@ -81,6 +81,9 @@ node_modules/
 # Ignore composer files
 vendor/
 
+# Ignore psalm cache
+/.psalm/
+
 # Ignore JavaScript build files.
 frontend/www/js/dist/
 

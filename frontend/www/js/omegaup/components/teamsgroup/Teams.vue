@@ -23,7 +23,7 @@
               :username="identity.username"
             ></omegaup-user-username>
           </td>
-          <td>{{ identity.name }}</td>
+          <td data-group-team-name>{{ identity.name }}</td>
           <td>{{ identity.country }}</td>
           <td>{{ identity.state }}</td>
           <td>{{ identity.school }}</td>
@@ -60,6 +60,10 @@
       v-if="formToShow === AvailableForms.Edit"
       :countries="countries"
       :identity="identity"
+      :search-result-schools="searchResultSchools"
+      @update-search-result-schools="
+        (query) => $emit('update-search-result-schools', query)
+      "
       @cancel="onCancel"
       @edit-identity-member="onEditIdentityTeam"
     ></omegaup-identity-edit>
@@ -93,7 +97,6 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { dao, types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
 import identity_Edit from '../identity/Edit.vue';
 import identity_ChangePassword from '../identity/ChangePassword.vue';
@@ -128,11 +131,11 @@ export default class Teams extends Vue {
   @Prop() teams!: types.Identity[];
   @Prop() countries!: Array<dao.Countries>;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() searchResultSchools!: types.SchoolListItem[];
   @Prop({ default: () => [] }) teamsMembers!: types.TeamMember[];
 
   T = T;
   AvailableForms = AvailableForms;
-  typeahead = typeahead;
   identity: null | types.Identity = null;
   username: null | string = null;
   formToShow: AvailableForms = AvailableForms.None;
@@ -141,6 +144,7 @@ export default class Teams extends Vue {
     this.identity = identity;
     this.formToShow = AvailableForms.Edit;
     this.username = identity.username;
+    this.$emit('update-identity-team', this.identity);
   }
 
   onChangePass(username: string): void {
@@ -162,8 +166,11 @@ export default class Teams extends Vue {
     this.onCancel();
   }
 
-  onEditIdentityTeam(originalUsername: string, identity: types.Identity): void {
-    this.$emit('edit-identity-team', { originalUsername, identity });
+  onEditIdentityTeam(response: {
+    originalUsername: string;
+    identity: types.Identity;
+  }): void {
+    this.$emit('edit-identity-team', response);
     this.onCancel();
   }
 

@@ -14,6 +14,7 @@
         <div v-if="problems.length" class="mb-3">
           <a
             href="#clarifications/all/new"
+            data-new-clarification-button
             class="btn btn-primary"
             @click="currentPopupDisplayed = PopupDisplayed.NewClarification"
           >
@@ -79,14 +80,8 @@
     <div class="table-responsive">
       <table class="table mb-0">
         <thead>
-          <tr>
-            <slot name="table-title">
-              <th class="text-center" scope="col">{{ T.wordsProblem }}</th>
-            </slot>
-            <th class="text-center" scope="col">
-              {{ T.clarificationsAskedBy }}
-            </th>
-            <th class="text-center" scope="col">{{ T.wordsTime }}</th>
+          <tr class="text-nowrap">
+            <th class="text-center" scope="col">{{ T.clarificationInfo }}</th>
             <th class="text-center" scope="col">{{ T.wordsMessage }}</th>
             <th class="text-center" scope="col">{{ T.wordsResult }}</th>
           </tr>

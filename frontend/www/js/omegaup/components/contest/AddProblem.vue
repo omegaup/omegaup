@@ -11,15 +11,34 @@
               class="form-control"
               disabled="disabled"
             />
-            <omegaup-common-typeahead
-              v-else
-              :existing-options="searchResultProblems"
-              :value.sync="alias"
-              @update-existing-options="
-                (query) => $emit('update-search-result-problems', query)
-              "
-            >
-            </omegaup-common-typeahead>
+            <div v-else class="input-group w-100">
+              <div class="input-group-prepend w-25">
+                <select v-model="selectedSearchType" class="custom-select">
+                  <option
+                    v-for="searchType in availableSearchTypes"
+                    :key="searchType.key"
+                    :value="searchType.key"
+                    :selected="selectedSearchType === searchType.key"
+                  >
+                    {{ searchType.value }}
+                  </option>
+                </select>
+              </div>
+              <omegaup-common-typeahead
+                class="w-75"
+                :existing-options="searchResultProblems"
+                :activation-threshold="2"
+                :value.sync="alias"
+                @update-existing-options="
+                  (query) =>
+                    $emit('update-search-result-problems', {
+                      query,
+                      searchType: selectedSearchType,
+                    })
+                "
+              >
+              </omegaup-common-typeahead>
+            </div>
           </div>
         </div>
         <div v-if="alias" class="row">
@@ -173,6 +192,13 @@ interface MappedProblems {
   };
 }
 
+export enum SearchTypes {
+  ALL = 'all',
+  TITLE = 'title',
+  ALIAS = 'alias',
+  ID = 'problem_id',
+}
+
 @Component({
   components: {
     'omegaup-problem-versions': problem_Versions,
@@ -193,7 +219,7 @@ export default class AddProblem extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
-  alias: null | string = null;
+  alias: null | types.ListItem = null;
   title: null | string = null;
   points = this.initialPoints;
   order = this.initialProblems.length + 1;
@@ -202,6 +228,13 @@ export default class AddProblem extends Vue {
   useLatestVersion = true;
   publishedRevision: null | types.ProblemVersion = null;
   selectedRevision: null | types.ProblemVersion = null;
+  selectedSearchType: SearchTypes = SearchTypes.ALL;
+  availableSearchTypes: types.ListItem[] = [
+    { key: SearchTypes.ALL, value: T.contestEditAddProblemSearchByAll },
+    { key: SearchTypes.ALIAS, value: T.contestEditAddProblemSearchByAlias },
+    { key: SearchTypes.TITLE, value: T.contestEditAddProblemSearchByTitle },
+    { key: SearchTypes.ID, value: T.contestEditAddProblemSearchById },
+  ];
 
   get problemMapping(): MappedProblems {
     let problemMapping: MappedProblems = {};
@@ -236,7 +269,7 @@ export default class AddProblem extends Vue {
     this.$emit('add-problem', {
       problem: {
         order: this.order,
-        alias: this.alias,
+        alias: this.alias?.key,
         points: this.points,
         commit: !this.useLatestVersion
           ? this.selectedRevision?.commit
@@ -250,7 +283,7 @@ export default class AddProblem extends Vue {
 
   onEdit(problem: types.ProblemsetProblemWithVersions): void {
     this.title = problem.title;
-    this.alias = problem.alias;
+    this.alias = { key: problem.alias, value: problem.title };
     this.points = problem.points;
     this.order = problem.order;
   }
@@ -265,7 +298,7 @@ export default class AddProblem extends Vue {
   ): void {
     let found = false;
     for (const problem of this.problems) {
-      if (this.alias === problem.alias) {
+      if (this.alias?.key === problem.alias) {
         found = true;
         break;
       }
@@ -273,12 +306,12 @@ export default class AddProblem extends Vue {
     if (!found) {
       return;
     }
-    this.$emit('runs-diff', this.alias, versions, selectedCommit);
+    this.$emit('runs-diff', this.alias?.key, versions, selectedCommit);
   }
 
   get isUpdate(): boolean {
     if (!this.alias) return false;
-    return !!this.problemMapping[this.alias];
+    return !!this.problemMapping[this.alias.key];
   }
 
   get addProblemButtonLabel(): string {
@@ -302,19 +335,19 @@ export default class AddProblem extends Vue {
   }
 
   @Watch('alias')
-  onAliasChange(newProblemAlias: string) {
+  onAliasChange(newProblemAlias: null | types.ListItem) {
     if (!newProblemAlias) {
       this.versionLog = [];
       this.selectedRevision = this.publishedRevision = null;
       return;
     }
     if (this.isUpdate) {
-      this.onGetVersions(newProblemAlias);
+      this.onGetVersions(newProblemAlias.key);
       return;
     }
     this.$emit('get-versions', {
       target: this,
-      request: { problemAlias: this.alias },
+      request: { problemAlias: this.alias?.key },
     });
   }
 }

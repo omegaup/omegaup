@@ -1,9 +1,9 @@
 <template>
   <div class="omegaup-course-details card">
-    <div v-if="!update" class="card-header">
-      <h3 class="card-title">{{ T.courseNew }}</h3>
+    <div v-if="!update" class="card-header px-2 px-sm-4">
+      <h3 class="card-title mb-0">{{ T.courseNew }}</h3>
     </div>
-    <div class="card-body">
+    <div class="card-body px-2 px-sm-4">
       <form class="form" data-course-form @submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-4">
@@ -97,16 +97,15 @@
           <div class="form-group col-md-4">
             <label class="font-weight-bold w-100"
               >{{ T.profileSchool }}
-              <input
-                v-model="school_name"
-                autocomplete="off"
-                class="form-control typeahead school"
-                type="text"
-                @change="onChange" /><input
-                v-model="school_id"
-                class="school_id"
-                type="hidden"
-            /></label>
+              <omegaup-common-typeahead
+                :existing-options="searchResultSchools"
+                :options="searchResultSchools"
+                :value.sync="school"
+                @update-existing-options="
+                  (query) => $emit('update-search-result-schools', query)
+                "
+              ></omegaup-common-typeahead>
+            </label>
           </div>
           <div class="form-group col-md-4">
             <span class="font-weight-bold"
@@ -131,7 +130,7 @@
               />
             </span>
             <select
-              v-model="requests_user_information"
+              v-model="requestsUserInformation"
               data-course-participant-information
               class="form-control"
             >
@@ -241,7 +240,7 @@
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
+import common_Typeahead from '../common/Typeahead.vue';
 import DatePicker from '../DatePicker.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
 import Multiselect from 'vue-multiselect';
@@ -273,6 +272,7 @@ const levelOptions = [
 
 @Component({
   components: {
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-datepicker': DatePicker,
     'omegaup-radio-switch': omegaup_RadioSwitch,
     'font-awesome-icon': FontAwesomeIcon,
@@ -286,6 +286,7 @@ export default class CourseDetails extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop({ default: '' }) invalidParameterName!: string;
   @Prop() allLanguages!: string[];
+  @Prop() searchResultSchools!: types.SchoolListItem[];
 
   T = T;
   alias = this.course.alias;
@@ -296,29 +297,12 @@ export default class CourseDetails extends Vue {
   name = this.course.name;
   level = this.course.level;
   objective = this.course.objective;
-  school_name = this.course.school_name;
-  school_id = this.course.school_id;
+  school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
   needsBasicInformation = this.course.needs_basic_information;
-  requests_user_information = this.course.requests_user_information;
+  requestsUserInformation = this.course.requests_user_information;
   unlimitedDuration = this.course.finish_time === null;
   selectedLanguages = this.course.languages;
   levelOptions = levelOptions;
-
-  data(): { [name: string]: any } {
-    return {
-      school_id: this.course.school_id,
-    };
-  }
-
-  mounted(): void {
-    typeahead.schoolTypeahead(
-      $('input.typeahead', this.$el),
-      (event: Event, item: any) => {
-        this.school_name = item.value;
-        this.school_id = item.id;
-      },
-    );
-  }
 
   reset(): void {
     this.alias = this.course.alias;
@@ -327,28 +311,35 @@ export default class CourseDetails extends Vue {
     this.showScoreboard = this.course.show_scoreboard;
     this.startTime = this.course.start_time;
     this.name = this.course.name;
-    this.school_name = this.course.school_name;
-    this.school_id = this.course.school_id;
+    this.school = this.searchResultSchools[0];
     this.needsBasicInformation = this.course.needs_basic_information;
-    this.requests_user_information = this.course.requests_user_information;
+    this.requestsUserInformation = this.course.requests_user_information;
     this.unlimitedDuration = this.course.finish_time === null;
   }
 
   onSubmit(): void {
-    this.$emit('submit', this);
+    this.$emit('submit', {
+      name: this.name,
+      description: this.description,
+      objective: this.objective,
+      start_time: this.startTime,
+      alias: this.alias,
+      level: this.level,
+      languages: this.selectedLanguages,
+      show_scoreboard: this.showScoreboard,
+      needs_basic_information: this.needsBasicInformation,
+      requests_user_information: this.requestsUserInformation,
+      school: this.school,
+      unlimited_duration: this.unlimitedDuration,
+      finish_time: !this.unlimitedDuration
+        ? new Date(this.finishTime).setHours(23, 59, 59, 999) / 1000
+        : null,
+    });
   }
 
   @Emit('emit-cancel')
   onCancel(): void {
     this.reset();
-  }
-
-  onChange(): void {
-    if (this.course.school_id === this.school_id) {
-      this.school_id = undefined;
-    } else {
-      this.course.school_id = this.school_id;
-    }
   }
 }
 </script>

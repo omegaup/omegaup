@@ -6,6 +6,7 @@
         <slot name="socket-status">
           <sup class="socket-status-error" title="WebSocket">✗</sup>
         </slot>
+        <slot name="edit-button"></slot>
       </h2>
       <slot name="clock"><div class="clock">∞</div></slot>
     </div>
@@ -73,6 +74,7 @@ import { Tab } from '../problem/Details.vue';
 @Component
 export default class Arena extends Vue {
   @Prop({ default: false }) shouldShowRuns!: boolean;
+  @Prop({ default: true }) shouldShowRanking!: boolean;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() title!: string;
   @Prop() activeTab!: string;
@@ -98,7 +100,7 @@ export default class Arena extends Vue {
       {
         name: 'ranking',
         text: T.wordsRanking,
-        visible: true,
+        visible: this.shouldShowRanking,
       },
       {
         name: 'runs',

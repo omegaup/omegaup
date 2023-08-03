@@ -53,7 +53,7 @@
       <div id="common-navbar"></div>
       {% jsInclude 'common_navbar' omitRuntime %}
     {% endif %}
-    <main role="main" {% if not fullWidth %}class="container-lg p-5"{% endif %}>
+    <main role="main" {% if not fullWidth %}class="container-lg py-5 px-3 px-md-5"{% endif %}>
       <div class="alert mt-0" id="status" style="display: none;">
         <button type="button" class="close" id="alert-close">&times;</button>
         <span class="message"></span>
@@ -69,6 +69,7 @@
       <div id="main-container"></div>
     </main>
     {% if OMEGAUP_GA_TRACK == 1 %}
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-PBDCQK1GEQ"></script>
       <script type="text/javascript" src="{% versionHash '/js/analytics.js' %}"></script>
     {% endif %}
     {% if not headerPayload.inContest and not hideFooterAndHeader %}

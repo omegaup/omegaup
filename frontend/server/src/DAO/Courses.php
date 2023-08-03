@@ -25,7 +25,12 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      * @return list<\OmegaUp\DAO\VO\Courses>
      */
     public static function findByName(string $name): array {
-        $sql = "SELECT DISTINCT c.*
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
+            'c'
+        );
+        $sql = "SELECT DISTINCT
+                {$fields}
                 FROM Courses c
                 WHERE c.name
                 LIKE CONCAT('%', ?, '%') LIMIT 10";
@@ -75,9 +80,14 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $args[] = $identity->identity_id;
         }
 
+        $fields =  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Assignments::FIELD_NAMES,
+            'a'
+        );
+
         $sql = "
             SELECT
-                a.*,
+                {$fields},
                 EXISTS(SELECT * FROM Submissions s WHERE s.problemset_id = a.problemset_id) AS has_runs,
                 COUNT(psp.problem_id) AS problem_count,
                 ps.scoreboard_url,
@@ -759,7 +769,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             HAVING
                 MAX(r.contest_score) IS NOT NULL
             ORDER BY
-                a.`order`, psp.`order`
+                students.name, a.`order`, psp.`order`
         ';
 
         $studentsProgress = [];
@@ -943,7 +953,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * Returns all courses that an identity can manage.
      *
-     * @return list<\OmegaUp\DAO\VO\Courses>
+     * @param list<int> $roles
+     * @return array{admin: list<FilteredCourse>, teachingAssistant: list<FilteredCourse>}
      */
     final public static function getAllCoursesAdminedByIdentity(
         int $identityId,
@@ -952,7 +963,12 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     ): array {
         $sql = '
             SELECT
-                c.*
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
+            'c'
+        ) . ',
+                ur.role_id AS user_role,
+                gr.role_id AS group_role
             FROM
                 Courses AS c
             INNER JOIN
@@ -962,7 +978,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             LEFT JOIN
                 User_Roles ur ON ur.acl_id = c.acl_id
             LEFT JOIN
-                Identities uri ON ur.user_id = uri.identity_id
+                Identities uri ON ur.user_id = uri.user_id
             LEFT JOIN
                 Group_Roles gr ON gr.acl_id = c.acl_id
             LEFT JOIN
@@ -971,10 +987,12 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 c.archived = 0 AND (
                     ai.identity_id = ? OR
                     (ur.role_id = ? AND uri.identity_id = ?) OR
+                    (gr.role_id = ? AND gi.identity_id = ?) OR
+                    (ur.role_id = ? AND uri.identity_id = ?) OR
                     (gr.role_id = ? AND gi.identity_id = ?)
                 )
             GROUP BY
-                c.course_id
+                c.course_id, user_role, group_role
             ORDER BY
                 c.course_id DESC
             LIMIT
@@ -985,15 +1003,48 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $identityId,
             \OmegaUp\Authorization::ADMIN_ROLE,
             $identityId,
+            \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE,
+            $identityId,
+            \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE,
+            $identityId,
             max(0, $page - 1) * $pageSize,
             $pageSize,
         ];
-        /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, group_role: int|null, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, user_role: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
-        $courses = [];
+        $courses = ['admin' => [], 'teachingAssistant' => []];
         foreach ($rs as $row) {
-            $courses[] = new \OmegaUp\DAO\VO\Courses($row);
+            $course = \OmegaUp\Controllers\Course::convertCourseToArray(
+                new \OmegaUp\DAO\VO\Courses([
+                    'acl_id' => $row['acl_id'],
+                    'admission_mode' => $row['admission_mode'],
+                    'alias' => $row['alias'],
+                    'archived' => $row['archived'],
+                    'course_id' => $row['course_id'],
+                    'description' => $row['description'],
+                    'finish_time' => $row['finish_time'],
+                    'group_id' => $row['group_id'],
+                    'languages' => $row['languages'],
+                    'level' => $row['level'],
+                    'minimum_progress_for_certificate' => $row['minimum_progress_for_certificate'],
+                    'name' => $row['name'],
+                    'needs_basic_information' => $row['needs_basic_information'],
+                    'objective' => $row['objective'],
+                    'requests_user_information' => $row['requests_user_information'],
+                    'school_id' => $row['school_id'],
+                    'show_scoreboard' => $row['show_scoreboard'],
+                    'start_time' => $row['start_time'],
+                ])
+            );
+            if (
+                $row['user_role'] == \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE
+                || $row['group_role'] == \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE
+            ) {
+                $courses['teachingAssistant'][] = $course;
+                continue;
+            }
+            $courses['admin'][] = $course;
         }
         return $courses;
     }
@@ -1086,7 +1137,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     ): array {
         $sql = '
             SELECT
-                c.*
+            ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
+            'c'
+        ) . '
             FROM
                 Courses AS c
             INNER JOIN
@@ -1121,7 +1175,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     ): array {
         $sql = '
             SELECT
-                c.*
+            ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
+            'c'
+        ) . '
             FROM
                 Courses c
             INNER JOIN
@@ -1142,10 +1199,43 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
+    final public static function getByProblemsetId(
+        \OmegaUp\DAO\VO\Problemsets $problemset
+    ): ?\OmegaUp\DAO\VO\Courses {
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
+            'c'
+        );
+        $sql = "SELECT
+                    {$fields}
+                FROM
+                    Courses c
+                INNER JOIN
+                    Assignments a
+                ON
+                    c.course_id = a.course_id
+                WHERE
+                    a.problemset_id = ?
+                LIMIT 1;";
+
+        /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}|null */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$problemset->problemset_id]
+        );
+        if (empty($row)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\Courses($row);
+    }
+
     final public static function getByAlias(
         string $alias
     ): ?\OmegaUp\DAO\VO\Courses {
-        $sql = 'SELECT * FROM Courses WHERE (alias = ?) LIMIT 1;';
+        $sql = 'SELECT ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
+            'Courses'
+        ) . ' FROM Courses WHERE (alias = ?) LIMIT 1;';
 
         /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
@@ -1335,10 +1425,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     LEFT JOIN
                         Submissions s ON s.problemset_id = cp.problemset_id
                         AND s.problem_id = cp.problem_id
-                    LEFT JOIN
-                        Runs r ON r.run_id = s.current_run_id
                     WHERE
-                        r.verdict = "AC"
+                        s.verdict = "AC"
                         AND s.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?)
                     GROUP BY s.identity_id
                     HAVING

@@ -13,17 +13,18 @@ import pika
 import pytest_mock
 import contest_callback
 
-import test_credentials
-import rabbitmq_connection
+import database.contest
 import producer_contest
-import rabbitmq_client
 import rabbitmq_connection
+import rabbitmq_client
+import test_credentials
 
 sys.path.insert(
     0,
     os.path.join(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
 import lib.db   # pylint: disable=wrong-import-position
+
 
 @dataclasses.dataclass
 class MessageSavingCallback:
@@ -45,22 +46,36 @@ class MessageSavingCallback:
     'params, expected',
     [
         (
-            {
-                'certificate_cutoff': 1,
-                'contest_id': 1,
-                'alias': 'contest1',
-                'scoreboard_url': 'abcdef',
-            },
-            'certificate_cutoff',
+            [
+                database.contest.ContestCertificate(
+                    certificate_cutoff=1,
+                    alias='contest1',
+                    scoreboard_url='abcdef',
+                    contest_id=1,
+                ),
+            ],
+            database.contest.ContestCertificate(
+                certificate_cutoff=1,
+                alias='contest1',
+                scoreboard_url='abcdef',
+                contest_id=1,
+            )._asdict(),
         ),
         (
-            {
-                'certificate_cutoff': 1,
-                'contest_id': 2,
-                'alias': 'contest2',
-                'scoreboard_url': '123456',
-            },
-            'certificate_cutoff',
+            [
+                database.contest.ContestCertificate(
+                    certificate_cutoff=1,
+                    alias='contest2',
+                    scoreboard_url='123456',
+                    contest_id=2,
+                ),
+            ],
+            database.contest.ContestCertificate(
+                certificate_cutoff=1,
+                alias='contest2',
+                scoreboard_url='123456',
+                contest_id=2,
+            )._asdict(),
         ),
     ],
 )  # type: ignore
@@ -82,9 +97,11 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
     )
 
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
-        rabbitmq_connection.connect(username=test_credentials.OMEGAUP_USERNAME,
-                                     password=test_credentials.OMEGAUP_PASSWORD,
-                                     host=test_credentials.RABBITMQ_HOST) as channel:
+        rabbitmq_connection.connect(
+            username=test_credentials.OMEGAUP_USERNAME,
+            password=test_credentials.OMEGAUP_PASSWORD,
+            host=test_credentials.RABBITMQ_HOST,
+    ) as channel:
         rabbitmq_connection.initialize_rabbitmq(
             queue='contest',
             exchange='certificates',

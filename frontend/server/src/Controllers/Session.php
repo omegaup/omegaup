@@ -23,9 +23,10 @@ class ScopedFacebook {
 /**
  * Session controller handles sessions.
  * @psalm-type AssociatedIdentity=array{default: bool, username: string}
+ * @psalm-type ApiToken=array{name: string, timestamp: \OmegaUp\Timestamp, last_used: \OmegaUp\Timestamp, rate_limit: array{reset: \OmegaUp\Timestamp, limit: int, remaining: int}}
  * @psalm-type IdentityExt=array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}
  * @psalm-type AuthIdentityExt=array{currentIdentity: IdentityExt, loginIdentity: IdentityExt}
- * @psalm-type CurrentSession=array{apiTokenId: int|null, associated_identities: list<AssociatedIdentity>, auth_token: null|string, cacheKey: null|string, classname: string, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool}
+ * @psalm-type CurrentSession=array{apiTokenId: int|null, associated_identities: list<AssociatedIdentity>, auth_token: null|string, cacheKey: null|string, classname: string, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool, api_tokens: list<ApiToken>}
  */
 class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
@@ -243,6 +244,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                 'cacheKey' => null,
                 'is_admin' => false,
                 'associated_identities' => [],
+                'api_tokens' => [],
             ];
         }
         return self::getCurrentSessionImpl(
@@ -301,6 +303,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         $associatedIdentities = [];
         $currentUser = null;
         $email = null;
+        $apiTokens = [];
         if (is_null($currentIdentity->user_id)) {
             if (\OmegaUp\DAO\Identities::isMainIdentity($loginIdentity)) {
                 $associatedIdentities = [
@@ -334,6 +337,9 @@ class Session extends \OmegaUp\Controllers\Controller {
                 $associatedIdentities = \OmegaUp\DAO\Identities::getAssociatedIdentities(
                     $currentIdentity
                 );
+                $apiTokens = \OmegaUp\DAO\APITokens::getAllByUser(
+                    $currentIdentity->user_id
+                );
             }
         }
 
@@ -351,6 +357,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                 $currentIdentity
             ),
             'associated_identities' => $associatedIdentities,
+            'api_tokens' => $apiTokens,
         ];
     }
 
@@ -462,6 +469,7 @@ class Session extends \OmegaUp\Controllers\Controller {
 
     private static function getUniqueUsernameFromEmail(string $email): string {
         $idx = strpos($email, '@');
+        $username = null;
         if ($idx === false) {
             $username = 'OmegaupUser';
         } else {
@@ -500,54 +508,65 @@ class Session extends \OmegaUp\Controllers\Controller {
         return "{$username}{$suffix}";
     }
 
-    /**
-     * @omegaup-request-param string $storeToken
-     *
-     * @return array{isAccountCreation: bool}
-     */
-    public static function apiGoogleLogin(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['storeToken'],
-            'storeToken'
+    public static function loginViaGoogle(
+        string $idToken,
+        string $gCsrfToken
+    ): void {
+        // Verify the Google ID token on the server side:
+        // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token?hl=en
+        $csrfTokenCookie = self::getSessionManagerInstance()->getCookie(
+            'g_csrf_token'
         );
 
-        $client = new \Google_Client();
-        $client->setClientId(OMEGAUP_GOOGLE_CLIENTID);
-        $client->setClientSecret(OMEGAUP_GOOGLE_SECRET);
+        if (is_null($csrfTokenCookie)) {
+            self::$log->error('Missing CSRF token cookie');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'loginGoogleInvalidCSRFToken',
+                'g_csrf_token'
+            );
+        }
+        if ($gCsrfToken !== $csrfTokenCookie) {
+            self::$log->error('Invalid CSRF token: mismatch');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'loginGoogleInvalidCSRFToken',
+                'g_csrf_token'
+            );
+        }
+
+        $client = new \Google_Client([
+            'client_id' => OMEGAUP_GOOGLE_CLIENTID,
+        ]);
 
         try {
-            $loginTicket = $client->verifyIdToken($r['storeToken']);
-        } catch (\Google_Auth_Exception $ge) {
+            /** @var array{email: string, email_verified: int, name?: string, picture: string, locale: string} */
+            $payload = $client->verifyIdToken($idToken);
+
+            // payload will have a superset of:
+            //    [email] => johndoe@gmail.com
+            //    [email_verified] => 1
+            //    [name] => Alan Gonzalez
+            //    [picture] => https://lh3.googleusercontent.com/-zrLvBe-AU/AAAAAAAAAAI/AAAAAAAAATU/hh0yUXEisCI/photo.jpg
+            //    [locale] => en
+        } catch (\Exception $ge) {
             throw new \OmegaUp\Exceptions\UnauthorizedException(
                 'loginRequired',
                 $ge
             );
         }
 
-        /** @var array{email: string, email_verified: int, name?: string, picture: string, locale: string} */
-        $payload = $loginTicket->getAttributes()['payload'];
-
-        // payload will have a superset of:
-        //    [email] => johndoe@gmail.com
-        //    [email_verified] => 1
-        //    [name] => Alan Gonzalez
-        //    [picture] => https://lh3.googleusercontent.com/-zrLvBe-AU/AAAAAAAAAAI/AAAAAAAAATU/hh0yUXEisCI/photo.jpg
-        //    [locale] => en
-
-        return self::LoginViaGoogle(
+        self::loginViaGoogleEmail(
             $payload['email'],
             (isset($payload['name']) ? $payload['name'] : null)
         );
     }
 
-    /**
-     * @return array{isAccountCreation: bool}
-     */
-    public static function LoginViaGoogle(
+    public static function loginViaGoogleEmail(
         string $email,
         ?string $name = null
-    ): array {
-        return self::thirdPartyLogin('Google', $email, $name);
+    ): void {
+        self::thirdPartyLogin('Google', $email, $name);
+
+        self::redirect();
     }
 
     /**

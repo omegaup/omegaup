@@ -14,6 +14,7 @@ import TextEditorComponent from './TextEditorComponent.vue';
 import ZipViewerComponent from './ZipViewerComponent.vue';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
+const theme = document.getElementById('theme').value;
 const defaultValidatorSource = `#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
@@ -176,7 +177,7 @@ let store = new Vuex.Store({
     alias: null,
     showSubmitButton: false,
     languages: [],
-    localStorageSources: null,
+    sessionStorageSources: null,
     request: {
       input: {
         limits: {},
@@ -201,8 +202,8 @@ let store = new Vuex.Store({
     languages(state) {
       return state.languages;
     },
-    localStorageSources(state) {
-      return state.localStorageSources;
+    sessionStorageSources(state) {
+      return state.sessionStorageSources;
     },
     moduleName(state) {
       if (state.request.input.interactive) {
@@ -324,26 +325,26 @@ let store = new Vuex.Store({
   mutations: {
     alias(state, value) {
       if (state.alias) {
-        persistToLocalStorage(state.alias).flush();
+        persistToSessionStorage(state.alias).flush();
       }
       state.alias = value;
-      const itemString = localStorage.getItem(
+      const itemString = sessionStorage.getItem(
         `ephemeral-sources-${state.alias}`,
       );
-      state.localStorageSources = null;
+      state.sessionStorageSources = null;
       if (itemString) {
-        state.localStorageSources = JSON.parse(itemString);
+        state.sessionStorageSources = JSON.parse(itemString);
       }
-      if (!state.localStorageSources) {
+      if (!state.sessionStorageSources) {
         if (state.request.input.interactive) {
-          state.localStorageSources = {
+          state.sessionStorageSources = {
             language: 'cpp17-gcc',
             sources: {
               ...interactiveTemplates,
             },
           };
         } else {
-          state.localStorageSources = {
+          state.sessionStorageSources = {
             language: 'cpp17-gcc',
             sources: {
               ...sourceTemplates,
@@ -351,10 +352,10 @@ let store = new Vuex.Store({
           };
         }
       }
-      state.request.language = state.localStorageSources.language;
+      state.request.language = state.sessionStorageSources.language;
       state.request.source =
-        state.localStorageSources.sources[
-          Util.languageExtensionMapping[state.localStorageSources.language]
+        state.sessionStorageSources.sources[
+          Util.languageExtensionMapping[state.sessionStorageSources.language]
         ];
       document.getElementById('language').value = state.request.language;
     },
@@ -403,14 +404,15 @@ let store = new Vuex.Store({
         )
       ) {
         const language = Util.languageExtensionMapping[value];
-        if (state.localStorageSources) {
+        if (state.sessionStorageSources) {
           if (
             Object.prototype.hasOwnProperty.call(
-              state.localStorageSources.sources,
+              state.sessionStorageSources.sources,
               language,
             )
           ) {
-            state.request.source = state.localStorageSources.sources[language];
+            state.request.source =
+              state.sessionStorageSources.sources[language];
           }
         } else if (store.getters.isInteractive) {
           if (
@@ -420,14 +422,14 @@ let store = new Vuex.Store({
           }
         } else {
           if (Object.prototype.hasOwnProperty.call(sourceTemplates, language)) {
-            request.source = sourceTemplates[language];
+            state.request.source = sourceTemplates[language];
           }
         }
-        if (state.localStorageSources && !state.updatingSettings) {
-          state.localStorageSources.language = value;
-          persistToLocalStorage(state.alias)({
+        if (state.sessionStorageSources && !state.updatingSettings) {
+          state.sessionStorageSources.language = value;
+          persistToSessionStorage(state.alias)({
             alias: state.alias,
-            contents: state.localStorageSources,
+            contents: state.sessionStorageSources,
           });
         }
       }
@@ -435,13 +437,13 @@ let store = new Vuex.Store({
     },
     'request.source'(state, value) {
       state.request.source = value;
-      if (!state.updatingSettings && state.localStorageSources) {
-        state.localStorageSources.sources[
-          Util.languageExtensionMapping[state.localStorageSources.language]
+      if (!state.updatingSettings && state.sessionStorageSources) {
+        state.sessionStorageSources.sources[
+          Util.languageExtensionMapping[state.sessionStorageSources.language]
         ] = value;
-        persistToLocalStorage(state.alias)({
+        persistToSessionStorage(state.alias)({
           alias: state.alias,
-          contents: state.localStorageSources,
+          contents: state.sessionStorageSources,
         });
       }
       state.dirty = true;
@@ -660,6 +662,7 @@ const goldenLayoutSettings = {
                       language: 'request.language',
                       module: 'moduleName',
                     },
+                    theme,
                   },
                   id: 'source',
                   isClosable: false,
@@ -690,6 +693,7 @@ const goldenLayoutSettings = {
                     readOnly: true,
                     module: 'compiler',
                     extension: 'out/err',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -704,6 +708,7 @@ const goldenLayoutSettings = {
                     readOnly: true,
                     module: 'logs',
                     extension: 'txt',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -713,6 +718,7 @@ const goldenLayoutSettings = {
                   componentState: {
                     storeMapping: {},
                     id: 'zipviewer',
+                    theme,
                   },
                   title: 'files.zip',
                   isClosable: false,
@@ -741,6 +747,7 @@ const goldenLayoutSettings = {
                     id: 'in',
                     readOnly: false,
                     extension: 'in',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -755,6 +762,7 @@ const goldenLayoutSettings = {
                     id: 'out',
                     readOnly: false,
                     extension: 'out',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -774,6 +782,7 @@ const goldenLayoutSettings = {
                     id: 'stdout',
                     readOnly: false,
                     extension: 'out',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -788,6 +797,7 @@ const goldenLayoutSettings = {
                     id: 'stderr',
                     readOnly: false,
                     extension: 'err',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -800,6 +810,7 @@ const goldenLayoutSettings = {
                       modifiedContents: 'outputStdout',
                     },
                     id: 'diff',
+                    theme,
                   },
                   isClosable: false,
                 },
@@ -818,6 +829,7 @@ const goldenLayoutSettings = {
               currentCase: 'currentCase',
             },
             id: 'source',
+            theme,
           },
           title: 'cases/',
           width: 15,
@@ -836,6 +848,7 @@ const validatorSettings = {
       language: 'request.input.validator.custom_validator.language',
     },
     initialModule: 'validator',
+    theme,
   },
   id: 'validator',
   isClosable: false,
@@ -850,6 +863,7 @@ const interactiveIdlSettings = {
     },
     initialLanguage: 'idl',
     readOnly: isEmbedded,
+    theme,
   },
   id: 'interactive-idl',
   isClosable: false,
@@ -863,11 +877,13 @@ const interactiveMainSourceSettings = {
       language: 'request.input.interactive.language',
     },
     initialModule: 'Main',
+    theme,
   },
   id: 'interactive-main-source',
   isClosable: false,
 };
 
+// eslint-disable-next-line no-undef
 const layout = new GoldenLayout(
   goldenLayoutSettings,
   document.getElementById('layout-root'),
@@ -949,8 +965,11 @@ RegisterVueComponent(
   componentMapping,
 );
 
-const persistToLocalStorage = Util.throttle(({ alias, contents }) => {
-  localStorage.setItem(`ephemeral-sources-${alias}`, JSON.stringify(contents));
+const persistToSessionStorage = Util.throttle(({ alias, contents }) => {
+  sessionStorage.setItem(
+    `ephemeral-sources-${alias}`,
+    JSON.stringify(contents),
+  );
 }, 10000);
 
 function initialize() {

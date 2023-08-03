@@ -117,7 +117,10 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
     final public static function getByGroupId(int $groupId): array {
         $sql = '
             SELECT
-                *
+            ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\GroupsIdentities::FIELD_NAMES,
+            'i'
+        ) . '
             FROM
                 Groups_Identities i
             WHERE

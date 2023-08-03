@@ -1,0 +1,42 @@
+#include "extremos.h"
+#include<iostream>
+
+using namespace std;
+
+// Main
+//	bool esMenor(int i, int j)
+//	void respuesta(int posMenor, int posMayor)
+
+int mini,maxi;
+bool aux;
+
+void buscaExtremos(int n) {
+
+    aux=esMenor(1,2);
+
+    if(aux){
+        mini=1;
+        maxi=2;
+    }
+    else{
+        mini=2;
+        maxi=1;
+    }
+
+    for(int c=3; c<=n; c++){
+        ///cout<<mini<<" "<<maxi<<"\n";
+        aux=esMenor(mini,c);
+        if(!aux){
+            mini=c;
+        }
+        else{
+            aux=esMenor(maxi,c);
+            if(aux){
+                maxi=c;
+            }
+        }
+    }
+
+    respuesta(mini,maxi);
+
+}

@@ -5,7 +5,6 @@ import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import course_Edit from '../components/course/Edit.vue';
-import course_Form from '../components/course/Form.vue';
 import Sortable from 'sortablejs';
 
 Vue.directive('Sortable', {
@@ -17,6 +16,14 @@ Vue.directive('Sortable', {
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseEditPayload();
   const courseAlias = payload.course.alias;
+  const searchResultEmpty: types.ListItem[] = [];
+  const searchResultSchools: types.SchoolListItem[] = [];
+  if (payload.course.school_name && payload.course.school_id) {
+    searchResultSchools.push({
+      key: payload.course.school_id,
+      value: payload.course.school_name,
+    });
+  }
 
   const courseEdit = new Vue({
     el: '#main-container',
@@ -26,12 +33,14 @@ OmegaUp.on('ready', () => {
     data: () => ({
       data: payload,
       initialTab: window.location.hash
-        ? window.location.hash.substr(1)
+        ? window.location.hash.substring(1)
         : 'course',
       invalidParameterName: '',
       token: '',
-      searchResultUsers: [] as types.ListItem[],
-      searchResultProblems: [] as types.ListItem[],
+      searchResultUsers: searchResultEmpty,
+      searchResultProblems: searchResultEmpty,
+      searchResultGroups: searchResultEmpty,
+      searchResultSchools: searchResultSchools,
     }),
     methods: {
       refreshCourseAdminDetails: (): void => {
@@ -104,11 +113,35 @@ OmegaUp.on('ready', () => {
           token: this.token,
           searchResultUsers: this.searchResultUsers,
           searchResultProblems: this.searchResultProblems,
+          searchResultGroups: this.searchResultGroups,
+          searchResultSchools: this.searchResultSchools,
         },
         on: {
-          'update-search-result-problems': (query: string) => {
-            api.Problem.list({
+          'update-search-result-groups': (query: string) => {
+            api.Group.list({
               query,
+            })
+              .then((data) => {
+                // Groups previously added into the contest should not be
+                // shown in the dropdown
+                const addedGroups = new Set(
+                  this.data.groupsAdmins.map((group) => group.alias),
+                );
+                this.searchResultGroups = data
+                  .filter((group) => !addedGroups.has(group.value))
+                  .map((group) => ({
+                    key: group.value,
+                    value: `${ui.escape(group.label)} (<strong>${ui.escape(
+                      group.value,
+                    )}</strong>)`,
+                  }));
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-problems': (query: string) => {
+            api.Problem.listForTypeahead({
+              query,
+              search_type: 'all',
             })
               .then((data) => {
                 // Problems previously added into the assignment should not be
@@ -117,22 +150,22 @@ OmegaUp.on('ready', () => {
                   component.assignmentProblems.map((problem) => problem.alias),
                 );
                 this.searchResultProblems = data.results
-                  .filter((problem) => !addedProblems.has(problem.alias))
-                  .map((problem) => ({
-                    key: problem.alias,
-                    value: `${ui.escape(problem.title)} (<strong>${ui.escape(
-                      problem.alias,
-                    )}</strong>)`,
+                  .filter((problem) => !addedProblems.has(problem.key))
+                  .map(({ key, value }, index) => ({
+                    key,
+                    value: `${String(index + 1).padStart(2, '0')}.- ${ui.escape(
+                      value,
+                    )} (<strong>${ui.escape(key)}</strong>)`,
                   }));
               })
               .catch(ui.apiError);
           },
-          'submit-edit-course': (source: course_Form) => {
+          'submit-edit-course': (request: messages.CourseUpdateRequest) => {
             new Promise<number | null>((accept) => {
-              if (source.school_id !== undefined) {
-                accept(source.school_id);
-              } else if (source.school_name) {
-                api.School.create({ name: source.school_name })
+              if (request.school.key) {
+                accept(request.school.key);
+              } else if (request.school.value) {
+                api.School.create({ name: request.school.value })
                   .then((response) => {
                     accept(response.school_id);
                   })
@@ -142,33 +175,18 @@ OmegaUp.on('ready', () => {
               }
             })
               .then((schoolId) => {
-                const params: messages.CourseUpdateRequest = {
-                  name: source.name,
-                  description: source.description,
-                  objective: source.objective,
-                  start_time: source.startTime,
-                  alias: source.alias,
-                  level: source.level,
-                  languages: source.selectedLanguages,
-                  show_scoreboard: source.showScoreboard,
-                  needs_basic_information: source.needsBasicInformation,
-                  requests_user_information: source.requests_user_information,
-                  school_id: schoolId ?? undefined,
-                  unlimited_duration: source.unlimitedDuration,
-                  finish_time: !source.unlimitedDuration
-                    ? new Date(source.finishTime).setHours(23, 59, 59, 999) /
-                      1000
-                    : null,
-                };
+                if (schoolId) {
+                  request.school_id = schoolId;
+                }
 
-                api.Course.update(params)
+                api.Course.update(request)
                   .then(() => {
                     ui.success(
                       ui.formatString(T.courseEditCourseEditedAndGoToCourse, {
-                        alias: source.alias,
+                        alias: request.alias,
                       }),
                     );
-                    this.data.course.name = source.name;
+                    this.data.course.name = request.name;
                     window.scrollTo(0, 0);
                     this.refreshCourseAdminDetails();
                   })
@@ -379,12 +397,12 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'add-student': (ev: {
-            participant: string;
+            participant: null | types.ListItem;
             participants: string;
           }) => {
             let participants: string[] = [];
             if (ev.participants) participants = ev.participants.split(/[\n,]/);
-            if (ev.participant) participants.push(ev.participant);
+            if (ev.participant) participants.push(ev.participant.key);
             if (participants.length === 0) {
               ui.error(T.wordsEmptyAddStudentInput);
               return;
@@ -526,6 +544,27 @@ OmegaUp.on('ready', () => {
                     value: `${ui.escape(key)} (<strong>${ui.escape(
                       value,
                     )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-schools': (query: string) => {
+            api.School.list({ query })
+              .then(({ results }) => {
+                if (!results.length) {
+                  this.searchResultSchools = [
+                    {
+                      key: 0,
+                      value: query,
+                    },
+                  ];
+                  return;
+                }
+                this.searchResultSchools = results.map(
+                  ({ key, value }: types.SchoolListItem) => ({
+                    key,
+                    value,
                   }),
                 );
               })

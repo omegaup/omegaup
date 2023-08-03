@@ -43,17 +43,17 @@ class ClarificationUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Validate that clarification stays the same
-        $this->assertEquals(
+        $this->assertSame(
             $clarificationData['request']['message'],
             $clarification->message
         );
-        $this->assertEquals(
+        $this->assertSame(
             $clarificationData['request']['public'] == '1',
             $clarification->public
         );
 
         // Validate our update
-        $this->assertEquals($newAnswer, $clarification->answer);
+        $this->assertSame($newAnswer, $clarification->answer);
     }
 
     public function testUpdateForCourseClarification() {
@@ -108,11 +108,11 @@ class ClarificationUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $clarification['clarification_id']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             $newAnswer,
             $updatedClarification->answer
         );
-        $this->assertEquals(
+        $this->assertSame(
             $clarification['message'],
             $updatedClarification->message,
         );
@@ -129,15 +129,15 @@ class ClarificationUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(1, $notifications);
 
         $contents = json_decode($notifications[0]['contents'], true);
-        $this->assertEquals(
+        $this->assertSame(
             \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_RESPONSE,
             $contents['type']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['course']->name,
             $contents['body']['localizationParams']['courseName']
         );
-        $this->assertEquals(
+        $this->assertSame(
             $problemData['problem']->alias,
             $contents['body']['localizationParams']['problemAlias']
         );

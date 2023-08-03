@@ -322,7 +322,7 @@ export default class Markdown extends Vue {
     }
 
     tr td:first-child pre {
-      margin-right: 20px;
+      margin-right: 31px;
     }
   }
 

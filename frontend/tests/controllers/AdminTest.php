@@ -16,7 +16,7 @@ class AdminTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should not have allowed access to report');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
     }
 

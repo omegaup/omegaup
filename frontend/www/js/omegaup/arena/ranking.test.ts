@@ -14,6 +14,7 @@ import {
 import { rankingStoreConfig } from './rankingStore';
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
+import { ScoreMode } from './navigation';
 
 describe('ranking', () => {
   const now = Date.now();
@@ -256,36 +257,15 @@ describe('ranking', () => {
       const localVue = createLocalVue();
       localVue.use(Vuex);
       const store = new Vuex.Store(rankingStoreConfig);
-      const contest: types.ContestPublicDetails = {
-        admission_mode: 'Public',
-        alias: 'contest_alias',
-        description: 'Description contest',
-        director: 'admin_omegaUp',
-        feedback: 'none',
-        finish_time: new Date(),
-        languages: 'py3',
-        partial_score: false,
-        penalty: 100,
-        penalty_calc_policy: 'sum',
-        penalty_type: 'none',
-        points_decay_factor: 1.0,
-        problemset_id: 1,
-        rerun_id: 0,
-        scoreboard: 1,
-        show_penalty: false,
-        default_show_all_contestants_in_scoreboard: false,
-        show_scoreboard_after: false,
-        start_time: new Date(0),
-        submissions_gap: 1,
-        title: 'Contest',
-      };
 
       onVirtualRankingChanged({
         scoreboard,
         scoreboardEvents: originalScoreboardEvents,
         problems: navbarProblems,
-        contest,
+        startTime: new Date(0),
+        finishTime: new Date(1),
         currentUsername: 'omegaUp',
+        scoreMode: ScoreMode.Partial,
       });
 
       expect(store.state.ranking).toEqual([
@@ -406,6 +386,7 @@ describe('ranking', () => {
         currentUsername: 'omegaUp',
         scoreboard: scoreboard,
         navbarProblems: navbarProblems,
+        scoreMode: ScoreMode.Partial,
       };
       const { ranking, users } = onRankingChanged(params);
       expect(ranking[0].total.points).toEqual(200);
@@ -417,6 +398,7 @@ describe('ranking', () => {
         currentUsername: 'omegaUp',
         scoreboard: scoreboard,
         navbarProblems: navbarProblems,
+        scoreMode: ScoreMode.Partial,
       });
       const params = {
         events: scoreboardEvents,
@@ -448,6 +430,7 @@ describe('ranking', () => {
         currentUsername: 'omegaUp',
         scoreboard: scoreboard,
         navbarProblems: navbarProblems,
+        scoreMode: ScoreMode.Partial,
       });
       const params = {
         events: scoreboardEvents,

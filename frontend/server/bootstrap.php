@@ -44,19 +44,37 @@ if (!defined('OMEGAUP_LOCKDOWN')) {
     define(
         'OMEGAUP_LOCKDOWN',
         isset($_SERVER['HTTP_HOST']) &&
-        is_string($_SERVER['HTTP_HOST']) &&
         strpos($_SERVER['HTTP_HOST'], OMEGAUP_LOCKDOWN_DOMAIN) === 0
     );
 }
 
 $contentSecurityPolicy = [
+    'connect-src' => [
+        '\'self\'',
+        'https://*.google-analytics.com',
+        'https://*.analytics.google.com',
+        'https://*.googletagmanager.com',
+        'https://accounts.google.com',
+    ],
+    'img-src' => [
+        // Problems can embed images from anywhere in the internet, so we need
+        // to be permissive here.
+        '*',
+        '\'self\'',
+        'data:',
+        'blob:',
+        'https://*.google-analytics.com',
+        'https://*.googletagmanager.com',
+        'https://secure.gravatar.com',
+    ],
     'script-src' => [
         '\'self\'',
         'https://www.google.com',
-        'https://apis.google.com',
+        'https://accounts.google.com',
         'https://www.gstatic.com',
         'https://js-agent.newrelic.com',
         'https://bam.nr-data.net',
+        'https://*.googletagmanager.com',
         'https://ssl.google-analytics.com',
         'https://www.google-analytics.com',
         'https://connect.facebook.net',
@@ -69,7 +87,6 @@ $contentSecurityPolicy = [
         'https://www.youtube.com',
         'https://platform.twitter.com',
         'https://www.google.com',
-        'https://apis.google.com',
         'https://accounts.google.com',
         'https://docs.google.com',
         'https://staticxx.facebook.com',
@@ -79,8 +96,10 @@ $contentSecurityPolicy = [
         '/cspreport.php',
     ],
 ];
-if (!is_null(NEW_RELIC_SCRIPT_HASH)) {
-    array_push($contentSecurityPolicy['script-src'], NEW_RELIC_SCRIPT_HASH);
+/** @var string|null $nrsh */
+$nrsh = NEW_RELIC_SCRIPT_HASH;
+if (!is_null($nrsh)) {
+    array_push($contentSecurityPolicy['script-src'], $nrsh);
 }
 header('Content-Security-Policy: ' . implode('; ', array_map(
     fn ($k) => "{$k} " . implode(' ', $contentSecurityPolicy[$k]),

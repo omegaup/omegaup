@@ -3,13 +3,20 @@ import { types } from '../api_types';
 import Vue from 'vue';
 import T from '../lang';
 import contest_Edit from '../components/contest/Edit.vue';
+import SearchTypes from '../components/contest/AddProblem.vue';
 import * as ui from '../ui';
 import * as api from '../api';
 import { toCsv, TableCell } from '../csv';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestEditPayload();
-
+  const searchResultTeamsGroups: types.ListItem[] = [];
+  if (payload.teams_group) {
+    searchResultTeamsGroups.push({
+      key: payload.teams_group.alias,
+      value: payload.teams_group.name,
+    });
+  }
   const contestEdit = new Vue({
     el: '#main-container',
     components: {
@@ -25,7 +32,7 @@ OmegaUp.on('ready', () => {
       users: payload.users,
       searchResultProblems: [] as types.ListItem[],
       searchResultUsers: [] as types.ListItem[],
-      searchResultTeamsGroups: [] as types.ListItem[],
+      searchResultTeamsGroups,
       searchResultGroups: [] as types.ListItem[],
       teamsGroup: payload.teams_group,
     }),
@@ -154,11 +161,19 @@ OmegaUp.on('ready', () => {
           searchResultTeamsGroups: this.searchResultTeamsGroups,
           searchResultGroups: this.searchResultGroups,
           teamsGroup: this.teamsGroup,
+          originalContestAdmissionMode: payload.original_contest_admission_mode,
         },
         on: {
-          'update-search-result-problems': (query: string) => {
-            api.Problem.list({
+          'update-search-result-problems': ({
+            query,
+            searchType,
+          }: {
+            query: string;
+            searchType: SearchTypes;
+          }) => {
+            api.Problem.listForTypeahead({
               query,
+              search_type: searchType,
             })
               .then((data) => {
                 // Problems previously added into the contest should not be
@@ -167,11 +182,14 @@ OmegaUp.on('ready', () => {
                   this.problems.map((problem) => problem.alias),
                 );
                 this.searchResultProblems = data.results
-                  .filter((problem) => !addedProblems.has(problem.alias))
-                  .map((problem) => ({
-                    key: problem.alias,
-                    value: `${ui.escape(problem.title)} (<strong>${ui.escape(
-                      problem.alias,
+                  .filter((problem) => !addedProblems.has(problem.key))
+                  .map(({ key, value }, index) => ({
+                    key: key,
+                    value: `${String(index + 1).padStart(
+                      2,
+                      '0',
+                    )}.-  ${ui.escape(value)} (<strong>${ui.escape(
+                      key,
                     )}</strong>)`,
                   }));
               })
@@ -185,7 +203,7 @@ OmegaUp.on('ready', () => {
                 // Groups previously added into the contest should not be
                 // shown in the dropdown
                 const addedGroups = new Set(
-                  this.groups.map((problem) => problem.alias),
+                  this.groups.map((group) => group.alias),
                 );
                 this.searchResultGroups = data
                   .filter((group) => !addedGroups.has(group.value))
@@ -368,6 +386,7 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 contestEdit.details.admission_mode = admissionMode;
+                contestEdit.details.default_show_all_contestants_in_scoreboard = defaultShowAllContestantsInScoreboard;
                 ui.success(`
                   ${T.contestEditContestEdited} <a href="/arena/${payload.details.alias}/">${T.contestEditGoToContest}</a>
                 `);

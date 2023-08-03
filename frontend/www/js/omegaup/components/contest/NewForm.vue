@@ -3,7 +3,7 @@
     <div v-if="!update" class="card-header bg-primary text-white panel-heading">
       <h3 class="card-title mb-0">{{ T.contestNew }}</h3>
     </div>
-    <div class="card-body">
+    <div class="card-body px-2 px-sm-4">
       <div class="btn-group d-block mb-3 text-center">
         <button class="btn btn-secondary" data-contest-omi @click="fillOmi">
           {{ T.contestNewFormOmiStyle }}
@@ -22,7 +22,7 @@
         >
           {{ T.contestNewFormConacupStyle }}
         </button>
-        <button class="btn btn-secondary" data-contest-cpc @click="fillIcpc">
+        <button class="btn btn-secondary" data-contest-icpc @click="fillIcpc">
           {{ T.contestNewFormICPCStyle }}
         </button>
       </div>
@@ -100,13 +100,18 @@
             <label>{{ T.contestNewFormDifferentStarts }}</label>
             <div class="checkbox">
               <label
-                ><input v-model="windowLengthEnabled" type="checkbox" />
+                ><input
+                  v-model="windowLengthEnabled"
+                  data-different-start-check
+                  type="checkbox"
+                />
                 {{ T.wordsEnable }}</label
               >
             </div>
             <input
               v-model="windowLength"
               class="form-control"
+              data-different-start-time-input
               :class="{
                 'is-invalid': invalidParameterName === 'window_length',
               }"
@@ -122,6 +127,7 @@
             <label>{{ T.contestNewFormScoreboardTimePercent }}</label>
             <input
               v-model="scoreboard"
+              data-score-board-visible-time
               class="form-control scoreboard-time-percent"
               :class="{
                 'is-invalid': invalidParameterName === 'scoreboard',
@@ -220,6 +226,7 @@
             <omegaup-common-typeahead
               v-if="currentContestForTeams && !hasSubmissions"
               :existing-options="searchResultTeamsGroups"
+              :options="searchResultTeamsGroups"
               :value.sync="currentTeamsGroupAlias"
               @update-existing-options="
                 (query) => $emit('update-search-result-teams-groups', query)
@@ -230,7 +237,7 @@
               v-else
               class="form-control"
               disabled
-              :value="currentTeamsGroupAlias"
+              :value="teamsGroupName"
             />
             <p class="help-block">{{ T.contestNewFormForTeamsDesc }}</p>
           </div>
@@ -253,20 +260,23 @@
             <p class="help-block">{{ T.contestNewFormScoreboardAtEndDesc }}</p>
           </div>
           <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormPartialScore }}</label>
+            <label>{{ T.contestNewFormScoreMode }}</label>
             <select
-              v-model="partialScore"
-              data-partial-points
+              v-model="currentScoreMode"
+              data-score-mode
               class="form-control"
             >
-              <option :value="true">
-                {{ T.wordsYes }}
+              <option :value="ScoreMode.Partial">
+                {{ T.contestNewFormScoreModePartial }}
               </option>
-              <option :value="false">
-                {{ T.wordsNo }}
+              <option :value="ScoreMode.AllOrNothing">
+                {{ T.contestNewFormScoreModeAllOrNothing }}
+              </option>
+              <option :value="ScoreMode.MaxPerGroup">
+                {{ T.contestNewFormScoreModeMaxPerGroup }}
               </option>
             </select>
-            <p class="help-block">{{ T.contestNewFormPartialScoreDesc }}</p>
+            <p class="help-block">{{ T.contestNewFormScoreModeDesc }}</p>
           </div>
         </div>
         <div class="row">
@@ -363,6 +373,12 @@ import DateTimePicker from '../DateTimePicker.vue';
 import Multiselect from 'vue-multiselect';
 import { types } from '../../api_types';
 
+export enum ScoreMode {
+  AllOrNothing = 'all_or_nothing',
+  Partial = 'partial',
+  MaxPerGroup = 'max_per_group',
+}
+
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
@@ -374,6 +390,7 @@ export default class NewForm extends Vue {
   @Prop() update!: boolean;
   @Prop() allLanguages!: string[];
   @Prop({ default: 'private' }) admissionMode!: string;
+  @Prop({ default: false }) defaultShowAllContestantsInScoreboard!: boolean;
   @Prop({ default: '' }) initialAlias!: string;
   @Prop({ default: '' }) initialDescription!: string;
   @Prop({ default: 'none' }) initialFeedback!: string;
@@ -386,19 +403,20 @@ export default class NewForm extends Vue {
   @Prop({ default: 'no' }) initialRequestsUserInformation!: string;
   @Prop({ default: 100 }) initialScoreboard!: number;
   @Prop({ default: true }) initialShowScoreboardAfter!: boolean;
-  @Prop({ default: true }) initialPartialScore!: boolean;
+  @Prop({ default: ScoreMode.Partial }) scoreMode!: ScoreMode;
   @Prop({ default: false }) hasSubmissions!: boolean;
   @Prop() initialStartTime!: Date;
   @Prop() initialSubmissionsGap!: number;
   @Prop({ default: '' }) initialTitle!: string;
   @Prop({ default: null }) initialWindowLength!: null | number;
   @Prop({ default: null }) invalidParameterName!: null | string;
-  @Prop({ default: null }) teamsGroupAlias!: null | string;
+  @Prop({ default: null }) teamsGroupAlias!: null | types.ListItem;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop({ default: false }) contestForTeams!: boolean;
   @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
 
   T = T;
+  ScoreMode = ScoreMode;
   alias = this.initialAlias;
   description = this.initialDescription;
   feedback = this.initialFeedback;
@@ -411,7 +429,7 @@ export default class NewForm extends Vue {
   requestsUserInformation = this.initialRequestsUserInformation;
   scoreboard = this.initialScoreboard;
   showScoreboardAfter = this.initialShowScoreboardAfter;
-  partialScore = this.initialPartialScore;
+  currentScoreMode = this.scoreMode;
   startTime = this.initialStartTime;
   submissionsGap = this.initialSubmissionsGap
     ? this.initialSubmissionsGap / 60
@@ -442,7 +460,7 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.partialScore = true;
+    this.currentScoreMode = ScoreMode.Partial;
   }
 
   fillPreIoi(): void {
@@ -457,7 +475,7 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.partialScore = true;
+    this.currentScoreMode = ScoreMode.Partial;
   }
 
   fillConacup(): void {
@@ -472,7 +490,7 @@ export default class NewForm extends Vue {
     this.penalty = 20;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.partialScore = true;
+    this.currentScoreMode = ScoreMode.Partial;
   }
 
   fillIcpc(): void {
@@ -494,7 +512,7 @@ export default class NewForm extends Vue {
     this.penalty = 20;
     this.penaltyType = 'contest_start';
     this.showScoreboardAfter = true;
-    this.partialScore = false;
+    this.currentScoreMode = ScoreMode.AllOrNothing;
   }
 
   onSubmit() {
@@ -521,9 +539,10 @@ export default class NewForm extends Vue {
       penalty: this.penalty,
       scoreboard: this.scoreboard,
       penalty_type: this.penaltyType,
-      default_show_all_contestants_in_scoreboard: false,
+      default_show_all_contestants_in_scoreboard: this
+        .defaultShowAllContestantsInScoreboard,
       show_scoreboard_after: this.showScoreboardAfter,
-      partial_score: this.partialScore,
+      score_mode: this.currentScoreMode,
       needs_basic_information: this.needsBasicInformation,
       requests_user_information: this.requestsUserInformation,
       contest_for_teams: this.currentContestForTeams,
@@ -537,6 +556,10 @@ export default class NewForm extends Vue {
       return;
     }
     this.$emit('create-contest', request);
+  }
+
+  get teamsGroupName(): null | string {
+    return this.currentTeamsGroupAlias?.value ?? null;
   }
 
   get catLanguageBlocked(): boolean {

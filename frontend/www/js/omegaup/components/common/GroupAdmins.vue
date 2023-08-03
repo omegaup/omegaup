@@ -1,19 +1,25 @@
 <template>
-  <div class="card panel panel-primary">
-    <div class="card-body panel-body">
-      <form class="form" @submit.prevent="onSubmit">
-        <div class="form-group">
-          <label class="font-weight-bold"
+  <div class="card">
+    <div class="card-body">
+      <form
+        class="form"
+        @submit.prevent="$emit('add-group-admin', groupAlias.key)"
+      >
+        <div class="form-group mb-0">
+          <label class="font-weight-bold w-100"
             >{{ T.wordsGroupAdmin }}
             <font-awesome-icon
               :title="T.courseEditAddGroupAdminsTooltip"
               icon="info-circle"
             />
-            <omegaup-autocomplete
-              class="form-control"
-              :init="(el) => typeahead.groupTypeahead(el)"
+            <omegaup-common-typeahead
+              :existing-options="searchResultGroups"
               :value.sync="groupAlias"
-            ></omegaup-autocomplete>
+              :max-results="10"
+              @update-existing-options="
+                (query) => $emit('update-search-result-groups', query)
+              "
+            ></omegaup-common-typeahead>
           </label>
         </div>
         <button class="btn btn-primary" type="submit">
@@ -22,34 +28,36 @@
       </form>
     </div>
     <div v-if="groupAdmins.length === 0">
-      <div class="empty-table-message">
+      <div class="my-2 empty-table-message">
         {{ T.courseEditGroupAdminsEmpty }}
       </div>
     </div>
-    <table v-else class="table table-striped">
+    <table v-else class="table table-striped mb-0">
       <thead>
         <tr>
-          <th>{{ T.contestEditRegisteredGroupAdminName }}</th>
-          <th>{{ T.contestEditRegisteredAdminRole }}</th>
-          <th>{{ T.contestEditRegisteredAdminDelete }}</th>
+          <th class="text-center">
+            {{ T.contestEditRegisteredGroupAdminName }}
+          </th>
+          <th class="text-center">{{ T.contestEditRegisteredAdminRole }}</th>
+          <th class="text-center">{{ T.contestEditRegisteredAdminDelete }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="groupAdmin in groupAdmins">
+        <tr v-for="groupAdmin in groupAdmins" :key="groupAdmin.alias">
           <td>
             <a :href="`/group/${groupAdmin.alias}/edit/`">
               {{ groupAdmin.name }}
             </a>
           </td>
-          <td>{{ groupAdmin.role }}</td>
-          <td>
+          <td class="text-center">{{ groupAdmin.role }}</td>
+          <td class="text-center">
             <button
               v-if="groupAdmin.name !== 'admin'"
-              class="close"
+              class="close float-none"
               type="button"
-              @click="onRemove(groupAdmin)"
+              @click="$emit('remove-group-admin', groupAdmin.alias)"
             >
-              &times;
+              <font-awesome-icon :icon="['fas', 'trash']" size="xs" />
             </button>
           </td>
         </tr>
@@ -60,10 +68,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 
 import {
   FontAwesomeIcon,
@@ -76,46 +83,22 @@ library.add(fas);
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
 export default class GroupAdmin extends Vue {
-  @Prop() initialGroups!: omegaup.ContestGroupAdmin[];
-  @Prop({ default: false }) hasParentComponent!: boolean;
+  @Prop() groupAdmins!: types.ContestGroupAdmin[];
+  @Prop() searchResultGroups!: types.ListItem[];
 
   T = T;
-  typeahead = typeahead;
-  groupAlias = '';
-  selected: omegaup.ContestGroupAdmin = {};
-  groupAdmins = this.initialGroups;
+  groupAlias: null | types.ListItem = null;
 
-  @Watch('initialGroups')
-  onAdminsChanged(newValue: omegaup.ContestGroupAdmin[]): void {
-    this.groupAdmins = newValue;
-  }
-
-  onSubmit(): void {
-    if (this.hasParentComponent) {
-      this.$emit('emit-add-group-admin', this);
-      return;
-    }
-    this.$emit('add-group-admin', this.groupAlias);
-  }
-
-  onRemove(group: omegaup.ContestGroupAdmin): void {
-    if (this.hasParentComponent) {
-      this.selected = group;
-      this.$emit('emit-remove-group-admin', this);
-      return;
-    }
-    this.$emit('remove-group-admin', group.alias);
+  @Watch('groupAdmins')
+  ongroupAdminsChange(): void {
+    this.groupAlias = null;
   }
 }
 </script>
-
-<style lang="scss">
-@import '../../../../sass/main.scss';
-</style>

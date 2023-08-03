@@ -24,7 +24,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals($courseData['course_alias'], $response['alias']);
+        $this->assertSame($courseData['course_alias'], $response['alias']);
         \OmegaUp\Validators::validateNumber(
             $response['start_time']->time,
             'start_time'
@@ -36,8 +36,8 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Both assignments added should be visible since the caller is an
         // admin.
-        $this->assertEquals(true, $response['is_admin']);
-        $this->assertEquals(2, count($response['assignments']));
+        $this->assertSame(true, $response['is_admin']);
+        $this->assertSame(2, count($response['assignments']));
 
         foreach ($response['assignments'] as $assignment) {
             $this->assertNotNull($assignment['name']);
@@ -84,7 +84,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals($courseData['course_alias'], $response['alias']);
+        $this->assertSame($courseData['course_alias'], $response['alias']);
         \OmegaUp\Validators::validateNumber(
             $response['start_time']->time,
             'start_time'
@@ -95,9 +95,9 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Only the course that has started should be visible.
-        $this->assertEquals(false, $response['is_admin']);
-        $this->assertEquals(1, count($response['assignments']));
-        $this->assertEquals(
+        $this->assertSame(false, $response['is_admin']);
+        $this->assertSame(1, count($response['assignments']));
+        $this->assertSame(
             $courseData['assignment_alias'],
             $response['assignments'][0]['alias']
         );
@@ -121,7 +121,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -144,7 +144,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -162,7 +162,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals(
+        $this->assertSame(
             $courseData['request']['name'],
             $response['course']['name']
         );
@@ -179,7 +179,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals(false, $response['is_admin']);
+        $this->assertSame(false, $response['is_admin']);
     }
 
     public function testGetAssignmentAsStudent() {

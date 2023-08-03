@@ -1,10 +1,14 @@
 <template>
-  <div class="container-fluid p-5">
+  <div class="container-fluid py-5 px-3 px-md-5">
     <omegaup-problem-search-bar
-      :initial-language="language"
+      :language="language"
       :languages="languages"
-      :initial-keyword="keyword"
+      :keyword="keyword"
       :tags="tags"
+      :search-result-problems="searchResultProblems"
+      @update-search-result-problems="
+        (query) => $emit('update-search-result-problems', query)
+      "
     ></omegaup-problem-search-bar>
     <button
       class="btn btn-primary mb-3"
@@ -49,7 +53,6 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import { types } from '../../api_types';
-import * as ui from '../../ui';
 
 import problem_FinderWizard from './FinderWizard.vue';
 import problem_SearchBar from './SearchBar.vue';
@@ -78,9 +81,9 @@ export default class List extends Vue {
   @Prop() tags!: string[];
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
+  @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
-  ui = ui;
   omegaup = omegaup;
   showFinderWizard = false;
 

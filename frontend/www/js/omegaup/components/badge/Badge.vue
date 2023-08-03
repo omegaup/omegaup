@@ -1,5 +1,5 @@
 <template>
-  <figure v-tooltip="description" class="col-md-3 col-sm-3 badge-container">
+  <figure v-tooltip="description" class="col-6 col-sm-3 badge-container">
     <a class="badge-icon" :href="`/badge/${badge.badge_alias}/`"
       ><img
         :class="{ 'badge-gray': !badge.unlocked }"

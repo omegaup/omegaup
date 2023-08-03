@@ -6,11 +6,17 @@ import {
   refreshContestClarifications,
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
-import { onRankingChanged, onRankingEvents } from './ranking';
+import {
+  createChart,
+  onRankingChanged,
+  onRankingEvents,
+  onVirtualRankingChanged,
+} from './ranking';
 import { updateRun } from './submissions';
 import { types } from '../api_types';
 import rankingStore from './rankingStore';
 import socketStore from './socketStore';
+import { ScoreMode } from './navigation';
 
 export enum SocketStatus {
   Waiting = '↻',
@@ -21,6 +27,10 @@ export enum SocketStatus {
 export interface SocketOptions {
   disableSockets: boolean;
   problemsetAlias: string;
+  isVirtual: boolean;
+  originalProblemsetId?: number;
+  startTime: Date;
+  finishTime?: Date;
   locationProtocol: string;
   locationHost: string;
   problemsetId: number;
@@ -30,6 +40,7 @@ export interface SocketOptions {
   currentUsername: string;
   navbarProblems: types.NavbarProblemsetProblem[];
   intervalInMilliseconds: number;
+  scoreMode: ScoreMode;
 }
 
 export class EventsSocket {
@@ -41,6 +52,10 @@ export class EventsSocket {
 
   private readonly disableSockets: boolean;
   private readonly problemsetAlias: string;
+  private readonly isVirtual: boolean;
+  private readonly originalProblemsetId?: number;
+  private readonly startTime: Date;
+  private readonly finishTime?: Date;
   private readonly problemsetId: number;
   private readonly scoreboardToken: null | string;
   socketStatus: SocketStatus = SocketStatus.Waiting;
@@ -51,10 +66,15 @@ export class EventsSocket {
   private readonly currentUsername: string;
   private readonly navbarProblems: types.NavbarProblemsetProblem[];
   private readonly intervalInMilliseconds: number;
+  private readonly scoreMode: ScoreMode;
 
   constructor({
     disableSockets = false,
     problemsetAlias,
+    isVirtual = false,
+    originalProblemsetId,
+    startTime,
+    finishTime,
     locationProtocol,
     locationHost,
     problemsetId,
@@ -64,11 +84,16 @@ export class EventsSocket {
     currentUsername,
     navbarProblems,
     intervalInMilliseconds = 5 * 60 * 1000,
+    scoreMode = ScoreMode.Partial,
   }: SocketOptions) {
     this.socket = null;
 
     this.disableSockets = disableSockets;
     this.problemsetAlias = problemsetAlias;
+    this.isVirtual = isVirtual;
+    this.originalProblemsetId = originalProblemsetId;
+    this.startTime = startTime;
+    this.finishTime = finishTime;
     this.problemsetId = problemsetId;
     this.scoreboardToken = scoreboardToken;
     this.clarificationsOffset = clarificationsOffset;
@@ -79,6 +104,7 @@ export class EventsSocket {
     this.clarificationInterval = null;
     this.rankingInterval = null;
     this.intervalInMilliseconds = intervalInMilliseconds;
+    this.scoreMode = scoreMode;
 
     const protocol = locationProtocol === 'https:' ? 'wss:' : 'ws:';
     const host = locationHost;
@@ -92,50 +118,125 @@ export class EventsSocket {
     const data = JSON.parse(message.data);
 
     if (data.message == '/run/update/') {
-      data.run.time = time.remoteTime(data.run.time * 1000);
-      updateRun({ run: data.run });
+      const { run } = data;
+      const updatedRun = {
+        ...run,
+        time: time.remoteTime(run.time * 1000),
+      };
+      updateRun({ run: updatedRun });
     } else if (data.message == '/clarification/update/') {
       data.clarification.time = time.remoteTime(data.clarification.time * 1000);
       clarificationStore.commit('addClarification', data.clarification);
     } else if (data.message == '/scoreboard/update/') {
-      data.scoreboard.time = time.remoteTime(data.scoreboard.time * 1000);
-      data.scoreboard.start_time = time.remoteTime(
-        data.scoreboard.start_time * 1000,
-      );
-      data.scoreboard.finish_time = time.remoteTime(
-        data.scoreboard.finish_time * 1000,
-      );
-      // TODO: Uncomment next block when virtual contest is migrated
-      /*if (problemsetAdmin && data.scoreboard_type != 'admin') {
-        if (options.originalContestAlias == null) return;
-        virtualRankingChange(data.scoreboard);
-        return;
-      }*/
-      const {
-        currentRanking,
-        ranking,
-        users,
-        lastTimeUpdated,
-      } = onRankingChanged({
+      this.processRankings({
         scoreboard: data.scoreboard,
-        currentUsername: this.currentUsername,
-        navbarProblems: this.navbarProblems,
+        currentTime: data.scoreboard.time,
+        startTime: data.scoreboard.start_time,
+        finishTime: data.scoreboard.finish_time,
       });
-      rankingStore.commit('updateRanking', ranking);
-      rankingStore.commit('updateMiniRankingUsers', users);
-      rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
+    }
+  }
 
+  private processRankings({
+    scoreboard,
+    currentTime,
+    startTime,
+    finishTime,
+  }: {
+    scoreboard: types.Scoreboard;
+    currentTime: number;
+    startTime: number;
+    finishTime: number;
+  }) {
+    scoreboard.time = time.remoteTime(currentTime * 1000);
+    scoreboard.start_time = time.remoteTime(startTime * 1000);
+    if (scoreboard.finish_time != null) {
+      scoreboard.finish_time = time.remoteTime(finishTime * 1000);
+    }
+    if (this.isVirtual) {
       api.Problemset.scoreboardEvents({
-        problemset_id: this.problemsetId,
+        problemset_id: this.originalProblemsetId,
         token: this.scoreboardToken,
       })
-        .then((response) =>
-          onRankingEvents({
-            events: response.events,
-            currentRanking,
-          }),
-        )
+        .then((response) => {
+          onVirtualRankingChanged({
+            scoreboard,
+            currentUsername: this.currentUsername,
+            scoreboardEvents: response.events,
+            problems: this.navbarProblems,
+            startTime: this.startTime,
+            finishTime: this.finishTime,
+            scoreMode: this.scoreMode,
+          });
+        })
         .catch(ui.ignoreError);
+      return;
+    }
+    const {
+      currentRanking,
+      ranking,
+      users,
+      lastTimeUpdated,
+    } = onRankingChanged({
+      scoreboard,
+      currentUsername: this.currentUsername,
+      navbarProblems: this.navbarProblems,
+      scoreMode: this.scoreMode,
+    });
+    rankingStore.commit('updateRanking', ranking);
+    rankingStore.commit('updateMiniRankingUsers', users);
+    rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
+
+    api.Problemset.scoreboardEvents({
+      problemset_id: this.problemsetId,
+      token: this.scoreboardToken,
+    })
+      .then((response) =>
+        this.calculateRankingEvents({
+          events: response.events,
+          startTimestamp: this.startTime.getTime(),
+          finishTimestamp: Date.now(),
+          currentRanking,
+        }),
+      )
+      .catch(ui.ignoreError);
+  }
+
+  private calculateRankingEvents({
+    events,
+    currentRanking,
+    startTimestamp = 0,
+    finishTimestamp = Date.now(),
+    placesToShowInChart = 10,
+  }: {
+    events: types.ScoreboardEvent[];
+    currentRanking: { [username: string]: number };
+    startTimestamp?: number;
+    finishTimestamp?: number;
+    placesToShowInChart?: number;
+  }) {
+    const { series, navigatorData } = onRankingEvents({
+      events,
+      startTimestamp,
+      finishTimestamp,
+      currentRanking,
+      placesToShowInChart,
+    });
+
+    let maxPoints = 0;
+    for (const problem of this.navbarProblems) {
+      maxPoints += problem.maxScore;
+    }
+
+    if (series.length) {
+      const rankingChartOptions = createChart({
+        series,
+        navigatorData,
+        startTimestamp: this.startTime.getTime(),
+        finishTimestamp: Date.now(),
+        maxPoints,
+      });
+      rankingStore.commit('updateRankingChartOptions', rankingChartOptions);
     }
   }
 
@@ -223,6 +324,7 @@ export class EventsSocket {
           scoreboard,
           currentUsername: this.currentUsername,
           navbarProblems: this.navbarProblems,
+          scoreMode: this.scoreMode,
         });
 
         api.Problemset.scoreboardEvents({
@@ -271,6 +373,7 @@ export class EventsSocket {
               scoreboard,
               currentUsername: this.currentUsername,
               navbarProblems: this.navbarProblems,
+              scoreMode: this.scoreMode,
             });
 
             api.Problemset.scoreboardEvents({
