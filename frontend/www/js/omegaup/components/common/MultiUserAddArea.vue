@@ -58,7 +58,7 @@ export default class MultiUserAddArea extends Vue {
 
   T = T;
   isFocused: boolean = false;
-  bulkContestants: string | null = '';
+  bulkContestants: string | null = null;
 
   // if the users prop is not empty, we need to keep track of those users in the usersList
   usersList: string[] = this.users || [];
