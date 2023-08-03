@@ -10,9 +10,9 @@
     >
     </textarea>
     <div v-else class="form-control contestants">
-      <span href="#" class="edit-icon" @click.prevent="isFocused = true"
-        >Editar</span
-      >
+      <span href="#" class="edit-icon" @click.prevent="isFocused = true">{{
+        T.wordsEdit
+      }}</span>
       <div class="users-list">
         <div v-for="user in usersList" :key="user" class="users-list__item">
           <span
@@ -50,10 +50,13 @@ const debounce = (fn: (event: Event) => void, waitTime: number) => {
 
 const WAIT_TIME = 1000;
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
+import T from '../../lang';
 
 @Component({})
 export default class MultiUserAddArea extends Vue {
   @Prop() users!: string[];
+
+  T = T;
   isFocused: boolean = false;
   bulkContestants: string | null = '';
 
