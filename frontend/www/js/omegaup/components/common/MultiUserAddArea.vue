@@ -39,11 +39,8 @@ const debounce = (fn: (event: Event) => void, waitTime: number) => {
       clearTimeout(timer);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const context = this;
-
     timer = setTimeout(() => {
-      fn.apply(context, args);
+      fn.apply(this, args);
     }, waitTime);
   };
 };
