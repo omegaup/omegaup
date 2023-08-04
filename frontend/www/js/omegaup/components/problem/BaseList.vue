@@ -86,11 +86,7 @@
                 ></omegaup-common-sort-controls
               ></span>
             </th>
-            <th
-              v-if="loggedIn"
-              scope="col"
-              class="align-middle text-nowrap"
-            >
+            <th v-if="loggedIn" scope="col" class="align-middle text-nowrap">
               <span
                 >{{ T.wordsMyScore }}
                 <omegaup-common-sort-controls
