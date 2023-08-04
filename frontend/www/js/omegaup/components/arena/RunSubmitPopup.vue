@@ -121,7 +121,7 @@ export default class ArenaRunSubmitPopup extends Vue {
           steps: [
             {
               title,
-              intro: T.interactveGuideUploadSolutionWelcome ,
+              intro: T.interactveGuideUploadSolutionWelcome,
             },
             {
               element: document.querySelector('introjs-language') as Element,
@@ -129,17 +129,23 @@ export default class ArenaRunSubmitPopup extends Vue {
               intro: T.interactveGuideUploadSolutionLanguage,
             },
             {
-              element: document.querySelector('.introjs-new-submissions') as Element,
+              element: document.querySelector(
+                '.introjs-new-submissions',
+              ) as Element,
               title,
               intro: T.interactiveGuideUploadSolutionSubmit,
             },
             {
-              element: document.querySelector('.introjs-paste-cod****') as Element,
+              element: document.querySelector(
+                '.introjs-paste-cod****',
+              ) as Element,
               title,
               intro: T.interactveGuideUploadSolutionCodeInput,
             },
             {
-              element: document.querySelector('.introjs-upload-file') as Element,
+              element: document.querySelector(
+                '.introjs-upload-file',
+              ) as Element,
               title,
               intro: T.interactveGuideUploadSolutionUploadFile,
             },
