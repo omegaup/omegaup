@@ -131,7 +131,7 @@
           <tr v-for="problem in problems" :key="problem.problem_id">
             <td class="align-middle">{{ problem.problem_id }}</td>
             <td class="align-middle">
-              <a :href="`/arena/problem/${problem.alias}/`">{{
+              <a :href="`/arena/problem/${problem.alias}/`" class="mr-2">{{
                 problem.title
               }}</a>
               <font-awesome-icon

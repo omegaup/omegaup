@@ -6,8 +6,8 @@
           T.problemCollectionBackCollections
         }}</a>
       </div>
-      <div class="col">
-        <h1>{{ T.omegaupTitleCollectionsByAuthor }}</h1>
+      <div class="col mb-4">
+        <h1 class="title-font">{{ T.omegaupTitleCollectionsByAuthor }}</h1>
       </div>
     </div>
     <div class="row">
@@ -143,3 +143,14 @@ export default class CollectionList extends Vue {
   authors = this.data.authorsRanking;
 }
 </script>
+
+<style scoped>
+.title-font {
+  font-size: 2rem;
+  letter-spacing: 0.01rem;
+}
+
+.max-width {
+  max-width: 75rem;
+}
+</style>
