@@ -68,6 +68,7 @@
         <button
           class="btn btn-primary"
           type="button"
+          data-button-previous
           :disabled="totalPagesCount === 1 || currentPageNumber === 0"
           @click="previousPage"
         >
@@ -76,6 +77,7 @@
         <button
           class="btn btn-primary"
           type="button"
+          data-button-next
           :disabled="
             totalPagesCount === 1 || currentPageNumber >= totalPagesCount - 1
           "
