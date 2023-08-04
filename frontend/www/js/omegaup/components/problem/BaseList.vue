@@ -44,7 +44,7 @@
                 "
               ></omegaup-common-sort-controls>
             </th>
-            <th scope="col" class="text-center align-middle text-nowrap">
+            <th scope="col" class="align-middle text-nowrap">
               <span
                 >{{ T.wordsQuality }}
                 <omegaup-common-sort-controls
@@ -58,7 +58,7 @@
                 ></omegaup-common-sort-controls
               ></span>
             </th>
-            <th scope="col" class="text-center align-middle text-nowrap">
+            <th scope="col" class="align-middle text-nowrap">
               <span
                 >{{ T.wordsDifficulty }}
                 <omegaup-common-sort-controls
@@ -72,7 +72,7 @@
                 ></omegaup-common-sort-controls
               ></span>
             </th>
-            <th scope="col" class="text-right align-middle text-nowrap">
+            <th scope="col" class="align-middle text-nowrap">
               <span
                 >{{ T.wordsRatio }}
                 <omegaup-common-sort-controls
@@ -89,7 +89,7 @@
             <th
               v-if="loggedIn"
               scope="col"
-              class="text-right align-middle text-nowrap"
+              class="align-middle text-nowrap"
             >
               <span
                 >{{ T.wordsMyScore }}
@@ -104,7 +104,7 @@
                 ></omegaup-common-sort-controls
               ></span>
             </th>
-            <th scope="col" class="text-right align-middle text-nowrap">
+            <th scope="col" class="align-middle text-nowrap">
               <span>
                 <a
                   data-toggle="tooltip"
