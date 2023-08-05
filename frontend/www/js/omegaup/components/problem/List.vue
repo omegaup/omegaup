@@ -1,5 +1,5 @@
 <template>
-  <div class="container-lg p-3">
+    <div class="container-lg p-3">
     <h2 class="text-center my-5">
       {{ T.wordsProblems }}
     </h2>
@@ -16,7 +16,6 @@
         @show-finder-wizard="() => (showFinderWizard = true)"
       ></omegaup-problem-search-bar>
     </div>
-
     <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
     <omegaup-problem-finder
       v-show="showFinderWizard"

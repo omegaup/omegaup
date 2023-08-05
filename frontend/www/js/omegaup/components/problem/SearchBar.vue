@@ -5,7 +5,7 @@
     <form
       action="/problem/"
       method="GET"
-      class="form-inline d-flex justify-content-start align-items-center flex-wrap"
+      class="form-inline d-flex justify-content-center align-items-center flex-wrap form-mobile"
     >
       <div v-if="tags.length !== 0" class="form-group mr-2">
         <div v-for="tag in tags" :key="tag" class="mr-1">
@@ -51,20 +51,18 @@
         </label>
       </div>
       <input
-        class="btn btn-primary mr-3"
+        class="btn btn-primary mr-2 button-mobile"
         type="submit"
         :value="T.wordsSearch"
       />
-    </form>
-    <div class="d-flex justify-content-end">
       <button
-        class="btn btn-primary ml-2 align-self-center"
+        class="btn btn-primary ml-2 align-self-center form-control"
         type="button"
         @click="$emit('show-finder-wizard')"
       >
         {{ T.wizardLinkText }}
       </button>
-    </div>
+    </form>
   </div>
 </template>
 
@@ -119,5 +117,14 @@ export default class ProblemSearchBar extends Vue {
 .card-header {
   border: 1px solid var(--header-problem-card-color);
   border-bottom: none;
+}
+
+@media (max-width: 576px) {
+  .button-mobile {
+    margin-left: 1rem;
+  }
+  .form-control {
+    margin-left: 0 !important;
+  }
 }
 </style>
