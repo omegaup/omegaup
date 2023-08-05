@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid max-width card pr-0 pl-0">
+  <div class="container-fluid max-width card pr-0 pl-0 px-4 py-5 p-md-5">
     <ul class="nav nav-tabs" role="tablist">
       <li
         v-for="(tabName, tabKey) in tabNames"
@@ -215,10 +215,19 @@ export default class CourseTabs extends Vue {
 
   .public-course-card {
     background-color: $omegaup-blue;
+    height: 1em;
   }
 
   .enrolled-course-card {
     background-color: $omegaup-pink--lighter;
+    height: 1em;
+  }
+
+  @media only screen and (min-width: 576px) {
+    .public-course-card,
+    .enrolled-course-card {
+      height: auto;
+    }
   }
 
   .finished-course-card {
