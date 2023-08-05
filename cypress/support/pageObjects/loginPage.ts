@@ -27,6 +27,28 @@ export class LoginPage {
     cy.get('#alert-close').click();
     cy.logout();
   }
+
+  registerSingleUser(loginOptions: LoginOptions): void {
+    cy.get('[data-login-button]').click();
+    cy.get('[data-signup-username]').type(loginOptions.username);
+    cy.get('[data-signup-password]').type(loginOptions.password);
+    cy.get('[data-signup-repeat-password]').type(loginOptions.password);
+    cy.get('[data-signup-email]').type(`${loginOptions.username}@omegaup.com`);
+    cy.get('[data-signup-submit]').click();
+  }
+
+  verifyUsername(loginOptions: LoginOptions): void {
+    cy.waitUntil(() =>
+      cy.get('header .username').should('have.text', loginOptions.username),
+    );
+  }
+
+  loginByGUI(loginOptions: LoginOptions): void {
+    cy.get('[data-login-button]').click();
+    cy.get('[data-login-username]').type(loginOptions.username);
+    cy.get('[data-login-password]').type(loginOptions.password);
+    cy.get('[data-login-submit]').click();
+  }
 }
 
 export const loginPage = new LoginPage();
