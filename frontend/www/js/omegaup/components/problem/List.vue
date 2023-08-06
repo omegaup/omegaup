@@ -1,5 +1,5 @@
 <template>
-    <div class="container-lg p-3">
+  <div class="container-lg p-3">
     <h2 class="text-center my-5">
       {{ T.wordsProblems }}
     </h2>
