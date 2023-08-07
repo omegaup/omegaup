@@ -1531,7 +1531,7 @@ const translations: { [key: string]: string; } = {
   virtualSuffix: "%(username) [virtual]",
   virtualTitle: "%(title) - Virtual contest",
   wizardDescription: "Follow the steps to find the problems that interest you!",
-  wizardLinkText: "Try the new Problem Finder",
+  wizardLinkText: "Problem Finder",
   wizardPriorityPopularity: "Popularity",
   wizardStepOne: "Choose the themes tag(s)",
   wizardStepThree: "Select your priority",
