@@ -1,22 +1,21 @@
 <template>
-  <div class="container-fluid py-5 px-3 px-md-5">
-    <omegaup-problem-search-bar
-      :language="language"
-      :languages="languages"
-      :keyword="keyword"
-      :tags="tags"
-      :search-result-problems="searchResultProblems"
-      @update-search-result-problems="
-        (query) => $emit('update-search-result-problems', query)
-      "
-    ></omegaup-problem-search-bar>
-    <button
-      class="btn btn-primary mb-3"
-      type="button"
-      @click="showFinderWizard = true"
-    >
-      {{ T.wizardLinkText }}
-    </button>
+  <div class="container-lg p-3">
+    <h2 class="text-center my-5">
+      {{ T.wordsProblems }}
+    </h2>
+    <div class="d-flex align-items-center">
+      <omegaup-problem-search-bar
+        :language="language"
+        :languages="languages"
+        :keyword="keyword"
+        :tags="tags"
+        :search-result-problems="searchResultProblems"
+        @update-search-result-problems="
+          (query) => $emit('update-search-result-problems', query)
+        "
+        @show-finder-wizard="() => (showFinderWizard = true)"
+      ></omegaup-problem-search-bar>
+    </div>
     <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
     <omegaup-problem-finder
       v-show="showFinderWizard"
