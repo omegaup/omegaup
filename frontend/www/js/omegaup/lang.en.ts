@@ -556,6 +556,7 @@ const translations: { [key: string]: string; } = {
   email: "E-Mail",
   emailNotVerified: "Your email is not verified yet. Please look for the verification email in your inbox and spam folder. If you still have problems, please contact omegaup-soporte@googlegroups.com for support.",
   enterContest: "Enter Contest",
+  ephemeralGraderAlert: "You need a larger screen size to use the Ephemeral Grader. Try putting your phone in horizontal position or use another device.",
   errorWhileSendingMail: "There was an error sending the verification email. Please try again later or contact omegaup-soporte@googlegroups.com for support. Your email is not verified yet.",
   feedbackLeftBy: "Feedback left on date %(date), by:",
   feedbackNotSentYet: "The feedback for this submission has not been sent yet.",

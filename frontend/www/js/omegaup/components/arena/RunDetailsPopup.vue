@@ -116,12 +116,10 @@
             :feedback-map="feedbackMap"
             :feedback-thread-map="feedbackThreadMap"
             @save-feedback-list="
-              (feedbackList) =>
-                $emit('save-feedback-list', { feedbackList, guid: data.guid })
+              (feedbackList) => onSaveFeedbackList(feedbackList, data.guid)
             "
             @submit-feedback-thread="
-              (feedback) =>
-                $emit('submit-feedback-thread', { feedback, guid: data.guid })
+              (feedback) => onSubmitFeedbackThread(feedback, data.guid)
             "
           ></omegaup-arena-feedback-code-view>
         </slot>
