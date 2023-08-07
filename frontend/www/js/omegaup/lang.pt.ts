@@ -1530,7 +1530,7 @@ const translations: { [key: string]: string; } = {
   virtualSuffix: "%(username) [virtual]",
   virtualTitle: "%(title) - Concurso virtual",
   wizardDescription: "Siga os passos para encontrar os problemas que lhe interessam!",
-  wizardLinkText: "Tente o novo localizador de problemas",
+  wizardLinkText: "Localizador de problemas",
   wizardPriorityPopularity: "Popularidade",
   wizardStepOne: "Escolha a(s) tag(s) dos temas",
   wizardStepThree: "Escolha sua prioridade",
