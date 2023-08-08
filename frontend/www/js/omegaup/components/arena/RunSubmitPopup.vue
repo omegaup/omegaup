@@ -5,7 +5,7 @@
       class="d-flex flex-column h-100"
       @submit.prevent="onSubmit"
     >
-      <div class="form-group row introjs-language">
+      <div class="form-group row">
         <label class="col-sm-2 col-form-label">
           {{ T.wordsLanguage }}
         </label>
@@ -19,6 +19,7 @@
               v-for="(language, key) in allowedLanguages"
               :key="key"
               :value="key"
+              class="introjs-language"
             >
               {{ language }}
             </option>

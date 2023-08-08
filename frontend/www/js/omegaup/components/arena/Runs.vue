@@ -506,7 +506,9 @@ export default class Runs extends Vue {
               intro: T.interactveGuideUploadSolutionSubmissions,
             },
             {
-              element: document.querySelector('.introjs-new-submissions') as Element,
+              element: document.querySelector(
+                '.introjs-new-submissions',
+              ) as Element,
               title,
               intro: T.interactiveGuideUploadSolutionSubmit,
             },
