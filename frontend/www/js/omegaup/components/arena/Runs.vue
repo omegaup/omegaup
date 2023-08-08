@@ -6,7 +6,7 @@
       </div>
     </slot>
     <div
-      class="px-2 px-sm-4 border-0"
+      class="px-2 px-sm-4 border-0 introjs-submissions"
       :class="{
         'single-problem-runs': !showAllRuns,
         'all-runs': showAllRuns,
@@ -198,7 +198,7 @@
           </thead>
           <tfoot v-if="problemAlias != null">
             <tr>
-              <td colspan="10" data-new-run>
+              <td colspan="10" data-new-run class="introjs-new-submission">
                 <a
                   v-if="isContestFinished"
                   :href="`/arena/${contestAlias}/practice/`"
@@ -408,6 +408,10 @@ import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import arena_RunDetailsPopup from './RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
+import 'intro.js/introjs.css';
+import introJs from 'intro.js';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -477,10 +481,41 @@ export default class Runs extends Vue {
   @Prop() totalRuns!: number;
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
+  @Prop() hasVisitedSection!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
+
+  mounted() {
+    const title = T.interactveGuideUploadSolutionTitle;
+    if (!this.hasVisitedSection) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title,
+              intro: T.interactveGuideUploadSolutionWelcome,
+            },
+            {
+              element: document.querySelector('introjs-submissions') as Element,
+              title,
+              intro: T.interactveGuideUploadSolutionSubmissions,
+            },
+            {
+              element: document.querySelector('.introjs-new-submissions') as Element,
+              title,
+              intro: T.interactiveGuideUploadSolutionSubmit,
+            },
+          ],
+        })
+        .start();
+      this.$cookies.set('has-visited-submit-problem', true, -1);
+    }
+  }
 
   filterLanguage: string = '';
   filterOffset: number = 0;

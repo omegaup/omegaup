@@ -397,6 +397,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) languages!: null | string[];
   @Prop() totalRuns!: number;
   @Prop({ default: false }) requestFeedback!: boolean;
+  @Prop() hasVisitedSection!: boolean;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackMap!: Map<number, ArenaCourseFeedback>;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
