@@ -137,13 +137,6 @@ export default class ArenaRunSubmitPopup extends Vue {
             },
             {
               element: document.querySelector(
-                '.introjs-paste-cod****',
-              ) as Element,
-              title,
-              intro: T.interactveGuideUploadSolutionCodeInput,
-            },
-            {
-              element: document.querySelector(
                 '.introjs-upload-file',
               ) as Element,
               title,
