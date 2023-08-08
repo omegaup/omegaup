@@ -1,12 +1,12 @@
 <template>
-  <div class="mt-2" data-runs>
+  <div class="mt-2" data-runs id="introjs-submissions">
     <slot name="title">
       <div class="card-header">
         <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
       </div>
     </slot>
     <div
-      class="px-2 px-sm-4 border-0 introjs-submissions"
+      class="px-2 px-sm-4 border-0"
       :class="{
         'single-problem-runs': !showAllRuns,
         'all-runs': showAllRuns,
@@ -197,8 +197,8 @@
             </tr>
           </thead>
           <tfoot v-if="problemAlias != null">
-            <tr>
-              <td colspan="10" data-new-run class="introjs-new-submission">
+            <tr class="introjs-new-submissions">
+              <td colspan="10" data-new-run>
                 <a
                   v-if="isContestFinished"
                   :href="`/arena/${contestAlias}/practice/`"
@@ -501,7 +501,7 @@ export default class Runs extends Vue {
               intro: T.interactveGuideUploadSolutionWelcome,
             },
             {
-              element: document.querySelector('introjs-submissions') as Element,
+              element: "#introjs-submissions",
               title,
               intro: T.interactveGuideUploadSolutionSubmissions,
             },

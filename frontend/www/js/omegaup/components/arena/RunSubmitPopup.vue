@@ -5,21 +5,20 @@
       class="d-flex flex-column h-100"
       @submit.prevent="onSubmit"
     >
-      <div class="form-group row">
+      <div class="form-group row" id="introjs-language">
         <label class="col-sm-2 col-form-label">
           {{ T.wordsLanguage }}
         </label>
         <div class="col-sm-4">
           <select
             v-model="selectedLanguage"
-            class="form-control"
+            class="form-control "
             name="language"
           >
             <option
               v-for="(language, key) in allowedLanguages"
               :key="key"
               :value="key"
-              class="introjs-language"
             >
               {{ language }}
             </option>
@@ -37,7 +36,7 @@
           T.arenaRunSubmitPaste
         }}</label>
       </div>
-      <div class="h-100">
+      <div class="h-100 introjs-pasteyourcode">
         <omegaup-arena-code-view
           v-model="code"
           :language="selectedLanguage"
@@ -120,7 +119,7 @@ export default class ArenaRunSubmitPopup extends Vue {
           doneLabel: T.interactiveGuideDoneButton,
           steps: [
             {
-              element: document.querySelector('introjs-language') as Element,
+              element: "#introjs-language",
               title,
               intro: T.interactveGuideUploadSolutionLanguage,
             },
@@ -129,7 +128,7 @@ export default class ArenaRunSubmitPopup extends Vue {
                 '.introjs-pasteyourcode',
               ) as Element,
               title,
-              intro: T.interactiveGuideUploadSolutionSubmit,
+              intro: T.interactiveGuidePasteYourCode,
             },
             {
               element: document.querySelector(
