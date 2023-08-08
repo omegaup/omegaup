@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-2" data-runs id="introjs-submissions">
+  <div id="introjs-submissions" class="mt-2" data-runs>
     <slot name="title">
       <div class="card-header">
         <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>

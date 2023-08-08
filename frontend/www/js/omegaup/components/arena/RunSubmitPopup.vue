@@ -5,7 +5,7 @@
       class="d-flex flex-column h-100"
       @submit.prevent="onSubmit"
     >
-      <div class="form-group row" id="introjs-language">
+      <div id="introjs-language" class="form-group row">
         <label class="col-sm-2 col-form-label">
           {{ T.wordsLanguage }}
         </label>
@@ -128,7 +128,7 @@ export default class ArenaRunSubmitPopup extends Vue {
                 '.introjs-pasteyourcode',
               ) as Element,
               title,
-              intro: T.interactiveGuidePasteYourCode,
+              intro: T.interactveGuideUploadSolutionPasteYourCode,
             },
             {
               element: document.querySelector(
