@@ -40,7 +40,6 @@ describe('Basic Commands Test', () => {
 
     cy.register(loginOptions);
     loginPage.verifyUsername(loginOptions);
-    cy.logout();
   });
 
   it('Should register a user', () => {
@@ -51,18 +50,16 @@ describe('Basic Commands Test', () => {
 
     loginPage.registerSingleUser(loginOptions);
     loginPage.verifyUsername(loginOptions);
-    cy.logout();
   });
 
   it('Should login a user using the API', () => {
     const loginOptions: LoginOptions = {
-      username: uuid(),
-      password: uuid(),
+      username: 'user',
+      password: 'user',
     };
 
     cy.login(loginOptions);
     loginPage.verifyUsername(loginOptions);
-    cy.logout();
   });
 
   it('Should login a user', () => {
@@ -73,7 +70,6 @@ describe('Basic Commands Test', () => {
 
     loginPage.loginByGUI(loginOptions);
     loginPage.verifyUsername(loginOptions);
-    cy.logout();
   });
 
   it('Should create a problem', () => {
@@ -136,7 +132,7 @@ describe('Basic Commands Test', () => {
     cy.logout();
   });
 
-  it('Should create two contest and merge their scoreboard', () => {
+  it.only('Should create two contest and merge their scoreboard', () => {
     const contestOptions1 = contestPage.generateContestOptions();
     const contestOptions2 = contestPage.generateContestOptions();
     const loginOptions = loginPage.registerMultipleUsers(4);

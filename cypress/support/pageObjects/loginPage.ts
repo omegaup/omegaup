@@ -41,6 +41,7 @@ export class LoginPage {
     cy.waitUntil(() =>
       cy.get('header .username').should('have.text', loginOptions.username),
     );
+    cy.logoutUsingApi();
   }
 
   loginByGUI(loginOptions: LoginOptions): void {
