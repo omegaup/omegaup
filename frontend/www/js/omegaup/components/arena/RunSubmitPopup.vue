@@ -5,14 +5,16 @@
       class="d-flex flex-column h-100"
       @submit.prevent="onSubmit"
     >
+      <!-- id-lint off -->
       <div id="introjs-language" class="form-group row">
+        <!-- id-lint on -->
         <label class="col-sm-2 col-form-label">
           {{ T.wordsLanguage }}
         </label>
         <div class="col-sm-4">
           <select
             v-model="selectedLanguage"
-            class="form-control "
+            class="form-control"
             name="language"
           >
             <option
@@ -119,7 +121,7 @@ export default class ArenaRunSubmitPopup extends Vue {
           doneLabel: T.interactiveGuideDoneButton,
           steps: [
             {
-              element: "#introjs-language",
+              element: '#introjs-language',
               title,
               intro: T.interactveGuideUploadSolutionLanguage,
             },

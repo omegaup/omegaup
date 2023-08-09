@@ -1,5 +1,7 @@
 <template>
+  <!-- id-lint off -->
   <div id="introjs-submissions" class="mt-2" data-runs>
+    <!-- id-lint on -->
     <slot name="title">
       <div class="card-header">
         <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
@@ -501,7 +503,7 @@ export default class Runs extends Vue {
               intro: T.interactveGuideUploadSolutionWelcome,
             },
             {
-              element: "#introjs-submissions",
+              element: '#introjs-submissions',
               title,
               intro: T.interactveGuideUploadSolutionSubmissions,
             },
