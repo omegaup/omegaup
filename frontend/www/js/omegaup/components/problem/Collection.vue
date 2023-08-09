@@ -1,23 +1,21 @@
 <template>
   <div>
-    <div class="row mb-2">
-      <div class="col-md-7">
-        <h1 class="card-title">{{ T.collectionTitle }}</h1>
-      </div>
-      <div class="col-md-5 text-right align-self-end">
+    <div class="row mb-2 justify-content-center">
+      <h2 class="text-center mb-4 col-md-7">{{ T.collectionTitle }}</h2>
+    </div>
+    <div class="card panel panel-default">
+      <div
+        class="card-header panel-heading d-flex justify-content-between align-items-center"
+      >
+        <h5 class="card-title panel-title mb-0">
+          {{ T.problemCollectionEducationLevel }}
+        </h5>
         <a class="btn btn-primary" href="/problem/" data-nav-problems-all>{{
           T.navAllProblems
         }}</a>
       </div>
-    </div>
-    <div class="card panel panel-default">
-      <div class="card-header panel-heading">
-        <h5 class="card-title panel-title">
-          {{ T.problemCollectionEducationLevel }}
-        </h5>
-      </div>
       <div class="card-body panel-body">
-        <div class="container-fluid">
+        <div class="container-fluid px-0">
           <div class="row d-flex justify-content-center">
             <omegaup-problem-collection
               v-for="(collection, idx) in problemCount"
@@ -52,9 +50,9 @@
         </div>
       </div>
     </div>
-    <div class="card panel panel-default">
+    <div class="card mt-4 panel panel-default">
       <div class="card-header panel-heading">
-        <h5 class="card-title panel-title">
+        <h5 class="card-title panel-title mb-0">
           {{ T.problemCollectionOthers }}
         </h5>
       </div>

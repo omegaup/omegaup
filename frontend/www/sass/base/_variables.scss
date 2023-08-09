@@ -17,7 +17,7 @@
   --header-navbar-dropdown-item-font-color: #000000;
   --header-active-color: #5f87d4;
   --header-accent-color: #577dc7;
-
+  --header-problem-card-color: #00000020;
   --header-font-primary-color: #ffffff;
   --header-font-secondary-color: #333333;
   --header-dropdown-active-item: #f5f5f5;
@@ -29,6 +29,9 @@
   --btn-ok-font-color: #fff;
   --btn-ok-font-color--hover: #fff;
   --btn-next-previous-font-color: #666;
+  --btn-intro-js-background-color: #f4f4f4;
+  --btn-intro-js-font-color: #212529;
+  --btn-intro-js-border-color: #bdbdbd;
 
   // MARKDOWN
   --markdown-pre-background-color: #eeeeee;
@@ -233,6 +236,10 @@
   // FORM INPUT
   --form-input-error-color: #dc3545;
   --form-input-box-shadow-error-color: rgba(220, 53, 69, 0.25);
+
+  // PAGINATOR
+  --table-paginator-background-color: #fff;
+  --table-paginator-border-color: #ddd;
 
   // FOOTER
   --footer-link-hover-color: rgb(212, 215, 224);
