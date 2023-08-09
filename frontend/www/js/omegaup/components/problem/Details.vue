@@ -193,6 +193,7 @@
             :problemset-problems="[]"
             :request-feedback="requestFeedback"
             :is-contest-finished="isContestFinished"
+            :has-visited-section="hasVisitedSection"
             @request-feedback="(guid) => $emit('request-feedback', guid)"
             @details="(request) => onRunDetails(request, 'problems')"
             @update-search-result-users-contest="
