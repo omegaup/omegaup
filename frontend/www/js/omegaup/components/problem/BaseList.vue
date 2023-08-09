@@ -1,8 +1,5 @@
 <template>
   <div class="card">
-    <h5 class="card-header">
-      {{ T.wordsProblems }}
-    </h5>
     <div class="table-responsive mb-0">
       <table class="table">
         <thead>
@@ -14,6 +11,7 @@
                   column="problem_id"
                   :sort-order="sortOrder"
                   :column-name="columnName"
+                  class="sort-color"
                   @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
@@ -305,6 +303,16 @@ export default class BaseList extends Vue {
 .sticky-offset {
   top: 4rem;
 }
+.card {
+  border-top: none;
+  border-radius: 0rem 0rem 0.25rem 0.25rem;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
 .table-responsive {
   max-height: 80vh;
 }

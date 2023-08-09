@@ -4034,7 +4034,10 @@ Updates the admin feedback for a submission
 
 ### Returns
 
-_Nothing_
+| Name                       | Type                           |
+| -------------------------- | ------------------------------ |
+| `submissionFeedback`       | `dao.SubmissionFeedback`       |
+| `submissionFeedbackThread` | `dao.SubmissionFeedbackThread` |
 
 # Tag
 

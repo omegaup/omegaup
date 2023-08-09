@@ -1,5 +1,5 @@
 <template>
-  <div class="problem-list">
+  <div class="problem-list mr-3 mr-lg-0">
     <div v-if="inAssignment" class="active" data-breadcrumbs>
       <span>
         <a class="breadcrumbs-link" href="/course/">{{ T.navCourses }}</a> >
