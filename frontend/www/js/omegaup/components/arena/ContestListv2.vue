@@ -307,6 +307,10 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
+import 'intro.js/introjs.css';
+import introJs from 'intro.js';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';
@@ -367,6 +371,8 @@ export default class ArenaContestList extends Vue {
   @Prop() sortOrder!: ContestOrder;
   @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
   @Prop() page!: number;
+  @Prop() hasVisitedSection!: boolean;
+  
   T = T;
   ui = ui;
   ContestTab = ContestTab;
@@ -378,6 +384,60 @@ export default class ArenaContestList extends Vue {
   currentFilter: ContestFilter = this.filter;
   currentPage: number = this.page;
   refreshing: boolean = false;
+
+  mounted() {
+    const title = T.signUpFormInteractiveGuideTitle;
+    if (!this.hasVisitedSection) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title,
+              intro: T.signUpFormInteractiveGuideWelcome,
+            },
+            {
+              element: document.querySelector('.introjs-username') as Element,
+              title,
+              intro: T.signUpFormInteractiveGuideUsername,
+            },
+            {
+              element: document.querySelector('.introjs-email') as Element,
+              title,
+              intro: T.signUpFormInteractiveGuideEmail,
+            },
+            {
+              element: document.querySelector('.introjs-password') as Element,
+              title,
+              intro: T.signUpFormInteractiveGuidePassword,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-confirmpassword',
+              ) as Element,
+              title,
+              intro: T.signUpFormInteractiveGuideConfirmPassword,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-terms-and-conditions',
+              ) as Element,
+              title,
+              intro: T.signUpFormInteractiveGuideTermsAndConditions,
+            },
+            {
+              element: document.querySelector('.introjs-register') as Element,
+              title,
+              intro: T.signUpFormInteractiveGuideRegister,
+            },
+          ],
+        })
+        .start();
+      this.$cookies.set('has-visited-signup', true, -1);
+    }
+  }
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
