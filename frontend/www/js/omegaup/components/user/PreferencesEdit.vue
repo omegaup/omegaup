@@ -13,7 +13,7 @@
     </div>
     <div class="form-group">
       <label>{{ T.userEditLanguage }}</label>
-      <select v-model="locale" data-locale class="custom-select">
+      <select v-model="locale" data-preference-language class="custom-select">
         <option value="es">{{ T.wordsSpanish }}</option>
         <option value="en">{{ T.wordsEnglish }}</option>
         <option value="pt">{{ T.wordsPortuguese }}</option>
@@ -102,7 +102,7 @@
       </label>
     </div>
     <div class="mt-3">
-      <button type="submit" class="btn btn-primary mr-2">
+      <button type="submit" class="btn btn-primary mr-2" data-preference-save-button>
         {{ T.wordsSaveChanges }}
       </button>
       <a href="/profile/" class="btn btn-cancel">{{ T.wordsCancel }}</a>

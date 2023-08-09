@@ -19,6 +19,21 @@ export interface TeamGroupOptions {
   noOfContestants: string;
 }
 
+export interface UserInformation {
+  name: string;
+  gender: string;
+  country: string;
+  state: string;
+  dateOfBirth: string;
+}
+
+export interface UserPreferences {
+  language: string;
+  programmingLanguage: string;
+  useCase: string;
+  objective: string;
+}
+
 export interface ProblemOptions {
   problemAlias: string;
   tag: string;

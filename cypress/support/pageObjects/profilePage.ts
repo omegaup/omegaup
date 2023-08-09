@@ -1,4 +1,4 @@
-import { TeamGroupOptions } from '../types';
+import { TeamGroupOptions, UserInformation, UserPreferences } from '../types';
 
 export class ProfilePage {
   addUsername(userName: string): void {
@@ -53,6 +53,49 @@ export class ProfilePage {
         })
         .should('deep.equal', textArray);
     });
+  }
+
+  changePassword(oldPassword: string, newPassword: string): void {
+    cy.get('[data-nav-user]').click();
+    cy.get('[data-nav-profile]').click();
+    cy.get('a[href="/profile/#change-password"]').click();
+    cy.get('[data-old-password]').type(oldPassword);
+    cy.get('[data-new-password]').type(newPassword);
+    cy.get('[data-new-password2]').type(newPassword);
+    cy.get('[data-save-changed-password]').click();
+  }
+
+  updateProfileInformation(userBasicInformation: UserInformation): void {
+    cy.get('[data-nav-user]').click();
+    cy.get('[data-nav-profile]').click();
+    cy.get('a[href="/profile/#edit-basic-information"]').click();
+    cy.get('[data-name]').type(userBasicInformation.name);
+    cy.get('[data-gender]').select(userBasicInformation.gender);
+    cy.get('[data-countries]').select(userBasicInformation.country);
+    cy.get('[data-states]').select(userBasicInformation.state);
+    cy.get('[data-date-of-birth]').type(userBasicInformation.dateOfBirth);
+    cy.get('[data-save-profile-changes-button]').click();
+  }
+
+  verifyProfileInformation(userBasicInformation: UserInformation): void {
+    cy.get('[data-nav-user]').click();
+    cy.get('[data-nav-profile]').click();
+    cy.get('a[href="#data"]').click();
+    cy.get('[data-user-name]').should('contain', userBasicInformation.name);
+    cy.get('[data-user-country]').should('contain', userBasicInformation.country);
+    cy.get('[data-user-state]').should('contain', userBasicInformation.state);
+  }
+
+  updatePreferences(userPreferences: UserPreferences): void {
+    cy.get('[data-nav-user]').click();
+    cy.get('[data-nav-profile]').click();
+    cy.get('a[href="/profile/#edit-preferences"]').click();
+    cy.get('[data-preference-language]').select(userPreferences.language);
+    cy.get('[data-preferred-language]').select(userPreferences.programmingLanguage);
+    cy.get('[data-learning-teaching-objective]').select(userPreferences.useCase);
+    cy.get('[data-scholar-competitive-objective]').select(userPreferences.objective);
+    cy.get('[data-preference-save-button]').click();
+    cy.pause();
   }
 }
 

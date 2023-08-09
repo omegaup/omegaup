@@ -21,7 +21,7 @@
         <div class="col-sm-3">
           <strong>{{ T.profile }}</strong>
         </div>
-        <div class="col-sm-9 field-data">
+        <div class="col-sm-9 field-data" data-user-name>
           {{ profile.name }}
         </div>
       </div>
@@ -39,7 +39,7 @@
           <div class="col-sm-3">
             <strong>{{ T.profileCountry }}</strong>
           </div>
-          <div class="col-sm-9 field-data">
+          <div class="col-sm-9 field-data" data-user-country>
             <strong>{{ profile.country }}</strong>
           </div>
         </div>
@@ -48,7 +48,7 @@
           <div class="col-sm-3">
             <strong>{{ T.profileState }}</strong>
           </div>
-          <div class="col-sm-9 field-data">
+          <div class="col-sm-9 field-data" data-user-state>
             <strong>{{ profile.state }}</strong>
           </div>
         </div>
