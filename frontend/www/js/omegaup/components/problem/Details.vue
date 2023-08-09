@@ -115,6 +115,7 @@
               :preferred-language="problem.preferred_language"
               :languages="filteredLanguages"
               :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
+              :has-visited-section="hasVisitedSection"
               @dismiss="onPopupDismissed"
               @submit-run="onRunSubmitted"
             ></omegaup-arena-runsubmit-popup>

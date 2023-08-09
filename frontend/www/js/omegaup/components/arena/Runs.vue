@@ -1,14 +1,12 @@
 <template>
-  <!-- id-lint off -->
-  <div id="introjs-submissions" class="mt-2" data-runs>
-    <!-- id-lint on -->
+  <div class="mt-2" data-runs>
     <slot name="title">
       <div class="card-header">
         <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
       </div>
     </slot>
     <div
-      class="px-2 px-sm-4 border-0"
+      class="px-2 px-sm-4 border-0 introjs-submissions"
       :class="{
         'single-problem-runs': !showAllRuns,
         'all-runs': showAllRuns,
@@ -503,7 +501,9 @@ export default class Runs extends Vue {
               intro: T.interactveGuideUploadSolutionWelcome,
             },
             {
-              element: '#introjs-submissions',
+              element: document.querySelector(
+                '.introjs-submissions',
+              ) as Element,
               title,
               intro: T.interactveGuideUploadSolutionSubmissions,
             },

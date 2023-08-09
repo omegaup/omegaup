@@ -86,6 +86,7 @@ OmegaUp.on('ready', async () => {
       return createElement('omegaup-problem-details', {
         props: {
           activeTab: this.activeTab,
+          hasVisitedSection: payload.hasVisitedSection,
           allRuns: runsStore.state.runs,
           problem: payload.problem,
           runs: myRunsStore.state.runs,
