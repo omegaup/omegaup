@@ -236,6 +236,7 @@
           :search-result-users="searchResultUsers"
           :search-result-problems="searchResultProblems"
           :total-runs="totalRuns"
+          :has-visited-section="hasVisitedSection"
           @details="(request) => onRunDetails(request, 'runs')"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"

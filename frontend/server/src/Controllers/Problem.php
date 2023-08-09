@@ -4664,6 +4664,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'reviewer' => false,
                     ],
                     'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
+                        'has-visited-submit-popup'
+                    ),
+                    'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
                         'has-visited-submit-problem'
                     ),
                 ],

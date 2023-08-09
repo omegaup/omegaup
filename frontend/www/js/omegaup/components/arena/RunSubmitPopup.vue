@@ -145,7 +145,7 @@ export default class ArenaRunSubmitPopup extends Vue {
           ],
         })
         .start();
-      this.$cookies.set('has-visited-submit-problem', true, -1);
+      this.$cookies.set('has-visited-submit-popup', true, -1);
     }
   }
 
