@@ -459,6 +459,17 @@ OmegaUp.on('ready', async () => {
                 if (!feedbackWithError.length) {
                   ui.success(T.feedbackSuccesfullyAdded);
                   resetHash('runs', null);
+                  api.Run.getSubmissionFeedback({
+                    run_alias: guid,
+                  }).then((response) => {
+                    component.feedbackMap.forEach((feedback) => {
+                      feedback.submissionFeedbackId = response.find(
+                        (fb) => fb.range_bytes_start == feedback.lineNumber,
+                      )?.submission_feedback_id;
+                      feedback.status = FeedbackStatus.Saved;
+                    });
+                  });
+
                   component.currentPopupDisplayed = PopupDisplayed.None;
                 } else {
                   ui.error('There was an error');
@@ -481,9 +492,25 @@ OmegaUp.on('ready', async () => {
               range_bytes_start: feedback.lineNumber,
               submission_feedback_id: feedback.submissionFeedbackId,
             })
-              .then(() => {
+              .then(({ submissionFeedbackThread }) => {
                 ui.success(T.feedbackSuccesfullyAdded);
                 resetHash('runs', null);
+                if (
+                  submissionFeedbackThread &&
+                  submissionFeedbackThread.submission_feedback_thread_id &&
+                  submissionFeedbackThread.identity_id
+                ) {
+                  feedbackThreadMap.set(
+                    submissionFeedbackThread.submission_feedback_thread_id,
+                    {
+                      author: commonPayload.currentUsername,
+                      authorClassname: commonPayload.userClassname,
+                      lineNumber: feedback.lineNumber,
+                      text: feedback.text,
+                      status: FeedbackStatus.Saved,
+                    },
+                  );
+                }
                 component.currentPopupDisplayed = PopupDisplayed.None;
               })
               .catch(ui.error);
