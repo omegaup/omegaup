@@ -93,7 +93,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         string $guid,
         \OmegaUp\DAO\VO\Courses $course,
         $courseSubmissionInfo
-    ): void {
+    ): \OmegaUp\DAO\VO\SubmissionFeedbackThread {
         $group = \OmegaUp\Controllers\Course::resolveGroup($course);
         if (
             !\OmegaUp\Authorization::canViewCourse(
@@ -104,13 +104,14 @@ class Submission extends \OmegaUp\Controllers\Controller {
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
+        $submissionFeedbackThread = new \OmegaUp\DAO\VO\SubmissionFeedbackThread([
+            'identity_id' => $feedbackAuthor->identity_id,
+            'submission_feedback_id' => $submissionFeedbackId,
+            'contents' => $feedback,
+            'date' => gmdate('Y-m-d H:i:s'),
+        ]);
         \OmegaUp\DAO\Base\SubmissionFeedbackThread::create(
-            new \OmegaUp\DAO\VO\SubmissionFeedbackThread([
-                'identity_id' => $feedbackAuthor->identity_id,
-                'submission_feedback_id' => $submissionFeedbackId,
-                'contents' => $feedback,
-                'date' => gmdate('Y-m-d H:i:s'),
-            ])
+            $submissionFeedbackThread
         );
 
         $participants = \OmegaUp\DAO\SubmissionFeedbackThread::getSubmissionFeedbackThreadParticipants(
@@ -151,6 +152,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 ])
             );
         }
+
+        return $submissionFeedbackThread;
     }
 
     /**
@@ -167,16 +170,15 @@ class Submission extends \OmegaUp\Controllers\Controller {
         ?int $rangeBytesEnd,
         string $feedback,
         $courseSubmissionInfo
-    ): void {
-        \OmegaUp\DAO\Base\SubmissionFeedback::create(
-            new \OmegaUp\DAO\VO\SubmissionFeedback([
-                'identity_id' => $feedbackAuthor->identity_id,
-                'submission_id' => $submission->submission_id,
-                'range_bytes_start' => $rangeBytesStart,
-                'range_bytes_end' => $rangeBytesEnd,
-                'feedback' => $feedback,
-            ])
-        );
+    ): \OmegaUp\DAO\VO\SubmissionFeedback {
+        $submissionFeedback = new \OmegaUp\DAO\VO\SubmissionFeedback([
+            'identity_id' => $feedbackAuthor->identity_id,
+            'submission_id' => $submission->submission_id,
+            'range_bytes_start' => $rangeBytesStart,
+            'range_bytes_end' => $rangeBytesEnd,
+            'feedback' => $feedback,
+        ]);
+        \OmegaUp\DAO\Base\SubmissionFeedback::create($submissionFeedback);
 
         if (!is_null($courseSubmissionInfo['author_id'])) {
             $courseAlias = $course->alias;
@@ -203,6 +205,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 ])
             );
         }
+
+        return $submissionFeedback;
     }
 
     /**
@@ -216,7 +220,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $range_bytes_start
      * @omegaup-request-param int|null $submission_feedback_id
      *
-     * @return array{status: string}
+     * @return array{status: string, submissionFeedback: null|\OmegaUp\DAO\VO\SubmissionFeedback, submissionFeedbackThread: null|\OmegaUp\DAO\VO\SubmissionFeedbackThread}
      */
     public static function apiSetFeedback(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -266,7 +270,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
 
         $submissionFeedbackId = $r->ensureOptionalInt('submission_feedback_id');
         if (!is_null($submissionFeedbackId)) {
-            self::createFeedbackThread(
+            $submissionFeedbackThread = self::createFeedbackThread(
                 $r->identity,
                 $submissionFeedbackId,
                 $feedback,
@@ -274,8 +278,13 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 $course,
                 $courseSubmissionInfo
             );
+            $submissionFeedback = \OmegaUp\DAO\SubmissionFeedback::getByPK(
+                $submissionFeedbackId
+            );
             return [
                 'status' => 'ok',
+                'submissionFeedback' => $submissionFeedback,
+                'submissionFeedbackThread' => $submissionFeedbackThread,
             ];
         }
 
@@ -317,7 +326,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
             );
 
             if (is_null($submissionFeedback)) {
-                self::createFeedback(
+                $submissionFeedback = self::createFeedback(
                     $r->identity,
                     $submission,
                     $course,
@@ -349,6 +358,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
+            'submissionFeedback' => $submissionFeedback,
+            'submissionFeedbackThread' => null,
         ];
     }
 }
