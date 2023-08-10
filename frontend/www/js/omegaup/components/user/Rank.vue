@@ -1,6 +1,6 @@
 <template>
   <div class="card" data-user-rank>
-    <h5 class="card-header">
+    <h5 class="card-header d-flex justify-content-between align-items-center">
       {{
         isIndex
           ? ui.formatString(T.userRankOfTheMonthHeader, {
@@ -11,6 +11,10 @@
               highCount: page * length,
             })
       }}
+      <a href="https://blog.omegaup.com/el-nuevo-ranking-de-omegaup/"
+        ><font-awesome-icon :icon="['fas', 'question-circle']" />
+        {{ T.wordsRankingMeasurement }}</a
+      >
     </h5>
     <div v-if="!isIndex" class="card-body form-row">
       <omegaup-common-typeahead
@@ -86,7 +90,7 @@
               {{ user.name }}</span
             >
           </td>
-          <td class="text-right">{{ user.score }}</td>
+          <td class="text-right">{{ user.score.toFixed(2) }}</td>
           <td v-if="!isIndex" class="text-right pr-4">
             {{ user.problems_solved }}
           </td>
@@ -114,6 +118,7 @@ import common_Typeahead from '../common/Typeahead.vue';
 import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
 import common_Paginator from '../common/Paginator.vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 interface Rank {
   country: string;
@@ -126,6 +131,7 @@ interface Rank {
 
 @Component({
   components: {
+    FontAwesomeIcon,
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-countryflag': CountryFlag,
     'omegaup-user-username': user_Username,
