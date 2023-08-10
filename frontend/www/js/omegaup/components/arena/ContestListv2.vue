@@ -5,7 +5,7 @@
     </div>
     <b-card no-body>
       <b-tabs
-        class="sidebar"
+        class="sidebar introjs-time"
         pills
         card
         vertical
@@ -16,7 +16,7 @@
             <b-row class="justify-content-between" align-v="center">
               <b-col class="col-12 col-md-5 mb-2 mb-md-0 p-0">
                 <form :action="queryURL" method="GET">
-                  <div class="input-group">
+                  <div class="input-group introjs-search">
                     <input
                       v-model.lazy="currentQuery"
                       class="form-control nav-link"
@@ -42,7 +42,7 @@
                 </form>
               </b-col>
               <b-col sm="12" class="d-flex col-md-6 btns-group p-0">
-                <b-dropdown ref="dropdownOrderBy" no-caret>
+                <b-dropdown ref="dropdownOrderBy" no-caret class="introjs-sort">
                   <template #button-content>
                     <div>
                       <font-awesome-icon icon="sort-amount-down" />
@@ -116,7 +116,7 @@
                     />{{ T.contestOrderBySignedUp }}</b-dropdown-item
                   >
                 </b-dropdown>
-                <b-dropdown ref="dropdownFilterBy" class="mr-0" no-caret>
+                <b-dropdown ref="dropdownFilterBy" class="mr-0 introjs-filter" no-caret>
                   <template #button-content>
                     <font-awesome-icon icon="filter" />
                     {{ T.contestFilterBy }}
@@ -161,7 +161,7 @@
         </b-card>
         <b-tab
           ref="currentContestTab"
-          class="scroll-content"
+          class="scroll-content introjs-contest-list"
           :title="T.contestListCurrent"
           :title-link-class="titleLinkClass(ContestTab.Current)"
           :active="currentTab === ContestTab.Current"
@@ -386,7 +386,7 @@ export default class ArenaContestList extends Vue {
   refreshing: boolean = false;
 
   mounted() {
-    const title = T.signUpFormInteractiveGuideTitle;
+    const title = T.joinContestInteractiveGuideTitle;
     if (!this.hasVisitedSection) {
       introJs()
         .setOptions({
@@ -396,46 +396,39 @@ export default class ArenaContestList extends Vue {
           steps: [
             {
               title,
-              intro: T.signUpFormInteractiveGuideWelcome,
+              intro: T.joinContestInteractiveGuideWelcome ,
             },
             {
-              element: document.querySelector('.introjs-username') as Element,
+              element: document.querySelector('.introjs-time') as Element,
               title,
-              intro: T.signUpFormInteractiveGuideUsername,
+              intro: T.joinContestInteractiveGuideTime,
             },
             {
-              element: document.querySelector('.introjs-email') as Element,
+              element: document.querySelector('.introjs-search') as Element,
               title,
-              intro: T.signUpFormInteractiveGuideEmail,
+              intro: T.joinContestInteractiveGuideSearch,
             },
             {
-              element: document.querySelector('.introjs-password') as Element,
+              element: document.querySelector('.introjs-sort') as Element,
               title,
-              intro: T.signUpFormInteractiveGuidePassword,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-confirmpassword',
-              ) as Element,
-              title,
-              intro: T.signUpFormInteractiveGuideConfirmPassword,
+              intro: T.joinContestInteractiveGuideSort,
             },
             {
               element: document.querySelector(
-                '.introjs-terms-and-conditions',
+                '.introjs-filter',
               ) as Element,
               title,
-              intro: T.signUpFormInteractiveGuideTermsAndConditions,
+              intro: T.joinContestInteractiveGuideFilter,
             },
             {
-              element: document.querySelector('.introjs-register') as Element,
+              element: document.querySelector('.introjs-contest-list') as Element,
               title,
-              intro: T.signUpFormInteractiveGuideRegister,
+              intro: T.joinContestInteractiveGuideContestList,
             },
           ],
         })
         .start();
-      this.$cookies.set('has-visited-signup', true, -1);
+      this.$cookies.set('has-visited-join-contest', true, -1);
     }
   }
 
