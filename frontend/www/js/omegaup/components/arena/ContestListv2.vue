@@ -116,7 +116,11 @@
                     />{{ T.contestOrderBySignedUp }}</b-dropdown-item
                   >
                 </b-dropdown>
-                <b-dropdown ref="dropdownFilterBy" class="mr-0 introjs-filter" no-caret>
+                <b-dropdown
+                  ref="dropdownFilterBy"
+                  class="mr-0 introjs-filter"
+                  no-caret
+                >
                   <template #button-content>
                     <font-awesome-icon icon="filter" />
                     {{ T.contestFilterBy }}
@@ -372,7 +376,7 @@ export default class ArenaContestList extends Vue {
   @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
   @Prop() page!: number;
   @Prop() hasVisitedSection!: boolean;
-  
+
   T = T;
   ui = ui;
   ContestTab = ContestTab;
@@ -396,7 +400,7 @@ export default class ArenaContestList extends Vue {
           steps: [
             {
               title,
-              intro: T.joinContestInteractiveGuideWelcome ,
+              intro: T.joinContestInteractiveGuideWelcome,
             },
             {
               element: document.querySelector('.introjs-time') as Element,
@@ -414,14 +418,14 @@ export default class ArenaContestList extends Vue {
               intro: T.joinContestInteractiveGuideSort,
             },
             {
-              element: document.querySelector(
-                '.introjs-filter',
-              ) as Element,
+              element: document.querySelector('.introjs-filter') as Element,
               title,
               intro: T.joinContestInteractiveGuideFilter,
             },
             {
-              element: document.querySelector('.introjs-contest-list') as Element,
+              element: document.querySelector(
+                '.introjs-contest-list',
+              ) as Element,
               title,
               intro: T.joinContestInteractiveGuideContestList,
             },
