@@ -13,7 +13,7 @@
     </div>
     <div class="form-group">
       <label>{{ T.userEditLanguage }}</label>
-      <select v-model="locale" data-preference-language class="custom-select">
+      <select v-model="locale" data-locale data-preference-language class="custom-select">
         <option value="es">{{ T.wordsSpanish }}</option>
         <option value="en">{{ T.wordsEnglish }}</option>
         <option value="pt">{{ T.wordsPortuguese }}</option>

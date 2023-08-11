@@ -57,7 +57,7 @@
           <div class="col-sm-3">
             <strong>{{ T.profileSchool }}</strong>
           </div>
-          <div class="col-sm-9 field-data">
+          <div class="col-sm-9 field-data" data-user-school>
             <a :href="`/schools/profile/${profile.school_id}/`"
               ><strong>{{ profile.school }}</strong></a
             >
@@ -68,7 +68,7 @@
           <div class="col-sm-3">
             <strong>{{ T.profileGraduationDate }}</strong>
           </div>
-          <div class="col-sm-9 field-data">
+          <div class="col-sm-9 field-data" data-graduation-date>
             <strong>{{ graduationDate }}</strong>
           </div>
         </div>

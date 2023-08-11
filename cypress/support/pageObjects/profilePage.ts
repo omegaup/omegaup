@@ -1,4 +1,9 @@
-import { TeamGroupOptions, UserInformation, UserPreferences } from '../types';
+import {
+  SchoolDetails,
+  TeamGroupOptions,
+  UserInformation,
+  UserPreferences,
+} from '../types';
 
 export class ProfilePage {
   addUsername(userName: string): void {
@@ -82,7 +87,10 @@ export class ProfilePage {
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="#data"]').click();
     cy.get('[data-user-name]').should('contain', userBasicInformation.name);
-    cy.get('[data-user-country]').should('contain', userBasicInformation.country);
+    cy.get('[data-user-country]').should(
+      'contain',
+      userBasicInformation.country,
+    );
     cy.get('[data-user-state]').should('contain', userBasicInformation.state);
   }
 
@@ -91,11 +99,48 @@ export class ProfilePage {
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#edit-preferences"]').click();
     cy.get('[data-preference-language]').select(userPreferences.language);
-    cy.get('[data-preferred-language]').select(userPreferences.programmingLanguage);
-    cy.get('[data-learning-teaching-objective]').select(userPreferences.useCase);
-    cy.get('[data-scholar-competitive-objective]').select(userPreferences.objective);
+    cy.get('[data-preferred-language]').select(
+      userPreferences.programmingLanguage,
+    );
+    cy.get('[data-learning-teaching-objective]').select(
+      userPreferences.useCase,
+    );
+    cy.get('[data-scholar-competitive-objective]').select(
+      userPreferences.objective,
+    );
     cy.get('[data-preference-save-button]').click();
-    cy.pause();
+    cy.get('[data-preferred-programming-languages]').should('contain', 'C++17');
+  }
+
+  updateSchoolDetails(schoolDetails: SchoolDetails): void {
+    cy.get('[data-nav-user]').click();
+    cy.get('[data-nav-profile]').click();
+    cy.get('a[href="/profile/#manage-schools"]').click();
+    cy.get('[data-school-name]').click();
+    cy.get('[data-school-name]').type(schoolDetails.name + '{enter}');
+    cy.get('[data-school-grade]').select(schoolDetails.grade);
+    if (schoolDetails.enrolledStatus) {
+      cy.get('[type="radio"]').check('true');
+    } else {
+      cy.get('[type="radio"]').check('false');
+      cy.get('[data-graduation-date]').type(
+        schoolDetails.graduationDate || '01/01/2001',
+      );
+    }
+    cy.get('[data-save-school-changes]').click();
+  }
+
+  verifySchoolDetails(schoolDetails: SchoolDetails): void {
+    cy.get('[data-nav-user]').click();
+    cy.get('[data-nav-profile]').click();
+    cy.get('a[href="#data"]').click();
+    cy.get('[data-user-school]').should('contain', schoolDetails.name);
+    if (schoolDetails.graduationDate != undefined) {
+      cy.get('[data-graduation-date]').should(
+        'contain',
+        schoolDetails.graduationDate,
+      );
+    }
   }
 }
 

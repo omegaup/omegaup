@@ -34,6 +34,13 @@ export interface UserPreferences {
   objective: string;
 }
 
+export interface SchoolDetails {
+  name: string;
+  grade: string;
+  enrolledStatus: boolean;
+  graduationDate?: string;
+}
+
 export interface ProblemOptions {
   problemAlias: string;
   tag: string;

@@ -1,7 +1,7 @@
 import { getISODate } from '../support/commands';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { profilePage } from '../support/pageObjects/profilePage';
-import { UserInformation, UserPreferences } from '../support/types';
+import { SchoolDetails, UserInformation, UserPreferences } from '../support/types';
 
 describe('Group Test', () => {
   beforeEach(() => {
@@ -44,14 +44,33 @@ describe('Group Test', () => {
   it('Should update preferences', () => {
     const loginOptions = loginPage.registerMultipleUsers(1);
     const userPreferences: UserPreferences = {
-      language: 'English',
-      programmingLanguage: 'C++17 (g++ 10.3)',
-      useCase: 'learn programming',
-      objective: 'school classes',
+      language: 'en',
+      programmingLanguage: 'cpp17-gcc',
+      useCase: 'learning',
+      objective: 'competitive',
     };
 
     cy.login(loginOptions[0]);
     profilePage.updatePreferences(userPreferences);
     cy.logout();
+  });
+
+  it('Should update school', () => {
+    const loginOptions = loginPage.registerMultipleUsers(1);
+    const schoolDetails: SchoolDetails = {
+      name: 'MIT',
+      grade: 'bachelors',
+      enrolledStatus: true,
+    }
+
+    cy.login(loginOptions[0]);
+    profilePage.updateSchoolDetails(schoolDetails);
+    profilePage.verifySchoolDetails(schoolDetails);
+    cy.logout();
+  });
+
+  it('Should merge identities', () => {
+    const loginOptions = loginPage.registerMultipleUsers(2);
+
   });
 });
