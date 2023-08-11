@@ -408,7 +408,7 @@ export default class CourseDetails extends Vue {
           ],
         })
         .start();
-      this.$cookies.set('has-visited-signup', true, -1);
+      this.$cookies.set('has-visited-create-course', true, -1);
     }
   }
 

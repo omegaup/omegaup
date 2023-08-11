@@ -3239,6 +3239,7 @@ export namespace types {
     course: types.CourseDetails;
     groupsAdmins: types.CourseGroupAdmin[];
     groupsTeachingAssistants: types.CourseGroupAdmin[];
+    hasVisitedSection: boolean;
     identityRequests: types.IdentityRequest[];
     selectedAssignment?: types.CourseAssignment;
     students: types.CourseStudent[];
