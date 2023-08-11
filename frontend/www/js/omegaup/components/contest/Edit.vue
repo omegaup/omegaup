@@ -147,7 +147,6 @@
           :update="true"
           :search-result-teams-groups="searchResultTeamsGroups"
           :problems="problems"
-          :has-visited-section="hasVisitedSection"
           @update-search-result-teams-groups="
             (query) => $emit('update-search-result-teams-groups', query)
           "
@@ -336,7 +335,6 @@ export default class Edit extends Vue {
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop() searchResultGroups!: types.ListItem[];
   @Prop({ default: null }) originalContestAdmissionMode!: null | string;
-  @Prop() hasVisitedSection!: boolean;
 
   T = T;
   ui = ui;
