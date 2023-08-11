@@ -5,7 +5,7 @@
     </div>
     <div class="card-body">
       <div class="row align-items-center">
-        <div class="form-group col-md-9">
+        <div class="form-group col-md-9" data-merge-contest-name>
           <label>{{ T.wordsContest }}:</label>
           <multiselect
             :value="selectedContests"
