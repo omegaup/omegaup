@@ -1692,6 +1692,7 @@ const translations: { [key: string]: string; } = {
   wordsPrivacyPolicy: "Privacy Policy",
   wordsPrivacyPolicyAccepted: "You have accepted the privacy policy",
   wordsPrivate: "Private",
+  wordsPrivateRank: "Your account rank will not be visible",
   wordsPrivateTags: "Private tags",
   wordsProblem: "Problem",
   wordsProblemOrSolutionNotExist: "The problem or solution don't exist.",

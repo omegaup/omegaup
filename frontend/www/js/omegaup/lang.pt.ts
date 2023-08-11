@@ -1692,6 +1692,7 @@ const translations: { [key: string]: string; } = {
   wordsPrivacyPolicy: "Pol\u00edtica de privacidade",
   wordsPrivacyPolicyAccepted: "Voc\u00ea aceitou a pol\u00edtica de privacidade",
   wordsPrivate: "Privado",
+  wordsPrivateRank: "A classifica\u00e7\u00e3o da sua conta n\u00e3o ficar\u00e1 vis\u00edvel",
   wordsPrivateTags: "Tags privados",
   wordsProblem: "Problema",
   wordsProblemOrSolutionNotExist: "O problema ou a solu\u00e7\u00e3o nao existem.",

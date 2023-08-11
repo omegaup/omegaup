@@ -89,6 +89,16 @@
           class="mr-2"
         />{{ T.userEditPrivateProfile }}
       </label>
+      <button
+        type="button"
+        class="btn btn-sm ml-1 btn-light"
+        data-toggle="popover"
+        data-trigger="focus"
+        :data-content="T.wordsPrivateRank"
+        @click="showWarningAboutRank"
+      >
+        <font-awesome-icon :icon="['fas', 'question-circle']" />
+      </button>
     </div>
     <div class="form-group">
       <label>
@@ -115,8 +125,13 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { ObjectivesAnswers } from './ObjectivesQuestions.vue';
 import { types } from '../../api_types';
 import T from '../../lang';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-@Component
+@Component({
+  components: {
+    FontAwesomeIcon,
+  },
+})
 export default class UserPreferencesEdit extends Vue {
   @Prop() profile!: types.UserProfileInfo;
 
@@ -230,6 +245,10 @@ export default class UserPreferencesEdit extends Vue {
       },
       localeChanged: this.locale != this.profile.locale,
     });
+  }
+
+  showWarningAboutRank(ev: Event): void {
+    $(ev.target as HTMLElement).popover('show');
   }
 }
 </script>
