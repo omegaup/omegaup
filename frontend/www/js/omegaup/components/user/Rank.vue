@@ -68,6 +68,15 @@
           <th scope="col" class="text-right">{{ T.rankScore }}</th>
           <th v-if="!isIndex" scope="col" class="text-right pr-4">
             {{ T.rankSolved }}
+            <a @click="showSolvedProblemsHelp">
+              <font-awesome-icon
+                tabindex="0"
+                :data-content="T.solvedProblemsHelp"
+                data-toggle="popover"
+                data-trigger="focus"
+                :icon="['fas', 'question-circle']"
+              />
+            </a>
           </th>
         </tr>
       </thead>
@@ -115,6 +124,11 @@ import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
 import common_Paginator from '../common/Paginator.vue';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+library.add(faQuestionCircle);
+
 interface Rank {
   country: string;
   classname?: string;
@@ -126,6 +140,7 @@ interface Rank {
 
 @Component({
   components: {
+    FontAwesomeIcon,
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-countryflag': CountryFlag,
     'omegaup-user-username': user_Username,
@@ -187,6 +202,10 @@ export default class UserRank extends Vue {
         this.filter,
       )}`;
     else return `/rank?page=${this.page - 1}`;
+  }
+
+  showSolvedProblemsHelp(ev: Event): void {
+    $(ev.target as HTMLElement).popover('show');
   }
 }
 </script>

@@ -1328,6 +1328,7 @@ const translations: { [key: string]: string; } = {
   solutionNotLoggedIn: "You must login to unlock/see this solution.",
   solutionTokens: "You have **%(available)** tokens available, out of a total of **%(total)** obtained.",
   solutionViewCurrentTokens: "View my current tokens",
+  solvedProblemsHelp: "The number of solved problems is updated once a day.",
   spinnerLoadingMessage: "Loading...",
   startContest: "Start Contest",
   startCourse: "Start Course",

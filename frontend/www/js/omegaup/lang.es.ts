@@ -1328,6 +1328,7 @@ const translations: { [key: string]: string; } = {
   solutionNotLoggedIn: "Debes iniciar sesi\u00f3n para desbloquear/ver esta soluci\u00f3n.",
   solutionTokens: "Te quedan **%(available)** tokens disponibles, de un total de **%(total)** obtenido(s).",
   solutionViewCurrentTokens: "Ver mis tokens actuales",
+  solvedProblemsHelp: "El n\u00famero de problemas resueltos se actualiza una vez al d\u00eda.",
   spinnerLoadingMessage: "Cargando...",
   startContest: "Iniciar concurso",
   startCourse: "Iniciar curso",
