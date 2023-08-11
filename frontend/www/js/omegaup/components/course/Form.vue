@@ -221,7 +221,10 @@
         </div>
         <div class="row">
           <div class="form-group col-md-12 text-right">
-            <button class="btn btn-primary mr-2 submit introjs-submit" type="submit">
+            <button
+              class="btn btn-primary mr-2 submit introjs-submit"
+              type="submit"
+            >
               <template v-if="update">
                 {{ T.courseNewFormUpdateCourse }}
               </template>
@@ -323,12 +326,16 @@ export default class CourseDetails extends Vue {
               intro: T.createCourseInteractiveGuideWelcome,
             },
             {
-              element: document.querySelector('.introjs-course-name') as Element,
+              element: document.querySelector(
+                '.introjs-course-name',
+              ) as Element,
               title,
               intro: T.createCourseInteractiveGuideName,
             },
             {
-              element: document.querySelector('.introjs-short-title') as Element,
+              element: document.querySelector(
+                '.introjs-short-title',
+              ) as Element,
               title,
               intro: T.createCourseInteractiveGuideShortTitle,
             },
@@ -338,16 +345,12 @@ export default class CourseDetails extends Vue {
               intro: T.createCourseInteractiveGuideScoreboard,
             },
             {
-              element: document.querySelector(
-                '.introjs-start-date',
-              ) as Element,
+              element: document.querySelector('.introjs-start-date') as Element,
               title,
               intro: T.createCourseInteractiveGuideStartDate,
             },
             {
-              element: document.querySelector(
-                '.introjs-duration',
-              ) as Element,
+              element: document.querySelector('.introjs-duration') as Element,
               title,
               intro: T.createCourseInteractiveGuideDuration,
             },
@@ -362,12 +365,16 @@ export default class CourseDetails extends Vue {
               intro: T.createCourseInteractiveGuideSchool,
             },
             {
-              element: document.querySelector('.introjs-basic-information') as Element,
+              element: document.querySelector(
+                '.introjs-basic-information',
+              ) as Element,
               title,
               intro: T.createCourseInteractiveGuideBasicInformation,
             },
             {
-              element: document.querySelector('.introjs-ask-information') as Element,
+              element: document.querySelector(
+                '.introjs-ask-information',
+              ) as Element,
               title,
               intro: T.createCourseInteractiveGuideAskInformation,
             },
@@ -379,15 +386,17 @@ export default class CourseDetails extends Vue {
             {
               element: document.querySelector('.introjs-language') as Element,
               title,
-              intro: T.createCourseInteractiveGuideLanguage ,
-            }, 
+              intro: T.createCourseInteractiveGuideLanguage,
+            },
             {
               element: document.querySelector('.introjs-objective') as Element,
               title,
               intro: T.createCourseInteractiveGuideObjective,
-            }, 
+            },
             {
-              element: document.querySelector('.introjs-description') as Element,
+              element: document.querySelector(
+                '.introjs-description',
+              ) as Element,
               title,
               intro: T.createCourseInteractiveGuideDescription,
             },
@@ -395,7 +404,7 @@ export default class CourseDetails extends Vue {
               element: document.querySelector('.introjs-submit') as Element,
               title,
               intro: T.createCourseInteractiveGuideSubmit,
-            },                    
+            },
           ],
         })
         .start();
