@@ -2937,6 +2937,7 @@ export namespace types {
     details: types.ContestAdminDetails;
     group_admins: types.ContestGroupAdmin[];
     groups: types.ContestGroup[];
+    hasVisitedSection?: boolean;
     original_contest_admission_mode?: string;
     problems: types.ProblemsetProblemWithVersions[];
     requests: types.ContestRequest[];

@@ -162,6 +162,7 @@ OmegaUp.on('ready', () => {
           searchResultGroups: this.searchResultGroups,
           teamsGroup: this.teamsGroup,
           originalContestAdmissionMode: payload.original_contest_admission_mode,
+          hasVisitedSection: payload.hasVisitedSection,
         },
         on: {
           'update-search-result-problems': ({
