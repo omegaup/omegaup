@@ -28,6 +28,7 @@ OmegaUp.on('ready', () => {
           initialFinishTime: finishTime,
           invalidParameterName: this.invalidParameterName,
           searchResultTeamsGroups: this.searchResultTeamsGroups,
+          hasVisitedSection: payload.hasVisitedSection,
         },
         on: {
           'create-contest': ({
