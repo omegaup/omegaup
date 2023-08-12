@@ -2323,18 +2323,21 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $school_id
      * @omegaup-request-param null|string $school_name
      * @omegaup-request-param string $state_id
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
-        if (isset($r['username'])) {
-            \OmegaUp\Validators::validateValidUsername(
-                $r['username'],
-                'username'
-            );
-            $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
-            if ($r['username'] !== $r->identity->username && !is_null($user)) {
+        $username = $r->ensureOptionalString(
+            key: 'username',
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::normalUsername(
+                $username
+            )
+        );
+        if (!is_null($username)) {
+            $user = \OmegaUp\DAO\Users::FindByUsername($username);
+            if ($username !== $r->identity->username && !is_null($user)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                     'usernameInUse'
                 );
@@ -2403,7 +2406,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $newSchoolId = $currentSchoolId;
 
         $schoolId = $r->ensureOptionalInt('school_id');
-        if (!is_null($schoolId)) {
+        if (!is_null($schoolId) && $schoolId !== 0) {
             $school = \OmegaUp\DAO\Schools::getByPK($schoolId);
             if (is_null($school)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
