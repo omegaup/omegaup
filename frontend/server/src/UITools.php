@@ -106,11 +106,18 @@ class UITools {
         ];
     }
 
-    public static function getFormattedGravatarURL(
+    private static function getFormattedGravatarURL(
         string $hashedEmail,
         string $size
     ): string {
         return "https://secure.gravatar.com/avatar/{$hashedEmail}?s={$size}";
+    }
+
+    public static function hasVisitedSection(string $section): bool {
+        if (!isset($_COOKIE[$section])) {
+            return false;
+        }
+        return boolval($_COOKIE[$section]);
     }
 
     private static function shouldReportToAnalytics(): bool {
