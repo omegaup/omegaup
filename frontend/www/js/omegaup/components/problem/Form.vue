@@ -219,7 +219,9 @@
                 </button>
               </h2>
             </div>
-            <div class="collapse card-body px-2 px-sm-4 limits introjs-public-tags">
+            <div
+              class="collapse card-body px-2 px-sm-4 limits introjs-public-tags"
+            >
               <omegaup-problem-settings
                 :errors="errors"
                 :current-languages="currentLanguages"
@@ -521,7 +523,9 @@ export default class ProblemForm extends Vue {
               intro: T.createProblemInteractiveGuideProblemTitle,
             },
             {
-              element: document.querySelector('.introjs-short-title') as Element,
+              element: document.querySelector(
+                '.introjs-short-title',
+              ) as Element,
               title,
               intro: T.createProblemInteractiveGuideShortTitle,
             },
