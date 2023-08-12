@@ -2,7 +2,12 @@ import 'cypress-file-upload';
 import 'cypress-wait-until';
 import { v4 as uuid } from 'uuid';
 
-import { ContestOptions, GroupOptions, ProblemOptions } from '../types';
+import {
+  ContestOptions,
+  GroupOptions,
+  LoginOptions,
+  ProblemOptions,
+} from '../types';
 import { addSubtractDaysToDate } from '../commands';
 
 enum ScoreMode {
@@ -46,7 +51,7 @@ export class ContestPage {
     });
 
     cy.get('[name="create-identities"]').click();
-    cy.get('#alert-close').click();
+    // cy.get('#alert-close').click();
     cy.waitUntil(() => {
       return cy.get('#alert-close').should('not.be.visible');
     });
@@ -124,10 +129,7 @@ export class ContestPage {
     });
   }
 
-  createContest(
-    contestOptions: ContestOptions,
-    users: Array<string>,
-  ): void {
+  createContest(contestOptions: ContestOptions, users: Array<string>): void {
     cy.createContest(contestOptions);
 
     cy.location('href').should('include', contestOptions.contestAlias);
@@ -150,8 +152,13 @@ export class ContestPage {
     cy.waitUntil(() => cy.get('[data-table-scoreboard]').should('be.visible'));
   }
 
-  generateContestOptions(): ContestOptions {
+  generateContestOptions(loginOption: LoginOptions): ContestOptions {
     const now = new Date();
+    const problem = this.generateProblemOptions(1);
+
+    cy.login(loginOption);
+    cy.createProblem(problem[0]);
+    cy.logout();
 
     const contestOptions: ContestOptions = {
       contestAlias: 'contest' + uuid().slice(0, 5),
@@ -165,15 +172,15 @@ export class ContestPage {
       admissionMode: 'public',
       problems: [
         {
-          problemAlias: 'sumas',
-          tag: 'Recursión',
-          autoCompleteTextTag: 'Recur',
-          problemLevelIndex: 1,
+          problemAlias: problem[0].problemAlias,
+          tag: problem[0].tag,
+          autoCompleteTextTag: problem[0].autoCompleteTextTag,
+          problemLevelIndex: problem[0].problemLevelIndex,
         },
       ],
       runs: [
         {
-          problemAlias: 'sumas',
+          problemAlias: problem[0].problemAlias,
           fixturePath: 'main.cpp',
           language: 'cpp11-gcc',
           valid: true,
@@ -200,6 +207,18 @@ export class ContestPage {
     }
 
     return problems;
+  }
+
+  setPasswordForIdentity(identityName: string, password: string): void {
+    cy.get('[data-identity-change-password]').first().click();
+    cy.get('input[type=password]').first().type(password);
+    cy.get('input[type=password]').last().type(password);
+    cy.get('[data-change-password-identity]').click();
+  }
+
+  verifySubmissionInPastContest(username: string, contestAlias: string): void {
+    cy.visit(`/arena/${contestAlias}/#ranking`);
+    cy.get('[data-table-scoreboard-username]').should('contain', username);
   }
 }
 

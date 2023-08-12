@@ -1,4 +1,5 @@
 import {
+  LoginOptions,
   SchoolDetails,
   TeamGroupOptions,
   UserInformation,
@@ -141,6 +142,26 @@ export class ProfilePage {
         schoolDetails.graduationDate,
       );
     }
+  }
+
+  mergeIdentities(identityLogin: LoginOptions): void {
+    cy.get('[data-nav-user]').click();
+    cy.get('[data-nav-profile]').click();
+    cy.get('a[href="/profile/#manage-identities"]').click();
+    cy.get('[data-identity-username]').type(identityLogin.username);
+    cy.get('[data-identity-password]').type(identityLogin.password);
+    cy.get('[data-add-identity-button]').click();
+
+    cy.get('[data-added-identity-username]').should('have.length', 2);
+    cy.get('[data-added-identity-username]')
+      .first()
+      .should('contain', identityLogin.username);
+    cy.reload();
+  }
+
+  changeIdentity(username: string): void {
+    cy.get('[data-nav-user]').click();
+    cy.get('button').contains(username).click();
   }
 }
 

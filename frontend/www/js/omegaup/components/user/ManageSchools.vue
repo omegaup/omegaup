@@ -6,10 +6,10 @@
         :existing-options="searchResultSchools"
         :options="searchResultSchools"
         :value.sync="school"
+        data-school-name
         @update-existing-options="
           (query) => $emit('update-search-result-schools', query)
         "
-        data-school-name
       ></omegaup-common-typeahead>
     </div>
     <div class="form-group">
@@ -50,7 +50,11 @@
       ></omegaup-datepicker>
     </div>
     <div class="mt-3">
-      <button type="submit" class="btn btn-primary mr-2" data-save-school-changes>
+      <button
+        type="submit"
+        class="btn btn-primary mr-2"
+        data-save-school-changes
+      >
         {{ T.wordsSaveChanges }}
       </button>
       <a href="/profile/" class="btn btn-cancel">{{ T.wordsCancel }}</a>

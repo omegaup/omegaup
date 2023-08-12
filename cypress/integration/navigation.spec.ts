@@ -1,9 +1,9 @@
 import { getISODate } from '../support/commands';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { profilePage } from '../support/pageObjects/profilePage';
-import { SchoolDetails, UserInformation, UserPreferences } from '../support/types';
+import { UserInformation, UserPreferences } from '../support/types';
 
-describe('Group Test', () => {
+describe('Navigation Test', () => {
   beforeEach(() => {
     cy.clearCookies();
     cy.clearLocalStorage();
@@ -27,7 +27,7 @@ describe('Group Test', () => {
     const loginOptions = loginPage.registerMultipleUsers(1);
     const userBasicInformation: UserInformation = {
       name: 'Test User',
-      gender: 'Male',
+      gender: 'male',
       country: 'Mexico',
       state: 'Colima',
       dateOfBirth: getISODate(
@@ -55,22 +55,20 @@ describe('Group Test', () => {
     cy.logout();
   });
 
-  it('Should update school', () => {
-    const loginOptions = loginPage.registerMultipleUsers(1);
-    const schoolDetails: SchoolDetails = {
-      name: 'MIT',
-      grade: 'bachelors',
-      enrolledStatus: true,
-    }
+  // Uncomment this test when this issue is resolved
+  // https://github.com/omegaup/omegaup/issues/7037
 
-    cy.login(loginOptions[0]);
-    profilePage.updateSchoolDetails(schoolDetails);
-    profilePage.verifySchoolDetails(schoolDetails);
-    cy.logout();
-  });
+  // it('Should update school', () => {
+  //   const loginOptions = loginPage.registerMultipleUsers(1);
+  //   const schoolDetails: SchoolDetails = {
+  //     name: 'MIT',
+  //     grade: 'bachelors',
+  //     enrolledStatus: true,
+  //   }
 
-  it('Should merge identities', () => {
-    const loginOptions = loginPage.registerMultipleUsers(2);
-
-  });
+  //   cy.login(loginOptions[0]);
+  //   profilePage.updateSchoolDetails(schoolDetails);
+  //   profilePage.verifySchoolDetails(schoolDetails);
+  //   cy.logout();
+  // });
 });
