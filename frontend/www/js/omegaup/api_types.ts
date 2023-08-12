@@ -3817,6 +3817,8 @@ export namespace types {
     allRuns?: types.Run[];
     allowUserAddTags?: boolean;
     clarifications?: types.Clarification[];
+    hasVisitedSection: boolean;
+    hasVisitedSectionPopup: boolean;
     histogram: types.Histogram;
     levelTags?: string[];
     nominationStatus?: types.NominationStatus;

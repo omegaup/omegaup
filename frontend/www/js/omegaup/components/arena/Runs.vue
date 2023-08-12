@@ -482,6 +482,7 @@ export default class Runs extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
   @Prop() hasVisitedSection!: boolean;
+  @Prop() hasVisitedSectionPopup!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;

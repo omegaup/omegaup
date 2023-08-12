@@ -101,6 +101,7 @@ export default class ArenaRunSubmitPopup extends Vue {
   @Prop({ required: true }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
   @Prop({ default: null }) preferredLanguage!: null | string;
+  @Prop() hasVisitedSectionPopup!: boolean;
   @Prop() hasVisitedSection!: boolean;
 
   T = T;
@@ -111,7 +112,7 @@ export default class ArenaRunSubmitPopup extends Vue {
 
   mounted() {
     const title = T.interactiveGuideUploadSolutionTitle;
-    if (!this.hasVisitedSection) {
+    if (!this.hasVisitedSectionPopup) {
       introJs()
         .setOptions({
           nextLabel: T.interactiveGuideNextButton,
