@@ -2323,7 +2323,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $school_id
      * @omegaup-request-param null|string $school_name
      * @omegaup-request-param string $state_id
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
