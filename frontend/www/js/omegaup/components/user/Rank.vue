@@ -14,7 +14,7 @@
     </h5>
     <div v-if="!isIndex" class="card-body form-row">
       <omegaup-common-typeahead
-        class="col-md-3 pl-0 pr-2"
+        class="col col-md-3 pl-0 pr-2"
         :existing-options="searchResultUsers"
         :value.sync="searchedUsername"
         :max-results="10"
@@ -23,7 +23,7 @@
         "
       ></omegaup-common-typeahead>
       <button
-        class="btn btn-primary form-control col-md-2 mr-2"
+        class="btn btn-primary form-control col-4 col-md-2 mr-0 mr-md-2"
         type="button"
         @click="onSubmit"
       >
@@ -32,7 +32,7 @@
       <template v-if="Object.keys(availableFilters).length > 0">
         <select
           v-model="filter"
-          class="filter form-control col-md-4"
+          class="filter form-control col-12 col-md-5 mt-2 mt-md-0"
           @change="onFilterChange"
         >
           <option value="">
@@ -49,13 +49,13 @@
       </template>
       <template v-else-if="!isLogged &amp;&amp; !isIndex">
         <span
-          class="badge badge-info col-md-6 d-flex align-items-center justify-content-center"
+          class="badge badge-info text-wrap p-2 mt-2 mt-lg-0 d-flex align-items-center"
           >{{ T.mustLoginToFilterUsers }}</span
         >
       </template>
       <template v-else-if="!isIndex">
         <span
-          class="badge badge-info col-md-6 d-flex align-items-center justify-content-center"
+          class="badge badge-info text-wrap p-2 mt-2 mt-lg-0 d-flex align-items-center"
           >{{ T.mustUpdateBasicInfoToFilterUsers }}</span
         >
       </template>
@@ -202,6 +202,6 @@ export default class UserRank extends Vue {
 }
 
 .column-width {
-  max-width: 1rem;
+  max-width: 4rem;
 }
 </style>

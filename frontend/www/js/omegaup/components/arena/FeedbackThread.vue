@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!saved" class="form-group" @keydown="onHandleKeyDown">
+  <div v-if="!currentSaved" class="form-group" @keydown="onHandleKeyDown">
     <input
       v-if="!isSelectedNewFeedback"
       class="form-control"
@@ -9,6 +9,11 @@
     />
     <div v-else class="card">
       <div class="card-header">
+        <omegaup-user-username
+          :classname="currentFeedbackThread.authorClassname"
+          :username="currentFeedbackThread.author"
+          :linkify="true"
+        ></omegaup-user-username>
         <button
           class="close btn-sm"
           type="button"
@@ -20,7 +25,7 @@
       <div class="card-body">
         <textarea
           ref="feedback-thread-form"
-          v-model="currentFeedback.text"
+          v-model="currentFeedbackThread.text"
           :placeholder="T.runDetailsFeedbackThreadPlaceholder"
           class="w-100"
         ></textarea>
@@ -29,7 +34,7 @@
         <div class="form-group my-2">
           <button
             data-button-submit
-            :disabled="!currentFeedback.text"
+            :disabled="!currentFeedbackThread.text"
             class="btn btn-primary mx-2"
             @click.prevent="onSubmitFeedback"
           >
@@ -47,10 +52,17 @@
     </div>
   </div>
   <div v-else class="card">
-    <div class="card-header"></div>
+    <div class="card-header">
+      <omegaup-user-username
+        :classname="currentFeedbackThread.authorClassname"
+        :username="currentFeedbackThread.author"
+        :linkify="true"
+      ></omegaup-user-username>
+      {{ currentFeedbackThreadTimestamp }}
+    </div>
     <div class="card-body">
       <omegaup-markdown
-        :markdown="currentFeedback.text"
+        :markdown="currentFeedbackThread.text"
         :full-width="true"
       ></omegaup-markdown>
     </div>
@@ -71,16 +83,23 @@ import { ArenaCourseFeedback, FeedbackStatus } from './Feedback.vue';
     'omegaup-user-username': user_Username,
   },
 })
-export default class Feedback extends Vue {
-  @Prop() feedback!: ArenaCourseFeedback;
+export default class FeedbackThread extends Vue {
+  @Prop() feedbackThread!: ArenaCourseFeedback;
+  @Prop({ default: false }) saved!: boolean;
   @Ref('feedback-thread-form') feedbackThreadForm!: HTMLTextAreaElement;
 
   FeedbackStatus = FeedbackStatus;
   T = T;
   time = time;
-  saved = false;
-  currentFeedback = this.feedback;
+  currentSaved = this.saved;
+  currentFeedbackThread = this.feedbackThread;
   isSelectedNewFeedback = false;
+
+  get currentFeedbackThreadTimestamp(): string {
+    return time.formatDateTimeLocal(
+      this.currentFeedbackThread.timestamp ?? new Date(),
+    );
+  }
 
   onHandleKeyDown(event: KeyboardEvent) {
     if (event.key === 'Escape') {
@@ -89,12 +108,12 @@ export default class Feedback extends Vue {
   }
 
   onSubmitFeedback() {
-    this.saved = true;
-    this.$emit('submit-feedback-thread', this.currentFeedback);
+    this.currentSaved = true;
+    this.$emit('submit-feedback-thread', this.currentFeedbackThread);
   }
 
   onDeleteFeedbackThread() {
-    this.currentFeedback.text = '';
+    this.currentFeedbackThread.text = '';
     this.isSelectedNewFeedback = false;
   }
 
