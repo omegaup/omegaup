@@ -4,7 +4,8 @@ namespace OmegaUp;
 
 /**
  * @psalm-type AssociatedIdentity=array{default: bool, username: string}
- * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>}
+ * @psalm-type ApiToken=array{name: string, timestamp: \OmegaUp\Timestamp, last_used: \OmegaUp\Timestamp, rate_limit: array{reset: \OmegaUp\Timestamp, limit: int, remaining: int}}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>, apiTokens: list<ApiToken>}
  * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
  * @psalm-type RenderCallbackPayload=array{templateProperties: array{fullWidth?: bool, hideFooterAndHeader?: bool, payload: array<string, mixed>, scripts?: list<string>, title: \OmegaUp\TranslationString}, entrypoint: string, inContest?: bool, navbarSection?: string}
  */
@@ -105,11 +106,18 @@ class UITools {
         ];
     }
 
-    public static function getFormattedGravatarURL(
+    private static function getFormattedGravatarURL(
         string $hashedEmail,
         string $size
     ): string {
         return "https://secure.gravatar.com/avatar/{$hashedEmail}?s={$size}";
+    }
+
+    public static function hasVisitedSection(string $section): bool {
+        if (!isset($_COOKIE[$section])) {
+            return false;
+        }
+        return boolval($_COOKIE[$section]);
     }
 
     private static function shouldReportToAnalytics(): bool {
@@ -152,6 +160,7 @@ class UITools {
             'user' => $user,
             'is_admin' => $isAdmin,
             'associated_identities' => $associatedIdentities,
+            'api_tokens' => $apiTokens,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
         return [
             'omegaUpLockDown' => boolval(OMEGAUP_LOCKDOWN),
@@ -180,6 +189,7 @@ class UITools {
             'currentName' => !is_null($identity) ? $identity->name : null,
             'currentEmail' => $email ?? '',
             'associatedIdentities' => $associatedIdentities,
+            'apiTokens' => $apiTokens,
             'userClassname' => $userClassname,
             'userCountry' => (!is_null(
                 $identity

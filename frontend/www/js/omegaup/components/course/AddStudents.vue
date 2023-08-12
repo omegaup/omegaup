@@ -33,6 +33,7 @@
           <label>{{ T.wordsMultipleUser }}</label>
           <textarea
             v-model="participants"
+            data-course-multiple-students-add
             class="form-control pariticipants"
             rows="4"
           ></textarea>
@@ -63,7 +64,7 @@
         </thead>
         <tbody>
           <tr v-for="student in students" :key="student.username">
-            <td>
+            <td data-uploaded-students>
               <a :href="studentProgressUrl(student)">{{
                 student.name || student.username
               }}</a>

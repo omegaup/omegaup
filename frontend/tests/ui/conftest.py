@@ -251,6 +251,14 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
         self._wait_for_page_loaded()
 
+        elements = self.browser.find_elements(
+            By.XPATH,
+            '//a[contains(concat(" ", normalize-space(@class), " "), " '
+            'introjs-skipbutton ")]')
+
+        if len(elements) > 0:
+            elements[0].click()
+
         self.browser.find_element(By.NAME,
                                   'login_username').send_keys(username)
         self.browser.find_element(By.NAME,
@@ -295,6 +303,14 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 EC.element_to_be_clickable(
                     (By.XPATH,
                      '//a[contains(@href, "/login/")]'))).click()
+
+        elements = self.browser.find_elements(
+            By.XPATH,
+            '//a[contains(concat(" ", normalize-space(@class), " "), " '
+            'introjs-skipbutton ")]')
+
+        if len(elements) > 0:
+            elements[0].click()
 
         # Login screen
         self.browser.find_element(By.NAME, 'reg_username').send_keys(user)

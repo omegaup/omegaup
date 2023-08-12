@@ -1,6 +1,12 @@
 <template>
-  <div class="mb-3">
-    <form action="/problem/" method="GET" class="form-inline">
+  <div
+    class="card-header d-flex justify-content-between align-items-center container-lg"
+  >
+    <form
+      action="/problem/"
+      method="GET"
+      class="form-inline d-flex justify-content-center align-items-center flex-wrap form-mobile"
+    >
       <div v-if="tags.length !== 0" class="form-group mr-2">
         <div v-for="tag in tags" :key="tag" class="mr-1">
           <input type="hidden" name="tag[]" :value="tag" />
@@ -12,7 +18,7 @@
           <font-awesome-icon :icon="['fas', 'times']" />
         </a>
       </div>
-      <div class="form-group mr-2 mt-1">
+      <div class="form-group mr-2">
         <omegaup-common-typeahead
           :only-existing-tags="false"
           :max-results="10"
@@ -26,13 +32,13 @@
         ></omegaup-common-typeahead>
         <input type="hidden" name="query" :value="currentKeywordValue" />
       </div>
-      <div class="form-group mr-2 mt-1">
+      <div class="form-group mr-2">
         <label>
           {{ T.wordsFilterByLanguage }}
           <select
             v-model="currentLanguage"
             name="language"
-            class="ml-1 form-control"
+            class="ml-2 form-control"
           >
             <option
               v-for="language in languages"
@@ -45,10 +51,17 @@
         </label>
       </div>
       <input
-        class="btn btn-primary mt-1"
+        class="btn btn-primary mr-2 button-mobile"
         type="submit"
         :value="T.wordsSearch"
       />
+      <button
+        class="btn btn-primary ml-2 align-self-center form-control"
+        type="button"
+        @click="$emit('show-finder-wizard')"
+      >
+        {{ T.wizardLinkText }}
+      </button>
     </form>
   </div>
 </template>
@@ -99,6 +112,19 @@ export default class ProblemSearchBar extends Vue {
 .form-group {
   label {
     font-weight: bold;
+  }
+}
+.card-header {
+  border: 1px solid var(--header-problem-card-color);
+  border-bottom: none;
+}
+
+@media (max-width: 576px) {
+  .button-mobile {
+    margin-left: 1rem;
+  }
+  .form-control {
+    margin-left: 0 !important;
   }
 }
 </style>

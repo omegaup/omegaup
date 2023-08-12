@@ -13,6 +13,12 @@ export interface GroupOptions {
   groupDescription: string;
 }
 
+export interface TeamGroupOptions {
+  groupTitle: string;
+  groupDescription: string;
+  noOfContestants: string;
+}
+
 export interface ProblemOptions {
   problemAlias: string;
   tag: string;
@@ -46,6 +52,9 @@ export interface ContestOptions {
   startDate: Date;
   endDate: Date;
   showScoreboard?: boolean;
+  scoreBoardVisibleTime?: string;
+  differentStart?: boolean;
+  differentStartTime?: string;
   scoreMode: ScoreMode;
   basicInformation?: boolean;
   requestParticipantInformation?: RequestParticipantInformation;

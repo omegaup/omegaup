@@ -9,7 +9,19 @@ describe('CourseClarifications.vue', () => {
     const wrapper = mount(course_Clarifications, {
       propsData: {
         isAdmin: true,
-        clarifications: [] as types.Clarification[],
+        clarifications: [
+          {
+            answer: '',
+            author: 'omegaUp',
+            clarification_id: 1,
+            message: 'Clarificación de prueba 1',
+            assignment_alias: 'Tarea de prueba',
+            problem_alias: 'Problema de prueba',
+            public: false,
+            receiver: '',
+            time: new Date(),
+          },
+        ] as types.Clarification[],
         pagerItems: [
           {
             label: '«',
@@ -32,7 +44,7 @@ describe('CourseClarifications.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(T.wordsHomework);
-    expect(wrapper.text()).toContain(T.wordsProblem);
+    expect(wrapper.text()).toContain(T.clarificationHomework);
+    expect(wrapper.text()).toContain(T.clarificationProblem);
   });
 });

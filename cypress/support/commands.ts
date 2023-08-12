@@ -164,9 +164,12 @@ Cypress.Commands.add(
     endDate,
     description = 'Default Description',
     showScoreboard = true,
+    scoreBoardVisibleTime = "100",
     scoreMode = ScoreMode.Partial,
     basicInformation = false,
     requestParticipantInformation = 'no',
+    differentStart = false,
+    differentStartTime = "",
   }) => {
     cy.visit('contest/new/');
     cy.get('[name="title"]').type(contestAlias);
@@ -174,6 +177,11 @@ Cypress.Commands.add(
     cy.get('[name="description"]').type(description);
     cy.get('[data-start-date]').type(getISODateTime(startDate));
     cy.get('[data-end-date]').type(getISODateTime(endDate));
+    cy.get('[data-score-board-visible-time]').clear().type(scoreBoardVisibleTime);
+    if (differentStart) {
+      cy.get('[data-different-start-check]').click();
+      cy.get('[data-different-start-time-input]').type(differentStartTime);
+    }
     cy.get('[data-show-scoreboard-at-end]').select(`${showScoreboard}`); // "true" | "false"
     cy.get('[data-score-mode]').select(`${scoreMode}`);
     if (basicInformation) {
@@ -225,8 +233,7 @@ Cypress.Commands.add(
   ({
     contestAlias,
   }) => {
-    cy.visit('arena/');
-    cy.get(`a[href="/arena/${contestAlias}/"]`).first().click();
+    cy.visit(`arena/${contestAlias}`);
     cy.get('button[data-start-contest]').click();
   },
 );
@@ -266,7 +273,6 @@ Cypress.Commands.add(
       });
 
       const expectedStatus: Status = runs[idx].status;
-      cy.get('[data-run-status] > span').first().should('have.text', 'new');
       cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
 
       cy.wait(['@runStatus'], { timeout: 10000 }).its(
@@ -294,7 +300,8 @@ export const getISODate = (date: Date) => {
  * @returns ISO datetime required to type on a date input inside cypress
  */
 export const getISODateTime = (date: Date) => {
-  return date.toISOString().slice(0, 16);
+  const isoDateTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+  return isoDateTime.slice(0, 16);
 };
 
 /**

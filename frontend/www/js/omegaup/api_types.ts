@@ -55,6 +55,24 @@ export namespace dao {
     username?: string;
   }
 
+  export interface SubmissionFeedback {
+    date?: Date;
+    feedback?: string;
+    identity_id?: number;
+    range_bytes_end?: number;
+    range_bytes_start?: number;
+    submission_feedback_id?: number;
+    submission_id?: number;
+  }
+
+  export interface SubmissionFeedbackThread {
+    contents?: string;
+    date?: Date;
+    identity_id?: number;
+    submission_feedback_id?: number;
+    submission_feedback_thread_id?: number;
+  }
+
   export interface Users {
     birth_date?: string;
     creation_timestamp?: Date;
@@ -184,6 +202,20 @@ export namespace types {
                       )
                         x.feedback = ((x) => {
                           x.date = ((x: number) => new Date(x * 1000))(x.date);
+                          if (
+                            typeof x.feedback_thread !== 'undefined' &&
+                            x.feedback_thread !== null
+                          )
+                            x.feedback_thread = ((x) => {
+                              if (!Array.isArray(x)) {
+                                return x;
+                              }
+                              return x.map((x) => {
+                                x.timestamp = ((x: number) =>
+                                  new Date(x * 1000))(x.timestamp);
+                                return x;
+                              });
+                            })(x.feedback_thread);
                           return x;
                         })(x.feedback);
                       return x;
@@ -405,8 +437,26 @@ export namespace types {
     export function CommonPayload(
       elementId: string = 'payload',
     ): types.CommonPayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
+      return ((x) => {
+        x.apiTokens = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.last_used = ((x: number) => new Date(x * 1000))(x.last_used);
+            x.rate_limit = ((x) => {
+              x.reset = ((x: number) => new Date(x * 1000))(x.reset);
+              return x;
+            })(x.rate_limit);
+            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+            return x;
+          });
+        })(x.apiTokens);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -877,6 +927,20 @@ export namespace types {
                                 x.date = ((x: number) => new Date(x * 1000))(
                                   x.date,
                                 );
+                                if (
+                                  typeof x.feedback_thread !== 'undefined' &&
+                                  x.feedback_thread !== null
+                                )
+                                  x.feedback_thread = ((x) => {
+                                    if (!Array.isArray(x)) {
+                                      return x;
+                                    }
+                                    return x.map((x) => {
+                                      x.timestamp = ((x: number) =>
+                                        new Date(x * 1000))(x.timestamp);
+                                      return x;
+                                    });
+                                  })(x.feedback_thread);
                                 return x;
                               })(x.feedback);
                             return x;
@@ -1857,6 +1921,21 @@ export namespace types {
                     )
                       x.feedback = ((x) => {
                         x.date = ((x: number) => new Date(x * 1000))(x.date);
+                        if (
+                          typeof x.feedback_thread !== 'undefined' &&
+                          x.feedback_thread !== null
+                        )
+                          x.feedback_thread = ((x) => {
+                            if (!Array.isArray(x)) {
+                              return x;
+                            }
+                            return x.map((x) => {
+                              x.timestamp = ((x: number) => new Date(x * 1000))(
+                                x.timestamp,
+                              );
+                              return x;
+                            });
+                          })(x.feedback_thread);
                         return x;
                       })(x.feedback);
                     return x;
@@ -2366,6 +2445,13 @@ export namespace types {
     };
   }
 
+  export interface ApiToken {
+    last_used: Date;
+    name: string;
+    rate_limit: { limit: number; remaining: number; reset: Date };
+    timestamp: Date;
+  }
+
   export interface ArenaAssignment {
     alias?: string;
     assignment_type: string;
@@ -2675,6 +2761,7 @@ export namespace types {
   }
 
   export interface CommonPayload {
+    apiTokens: types.ApiToken[];
     associatedIdentities: types.AssociatedIdentity[];
     currentEmail: string;
     currentName?: string;
@@ -3211,7 +3298,14 @@ export namespace types {
 
   export interface CourseRun {
     contest_score?: number;
-    feedback?: types.SubmissionFeedback;
+    feedback?: {
+      author: string;
+      author_classname: string;
+      date: Date;
+      feedback: string;
+      range_bytes_end?: number;
+      range_bytes_start?: number;
+    };
     guid: string;
     language: string;
     memory: number;
@@ -3280,6 +3374,7 @@ export namespace types {
 
   export interface CurrentSession {
     apiTokenId?: number;
+    api_tokens: types.ApiToken[];
     associated_identities: types.AssociatedIdentity[];
     auth_token?: string;
     cacheKey?: string;
@@ -3541,6 +3636,7 @@ export namespace types {
 
   export interface LoginDetailsPayload {
     facebookUrl?: string;
+    hasVisitedSection?: boolean;
     statusError?: string;
     validateRecaptcha: boolean;
     verifyEmailSuccessfully?: string;
@@ -4462,8 +4558,18 @@ export namespace types {
     author_classname: string;
     date: Date;
     feedback: string;
+    feedback_thread?: types.SubmissionFeedbackThread[];
     range_bytes_end?: number;
     range_bytes_start?: number;
+    submission_feedback_id: number;
+  }
+
+  export interface SubmissionFeedbackThread {
+    author: string;
+    authorClassname: string;
+    submission_feedback_thread_id: number;
+    text: string;
+    timestamp: Date;
   }
 
   export interface SubmissionsListPayload {
@@ -5354,6 +5460,9 @@ export namespace messages {
   export type RunDetailsResponse = types.RunDetails;
   export type RunDisqualifyRequest = { [key: string]: any };
   export type RunDisqualifyResponse = {};
+  export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
+  export type _RunGetSubmissionFeedbackServerResponse = any;
+  export type RunGetSubmissionFeedbackResponse = types.SubmissionFeedback[];
   export type RunListRequest = { [key: string]: any };
   export type _RunListServerResponse = any;
   export type RunListResponse = { runs: types.Run[]; totalRuns: number };
@@ -5402,6 +5511,7 @@ export namespace messages {
 
   // Session
   export type SessionCurrentSessionRequest = { [key: string]: any };
+  export type _SessionCurrentSessionServerResponse = any;
   export type SessionCurrentSessionResponse = {
     session?: types.CurrentSession;
     time: number;
@@ -5409,7 +5519,10 @@ export namespace messages {
 
   // Submission
   export type SubmissionSetFeedbackRequest = { [key: string]: any };
-  export type SubmissionSetFeedbackResponse = {};
+  export type SubmissionSetFeedbackResponse = {
+    submissionFeedback?: dao.SubmissionFeedback;
+    submissionFeedbackThread?: dao.SubmissionFeedbackThread;
+  };
 
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
@@ -5506,14 +5619,7 @@ export namespace messages {
   export type UserListResponse = { results: types.ListItem[] };
   export type UserListAPITokensRequest = { [key: string]: any };
   export type _UserListAPITokensServerResponse = any;
-  export type UserListAPITokensResponse = {
-    tokens: {
-      last_used: Date;
-      name: string;
-      rate_limit: { limit: number; remaining: number; reset: Date };
-      timestamp: Date;
-    }[];
-  };
+  export type UserListAPITokensResponse = { tokens: types.ApiToken[] };
   export type UserListAssociatedIdentitiesRequest = { [key: string]: any };
   export type UserListAssociatedIdentitiesResponse = {
     identities: types.AssociatedIdentity[];
@@ -6132,6 +6238,9 @@ export namespace controllers {
     disqualify: (
       params?: messages.RunDisqualifyRequest,
     ) => Promise<messages.RunDisqualifyResponse>;
+    getSubmissionFeedback: (
+      params?: messages.RunGetSubmissionFeedbackRequest,
+    ) => Promise<messages.RunGetSubmissionFeedbackResponse>;
     list: (
       params?: messages.RunListRequest,
     ) => Promise<messages.RunListResponse>;

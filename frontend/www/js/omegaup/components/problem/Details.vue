@@ -122,6 +122,7 @@
               v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
               :data="currentRunDetailsData"
               :feedback-map="feedbackMap"
+              :feedback-thread-map="feedbackThreadMap"
               @dismiss="onPopupDismissed"
             >
               <template #feedback="data">
@@ -172,12 +173,17 @@
           </template>
         </omegaup-overlay>
         <template v-if="problem.accepts_submissions">
-          <omegaup-arena-ephemeral-grader
-            v-if="!problem.karel_problem"
-            :problem="problem"
-            :can-submit="user.loggedIn && !inContestOrCourse"
-            :accepted-languages="filteredLanguages"
-          ></omegaup-arena-ephemeral-grader>
+          <div class="d-none d-sm-block">
+            <omegaup-arena-ephemeral-grader
+              v-if="!problem.karel_problem"
+              :problem="problem"
+              :can-submit="user.loggedIn && !inContestOrCourse"
+              :accepted-languages="filteredLanguages"
+            ></omegaup-arena-ephemeral-grader>
+          </div>
+          <div class="bg-white text-center p-4 d-sm-none border">
+            {{ T.ephemeralGraderAlert }}
+          </div>
           <omegaup-arena-runs
             :problem-alias="problem.alias"
             :contest-alias="contestAlias"
@@ -272,9 +278,6 @@
           @clarification-response="onClarificationResponse"
         >
           <template #new-clarification><div></div></template>
-          <template #table-title>
-            <th class="text-center" scope="col">{{ T.wordsContest }}</th>
-          </template>
         </omegaup-arena-clarification-list>
       </div>
     </div>
@@ -396,6 +399,8 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) requestFeedback!: boolean;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackMap!: Map<number, ArenaCourseFeedback>;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
