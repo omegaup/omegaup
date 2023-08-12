@@ -43,7 +43,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="rank in scoreboard" :key="rank.username" :class = "rank.username">
+            <tr
+              v-for="rank in scoreboard"
+              :key="rank.username"
+              :class="rank.username"
+            >
               <th>{{ rank.place }}</th>
               <th>
                 <div class="username" data-test-merged-username>

@@ -117,33 +117,14 @@ export class CoursePage {
     cy.get('input[name="show-scoreboard"][value="true"]')
       .should('be.visible')
       .click();
-    cy.get('[name="unlimited-duration"]')
-      .eq(courseOptions.unlimitedDuration ? 0 : 1)
-      .click();
-    cy.get('[name="basic-information"]')
-      .eq(courseOptions.basicInformation ? 0 : 1)
-      .click();
-    if(courseOptions.requestParticipantInformation != undefined) {
-      cy.get('[data-course-participant-information]').select(
-        courseOptions.requestParticipantInformation,
-      );
-    }
-    if (courseOptions.problemLevel != undefined) {
-      cy.get('[data-course-problem-level]').select(courseOptions.problemLevel);
-    }
-    if (courseOptions.objective != undefined) {
-      cy.get('[data-course-objective]').type(courseOptions.objective);
-    }
     if (courseOptions.school != undefined)
       cy.get('.tags-input input[type="text"]')
         .first()
         .type(courseOptions.school);
     cy.get('.typeahead-dropdown li').first().click();
-    if (courseOptions.description != undefined) {
-      cy.get('textarea[data-course-new-description]')
-        .should('be.visible')
-        .type(courseOptions.description);
-    }
+    cy.get('textarea[data-course-new-description]')
+      .should('be.visible')
+      .type('course description');
     cy.get('form[data-course-form]').submit();
     cy.url().should('include', `/course/${courseOptions.courseAlias}/edit/`);
   }
@@ -413,7 +394,7 @@ export class CoursePage {
       .should('be.checked');
     cy.get('[name="start-date"]').should(
       'have.value',
-      getISODate(addSubtractDaysToDate(courseOptions.startDate, { days: 1 })),
+      getISODate(courseOptions.startDate),
     );
     cy.get('[name="unlimited-duration"]')
       .eq(courseOptions.unlimitedDuration ? 0 : 1)

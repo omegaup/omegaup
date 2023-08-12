@@ -17,7 +17,7 @@ describe('Basic Commands Test', () => {
 
     cy.login(loginOptions[0]);
     courseOptions.unlimitedDuration = true;
-    coursePage.createCourse(courseOptions);
+    cy.createCourse(courseOptions);
     coursePage.verifyCourseOptions(courseOptions);
     cy.logout();
   });
@@ -27,7 +27,7 @@ describe('Basic Commands Test', () => {
     const courseOptions = coursePage.generateCourseOptions();
 
     cy.login(loginOptions[0]);
-    coursePage.createCourse(courseOptions);
+    cy.createCourse(courseOptions);
     coursePage.verifyCourseOptions(courseOptions);
     cy.logout();
   });

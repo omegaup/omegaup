@@ -30,6 +30,7 @@ export class LoginPage {
 
   registerSingleUser(loginOptions: LoginOptions): void {
     cy.get('[data-login-button]').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('[data-signup-username]').type(loginOptions.username);
     cy.get('[data-signup-password]').type(loginOptions.password);
     cy.get('[data-signup-repeat-password]').type(loginOptions.password);
@@ -46,6 +47,7 @@ export class LoginPage {
 
   loginByGUI(loginOptions: LoginOptions): void {
     cy.get('[data-login-button]').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('[data-login-username]').type(loginOptions.username);
     cy.get('[data-login-password]').type(loginOptions.password);
     cy.get('[data-login-submit]').click();
