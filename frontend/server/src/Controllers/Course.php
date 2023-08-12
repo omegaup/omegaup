@@ -3682,12 +3682,12 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                     'is_admin' => true,
                     'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+                    'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
+                        'has-visited-create-course'
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCourseNew'
-                ),
-                'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
-                    'has-visited-create-course'
                 ),
             ],
             'entrypoint' => 'course_new',
