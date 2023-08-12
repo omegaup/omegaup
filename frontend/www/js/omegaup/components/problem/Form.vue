@@ -36,7 +36,7 @@
             </div>
             <div class="collapse show card-body px-2 px-sm-4 basic-info">
               <div class="row">
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 introjs-title">
                   <label class="control-label">{{ T.wordsTitle }}</label>
                   <input
                     v-model="title"
@@ -48,7 +48,7 @@
                     @blur="onGenerateAlias"
                   />
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 introjs-short-title">
                   <label class="control-label">{{ T.wordsAlias }}</label>
                   <input
                     ref="alias"
@@ -65,7 +65,7 @@
                 </div>
               </div>
               <div class="row">
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 introjs-origin">
                   <label class="control-label">{{ T.problemEditSource }}</label>
                   <input
                     v-model="source"
@@ -76,7 +76,7 @@
                     :class="{ 'is-invalid': errors.includes('source') }"
                   />
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 introjs-file">
                   <label class="control-label">{{
                     T.problemEditFormFile
                   }}</label>
@@ -163,7 +163,7 @@
             </div>
             <div class="card-body px-2 px-sm-4 validation">
               <div class="row">
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 introjs-type">
                   <label>{{ T.problemEditFormLanguages }}</label>
                   <select
                     v-model="currentLanguages"
@@ -181,7 +181,7 @@
                     </option>
                   </select>
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 introjs-validator">
                   <label>{{ T.problemEditFormValidatorType }}</label>
                   <select
                     v-model="validator"
@@ -219,7 +219,7 @@
                 </button>
               </h2>
             </div>
-            <div class="collapse card-body px-2 px-sm-4 limits">
+            <div class="collapse card-body px-2 px-sm-4 limits introjs-public-tags">
               <omegaup-problem-settings
                 :errors="errors"
                 :current-languages="currentLanguages"
@@ -451,6 +451,10 @@ import problem_Tags from './Tags.vue';
 import T from '../../lang';
 import latinize from 'latinize';
 import { types } from '../../api_types';
+import 'intro.js/introjs.css';
+import introJs from 'intro.js';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 @Component({
   components: {
@@ -463,6 +467,7 @@ export default class ProblemForm extends Vue {
   @Prop({ default: () => [] }) errors!: string[];
   @Prop({ default: false }) isUpdate!: boolean;
   @Prop({ default: 0 }) originalVisibility!: number;
+  @Prop() hasVisitedSection!: boolean;
 
   @Ref('basic-info') basicInfoRef!: HTMLDivElement;
   @Ref('tags') tagsRef!: HTMLDivElement;
@@ -496,6 +501,75 @@ export default class ProblemForm extends Vue {
   validLanguages = this.data.validLanguages;
   validatorTypes = this.data.validatorTypes;
   currentLanguages = this.data.languages;
+
+  mounted() {
+    const title = T.createProblemInteractiveGuideTitle;
+    if (!this.hasVisitedSection) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title,
+              intro: T.createProblemInteractiveGuideWelcome,
+            },
+            {
+              element: document.querySelector('.introjs-title') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideProblemTitle,
+            },
+            {
+              element: document.querySelector('.introjs-short-title') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideShortTitle,
+            },
+            {
+              element: document.querySelector('.introjs-origin') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideOrigin,
+            },
+            {
+              element: document.querySelector('.introjs-file') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideFile,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-public-tags',
+              ) as Element,
+              title,
+              intro: T.createProblemInteractiveGuidePublicTags,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-private-tags',
+              ) as Element,
+              title,
+              intro: T.createProblemInteractiveGuidePrivateTags,
+            },
+            {
+              element: document.querySelector('.introjs-level') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideLevel,
+            },
+            {
+              element: document.querySelector('.introjs-type') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideType,
+            },
+            {
+              element: document.querySelector('.introjs-validator') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideValidator,
+            },
+          ],
+        })
+        .start();
+      this.$cookies.set('has-visited-create-problem', true, -1);
+    }
+  }
 
   get howToWriteProblemLink(): string {
     return 'https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup';
