@@ -4,6 +4,7 @@
 
 import os
 import sys
+import typing
 
 # pylint indicates pytest_mock should be placed before "import mysql.connector"
 import contest_callback
@@ -50,8 +51,45 @@ class ContestsCallbackForTesting:
         channel.close()
 
 
-def test_client_contest() -> None:
-    '''Basic test for client contest queue.'''
+def reset_rabbitmq_state() -> None:
+    '''
+
+    Establish a connection to RabbitMQ management API in order to delete the
+    queue.
+
+    '''
+    connection = pika.BlockingConnection(pika.ConnectionParameters(
+        host=test_credentials.RABBITMQ_HOST,
+        port=5672,
+        virtual_host='/',
+        credentials=pika.PlainCredentials(test_credentials.OMEGAUP_USERNAME,
+                                          test_credentials.MYSQL_PASSWORD),
+        heartbeat=600,
+        # mypy does not support structural typing yet
+        # https://github.com/python/mypy/issues/3186
+        blocked_connection_timeout=300.0,  # type: ignore
+    ))
+    channel = connection.channel()
+
+    channel.queue_delete(queue='contest')
+
+    connection.close()
+
+
+@pytest.fixture(scope='function')
+def reset_rabbitmq() -> typing.Callable:
+    ''' Function to reset the rabbitMQ connection '''
+    def reset() -> None:
+        reset_rabbitmq_state()
+    return reset
+
+
+# pylint: disable=redefined-outer-name
+def test_client_contest(reset_rabbitmq: typing.Callable) -> None:
+    ''' Basic test for client contest queue. '''
+
+    reset_rabbitmq()
+
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
             user=test_credentials.MYSQL_USER,
@@ -103,7 +141,6 @@ def test_client_contest() -> None:
         assert count['count'] > 0
 
 
-@pytest.mark.skip(reason="Disabled temporarily because it's flaky")
 def test_client_contest_with_mocked_codes(
         mocker: pytest_mock.MockerFixture
 ) -> None:
@@ -158,7 +195,6 @@ def test_client_contest_with_mocked_codes(
         assert spy.call_count == 4
 
 
-@pytest.mark.skip(reason="Disabled temporarily because it's flaky")
 def test_client_contest_with_duplicated_codes(
         mocker: pytest_mock.MockerFixture
 ) -> None:
