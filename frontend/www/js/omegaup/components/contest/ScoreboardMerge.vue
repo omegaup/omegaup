@@ -5,7 +5,7 @@
     </div>
     <div class="card-body">
       <div class="row align-items-center">
-        <div class="form-group col-md-9">
+        <div class="form-group col-md-9" data-merge-contest-name>
           <label>{{ T.wordsContest }}:</label>
           <multiselect
             :value="selectedContests"
@@ -20,6 +20,7 @@
         </div>
         <div class="form-group col-md-3 text-right">
           <button
+            data-merge-contest-button
             class="btn btn-primary"
             type="button"
             :disabled="!selectedContests.length"
@@ -42,10 +43,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="rank in scoreboard" :key="rank.username">
+            <tr
+              v-for="rank in scoreboard"
+              :key="rank.username"
+              :class="rank.username"
+            >
               <th>{{ rank.place }}</th>
               <th>
-                <div class="username">
+                <div class="username" data-test-merged-username>
                   {{ rank.username }}
                 </div>
                 <div class="name">
@@ -63,7 +68,7 @@
                   ({{ rank.contests[alias].penalty }})
                 </span>
               </th>
-              <th class="numeric" colspan="2">
+              <th class="numeric" colspan="2" data-total-merged-score>
                 {{ rank.total.points }}
                 <span v-if="showPenalty" class="scoreboard-penalty">
                   ({{ rank.total.penalty }})
