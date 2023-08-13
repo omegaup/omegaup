@@ -89,7 +89,6 @@ describe('Contest Test', () => {
     cy.get('[data-table-scoreboard]').should('be.visible');
     cy.get('[data-table-scoreboard-username]').should('have.length', 1);
     cy.get('.points').should('contain', '+100.00');
-    cy.pause();
     cy.logout();
   });
 

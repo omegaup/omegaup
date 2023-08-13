@@ -120,7 +120,6 @@ export class ProfilePage {
     cy.get('[data-school-name]').click();
     cy.get('[data-school-name]').type(schoolDetails.name);
     cy.get('.tags-input-typeahead-item-highlighted-default').first().click();
-    cy.pause();
     cy.get('[data-school-grade]').select(schoolDetails.grade);
     if (schoolDetails.enrolledStatus) {
       cy.get('[type="radio"]').check('true');
@@ -131,7 +130,6 @@ export class ProfilePage {
       );
     }
     cy.get('[data-save-school-changes]').click();
-    cy.pause();
   }
 
   verifySchoolDetails(schoolDetails: SchoolDetails): void {
