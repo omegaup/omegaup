@@ -55,7 +55,7 @@ describe('Navigation Test', () => {
     cy.logout();
   });
 
-  it.only('Should update school', () => {
+  it('Should update school', () => {
     const loginOptions = loginPage.registerMultipleUsers(1);
     const schoolDetails: SchoolDetails = {
       name: 'MIT',
