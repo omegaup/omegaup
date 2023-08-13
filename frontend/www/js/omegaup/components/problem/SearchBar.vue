@@ -20,6 +20,7 @@
       </div>
       <div class="form-group mr-2">
         <omegaup-common-typeahead
+          data-problem-keyword-search
           :only-existing-tags="false"
           :max-results="10"
           :existing-options="searchResultProblems"
@@ -37,6 +38,7 @@
           {{ T.wordsFilterByLanguage }}
           <select
             v-model="currentLanguage"
+            data-filter-language
             name="language"
             class="ml-2 form-control"
           >
@@ -51,6 +53,7 @@
         </label>
       </div>
       <input
+        data-filter-submit-button
         class="btn btn-primary mr-2 button-mobile"
         type="submit"
         :value="T.wordsSearch"
