@@ -37,8 +37,8 @@
         <label>
           {{ T.wordsFilterByLanguage }}
           <select
-            data-filter-language
             v-model="currentLanguage"
+            data-filter-language
             name="language"
             class="ml-2 form-control"
           >
