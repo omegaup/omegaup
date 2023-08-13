@@ -8,7 +8,7 @@ import {
   LoginOptions,
   ProblemOptions,
 } from '../types';
-import { addSubtractDaysToDate } from '../commands';
+import { addSubtractDaysToDate, getISODateTime } from '../commands';
 
 enum ScoreMode {
   AllOrNothing = 'all_or_nothing',
@@ -51,7 +51,6 @@ export class ContestPage {
     });
 
     cy.get('[name="create-identities"]').click();
-    // cy.get('#alert-close').click();
     cy.waitUntil(() => {
       return cy.get('#alert-close').should('not.be.visible');
     });
@@ -222,6 +221,53 @@ export class ContestPage {
   verifySubmissionInPastContest(username: string, contestAlias: string): void {
     cy.visit(`/arena/${contestAlias}/#ranking`);
     cy.get('[data-table-scoreboard-username]').should('contain', username);
+  }
+
+  verifyContestDetails(contestOptions: ContestOptions): void {
+    cy.visit(`/contest/${contestOptions.contestAlias}/edit`);
+    cy.get('[name="title"]').should('have.value', contestOptions.contestAlias);
+    cy.get('[name="alias"]').should('have.value', contestOptions.contestAlias);
+    cy.get('[name="description"]').should(
+      'have.value',
+      contestOptions.description,
+    );
+    cy.get('[data-start-date]').should(
+      'have.value',
+      getISODateTime(contestOptions.startDate),
+    );
+    cy.get('[data-end-date]').type(getISODateTime(contestOptions.endDate));
+    cy.get('[data-show-scoreboard-at-end]').should(
+      'have.value',
+      `${contestOptions.showScoreboard}`,
+    );
+    cy.get('[data-score-mode]').should(
+      'have.value',
+      `${contestOptions.scoreMode}`,
+    );
+    cy.get('[data-basic-information-required]').should(
+      contestOptions.basicInformation ? 'be.checked' : 'not.be.checked',
+    );
+    cy.get('[data-request-user-information]').should(
+      'have.value',
+      contestOptions.requestParticipantInformation,
+    );
+  }
+
+  mergeContests(contestAlias: string[]): void {
+    cy.visit('/scoreboardmerge');
+    cy.get('[data-merge-contest-name]').click();
+    contestAlias.forEach((contestAlias) => {
+      cy.get('[data-merge-contest-name] input').type(contestAlias + '{enter}');
+    });
+    cy.get('[data-merge-contest-button]').click();
+  }
+
+  verifyMergedScoreboard(users: string[]): void {
+    cy.get('[data-test-merged-username]').should('have.length', users.length);
+    cy.get('[data-test-merged-username]').first().should('contain', users[0]);
+    cy.get('[data-test-merged-username]').last().should('contain', users[1]);
+    cy.get('[data-total-merged-score]').first().should('contain', '100');
+    cy.get('[data-total-merged-score]').last().should('contain', '100');
   }
 }
 

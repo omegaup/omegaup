@@ -1,7 +1,7 @@
 import { getISODate } from '../support/commands';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { profilePage } from '../support/pageObjects/profilePage';
-import { UserInformation, UserPreferences } from '../support/types';
+import { SchoolDetails, UserInformation, UserPreferences } from '../support/types';
 
 describe('Navigation Test', () => {
   beforeEach(() => {
@@ -55,20 +55,17 @@ describe('Navigation Test', () => {
     cy.logout();
   });
 
-  // Uncomment this test when this issue is resolved
-  // https://github.com/omegaup/omegaup/issues/7037
+  it.only('Should update school', () => {
+    const loginOptions = loginPage.registerMultipleUsers(1);
+    const schoolDetails: SchoolDetails = {
+      name: 'MIT',
+      grade: 'bachelors',
+      enrolledStatus: true,
+    }
 
-  // it('Should update school', () => {
-  //   const loginOptions = loginPage.registerMultipleUsers(1);
-  //   const schoolDetails: SchoolDetails = {
-  //     name: 'MIT',
-  //     grade: 'bachelors',
-  //     enrolledStatus: true,
-  //   }
-
-  //   cy.login(loginOptions[0]);
-  //   profilePage.updateSchoolDetails(schoolDetails);
-  //   profilePage.verifySchoolDetails(schoolDetails);
-  //   cy.logout();
-  // });
+    cy.login(loginOptions[0]);
+    profilePage.updateSchoolDetails(schoolDetails);
+    profilePage.verifySchoolDetails(schoolDetails);
+    cy.logout();
+  });
 });
