@@ -37,7 +37,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
- * @psalm-type LoginDetailsPayload=array{facebookUrl?: string, statusError?: string, validateRecaptcha: bool, verifyEmailSuccessfully?: string}
+ * @psalm-type LoginDetailsPayload=array{facebookUrl?: string, hasVisitedSection?: bool, statusError?: string, validateRecaptcha: bool, verifyEmailSuccessfully?: string}
  * @psalm-type Experiment=array{config: bool, hash: string, name: string}
  * @psalm-type UserRole=array{name: string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
@@ -2323,18 +2323,21 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $school_id
      * @omegaup-request-param null|string $school_name
      * @omegaup-request-param string $state_id
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
-        if (isset($r['username'])) {
-            \OmegaUp\Validators::validateValidUsername(
-                $r['username'],
-                'username'
-            );
-            $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
-            if ($r['username'] !== $r->identity->username && !is_null($user)) {
+        $username = $r->ensureOptionalString(
+            key: 'username',
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::normalUsername(
+                $username
+            )
+        );
+        if (!is_null($username)) {
+            $user = \OmegaUp\DAO\Users::FindByUsername($username);
+            if ($username !== $r->identity->username && !is_null($user)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                     'usernameInUse'
                 );
@@ -2403,7 +2406,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $newSchoolId = $currentSchoolId;
 
         $schoolId = $r->ensureOptionalInt('school_id');
-        if (!is_null($schoolId)) {
+        if (!is_null($schoolId) && $schoolId !== 0) {
             $school = \OmegaUp\DAO\Schools::getByPK($schoolId);
             if (is_null($school)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -4524,6 +4527,9 @@ class User extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'validateRecaptcha' => boolval(OMEGAUP_VALIDATE_CAPTCHA),
                     'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
+                    'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
+                        'has-visited-signup'
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
             ],
