@@ -127,13 +127,6 @@ class UITools {
         return boolval($_COOKIE['accept_cookies']);
     }
 
-    public static function hasVisitedSection(string $section): bool {
-        if (!isset($_COOKIE[$section])) {
-            return false;
-        }
-        return boolval($_COOKIE[$section]);
-    }
-
     /**
      * @param array<string, mixed> $payload
      * @return array<string, mixed>
