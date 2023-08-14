@@ -29,6 +29,7 @@ describe('FeedbackCodeView.vue', () => {
         language: 'java',
         value: 'This \ncode \nhas \nfour lines;',
         feedbackMap,
+        readonly: false,
       },
     });
 

@@ -80,7 +80,7 @@ export default class Testimonials extends Vue {
 }
 
 .carousel-inner {
-  min-height: 12rem;
+  min-height: 31rem;
 
   .carousel-item {
     blockquote.blockquote {
@@ -91,6 +91,11 @@ export default class Testimonials extends Vue {
         color: wheat;
       }
     }
+  }
+}
+@media only screen and (min-width: 767px) {
+  .carousel-inner {
+    min-height: 12rem;
   }
 }
 </style>
