@@ -119,6 +119,7 @@
                 >
                   {{ T.problemEditTagPublicRequired }}
                 </div>
+                <div class="introjs-tags-and-level">
                 <omegaup-problem-tags
                   :public-tags="data.publicTags"
                   :level-tags="data.levelTags"
@@ -143,6 +144,7 @@
                   :value="problemLevel"
                   type="hidden"
                 />
+                </div>
               </div>
             </div>
           </template>
@@ -541,22 +543,10 @@ export default class ProblemForm extends Vue {
             },
             {
               element: document.querySelector(
-                '.introjs-public-tags',
+                '.introjs-tags-and-level',
               ) as Element,
               title,
-              intro: T.createProblemInteractiveGuidePublicTags,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-private-tags',
-              ) as Element,
-              title,
-              intro: T.createProblemInteractiveGuidePrivateTags,
-            },
-            {
-              element: document.querySelector('.introjs-level') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideLevel,
+              intro: T.createProblemInteractiveGuideTagsAndLevel,
             },
             {
               element: document.querySelector('.introjs-type') as Element,
