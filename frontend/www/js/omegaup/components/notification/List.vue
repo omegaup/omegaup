@@ -15,7 +15,9 @@
         >{{ notifications.length }}</span
       ></a
     >
-    <div class="dropdown-menu dropdown-menu-right notification-dropdown">
+    <div
+      class="dropdown-menu dropdown-menu-right notification-dropdown position-absolute mt-2"
+    >
       <div v-if="notifications.length === 0" class="text-center">
         {{ T.notificationsNoNewNotifications }}
       </div>
@@ -82,7 +84,10 @@ export default class NotificationList extends Vue {
 }
 
 .navbar-expand-lg .navbar-nav .dropdown-menu {
-  width: 35rem;
+  min-width: 84vw;
+  @media only screen and (min-width: 767px) {
+    min-width: 35rem;
+  }
 }
 
 .notification-dropdown {
