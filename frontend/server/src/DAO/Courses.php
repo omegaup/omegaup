@@ -457,7 +457,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * Returns the list of students in a course
      *
-     * @return list<array{name: null|string, username: string}>
+     * @return list<array{name: null|string, username: string, user_id: null|int}>
      */
     public static function getStudentsInCourse(
         int $courseId,
@@ -466,7 +466,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         $sql = '
             SELECT
                 i.username,
-                i.name
+                i.name,
+                i.user_id
             FROM
                 Groups_Identities gi
             INNER JOIN
@@ -474,7 +475,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 gi.group_id = ?';
 
-        /** @var list<array{name: null|string, username: string}> */
+        /** @var list<array{name: null|string, username: string, user_id: null|int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$groupId]
