@@ -93,6 +93,7 @@ export const urlMapping: { key: string; title: string; visible: boolean }[] = [
   { key: 'manage-identities', title: T.profileManageIdentities, visible: true },
   { key: 'manage-api-tokens', title: T.profileManageApiTokens, visible: true },
   { key: 'change-password', title: T.userEditChangePassword, visible: false },
+  { key: 'manage-api-tokens', title: T.profileManageApiTokens, visible: true },
   { key: 'add-password', title: T.userEditAddPassword, visible: false },
   { key: 'change-email', title: T.userEditChangeEmail, visible: false },
   { key: 'delete-account', title: T.userEditDeleteAccount, visible: true },
