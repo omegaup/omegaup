@@ -120,30 +120,30 @@
                   {{ T.problemEditTagPublicRequired }}
                 </div>
                 <div class="introjs-tags-and-level">
-                <omegaup-problem-tags
-                  :public-tags="data.publicTags"
-                  :level-tags="data.levelTags"
-                  :alias="data.alias"
-                  :is-create="true"
-                  :problem-level="problemLevel"
-                  :selected-private-tags="selectedPrivateTags"
-                  :selected-public-tags="selectedPublicTags"
-                  :can-add-new-tags="true"
-                  :errors="errors"
-                  @emit-add-tag="addTag"
-                  @emit-remove-tag="removeTag"
-                  @select-problem-level="selectProblemLevel"
-                ></omegaup-problem-tags>
-                <input
-                  name="selected_tags"
-                  :value="selectedTagsList"
-                  type="hidden"
-                />
-                <input
-                  name="problem_level"
-                  :value="problemLevel"
-                  type="hidden"
-                />
+                  <omegaup-problem-tags
+                    :public-tags="data.publicTags"
+                    :level-tags="data.levelTags"
+                    :alias="data.alias"
+                    :is-create="true"
+                    :problem-level="problemLevel"
+                    :selected-private-tags="selectedPrivateTags"
+                    :selected-public-tags="selectedPublicTags"
+                    :can-add-new-tags="true"
+                    :errors="errors"
+                    @emit-add-tag="addTag"
+                    @emit-remove-tag="removeTag"
+                    @select-problem-level="selectProblemLevel"
+                  ></omegaup-problem-tags>
+                  <input
+                    name="selected_tags"
+                    :value="selectedTagsList"
+                    type="hidden"
+                  />
+                  <input
+                    name="problem_level"
+                    :value="problemLevel"
+                    type="hidden"
+                  />
                 </div>
               </div>
             </div>
@@ -221,9 +221,7 @@
                 </button>
               </h2>
             </div>
-            <div
-              class="collapse card-body px-2 px-sm-4 limits introjs-public-tags"
-            >
+            <div class="collapse card-body px-2 px-sm-4 limits">
               <omegaup-problem-settings
                 :errors="errors"
                 :current-languages="currentLanguages"
@@ -235,6 +233,7 @@
                 :overall-wall-time-limit="overallWallTimeLimit"
                 :validator="validator"
                 :validator-time-limit="validatorTimeLimit"
+                :has-visited-section="hasVisitedSection"
               ></omegaup-problem-settings>
             </div>
           </div>

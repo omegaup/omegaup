@@ -24,6 +24,7 @@ OmegaUp.on('ready', () => {
         props: {
           data: payload,
           errors: this.errors,
+          hasVisitedSection: payload.hasVisitedSection,
         },
         on: {
           'alias-changed': (alias: string): void => {

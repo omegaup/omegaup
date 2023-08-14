@@ -3875,6 +3875,7 @@ export namespace types {
     emailClarifications: boolean;
     extraWallTime: number | string;
     groupScorePolicy?: string;
+    hasVisitedSection?: boolean;
     inputLimit: number | string;
     languages: string;
     levelTags: string[];
