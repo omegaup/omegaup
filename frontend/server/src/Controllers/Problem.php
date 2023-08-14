@@ -5455,6 +5455,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'problem_level' => '',
                         'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                         'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
+                        'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
+                            'has-visited-create-problem'
+                        ),
                     ],
                     self::getCommonPayloadForTypeScript()
                 ),
