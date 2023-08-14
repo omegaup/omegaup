@@ -5,7 +5,7 @@ namespace OmegaUp;
 /**
  * @psalm-type AssociatedIdentity=array{default: bool, username: string}
  * @psalm-type ApiToken=array{name: string, timestamp: \OmegaUp\Timestamp, last_used: \OmegaUp\Timestamp, rate_limit: array{reset: \OmegaUp\Timestamp, limit: int, remaining: int}}
- * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>, apiTokens: list<ApiToken>}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>, apiTokens: list<ApiToken>, nextRegisteredContestForUser: ContestListItem}
  * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
  * @psalm-type RenderCallbackPayload=array{templateProperties: array{fullWidth?: bool, hideFooterAndHeader?: bool, payload: array<string, mixed>, scripts?: list<string>, title: \OmegaUp\TranslationString}, entrypoint: string, inContest?: bool, navbarSection?: string}
  */
@@ -205,6 +205,14 @@ class UITools {
                 !is_null($identity) &&
                 !is_null($user) ?
                 \OmegaUp\Controllers\User::getUserTypes($user, $identity) :
+                []
+            ),
+            'nextRegisteredContestForUser' => (
+                !is_null($identity) &&
+                !is_null($identity->identity_id) ?
+                \OmegaUp\Controllers\Contest::getNextRegisteredContestForUser(
+                    $identity
+                ) :
                 []
             ),
         ];
