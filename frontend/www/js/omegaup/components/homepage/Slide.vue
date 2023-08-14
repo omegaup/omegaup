@@ -48,6 +48,8 @@ export default class Slide extends Vue {
 
 <style lang="scss" scoped>
 .slide {
+  height: 43.5rem;
+
   @media only screen and (min-width: 767px) {
     height: 31rem;
   }
@@ -68,11 +70,9 @@ a.slide-button {
   letter-spacing: 0.03rem;
   font-size: 1.08rem;
 }
-
 .image-width {
   max-width: 480px;
 }
-
 .titles-width {
   max-width: 640px;
 }

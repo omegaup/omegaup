@@ -56,6 +56,7 @@ OmegaUp.on('ready', async () => {
   let runDetails: null | types.RunDetails = null;
   let problemDetails: null | types.ProblemDetails = null;
   let feedbackMap: Map<number, ArenaCourseFeedback> = new Map();
+  let feedbackThreadMap: Map<number, ArenaCourseFeedback> = new Map();
   try {
     ({ runDetails, problemDetails } = await getProblemAndRunDetails({
       problems: payload.currentAssignment.problems,
@@ -63,7 +64,9 @@ OmegaUp.on('ready', async () => {
       problemsetId: payload.currentAssignment.problemset_id,
     }));
     if (runDetails != null) {
-      feedbackMap = getFeedbackMap(runDetails.feedback);
+      ({ feedbackMap, feedbackThreadMap } = getFeedbackMap(
+        runDetails.feedback,
+      ));
     }
   } catch (e: any) {
     ui.apiError(e);
@@ -97,6 +100,7 @@ OmegaUp.on('ready', async () => {
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
       feedbackMap,
+      feedbackThreadMap,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-course', {
@@ -125,6 +129,9 @@ OmegaUp.on('ready', async () => {
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
           feedbackMap: this.feedbackMap,
+          feedbackThreadMap: this.feedbackThreadMap,
+          currentUsername: commonPayload.currentUsername,
+          currentUserClassName: commonPayload.userClassname,
         },
         on: {
           'navigate-to-assignment': ({
@@ -190,7 +197,11 @@ OmegaUp.on('ready', async () => {
               .then((runDetails) => {
                 this.runDetailsData = showSubmission({ request, runDetails });
 
-                this.feedbackMap = getFeedbackMap(this.runDetailsData.feedback);
+                ({ feedbackMap, feedbackThreadMap } = getFeedbackMap(
+                  this.runDetailsData.feedback,
+                ));
+                this.feedbackMap = feedbackMap;
+                this.feedbackThreadMap = feedbackThreadMap;
 
                 if (request.hash) {
                   window.location.hash = request.hash;
@@ -448,12 +459,61 @@ OmegaUp.on('ready', async () => {
                 if (!feedbackWithError.length) {
                   ui.success(T.feedbackSuccesfullyAdded);
                   resetHash('runs', null);
+                  api.Run.getSubmissionFeedback({
+                    run_alias: guid,
+                  }).then((response) => {
+                    component.feedbackMap.forEach((feedback) => {
+                      feedback.submissionFeedbackId = response.find(
+                        (fb) => fb.range_bytes_start == feedback.lineNumber,
+                      )?.submission_feedback_id;
+                      feedback.status = FeedbackStatus.Saved;
+                    });
+                  });
+
                   component.currentPopupDisplayed = PopupDisplayed.None;
                 } else {
                   ui.error('There was an error');
                 }
               })
               .catch(ui.ignoreError);
+          },
+          'submit-feedback-thread': ({
+            feedback,
+            guid,
+          }: {
+            feedback: ArenaCourseFeedback;
+            guid: string;
+          }) => {
+            api.Submission.setFeedback({
+              guid,
+              course_alias: payload.courseDetails.alias,
+              assignment_alias: payload.currentAssignment.alias,
+              feedback: feedback.text,
+              range_bytes_start: feedback.lineNumber,
+              submission_feedback_id: feedback.submissionFeedbackId,
+            })
+              .then(({ submissionFeedbackThread }) => {
+                ui.success(T.feedbackSuccesfullyAdded);
+                resetHash('runs', null);
+                if (
+                  submissionFeedbackThread &&
+                  submissionFeedbackThread.submission_feedback_thread_id &&
+                  submissionFeedbackThread.identity_id
+                ) {
+                  feedbackThreadMap.set(
+                    submissionFeedbackThread.submission_feedback_thread_id,
+                    {
+                      author: commonPayload.currentUsername,
+                      authorClassname: commonPayload.userClassname,
+                      lineNumber: feedback.lineNumber,
+                      text: feedback.text,
+                      status: FeedbackStatus.Saved,
+                    },
+                  );
+                }
+                component.currentPopupDisplayed = PopupDisplayed.None;
+              })
+              .catch(ui.error);
           },
         },
         ref: 'component',
@@ -490,8 +550,12 @@ OmegaUp.on('ready', async () => {
 
   function getFeedbackMap(
     runDetailsFeedback: types.SubmissionFeedback[],
-  ): Map<number, ArenaCourseFeedback> {
+  ): {
+    feedbackMap: Map<number, ArenaCourseFeedback>;
+    feedbackThreadMap: Map<number, ArenaCourseFeedback>;
+  } {
     const feedbackMap: Map<number, ArenaCourseFeedback> = new Map();
+    const feedbackThreadMap: Map<number, ArenaCourseFeedback> = new Map();
 
     runDetailsFeedback
       .filter((feedback) => feedback.range_bytes_start != null)
@@ -499,13 +563,30 @@ OmegaUp.on('ready', async () => {
         const lineNumber = feedback.range_bytes_start ?? null;
         if (lineNumber != null) {
           feedbackMap.set(lineNumber, {
+            author: feedback.author,
+            authorClassname: feedback.author_classname,
             lineNumber,
             text: feedback.feedback,
             status: FeedbackStatus.Saved,
+            timestamp: feedback.date,
+            submissionFeedbackId: feedback.submission_feedback_id,
+          });
+          feedback.feedback_thread?.map((feedbackThread) => {
+            feedbackThreadMap.set(
+              feedbackThread.submission_feedback_thread_id,
+              {
+                author: feedbackThread.author,
+                authorClassname: feedbackThread.authorClassname,
+                lineNumber,
+                text: feedbackThread.text,
+                status: FeedbackStatus.Saved,
+                timestamp: feedbackThread.timestamp,
+              },
+            );
           });
         }
       });
-    return feedbackMap;
+    return { feedbackMap, feedbackThreadMap };
   }
 
   // This function updates the state and URL of the history object in the
@@ -582,9 +663,12 @@ OmegaUp.on('ready', async () => {
             runDetails,
           });
 
-          arenaCourse.feedbackMap = getFeedbackMap(
+          ({ feedbackMap, feedbackThreadMap } = getFeedbackMap(
             arenaCourse.runDetailsData.feedback,
-          );
+          ));
+
+          arenaCourse.feedbackMap = feedbackMap;
+          arenaCourse.feedbackThreadMap = feedbackThreadMap;
 
           if (hash) {
             window.location.hash = hash;
