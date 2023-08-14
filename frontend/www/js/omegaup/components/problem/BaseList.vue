@@ -125,9 +125,12 @@
           <tr v-for="problem in problems" :key="problem.problem_id">
             <td class="align-middle">{{ problem.problem_id }}</td>
             <td class="align-middle">
-              <a :href="`/arena/problem/${problem.alias}/`" class="mr-2">{{
-                problem.title
-              }}</a>
+              <a
+                :href="`/arena/problem/${problem.alias}/`"
+                class="mr-2"
+                data-problem-title-list
+                >{{ problem.title }}</a
+              >
               <font-awesome-icon
                 v-if="problem.qualitySeal || problem.visibility === 3"
                 :title="T.wordsHighQualityProblem"
