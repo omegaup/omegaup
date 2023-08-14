@@ -1,7 +1,7 @@
 <template>
-  <div class="container-fluid p-5 max-width mx-auto">
+  <div class="px-3 py-5 p-lg-5">
     <div class="row">
-      <div class="col col-md-4 d-flex align-items-center">
+      <div class="col-12 col-md-4 d-flex align-items-center">
         <a href="/problem/collection/" data-nav-problems-collection>{{
           T.problemCollectionBackCollections
         }}</a>
@@ -11,52 +11,54 @@
       </div>
     </div>
     <div class="row">
-      <div class="col col-md-3">
-        <omegaup-problem-filter-authors
-          :authors="authors"
-          :selected-authors="selectedAuthors"
-          @new-selected-author="
-            (selectedAuthors) =>
-              $emit(
-                'apply-filter',
-                columnName,
-                sortOrder,
-                difficulty,
-                quality,
-                selectedAuthors,
-              )
-          "
-        ></omegaup-problem-filter-authors>
-        <omegaup-problem-filter-difficulty
-          :selected-difficulty="difficulty"
-          @change-difficulty="
-            (difficulty) =>
-              $emit(
-                'apply-filter',
-                columnName,
-                sortOrder,
-                difficulty,
-                quality,
-                selectedAuthors,
-              )
-          "
-        ></omegaup-problem-filter-difficulty>
-        <omegaup-problem-filter-quality
-          :quality="quality"
-          @change-quality="
-            (quality) =>
-              $emit(
-                'apply-filter',
-                columnName,
-                sortOrder,
-                difficulty,
-                quality,
-                selectedAuthors,
-              )
-          "
-        ></omegaup-problem-filter-quality>
+      <div class="col-12 col-lg-4 mb-3 mb-lg-0">
+        <div class="row">
+          <omegaup-problem-filter-authors
+            :authors="authors"
+            :selected-authors="selectedAuthors"
+            @new-selected-author="
+              (selectedAuthors) =>
+                $emit(
+                  'apply-filter',
+                  columnName,
+                  sortOrder,
+                  difficulty,
+                  quality,
+                  selectedAuthors,
+                )
+            "
+          ></omegaup-problem-filter-authors>
+          <omegaup-problem-filter-difficulty
+            :selected-difficulty="difficulty"
+            @change-difficulty="
+              (difficulty) =>
+                $emit(
+                  'apply-filter',
+                  columnName,
+                  sortOrder,
+                  difficulty,
+                  quality,
+                  selectedAuthors,
+                )
+            "
+          ></omegaup-problem-filter-difficulty>
+          <omegaup-problem-filter-quality
+            :quality="quality"
+            @change-quality="
+              (quality) =>
+                $emit(
+                  'apply-filter',
+                  columnName,
+                  sortOrder,
+                  difficulty,
+                  quality,
+                  selectedAuthors,
+                )
+            "
+          ></omegaup-problem-filter-quality>
+        </div>
       </div>
-      <div class="col p-0">
+      <div class="col">
         <div v-if="!problems || problems.length == 0" class="card-body">
           <div class="empty-table-message">
             {{ T.courseAssignmentProblemsEmpty }}
