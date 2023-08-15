@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid max-width card pr-0 pl-0">
-    <ul class="nav nav-tabs" role="tablist">
+    <ul class="nav nav-tabs introjs-tabs" role="tablist">
       <li
         v-for="(tabName, tabKey) in tabNames"
         :key="tabKey"
@@ -28,7 +28,7 @@
         <div class="col-md-6 col-lg-3 p-0 ml-4">
           <input
             v-model="searchText"
-            class="form-control"
+            class="form-control introjs-search"
             type="text"
             :placeholder="T.courseCardsListSearch"
           />
@@ -46,7 +46,7 @@
       >
         <div
           v-if="tabKey === Tab.Public"
-          class="row row-cols-1 row-cols-md-2 row-cols-xl-3 p-4"
+          class="row row-cols-1 row-cols-md-2 row-cols-xl-3 p-4 introjs-join"
         >
           <omegaup-course-card-public
             v-for="course in filteredCards"
@@ -170,31 +170,17 @@ export default class CourseTabs extends Vue {
               intro: T.joinCourseInteractiveGuideWelcome,
             },
             {
-              element: document.querySelector('.introjs-explore') as Element,
+              element: document.querySelector('.introjs-tabs') as Element,
               title,
-              intro: T.joinCourseInteractiveGuideExplore,
+              intro: T.joinCourseInteractiveGuideTabs,
             },
             {
-              element: document.querySelector('.introjs-studying') as Element,
-              title,
-              intro: T.joinCourseInteractiveGuideStudying,
-            },
-            {
-              element: document.querySelector('.introjs-finished') as Element,
-              title,
-              intro: T.joinCourseInteractiveGuideFinished,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-search',
-              ) as Element,
+              element: document.querySelector('.introjs-search') as Element,
               title,
               intro: T.joinCourseInteractiveGuideSearch,
             },
             {
-              element: document.querySelector(
-                '.introjs-join',
-              ) as Element,
+              element: document.querySelector('.introjs-join') as Element,
               title,
               intro: T.joinCourseInteractiveGuideJoin,
             },
