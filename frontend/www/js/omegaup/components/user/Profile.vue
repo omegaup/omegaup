@@ -1,5 +1,5 @@
 <template>
-  <div data-user-profile-edit class="m-5">
+  <div data-user-profile-edit class="mx-auto">
     <omegaup-user-profile-wrapper
       :profile="profile"
       :data="data"
@@ -12,7 +12,7 @@
         </h1>
       </template>
       <template #title>
-        <h3>{{ currentTitle }}</h3>
+        <h3 class="text-center mt-1">{{ currentTitle }}</h3>
       </template>
       <template #content>
         <template v-if="currentSelectedTab === 'view-profile'">
@@ -161,3 +161,10 @@ export default class Profile extends Vue {
   }
 }
 </script>
+
+<style scoped>
+[data-user-profile-edit] {
+  max-width: 69rem;
+  margin: 3rem 0;
+}
+</style>
