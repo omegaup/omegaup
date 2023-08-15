@@ -53,6 +53,7 @@
             :key="course.alias"
             :course="course"
             :logged-in="loggedIn"
+            :has-visited-section="hasVisitedSection"
           ></omegaup-course-card-public>
         </div>
         <div

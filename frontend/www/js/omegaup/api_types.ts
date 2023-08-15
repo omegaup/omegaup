@@ -3357,6 +3357,7 @@ export namespace types {
     courses: {
       enrolled: types.CourseCardEnrolled[];
       finished: types.CourseCardFinished[];
+      hasVisitedSection?: boolean;
       public: types.CourseCardPublic[];
     };
   }
