@@ -700,6 +700,7 @@ CREATE TABLE `Problemset_Identities` (
   `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.',
   `privacystatement_consent_id` int DEFAULT NULL COMMENT 'Id del documento con el consentimiento de privacidad',
   `is_invited` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si la identidad ingresará al concurso por invitación o lo encontró en el listado de concursos públicos',
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Almacena la hora y fecha en que se creó la invitación del usuario a un concurso',
   PRIMARY KEY (`identity_id`,`problemset_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `identity_id` (`identity_id`),
