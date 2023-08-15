@@ -639,7 +639,7 @@
 	"invalidStatementType": "Redacci\u00f3n del problema inv\u00e1lida",
 	"invalidUser": "Usuario no v\u00e1lido.",
 	"invalidVisibility": "El par\u00e1metro visibility puede ser alguno de los siguientes valores: deleted, private_banned, public_banned, private_warning, private, public_warning, public y promoted",
-	"joinCourseInteractiveGuideJoin": "Haz clic en el bot\u00f3n de inicio para unirte al curso.",
+	"joinCourseInteractiveGuideJoin": "Haz clic en el bot\u00f3n de iniciar para unirte a un curso.",
 	"joinCourseInteractiveGuideSearch": "Aqu\u00ed podr\u00e1s buscar cursos por nombre.",
 	"joinCourseInteractiveGuideTabs": "Aqu\u00ed podr\u00e1s navegar entre los cursos que estas cursando, los que has completado y explorar nuevos cursos.",
 	"joinCourseInteractiveGuideTitle": "Unirse a un curso",
