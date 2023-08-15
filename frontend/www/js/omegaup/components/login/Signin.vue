@@ -7,6 +7,7 @@
     >
     </omegaup-login>
     <omegaup-signup
+      :has-visited-section="hasVisitedSection"
       :validate-recaptcha="validateRecaptcha"
       @register-and-login="
         (username, email, password, passwordConfirmation, recaptchaResponse) =>
@@ -42,6 +43,7 @@ export default class Signin extends Vue {
   @Prop() validateRecaptcha!: boolean;
   @Prop() facebookUrl!: string;
   @Prop() googleClientId!: string;
+  @Prop() hasVisitedSection!: string;
 
   T = T;
 }
