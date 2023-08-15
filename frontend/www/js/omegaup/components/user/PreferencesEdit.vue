@@ -90,17 +90,25 @@
           @change="handlePrivateProfileCheckboxChange"
         />{{ T.userEditPrivateProfile }}
       </label>
-      <button
-        ref="privateProfileButton"
-        type="button"
-        class="btn btn-sm ml-1 btn-light"
-        data-toggle="popover"
-        data-trigger="focus"
-        :data-content="T.profilePrivateRankMessage"
-        @click="showWarningAboutRank"
+      <!-- id-lint off -->
+      <b-button
+        id="popover-private-profile"
+        class="ml-1"
+        size="sm"
+        @click="show = !show"
       >
         <font-awesome-icon :icon="['fas', 'question-circle']" />
-      </button>
+      </b-button>
+      <!-- id-lint on -->
+      <b-popover
+        :show.sync="show"
+        target="popover-private-profile"
+        variant="danger"
+        placement="right"
+      >
+        <template #title>{{ T.profilePrivateRankMessageTitle }}</template>
+        {{ T.profilePrivateRankMessage }}
+      </b-popover>
     </div>
     <div class="form-group">
       <label>
@@ -129,6 +137,15 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
+// Import Bootstrap an BootstrapVue CSS files (order is important)
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+
+// Import Only Required Plugins
+import { ButtonPlugin, PopoverPlugin } from 'bootstrap-vue';
+Vue.use(ButtonPlugin);
+Vue.use(PopoverPlugin);
+
 @Component({
   components: {
     FontAwesomeIcon,
@@ -137,7 +154,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 export default class UserPreferencesEdit extends Vue {
   @Prop() profile!: types.UserProfileInfo;
 
-  isPopoverVisible: boolean = false;
+  show: boolean = false;
   T = T;
   ObjectivesAnswers = ObjectivesAnswers;
   email = this.profile.email;
@@ -250,19 +267,8 @@ export default class UserPreferencesEdit extends Vue {
     });
   }
 
-  showWarningAboutRank(ev: Event): void {
-    $(ev.target as HTMLElement).popover('show');
-  }
-
   handlePrivateProfileCheckboxChange(): void {
-    const privateProfileButton = this.$refs
-      .privateProfileButton as HTMLButtonElement;
-
-    if (this.isPrivate) {
-      $(privateProfileButton).popover('show');
-    } else {
-      $(privateProfileButton).popover('hide');
-    }
+    this.show = this.isPrivate;
   }
 }
 </script>
