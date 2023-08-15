@@ -251,25 +251,17 @@ export default class UserPreferencesEdit extends Vue {
   }
 
   showWarningAboutRank(ev: Event): void {
-    if (this.isPopoverVisible) {
-      $(ev.target as HTMLElement).popover('hide');
-    } else {
-      $(ev.target as HTMLElement).popover('show');
-    }
-    this.isPopoverVisible = !this.isPopoverVisible;
+    $(ev.target as HTMLElement).popover('show');
   }
 
-  handlePrivateProfileCheckboxChange(event: Event): void {
+  handlePrivateProfileCheckboxChange(): void {
     const privateProfileButton = this.$refs
       .privateProfileButton as HTMLButtonElement;
-    const privateProfileCheckbox = event.target as HTMLInputElement;
-    const isChecked = privateProfileCheckbox.checked;
 
-    if (
-      (isChecked && this.isPopoverVisible == false) ||
-      (isChecked == false && this.isPopoverVisible)
-    ) {
-      privateProfileButton.click();
+    if (this.isPrivate) {
+      $(privateProfileButton).popover('show');
+    } else {
+      $(privateProfileButton).popover('hide');
     }
   }
 }
