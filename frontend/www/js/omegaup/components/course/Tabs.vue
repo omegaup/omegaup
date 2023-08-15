@@ -157,7 +157,7 @@ export default class CourseTabs extends Vue {
   searchText = '';
 
   mounted() {
-    const title = T.signUpFormInteractiveGuideTitle;
+    const title = T.joinCourseInteractiveGuideTitle;
     if (!this.hasVisitedSection) {
       introJs()
         .setOptions({
@@ -167,41 +167,36 @@ export default class CourseTabs extends Vue {
           steps: [
             {
               title,
-              intro: T.signUpFormInteractiveGuideWelcome,
+              intro: T.joinCourseInteractiveGuideWelcome,
             },
             {
-              element: document.querySelector('.introjs-username') as Element,
+              element: document.querySelector('.introjs-explore') as Element,
               title,
-              intro: T.signUpFormInteractiveGuideUsername,
+              intro: T.joinCourseInteractiveGuideExplore,
             },
             {
-              element: document.querySelector('.introjs-email') as Element,
+              element: document.querySelector('.introjs-studying') as Element,
               title,
-              intro: T.signUpFormInteractiveGuideEmail,
+              intro: T.joinCourseInteractiveGuideStudying,
             },
             {
-              element: document.querySelector('.introjs-password') as Element,
+              element: document.querySelector('.introjs-finished') as Element,
               title,
-              intro: T.signUpFormInteractiveGuidePassword,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-confirmpassword',
-              ) as Element,
-              title,
-              intro: T.signUpFormInteractiveGuideConfirmPassword,
+              intro: T.joinCourseInteractiveGuideFinished,
             },
             {
               element: document.querySelector(
-                '.introjs-terms-and-conditions',
+                '.introjs-search',
               ) as Element,
               title,
-              intro: T.signUpFormInteractiveGuideTermsAndConditions,
+              intro: T.joinCourseInteractiveGuideSearch,
             },
             {
-              element: document.querySelector('.introjs-register') as Element,
+              element: document.querySelector(
+                '.introjs-join',
+              ) as Element,
               title,
-              intro: T.signUpFormInteractiveGuideRegister,
+              intro: T.joinCourseInteractiveGuideJoin,
             },
           ],
         })
