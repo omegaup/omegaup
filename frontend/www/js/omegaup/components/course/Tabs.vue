@@ -269,9 +269,8 @@ export default class CourseTabs extends Vue {
 }
 
 @media (max-width: 576px) {
-    .custom-card {
-      padding: 1.25rem 2rem !important;
-    }
+  .custom-card {
+    padding: 1.25rem 2rem !important;
   }
-
+}
 </style>
