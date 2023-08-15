@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid max-width card pr-0 pl-0 px-4 py-5 p-md-5">
+  <div class="container-fluid max-width card pr-0 pl-0 custom-card">
     <ul class="nav nav-tabs" role="tablist">
       <li
         v-for="(tabName, tabKey) in tabNames"
@@ -267,4 +267,11 @@ export default class CourseTabs extends Vue {
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
 }
+
+@media (max-width: 576px) {
+    .custom-card {
+      padding: 1.25rem 2rem !important;
+    }
+  }
+
 </style>
