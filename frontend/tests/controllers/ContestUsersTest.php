@@ -561,23 +561,26 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Get the next registered contest for a user who is not registered in any contest
-        $nextRegisteredContestForUser1 = \OmegaUp\Controllers\Contest::getNextRegisteredContestForUser(
+        $nextRegisteredContestForUser1 = \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
             $identity1
         );
-        $this->assertEmpty($nextRegisteredContestForUser1);
+        $this->assertNull($nextRegisteredContestForUser1);
 
-        $timePast =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 120 * 60);
-        $timeFuture1 =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 60 * 60);
-        $timeFuture2 =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 120 * 60);
+        $currentTime = \OmegaUp\Time::get();
+        $timePast =  new \OmegaUp\Timestamp($currentTime - 120 * 60);
+        $timeFuture1 =  new \OmegaUp\Timestamp($currentTime + 60 * 60);
+        $timeFuture2 =  new \OmegaUp\Timestamp($currentTime + 120 * 60);
         // Get 2 active contests
         $contest1 = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
+                'title' => 'Contest_1',
                 'startTime' => $timePast,
                 'finishTime' => $timeFuture2,
             ])
         );
         $contest2 = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
+                'title' => 'Contest_2',
                 'startTime' => $timePast,
                 'finishTime' => $timeFuture1,
             ])
@@ -585,6 +588,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         // Get a future contest
         $contest3 = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
+                'title' => 'Contest_3',
                 'startTime' => $timeFuture1,
                 'finishTime' => $timeFuture2,
             ])
@@ -601,16 +605,12 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Check that the next registered contest for user1 is contest2
-        $nextRegisteredContestForUser1 = \OmegaUp\Controllers\Contest::getNextRegisteredContestForUser(
+        $nextRegisteredContestForUser1 = \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
             $identity1
         );
         $this->assertSame(
-            $timePast->time,
-            $nextRegisteredContestForUser1[0]['start_time']->time
-        );
-        $this->assertSame(
-            $timeFuture1->time,
-            $nextRegisteredContestForUser1[0]['finish_time']->time
+            $contest2['contest']->title,
+            $nextRegisteredContestForUser1['title']
         );
 
         // Add user2 to an active contest and to a future contest
@@ -624,16 +624,12 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Check that the next registered contest for user2 is contest1
-        $nextRegisteredContestForUser2 = \OmegaUp\Controllers\Contest::getNextRegisteredContestForUser(
+        $nextRegisteredContestForUser2 = \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
             $identity2
         );
         $this->assertSame(
-            $timePast->time,
-            $nextRegisteredContestForUser2[0]['start_time']->time
-        );
-        $this->assertSame(
-            $timeFuture2->time,
-            $nextRegisteredContestForUser2[0]['finish_time']->time
+            $contest1['contest']->title,
+            $nextRegisteredContestForUser2['title']
         );
     }
 

@@ -452,15 +452,21 @@ export namespace types {
             return x;
           });
         })(x.apiTokens);
-        x.nextRegisteredContestForUser = ((x) => {
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-          x.original_finish_time = ((x: number) => new Date(x * 1000))(
-            x.original_finish_time,
-          );
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        })(x.nextRegisteredContestForUser);
+        if (
+          typeof x.nextRegisteredContestForUser !== 'undefined' &&
+          x.nextRegisteredContestForUser !== null
+        )
+          x.nextRegisteredContestForUser = ((x) => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
+            x.original_finish_time = ((x: number) => new Date(x * 1000))(
+              x.original_finish_time,
+            );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          })(x.nextRegisteredContestForUser);
         return x;
       })(
         JSON.parse(
@@ -2795,7 +2801,7 @@ export namespace types {
     isReviewer: boolean;
     lockDownImage: string;
     navbarSection: string;
-    nextRegisteredContestForUser: types.ContestListItem;
+    nextRegisteredContestForUser?: types.ContestListItem;
     omegaUpLockDown: boolean;
     profileProgress: number;
     userClassname: string;

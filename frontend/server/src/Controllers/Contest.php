@@ -315,19 +315,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return ContestListItem
-     */
-    public static function getNextRegisteredContestForUser(
-        ?\OmegaUp\DAO\VO\Identities $identity
-    ) {
-        $contest = \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
-            $identity->identity_id
-        );
-
-        return $contest;
-    }
-
-    /**
      * Returns a list of contests where current user has admin rights (or is
      * the director).
      *

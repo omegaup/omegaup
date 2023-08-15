@@ -637,11 +637,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     /**
      * Returns the next contest a user registered for.
      *
-     * @return ContestListItem
+     * @return ContestListItem|null
      */
     final public static function getNextRegisteredContestForUser(
-        int $identityId
+        ?\OmegaUp\DAO\VO\Identities $identity
     ) {
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            return null;
+        }
+
         $activeCondition = \OmegaUp\DAO\Enum\ActiveStatus::sql(
             \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE
         );
@@ -716,27 +720,30 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         ";
         $params = [
             // Direct participation
-            $identityId,
+            $identity->identity_id,
             // Group participation
-            $identityId,
+            $identity->identity_id,
             \OmegaUp\Authorization::CONTESTANT_ROLE,
             // Team participation
-            $identityId,
+            $identity->identity_id,
             \OmegaUp\Authorization::CONTESTANT_ROLE,
         ];
 
         $limits = '
             ORDER BY
                 start_time,
-                finish_time
-            LIMIT 1;
+                finish_time;
         ';
 
-        /** @var {admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null} */
-        $contest = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}|null */
+        $contest = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             "{$select} {$sql} {$limits}",
             $params
         );
+
+        if (!is_null($contest)) {
+            $contest['participating'] = true;
+        }
 
         return $contest;
     }

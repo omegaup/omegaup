@@ -5,7 +5,8 @@ namespace OmegaUp;
 /**
  * @psalm-type AssociatedIdentity=array{default: bool, username: string}
  * @psalm-type ApiToken=array{name: string, timestamp: \OmegaUp\Timestamp, last_used: \OmegaUp\Timestamp, rate_limit: array{reset: \OmegaUp\Timestamp, limit: int, remaining: int}}
- * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>, apiTokens: list<ApiToken>, nextRegisteredContestForUser: ContestListItem}
+ * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration?: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>, apiTokens: list<ApiToken>, nextRegisteredContestForUser: ContestListItem|null}
  * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
  * @psalm-type RenderCallbackPayload=array{templateProperties: array{fullWidth?: bool, hideFooterAndHeader?: bool, payload: array<string, mixed>, scripts?: list<string>, title: \OmegaUp\TranslationString}, entrypoint: string, inContest?: bool, navbarSection?: string}
  */
@@ -208,12 +209,9 @@ class UITools {
                 []
             ),
             'nextRegisteredContestForUser' => (
-                !is_null($identity) &&
-                !is_null($identity->identity_id) ?
-                \OmegaUp\Controllers\Contest::getNextRegisteredContestForUser(
+                \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
                     $identity
-                ) :
-                []
+                )
             ),
         ];
     }
