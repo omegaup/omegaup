@@ -87,14 +87,16 @@
           :checked="isPrivate"
           data-is-private
           class="mr-2"
+          @change="handlePrivateProfileCheckboxChange"
         />{{ T.userEditPrivateProfile }}
       </label>
       <button
+        ref="privateProfileButton"
         type="button"
         class="btn btn-sm ml-1 btn-light"
         data-toggle="popover"
         data-trigger="focus"
-        :data-content="T.wordsPrivateRank"
+        :data-content="T.profilePrivateRankMessage"
         @click="showWarningAboutRank"
       >
         <font-awesome-icon :icon="['fas', 'question-circle']" />
@@ -135,6 +137,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 export default class UserPreferencesEdit extends Vue {
   @Prop() profile!: types.UserProfileInfo;
 
+  isPopoverVisible: boolean = false;
   T = T;
   ObjectivesAnswers = ObjectivesAnswers;
   email = this.profile.email;
@@ -248,7 +251,26 @@ export default class UserPreferencesEdit extends Vue {
   }
 
   showWarningAboutRank(ev: Event): void {
-    $(ev.target as HTMLElement).popover('show');
+    if (this.isPopoverVisible) {
+      $(ev.target as HTMLElement).popover('hide');
+    } else {
+      $(ev.target as HTMLElement).popover('show');
+    }
+    this.isPopoverVisible = !this.isPopoverVisible;
+  }
+
+  handlePrivateProfileCheckboxChange(event: Event): void {
+    const privateProfileButton = this.$refs
+      .privateProfileButton as HTMLButtonElement;
+    const privateProfileCheckbox = event.target as HTMLInputElement;
+    const isChecked = privateProfileCheckbox.checked;
+
+    if (
+      (isChecked && this.isPopoverVisible == false) ||
+      (isChecked == false && this.isPopoverVisible)
+    ) {
+      privateProfileButton.click();
+    }
   }
 }
 </script>
