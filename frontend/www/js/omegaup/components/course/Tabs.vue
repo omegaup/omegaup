@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid max-width card pr-0 pl-0 px-4 py-5 p-md-5">
+  <div class="container-fluid max-width card pr-0 pl-0">
     <ul class="nav nav-tabs" role="tablist">
       <li
         v-for="(tabName, tabKey) in tabNames"
@@ -116,6 +116,10 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import latinize from 'latinize';
+import 'intro.js/introjs.css';
+import introJs from 'intro.js';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 import omegaup_Markdown from '../Markdown.vue';
 import course_CardPublic from './CardPublic.vue';
@@ -144,12 +148,67 @@ export default class CourseTabs extends Vue {
   };
   @Prop({ default: false }) loggedIn!: boolean;
   @Prop({ default: Tab.Public }) selectedTab!: Tab;
+  @Prop() hasVisitedSection!: boolean;
 
   T = T;
   ui = ui;
   Tab = Tab;
   currentSelectedTab = this.selectedTab;
   searchText = '';
+
+  mounted() {
+    const title = T.signUpFormInteractiveGuideTitle;
+    if (!this.hasVisitedSection) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title,
+              intro: T.signUpFormInteractiveGuideWelcome,
+            },
+            {
+              element: document.querySelector('.introjs-username') as Element,
+              title,
+              intro: T.signUpFormInteractiveGuideUsername,
+            },
+            {
+              element: document.querySelector('.introjs-email') as Element,
+              title,
+              intro: T.signUpFormInteractiveGuideEmail,
+            },
+            {
+              element: document.querySelector('.introjs-password') as Element,
+              title,
+              intro: T.signUpFormInteractiveGuidePassword,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-confirmpassword',
+              ) as Element,
+              title,
+              intro: T.signUpFormInteractiveGuideConfirmPassword,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-terms-and-conditions',
+              ) as Element,
+              title,
+              intro: T.signUpFormInteractiveGuideTermsAndConditions,
+            },
+            {
+              element: document.querySelector('.introjs-register') as Element,
+              title,
+              intro: T.signUpFormInteractiveGuideRegister,
+            },
+          ],
+        })
+        .start();
+      this.$cookies.set('has-visited-join-course', true, -1);
+    }
+  }
 
   get tabNames(): Record<Tab, string> {
     return {
