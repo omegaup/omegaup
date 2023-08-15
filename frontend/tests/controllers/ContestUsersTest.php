@@ -571,6 +571,8 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $timeFuture1 =  new \OmegaUp\Timestamp($currentTime + 60 * 60);
         $timeFuture2 =  new \OmegaUp\Timestamp($currentTime + 120 * 60);
         // Get 2 active contests
+        // The first one started 2 hours ago, and it will finish in 2 hours
+        // It has a duration of 4 hours
         $contest1 = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'title' => 'Contest_1',
@@ -578,6 +580,8 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'finishTime' => $timeFuture2,
             ])
         );
+        // The second one started 2 hours ago, and it will finish in 1 hour
+        // It has a duration of 3 hours
         $contest2 = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'title' => 'Contest_2',
@@ -586,6 +590,8 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         // Get a future contest
+        // It will start in 1 hour and it will finish in 2 hours
+        // It has a duration of 1 hour
         $contest3 = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'title' => 'Contest_3',
@@ -605,6 +611,8 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Check that the next registered contest for user1 is contest2
+        // Although both contests started at the same time, contest2 is scheduled
+        // to finish sooner, making it the next registered contest.
         $nextRegisteredContestForUser1 = \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
             $identity1
         );
@@ -624,6 +632,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Check that the next registered contest for user2 is contest1
+        // because it started first
         $nextRegisteredContestForUser2 = \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
             $identity2
         );

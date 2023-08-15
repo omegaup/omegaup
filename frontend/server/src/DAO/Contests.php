@@ -731,8 +731,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $limits = '
             ORDER BY
-                start_time,
-                finish_time;
+                start_time ASC,
+                finish_time ASC
+            LIMIT 1;
         ';
 
         /** @var array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}|null */
