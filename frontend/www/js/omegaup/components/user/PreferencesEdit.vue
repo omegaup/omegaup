@@ -95,6 +95,7 @@
         id="popover-private-profile"
         class="ml-1"
         size="sm"
+        variant="none"
         @click="show = !show"
       >
         <font-awesome-icon :icon="['fas', 'question-circle']" />
