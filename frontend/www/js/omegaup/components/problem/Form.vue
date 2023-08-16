@@ -286,6 +286,7 @@
                     <label class="form-check form-check-inline">
                       <input
                         v-model="isPublic"
+                        data-problem-access-radio-yes
                         type="radio"
                         name="visibility"
                         class="form-check-input"
