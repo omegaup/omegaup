@@ -2,7 +2,10 @@
   <div class="card">
     <div class="card-body">
       <div class="mb-4">
-        <omegaup-markdown :markdown="T.groupsCsvHelp"></omegaup-markdown>
+        <omegaup-markdown
+          :markdown="T.groupsCsvHelp"
+          class="introjs-information"
+        ></omegaup-markdown>
         <div class="form-check mb-4">
           <label class="form-check-label">
             <input
@@ -87,6 +90,10 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import omegaup_Markdown from '../Markdown.vue';
+import 'intro.js/introjs.css';
+import introJs from 'intro.js';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -102,10 +109,58 @@ library.add(faDownload);
 export default class Identities extends Vue {
   @Prop() groupAlias!: string;
   @Prop() userErrorRow!: string | null;
+  @Prop() hasVisitedSection!: boolean;
 
   T = T;
   identities: types.Identity[] = [];
   humanReadable = false;
+
+  mounted() {
+    const title = T.createIdentitiesInteractiveGuideTitle;
+    if (!this.hasVisitedSection) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title,
+              intro: T.signUpFormInteractiveGuideWelcome,
+            },
+            {
+              element: document.querySelector('.introjs-welcome') as Element,
+              title,
+              intro: T.createIdentitiesInteractiveGuideWelcome,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-information',
+              ) as Element,
+              title,
+              intro: T.createIdentitiesInteractiveGuideInformation,
+            },
+            {
+              element: document.querySelector('.introjs-example') as Element,
+              title,
+              intro: T.createIdentitiesInteractiveGuideExample,
+            },
+            {
+              element: document.querySelector('.introjs-password') as Element,
+              title,
+              intro: T.createIdentitiesInteractiveGuidePassword,
+            },
+            {
+              element: document.querySelector('.introjs-upload') as Element,
+              title,
+              intro: T.createIdentitiesInteractiveGuideUpload,
+            },
+          ],
+        })
+        .start();
+      this.$cookies.set('has-visited-create-identities', true, -1);
+    }
+  }
 
   readFile(e: HTMLInputElement): File | null {
     return (e.files && e.files[0]) || null;
