@@ -1,4 +1,4 @@
-import { RunOptions } from "../types";
+import { RunOptions } from '../types';
 
 export class ProblemPage {
   navigateToAllProblemsTab(): void {
@@ -14,7 +14,9 @@ export class ProblemPage {
   }
 
   verifyFilterByAlias(problemAlias: string): void {
-    cy.get('[data-problem-keyword-search] input').type(problemAlias + '{enter}');
+    cy.get('[data-problem-keyword-search] input').type(
+      problemAlias + '{enter}',
+    );
     cy.get('[data-filter-submit-button]').click();
 
     cy.get('[data-problem-title-list]').first().should('contain', problemAlias);
@@ -60,7 +62,7 @@ export class ProblemPage {
           .click(),
       );
       cy.get('[data-tag-name]').last().should('contain', tag);
-    })
+    });
     cy.get('[data-review-submit-button]').click();
   }
 
@@ -78,7 +80,9 @@ export class ProblemPage {
   }
 
   verifyBan(problemAlias: string): void {
-    cy.get('[data-problem-keyword-search] input').type(problemAlias + '{enter}');
+    cy.get('[data-problem-keyword-search] input').type(
+      problemAlias + '{enter}',
+    );
     cy.get('[data-filter-submit-button]').click();
     cy.get('[data-problem-title-list]').should('not.exist');
   }
