@@ -126,24 +126,29 @@ export default class Identities extends Vue {
           steps: [
             {
               title,
-              intro: T.signUpFormInteractiveGuideWelcome,
-            },
-            {
-              element: document.querySelector('.introjs-welcome') as Element,
-              title,
               intro: T.createIdentitiesInteractiveGuideWelcome,
             },
             {
-              element: document.querySelector(
-                '.introjs-information',
-              ) as Element,
+              element: document.querySelector('.introjs-information p:nth-child(1)') as Element,
               title,
               intro: T.createIdentitiesInteractiveGuideInformation,
             },
             {
-              element: document.querySelector('.introjs-example') as Element,
+              element: document.querySelector('.introjs-information p:nth-child(2)') as Element,
+              title,
+              intro: T.createIdentitiesInteractiveGuideFormat,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-information pre'
+              ) as Element,
               title,
               intro: T.createIdentitiesInteractiveGuideExample,
+            },
+            {
+              element: document.querySelector('.introjs-information button') as Element,
+              title,
+              intro: T.createIdentitiesInteractiveGuideCopy,
             },
             {
               element: document.querySelector('.introjs-password') as Element,
