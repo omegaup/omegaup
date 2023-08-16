@@ -725,6 +725,8 @@
 	"navViewProblemsAll": "Problems List",
 	"navViewProfile": "My profile",
 	"newPublicTagsNotAllowed": "It is not allowed to add new public tags",
+	"nextRegisteredContestModalButton": "See details",
+	"nextRegisteredContestModalTitle": "Remember to participate in the contest",
 	"noCoders": "No coders.",
 	"nominationsRangeHeader": "Problem reports (from %(lowCount) to %(highCount))",
 	"notProblemLevelTag": "The tag sent is not a level tag.",

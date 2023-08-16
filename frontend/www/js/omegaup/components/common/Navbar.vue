@@ -340,6 +340,11 @@
       "
       @submit="(objectives) => $emit('update-user-objectives', objectives)"
     ></omegaup-user-objectives-questions>
+    <omegaup-user-next-registered-contest
+      v-if="fromLogin && isLoggedIn && nextRegisteredContest !== null"
+      :next-registered-contest="nextRegisteredContest"
+      @submit="(alias) => $emit('redirect-to-next-registered-contest', alias)"
+    ></omegaup-user-next-registered-contest>
   </header>
 </template>
 
@@ -352,6 +357,7 @@ import notifications_List from '../notification/List.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
 import common_GraderBadge from '../common/GraderBadge.vue';
 import user_objectives_questions from '../user/ObjectivesQuestions.vue';
+import user_next_registered_contest from '../user/NextRegisteredContest.vue';
 import navbar_items from './NavbarItems.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -367,6 +373,7 @@ library.add(faSignOutAlt, faUser);
     'omegaup-common-grader-status': common_GraderStatus,
     'omegaup-common-grader-badge': common_GraderBadge,
     'omegaup-user-objectives-questions': user_objectives_questions,
+    'omegaup-user-next-registered-contest': user_next_registered_contest,
     'omegaup-navbar-items': navbar_items,
   },
 })
@@ -393,6 +400,7 @@ export default class Navbar extends Vue {
   @Prop() clarifications!: types.Clarification[];
   @Prop() fromLogin!: boolean;
   @Prop() userTypes!: string[];
+  @Prop() nextRegisteredContest!: types.ContestListItem | null;
 
   T = T;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];

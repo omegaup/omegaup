@@ -4,6 +4,7 @@ import T from '../../lang';
 
 import common_Navbar from './Navbar.vue';
 import UserObjectivesQuestions from '../user/ObjectivesQuestions.vue';
+import user_NextRegisteredContest from '../user/NextRegisteredContest.vue';
 
 describe('Navbar.vue', () => {
   const propsData = {
@@ -26,6 +27,7 @@ describe('Navbar.vue', () => {
     notifications: [],
     fromLogin: false,
     userTypes: [],
+    nextRegisteredContest: null,
   };
 
   it('Should handle empty navbar (in contest only)', () => {
@@ -75,5 +77,48 @@ describe('Navbar.vue', () => {
     await wrapper.setProps({ isMainUserIdentity: true });
 
     expect(wrapper.findComponent(UserObjectivesQuestions).exists()).toBe(true);
+  });
+
+  it('Should show the next registered contest modal when the user is registered to a current or upcoming contest', () => {
+    const wrapper = shallowMount(common_Navbar, {
+      propsData: {
+        ...propsData,
+        ...{
+          fromLogin: true,
+          nextRegisteredContest: {
+            admission_mode: '',
+            alias: 'prueba',
+            contest_id: 1,
+            contestants: 10,
+            description: 'Este es un concurso de prueba',
+            duration: null,
+            finish_time: new Date('2023-08-20'),
+            last_updated: new Date('2023-08-16'),
+            organizer: '',
+            original_finish_time: new Date('2023-08-17'),
+            participating: true,
+            problemset_id: 1,
+            recommended: true,
+            rerun_id: 1,
+            score_mode: null,
+            scoreboard_url: null,
+            scoreboard_url_admin: null,
+            start_time: new Date('2023-08-16'),
+            title: '',
+            window_length: null,
+          },
+        },
+      },
+    });
+
+    expect(wrapper.findComponent(user_NextRegisteredContest).exists()).toBe(true);
+  });
+
+  it('Should not show next registered contest modal when the user is not registered to a current or upcoming contest', () => {
+    const wrapper = shallowMount(common_Navbar, {
+      propsData: { ...propsData, ...{ fromLogin: true } },
+    });
+
+    expect(wrapper.findComponent(user_NextRegisteredContest).exists()).toBe(false);
   });
 });

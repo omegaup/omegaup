@@ -726,6 +726,8 @@ const translations: { [key: string]: string; } = {
   navViewProblemsAll: "Lista de Problemas",
   navViewProfile: "Mi perfil",
   newPublicTagsNotAllowed: "No est\u00e1 permitido agregar nuevas etiquetas p\u00fablicas",
+  nextRegisteredContestModalButton: "Ver detalles",
+  nextRegisteredContestModalTitle: "Recuerda participar en el concurso",
   noCoders: "No hay coders",
   nominationsRangeHeader: "Reportes de problemas (del %(lowCount) al %(highCount))",
   notProblemLevelTag: "La etiqueta enviada no es una etiqueta de nivel.",
