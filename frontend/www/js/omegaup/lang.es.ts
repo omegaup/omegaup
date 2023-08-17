@@ -1248,6 +1248,7 @@ const translations: { [key: string]: string; } = {
   qualityNominationReviewerHasAlreadySentNominationForProblem: "Ya se ha enviado una nominaci\u00f3n para este problema",
   qualityNominationShowAll: "Tambi\u00e9n mostrar nominaciones resueltas",
   qualityNominationType: "Tipo",
+  rankEmpty: "No hay datos que mostrar en el ranking",
   rankRangeHeader: "Coders con mayor puntaje (%(lowCount) a %(highCount))",
   rankScore: "Score",
   rankSolved: "Problemas",

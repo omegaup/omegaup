@@ -1,5 +1,7 @@
 import { shallowMount, mount } from '@vue/test-utils';
 
+import T from '../../lang';
+
 import user_Rank from './Rank.vue';
 
 describe('Rank.vue', () => {
@@ -27,7 +29,8 @@ describe('Rank.vue', () => {
       propsData,
     });
 
-    expect(wrapper.find('table tbody').text()).toBe('');
+    expect(wrapper.find('table').exists()).toBe(false);
+    expect(wrapper.find('div.empty-category').text()).toBe(T.rankEmpty);
   });
 
   it('Should handle a rank with data', () => {

@@ -1248,6 +1248,7 @@ const translations: { [key: string]: string; } = {
   qualityNominationReviewerHasAlreadySentNominationForProblem: "(R3vi3w3r ha5 a1r3ady 53n7 n0mina7i0n f0r pr0b13m)",
   qualityNominationShowAll: "(A150 5h0w r3501v3d n0mina7i0n5)",
   qualityNominationType: "(Typ3)",
+  rankEmpty: "(Th3r3 i5 n07 da7a 70 5h0w in 7h3 ranking)",
   rankRangeHeader: "(C0d3r5 wi7h 7h3 m057 p0in75 (%(lowCount) 70 %(highCount)))",
   rankScore: "(Sc0r3)",
   rankSolved: "(S01v3d pr0b13m5)",
