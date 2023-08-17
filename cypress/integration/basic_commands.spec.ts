@@ -102,8 +102,8 @@ describe('Basic Commands Test', () => {
   });
 
   it('Should create a contest', () => {
-    const contestOptions = contestPage.generateContestOptions();
     const loginOptions = loginPage.registerMultipleUsers(2);
+    const contestOptions = contestPage.generateContestOptions(loginOptions[0]);
     const users = [loginOptions[1].username];
 
     loginPage.giveAdminPrivilage(
@@ -118,8 +118,8 @@ describe('Basic Commands Test', () => {
   });
 
   it('Should create runs inside contest', () => {
-    const contestOptions = contestPage.generateContestOptions();
     const loginOptions = loginPage.registerMultipleUsers(2);
+    const contestOptions = contestPage.generateContestOptions(loginOptions[1]);
     const users = [loginOptions[0].username];
 
     cy.login(loginOptions[1]);
@@ -133,9 +133,9 @@ describe('Basic Commands Test', () => {
   });
 
   it('Should create two contest and merge their scoreboard', () => {
-    const contestOptions1 = contestPage.generateContestOptions();
-    const contestOptions2 = contestPage.generateContestOptions();
     const loginOptions = loginPage.registerMultipleUsers(4);
+    const contestOptions1 = contestPage.generateContestOptions(loginOptions[1]);
+    const contestOptions2 = contestPage.generateContestOptions(loginOptions[2]);
     const users1 = [loginOptions[0].username, loginOptions[3].username];
     const users2 = [loginOptions[3].username];
 
