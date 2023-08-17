@@ -76,6 +76,7 @@ OmegaUp.on('ready', () => {
           userErrorRow: this.userErrorRow,
           searchResultUsers: this.searchResultUsers,
           searchResultSchools: this.searchResultSchools,
+          hasVisitedSection: payload.hasVisitedSection,
         },
         on: {
           'update-group': (name: string, description: string) => {
