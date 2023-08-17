@@ -63,6 +63,13 @@
             @add-identity="(request) => $emit('add-identity', request)"
           ></omegaup-user-manage-identities>
         </template>
+        <template v-else-if="currentSelectedTab === 'manage-api-tokens'">
+          <omegaup-user-manage-api-tokens
+            :api-tokens="apiTokens"
+            @create-api-token="(request) => $emit('create-api-token', request)"
+            @revoke-api-token="(request) => $emit('revoke-api-token', request)"
+          ></omegaup-user-manage-api-tokens>
+        </template>
         <template v-else-if="currentSelectedTab === 'change-password'">
           <omegaup-user-edit-password
             @update-password="(request) => $emit('update-password', request)"
@@ -102,6 +109,7 @@ import user_PasswordAdd from './PasswordAdd.vue';
 import { urlMapping } from './SidebarMainInfo.vue';
 import user_ManageSchools from './ManageSchools.vue';
 import user_ManageIdentities from './ManageIdentities.vue';
+import user_ManageApiTokens from './ManageApiTokens.vue';
 import userDeleteAccount from './DeleteAccount.vue';
 
 @Component({
@@ -124,6 +132,7 @@ export default class Profile extends Vue {
   @Prop({ default: null }) viewProfileSelectedTab!: string | null;
   @Prop() identities!: types.Identity[];
   @Prop() profileBadges!: Set<string>;
+  @Prop() apiTokens!: types.ApiToken[];
   @Prop() visitorBadges!: Set<string>;
   @Prop() countries!: dao.Countries[];
   @Prop() programmingLanguages!: { [key: string]: string };
