@@ -121,6 +121,7 @@ import userDeleteAccount from './DeleteAccount.vue';
     'omegaup-user-edit-password': user_PasswordEdit,
     'omegaup-user-add-password': user_PasswordAdd,
     'omegaup-user-manage-identities': user_ManageIdentities,
+    'omegaup-user-manage-api-tokens': user_ManageApiTokens,
     'omegaup-user-manage-schools': user_ManageSchools,
     'omegaup-user-delete-account': userDeleteAccount,
   },
@@ -131,8 +132,8 @@ export default class Profile extends Vue {
   @Prop({ default: 'view-profile' }) selectedTab!: string;
   @Prop({ default: null }) viewProfileSelectedTab!: string | null;
   @Prop() identities!: types.Identity[];
-  @Prop() profileBadges!: Set<string>;
   @Prop() apiTokens!: types.ApiToken[];
+  @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
   @Prop() countries!: dao.Countries[];
   @Prop() programmingLanguages!: { [key: string]: string };
