@@ -60,64 +60,60 @@
         >
       </template>
     </div>
-    <div v-if="ranking.length === 0">
-      <div class="empty-category">{{ T.rankEmpty }}</div>
+    <div v-if="ranking.length === 0" class="empty-category text-center m-4">
+      <h2>{{ T.userRankEmptyList }}</h2>
     </div>
-    <div v-else>
-      <table class="table mb-0 table-responsive-sm">
-        <thead>
-          <tr>
-            <th scope="col" class="pl-4 column-width">#</th>
-            <th scope="col">{{ T.contestParticipant }}</th>
-            <th scope="col" class="text-right">{{ T.rankScore }}</th>
-            <th v-if="!isIndex" scope="col" class="text-right pr-4">
-              {{ T.rankSolved }}
-              <!-- id-lint off -->
-              <b-button
-                id="popover-solved-problems"
-                class="ml-1"
-                size="sm"
-                variant="none"
-                @click="showPopover = !showPopover"
-              >
-                <font-awesome-icon :icon="['fas', 'question-circle']" />
-              </b-button>
-              <!-- id-lint on -->
-              <b-popover
-                :show.sync="showPopover"
-                target="popover-solved-problems"
-                placement="right"
-              >
-                {{ T.solvedProblemsHelp }}
-              </b-popover>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(user, index) in ranking" :key="index">
-            <th scope="row" class="pl-4 column-width">{{ user.rank }}</th>
-            <td>
-              <omegaup-countryflag
-                :country="user.country"
-              ></omegaup-countryflag>
-              <omegaup-user-username
-                :classname="user.classname"
-                :linkify="true"
-                :username="user.username"
-              ></omegaup-user-username>
-              <span v-if="user.name && length !== 5"
-                ><br />
-                {{ user.name }}</span
-              >
-            </td>
-            <td class="text-right">{{ user.score }}</td>
-            <td v-if="!isIndex" class="text-right pr-4">
-              {{ user.problems_solved }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <table v-else class="table mb-0 table-responsive-sm">
+      <thead>
+        <tr>
+          <th scope="col" class="pl-4 column-width">#</th>
+          <th scope="col">{{ T.contestParticipant }}</th>
+          <th scope="col" class="text-right">{{ T.rankScore }}</th>
+          <th v-if="!isIndex" scope="col" class="text-right pr-4">
+            {{ T.rankSolved }}
+            <!-- id-lint off -->
+            <b-button
+              id="popover-solved-problems"
+              class="ml-1"
+              size="sm"
+              variant="none"
+              @click="showPopover = !showPopover"
+            >
+              <font-awesome-icon :icon="['fas', 'question-circle']" />
+            </b-button>
+            <!-- id-lint on -->
+            <b-popover
+              :show.sync="showPopover"
+              target="popover-solved-problems"
+              placement="right"
+            >
+              {{ T.userRankSolvedProblemsHelp }}
+            </b-popover>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(user, index) in ranking" :key="index">
+          <th scope="row" class="pl-4 column-width">{{ user.rank }}</th>
+          <td>
+            <omegaup-countryflag :country="user.country"></omegaup-countryflag>
+            <omegaup-user-username
+              :classname="user.classname"
+              :linkify="true"
+              :username="user.username"
+            ></omegaup-user-username>
+            <span v-if="user.name && length !== 5"
+              ><br />
+              {{ user.name }}</span
+            >
+          </td>
+          <td class="text-right">{{ user.score }}</td>
+          <td v-if="!isIndex" class="text-right pr-4">
+            {{ user.problems_solved }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
     <div v-if="isIndex" class="card-footer">
       <a href="/rank/">{{ T.wordsSeeGeneralRanking }}</a>
     </div>
@@ -233,9 +229,6 @@ export default class UserRank extends Vue {
 <style lang="scss">
 @import '../../../../sass/main.scss';
 .empty-category {
-  text-align: center;
-  font-size: 200%;
-  margin: 1em;
   color: var(--arena-contest-list-empty-category-font-color);
 }
 

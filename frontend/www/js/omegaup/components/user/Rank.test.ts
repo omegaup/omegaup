@@ -29,8 +29,8 @@ describe('Rank.vue', () => {
       propsData,
     });
 
-    expect(wrapper.find('table').exists()).toBe(false);
-    expect(wrapper.find('div.empty-category').text()).toBe(T.rankEmpty);
+    expect(wrapper.find('table').exists()).toBeFalsy;
+    expect(wrapper.find('div.empty-category').text()).toBe(T.userRankEmptyList);
   });
 
   it('Should handle a rank with data', () => {
@@ -45,7 +45,7 @@ describe('Rank.vue', () => {
               username: 'user',
               name: 'User Name',
               classname: '',
-              score: 1,
+              score: 234,
               problems_solved: 500,
             },
           ],
@@ -54,5 +54,6 @@ describe('Rank.vue', () => {
     });
 
     expect(wrapper.find('table tbody').text()).toContain('user');
+    expect(wrapper.find('table tbody').text()).toContain('234');
   });
 });
