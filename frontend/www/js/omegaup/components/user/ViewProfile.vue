@@ -349,18 +349,6 @@ export default class ViewProfile extends Vue {
 </script>
 
 <style lang="scss">
-.float-right {
-  font-size: 1rem;
-}
-
-[data-profile-tabs] h5 {
-  font-size: 1rem;
-}
-
-[data-profile-tabs] .table {
-  padding: 0;
-}
-
 a:hover {
   cursor: pointer;
 }

@@ -73,7 +73,6 @@ import { Chart } from 'highcharts-vue';
   components: {
     'omegaup-country-flag': CountryFlag,
     'omegaup-grid-paginator': GridPaginator,
-    'omegaup-table-paginator': TablePaginator,
     'omegaup-username': UserName,
     highcharts: Chart,
   },
@@ -149,7 +148,7 @@ export default class SchoolProfile extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 .list-group-item strong {
   display: inline-block;
   width: 60px;
