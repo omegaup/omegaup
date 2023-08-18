@@ -1,13 +1,20 @@
 <template>
-  <b-modal v-model="showModal" hide-footer>
-    <template #modal-title>
-      <h5 class="modal-title font-weight-bold">
-        {{ T.nextRegisteredContestModalTitle }}
-      </h5>
-    </template>
+  <b-collapse v-model="showContestInfo" class="p-4">
+    <div class="justify-content-end">
+      <button type="button" class="close" @click="showContestInfo = false">
+        ×
+      </button>
+    </div>
     <b-container>
       <b-row class="p-1">
         <b-col class="col-12 p-1 text-center">
+          <h3 class="mb-3 display-4">
+            {{ T.userNextRegisteredContestInfoTitle }}
+          </h3>
+        </b-col>
+      </b-row>
+      <b-row class="p-1 flex-column flex-sm-row" align-v="center">
+        <b-col class="col-md-4 col-sm-12 p-1 text-center">
           <h5 class="m-0">
             <a>{{ nextRegisteredContest.title }}</a>
             <font-awesome-icon
@@ -18,19 +25,17 @@
             />
           </h5>
         </b-col>
-      </b-row>
-      <b-row class="p-1 flex-column flex-sm-row">
-        <b-col class="col-md-6 col-sm-12 p-1 text-center">
+        <b-col class="col-md-4 col-sm-12 p-1 text-center">
           <font-awesome-icon class="mr-1" icon="clipboard-list" />
           {{ nextRegisteredContest.organizer }}
         </b-col>
-        <b-col class="col-md-6 col-sm-12 p-1 text-center">
+        <b-col class="col-md-4 col-sm-12 p-1 text-center">
           <font-awesome-icon class="mr-1" icon="users" />
           {{ nextRegisteredContest.contestants }}
         </b-col>
       </b-row>
-      <b-row class="p-1 flex-column flex-sm-row">
-        <b-col class="col-md-6 col-sm-12 p-1 text-center">
+      <b-row class="p-1 flex-column flex-sm-row" align-v="center">
+        <b-col class="col-md-4 col-sm-12 p-1 text-center">
           <font-awesome-icon icon="calendar-alt" />
           <a :href="startTimeLink">
             {{
@@ -40,7 +45,7 @@
             }}
           </a>
         </b-col>
-        <b-col class="col-md-6 col-sm-12 p-1 text-center">
+        <b-col class="col-md-4 col-sm-12 p-1 text-center">
           <font-awesome-icon class="mr-1" icon="stopwatch" />
           {{
             ui.formatString(T.contestDuration, {
@@ -48,21 +53,14 @@
             })
           }}
         </b-col>
-      </b-row>
-      <b-row class="p-1 justify-content-center">
-        <b-col class="col-md-4 col-sm-12 p-1">
-          <button
-            type="button"
-            class="btn btn-primary w-100"
-            data-dismiss="modal"
-            @click="onSubmit"
-          >
-            {{ T.nextRegisteredContestModalButton }}
+        <b-col class="col-md-4 col-sm-12 p-1 text-center">
+          <button type="button" class="btn btn-primary w-75" @click="onClick">
+            {{ T.userNextRegisteredContestInfoButton }}
           </button>
         </b-col>
       </b-row>
     </b-container>
-  </b-modal>
+  </b-collapse>
 </template>
 
 <script lang="ts">
@@ -74,9 +72,10 @@ import T from '../../lang';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-import { ModalPlugin, LayoutPlugin } from 'bootstrap-vue';
-Vue.use(ModalPlugin);
+
+import { LayoutPlugin, CollapsePlugin } from 'bootstrap-vue';
 Vue.use(LayoutPlugin);
+Vue.use(CollapsePlugin);
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
@@ -89,10 +88,10 @@ library.add(fas);
   },
 })
 export default class UserNextRegisteredContest extends Vue {
-  @Prop() nextRegisteredContest!: types.ContestListItem | null;
+  @Prop() nextRegisteredContest!: types.ContestListItem;
   T = T;
   ui = ui;
-  showModal = true;
+  showContestInfo = true;
 
   get contestDuration(): string {
     return time.formatContestDuration(
@@ -109,9 +108,9 @@ export default class UserNextRegisteredContest extends Vue {
     return `http://timeanddate.com/worldclock/fixedtime.html?iso=${this.nextRegisteredContest.start_time.toISOString()}`;
   }
 
-  onSubmit(): void {
-    this.showModal = false;
-    this.$emit('submit', this.nextRegisteredContest.alias);
+  onClick(): void {
+    this.showContestInfo = false;
+    this.$emit('redirect', this.nextRegisteredContest.alias);
   }
 }
 </script>
@@ -119,11 +118,10 @@ export default class UserNextRegisteredContest extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
->>> .modal-dialog {
-  max-width: 330px;
-}
-
->>> .modal-header {
-  border-bottom: 0;
+h3.display-4 {
+  color: $omegaup-primary--darker;
+  font-weight: normal;
+  font-size: 1.8rem;
+  margin-top: 1em;
 }
 </style>

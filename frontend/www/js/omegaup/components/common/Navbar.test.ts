@@ -79,7 +79,7 @@ describe('Navbar.vue', () => {
     expect(wrapper.findComponent(UserObjectivesQuestions).exists()).toBe(true);
   });
 
-  it('Should show the next registered contest modal when the user is registered to a current or upcoming contest', () => {
+  it('Should show the information of the next registered contest when the user is registered to a current or upcoming contest', () => {
     const wrapper = shallowMount(common_Navbar, {
       propsData: {
         ...propsData,
@@ -111,14 +111,16 @@ describe('Navbar.vue', () => {
       },
     });
 
-    expect(wrapper.findComponent(user_NextRegisteredContest).exists()).toBe(true);
+    expect(wrapper.findComponent(user_NextRegisteredContest).exists())
+      .toBeTruthy;
   });
 
-  it('Should not show next registered contest modal when the user is not registered to a current or upcoming contest', () => {
+  it('Should not show the information of a next registered contest when the user is not registered to a current or upcoming contest', () => {
     const wrapper = shallowMount(common_Navbar, {
       propsData: { ...propsData, ...{ fromLogin: true } },
     });
 
-    expect(wrapper.findComponent(user_NextRegisteredContest).exists()).toBe(false);
+    expect(wrapper.findComponent(user_NextRegisteredContest).exists())
+      .toBeFalsy;
   });
 });

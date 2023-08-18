@@ -343,7 +343,7 @@
     <omegaup-user-next-registered-contest
       v-if="fromLogin && isLoggedIn && nextRegisteredContest !== null"
       :next-registered-contest="nextRegisteredContest"
-      @submit="(alias) => $emit('redirect-to-next-registered-contest', alias)"
+      @redirect="(alias) => $emit('redirect-next-registered-contest', alias)"
     ></omegaup-user-next-registered-contest>
   </header>
 </template>

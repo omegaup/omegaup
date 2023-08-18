@@ -100,7 +100,7 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'redirect-to-next-registered-contest': (alias: string) => {
+          'redirect-next-registered-contest': (alias: string) => {
             window.location.href = `/arena/${encodeURIComponent(alias)}/`;
           },
         },
