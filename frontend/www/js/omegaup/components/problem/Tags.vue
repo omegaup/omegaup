@@ -25,6 +25,7 @@
             <th class="pl-5" scope="col">
               {{ T.contestEditTagDelete }}
               <a
+                v-if="currentLanguages !== ''"
                 data-toggle="tooltip"
                 rel="tooltip"
                 :title="T.problemEditTagPublicRequired"
@@ -47,7 +48,9 @@
               <button
                 type="button"
                 class="btn btn-danger"
-                :disabled="selectedPublicTags.length < 2"
+                :disabled="
+                  selectedPublicTags.length < 2 && currentLanguages !== ''
+                "
                 @click="removeTag(tag, /*public=*/ true)"
               >
                 <font-awesome-icon :icon="['fas', 'trash']" />
@@ -193,6 +196,7 @@ export default class ProblemTags extends Vue {
   @Prop({ default: false }) canAddNewTags!: boolean;
   @Prop({ default: false }) isCreate!: boolean;
   @Prop({ default: () => [] }) errors!: string[];
+  @Prop() currentLanguages!: string;
 
   T = T;
   allowTags = this.initialAllowTags;
