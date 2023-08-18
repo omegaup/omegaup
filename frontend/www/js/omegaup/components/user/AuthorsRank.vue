@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <h5 class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="card-header d-flex justify-content-between align-items-center rank-title">
       {{
         ui.formatString(T.authorRankRangeHeader, {
           lowCount: (page - 1) * length + 1,
@@ -86,7 +86,7 @@ export default class AuthorsRank extends Vue {
 }
 
 .rank-title {
-  font-size: 1.6rem;
+  font-size: 1.25rem;
   text-align: center;
 }
 

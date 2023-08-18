@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <h5 class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="card-header d-flex justify-content-between align-items-center school-rank-title">
       {{
         showHeader
           ? ui.formatString(T.schoolRankOfTheMonthHeader, {
@@ -100,6 +100,6 @@ export default class SchoolRank extends Vue {
 }
 
 .school-rank-title {
-  font-size: 1.6rem;
+  font-size: 1.25rem;
 }
 </style>

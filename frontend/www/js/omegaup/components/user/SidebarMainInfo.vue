@@ -32,7 +32,7 @@
           {{ `#${profile.rankinfo.author_ranking}` }}
         </h4>
         <small v-else>
-          <strong> {{ rank }} </strong>
+          <strong> {{ T.authorRankUnranked }} </strong>
         </small>
         <p>
           <small>
