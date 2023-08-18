@@ -1,6 +1,8 @@
 <template>
   <div class="card">
-    <h5 class="card-header d-flex justify-content-between align-items-center school-rank-title">
+    <h5
+      class="card-header d-flex justify-content-between align-items-center school-rank-title"
+    >
       {{
         showHeader
           ? ui.formatString(T.schoolRankOfTheMonthHeader, {
