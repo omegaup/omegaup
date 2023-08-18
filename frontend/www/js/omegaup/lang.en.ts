@@ -1251,6 +1251,7 @@ const translations: { [key: string]: string; } = {
   rankRangeHeader: "Coders with the most points (%(lowCount) to %(highCount))",
   rankScore: "Score",
   rankSolved: "Solved problems",
+  rankingNoUsers: "We don't have data to display on the Ranking graph.",
   recordNotFound: "Record not found.",
   registerForContest: "Register for contest",
   registerForContestChallenges: "Challenge",
