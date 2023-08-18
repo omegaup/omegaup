@@ -25,19 +25,11 @@
         })
       }}</span>
       <div class="mt-2 row float-sm-right">
-        <div class="col-sm">
-          <a
-            :href="`/course/${course.alias}/clarification/`"
-            role="button"
-            class="btn btn-primary"
-            >{{ T.wordsClarifications }}</a
-          >
-        </div>
-        <div class="col-sm">
+        <div class="col">
           <div class="dropdown">
             <a
               data-button-statistics
-              class="btn btn-primary dropdown-toggle"
+              class="btn btn-primary dropdown-toggle p-1 p-sm-2"
               href="#"
               role="button"
               data-toggle="dropdown"
@@ -68,11 +60,11 @@
             </div>
           </div>
         </div>
-        <div class="col-sm">
+        <div class="col d-flex justify-content-center">
           <div class="dropdown">
             <a
               data-button-manage-course
-              class="btn btn-primary dropdown-toggle"
+              class="btn btn-primary dropdown-toggle p-1 p-sm-2"
               href="#"
               role="button"
               data-toggle="dropdown"
@@ -103,22 +95,30 @@
             </div>
           </div>
         </div>
+        <div class="col">
+          <a
+            :href="`/course/${course.alias}/clarification/`"
+            role="button"
+            class="btn btn-primary p-1 p-sm-2"
+            >{{ T.wordsClarifications }}</a
+          >
+        </div>
       </div>
       <div class="card mt-5">
         <h5 class="card-header">{{ T.wordsContent }}</h5>
         <div class="table-responsive">
           <table class="table table-striped table-hover mb-0">
             <thead>
-              <tr>
-                <th class="text-center" scope="col">
+              <tr class="text-center">
+                <th class="align-middle" scope="col">
                   {{ T.wordsContentType }}
                 </th>
-                <th class="text-center" scope="col">{{ T.wordsName }}</th>
-                <th v-if="!course.is_admin" class="text-center" scope="col">
+                <th class="align-middle" scope="col">{{ T.wordsName }}</th>
+                <th v-if="!course.is_admin" class="align-middle" scope="col">
                   {{ T.wordsCompletedPercentage }}
                 </th>
-                <th class="text-center" scope="col">{{ T.wordsDueDate }}</th>
-                <th v-if="course.is_admin" class="text-center" scope="col">
+                <th class="align-middle" scope="col">{{ T.wordsDueDate }}</th>
+                <th v-if="course.is_admin" class="align-middle" scope="col">
                   {{ T.wordsActions }}
                 </th>
               </tr>
@@ -134,8 +134,9 @@
                 v-else
                 :key="assignment.alias"
                 :data-content-alias="assignment.alias"
+                class="text-center"
               >
-                <td class="text-center">
+                <td class="align-middle">
                   <template v-if="assignment.assignment_type === 'homework'">
                     <font-awesome-icon icon="file-alt" />
                     <span class="ml-2">{{ T.wordsHomework }}</span>
@@ -152,19 +153,19 @@
                 <td>
                   <a
                     data-course-homework-button
-                    class="text-center"
+                    class="align-middle"
                     :href="`/course/${course.alias}/assignment/${assignment.alias}/`"
                   >
                     {{ assignment.name }}
                   </a>
                 </td>
-                <td v-if="!course.is_admin" class="text-center">
+                <td v-if="!course.is_admin" class="align-middle">
                   {{ getAssignmentProgress(progress[assignment.alias]) }}
                 </td>
-                <td class="text-center">
+                <td class="align-middle">
                   {{ getFormattedTime(assignment.finish_time) }}
                 </td>
-                <td v-if="course.is_admin" class="text-center">
+                <td v-if="course.is_admin" class="align-middle">
                   <a
                     data-course-scoreboard-button
                     class="mr-2"
@@ -214,7 +215,7 @@
           </p>
         </div>
       </div>
-      <div class="d-flex justify-content-end">
+      <div class="d-flex justify-content-end py-3 px-5 mx-3 p-sm-0 mx-sm-0">
         <div class="dropdown">
           <a
             class="btn btn-primary dropdown-toggle"
