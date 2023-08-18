@@ -1187,7 +1187,7 @@ const translations: { [key: string]: string; } = {
   profileName: "Name",
   profileOrganizedContests: "Organized contests",
   profilePersonalData: "Personal data",
-  profilePrivateRankMessage: "When you active this option, your account ranking will not be visible.",
+  profilePrivateRankMessage: "When you enable this option, your account ranking will not be visible.",
   profilePrivateRankMessageTitle: "Warning",
   profileRank: "Rank",
   profileRankBeginner: "\u03bf",
