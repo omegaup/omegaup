@@ -20,6 +20,7 @@
       </div>
       <div class="form-group mr-2">
         <omegaup-common-typeahead
+          class="typeahead-index"
           data-problem-keyword-search
           :only-existing-tags="false"
           :max-results="10"
@@ -143,5 +144,8 @@ export default class ProblemSearchBar extends Vue {
   .form-control {
     margin-left: 0 !important;
   }
+}
+.typeahead-index{
+  z-index: 9999;
 }
 </style>
