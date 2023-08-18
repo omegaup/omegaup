@@ -44,7 +44,7 @@ describe('GridPaginator.vue', () => {
       },
     });
 
-    expect(wrapper.find('h5.card-header').text()).toContain(title);
+    expect(wrapper.find('h6.card-header').text()).toContain(title);
     expect(wrapper.find('table').exists()).toBeFalsy();
   });
 
