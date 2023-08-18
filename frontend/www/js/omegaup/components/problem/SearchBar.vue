@@ -70,13 +70,6 @@
         type="submit"
         :value="T.wordsSearch"
       />
-      <button
-        class="btn btn-primary ml-2 align-self-center form-control"
-        type="button"
-        @click="$emit('show-finder-wizard')"
-      >
-        {{ T.wizardLinkText }}
-      </button>
     </form>
   </div>
 </template>
