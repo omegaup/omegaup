@@ -215,34 +215,29 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             $adminPayload['currentAssignment']['alias']
         );
 
-        // Student should throw an exception as the assignment has not started yet
+        // Student should not have problems even when the assignment has not started yet
         $studentLogin = self::login($student['identity']);
-        try {
-            \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
-                'auth_token' => $studentLogin->auth_token,
-                'course_alias' => $courseData['course_alias'],
-                'assignment_alias' => $courseData['assignment']->alias,
-            ]));
-            $this->fail('Should have thrown a ForbiddenAccessException');
-        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertSame($e->getMessage(), 'assignmentNotStarted');
-        }
+        $studentPayload = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
+            'auth_token' => $studentLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment']->alias,
+        ]))['templateProperties']['payload'];
 
-        try {
-            \OmegaUp\Controllers\Course::getAssignmentDetails(
-                $student['identity'],
-                null,
-                $courseData['course'],
-                \OmegaUp\DAO\Groups::getByPK(
-                    intval($courseData['course']->group_id)
-                ),
-                $courseData['assignment_alias'],
-            );
-            $this->fail('Should have thrown a ForbiddenAccessException');
-        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertSame($e->getMessage(), 'assignmentNotStarted');
-        }
+        $this->assertSame(
+            $courseData['course']->name,
+            $studentPayload['courseDetails']['name']
+        );
+        $this->assertSame(
+            $courseData['assignment']->alias,
+            $studentPayload['currentAssignment']['alias']
+        );
 
+        // Student should not be able to see the name, description or any problem in the assignment
+        $this->assertEmpty($studentPayload['currentAssignment']['name']);
+        $this->assertEmpty($studentPayload['currentAssignment']['description']);
+        $this->assertEmpty($studentPayload['currentAssignment']['problems']);
+
+        // Student should throw an exception as the assignment has not started yet
         try {
             \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
                 new \OmegaUp\Request([
