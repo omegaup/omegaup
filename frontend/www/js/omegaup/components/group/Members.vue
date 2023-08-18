@@ -81,6 +81,7 @@
               <font-awesome-icon :icon="['fas', 'edit']" />
             </button>
             <button
+              data-identity-change-password
               class="btn btn-link"
               :title="T.groupEditMembersChangePassword"
               @click="onChangePass(identity.username)"
