@@ -283,7 +283,6 @@
                 class="text-center opacity-4 font-weight-bold"
               >
                 <span class="mr-1">{{ status(run) }}</span>
-
                 <button
                   v-if="!!statusHelp(run)"
                   type="button"
@@ -295,6 +294,11 @@
                 >
                   <font-awesome-icon :icon="['fas', 'question-circle']" />
                 </button>
+                <span
+                  v-if="run.submission_feedback_id !== null && showDisqualify"
+                  class="position-absolute top-0 end-0 badge badge-pill badge-danger"
+                  >1
+                </span>
               </td>
               <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
               <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
