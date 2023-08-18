@@ -63,7 +63,6 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import CountryFlag from '../CountryFlag.vue';
 import GridPaginator from '../common/GridPaginator.vue';
-import TablePaginator from '../common/TablePaginator.vue';
 import UserName from '../user/Username.vue';
 import { types } from '../../api_types';
 import { SchoolCoderOfTheMonth, SchoolUser } from '../../linkable_resource';
