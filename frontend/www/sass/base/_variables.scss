@@ -13,6 +13,7 @@
   --header-caret-border-color: #ffffff;
   --header-navbar-right-caret-border-color: #000000;
   --header-navbar-right-a-font-color: #000000;
+  --header-navbar-primary-link-color: #dbe2f3;
   --header-navbar-brand-background-color: #f2f2f2;
   --header-navbar-dropdown-item-font-color: #000000;
   --header-active-color: #5f87d4;
@@ -243,4 +244,8 @@
 
   // FOOTER
   --footer-link-hover-color: rgb(212, 215, 224);
+
+  // MULTI USER ADD AREA
+  --multi-user-add-area-edit-button-color: #8bb0d3;
+  --multi-user-add-area-edit-button-color--hover: #666;
 }
