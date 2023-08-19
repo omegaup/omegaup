@@ -241,6 +241,67 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Testing the modifications on IdentitiesSchools
+     * on each user information update
+     */
+    public function testUpdateUserWithNewSchool() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        // On user creation, no IdentitySchool is created
+        $this->assertNull($identity->current_identity_school_id);
+
+        $schoolName = 'New school';
+
+        // Update user, adding a new school with value 0 in school_id
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'school_id' => 0,
+            'school_name' => $schoolName,
+        ]));
+
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $identity->username
+        );
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identity->current_identity_school_id
+        );
+
+        $school = \OmegaUp\DAO\Schools::getByPK($identitySchool->school_id);
+
+        $this->assertSame($school->name, $schoolName);
+
+        // Update user, adding a new school with no value in school_id
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'school_name' => $schoolName,
+        ]));
+
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $identity->username
+        );
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identity->current_identity_school_id
+        );
+
+        $school = \OmegaUp\DAO\Schools::getByPK($identitySchool->school_id);
+
+        $this->assertSame($school->name, $schoolName);
+
+        // Update user, adding a new school with null value in school_id should
+        // thow an exception
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'school_id' => null,
+                'school_name' => $schoolName,
+            ]));
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterEmpty', $e->getMessage());
+        }
+    }
+
+    /**
      * Update profile username with non-existence username
      */
     public function testUsernameUpdate() {

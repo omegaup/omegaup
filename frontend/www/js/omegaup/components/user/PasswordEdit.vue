@@ -45,6 +45,7 @@
     </div>
     <div>
       <button
+        data-save-changed-password
         type="submit"
         class="btn btn-primary mr-2"
         :disabled="submitDisabled"

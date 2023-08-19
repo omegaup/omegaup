@@ -2784,6 +2784,7 @@ export namespace types {
     isLoggedIn: boolean;
     isMainUserIdentity: boolean;
     isReviewer: boolean;
+    isUnder13User: boolean;
     lockDownImage: string;
     navbarSection: string;
     omegaUpLockDown: boolean;
@@ -3393,6 +3394,7 @@ export namespace types {
     email?: string;
     identity?: dao.Identities;
     is_admin: boolean;
+    is_under_13_user: boolean;
     loginIdentity?: dao.Identities;
     user?: dao.Users;
     valid: boolean;
@@ -3647,6 +3649,7 @@ export namespace types {
 
   export interface LoginDetailsPayload {
     facebookUrl?: string;
+    hasVisitedSection?: boolean;
     statusError?: string;
     validateRecaptcha: boolean;
     verifyEmailSuccessfully?: string;
