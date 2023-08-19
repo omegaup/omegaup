@@ -1429,7 +1429,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'courseName' => $course->name,
                         'assignmentName' => $assignment->name,
                     ],
-                    'url' => "/course/{$course->alias}/assignment/{$assignmentAlias}/#problems",
+                    'url' => "/course/{$course->alias}/assignment/{$assignmentAlias}/",
                     'iconUrl' => '/media/info.png',
                 ],
             ];
