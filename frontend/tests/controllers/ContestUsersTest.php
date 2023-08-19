@@ -551,151 +551,79 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    public function testNextRegisteredContestForUser() {
-        // Create 3 users
-        ['user' => $user1, 'identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
-            'username' => 'test_contest_user_1',
-        ]));
-        ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
-            'username' => 'test_contest_user_2',
-        ]));
-        ['user' => $user3, 'identity' => $identity3] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
-            'username' => 'test_contest_user_3',
-        ]));
-
-        // Get the next registered contest for a user who is not registered in any contest
-        $nextRegisteredContestForUser1 = \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
-            $identity1
-        );
-        $this->assertNull($nextRegisteredContestForUser1);
-
+    /**
+     * A PHPUnit data provider for the test of the next registered contest for a user.
+     *
+     * @return list<array{0: list<\OmegaUp\Timestamp>, 1: list<\OmegaUp\Timestamp>, 2: null|int}>
+     */
+    public function NextRegisteredContestForUserProvider(): array {
         $currentTime = \OmegaUp\Time::get();
         $timePast1 =  new \OmegaUp\Timestamp($currentTime - 180 * 60);
         $timePast2 =  new \OmegaUp\Timestamp($currentTime - 120 * 60);
         $timePast3 =  new \OmegaUp\Timestamp($currentTime - 60 * 60);
         $timeFuture1 =  new \OmegaUp\Timestamp($currentTime + 60 * 60);
         $timeFuture2 =  new \OmegaUp\Timestamp($currentTime + 120 * 60);
-        // Get 2 past contests
-        // The first one started 3 hours ago, and it finished 1 hour ago
-        // It had a duration of 2 hours
-        $pastContest1 = \OmegaUp\Test\Factories\Contest::createContest(
-            new \OmegaUp\Test\Factories\ContestParams([
-                'title' => 'past_contest_1',
-                'startTime' => $timePast1,
-                'finishTime' => $timePast3,
-            ])
-        );
-        // The second one started 2 hours ago, and it finished 1 hour ago
-        // It had a duration of 1 hour
-        $pastContest2 = \OmegaUp\Test\Factories\Contest::createContest(
-            new \OmegaUp\Test\Factories\ContestParams([
-                'title' => 'past_contest_2',
-                'startTime' => $timePast2,
-                'finishTime' => $timePast3,
-            ])
-        );
-        // Get 2 active contests
-        // The first one started 2 hours ago, and it will finish in 2 hours
-        // It has a duration of 4 hours
-        $activeContest1 = \OmegaUp\Test\Factories\Contest::createContest(
-            new \OmegaUp\Test\Factories\ContestParams([
-                'title' => 'active_contest_1',
-                'startTime' => $timePast2,
-                'finishTime' => $timeFuture2,
-            ])
-        );
-        // The second one started 2 hours ago, and it will finish in 1 hour
-        // It has a duration of 3 hours
-        $activeContest2 = \OmegaUp\Test\Factories\Contest::createContest(
-            new \OmegaUp\Test\Factories\ContestParams([
-                'title' => 'active_contest_2',
-                'startTime' => $timePast2,
-                'finishTime' => $timeFuture1,
-            ])
-        );
-        // Get a future contest
-        // It will start in 1 hour and it will finish in 2 hours
-        // It has a duration of 1 hour
-        $futureContest = \OmegaUp\Test\Factories\Contest::createContest(
-            new \OmegaUp\Test\Factories\ContestParams([
-                'title' => 'future_contest',
-                'startTime' => $timeFuture1,
-                'finishTime' => $timeFuture2,
-            ])
+        return [
+            // Get the next registered contest for a user who is not registered in any contest
+            [[], [], null],
+            // Although both contests started at the same time, the second one is scheduled
+            // to finish sooner, making it the next registered contest.
+            [[$timePast1, $timePast1], [$timeFuture2, $timeFuture1], 1],
+            // The first contest started first
+            [[$timePast1, $timeFuture1], [$timeFuture1, $timeFuture2], 0],
+            // The user doesn't have a next registered contest because the two contests already finished
+            [[$timePast1, $timePast2], [$timePast3, $timePast3], null],
+            // The third contest is the only current or upcoming contest
+            [[$timePast1, $timePast2, $timeFuture1], [$timePast3, $timePast3, $timeFuture2], 2],
+        ];
+    }
+
+    /**
+     * @dataProvider NextRegisteredContestForUserProvider
+     *
+     * @param list<\OmegaUp\Timestamp> $startTimes
+     * @param list<\OmegaUp\Timestamp> $finishTimes
+     * @param null|int $nextExpectedRegisteredContestIndex
+     */
+    public function testNextRegisteredContestForUser(
+        $startTimes,
+        $finishTimes,
+        $nextExpectedRegisteredContestIndex
+    ) {
+        // Create user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create contests and add user to them
+        $n = count($startTimes);
+        $contests = [];
+        for ($i = 0; $i < $n; $i++) {
+            $contests[] = \OmegaUp\Test\Factories\Contest::createContest(
+                new \OmegaUp\Test\Factories\ContestParams([
+                    'title' => 'Contest_' . $i,
+                    'startTime' => $startTimes[$i],
+                    'finishTime' => $finishTimes[$i],
+                ])
+            );
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $contests[$i],
+                $identity
+            );
+        }
+
+        // Get the next registered contest for the user
+        $nextRegisteredContestForUser = \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
+            $identity
         );
 
-        // Add user1 to the active contests
-        \OmegaUp\Test\Factories\Contest::addUser(
-            $activeContest1,
-            $identity1
-        );
-        \OmegaUp\Test\Factories\Contest::addUser(
-            $activeContest2,
-            $identity1
-        );
-
-        // Check that the next registered contest for user1 is activeContest2
-        // Although both contests started at the same time, activeContest2 is scheduled
-        // to finish sooner, making it the next registered contest.
-        $nextRegisteredContestForUser1 = \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
-            $identity1
-        );
-        $this->assertSame(
-            $activeContest2['contest']->title,
-            $nextRegisteredContestForUser1['title']
-        );
-
-        // Add user2 to an active contest and to a future contest
-        \OmegaUp\Test\Factories\Contest::addUser(
-            $activeContest1,
-            $identity2
-        );
-        \OmegaUp\Test\Factories\Contest::addUser(
-            $futureContest,
-            $identity2
-        );
-
-        // Check that the next registered contest for user2 is activeContest1
-        // because it started first
-        $nextRegisteredContestForUser2 = \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
-            $identity2
-        );
-        $this->assertSame(
-            $activeContest1['contest']->title,
-            $nextRegisteredContestForUser2['title']
-        );
-
-        // Add user3 to the past contests
-        \OmegaUp\Test\Factories\Contest::addUser(
-            $pastContest1,
-            $identity3
-        );
-        \OmegaUp\Test\Factories\Contest::addUser(
-            $pastContest2,
-            $identity3
-        );
-
-        // Check that user3 doesn't have a next registered contest
-        $nextRegisteredContestForUser3 = \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
-            $identity3
-        );
-        $this->assertNull($nextRegisteredContestForUser3);
-
-        // Add user3 to a future contest
-        \OmegaUp\Test\Factories\Contest::addUser(
-            $futureContest,
-            $identity3
-        );
-
-        // Check that the next registered contest for user3 is futureContest
-        // because it is the only current or upcoming contest for user3
-        $nextRegisteredContestForUser3 = \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
-            $identity3
-        );
-        $this->assertSame(
-            $futureContest['contest']->title,
-            $nextRegisteredContestForUser3['title']
-        );
+        // Check that the next registered contest for the user is correct
+        if (is_null($nextExpectedRegisteredContestIndex)) {
+            $this->assertNull($nextRegisteredContestForUser);
+        } else {
+            $this->assertSame(
+                $contests[$nextExpectedRegisteredContestIndex]['contest']->title,
+                $nextRegisteredContestForUser['title']
+            );
+        }
     }
 
     private static function numberOfUsersSharingBasicInformation(
