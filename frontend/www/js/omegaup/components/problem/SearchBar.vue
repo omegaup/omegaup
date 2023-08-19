@@ -71,13 +71,6 @@
         type="submit"
         :value="T.wordsSearch"
       />
-      <button
-        class="btn btn-primary ml-2 align-self-center form-control"
-        type="button"
-        @click="$emit('show-finder-wizard')"
-      >
-        {{ T.wizardLinkText }}
-      </button>
     </form>
   </div>
 </template>
@@ -145,7 +138,7 @@ export default class ProblemSearchBar extends Vue {
     margin-left: 0 !important;
   }
 }
-.typeahead-index{
+.typeahead-index {
   z-index: 9999;
 }
 </style>
