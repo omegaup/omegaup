@@ -349,7 +349,6 @@ export default class ViewProfile extends Vue {
 </script>
 
 <style lang="scss">
-
 a:hover {
   cursor: pointer;
 }
