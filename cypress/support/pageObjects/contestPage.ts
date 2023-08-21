@@ -26,6 +26,7 @@ export class ContestPage {
 
   addIdentitiesGroup(): void {
     cy.get('[href="#identities"]').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('[name="identities"]').attachFile('identities.csv');
 
     cy.get('[data-identity-username]').then((rawHTMLElements) => {
