@@ -541,7 +541,7 @@ const translations: { [key: string]: string; } = {
   createProblemInteractiveGuideOrigin: "Elije la fuente del problema",
   createProblemInteractiveGuideProblemTitle: "Elije el titulo del problema",
   createProblemInteractiveGuideShortTitle: "Elije un titulo corto para el problema",
-  createProblemInteractiveGuideTagsAndLevel: "Choose the tags and level for your problem",
+  createProblemInteractiveGuideTagsAndLevel: "Elije las etiquetas y selecciona el nivel de tu problema",
   createProblemInteractiveGuideTitle: "Crear un problema",
   createProblemInteractiveGuideType: "Elije el tipo de problema",
   createProblemInteractiveGuideValidator: "Selecciona el tipo de validador de salida",
