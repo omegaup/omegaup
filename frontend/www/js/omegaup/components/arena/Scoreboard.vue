@@ -19,9 +19,12 @@
       </div>
     </slot>
     <highcharts
-      v-if="rankingChartOptions"
+      v-if="rankingChartOptions && Object.keys(rankingChartOptions).length"
       :options="rankingChartOptions"
     ></highcharts>
+    <div v-else class="bg-white text-center p-4 mb-3">
+      {{ T.rankingNoUsers }}
+    </div>
     <label v-if="showInvitedUsersFilter">
       <input
         v-model="onlyShowExplicitlyInvited"
