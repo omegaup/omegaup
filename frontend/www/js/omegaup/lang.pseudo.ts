@@ -1253,6 +1253,7 @@ const translations: { [key: string]: string; } = {
   rankRangeHeader: "(C0d3r5 wi7h 7h3 m057 p0in75 (%(lowCount) 70 %(highCount)))",
   rankScore: "(Sc0r3)",
   rankSolved: "(S01v3d pr0b13m5)",
+  rankingNoUsers: "(W3 d0n'7 hav3 da7a 70 di5p1ay 0n 7h3 Ranking graph.)",
   recordNotFound: "(R3c0rd n07 f0und.)",
   registerForContest: "(R3gi573r f0r c0n7357)",
   registerForContestChallenges: "(Cha113ng3)",
