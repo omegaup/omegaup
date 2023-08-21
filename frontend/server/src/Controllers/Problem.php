@@ -362,15 +362,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
             $hasPublicTags = false;
-            foreach ($selectedTags as $tag) {
-                if (!$hasPublicTags) {
-                    $hasPublicTags = boolval($tag['public']);
-                }
-                if (empty($tag['tagname'])) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'parameterEmpty',
-                        'tagname'
-                    );
+            if (!is_null($selectedTags)) {
+                foreach ($selectedTags as $tag) {
+                    if (!$hasPublicTags) {
+                        $hasPublicTags = boolval($tag['public']);
+                    }
+                    if (empty($tag['tagname'])) {
+                        throw new \OmegaUp\Exceptions\InvalidParameterException(
+                            'parameterEmpty',
+                            'tagname'
+                        );
+                    }
                 }
             }
             if (!$hasPublicTags && !$isLecture) {
