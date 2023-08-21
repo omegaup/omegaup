@@ -134,6 +134,7 @@ export class ContestPage {
     cy.createContest(contestOptions);
 
     cy.location('href').should('include', contestOptions.contestAlias);
+    cy.get('.introjs-skipbutton').click();
     cy.get('[name="title"]').should('have.value', contestOptions.contestAlias);
     cy.get('[name="alias"]').should('have.value', contestOptions.contestAlias);
     cy.get('[name="description"]').should(
