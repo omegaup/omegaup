@@ -3314,7 +3314,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             $submission,
             $course,
             $courseSubmissionInfo,
-            $course,
             $feedback
         );
 

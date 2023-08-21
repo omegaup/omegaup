@@ -288,7 +288,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 ) AS status_memory
             FROM
                 Submissions s
-            INNER JOIN
+            LEFT JOIN
                 Submission_Feedback sf ON sf.submission_id = s.submission_id
             INNER JOIN
                 Runs r ON r.run_id = s.current_run_id

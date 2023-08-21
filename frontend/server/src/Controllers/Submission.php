@@ -174,20 +174,26 @@ class Submission extends \OmegaUp\Controllers\Controller {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
+            if (is_null($submission->guid)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'submissionNotFound'
+                );
+            }
             $submissionFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
                 $submission->guid,
                 rangeBytesStart: null
             );
 
             if (is_null($submissionFeedback)) {
+                $submissionFeedback = new \OmegaUp\DAO\VO\SubmissionFeedback([
+                    'identity_id' => $feedbackAuthor->identity_id,
+                    'submission_id' => $submission->submission_id,
+                    'range_bytes_start' => $rangeBytesStart,
+                    'range_bytes_end' => $rangeBytesEnd,
+                    'feedback' => $feedback,
+                ]);
                 \OmegaUp\DAO\Base\SubmissionFeedback::create(
-                    new \OmegaUp\DAO\VO\SubmissionFeedback([
-                        'identity_id' => $feedbackAuthor->identity_id,
-                        'submission_id' => $submission->submission_id,
-                        'range_bytes_start' => $rangeBytesStart,
-                        'range_bytes_end' => $rangeBytesEnd,
-                        'feedback' => $feedback,
-                    ])
+                    $submissionFeedback
                 );
 
                 if (!is_null($courseSubmissionInfo['author_id'])) {
