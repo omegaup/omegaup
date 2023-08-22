@@ -220,7 +220,6 @@ const translations: { [key: string]: string; } = {
   contestButtonEnter: "Enter",
   contestButtonScoreboard: "Scoreboard",
   contestButtonSeeDetails: "See details",
-  contestButtonSingUp: "Sign up",
   contestCanNotChangeToContestForTeams: "A normal contest cannot be changed to a contest for teams",
   contestDetailsGoToContest: "Go to contest",
   contestDownloadListOfUsersInContest: "Download list of users in the contest",

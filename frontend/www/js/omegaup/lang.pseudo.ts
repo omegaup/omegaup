@@ -220,7 +220,6 @@ const translations: { [key: string]: string; } = {
   contestButtonEnter: "(En73r)",
   contestButtonScoreboard: "(Sc0r3b0ard)",
   contestButtonSeeDetails: "(S33 d37ai15)",
-  contestButtonSingUp: "(Sign up)",
   contestCanNotChangeToContestForTeams: "(A n0rma1 c0n7357 cann07 b3 chang3d 70 a c0n7357 f0r 73am5)",
   contestDetailsGoToContest: "(G0 70 c0n7357)",
   contestDownloadListOfUsersInContest: "(D0wn10ad 1i57 0f u53r5 in 7h3 c0n7357)",

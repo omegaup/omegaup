@@ -218,7 +218,6 @@ contestBasicInformationNeeded = "Para participar do concurso, você deve preench
 contestButtonEnter = "Entrar"
 contestButtonScoreboard = "Scoreboard"
 contestButtonSeeDetails = "Ver detalhes"
-contestButtonSingUp = "Inscrever-se"
 contestCanNotChangeToContestForTeams = "O concurso normal não pode ser alterado para o concurso para equipes"
 contestDetailsGoToContest = "Ir ao concurso"
 contestDownloadListOfUsersInContest = "Faça o download da lista de usuários no concurso"
