@@ -217,6 +217,7 @@ contestAdmissionModeDescription = "Selecciona el modo de acceso del concurso. Ex
 contestBasicInformationNeeded = "Para unirte al concurso debes completar tu información básica. Ir a [Mi perfil](/profile/#edit-basic-information)"
 contestButtonEnter = "Entrar"
 contestButtonScoreboard = "Scoreboard"
+contestButtonSeeDetails = "Ver detalles"
 contestButtonSingUp = "Inscribirme"
 contestCanNotChangeToContestForTeams = "Un concurso normal no se puede cambiar a concurso para equipos"
 contestDetailsGoToContest = "Ir al concurso"

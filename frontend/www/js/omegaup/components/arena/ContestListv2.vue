@@ -281,7 +281,7 @@
             <template #contest-button-enter>
               <div></div>
             </template>
-            <template #contest-button-singup>
+            <template #contest-button-seedetails>
               <div></div>
             </template>
           </omegaup-contest-card>
