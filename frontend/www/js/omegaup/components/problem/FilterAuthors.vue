@@ -1,6 +1,6 @@
 <template>
-  <div class="card">
-    <div class="card-body">
+  <div class="mx-auto card col-12 col-sm-5 col-lg-12">
+    <div class="card-body p-0 py-3 p-lg-3">
       <h3>{{ T.problemCollectionAuthors }}</h3>
       <div
         v-for="author in authors.ranking"
@@ -52,3 +52,9 @@ export default class FilterAuthors extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.section-font-size {
+  font-size: 1.44rem;
+}
+</style>

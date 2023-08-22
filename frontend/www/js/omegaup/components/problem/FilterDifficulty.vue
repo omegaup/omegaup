@@ -1,6 +1,6 @@
 <template>
-  <div class="card mt-4">
-    <div class="card-body">
+  <div class="mx-auto card mt-0 mt-lg-4 col-6 col-sm-3 col-lg-12">
+    <div class="card-body p-0 py-3 p-lg-3">
       <h3>{{ T.wordsDifficulty }}</h3>
       <div
         v-for="difficulty in difficulties"
@@ -59,3 +59,9 @@ export default class FilterDifficulty extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.section-font-size {
+  font-size: 1.44rem;
+}
+</style>

@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <h3>{{ T.problemEditAddTags }}</h3>
+      <h3 class="section-font-size text-center">{{ T.problemEditAddTags }}</h3>
       <div v-for="(tag, index) in tags" :key="index" class="form-check">
         <label class="form-check-label">
           <input
@@ -12,7 +12,7 @@
           />{{ `${T[tag.name]}  (${tag.problemCount})` }}
         </label>
       </div>
-      <div class="form-group">
+      <div class="form-group mt-2">
         <vue-typeahead-bootstrap
           :data="publicQualityTagNames"
           :serializer="publicQualityTagsSerializer"
@@ -66,3 +66,9 @@ export default class FilterTags extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.section-font-size {
+  font-size: 1.44rem;
+}
+</style>

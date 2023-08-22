@@ -55,6 +55,24 @@ export namespace dao {
     username?: string;
   }
 
+  export interface SubmissionFeedback {
+    date?: Date;
+    feedback?: string;
+    identity_id?: number;
+    range_bytes_end?: number;
+    range_bytes_start?: number;
+    submission_feedback_id?: number;
+    submission_id?: number;
+  }
+
+  export interface SubmissionFeedbackThread {
+    contents?: string;
+    date?: Date;
+    identity_id?: number;
+    submission_feedback_id?: number;
+    submission_feedback_thread_id?: number;
+  }
+
   export interface Users {
     birth_date?: string;
     creation_timestamp?: Date;
@@ -2766,6 +2784,7 @@ export namespace types {
     isLoggedIn: boolean;
     isMainUserIdentity: boolean;
     isReviewer: boolean;
+    isUnder13User: boolean;
     lockDownImage: string;
     navbarSection: string;
     omegaUpLockDown: boolean;
@@ -3375,6 +3394,7 @@ export namespace types {
     email?: string;
     identity?: dao.Identities;
     is_admin: boolean;
+    is_under_13_user: boolean;
     loginIdentity?: dao.Identities;
     user?: dao.Users;
     valid: boolean;
@@ -3629,6 +3649,7 @@ export namespace types {
 
   export interface LoginDetailsPayload {
     facebookUrl?: string;
+    hasVisitedSection?: boolean;
     statusError?: string;
     validateRecaptcha: boolean;
     verifyEmailSuccessfully?: string;
@@ -5511,7 +5532,10 @@ export namespace messages {
 
   // Submission
   export type SubmissionSetFeedbackRequest = { [key: string]: any };
-  export type SubmissionSetFeedbackResponse = {};
+  export type SubmissionSetFeedbackResponse = {
+    submissionFeedback?: dao.SubmissionFeedback;
+    submissionFeedbackThread?: dao.SubmissionFeedbackThread;
+  };
 
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
