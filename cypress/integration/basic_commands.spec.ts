@@ -227,6 +227,7 @@ describe('Basic Commands Test', () => {
 
     // Assert problem has been created
     cy.location('href').should('include', problemOptions.problemAlias); // Url
+    cy.get('.introjs-skipbutton').click();
     cy.get('[name="title"]').should('have.value', problemOptions.problemAlias); // Title
     cy.get('[name="problem_alias"]').should(
       'have.value',

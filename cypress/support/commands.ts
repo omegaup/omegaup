@@ -63,9 +63,9 @@ Cypress.Commands.add(
   }: ProblemOptions) => {
     cy.visit('/');
     // Select problem nav
-    cy.get('.introjs-skipbutton').click();
     cy.get('[data-nav-problems]').click();
     cy.get('[data-nav-problems-create]').click();
+    cy.get('.introjs-skipbutton').click();
     // Fill basic problem form
     cy.get('[name="title"]').type(problemAlias).blur();
 
