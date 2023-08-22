@@ -46,6 +46,7 @@ describe('Basic Commands Test', () => {
     cy.location('href').should('include', courseOptions.courseAlias); // Url
     cy.get('[data-course-name]').contains(courseOptions.courseAlias);
     cy.get('[data-tab-course').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('[data-course-new-name]').should(
       'have.value',
       courseOptions.courseAlias,
@@ -117,6 +118,7 @@ describe('Basic Commands Test', () => {
     cy.location('href').should('include', courseOptions.courseAlias); // Url
     cy.get('[data-course-name]').contains(courseOptions.courseAlias);
     cy.get('[data-tab-course').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('[data-course-new-name]').should(
       'have.value',
       courseOptions.courseAlias,
