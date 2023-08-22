@@ -9,6 +9,7 @@
         :languages="languages"
         :keyword="keyword"
         :tags="tags"
+        :only-quality-seal="onlyQualitySeal"
         :search-result-problems="searchResultProblems"
         @update-search-result-problems="
           (query) => $emit('update-search-result-problems', query)
@@ -78,6 +79,7 @@ export default class List extends Vue {
   @Prop() mode!: string;
   @Prop() column!: string;
   @Prop() tags!: string[];
+  @Prop() onlyQualitySeal!: boolean;
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() searchResultProblems!: types.ListItem[];
