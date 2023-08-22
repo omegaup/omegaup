@@ -47,6 +47,7 @@
           (profile.is_own_profile || !profile.is_private)
         "
         class="mb-3 text-center"
+        data-preferred-programming-languages
       >
         <h5 class="m-0">
           {{
