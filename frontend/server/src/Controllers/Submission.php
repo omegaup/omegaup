@@ -210,7 +210,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
                                         'problemAlias' => $courseSubmissionInfo['problem_alias'],
                                         'courseName' => $course->name,
                                     ],
-                                    'url' => "/course/{$course->alias}/assignment/{$courseSubmissionInfo['assignment_alias']}/#problems/{$courseSubmissionInfo['problem_alias']}/",
+                                    'url' => "/course/{$course->alias}/assignment/{$courseSubmissionInfo['assignment_alias']}/#problems/{$courseSubmissionInfo['problem_alias']}/show-run:{$submission->guid}",
                                     'iconUrl' => '/media/info.png',
                                 ]
                             ]),
