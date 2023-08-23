@@ -6,7 +6,7 @@
           :markdown="T.groupsCsvHelp"
           class="introjs-information"
         ></omegaup-markdown>
-        <div class="form-check mb-4">
+        <div class="form-check mb-4 .introjs-password'">
           <label class="form-check-label">
             <input
               v-model="humanReadable"
@@ -21,6 +21,7 @@
           name="identities"
           type="file"
           accept=".csv,.txt"
+          class="introjs-upload"
           @change="readCsv"
         />
       </div>
