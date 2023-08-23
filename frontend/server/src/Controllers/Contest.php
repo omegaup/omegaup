@@ -648,6 +648,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             isPracticeMode: $isPracticeMode
         );
         /** @var list<NavbarProblemsetProblem> */
+
+        $solved = \OmegaUp\DAO\Runs::getProblemsetRunsByUser(
+            $identity->identity_id,
+            $problemset->problemset_id
+        );
+
         $problems = [];
         foreach ($contestDetails['problems'] as $problem) {
             $problemText = isset(
@@ -662,6 +668,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'bestScore' => 0,
                     'maxScore' => floatval($problem['points']),
                     'hasRuns' => $problem['has_submissions'],
+                    'myBestScore' => isset(
+                        $solved[$problem['alias']]['contest_score']
+                    ) ? $solved[$problem['alias']]['contest_score'] : 0,
+                    'hasMyRuns' => isset(
+                        $solved[$problem['alias']]['contest_score']
+                    ) ? true : false,
                 ]
             );
         }
