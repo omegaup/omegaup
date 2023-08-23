@@ -3358,9 +3358,9 @@ export namespace types {
     courses: {
       enrolled: types.CourseCardEnrolled[];
       finished: types.CourseCardFinished[];
-      hasVisitedSection?: boolean;
       public: types.CourseCardPublic[];
     };
+    hasVisitedSection: boolean;
   }
 
   export interface CoursesByAccessMode {
