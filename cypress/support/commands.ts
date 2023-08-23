@@ -143,7 +143,6 @@ Cypress.Commands.add(
     cy.visit(`arena/problem/${encodeURIComponent(problemAlias)}/`);
     cy.get('.introjs-skipbutton').click();
     cy.get('[data-new-run]').click();
-    cy.get('.introjs-skipbutton').click();
     cy.get('[name="language"]').select(language);
     cy.fixture(fixturePath).then((fileContent) => {
       cy.get('.CodeMirror-line').type(fileContent);
@@ -257,6 +256,7 @@ Cypress.Commands.add(
     for (const idx in runs) {
       // Mocking date just a few seconds after to allow create new run
       cy.clock(new Date(), ['Date']).then((clock) => clock.tick(3000));
+      cy.get('.introjs-skipbutton').click();
       cy.get('[data-new-run]').click();
       cy.get('[name="language"]').select(runs[idx].language);
 
