@@ -84,7 +84,7 @@
                 {{ T.contestButtonEnter }}
               </b-button>
             </slot>
-            <slot name="contest-button-seedetails">
+            <slot name="contest-button-see-details">
               <b-button
                 v-if="!contest.participating"
                 ref="contestButtonSeeDetails"
