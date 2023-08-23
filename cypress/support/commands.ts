@@ -143,6 +143,7 @@ Cypress.Commands.add(
     cy.visit(`arena/problem/${encodeURIComponent(problemAlias)}/`);
     cy.get('.introjs-skipbutton').click();
     cy.get('[data-new-run]').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('[name="language"]').select(language);
     cy.fixture(fixturePath).then((fileContent) => {
       cy.get('.CodeMirror-line').type(fileContent);
