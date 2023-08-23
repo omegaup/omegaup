@@ -294,7 +294,7 @@ export default class CourseDetails extends Vue {
   @Prop({ default: '' }) invalidParameterName!: string;
   @Prop() allLanguages!: string[];
   @Prop() searchResultSchools!: types.SchoolListItem[];
-  @Prop() hasVisitedSection!: boolean;
+  @Prop({ default: true }) hasVisitedSection!: boolean;
 
   T = T;
   alias = this.course.alias;
