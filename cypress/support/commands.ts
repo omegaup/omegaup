@@ -259,6 +259,7 @@ Cypress.Commands.add(
       cy.clock(new Date(), ['Date']).then((clock) => clock.tick(3000));
       cy.get('.introjs-skipbutton').click();
       cy.get('[data-new-run]').click();
+      cy.get('.introjs-skipbutton').click();
       cy.get('[name="language"]').select(runs[idx].language);
 
       // Only the first submission is created because of server validations
