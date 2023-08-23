@@ -683,34 +683,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ];
     }
 
-    /**
-     * @return array<string, array{alias: string, contest_score: float}>
-     */
-    final public static function getProblemsetRunsByUser(
-        int $identityId,
-        int $problemsetId
-    ): array {
-        $sql = 'SELECT p.alias, MAX(r.contest_score) AS contest_score
-        FROM Runs r
-        JOIN Submissions s ON s.submission_id = r.submission_id
-        JOIN Problems p ON p.problem_id = s.problem_id
-        WHERE s.identity_id = ? AND s.problemset_id = ?
-        GROUP BY p.alias;';
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [$identityId, $problemsetId]
-        );
-
-        $problems = [];
-        foreach ($rs as $problem) {
-            $problems[$problem['alias']]  = $problem;
-        }
-
-        /** @var array<string, array{alias: string, contest_score: float}> */
-        return $problems;
-    }
-
-    /**
+     /**
      * @return list<array{contest_score: float, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}>
      */
     final public static function getProblemsetRuns(
@@ -1586,5 +1559,32 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
 
         /** @var list<array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+    }
+
+    /**
+     * @return array<string, array{alias: string, contest_score: float|null}>
+     */
+    final public static function getProblemsetRunsByUser(
+        int $identityId,
+        int $problemsetId
+    ): array {
+        $sql = 'SELECT p.alias, MAX(r.contest_score) AS contest_score
+        FROM Runs r
+        JOIN Submissions s ON s.submission_id = r.submission_id
+        JOIN Problems p ON p.problem_id = s.problem_id
+        WHERE s.identity_id = ? AND s.problemset_id = ?
+        GROUP BY p.alias;';
+        /** @var array<string, array{alias: string, contest_score: float|null}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$identityId, $problemsetId]
+        );
+
+        $problems = [];
+        foreach ($rs as $problem) {
+            $problems[$problem['alias']]  = $problem;
+        }
+
+        return $problems;
     }
 }
