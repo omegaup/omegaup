@@ -28,56 +28,6 @@ describe('Basic Commands Test', () => {
 
     cy.login(loginOptions[0]);
     cy.createCourse(courseOptions);
-
-    // Assert
-    cy.location('href').should('include', courseOptions.courseAlias); // Url
-    cy.get('[data-course-name]').contains(courseOptions.courseAlias);
-    cy.get('[data-tab-course').click();
-    cy.get('.introjs-skipbutton').click();
-    cy.get('[data-course-new-name]').should(
-      'have.value',
-      courseOptions.courseAlias,
-    );
-    cy.get('[data-course-new-alias]').should(
-      'have.value',
-      courseOptions.courseAlias,
-    );
-    cy.get('[name="show-scoreboard"]')
-      .eq(courseOptions.showScoreboard ? 0 : 1)
-      .should('be.checked');
-    cy.get('[name="start-date"]').should(
-      'have.value',
-      getISODate(courseOptions.startDate),
-    );
-    cy.get('[name="unlimited-duration"]')
-      .eq(courseOptions.unlimitedDuration ? 0 : 1)
-      .should('be.checked');
-    if (courseOptions.endDate) {
-      cy.get('[name="end-date"]').should(
-        'have.value',
-        getISODate(courseOptions.endDate),
-      );
-    }
-    cy.get('.tags-input').should('have.text', courseOptions.school); //
-    cy.get('[name="basic-information"]')
-      .eq(courseOptions.basicInformation ? 0 : 1)
-      .should('be.checked');
-    cy.get('[data-course-participant-information]').should(
-      'have.value',
-      courseOptions.requestParticipantInformation,
-    );
-    cy.get('[data-course-problem-level]').should(
-      'have.value',
-      courseOptions.problemLevel,
-    );
-    cy.get('[data-course-objective]').should(
-      'have.value',
-      courseOptions.objective,
-    );
-    cy.get('[data-course-new-description]').should(
-      'have.value',
-      courseOptions.description,
-    );
     coursePage.verifyCourseOptions(courseOptions);
     cy.logout();
   });
