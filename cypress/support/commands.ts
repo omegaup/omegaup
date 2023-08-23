@@ -211,6 +211,7 @@ Cypress.Commands.add(
     problems,
   }) => {
     cy.visit(`contest/${contestAlias}/edit/`);
+    cy.get('.introjs-skipbutton').click();
     cy.get('a[data-nav-contest-edit]').click();
     cy.get('a.dropdown-item.problems').click();
 
@@ -229,6 +230,7 @@ Cypress.Commands.add(
     admissionMode,
   }) => {
     cy.visit(`contest/${contestAlias}/edit/`);
+    cy.get('.introjs-skipbutton').click();
     cy.get('a[data-nav-contest-edit]').click();
     cy.get('a.dropdown-item.admission-mode').click();
     cy.get('select[name="admission-mode"]').select(
