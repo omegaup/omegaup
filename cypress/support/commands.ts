@@ -181,7 +181,9 @@ Cypress.Commands.add(
     differentStartTime = "",
   }) => {
     cy.visit('contest/new/');
-    cy.get('.introjs-skipbutton').click();
+    if (shouldShowIntro) {
+      cy.get('.introjs-skipbutton').click();
+    }
     cy.get('[name="title"]').type(contestAlias);
     cy.get('[name="alias"]').type(contestAlias);
     cy.get('[name="description"]').type(description);
