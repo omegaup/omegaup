@@ -4239,7 +4239,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'templateProperties' => [
                 'payload' => [
                     'courses' => $courses,
-                ],
+Lis                ],
                 'title' => new \OmegaUp\TranslationString('courseList'),
                 'fullWidth' => true,
             ],
