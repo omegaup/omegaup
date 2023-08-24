@@ -4206,10 +4206,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             return [
                 'templateProperties' => [
                     'payload' => [
+                        'has-visited-join-course' => true;
                         'courses' => $courses,
-                        'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
-                            'has-visited-join-course'
-                        ),
                     ],
                     'title' => new \OmegaUp\TranslationString('courseList'),
                     'fullWidth' => true,
@@ -4242,6 +4240,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             'templateProperties' => [
                 'payload' => [
                     'courses' => $courses,
+                    'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
+                        'has-visited-join-course'
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString('courseList'),
                 'fullWidth' => true,
