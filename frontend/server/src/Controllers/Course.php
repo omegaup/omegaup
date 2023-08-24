@@ -4206,7 +4206,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             return [
                 'templateProperties' => [
                     'payload' => [
-                        'has-visited-join-course' => true,
+                        'hasVisitedSection' => true,
                         'courses' => $courses,
                     ],
                     'title' => new \OmegaUp\TranslationString('courseList'),
