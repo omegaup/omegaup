@@ -213,7 +213,6 @@ Cypress.Commands.add(
     problems,
   }) => {
     cy.visit(`contest/${contestAlias}/edit/`);
-    cy.get('.introjs-skipbutton').click();
     cy.get('a[data-nav-contest-edit]').click();
     cy.get('a.dropdown-item.problems').click();
 
