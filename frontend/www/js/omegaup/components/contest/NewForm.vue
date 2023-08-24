@@ -418,7 +418,7 @@ export default class NewForm extends Vue {
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop({ default: false }) contestForTeams!: boolean;
   @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
-  @Prop() hasVisitedSection!: boolean;
+  @Prop({ default: true }) hasVisitedSection!: boolean;
 
   T = T;
   ScoreMode = ScoreMode;
