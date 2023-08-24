@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <div class="card-body">
+    <div class="card-body introjs-info">
       <div class="mb-4">
         <omegaup-markdown
           :markdown="T.groupsCsvHelp"
@@ -166,6 +166,16 @@ export default class Identities extends Vue {
               element: document.querySelector('.introjs-upload') as Element,
               title,
               intro: T.createIdentitiesInteractiveGuideUpload,
+            },
+            {
+              element: document.querySelector('.introjs-info') as Element,
+              title,
+              intro: T.createIdentitiesInteractiveGuideInformationPassword,
+            },
+            {
+              element: document.querySelector('.introjs-info') as Element,
+              title,
+              intro: T.createIdentitiesInteractiveGuideInformationConfirm,
             },
           ],
         })

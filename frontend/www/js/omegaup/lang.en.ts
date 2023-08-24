@@ -541,6 +541,8 @@ const translations: { [key: string]: string; } = {
   createIdentitiesInteractiveGuideExample: "Here's an example of how you should upload the identities in the file",
   createIdentitiesInteractiveGuideFormat: "Remember to upload them in CSV format",
   createIdentitiesInteractiveGuideInformation: "Remember to read the important information.",
+  createIdentitiesInteractiveGuideInformationConfirm: "After verifying that everything is correct, click on the 'Create Identities' button.",
+  createIdentitiesInteractiveGuideInformationPassword: "After adding the file, review the records that were created and store the generated passwords in a secure place, as they will not be shown again.",
   createIdentitiesInteractiveGuidePassword: "Do you want to generate easy reading activities?",
   createIdentitiesInteractiveGuideTitle: "Create Identities",
   createIdentitiesInteractiveGuideUpload: "Upload your identities. Remember that it must be a CSV format file.",
