@@ -106,8 +106,8 @@ export default class List extends Vue {
 .form-control {
   max-width: 14rem;
 }
+
 .searchbar-width .tags-input-wrapper-default {
   min-width: 20rem;
 }
-
 </style>
