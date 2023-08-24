@@ -70,7 +70,6 @@ export class ContestPage {
   // TODO: Replace multiuser add for courses/contests
   addStudentsBulk(users: Array<string>): void {
     cy.get('a[data-nav-contest-edit]').click();
-    cy.get('.introjs-skipbutton').click();
     cy.get('a[data-nav-contestant]').click();
 
     cy.get('textarea[data-contestant-names]').type(users.join(', '));
