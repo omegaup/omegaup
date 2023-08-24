@@ -683,7 +683,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ];
     }
 
-     /**
+    /**
      * @return list<array{contest_score: float, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}>
      */
     final public static function getProblemsetRuns(
@@ -1562,19 +1562,30 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return array<string, array{alias: string, contest_score: float|null}>
+     * @return array<string, float|null>
      */
     final public static function getProblemsetRunsByUser(
         int $identityId,
         int $problemsetId
     ): array {
-        $sql = 'SELECT p.alias, MAX(r.contest_score) AS contest_score
-        FROM Runs r
-        JOIN Submissions s ON s.submission_id = r.submission_id
-        JOIN Problems p ON p.problem_id = s.problem_id
-        WHERE s.identity_id = ? AND s.problemset_id = ?
-        GROUP BY p.alias;';
-        /** @var array<string, array{alias: string, contest_score: float|null}> */
+        $sql = 'SELECT
+                    p.alias,
+                    MAX(r.contest_score) AS contest_score
+                FROM
+                    Runs r
+                INNER JOIN
+                    Submissions s
+                ON
+                    s.submission_id = r.submission_id
+                INNER JOIN
+                    Problems p
+                ON
+                    p.problem_id = s.problem_id
+                WHERE
+                    s.identity_id = ? AND s.problemset_id = ?
+                GROUP BY
+                    p.alias;';
+        /** @var list<array{alias: string, contest_score: float|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId, $problemsetId]
@@ -1582,7 +1593,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
 
         $problems = [];
         foreach ($rs as $problem) {
-            $problems[$problem['alias']]  = $problem;
+            $problems[$problem['alias']]  = $problem['contest_score'];
         }
 
         return $problems;
