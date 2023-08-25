@@ -830,6 +830,83 @@ if __name__ == \'__main__\':
     }
 
     /**
+     * Test that we are able to submit a lecture problem without public tags.
+     */
+    public function testValidLecture() {
+        // Get the problem data
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
+            'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'readonlylecture.zip',
+            'languages' => '',
+            'selectedTags' => '',
+        ]));
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call the API
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
+
+        // Validate
+        // Verify response
+        $this->assertSame('ok', $response['status']);
+
+        // Verify data in DB
+        $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
+
+        // Check that we only retreived 1 element
+        $this->assertSame(1, count($problems));
+        $problem = $problems[0];
+
+        // Verify contest was found
+        $this->assertNotNull($problem);
+        $this->assertNotNull($problem->problem_id);
+
+        // Verify DB data
+        $this->assertSame($r['title'], $problem->title);
+        $this->assertSame(
+            substr(
+                $r['title'],
+                0,
+                \OmegaUp\Validators::ALIAS_MAX_LENGTH
+            ),
+            $problem->alias
+        );
+        $this->assertSame($r['order'], $problem->order);
+        $this->assertSame($r['source'], $problem->source);
+        $this->assertSameSets($r['languages'], $problem->languages);
+
+        // Verify author username -> author id conversion
+        $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
+        $identity = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id);
+        $this->assertSame($identity->username, $r['author_username']);
+
+        // Verify problem settings.
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
+        $this->assertTrue($problemArtifacts->exists('settings.json'));
+        $problemSettings = json_decode($problemArtifacts->get('settings.json'));
+        $this->assertSame(false, $problemSettings->Slow);
+        $this->assertSame($r['validator'], $problemSettings->Validator->Name);
+        $this->assertSame(5000.0, $r['time_limit']);
+        $this->assertSame('5s', $problemSettings->Limits->TimeLimit);
+        $this->assertSame(
+            $r['memory_limit'] * 1024,
+            $problemSettings->Limits->MemoryLimit
+        );
+
+        // Verify problem contents were copied
+        $this->assertTrue($problemArtifacts->exists('statements/en.markdown'));
+
+        // Default data
+        $this->assertSame(0, $problem->visits);
+        $this->assertSame(0, $problem->submissions);
+        $this->assertSame(0, $problem->accepted);
+        $this->assertNull($problem->difficulty);
+    }
+
+    /**
      * Test that we are able to generate the input .zip of a problem that
      * admits an output-only solution.
      */
