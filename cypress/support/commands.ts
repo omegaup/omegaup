@@ -179,7 +179,7 @@ Cypress.Commands.add(
     requestParticipantInformation = 'no',
     differentStart = false,
     differentStartTime = "",
-  }) => {
+  },shouldShowIntro: boolean = true) => {
     cy.visit('contest/new/');
     if (shouldShowIntro) {
       cy.get('.introjs-skipbutton').click();
