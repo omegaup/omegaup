@@ -129,7 +129,7 @@
                   :selected-public-tags="selectedPublicTags"
                   :can-add-new-tags="true"
                   :errors="errors"
-                  :current-languages="currentLanguages"
+                  :is-lecture="currentLanguages === ''"
                   @emit-add-tag="addTag"
                   @emit-remove-tag="removeTag"
                   @select-problem-level="selectProblemLevel"
