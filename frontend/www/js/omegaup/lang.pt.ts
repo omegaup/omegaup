@@ -1187,7 +1187,7 @@ const translations: { [key: string]: string; } = {
   profileName: "Nome",
   profileOrganizedContests: "Concursos gerenciados",
   profilePersonalData: "Dados pessoais",
-  profileRank: "Classifica\u00e7\u00e3o do usu\u00e1rio",
+  profileRank: "Classifica\u00e7\u00e3o do coder",
   profileRankBeginner: "\u03bf",
   profileRankExpert: "\u0398",
   profileRankInternationalMaster: "\u03c9",
