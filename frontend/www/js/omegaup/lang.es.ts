@@ -1186,7 +1186,7 @@ const translations: { [key: string]: string; } = {
   profileManageIdentities: "Administrar identidades",
   profileName: "Nombre",
   profileOrganizedContests: "Concursos organizados",
-  profilePersonalData: "Datos personales",  
+  profilePersonalData: "Datos personales",
   profilePrivateRankMessage: "Al activar esta opci\u00f3n, el rango de tu cuenta no ser\u00e1 visible.",
   profilePrivateRankMessageTitle: "Advertencia",
   profileRank: "Rango de coder",

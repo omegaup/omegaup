@@ -1186,7 +1186,7 @@ const translations: { [key: string]: string; } = {
   profileManageIdentities: "(Manag3 id3n7i7i35)",
   profileName: "(Nam3)",
   profileOrganizedContests: "(Organiz3d c0n73575)",
-  profilePersonalData: "(P3r50na1 da7a)",  
+  profilePersonalData: "(P3r50na1 da7a)",
   profilePrivateRankMessage: "(Wh3n y0u 3nab13 7hi5 0p7i0n, y0ur acc0un7 ranking wi11 n07 b3 vi5ib13.)",
   profilePrivateRankMessageTitle: "(Warning)",
   profileRank: "(C0d3r rank)",
