@@ -64,7 +64,10 @@
         >
       </template>
     </div>
-    <table class="table mb-0 table-responsive-sm">
+    <div v-if="ranking.length === 0" class="empty-category text-center m-4">
+      <h2>{{ T.userRankEmptyList }}</h2>
+    </div>
+    <table v-else class="table mb-0 table-responsive-sm">
       <thead>
         <tr>
           <th scope="col" class="pl-4 column-width">#</th>
@@ -72,6 +75,24 @@
           <th scope="col" class="text-right">{{ T.rankScore }}</th>
           <th v-if="!isIndex" scope="col" class="text-right pr-4">
             {{ T.rankSolved }}
+            <!-- id-lint off -->
+            <b-button
+              id="popover-solved-problems"
+              class="ml-1"
+              size="sm"
+              variant="none"
+              @click="showPopover = !showPopover"
+            >
+              <font-awesome-icon :icon="['fas', 'question-circle']" />
+            </b-button>
+            <!-- id-lint on -->
+            <b-popover
+              :show.sync="showPopover"
+              target="popover-solved-problems"
+              placement="right"
+            >
+              {{ T.userRankSolvedProblemsHelp }}
+            </b-popover>
           </th>
         </tr>
       </thead>
@@ -120,6 +141,18 @@ import user_Username from '../user/Username.vue';
 import common_Paginator from '../common/Paginator.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+library.add(faQuestionCircle);
+
+// Import Bootstrap and BootstrapVue CSS files (order is important)
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+// Import Only Required Plugins
+import { ButtonPlugin, PopoverPlugin } from 'bootstrap-vue';
+Vue.use(ButtonPlugin);
+Vue.use(PopoverPlugin);
 interface Rank {
   country: string;
   classname?: string;
@@ -153,6 +186,7 @@ export default class UserRank extends Vue {
   T = T;
   ui = ui;
   searchedUsername: null | types.ListItem = null;
+  showPopover: boolean = false;
 
   onSubmit(): void {
     if (!this.searchedUsername) return;
@@ -198,6 +232,11 @@ export default class UserRank extends Vue {
 </script>
 
 <style lang="scss">
+@import '../../../../sass/main.scss';
+.empty-category {
+  color: var(--arena-contest-list-empty-category-font-color);
+}
+
 [data-user-rank] .tags-input-wrapper-default {
   padding: 0.35rem 0.25rem 0.7rem 0.25rem;
 }
