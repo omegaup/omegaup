@@ -4703,8 +4703,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         if (!$isAdmin && $assignment->start_time->time > \OmegaUp\Time::get()) {
-            $response['templateProperties']['payload']['currentAssignment']['name'] = '';
-            $response['templateProperties']['payload']['currentAssignment']['description'] = '';
+            $response['templateProperties']['payload']['currentAssignment']['name'] = null;
+            $response['templateProperties']['payload']['currentAssignment']['description'] = null;
         }
         return $response;
     }

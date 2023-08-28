@@ -2044,24 +2044,24 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $contestAlias
         );
 
-        $assignment = \OmegaUp\DAO\Assignments::getAssignmentForProblemset(
+        $result = \OmegaUp\DAO\Assignments::getAssignmentAndCourseForProblemset(
             intval($problemsetId)
         );
-        if (!is_null($assignment)) {
-            $course = \OmegaUp\DAO\Courses::getByPK(
-                intval($assignment->course_id)
-            );
+
+        if (!empty($result)) {
+            $assignment = (object) $result['assignment'];
+            $course = (object) $result['course'];
 
             if (
-                !is_null($course) &&
                 !is_null($identity) &&
+                $course instanceof \OmegaUp\DAO\VO\Courses &&
                 !\OmegaUp\Authorization::isCourseAdmin(
                     $identity,
                     $course
                 ) && $assignment->start_time->time > \OmegaUp\Time::get()
             ) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                    'problemNotFoundInProblemset'
+                    'problemNotFound'
                 );
             }
         }

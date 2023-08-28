@@ -217,6 +217,102 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         return $counts;
     }
 
+    /**
+     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, course: \OmegaUp\DAO\VO\Courses}|array[]
+     */
+    public static function getAssignmentAndCourseForProblemset(int $problemsetId): array {
+        $sql = 'SELECT
+                    a.assignment_id,
+                    a.course_id,
+                    a.problemset_id,
+                    a.acl_id,
+                    a.name AS assignment_name,
+                    a.description AS assignment_description,
+                    a.alias AS assignment_alias,
+                    a.publish_time_delay,
+                    a.assignment_type,
+                    a.start_time AS assignment_start_time,
+                    a.finish_time AS assignment_finish_time,
+                    a.max_points,
+                    a.order,
+                    c.course_id,
+                    c.name AS course_name,
+                    c.description AS course_description,
+                    c.objective,
+                    c.alias AS course_alias,
+                    c.group_id,
+                    c.acl_id,
+                    c.level,
+                    c.start_time AS course_start_time,
+                    c.finish_time AS course_finish_time,
+                    c.admission_mode,
+                    c.school_id,
+                    c.needs_basic_information,
+                    c.requests_user_information,
+                    c.show_scoreboard,
+                    c.languages,
+                    c.archived,
+                    c.minimum_progress_for_certificate
+                FROM
+                    Assignments a
+                JOIN
+                    Courses c ON a.course_id = c.course_id
+                WHERE
+                    a.problemset_id = ?
+                LIMIT 1;';
+        /** @var array{acl_id: int, acl_id: int, admission_mode: string, archived: bool, assignment_alias: string, assignment_description: string, assignment_finish_time: \OmegaUp\Timestamp|null, assignment_id: int, assignment_name: string, assignment_start_time: \OmegaUp\Timestamp, assignment_type: string, course_alias: string, course_description: string, course_finish_time: \OmegaUp\Timestamp|null, course_id: int, course_id: int, course_name: string, course_start_time: \OmegaUp\Timestamp, group_id: int, languages: null|string, level: null|string, max_points: float, minimum_progress_for_certificate: int|null, needs_basic_information: bool, objective: null|string, order: int, problemset_id: int, publish_time_delay: int|null, requests_user_information: string, school_id: int|null, show_scoreboard: bool}|null */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$problemsetId]
+        );
+
+        if (empty($row)) {
+            return [];
+        }
+
+        $assignmentMapping = [
+            'assignment_id' => $row['assignment_id'],
+            'course_id' => $row['course_id'],
+            'name' => $row['assignment_name'],
+            'description' => $row['assignment_description'],
+            'alias' => $row['assignment_alias'],
+            'acl_id' => $row['acl_id'],
+            'publish_time_delay' => $row['publish_time_delay'],
+            'assignment_type' => $row['assignment_type'],
+            'start_time' => $row['assignment_start_time'],
+            'finish_time' => $row['assignment_finish_time'],
+            'max_points' => $row['max_points'],
+            'order' => $row['order']
+        ];
+
+        $courseMapping = [
+            'course_id' => $row['course_id'],
+            'name' => $row['course_name'],
+            'description' => $row['course_description'],
+            'alias' => $row['course_alias'],
+            'objective' => $row['objective'],
+            'group_id' => $row['group_id'],
+            'acl_id' => $row['acl_id'],
+            'level' => $row['level'],
+            'start_time' => $row['course_start_time'],
+            'finish_time' => $row['course_finish_time'],
+            'admission_mode' => $row['admission_mode'],
+            'school_id' => $row['school_id'],
+            'needs_basic_information' => $row['needs_basic_information'],
+            'requests_user_information' => $row['requests_user_information'],
+            'show_scoreboard' => $row['show_scoreboard'],
+            'languages' => $row['languages'],
+            'archived' => $row['archived'],
+            'minimum_progress_for_certificate' => $row['minimum_progress_for_certificate']
+
+        ];
+
+        return [
+            'assignment' => new \OmegaUp\DAO\VO\Assignments($assignmentMapping),
+            'course' => new \OmegaUp\DAO\VO\Courses($courseMapping)
+        ];
+    }
+
     public static function getAssignmentForProblemset(?int $problemsetId): ?\OmegaUp\DAO\VO\Assignments {
         if (is_null($problemsetId)) {
             return null;
