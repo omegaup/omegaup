@@ -3,8 +3,16 @@
     <h2 class="text-center my-5">
       {{ T.wordsProblems }}
     </h2>
+    <button
+      class="btn btn-primary mb-2 align-self-center form-control"
+      type="button"
+      @click="$emit('show-finder-wizard')"
+    >
+      {{ T.wizardLinkText }}
+    </button>
     <div class="d-flex align-items-center">
       <omegaup-problem-search-bar
+        class="searchbar-width"
         :language="language"
         :languages="languages"
         :keyword="keyword"
@@ -93,3 +101,13 @@ export default class List extends Vue {
   }
 }
 </script>
+
+<style>
+.form-control {
+  max-width: 14rem;
+}
+
+.searchbar-width .tags-input-wrapper-default {
+  min-width: 20rem;
+}
+</style>
