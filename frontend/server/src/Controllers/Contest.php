@@ -653,9 +653,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'problemsetNotFound'
             );
         }
-        $solved = \OmegaUp\DAO\Runs::getProblemsetRunsByUser(
+
+        [
+            'runs' => $runs,
+        ] = \OmegaUp\DAO\Runs::getAllRuns(
+            $problemset->problemset_id,
+            null,
+            null,
+            null,
+            null,
             $identity->identity_id,
-            $problemset->problemset_id
+            null,
+            null,
         );
 
         /** @var list<NavbarProblemsetProblem> */
@@ -673,10 +682,23 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'bestScore' => 0,
                     'maxScore' => floatval($problem['points']),
                     'hasRuns' => $problem['has_submissions'],
-                    'myBestScore' => $solved[$problem['alias']] ?? null,
-                    'hasMyRuns' => !is_null($solved[$problem['alias']] ?? null),
+                    'myBestScore' => null,
+                    'hasMyRuns' => false,
                 ]
             );
+        }
+
+        $problemIndex = [];
+
+        foreach ($problems as &$problem) {
+            $problemIndex[$problem['alias']] = &$problem;
+        }
+
+        foreach ($runs as $run) {
+            if (isset($problemIndex[$run['alias']])) {
+                $problemIndex[$run['alias']]['myBestScore'] = $run['contest_score'];
+                $problemIndex[$run['alias']]['hasMyRuns'] = true;
+            }
         }
 
         return [

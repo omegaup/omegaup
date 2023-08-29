@@ -1560,42 +1560,4 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         /** @var list<array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
-
-    /**
-     * @return array<string, float|null>
-     */
-    final public static function getProblemsetRunsByUser(
-        int $identityId,
-        int $problemsetId
-    ): array {
-        $sql = 'SELECT
-                    p.alias,
-                    MAX(r.contest_score) AS contest_score
-                FROM
-                    Runs r
-                INNER JOIN
-                    Submissions s
-                ON
-                    s.submission_id = r.submission_id
-                INNER JOIN
-                    Problems p
-                ON
-                    p.problem_id = s.problem_id
-                WHERE
-                    s.identity_id = ? AND s.problemset_id = ?
-                GROUP BY
-                    p.alias;';
-        /** @var list<array{alias: string, contest_score: float|null}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [$identityId, $problemsetId]
-        );
-
-        $problems = [];
-        foreach ($rs as $problem) {
-            $problems[$problem['alias']]  = $problem['contest_score'];
-        }
-
-        return $problems;
-    }
 }
