@@ -2044,28 +2044,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $contestAlias
         );
 
-        $result = \OmegaUp\DAO\Assignments::getAssignmentAndCourseForProblemset(
-            intval($problemsetId)
-        );
-
-        if (!empty($result)) {
-            $assignment = (object) $result['assignment'];
-            $course = (object) $result['course'];
-
-            if (
-                !is_null($identity) &&
-                $course instanceof \OmegaUp\DAO\VO\Courses &&
-                !\OmegaUp\Authorization::isCourseAdmin(
-                    $identity,
-                    $course
-                ) && $assignment->start_time->time > \OmegaUp\Time::get()
-            ) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                    'problemNotFound'
-                );
-            }
-        }
-
         $response['problem'] = $problem;
 
         if (!is_null($problemset) && isset($problemset['problemset'])) {
@@ -2113,7 +2091,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     ) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException();
                     }
-                    // TODO: Check start times.
+
+                    $assignment = \OmegaUp\DAO\Assignments::getAssignmentForProblemset(
+                        $problemsetId
+                    );
+
+                    if (
+                        !is_null($assignment)
+                        && $assignment->start_time->time > \OmegaUp\Time::get()
+                    ) {
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                            'problemNotFound'
+                        );
+                    }
                 }
             }
             $response['problemset'] = $problemset['problemset'];
