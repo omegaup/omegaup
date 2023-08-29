@@ -84,16 +84,16 @@
                 {{ T.contestButtonEnter }}
               </b-button>
             </slot>
-            <slot name="contest-button-singup">
+            <slot name="contest-button-see-details">
               <b-button
                 v-if="!contest.participating"
-                ref="contestButtonSingUp"
+                ref="contestButtonSeeDetails"
                 :href="getContestURL(contest.alias)"
                 variant="primary"
                 class="text-center"
               >
                 <font-awesome-icon class="mr-1" icon="sign-in-alt" />
-                {{ T.contestButtonSingUp }}
+                {{ T.contestButtonSeeDetails }}
               </b-button>
             </slot>
           </div>
