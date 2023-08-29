@@ -354,25 +354,28 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $params->selectedTagsAsJSON,
                 associative: true
             ) : null;
-            if (empty($selectedTags)) {
+            $isLecture = $params->languages === [''];
+            if (empty($selectedTags) && !$isLecture) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'problemEditTagPublicRequired',
                     'public_tags'
                 );
             }
             $hasPublicTags = false;
-            foreach ($selectedTags as $tag) {
-                if (!$hasPublicTags) {
-                    $hasPublicTags = boolval($tag['public']);
-                }
-                if (empty($tag['tagname'])) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'parameterEmpty',
-                        'tagname'
-                    );
+            if (!is_null($selectedTags)) {
+                foreach ($selectedTags as $tag) {
+                    if (!$hasPublicTags) {
+                        $hasPublicTags = boolval($tag['public']);
+                    }
+                    if (empty($tag['tagname'])) {
+                        throw new \OmegaUp\Exceptions\InvalidParameterException(
+                            'parameterEmpty',
+                            'tagname'
+                        );
+                    }
                 }
             }
-            if (!$hasPublicTags) {
+            if (!$hasPublicTags && !$isLecture) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'problemEditTagPublicRequired',
                     'public_tags'

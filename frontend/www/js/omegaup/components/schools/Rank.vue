@@ -1,6 +1,8 @@
 <template>
-  <div>
-    <h5 class="text-center mb-5 mt-1 school-rank-title">
+  <div class="card">
+    <h5
+      class="card-header d-flex justify-content-between align-items-center school-rank-title"
+    >
       {{
         showHeader
           ? ui.formatString(T.schoolRankOfTheMonthHeader, {
@@ -11,43 +13,45 @@
               highCount: page * length,
             })
       }}
+      <a href="https://blog.omegaup.com/ranking-de-escuelas-en-omegaup/"
+        ><font-awesome-icon :icon="['fas', 'question-circle']" />
+        {{ T.wordsRankingMeasurement }}</a
+      >
     </h5>
-    <div class="card table-responsive-sm table-width">
-      <table class="table mb-0">
-        <thead>
-          <tr>
-            <th class="text-center" scope="col">#</th>
-            <th class="text-center" scope="col">{{ T.profileSchool }}</th>
-            <th class="text-center" scope="col">{{ T.wordsScore }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(school, index) in rank" :key="index">
-            <th class="text-center" scope="row">
-              {{ showHeader ? index + 1 : school.ranking || '' }}
-            </th>
-            <td class="text-truncate text-center">
-              <omegaup-countryflag
-                :country="school.country_id"
-              ></omegaup-countryflag>
-              <a :href="`/schools/profile/${school.school_id}/`">{{
-                school.name
-              }}</a>
-            </td>
-            <td class="text-center">
-              {{ school.score }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div v-if="showHeader" class="card-footer">
-        <a href="/rank/schools/">{{ T.wordsSeeGeneralRanking }}</a>
-      </div>
-      <div v-else class="card-footer">
-        <omegaup-common-paginator
-          :pager-items="pagerItems"
-        ></omegaup-common-paginator>
-      </div>
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th class="text-center" scope="col">#</th>
+          <th class="text-center" scope="col">{{ T.profileSchool }}</th>
+          <th class="text-center" scope="col">{{ T.wordsScore }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(school, index) in rank" :key="index">
+          <th class="text-center" scope="row">
+            {{ showHeader ? index + 1 : school.ranking || '' }}
+          </th>
+          <td class="text-truncate text-center">
+            <omegaup-countryflag
+              :country="school.country_id"
+            ></omegaup-countryflag>
+            <a :href="`/schools/profile/${school.school_id}/`">{{
+              school.name
+            }}</a>
+          </td>
+          <td class="text-center">
+            {{ school.score.toFixed(2) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div v-if="showHeader" class="card-footer">
+      <a href="/rank/schools/">{{ T.wordsSeeGeneralRanking }}</a>
+    </div>
+    <div v-else class="card-footer">
+      <omegaup-common-paginator
+        :pager-items="pagerItems"
+      ></omegaup-common-paginator>
     </div>
   </div>
 </template>
@@ -61,9 +65,11 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import CountryFlag from '../CountryFlag.vue';
 import common_Paginator from '../common/Paginator.vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 @Component({
   components: {
+    FontAwesomeIcon,
     'omegaup-countryflag': CountryFlag,
     'omegaup-common-paginator': common_Paginator,
   },
@@ -96,6 +102,6 @@ export default class SchoolRank extends Vue {
 }
 
 .school-rank-title {
-  font-size: 1.6rem;
+  font-size: 1.25rem;
 }
 </style>
