@@ -14,6 +14,7 @@
     </div>
     <div class="d-flex align-items-center">
       <omegaup-problem-search-bar
+        class="searchbar-width"
         :language="language"
         :languages="languages"
         :keyword="keyword"
@@ -101,3 +102,13 @@ export default class List extends Vue {
   }
 }
 </script>
+
+<style>
+.form-control {
+  max-width: 14rem;
+}
+
+.searchbar-width .tags-input-wrapper-default {
+  min-width: 20rem;
+}
+</style>
