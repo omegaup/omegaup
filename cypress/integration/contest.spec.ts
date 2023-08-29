@@ -3,19 +3,24 @@ import { ContestOptions, GroupOptions, LoginOptions } from '../support/types';
 import { contestPage } from '../support/pageObjects/contestPage';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { addSubtractDaysToDate } from '../support/commands';
+import { profilePage } from '../support/pageObjects/profilePage';
 
 describe('Contest Test', () => {
   let virtualContestDetails: ContestOptions;
   let contestWithHalfTimeVisibleScoreboard: ContestOptions;
   let loginOptionstoVerify: LoginOptions;
+  let identityLogin: LoginOptions;
+  let identityContestAlias: string;
 
   before(() => {
     cy.clearCookies();
     cy.clearLocalStorage();
     cy.visit('/');
 
-    const contestOptions = contestPage.generateContestOptions();
     const userLoginOptions = loginPage.registerMultipleUsers(2);
+    const contestOptions = contestPage.generateContestOptions(
+      userLoginOptions[1],
+    );
     const users = [userLoginOptions[0].username];
 
     const now = new Date();
@@ -43,9 +48,55 @@ describe('Contest Test', () => {
     cy.visit('/');
   });
 
+  it('Should create a contest and participate in it as a identity', () => {
+    const loginOptions = loginPage.registerMultipleUsers(1);
+    const groupOptions: GroupOptions = {
+      groupTitle: 'ut_group_' + uuid(),
+      groupDescription: 'group description',
+    };
+    const contestOptions = contestPage.generateContestOptions(loginOptions[0]);
+    identityContestAlias = contestOptions.contestAlias;
+    const now = new Date();
+
+    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
+    const milliseconds = 200 * 1000;
+    let newEndDate = new Date();
+    newEndDate = new Date(newEndDate.getTime() + milliseconds);
+    contestOptions.endDate = newEndDate;
+    identityLogin = {
+      username:
+        groupOptions.groupTitle.split('-').slice(0, -1).join('-') +
+        ':identity_1',
+      password: '12345678',
+    };
+
+    loginPage.giveAdminPrivilage(
+      'GroupIdentityCreator',
+      loginOptions[0].username,
+    );
+
+    cy.login(loginOptions[0]);
+    contestPage.createGroup(groupOptions);
+    contestPage.addIdentitiesGroup();
+    contestPage.setPasswordForIdentity(identityLogin.username, '12345678');
+    contestPage.createContest(contestOptions, [identityLogin.username]);
+    cy.logout();
+
+    cy.login(identityLogin);
+    cy.enterContest(contestOptions);
+    cy.createRunsInsideContest(contestOptions);
+    cy.get('a[href="#ranking"]').click();
+    cy.get('[data-table-scoreboard]').should('be.visible');
+    cy.get('[data-table-scoreboard-username]').should('have.length', 1);
+    cy.get('.points').should('contain', '+100.00');
+    cy.logout();
+  });
+
   it('Should create a contest when the scoreboard is shown half the time', () => {
-    const contestOptions = contestPage.generateContestOptions();
     const userLoginOptions = loginPage.registerMultipleUsers(3);
+    const contestOptions = contestPage.generateContestOptions(
+      userLoginOptions[2],
+    );
     const users = [userLoginOptions[0].username];
     loginOptionstoVerify = userLoginOptions[1];
 
@@ -76,13 +127,15 @@ describe('Contest Test', () => {
   });
 
   it('Should create a contest with different start', () => {
-    const contestOptions = contestPage.generateContestOptions();
     const userLoginOptions = loginPage.registerMultipleUsers(2);
+    const contestOptions = contestPage.generateContestOptions(
+      userLoginOptions[1],
+    );
     const users = [userLoginOptions[0].username];
     const now = new Date();
 
     contestOptions.differentStart = true;
-    contestOptions.differentStartTime = "60";
+    contestOptions.differentStartTime = '60';
     contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
     contestOptions.endDate = addSubtractDaysToDate(now, { days: 1 });
     cy.login(userLoginOptions[1]);
@@ -91,7 +144,7 @@ describe('Contest Test', () => {
 
     cy.login(userLoginOptions[0]);
     cy.enterContest(contestOptions);
-    cy.get('.clock').should('contain', "59");
+    cy.get('.clock').should('contain', '59');
     cy.logout();
   });
 
@@ -107,16 +160,18 @@ describe('Contest Test', () => {
       'GroupIdentityCreator',
       userLoginOptions[0].username,
     );
-  
+
     cy.login(userLoginOptions[0]);
     contestPage.createGroup(groupOptions);
     contestPage.addIdentitiesGroup();
     cy.logout();
 
-    const contestOptions = contestPage.generateContestOptions();
+    const contestOptions = contestPage.generateContestOptions(
+      userLoginOptions[0],
+    );
 
     const users = [userLoginOptions[1].username, userLoginOptions[2].username];
-    cy.login(userLoginOptions[0])
+    cy.login(userLoginOptions[0]);
     contestPage.createContest(contestOptions, users);
     cy.logout();
 
@@ -127,7 +182,7 @@ describe('Contest Test', () => {
 
     contestPage.updateScoreboardForContest(contestOptions.contestAlias);
 
-    cy.login(userLoginOptions[0])
+    cy.login(userLoginOptions[0]);
     cy.visit(`/arena/${contestOptions.contestAlias}/`);
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard-username]')
@@ -140,13 +195,13 @@ describe('Contest Test', () => {
   });
 
   it('Should create a contest and add a clarification.', () => {
-    const contestOptions = contestPage.generateContestOptions();
     const userLoginOptions = loginPage.registerMultipleUsers(2);
+    const contestOptions = contestPage.generateContestOptions(
+      userLoginOptions[1],
+    );
 
     cy.login(userLoginOptions[1]);
-    contestPage.createContest(contestOptions, [
-      userLoginOptions[0].username,
-    ]);
+    contestPage.createContest(contestOptions, [userLoginOptions[0].username]);
     cy.logout();
 
     cy.login(userLoginOptions[0]);
@@ -160,8 +215,10 @@ describe('Contest Test', () => {
   });
 
   it('Should create a contest and review ranking', () => {
-    const contestOptions = contestPage.generateContestOptions();
     const userLoginOptions = loginPage.registerMultipleUsers(5);
+    const contestOptions = contestPage.generateContestOptions(
+      userLoginOptions[4],
+    );
 
     const groupOptions: GroupOptions = {
       groupTitle: 'ut_group_' + uuid(),
@@ -172,7 +229,7 @@ describe('Contest Test', () => {
       'GroupIdentityCreator',
       userLoginOptions[4].username,
     );
-  
+
     cy.login(userLoginOptions[4]);
     contestPage.createGroup(groupOptions);
     contestPage.addIdentitiesGroup();
@@ -224,9 +281,11 @@ describe('Contest Test', () => {
   });
 
   it('Should test practice mode in contest', () => {
-    const contestOptions = contestPage.generateContestOptions();
-    const now = new Date();
     const userLoginOptions = loginPage.registerMultipleUsers(2);
+    const contestOptions = contestPage.generateContestOptions(
+      userLoginOptions[1],
+    );
+    const now = new Date();
     const users = [userLoginOptions[0].username];
 
     contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
@@ -262,8 +321,10 @@ describe('Contest Test', () => {
     'Should create a contest and review contest ranking when the scoreboard shows' +
       ' time has finished',
     () => {
-      const contestOptions = contestPage.generateContestOptions();
       const userLoginOptions = loginPage.registerMultipleUsers(3);
+      const contestOptions = contestPage.generateContestOptions(
+        userLoginOptions[2],
+      );
       const users = [
         userLoginOptions[0].username,
         userLoginOptions[1].username,
@@ -298,12 +359,14 @@ describe('Contest Test', () => {
   );
 
   it('Should create a contest when the scoreboard is never shown', () => {
-    const contestOptions = contestPage.generateContestOptions();
     const userLoginOptions = loginPage.registerMultipleUsers(2);
+    const contestOptions = contestPage.generateContestOptions(
+      userLoginOptions[1],
+    );
     const users = [userLoginOptions[0].username];
 
     contestOptions.scoreBoardVisibleTime = '0';
-    cy.login(userLoginOptions[1])
+    cy.login(userLoginOptions[1]);
     contestPage.createContest(contestOptions, users);
     cy.logout();
 
@@ -354,6 +417,19 @@ describe('Contest Test', () => {
     cy.get(`.${userLoginOptions[0].username} > td:nth-child(4)`).should(
       'contain',
       '+100.00',
+    );
+    cy.logout();
+  });
+
+  it('Should merge identities', () => {
+    const loginOptions = loginPage.registerMultipleUsers(1);
+
+    cy.login(loginOptions[0]);
+    profilePage.mergeIdentities(identityLogin);
+    profilePage.changeIdentity(identityLogin.username);
+    contestPage.verifySubmissionInPastContest(
+      identityLogin.username,
+      identityContestAlias,
     );
     cy.logout();
   });
