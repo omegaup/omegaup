@@ -543,7 +543,7 @@ const translations: { [key: string]: string; } = {
   createIdentitiesInteractiveGuideInformation: "Recuerda leer la informaci\u00f3n importante.",
   createIdentitiesInteractiveGuideInformationConfirm: "Despu\u00e9s de verificar que todo est\u00e9 correcto, haz clic en el bot\u00f3n de 'Crear identidades'.",
   createIdentitiesInteractiveGuideInformationPassword: "Despu\u00e9s de agregar el archivo, revisa los registros que se crearon y almacena las contrase\u00f1as generadas en un lugar seguro, ya que no se volver\u00e1n a mostrar.",
-  createIdentitiesInteractiveGuidePassword: "\u00bfDeseas generar actividades de f\u00e1cil lectura?",
+  createIdentitiesInteractiveGuidePassword: "\u00bfDeseas generar contrase\u00f1as de f\u00e1cil lectura?",
   createIdentitiesInteractiveGuideTitle: "Crear identidades",
   createIdentitiesInteractiveGuideUpload: "Carga tus identidades. Recuerda que debe ser un archivo con formato CSV.",
   createIdentitiesInteractiveGuideWelcome: "\u00a1Hola, vamos a crear identidades!",

@@ -542,7 +542,7 @@
 	"createIdentitiesInteractiveGuideInformation": "Lembre-se de ler as informa\u00e7\u00f5es importantes.",
 	"createIdentitiesInteractiveGuideInformationConfirm": "Ap\u00f3s verificar que tudo est\u00e1 correto, clique no bot\u00e3o 'Criar Identidades'.",
 	"createIdentitiesInteractiveGuideInformationPassword": "Depois de adicionar o arquivo, revise os registros que foram criados e armazene as senhas geradas em um local seguro, pois elas n\u00e3o ser\u00e3o exibidas novamente.",
-	"createIdentitiesInteractiveGuidePassword": "Deseja gerar atividades de leitura f\u00e1cil?",
+	"createIdentitiesInteractiveGuidePassword": "Deseja gerar palavras-passe de leitura f\u00e1cil?",
 	"createIdentitiesInteractiveGuideTitle": "Criar identidades",
 	"createIdentitiesInteractiveGuideUpload": "Carregue suas identidades. Lembre-se de que deve ser um arquivo no formato CSV.",
 	"createIdentitiesInteractiveGuideWelcome": "Ol\u00e1, vamos criar identidades!",
