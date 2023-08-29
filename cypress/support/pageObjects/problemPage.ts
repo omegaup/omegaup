@@ -52,7 +52,7 @@ export class ProblemPage {
 
   qualifyProblem(tags: string[]): void {
     cy.get('[data-rate-problem-button]').click();
-    cy.get('[type="radio"]').check('false');
+    cy.get('[type="radio"]').check('true');
     tags.forEach((tag) => {
       cy.get('[data-other-tag-input] input').clear().type(tag);
       cy.waitUntil(() =>
