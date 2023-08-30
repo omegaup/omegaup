@@ -17,7 +17,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * time period.
      * category.
      *
-     * @return list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}>
+     * @return list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, email: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}>
      */
     public static function getCandidatesToCoderOfTheMonth(
         string $time,
@@ -44,13 +44,13 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             Users u ON i.user_id = u.user_id
           LEFT JOIN
             Emails e ON u.main_email_id = e.email_id
-            WHERE
+          WHERE
             `time` = ? AND
             category = ?
           LIMIT ?;
         ";
 
-        /** @var list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}> */
+        /** @var list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, email: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$time, $category, $rowCount]
@@ -59,7 +59,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
     /**
      * Get all first coders of the month
-     * @return listlist<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, email: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}>
+     * @return list<array{classname: string, country_id: string, email: null|string, time: string, username: string}>
      */
     final public static function getCodersOfTheMonth(string $category = 'all'): array {
         $date = date('Y-m-01', \OmegaUp\Time::get());
