@@ -56,7 +56,7 @@
       <table v-else class="table table-striped table-over">
         <thead>
           <tr>
-            <th>{{ T.wordsUser }}</th>
+            <th>{{ T.wordsStudent }}</th>
             <th class="align-right">
               {{ T.contestEditRegisteredAdminDelete }}
             </th>

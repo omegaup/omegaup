@@ -23,7 +23,7 @@
     <table class="table table-striped" data-table-members>
       <thead>
         <tr>
-          <th>{{ T.wordsUser }}</th>
+          <th>{{ T.wordsCoder }}</th>
           <th>{{ T.contestEditRegisteredAdminDelete }}</th>
         </tr>
       </thead>
