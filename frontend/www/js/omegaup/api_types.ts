@@ -452,6 +452,21 @@ export namespace types {
             return x;
           });
         })(x.apiTokens);
+        if (
+          typeof x.nextRegisteredContestForUser !== 'undefined' &&
+          x.nextRegisteredContestForUser !== null
+        )
+          x.nextRegisteredContestForUser = ((x) => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
+            x.original_finish_time = ((x: number) => new Date(x * 1000))(
+              x.original_finish_time,
+            );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          })(x.nextRegisteredContestForUser);
         return x;
       })(
         JSON.parse(
@@ -2773,8 +2788,10 @@ export namespace types {
     isLoggedIn: boolean;
     isMainUserIdentity: boolean;
     isReviewer: boolean;
+    isUnder13User: boolean;
     lockDownImage: string;
     navbarSection: string;
+    nextRegisteredContestForUser?: types.ContestListItem;
     omegaUpLockDown: boolean;
     profileProgress: number;
     userClassname: string;
@@ -3382,6 +3399,7 @@ export namespace types {
     email?: string;
     identity?: dao.Identities;
     is_admin: boolean;
+    is_under_13_user: boolean;
     loginIdentity?: dao.Identities;
     user?: dao.Users;
     valid: boolean;
