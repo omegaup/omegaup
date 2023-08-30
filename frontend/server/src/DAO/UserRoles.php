@@ -216,14 +216,27 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
                 `Users` u ON u.user_id = i.user_id
                 WHERE
                     gr.role_id IN (?,?)
-                    AND gr.acl_id IN (?));
-            ';
+                    AND gr.acl_id IN (?))
+            UNION DISTINCT
+            (SELECT DISTINCT
+                i.user_id,
+                i.username,
+                a.acl_id as acl
+            FROM
+                `ACLs` a
+            INNER JOIN
+                `Users` u ON u.user_id = a.owner_id
+            INNER JOIN
+                `Identities` i ON u.user_id = i.user_id
+            WHERE
+                a.acl_id IN (?));';
         $params = [
             \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE,
             \OmegaUp\Authorization::ADMIN_ROLE,
             $course->acl_id,
             \OmegaUp\Authorization::ADMIN_ROLE,
             \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE,
+            $course->acl_id,
             $course->acl_id,
         ];
 
