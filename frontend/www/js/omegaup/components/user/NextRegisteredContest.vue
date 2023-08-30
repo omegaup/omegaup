@@ -1,5 +1,8 @@
 <template>
-  <b-collapse v-model="showContestInfo" class="p-4">
+  <b-collapse
+    v-model="showContestInfo"
+    class="p-4 border bg-light container-fluid"
+  >
     <div class="justify-content-end">
       <button type="button" class="close" @click="showContestInfo = false">
         ×
@@ -37,7 +40,14 @@
       <b-row class="p-1 flex-column flex-sm-row" align-v="center">
         <b-col class="col-md-4 col-sm-12 p-1 text-center">
           <font-awesome-icon icon="calendar-alt" />
-          <a :href="startTimeLink">
+          <a v-if="isContestStarted" :href="startTimeLink">
+            {{
+              ui.formatString(T.contestStartedTime, {
+                startedDate: startContestDate,
+              })
+            }}
+          </a>
+          <a v-else :href="startTimeLink">
             {{
               ui.formatString(T.contestStartTime, {
                 startDate: startContestDate,
@@ -47,11 +57,16 @@
         </b-col>
         <b-col class="col-md-4 col-sm-12 p-1 text-center">
           <font-awesome-icon class="mr-1" icon="stopwatch" />
-          {{
-            ui.formatString(T.contestDuration, {
-              duration: contestDuration,
-            })
-          }}
+          {{ T.wordsDuration }}:
+          <omegaup-countdown
+            v-if="isContestStarted"
+            class="clock"
+            :target-time="nextRegisteredContest.finish_time"
+            @finish="now = new Date()"
+          ></omegaup-countdown>
+          <p v-else class="d-inline">
+            {{ contestDuration }}
+          </p>
         </b-col>
         <b-col class="col-md-4 col-sm-12 p-1 text-center">
           <button type="button" class="btn btn-primary w-75" @click="onClick">
@@ -69,6 +84,8 @@ import { types } from '../../api_types';
 import * as time from '../../time';
 import * as ui from '../../ui';
 import T from '../../lang';
+import omegaup_Countdown from '../Countdown.vue';
+import { omegaup } from '../../omegaup';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
@@ -85,13 +102,16 @@ library.add(fas);
 @Component({
   components: {
     FontAwesomeIcon,
+    'omegaup-countdown': omegaup_Countdown,
   },
 })
 export default class UserNextRegisteredContest extends Vue {
   @Prop() nextRegisteredContest!: types.ContestListItem;
   T = T;
   ui = ui;
+  omegaup = omegaup;
   showContestInfo = true;
+  now = new Date();
 
   get contestDuration(): string {
     return time.formatContestDuration(
@@ -101,11 +121,15 @@ export default class UserNextRegisteredContest extends Vue {
   }
 
   get startContestDate(): string {
-    return this.nextRegisteredContest.start_time.toLocaleDateString();
+    return `${this.nextRegisteredContest.start_time.toLocaleDateString()} ${this.nextRegisteredContest.start_time.toLocaleTimeString()}`;
   }
 
   get startTimeLink(): string {
     return `http://timeanddate.com/worldclock/fixedtime.html?iso=${this.nextRegisteredContest.start_time.toISOString()}`;
+  }
+
+  get isContestStarted(): boolean {
+    return this.nextRegisteredContest.start_time < this.now;
   }
 
   onClick(): void {

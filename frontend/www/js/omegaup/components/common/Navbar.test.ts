@@ -80,7 +80,13 @@ describe('Navbar.vue', () => {
   });
 
   it('Should show the information of the next registered contest when the user is registered to a current or upcoming contest', () => {
-    const wrapper = shallowMount(common_Navbar, {
+    const currentDate = new Date();
+    const startTime = new Date();
+    const finishTime = new Date();
+    startTime.setHours(startTime.getHours() + 1);
+    finishTime.setHours(finishTime.getHours() + 2);
+
+    const wrapper = mount(common_Navbar, {
       propsData: {
         ...propsData,
         ...{
@@ -92,10 +98,10 @@ describe('Navbar.vue', () => {
             contestants: 10,
             description: 'Este es un concurso de prueba',
             duration: null,
-            finish_time: new Date('2023-08-20'),
-            last_updated: new Date('2023-08-16'),
-            organizer: '',
-            original_finish_time: new Date('2023-08-17'),
+            finish_time: finishTime,
+            last_updated: currentDate,
+            organizer: 'omegaup',
+            original_finish_time: finishTime,
             participating: true,
             problemset_id: 1,
             recommended: true,
@@ -103,16 +109,25 @@ describe('Navbar.vue', () => {
             score_mode: null,
             scoreboard_url: null,
             scoreboard_url_admin: null,
-            start_time: new Date('2023-08-16'),
-            title: '',
+            start_time: startTime,
+            title: 'Concurso de prueba',
             window_length: null,
           },
         },
       },
     });
 
-    expect(wrapper.findComponent(user_NextRegisteredContest).exists())
-      .toBeTruthy;
+    const nextRegisteredContest = wrapper.findComponent(
+      user_NextRegisteredContest,
+    );
+    const startDate =
+      startTime.toLocaleDateString() + ' ' + startTime.toLocaleTimeString();
+    expect(nextRegisteredContest.exists()).toBeTruthy();
+    expect(nextRegisteredContest.text()).toContain('Concurso de prueba');
+    expect(nextRegisteredContest.text()).toContain('omegaup');
+    expect(nextRegisteredContest.text()).toContain('10');
+    expect(nextRegisteredContest.text()).toContain('Inicia: ' + startDate);
+    expect(nextRegisteredContest.text()).toContain('01:00:00');
   });
 
   it('Should not show the information of a next registered contest when the user is not registered to a current or upcoming contest', () => {
@@ -120,7 +135,8 @@ describe('Navbar.vue', () => {
       propsData: { ...propsData, ...{ fromLogin: true } },
     });
 
-    expect(wrapper.findComponent(user_NextRegisteredContest).exists())
-      .toBeFalsy;
+    expect(
+      wrapper.findComponent(user_NextRegisteredContest).exists(),
+    ).toBeFalsy();
   });
 });
