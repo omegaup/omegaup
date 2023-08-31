@@ -42,7 +42,7 @@ class ContestsCallback:
     def __init__(self,
                  dbconn: mysql.connector.MySQLConnection,
                  client: omegaup.api.Client):
-        '''Contructor for contest callback'''
+        '''Constructor for contest callback'''
         self.dbconn = dbconn
         self.client = client
 
