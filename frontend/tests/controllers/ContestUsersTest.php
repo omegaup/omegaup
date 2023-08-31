@@ -551,6 +551,81 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    /**
+     * A PHPUnit data provider for the test of the next registered contest for a user.
+     *
+     * @return list<array{0: list<\OmegaUp\Timestamp>, 1: list<\OmegaUp\Timestamp>, 2: null|int}>
+     */
+    public function NextRegisteredContestForUserProvider(): array {
+        $currentTime = \OmegaUp\Time::get();
+        $timePast1 =  new \OmegaUp\Timestamp($currentTime - 180 * 60);
+        $timePast2 =  new \OmegaUp\Timestamp($currentTime - 120 * 60);
+        $timePast3 =  new \OmegaUp\Timestamp($currentTime - 60 * 60);
+        $timeFuture1 =  new \OmegaUp\Timestamp($currentTime + 60 * 60);
+        $timeFuture2 =  new \OmegaUp\Timestamp($currentTime + 120 * 60);
+        return [
+            // Get the next registered contest for a user who is not registered in any contest
+            [[], [], null],
+            // Although both contests started at the same time, the second one is scheduled
+            // to finish sooner, making it the next registered contest.
+            [[$timePast1, $timePast1], [$timeFuture2, $timeFuture1], 1],
+            // The first contest started first
+            [[$timePast1, $timeFuture1], [$timeFuture1, $timeFuture2], 0],
+            // The user doesn't have a next registered contest because the two contests already finished
+            [[$timePast1, $timePast2], [$timePast3, $timePast3], null],
+            // The third contest is the only current or upcoming contest
+            [[$timePast1, $timePast2, $timeFuture1], [$timePast3, $timePast3, $timeFuture2], 2],
+        ];
+    }
+
+    /**
+     * @dataProvider NextRegisteredContestForUserProvider
+     *
+     * @param list<\OmegaUp\Timestamp> $startTimes
+     * @param list<\OmegaUp\Timestamp> $finishTimes
+     * @param null|int $nextExpectedRegisteredContestIndex
+     */
+    public function testNextRegisteredContestForUser(
+        $startTimes,
+        $finishTimes,
+        $nextExpectedRegisteredContestIndex
+    ) {
+        // Create user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create contests and add user to them
+        $n = count($startTimes);
+        $contests = [];
+        for ($i = 0; $i < $n; $i++) {
+            $contests[] = \OmegaUp\Test\Factories\Contest::createContest(
+                new \OmegaUp\Test\Factories\ContestParams([
+                    'title' => 'Contest_' . $i,
+                    'startTime' => $startTimes[$i],
+                    'finishTime' => $finishTimes[$i],
+                ])
+            );
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $contests[$i],
+                $identity
+            );
+        }
+
+        // Get the next registered contest for the user
+        $nextRegisteredContestForUser = \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
+            $identity
+        );
+
+        // Check that the next registered contest for the user is correct
+        if (is_null($nextExpectedRegisteredContestIndex)) {
+            $this->assertNull($nextRegisteredContestForUser);
+        } else {
+            $this->assertSame(
+                $contests[$nextExpectedRegisteredContestIndex]['contest']->title,
+                $nextRegisteredContestForUser['title']
+            );
+        }
+    }
+
     private static function numberOfUsersSharingBasicInformation(
         array $contestants
     ): int {
