@@ -49,8 +49,8 @@ describe('Problem Collection Test', () => {
     cy.logout();
   });
 
-  // Uncomment this test when qualify problem functionality's
-  // bug is resolved.
+  // Uncomment this test when the following issue is fixed
+  // https://github.com/omegaup/omegaup/issues/7218
 
   // it('Should add additional tags to a problem as admin', () => {
   //   const loginOptions = loginPage.registerMultipleUsers(1);
