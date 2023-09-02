@@ -219,7 +219,7 @@ const translations: { [key: string]: string; } = {
   contestBasicInformationNeeded: "To join the contest you must fill in your basic information. Go to [My profile](/profile/#edit-basic-information)",
   contestButtonEnter: "Enter",
   contestButtonScoreboard: "Scoreboard",
-  contestButtonSingUp: "Sign up",
+  contestButtonSeeDetails: "See details",
   contestCanNotChangeToContestForTeams: "A normal contest cannot be changed to a contest for teams",
   contestDetailsGoToContest: "Go to contest",
   contestDownloadListOfUsersInContest: "Download list of users in the contest",
