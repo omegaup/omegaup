@@ -30,6 +30,7 @@
                 {{ T.contestsJoinScoreboards }}
               </a>
               <a
+                v-if="!isUnder13User"
                 class="dropdown-item"
                 href="/contest/new/"
                 data-nav-contests-create
@@ -219,6 +220,7 @@ export default class NavbarItems extends Vue {
   @Prop() isAdmin!: boolean;
   @Prop() isMainUserIdentity!: boolean;
   @Prop() navbarSection!: string;
+  @Prop() isUnder13User!: boolean;
 
   T = T;
 }
