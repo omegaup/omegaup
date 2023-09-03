@@ -17,7 +17,7 @@
                 :selected-value="qualitySeal"
               ></omegaup-radio-switch>
             </div>
-            <div class="form-group w-100">
+            <div class="form-group w-100" data-other-tag-input>
               <vue-typeahead-bootstrap
                 :data="publicTags"
                 :serializer="publicTagsSerializer"
@@ -38,7 +38,7 @@
                   </thead>
                   <tbody>
                     <tr v-for="tag in publicTagsList" :key="tag">
-                      <td>{{ getName(tag) }}</td>
+                      <td data-tag-name>{{ getName(tag) }}</td>
                       <td class="text-center">
                         <button
                           type="button"
@@ -56,6 +56,7 @@
             </div>
             <div class="text-right">
               <button
+                data-review-submit-button
                 class="btn btn-primary mr-3"
                 type="submit"
                 :disabled="qualitySeal && !tag"
