@@ -2094,7 +2094,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     ) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException();
                     }
-                    // TODO: Check start times.
+
+                    $assignment = \OmegaUp\DAO\Assignments::getAssignmentForProblemset(
+                        $problemsetId
+                    );
+
+                    if (
+                        !is_null($assignment)
+                        && $assignment->start_time->time > \OmegaUp\Time::get()
+                    ) {
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                            'problemNotFound'
+                        );
+                    }
                 }
             }
             $response['problemset'] = $problemset['problemset'];

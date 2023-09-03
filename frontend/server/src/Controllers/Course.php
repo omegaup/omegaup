@@ -4587,19 +4587,17 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        $problemsInAssignment = [];
+
         if (
-            !$isAdmin &&
-            $assignment->start_time->time > \OmegaUp\Time::get()
+            $isAdmin ||
+            $assignment->start_time->time <= \OmegaUp\Time::get()
         ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'assignmentNotStarted'
+            $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+                intval($assignment->problemset_id),
+                needSubmissions: false
             );
         }
-
-        $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            intval($assignment->problemset_id),
-            needSubmissions: false
-        );
 
         $problemsResponseArray = [];
         $letter = 0;
@@ -4672,8 +4670,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                     'currentAssignment' => [
                         'name' => $assignment->name,
-                        'alias' => $assignment->alias,
                         'description' => $assignment->description,
+                        'alias' => $assignment->alias,
                         'director' => $director,
                         'assignment_type' => $assignment->assignment_type,
                         'start_time' => $assignment->start_time,
@@ -4702,6 +4700,11 @@ class Course extends \OmegaUp\Controllers\Controller {
                 withRunDetails: false,
                 sortByName: false
             );
+        }
+
+        if (!$isAdmin && $assignment->start_time->time > \OmegaUp\Time::get()) {
+            $response['templateProperties']['payload']['currentAssignment']['name'] = null;
+            $response['templateProperties']['payload']['currentAssignment']['description'] = null;
         }
         return $response;
     }
