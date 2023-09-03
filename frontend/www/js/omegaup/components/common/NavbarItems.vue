@@ -118,7 +118,7 @@
               T.navViewLatestSubmissions
             }}</a>
             <a
-              v-if="isLoggedIn && isMainUserIdentity"
+              v-if="isLoggedIn && isMainUserIdentity && !isUnder13User"
               class="dropdown-item"
               href="/problem/new/"
               data-nav-problems-create
@@ -219,6 +219,7 @@ export default class NavbarItems extends Vue {
   @Prop() isAdmin!: boolean;
   @Prop() isMainUserIdentity!: boolean;
   @Prop() navbarSection!: string;
+  @Prop() isUnder13User!: boolean;
 
   T = T;
 }
