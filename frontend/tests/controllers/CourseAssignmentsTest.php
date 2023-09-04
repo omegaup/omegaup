@@ -199,6 +199,18 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $adminLogin = self::login($courseData['admin']);
+
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'problem_alias' => 'test_problem'
+        ]));
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $adminLogin,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+
         $adminPayload = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
@@ -215,34 +227,59 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             $adminPayload['currentAssignment']['alias']
         );
 
-        // Student should throw an exception as the assignment has not started yet
+        // Student should not have problems even when the assignment has not started yet
         $studentLogin = self::login($student['identity']);
-        try {
-            \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
-                'auth_token' => $studentLogin->auth_token,
-                'course_alias' => $courseData['course_alias'],
-                'assignment_alias' => $courseData['assignment']->alias,
-            ]));
-            $this->fail('Should have thrown a ForbiddenAccessException');
-        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertSame($e->getMessage(), 'assignmentNotStarted');
-        }
+        $studentPayload = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
+            'auth_token' => $studentLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment']->alias,
+        ]))['templateProperties']['payload'];
 
+        $this->assertSame(
+            $courseData['course']->name,
+            $studentPayload['courseDetails']['name']
+        );
+        $this->assertSame(
+            $courseData['assignment']->alias,
+            $studentPayload['currentAssignment']['alias']
+        );
+
+        // Student should throw an exception when access to a problem from an assignment that has not started yet
         try {
-            \OmegaUp\Controllers\Course::getAssignmentDetails(
-                $student['identity'],
-                null,
-                $courseData['course'],
-                \OmegaUp\DAO\Groups::getByPK(
-                    intval($courseData['course']->group_id)
-                ),
-                $courseData['assignment_alias'],
+            \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $studentLogin->auth_token,
+                    'problem_alias' => $problemData['request']['problem_alias'],
+                    'problemset_id' => $courseData['assignment']->problemset_id
+                ])
             );
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertSame($e->getMessage(), 'assignmentNotStarted');
+            $this->assertSame('problemNotFound', $e->getMessage());
         }
 
+        // Admin should can access to a problem from an assignment that has not started yet
+        try {
+            \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'problem_alias' => $problemData['request']['problem_alias'],
+                    'problemset_id' => $courseData['assignment']->problemset_id
+                ])
+            );
+            $this->assertTrue(true);
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->fail(
+                'Caught unexpected ForbiddenAccessException: ' . $e->getMessage()
+            );
+        }
+
+        // Student should not be able to see the name, description or any problem in the assignment
+        $this->assertEmpty($studentPayload['currentAssignment']['name']);
+        $this->assertEmpty($studentPayload['currentAssignment']['description']);
+        $this->assertEmpty($studentPayload['currentAssignment']['problems']);
+
+        // Student should throw an exception as the assignment has not started yet
         try {
             \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
                 new \OmegaUp\Request([
