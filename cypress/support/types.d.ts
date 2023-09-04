@@ -46,6 +46,7 @@ export interface ProblemOptions {
   tag: string;
   autoCompleteTextTag: string;
   problemLevelIndex: number;
+  publicAccess?: boolean;
 }
 
 export interface CourseOptions {

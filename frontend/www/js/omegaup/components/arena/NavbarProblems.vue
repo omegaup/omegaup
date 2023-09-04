@@ -35,12 +35,18 @@
         >
           <span class="mr-1">{{ getMaxScoreForProblem(problem) }}</span>
           <font-awesome-icon
-            v-if="problem.bestScore == problem.maxScore"
+            v-if="
+              problem.myBestScore == problem.maxScore ||
+              problem.bestScore == problem.maxScore
+            "
             icon="check"
             :style="{ color: 'green' }"
           />
           <font-awesome-icon
-            v-else-if="problem.hasRuns"
+            v-else-if="
+              problem.hasMyRuns ||
+              (problem.hasRuns && problem.hasMyRuns === null)
+            "
             icon="times"
             :style="{ color: 'red' }"
           />
@@ -98,7 +104,8 @@ export default class ArenaNavbarProblems extends Vue {
   }
 
   getMaxScoreForProblem(problem: types.NavbarProblemsetProblem): string {
-    return `(${problem.bestScore.toFixed(
+    const bestScore = problem.myBestScore ?? problem.bestScore;
+    return `(${bestScore.toFixed(
       this.digitsAfterDecimalPoint,
     )} / ${problem.maxScore.toFixed(this.digitsAfterDecimalPoint)})`;
   }
