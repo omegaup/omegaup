@@ -252,6 +252,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $school = trim($identity['school_name']);
                 }
                 if (!empty($school)) {
+                    \OmegaUp\Validators::validateLengthInRange(
+                        $school,
+                        'school_name',
+                        1,
+                        128
+                    );
                     $state = null;
                     if (!is_null($countryId) && !is_null($stateId)) {
                         $state = \OmegaUp\DAO\States::getByPK(
