@@ -54,7 +54,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>}
  * @psalm-type IntroDetailsPayload=array{course: CourseDetails, isFirstTimeAccess: bool, needsBasicInformation: bool, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
- * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
+ * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string, myBestScore?: float|null, hasMyRuns?: bool|null}
  * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, problemset_id: int, runs: list<Run>, start_time: \OmegaUp\Timestamp, totalRuns: int|null}
  * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard?: Scoreboard, courseDetails: CourseDetails, currentAssignment: ArenaAssignment, shouldShowFirstAssociatedIdentityRunWarning: bool, isTeachingAssistant: bool}
  * @psalm-type AssignmentDetails=array{admin: bool, alias: string, assignmentType: string, courseAssignments: list<CourseAssignment>, description: string, director: string, finishTime: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemsetId: int, startTime: \OmegaUp\Timestamp}
@@ -4660,19 +4660,17 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        $problemsInAssignment = [];
+
         if (
-            !$isAdmin &&
-            $assignment->start_time->time > \OmegaUp\Time::get()
+            $isAdmin ||
+            $assignment->start_time->time <= \OmegaUp\Time::get()
         ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'assignmentNotStarted'
+            $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+                intval($assignment->problemset_id),
+                needSubmissions: false
             );
         }
-
-        $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            intval($assignment->problemset_id),
-            needSubmissions: false
-        );
 
         $problemsResponseArray = [];
         $letter = 0;
@@ -4745,8 +4743,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                     'currentAssignment' => [
                         'name' => $assignment->name,
-                        'alias' => $assignment->alias,
                         'description' => $assignment->description,
+                        'alias' => $assignment->alias,
                         'director' => $director,
                         'assignment_type' => $assignment->assignment_type,
                         'start_time' => $assignment->start_time,
@@ -4775,6 +4773,11 @@ class Course extends \OmegaUp\Controllers\Controller {
                 withRunDetails: false,
                 sortByName: false
             );
+        }
+
+        if (!$isAdmin && $assignment->start_time->time > \OmegaUp\Time::get()) {
+            $response['templateProperties']['payload']['currentAssignment']['name'] = null;
+            $response['templateProperties']['payload']['currentAssignment']['description'] = null;
         }
         return $response;
     }
