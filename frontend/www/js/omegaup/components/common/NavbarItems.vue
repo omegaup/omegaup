@@ -30,6 +30,7 @@
                 {{ T.contestsJoinScoreboards }}
               </a>
               <a
+                v-if="!isUnder13User"
                 class="dropdown-item"
                 href="/contest/new/"
                 data-nav-contests-create
