@@ -30,6 +30,7 @@
                 {{ T.contestsJoinScoreboards }}
               </a>
               <a
+                v-if="!isUnder13User"
                 class="dropdown-item"
                 href="/contest/new/"
                 data-nav-contests-create
@@ -118,7 +119,7 @@
               T.navViewLatestSubmissions
             }}</a>
             <a
-              v-if="isLoggedIn && isMainUserIdentity"
+              v-if="isLoggedIn && isMainUserIdentity && !isUnder13User"
               class="dropdown-item"
               href="/problem/new/"
               data-nav-problems-create
