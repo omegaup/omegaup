@@ -114,7 +114,7 @@
               </div>
               <div class="collapse show card-body px-2 px-sm-4 tags">
                 <div
-                  v-show="selectedTags.length === 0"
+                  v-show="selectedTags.length === 0 && currentLanguages !== ''"
                   class="alert alert-info"
                 >
                   {{ T.problemEditTagPublicRequired }}
@@ -145,6 +145,31 @@
                     type="hidden"
                   />
                 </div>
+                <omegaup-problem-tags
+                  :public-tags="data.publicTags"
+                  :level-tags="data.levelTags"
+                  :alias="data.alias"
+                  :is-create="true"
+                  :problem-level="problemLevel"
+                  :selected-private-tags="selectedPrivateTags"
+                  :selected-public-tags="selectedPublicTags"
+                  :can-add-new-tags="true"
+                  :errors="errors"
+                  :is-lecture="currentLanguages === ''"
+                  @emit-add-tag="addTag"
+                  @emit-remove-tag="removeTag"
+                  @select-problem-level="selectProblemLevel"
+                ></omegaup-problem-tags>
+                <input
+                  name="selected_tags"
+                  :value="selectedTagsList"
+                  type="hidden"
+                />
+                <input
+                  name="problem_level"
+                  :value="problemLevel"
+                  type="hidden"
+                />
               </div>
             </div>
           </template>
@@ -289,6 +314,7 @@
                     <label class="form-check form-check-inline">
                       <input
                         v-model="isPublic"
+                        data-problem-access-radio-yes
                         type="radio"
                         name="visibility"
                         class="form-check-input"

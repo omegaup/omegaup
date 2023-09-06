@@ -69,6 +69,7 @@ Cypress.Commands.add(
     tag,
     autoCompleteTextTag,
     problemLevelIndex,
+    publicAccess = false
   }: ProblemOptions) => {
     cy.visit('/');
     // Select problem nav
@@ -92,6 +93,11 @@ Cypress.Commands.add(
         .should('have.text', tag) // Maybe theres another way to avoid to hardcode this
         .click(),
     );
+
+    if(publicAccess) {
+      cy.get('[data-target=".access"]').click();
+      cy.get('[data-problem-access-radio-yes]').check();
+    }
 
     cy.get('[name="problem-level"]').select(problemLevelIndex); // How can we assert this with the real text?
 
