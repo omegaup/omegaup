@@ -1,9 +1,19 @@
 <template>
   <div>
-    <form class="form-group">
-      <div class="form-row mb-3">
+    <h3 class="text-center mb-4">
+        {{
+          ui.formatString(T.nominationsRangeHeader, {
+            lowCount: (pages - 1) * length + 1,
+            highCount: pages * length,
+          })
+        }}
+      </h3>
+    <div class="card">
+      <div class="card-header">
+      <form class="form-group mb-0">
+      <div class="form-row">
         <label class="col-form-label">{{ T.wordsSearchBy }}</label>
-        <div class="col-md-4">
+        <div class="col-md-4 mb-1">
           <select v-model="selectColumn" name="column" class="form-control">
             <option
               v-for="(columnText, columnIndex) in columns"
@@ -14,7 +24,7 @@
             </option>
           </select>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 mb-1">
           <omegaup-common-typeahead
             v-show="selectColumn == 'problem_alias'"
             :existing-options="searchResultProblems"
@@ -37,8 +47,7 @@
             "
           ></omegaup-common-typeahead>
         </div>
-      </div>
-      <button
+        <button
         class="btn btn-primary"
         @click.prevent="
           $emit('go-to-page', 1, getStatus(), getQuery(), selectColumn)
@@ -46,16 +55,9 @@
       >
         {{ T.wordsSearch }}
       </button>
+      </div>
     </form>
-    <div class="card">
-      <h3 class="card-header">
-        {{
-          ui.formatString(T.nominationsRangeHeader, {
-            lowCount: (pages - 1) * length + 1,
-            highCount: pages * length,
-          })
-        }}
-      </h3>
+  </div>
       <div class="card-body">
         <a v-if="isAdmin" href="/group/omegaup:quality-reviewer/edit/#members">
           {{ T.addUsersToReviewerGroup }}
@@ -144,6 +146,7 @@
       </div>
       <omegaup-common-paginator
         :pager-items="pagerItems"
+        class="mb-3"
         @page-changed="
           (page) =>
             $emit('go-to-page', page, getStatus(), getQuery(), selectColumn)
