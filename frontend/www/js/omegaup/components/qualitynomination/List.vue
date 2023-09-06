@@ -48,7 +48,7 @@
           ></omegaup-common-typeahead>
         </div>
         <button
-        class="btn btn-primary"
+        class="btn btn-primary mb-1"
         @click.prevent="
           $emit('go-to-page', 1, getStatus(), getQuery(), selectColumn)
         "
