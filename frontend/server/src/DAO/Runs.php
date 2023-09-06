@@ -881,27 +881,109 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 ' .  \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Runs::FIELD_NAMES,
             'r'
-        ) . '
-            FROM
-                `Runs` `r`
-            INNER JOIN
-                `Submissions` `s`
-            ON
-                `r`.`submission_id` = `s`.`submission_id`
-            WHERE
-                `s`.`guid` = ?
-            LIMIT
-                1;
+        ) . ',                 ( SELECT
+        IF(
+            verdict IN ("OLE", "OL"), "OUTPUT_EXCEEDED",
+        IF(
+            verdict IN ("WA", "PA"), "OUTPUT_INCORRECT",
+        IF(
+            verdict IN ("JE", "VE", "CE", "FO", "RFE", "RE", "RTE", "MLE", "TLE"), "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT"
+        )))
+    AS output
+    FROM
+        Runs_Groups
+    WHERE
+        run_id = r.run_id
+    GROUP BY
+        output
+    ORDER BY
+        field(output, "OUTPUT_EXCEEDED", "OUTPUT_INCORRECT", "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT")
+    LIMIT 1
+    ) AS output,
+    ( SELECT
+        IF(
+            verdict = "JE", "EXECUTION_JUDGE_ERROR",
+        IF(
+            verdict = "VE", "EXECUTION_VALIDATOR_ERROR",
+        IF(
+            verdict = "CE", "EXECUTION_COMPILATION_ERROR",
+        IF(
+            verdict IN ("OF", "RFE"), "EXECUTION_RUNTIME_FUNCTION_ERROR",
+        IF(
+            verdict IN ("RE", "RTE"), "EXECUTION_RUNTIME_ERROR",
+        IF(
+            verdict IN ("ML", "MLE", "TLE", "OLE", "TO", "OL"), "EXECUTION_INTERRUPTED", "EXECUTION_FINISHED")
+        )))))
+        AS execution
+    FROM
+        Runs_Groups
+    WHERE
+        run_id = r.run_id
+    GROUP BY
+        execution
+    ORDER BY
+        field(
+            execution,
+            "EXECUTION_JUDGE_ERROR",
+            "EXECUTION_VALIDATOR_ERROR",
+            "EXECUTION_COMPILATION_ERROR",
+            "EXECUTION_RUNTIME_FUNCTION_ERROR",
+            "EXECUTION_RUNTIME_ERROR",
+            "EXECUTION_INTERRUPTED",
+            "EXECUTION_FINISHED"
+        )
+    LIMIT 1
+    ) AS execution,
+    ( SELECT
+        IF(
+            verdict IN ("JE", "CE"), "RUNTIME_NOT_AVAILABLE",
+        IF(
+            verdict IN ("TLE", "TO"), "RUNTIME_EXCEEDED", "RUNTIME_AVAILABLE"
+        ))
+        AS status_runtime
+    FROM
+        Runs_Groups
+    WHERE
+        run_id = r.run_id
+    ORDER BY
+        field(status_runtime, "RUNTIME_NOT_AVAILABLE", "RUNTIME_EXCEEDED", "RUNTIME_AVAILABLE")
+            LIMIT 1
+    ) AS status_runtime,
+    ( SELECT
+        IF(
+            verdict IN ("JE", "CE"), "MEMORY_NOT_AVAILABLE",
+        IF(
+            verdict IN ("ML", "MLE"), "MEMORY_EXCEEDED", "MEMORY_AVAILABLE"
+        ))
+    AS status_memory
+    FROM
+        Runs_Groups
+    WHERE
+        run_id = r.run_id
+    ORDER BY
+        field(status_memory, "MEMORY_NOT_AVAILABLE", "MEMORY_EXCEEDED", "MEMORY_AVAILABLE")
+    LIMIT 1
+    ) AS status_memory
+FROM
+    `Runs` `r`
+INNER JOIN
+    `Submissions` `s`
+ON
+    `r`.`submission_id` = `s`.`submission_id`
+WHERE
+    `s`.`guid` = ?
+LIMIT
+    1;
         ';
 
         /** @var array{commit: string, contest_score: float|null, judged_by: null|string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submission_id: int, time: \OmegaUp\Timestamp, verdict: string, version: string}|null */
-        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$guid]);
+        $run = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$guid]);
 
-        if (is_null($row)) {
+        if (is_null($run)) {
             return null;
         }
 
-        return new \OmegaUp\DAO\VO\Runs($row);
+        return $run;
     }
 
     /**

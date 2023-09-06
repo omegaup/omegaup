@@ -133,6 +133,7 @@
         :show-disqualify="true"
         :show-pager="true"
         :show-rejudge="true"
+        :show-status="false"
         :show-user="true"
         :problemset-problems="Object.values(problems)"
         :is-contest-finished="isContestFinished"
