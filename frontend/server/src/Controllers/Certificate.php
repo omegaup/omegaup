@@ -60,7 +60,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->SetTextColor(153, 153, 153);
         $pdf->SetXY(50, 151);
         $day = date('j', $date);
-        $month = date('n', $date);
+        $month = intval(date('n', $date));
         $year = date('o', $date);
         $pdf->Cell(
             215,
@@ -80,6 +80,10 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $certificateData = \OmegaUp\DAO\Certificates::getContestCertificateByVerificationCode(
             $verification_code
         );
+
+        if (is_null($certificateData)) {
+            return '';
+        }
 
         $title = $certificateData['contest_place'] . '° lugar';
         $identityName = $certificateData['identity_name'];

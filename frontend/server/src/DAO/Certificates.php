@@ -47,10 +47,10 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         string $verification_code
     ) {
         $sql = '
-            SELECT 
+            SELECT
                 co.title AS contest_title,
                 i.name AS identity_name,
-                ce.contest_place, 
+                ce.contest_place,
                 ce.timestamp
             FROM
                 Certificates ce
