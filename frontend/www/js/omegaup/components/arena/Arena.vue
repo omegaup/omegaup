@@ -1,7 +1,7 @@
 <template>
   <div data-arena-wrapper :class="backgroundClass">
     <div class="text-center mt-4 pt-2">
-      <h2 class="mb-4">
+      <h2 v-if="title !== null" class="mb-4">
         <span>{{ title }}</span>
         <slot name="socket-status">
           <sup class="socket-status-error" title="WebSocket">✗</sup>

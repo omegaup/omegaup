@@ -1,4 +1,4 @@
-import { RunOptions } from "../types";
+import { RunOptions } from '../types';
 
 export class ProblemPage {
   navigateToAllProblemsTab(): void {
@@ -14,14 +14,12 @@ export class ProblemPage {
   }
 
   verifyFilterByAlias(problemAlias: string): void {
-    cy.get('[data-problem-keyword-search] input').type(problemAlias + '{enter}');
+    cy.get('[data-problem-keyword-search] input').type(
+      problemAlias + '{enter}',
+    );
     cy.get('[data-filter-submit-button]').click();
 
     cy.get('[data-problem-title-list]').first().should('contain', problemAlias);
-  }
-
-  verifyFilterByTags(): void {
-
   }
 
   openProblem(problemAlias: string): void {
@@ -50,6 +48,43 @@ export class ProblemPage {
     cy.get('a[href="#runs"]').click();
     cy.get(`[data-username=${username}]`).should('be.visible');
     cy.get('[data-run-status]').should('contain', 'AC');
+  }
+
+  qualifyProblem(tags: string[]): void {
+    cy.get('[data-rate-problem-button]').click();
+    cy.get('[type="radio"]').check('true');
+    tags.forEach((tag) => {
+      cy.get('[data-other-tag-input] input').clear().type(tag);
+      cy.waitUntil(() =>
+        cy
+          .get('[data-other-tag-input] .vbt-autcomplete-list a.vbst-item:first')
+          .should('have.text', tag)
+          .click(),
+      );
+      cy.get('[data-tag-name]').last().should('contain', tag);
+    });
+    cy.get('[data-review-submit-button]').click();
+  }
+
+  reportProblem(reason: string): void {
+    cy.get('[data-report-problem-button]').click();
+    cy.get('[name="selectedReason"]').select(reason);
+    cy.get('[ data-submit-report-button]').click();
+  }
+
+  banProblem(problemAlias: string): void {
+    cy.visit('nomination');
+    cy.get(`.${problemAlias}`).click();
+    cy.get('[data-ban-problem-button]').click();
+    cy.get('.modal-footer [data-dismiss="modal"]').first().click();
+  }
+
+  verifyBan(problemAlias: string): void {
+    cy.get('[data-problem-keyword-search] input').type(
+      problemAlias + '{enter}',
+    );
+    cy.get('[data-filter-submit-button]').click();
+    cy.get('[data-problem-title-list]').should('not.exist');
   }
 }
 

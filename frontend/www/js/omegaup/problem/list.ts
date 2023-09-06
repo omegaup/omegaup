@@ -12,6 +12,7 @@ OmegaUp.on('ready', () => {
   let sortOrder: omegaup.SortOrder = omegaup.SortOrder.Descending;
   let columnName = 'problem_id';
   let language = 'all';
+  let onlyQualitySeal = false;
   let query: null | string = null;
   let tag: string[] = [];
   if (queryString) {
@@ -35,6 +36,12 @@ OmegaUp.on('ready', () => {
       const languageParam = urlParams.get('language');
       if (languageParam) {
         language = languageParam;
+      }
+    }
+    if (urlParams.get('only_quality_seal')) {
+      const onlyQualitySealParam = urlParams.get('only_quality_seal');
+      if (onlyQualitySealParam) {
+        onlyQualitySeal = onlyQualitySealParam === 'true';
       }
     }
     if (urlParams.get('tag[]')) {
@@ -74,6 +81,7 @@ OmegaUp.on('ready', () => {
           languages: payload.languages,
           keyword: payload.keyword,
           tags: payload.tags,
+          onlyQualitySeal: onlyQualitySeal,
           sortOrder: sortOrder,
           columnName: columnName,
           searchResultProblems: this.searchResultProblems,
@@ -91,6 +99,7 @@ OmegaUp.on('ready', () => {
             const queryParameters = {
               language,
               query: query ?? '',
+              only_quality_seal: onlyQualitySeal,
               order_by: columnName,
               sort_order: sortOrder,
               tag,
