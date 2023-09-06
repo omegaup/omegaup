@@ -1,8 +1,6 @@
 <template>
-  <div class="container-fluid max-width card pr-0 pl-0">
-    <ul class="nav nav-tabs introjs-tabs" role="tablist">
   <div class="container-fluid max-width card pr-0 pl-0 custom-card">
-    <ul class="nav nav-tabs" role="tablist">
+    <ul class="nav nav-tabs introjs-tabs" role="tablist">
       <li
         v-for="(tabName, tabKey) in tabNames"
         :key="tabKey"
