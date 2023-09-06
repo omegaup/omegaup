@@ -5,7 +5,9 @@
     </div>
     <div class="card ml-lg-4 mr-lg-4">
       <div class="card-header text-right">
-        <a class="btn btn-primary" href="/group/new/">{{ T.groupsCreateNew }}</a>
+        <a class="btn btn-primary" href="/group/new/">{{
+          T.groupsCreateNew
+        }}</a>
       </div>
       <table class="table mb-0" data-table-groups>
         <thead>
