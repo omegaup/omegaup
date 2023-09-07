@@ -30,6 +30,10 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         ];
     }
 
+    private static function getMonthName(int $month): string {
+        return '';
+    }
+
     private static function createCertificatePdf(
         string $title,
         string $identityName,
@@ -51,14 +55,25 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             return '';
         }
 
-        $title = 'Coder del mes';
+        $translator = \OmegaUp\Translations::getInstance();
         if ($isFemaleCategory) {
-            $title .= ' para ellas';
+            $title = utf8_decode(
+                $translator->get('certificatePdfCoderOfTheMonthFemaleTitle')
+            );
+        } else {
+            $title = utf8_decode(
+                $translator->get('certificatePdfCoderOfTheMonthTitle')
+            );
         }
         $identityName = $certificateData['identity_name'];
         $date = $certificateData['timestamp']->time;
         $month = intval(date('n', $date));
-        $description = 'por su desempeño en el mes de ' . self::$months[$month - 1] . ' al obtener más puntos en la plataforma omegaUp.com';
+        $description = utf8_decode(
+            sprintf(
+                $translator->get('certificatePdfCoderOfTheMonthDescription'),
+                self::getMonthName($month - 1)
+            )
+        );
 
         return self::createCertificatePdf(
             $title,
