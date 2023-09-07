@@ -161,6 +161,7 @@ cannotRemoveProblemWithSubmissions = "No puedes eliminar un problema que ya tien
 certificateDetailsBody = "Favor de escribirnos a [certificados@omegaup.com](mailto:certificados@omegaup.com?subject=Validar%20certificado%20%(uuid)) para verificar el certificado. Incluye el ID del certificado (%(uuid)) en el asunto del correo."
 certificateDetailsTitle = "Proceso de verificación de certificados"
 certificatePdfContestDescription = "por su participación en el concurso %s que se llevó a cabo en la plataforma omegaUp.com"
+certificatePdfContestParticipation = "Participación"
 certificatePdfContestPlace = " lugar"
 certificatePdfContestPlace0 = "°"
 certificatePdfContestPlace1 = "°"

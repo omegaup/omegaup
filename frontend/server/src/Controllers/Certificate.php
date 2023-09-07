@@ -230,14 +230,22 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         }
 
         $translator = \OmegaUp\Translations::getInstance();
-        $placeNumber = intval($certificateData['contest_place']);
-        $title = utf8_decode(
-            $placeNumber
-            . self::getPlaceSuffix($placeNumber)
-            . $translator->get(
-                'certificatePdfContestPlace'
-            )
-        );
+        if (!is_null($certificateData['contest_place'])) {
+            $placeNumber = intval($certificateData['contest_place']);
+            $title = utf8_decode(
+                $placeNumber
+                . self::getPlaceSuffix($placeNumber)
+                . $translator->get(
+                    'certificatePdfContestPlace'
+                )
+            );
+        } else {
+            $title = utf8_decode(
+                $translator->get(
+                    'certificatePdfContestParticipation'
+                )
+            );
+        }
         $identityName = utf8_decode($certificateData['identity_name']);
         $description = utf8_decode(
             sprintf(

@@ -163,6 +163,7 @@ const translations: { [key: string]: string; } = {
   certificateDetailsBody: "Favor de escribirnos a [certificados@omegaup.com](mailto:certificados@omegaup.com?subject=Validar%20certificado%20%(uuid)) para verificar el certificado. Incluye el ID del certificado (%(uuid)) en el asunto del correo.",
   certificateDetailsTitle: "Proceso de verificaci\u00f3n de certificados",
   certificatePdfContestDescription: "por su participaci\u00f3n en el concurso %s que se llev\u00f3 a cabo en la plataforma omegaUp.com",
+  certificatePdfContestParticipation: "Participaci\u00f3n",
   certificatePdfContestPlace: " lugar",
   certificatePdfContestPlace0: "\u00b0",
   certificatePdfContestPlace1: "\u00b0",
