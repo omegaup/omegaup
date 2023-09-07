@@ -200,7 +200,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $center
         );
 
-        $pdf->Output('Certificate.pdf', 'F');
         return $pdf->Output('', 'S');
     }
 
