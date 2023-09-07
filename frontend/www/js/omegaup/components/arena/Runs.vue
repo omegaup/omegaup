@@ -185,7 +185,9 @@
               <th v-if="showUser">{{ T.contestParticipant }}</th>
               <th v-if="showContest">{{ T.wordsContest }}</th>
               <th v-if="showProblem">{{ T.wordsProblem }}</th>
-              <th v-if="showStatus">{{ T.wordsStatus }}</th>
+              <th v-if="contestAlias != null && !showUser">
+                {{ T.wordsStatus }}
+              </th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPoints }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPenalty }}</th>
               <th v-if="!showPoints" class="numeric">
@@ -289,7 +291,7 @@
                 </a>
               </td>
               <td
-                v-if="showStatus"
+                v-if="contestAlias != null && !showUser"
                 :class="statusClass(run)"
                 data-run-status
                 class="text-center opacity-4 font-weight-bold"
@@ -510,7 +512,6 @@ export default class Runs extends Vue {
   @Prop({ default: false }) showPoints!: boolean;
   @Prop({ default: false }) showProblem!: boolean;
   @Prop({ default: false }) showRejudge!: boolean;
-  @Prop({ default: true }) showStatus!: boolean;
   @Prop({ default: false }) showUser!: boolean;
   @Prop({ default: false }) useNewSubmissionButton!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;

@@ -669,6 +669,9 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
+        if (is_null($submission->guid)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
         $run = \OmegaUp\DAO\Runs::getByGUID(
             $submission->guid
         );

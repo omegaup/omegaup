@@ -207,6 +207,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Call API
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
+        $submission = \OmegaUp\DAO\Submissions::getByGuid($response['guid']);
 
         $this->assertRun($r, $response);
 
@@ -214,7 +215,9 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         $this->assertSame(1, $problem->submissions);
 
-        $run = \OmegaUp\DAO\Runs::getByGUID($response['guid']);
+        $run = \OmegaUp\DAO\Runs::getByPK(
+            $submission->current_run_id
+        );
         $this->assertSame($problem->commit, $run->commit);
     }
 

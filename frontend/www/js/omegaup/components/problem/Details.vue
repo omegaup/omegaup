@@ -190,7 +190,6 @@
             {{ T.ephemeralGraderAlert }}
           </div>
           <omegaup-arena-runs
-            :show-status="false"
             :problem-alias="problem.alias"
             :contest-alias="contestAlias"
             :runs="runsByProblem"
