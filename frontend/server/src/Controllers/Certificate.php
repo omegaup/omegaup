@@ -45,9 +45,17 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             return '';
         }
 
-        $title = 'Graduación';
+        $translator = \OmegaUp\Translations::getInstance();
+        $title = utf8_decode(
+            $translator->get('certificatePdfCourseTitle')
+        );
         $identityName = $certificateData['identity_name'];
-        $description = 'por completar el curso "' . $certificateData['course_name'] . '" en la plataforma omegaUp.com';
+        $description = utf8_decode(
+            sprintf(
+                $translator->get('certificatePdfCourseDescription'),
+                $certificateData['course_name']
+            )
+        );
         $date = $certificateData['timestamp']->time;
 
         return self::createCertificatePdf(
