@@ -8,7 +8,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type Contest=array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, score_mode: string, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}
- * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
+ * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string, myBestScore?: float|null, hasMyRuns?: bool|null}
  * @psalm-type ContestUser=array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, is_owner: int|null, username: string}
  * @psalm-type ContestGroup=array{alias: string, name: string}
  * @psalm-type ContestRequest=array{accepted: bool|null, admin?: array{username?: null|string}, country: null|string, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}
@@ -647,6 +647,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
             token: null,
             isPracticeMode: $isPracticeMode
         );
+
+        if (is_null($problemset->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemsetNotFound'
+            );
+        }
+
+        [
+            'runs' => $runs,
+        ] = \OmegaUp\DAO\Runs::getAllRuns(
+            $problemset->problemset_id,
+            null,
+            null,
+            null,
+            null,
+            $identity->identity_id,
+            null,
+            null,
+        );
+
         /** @var list<NavbarProblemsetProblem> */
         $problems = [];
         foreach ($contestDetails['problems'] as $problem) {
@@ -662,8 +682,23 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'bestScore' => 0,
                     'maxScore' => floatval($problem['points']),
                     'hasRuns' => $problem['has_submissions'],
+                    'myBestScore' => null,
+                    'hasMyRuns' => false,
                 ]
             );
+        }
+
+        $problemIndex = [];
+
+        foreach ($problems as &$problem) {
+            $problemIndex[$problem['alias']] = &$problem;
+        }
+
+        foreach ($runs as $run) {
+            if (isset($problemIndex[$run['alias']])) {
+                $problemIndex[$run['alias']]['myBestScore'] = $run['contest_score'];
+                $problemIndex[$run['alias']]['hasMyRuns'] = true;
+            }
         }
 
         return [
