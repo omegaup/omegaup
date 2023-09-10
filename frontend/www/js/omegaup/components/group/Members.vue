@@ -2,23 +2,25 @@
   <div class="card">
     <div class="card-body">
       <form class="form" @submit.prevent="onAddMember">
-        <div class="form-group">
-          <label class="d-inline"
-            >{{ T.wordsMember }}
-            <omegaup-common-typeahead
-              :existing-options="searchResultUsers"
-              :value.sync="searchedUsername"
-              :max-results="10"
-              @update-existing-options="
-                (query) => $emit('update-search-result-users', query)
-              "
-            ></omegaup-common-typeahead>
-          </label>
-        </div>
-        <button class="btn btn-primary" type="submit">
-          {{ T.wordsAddMember }}
-        </button>
-      </form>
+  <div class="row">
+    <div class="col-md-9">
+      <div class="form-group">
+        <label class="d-inline">{{ T.wordsMember }}</label>
+        <omegaup-common-typeahead
+          :existing-options="searchResultUsers"
+          :value.sync="searchedUsername"
+          :max-results="10"
+          @update-existing-options="(query) => $emit('update-search-result-users', query)"
+        ></omegaup-common-typeahead>
+      </div>
+    </div>
+    <div class="col-md-3 d-flex justify-content-center align-items-center mt-2">
+      <div class="form-group d-flex justify-content-center align-items-center mb-0">
+        <button class="btn btn-primary" type="submit">{{ T.wordsAddMember }}</button>
+      </div>
+    </div>
+  </div>
+</form>
     </div>
     <table class="table table-striped" data-table-members>
       <thead>
