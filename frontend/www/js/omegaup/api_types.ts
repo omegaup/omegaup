@@ -3376,6 +3376,7 @@ export namespace types {
       finished: types.CourseCardFinished[];
       public: types.CourseCardPublic[];
     };
+    hasVisitedSection: boolean;
   }
 
   export interface CoursesByAccessMode {
