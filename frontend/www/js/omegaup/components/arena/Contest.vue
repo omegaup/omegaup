@@ -131,7 +131,7 @@
         :show-problem="true"
         :show-details="true"
         :show-disqualify="true"
-        :show-pager="true"
+        :show-filters="true"
         :show-rejudge="true"
         :show-user="true"
         :problemset-problems="Object.values(problems)"

@@ -665,13 +665,10 @@ class Run extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $submission = \OmegaUp\DAO\Submissions::getByGuid($runAlias);
-        if (is_null($submission) || is_null($submission->current_run_id)) {
+        if (is_null($submission) || is_null($submission->current_run_id) || is_null($submission->guid)) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
-        if (is_null($submission->guid)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
-        }
         $run = \OmegaUp\DAO\Runs::getByGUID(
             $submission->guid
         );
