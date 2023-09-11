@@ -521,37 +521,37 @@ class InProcessCacheAdapter extends CacheAdapter {
  *
  */
 class Cache {
-    const AUTHORS_RANK = 'authors-rank-1';
-    const AUTHORS_RANK_WITH_QUALITY_PROBLEMS = 'authors-rank-quality-problems-1';
-    const SESSION_PREFIX = 'session-1';
-    const CONTESTANT_SCOREBOARD_PREFIX = 'scoreboard-1';
-    const ADMIN_SCOREBOARD_PREFIX = 'scoreboard-admin-1';
-    const CONTESTANT_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-3';
-    const ADMIN_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-admin-3';
-    const CODERS_OF_THE_MONTH = 'coders-of-the-month-1';
-    const CONTEST_INFO = 'contest-info-1';
-    const PROBLEM_SETTINGS = 'problem-settings-json-1';
-    const PROBLEM_SETTINGS_DISTRIB = 'problem-settings-distrib-json-1';
-    const PROBLEM_STATEMENT = 'statement-1';
-    const PROBLEM_SOLUTION = 'solution-1';
-    const PROBLEM_SOLUTION_EXISTS = 'solution-exists-1';
-    const PROBLEM_STATS = 'problem-stats-1';
-    const PROBLEMS_LIST = 'problems-list-1';
-    const RUN_ADMIN_DETAILS = 'run-admin-details-1';
-    const RUN_COUNTS = 'run-counts-1';
-    const RUN_TOTAL_COUNTS = 'run-total-counts-1';
-    const USER_PROFILE = 'profile-1';
-    const PROBLEMS_SOLVED_RANK = 'problems-solved-rank-1';
-    const CONTESTS_LIST_PUBLIC = 'contest-list-public-1';
-    const CONTESTS_LIST_SYSTEM_ADMIN = 'contest-list-sys-admin-1';
-    const CONTESTS_LIST_USER_ID = 'contest-list-user-id-1';
-    const SCHOOL_RANK = 'school-rank-1';
-    const SCHOOL_STUDENTS_PROGRESS = 'school-students-progress-1';
-    const SCHOOLS_OF_THE_MONTH = 'schools-of-the-month-1';
-    const TAGS_LIST = 'tags-list-1';
-    const PROBLEM_CASES_CONTENTS = 'problem-cases-contents-1';
-    const DATA_CASES_FILES = 'data-cases-files-1';
-    const PROBLEM_CASES_METADATA = 'problem-cases-metadata-1';
+    const AUTHORS_RANK = 'authors-rank-';
+    const AUTHORS_RANK_WITH_QUALITY_PROBLEMS = 'authors-rank-quality-problems-';
+    const SESSION_PREFIX = 'session-';
+    const CONTESTANT_SCOREBOARD_PREFIX = 'scoreboard-';
+    const ADMIN_SCOREBOARD_PREFIX = 'scoreboard-admin-';
+    const CONTESTANT_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-';
+    const ADMIN_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-admin-';
+    const CODERS_OF_THE_MONTH = 'coders-of-the-month';
+    const CONTEST_INFO = 'contest-info-';
+    const PROBLEM_SETTINGS = 'problem-settings-json-';
+    const PROBLEM_SETTINGS_DISTRIB = 'problem-settings-distrib-json-';
+    const PROBLEM_STATEMENT = 'statement-';
+    const PROBLEM_SOLUTION = 'solution-';
+    const PROBLEM_SOLUTION_EXISTS = 'solution-exists-';
+    const PROBLEM_STATS = 'problem-stats-';
+    const PROBLEMS_LIST = 'problems-list-';
+    const RUN_ADMIN_DETAILS = 'run-admin-details-';
+    const RUN_COUNTS = 'run-counts-';
+    const RUN_TOTAL_COUNTS = 'run-total-counts';
+    const USER_PROFILE = 'profile-';
+    const PROBLEMS_SOLVED_RANK = 'problems-solved-rank-';
+    const CONTESTS_LIST_PUBLIC = 'contest-list-public';
+    const CONTESTS_LIST_SYSTEM_ADMIN = 'contest-list-sys-admin';
+    const CONTESTS_LIST_USER_ID = 'contest-list-user-id';
+    const SCHOOL_RANK = 'school-rank';
+    const SCHOOL_STUDENTS_PROGRESS = 'school-students-progress-';
+    const SCHOOLS_OF_THE_MONTH = 'schools-of-the-month';
+    const TAGS_LIST = 'tags-list-';
+    const PROBLEM_CASES_CONTENTS = 'problem-cases-contents-';
+    const DATA_CASES_FILES = 'data-cases-files-';
+    const PROBLEM_CASES_METADATA = 'problem-cases-metadata-';
 
     /** @var \Monolog\Logger */
     private $log;
