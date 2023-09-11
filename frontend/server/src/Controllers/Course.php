@@ -1100,7 +1100,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             $notificationContents = [
                 'type' => $problemAdded ? \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_PROBLEM_ADDED : \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_ADDED,
-                'body' => [                    
+                'body' => [
                     'localizationParams' => [
                         'courseName' => $course->name,
                     ],
