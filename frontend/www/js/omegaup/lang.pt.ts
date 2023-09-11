@@ -1593,6 +1593,7 @@ const translations: { [key: string]: string; } = {
   wordsContentEdit: "Editar conte\u00fado",
   wordsContentType: "Tipo de conte\u00fado",
   wordsContest: "Concurso",
+  wordsContestant: "Concorrente",
   wordsContests: "Concursos",
   wordsContestsResults: "Results",
   wordsCopyToClipboard: "Copiar para o clipboard",

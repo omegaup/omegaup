@@ -51,7 +51,7 @@
     <table class="table table-striped" data-table-identities>
       <thead>
         <tr>
-          <th>{{ T.wordsIdentity }}</th>
+          <th>{{ T.wordsCoder }}</th>
           <th>{{ T.wordsName }}</th>
           <th>{{ T.profileCountry }}</th>
           <th>{{ T.profileState }}</th>

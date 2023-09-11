@@ -1593,6 +1593,7 @@ const translations: { [key: string]: string; } = {
   wordsContentEdit: "Edit content",
   wordsContentType: "Content type",
   wordsContest: "Contest",
+  wordsContestant: "Contestant",
   wordsContests: "Contests",
   wordsContestsResults: "Results",
   wordsCopyToClipboard: "Copy to clipboard",

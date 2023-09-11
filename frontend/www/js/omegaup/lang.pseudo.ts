@@ -1593,6 +1593,7 @@ const translations: { [key: string]: string; } = {
   wordsContentEdit: "(Edi7 c0n73n7)",
   wordsContentType: "(C0n73n7 7yp3)",
   wordsContest: "(C0n7357)",
+  wordsContestant: "(C0n7357an7)",
   wordsContests: "(C0n73575)",
   wordsContestsResults: "(R35u175)",
   wordsCopyToClipboard: "(C0py 70 c1ipb0ard)",

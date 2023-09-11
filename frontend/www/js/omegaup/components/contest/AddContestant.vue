@@ -34,7 +34,7 @@
       <table class="table table-striped mb-0 participants">
         <thead>
           <tr>
-            <th class="text-center">{{ T.wordsCoder }}</th>
+            <th class="text-center">{{ T.wordsContestant }}</th>
             <th class="text-center">
               {{ T.contestAdduserRegisteredUserTime }}
             </th>
