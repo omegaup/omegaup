@@ -3377,6 +3377,7 @@ export namespace types {
       finished: types.CourseCardFinished[];
       public: types.CourseCardPublic[];
     };
+    hasVisitedSection: boolean;
   }
 
   export interface CoursesByAccessMode {
@@ -3684,8 +3685,10 @@ export namespace types {
     acceptsSubmissions: boolean;
     alias: string;
     bestScore: number;
+    hasMyRuns?: boolean;
     hasRuns: boolean;
     maxScore: number | number;
+    myBestScore?: number;
     text: string;
   }
 
