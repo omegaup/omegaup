@@ -1075,6 +1075,60 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @param \OmegaUp\DAO\VO\Courses $course
+     * @param string $assignmentAlias
+     * @param bool $problemAdded
+     */
+    private static function sendNotificationToStudent(
+        \OmegaUp\DAO\VO\Courses $course,
+        string $assignmentAlias,
+        bool $problemAdded
+    ): void {
+        if (is_null($course->group_id) || is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseNotFound'
+            );
+        }
+
+        $students = [];
+        $notificationContents = [];
+
+            $students = \OmegaUp\DAO\Courses::getStudentsInCourse(
+                $course->course_id,
+                $course->group_id
+            );
+
+            $notificationContents = [
+                'type' => $problemAdded ? \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_PROBLEM_ADDED : \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_ADDED,
+                'body' => [                    
+                    'localizationParams' => [
+                        'courseName' => $course->name,
+                    ],
+                    'url' => "/course/{$course->alias}/assignment/{$assignmentAlias}/",
+                    'iconUrl' => '/media/info.png',
+                ],
+            ];
+
+            if ($problemAdded) {
+                $notificationContents['body']['localizationString'] = new \OmegaUp\TranslationString(
+                    'notificationCourseAssignmentProblemAdded'
+                );
+            } else {
+                $notificationContents['body']['localizationString'] = new \OmegaUp\TranslationString(
+                    'notificationCourseAssignmentAdded'
+                );
+            }
+            foreach ($students as $student) {
+                \OmegaUp\DAO\Notifications::create(
+                    new \OmegaUp\DAO\VO\Notifications([
+                        'user_id' => $student['user_id'],
+                        'contents' =>  json_encode($notificationContents),
+                    ])
+                );
+            }
+    }
+
+    /**
      * API to Create an assignment
      *
      * @return array{status: string}
@@ -1134,39 +1188,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $addedProblems
         );
 
-        $students = [];
-        $notificationContents = [];
-        $assignmentAlias = $r['alias'];
-
-        if (!is_null($course->group_id)) {
-            $students = \OmegaUp\DAO\Courses::getStudentsInCourse(
-                $course->course_id,
-                $course->group_id
-            );
-
-            $notificationContents = [
-                'type' => \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_ADDED,
-                'body' => [
-                    'localizationString' => new \OmegaUp\TranslationString(
-                        'notificationCourseAssignmentAdded'
-                    ),
-                    'localizationParams' => [
-                        'courseName' => $course->name,
-                    ],
-                    'url' => "/course/{$course->alias}/assignment/{$assignmentAlias}/",
-                    'iconUrl' => '/media/info.png',
-                ],
-            ];
-
-            foreach ($students as $student) {
-                \OmegaUp\DAO\Notifications::create(
-                    new \OmegaUp\DAO\VO\Notifications([
-                        'user_id' => $student['user_id'],
-                        'contents' =>  json_encode($notificationContents),
-                    ])
-                );
-            }
-        }
+        self::sendNotificationToStudent($course, $r['alias'], false);
 
         return [
             'status' => 'ok',
@@ -1405,44 +1427,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $assignmentAlias
         );
 
-        $students = [];
-        $notificationContents = [];
-
-        $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
-            $assignmentAlias,
-            intval($course->course_id)
-        );
-
-        if (!is_null($course->group_id) && !is_null($assignment)) {
-            $students = \OmegaUp\DAO\Courses::getStudentsInCourse(
-                $course->course_id,
-                $course->group_id
-            );
-
-            $notificationContents = [
-                'type' => \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_PROBLEM_ADDED,
-                'body' => [
-                    'localizationString' => new \OmegaUp\TranslationString(
-                        'notificationCourseAssignmentProblemAdded'
-                    ),
-                    'localizationParams' => [
-                        'courseName' => $course->name,
-                        'assignmentName' => $assignment->name,
-                    ],
-                    'url' => "/course/{$course->alias}/assignment/{$assignmentAlias}/",
-                    'iconUrl' => '/media/info.png',
-                ],
-            ];
-
-            foreach ($students as $student) {
-                \OmegaUp\DAO\Notifications::create(
-                    new \OmegaUp\DAO\VO\Notifications([
-                        'user_id' => $student['user_id'],
-                        'contents' =>  json_encode($notificationContents),
-                    ])
-                );
-            }
-        }
+        self::sendNotificationToStudent($course, $assignmentAlias, true);
 
         return [
             'status' => 'ok',
