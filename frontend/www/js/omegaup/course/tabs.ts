@@ -25,6 +25,7 @@ OmegaUp.on('ready', () => {
           courses: payload.courses,
           loggedIn: commonPayload.isLoggedIn,
           selectedTab,
+          hasVisitedSection: payload.hasVisitedSection,
         },
       });
     },
