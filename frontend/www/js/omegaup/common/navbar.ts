@@ -49,6 +49,7 @@ OmegaUp.on('ready', () => {
           fromLogin: fromLogin,
           userTypes: payload.userTypes,
           nextRegisteredContest: payload.nextRegisteredContestForUser,
+          isUnder13User: payload.isUnder13User,
         },
         on: {
           'read-notifications': (
