@@ -526,8 +526,8 @@ class Cache {
     const SESSION_PREFIX = 'session-1';
     const CONTESTANT_SCOREBOARD_PREFIX = 'scoreboard-1';
     const ADMIN_SCOREBOARD_PREFIX = 'scoreboard-admin-1';
-    const CONTESTANT_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-1';
-    const ADMIN_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-admin-1';
+    const CONTESTANT_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-3';
+    const ADMIN_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-admin-3';
     const CODERS_OF_THE_MONTH = 'coders-of-the-month-1';
     const CONTEST_INFO = 'contest-info-1';
     const PROBLEM_SETTINGS = 'problem-settings-json-1';

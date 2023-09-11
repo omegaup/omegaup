@@ -696,13 +696,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         foreach ($runs as $run) {
             if (isset($problemIndex[$run['alias']])) {
-                $myBestScore = $problemIndex[$run['alias']]['myBestScore'];
-
-                $problemIndex[$run['alias']]['myBestScore'] = max(
-                    $myBestScore,
+                $alias = $run['alias'];
+                $problemIndex[$alias]['myBestScore'] = isset(
+                    $problemIndex[$alias]['myBestScore']
+                ) ? max(
+                    $problemIndex[$alias]['myBestScore'],
                     $run['contest_score']
-                );
-                $problemIndex[$run['alias']]['hasMyRuns'] = true;
+                ) : $run['contest_score'];
+                $problemIndex[$alias]['hasMyRuns'] = true;
             }
         }
 
