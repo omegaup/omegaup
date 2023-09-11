@@ -652,6 +652,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $futureCondition = \OmegaUp\DAO\Enum\ActiveStatus::sql(
             \OmegaUp\DAO\Enum\ActiveStatus::FUTURE
         );
+        $inTwoWeeksCondition = 'DATEDIFF(start_time, NOW()) < 15';
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
 
         $select = "SELECT
@@ -714,7 +715,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 a.owner_id = organizer.user_id
             WHERE
                 ($activeCondition OR
-                $futureCondition) AND
+                ($futureCondition AND $inTwoWeeksCondition)) AND
                 archived = 0
             GROUP BY Contests.contest_id
         ";
