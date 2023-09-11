@@ -1,63 +1,63 @@
 <template>
   <div>
     <h3 class="text-center mb-4">
-        {{
-          ui.formatString(T.nominationsRangeHeader, {
-            lowCount: (pages - 1) * length + 1,
-            highCount: pages * length,
-          })
-        }}
-      </h3>
+      {{
+        ui.formatString(T.nominationsRangeHeader, {
+          lowCount: (pages - 1) * length + 1,
+          highCount: pages * length,
+        })
+      }}
+    </h3>
     <div class="card">
       <div class="card-header">
-      <form class="form-group mb-0">
-      <div class="form-row">
-        <label class="col-form-label">{{ T.wordsSearchBy }}</label>
-        <div class="col-md-4 mb-1">
-          <select v-model="selectColumn" name="column" class="form-control">
-            <option
-              v-for="(columnText, columnIndex) in columns"
-              :key="columnIndex"
-              :value="columnIndex"
+        <form class="form-group mb-0">
+          <div class="form-row">
+            <label class="col-form-label">{{ T.wordsSearchBy }}</label>
+            <div class="col-md-4 mb-1">
+              <select v-model="selectColumn" name="column" class="form-control">
+                <option
+                  v-for="(columnText, columnIndex) in columns"
+                  :key="columnIndex"
+                  :value="columnIndex"
+                >
+                  {{ columnText }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-4 mb-1">
+              <omegaup-common-typeahead
+                v-show="selectColumn == 'problem_alias'"
+                :existing-options="searchResultProblems"
+                :value.sync="queryProblem"
+                :placeholder="T.wordsKeyword"
+                @update-existing-options="
+                  (query) => $emit('update-search-result-problems', query)
+                "
+              ></omegaup-common-typeahead>
+              <omegaup-common-typeahead
+                v-show="
+                  selectColumn == 'nominator_username' ||
+                  selectColumn == 'author_username'
+                "
+                :existing-options="searchResultUsers"
+                :value.sync="queryUsername"
+                :max-results="10"
+                @update-existing-options="
+                  (query) => $emit('update-search-result-users', query)
+                "
+              ></omegaup-common-typeahead>
+            </div>
+            <button
+              class="btn btn-primary mb-1"
+              @click.prevent="
+                $emit('go-to-page', 1, getStatus(), getQuery(), selectColumn)
+              "
             >
-              {{ columnText }}
-            </option>
-          </select>
-        </div>
-        <div class="col-md-4 mb-1">
-          <omegaup-common-typeahead
-            v-show="selectColumn == 'problem_alias'"
-            :existing-options="searchResultProblems"
-            :value.sync="queryProblem"
-            :placeholder="T.wordsKeyword"
-            @update-existing-options="
-              (query) => $emit('update-search-result-problems', query)
-            "
-          ></omegaup-common-typeahead>
-          <omegaup-common-typeahead
-            v-show="
-              selectColumn == 'nominator_username' ||
-              selectColumn == 'author_username'
-            "
-            :existing-options="searchResultUsers"
-            :value.sync="queryUsername"
-            :max-results="10"
-            @update-existing-options="
-              (query) => $emit('update-search-result-users', query)
-            "
-          ></omegaup-common-typeahead>
-        </div>
-        <button
-        class="btn btn-primary mb-1"
-        @click.prevent="
-          $emit('go-to-page', 1, getStatus(), getQuery(), selectColumn)
-        "
-      >
-        {{ T.wordsSearch }}
-      </button>
+              {{ T.wordsSearch }}
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
-  </div>
       <div class="card-body">
         <a v-if="isAdmin" href="/group/omegaup:quality-reviewer/edit/#members">
           {{ T.addUsersToReviewerGroup }}
