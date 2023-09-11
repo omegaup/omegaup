@@ -96,16 +96,20 @@
       <omegaup-section
         :title="T.homepageCreateSectionTitle"
         :description="T.homepageCreateSectionDescription"
-        :buttons="!isUnder13User ? [
-          {
-            text: T.buttonCreateProblem,
-            href: '/problem/new/',
-          },
-          {
-            text: T.buttonCreateContest,
-            href: '/contest/new/',
-          },
-        ] : []"
+        :buttons="
+          !isUnder13User
+            ? [
+                {
+                  text: T.buttonCreateProblem,
+                  href: '/problem/new/',
+                },
+                {
+                  text: T.buttonCreateContest,
+                  href: '/contest/new/',
+                },
+              ]
+            : []
+        "
         :image-src="'/media/homepage/create_section.svg'"
       ></omegaup-section>
       <omegaup-section

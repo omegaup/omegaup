@@ -192,7 +192,7 @@ class UITools {
             'currentEmail' => $email ?? '',
             'associatedIdentities' => $associatedIdentities,
             'apiTokens' => $apiTokens,
-            'isUnder13User' => true,
+            'isUnder13User' => $isUnder13User,
             'userClassname' => $userClassname,
             'userCountry' => (!is_null(
                 $identity
