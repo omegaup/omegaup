@@ -104,7 +104,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return $result;
     }
 
-    final public static function getRunExtraFields(){
+    final public static function getRunExtraFields() {
         return '
         ( SELECT
             IF(
@@ -291,7 +291,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 IFNULL(`i`.`country_id`, "xx") `country`,
                 `c`.`alias` AS `contest_alias`,
                 IFNULL(ur.classname, "user-rank-unranked") `classname`,
-                ' . $extraFields .'
+                ' . $extraFields . '
             FROM
                 Submissions s
             INNER JOIN
@@ -883,7 +883,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      * @return array{commit: string, contest_score: float|null, execution: null|string, judged_by: null|string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: null|string, status_runtime: null|string, submission_id: int, time: \OmegaUp\Timestamp, verdict: string, version: string}|null
      */
     final public static function getByGUID(string $guid) {
-        
         $extraFields = self::getRunExtraFields();
 
         $sql = '

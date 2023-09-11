@@ -16,9 +16,13 @@
         <span class="font-weight-bold">{{ T.wordsSubmissions }}</span>
         <div v-if="showFilters">
           <div class="filters row">
-            <label class="col-3 col-sm pr-0 font-weight-bold" v-if="!isCourse"
+            <label v-if="!isCourse" class="col-3 col-sm pr-0 font-weight-bold"
               >{{ T.wordsVerdict }}:
-              <select v-model="filterVerdict" data-select-verdict class="form-control">
+              <select
+                v-model="filterVerdict"
+                data-select-verdict
+                class="form-control"
+              >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="AC">AC</option>
                 <option value="PA">PA</option>
@@ -34,23 +38,45 @@
                 <option value="NO-AC">No AC</option>
               </select>
             </label>
-            <label class="col-3 col-sm pr-0 font-weight-bold" v-else>
-              {{T.wordsExecution}}
-              <select v-model="filterExecution" data-select-execution class="form-control">  
+            <label v-else class="col-3 col-sm pr-0 font-weight-bold">
+              {{ T.wordsExecution }}
+              <select
+                v-model="filterExecution"
+                data-select-execution
+                class="form-control"
+              >
                 <option value="">{{ T.wordsAll }}</option>
-                <option value="EXECUTION_JUDGE_ERROR">{{T.runDetailsJudgeError}}</option>
-                <option value="EXECUTION_VALIDATOR_ERROR">{{T.runDetailsValidatorError}}</option>
-                <option value="EXECUTION_COMPILATION_ERROR">{{T.runDetailsCompilationError}}</option>
-                <option value="EXECUTION_RUNTIME_FUNCTION_ERROR">{{T.runDetailsRuntimeFunctionError}}</option>
-                <option value="EXECUTION_RUNTIME_ERROR">{{T.runDetailsRuntimeError}}</option>
-                <option value="EXECUTION_INTERRUPTED">{{T.runDetailsInterrupted}}</option>
-                <option value="EXECUTION_FINISHED">{{T.runDetailsFinished}}</option>                
+                <option value="EXECUTION_JUDGE_ERROR">
+                  {{ T.runDetailsJudgeError }}
+                </option>
+                <option value="EXECUTION_VALIDATOR_ERROR">
+                  {{ T.runDetailsValidatorError }}
+                </option>
+                <option value="EXECUTION_COMPILATION_ERROR">
+                  {{ T.runDetailsCompilationError }}
+                </option>
+                <option value="EXECUTION_RUNTIME_FUNCTION_ERROR">
+                  {{ T.runDetailsRuntimeFunctionError }}
+                </option>
+                <option value="EXECUTION_RUNTIME_ERROR">
+                  {{ T.runDetailsRuntimeError }}
+                </option>
+                <option value="EXECUTION_INTERRUPTED">
+                  {{ T.runDetailsInterrupted }}
+                </option>
+                <option value="EXECUTION_FINISHED">
+                  {{ T.runDetailsFinished }}
+                </option>
               </select>
             </label>
 
-            <label class="col-3 col-sm pr-0 font-weight-bold" v-if="!isCourse"
+            <label v-if="!isCourse" class="col-3 col-sm pr-0 font-weight-bold"
               >{{ T.wordsStatus }}:
-              <select v-model="filterStatus" data-select-status class="form-control">
+              <select
+                v-model="filterStatus"
+                data-select-status
+                class="form-control"
+              >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="new">new</option>
                 <option value="waiting">waiting</option>
@@ -60,20 +86,36 @@
               </select>
             </label>
 
-            <label class="col-3 col-sm pr-0 font-weight-bold" v-else>
-              {{T.wordsOutput}}
-              <select v-model="filterOutput" data-select-output class="form-control">  
+            <label v-else class="col-3 col-sm pr-0 font-weight-bold">
+              {{ T.wordsOutput }}
+              <select
+                v-model="filterOutput"
+                data-select-output
+                class="form-control"
+              >
                 <option value="">{{ T.wordsAll }}</option>
-                <option value="OUTPUT_EXCEEDED">{{T.runDetailsExceeded}}</option>
-                <option value="OUTPUT_INCORRECT">{{T.runDetailsIncorrect}}</option>
-                <option value="OUTPUT_INTERRUPTED">{{T.runDetailsInterrupted}}</option>
-                <option value="OUTPUT_CORRECT">{{T.runDetailsCorrect}}</option>
+                <option value="OUTPUT_EXCEEDED">
+                  {{ T.runDetailsExceeded }}
+                </option>
+                <option value="OUTPUT_INCORRECT">
+                  {{ T.runDetailsIncorrect }}
+                </option>
+                <option value="OUTPUT_INTERRUPTED">
+                  {{ T.runDetailsInterrupted }}
+                </option>
+                <option value="OUTPUT_CORRECT">
+                  {{ T.runDetailsCorrect }}
+                </option>
               </select>
             </label>
 
             <label class="col-5 col-sm pr-0 font-weight-bold"
               >{{ T.wordsLanguage }}:
-              <select v-model="filterLanguage" data-select-language class="form-control">
+              <select
+                v-model="filterLanguage"
+                data-select-language
+                class="form-control"
+              >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="cpp20-gcc">C++20 (g++ 10.3)</option>
                 <option value="cpp20-clang">C++20 (clang++ 10.0)</option>
@@ -145,11 +187,18 @@
                 class="btn-secondary mr-3"
               >
                 <span class="mr-2">{{ filter.name }}: {{ filter.value }}</span>
-                <a :data-remove-filter="filter.name" @click="onRemoveFilter(filter.name)">
+                <a
+                  :data-remove-filter="filter.name"
+                  @click="onRemoveFilter(filter.name)"
+                >
                   <font-awesome-icon :icon="['fas', 'times']" />
                 </a>
               </span>
-              <a href="#runs" data-remove-all-filters @click="onRemoveFilter('all')">
+              <a
+                href="#runs"
+                data-remove-all-filters
+                @click="onRemoveFilter('all')"
+              >
                 <span class="mr-2">{{ T.wordsRemoveFilter }}</span>
               </a>
             </div>
@@ -196,9 +245,11 @@
           <tfoot v-if="problemAlias != null">
             <tr>
               <td colspan="10" data-new-run>
-                <a v-if="isContestFinished" :href="`/arena/${contestAlias}/practice/`">{{
-                  T.arenaContestEndedUsePractice
-                }}</a>
+                <a
+                  v-if="isContestFinished"
+                  :href="`/arena/${contestAlias}/practice/`"
+                  >{{ T.arenaContestEndedUsePractice }}</a
+                >
                 <button
                   v-else-if="useNewSubmissionButton"
                   class="w-100"
@@ -206,9 +257,12 @@
                 >
                   {{ newSubmissionDescription }}
                 </button>
-                <a v-else :href="newSubmissionUrl" @click="$emit('new-submission')">{{
-                  newSubmissionDescription
-                }}</a>
+                <a
+                  v-else
+                  :href="newSubmissionUrl"
+                  @click="$emit('new-submission')"
+                  >{{ newSubmissionDescription }}</a
+                >
               </td>
             </tr>
           </tfoot>
@@ -233,7 +287,8 @@
                   :linkify="true"
                   :emit-click-event="true"
                   @click="
-                    (username) => (filterUsername = { key: username, value: username })
+                    (username) =>
+                      (filterUsername = { key: username, value: username })
                   "
                 ></omegaup-user-username>
                 <a :href="`/profile/${run.username}/`" class="ml-2">
@@ -280,16 +335,22 @@
                 </button>
               </td>
               <td v-if="showProblem" class="text-break-all">
-                <a href="#runs" @click.prevent="filterProblem.key = run.alias">{{
-                  run.alias
-                }}</a>
+                <a
+                  href="#runs"
+                  @click.prevent="filterProblem.key = run.alias"
+                  >{{ run.alias }}</a
+                >
                 <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
               </td>
               <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
               <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
-              <td v-if="!showPoints" :class="statusPercentageClass(run)" class="numeric">
+              <td
+                v-if="!showPoints"
+                :class="statusPercentageClass(run)"
+                class="numeric"
+              >
                 {{ percentage(run) }}
               </td>
               <td class="numeric">{{ execution(run) }}</td>
@@ -300,7 +361,9 @@
                   style="color: green"
                 />
                 <font-awesome-icon
-                  v-else-if="outputIconColorStatus(run) === OutputStatus.Incorrect"
+                  v-else-if="
+                    outputIconColorStatus(run) === OutputStatus.Incorrect
+                  "
                   :icon="['fas', 'times-circle']"
                   style="color: red"
                 />
@@ -412,18 +475,18 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Emit } from "vue-property-decorator";
-import T from "../../lang";
-import { types } from "../../api_types";
-import * as time from "../../time";
-import user_Username from "../user/Username.vue";
-import common_Typeahead from "../common/Typeahead.vue";
-import arena_RunDetailsPopup from "./RunDetailsPopup.vue";
-import omegaup_Overlay from "../Overlay.vue";
+import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import T from '../../lang';
+import { types } from '../../api_types';
+import * as time from '../../time';
+import user_Username from '../user/Username.vue';
+import common_Typeahead from '../common/Typeahead.vue';
+import arena_RunDetailsPopup from './RunDetailsPopup.vue';
+import omegaup_Overlay from '../Overlay.vue';
 
-import { PaginationPlugin } from "bootstrap-vue";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { PaginationPlugin } from 'bootstrap-vue';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
   faQuestionCircle,
   faRedoAlt,
@@ -436,7 +499,7 @@ import {
   faCalendarAlt,
   faCheckCircle,
   faTimesCircle,
-} from "@fortawesome/free-solid-svg-icons";
+} from '@fortawesome/free-solid-svg-icons';
 
 library.add(faQuestionCircle);
 library.add(faRedoAlt);
@@ -477,10 +540,10 @@ export enum PopupDisplayed {
 @Component({
   components: {
     FontAwesomeIcon,
-    "omegaup-arena-rundetails-popup": arena_RunDetailsPopup,
-    "omegaup-overlay": omegaup_Overlay,
-    "omegaup-common-typeahead": common_Typeahead,
-    "omegaup-user-username": user_Username,
+    'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
+    'omegaup-overlay': omegaup_Overlay,
+    'omegaup-common-typeahead': common_Typeahead,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class Runs extends Vue {
@@ -516,15 +579,15 @@ export default class Runs extends Vue {
   T = T;
   time = time;
 
-  filterLanguage: string = "";
+  filterLanguage: string = '';
   filterOffset: number = 0;
   filterProblem: null | types.ListItem = null;
-  filterStatus: string = "";
+  filterStatus: string = '';
   filterUsername: null | types.ListItem = null;
-  filterVerdict: string = "";
-  filterContest: string = "";
-  filterExecution: string = "";
-  filterOutput: string = "";
+  filterVerdict: string = '';
+  filterContest: string = '';
+  filterExecution: string = '';
+  filterOutput: string = '';
   filters: { name: string; value: string }[] = [];
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
@@ -556,8 +619,8 @@ export default class Runs extends Vue {
     }
     return this.sortedRuns.filter((run) => {
       if (this.filterVerdict) {
-        if (this.filterVerdict == "NO-AC") {
-          if (run.verdict == "AC") {
+        if (this.filterVerdict == 'NO-AC') {
+          if (run.verdict == 'AC') {
             return false;
           }
         } else if (run.verdict != this.filterVerdict) {
@@ -581,23 +644,25 @@ export default class Runs extends Vue {
       }
       if (this.filterExecution && run.execution !== this.filterExecution) {
         return false;
-      }      
+      }
       if (this.filterOutput && run.output !== this.filterOutput) {
         return false;
-      }    
+      }
       return true;
     });
   }
 
   get filtersExcludingOffset(): { name: string; value: string }[] {
-    return this.filters.filter((filter) => filter.name !== "offset");
+    return this.filters.filter((filter) => filter.name !== 'offset');
   }
 
   get sortedRuns(): types.Run[] {
     if (!this.runs) {
       return [];
     }
-    return this.runs.slice().sort((a, b) => b.time.getTime() - a.time.getTime());
+    return this.runs
+      .slice()
+      .sort((a, b) => b.time.getTime() - a.time.getTime());
   }
 
   get newSubmissionUrl(): string {
@@ -615,55 +680,58 @@ export default class Runs extends Vue {
   }
 
   memory(run: types.Run): string {
-    if (run.status !== "ready" || run.status_memory === "MEMORY_NOT_AVAILABLE")
-      return "—";
-    if (run.status_memory === "MEMORY_EXCEEDED") return T.runDetailsExceeded;
+    if (run.status !== 'ready' || run.status_memory === 'MEMORY_NOT_AVAILABLE')
+      return '—';
+    if (run.status_memory === 'MEMORY_EXCEEDED') return T.runDetailsExceeded;
     return `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
   }
 
   penalty(run: types.Run): string {
     if (
-      run.status == "ready" &&
-      run.verdict != "JE" &&
-      run.verdict != "VE" &&
-      run.verdict != "CE"
+      run.status == 'ready' &&
+      run.verdict != 'JE' &&
+      run.verdict != 'VE' &&
+      run.verdict != 'CE'
     ) {
       return run.penalty.toFixed(2);
     }
-    return "—";
+    return '—';
   }
 
   percentage(run: types.Run): string {
     if (
-      run.status == "ready" &&
-      run.verdict != "JE" &&
-      run.verdict != "VE" &&
-      run.verdict != "CE"
+      run.status == 'ready' &&
+      run.verdict != 'JE' &&
+      run.verdict != 'VE' &&
+      run.verdict != 'CE'
     ) {
       return `${(run.score * 100).toFixed(2)}%`;
     }
-    return "—";
+    return '—';
   }
 
   points(run: types.Run): string {
     if (
-      run.status == "ready" &&
-      run.verdict != "JE" &&
-      run.verdict != "VE" &&
-      run.verdict != "CE" &&
-      typeof run.contest_score !== "undefined"
+      run.status == 'ready' &&
+      run.verdict != 'JE' &&
+      run.verdict != 'VE' &&
+      run.verdict != 'CE' &&
+      typeof run.contest_score !== 'undefined'
     ) {
       return run.contest_score.toFixed(2);
     }
-    return "—";
+    return '—';
   }
 
   runtime(run: types.Run): string {
-    if (run.status !== "ready" || run.status_runtime === "RUNTIME_NOT_AVAILABLE") {
-      return "—";
+    if (
+      run.status !== 'ready' ||
+      run.status_runtime === 'RUNTIME_NOT_AVAILABLE'
+    ) {
+      return '—';
     }
 
-    if (run.status_runtime === "RUNTIME_EXCEEDED") {
+    if (run.status_runtime === 'RUNTIME_EXCEEDED') {
       return T.runDetailsExceeded;
     }
 
@@ -671,22 +739,22 @@ export default class Runs extends Vue {
   }
 
   execution(run: types.Run): string {
-    if (run.status !== "ready") {
-      return "—";
+    if (run.status !== 'ready') {
+      return '—';
     }
 
     switch (run.execution) {
-      case "EXECUTION_JUDGE_ERROR":
+      case 'EXECUTION_JUDGE_ERROR':
         return T.runDetailsJudgeError;
-      case "EXECUTION_VALIDATOR_ERROR":
+      case 'EXECUTION_VALIDATOR_ERROR':
         return T.runDetailsValidatorError;
-      case "EXECUTION_COMPILATION_ERROR":
+      case 'EXECUTION_COMPILATION_ERROR':
         return T.runDetailsCompilationError;
-      case "EXECUTION_RUNTIME_FUNCTION_ERROR":
+      case 'EXECUTION_RUNTIME_FUNCTION_ERROR':
         return T.runDetailsRuntimeFunctionError;
-      case "EXECUTION_RUNTIME_ERROR":
+      case 'EXECUTION_RUNTIME_ERROR':
         return T.runDetailsRuntimeError;
-      case "EXECUTION_INTERRUPTED":
+      case 'EXECUTION_INTERRUPTED':
         return T.runDetailsInterrupted;
       default:
         return T.runDetailsFinished;
@@ -694,16 +762,16 @@ export default class Runs extends Vue {
   }
 
   output(run: types.Run): string {
-    if (run.status !== "ready") {
-      return "—";
+    if (run.status !== 'ready') {
+      return '—';
     }
 
     switch (run.output) {
-      case "OUTPUT_EXCEEDED":
+      case 'OUTPUT_EXCEEDED':
         return T.runDetailsExceeded;
-      case "OUTPUT_INCORRECT":
+      case 'OUTPUT_INCORRECT':
         return T.runDetailsIncorrect;
-      case "OUTPUT_INTERRUPTED":
+      case 'OUTPUT_INTERRUPTED':
         return T.runDetailsInterrupted;
       default:
         return T.runDetailsCorrect;
@@ -711,25 +779,25 @@ export default class Runs extends Vue {
   }
 
   statusPercentageClass(run: types.Run): string {
-    if (!(run.status === "ready" && run.verdict === "AC")) {
-      return "";
+    if (!(run.status === 'ready' && run.verdict === 'AC')) {
+      return '';
     }
 
-    return "status-ac";
+    return 'status-ac';
   }
 
   outputIconColorStatus(run: types.Run): number {
     if (
       !(
-        run.status === "ready" &&
-        run.output !== "OUTPUT_EXCEEDED" &&
-        run.output !== "OUTPUT_INTERRUPTED"
+        run.status === 'ready' &&
+        run.output !== 'OUTPUT_EXCEEDED' &&
+        run.output !== 'OUTPUT_INTERRUPTED'
       )
     ) {
       return OutputStatus.None;
     }
 
-    if (run.output !== "OUTPUT_INCORRECT") {
+    if (run.output !== 'OUTPUT_INCORRECT') {
       return OutputStatus.Correct;
     } else {
       return OutputStatus.Incorrect;
@@ -737,43 +805,43 @@ export default class Runs extends Vue {
   }
 
   showVerdictHelp(ev: Event): void {
-    $(ev.target as HTMLElement).popover("show");
+    $(ev.target as HTMLElement).popover('show');
   }
 
   statusClass(run: types.Run): string {
-    if (run.status != "ready") return "";
-    if (run.type == "disqualified") return "status-disqualified";
-    if (run.verdict == "AC") {
-      return "status-ac";
+    if (run.status != 'ready') return '';
+    if (run.type == 'disqualified') return 'status-disqualified';
+    if (run.verdict == 'AC') {
+      return 'status-ac';
     }
-    if (run.verdict == "CE") {
-      return "status-ce";
+    if (run.verdict == 'CE') {
+      return 'status-ce';
     }
-    if (run.verdict == "JE" || run.verdict == "VE") {
-      return "status-je-ve";
+    if (run.verdict == 'JE' || run.verdict == 'VE') {
+      return 'status-je-ve';
     }
-    return "";
+    return '';
   }
 
   status(run: types.Run): string {
-    if (run.type == "disqualified") return T.arenaRunsActionsDisqualified;
+    if (run.type == 'disqualified') return T.arenaRunsActionsDisqualified;
 
-    return run.status == "ready" ? run.verdict : run.status;
+    return run.status == 'ready' ? run.verdict : run.status;
   }
 
   statusHelp(run: types.Run): string {
-    if (run.status != "ready" || run.verdict == "AC") {
-      return "";
+    if (run.status != 'ready' || run.verdict == 'AC') {
+      return '';
     }
 
-    if (run.language == "kj" || run.language == "kp") {
-      if (run.verdict == "RTE" || run.verdict == "RE") {
+    if (run.language == 'kj' || run.language == 'kp') {
+      if (run.verdict == 'RTE' || run.verdict == 'RE') {
         return T.verdictHelpKarelRTE;
-      } else if (run.verdict == "TLE" || run.verdict == "TO") {
+      } else if (run.verdict == 'TLE' || run.verdict == 'TO') {
         return T.verdictHelpKarelTLE;
       }
     }
-    if (run.type == "disqualified") return T.verdictHelpDisqualified;
+    if (run.type == 'disqualified') return T.verdictHelpDisqualified;
     const verdict = T[`verdict${run.verdict}`];
     const verdictHelp = T[`verdictHelp${run.verdict}`];
 
@@ -781,7 +849,7 @@ export default class Runs extends Vue {
   }
 
   onRunDetails(run: types.Run): void {
-    this.$emit("details", {
+    this.$emit('details', {
       guid: run.guid,
       isAdmin: true,
       hash: `#runs/all/show-run:${run.guid}`,
@@ -792,15 +860,15 @@ export default class Runs extends Vue {
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
     this.currentRunDetailsData = null;
-    this.$emit("reset-hash");
+    this.$emit('reset-hash');
   }
 
-  @Watch("runDetailsData")
+  @Watch('runDetailsData')
   onRunDetailsChanged(newValue: types.RunDetails): void {
     this.currentRunDetailsData = newValue;
   }
 
-  @Watch("username")
+  @Watch('username')
   onUsernameChanged(newValue: string | null) {
     if (!newValue) {
       this.filterUsername = null;
@@ -809,7 +877,7 @@ export default class Runs extends Vue {
     this.filterUsername = { key: newValue, value: newValue };
   }
 
-  @Watch("problemAlias")
+  @Watch('problemAlias')
   onProblemAliasChanged(newValue: string | null) {
     if (!newValue) {
       this.filterProblem = null;
@@ -818,52 +886,58 @@ export default class Runs extends Vue {
     this.filterProblem = { key: newValue, value: newValue };
   }
 
-  @Watch("filterLanguage")
+  @Watch('filterLanguage')
   onFilterLanguageChanged(newValue: string) {
-    this.onEmitFilterChanged({ filter: "language", value: newValue });
+    this.onEmitFilterChanged({ filter: 'language', value: newValue });
   }
 
-  @Watch("filterOffset")
+  @Watch('filterOffset')
   onFilterOffsetChanged(newValue: number) {
-    this.$emit("filter-changed", { filter: "offset", value: `${newValue}` });
+    this.$emit('filter-changed', { filter: 'offset', value: `${newValue}` });
   }
 
-  @Watch("filterProblem")
+  @Watch('filterProblem')
   onFilterProblemChanged(newValue: null | types.ListItem) {
     if (!newValue) {
-      this.onEmitFilterChanged({ filter: "problem", value: null });
+      this.onEmitFilterChanged({ filter: 'problem', value: null });
       return;
     }
-    this.onEmitFilterChanged({ filter: "problem", value: newValue.key });
+    this.onEmitFilterChanged({ filter: 'problem', value: newValue.key });
   }
 
-  @Watch("filterStatus")
+  @Watch('filterStatus')
   onFilterStatusChanged(newValue: string) {
-    this.onEmitFilterChanged({ filter: "status", value: newValue });
+    this.onEmitFilterChanged({ filter: 'status', value: newValue });
   }
 
-  @Watch("filterUsername")
+  @Watch('filterUsername')
   onFilterUsernameChanged(newValue: null | types.ListItem) {
     if (!newValue) {
-      this.onEmitFilterChanged({ filter: "username", value: null });
+      this.onEmitFilterChanged({ filter: 'username', value: null });
       return;
     }
-    this.onEmitFilterChanged({ filter: "username", value: newValue.key });
+    this.onEmitFilterChanged({ filter: 'username', value: newValue.key });
   }
 
-  @Watch("filterVerdict")
+  @Watch('filterVerdict')
   onFilterVerdictChanged(newValue: string) {
-    this.onEmitFilterChanged({ filter: "verdict", value: newValue });
+    this.onEmitFilterChanged({ filter: 'verdict', value: newValue });
   }
 
-  @Emit("filter-changed")
-  onEmitFilterChanged({ filter, value }: { filter: string; value: null | string }): void {
+  @Emit('filter-changed')
+  onEmitFilterChanged({
+    filter,
+    value,
+  }: {
+    filter: string;
+    value: null | string;
+  }): void {
     this.filterOffset = 0;
     if (!value) {
       this.filters = this.filters.filter((item) => item.name !== filter);
       return;
     }
-    if (filter === "contest") {
+    if (filter === 'contest') {
       // This field does not appear as filter
       this.filterContest = value;
     }
@@ -876,55 +950,55 @@ export default class Runs extends Vue {
   }
 
   onRemoveFilter(filter: string): void {
-    if (filter === "all") {
-      this.filterLanguage = "";
+    if (filter === 'all') {
+      this.filterLanguage = '';
       this.filterProblem = null;
-      this.filterStatus = "";
+      this.filterStatus = '';
       this.filterUsername = null;
-      this.filterVerdict = "";
-      this.filterContest = "";
+      this.filterVerdict = '';
+      this.filterContest = '';
       this.filterOffset = 0;
 
       this.filters = [];
       return;
     }
     switch (filter) {
-      case "language":
-        this.filterLanguage = "";
+      case 'language':
+        this.filterLanguage = '';
         break;
-      case "problem":
+      case 'problem':
         this.filterProblem = null;
         break;
-      case "status":
-        this.filterStatus = "";
+      case 'status':
+        this.filterStatus = '';
         break;
-      case "username":
+      case 'username':
         this.filterUsername = null;
         break;
-      case "verdict":
-        this.filterVerdict = "";
+      case 'verdict':
+        this.filterVerdict = '';
         break;
-      case "contest":
-        this.filterContest = "";
+      case 'contest':
+        this.filterContest = '';
     }
     this.filters = this.filters.filter((item) => item.name !== filter);
   }
 
   updateSearchResultUsers(query: string): void {
     if (this.problemsetProblems.length !== 0 && this.contestAlias) {
-      this.$emit("update-search-result-users-contest", {
+      this.$emit('update-search-result-users-contest', {
         query,
         contestAlias: this.contestAlias,
       });
       return;
     }
-    this.$emit("update-search-result-users", { query });
+    this.$emit('update-search-result-users', { query });
   }
 }
 </script>
 
 <style lang="scss" scoped>
-@import "../../../../sass/main.scss";
+@import '../../../../sass/main.scss';
 
 .text-break-all {
   word-break: break-all;
