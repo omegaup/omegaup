@@ -96,7 +96,7 @@
       <omegaup-section
         :title="T.homepageCreateSectionTitle"
         :description="T.homepageCreateSectionDescription"
-        :buttons="[
+        :buttons="!isUnder13User ? [
           {
             text: T.buttonCreateProblem,
             href: '/problem/new/',
@@ -105,7 +105,7 @@
             text: T.buttonCreateContest,
             href: '/contest/new/',
           },
-        ]"
+        ] : []"
         :image-src="'/media/homepage/create_section.svg'"
       ></omegaup-section>
       <omegaup-section
@@ -177,6 +177,7 @@ export default class Homepage extends Vue {
   @Prop() currentUserInfo!: omegaup.User;
   @Prop() rankTable!: omegaup.UserRankTable;
   @Prop() schoolsRank!: omegaup.SchoolRankTable;
+  @Prop() isUnder13User!: boolean;
 
   T = T;
   cookieClickedAccept() {
