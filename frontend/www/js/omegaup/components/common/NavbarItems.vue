@@ -119,7 +119,7 @@
               T.navViewLatestSubmissions
             }}</a>
             <a
-              v-if="(isLoggedIn && isMainUserIdentity) || !isUnder13User"
+              v-if="(isLoggedIn && isMainUserIdentity) && !isUnder13User"
               class="dropdown-item"
               href="/problem/new/"
               data-nav-problems-create
