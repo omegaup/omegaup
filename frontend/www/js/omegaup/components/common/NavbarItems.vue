@@ -67,7 +67,7 @@
             <a class="dropdown-item" href="/course/" data-nav-courses-all>
               {{ T.navViewCourses }}
             </a>
-            <template v-if="isMainUserIdentity">
+            <template v-if="isMainUserIdentity || !isUnder13User">
               <a
                 class="dropdown-item"
                 href="/course/new/"
