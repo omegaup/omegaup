@@ -67,7 +67,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseCardPublic=array{alias: string, alreadyStarted: bool, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}
  * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
  * @psalm-type CourseCardFinished=array{alias: string, name: string}
- * @psalm-type CourseTabsPayload=array{courses: array{enrolled: list<CourseCardEnrolled>, finished: list<CourseCardFinished>, public: list<CourseCardPublic>}}
+ * @psalm-type CourseTabsPayload=array{courses: array{enrolled: list<CourseCardEnrolled>, finished: list<CourseCardFinished>, public: list<CourseCardPublic>}, hasVisitedSection: bool}
  * @psalm-type SettingLimits=array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}
  * @psalm-type NominationStatus=array{alreadyReviewed: bool, canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language: string, nominated: bool, nominatedBeforeAc: bool, solved: bool, tried: bool}
  * @psalm-type ProblemsetterInfo=array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}
@@ -4206,6 +4206,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             return [
                 'templateProperties' => [
                     'payload' => [
+                        'hasVisitedSection' => true,
                         'courses' => $courses,
                     ],
                     'title' => new \OmegaUp\TranslationString('courseList'),
@@ -4239,6 +4240,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             'templateProperties' => [
                 'payload' => [
                     'courses' => $courses,
+                    'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
+                        'has-visited-join-course'
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString('courseList'),
                 'fullWidth' => true,
