@@ -42,10 +42,10 @@
       >
         <option :value="ui.NameDisplayOptions.Name">{{ T.wordsName }}</option>
         <option :value="ui.NameDisplayOptions.Username">
-          {{ T.wordsAccountName }}
+          {{ T.scoreboardAccountName }}
         </option>
         <option :value="ui.NameDisplayOptions.NameAndUsername">
-          {{ T.arenaNameAndUsername }}
+          {{ T.scoreboardNameAndAccountName }}
         </option>
       </select>
     </label>
