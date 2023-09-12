@@ -58,35 +58,21 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         }
     }
 
-    private static function createCertificatePdf(
-        string $title,
-        string $identityName,
-        string $description,
-        int $date
-    ): string {
+    private static function printCertificateHeader(FPDI $pdf): void {
         $translator = \OmegaUp\Translations::getInstance();
-        $pdf = new FPDI('L');
-
-        $pdf->setSourceFile('/opt/omegaup/stuff/CertificateTemplate.pdf');
-        $templateId = $pdf->importPage(1);
-        $pdf->AddPage();
-        $pdf->useTemplate($templateId);
-        $pdf->SetAutoPageBreak(false);
 
         $x = 50;
-        $y = 0;
+        $y = 41;
         $width = 215;
         $height = 15;
         $border = 0;
         $ln = 1;
         $center = 'C';
-        $bold = 'B';
         $italic = 'I';
 
-        $pdf->SetFont('Arial', $italic, 14);
+        $pdf->SetFont('', $italic, 14);
         $pdf->SetTextColor(153, 153, 153);
 
-        $y = 41;
         $pdf->SetXY($x, $y);
         $pdf->Cell(
             $width,
@@ -100,8 +86,26 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $ln,
             $center
         );
+    }
 
+    private static function printCertificatePlaceAndDate(
+        FPDI $pdf,
+        int $date
+    ): void {
+        $translator = \OmegaUp\Translations::getInstance();
+
+        $x = 50;
         $y = 148;
+        $width = 215;
+        $height = 15;
+        $border = 0;
+        $ln = 1;
+        $center = 'C';
+        $italic = 'I';
+
+        $pdf->SetFont('', $italic, 14);
+        $pdf->SetTextColor(153, 153, 153);
+
         $pdf->SetXY($x, $y);
         $day = intval(date('j', $date));
         $month = intval(date('n', $date));
@@ -121,8 +125,23 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $ln,
             $center
         );
+    }
 
+    private static function printCertificateDirector(FPDI $pdf): void {
+        $translator = \OmegaUp\Translations::getInstance();
+
+        $x = 50;
         $y = 197;
+        $width = 215;
+        $height = 15;
+        $border = 0;
+        $ln = 1;
+        $center = 'C';
+        $italic = 'I';
+
+        $pdf->SetFont('', $italic, 14);
+        $pdf->SetTextColor(153, 153, 153);
+
         $pdf->SetXY($x, $y);
         $pdf->Cell(
             $width,
@@ -136,6 +155,20 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $ln,
             $center
         );
+    }
+
+    private static function printCertificateTitle(
+        FPDI $pdf,
+        string $title
+    ): void {
+        $x = 50;
+        $y = 41;
+        $width = 215;
+        $height = 15;
+        $border = 0;
+        $ln = 1;
+        $center = 'C';
+        $bold = 'B';
 
         $pdf->SetFont('', $bold, 39);
         $pdf->SetTextColor(0, 0, 0);
@@ -143,10 +176,24 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $y = 76;
         $pdf->SetXY($x, $y);
         $pdf->Cell($width, $height, $title, $border, $ln, $center);
+    }
+
+    private static function printCertificateName(
+        FPDI $pdf,
+        string $identityName
+    ): void {
+        $x = 50;
+        $y = 109;
+        $width = 215;
+        $height = 15;
+        $border = 0;
+        $ln = 1;
+        $center = 'C';
+        $bold = 'B';
 
         $pdf->SetFont('', $bold, 21);
+        $pdf->SetTextColor(0, 0, 0);
 
-        $y = 109;
         $pdf->SetXY($x, $y);
         $pdf->Cell(
             $width,
@@ -156,10 +203,22 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $ln,
             $center
         );
+    }
+
+    private static function printCertificateGrantsRecognition(FPDI $pdf): void {
+        $translator = \OmegaUp\Translations::getInstance();
+
+        $x = 50;
+        $y = 57;
+        $width = 215;
+        $height = 15;
+        $border = 0;
+        $ln = 1;
+        $center = 'C';
 
         $pdf->SetFont('', '', 18);
+        $pdf->SetTextColor(0, 0, 0);
 
-        $y = 57;
         $pdf->SetXY($x, $y);
         $pdf->Cell(
             $width,
@@ -173,8 +232,22 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $ln,
             $center
         );
+    }
 
+    private static function printCertificatePerson(FPDI $pdf): void {
+        $translator = \OmegaUp\Translations::getInstance();
+
+        $x = 50;
         $y = 92;
+        $width = 215;
+        $height = 15;
+        $border = 0;
+        $ln = 1;
+        $center = 'C';
+
+        $pdf->SetFont('', '', 18);
+        $pdf->SetTextColor(0, 0, 0);
+
         $pdf->SetXY($x, $y);
         $pdf->Cell(
             $width,
@@ -188,9 +261,22 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $ln,
             $center
         );
+    }
 
+    private static function printCertificateDescription(
+        FPDI $pdf,
+        string $description
+    ): void {
+        $x = 50;
         $y = 132;
+        $width = 215;
         $height = 10;
+        $border = 0;
+        $center = 'C';
+
+        $pdf->SetFont('', '', 18);
+        $pdf->SetTextColor(0, 0, 0);
+
         $pdf->SetXY($x, $y);
         $pdf->MultiCell(
             $width,
@@ -199,25 +285,50 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $border,
             $center
         );
+    }
 
+    private static function createCertificatePdf(
+        string $title,
+        string $identityName,
+        string $description,
+        int $date
+    ): string {
+        $pdf = new FPDI('L');
+        $pdf->setSourceFile('/opt/omegaup/stuff/CertificateTemplate.pdf');
+        $templateId = $pdf->importPage(1);
+        $pdf->AddPage();
+        $pdf->useTemplate($templateId);
+        $pdf->SetAutoPageBreak(false);
+        $pdf->SetFont('Arial', '', 14);
+
+        self::printCertificateHeader($pdf);
+        self::printCertificatePlaceAndDate($pdf, $date);
+        self::printCertificateDirector($pdf);
+        self::printCertificateTitle($pdf, $title);
+        self::printCertificateName($pdf, $identityName);
+        self::printCertificateGrantsRecognition($pdf);
+        self::printCertificatePerson($pdf);
+        self::printCertificateDescription($pdf, $description);
+
+        $pdf->Output('Certificate.pdf', 'F');
         return $pdf->Output('', 'S');
     }
 
     private static function getPlaceSuffix(int $n): string {
         $translator = \OmegaUp\Translations::getInstance();
         if ($n >= 11 && $n <= 13) {
-            return $translator->get('certificatePdfContestPlace0');
+            return $translator->get('certificatePdfContestPlaceTh');
         }
         if (($n % 10) == 1) {
-            return $translator->get('certificatePdfContestPlace1');
+            return $translator->get('certificatePdfContestPlaceSt');
         }
         if (($n % 10) == 2) {
-            return $translator->get('certificatePdfContestPlace2');
+            return $translator->get('certificatePdfContestPlaceNd');
         }
         if (($n % 10) == 3) {
-            return $translator->get('certificatePdfContestPlace3');
+            return $translator->get('certificatePdfContestPlaceRd');
         }
-        return $translator->get('certificatePdfContestPlace0');
+        return $translator->get('certificatePdfContestPlaceTh');
     }
 
     private static function getContestCertificate(string $verification_code): string {
@@ -235,9 +346,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $title = utf8_decode(
                 $placeNumber
                 . self::getPlaceSuffix($placeNumber)
-                . $translator->get(
-                    'certificatePdfContestPlace'
-                )
             );
         } else {
             $title = utf8_decode(
