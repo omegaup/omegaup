@@ -1599,7 +1599,6 @@ const translations: { [key: string]: string; } = {
   wordsCloneCourse: "Clone course",
   wordsCloneThisCourse: "Clone this course",
   wordsClose: "Close",
-  wordsCoder: "Coder",
   wordsCompilerOutput: "Compiler output",
   wordsCompletedPercentage: "Percentage completed",
   wordsConfirm: "Confirm",
