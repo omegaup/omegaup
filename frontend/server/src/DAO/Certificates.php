@@ -21,10 +21,10 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         string $verification_code
     ) {
         $sql = '
-        SELECT 
+        SELECT
             EXISTS(
-                SELECT certificate_id 
-                FROM Certificates 
+                SELECT certificate_id
+                FROM Certificates
                 WHERE verification_code = ?
             );
         ';

@@ -10,7 +10,9 @@ class CertificateValidateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testValidateCertificateWithInvalidVerificationCode() {
         $r = new \OmegaUp\Request(['verification_code' => 'D89lJ2aOZ3',]);
 
-        $response = \OmegaUp\Controllers\Certificate::apiValidateCertificate($r);
+        $response = \OmegaUp\Controllers\Certificate::apiValidateCertificate(
+            $r
+        );
 
         $this->assertFalse($response['valid']);
 
@@ -25,7 +27,9 @@ class CertificateValidateTest extends \OmegaUp\Test\ControllerTestCase {
             'verification_code' => '45KoPi9aM3'
         ]));
 
-        $response = \OmegaUp\Controllers\Certificate::apiValidateCertificate($r);
+        $response = \OmegaUp\Controllers\Certificate::apiValidateCertificate(
+            $r
+        );
 
         $this->assertFalse($response['valid']);
     }
@@ -46,7 +50,9 @@ class CertificateValidateTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         $r = new \OmegaUp\Request(['verification_code' => 'D89lJ2aOZ3',]);
-        $response = \OmegaUp\Controllers\Certificate::apiValidateCertificate($r);
+        $response = \OmegaUp\Controllers\Certificate::apiValidateCertificate(
+            $r
+        );
 
         $this->assertTrue($response['valid']);
     }
