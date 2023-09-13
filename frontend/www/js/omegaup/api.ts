@@ -203,6 +203,13 @@ export const Badge = {
   }),
 };
 
+export const Certificate = {
+  validateCertificate: apiCall<
+    messages.CertificateValidateCertificateRequest,
+    messages.CertificateValidateCertificateResponse
+  >('/api/certificate/validateCertificate/'),
+};
+
 export const Clarification = {
   create: apiCall<
     messages.ClarificationCreateRequest,
