@@ -310,7 +310,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         self::printCertificatePerson($pdf);
         self::printCertificateDescription($pdf, $description);
 
-        $pdf->Output('Certificate.pdf', 'F');
         return $pdf->Output('', 'S');
     }
 
