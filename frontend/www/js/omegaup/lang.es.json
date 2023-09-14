@@ -536,7 +536,6 @@
 	"courseUnarchivedSuccess": "Curso desarchivado exitosamente.",
 	"courseUpdateAlreadyHasRuns": "La duraci\u00f3n no se puede cambiar si ya existen soluciones revisadas.",
 	"courseWithoutProblems": "Sin problemas",
-<<<<<<< HEAD
 	"createContestInteractiveGuideContestTitle": "Elige el t\u00edtulo de tu concurso",
 	"createContestInteractiveGuideDescription": "A\u00f1ade una descripci\u00f3n a tu concurso",
 	"createContestInteractiveGuideSchedule": "Despu\u00e9s de completar toda la informaci\u00f3n, programa el concurso",
@@ -544,7 +543,6 @@
 	"createContestInteractiveGuideStyle": "Elige entre estilos de concursos predefinidos",
 	"createContestInteractiveGuideTitle": "Crear un concurso",
 	"createContestInteractiveGuideWelcome": "Vamos a crear un concurso",
-=======
 	"createCourseInteractiveGuideAskInformation": "Selecciona si deseas solicitar informaci\u00f3n personal de cada estudiante.",
 	"createCourseInteractiveGuideBasicInformation": "Selecciona si es obligatorio que cada estudiante comparta su informaci\u00f3n personal.",
 	"createCourseInteractiveGuideDescription": "Ingresa una breve descripci\u00f3n del curso.",
@@ -561,7 +559,6 @@
 	"createCourseInteractiveGuideSubmit": "Agenda el curso.",
 	"createCourseInteractiveGuideTitle": "Crear Curso",
 	"createCourseInteractiveGuideWelcome": "Te damos la bienvenida, vamos a crear un curso.",
->>>>>>> upstream/main
 	"csrfException": "Intento de Cross-site Request Forgery",
 	"currentStatus": "Estado actual",
 	"datePickerFormat": "dd/mm/yyyy",

@@ -537,7 +537,6 @@ const translations: { [key: string]: string; } = {
   courseUnarchivedSuccess: "(C0ur53 unarchiv3d 5ucc35fu11y.)",
   courseUpdateAlreadyHasRuns: "(Th3 dura7i0n can'7 b3 chang3d 0nc3 a 501u7i0n ha5 b33n judg3d.)",
   courseWithoutProblems: "(Wi7h0u7 pr0b13m5)",
-<<<<<<< HEAD
   createContestInteractiveGuideContestTitle: "(Ch0053 7h3 7i713 0f y0ur c0n7357)",
   createContestInteractiveGuideDescription: "(Add a d35crip7i0n f0r y0ur c0n7357)",
   createContestInteractiveGuideSchedule: "(Af73r fi11ing 0u7 a11 7h3 inf0rma7i0n, 5ch3du13 7h3 c0n7357)",
@@ -545,7 +544,6 @@ const translations: { [key: string]: string; } = {
   createContestInteractiveGuideStyle: "(Ch0053 fr0m pr3d3fin3d c0n7357 57y135)",
   createContestInteractiveGuideTitle: "(Cr3a73 a C0n7357)",
   createContestInteractiveGuideWelcome: "(L37'5 cr3a73 a c0n7357)",
-=======
   createCourseInteractiveGuideAskInformation: "(S313c7 if y0u wan7 70 r3qu357 inf0rma7i0n fr0m par7icipan75.)",
   createCourseInteractiveGuideBasicInformation: "(S313c7 if ba5ic par7icipan7 inf0rma7i0n wi11 b3 r3quir3d.)",
   createCourseInteractiveGuideDescription: "(En73r a bri3f c0ur53 d35crip7i0n.)",
@@ -562,7 +560,6 @@ const translations: { [key: string]: string; } = {
   createCourseInteractiveGuideSubmit: "(Submi7 c0ur53)",
   createCourseInteractiveGuideTitle: "(Cr3a73 C0ur53)",
   createCourseInteractiveGuideWelcome: "(W31c0m3, 137'5 cr3a73 a c0ur53.)",
->>>>>>> upstream/main
   csrfException: "(Cr055-5i73 R3qu357 F0rg3ry a773mp7)",
   currentStatus: "(Curr3n7 57a73)",
   datePickerFormat: "(mm/dd/yyyy)",

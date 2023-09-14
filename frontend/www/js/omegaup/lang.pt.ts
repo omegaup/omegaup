@@ -537,7 +537,6 @@ const translations: { [key: string]: string; } = {
   courseUnarchivedSuccess: "Curso desarquivado exitosamente.",
   courseUpdateAlreadyHasRuns: "A dura\u00e7\u00e3o n\u00e3o pode ser alterada depois que uma solu\u00e7\u00e3o foi avaliada.",
   courseWithoutProblems: "Sem problemas",
-<<<<<<< HEAD
   createContestInteractiveGuideContestTitle: "Escolha o t\u00edtulo do seu concurso",
   createContestInteractiveGuideDescription: "Adicione uma descri\u00e7\u00e3o para o seu concurso",
   createContestInteractiveGuideSchedule: "Ap\u00f3s preencher todas as informa\u00e7\u00f5es, agende o concurso",
@@ -545,7 +544,6 @@ const translations: { [key: string]: string; } = {
   createContestInteractiveGuideStyle: "Escolha entre estilos de concursos predefinidos",
   createContestInteractiveGuideTitle: "Criar um Concurso",
   createContestInteractiveGuideWelcome: "Vamos criar um concurso",
-=======
   createCourseInteractiveGuideAskInformation: "Escolha se deseja solicitar informa\u00e7\u00f5es pessoais dos estudantes.",
   createCourseInteractiveGuideBasicInformation: "Escolha se \u00e9 obrigat\u00f3rio para cada estudante compartilhar suas informa\u00e7\u00f5es pessoais.",
   createCourseInteractiveGuideDescription: "Digite uma breve descri\u00e7\u00e3o do curso.",
@@ -562,7 +560,6 @@ const translations: { [key: string]: string; } = {
   createCourseInteractiveGuideSubmit: "Agendar curso.",
   createCourseInteractiveGuideTitle: "Criar Curso.",
   createCourseInteractiveGuideWelcome: "Bem-vindo, vamos criar um curso.",
->>>>>>> upstream/main
   csrfException: "Tentativa de Cross-site Request Forgery",
   currentStatus: "situa\u00e7\u00e3o atual",
   datePickerFormat: "dd/mm/yyyy",

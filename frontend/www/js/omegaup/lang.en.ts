@@ -537,7 +537,6 @@ const translations: { [key: string]: string; } = {
   courseUnarchivedSuccess: "Course unarchived succesfully.",
   courseUpdateAlreadyHasRuns: "The duration can't be changed once a solution has been judged.",
   courseWithoutProblems: "Without problems",
-<<<<<<< HEAD
   createContestInteractiveGuideContestTitle: "Choose the title of your contest",
   createContestInteractiveGuideDescription: "Add a description for your contest",
   createContestInteractiveGuideSchedule: "After filling out all the information, schedule the contest",
@@ -545,7 +544,6 @@ const translations: { [key: string]: string; } = {
   createContestInteractiveGuideStyle: "Choose from predefined contest styles",
   createContestInteractiveGuideTitle: "Create a Contest",
   createContestInteractiveGuideWelcome: "Let's create a contest",
-=======
   createCourseInteractiveGuideAskInformation: "Select if you want to request information from participants.",
   createCourseInteractiveGuideBasicInformation: "Select if basic participant information will be required.",
   createCourseInteractiveGuideDescription: "Enter a brief course description.",
@@ -562,7 +560,6 @@ const translations: { [key: string]: string; } = {
   createCourseInteractiveGuideSubmit: "Submit course",
   createCourseInteractiveGuideTitle: "Create Course",
   createCourseInteractiveGuideWelcome: "Welcome, let's create a course.",
->>>>>>> upstream/main
   csrfException: "Cross-site Request Forgery attempt",
   currentStatus: "Current state",
   datePickerFormat: "mm/dd/yyyy",
