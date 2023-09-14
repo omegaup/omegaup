@@ -638,7 +638,6 @@ invalidScoreboardUrl = "Url do painel de avaliação inválido."
 invalidStatementType = "Tipo de elaboração inválido"
 invalidUser = "Usuário inválido."
 invalidVisibility = "O parâmetro de visibilidade pode ser um dos seguintes valores: deleted, private_banned, public_banned, private_warning, private, public_warning, public e promoted"
-<<<<<<< HEAD
 joinContestInteractiveGuideContestList = "Aqui, você verá os concursos que atendem aos seus requisitos. Clique em 'inscrever-se' para se registrar no concurso que deseja."
 joinContestInteractiveGuideFilter = "Você também pode filtrar por todos os concursos, aqueles em que você participa ou os recomendados."
 joinContestInteractiveGuideSearch = "Você pode buscar pelo nome ou palavra-chave."
@@ -646,13 +645,11 @@ joinContestInteractiveGuideSort = "Ordenar por data de término, nome, duração
 joinContestInteractiveGuideTime = "Selecione o período do concurso: concursos atuais, anteriores ou futuros."
 joinContestInteractiveGuideTitle = "Participar de um concurso"
 joinContestInteractiveGuideWelcome = "Vamos nos inscrever em um concurso"
-=======
 joinCourseInteractiveGuideJoin = "Clique no botão de início para se juntar ao curso."
 joinCourseInteractiveGuideSearch = "Aqui você pode buscar cursos por nome."
 joinCourseInteractiveGuideTabs = "Navegue entre cursos que concluiu, explore novos cursos e ver os cursos que está cursando"
 joinCourseInteractiveGuideTitle = "Unir-se a um curso"
 joinCourseInteractiveGuideWelcome = "Olá! Aqui você pode encontrar seus cursos."
->>>>>>> c9fa2306c7e9a606b967ee7cbd960ec23d05497b
 lastUpdate = "Última atualização"
 levelTagHelp = "Os níveis devem coincidir com a carreira escolar do aluno e andar de mãos dadas com os cursos que eles costumam fazer."
 libinteractiveDownload = "Baixar"
