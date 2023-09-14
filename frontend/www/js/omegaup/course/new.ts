@@ -40,10 +40,12 @@ OmegaUp.on('ready', () => {
             requests_user_information: 'no',
             is_curator: payload.is_curator,
             is_admin: payload.is_admin,
+            hasVisitedSection: payload.hasVisitedSection,
           },
           allLanguages: payload.languages,
           invalidParameterName: this.invalidParameterName,
           searchResultSchools: this.searchResultSchools,
+          hasVisitedSection: payload.hasVisitedSection,
         },
         on: {
           submit: (request: messages.CourseCreateRequest) => {
