@@ -5,7 +5,7 @@
     </div>
     <b-card no-body>
       <b-tabs
-        class="sidebar introjs-time"
+        class="sidebar"
         pills
         card
         vertical
