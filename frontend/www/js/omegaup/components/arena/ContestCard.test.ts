@@ -107,8 +107,8 @@ describe('ContestCard.vue', () => {
     const contestButtonEnter = wrapper.findComponent({
       ref: 'contestButtonEnter',
     });
-    const contestButtonSingUp = wrapper.findComponent({
-      ref: 'contestButtonSingUp',
+    const contestButtonSeeDetails = wrapper.findComponent({
+      ref: 'contestButtonSeeDetails',
     });
     const contestIconRecommended = wrapper.findComponent({
       ref: 'contestIconRecommended',
@@ -117,7 +117,7 @@ describe('ContestCard.vue', () => {
     expect(contestEnrollStatus.exists()).toBe(true);
     expect(contestButtonEnter.exists()).toBe(true);
     expect(contestIconRecommended.exists()).toBe(true);
-    expect(contestButtonSingUp.exists()).toBe(false);
+    expect(contestButtonSeeDetails.exists()).toBe(false);
   });
 
   it('Should show the past contest card', async () => {

@@ -69,6 +69,7 @@ Cypress.Commands.add(
     tag,
     autoCompleteTextTag,
     problemLevelIndex,
+    publicAccess = false
   }: ProblemOptions) => {
     cy.visit('/');
     // Select problem nav
@@ -91,6 +92,11 @@ Cypress.Commands.add(
         .should('have.text', tag) // Maybe theres another way to avoid to hardcode this
         .click(),
     );
+
+    if(publicAccess) {
+      cy.get('[data-target=".access"]').click();
+      cy.get('[data-problem-access-radio-yes]').check();
+    }
 
     cy.get('[name="problem-level"]').select(problemLevelIndex); // How can we assert this with the real text?
 
@@ -115,6 +121,7 @@ Cypress.Commands.add(
   }: Partial<CourseOptions> & Pick<CourseOptions, 'courseAlias'>) => {
     cy.get('[data-nav-courses]').click();
     cy.get('[data-nav-courses-create]').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('[data-course-new-name]').type(courseAlias);
     cy.get('[data-course-new-alias]').type(courseAlias);
     cy.get('[name="show-scoreboard"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
