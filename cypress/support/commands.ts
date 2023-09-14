@@ -42,6 +42,15 @@ Cypress.Commands.add('logout', () => {
   );
 });
 
+// Logouts the user
+Cypress.Commands.add('logoutUsingApi', () => {
+  const URL = '/logout/?redirect=/';
+  cy.request(URL).then((response) => {
+    expect(response.status).to.equal(200);
+    cy.reload();
+  });
+});
+
 // Registers and logs in a new user given a username and password.
 Cypress.Commands.add('register', ({ username, password }: LoginOptions) => {
   const URL =
@@ -60,6 +69,7 @@ Cypress.Commands.add(
     tag,
     autoCompleteTextTag,
     problemLevelIndex,
+    publicAccess = false
   }: ProblemOptions) => {
     cy.visit('/');
     // Select problem nav
@@ -82,6 +92,11 @@ Cypress.Commands.add(
         .should('have.text', tag) // Maybe theres another way to avoid to hardcode this
         .click(),
     );
+
+    if(publicAccess) {
+      cy.get('[data-target=".access"]').click();
+      cy.get('[data-problem-access-radio-yes]').check();
+    }
 
     cy.get('[name="problem-level"]').select(problemLevelIndex); // How can we assert this with the real text?
 

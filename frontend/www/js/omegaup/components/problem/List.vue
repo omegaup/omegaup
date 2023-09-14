@@ -1,19 +1,29 @@
 <template>
   <div class="container-lg p-3">
-    <h2 class="text-center my-5">
+    <h2 class="text-center mt-5">
       {{ T.wordsProblems }}
     </h2>
+    <div class="d-flex justify-content-end">
+      <button
+        class="btn btn-primary mb-2"
+        type="button"
+        @click="showFinderWizard = true"
+      >
+        {{ T.wizardLinkText }}
+      </button>
+    </div>
     <div class="d-flex align-items-center">
       <omegaup-problem-search-bar
+        class="searchbar-width"
         :language="language"
         :languages="languages"
         :keyword="keyword"
         :tags="tags"
+        :only-quality-seal="onlyQualitySeal"
         :search-result-problems="searchResultProblems"
         @update-search-result-problems="
           (query) => $emit('update-search-result-problems', query)
         "
-        @show-finder-wizard="() => (showFinderWizard = true)"
       ></omegaup-problem-search-bar>
     </div>
     <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
@@ -78,6 +88,7 @@ export default class List extends Vue {
   @Prop() mode!: string;
   @Prop() column!: string;
   @Prop() tags!: string[];
+  @Prop() onlyQualitySeal!: boolean;
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() searchResultProblems!: types.ListItem[];
@@ -91,3 +102,13 @@ export default class List extends Vue {
   }
 }
 </script>
+
+<style>
+.form-control {
+  max-width: 14rem;
+}
+
+.searchbar-width .tags-input-wrapper-default {
+  min-width: 20rem;
+}
+</style>
