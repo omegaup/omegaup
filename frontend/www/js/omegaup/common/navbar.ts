@@ -48,6 +48,7 @@ OmegaUp.on('ready', () => {
           clarifications: clarificationsStore.state.clarifications,
           fromLogin: fromLogin,
           userTypes: payload.userTypes,
+          isUnder13User: payload.isUnder13User,
         },
         on: {
           'read-notifications': (

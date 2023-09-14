@@ -28,7 +28,19 @@
             {{ T.profileRank }}
           </small>
         </p>
+        <h4 v-if="profile.rankinfo.author_ranking > 0" class="m-0">
+          {{ `#${profile.rankinfo.author_ranking}` }}
+        </h4>
+        <small v-else>
+          <strong> {{ T.authorRankUnranked }} </strong>
+        </small>
+        <p>
+          <small>
+            {{ T.profileAuthorRank }}
+          </small>
+        </p>
       </div>
+
       <div
         v-if="profile.is_own_profile || !profile.is_private"
         class="mb-3 text-center"

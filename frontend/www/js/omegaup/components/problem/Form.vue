@@ -114,7 +114,7 @@
               </div>
               <div class="collapse show card-body px-2 px-sm-4 tags">
                 <div
-                  v-show="selectedTags.length === 0"
+                  v-show="selectedTags.length === 0 && currentLanguages !== ''"
                   class="alert alert-info"
                 >
                   {{ T.problemEditTagPublicRequired }}
@@ -129,6 +129,7 @@
                   :selected-public-tags="selectedPublicTags"
                   :can-add-new-tags="true"
                   :errors="errors"
+                  :is-lecture="currentLanguages === ''"
                   @emit-add-tag="addTag"
                   @emit-remove-tag="removeTag"
                   @select-problem-level="selectProblemLevel"
@@ -286,6 +287,7 @@
                     <label class="form-check form-check-inline">
                       <input
                         v-model="isPublic"
+                        data-problem-access-radio-yes
                         type="radio"
                         name="visibility"
                         class="form-check-input"

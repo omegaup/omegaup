@@ -64,6 +64,7 @@
             :is-reviewer="isReviewer"
             :is-admin="isAdmin"
             :is-main-user-identity="isMainUserIdentity"
+            :is-under13-user="isUnder13User"
             :navbar-section="navbarSection"
           >
             <template v-if="hasTeachingObjective" #contests-items>
@@ -397,6 +398,7 @@ export default class Navbar extends Vue {
   @Prop() clarifications!: types.Clarification[];
   @Prop() fromLogin!: boolean;
   @Prop() userTypes!: string[];
+  @Prop() isUnder13User!: boolean;
 
   T = T;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];

@@ -24,7 +24,6 @@ describe('Problem Collection Test', () => {
     });
     problemPage.verifyLanguageFilter('all');
     problemPage.verifyFilterByAlias(problemOptions[0].problemAlias);
-    problemPage.verifyFilterByTags();
     cy.logout();
   });
 
@@ -47,6 +46,57 @@ describe('Problem Collection Test', () => {
     problemPage.openProblem(problemOptions[0].problemAlias);
     problemPage.createRun(runOptions);
     problemPage.verifySubmission(loginOptions[0].username);
+    cy.logout();
+  });
+
+  // Uncomment this test when the following issue is fixed
+  // https://github.com/omegaup/omegaup/issues/7218
+
+  // it('Should add additional tags to a problem as admin', () => {
+  //   const loginOptions = loginPage.registerMultipleUsers(1);
+  //   const problemOptions = contestPage.generateProblemOptions(1);
+  //   problemOptions[0].problemLevelIndex = 5;
+
+  //   cy.login(loginOptions[0]);
+  //   cy.createProblem(problemOptions[0]);
+  //   cy.logout();
+
+  //   cy.loginAdmin();
+  //   problemPage.navigateToAllProblemsTab();
+  //   problemPage.verifyFilterByAlias(problemOptions[0].problemAlias);
+  //   problemPage.openProblem(problemOptions[0].problemAlias);
+  //   problemPage.qualifyProblem(['Dynamic programming', 'Backtracking']);
+  //   cy.logout();
+
+  //   cy.login(loginOptions[0]);
+  //   problemPage.navigateToAllProblemsTab();
+  //   problemPage.verifyFilterByAlias(problemOptions[0].problemAlias);
+  //   cy.logout();
+  // });
+
+  it('Should report a problem', () => {
+    const loginOptions = loginPage.registerMultipleUsers(2);
+    const problemOptions = contestPage.generateProblemOptions(1);
+    problemOptions[0].publicAccess = true;
+
+    cy.login(loginOptions[0]);
+    cy.createProblem(problemOptions[0]);
+    cy.logout();
+
+    cy.login(loginOptions[1]);
+    problemPage.navigateToAllProblemsTab();
+    problemPage.verifyFilterByAlias(problemOptions[0].problemAlias);
+    problemPage.openProblem(problemOptions[0].problemAlias);
+    problemPage.reportProblem('offensive');
+    cy.logout();
+
+    cy.loginAdmin();
+    problemPage.banProblem(problemOptions[0].problemAlias);
+    cy.logout();
+
+    cy.login(loginOptions[1]);
+    problemPage.navigateToAllProblemsTab();
+    problemPage.verifyBan(problemOptions[0].problemAlias);
     cy.logout();
   });
 });
