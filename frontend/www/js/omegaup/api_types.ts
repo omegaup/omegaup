@@ -3274,6 +3274,7 @@ export namespace types {
   }
 
   export interface CourseNewPayload {
+    hasVisitedSection: boolean;
     is_admin: boolean;
     is_curator: boolean;
     languages: { [key: string]: string };
@@ -3376,6 +3377,7 @@ export namespace types {
       finished: types.CourseCardFinished[];
       public: types.CourseCardPublic[];
     };
+    hasVisitedSection: boolean;
   }
 
   export interface CoursesByAccessMode {
