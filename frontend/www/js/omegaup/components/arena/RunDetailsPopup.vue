@@ -170,6 +170,12 @@
             <code v-text="data.judged_by"></code>
           </pre>
         </div>
+        <div>
+          <h3>{{ T.runGUID }}</h3>
+          <acronym :title="data.guid" data-run-guid>
+            <tt>{{ data.guid.substring(0, 8) }}</tt>
+          </acronym>
+        </div>
       </form>
     </div>
     <div v-else>

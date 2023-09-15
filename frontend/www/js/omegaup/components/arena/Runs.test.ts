@@ -49,11 +49,11 @@ describe('Runs.vue', () => {
         showContest: true,
         showDetails: true,
         showDisqualify: true,
-        showPager: true,
+        showFilters: true,
         showPoints: false,
         showProblem: true,
         showRejudge: true,
-        showUser: true,
+        showUser: false,
         username: null,
       },
     });
@@ -124,7 +124,7 @@ describe('Runs.vue', () => {
         showContest: true,
         showDetails: true,
         showDisqualify: true,
-        showPager: true,
+        showFilters: true,
         showPoints: false,
         showProblem: true,
         showRejudge: true,
@@ -149,7 +149,7 @@ describe('Runs.vue', () => {
         propsData: {
           contestAlias: 'admin',
           runs,
-          showPager: true,
+          showFilters: true,
         },
       });
       await wrapper
@@ -161,44 +161,12 @@ describe('Runs.vue', () => {
     });
   });
 
-  it('Should handle change page control', async () => {
-    const wrapper = shallowMount(arena_Runs, {
-      propsData: {
-        contestAlias: 'contest',
-        runs,
-        showPager: true,
-        rowCount: 2,
-      },
-    });
-
-    expect(
-      wrapper.find('button[data-button-page-previous]').attributes('disabled'),
-    ).toBeTruthy();
-    expect(
-      wrapper.find('button[data-button-page-next]').attributes('disabled'),
-    ).toBeFalsy();
-    expect(wrapper.find('.pager-controls').text()).toContain('1');
-    await wrapper.find('button[data-button-page-next]').trigger('click');
-
-    expect(wrapper.emitted('filter-changed')).toEqual([
-      [{ filter: 'offset', value: '1' }],
-    ]);
-
-    expect(
-      wrapper.find('button[data-button-page-previous]').attributes('disabled'),
-    ).toBeFalsy();
-    expect(
-      wrapper.find('button[data-button-page-next]').attributes('disabled'),
-    ).toBeFalsy();
-    expect(wrapper.find('.pager-controls').text()).toContain('2');
-  });
-
   it('Should handle username filter', async () => {
     const wrapper = shallowMount(arena_Runs, {
       propsData: {
         contestAlias: 'contest',
         runs,
-        showPager: true,
+        showFilters: true,
         showUser: true,
       },
     });
@@ -216,7 +184,7 @@ describe('Runs.vue', () => {
       propsData: {
         contestAlias: 'contest',
         runs,
-        showPager: true,
+        showFilters: true,
         showProblem: true,
       },
     });
@@ -309,7 +277,7 @@ describe('Runs.vue', () => {
         showContest: true,
         showDetails: true,
         showDisqualify: true,
-        showPager: true,
+        showFilters: true,
         showPoints: false,
         showProblem: true,
         showRejudge: true,
@@ -335,7 +303,7 @@ describe('Runs.vue', () => {
           showContest: true,
           showDetails: true,
           showDisqualify: true,
-          showPager: true,
+          showFilters: true,
           showPoints: false,
           showProblem: true,
           showRejudge: true,

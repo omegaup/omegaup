@@ -14,29 +14,9 @@
     >
       <div>
         <span class="font-weight-bold">{{ T.wordsSubmissions }}</span>
-        <div v-if="showPager">
-          <div class="pager-controls">
-            <button
-              data-button-page-previous
-              :disabled="filterOffset <= 0"
-              @click="filterOffset--"
-            >
-              &lt;
-            </button>
-            {{ currentPage }}
-            <button
-              data-button-page-next
-              :disabled="
-                totalRuns && Math.ceil(totalRuns / rowCount) == currentPage
-              "
-              @click="filterOffset++"
-            >
-              &gt;
-            </button>
-          </div>
-
+        <div v-if="showFilters">
           <div class="filters row">
-            <label class="col-3 col-sm pr-0 font-weight-bold"
+            <label v-if="!isCourse" class="col-3 col-sm pr-0 font-weight-bold"
               >{{ T.wordsVerdict }}:
               <select
                 v-model="filterVerdict"
@@ -58,8 +38,39 @@
                 <option value="NO-AC">No AC</option>
               </select>
             </label>
+            <label v-else class="col-3 col-sm pr-0 font-weight-bold">
+              {{ T.wordsExecution }}
+              <select
+                v-model="filterExecution"
+                data-select-execution
+                class="form-control"
+              >
+                <option value="">{{ T.wordsAll }}</option>
+                <option value="EXECUTION_JUDGE_ERROR">
+                  {{ T.runDetailsJudgeError }}
+                </option>
+                <option value="EXECUTION_VALIDATOR_ERROR">
+                  {{ T.runDetailsValidatorError }}
+                </option>
+                <option value="EXECUTION_COMPILATION_ERROR">
+                  {{ T.runDetailsCompilationError }}
+                </option>
+                <option value="EXECUTION_RUNTIME_FUNCTION_ERROR">
+                  {{ T.runDetailsRuntimeFunctionError }}
+                </option>
+                <option value="EXECUTION_RUNTIME_ERROR">
+                  {{ T.runDetailsRuntimeError }}
+                </option>
+                <option value="EXECUTION_INTERRUPTED">
+                  {{ T.runDetailsInterrupted }}
+                </option>
+                <option value="EXECUTION_FINISHED">
+                  {{ T.runDetailsFinished }}
+                </option>
+              </select>
+            </label>
 
-            <label class="col-3 col-sm pr-0 font-weight-bold"
+            <label v-if="!isCourse" class="col-3 col-sm pr-0 font-weight-bold"
               >{{ T.wordsStatus }}:
               <select
                 v-model="filterStatus"
@@ -72,6 +83,29 @@
                 <option value="compiling">compiling</option>
                 <option value="running">running</option>
                 <option value="ready">ready</option>
+              </select>
+            </label>
+
+            <label v-else class="col-3 col-sm pr-0 font-weight-bold">
+              {{ T.wordsOutput }}
+              <select
+                v-model="filterOutput"
+                data-select-output
+                class="form-control"
+              >
+                <option value="">{{ T.wordsAll }}</option>
+                <option value="OUTPUT_EXCEEDED">
+                  {{ T.runDetailsExceeded }}
+                </option>
+                <option value="OUTPUT_INCORRECT">
+                  {{ T.runDetailsIncorrect }}
+                </option>
+                <option value="OUTPUT_INTERRUPTED">
+                  {{ T.runDetailsInterrupted }}
+                </option>
+                <option value="OUTPUT_CORRECT">
+                  {{ T.runDetailsCorrect }}
+                </option>
               </select>
             </label>
 
@@ -176,24 +210,36 @@
         <table class="table runs">
           <thead>
             <tr>
-              <th class="text-nowrap">{{ T.wordsTime }}</th>
-              <th>GUID</th>
+              <th>
+                <font-awesome-icon :icon="['fas', 'calendar-alt']" />
+                {{ T.wordsTime }}
+              </th>
+              <th>{{ T.wordsLanguage }}</th>
+              <th hidden>GUID</th>
               <th v-if="showUser">{{ T.contestParticipant }}</th>
               <th v-if="showContest">{{ T.wordsContest }}</th>
+              <th v-if="contestAlias != null && !isCourse">
+                {{ T.wordsVerdict }}
+              </th>
               <th v-if="showProblem">{{ T.wordsProblem }}</th>
-              <th>{{ T.wordsStatus }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPoints }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPenalty }}</th>
               <th v-if="!showPoints" class="numeric">
                 {{ T.wordsPercentage }}
               </th>
-              <th>{{ T.wordsLanguage }}</th>
-              <th class="numeric">{{ T.wordsMemory }}</th>
-              <th class="numeric">{{ T.wordsRuntime }}</th>
-              <th v-if="showDetails && !showDisqualify && !showRejudge">
+              <th>{{ T.wordsExecution }}</th>
+              <th>{{ T.wordsOutput }}</th>
+              <th class="numeric">
+                <font-awesome-icon :icon="['fas', 'database']" />
+                {{ T.wordsMemory }}
+              </th>
+              <th class="numeric">
+                <font-awesome-icon :icon="['fas', 'clock']" />
+                {{ T.wordsRuntime }}
+              </th>
+              <th>
                 {{ T.arenaRunsActions }}
               </th>
-              <th v-else></th>
             </tr>
           </thead>
           <tfoot v-if="problemAlias != null">
@@ -221,13 +267,14 @@
             </tr>
           </tfoot>
           <tbody>
-            <tr v-for="run in filteredRuns" :key="run.guid">
+            <tr v-for="run in paginatedRuns" :key="run.guid">
               <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
-              <td>
+              <td hidden>
                 <acronym :title="run.guid" data-run-guid>
                   <tt>{{ run.guid.substring(0, 8) }}</tt>
                 </acronym>
               </td>
+              <td>{{ run.language }}</td>
               <td
                 v-if="showUser"
                 class="text-break-all text-nowrap"
@@ -267,17 +314,8 @@
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
               </td>
-              <td v-if="showProblem" class="text-break-all">
-                <a
-                  href="#runs"
-                  @click.prevent="filterProblem.key = run.alias"
-                  >{{ run.alias }}</a
-                >
-                <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
-                  <font-awesome-icon :icon="['fas', 'external-link-alt']" />
-                </a>
-              </td>
               <td
+                v-if="contestAlias != null && !isCourse"
                 :class="statusClass(run)"
                 data-run-status
                 class="text-center opacity-4 font-weight-bold"
@@ -296,10 +334,41 @@
                   <font-awesome-icon :icon="['fas', 'question-circle']" />
                 </button>
               </td>
+              <td v-if="showProblem" class="text-break-all">
+                <a
+                  href="#runs"
+                  @click.prevent="filterProblem.key = run.alias"
+                  >{{ run.alias }}</a
+                >
+                <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
+                  <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+                </a>
+              </td>
               <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
               <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
-              <td v-if="!showPoints" class="numeric">{{ percentage(run) }}</td>
-              <td>{{ run.language }}</td>
+              <td
+                v-if="!showPoints"
+                :class="statusPercentageClass(run)"
+                class="numeric"
+              >
+                {{ percentage(run) }}
+              </td>
+              <td class="numeric">{{ execution(run) }}</td>
+              <td class="numeric">
+                <font-awesome-icon
+                  v-if="outputIconColorStatus(run) === OutputStatus.Correct"
+                  :icon="['fas', 'check-circle']"
+                  style="color: green"
+                />
+                <font-awesome-icon
+                  v-else-if="
+                    outputIconColorStatus(run) === OutputStatus.Incorrect
+                  "
+                  :icon="['fas', 'times-circle']"
+                  style="color: red"
+                />
+                {{ output(run) }}
+              </td>
               <td class="numeric">{{ memory(run) }}</td>
               <td class="numeric">{{ runtime(run) }}</td>
               <td v-if="showDetails && !showDisqualify && !showRejudge">
@@ -380,6 +449,12 @@
             </tr>
           </tbody>
         </table>
+        <b-pagination
+          v-model="currentPage"
+          :total-rows="totalRows"
+          :per-page="itemsPerPage"
+          align="center"
+        ></b-pagination>
       </div>
     </div>
     <slot name="runs">
@@ -409,6 +484,7 @@ import common_Typeahead from '../common/Typeahead.vue';
 import arena_RunDetailsPopup from './RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
 
+import { PaginationPlugin } from 'bootstrap-vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
@@ -418,19 +494,38 @@ import {
   faSearchPlus,
   faExternalLinkAlt,
   faTimes,
+  faDatabase,
+  faClock,
+  faCalendarAlt,
+  faCheckCircle,
+  faTimesCircle,
 } from '@fortawesome/free-solid-svg-icons';
+
 library.add(faQuestionCircle);
 library.add(faRedoAlt);
 library.add(faBan);
 library.add(faSearchPlus);
 library.add(faExternalLinkAlt);
 library.add(faTimes);
+library.add(faDatabase);
+library.add(faClock);
+library.add(faCalendarAlt);
+library.add(faCheckCircle);
+library.add(faTimesCircle);
+
+Vue.use(PaginationPlugin);
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface JQuery {
     popover(action: string): JQuery;
   }
+}
+
+export enum OutputStatus {
+  None = 0,
+  Correct = 1,
+  Incorrect = 2,
 }
 
 export enum PopupDisplayed {
@@ -457,7 +552,7 @@ export default class Runs extends Vue {
   @Prop({ default: false }) showContest!: boolean;
   @Prop({ default: false }) showDetails!: boolean;
   @Prop({ default: false }) showDisqualify!: boolean;
-  @Prop({ default: false }) showPager!: boolean;
+  @Prop({ default: false }) showFilters!: boolean;
   @Prop({ default: false }) showPoints!: boolean;
   @Prop({ default: false }) showProblem!: boolean;
   @Prop({ default: false }) showRejudge!: boolean;
@@ -477,7 +572,10 @@ export default class Runs extends Vue {
   @Prop() totalRuns!: number;
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
+  @Prop({ default: false }) isCourse!: boolean;
+  @Prop({ default: 7 }) itemsPerPage!: number;
 
+  OutputStatus = OutputStatus;
   PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
@@ -489,12 +587,21 @@ export default class Runs extends Vue {
   filterUsername: null | types.ListItem = null;
   filterVerdict: string = '';
   filterContest: string = '';
+  filterExecution: string = '';
+  filterOutput: string = '';
   filters: { name: string; value: string }[] = [];
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
+  currentPage: number = 1;
 
-  get currentPage(): number {
-    return this.filterOffset + 1;
+  get totalRows(): number {
+    return this.filteredRuns.length;
+  }
+
+  get paginatedRuns(): types.Run[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredRuns.slice(startIndex, endIndex);
   }
 
   get filteredRuns(): types.Run[] {
@@ -504,7 +611,9 @@ export default class Runs extends Vue {
       !this.filterStatus &&
       !this.filterUsername &&
       !this.filterContest &&
-      !this.filterVerdict
+      !this.filterVerdict &&
+      !this.filterExecution &&
+      !this.filterOutput
     ) {
       return this.sortedRuns;
     }
@@ -531,6 +640,12 @@ export default class Runs extends Vue {
         return false;
       }
       if (this.filterContest && run.contest_alias !== this.filterContest) {
+        return false;
+      }
+      if (this.filterExecution && run.execution !== this.filterExecution) {
+        return false;
+      }
+      if (this.filterOutput && run.output !== this.filterOutput) {
         return false;
       }
       return true;
@@ -565,20 +680,10 @@ export default class Runs extends Vue {
   }
 
   memory(run: types.Run): string {
-    if (
-      run.status == 'ready' &&
-      run.verdict != 'JE' &&
-      run.verdict != 'VE' &&
-      run.verdict != 'CE'
-    ) {
-      let prefix = '';
-      if (run.verdict == 'MLE') {
-        prefix = '>';
-      }
-      return `${prefix}${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
-    } else {
+    if (run.status !== 'ready' || run.status_memory === 'MEMORY_NOT_AVAILABLE')
       return '—';
-    }
+    if (run.status_memory === 'MEMORY_EXCEEDED') return T.runDetailsExceeded;
+    return `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
   }
 
   penalty(run: types.Run): string {
@@ -620,18 +725,83 @@ export default class Runs extends Vue {
 
   runtime(run: types.Run): string {
     if (
-      run.status == 'ready' &&
-      run.verdict != 'JE' &&
-      run.verdict != 'VE' &&
-      run.verdict != 'CE'
+      run.status !== 'ready' ||
+      run.status_runtime === 'RUNTIME_NOT_AVAILABLE'
     ) {
-      let prefix = '';
-      if (run.verdict == 'TLE') {
-        prefix = '>';
-      }
-      return `${prefix}${(run.runtime / 1000).toFixed(2)} s`;
+      return '—';
     }
-    return '—';
+
+    if (run.status_runtime === 'RUNTIME_EXCEEDED') {
+      return T.runDetailsExceeded;
+    }
+
+    return `${(run.runtime / 1000).toFixed(2)} s`;
+  }
+
+  execution(run: types.Run): string {
+    if (run.status !== 'ready') {
+      return '—';
+    }
+
+    switch (run.execution) {
+      case 'EXECUTION_JUDGE_ERROR':
+        return T.runDetailsJudgeError;
+      case 'EXECUTION_VALIDATOR_ERROR':
+        return T.runDetailsValidatorError;
+      case 'EXECUTION_COMPILATION_ERROR':
+        return T.runDetailsCompilationError;
+      case 'EXECUTION_RUNTIME_FUNCTION_ERROR':
+        return T.runDetailsRuntimeFunctionError;
+      case 'EXECUTION_RUNTIME_ERROR':
+        return T.runDetailsRuntimeError;
+      case 'EXECUTION_INTERRUPTED':
+        return T.runDetailsInterrupted;
+      default:
+        return T.runDetailsFinished;
+    }
+  }
+
+  output(run: types.Run): string {
+    if (run.status !== 'ready') {
+      return '—';
+    }
+
+    switch (run.output) {
+      case 'OUTPUT_EXCEEDED':
+        return T.runDetailsExceeded;
+      case 'OUTPUT_INCORRECT':
+        return T.runDetailsIncorrect;
+      case 'OUTPUT_INTERRUPTED':
+        return T.runDetailsInterrupted;
+      default:
+        return T.runDetailsCorrect;
+    }
+  }
+
+  statusPercentageClass(run: types.Run): string {
+    if (!(run.status === 'ready' && run.verdict === 'AC')) {
+      return '';
+    }
+
+    return 'status-ac';
+  }
+
+  outputIconColorStatus(run: types.Run): number {
+    if (
+      !(
+        run.status === 'ready' &&
+        run.output !== 'OUTPUT_EXCEEDED' &&
+        run.output !== 'OUTPUT_INTERRUPTED'
+      )
+    ) {
+      return OutputStatus.None;
+    }
+
+    if (run.output !== 'OUTPUT_INCORRECT') {
+      return OutputStatus.Correct;
+    } else {
+      return OutputStatus.Incorrect;
+    }
   }
 
   showVerdictHelp(ev: Event): void {
