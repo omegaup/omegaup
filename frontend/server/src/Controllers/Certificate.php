@@ -367,7 +367,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
                 $translator->get('certificatePdfCoderOfTheMonthTitle')
             );
         }
-        $identityName = $certificateData['identity_name'];
+        $identityName = utf8_decode($certificateData['identity_name']);
         $date = $certificateData['timestamp']->time;
         $month = intval(date('n', $date));
         $description = utf8_decode(
@@ -404,6 +404,14 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             return [
                 'certificate' => self::getContestCertificate(
                     $verification_code
+                ),
+            ];
+        }
+        if ($type === 'coder_of_the_month' || $type === 'coder_of_the_month_female') {
+            return [
+                'certificate' => self::getCoderOfTheMonthCertificate(
+                    $verification_code,
+                    $type === 'coder_of_the_month_female'
                 ),
             ];
         }
