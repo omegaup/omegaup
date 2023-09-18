@@ -358,7 +358,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $title = utf8_decode(
             $translator->get('certificatePdfCourseTitle')
         );
-        $identityName = $certificateData['identity_name'];
+        $identityName = utf8_decode($certificateData['identity_name']);
         $description = utf8_decode(
             sprintf(
                 $translator->get('certificatePdfCourseDescription'),
@@ -393,6 +393,13 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         if ($type === 'contest') {
             return [
                 'certificate' => self::getContestCertificate(
+                    $verification_code
+                ),
+            ];
+        }
+        if ($type === 'course') {
+            return [
+                'certificate' => self::getCourseCertificate(
                     $verification_code
                 ),
             ];
