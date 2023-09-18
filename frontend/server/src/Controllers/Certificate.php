@@ -68,10 +68,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $border = 0;
         $ln = 1;
         $center = 'C';
-        $italic = 'I';
-
-        $pdf->SetFont('', $italic, 14);
-        $pdf->SetTextColor(153, 153, 153);
 
         $pdf->SetXY($x, $y);
         $pdf->Cell(
@@ -101,10 +97,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $border = 0;
         $ln = 1;
         $center = 'C';
-        $italic = 'I';
-
-        $pdf->SetFont('', $italic, 14);
-        $pdf->SetTextColor(153, 153, 153);
 
         $pdf->SetXY($x, $y);
         $day = intval(date('j', $date));
@@ -137,10 +129,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $border = 0;
         $ln = 1;
         $center = 'C';
-        $italic = 'I';
-
-        $pdf->SetFont('', $italic, 14);
-        $pdf->SetTextColor(153, 153, 153);
 
         $pdf->SetXY($x, $y);
         $pdf->Cell(
@@ -162,18 +150,13 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         string $title
     ): void {
         $x = 50;
-        $y = 41;
+        $y = 76;
         $width = 215;
         $height = 15;
         $border = 0;
         $ln = 1;
         $center = 'C';
-        $bold = 'B';
 
-        $pdf->SetFont('', $bold, 39);
-        $pdf->SetTextColor(0, 0, 0);
-
-        $y = 76;
         $pdf->SetXY($x, $y);
         $pdf->Cell($width, $height, $title, $border, $ln, $center);
     }
@@ -189,10 +172,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $border = 0;
         $ln = 1;
         $center = 'C';
-        $bold = 'B';
-
-        $pdf->SetFont('', $bold, 21);
-        $pdf->SetTextColor(0, 0, 0);
 
         $pdf->SetXY($x, $y);
         $pdf->Cell(
@@ -215,9 +194,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $border = 0;
         $ln = 1;
         $center = 'C';
-
-        $pdf->SetFont('', '', 18);
-        $pdf->SetTextColor(0, 0, 0);
 
         $pdf->SetXY($x, $y);
         $pdf->Cell(
@@ -245,9 +221,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $ln = 1;
         $center = 'C';
 
-        $pdf->SetFont('', '', 18);
-        $pdf->SetTextColor(0, 0, 0);
-
         $pdf->SetXY($x, $y);
         $pdf->Cell(
             $width,
@@ -274,9 +247,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $border = 0;
         $center = 'C';
 
-        $pdf->SetFont('', '', 18);
-        $pdf->SetTextColor(0, 0, 0);
-
         $pdf->SetXY($x, $y);
         $pdf->MultiCell(
             $width,
@@ -299,13 +269,18 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->AddPage();
         $pdf->useTemplate($templateId);
         $pdf->SetAutoPageBreak(false);
-        $pdf->SetFont('Arial', '', 14);
 
+        $pdf->SetFont('Arial', 'I', 14);
+        $pdf->SetTextColor(153, 153, 153);
         self::printCertificateHeader($pdf);
         self::printCertificatePlaceAndDate($pdf, $date);
         self::printCertificateDirector($pdf);
+        $pdf->SetFont('', 'B', 39);
+        $pdf->SetTextColor(0, 0, 0);
         self::printCertificateTitle($pdf, $title);
+        $pdf->SetFont('', 'B', 21);
         self::printCertificateName($pdf, $identityName);
+        $pdf->SetFont('', '', 18);
         self::printCertificateGrantsRecognition($pdf);
         self::printCertificatePerson($pdf);
         self::printCertificateDescription($pdf, $description);
