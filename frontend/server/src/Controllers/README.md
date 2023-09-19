@@ -9,6 +9,7 @@
   - [`/api/badge/myList/`](#apibadgemylist)
   - [`/api/badge/userList/`](#apibadgeuserlist)
 - [Certificate](#certificate)
+  - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
   - [`/api/certificate/validateCertificate/`](#apicertificatevalidatecertificate)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
@@ -392,6 +393,24 @@ Returns a list of badges owned by a certain user
 # Certificate
 
 CertificateController
+
+## `/api/certificate/getCertificatePdf/`
+
+### Description
+
+API to generate the certificate PDF
+
+### Parameters
+
+| Name                | Type     | Description |
+| ------------------- | -------- | ----------- |
+| `verification_code` | `string` |             |
+
+### Returns
+
+| Name          | Type     |
+| ------------- | -------- |
+| `certificate` | `string` |
 
 ## `/api/certificate/validateCertificate/`
 

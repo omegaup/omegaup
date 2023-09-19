@@ -3274,6 +3274,7 @@ export namespace types {
   }
 
   export interface CourseNewPayload {
+    hasVisitedSection: boolean;
     is_admin: boolean;
     is_curator: boolean;
     languages: { [key: string]: string };
@@ -4849,6 +4850,8 @@ export namespace messages {
   export type BadgeUserListResponse = { badges: types.Badge[] };
 
   // Certificate
+  export type CertificateGetCertificatePdfRequest = { [key: string]: any };
+  export type CertificateGetCertificatePdfResponse = { certificate: string };
   export type CertificateValidateCertificateRequest = { [key: string]: any };
   export type CertificateValidateCertificateResponse = { valid: boolean };
 
@@ -5743,6 +5746,9 @@ export namespace controllers {
   }
 
   export interface Certificate {
+    getCertificatePdf: (
+      params?: messages.CertificateGetCertificatePdfRequest,
+    ) => Promise<messages.CertificateGetCertificatePdfResponse>;
     validateCertificate: (
       params?: messages.CertificateValidateCertificateRequest,
     ) => Promise<messages.CertificateValidateCertificateResponse>;
