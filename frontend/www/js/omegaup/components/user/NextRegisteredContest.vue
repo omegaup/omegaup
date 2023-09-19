@@ -12,7 +12,7 @@
       <b-row class="p-1">
         <b-col class="col-12 p-1 text-center">
           <h3 class="mb-3 display-4">
-            {{ T.userNextRegisteredContestInfoTitle }}
+            {{ T.userNextRegisteredContestTitle }}
           </h3>
         </b-col>
       </b-row>
@@ -69,8 +69,21 @@
           </p>
         </b-col>
         <b-col class="col-md-4 col-sm-12 p-1 text-center">
-          <button type="button" class="btn btn-primary w-75" @click="onClick">
-            {{ T.userNextRegisteredContestInfoButton }}
+          <button
+            v-if="isContestStarted"
+            type="button"
+            class="btn btn-primary w-75"
+            @click="onClick"
+          >
+            {{ T.userNextRegisteredContestButtonEnter }}
+          </button>
+          <button
+            v-else
+            type="button"
+            class="btn btn-primary w-75"
+            @click="onClick"
+          >
+            {{ T.userNextRegisteredContestButtonSeeDetails }}
           </button>
         </b-col>
       </b-row>
