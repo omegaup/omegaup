@@ -1409,7 +1409,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             if ($contestAdmin) {
                 return !\OmegaUp\Controllers\Contest::SHOW_INTRO;
             }
-            if (!\OmegaUp\DAO\Contests::hasStarted($contest)) {
+            if (
+                !\OmegaUp\DAO\Contests::hasStarted($contest) &&
+                self::isInvitedToContest($contest, $identity)
+            ) {
                 return \OmegaUp\Controllers\Contest::SHOW_INTRO;
             }
         } catch (\Exception $e) {
