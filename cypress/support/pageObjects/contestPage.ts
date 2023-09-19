@@ -198,14 +198,14 @@ export class ContestPage {
     const problems: ProblemOptions[] = [];
 
     for (let i = 0; i < noOfProblems; i++) {
-      const userLoginOptions: ProblemOptions = {
+      const problemOptions: ProblemOptions = {
         problemAlias: uuid().slice(0, 10),
         tag: 'Recursión',
         autoCompleteTextTag: 'recur',
         problemLevelIndex: 0,
       };
 
-      problems.push(userLoginOptions);
+      problems.push(problemOptions);
     }
 
     return problems;
