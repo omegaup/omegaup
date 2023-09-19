@@ -4851,6 +4851,10 @@ export namespace messages {
   export type _BadgeUserListServerResponse = any;
   export type BadgeUserListResponse = { badges: types.Badge[] };
 
+  // Certificate
+  export type CertificateGetCertificatePdfRequest = { [key: string]: any };
+  export type CertificateGetCertificatePdfResponse = { certificate: string };
+
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
   export type _ClarificationCreateServerResponse = any;
@@ -5739,6 +5743,12 @@ export namespace controllers {
     userList: (
       params?: messages.BadgeUserListRequest,
     ) => Promise<messages.BadgeUserListResponse>;
+  }
+
+  export interface Certificate {
+    getCertificatePdf: (
+      params?: messages.CertificateGetCertificatePdfRequest,
+    ) => Promise<messages.CertificateGetCertificatePdfResponse>;
   }
 
   export interface Clarification {
