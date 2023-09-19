@@ -265,7 +265,7 @@ Cypress.Commands.add(
 
     for (const idx in runs) {
       // Mocking date just a few seconds after to allow create new run
-      cy.clock(new Date(), ['Date']).then((clock) => clock.tick(3000));
+      cy.clock(new Date(), ['Date']).then((clock) => clock.tick(6000));
       cy.get('.introjs-skipbutton').click();
       cy.get('[data-new-run]').click();
       cy.get('.introjs-skipbutton').click();
