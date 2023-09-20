@@ -170,7 +170,9 @@ export default class Signup extends Vue {
               intro: T.signUpFormInteractiveGuideEmail,
             },
             {
-              element: document.querySelector('.introjs-date-of-birth') as Element,
+              element: document.querySelector(
+                '.introjs-date-of-birth',
+              ) as Element,
               title,
               intro: T.signUpFormInteractiveGuideDateOfBirth,
             },
