@@ -1381,6 +1381,7 @@
 	"signUpFormInteractiveGuideTitle": "Crear cuenta",
 	"signUpFormInteractiveGuideUsername": "Elige el nombre de tu cuenta, S\u00f3lo se permiten letras may\u00fasculas, min\u00fasculas, n\u00fameros y los caracteres _, . y -, el m\u00ednimo de caracteres es 2.",
 	"signUpFormInteractiveGuideWelcome": "Vamos a crear tu cuenta! \ud83d\udc4b",
+	"signupDateOfBirth": "Fecha de nacimiento",
 	"singleUserAddSuccess": "Cuenta exitosamente agregada.",
 	"socketStatusConnected": "El socket est\u00e1 conectado",
 	"socketStatusFailed": "La conexi\u00f3n con el socket fall\u00f3",

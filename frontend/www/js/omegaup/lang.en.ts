@@ -1382,6 +1382,7 @@ const translations: { [key: string]: string; } = {
   signUpFormInteractiveGuideTitle: "Sign Up",
   signUpFormInteractiveGuideUsername: "Create your username, only uppercase letters, lowercase letters, numbers, the characters _, . and - are allowed, the minimum number of characters is 2.",
   signUpFormInteractiveGuideWelcome: "Let's create your account! \ud83d\udc4b",
+  signupDateOfBirth: "Date of birth",
   singleUserAddSuccess: "Usu\u00e1rio adicionado com sucesso.",
   socketStatusConnected: "Socket is connected",
   socketStatusFailed: "Socket connection failed",

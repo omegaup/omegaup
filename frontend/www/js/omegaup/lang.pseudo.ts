@@ -1382,6 +1382,7 @@ const translations: { [key: string]: string; } = {
   signUpFormInteractiveGuideTitle: "(Sign Up)",
   signUpFormInteractiveGuideUsername: "(Cr3a73 y0ur u53rnam3, 0n1y upp3rca53 13773r5, 10w3rca53 13773r5, numb3r5, 7h3 charac73r5 _, . and - ar3 a110w3d, 7h3 minimum numb3r 0f charac73r5 i5 2.)",
   signUpFormInteractiveGuideWelcome: "(L37'5 cr3a73 y0ur acc0un7! \ud83d\udc4b)",
+  signupDateOfBirth: "(Da73 0f bir7h)",
   singleUserAddSuccess: "(U5u\u00e1ri0 adici0nad0 c0m 5uc3550.)",
   socketStatusConnected: "(S0ck37 i5 c0nn3c73d)",
   socketStatusFailed: "(S0ck37 c0nn3c7i0n fai13d)",

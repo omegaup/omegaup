@@ -31,6 +31,12 @@
               />
             </div>
           </div>
+          <div class="col-md-4 col-md-offset-2 c-azul">
+            <div class="form-group">
+              <label class="control-label">{{ T.signupDateOfBirth }}</label>
+              <input type="date" name="birthdate" class="form-control" />
+            </div>
+          </div>
         </div>
         <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-2 introjs-password">

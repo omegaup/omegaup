@@ -1382,6 +1382,7 @@ const translations: { [key: string]: string; } = {
   signUpFormInteractiveGuideTitle: "Inscrever-se",
   signUpFormInteractiveGuideUsername: "Crie seu nome de usu\u00e1rio, s\u00f3 s\u00e3o permitidas letras mai\u00fasculas, min\u00fasculas, n\u00fameros e os caracteres _, . e -, e o n\u00famero m\u00ednimo de caracteres \u00e9 2.",
   signUpFormInteractiveGuideWelcome: "Vamos criar sua conta! \ud83d\udc4b",
+  signupDateOfBirth: "Data de nascimento",
   singleUserAddSuccess: "Usuario exitosamente agregado.",
   socketStatusConnected: "Soquete est\u00e1 conectado",
   socketStatusFailed: "A conex\u00e3o do soquete falhou",

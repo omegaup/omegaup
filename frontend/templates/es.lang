@@ -1380,6 +1380,7 @@ signUpFormInteractiveGuideTermsAndConditions = "Porfavor lea y acepte nuestros t
 signUpFormInteractiveGuideTitle = "Crear cuenta"
 signUpFormInteractiveGuideUsername = "Elige el nombre de tu cuenta, Sólo se permiten letras mayúsculas, minúsculas, números y los caracteres _, . y -, el mínimo de caracteres es 2."
 signUpFormInteractiveGuideWelcome = "Vamos a crear tu cuenta! 👋"
+signupDateOfBirth = "Fecha de nacimiento"
 singleUserAddSuccess = "Cuenta exitosamente agregada."
 socketStatusConnected = "El socket está conectado"
 socketStatusFailed = "La conexión con el socket falló"
