@@ -69,8 +69,7 @@ OmegaUp.on('ready', async () => {
       runDetailsData: runDetails,
       solutionStatus: payload.solutionStatus,
       solution: null as types.ProblemStatement | null,
-      availableTokens: 0,
-      allTokens: 0,
+      allowedSolutionsToSee: payload.allowedSolutionsToSee,
       activeTab: window.location.hash ? locationHash[0] : 'problems',
       nominationStatus: payload.nominationStatus,
       hasBeenNominated:
@@ -96,8 +95,7 @@ OmegaUp.on('ready', async () => {
           clarifications: clarificationStore.state.clarifications,
           solutionStatus: this.solutionStatus,
           solution: this.solution,
-          availableTokens: this.availableTokens,
-          allTokens: this.allTokens,
+          allowedSolutionsToSee: this.allowedSolutionsToSee,
           popupDisplayed: this.popupDisplayed,
           runDetailsData: this.runDetailsData,
           allowUserAddTags: payload.allowUserAddTags,
@@ -274,6 +272,7 @@ OmegaUp.on('ready', async () => {
               .catch(ui.apiError);
           },
           'unlock-solution': () => {
+            console.log('simon');
             api.Problem.solution(
               {
                 problem_alias: payload.problem.alias,
@@ -289,9 +288,9 @@ OmegaUp.on('ready', async () => {
                 this.solutionStatus = 'unlocked';
                 this.solution = data.solution;
                 ui.info(
-                  ui.formatString(T.solutionTokens, {
-                    available: this.availableTokens - 1,
-                    total: this.allTokens,
+                  ui.formatString(T.solutionViewsLeft, {
+                    available: this.allowedSolutionsToSee - 1,
+                    total: 5,
                   }),
                 );
               })
@@ -303,18 +302,17 @@ OmegaUp.on('ready', async () => {
                 ui.apiError(error);
               });
           },
-          'get-tokens': () => {
+          'get-allowed-solutions': () => {
             api.ProblemForfeited.getCounts()
               .then((data) => {
-                this.allTokens = data.allowed;
-                this.availableTokens = data.allowed - data.seen;
-                if (this.availableTokens <= 0) {
+                this.allowedSolutionsToSee = data.allowed - data.seen;
+                if (this.allowedSolutionsToSee <= 0) {
                   ui.warning(T.solutionNoTokens);
                 }
               })
               .catch(ui.apiError);
           },
-          'get-solution': () => {
+          'get-solution': () => {            
             if (payload.solutionStatus === 'unlocked') {
               api.Problem.solution(
                 { problem_alias: payload.problem.alias },

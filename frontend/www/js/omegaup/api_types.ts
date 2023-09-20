@@ -3838,6 +3838,7 @@ export namespace types {
   export interface ProblemDetailsPayload {
     allRuns?: types.Run[];
     allowUserAddTags?: boolean;
+    allowedSolutionsToSee?: number;
     clarifications?: types.Clarification[];
     histogram: types.Histogram;
     levelTags?: string[];
