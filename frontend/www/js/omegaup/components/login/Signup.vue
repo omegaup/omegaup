@@ -31,10 +31,17 @@
               />
             </div>
           </div>
-          <div class="col-md-4 col-md-offset-2 c-azul">
+          <div class="col-md-4 col-md-offset-2 introjs-date-of-birth">
             <div class="form-group">
               <label class="control-label">{{ T.signupDateOfBirth }}</label>
-              <input type="date" name="birthdate" class="form-control" />
+              <input
+                v-model="dateOfBirth"
+                data-signup-date-of-birth
+                name="reg_date_of_birth"
+                type="date"
+                class="form-control"
+                autocomplete="date-of-birth"
+              />
             </div>
           </div>
         </div>
@@ -95,6 +102,7 @@
                     'register-and-login',
                     username,
                     email,
+                    dateOfBirth,
                     password,
                     passwordConfirmation,
                     recaptchaResponse,
@@ -132,6 +140,7 @@ export default class Signup extends Vue {
   T = T;
   username: string = '';
   email: string = '';
+  dateOfBirth: string = '';
   password: string = '';
   passwordConfirmation: string = '';
   recaptchaResponse: string = '';
@@ -159,6 +168,11 @@ export default class Signup extends Vue {
               element: document.querySelector('.introjs-email') as Element,
               title,
               intro: T.signUpFormInteractiveGuideEmail,
+            },
+            {
+              element: document.querySelector('.introjs-date-of-birth') as Element,
+              title,
+              intro: T.signUpFormInteractiveGuideDateOfBirth,
             },
             {
               element: document.querySelector('.introjs-password') as Element,
