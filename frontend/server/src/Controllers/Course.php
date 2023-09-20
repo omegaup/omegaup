@@ -1082,7 +1082,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     private static function sendNotificationToStudent(
         \OmegaUp\DAO\VO\Courses $course,
         string $assignmentAlias,
-        bool $problemAdded
+        string $notificationType
     ): void {
         if (is_null($course->group_id) || is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1099,7 +1099,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
 
             $notificationContents = [
-                'type' => $problemAdded ? \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_PROBLEM_ADDED : \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_ADDED,
+                'type' => $notificationType,
                 'body' => [
                     'localizationParams' => [
                         'courseName' => $course->name,
@@ -1109,7 +1109,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 ],
             ];
 
-            if ($problemAdded) {
+            if ($notificationType == \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_PROBLEM_ADDED) {
                 $notificationContents['body']['localizationString'] = new \OmegaUp\TranslationString(
                     'notificationCourseAssignmentProblemAdded'
                 );
@@ -1188,7 +1188,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             $addedProblems
         );
 
-        self::sendNotificationToStudent($course, $r['alias'], false);
+        self::sendNotificationToStudent(
+            $course,
+            $r['alias'],
+            \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_ADDED
+        );
 
         return [
             'status' => 'ok',
@@ -1427,7 +1431,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             $assignmentAlias
         );
 
-        self::sendNotificationToStudent($course, $assignmentAlias, true);
+        self::sendNotificationToStudent(
+            $course,
+            $assignmentAlias,
+            \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_PROBLEM_ADDED
+        );
 
         return [
             'status' => 'ok',
