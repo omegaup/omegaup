@@ -48,7 +48,7 @@
           </div>
           <div v-if="userAge" class="col-md-4">
             <div class="form-group">
-              <label class="control-label">Correo Electrónico del Padre</label>
+              <label class="control-label">{{ T.loginParentEmail }}</label>
               <input
                 v-model="parentEmail"
                 name="reg_parent_email"
