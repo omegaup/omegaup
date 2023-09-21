@@ -686,16 +686,18 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $mainEmail = \OmegaUp\DAO\Emails::getByUserId($mainUser->user_id)[0];
 
         $dependents = [];
+        $users = [];
         for ($i = 0; $i < 3; $i++) {
             [
-                'identity' => $dependents[], 'user' => $user,
+                'identity' => $dependents[],
+                'user' => $users[],
             ] = \OmegaUp\Test\Factories\User::createUser(
                 new \OmegaUp\Test\Factories\UserParams([
                     'birthDate' => 1406684800,
                 ])
             );
-            $user->parent_email_id = $mainEmail->email_id;
-            \OmegaUp\DAO\Users::update($user);
+            $users[$i]->parent_email_id = $mainEmail->email_id;
+            \OmegaUp\DAO\Users::update($users[$i]);
         }
 
         // This user is not a dependent
