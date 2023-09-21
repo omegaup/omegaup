@@ -712,6 +712,7 @@ const translations: { [key: string]: string; } = {
   loginHeader: "Inicia sesi\u00f3n en omegaUp",
   loginLogIn: "Iniciar sesi\u00f3n",
   loginNative: "Cuenta omegaUp",
+  loginParentEmail: "Correo electr\u00f3nico del padre",
   loginPassword: "Contrase\u00f1a",
   loginPasswordCreate: "Contrase\u00f1a (Min. 8 caracteres)",
   loginPasswordTooShort: "La contrase\u00f1a es muy corta",

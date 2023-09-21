@@ -712,6 +712,7 @@ const translations: { [key: string]: string; } = {
   loginHeader: "(L0gin 70 0m3gaUp)",
   loginLogIn: "(L0g in)",
   loginNative: "(0m3gaUp acc0un7)",
+  loginParentEmail: "(Fa7h3r'5 3-mai1)",
   loginPassword: "(Pa55w0rd)",
   loginPasswordCreate: "(Pa55w0rd (Min. 8 charac73r5))",
   loginPasswordTooShort: "(Pa55w0rd i5 700 5h0r7.)",
