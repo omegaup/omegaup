@@ -10,11 +10,13 @@
       :has-visited-section="hasVisitedSection"
       :validate-recaptcha="validateRecaptcha"
       @register-and-login="
-        (username, email, password, passwordConfirmation, recaptchaResponse) =>
+        (username, email, dateOfBirth, parentEmail, password, passwordConfirmation, recaptchaResponse) =>
           $emit(
             'register-and-login',
             username,
             email,
+            dateOfBirth,
+            parentEmail,
             password,
             passwordConfirmation,
             recaptchaResponse,

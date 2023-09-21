@@ -31,6 +31,8 @@
               />
             </div>
           </div>
+        </div>
+        <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-2 introjs-date-of-birth">
             <div class="form-group">
               <label class="control-label">{{ T.signupDateOfBirth }}</label>
@@ -41,6 +43,18 @@
                 type="date"
                 class="form-control"
                 autocomplete="date-of-birth"
+              />
+            </div>
+          </div>
+          <div v-if="userAge" class="col-md-4">
+            <div class="form-group">
+              <label class="control-label">Correo Electrónico del Padre</label>
+              <input
+                v-model="parentEmail"
+                name="reg_parent_email"
+                type="email"
+                class="form-control"
+                autocomplete="parent-email"
               />
             </div>
           </div>
@@ -103,6 +117,7 @@
                     username,
                     email,
                     dateOfBirth,
+                    parentEmail,
                     password,
                     passwordConfirmation,
                     recaptchaResponse,
@@ -141,6 +156,7 @@ export default class Signup extends Vue {
   username: string = '';
   email: string = '';
   dateOfBirth: string = '';
+  parentEmail: string = '';
   password: string = '';
   passwordConfirmation: string = '';
   recaptchaResponse: string = '';
@@ -213,6 +229,22 @@ export default class Signup extends Vue {
 
   expired(): void {
     this.recaptchaResponse = '';
+  }
+
+  checkAge() {
+    const dateOfBirth = new Date(this.dateOfBirth);
+    const today = new Date();
+    const age = today.getFullYear() - dateOfBirth.getFullYear();
+    if (age < 13) {
+      this.parentEmail = ""; 
+    }
+  }
+
+  get userAge() {
+    const dateOfBirth = new Date(this.dateOfBirth);
+    const today = new Date();
+    const age = today.getFullYear() - dateOfBirth.getFullYear();
+    return age < 13;
   }
 }
 </script>
