@@ -35,7 +35,7 @@
         <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-2 introjs-date-of-birth">
             <div class="form-group">
-              <label class="control-label">{{ T.signupDateOfBirth }}</label>
+              <label class="control-label">{{ T.loginDateOfBirth }}</label>
               <input
                 v-model="dateOfBirth"
                 data-signup-date-of-birth
@@ -236,7 +236,7 @@ export default class Signup extends Vue {
     const today = new Date();
     const age = today.getFullYear() - dateOfBirth.getFullYear();
     if (age < 13) {
-      this.parentEmail = ""; 
+      this.parentEmail = '';
     }
   }
 
