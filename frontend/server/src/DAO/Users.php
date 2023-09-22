@@ -481,7 +481,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
     }
 
     /**
-     * @return list<array{name: string, username: string, email: string}>
+     * @return list<array{email: null|string, name: null|string, username: string}>
      */
     public static function getUserDependents(\OmegaUp\DAO\VO\Users $user): array {
         $sql = 'SELECT

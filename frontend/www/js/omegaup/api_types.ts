@@ -4671,7 +4671,7 @@ export namespace types {
   }
 
   export interface UserDependentsPayload {
-    dependents: { email: string; name: string; username: string }[];
+    dependents: { email?: string; name?: string; username: string }[];
   }
 
   export interface UserDetailsPayload {
