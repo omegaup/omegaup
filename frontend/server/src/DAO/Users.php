@@ -497,7 +497,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 WHERE
                     u.parent_email_id = ?';
 
-        /** @var list<array{name: string, username: string, email: string}>|null */
+        /** @var list<array{email: null|string, name: null|string, username: string}> */
         $dependents = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [ $user->main_email_id ]
