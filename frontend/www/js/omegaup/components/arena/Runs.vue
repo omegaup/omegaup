@@ -315,7 +315,7 @@
                 </a>
               </td>
               <td
-                v-if="contestAlias != null && !isCourse"
+                v-show="contestAlias != null && !isCourse"
                 :class="statusClass(run)"
                 data-run-status
                 class="text-center opacity-4 font-weight-bold"
