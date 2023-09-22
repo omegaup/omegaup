@@ -502,6 +502,6 @@ class Users extends \OmegaUp\DAO\Base\Users {
             $sql,
             [ $user->main_email_id ]
         );
-        return is_null($dependents) ? [] : $dependents;
+        return $dependents;
     }
 }
