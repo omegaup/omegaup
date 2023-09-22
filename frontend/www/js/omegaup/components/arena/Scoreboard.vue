@@ -232,7 +232,6 @@ export default class ArenaScoreboard extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 .omegaup-scoreboard {
-  max-width: 900px;
   margin: 0 auto;
 
   a {
