@@ -161,6 +161,39 @@ describe('Runs.vue', () => {
     });
   });
 
+  it('Should handle paginator in user view', async () => {
+    const wrapper = mount(arena_Runs, {
+      propsData: {
+        runs,
+        itemsPerPage: 2,
+      },
+    });
+
+    const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
+    expect(paginationComponent.exists()).toBe(true);
+
+    expect(paginationComponent.vm.numberOfPages).toBe(3);
+    expect(paginationComponent.vm.currentPage).toBe(1);
+  });
+
+  it('Should handle paginator in admin view', async () => {
+    const wrapper = mount(arena_Runs, {
+      propsData: {
+        contestAlias: 'contest',
+        runs,
+        showFilters: true,
+        showUser: true,
+        itemsPerPage: 1,
+      },
+    });
+
+    const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
+    expect(paginationComponent.exists()).toBe(true);
+
+    expect(paginationComponent.vm.numberOfPages).toBe(5);
+    expect(paginationComponent.vm.currentPage).toBe(1);
+  });
+
   it('Should handle username filter', async () => {
     const wrapper = shallowMount(arena_Runs, {
       propsData: {
