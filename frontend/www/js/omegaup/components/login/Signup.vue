@@ -18,7 +18,7 @@
               />
             </div>
           </div>
-          <div class="col-md-4 introjs-email">
+          <div v-show="!isUnder13" class="col-md-4 introjs-email">
             <div class="form-group">
               <label class="control-label">{{ T.loginEmail }}</label>
               <input
@@ -46,7 +46,7 @@
               />
             </div>
           </div>
-          <div v-if="userAge" class="col-md-4">
+          <div v-show="isUnder13" class="col-md-4">
             <div class="form-group">
               <label class="control-label">{{ T.loginParentEmail }}</label>
               <input
@@ -240,7 +240,7 @@ export default class Signup extends Vue {
     }
   }
 
-  get userAge() {
+  get isUnder13() {
     const dateOfBirth = new Date(this.dateOfBirth);
     const today = new Date();
     const age = today.getFullYear() - dateOfBirth.getFullYear();
