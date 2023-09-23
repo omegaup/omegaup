@@ -171,9 +171,8 @@ describe('Runs.vue', () => {
 
     const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
     expect(paginationComponent.exists()).toBe(true);
-
-    expect(paginationComponent.vm.numberOfPages).toBe(3);
-    expect(paginationComponent.vm.currentPage).toBe(1);
+    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(3);
+    expect(paginationComponent.vm.$data.currentPage).toBe(1);
   });
 
   it('Should handle paginator in admin view', async () => {
@@ -190,8 +189,8 @@ describe('Runs.vue', () => {
     const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
     expect(paginationComponent.exists()).toBe(true);
 
-    expect(paginationComponent.vm.numberOfPages).toBe(5);
-    expect(paginationComponent.vm.currentPage).toBe(1);
+    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(5);
+    expect(paginationComponent.vm.$data.currentPage).toBe(1);
   });
 
   it('Should handle username filter', async () => {
