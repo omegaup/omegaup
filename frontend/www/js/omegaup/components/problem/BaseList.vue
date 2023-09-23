@@ -11,7 +11,6 @@
                   column="problem_id"
                   :sort-order="sortOrder"
                   :column-name="columnName"
-                  class="sort-color"
                   @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)

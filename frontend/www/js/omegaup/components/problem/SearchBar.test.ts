@@ -33,4 +33,29 @@ describe('SearchBar.vue', () => {
       );
     }
   });
+
+  it('Should handle the "only quality seal problems" checkbox', async () => {
+    const wrapper = shallowMount(problem_SearchBar, {
+      propsData: {
+        tags: [],
+        keyword: '',
+        language: '',
+        languages: ['all', 'en', 'es', 'pt'],
+        onlyQualitySeal: false,
+        searchResultProblems: [],
+      },
+    });
+
+    const checkboxOnlyQualitySeal = wrapper.find(
+      'input[name="only_quality_seal"]',
+    );
+    expect(
+      (checkboxOnlyQualitySeal.element as HTMLInputElement).checked,
+    ).toBeFalsy();
+    await checkboxOnlyQualitySeal.setChecked();
+    expect(
+      (checkboxOnlyQualitySeal.element as HTMLInputElement).checked,
+    ).toBeTruthy();
+    await wrapper.find('input[type="submit"]').trigger('click');
+  });
 });

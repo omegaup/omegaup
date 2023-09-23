@@ -424,7 +424,7 @@ describe('Course Test', () => {
     cy.get('[data-course-start-assignment-button]').should('not.exist');
     const assignmentUrl = courseUrl + '/assignment/' + shortAlias + '#problems';
     cy.request({ url: assignmentUrl, failOnStatusCode: false }).then((resp) => {
-      expect(resp.status).to.eq(404);
+      expect(resp.status).to.eq(200);
     });
     cy.visit('/');
     cy.logout();

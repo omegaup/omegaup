@@ -64,6 +64,7 @@
             :is-reviewer="isReviewer"
             :is-admin="isAdmin"
             :is-main-user-identity="isMainUserIdentity"
+            :is-under13-user="isUnder13User"
             :navbar-section="navbarSection"
           >
             <template v-if="hasTeachingObjective" #contests-items>
@@ -254,7 +255,7 @@
                       data-nav-user-contests
                       >{{ T.navContestsEnrolled }}</a
                     >
-                    <form class="collapse-submenu">
+                    <form v-if="!isUnder13User" class="collapse-submenu">
                       <div class="btn-group">
                         <a
                           class="dropdown-item"
@@ -397,6 +398,7 @@ export default class Navbar extends Vue {
   @Prop() clarifications!: types.Clarification[];
   @Prop() fromLogin!: boolean;
   @Prop() userTypes!: string[];
+  @Prop() isUnder13User!: boolean;
 
   T = T;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];

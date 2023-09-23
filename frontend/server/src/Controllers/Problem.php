@@ -354,25 +354,28 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $params->selectedTagsAsJSON,
                 associative: true
             ) : null;
-            if (empty($selectedTags)) {
+            $isLecture = $params->languages === [''];
+            if (empty($selectedTags) && !$isLecture) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'problemEditTagPublicRequired',
                     'public_tags'
                 );
             }
             $hasPublicTags = false;
-            foreach ($selectedTags as $tag) {
-                if (!$hasPublicTags) {
-                    $hasPublicTags = boolval($tag['public']);
-                }
-                if (empty($tag['tagname'])) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'parameterEmpty',
-                        'tagname'
-                    );
+            if (!is_null($selectedTags)) {
+                foreach ($selectedTags as $tag) {
+                    if (!$hasPublicTags) {
+                        $hasPublicTags = boolval($tag['public']);
+                    }
+                    if (empty($tag['tagname'])) {
+                        throw new \OmegaUp\Exceptions\InvalidParameterException(
+                            'parameterEmpty',
+                            'tagname'
+                        );
+                    }
                 }
             }
-            if (!$hasPublicTags) {
+            if (!$hasPublicTags && !$isLecture) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'problemEditTagPublicRequired',
                     'public_tags'
@@ -2091,7 +2094,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     ) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException();
                     }
-                    // TODO: Check start times.
+
+                    $assignment = \OmegaUp\DAO\Assignments::getAssignmentForProblemset(
+                        $problemsetId
+                    );
+
+                    if (
+                        !is_null($assignment)
+                        && $assignment->start_time->time > \OmegaUp\Time::get()
+                    ) {
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                            'problemNotFound'
+                        );
+                    }
                 }
             }
             $response['problemset'] = $problemset['problemset'];
@@ -4803,6 +4818,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $min_visibility
      * @omegaup-request-param int|null $offset
      * @omegaup-request-param mixed $only_karel
+     * @omegaup-request-param bool $only_quality_seal
      * @omegaup-request-param mixed $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
@@ -4831,6 +4847,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if ($offset < 0) {
             $offset = 0;
         }
+
+        $onlyQualitySeal = $r->ensureOptionalBool('only_quality_seal') ?? false;
 
         [
             'sortOrder' => $sortOrder,
@@ -4861,7 +4879,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            onlyQualitySeal: false,
+            $onlyQualitySeal,
             url: '/problem/list/',
             level: null,
             difficulty: 'all',

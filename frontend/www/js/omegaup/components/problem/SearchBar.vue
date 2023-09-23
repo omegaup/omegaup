@@ -52,19 +52,24 @@
           </select>
         </label>
       </div>
+      <div class="form-group mr-2">
+        <label>
+          <input
+            v-model="currentOnlyQualitySeal"
+            name="only_quality_seal"
+            class="form-check-input"
+            type="checkbox"
+            :value="true"
+          />
+          {{ T.qualityFormQualityOnly }}
+        </label>
+      </div>
       <input
         data-filter-submit-button
         class="btn btn-primary mr-2 button-mobile"
         type="submit"
         :value="T.wordsSearch"
       />
-      <button
-        class="btn btn-primary ml-2 align-self-center form-control"
-        type="button"
-        @click="$emit('show-finder-wizard')"
-      >
-        {{ T.wizardLinkText }}
-      </button>
     </form>
   </div>
 </template>
@@ -91,12 +96,14 @@ export default class ProblemSearchBar extends Vue {
   @Prop() keyword!: string;
   @Prop() language!: string;
   @Prop() languages!: string[];
+  @Prop() onlyQualitySeal!: boolean;
   @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
 
   currentKeyword: types.ListItem = { key: this.keyword, value: this.keyword };
   currentLanguage = this.language;
+  currentOnlyQualitySeal = this.onlyQualitySeal;
 
   getLanguageText(language: string): string {
     if (language === 'all') return T.wordsAll;
@@ -129,5 +136,9 @@ export default class ProblemSearchBar extends Vue {
   .form-control {
     margin-left: 0 !important;
   }
+}
+
+[data-problem-keyword-search] {
+  z-index: 9999;
 }
 </style>
