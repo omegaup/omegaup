@@ -2718,25 +2718,14 @@ export namespace types {
     country_id: string;
     date: string;
     gravatar_32: string;
+    problems_solved?: number;
+    score?: number;
     username: string;
   }
   [];
 
   export interface CoderOfTheMonthPayload {
-    candidatesToCoderOfTheMonth: {
-      category: string;
-      classname: string;
-      coder_of_the_month_id: number;
-      country_id: string;
-      description?: string;
-      problems_solved: number;
-      ranking: number;
-      school_id?: number;
-      score: number;
-      selected_by?: number;
-      time: string;
-      username: string;
-    }[];
+    candidatesToCoderOfTheMonth: types.CoderOfTheMonthList;
     category: string;
     codersOfCurrentMonth: types.CoderOfTheMonthList;
     codersOfPreviousMonth: types.CoderOfTheMonthList;
