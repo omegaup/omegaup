@@ -1,10 +1,10 @@
 <template>
-  <div class="container-lg p-5">
+  <div class="py-0 px-0 mx-auto my-0">
     <h2 class="text-center mb-4">
       <span v-if="rank !== 0" class="rank-number">#{{ rank }} </span>
       {{ name }}
     </h2>
-    <div class="row mb-4">
+    <div class="row mb-3">
       <div class="col-md-4">
         <ul v-if="country" class="list-group mb-3">
           <li class="list-group-item">
@@ -16,24 +16,16 @@
             <strong>{{ T.profileState }}:</strong> {{ stateName }}
           </li>
         </ul>
-        <omegaup-grid-paginator
-          :columns="1"
+        <omegaup-table-paginator
+          :column-names="columnNames"
           :items="codersOfTheMonth"
-          :items-per-page="5"
+          :items-per-page="3"
           :title="T.codersOfTheMonth"
         >
-          <template #table-header>
-            <thead>
-              <tr>
-                <th>{{ T.codersOfTheMonthUser }}</th>
-                <th class="numericColumn">{{ T.codersOfTheMonthDate }}</th>
-              </tr>
-            </thead>
-          </template>
-        </omegaup-grid-paginator>
+        </omegaup-table-paginator>
       </div>
-      <div class="col-md-8">
-        <div class="card">
+      <div class="col-md-8 pl-0">
+        <div class="card h-100">
           <div class="card-body">
             <highcharts :options="chartOptions"></highcharts>
           </div>
@@ -42,8 +34,8 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <omegaup-grid-paginator
-          :columns="1"
+        <omegaup-table-paginator
+          :column-names="userColumnNames"
           :show-page-offset="true"
           :items="schoolUsers"
           :items-per-page="30"
@@ -51,17 +43,6 @@
           :sort-options="sortOptions"
           @sort-option-change="updateUsers"
         >
-          <template #table-header>
-            <thead>
-              <tr>
-                <th scope="col" class="text-center">
-                  {{ T.profileContestsTablePlace }}
-                </th>
-                <th scope="col">{{ T.username }}</th>
-                <th scope="col" class="text-right">{{ sortByTableTitle }}</th>
-              </tr>
-            </thead>
-          </template>
           <template #item-data="slotProps">
             <omegaup-username
               :username="slotProps.item.toString()"
@@ -69,7 +50,7 @@
               :linkify="true"
             ></omegaup-username>
           </template>
-        </omegaup-grid-paginator>
+        </omegaup-table-paginator>
       </div>
     </div>
   </div>
@@ -80,7 +61,6 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
-
 import CountryFlag from '../CountryFlag.vue';
 import GridPaginator from '../common/GridPaginator.vue';
 import UserName from '../user/Username.vue';
@@ -124,6 +104,21 @@ export default class SchoolProfile extends Vue {
     },
   ];
 
+  get columnNames(): Array<{ name: string; style: string }> {
+    return [
+      { name: T.codersOfTheMonthUser, style: '' },
+      { name: T.codersOfTheMonthDate, style: 'text-right' },
+    ];
+  }
+
+  get userColumnNames(): Array<{ name: string; style: string }> {
+    return [
+      { name: T.profileContestsTablePlace, style: 'col-1 text-left' },
+      { name: T.username, style: 'text-center' },
+      { name: this.sortByTableTitle, style: 'text-right' },
+    ];
+  }
+
   get schoolUsers(): SchoolUser[] {
     return this.users.sort((userA, userB) => {
       if (userA.getDisplayValue() < userB.getDisplayValue()) return 1;
@@ -152,7 +147,7 @@ export default class SchoolProfile extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 .list-group-item strong {
   display: inline-block;
   width: 60px;
@@ -160,5 +155,10 @@ export default class SchoolProfile extends Vue {
 
 .rank-number {
   color: gray;
+}
+
+h2 {
+  font-size: 1.8rem;
+  letter-spacing: 0.01rem;
 }
 </style>
