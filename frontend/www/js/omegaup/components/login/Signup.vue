@@ -43,6 +43,7 @@
                 type="date"
                 class="form-control"
                 autocomplete="date-of-birth"
+                @input="checkAge"
               />
             </div>
           </div>
@@ -160,6 +161,7 @@ export default class Signup extends Vue {
   password: string = '';
   passwordConfirmation: string = '';
   recaptchaResponse: string = '';
+  isUnder13: boolean = false;
 
   mounted() {
     const title = T.signUpFormInteractiveGuideTitle;
@@ -235,16 +237,10 @@ export default class Signup extends Vue {
     const dateOfBirth = new Date(this.dateOfBirth);
     const today = new Date();
     const age = today.getFullYear() - dateOfBirth.getFullYear();
-    if (age < 13) {
+    this.isUnder13 = age < 13;
+    if (this.isUnder13) {
       this.parentEmail = '';
     }
-  }
-
-  get isUnder13() {
-    const dateOfBirth = new Date(this.dateOfBirth);
-    const today = new Date();
-    const age = today.getFullYear() - dateOfBirth.getFullYear();
-    return age < 13;
   }
 }
 </script>
