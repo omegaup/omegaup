@@ -1420,6 +1420,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             if ($contestAdmin) {
                 return !\OmegaUp\Controllers\Contest::SHOW_INTRO;
             }
+            if (
+                !\OmegaUp\DAO\Contests::hasStarted($contest) &&
+                self::isInvitedToContest($contest, $identity)
+            ) {
+                return \OmegaUp\Controllers\Contest::SHOW_INTRO;
+            }
         } catch (\Exception $e) {
             // Could not access contest. Private contests must not be leaked, so
             // unless they were manually added beforehand, show them a 404 error.
