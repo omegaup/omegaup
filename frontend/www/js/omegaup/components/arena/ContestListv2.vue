@@ -403,22 +403,18 @@ export default class ArenaContestList extends Vue {
               intro: T.joinContestInteractiveGuideWelcome,
             },
             {
-              element: document.querySelector('.introjs-time') as Element,
               title,
               intro: T.joinContestInteractiveGuideTime,
             },
             {
-              element: document.querySelector('.introjs-time') as Element,
               title,
               intro: T.joinContestInteractiveGuideTimeCurrent,
             },
             {
-              element: document.querySelector('.introjs-time') as Element,
               title,
               intro: T.joinContestInteractiveGuideTimePast,
             },
             {
-              element: document.querySelector('.introjs-time') as Element,
               title,
               intro: T.joinContestInteractiveGuideTimeFuture,
             },
