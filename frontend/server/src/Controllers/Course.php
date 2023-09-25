@@ -1077,7 +1077,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * @param \OmegaUp\DAO\VO\Courses $course
      * @param string $assignmentAlias
-     * @param bool $problemAdded
+     * @param string $notificationType
      */
     private static function sendNotificationToStudent(
         \OmegaUp\DAO\VO\Courses $course,
