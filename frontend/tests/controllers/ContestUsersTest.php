@@ -105,7 +105,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testFutureContestIntro() {
-        // Get a contest
+        // Get a future public contest
         $startTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 60 * 60);
         $finishTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 120 * 60);
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -115,8 +115,18 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'finishTime' => $finishTime,
             ])
         );
+
         // Create user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $userLogin = self::login($identity);
+
+        // Should show the contest intro when it is public
+        $this->assertTrue(
+            \OmegaUp\Controllers\Contest::shouldShowIntro(
+                $identity,
+                $contestData['contest']
+            )
+        );
 
         // Add user to our contest
         \OmegaUp\Test\Factories\Contest::addUser(
@@ -124,13 +134,14 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             $identity
         );
 
-        $userLogin = self::login($identity);
+        // Should show the contest intro when the user is registered in the contest
         $this->assertTrue(
             \OmegaUp\Controllers\Contest::shouldShowIntro(
                 $identity,
                 $contestData['contest']
             )
         );
+
         $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
@@ -141,6 +152,48 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame(
             $contestDetails['contest']['start_time']->time,
             $startTime->time
+        );
+
+        // Get a future private contest
+        $startTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 60 * 60);
+        $finishTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 120 * 60);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'requestsUserInformation' => 'optional',
+                'startTime' => $startTime,
+                'finishTime' => $finishTime,
+                'admissionMode' => 'private',
+            ])
+        );
+
+        // Shouldn't show the contest intro when it is private
+        try {
+            $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $userLogin->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                ])
+            )['templateProperties']['payload'];
+
+            $this->fail(
+                'User should not have access to a future contest when it is private'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+
+        // Add user to our contest
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contestData,
+            $identity
+        );
+
+        // Should show the contest intro when the user is registered in the contest
+        $this->assertTrue(
+            \OmegaUp\Controllers\Contest::shouldShowIntro(
+                $identity,
+                $contestData['contest']
+            )
         );
     }
 
