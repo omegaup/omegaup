@@ -255,7 +255,7 @@
                       data-nav-user-contests
                       >{{ T.navContestsEnrolled }}</a
                     >
-                    <form class="collapse-submenu">
+                    <form v-if="!isUnder13User" class="collapse-submenu">
                       <div class="btn-group">
                         <a
                           class="dropdown-item"

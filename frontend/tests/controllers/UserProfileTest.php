@@ -678,4 +678,49 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame($profile['is_own_profile'], $isOwnProfile);
         $this->assertSame($profile['is_private'], $isPrivate);
     }
+
+    public function testGetUserDependents() {
+        ['identity' => $mainIdentity, 'user' => $mainUser ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams()
+        );
+        $mainEmail = \OmegaUp\DAO\Emails::getByUserId($mainUser->user_id)[0];
+
+        $dependents = [];
+        $users = [];
+        for ($i = 0; $i < 3; $i++) {
+            [
+                'identity' => $dependents[],
+                'user' => $users[],
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams([
+                    'birthDate' => 1406684800,
+                ])
+            );
+            $users[$i]->parent_email_id = $mainEmail->email_id;
+            \OmegaUp\DAO\Users::update($users[$i]);
+        }
+
+        // This user is not a dependent
+        \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams()
+        );
+
+        $login = self::login($mainIdentity);
+        $response = \OmegaUp\Controllers\User::getUserDependentsForTypeScript(
+            new \OmegaUp\Request([ 'auth_token' => $login->auth_token ])
+        )['templateProperties']['payload'];
+        $this->assertCount(3, $response['dependents']);
+        $this->assertEquals(
+            $dependents[0]->name,
+            $response['dependents'][0]['name']
+        );
+        $this->assertEquals(
+            $dependents[1]->name,
+            $response['dependents'][1]['name']
+        );
+        $this->assertEquals(
+            $dependents[2]->name,
+            $response['dependents'][2]['name']
+        );
+    }
 }
