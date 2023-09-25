@@ -796,6 +796,7 @@ const translations: { [key: string]: string; } = {
   notificationNotFound: "No se encontr\u00f3 la notificaci\u00f3n",
   notificationsMarkAllAsRead: "Marcar todo como le\u00eddo",
   notificationsNoNewNotifications: "No hay nuevas notificaciones.",
+  omegaUpTitleMyDependents: "Mis dependientes",
   omegaupTitleAdminUsers: "Administraci\u00f3n de coders",
   omegaupTitleAuthorsRank: "Ranking de contribuidores",
   omegaupTitleBadges: "Insignias",
