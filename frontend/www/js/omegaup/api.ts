@@ -1743,6 +1743,13 @@ export const Session = {
             return x;
           });
         })(x.api_tokens);
+        if (
+          typeof x.user_verification_deadline !== 'undefined' &&
+          x.user_verification_deadline !== null
+        )
+          x.user_verification_deadline = ((x: number) => new Date(x * 1000))(
+            x.user_verification_deadline,
+          );
         return x;
       })(x.session);
     return x;
