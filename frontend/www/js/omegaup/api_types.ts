@@ -2272,6 +2272,14 @@ export namespace types {
       );
     }
 
+    export function UserDependentsPayload(
+      elementId: string = 'payload',
+    ): types.UserDependentsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function UserDetailsPayload(
       elementId: string = 'payload',
     ): types.UserDetailsPayload {
@@ -4649,6 +4657,10 @@ export namespace types {
 
   export interface TimeTypeContests {
     [key: string]: types.ContestListItem[];
+  }
+
+  export interface UserDependentsPayload {
+    dependents: { email?: string; name?: string; username: string }[];
   }
 
   export interface UserDetailsPayload {
