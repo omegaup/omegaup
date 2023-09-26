@@ -455,7 +455,7 @@ const translations: { [key: string]: string; } = {
   courseDetailsSettings: "Configura\u00e7\u00f5es",
   courseDetailsTabContent: "Conte\u00fado",
   courseDetailsTabInformation: "Informa\u00e7\u00e3o geral",
-  courseDoesNotAdmitRegistration: "Curso n\u00e3o admite cadastro de coders",
+  courseDoesNotAdmitRegistration: "Curso n\u00e3o admite cadastro de estudantes",
   courseDoesNotHaveUnlimitedDuration: "N\u00e3o \u00e9 poss\u00edvel definir uma dura\u00e7\u00e3o ilimitada se o curso for de dura\u00e7\u00e3o n\u00e3o ilimitada.",
   courseEdit: "Editar curso",
   courseEditAddAdminsTooltip: "Adicionar administratores usando seu nome de conta omegaUp",
