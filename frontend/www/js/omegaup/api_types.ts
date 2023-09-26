@@ -2693,8 +2693,9 @@ export namespace types {
   }
 
   export interface CertificateListItem {
+    certificate_type: string;
     date: Date;
-    reason: string;
+    name: string;
     verification_code: string;
   }
 

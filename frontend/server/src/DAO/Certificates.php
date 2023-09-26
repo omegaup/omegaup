@@ -11,8 +11,7 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  *
- * @psalm-type Certificate=array{answer: null|string, assignment_alias?: null|string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
- * @psalm-type CertificateListItem=array{verification_code: string, reason: string, date: \OmegaUp\Timestamp}
+ * @psalm-type CertificateListItem=array{verification_code: string, date: \OmegaUp\Timestamp, certificate_type: string, name: string}
  */
 class Certificates extends \OmegaUp\DAO\Base\Certificates {
     /**
@@ -119,16 +118,17 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         $sql = '
             SELECT
                 `Certificates`.verification_code,
+                `Certificates`.timestamp AS date,
+                `Certificates`.certificate_type,
                 IF(
                     `Certificates`.certificate_type = "course",
                     `Courses`.name,
                     IF(
                         `Certificates`.certificate_type = "contest",
                         `Contests`.title,
-                        "Coder of the month"
+                        NULL
                     )
-                ) AS reason,
-                `Certificates`.timestamp AS date
+                ) AS name,
             FROM `Certificates`
             LEFT JOIN `Courses`
                 ON `Certificates`.course_id = `Courses`.course_id
