@@ -208,6 +208,10 @@ export const Certificate = {
     messages.CertificateGetCertificatePdfRequest,
     messages.CertificateGetCertificatePdfResponse
   >('/api/certificate/getCertificatePdf/'),
+  getUserCertificates: apiCall<
+    messages.CertificateGetUserCertificatesRequest,
+    messages.CertificateGetUserCertificatesResponse
+  >('/api/certificate/getUserCertificates/'),
 };
 
 export const Clarification = {

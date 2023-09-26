@@ -10,6 +10,7 @@
   - [`/api/badge/userList/`](#apibadgeuserlist)
 - [Certificate](#certificate)
   - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
+  - [`/api/certificate/getUserCertificates/`](#apicertificategetusercertificates)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
   - [`/api/clarification/details/`](#apiclarificationdetails)
@@ -410,6 +411,22 @@ API to generate the certificate PDF
 | Name          | Type     |
 | ------------- | -------- |
 | `certificate` | `string` |
+
+## `/api/certificate/getUserCertificates/`
+
+### Description
+
+Creates a Clarification for a contest or an assignment of a course
+
+### Parameters
+
+| Name      | Type        | Description |
+| --------- | ----------- | ----------- |
+| `user_id` | `int\|null` |             |
+
+### Returns
+
+_Nothing_
 
 # Clarification
 

@@ -4852,6 +4852,8 @@ export namespace messages {
   // Certificate
   export type CertificateGetCertificatePdfRequest = { [key: string]: any };
   export type CertificateGetCertificatePdfResponse = { certificate: string };
+  export type CertificateGetUserCertificatesRequest = { [key: string]: any };
+  export type CertificateGetUserCertificatesResponse = {};
 
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
@@ -5744,9 +5746,15 @@ export namespace controllers {
   }
 
   export interface Certificate {
+<<<<<<< HEAD
     getCertificatePdf: (
       params?: messages.CertificateGetCertificatePdfRequest,
     ) => Promise<messages.CertificateGetCertificatePdfResponse>;
+=======
+    getUserCertificates: (
+      params?: messages.CertificateGetUserCertificatesRequest,
+    ) => Promise<messages.CertificateGetUserCertificatesResponse>;
+>>>>>>> alexia/apiGetUserCertificates
   }
 
   export interface Clarification {
