@@ -416,7 +416,7 @@ API to generate the certificate PDF
 
 ### Description
 
-Creates a Clarification for a contest or an assignment of a course
+Get all the certificates belonging to a user
 
 ### Parameters
 
@@ -426,7 +426,9 @@ Creates a Clarification for a contest or an assignment of a course
 
 ### Returns
 
-_Nothing_
+| Name           | Type                          |
+| -------------- | ----------------------------- |
+| `certificates` | `types.CertificateListItem[]` |
 
 # Clarification
 

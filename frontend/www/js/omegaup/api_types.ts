@@ -2692,6 +2692,12 @@ export namespace types {
     uuid: string;
   }
 
+  export interface CertificateListItem {
+    date: Date;
+    reason: string;
+    verification_code: string;
+  }
+
   export interface Clarification {
     answer?: string;
     assignment_alias?: string;
@@ -4854,7 +4860,10 @@ export namespace messages {
   export type CertificateGetCertificatePdfRequest = { [key: string]: any };
   export type CertificateGetCertificatePdfResponse = { certificate: string };
   export type CertificateGetUserCertificatesRequest = { [key: string]: any };
-  export type CertificateGetUserCertificatesResponse = {};
+  export type _CertificateGetUserCertificatesServerResponse = any;
+  export type CertificateGetUserCertificatesResponse = {
+    certificates: types.CertificateListItem[];
+  };
 
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };

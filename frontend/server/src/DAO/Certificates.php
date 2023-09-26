@@ -12,6 +12,7 @@ namespace OmegaUp\DAO;
  * @package docs
  *
  * @psalm-type Certificate=array{answer: null|string, assignment_alias?: null|string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
+ * @psalm-type CertificateListItem=array{verification_code: string, reason: string, date: \OmegaUp\Timestamp}
  */
 class Certificates extends \OmegaUp\DAO\Base\Certificates {
     /**
@@ -20,7 +21,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
      * @return string|null
      */
     final public static function getCertificateTypeByVerificationCode(
-        string $verification_code
+        string $verificationCode
     ) {
         $sql = '
             SELECT
@@ -34,7 +35,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         /** @var string|null */
         $type = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
-            [$verification_code]
+            [$verificationCode]
         );
 
         return $type;
@@ -46,7 +47,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
      * @return array{contest_title: string, identity_name: string, contest_place: int|null, timestamp: \OmegaUp\Timestamp}|null
      */
     final public static function getContestCertificateByVerificationCode(
-        string $verification_code
+        string $verificationCode
     ) {
         $sql = '
             SELECT
@@ -71,7 +72,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         /** @var array{contest_title: string, identity_name: string, contest_place: int, timestamp: \OmegaUp\Timestamp}|null */
         $data = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$verification_code]
+            [$verificationCode]
         );
 
         return $data;
@@ -83,7 +84,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
      * @return array{identity_name: string, timestamp: \OmegaUp\Timestamp}|null
      */
     final public static function getCoderOfTheMonthCertificateByVerificationCode(
-        string $verification_code
+        string $verificationCode
     ) {
         $sql = '
             SELECT
@@ -102,15 +103,15 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         /** @var array{identity_name: string, timestamp: \OmegaUp\Timestamp}|null */
         $data = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$verification_code]
+            [$verificationCode]
         );
 
         return $data;
     }
 
     /**
-     * Gets an array of the best solving runs for a problem.
-     * @return list<array{classname: string, username: string, language: string, runtime: float, memory: float, time: \OmegaUp\Timestamp}>
+     * Gets an array of a user's certificates using the user id.
+     * @return list<CertificateListItem>
      */
     final public static function getUserCertificates(
         int $userId
@@ -118,38 +119,35 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         $sql = '
             SELECT
                 `Certificates`.verification_code,
-                `Certificates`.timestamp AS Fecha,
-                `Certificates`.identity_id,
                 IF(
-                    `Certificates`.certificate_type = "course", `Courses`.name,
-                    IF(`Certificates`.certificate_type = "contest", `Contests`.title, null)
-                ) as Nombre
-                FROM `Certificates`
-                LEFT JOIN `Courses`
-                    ON `Certificates`.course_id = `Courses`.course_id
-                LEFT JOIN `Contests`
-                    ON `Certificates`.contest_id = `Contests`.contest_id
-                INNER JOIN `Identities`
-                    ON `Identities`.identity_id = `Certificates`.identity_id
-                INNER JOIN `Users`
-                    ON `Identities`.user_id = `Users`.user_id
-                WHERE
-                    `Users`.user_id = ?
-                ORDER BY `Certificates`.timestamp ASC;
+                    `Certificates`.certificate_type = "course",
+                    `Courses`.name,
+                    IF(
+                        `Certificates`.certificate_type = "contest",
+                        `Contests`.title,
+                        "Coder of the month"
+                    )
+                ) AS reason,
+                `Certificates`.timestamp AS date
+            FROM `Certificates`
+            LEFT JOIN `Courses`
+                ON `Certificates`.course_id = `Courses`.course_id
+            LEFT JOIN `Contests`
+                ON `Certificates`.contest_id = `Contests`.contest_id
+            INNER JOIN `Identities`
+                ON `Identities`.identity_id = `Certificates`.identity_id
+            INNER JOIN `Users`
+                ON `Identities`.user_id = `Users`.user_id
+            WHERE
+                `Users`.user_id = ?
+            ORDER BY `Certificates`.timestamp DESC;
         ';
-        $val = [$userId];
 
-        $result = [];
-        /** @var array{classname: string, language: string, memory: int, per_identity_rank: int, runtime: int, time: \OmegaUp\Timestamp, username: string} $row */
-        foreach (
-            \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sql,
-                $val
-            ) as $row
-        ) {
-            $result[] = $row;
-        }
-        error_log(print_r('holaaaaaaaaaaaa', true));
+        /** @var list<CertificateListItem> */
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$userId]
+        );
         return $result;
     }
 }

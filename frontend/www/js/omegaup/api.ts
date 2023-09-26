@@ -210,8 +210,20 @@ export const Certificate = {
   >('/api/certificate/getCertificatePdf/'),
   getUserCertificates: apiCall<
     messages.CertificateGetUserCertificatesRequest,
+    messages._CertificateGetUserCertificatesServerResponse,
     messages.CertificateGetUserCertificatesResponse
-  >('/api/certificate/getUserCertificates/'),
+  >('/api/certificate/getUserCertificates/', (x) => {
+    x.certificates = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.date = ((x: number) => new Date(x * 1000))(x.date);
+        return x;
+      });
+    })(x.certificates);
+    return x;
+  }),
 };
 
 export const Clarification = {

@@ -7,6 +7,7 @@ use setasign\Fpdi\Fpdi;
  * CertificateController
 
  * @psalm-type CertificateDetailsPayload=array{uuid: string}
+ * @psalm-type CertificateListItem=array{verification_code: string, reason: string, date: \OmegaUp\Timestamp}
  */
 class Certificate extends \OmegaUp\Controllers\Controller {
     /**
@@ -421,17 +422,16 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Creates a Clarification for a contest or an assignment of a course
+     * Get all the certificates belonging to a user
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
-     * @return array{status: string}
+     * @return array{certificates: list<CertificateListItem>}
      *
      * @omegaup-request-param int|null $user_id
      */
     public static function apiGetUserCertificates(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
-        error_log(print_r($r['user_id'], true));
         try {
             $r->ensureMainUserIdentity();
             if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
@@ -440,15 +440,12 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
         }
 
-        ///mandar llamar la api
         $response = \OmegaUp\DAO\Certificates::getUserCertificates(
             $r['user_id']
         );
 
-        error_log(print_r($response, true));
-
         return [
-            'status' => 'ok',
+            'certificates' => $response
         ];
     }
 }
