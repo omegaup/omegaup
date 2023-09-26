@@ -77,6 +77,37 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         return $data;
     }
 
+     /**
+     * Returns the data of the coder of the month certificate using its verification code
+     *
+     * @return array{identity_name: string, timestamp: \OmegaUp\Timestamp}|null
+     */
+    final public static function getCoderOfTheMonthCertificateByVerificationCode(
+        string $verification_code
+    ) {
+        $sql = '
+            SELECT
+                i.name AS identity_name,
+                ce.timestamp
+            FROM
+                Certificates ce
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = ce.identity_id
+            WHERE
+                ce.verification_code = ?;
+        ';
+
+        /** @var array{identity_name: string, timestamp: \OmegaUp\Timestamp}|null */
+        $data = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$verification_code]
+        );
+
+        return $data;
+    }
+
     /**
      * Gets an array of the best solving runs for a problem.
      * @return list<array{classname: string, username: string, language: string, runtime: float, memory: float, time: \OmegaUp\Timestamp}>

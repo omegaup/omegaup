@@ -2272,6 +2272,14 @@ export namespace types {
       );
     }
 
+    export function UserDependentsPayload(
+      elementId: string = 'payload',
+    ): types.UserDependentsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function UserDetailsPayload(
       elementId: string = 'payload',
     ): types.UserDetailsPayload {
@@ -2718,25 +2726,14 @@ export namespace types {
     country_id: string;
     date: string;
     gravatar_32: string;
+    problems_solved?: number;
+    score?: number;
     username: string;
   }
   [];
 
   export interface CoderOfTheMonthPayload {
-    candidatesToCoderOfTheMonth: {
-      category: string;
-      classname: string;
-      coder_of_the_month_id: number;
-      country_id: string;
-      description?: string;
-      problems_solved: number;
-      ranking: number;
-      school_id?: number;
-      score: number;
-      selected_by?: number;
-      time: string;
-      username: string;
-    }[];
+    candidatesToCoderOfTheMonth: types.CoderOfTheMonthList;
     category: string;
     codersOfCurrentMonth: types.CoderOfTheMonthList;
     codersOfPreviousMonth: types.CoderOfTheMonthList;
@@ -4660,6 +4657,10 @@ export namespace types {
 
   export interface TimeTypeContests {
     [key: string]: types.ContestListItem[];
+  }
+
+  export interface UserDependentsPayload {
+    dependents: { email?: string; name?: string; username: string }[];
   }
 
   export interface UserDetailsPayload {
