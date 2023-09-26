@@ -5746,15 +5746,12 @@ export namespace controllers {
   }
 
   export interface Certificate {
-<<<<<<< HEAD
     getCertificatePdf: (
       params?: messages.CertificateGetCertificatePdfRequest,
     ) => Promise<messages.CertificateGetCertificatePdfResponse>;
-=======
     getUserCertificates: (
       params?: messages.CertificateGetUserCertificatesRequest,
     ) => Promise<messages.CertificateGetUserCertificatesResponse>;
->>>>>>> alexia/apiGetUserCertificates
   }
 
   export interface Clarification {
