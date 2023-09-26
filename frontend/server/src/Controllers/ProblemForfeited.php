@@ -6,7 +6,6 @@
  * ProblemForfeitedController
  */
 class ProblemForfeited extends \OmegaUp\Controllers\Controller {
-    // For each 10 solved problems, 1 solution is granted    
     const SOLUTIONS_ALLOWED_TO_SEE_PER_DAY = 5;
 
     /**
@@ -18,10 +17,10 @@ class ProblemForfeited extends \OmegaUp\Controllers\Controller {
      */
     public static function apiGetCounts(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
-        $seen = \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCount(
+        $seen = \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCountInDay(
             $r->user
         );
-        $allowed = SOLUTIONS_ALLOWED_TO_SEE_PER_DAY;
+        $allowed = intval(static::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY);
         return [
             'allowed' => $allowed,
             'seen' => $seen,

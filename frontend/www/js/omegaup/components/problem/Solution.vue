@@ -37,7 +37,7 @@
           class="btn btn-secondary btn-md"
           @click="$emit('get-allowed-solutions')"
         >
-          {{ T.solutionViewCurrentTokens }}
+          {{ T.solutionAvailableViews }}
         </button>
         <button
           v-else-if="status === 'locked' && allowedSolutionsToSee &gt; 0"
@@ -46,27 +46,6 @@
         >
           {{ T.wordsUnlockSolution }}
         </button>
-        <!-- id-lint off -->
-        <b-button
-          id="popover-problem-solution"
-          class="ml-1"
-          size="sm"
-          variant="none"
-          @click="show = !show"
-        >
-          <font-awesome-icon :icon="['fas', 'question-circle']" />
-        </b-button>
-        <!-- id-lint on -->
-        <b-popover
-          target="popover-problem-solution"
-          variant="info"
-          placement="right"
-        >
-          <template #title>¿Cómo funciona?</template>
-          {{
-            '¡Si te has quedado sin puntos, vuelve mañana! Puedes ver hasta 5 soluciones por día.'
-          }}
-        </b-popover>
       </div>
     </div>
   </div>
@@ -78,15 +57,6 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import { types } from '../../api_types';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-
-// Import Bootstrap and BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-
-// Import Only Required Plugins
-import { ButtonPlugin, PopoverPlugin } from 'bootstrap-vue';
-Vue.use(ButtonPlugin);
-Vue.use(PopoverPlugin);
 
 import omegaup_Markdown from '../Markdown.vue';
 
@@ -132,9 +102,5 @@ export default class ProblemSolution extends Vue {
 
 .solution {
   padding: 2em 7em;
-}
-
-.solution-tokens {
-  font-size: 1.25em;
 }
 </style>

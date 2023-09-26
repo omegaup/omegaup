@@ -307,12 +307,12 @@ OmegaUp.on('ready', async () => {
               .then((data) => {
                 this.allowedSolutionsToSee = data.allowed - data.seen;
                 if (this.allowedSolutionsToSee <= 0) {
-                  ui.warning(T.solutionNoTokens);
+                  ui.warning(T.allowedSolutionsLimitReached);
                 }
               })
               .catch(ui.apiError);
           },
-          'get-solution': () => {            
+          'get-solution': () => {
             if (payload.solutionStatus === 'unlocked') {
               api.Problem.solution(
                 { problem_alias: payload.problem.alias },

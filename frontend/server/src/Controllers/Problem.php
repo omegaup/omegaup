@@ -4742,9 +4742,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             identityId: intval($r->identity->identity_id)
         );
 
-        $seenSolutions = \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCountInDay(
+        $seenSolutions = (!is_null(
             $r->user
-        );
+        )) ? \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCountInDay(
+            $r->user
+        ) : \OmegaUp\Controllers\ProblemForfeited::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY;
+
         $allowedSolutions = intval(
             \OmegaUp\Controllers\ProblemForfeited::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY
         );
