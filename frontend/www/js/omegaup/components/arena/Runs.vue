@@ -215,7 +215,7 @@
                 {{ T.wordsTime }}
               </th>
               <th>{{ T.wordsLanguage }}</th>
-              <th hidden>GUID</th>
+              <th hidden>{T.runGUID}</th>
               <th v-if="showUser">{{ T.contestParticipant }}</th>
               <th v-if="showContest">{{ T.wordsContest }}</th>
               <th v-if="contestAlias != null && !isCourse">
@@ -271,7 +271,7 @@
               <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
               <td hidden>
                 <acronym :title="run.guid" data-run-guid>
-                  <tt>{{ run.guid.substring(0, 8) }}</tt>
+                  <tt>{{ getShortGuid(run.guid) }}</tt>
                 </acronym>
               </td>
               <td>{{ run.language }}</td>
@@ -315,7 +315,7 @@
                 </a>
               </td>
               <td
-                v-show="contestAlias != null && !isCourse"
+                v-show="contestAlias && !isCourse"
                 :class="statusClass(run)"
                 data-run-status
                 class="text-center opacity-4 font-weight-bold"
@@ -356,13 +356,15 @@
               <td class="numeric">{{ execution(run) }}</td>
               <td class="numeric">
                 <font-awesome-icon
-                  v-if="outputIconColorStatus(run) === OutputStatus.Correct"
+                  v-if="
+                    outputIconColorStatus(run) === NumericOutputStatus.Correct
+                  "
                   :icon="['fas', 'check-circle']"
                   style="color: green"
                 />
                 <font-awesome-icon
                   v-else-if="
-                    outputIconColorStatus(run) === OutputStatus.Incorrect
+                    outputIconColorStatus(run) === NumericOutputStatus.Incorrect
                   "
                   :icon="['fas', 'times-circle']"
                   style="color: red"
@@ -522,10 +524,35 @@ declare global {
   }
 }
 
-export enum OutputStatus {
+export enum MemoryStatus {
+  NotAvailable = 'MEMORY_NOT_AVAILABLE',
+  Exceeded = 'MEMORY_EXCEEDED',
+}
+
+export enum RuntimeStatus {
+  NotAvailable = 'RUNTIME_NOT_AVAILABLE',
+  Exceeded = 'RUNTIME_EXCEEDED',
+}
+
+export enum ExecutionStatus {
+  JudgeError = 'EXECUTION_JUDGE_ERROR',
+  ValidatorError = 'EXECUTION_VALIDATOR_ERROR',
+  CompilationError = 'EXECUTION_COMPILATION_ERROR',
+  RuntimeFunctionError = 'EXECUTION_RUNTIME_FUNCTION_ERROR',
+  RuntimeError = 'EXECUTION_RUNTIME_ERROR',
+  Interrupted = 'EXECUTION_INTERRUPTED',
+}
+
+export enum NumericOutputStatus {
   None = 0,
   Correct = 1,
   Incorrect = 2,
+}
+
+export enum StringOutputStatus {
+  Exceeded = 'OUTPUT_EXCEEDED',
+  Incorrect = 'OUTPUT_INCORRECT',
+  Interrupted = 'OUTPUT_INTERRUPTED',
 }
 
 export enum PopupDisplayed {
@@ -575,7 +602,7 @@ export default class Runs extends Vue {
   @Prop({ default: false }) isCourse!: boolean;
   @Prop({ default: 7 }) itemsPerPage!: number;
 
-  OutputStatus = OutputStatus;
+  NumericOutputStatus = NumericOutputStatus;
   PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
@@ -602,6 +629,10 @@ export default class Runs extends Vue {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     return this.filteredRuns.slice(startIndex, endIndex);
+  }
+
+  getShortGuid(guid: string): string {
+    return guid.substring(0, 8);
   }
 
   get filteredRuns(): types.Run[] {
@@ -680,9 +711,13 @@ export default class Runs extends Vue {
   }
 
   memory(run: types.Run): string {
-    if (run.status !== 'ready' || run.status_memory === 'MEMORY_NOT_AVAILABLE')
+    if (
+      run.status !== 'ready' ||
+      run.status_memory === MemoryStatus.NotAvailable
+    )
       return '—';
-    if (run.status_memory === 'MEMORY_EXCEEDED') return T.runDetailsExceeded;
+    if (run.status_memory === MemoryStatus.Exceeded)
+      return T.runDetailsExceeded;
     return `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
   }
 
@@ -726,12 +761,12 @@ export default class Runs extends Vue {
   runtime(run: types.Run): string {
     if (
       run.status !== 'ready' ||
-      run.status_runtime === 'RUNTIME_NOT_AVAILABLE'
+      run.status_runtime === RuntimeStatus.NotAvailable
     ) {
       return '—';
     }
 
-    if (run.status_runtime === 'RUNTIME_EXCEEDED') {
+    if (run.status_runtime === RuntimeStatus.Exceeded) {
       return T.runDetailsExceeded;
     }
 
@@ -744,17 +779,17 @@ export default class Runs extends Vue {
     }
 
     switch (run.execution) {
-      case 'EXECUTION_JUDGE_ERROR':
+      case ExecutionStatus.JudgeError:
         return T.runDetailsJudgeError;
-      case 'EXECUTION_VALIDATOR_ERROR':
+      case ExecutionStatus.ValidatorError:
         return T.runDetailsValidatorError;
-      case 'EXECUTION_COMPILATION_ERROR':
+      case ExecutionStatus.CompilationError:
         return T.runDetailsCompilationError;
-      case 'EXECUTION_RUNTIME_FUNCTION_ERROR':
+      case ExecutionStatus.RuntimeFunctionError:
         return T.runDetailsRuntimeFunctionError;
-      case 'EXECUTION_RUNTIME_ERROR':
+      case ExecutionStatus.RuntimeError:
         return T.runDetailsRuntimeError;
-      case 'EXECUTION_INTERRUPTED':
+      case ExecutionStatus.Interrupted:
         return T.runDetailsInterrupted;
       default:
         return T.runDetailsFinished;
@@ -767,11 +802,11 @@ export default class Runs extends Vue {
     }
 
     switch (run.output) {
-      case 'OUTPUT_EXCEEDED':
+      case StringOutputStatus.Exceeded:
         return T.runDetailsExceeded;
-      case 'OUTPUT_INCORRECT':
+      case StringOutputStatus.Incorrect:
         return T.runDetailsIncorrect;
-      case 'OUTPUT_INTERRUPTED':
+      case StringOutputStatus.Interrupted:
         return T.runDetailsInterrupted;
       default:
         return T.runDetailsCorrect;
@@ -779,8 +814,12 @@ export default class Runs extends Vue {
   }
 
   statusPercentageClass(run: types.Run): string {
-    if (!(run.status === 'ready' && run.verdict === 'AC')) {
+    if (run.status !== 'ready') {
       return '';
+    }
+
+    if (run.type == 'disqualified') {
+      return 'status-disqualified';
     }
 
     return 'status-ac';
@@ -790,17 +829,17 @@ export default class Runs extends Vue {
     if (
       !(
         run.status === 'ready' &&
-        run.output !== 'OUTPUT_EXCEEDED' &&
-        run.output !== 'OUTPUT_INTERRUPTED'
+        run.output !== StringOutputStatus.Exceeded &&
+        run.output !== StringOutputStatus.Interrupted
       )
     ) {
-      return OutputStatus.None;
+      return NumericOutputStatus.None;
     }
 
-    if (run.output !== 'OUTPUT_INCORRECT') {
-      return OutputStatus.Correct;
+    if (run.output !== StringOutputStatus.Incorrect) {
+      return NumericOutputStatus.Correct;
     } else {
-      return OutputStatus.Incorrect;
+      return NumericOutputStatus.Incorrect;
     }
   }
 

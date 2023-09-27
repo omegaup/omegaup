@@ -173,7 +173,7 @@
         <div>
           <h3>{{ T.runGUID }}</h3>
           <acronym :title="data.guid" data-run-guid>
-            <tt>{{ data.guid.substring(0, 8) }}</tt>
+            <tt>{{ getShortGuid(data.guid) }}</tt>
           </acronym>
         </div>
       </form>
@@ -237,6 +237,10 @@ export default class ArenaRunDetailsPopup extends Vue {
 
   get source(): string | undefined {
     return this.data?.source;
+  }
+
+  getShortGuid(guid: string): string {
+    return guid.substring(0, 8);
   }
 
   toggle(group: string): void {
