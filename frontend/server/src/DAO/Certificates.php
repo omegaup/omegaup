@@ -128,7 +128,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
                         `Contests`.title,
                         NULL
                     )
-                ) AS name,
+                ) AS name
             FROM `Certificates`
             LEFT JOIN `Courses`
                 ON `Certificates`.course_id = `Courses`.course_id
