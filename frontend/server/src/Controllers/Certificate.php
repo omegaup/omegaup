@@ -5,8 +5,10 @@ namespace OmegaUp\Controllers;
 use setasign\Fpdi\Fpdi;
 /**
  * CertificateController
-
+ *
  * @psalm-type CertificateDetailsPayload=array{uuid: string}
+ * @psalm-type CertificateListItem=array{certificate_type: string, date: \OmegaUp\Timestamp, name: string, verification_code: string}
+ * @psalm-type CertificateListMinePayload=array{certificates: list<CertificateListItem>}
  */
 class Certificate extends \OmegaUp\Controllers\Controller {
     /**
@@ -25,6 +27,30 @@ class Certificate extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'certificate_details',
+        ];
+    }
+
+    /**
+     * @return array{templateProperties: array{payload: CertificateListMinePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @omegaup-request-param int|null $user_id
+     */
+    public static function getCertificateListMineForTypeScript(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
+        $request = new \OmegaUp\Request([
+            'user_id' => $r->identity->user_id,
+        ]);
+        $certificates = self::apiGetUserCertificates($request);
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'certificates' => $certificates['certificates']
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCertificate'
+                ),
+            ],
+            'entrypoint' => 'certificate_mine',
         ];
     }
 
@@ -285,7 +311,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         self::printCertificatePerson($pdf);
         self::printCertificateDescription($pdf, $description);
 
-        return $pdf->Output('', 'S');
+        return base64_encode($pdf->Output('', 'S'));
     }
 
     private static function getPlaceSuffix(int $n): string {
