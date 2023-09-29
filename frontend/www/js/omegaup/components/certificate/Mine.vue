@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <h5 class="card-header d-flex justify-content-between align-items-center">
-      Mis diplomas
+      {{ T.certificateListMineTitle }}
     </h5>
     <table class="table table-striped table-hover table-responsive-sm mb-0">
       <thead>
