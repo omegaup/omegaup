@@ -10,7 +10,7 @@
     <table class="table mb-0">
       <thead>
         <tr>
-          <th class="text-center">{{ T.wordsUser }}</th>
+          <th class="text-center">{{ T.requestCoder }}</th>
           <th class="text-center">{{ T.userEditCountry }}</th>
           <th class="text-center">{{ T.requestDate }}</th>
           <th class="text-center">{{ T.currentStatus }}</th>

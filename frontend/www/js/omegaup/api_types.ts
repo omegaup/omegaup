@@ -2272,6 +2272,14 @@ export namespace types {
       );
     }
 
+    export function UserDependentsPayload(
+      elementId: string = 'payload',
+    ): types.UserDependentsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function UserDetailsPayload(
       elementId: string = 'payload',
     ): types.UserDetailsPayload {
@@ -2718,25 +2726,14 @@ export namespace types {
     country_id: string;
     date: string;
     gravatar_32: string;
+    problems_solved?: number;
+    score?: number;
     username: string;
   }
   [];
 
   export interface CoderOfTheMonthPayload {
-    candidatesToCoderOfTheMonth: {
-      category: string;
-      classname: string;
-      coder_of_the_month_id: number;
-      country_id: string;
-      description?: string;
-      problems_solved: number;
-      ranking: number;
-      school_id?: number;
-      score: number;
-      selected_by?: number;
-      time: string;
-      username: string;
-    }[];
+    candidatesToCoderOfTheMonth: types.CoderOfTheMonthList;
     category: string;
     codersOfCurrentMonth: types.CoderOfTheMonthList;
     codersOfPreviousMonth: types.CoderOfTheMonthList;
@@ -3274,6 +3271,7 @@ export namespace types {
   }
 
   export interface CourseNewPayload {
+    hasVisitedSection: boolean;
     is_admin: boolean;
     is_curator: boolean;
     languages: { [key: string]: string };
@@ -3376,6 +3374,7 @@ export namespace types {
       finished: types.CourseCardFinished[];
       public: types.CourseCardPublic[];
     };
+    hasVisitedSection: boolean;
   }
 
   export interface CoursesByAccessMode {
@@ -4660,6 +4659,10 @@ export namespace types {
     [key: string]: types.ContestListItem[];
   }
 
+  export interface UserDependentsPayload {
+    dependents: { email?: string; name?: string; username: string }[];
+  }
+
   export interface UserDetailsPayload {
     emails: string[];
     experiments: string[];
@@ -4846,6 +4849,10 @@ export namespace messages {
   export type BadgeUserListRequest = { [key: string]: any };
   export type _BadgeUserListServerResponse = any;
   export type BadgeUserListResponse = { badges: types.Badge[] };
+
+  // Certificate
+  export type CertificateGetCertificatePdfRequest = { [key: string]: any };
+  export type CertificateGetCertificatePdfResponse = { certificate: string };
 
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
@@ -5735,6 +5742,12 @@ export namespace controllers {
     userList: (
       params?: messages.BadgeUserListRequest,
     ) => Promise<messages.BadgeUserListResponse>;
+  }
+
+  export interface Certificate {
+    getCertificatePdf: (
+      params?: messages.CertificateGetCertificatePdfRequest,
+    ) => Promise<messages.CertificateGetCertificatePdfResponse>;
   }
 
   export interface Clarification {

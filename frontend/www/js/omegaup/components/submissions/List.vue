@@ -37,7 +37,7 @@
             <tr>
               <th scope="col" class="text-center">{{ T.wordsTime }}</th>
               <th v-if="includeUser" scope="col" class="text-center">
-                {{ T.wordsUser }}
+                {{ T.submissionsListCoder }}
               </th>
               <th scope="col" class="text-center">{{ T.wordsProblem }}</th>
               <th

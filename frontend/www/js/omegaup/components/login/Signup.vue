@@ -8,7 +8,7 @@
         <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-2 introjs-username">
             <div class="form-group">
-              <label class="control-label">{{ T.wordsUser }}</label>
+              <label class="control-label">{{ T.loginAccountName }}</label>
               <input
                 v-model="username"
                 data-signup-username
