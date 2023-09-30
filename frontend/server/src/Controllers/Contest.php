@@ -696,8 +696,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         foreach ($runs as $run) {
             if (isset($problemIndex[$run['alias']])) {
-                $problemIndex[$run['alias']]['myBestScore'] = $run['contest_score'];
-                $problemIndex[$run['alias']]['hasMyRuns'] = true;
+                $alias = $run['alias'];
+                if (isset($problemIndex[$alias]['myBestScore'])) {
+                    $problemIndex[$alias]['myBestScore'] = max(
+                        $problemIndex[$alias]['myBestScore'],
+                        $run['contest_score']
+                    );
+                } else {
+                    $problemIndex[$alias]['myBestScore'] = $run['contest_score'];
+                }
+                $problemIndex[$alias]['hasMyRuns'] = true;
             }
         }
 
@@ -1408,6 +1416,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
             if ($contestAdmin) {
                 return !\OmegaUp\Controllers\Contest::SHOW_INTRO;
+            }
+            if (
+                !\OmegaUp\DAO\Contests::hasStarted($contest) &&
+                self::isInvitedToContest($contest, $identity)
+            ) {
+                return \OmegaUp\Controllers\Contest::SHOW_INTRO;
             }
         } catch (\Exception $e) {
             // Could not access contest. Private contests must not be leaked, so
