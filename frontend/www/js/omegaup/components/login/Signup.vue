@@ -6,15 +6,26 @@
     <div class="card-body">
       <form>
         <div class="row justify-content-md-center">
-          <div class="col-md-4 col-md-offset-2 introjs-username">
+          <div class="col-md-8 introjs-terms-and-conditions">
+            <input v-model="checked" type="checkbox" />
+            <label for="checkbox" class="pl-1">
+              <omegaup-markdown
+                :markdown="T.over13yearsOld"
+              ></omegaup-markdown>
+            </label>
+          </div>
+        </div>
+
+        <div class="row justify-content-md-center">
+          <div v-show="isUnder13" class="col-md-4">
             <div class="form-group">
-              <label class="control-label">{{ T.loginAccountName }}</label>
+              <label class="control-label">{{ T.loginParentEmail }}</label>
               <input
-                v-model="username"
-                data-signup-username
-                name="reg_username"
+                v-model="parentEmail"
+                name="reg_parent_email"
+                type="email"
                 class="form-control"
-                autocomplete="username"
+                autocomplete="parent-email"
               />
             </div>
           </div>
@@ -33,6 +44,18 @@
           </div>
         </div>
         <div class="row justify-content-md-center">
+          <div class="col-md-4 col-md-offset-2 introjs-username">
+            <div class="form-group">
+              <label class="control-label">{{ T.loginAccountName }}</label>
+              <input
+                v-model="username"
+                data-signup-username
+                name="reg_username"
+                class="form-control"
+                autocomplete="username"
+              />
+            </div>
+          </div>
           <div class="col-md-4 col-md-offset-2 introjs-date-of-birth">
             <div class="form-group">
               <label class="control-label">{{ T.loginDateOfBirth }}</label>
@@ -44,18 +67,6 @@
                 class="form-control"
                 autocomplete="date-of-birth"
                 @input="checkAge"
-              />
-            </div>
-          </div>
-          <div v-show="isUnder13" class="col-md-4">
-            <div class="form-group">
-              <label class="control-label">{{ T.loginParentEmail }}</label>
-              <input
-                v-model="parentEmail"
-                name="reg_parent_email"
-                type="email"
-                class="form-control"
-                autocomplete="parent-email"
               />
             </div>
           </div>
