@@ -9,9 +9,7 @@
           <div class="col-md-8 introjs-terms-and-conditions">
             <input v-model="checked" type="checkbox" />
             <label for="checkbox" class="pl-1">
-              <omegaup-markdown
-                :markdown="T.over13yearsOld"
-              ></omegaup-markdown>
+              <omegaup-markdown :markdown="T.over13yearsOld"></omegaup-markdown>
             </label>
           </div>
         </div>
