@@ -285,7 +285,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         self::printCertificatePerson($pdf);
         self::printCertificateDescription($pdf, $description);
 
-        return $pdf->Output('', 'S');
+        return base64_encode($pdf->Output('', 'S'));
     }
 
     private static function getPlaceSuffix(int $n): string {
@@ -305,13 +305,13 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         return $translator->get('certificatePdfContestPlaceTh');
     }
 
-    private static function getContestCertificate(string $verification_code): string {
+    private static function getContestCertificate(string $verification_code): ?string {
         $certificateData = \OmegaUp\DAO\Certificates::getContestCertificateByVerificationCode(
             $verification_code
         );
 
         if (is_null($certificateData)) {
-            return '';
+            return null;
         }
 
         $translator = \OmegaUp\Translations::getInstance();
@@ -345,13 +345,13 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         );
     }
 
-    private static function getCourseCertificate(string $verification_code): string {
+    private static function getCourseCertificate(string $verification_code): ?string {
         $certificateData = \OmegaUp\DAO\Certificates::getCourseCertificateByVerificationCode(
             $verification_code
         );
 
         if (is_null($certificateData)) {
-            return '';
+            return null;
         }
 
         $translator = \OmegaUp\Translations::getInstance();
@@ -378,13 +378,13 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     private static function getCoderOfTheMonthCertificate(
         string $verification_code,
         bool $isFemaleCategory
-    ): string {
+    ): ?string {
         $certificateData = \OmegaUp\DAO\Certificates::getCoderOfTheMonthCertificateByVerificationCode(
             $verification_code
         );
 
         if (is_null($certificateData)) {
-            return '';
+            return null;
         }
 
         $translator = \OmegaUp\Translations::getInstance();
@@ -418,7 +418,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     /**
      * API to generate the certificate PDF
      *
-     * @return array{certificate: string}
+     * @return array{certificate: string|null}
      *
      * @omegaup-request-param string $verification_code
      */
@@ -453,7 +453,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             ];
         }
         return [
-            'certificate' => '',
+            'certificate' => null,
         ];
     }
 }

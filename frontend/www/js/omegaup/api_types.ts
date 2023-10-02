@@ -4852,7 +4852,7 @@ export namespace messages {
 
   // Certificate
   export type CertificateGetCertificatePdfRequest = { [key: string]: any };
-  export type CertificateGetCertificatePdfResponse = { certificate: string };
+  export type CertificateGetCertificatePdfResponse = { certificate?: string };
 
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
