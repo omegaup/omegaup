@@ -108,6 +108,7 @@ export class CoursePage {
   createCourse(courseOptions: CourseOptions): void {
     cy.get('a[data-nav-courses]').should('be.visible').click();
     cy.get('a[data-nav-courses-create]').should('be.visible').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('input[data-course-new-name]')
       .should('be.visible')
       .type(courseOptions.courseAlias);
