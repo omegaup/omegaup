@@ -49,16 +49,16 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $certificateType = \OmegaUp\DAO\Certificates::getCertificateTypeByVerificationCode(
             '5OpsU8zX80'
         );
-        $this->assertSame($certificateType, 'contest');
+        $this->assertSame('contest', $certificateType);
 
         $certificateData = \OmegaUp\DAO\Certificates::getContestCertificateByVerificationCode(
             '5OpsU8zX80'
         );
         $this->assertSame(
-            $certificateData['contest_title'],
-            $contestData['contest']->title
+            $contestData['contest']->title,
+            $certificateData['contest_title']
         );
-        $this->assertSame($certificateData['identity_name'], $identity->name);
+        $this->assertSame($identity->name, $certificateData['identity_name']);
         $this->assertNull($certificateData['contest_place']);
 
         $r = new \OmegaUp\Request(['verification_code' => '5OpsU8zX80',]);
@@ -85,16 +85,16 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $certificateType = \OmegaUp\DAO\Certificates::getCertificateTypeByVerificationCode(
             '9lP5j0aLx6'
         );
-        $this->assertSame($certificateType, 'course');
+        $this->assertSame('course', $certificateType);
 
         $certificateData = \OmegaUp\DAO\Certificates::getContestCertificateByVerificationCode(
             '9lP5j0aLx6'
         );
         $this->assertSame(
-            $certificateData['course_name'],
-            $courseData['course_name']
+            $courseData['course_name'],
+            $certificateData['course_name']
         );
-        $this->assertSame($certificateData['identity_name'], $identity->name);
+        $this->assertSame($identity->name, $certificateData['identity_name']);
 
         $r = new \OmegaUp\Request(['verification_code' => '9lP5j0aLx6',]);
         $response = \OmegaUp\Controllers\Certificate::apiGetCertificatePdf($r);
@@ -118,12 +118,12 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $certificateType = \OmegaUp\DAO\Certificates::getCertificateTypeByVerificationCode(
             'Kp8L30nJQ3'
         );
-        $this->assertSame($certificateType, 'coder_of_the_month');
+        $this->assertSame('coder_of_the_month', $certificateType);
 
         $certificateData = \OmegaUp\DAO\Certificates::getContestCertificateByVerificationCode(
             'Kp8L30nJQ3'
         );
-        $this->assertSame($certificateData['identity_name'], $identity->name);
+        $this->assertSame($identity->name, $certificateData['identity_name']);
 
         $r = new \OmegaUp\Request(['verification_code' => 'Kp8L30nJQ3',]);
         $response = \OmegaUp\Controllers\Certificate::apiGetCertificatePdf($r);
@@ -148,12 +148,12 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $certificateType = \OmegaUp\DAO\Certificates::getCertificateTypeByVerificationCode(
             'ao8A22kUmg'
         );
-        $this->assertSame($certificateType, 'coder_of_the_month_female');
+        $this->assertSame('coder_of_the_month_female', $certificateType);
 
         $certificateData = \OmegaUp\DAO\Certificates::getContestCertificateByVerificationCode(
             'ao8A22kUmg'
         );
-        $this->assertSame($certificateData['identity_name'], $identity->name);
+        $this->assertSame($identity->name, $certificateData['identity_name']);
 
         $r = new \OmegaUp\Request(['verification_code' => 'ao8A22kUmg',]);
         $response = \OmegaUp\Controllers\Certificate::apiGetCertificatePdf($r);
@@ -169,98 +169,98 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(1);
         $this->assertSame(
-            $placeSuffix,
             $translator->get(
                 'certificatePdfContestPlaceSt'
-            )
+            ),
+            $placeSuffix
         );
 
         $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(2);
         $this->assertSame(
-            $placeSuffix,
             $translator->get(
                 'certificatePdfContestPlaceNd'
-            )
+            ),
+            $placeSuffix
         );
 
         $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(3);
         $this->assertSame(
-            $placeSuffix,
             $translator->get(
                 'certificatePdfContestPlaceRd'
-            )
+            ),
+            $placeSuffix
         );
 
         $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(11);
         $this->assertSame(
-            $placeSuffix,
             $translator->get(
                 'certificatePdfContestPlaceTh'
-            )
+            ),
+            $placeSuffix
         );
 
         $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(12);
         $this->assertSame(
-            $placeSuffix,
             $translator->get(
                 'certificatePdfContestPlaceTh'
-            )
+            ),
+            $placeSuffix
         );
 
         $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(13);
         $this->assertSame(
-            $placeSuffix,
             $translator->get(
                 'certificatePdfContestPlaceTh'
-            )
+            ),
+            $placeSuffix
         );
 
         $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(91);
         $this->assertSame(
-            $placeSuffix,
             $translator->get(
                 'certificatePdfContestPlaceSt'
-            )
+            ),
+            $placeSuffix
         );
 
         $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(92);
         $this->assertSame(
-            $placeSuffix,
             $translator->get(
                 'certificatePdfContestPlaceNd'
-            )
+            ),
+            $placeSuffix
         );
 
         $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(93);
         $this->assertSame(
-            $placeSuffix,
             $translator->get(
                 'certificatePdfContestPlaceRd'
-            )
+            ),
+            $placeSuffix
         );
 
         $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(4);
         $this->assertSame(
-            $placeSuffix,
             $translator->get(
                 'certificatePdfContestPlaceTh'
-            )
+            ),
+            $placeSuffix
         );
 
         $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(50);
         $this->assertSame(
-            $placeSuffix,
             $translator->get(
                 'certificatePdfContestPlaceTh'
-            )
+            ),
+            $placeSuffix
         );
 
         $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(98);
         $this->assertSame(
-            $placeSuffix,
             $translator->get(
                 'certificatePdfContestPlaceTh'
-            )
+            ),
+            $placeSuffix
         );
     }
 }
