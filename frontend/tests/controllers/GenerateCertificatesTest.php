@@ -248,17 +248,16 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create a contestant
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        error_log(print_r($identity->user_id, true));
+        ['identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add contestant to contest
-        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity1);
 
         // User creates a run in a valid time
         $run = \OmegaUp\Test\Factories\Run::createRun(
             $problem,
             $contestData,
-            $identity
+            $identity1
         );
         \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
 
@@ -273,7 +272,7 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         //login
-        $loginIdentity = self::login($identity);
+        $loginIdentity = self::login($identity1);
 
         $contest = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
@@ -281,13 +280,39 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals(3, $contest->certificate_cutoff);
 
-        ///checar los
-
-        \OmegaUp\Controllers\Certificate::apiGetUserCertificates(
+        //check the certificate data
+        $certificates = \OmegaUp\Controllers\Certificate::apiGetUserCertificates(
             new \OmegaUp\Request([
                 'auth_token' => $loginIdentity->auth_token,
-                'user_id' => $identity->user_id
+                'user_id' => $identity1->user_id,
             ])
+        )['certificates'];
+
+        $this->assertCount(1, $certificates);
+        $this->assertSame('contest', $certificates[0]['certificate_type']);
+        $this->assertSame(
+            $contestData['contest']->title,
+            $certificates[0]['name']
         );
+
+        //login with another account
+        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
+        $loginIdentity = self::login($identity2);
+
+        //try to get the certificates of identity1
+        try {
+            \OmegaUp\Controllers\Certificate::apiGetUserCertificates(
+                new \OmegaUp\Request([
+                    'auth_token' => $loginIdentity->auth_token,
+                    'user_id' => $identity1->user_id
+                ])
+            );
+
+            $this->fail(
+                'Should not have been able to get the user certificates'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
     }
 }

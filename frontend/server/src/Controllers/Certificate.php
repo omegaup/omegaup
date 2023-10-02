@@ -424,7 +424,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     /**
      * Get all the certificates belonging to a user
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{certificates: list<CertificateListItem>}
      *
@@ -432,12 +432,12 @@ class Certificate extends \OmegaUp\Controllers\Controller {
      */
     public static function apiGetUserCertificates(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
-        try {
-            $r->ensureMainUserIdentity();
-            if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-            }
-        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+        $r->ensureMainUserIdentity();
+        if (
+            $r->identity->user_id !== $r['user_id'] &&
+            !\OmegaUp\Authorization::isSystemAdmin($r->identity)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $response = \OmegaUp\DAO\Certificates::getUserCertificates(
