@@ -9,13 +9,15 @@
               :existing-options="searchResultUsers"
               :value.sync="searchedUsername"
               :max-results="10"
+              class="input"
               @update-existing-options="
                 (query) => $emit('update-search-result-users', query)
               "
-              class="input"
             ></omegaup-common-typeahead>
           </div>
-          <div class="form-group mb-0 col-md-3 d-flex align-items-center mt-4 margin-phone">
+          <div
+            class="form-group mb-0 col-md-3 d-flex align-items-center mt-4 margin-phone"
+          >
             <button class="btn btn-primary" type="submit">
               {{ T.wordsAddMember }}
             </button>
@@ -206,7 +208,6 @@ export default class Members extends Vue {
 </script>
 
 <style scoped lang="scss">
-
 @media (max-width: 576px) {
   .input {
     max-width: 13rem;
@@ -216,11 +217,9 @@ export default class Members extends Vue {
     width: 100%;
     overflow-x: auto;
     display: block;
+  }
+  .margin-phone {
+    margin-top: 0.4rem !important;
+  }
 }
-.margin-phone {
-  margin-top: 0.4rem !important;
-}
-
-}
-
 </style>
