@@ -161,6 +161,7 @@ const translations: { [key: string]: string; } = {
   cannotRemoveProblemWithSubmissions: "You cannot remove a problem that already has submissions",
   certificateDetailsBody: "Please send us an email to [certificates@omegaup.com](mailto:certificates@omegaup.com?subject=Verify%20certificate%20%(uuid)) to verify a certificate. Make sure to include the ID of the certificate (%(uuid)) in the subject.",
   certificateDetailsTitle: "Certificate verification process",
+  certificateListMineCertificatesEmpty: "No diplomas",
   certificateListMineCoderOfTheMonth: "Coder of the month",
   certificateListMineCoderOfTheMonthFemale: "Coder of the month for her",
   certificateListMineCopyToClipboard: "Copy to clipboard",

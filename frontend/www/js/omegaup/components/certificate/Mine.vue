@@ -3,7 +3,15 @@
     <h5 class="card-header d-flex justify-content-between align-items-center">
       {{ T.certificateListMineTitle }}
     </h5>
-    <table class="table table-striped table-hover table-responsive-sm mb-0">
+    <div v-if="certificates.length === 0">
+      <div class="my-2 empty-table-message">
+        {{ T.certificateListMineCertificatesEmpty }}
+      </div>
+    </div>
+    <table
+      v-else
+      class="table table-striped table-hover table-responsive-sm mb-0"
+    >
       <thead>
         <tr>
           <th scope="col" class="text-left align-middle">

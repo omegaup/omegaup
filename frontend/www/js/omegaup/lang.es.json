@@ -160,6 +160,7 @@
 	"cannotRemoveProblemWithSubmissions": "No puedes eliminar un problema que ya tiene env\u00edos",
 	"certificateDetailsBody": "Favor de escribirnos a [certificados@omegaup.com](mailto:certificados@omegaup.com?subject=Validar%20certificado%20%(uuid)) para verificar el certificado. Incluye el ID del certificado (%(uuid)) en el asunto del correo.",
 	"certificateDetailsTitle": "Proceso de verificaci\u00f3n de certificados",
+	"certificateListMineCertificatesEmpty": "No hay diplomas",
 	"certificateListMineCoderOfTheMonth": "Coder del mes",
 	"certificateListMineCoderOfTheMonthFemale": "Coder del mes para ellas",
 	"certificateListMineCopyToClipboard": "Copiar a portapapeles",
