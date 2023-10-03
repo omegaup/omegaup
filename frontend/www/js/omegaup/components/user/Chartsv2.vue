@@ -1,21 +1,21 @@
 <template>
-  <div class="card-body">
+  <div class="card-body text-center">
+    <label class="pr-4"
+      ><input v-model="type" type="radio" value="delta" />
+      {{ T.profileStatisticsDelta }}</label
+    >
+    <label class="pr-4"
+      ><input v-model="type" type="radio" value="cumulative" />
+      {{ T.profileStatisticsCumulative }}</label
+    >
+    <label class="pr-4"
+      ><input v-model="type" type="radio" value="total" />
+      {{ T.profileStatisticsTotal }}</label
+    >
     <div
       v-if="type != 'total' && type != ''"
       class="period-group text-center mb-2"
     >
-      <label class="pr-4"
-        ><input v-model="type" type="radio" value="delta" />
-        {{ T.profileStatisticsDelta }}</label
-      >
-      <label class="pr-4"
-        ><input v-model="type" type="radio" value="cumulative" />
-        {{ T.profileStatisticsCumulative }}</label
-      >
-      <label class="pr-4"
-        ><input v-model="type" type="radio" value="total" />
-        {{ T.profileStatisticsTotal }}</label
-      >
       <label class="pr-4"
         ><input v-model="period" name="period" type="radio" value="day" />
         {{ T.profileStatisticsDay }}</label
