@@ -265,7 +265,7 @@ export default class Signup extends Vue {
   }
 
   updateDateRestriction() {
-    this.checkAge(); 
+    this.checkAge();
 
     if (this.over13Checked) {
       this.email = '';
