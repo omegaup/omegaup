@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="mb-4">
+    <div class="mb-3">
       <h3 class="card-title text-center">{{ T.wordsGroups }}</h3>
     </div>
     <div class="card ml-lg-4 mr-lg-4">
