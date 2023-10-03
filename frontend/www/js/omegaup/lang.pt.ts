@@ -1384,7 +1384,6 @@ const translations: { [key: string]: string; } = {
   showLinks: "V\u00ednculos",
   showTotalScoreboard: "Mostre o painel total",
   signUpFormInteractiveGuideConfirmPassword: "Confirme sua senha",
-  signUpFormInteractiveGuideDateOfBirth: "Digite sua data de nascimento",
   signUpFormInteractiveGuideEmail: "Digite seu e-mail",
   signUpFormInteractiveGuidePassword: "Crie sua senha, minimo de 8 caracteres",
   signUpFormInteractiveGuideRegister: "Conclua o registro",

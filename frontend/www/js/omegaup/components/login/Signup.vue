@@ -7,14 +7,18 @@
       <form>
         <div class="row">
           <div class="col">
-            <input v-model="over13Checked" type="checkbox" @change="updateDateRestriction" />
+            <input
+              v-model="over13Checked"
+              type="checkbox"
+              @change="updateDateRestriction"
+            />
             <label for="checkbox" class="pl-1">
               <omegaup-markdown :markdown="T.over13yearsOld"></omegaup-markdown>
             </label>
           </div>
         </div>
 
-        <div class="row ">
+        <div class="row">
           <div v-show="!isUnder13" class="col-md-4 offset-md-2">
             <div class="form-group">
               <label class="control-label">{{ T.loginParentEmail }}</label>
@@ -64,9 +68,9 @@
                 type="date"
                 class="form-control"
                 autocomplete="date-of-birth"
-                @input="checkAge"
                 :max="maxDate"
                 :min="minDate"
+                @input="checkAge"
               />
             </div>
           </div>
@@ -240,7 +244,9 @@ export default class Signup extends Vue {
 
   get maxDate() {
     const currentYear = new Date().getFullYear();
-    return this.over13Checked ? `${currentYear - 14}-12-31` : `${currentYear}-12-31`;
+    return this.over13Checked
+      ? `${currentYear - 14}-12-31`
+      : `${currentYear}-12-31`;
   }
 
   get minDate() {
@@ -258,7 +264,7 @@ export default class Signup extends Vue {
     }
   }
 
-    // Actualiza las fechas máximas y mínimas cuando cambia el estado del checkbox
+  // Actualiza las fechas máximas y mínimas cuando cambia el estado del checkbox
   updateDateRestriction() {
     this.checkAge(); // Revisar la edad cuando cambia el estado del checkbox
 
@@ -271,8 +277,6 @@ export default class Signup extends Vue {
       this.parentEmail = '';
       this.isUnder13 = false;
     }
-
-
   }
 }
 </script>
