@@ -264,16 +264,13 @@ export default class Signup extends Vue {
     }
   }
 
-  // Actualiza las fechas máximas y mínimas cuando cambia el estado del checkbox
   updateDateRestriction() {
-    this.checkAge(); // Revisar la edad cuando cambia el estado del checkbox
+    this.checkAge(); 
 
     if (this.over13Checked) {
-      // Si está seleccionado, usa parentEmail
       this.email = '';
       this.isUnder13 = true;
     } else {
-      // Si no está seleccionado, usa email
       this.parentEmail = '';
       this.isUnder13 = false;
     }
