@@ -139,5 +139,7 @@
     "refactor": "cross-env ./stuff/refactor.js",
     "test:e2e": "cypress run --browser chrome"
   },
-  "dependencies": {}
+  "dependencies": {
+    "node-gyp": "^9.4.0"
+  }
 }
