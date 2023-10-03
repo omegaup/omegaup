@@ -1382,7 +1382,6 @@ showDefaultAllContestantsInScoreboard = "Mostrar por defecto a todas las persona
 showLinks = "Enlaces"
 showTotalScoreboard = "Ver scoreboard total"
 signUpFormInteractiveGuideConfirmPassword = "Confirma tu contraseña"
-signUpFormInteractiveGuideDateOfBirth = "Ingresa tu fecha de nacimiento"
 signUpFormInteractiveGuideEmail = "Ingresa tu correo electrónico"
 signUpFormInteractiveGuidePassword = "Crea tu contraseña, mínimo 8 caracteres"
 signUpFormInteractiveGuideRegister = "Completa el registro"

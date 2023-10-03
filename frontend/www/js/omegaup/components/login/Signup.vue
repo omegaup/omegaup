@@ -5,17 +5,17 @@
     </div>
     <div class="card-body">
       <form>
-        <div class="row justify-content-md-center">
-          <div class="col-md-8 introjs-terms-and-conditions">
-            <input v-model="checked" type="checkbox" />
+        <div class="row">
+          <div class="col">
+            <input v-model="over13Checked" type="checkbox" @change="updateDateRestriction" />
             <label for="checkbox" class="pl-1">
               <omegaup-markdown :markdown="T.over13yearsOld"></omegaup-markdown>
             </label>
           </div>
         </div>
 
-        <div class="row justify-content-md-center">
-          <div v-show="isUnder13" class="col-md-4">
+        <div class="row ">
+          <div v-show="!isUnder13" class="col-md-4 offset-md-2">
             <div class="form-group">
               <label class="control-label">{{ T.loginParentEmail }}</label>
               <input
@@ -27,7 +27,7 @@
               />
             </div>
           </div>
-          <div v-show="!isUnder13" class="col-md-4 introjs-email">
+          <div v-show="isUnder13" class="col-md-4 offset-md-2 introjs-email">
             <div class="form-group">
               <label class="control-label">{{ T.loginEmail }}</label>
               <input
@@ -54,7 +54,7 @@
               />
             </div>
           </div>
-          <div class="col-md-4 col-md-offset-2 introjs-date-of-birth">
+          <div class="col-md-4 introjs-date-of-birth">
             <div class="form-group">
               <label class="control-label">{{ T.loginDateOfBirth }}</label>
               <input
@@ -65,6 +65,8 @@
                 class="form-control"
                 autocomplete="date-of-birth"
                 @input="checkAge"
+                :max="maxDate"
+                :min="minDate"
               />
             </div>
           </div>
@@ -101,7 +103,7 @@
         <div class="row justify-content-md-center">
           <div class="col-md-8 introjs-terms-and-conditions">
             <input v-model="checked" type="checkbox" />
-            <label for="checkbox">
+            <label for="checkbox" class="pl-1">
               <omegaup-markdown
                 :markdown="T.acceptPrivacyPolicy"
               ></omegaup-markdown>
@@ -171,6 +173,7 @@ export default class Signup extends Vue {
   passwordConfirmation: string = '';
   recaptchaResponse: string = '';
   isUnder13: boolean = false;
+  over13Checked: boolean = false;
 
   mounted() {
     const title = T.signUpFormInteractiveGuideTitle;
@@ -195,13 +198,6 @@ export default class Signup extends Vue {
               element: document.querySelector('.introjs-email') as Element,
               title,
               intro: T.signUpFormInteractiveGuideEmail,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-date-of-birth',
-              ) as Element,
-              title,
-              intro: T.signUpFormInteractiveGuideDateOfBirth,
             },
             {
               element: document.querySelector('.introjs-password') as Element,
@@ -242,14 +238,41 @@ export default class Signup extends Vue {
     this.recaptchaResponse = '';
   }
 
+  get maxDate() {
+    const currentYear = new Date().getFullYear();
+    return this.over13Checked ? `${currentYear - 14}-12-31` : `${currentYear}-12-31`;
+  }
+
+  get minDate() {
+    const currentYear = new Date().getFullYear();
+    return this.over13Checked ? '1900-01-01' : `${currentYear - 13}-01-01`;
+  }
+
   checkAge() {
     const dateOfBirth = new Date(this.dateOfBirth);
     const today = new Date();
     const age = today.getFullYear() - dateOfBirth.getFullYear();
-    this.isUnder13 = age < 13;
+    this.isUnder13 = age > 13;
     if (this.isUnder13) {
-      this.parentEmail = '';
+      this.email = '';
     }
+  }
+
+    // Actualiza las fechas máximas y mínimas cuando cambia el estado del checkbox
+  updateDateRestriction() {
+    this.checkAge(); // Revisar la edad cuando cambia el estado del checkbox
+
+    if (this.over13Checked) {
+      // Si está seleccionado, usa parentEmail
+      this.email = '';
+      this.isUnder13 = true;
+    } else {
+      // Si no está seleccionado, usa email
+      this.parentEmail = '';
+      this.isUnder13 = false;
+    }
+
+
   }
 }
 </script>
