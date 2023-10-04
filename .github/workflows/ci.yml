@@ -147,6 +147,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Install node.js
+        run: |
+          curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \ sudo apt-get install -y nodejs
+
       - name: Install yarn dependencies
         run: yarn install
 
@@ -254,7 +258,11 @@ jobs:
 
       - name: Install wait-for-it
         run: |
-          sudo apt-get update -y && sudo apt-get install -y wait-for-it
+            sudo apt-get update -y && sudo apt-get install -y wait-for-it
+
+      - name: Install node.js
+        run: |
+            curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \ sudo apt-get install -y nodejs
 
       - name: Download the Docker containers
         run: |
@@ -336,6 +344,10 @@ jobs:
             python3 -m pip install wheel && \
             python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
           docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
+
+      - name: Install node.js
+        run: |
+          curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \ sudo apt-get install -y nodejs
 
       - name: Install yarn dependencies
         run: yarn install
