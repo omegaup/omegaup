@@ -80,6 +80,7 @@
     "mock-socket": "^9.0.3",
     "monaco-editor": "^0.21",
     "monaco-editor-webpack-plugin": "^2.1",
+    "node-gyp": "^9.4.0",
     "pako": "^1.0.7",
     "popper.js": "^1.16.1",
     "prettier": "^2.1.2",
@@ -138,8 +139,5 @@
     "build-development-frontend": "cross-env webpack --config-name=frontend --mode=development",
     "refactor": "cross-env ./stuff/refactor.js",
     "test:e2e": "cypress run --browser chrome"
-  },
-  "dependencies": {
-    "node-gyp": "^9.4.0"
   }
 }
