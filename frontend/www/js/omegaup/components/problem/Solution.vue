@@ -1,5 +1,14 @@
 <template>
   <div class="card">
+    <div class="row p-3">
+      <div class="col-12 text-right">
+        <a href="https://blog.omegaup.com/soluciones-de-problemas-en-omegaup/"
+          ><font-awesome-icon :icon="['fas', 'question-circle']" />
+          {{ T.officialSolutionsInfo }}</a
+        >
+      </div>
+    </div>
+
     <omegaup-markdown
       v-if="showSolution"
       :markdown="solution.markdown"
@@ -8,12 +17,6 @@
     ></omegaup-markdown>
     <div v-else class="interstitial">
       <omegaup-markdown :markdown="statusMessage"></omegaup-markdown>
-      <omegaup-markdown
-        v-show="status === 'unlocked'"
-        :markdown="ui.formatString(T.solutionUnlocked)"
-      >
-      </omegaup-markdown>
-
       <omegaup-markdown
         v-show="allowedSolutionsToSee !== null"
         :markdown="
@@ -31,6 +34,7 @@
           @click="$emit('get-solution')"
         >
           {{ T.wordsSeeSolution }}
+          <font-awesome-icon :icon="['fas', 'unlock']" />
         </button>
         <button
           v-else-if="status === 'locked' && allowedSolutionsToSee === null"
@@ -45,6 +49,7 @@
           @click="$emit('unlock-solution')"
         >
           {{ T.wordsUnlockSolution }}
+          <font-awesome-icon :icon="['fas', 'lock']" />
         </button>
       </div>
     </div>
@@ -57,6 +62,16 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import { types } from '../../api_types';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faLock,
+  faUnlock,
+  faQuestionCircle,
+} from '@fortawesome/free-solid-svg-icons';
+
+library.add(faLock);
+library.add(faUnlock);
+library.add(faQuestionCircle);
 
 import omegaup_Markdown from '../Markdown.vue';
 

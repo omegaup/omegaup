@@ -1359,7 +1359,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Adds a problem to an assignment
      *
-     * @return array{status: 'ok'}
+     * @return array{status: 'ok', solutionStatus: string}
      *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param null|string $commit
@@ -1437,8 +1437,23 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_PROBLEM_ADDED
         );
 
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
+        $solutionStatus = null;
+
+        if (!is_null($problem) && \OmegaUp\DAO\Problems::isVisible($problem)) {
+            $solutionStatus = \OmegaUp\Controllers\Problem::getProblemSolutionStatus(
+                $problem,
+                $r->identity
+            );
+        }
+
+        $solutionStatus = is_null(
+            $solutionStatus
+        ) ? 'not_found' : $solutionStatus;
+
         return [
             'status' => 'ok',
+            'solutionStatus' => $solutionStatus,
         ];
     }
 

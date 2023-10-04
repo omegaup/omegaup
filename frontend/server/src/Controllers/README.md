@@ -1491,7 +1491,9 @@ Adds a problem to an assignment
 
 ### Returns
 
-_Nothing_
+| Name             | Type     |
+| ---------------- | -------- |
+| `solutionStatus` | `string` |
 
 ## `/api/course/addStudent/`
 

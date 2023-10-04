@@ -5063,7 +5063,7 @@ export namespace messages {
   export type CourseAddGroupTeachingAssistantRequest = { [key: string]: any };
   export type CourseAddGroupTeachingAssistantResponse = {};
   export type CourseAddProblemRequest = { [key: string]: any };
-  export type CourseAddProblemResponse = {};
+  export type CourseAddProblemResponse = { solutionStatus: string };
   export type CourseAddStudentRequest = { [key: string]: any };
   export type CourseAddStudentResponse = {};
   export type CourseAddTeachingAssistantRequest = { [key: string]: any };
