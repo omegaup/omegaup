@@ -160,6 +160,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential
           sudo apt-get install -y python3
+          yarn global add node-gyp
           yarn install
 
       - name: Run JavaScript tests
@@ -208,6 +209,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential
           sudo apt-get install -y python3
+          yarn global add node-gyp
           yarn install
 
       - name: Install composer dependencies
@@ -374,6 +376,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential
           sudo apt-get install -y python3
+          yarn global add node-gyp
           yarn install
 
       - name: Build webpack resources
