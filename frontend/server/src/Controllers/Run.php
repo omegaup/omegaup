@@ -664,10 +664,25 @@ class Run extends \OmegaUp\Controllers\Controller {
             'run_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        [
-            'run' => $run,
-            'submission' => $submission,
-        ] = self::validateDetailsRequest($runAlias);
+        $submission = \OmegaUp\DAO\Submissions::getByGuid($runAlias);
+        if (
+            is_null(
+                $submission
+            ) || is_null(
+                $submission->current_run_id
+            ) || is_null(
+                $submission->guid
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
+
+        $run = \OmegaUp\DAO\Runs::getByGUID(
+            $submission->guid
+        );
+        if (is_null($run)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
         $problem = \OmegaUp\DAO\Problems::getByPK(
             intval($submission->problem_id)
         );
@@ -701,9 +716,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             $submission->asFilteredArray([
                 'guid', 'language', 'time', 'submit_delay', 'type',
             ]) +
-            $run->asFilteredArray([
-                'status', 'verdict', 'runtime', 'penalty', 'memory', 'score', 'contest_score',
-            ])
+            $run
         );
         /** @var \OmegaUp\Timestamp $filtered['time'] */
         $result = [
@@ -728,10 +741,10 @@ class Run extends \OmegaUp\Controllers\Controller {
                 : ''
             ),
             'classname' => 'user-rank-unranked',
-            'execution' => null,
-            'output' => null,
-            'status_memory' => null,
-            'status_runtime' => null,
+            'execution' => strval($filtered['execution']),
+            'output' => strval($filtered['output']),
+            'status_memory' => strval($filtered['status_memory']),
+            'status_runtime' => strval($filtered['status_runtime']),
         ];
         if (!is_null($filtered['contest_score'])) {
             if (
