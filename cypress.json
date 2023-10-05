@@ -1,6 +1,0 @@
-{
-  "baseUrl": "http://127.0.0.1:8001",
-  "experimentalStudio": true,
-  "chromeWebSecurity": false,
-  "pluginsFile": "./cypress/plugins/index.js"
-}
