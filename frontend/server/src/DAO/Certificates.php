@@ -11,7 +11,7 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  *
- * @psalm-type CertificateListItem=array{verification_code: string, date: \OmegaUp\Timestamp, certificate_type: string, name: string}
+ * @psalm-type CertificateListItem=array{certificate_type: string, date: \OmegaUp\Timestamp, name: string|null, verification_code: string}
  */
 class Certificates extends \OmegaUp\DAO\Base\Certificates {
     /**
@@ -143,7 +143,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
             ORDER BY `Certificates`.timestamp DESC;
         ';
 
-        /** @var list<CertificateListItem> */
+        /** @var list<array{certificate_type: string, date: \OmegaUp\Timestamp, name: string|null, verification_code: string}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$userId]
