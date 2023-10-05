@@ -14,7 +14,7 @@ OmegaUp.on('ready', () => {
     },
     methods: {
       getPdfUrl: (verificationCode: string): string => {
-        var file = '';
+        let file = '';
         api.Certificate.getCertificatePdf({
           verification_code: verificationCode,
         })

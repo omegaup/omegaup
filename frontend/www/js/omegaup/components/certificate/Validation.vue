@@ -23,7 +23,12 @@
             })
           }}
         </p>
-        <p class="title">{{ T.certificateValidationStatus }}<span class="title-invalid">{{ T.certificateValidationInvalid }}</span></p>
+        <p class="title">
+          {{ T.certificateValidationStatus }}
+          <span class="title-invalid">
+            {{ T.certificateValidationInvalid }}
+          </span>
+        </p>
         <p class="description">
           {{
             ui.formatString(T.certificateValidationNotFound, {
@@ -46,7 +51,7 @@ export default class Validation extends Vue {
   @Prop() verificationCode!: string;
   @Prop() isValid!: boolean;
   @Prop() certificate?: string;
-  
+
   T = T;
   ui = ui;
 }
