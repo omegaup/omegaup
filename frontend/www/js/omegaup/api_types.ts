@@ -3024,6 +3024,7 @@ export namespace types {
   }
 
   export interface ContestNewPayload {
+    hasVisitedSection?: boolean;
     languages: { [key: string]: string };
   }
 
@@ -3486,6 +3487,7 @@ export namespace types {
     groupAlias: string;
     groupDescription?: string;
     groupName?: string;
+    hasVisitedSection?: boolean;
     identities: types.Identity[];
     isOrganizer: boolean;
     scoreboards: types.GroupScoreboard[];

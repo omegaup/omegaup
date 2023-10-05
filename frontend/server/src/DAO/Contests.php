@@ -635,12 +635,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
-     * Returns the next contest a user registered for.
+     * Returns the next contest (active or future) a user registered for, when it is
+     * a future contest it can be filtered by a limit of days between the start of the
+     * next registered contest and the current date using the $dayLimit param.
      *
      * @return ContestListItem|null
      */
     final public static function getNextRegisteredContestForUser(
-        ?\OmegaUp\DAO\VO\Identities $identity
+        ?\OmegaUp\DAO\VO\Identities $identity,
+        ?int $dayLimit = 15
     ) {
         if (is_null($identity) || is_null($identity->identity_id)) {
             return null;
@@ -652,6 +655,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $futureCondition = \OmegaUp\DAO\Enum\ActiveStatus::sql(
             \OmegaUp\DAO\Enum\ActiveStatus::FUTURE
         );
+        if (is_null($dayLimit)) {
+            $withinDayLimitCondition = true;
+        } else {
+            $withinDayLimitCondition = "DATEDIFF(start_time, NOW()) < $dayLimit";
+        }
+
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
 
         $select = "SELECT
@@ -714,7 +723,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 a.owner_id = organizer.user_id
             WHERE
                 ($activeCondition OR
-                $futureCondition) AND
+                ($futureCondition AND $withinDayLimitCondition)) AND
                 archived = 0
             GROUP BY Contests.contest_id
         ";
