@@ -107,26 +107,26 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
     }
 
     /**
-     * Returns if a certificate is valid using its verification code
+     * Returns true if a certificate is valid using its verification code
      *
      * @return int
      */
     final public static function isValid(
-        string $verification_code
+        string $verificationCode
     ) {
         $sql = '
-        SELECT
-            EXISTS(
-                SELECT certificate_id
-                FROM Certificates
-                WHERE verification_code = ?
-            );
+            SELECT
+                EXISTS(
+                    SELECT certificate_id
+                    FROM Certificates
+                    WHERE verification_code = ?
+                );
         ';
 
         /** @var int */
         $isValid = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
-            [$verification_code]
+            [$verificationCode]
         );
 
         return $isValid;
