@@ -5,8 +5,9 @@ namespace OmegaUp\Controllers;
 use setasign\Fpdi\Fpdi;
 /**
  * CertificateController
-
+ *
  * @psalm-type CertificateDetailsPayload=array{uuid: string}
+ * @psalm-type CertificateValidationPayload=array{verification_code: string, valid: bool}
  */
 class Certificate extends \OmegaUp\Controllers\Controller {
     /**
@@ -25,6 +26,32 @@ class Certificate extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'certificate_details',
+        ];
+    }
+
+    /**
+     * @return array{templateProperties: array{payload: CertificateValidationPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @omegaup-request-param string $verification_code
+     */
+    public static function getValidationForTypeScript(\OmegaUp\Request $r) {
+        $request = new \OmegaUp\Request([
+            'verification_code' => $r->ensureString('verification_code'),
+        ]);
+        $validation = self::apiValidateCertificate($request);
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'verification_code' => $r->ensureString(
+                        'verification_code'
+                    ),
+                    'valid' => $validation['valid'],
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCertificateValidation'
+                ),
+            ],
+            'entrypoint' => 'certificate_validation',
         ];
     }
 
@@ -285,7 +312,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         self::printCertificatePerson($pdf);
         self::printCertificateDescription($pdf, $description);
 
-        return $pdf->Output('', 'S');
+        return base64_encode($pdf->Output('', 'S'));
     }
 
     private static function getPlaceSuffix(int $n): string {
