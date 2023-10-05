@@ -1488,6 +1488,7 @@ const translations: { [key: string]: string; } = {
   totalRuns: "Total de env\u00edos: %(numRuns)",
   typeaheadSearchPlaceholder: "Buscar...",
   unableToVerifyCaptcha: "No fue posible verificar el captcha. Vuelve a cargar la p\u00e1gina e intenta de nuevo.",
+  under13UserException: "No puedes acceder a este sitio desde una cuenta para ni\u00f1os",
   unnecessaryTokenForPublicCourses: "El token no es necesario para los cursos p\u00fablicos",
   unsupportedBrowser: "Su navegador no admite todas las funciones de esta p\u00e1gina. Intenta actualizar a un <a href=\"https://github.com/omegaup/omegaup#navegadores-soportados\" target=\"blank\">navegador soportado</a>.",
   unverifiedUser: "Cuenta no verificada.",
