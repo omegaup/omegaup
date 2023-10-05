@@ -41,7 +41,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type StudentProgress=array{classname: string, country_id: null|string, name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}
  * @psalm-type StudentProgressInCourse=array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}
  * @psalm-type AssignmentsProblemsPoints=array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
- * @psalm-type CourseNewPayload=array{is_admin: bool, is_curator: bool, languages: array<string, string>}
+ * @psalm-type CourseNewPayload=array{is_admin: bool, hasVisitedSection: bool, is_curator: bool, languages: array<string, string>}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, teachingAssistants: list<CourseAdmin>, allLanguages: array<string, string>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, groupsTeachingAssistants: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, assignmentsProblems: list<AssignmentsProblemsPoints>, students: list<StudentProgressInCourse>, totalRows: int, page: int, length: int, pagerItems: list<PageItem>}
  * @psalm-type SubmissionFeedbackThread=array{author: string, authorClassname: string, submission_feedback_thread_id: int, text: string, timestamp: \OmegaUp\Timestamp}
@@ -1075,6 +1075,60 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @param \OmegaUp\DAO\VO\Courses $course
+     * @param string $assignmentAlias
+     * @param string $notificationType
+     */
+    private static function sendNotificationToStudent(
+        \OmegaUp\DAO\VO\Courses $course,
+        string $assignmentAlias,
+        string $notificationType
+    ): void {
+        if (is_null($course->group_id) || is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseNotFound'
+            );
+        }
+
+        $students = [];
+        $notificationContents = [];
+
+            $students = \OmegaUp\DAO\Courses::getStudentsInCourse(
+                $course->course_id,
+                $course->group_id
+            );
+
+            $notificationContents = [
+                'type' => $notificationType,
+                'body' => [
+                    'localizationParams' => [
+                        'courseName' => $course->name,
+                    ],
+                    'url' => "/course/{$course->alias}/assignment/{$assignmentAlias}/",
+                    'iconUrl' => '/media/info.png',
+                ],
+            ];
+
+            if ($notificationType == \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_PROBLEM_ADDED) {
+                $notificationContents['body']['localizationString'] = new \OmegaUp\TranslationString(
+                    'notificationCourseAssignmentProblemAdded'
+                );
+            } else {
+                $notificationContents['body']['localizationString'] = new \OmegaUp\TranslationString(
+                    'notificationCourseAssignmentAdded'
+                );
+            }
+            foreach ($students as $student) {
+                \OmegaUp\DAO\Notifications::create(
+                    new \OmegaUp\DAO\VO\Notifications([
+                        'user_id' => $student['user_id'],
+                        'contents' =>  json_encode($notificationContents),
+                    ])
+                );
+            }
+    }
+
+    /**
      * API to Create an assignment
      *
      * @return array{status: string}
@@ -1132,6 +1186,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             ]),
             $r->identity,
             $addedProblems
+        );
+
+        self::sendNotificationToStudent(
+            $course,
+            $r['alias'],
+            \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_ADDED
         );
 
         return [
@@ -1369,6 +1429,12 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\Courses::updateAssignmentMaxPoints(
             $course,
             $assignmentAlias
+        );
+
+        self::sendNotificationToStudent(
+            $course,
+            $assignmentAlias,
+            \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_PROBLEM_ADDED
         );
 
         return [
@@ -3682,6 +3748,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                     'is_admin' => true,
                     'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+                    'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
+                        'has-visited-create-course'
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCourseNew'
