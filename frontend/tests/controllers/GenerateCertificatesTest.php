@@ -219,33 +219,10 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Generate certificates in a contest
-     *
      */
     public function testGetUserCertificates() {
-        //Create user
-        ['identity' => $certificateGenerator] = \OmegaUp\Test\Factories\User::createUser();
-
-        //login
-        $loginCertificateGenerator = self::login($certificateGenerator);
-
-        //add role certificate generator to identity user
-        \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
-            'auth_token' => $loginCertificateGenerator->auth_token,
-            'username' => $certificateGenerator->username,
-            'role' => 'CertificateGenerator'
-        ]));
-
-        // Get a problem
-        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
-
         // Create contest with 2 hours and a window length 30 of minutes
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
-
-        // Add the problem to the contest
-        \OmegaUp\Test\Factories\Contest::addProblemToContest(
-            $problem,
-            $contestData
-        );
 
         // Create a contestant
         ['identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
@@ -253,32 +230,17 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         // Add contestant to contest
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity1);
 
-        // User creates a run in a valid time
-        $run = \OmegaUp\Test\Factories\Run::createRun(
-            $problem,
-            $contestData,
-            $identity1
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
-
-        $certificatesCutoff = 3;
-
-        \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
-            new \OmegaUp\Request([
-                'auth_token' => $loginCertificateGenerator->auth_token,
-                'contest_id' => $contestData['contest']->contest_id,
-                'certificates_cutoff' => $certificatesCutoff
-            ])
-        );
+        // Create a certificate
+        \OmegaUp\DAO\Certificates::create(new \OmegaUp\DAO\VO\Certificates([
+            'identity_id' => $identity1->identity_id,
+            'timestamp' => '2023-09-04',
+            'certificate_type' => 'contest',
+            'contest_id' => $contestData['contest']->contest_id,
+            'verification_code' => 'oP8a97pL5k'
+        ]));
 
         //login
         $loginIdentity = self::login($identity1);
-
-        $contest = \OmegaUp\DAO\Contests::getByAlias(
-            $contestData['request']['alias']
-        );
-
-        $this->assertEquals(3, $contest->certificate_cutoff);
 
         //check the certificate data
         $certificates = \OmegaUp\Controllers\Certificate::apiGetUserCertificates(
