@@ -1,13 +1,15 @@
 <template>
   <div>
-    <div class="mb-3 text-right">
-      <a class="btn btn-primary" href="/group/new/">{{ T.groupsCreateNew }}</a>
+    <div class="mb-3">
+      <h3 class="card-title text-center">{{ T.wordsGroups }}</h3>
     </div>
-    <div class="card">
-      <div class="card-header mb-3">
-        <h3 class="card-title">{{ T.wordsGroups }}</h3>
+    <div class="card ml-lg-4 mr-lg-4">
+      <div class="card-header text-right">
+        <a class="btn btn-primary" href="/group/new/">{{
+          T.groupsCreateNew
+        }}</a>
       </div>
-      <table class="table" data-table-groups>
+      <table class="table mb-0" data-table-groups>
         <thead>
           <tr>
             <th>{{ T.wordsTitle }}</th>
@@ -23,7 +25,7 @@
                 }}</a></strong
               >
             </td>
-            <td>
+            <td class="text-right pr-lg-3">
               <a :href="groupEditUrl(group)" :title="T.wordsEdit">
                 <font-awesome-icon :icon="['fas', 'edit']" />
               </a>

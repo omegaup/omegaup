@@ -31,6 +31,7 @@ declare global {
       createContest(
         contestOptions: Partial<ContestOptions> &
           Pick<ContestOptions, 'contestAlias'>,
+        shouldShowIntro: boolean,
       ): void;
       addProblemsToContest(contestOptions: ContestOptions): void;
       changeAdmissionModeContest(contestOptions: ContestOptions): void;
