@@ -2981,7 +2981,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Adds a problem to a contest
      *
-     * @return array{status: string}
+     * @return array{status: string, solutionStatus: string}
      *
      * @omegaup-request-param null|string $commit
      * @omegaup-request-param string $contest_alias
@@ -3082,7 +3082,24 @@ class Contest extends \OmegaUp\Controllers\Controller {
             )
         );
 
-        return ['status' => 'ok'];
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
+        $solutionStatus = null;
+
+        if (!is_null($problem) && \OmegaUp\DAO\Problems::isVisible($problem)) {
+            $solutionStatus = \OmegaUp\Controllers\Problem::getProblemSolutionStatus(
+                $problem,
+                $r->identity
+            );
+        }
+
+        $solutionStatus = is_null(
+            $solutionStatus
+        ) ? 'not_found' : $solutionStatus;
+
+        return [
+            'status' => 'ok',
+            'solutionStatus' => $solutionStatus,
+        ];
     }
 
     /**

@@ -4885,7 +4885,7 @@ export namespace messages {
   export type ContestAddGroupAdminRequest = { [key: string]: any };
   export type ContestAddGroupAdminResponse = {};
   export type ContestAddProblemRequest = { [key: string]: any };
-  export type ContestAddProblemResponse = {};
+  export type ContestAddProblemResponse = { solutionStatus: string };
   export type ContestAddUserRequest = { [key: string]: any };
   export type ContestAddUserResponse = {};
   export type ContestAdminDetailsRequest = { [key: string]: any };

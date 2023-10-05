@@ -574,7 +574,9 @@ Adds a problem to a contest
 
 ### Returns
 
-_Nothing_
+| Name             | Type     |
+| ---------------- | -------- |
+| `solutionStatus` | `string` |
 
 ## `/api/contest/addUser/`
 
