@@ -7,7 +7,7 @@ use setasign\Fpdi\Fpdi;
  * CertificateController
 
  * @psalm-type CertificateDetailsPayload=array{uuid: string}
- * @psalm-type CertificateListItem=array{certificate_type: string, date: \OmegaUp\Timestamp, name: string|null, verification_code: string}
+ * @psalm-type CertificateListItem=array{certificate_type: string, date: \OmegaUp\Timestamp, name: null|string, verification_code: string}
  */
 class Certificate extends \OmegaUp\Controllers\Controller {
     /**
