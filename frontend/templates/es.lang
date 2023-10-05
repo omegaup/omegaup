@@ -1406,7 +1406,6 @@ solutionConfirm = "Para ver la solución de este problema por favor haz clic en 
 solutionLocked = "Aún no puedes ver esta solución.\n\n*   Intenta resolver el problema primero o puedes desbloquearla si aún no has alcanzado el limite de soluciones vistas por día.\n*   Una vez que decidas desbloquear la solución de un problema, éste no contará en tu puntaje en el ranking de omegaUp."
 solutionNotFound = "Aún no ha sido agregada la solución para este problema."
 solutionNotLoggedIn = "Debes iniciar sesión para desbloquear/ver esta solución."
-solutionUnlocked = "Este problema ya se encuentra **desbloqueado**, por lo que tu número de vistas a soluciones diarias no disminuira."
 solutionViewsLeft = "Te quedan **%(available)** visualizaciones disponibles, de un total de **%(total)** que puedes realizar por día."
 spinnerLoadingMessage = "Cargando..."
 startContest = "Iniciar concurso"

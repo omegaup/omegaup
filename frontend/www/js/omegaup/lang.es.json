@@ -1407,7 +1407,6 @@
 	"solutionLocked": "A\u00fan no puedes ver esta soluci\u00f3n.\n\n*   Intenta resolver el problema primero o puedes desbloquearla si a\u00fan no has alcanzado el limite de soluciones vistas por d\u00eda.\n*   Una vez que decidas desbloquear la soluci\u00f3n de un problema, \u00e9ste no contar\u00e1 en tu puntaje en el ranking de omegaUp.",
 	"solutionNotFound": "A\u00fan no ha sido agregada la soluci\u00f3n para este problema.",
 	"solutionNotLoggedIn": "Debes iniciar sesi\u00f3n para desbloquear/ver esta soluci\u00f3n.",
-	"solutionUnlocked": "Este problema ya se encuentra **desbloqueado**, por lo que tu n\u00famero de vistas a soluciones diarias no disminuira.",
 	"solutionViewsLeft": "Te quedan **%(available)** visualizaciones disponibles, de un total de **%(total)** que puedes realizar por d\u00eda.",
 	"spinnerLoadingMessage": "Cargando...",
 	"startContest": "Iniciar concurso",

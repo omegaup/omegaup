@@ -1407,7 +1407,6 @@
 	"solutionLocked": "You can't see this solution yet.\n\n*   Try solving the problem first or you can unlock it if you have not yet reached the limit of solutions seen per day.\n*   Once you decide to unlock the solution for a problem, it won't count towards your score for omegaUp's ranking.",
 	"solutionNotFound": "There isn't any solution for this problem.",
 	"solutionNotLoggedIn": "You must login to unlock/see this solution.",
-	"solutionUnlocked": "This problem is already **unlocked**, so your number of daily solution views will not decrease.",
 	"solutionViewsLeft": "You have **%(available)** available views left, out of a total of **%(total)** that you can make per day.",
 	"spinnerLoadingMessage": "Loading...",
 	"startContest": "Start Contest",
