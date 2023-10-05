@@ -3024,6 +3024,7 @@ export namespace types {
   }
 
   export interface ContestNewPayload {
+    hasVisitedSection?: boolean;
     languages: { [key: string]: string };
   }
 
@@ -3412,6 +3413,7 @@ export namespace types {
     is_under_13_user: boolean;
     loginIdentity?: dao.Identities;
     user?: dao.Users;
+    user_verification_deadline?: Date;
     valid: boolean;
   }
 
@@ -3485,6 +3487,7 @@ export namespace types {
     groupAlias: string;
     groupDescription?: string;
     groupName?: string;
+    hasVisitedSection?: boolean;
     identities: types.Identity[];
     isOrganizer: boolean;
     scoreboards: types.GroupScoreboard[];
@@ -4853,6 +4856,8 @@ export namespace messages {
   // Certificate
   export type CertificateGetCertificatePdfRequest = { [key: string]: any };
   export type CertificateGetCertificatePdfResponse = { certificate: string };
+  export type CertificateValidateCertificateRequest = { [key: string]: any };
+  export type CertificateValidateCertificateResponse = { valid: boolean };
 
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
@@ -5748,6 +5753,9 @@ export namespace controllers {
     getCertificatePdf: (
       params?: messages.CertificateGetCertificatePdfRequest,
     ) => Promise<messages.CertificateGetCertificatePdfResponse>;
+    validateCertificate: (
+      params?: messages.CertificateValidateCertificateRequest,
+    ) => Promise<messages.CertificateValidateCertificateResponse>;
   }
 
   export interface Clarification {
