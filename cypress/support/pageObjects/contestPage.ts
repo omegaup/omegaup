@@ -31,6 +31,7 @@ export class ContestPage {
 
   addIdentitiesGroup(): void {
     cy.get('[href="#identities"]').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('[name="identities"]').attachFile('identities.csv');
 
     cy.get('[data-identity-username]').then((rawHTMLElements) => {
@@ -200,7 +201,7 @@ export class ContestPage {
     for (let i = 0; i < noOfProblems; i++) {
       const problemOptions: ProblemOptions = {
         problemAlias: uuid().slice(0, 10),
-        tag: 'Recursión',
+        tag: 'Recursion',
         autoCompleteTextTag: 'recur',
         problemLevelIndex: 0,
       };

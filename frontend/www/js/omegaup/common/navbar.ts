@@ -48,6 +48,7 @@ OmegaUp.on('ready', () => {
           clarifications: clarificationsStore.state.clarifications,
           fromLogin: fromLogin,
           userTypes: payload.userTypes,
+          nextRegisteredContest: payload.nextRegisteredContestForUser,
           isUnder13User: payload.isUnder13User,
         },
         on: {
@@ -99,6 +100,9 @@ OmegaUp.on('ready', () => {
                 ui.success(T.userObjectivesUpdateSuccess);
               })
               .catch(ui.apiError);
+          },
+          'redirect-next-registered-contest': (alias: string) => {
+            window.location.href = `/arena/${encodeURIComponent(alias)}/`;
           },
         },
       });
