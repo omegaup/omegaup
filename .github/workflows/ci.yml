@@ -280,7 +280,7 @@ jobs:
 
       - name: Install wait-for-it
         run: |
-            sudo apt-get update -y && sudo apt-get install -y wait-for-it
+          sudo apt-get update -y && sudo apt-get install -y wait-for-it
 
       - name: Download the Docker containers
         run: |
