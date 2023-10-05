@@ -224,6 +224,10 @@ export const Certificate = {
     })(x.certificates);
     return x;
   }),
+  validateCertificate: apiCall<
+    messages.CertificateValidateCertificateRequest,
+    messages.CertificateValidateCertificateResponse
+  >('/api/certificate/validateCertificate/'),
 };
 
 export const Clarification = {

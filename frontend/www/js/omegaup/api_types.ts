@@ -4867,6 +4867,8 @@ export namespace messages {
   export type CertificateGetUserCertificatesResponse = {
     certificates: types.CertificateListItem[];
   };
+  export type CertificateValidateCertificateRequest = { [key: string]: any };
+  export type CertificateValidateCertificateResponse = { valid: boolean };
 
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
@@ -5765,6 +5767,9 @@ export namespace controllers {
     getUserCertificates: (
       params?: messages.CertificateGetUserCertificatesRequest,
     ) => Promise<messages.CertificateGetUserCertificatesResponse>;
+    validateCertificate: (
+      params?: messages.CertificateValidateCertificateRequest,
+    ) => Promise<messages.CertificateValidateCertificateResponse>;
   }
 
   export interface Clarification {

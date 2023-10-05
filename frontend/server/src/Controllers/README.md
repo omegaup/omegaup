@@ -11,6 +11,7 @@
 - [Certificate](#certificate)
   - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
   - [`/api/certificate/getUserCertificates/`](#apicertificategetusercertificates)
+  - [`/api/certificate/validateCertificate/`](#apicertificatevalidatecertificate)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
   - [`/api/clarification/details/`](#apiclarificationdetails)
@@ -429,6 +430,24 @@ Get all the certificates belonging to a user
 | Name           | Type                          |
 | -------------- | ----------------------------- |
 | `certificates` | `types.CertificateListItem[]` |
+
+## `/api/certificate/validateCertificate/`
+
+### Description
+
+API to validate a certificate
+
+### Parameters
+
+| Name                | Type     | Description |
+| ------------------- | -------- | ----------- |
+| `verification_code` | `string` |             |
+
+### Returns
+
+| Name    | Type      |
+| ------- | --------- |
+| `valid` | `boolean` |
 
 # Clarification
 
