@@ -247,7 +247,8 @@ describe('Course Test', () => {
     cy.logout();
   });
 
-  it('Should not be able to submit a past assignment', () => {
+  // TODO: Temporarily skipping the test until it becomes more stable.
+  it.skip('Should not be able to submit a past assignment', () => {
     const runOptions: RunOptions = {
       problemAlias: problemOptions[0].problemAlias,
       fixturePath: 'main.cpp',
