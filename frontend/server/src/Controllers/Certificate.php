@@ -419,4 +419,24 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             'certificate' => '',
         ];
     }
+
+    /**
+     * API to validate a certificate
+     *
+     * @return array{valid: boolean}
+     *
+     * @omegaup-request-param string $verification_code
+     */
+    public static function apiValidateCertificate(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        $verification_code = $r->ensureString('verification_code');
+        $isValid = boolval(\OmegaUp\DAO\Certificates::isValid(
+            $verification_code
+        ));
+
+        return [
+            'valid' => $isValid,
+        ];
+    }
 }
