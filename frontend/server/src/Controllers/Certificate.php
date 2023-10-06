@@ -305,9 +305,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         return $translator->get('certificatePdfContestPlaceTh');
     }
 
-    private static function getContestCertificate(string $verification_code): ?string {
+    private static function getContestCertificate(string $verificationCode): ?string {
         $certificateData = \OmegaUp\DAO\Certificates::getContestCertificateByVerificationCode(
-            $verification_code
+            $verificationCode
         );
 
         if (is_null($certificateData)) {
@@ -345,9 +345,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         );
     }
 
-    private static function getCourseCertificate(string $verification_code): ?string {
+    private static function getCourseCertificate(string $verificationCode): ?string {
         $certificateData = \OmegaUp\DAO\Certificates::getCourseCertificateByVerificationCode(
-            $verification_code
+            $verificationCode
         );
 
         if (is_null($certificateData)) {
@@ -376,11 +376,11 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     }
 
     private static function getCoderOfTheMonthCertificate(
-        string $verification_code,
+        string $verificationCode,
         bool $isFemaleCategory
     ): ?string {
         $certificateData = \OmegaUp\DAO\Certificates::getCoderOfTheMonthCertificateByVerificationCode(
-            $verification_code
+            $verificationCode
         );
 
         if (is_null($certificateData)) {
@@ -425,29 +425,29 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     public static function apiGetCertificatePdf(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
-        $verification_code = $r->ensureString('verification_code');
+        $verificationCode = $r->ensureString('verification_code');
         $type = \OmegaUp\DAO\Certificates::getCertificateTypeByVerificationCode(
-            $verification_code
+            $verificationCode
         );
 
         if ($type === 'contest') {
             return [
                 'certificate' => self::getContestCertificate(
-                    $verification_code
+                    $verificationCode
                 ),
             ];
         }
         if ($type === 'course') {
             return [
                 'certificate' => self::getCourseCertificate(
-                    $verification_code
+                    $verificationCode
                 ),
             ];
         }
         if ($type === 'coder_of_the_month' || $type === 'coder_of_the_month_female') {
             return [
                 'certificate' => self::getCoderOfTheMonthCertificate(
-                    $verification_code,
+                    $verificationCode,
                     $type === 'coder_of_the_month_female'
                 ),
             ];
@@ -467,9 +467,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     public static function apiValidateCertificate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
-        $verification_code = $r->ensureString('verification_code');
+        $verificationCode = $r->ensureString('verification_code');
         $isValid = boolval(\OmegaUp\DAO\Certificates::isValid(
-            $verification_code
+            $verificationCode
         ));
 
         return [
