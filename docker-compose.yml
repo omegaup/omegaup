@@ -6,7 +6,7 @@ services:
     build:
       dockerfile: ./Dockerfile.dev-php
       context: ./stuff/docker/
-    image: omegaup/dev-php:20221023
+    image: omegaup/dev-php:20231008
     user: "${UID_GID}"
     restart: always
     volumes:
