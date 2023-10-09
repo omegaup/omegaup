@@ -120,6 +120,12 @@ class UITools {
         }
         return boolval($_COOKIE[$section]);
     }
+    public static function hasVisitedSectionPopup(string $section): bool {
+        if (!isset($_COOKIE[$section])) {
+            return false;
+        }
+        return boolval($_COOKIE[$section]);
+    }
 
     private static function shouldReportToAnalytics(): bool {
         if (!isset($_COOKIE['accept_cookies'])) {

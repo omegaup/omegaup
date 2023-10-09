@@ -120,6 +120,8 @@
               :preferred-language="problem.preferred_language"
               :languages="filteredLanguages"
               :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
+              :has-visited-section="hasVisitedSection"
+              :has-visited-section-popup="hasVisitedSectionPopup"
               @dismiss="onPopupDismissed"
               @submit-run="onRunSubmitted"
             ></omegaup-arena-runsubmit-popup>
@@ -197,6 +199,8 @@
             :problemset-problems="[]"
             :request-feedback="requestFeedback"
             :is-contest-finished="isContestFinished"
+            :has-visited-section="hasVisitedSection"
+            :has-visited-section-popup="hasVisitedSectionPopup"
             @request-feedback="(guid) => $emit('request-feedback', guid)"
             @details="(request) => onRunDetails(request, 'problems')"
             @update-search-result-users-contest="
@@ -240,6 +244,8 @@
           :search-result-users="searchResultUsers"
           :search-result-problems="searchResultProblems"
           :total-runs="totalRuns"
+          :has-visited-section="hasVisitedSection"
+          :has-visited-section-popup="hasVisitedSectionPopup"
           @details="(request) => onRunDetails(request, 'runs')"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
@@ -406,6 +412,8 @@ export default class ProblemDetails extends Vue {
   feedbackMap!: Map<number, ArenaCourseFeedback>;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
+  @Prop() hasVisitedSection!: boolean;
+  @Prop() hasVisitedSectionPopup!: boolean;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 

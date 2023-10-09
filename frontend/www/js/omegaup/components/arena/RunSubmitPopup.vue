@@ -5,7 +5,7 @@
       class="d-flex flex-column h-100"
       @submit.prevent="onSubmit"
     >
-      <div class="form-group row">
+      <div class="form-group row introjs-language">
         <label class="col-sm-2 col-form-label">
           {{ T.wordsLanguage }}
         </label>
@@ -36,14 +36,14 @@
           T.arenaRunSubmitPaste
         }}</label>
       </div>
-      <div class="h-100">
+      <div class="h-100 introjs-pasteyourcode">
         <omegaup-arena-code-view
           v-model="code"
           :language="selectedLanguage"
           :readonly="false"
         ></omegaup-arena-code-view>
       </div>
-      <div class="form-group row mt-3 align-items-center">
+      <div class="form-group row mt-3 align-items-center introjs-upload-file">
         <label class="col-sm-3 col-form-label">
           {{ T.arenaRunSubmitUpload }}
         </label>
@@ -55,7 +55,7 @@
         <div class="col-sm-10">
           <button
             type="submit"
-            class="btn btn-primary"
+            class="btn btn-primary introjs-submit"
             data-submit-run
             :disabled="!canSubmit"
           >
@@ -83,6 +83,10 @@ import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
+import 'intro.js/introjs.css';
+import introJs from 'intro.js';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 @Component({
   components: {
@@ -97,12 +101,54 @@ export default class ArenaRunSubmitPopup extends Vue {
   @Prop({ required: true }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
   @Prop({ default: null }) preferredLanguage!: null | string;
+  @Prop() hasVisitedSectionPopup!: boolean;
+  @Prop() hasVisitedSection!: boolean;
 
   T = T;
   omegaup = omegaup;
   selectedLanguage = this.preferredLanguage;
   code = '';
   now: number = Date.now();
+
+  mounted() {
+    const title = T.interactiveGuideUploadSolutionTitle;
+    if (!this.hasVisitedSectionPopup) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              element: document.querySelector('.introjs-language') as Element,
+              title,
+              intro: T.interactiveGuideUploadSolutionLanguage,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-pasteyourcode',
+              ) as Element,
+              title,
+              intro: T.interactiveGuideUploadSolutionPasteYourCode,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-upload-file',
+              ) as Element,
+              title,
+              intro: T.interactiveGuideUploadSolutionUploadFile,
+            },
+            {
+              element: document.querySelector('.introjs-submit') as Element,
+              title,
+              intro: T.interactiveGuideUploadSolutionSubmitButton,
+            },
+          ],
+        })
+        .start();
+      this.$cookies.set('has-visited-submit-popup', true, -1);
+    }
+  }
 
   get canSubmit(): boolean {
     return this.nextSubmissionTimestamp.getTime() <= this.now;

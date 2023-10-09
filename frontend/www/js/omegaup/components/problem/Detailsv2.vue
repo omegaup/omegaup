@@ -169,7 +169,7 @@ export enum PopupDisplayed {
     'omegaup-username': user_Username,
   },
 })
-export default class ProblemDetails extends Vue {
+export default class ProblemDetailsV2 extends Vue {
   @Prop() allRuns!: types.Run[];
   @Prop() currentRunDetails!: types.RunDetails | null;
   @Prop({ default: null }) languages!: null | string[];

@@ -150,7 +150,7 @@ export class ContestPage {
 
     cy.get('a[data-contest-link-button]').click();
     cy.url().should('include', '/arena/' + contestOptions.contestAlias);
-
+    cy.get('.introjs-skipbutton').click();
     cy.get('a[href="#ranking"]').click();
     cy.waitUntil(() => cy.get('[data-table-scoreboard]').should('be.visible'));
   }
