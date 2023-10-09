@@ -345,6 +345,46 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         );
     }
 
+    private static function getCoderOfTheMonthCertificate(
+        string $verification_code,
+        bool $isFemaleCategory
+    ): string {
+        $certificateData = \OmegaUp\DAO\Certificates::getCoderOfTheMonthCertificateByVerificationCode(
+            $verification_code
+        );
+
+        if (is_null($certificateData)) {
+            return '';
+        }
+
+        $translator = \OmegaUp\Translations::getInstance();
+        if ($isFemaleCategory) {
+            $title = utf8_decode(
+                $translator->get('certificatePdfCoderOfTheMonthFemaleTitle')
+            );
+        } else {
+            $title = utf8_decode(
+                $translator->get('certificatePdfCoderOfTheMonthTitle')
+            );
+        }
+        $identityName = utf8_decode($certificateData['identity_name']);
+        $date = $certificateData['timestamp']->time;
+        $month = intval(date('n', $date));
+        $description = utf8_decode(
+            sprintf(
+                $translator->get('certificatePdfCoderOfTheMonthDescription'),
+                self::getMonthName($month - 1)
+            )
+        );
+
+        return self::createCertificatePdf(
+            $title,
+            $identityName,
+            $description,
+            $date
+        );
+    }
+
     /**
      * API to generate the certificate PDF
      *
@@ -367,8 +407,36 @@ class Certificate extends \OmegaUp\Controllers\Controller {
                 ),
             ];
         }
+        if ($type === 'coder_of_the_month' || $type === 'coder_of_the_month_female') {
+            return [
+                'certificate' => self::getCoderOfTheMonthCertificate(
+                    $verification_code,
+                    $type === 'coder_of_the_month_female'
+                ),
+            ];
+        }
         return [
             'certificate' => '',
+        ];
+    }
+
+    /**
+     * API to validate a certificate
+     *
+     * @return array{valid: boolean}
+     *
+     * @omegaup-request-param string $verification_code
+     */
+    public static function apiValidateCertificate(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        $verification_code = $r->ensureString('verification_code');
+        $isValid = boolval(\OmegaUp\DAO\Certificates::isValid(
+            $verification_code
+        ));
+
+        return [
+            'valid' => $isValid,
         ];
     }
 }
