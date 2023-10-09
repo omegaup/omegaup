@@ -13,7 +13,12 @@
           }}
         </p>
         <p class="description">{{ T.certificateValidationCertifyValidity }}</p>
-        <iframe :src="certificate" width="100%" height="600px"></iframe>
+        <object
+          :data="certificateUrl"
+          type="application/pdf"
+          width="100%"
+          height="600rem"
+        ></object>
       </div>
       <div v-else>
         <p class="title">
@@ -54,6 +59,22 @@ export default class Validation extends Vue {
 
   T = T;
   ui = ui;
+  certificateUrl = '';
+
+  created() {
+    if (this.certificate !== undefined) {
+      const decodedData = atob(this.certificate);
+      const unicode = new Array(decodedData.length);
+      for (let i = 0; i < decodedData.length; i++) {
+        unicode[i] = decodedData.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(unicode);
+      const blob = new Blob([byteArray], {
+        type: 'application/pdf',
+      });
+      this.certificateUrl = window.URL.createObjectURL(blob);
+    }
+  }
 }
 </script>
 

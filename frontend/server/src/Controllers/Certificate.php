@@ -7,7 +7,7 @@ use setasign\Fpdi\Fpdi;
  * CertificateController
  *
  * @psalm-type CertificateDetailsPayload=array{uuid: string}
- * @psalm-type CertificateValidationPayload=array{verification_code: string, valid: bool}
+ * @psalm-type CertificateValidationPayload=array{certificate: null|string, verification_code: string, valid: bool}
  */
 class Certificate extends \OmegaUp\Controllers\Controller {
     /**
@@ -39,6 +39,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             'verification_code' => $r->ensureString('verification_code'),
         ]);
         $validation = self::apiValidateCertificate($request);
+        $certificate = self::apiGetCertificatePdf($request);
+
         return [
             'templateProperties' => [
                 'payload' => [
@@ -46,6 +48,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
                         'verification_code'
                     ),
                     'valid' => $validation['valid'],
+                    'certificate' => $certificate['certificate'],
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCertificateValidation'
@@ -332,13 +335,13 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         return $translator->get('certificatePdfContestPlaceTh');
     }
 
-    private static function getContestCertificate(string $verification_code): string {
+    private static function getContestCertificate(string $verification_code): ?string {
         $certificateData = \OmegaUp\DAO\Certificates::getContestCertificateByVerificationCode(
             $verification_code
         );
 
         if (is_null($certificateData)) {
-            return '';
+            return null;
         }
 
         $translator = \OmegaUp\Translations::getInstance();
@@ -375,13 +378,13 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     private static function getCoderOfTheMonthCertificate(
         string $verification_code,
         bool $isFemaleCategory
-    ): string {
+    ): ?string {
         $certificateData = \OmegaUp\DAO\Certificates::getCoderOfTheMonthCertificateByVerificationCode(
             $verification_code
         );
 
         if (is_null($certificateData)) {
-            return '';
+            return null;
         }
 
         $translator = \OmegaUp\Translations::getInstance();
@@ -415,7 +418,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     /**
      * API to generate the certificate PDF
      *
-     * @return array{certificate: string}
+     * @return array{certificate: string|null}
      *
      * @omegaup-request-param string $verification_code
      */
@@ -443,7 +446,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             ];
         }
         return [
-            'certificate' => '',
+            'certificate' => null,
         ];
     }
 
