@@ -3426,6 +3426,7 @@ export namespace types {
     is_under_13_user: boolean;
     loginIdentity?: dao.Identities;
     user?: dao.Users;
+    user_verification_deadline?: Date;
     valid: boolean;
   }
 
