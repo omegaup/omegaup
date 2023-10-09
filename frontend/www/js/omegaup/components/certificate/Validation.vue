@@ -13,12 +13,13 @@
           }}
         </p>
         <p class="description">{{ T.certificateValidationCertifyValidity }}</p>
-        <object
-          :data="certificateUrl"
-          type="application/pdf"
-          width="100%"
-          height="600rem"
-        ></object>
+        <div class="embed-responsive embed-responsive-4by3">
+          <object
+            :data="certificateUrl"
+            type="application/pdf"
+            class="embed-responsive-item"
+          ></object>
+        </div>
       </div>
       <div v-else>
         <p class="title">
