@@ -132,8 +132,8 @@ export class ContestPage {
     });
   }
 
-  createContest(contestOptions: ContestOptions, users: Array<string>): void {
-    cy.createContest(contestOptions);
+  createContest(contestOptions: ContestOptions, users: Array<string>, shouldShowIntro: boolean = true): void {
+    cy.createContest(contestOptions, shouldShowIntro);
 
     cy.location('href').should('include', contestOptions.contestAlias);
     cy.get('[name="title"]').should('have.value', contestOptions.contestAlias);
