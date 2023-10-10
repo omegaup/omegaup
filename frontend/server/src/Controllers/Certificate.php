@@ -35,20 +35,16 @@ class Certificate extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $verification_code
      */
     public static function getValidationForTypeScript(\OmegaUp\Request $r) {
-        $request = new \OmegaUp\Request([
-            'verification_code' => $r->ensureString('verification_code'),
-        ]);
-        $validation = self::apiValidateCertificate($request);
-        $certificate = self::apiGetCertificatePdf($request);
+        $verificationCode = $r->ensureString('verification_code');
 
         return [
             'templateProperties' => [
                 'payload' => [
-                    'verification_code' => $r->ensureString(
-                        'verification_code'
-                    ),
-                    'valid' => $validation['valid'],
-                    'certificate' => $certificate['certificate'],
+                    'verification_code' => $verificationCode,
+                    'valid' => boolval(\OmegaUp\DAO\Certificates::isValid(
+                        $verificationCode
+                    )),
+                    'certificate' => self::getCertificatePdf($verificationCode),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCertificateValidation'
@@ -415,6 +411,23 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         );
     }
 
+    private static function getCertificatePdf(string $verificationCode): ?string {
+        $type = \OmegaUp\DAO\Certificates::getCertificateTypeByVerificationCode(
+            $verificationCode
+        );
+
+        if ($type === 'contest') {
+            return self::getContestCertificate($verificationCode);
+        }
+        if ($type === 'coder_of_the_month' || $type === 'coder_of_the_month_female') {
+            return self::getCoderOfTheMonthCertificate(
+                $verificationCode,
+                isFemaleCategory: $type === 'coder_of_the_month_female'
+            );
+        }
+        return null;
+    }
+
     /**
      * API to generate the certificate PDF
      *
@@ -425,28 +438,10 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     public static function apiGetCertificatePdf(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
-        $verification_code = $r->ensureString('verification_code');
-        $type = \OmegaUp\DAO\Certificates::getCertificateTypeByVerificationCode(
-            $verification_code
-        );
-
-        if ($type === 'contest') {
-            return [
-                'certificate' => self::getContestCertificate(
-                    $verification_code
-                ),
-            ];
-        }
-        if ($type === 'coder_of_the_month' || $type === 'coder_of_the_month_female') {
-            return [
-                'certificate' => self::getCoderOfTheMonthCertificate(
-                    $verification_code,
-                    $type === 'coder_of_the_month_female'
-                ),
-            ];
-        }
         return [
-            'certificate' => null,
+            'certificate' => self::getCertificatePdf(
+                $r->ensureString('verification_code')
+            ),
         ];
     }
 
@@ -460,13 +455,10 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     public static function apiValidateCertificate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
-        $verification_code = $r->ensureString('verification_code');
-        $isValid = boolval(\OmegaUp\DAO\Certificates::isValid(
-            $verification_code
-        ));
-
         return [
-            'valid' => $isValid,
+            'valid' => boolval(\OmegaUp\DAO\Certificates::isValid(
+                $r->ensureString('verification_code')
+            )),
         ];
     }
 }

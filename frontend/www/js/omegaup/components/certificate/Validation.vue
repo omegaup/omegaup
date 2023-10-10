@@ -60,21 +60,22 @@ export default class Validation extends Vue {
 
   T = T;
   ui = ui;
-  certificateUrl = '';
+  certificateUrl: null | string = null;
 
   created() {
-    if (this.certificate !== undefined) {
-      const decodedData = atob(this.certificate);
-      const unicode = new Array(decodedData.length);
-      for (let i = 0; i < decodedData.length; i++) {
-        unicode[i] = decodedData.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(unicode);
-      const blob = new Blob([byteArray], {
-        type: 'application/pdf',
-      });
-      this.certificateUrl = window.URL.createObjectURL(blob);
+    if (this.certificate === undefined) {
+      return;
     }
+    const decodedData = atob(this.certificate);
+    const unicode = new Array(decodedData.length);
+    for (let i = 0; i < decodedData.length; i++) {
+      unicode[i] = decodedData.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(unicode);
+    const blob = new Blob([byteArray], {
+      type: 'application/pdf',
+    });
+    this.certificateUrl = window.URL.createObjectURL(blob);
   }
 }
 </script>
