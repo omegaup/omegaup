@@ -73,10 +73,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->Cell(
             $width,
             $height,
-            utf8_decode(
-                $translator->get(
-                    'certificatePdfHeader'
-                )
+            $translator->getDecoded(
+                'certificatePdfHeader'
             ),
             $border,
             $ln,
@@ -105,13 +103,14 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->Cell(
             $width,
             $height,
-            utf8_decode(
-                sprintf(
-                    $translator->get('certificatePdfPlaceAndDate'),
-                    $day,
-                    self::getMonthName($month),
-                    $year
-                )
+            \OmegaUp\ApiUtils::formatString(
+                $translator->get('certificatePdfPlaceAndDate'),
+                [
+                    'month' => self::getMonthName($month),
+                    'day' => $day,
+                    'year' => $year,
+                ],
+                convertUTF8ToISO: true
             ),
             $border,
             $ln,
@@ -134,10 +133,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->Cell(
             $width,
             $height,
-            utf8_decode(
-                $translator->get(
-                    'certificatePdfDirector'
-                )
+            $translator->getDecoded(
+                'certificatePdfDirector'
             ),
             $border,
             $ln,
@@ -199,10 +196,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->Cell(
             $width,
             $height,
-            utf8_decode(
-                $translator->get(
-                    'certificatePdfGrantsRecognition'
-                )
+            $translator->getDecoded(
+                'certificatePdfGrantsRecognition'
             ),
             $border,
             $ln,
@@ -225,10 +220,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->Cell(
             $width,
             $height,
-            utf8_decode(
-                $translator->get(
-                    'certificatePdfPerson'
-                )
+            $translator->getDecoded(
+                'certificatePdfPerson'
             ),
             $border,
             $ln,
@@ -317,23 +310,24 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $translator = \OmegaUp\Translations::getInstance();
         if (!is_null($certificateData['contest_place'])) {
             $placeNumber = intval($certificateData['contest_place']);
-            $title = utf8_decode(
+            $title = \OmegaUp\ApiUtils::convertUTFToISO(
                 $placeNumber
                 . self::getPlaceSuffix($placeNumber)
             );
         } else {
-            $title = utf8_decode(
-                $translator->get(
-                    'certificatePdfContestParticipation'
-                )
+            $title = $translator->getDecoded(
+                'certificatePdfContestParticipation'
             );
         }
-        $identityName = utf8_decode($certificateData['identity_name']);
-        $description = utf8_decode(
-            sprintf(
-                $translator->get('certificatePdfContestDescription'),
-                $certificateData['contest_title']
-            )
+        $identityName = \OmegaUp\ApiUtils::convertUTFToISO(
+            $certificateData['identity_name']
+        );
+        $description = \OmegaUp\ApiUtils::formatString(
+            $translator->get('certificatePdfContestDescription'),
+            [
+                'contest_title' => $certificateData['contest_title'],
+            ],
+            convertUTF8ToISO: true
         );
         $date = $certificateData['timestamp']->time;
 
@@ -355,15 +349,16 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         }
 
         $translator = \OmegaUp\Translations::getInstance();
-        $title = utf8_decode(
-            $translator->get('certificatePdfCourseTitle')
+        $title = $translator->getDecoded('certificatePdfCourseTitle');
+        $identityName = \OmegaUp\ApiUtils::convertUTFToISO(
+            $certificateData['identity_name']
         );
-        $identityName = utf8_decode($certificateData['identity_name']);
-        $description = utf8_decode(
-            sprintf(
-                $translator->get('certificatePdfCourseDescription'),
-                $certificateData['course_name']
-            )
+        $description = \OmegaUp\ApiUtils::formatString(
+            $translator->get('certificatePdfCourseDescription'),
+            [
+                'course_name' => $certificateData['course_name'],
+            ],
+            convertUTF8ToISO: true
         );
         $date = $certificateData['timestamp']->time;
 
@@ -389,22 +384,25 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
         $translator = \OmegaUp\Translations::getInstance();
         if ($isFemaleCategory) {
-            $title = utf8_decode(
-                $translator->get('certificatePdfCoderOfTheMonthFemaleTitle')
+            $title = $translator->getDecoded(
+                'certificatePdfCoderOfTheMonthFemaleTitle'
             );
         } else {
-            $title = utf8_decode(
-                $translator->get('certificatePdfCoderOfTheMonthTitle')
+            $title = $translator->getDecoded(
+                'certificatePdfCoderOfTheMonthTitle'
             );
         }
-        $identityName = utf8_decode($certificateData['identity_name']);
+        $identityName = \OmegaUp\ApiUtils::convertUTFToISO(
+            $certificateData['identity_name']
+        );
         $date = $certificateData['timestamp']->time;
         $month = intval(date('n', $date));
-        $description = utf8_decode(
-            sprintf(
-                $translator->get('certificatePdfCoderOfTheMonthDescription'),
-                self::getMonthName($month - 1)
-            )
+        $description = \OmegaUp\ApiUtils::formatString(
+            $translator->get('certificatePdfCoderOfTheMonthDescription'),
+            [
+                'month_name' => self::getMonthName($month - 1),
+            ],
+            convertUTF8ToISO: true
         );
 
         return self::createCertificatePdf(

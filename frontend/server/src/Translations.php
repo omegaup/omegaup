@@ -74,4 +74,22 @@ class Translations {
         }
         return $this->_translations[$key];
     }
+
+    /**
+     * Returns the translation string for the provided key and it is decoded
+     * from UTF-8 to ISO-8859-1.
+     *
+     * @param string $key the translation string to look up.
+     *
+     * @return string the translated string.
+     */
+    public function getDecoded(string $key): string {
+        if (!array_key_exists($key, $this->_translations)) {
+            \Monolog\Registry::omegaup()->withName('Translations')->error(
+                "Untranslated error message: {$key}"
+            );
+            return "{untranslated:{$key}}";
+        }
+        return \OmegaUp\ApiUtils::convertUTFToISO($this->_translations[$key]);
+    }
 }
