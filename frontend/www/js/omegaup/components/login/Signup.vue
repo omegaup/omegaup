@@ -58,12 +58,11 @@
               />
             </div>
           </div>
-          <div class="col-md-4 introjs-date-of-birth">
+          <div class="col-md-4">
             <div class="form-group">
               <label class="control-label">{{ T.loginDateOfBirth }}</label>
               <input
                 v-model="dateOfBirth"
-                data-signup-date-of-birth
                 name="reg_date_of_birth"
                 type="date"
                 class="form-control"
