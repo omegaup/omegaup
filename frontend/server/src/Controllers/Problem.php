@@ -4741,7 +4741,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             problemsetId: null,
             identityId: intval($r->identity->identity_id)
         );
-
+        // Count solutions viewed by the user today, if available.
+        // Otherwise, assign the maximum allowed per day.
         $seenSolutions = (!is_null(
             $r->user
         )) ? \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCountInDay(

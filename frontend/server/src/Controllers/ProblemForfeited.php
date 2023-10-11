@@ -17,13 +17,11 @@ class ProblemForfeited extends \OmegaUp\Controllers\Controller {
      */
     public static function apiGetCounts(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
-        $seen = \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCountInDay(
-            $r->user
-        );
-        $allowed = intval(static::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY);
         return [
-            'allowed' => $allowed,
-            'seen' => $seen,
+            'allowed' => intval(static::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY),
+            'seen' => \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCountInDay(
+                $r->user
+            ),
         ];
     }
 }

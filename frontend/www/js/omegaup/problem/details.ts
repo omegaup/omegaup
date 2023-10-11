@@ -272,7 +272,6 @@ OmegaUp.on('ready', async () => {
               .catch(ui.apiError);
           },
           'unlock-solution': () => {
-            console.log('simon');
             api.Problem.solution(
               {
                 problem_alias: payload.problem.alias,

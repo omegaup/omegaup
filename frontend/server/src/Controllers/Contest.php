@@ -3085,19 +3085,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
             )
         );
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        $solutionStatus = null;
+        $solutionStatus = \OmegaUp\Controllers\Problem::SOLUTION_NOT_FOUND;
 
-        if (!is_null($problem) && \OmegaUp\DAO\Problems::isVisible($problem)) {
+        if (\OmegaUp\DAO\Problems::isVisible($problem)) {
             $solutionStatus = \OmegaUp\Controllers\Problem::getProblemSolutionStatus(
                 $problem,
                 $r->identity
             );
         }
-
-        $solutionStatus = is_null(
-            $solutionStatus
-        ) ? 'not_found' : $solutionStatus;
 
         return [
             'status' => 'ok',
