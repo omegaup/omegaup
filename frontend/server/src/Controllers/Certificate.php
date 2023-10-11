@@ -73,8 +73,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->Cell(
             $width,
             $height,
-            $translator->getDecoded(
-                'certificatePdfHeader'
+            \OmegaUp\ApiUtils::convertUTFToISO(
+                $translator->get('certificatePdfHeader')
             ),
             $border,
             $ln,
@@ -133,8 +133,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->Cell(
             $width,
             $height,
-            $translator->getDecoded(
-                'certificatePdfDirector'
+            \OmegaUp\ApiUtils::convertUTFToISO(
+                $translator->get('certificatePdfDirector')
             ),
             $border,
             $ln,
@@ -196,8 +196,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->Cell(
             $width,
             $height,
-            $translator->getDecoded(
-                'certificatePdfGrantsRecognition'
+            \OmegaUp\ApiUtils::convertUTFToISO(
+                $translator->get('certificatePdfGrantsRecognition')
             ),
             $border,
             $ln,
@@ -220,8 +220,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->Cell(
             $width,
             $height,
-            $translator->getDecoded(
-                'certificatePdfPerson'
+            \OmegaUp\ApiUtils::convertUTFToISO(
+                $translator->get('certificatePdfPerson')
             ),
             $border,
             $ln,
@@ -315,8 +315,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
                 . self::getPlaceSuffix($placeNumber)
             );
         } else {
-            $title = $translator->getDecoded(
-                'certificatePdfContestParticipation'
+            $title = \OmegaUp\ApiUtils::convertUTFToISO(
+                $translator->get('certificatePdfContestParticipation')
             );
         }
         $identityName = \OmegaUp\ApiUtils::convertUTFToISO(
@@ -349,7 +349,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         }
 
         $translator = \OmegaUp\Translations::getInstance();
-        $title = $translator->getDecoded('certificatePdfCourseTitle');
+        $title = \OmegaUp\ApiUtils::convertUTFToISO(
+            $translator->get('certificatePdfCourseTitle')
+        );
         $identityName = \OmegaUp\ApiUtils::convertUTFToISO(
             $certificateData['identity_name']
         );
@@ -384,12 +386,12 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
         $translator = \OmegaUp\Translations::getInstance();
         if ($isFemaleCategory) {
-            $title = $translator->getDecoded(
-                'certificatePdfCoderOfTheMonthFemaleTitle'
+            $title = \OmegaUp\ApiUtils::convertUTFToISO(
+                $translator->get('certificatePdfCoderOfTheMonthFemaleTitle')
             );
         } else {
-            $title = $translator->getDecoded(
-                'certificatePdfCoderOfTheMonthTitle'
+            $title = \OmegaUp\ApiUtils::convertUTFToISO(
+                $translator->get('certificatePdfCoderOfTheMonthTitle')
             );
         }
         $identityName = \OmegaUp\ApiUtils::convertUTFToISO(
@@ -458,7 +460,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     /**
      * API to validate a certificate
      *
-     * @return array{valid: boolean}
+     * @return array{valid: bool}
      *
      * @omegaup-request-param string $verification_code
      */
