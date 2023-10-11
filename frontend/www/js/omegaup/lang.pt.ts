@@ -722,16 +722,10 @@ const translations: { [key: string]: string; } = {
   lockdownDetailsDisabled: "A visualiza\u00e7\u00e3o do c\u00f3digo-fonte foi desativada temporariamente.",
   lockdownMessageWarning: "Aviso: no modo lockdown, Suas env\u00edos n\u00e3o ser\u00e3o mais acess\u00edveis se voc\u00ea sair da p\u00e1gina.",
   loginAccountName: "Nome da conta",
-<<<<<<< HEAD
   loginDateOfBirth: "Data de nascimento",
   loginDisabled: "O usu\u00e1rio \u00e9 muito antigo e para a sua seguran\u00e7a ele foi desativado. Entre em contato com omegaup-soporte@googlegroups.com para acessar novamente.",
   loginEmail: "Endere\u00e7o de E-mail",
   loginEmailUsername: "E-mail ou usu\u00e1rio",
-=======
-  loginDisabled: "A sua conta est\u00e1 inativa h\u00e1 muito tempo e foi desactivada para sua seguran\u00e7a. Entre em contato com omegaup-soporte@googlegroups.com para acessar novamente.",
-  loginEmail: "E-mail",
-  loginEmailUsername: "E-mail ou nome da conta",
->>>>>>> 275b0c7851f7e7f111127d550ef5ed5739745a50
   loginFacebookEmptyEmailError: "Um endere\u00e7o de e-mail \u00e9 necess\u00e1rio para utilizar omegaUp. Por favor, proporcione acesso ao e-mail de Facebook para continuar",
   loginFederated: "Conta em outros sites",
   loginGoogleInvalidCSRFToken: "Token CSRF inv\u00e1lido",

@@ -722,16 +722,10 @@ const translations: { [key: string]: string; } = {
   lockdownDetailsDisabled: "Viewing source code has been temporarily disabled.",
   lockdownMessageWarning: "Warning: in lockdown mode, your submissions will no longer be accessible if you leave the page.",
   loginAccountName: "Account name",
-<<<<<<< HEAD
   loginDateOfBirth: "Date of birth",
   loginDisabled: "Your account is too old and it has been disabled for your security. Please contact omegaup-soporte@googlegroups.com to login again.",
   loginEmail: "E-mail address",
   loginEmailUsername: "E-mail or user",
-=======
-  loginDisabled: "Your account has been inactive for a long time and has been disabled for your security. Please contact omegaup-soporte@googlegroups.com to login again.",
-  loginEmail: "E-mail",
-  loginEmailUsername: "E-mail or account name",
->>>>>>> 275b0c7851f7e7f111127d550ef5ed5739745a50
   loginFacebookEmptyEmailError: "An email address is needed to use omegaUp. Please grant access to Facebook's email to continue",
   loginFederated: "Login using these sites",
   loginGoogleInvalidCSRFToken: "Invalid CSRF token",

@@ -720,16 +720,10 @@ lockdown = "Operação não permitida no modo lockdown"
 lockdownDetailsDisabled = "A visualização do código-fonte foi desativada temporariamente."
 lockdownMessageWarning = "Aviso: no modo lockdown, Suas envíos não serão mais acessíveis se você sair da página."
 loginAccountName = "Nome da conta"
-<<<<<<< HEAD
 loginDateOfBirth = "Data de nascimento"
 loginDisabled = "O usuário é muito antigo e para a sua segurança ele foi desativado. Entre em contato com omegaup-soporte@googlegroups.com para acessar novamente."
 loginEmail = "Endereço de E-mail"
 loginEmailUsername = "E-mail ou usuário"
-=======
-loginDisabled = "A sua conta está inativa há muito tempo e foi desactivada para sua segurança. Entre em contato com omegaup-soporte@googlegroups.com para acessar novamente."
-loginEmail = "E-mail"
-loginEmailUsername = "E-mail ou nome da conta"
->>>>>>> 275b0c7851f7e7f111127d550ef5ed5739745a50
 loginFacebookEmptyEmailError = "Um endereço de e-mail é necessário para utilizar omegaUp. Por favor, proporcione acesso ao e-mail de Facebook para continuar"
 loginFederated = "Conta em outros sites"
 loginGoogleInvalidCSRFToken = "Token CSRF inválido"
