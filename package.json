@@ -138,6 +138,7 @@
     "build-development": "cross-env webpack --mode=development",
     "build-development-frontend": "cross-env webpack --config-name=frontend --mode=development",
     "refactor": "cross-env ./stuff/refactor.js",
-    "test:e2e": "cypress run --browser chrome"
+    "test:e2e": "cypress run --browser chrome",
+    "storybook": "cd frontend/www/js/omegaup/components && yarn storybook"
   }
 }

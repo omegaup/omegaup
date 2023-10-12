@@ -2647,6 +2647,7 @@ export namespace types {
     first_assignation?: Date;
     owners_count: number;
     total_users: number;
+    unlocked: boolean;
   }
 
   export interface BadgeDetailsPayload {
