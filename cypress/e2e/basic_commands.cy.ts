@@ -75,26 +75,6 @@ describe('Basic Commands Test', () => {
   it('Should create a problem', () => {
     const loginOptions = loginPage.registerMultipleUsers(1);
     const problemOptions = contestPage.generateProblemOptions(1);
-
-    const problemOptions: ProblemOptions = {
-      problemAlias: uuid().slice(0, 10), // Too large for the alias,
-      tag: 'Recursión',
-      autoCompleteTextTag: 'recur',
-      problemLevelIndex: 0,
-    };
-
-    cy.register(loginOptions);
-    cy.createProblem(problemOptions);
-
-    // Assert problem has been created
-    cy.location('href').should('include', problemOptions.problemAlias); // Url
-    cy.get('.introjs-skipbutton').click();
-    cy.get('[name="title"]').should('have.value', problemOptions.problemAlias); // Title
-    cy.get('[name="problem_alias"]').should(
-      'have.value',
-      problemOptions.problemAlias,
-    );
-    cy.get('[name="source"]').should('have.value', problemOptions.problemAlias);
     cy.login(loginOptions[0]);
     cy.createProblem(problemOptions[0]);
     coursePage.verifyProblem(problemOptions[0]);
@@ -120,7 +100,7 @@ describe('Basic Commands Test', () => {
     cy.logout();
   });
 
-  it.only('Should create a contest', () => {
+  it('Should create a contest', () => {
     const loginOptions = loginPage.registerMultipleUsers(2);
     const contestOptions = contestPage.generateContestOptions(loginOptions[0]);
     const users = [loginOptions[1].username];
@@ -136,7 +116,7 @@ describe('Basic Commands Test', () => {
     cy.logout();
   });
 
-  it.only('Should create runs inside contest', () => {
+  it('Should create runs inside contest', () => {
     const loginOptions = loginPage.registerMultipleUsers(2);
     const contestOptions = contestPage.generateContestOptions(loginOptions[1]);
     const users = [loginOptions[0].username];
@@ -151,10 +131,10 @@ describe('Basic Commands Test', () => {
     cy.logout();
   });
 
-  it.only('Should create two contests and merge their scoreboard', () => {
+  it('Should create two contests and merge their scoreboard', () => {
     const loginOptions = loginPage.registerMultipleUsers(4);
     const contestOptions1 = contestPage.generateContestOptions(loginOptions[1]);
-    const contestOptions2 = contestPage.generateContestOptions(loginOptions[2]);
+    const contestOptions2 = contestPage.generateContestOptions(loginOptions[2], false);
     const users1 = [loginOptions[0].username, loginOptions[3].username];
     const users2 = [loginOptions[3].username];
 

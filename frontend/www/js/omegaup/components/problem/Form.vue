@@ -120,31 +120,6 @@
                   {{ T.problemEditTagPublicRequired }}
                 </div>
                 <div class="introjs-tags-and-level">
-                  <omegaup-problem-tags
-                    :public-tags="data.publicTags"
-                    :level-tags="data.levelTags"
-                    :alias="data.alias"
-                    :is-create="true"
-                    :problem-level="problemLevel"
-                    :selected-private-tags="selectedPrivateTags"
-                    :selected-public-tags="selectedPublicTags"
-                    :can-add-new-tags="true"
-                    :errors="errors"
-                    @emit-add-tag="addTag"
-                    @emit-remove-tag="removeTag"
-                    @select-problem-level="selectProblemLevel"
-                  ></omegaup-problem-tags>
-                  <input
-                    name="selected_tags"
-                    :value="selectedTagsList"
-                    type="hidden"
-                  />
-                  <input
-                    name="problem_level"
-                    :value="problemLevel"
-                    type="hidden"
-                  />
-                </div>
                 <omegaup-problem-tags
                   :public-tags="data.publicTags"
                   :level-tags="data.levelTags"
@@ -496,7 +471,7 @@ export default class ProblemForm extends Vue {
   @Prop({ default: () => [] }) errors!: string[];
   @Prop({ default: false }) isUpdate!: boolean;
   @Prop({ default: 0 }) originalVisibility!: number;
-  @Prop() hasVisitedSection!: boolean;
+  @Prop({ default: true }) hasVisitedSection!: boolean;
 
   @Ref('basic-info') basicInfoRef!: HTMLDivElement;
   @Ref('tags') tagsRef!: HTMLDivElement;
