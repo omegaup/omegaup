@@ -91,6 +91,7 @@
             </div>
             <div v-if="user.loggedIn">
               <button
+                data-report-problem-button
                 class="btn btn-link"
                 @click="onReportInappropriateProblem"
               >
@@ -98,7 +99,11 @@
               </button>
             </div>
             <div v-if="user.reviewer && !nominationStatus.alreadyReviewed">
-              <button class="btn btn-link" @click="onNewPromotionAsReviewer">
+              <button
+                data-rate-problem-button
+                class="btn btn-link"
+                @click="onNewPromotionAsReviewer"
+              >
                 {{ T.reviewerNomination }}
               </button>
             </div>

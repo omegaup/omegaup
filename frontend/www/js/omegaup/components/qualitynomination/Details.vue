@@ -86,6 +86,7 @@
           </div>
           <div class="col-sm-8 text-center">
             <button
+              data-ban-problem-button
               class="btn btn-danger"
               :disabled="!rationale"
               @click="showConfirmationDialog('banned')"
@@ -112,6 +113,7 @@
     </div>
     <omegaup-common-confirmation
       v-if="showConfirmation"
+      data-confirm-report
       :question="T.demotionProblemMultipleQuestion"
       :answer-yes="T.demotionProblemMultipleAnswerYes"
       :answer-no="T.demotionProblemMultipleAnswerNo"

@@ -8,6 +8,9 @@
   - [`/api/badge/myBadgeAssignationTime/`](#apibadgemybadgeassignationtime)
   - [`/api/badge/myList/`](#apibadgemylist)
   - [`/api/badge/userList/`](#apibadgeuserlist)
+- [Certificate](#certificate)
+  - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
+  - [`/api/certificate/validateCertificate/`](#apicertificatevalidatecertificate)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
   - [`/api/clarification/details/`](#apiclarificationdetails)
@@ -386,6 +389,46 @@ Returns a list of badges owned by a certain user
 | Name     | Type            |
 | -------- | --------------- |
 | `badges` | `types.Badge[]` |
+
+# Certificate
+
+CertificateController
+
+## `/api/certificate/getCertificatePdf/`
+
+### Description
+
+API to generate the certificate PDF
+
+### Parameters
+
+| Name                | Type     | Description |
+| ------------------- | -------- | ----------- |
+| `verification_code` | `string` |             |
+
+### Returns
+
+| Name          | Type     |
+| ------------- | -------- |
+| `certificate` | `string` |
+
+## `/api/certificate/validateCertificate/`
+
+### Description
+
+API to validate a certificate
+
+### Parameters
+
+| Name                | Type     | Description |
+| ------------------- | -------- | ----------- |
+| `verification_code` | `string` |             |
+
+### Returns
+
+| Name    | Type      |
+| ------- | --------- |
+| `valid` | `boolean` |
 
 # Clarification
 
@@ -4906,7 +4949,7 @@ Update user profile
 | `scholar_degree`            | `null\|string`                               |             |
 | `school_id`                 | `int\|null`                                  |             |
 | `school_name`               | `null\|string`                               |             |
-| `username`                  | `mixed`                                      |             |
+| `username`                  | `null\|string`                               |             |
 
 ### Returns
 

@@ -6,6 +6,7 @@
         :existing-options="searchResultSchools"
         :options="searchResultSchools"
         :value.sync="school"
+        data-school-name
         @update-existing-options="
           (query) => $emit('update-search-result-schools', query)
         "
@@ -13,7 +14,7 @@
     </div>
     <div class="form-group">
       <label>{{ T.userEditSchoolGrade }}</label>
-      <select v-model="scholarDegree" class="form-control">
+      <select v-model="scholarDegree" class="form-control" data-school-grade>
         <option value="none">{{ T.userEditNone }}</option>
         <option value="early_childhood">
           {{ T.userEditEarlyChildhood }}
@@ -40,7 +41,7 @@
         :selected-value="isCurrentlyEnrolled"
       ></omegaup-radio-switch>
     </div>
-    <div class="form-group">
+    <div class="form-group" data-graduation-date>
       <label>{{ T.userEditGraduationDate }}</label>
       <omegaup-datepicker
         v-model="graduationDate"
@@ -49,7 +50,11 @@
       ></omegaup-datepicker>
     </div>
     <div class="mt-3">
-      <button type="submit" class="btn btn-primary mr-2">
+      <button
+        type="submit"
+        class="btn btn-primary mr-2"
+        data-save-school-changes
+      >
         {{ T.wordsSaveChanges }}
       </button>
       <a href="/profile/" class="btn btn-cancel">{{ T.wordsCancel }}</a>

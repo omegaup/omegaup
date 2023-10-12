@@ -51,7 +51,7 @@
         </option>
       </select>
     </div>
-    <div class="form-group">
+    <div class="form-group" data-date-of-birth>
       <label>{{ T.userEditBirthDate }}</label>
       <omegaup-datepicker
         v-model="birthDate"

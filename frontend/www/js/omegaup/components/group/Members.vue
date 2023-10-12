@@ -23,7 +23,7 @@
     <table class="table table-striped" data-table-members>
       <thead>
         <tr>
-          <th>{{ T.wordsUser }}</th>
+          <th>{{ T.groupEditMembersCoder }}</th>
           <th>{{ T.contestEditRegisteredAdminDelete }}</th>
         </tr>
       </thead>
@@ -51,7 +51,7 @@
     <table class="table table-striped" data-table-identities>
       <thead>
         <tr>
-          <th>{{ T.wordsIdentity }}</th>
+          <th>{{ T.groupEditMembersCoder }}</th>
           <th>{{ T.wordsName }}</th>
           <th>{{ T.profileCountry }}</th>
           <th>{{ T.profileState }}</th>
@@ -81,6 +81,7 @@
               <font-awesome-icon :icon="['fas', 'edit']" />
             </button>
             <button
+              data-identity-change-password
               class="btn btn-link"
               :title="T.groupEditMembersChangePassword"
               @click="onChangePass(identity.username)"
