@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "./built/",
     "sourceMap": true,
-    "target": "es6",
+    "target": "esnext",
     "downlevelIteration": true,
     "strict": true,
     "lib": ["DOM", "ES5", "ScriptHost", "ES2020.Promise", "dom.iterable"],

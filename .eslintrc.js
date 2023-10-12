@@ -42,5 +42,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-namespace': 'off',
     'vue/script-setup-uses-vars': 'off', // This rule was deprecated: https://eslint.vuejs.org/rules/script-setup-uses-vars.html
+    '@typescript-eslint/no-unused-vars': 'error',
+    'vue/no-export-in-script-setup': 'off',
   },
 };

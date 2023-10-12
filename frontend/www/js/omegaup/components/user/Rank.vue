@@ -170,7 +170,7 @@ interface Rank {
     'omegaup-common-paginator': common_Paginator,
   },
 })
-export default class UserRank extends Vue {
+class UserRank extends Vue {
   @Prop() page!: number;
   @Prop() length!: number;
   @Prop() isIndex!: boolean;
@@ -228,6 +228,8 @@ export default class UserRank extends Vue {
     else return `/rank?page=${this.page - 1}`;
   }
 }
+
+export { UserRank as default };
 </script>
 
 <style lang="scss">
