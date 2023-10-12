@@ -69,7 +69,7 @@ OmegaUp.on('ready', async () => {
       runDetailsData: runDetails,
       solutionStatus: payload.solutionStatus,
       solution: null as types.ProblemStatement | null,
-      allowedSolutionsToSee: payload.allowedSolutionsToSee || 0,
+      allowedSolutionsToSee: payload.allowedSolutionsToSee,
       activeTab: window.location.hash ? locationHash[0] : 'problems',
       nominationStatus: payload.nominationStatus,
       hasBeenNominated:

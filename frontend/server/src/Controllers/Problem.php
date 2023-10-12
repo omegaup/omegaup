@@ -4742,7 +4742,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             identityId: intval($r->identity->identity_id)
         );
 
-        $allowedSolutionsTosee = 0;
+        $allowedSolutionsToSee = 0;
         if (!is_null($r->user)) {
             // Get the count of problems forfeited by the user on the current day.
             $problemsForfeitedCount = \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCountInDay(
@@ -4750,7 +4750,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
 
             // Calculate the remaining solutions the user can view by subtracting the number of solutions they have already seen from the daily allowed limit.
-            $allowedSolutionsTosee = \OmegaUp\Controllers\ProblemForfeited::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY - $problemsForfeitedCount;
+            $allowedSolutionsToSee = max(
+                \OmegaUp\Controllers\ProblemForfeited::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY - $problemsForfeitedCount,
+                $allowedSolutionsToSee
+            );
         }
 
         $response['templateProperties']['payload'] = array_merge(
@@ -4769,7 +4772,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     offset: null,
                     rowcount: 0,
                 ),
-                'allowedSolutionsToSee' => $allowedSolutionsTosee,
+                'allowedSolutionsToSee' => $allowedSolutionsToSee,
             ]
         );
 

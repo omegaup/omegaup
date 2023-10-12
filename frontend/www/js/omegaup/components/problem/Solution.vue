@@ -44,7 +44,7 @@
           {{ T.solutionAvailableViews }}
         </button>
         <button
-          v-else-if="status === 'locked' && allowedSolutionsToSee &gt; 0"
+          v-else-if="status === 'locked' && allowedSolutionsToSee > 0"
           class="btn btn-primary btn-md"
           @click="$emit('unlock-solution')"
         >
