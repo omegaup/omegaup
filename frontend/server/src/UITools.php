@@ -212,11 +212,7 @@ class UITools {
                 \OmegaUp\Controllers\User::getUserTypes($user, $identity) :
                 []
             ),
-            'nextRegisteredContestForUser' => (
-                \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
-                    $identity
-                )
-            ),
+            'nextRegisteredContestForUser' => null,
         ];
     }
 
