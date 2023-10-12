@@ -2,8 +2,6 @@ import type { StorybookConfig } from '@storybook/vue-webpack5';
 
 const config: StorybookConfig = {
   stories: [
-    '../frontend/www/js/omegaup/stories/**/*.stories.mdx',
-    '../frontend/www/js/omegaup/stories/**/*.stories.@(vue|js|jsx|ts|tsx)',
     '../frontend/www/js/omegaup/components/**/*.stories.mdx',
     '../frontend/www/js/omegaup/components/**/*.stories.@(vue|js|jsx|ts|tsx)',
   ],
