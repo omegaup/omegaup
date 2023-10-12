@@ -1,5 +1,5 @@
 /** @type { import('@storybook/vue').Preview } */
-import '../../../../third_party/bootstrap-4.5.0/css/bootstrap.min.css';
+import '../frontend/www/third_party/bootstrap-4.5.0/css/bootstrap.min.css';
 
 const preview = {
   parameters: {
