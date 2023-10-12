@@ -37,7 +37,7 @@ const meta: Meta<typeof Badge> = {
       control: 'boolean',
     },
   },
-}
+};
 
 export default meta;
 
