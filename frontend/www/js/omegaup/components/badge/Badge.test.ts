@@ -10,7 +10,7 @@ describe('Badge.vue', () => {
       },
     });
     expect(wrapper.find('img').attributes().src).toBe(
-      `/media/dist/badges/${badgeAlias}.svg`,
+      `https://omegaup.com/media/dist/badges/${badgeAlias}.svg`,
     );
   });
 });

@@ -37,7 +37,7 @@ export default class Badge extends Vue {
   }
 
   get iconUrl(): string {
-    return `/media/dist/badges/${this.badge.badge_alias}.svg`;
+    return `https://omegaup.com/media/dist/badges/${this.badge.badge_alias}.svg`;
   }
 }
 </script>
