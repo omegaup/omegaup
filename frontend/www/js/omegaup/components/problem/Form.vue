@@ -120,31 +120,31 @@
                   {{ T.problemEditTagPublicRequired }}
                 </div>
                 <div class="introjs-tags-and-level">
-                <omegaup-problem-tags
-                  :public-tags="data.publicTags"
-                  :level-tags="data.levelTags"
-                  :alias="data.alias"
-                  :is-create="true"
-                  :problem-level="problemLevel"
-                  :selected-private-tags="selectedPrivateTags"
-                  :selected-public-tags="selectedPublicTags"
-                  :can-add-new-tags="true"
-                  :errors="errors"
-                  :is-lecture="currentLanguages === ''"
-                  @emit-add-tag="addTag"
-                  @emit-remove-tag="removeTag"
-                  @select-problem-level="selectProblemLevel"
-                ></omegaup-problem-tags>
-                <input
-                  name="selected_tags"
-                  :value="selectedTagsList"
-                  type="hidden"
-                />
-                <input
-                  name="problem_level"
-                  :value="problemLevel"
-                  type="hidden"
-                />
+                  <omegaup-problem-tags
+                    :public-tags="data.publicTags"
+                    :level-tags="data.levelTags"
+                    :alias="data.alias"
+                    :is-create="true"
+                    :problem-level="problemLevel"
+                    :selected-private-tags="selectedPrivateTags"
+                    :selected-public-tags="selectedPublicTags"
+                    :can-add-new-tags="true"
+                    :errors="errors"
+                    :is-lecture="currentLanguages === ''"
+                    @emit-add-tag="addTag"
+                    @emit-remove-tag="removeTag"
+                    @select-problem-level="selectProblemLevel"
+                  ></omegaup-problem-tags>
+                  <input
+                    name="selected_tags"
+                    :value="selectedTagsList"
+                    type="hidden"
+                  />
+                  <input
+                    name="problem_level"
+                    :value="problemLevel"
+                    type="hidden"
+                  />
                 </div>
               </div>
             </div>
