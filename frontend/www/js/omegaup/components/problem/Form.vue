@@ -145,6 +145,7 @@
                   :value="problemLevel"
                   type="hidden"
                 />
+                </div>
               </div>
             </div>
           </template>
