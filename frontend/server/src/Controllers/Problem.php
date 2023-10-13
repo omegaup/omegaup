@@ -4744,7 +4744,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             problemsetId: null,
             identityId: intval($r->identity->identity_id)
         );
-        
+
         if (!is_null($r->user)) {
             // Get the count of problems forfeited by the user on the current day.
             $problemsForfeitedCount = \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCountInDay(
