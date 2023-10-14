@@ -215,7 +215,7 @@
                 {{ T.wordsTime }}
               </th>
               <th>{{ T.wordsLanguage }}</th>
-              <th hidden>{{T.runGUID}}</th>
+              <th hidden>{{ T.runGUID }}</th>
               <th v-if="showUser">{{ T.contestParticipant }}</th>
               <th v-if="showContest">{{ T.wordsContest }}</th>
               <th v-if="contestAlias != null && !isCourse">
