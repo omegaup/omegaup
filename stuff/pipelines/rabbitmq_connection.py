@@ -7,7 +7,6 @@ import contextlib
 from typing import Iterator
 
 import argparse
-import datetime
 import pika
 
 

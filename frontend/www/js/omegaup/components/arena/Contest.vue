@@ -11,6 +11,14 @@
         socketStatus
       }}</sup>
     </template>
+    <template v-if="contestAdmin" #edit-button>
+      <a
+        class="edit-contest-button ml-2"
+        :href="`/contest/${contest.alias}/edit/`"
+      >
+        <font-awesome-icon icon="edit" />
+      </a>
+    </template>
     <template #clock>
       <div v-if="isContestFinished" class="alert alert-warning" role="alert">
         <a :href="urlPractice">{{ T.arenaContestEndedUsePractice }}</a>
@@ -31,13 +39,15 @@
     <template #arena-problems>
       <div data-contest>
         <div class="tab navleft">
-          <div class="navbar">
+          <div class="navbar mb-2">
             <omegaup-arena-navbar-problems
               :problems="problems"
               :active-problem="activeProblemAlias"
               :in-assignment="false"
               :digits-after-decimal-point="
-                contest.partial_score ? digitsAfterDecimalPoint : 0
+                contest.score_mode == 'all_or_nothing'
+                  ? 0
+                  : digitsAfterDecimalPoint
               "
               @disable-active-problem="activeProblem = null"
               @navigate-to-problem="onNavigateToProblem"
@@ -218,6 +228,10 @@ import { ContestClarificationType } from '../../arena/clarifications';
 import { SocketStatus } from '../../arena/events_socket';
 import { AdmissionMode } from '../common/Publish.vue';
 import { SubmissionRequest } from '../../arena/submissions';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
 
 @Component({
   components: {
@@ -233,6 +247,7 @@ import { SubmissionRequest } from '../../arena/submissions';
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-problem-details': problem_Details,
+    'font-awesome-icon': FontAwesomeIcon,
   },
 })
 export default class ArenaContest extends Vue {
@@ -431,13 +446,11 @@ export default class ArenaContest extends Vue {
   overflow: hidden;
 
   .navbar {
-    width: 21em;
-    float: left;
     background: transparent;
+    justify-content: center;
   }
 
   .main {
-    margin-left: 20em;
     border: 1px solid var(--arena-contest-navleft-main-border-color);
     border-width: 0 0 1px 1px;
   }
@@ -453,7 +466,21 @@ export default class ArenaContest extends Vue {
 .problem {
   background: var(--arena-problem-background-color);
   padding: 1em;
-  margin-top: -1.5em;
-  margin-right: -1em;
+}
+
+@media only screen and (min-width: 960px) {
+  .navleft {
+    .navbar {
+      width: 21em;
+      float: left;
+    }
+    .main {
+      margin-left: 20em;
+    }
+  }
+  .problem {
+    margin-top: -1.5em;
+    margin-right: -1em;
+  }
 }
 </style>

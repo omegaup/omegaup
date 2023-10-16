@@ -7,7 +7,7 @@ import subprocess
 import sys
 from typing import Any, Callable, Dict, Optional, Sequence, Text, Tuple
 
-from hook_tools import linters
+from omegaup_hook_tools import linters
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -18,7 +18,7 @@ def _which(program: str) -> str:
         exe_file = os.path.join(path.strip('"'), program)
         if os.path.isfile(exe_file) and os.access(exe_file, os.X_OK):
             return exe_file
-    raise Exception('`%s` not found' % program)
+    raise Exception(f'`{program}` not found')
 
 
 def _generate_typescript(filename: str) -> str:
@@ -86,14 +86,13 @@ class ApiLinter(linters.Linter):
 
     def __init__(self, options: Optional[Dict[str, Any]] = None):
         super().__init__()
-        self.__options = options or {}
+        del options
 
     def run_all(
             self, filenames: Sequence[str],
             contents_callback: linters.ContentsCallback
     ) -> linters.MultipleResults:
         '''Runs the linter against a subset of files.'''
-        # pylint: disable=no-self-use
         del filenames  # unused
 
         new_contents, original_contents = _generate_new_contents(

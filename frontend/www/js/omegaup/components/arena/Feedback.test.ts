@@ -7,7 +7,7 @@ import arena_Feedback, {
 } from './Feedback.vue';
 
 const feedback: ArenaCourseFeedback = {
-  line: 2,
+  lineNumber: 2,
   text: null,
   status: FeedbackStatus.New,
 };
@@ -26,7 +26,14 @@ describe('Feedback.vue', () => {
     expect(button.attributes().disabled).toBeDefined();
     expect(button.attributes().disabled).toBe('disabled');
 
-    await wrapper.setData({ text: 'some text' });
+    await wrapper.setData({
+      currentFeedback: {
+        lineNumber: 2,
+        text: 'some text',
+        status: FeedbackStatus.New,
+      },
+    });
+    expect(wrapper.emitted('submit')).not.toBeDefined();
     expect(button.attributes().disabled).not.toBeDefined();
 
     await button.trigger('click');
@@ -34,7 +41,7 @@ describe('Feedback.vue', () => {
     expect(wrapper.emitted('submit')).toEqual([
       [
         {
-          line: 2,
+          lineNumber: 2,
           status: FeedbackStatus.InProgress,
           text: 'some text',
         },
@@ -53,18 +60,16 @@ describe('Feedback.vue', () => {
 
     const button = wrapper.find('button[data-button-cancel]');
 
-    await wrapper.setData({ text: 'some text' });
+    await wrapper.setData({
+      currentFeedback: {
+        lineNumber: 2,
+        text: 'some text',
+        status: FeedbackStatus.New,
+      },
+    });
 
     await button.trigger('click');
 
-    expect(wrapper.emitted('cancel')).toEqual([
-      [
-        {
-          line: 2,
-          status: FeedbackStatus.New,
-          text: null,
-        },
-      ],
-    ]);
+    expect(wrapper.emitted('cancel')).toEqual([[]]);
   });
 });

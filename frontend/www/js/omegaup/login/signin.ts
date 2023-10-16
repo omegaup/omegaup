@@ -32,6 +32,10 @@ OmegaUp.on('ready', () => {
       window.location.href = url.toString();
       return;
     }
+    if (pathname && pathname.indexOf(document.location.origin) === 0) {
+      window.location.href = pathname;
+      return;
+    }
     const fromLoginParam = '?fromLogin';
     if (isAccountCreation) {
       window.location.href = `/profile/${fromLoginParam}`;
@@ -41,6 +45,9 @@ OmegaUp.on('ready', () => {
   }
 
   const payload = types.payloadParsers.LoginDetailsPayload();
+  const googleClientId = document
+    .querySelector('meta[name="google-signin-client_id"]')
+    ?.getAttribute('content');
   if (payload.statusError) {
     ui.warning(payload.statusError);
   } else if (payload.verifyEmailSuccessfully) {
@@ -57,6 +64,8 @@ OmegaUp.on('ready', () => {
         props: {
           validateRecaptcha: payload.validateRecaptcha,
           facebookUrl: payload.facebookUrl,
+          googleClientId,
+          hasVisitedSection: payload.hasVisitedSection,
         },
         on: {
           'register-and-login': (
@@ -96,17 +105,6 @@ OmegaUp.on('ready', () => {
               password,
               /*isAccountCreation=*/ false,
             );
-          },
-          'google-login': (idToken: string) => {
-            // Only log in if the user actually clicked the sign-in button.
-            api.Session.googleLogin({ storeToken: idToken })
-              .then((data) => {
-                redirect(data.isAccountCreation);
-              })
-              .catch(ui.apiError);
-          },
-          'google-login-failure': () => {
-            ui.error(T.loginFederatedFailed);
           },
         },
       });

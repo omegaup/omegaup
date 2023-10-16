@@ -35,7 +35,6 @@ describe('Contest.vue', () => {
     feedback: 'detailed',
     finish_time: futureDate,
     languages: 'py3',
-    partial_score: true,
     score_mode: 'partial',
     penalty: 1,
     penalty_calc_policy: 'sum',
@@ -270,5 +269,33 @@ describe('Contest.vue', () => {
         },
       ],
     ]);
+  });
+
+  it('Should display the edit button when current user is admin', () => {
+    const wrapper = mount(arena_Contest, {
+      propsData: {
+        activeTab: 'runs',
+        contestAdmin: true,
+        contest,
+        problems,
+        allRuns: [run],
+        showAllRuns: true,
+      },
+    });
+    expect(wrapper.find('.edit-contest-button')).toBeTruthy();
+  });
+
+  it('Should hide the edit button when current user is not an admin', () => {
+    const wrapper = mount(arena_Contest, {
+      propsData: {
+        activeTab: 'runs',
+        contestAdmin: false,
+        contest,
+        problems,
+        allRuns: [run],
+        showAllRuns: true,
+      },
+    });
+    expect(wrapper.find('.edit-contest-button').exists()).toBeFalsy();
   });
 });

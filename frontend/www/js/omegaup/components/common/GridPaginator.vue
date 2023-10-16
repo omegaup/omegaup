@@ -1,9 +1,9 @@
 <template>
   <div class="card">
-    <h5 v-if="title" class="card-header">
+    <h6 v-if="title" class="card-header">
       {{ title }} <span class="badge badge-secondary">{{ items.length }}</span>
       <slot name="header-link"></slot>
-    </h5>
+    </h6>
     <div v-if="sortOptions.length > 0" class="card-body text-center">
       <div class="form-check form-check-inline">
         <label
@@ -22,7 +22,10 @@
         </label>
       </div>
     </div>
-    <table v-if="items.length > 0" class="table table-striped mb-0">
+    <table
+      v-if="items.length > 0"
+      class="table table-striped mb-0 table-responsive col-12 table-typo"
+    >
       <slot name="table-header"></slot>
       <tbody>
         <tr v-for="(group, index) in paginatedItems" :key="index">
@@ -52,6 +55,7 @@
         <button
           class="btn btn-primary"
           type="button"
+          data-button-previous
           :disabled="totalPagesCount === 1 || currentPageNumber === 0"
           @click="previousPage"
         >
@@ -60,6 +64,7 @@
         <button
           class="btn btn-primary"
           type="button"
+          data-button-next
           :disabled="
             totalPagesCount === 1 || currentPageNumber >= totalPagesCount - 1
           "
@@ -138,3 +143,14 @@ export default class GridPaginator extends Vue {
   }
 }
 </script>
+
+<style>
+@media (max-width: 550px) {
+  .table-typo td,
+  .table-typo th {
+    display: block;
+    background-color: #fff;
+    border: 1px solid #ddd;
+  }
+}
+</style>

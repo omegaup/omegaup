@@ -54,7 +54,8 @@ def update_problem_accepted_stats(
                 FROM
                     `Submissions` AS `s`
                 INNER JOIN
-                    `Identities` AS `i` ON `i`.`identity_id` = `s`.`identity_id`
+                    `Identities` AS `i` ON
+                    `i`.`identity_id` = `s`.`identity_id`
                 WHERE
                     `s`.`problem_id` = `p`.`problem_id`
                     AND `s`.verdict = 'AC'
@@ -174,8 +175,9 @@ def update_user_rank(
     for index, row in enumerate(cur_readonly.fetchall()):
         if row['score'] != prev_score:
             rank = index + 1
-        scores.append(row['score'])
-        prev_score = row['score']
+        score = row.get('score', 0)
+        scores.append(score)
+        prev_score = score
         cur.execute(
             '''
                     INSERT INTO
@@ -184,7 +186,7 @@ def update_user_rank(
                                      `username`, `name`, `country_id`,
                                      `state_id`, `school_id`)
                     VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);''',
-            (row['user_id'], rank, row['problems_solved_count'], row['score'],
+            (row['user_id'], rank, row['problems_solved_count'], score,
              row['username'], row['name'], row['country_id'], row['state_id'],
              row['school_id']))
     return scores
@@ -331,12 +333,15 @@ def update_schools_solved_problems(
         FROM
             `Submissions` AS `su`
         INNER JOIN
+            `Runs` AS `r` ON `r`.run_id = `su`.current_run_id
+        INNER JOIN
             `Schools` AS `sc` ON `sc`.`school_id` = `su`.`school_id`
         INNER JOIN
             `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
         WHERE
             `su`.`time` >= CURDATE() - INTERVAL %(months)s MONTH
-            AND `su`.`verdict` = "AC" AND `p`.`visibility` >= 1
+            AND `r`.`verdict` = "AC"
+            AND `p`.`visibility` >= 1
             AND NOT EXISTS (
                 SELECT
                     *

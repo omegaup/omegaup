@@ -1,13 +1,13 @@
 <template>
   <div class="omegaup-course-details card">
-    <div v-if="!update" class="card-header">
-      <h3 class="card-title">{{ T.courseNew }}</h3>
+    <div v-if="!update" class="card-header px-2 px-sm-4">
+      <h3 class="card-title mb-0">{{ T.courseNew }}</h3>
     </div>
-    <div class="card-body">
+    <div class="card-body px-2 px-sm-4">
       <form class="form" data-course-form @submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100"
+            <label class="font-weight-bold w-100 introjs-course-name"
               >{{ T.wordsName }}
               <input
                 v-model="name"
@@ -19,7 +19,7 @@
             /></label>
           </div>
           <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100"
+            <label class="font-weight-bold w-100 introjs-short-title"
               >{{ T.courseNewFormShortTitleAlias }}
               <font-awesome-icon
                 :title="T.courseNewFormShortTitleAliasDesc"
@@ -36,7 +36,7 @@
                 required="required"
             /></label>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-4 introjs-scoreboard">
             <span class="font-weight-bold"
               >{{ T.courseNewFormShowScoreboard }}
               <font-awesome-icon
@@ -53,7 +53,7 @@
         </div>
         <div class="row">
           <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100"
+            <label class="font-weight-bold w-100 introjs-start-date"
               >{{ T.courseNewFormStartDate }}
               <font-awesome-icon
                 :title="T.courseNewFormStartDateDesc"
@@ -64,7 +64,7 @@
               ></omegaup-datepicker
             ></label>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-4 introjs-duration">
             <span class="font-weight-bold"
               >{{ T.courseNewFormUnlimitedDuration }}
               <font-awesome-icon
@@ -79,7 +79,7 @@
             ></omegaup-radio-switch>
           </div>
           <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100"
+            <label class="font-weight-bold w-100 introjs-end-date"
               >{{ T.courseNewFormEndDate }}
               <font-awesome-icon
                 :title="T.courseNewFormEndDateDesc"
@@ -95,7 +95,7 @@
         </div>
         <div class="row">
           <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100"
+            <label class="font-weight-bold w-100 introjs-school"
               >{{ T.profileSchool }}
               <omegaup-common-typeahead
                 :existing-options="searchResultSchools"
@@ -107,7 +107,7 @@
               ></omegaup-common-typeahead>
             </label>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-4 introjs-basic-information">
             <span class="font-weight-bold"
               >{{ T.courseNewFormBasicInformationRequired }}
               <font-awesome-icon
@@ -121,7 +121,7 @@
               :selected-value="needsBasicInformation"
             ></omegaup-radio-switch>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-4 introjs-ask-information">
             <span class="font-weight-bold"
               >{{ T.courseNewFormUserInformationRequired }}
               <font-awesome-icon
@@ -158,7 +158,7 @@
             <select
               v-model="level"
               data-course-problem-level
-              class="form-control"
+              class="form-control introjs-level"
             >
               <option
                 v-for="levelOption in levelOptions"
@@ -169,7 +169,7 @@
               </option>
             </select>
           </div>
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-6 introjs-language">
             <label class="font-weight-bold w-100">{{ T.wordsLanguages }}</label>
             <vue-multiselect
               v-model="selectedLanguages"
@@ -184,7 +184,7 @@
         </div>
         <div class="row">
           <div class="form-group container-fluid col-md-6">
-            <label class="font-weight-bold w-100"
+            <label class="font-weight-bold w-100 introjs-objective"
               >{{ T.courseNewFormObjective }}
               <font-awesome-icon
                 :title="T.courseNewFormObjectiveDesc"
@@ -203,7 +203,7 @@
             </label>
           </div>
           <div class="form-group container-fluid col-md-6">
-            <label class="font-weight-bold w-100"
+            <label class="font-weight-bold w-100 introjs-description"
               >{{ T.courseNewFormDescription }}
               <textarea
                 v-model="description"
@@ -221,7 +221,10 @@
         </div>
         <div class="row">
           <div class="form-group col-md-12 text-right">
-            <button class="btn btn-primary mr-2 submit" type="submit">
+            <button
+              class="btn btn-primary mr-2 submit introjs-submit"
+              type="submit"
+            >
               <template v-if="update">
                 {{ T.courseNewFormUpdateCourse }}
               </template>
@@ -245,6 +248,10 @@ import DatePicker from '../DatePicker.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
+import 'intro.js/introjs.css';
+import introJs from 'intro.js';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 import {
   FontAwesomeIcon,
@@ -287,6 +294,7 @@ export default class CourseDetails extends Vue {
   @Prop({ default: '' }) invalidParameterName!: string;
   @Prop() allLanguages!: string[];
   @Prop() searchResultSchools!: types.SchoolListItem[];
+  @Prop({ default: true }) hasVisitedSection!: boolean;
 
   T = T;
   alias = this.course.alias;
@@ -303,6 +311,106 @@ export default class CourseDetails extends Vue {
   unlimitedDuration = this.course.finish_time === null;
   selectedLanguages = this.course.languages;
   levelOptions = levelOptions;
+
+  mounted() {
+    const title = T.createCourseInteractiveGuideTitle;
+    if (!this.hasVisitedSection) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title,
+              intro: T.createCourseInteractiveGuideWelcome,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-course-name',
+              ) as Element,
+              title,
+              intro: T.createCourseInteractiveGuideName,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-short-title',
+              ) as Element,
+              title,
+              intro: T.createCourseInteractiveGuideShortTitle,
+            },
+            {
+              element: document.querySelector('.introjs-scoreboard') as Element,
+              title,
+              intro: T.createCourseInteractiveGuideScoreboard,
+            },
+            {
+              element: document.querySelector('.introjs-start-date') as Element,
+              title,
+              intro: T.createCourseInteractiveGuideStartDate,
+            },
+            {
+              element: document.querySelector('.introjs-duration') as Element,
+              title,
+              intro: T.createCourseInteractiveGuideDuration,
+            },
+            {
+              element: document.querySelector('.introjs-end-date') as Element,
+              title,
+              intro: T.createCourseInteractiveGuideEndDate,
+            },
+            {
+              element: document.querySelector('.introjs-school') as Element,
+              title,
+              intro: T.createCourseInteractiveGuideSchool,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-basic-information',
+              ) as Element,
+              title,
+              intro: T.createCourseInteractiveGuideBasicInformation,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-ask-information',
+              ) as Element,
+              title,
+              intro: T.createCourseInteractiveGuideAskInformation,
+            },
+            {
+              element: document.querySelector('.introjs-level') as Element,
+              title,
+              intro: T.createCourseInteractiveGuideLevel,
+            },
+            {
+              element: document.querySelector('.introjs-language') as Element,
+              title,
+              intro: T.createCourseInteractiveGuideLanguage,
+            },
+            {
+              element: document.querySelector('.introjs-objective') as Element,
+              title,
+              intro: T.createCourseInteractiveGuideObjective,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-description',
+              ) as Element,
+              title,
+              intro: T.createCourseInteractiveGuideDescription,
+            },
+            {
+              element: document.querySelector('.introjs-submit') as Element,
+              title,
+              intro: T.createCourseInteractiveGuideSubmit,
+            },
+          ],
+        })
+        .start();
+      this.$cookies.set('has-visited-create-course', true, -1);
+    }
+  }
 
   reset(): void {
     this.alias = this.course.alias;

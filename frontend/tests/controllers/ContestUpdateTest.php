@@ -1169,25 +1169,24 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * A PHPUnit data provider for the test with different partial score values.
+     * A PHPUnit data provider for the test with different score mode values.
      *
-     * @return list<array{0: bool, 1:string, 2: int, 3: float, 4: float}>
+     * @return list<array{0:string, 1: int, 2: float, 3: float}>
      */
-    public function partialScoreValueProvider(): array {
+    public function scoreModeValueProvider(): array {
         return [
-            [false,'all_or_nothing', 1, 0.0, 0.05],
-            [true, 'partial',  1, 0.05, 0.0],
-            [false,'all_or_nothing', 100, 0.0, 5.0],
-            [true, 'partial', 100, 5.0, 0.0],
+            ['all_or_nothing', 1, 0.0, 0.05],
+            ['partial',  1, 0.05, 0.0],
+            ['all_or_nothing', 100, 0.0, 5.0],
+            ['partial', 100, 5.0, 0.0],
         ];
     }
 
     /**
-     * @dataProvider partialScoreValueProvider
+     * @dataProvider scoreModeValueProvider
      */
-    public function testCreateContestWhenPartialScoreIsUpdated(
-        bool $initialPartialScore,
-        string $initalScoreMode,
+    public function testCreateContestWhenScoreModeIsUpdated(
+        string $initialScoreMode,
         int $problemsetProblemPoints,
         float $expectedContestScoreBeforeUpdate,
         float $expectedContestScoreAfterUpdate
@@ -1195,12 +1194,12 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Get user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $partialScore = $initialPartialScore;
+        $scoreMode = $initialScoreMode;
 
-        // Get a contest, partial_score default value is $partialScore
+        // Get a contest, score_mode default value is $scoreMode
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams(
-                ['partialScore' => $partialScore]
+                ['scoreMode' => $scoreMode]
             )
         );
 
@@ -1237,7 +1236,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertSame($partialScore, $contest['partial_score']);
+        $this->assertSame($scoreMode, $contest['score_mode']);
 
         $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
@@ -1260,18 +1259,19 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $directorLogin->auth_token,
             $runData['response']['guid'],
             $expectedContestScoreBeforeUpdate,
-            $partialScore,
+            $scoreMode,
             $identity->username
         );
 
-        $partialScore = !$initialPartialScore;
+        // Updating score mode
+        $scoreMode = $initialScoreMode == 'partial' ? 'all_or_nothing' : 'partial';
 
-        // Call API to update partial score
+        // Call API to update score mode
         \OmegaUp\Controllers\Contest::apiUpdate(
             new \OmegaUp\Request([
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
-                'partial_score' => $partialScore,
+                'score_mode' => $scoreMode,
                 'languages' => 'c11-gcc',
             ])
         );
@@ -1289,7 +1289,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertSame($partialScore, $contest['partial_score']);
+        $this->assertSame($scoreMode, $contest['score_mode']);
 
         $this->assertAPIsShowCorrectContestScore(
             $contestData['request']['alias'],
@@ -1298,7 +1298,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $directorLogin->auth_token,
             $runData['response']['guid'],
             $expectedContestScoreAfterUpdate,
-            $partialScore,
+            $scoreMode,
             $identity->username
         );
     }
@@ -1517,7 +1517,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         string $directorToken,
         string $runGuid,
         float $expectedContestScore,
-        bool $partialScore,
+        string $scoreMode,
         string $contestantUsername
     ) {
         $runs = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
@@ -1583,9 +1583,9 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $expectedContestScore,
             $problemRun['contest_score']
         );
-        if ($partialScore) {
+        if ($scoreMode == 'partial') {
             $this->assertArrayHasKey('run_details', $report);
-        } else {
+        } elseif ($scoreMode == 'all_or_nothing') {
             $this->assertArrayNotHasKey('run_details', $report);
         }
 
@@ -1604,33 +1604,30 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-        /**
-     * A PHPUnit data provider for all the partial score to get profile details.
+    /**
+     * A PHPUnit data provider for all the score mode to get profile details.
      *
-     * @return list<array{0:bool, 1:string}>
+     * @return list<array{0:string}>
      */
-    public function partialScoreProvider(): array {
+    public function scoreModeProvider(): array {
         return [
-            [true, 'all_or_nothing'],
-            [false, 'partial'],
+            ['all_or_nothing'],
+            ['partial'],
         ];
     }
 
     /**
-     * @dataProvider partialScoreProvider
+     * @dataProvider scoreModeProvider
      */
-    public function testUpdateContestWithPartialScore(
-        bool $partialScore,
-        string $scoreModeExpected
-    ) {
+    public function testUpdateContestWithScoreMode(string $scoreModeExpected) {
         // Get a problem
         $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create contest with 2 hours and a window length 30 of minutes
         $contest = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
-                'partialScore' => $partialScore,
-                ])
+                'scoreMode' => $scoreModeExpected,
+            ])
         );
 
         // Add the problem to the contest
@@ -1641,11 +1638,12 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create a contestant
         $login = self::login($contest['director']);
+        $newScoreModeExpected = $scoreModeExpected == 'partial' ? 'all_or_nothing' : 'partial';
 
         \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contest['request']['alias'],
-                'partial_score' => !$partialScore,
+                'score_mode' => $newScoreModeExpected,
             ]));
 
         // Update a contest request
@@ -1653,6 +1651,6 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $contest['request']['alias']
         );
 
-        $this->assertSame($response->score_mode, $scoreModeExpected);
+        $this->assertSame($response->score_mode, $newScoreModeExpected);
     }
 }

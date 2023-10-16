@@ -7,14 +7,15 @@ import json
 import logging
 
 from typing import List, Optional
+
+import verification_code
+
 import omegaup.api
+import pika
 import mysql.connector
 import mysql.connector.cursor
 from mysql.connector import errors
 from mysql.connector import errorcode
-import pika
-
-import verification_code
 
 
 @dataclasses.dataclass
@@ -111,7 +112,8 @@ class ContestsCallback:
                     )
 
 
-def generate_contest_code()  -> str:
+def generate_contest_code() -> str:
+    '''Generates a random verification code.'''
     return verification_code.generate_code()
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

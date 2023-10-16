@@ -386,6 +386,7 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 contestEdit.details.admission_mode = admissionMode;
+                contestEdit.details.default_show_all_contestants_in_scoreboard = defaultShowAllContestantsInScoreboard;
                 ui.success(`
                   ${T.contestEditContestEdited} <a href="/arena/${payload.details.alias}/">${T.contestEditGoToContest}</a>
                 `);
@@ -402,7 +403,7 @@ OmegaUp.on('ready', () => {
                 api.Contest.addUser({
                   contest_alias: payload.details.alias,
                   usernameOrEmail: user,
-                }).catch(() => user),
+                }).catch(() => Promise.reject(user)),
               ),
             )
               .then((results) => {

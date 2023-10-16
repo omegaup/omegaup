@@ -243,25 +243,36 @@
       <div v-if="showTab === 'delete'" class="tab-pane active">
         <div class="card">
           <div class="card-body">
-            <form class="form" @submit.prevent="$emit('remove', alias)">
-              <div class="form-group">
-                <div class="alert alert-danger">
-                  <h4 class="alert-heading">{{ T.wordsDangerZone }}</h4>
-                  <hr />
-                  <omegaup-markdown
-                    :markdown="T.wordsDangerZoneDesc"
-                  ></omegaup-markdown>
-                  <br /><br />
-                  <button class="btn btn-danger" type="submit">
-                    {{ T.wordsDelete }}
-                  </button>
-                </div>
+            <div class="form-group">
+              <div class="alert alert-danger">
+                <h4 class="alert-heading">{{ T.wordsDangerZone }}</h4>
+                <hr />
+                <omegaup-markdown
+                  :markdown="T.wordsDangerZoneDesc"
+                ></omegaup-markdown>
+                <br /><br />
+                <button
+                  class="btn btn-danger"
+                  @click.prevent="showConfirmationModal = true"
+                >
+                  {{ T.wordsDelete }}
+                </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <b-modal
+      v-model="showConfirmationModal"
+      :title="T.problemEditDeleteRequireConfirmation"
+      :ok-title="T.problemEditDeleteOk"
+      ok-variant="danger"
+      :cancel-title="T.problemEditDeleteCancel"
+      @ok="$emit('remove', alias)"
+    >
+      <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
+    </b-modal>
   </div>
 </template>
 
@@ -276,6 +287,10 @@ import common_GroupAdmins from '../common/GroupAdmins.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import omegaup_Markdown from '../Markdown.vue';
+
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import { ModalPlugin } from 'bootstrap-vue';
+Vue.use(ModalPlugin);
 
 @Component({
   components: {
@@ -301,6 +316,7 @@ export default class ProblemEdit extends Vue {
   alias = this.data.alias;
   showTab = 'edit';
   currentStatement: types.ProblemStatement = this.statement;
+  showConfirmationModal = false;
 
   get activeTab(): string {
     switch (this.showTab) {

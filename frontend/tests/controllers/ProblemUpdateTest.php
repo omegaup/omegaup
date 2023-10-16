@@ -1268,6 +1268,323 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    /**
+     * Tests problem version update when test cases change in a submission
+     * outside a contest.
+     */
+    public function testProblemVersionUpdateCases() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problem = $problemData['problem'];
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($problemData['author']);
+        // Change the problem to something completely different.
+        {
+            $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem_updatedcases.zip';
+            $_detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+            $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+                'message' => 'Changed to mrkareltastic',
+                'validator' => 'token',
+                'time_limit' => 1000,
+                'overall_wall_time_limit' => 30000,
+                'validator_time_limit' => 0,
+                'extra_wall_time' => 1000,
+                'memory_limit' => 64000,
+                'output_limit' => 20480,
+            ]));
+            $this->assertTrue($response['rejudged']);
+            unset($_FILES['problem_contents']);
+        }
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            runData: $runData,
+            points: 0.75,
+            verdict: 'PA',
+            submitDelay: null,
+            runGuid: null,
+            runId: null,
+            problemsetPoints: 100,
+            outputFilesContent: null,
+            problemsetScoreMode: 'max_per_group',
+            runScoreByGroups: [
+                ['group_name' => 'sample', 'score' => 0.25, 'verdict' => 'AC'],
+                ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                ['group_name' => 'medium', 'score' => 0.25, 'verdict' => 'AC'],
+                ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+            ],
+        );
+
+        $contestantLogin = self::login($identity);
+        $response = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'problem_alias' => $problem->alias,
+                'auth_token' => $contestantLogin->auth_token,
+            ])
+        );
+        $this->assertSame(75.0, $response['score']);
+
+        $login = self::login($problemData['author']);
+        $versionData = \OmegaUp\Controllers\Problem::apiVersions(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+            ])
+        );
+
+        $versions = array_map(
+            fn ($log) => [
+                'commit' => $log['commit'],
+                'version' => $log['version'],
+            ],
+            $versionData['log']
+        );
+
+        \OmegaUp\Controllers\Problem::apiSelectVersion(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'commit' => $versions[1]['commit'],
+        ]));
+
+        $response = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'problem_alias' => $problem->alias,
+                'auth_token' => $contestantLogin->auth_token,
+            ])
+        );
+
+        $this->assertSame(0.0, $response['score']);
+    }
+
+    /**
+     * A PHPUnit data provider for all the score mode contests to update problem
+     * cases.
+     *
+     * @return list<array{0:string, 1:float, 2:string, 3:int, 4:list<array{group_name: string, score: float, verdict: string}>}>
+     */
+    public function scoreModeProvider(): array {
+        return [
+            [
+                'partial',
+                0.75,
+                100,
+                'PA',
+                []
+            ],
+            [
+                'all_or_nothing',
+                1.0,
+                1,
+                'AC',
+                []
+            ],
+            [
+                'max_per_group',
+                75.0,
+                1,
+                'PA',
+                [
+                    ['group_name' => 'sample', 'score' => 0.25, 'verdict' => 'AC'],
+                    ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                    ['group_name' => 'medium', 'score' => 0.25, 'verdict' => 'AC'],
+                    ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * Tests problem version update when test cases change in a submission
+     * inside a different types of contest.
+     *
+     * @param list<array{group_name:string, score:float, verdict:string}> $scoreByGroups
+     *
+     * @dataProvider scoreModeProvider
+     */
+    public function testProblemVersionUpdateCasesInAContest(
+        string $scoreMode,
+        float $points,
+        int $problemsetPoints,
+        string $verdict,
+        $scoreByGroups
+    ) {
+        // Create an admin
+        [
+            'user' => $userAdmin,
+            'identity' => $admin,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'author' => $admin,
+                'authorUser' => $userAdmin,
+            ])
+        );
+        $problem = $problemData['problem'];
+
+        // Create a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'scoreMode' => $scoreMode,
+                'contestDirector' => $admin,
+                'contestDirectorUser' => $userAdmin,
+            ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Create a contestant
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create a run
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+
+        $login = self::login($problemData['author']);
+        // Change the problem to something completely different.
+        {
+            $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem_updatedcases.zip';
+            $_detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+            $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+                'message' => 'Changed to mrkareltastic',
+                'validator' => 'token',
+                'time_limit' => 1000,
+                'overall_wall_time_limit' => 30000,
+                'validator_time_limit' => 0,
+                'extra_wall_time' => 1000,
+                'memory_limit' => 64000,
+                'output_limit' => 20480,
+            ]));
+            $this->assertTrue($response['rejudged']);
+            unset($_FILES['problem_contents']);
+        }
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            runData: $runData,
+            points: $points,
+            verdict: $verdict,
+            submitDelay: null,
+            runGuid: null,
+            runId: null,
+            problemsetPoints: $problemsetPoints,
+            outputFilesContent: null,
+            problemsetScoreMode: $scoreMode,
+            runScoreByGroups: $scoreByGroups,
+        );
+
+        $login = self::login($problemData['author']);
+        $versionData = \OmegaUp\Controllers\Problem::apiVersions(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+            ])
+        );
+
+        $versions = array_map(
+            fn ($log) => [
+                'commit' => $log['commit'],
+                'version' => $log['version'],
+            ],
+            $versionData['log']
+        );
+
+        [
+            'ranking' => $scoreboardContestBeforeUpdate,
+        ] = \OmegaUp\Controllers\Contest::apiScoreboard(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        );
+
+        $this->assertSame(
+            $scoreboardContestBeforeUpdate[0]['total']['points'],
+            $points * $problemsetPoints
+        );
+
+        \OmegaUp\Controllers\Problem::apiSelectVersion(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'commit' => $versions[1]['commit'],
+            'update_published' => \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS
+        ]));
+
+        // Let's grade the updated run
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            runData: $runData,
+            points: 0.0,
+            verdict: 'WA',
+            submitDelay: null,
+            runGuid: null,
+            runId: null,
+            problemsetPoints: $problemsetPoints,
+            outputFilesContent: null,
+            problemsetScoreMode: $scoreMode,
+            runScoreByGroups: [
+                ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
+                ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'WA'],
+                ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+            ],
+        );
+        // After five minutes, create a new run
+        $time = \OmegaUp\Time::get();
+
+        \OmegaUp\Time::setTimeForTesting($time + (5 * 60));
+
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            runData: $runData,
+            points: 0.0,
+            verdict: 'WA',
+            submitDelay: null,
+            runGuid: null,
+            runId: null,
+            problemsetPoints: $problemsetPoints,
+            outputFilesContent: null,
+            problemsetScoreMode: $scoreMode,
+            runScoreByGroups: [
+                ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
+                ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'WA'],
+                ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+            ],
+        );
+        [
+            'ranking' => $scoreboardContestAfterUpdate,
+        ] = \OmegaUp\Controllers\Contest::apiScoreboard(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        );
+
+        $this->assertSame(
+            $scoreboardContestAfterUpdate[0]['total']['points'],
+            0.0
+        );
+    }
+
     public function testUpdateProblemInputLimitAndEmailClarifications() {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -1427,7 +1744,8 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                     'auth_token' => $login->auth_token,
                     'contest_alias' => $pastContestData['request']['alias'],
                 ])
-            );[
+            );
+            [
                 'ranking' => $scoreboardPresentContestBeforeUpdate,
             ] = \OmegaUp\Controllers\Contest::apiScoreboard(
                 new \OmegaUp\Request([

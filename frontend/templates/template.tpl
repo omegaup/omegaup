@@ -53,7 +53,7 @@
       <div id="common-navbar"></div>
       {% jsInclude 'common_navbar' omitRuntime %}
     {% endif %}
-    <main role="main" {% if not fullWidth %}class="container-lg p-5"{% endif %}>
+    <main role="main" {% if not fullWidth %}class="container-lg py-5 px-3 px-md-5"{% endif %}>
       <div class="alert mt-0" id="status" style="display: none;">
         <button type="button" class="close" id="alert-close">&times;</button>
         <span class="message"></span>

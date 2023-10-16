@@ -49,6 +49,7 @@ describe('Runsv2.vue', () => {
     source: 'print(3)',
     language: 'py3',
     show_diff: 'none',
+    feedback: [],
   };
 
   const runs: types.Run[] = [

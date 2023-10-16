@@ -80,6 +80,8 @@
               :run-details-data="runDetailsData"
               :problem-alias="problemAlias"
               :in-contest-or-course="true"
+              :feedback-map="feedbackMap"
+              :feedback-thread-map="feedbackThreadMap"
               @request-feedback="(guid) => $emit('request-feedback', guid)"
               @update:activeTab="
                 (selectedTab) =>
@@ -178,6 +180,25 @@
                 @set-feedback="(request) => $emit('set-feedback', request)"
               ></omegaup-submission-feedback>
             </template>
+            <template #code-view="{ guid }">
+              <omegaup-arena-feedback-code-view
+                :language="language"
+                :value="source"
+                :readonly="false"
+                :feedback-map="feedbackMap"
+                :feedback-thread-map="feedbackThreadMap"
+                :current-user-class-name="currentUserClassName"
+                :current-username="currentUsername"
+                @save-feedback-list="
+                  (feedbackList) =>
+                    $emit('save-feedback-list', { feedbackList, guid })
+                "
+                @submit-feedback-thread="
+                  (feedback) =>
+                    $emit('submit-feedback-thread', { feedback, guid })
+                "
+              ></omegaup-arena-feedback-code-view>
+            </template>
           </omegaup-arena-rundetails-popup>
         </template>
       </omegaup-overlay>
@@ -230,6 +251,8 @@ import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import submission_Feedback from '../submissions/Feedback.vue';
 import { SocketStatus } from '../../arena/events_socket';
 import { SubmissionRequest } from '../../arena/submissions';
+import arena_FeedbackCodeView from './FeedbackCodeView.vue';
+import { ArenaCourseFeedback } from './Feedback.vue';
 
 @Component({
   components: {
@@ -245,6 +268,7 @@ import { SubmissionRequest } from '../../arena/submissions';
     'omegaup-problem-details': problem_Details,
     'omegaup-submission-feedback': submission_Feedback,
     'omegaup-countdown': omegaup_Countdown,
+    'omegaup-arena-feedback-code-view': arena_FeedbackCodeView,
   },
 })
 export default class ArenaCourse extends Vue {
@@ -271,6 +295,12 @@ export default class ArenaCourse extends Vue {
   @Prop() totalRuns!: number;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: false }) isTeachingAssistant!: boolean;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackMap!: Map<number, ArenaCourseFeedback>;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
+  @Prop() currentUsername!: string;
+  @Prop() currentUserClassName!: string;
 
   T = T;
   omegaup = omegaup;
@@ -359,6 +389,14 @@ export default class ArenaCourse extends Vue {
       key: problem.alias,
       value: problem.text,
     }));
+  }
+
+  get language(): string | undefined {
+    return this.runDetailsData?.language;
+  }
+
+  get source(): string | undefined {
+    return this.runDetailsData?.source;
   }
 
   onPopupDismissed(): void {

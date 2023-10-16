@@ -15,7 +15,7 @@ import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { codemirror } from 'vue-codemirror-lite';
 
-const languageModeMap: {
+export const languageModeMap: {
   [language: string]: string;
 } = {
   c: 'text/x-csrc',
@@ -47,7 +47,7 @@ const languageModeMap: {
 };
 
 // Preload all language modes.
-const modeList: string[] = [
+export const modeList: string[] = [
   'clike',
   'python',
   'ruby',
@@ -64,11 +64,12 @@ for (const mode of modeList) {
   require(`codemirror/mode/${mode}/${mode}.js`);
 }
 
-interface EditorOptions {
+export interface EditorOptions {
   tabSize: number;
   lineNumbers: boolean;
   mode?: string;
   readOnly: boolean;
+  gutters?: string[];
 }
 
 @Component({

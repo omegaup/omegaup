@@ -10,8 +10,7 @@ import argparse
 import json
 import logging
 
-import lib.db as db
-import lib.logs as logs
+from lib import db, logs
 
 MAPPINGS = {
     'problemCategoryAlgorithmAndNetworkOptimization':

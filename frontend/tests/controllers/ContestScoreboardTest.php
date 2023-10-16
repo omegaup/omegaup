@@ -354,12 +354,14 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for all percentages of scoreboard show.
      *
-     * @return list<list<int>>
+     * @return list<array<0: float, 1: bool, 2: int, 3: float>>
      */
     public function contestPercentageScoreboardShowProvider(): array {
         return [
-            [0],
-            [1],
+            [1.0, true, 1, 100.0],
+            [0.0, false, 0, 0.0],
+            [1.0, false, 1, 0.0],
+            [0.0, true, 1, 100.0],
         ];
     }
 
@@ -368,17 +370,26 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
      *
      * @dataProvider contestPercentageScoreboardShowProvider
      */
-    public function testScoreboardPercentajeForContestant(int $percentage) {
+    public function testScoreboardPercentajeForContestant(
+        float $scoreboardPct,
+        bool $showScoreboardAfter,
+        int $expectedRuns,
+        float $expectedPoints
+    ) {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['showScoreboardAfter' => $showScoreboardAfter]
+            )
+        );
 
         // Set percentage of scoreboard show
         \OmegaUp\Test\Factories\Contest::setScoreboardPercentage(
             $contestData,
-            $percentage
+            $scoreboardPct
         );
 
         // Add the problem to the contest
@@ -399,11 +410,6 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Grade the run
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        $runs = 0;
-        if ($percentage !== 0) {
-            $runs++;
-        }
 
         // Create request
         $login = self::login($identity);
@@ -437,9 +443,44 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             0.0,
             $response['ranking'][0]['problems'][0]['penalty']
         );
+        // When scoreboardPercentage is 0 and ShowScoreboardAfter is false,
+        // the number of runs is not updated in the scoreboard
         $this->assertSame(
-            $runs,
+            $expectedRuns,
             $response['ranking'][0]['problems'][0]['runs']
+        );
+
+        $time = \OmegaUp\Time::get();
+
+        // Create a new run 2 minutes after
+        \OmegaUp\Time::setTimeForTesting($time + (2 * 60));
+
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+
+        // Grade the run
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Now, the contest has finished
+        \OmegaUp\Time::setTimeForTesting($time + (5 * 60 * 60));
+
+        $login = self::login($identity);
+
+        // Create API
+        $response = \OmegaUp\Controllers\Problemset::apiScoreboard(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problemset_id' =>  $contestData['contest']->problemset_id,
+            ])
+        );
+
+        // Check data per problem
+        $this->assertSame(
+            $expectedPoints,
+            $response['ranking'][0]['problems'][0]['points']
         );
     }
 
@@ -989,16 +1030,20 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
 
         $response1 = \OmegaUp\Controllers\Problemset::$testApi($r);
-        $this->assertSame(
-            false,
+        $this->assertFalse(
             \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting()
         );
 
         $response2 = \OmegaUp\Controllers\Problemset::$testApi($r);
-        $this->assertSame(
-            true,
-            \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting()
-        );
+        if ($isAdmin && $testApi == 'apiScoreboardEvents') {
+            $this->assertFalse(
+                \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting()
+            );
+        } else {
+            $this->assertTrue(
+                \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting()
+            );
+        }
 
         $this->assertSame($response1, $response2);
 
@@ -1026,10 +1071,15 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
         $response4 = \OmegaUp\Controllers\Problemset::$testApi($r);
-        $this->assertSame(
-            true,
-            \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting()
-        );
+        if ($isAdmin && $testApi == 'apiScoreboardEvents') {
+            $this->assertFalse(
+                \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting()
+            );
+        } else {
+            $this->assertTrue(
+                \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting()
+            );
+        }
         $this->assertEquals($response3, $response4);
     }
 
@@ -1257,7 +1307,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for the contest with max_per_group mode.
      *
-     * @return array{0: int, 1: list<array: {runs: int, score: float, execution: string, output: string, status_memory: string, status_runtime: string}>, 2: list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}>}
+     * @return array{0: int, 1: list<array: {runs: int, score: float, execution: string, output: string, status_memory: string, status_runtime: string}>, 2: list<array{total: float, points_per_group:array{group_name: string, score: float, verdict: string}}>, 3: int}
      */
     public function runsMappingProvider(): array {
         $runsMapping = [
@@ -1292,10 +1342,11 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 100,
                 [
                     ['runs' => 1, 'score' => 0.4, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
-                    ['runs' => 2, 'score' => 0.73, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
+                    ['runs' => 2, 'score' => 0.7333, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                     ['runs' => 3, 'score' => 0.8, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                 ],
-                $runsMapping
+                $runsMapping,
+                100,
             ],
             [
                 60,
@@ -1306,14 +1357,15 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                     // contest's settings
                     ['runs' => 3, 'score' => 0.73, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                 ],
-                $runsMapping
+                $runsMapping,
+                1
             ],
             [
                 100,
                 [
                     ['runs' => 1, 'score' => 0.0, 'execution' => 'EXECUTION_COMPILATION_ERROR', 'output' => 'OUTPUT_INCORRECT', 'status_memory' => 'MEMORY_NOT_AVAILABLE', 'status_runtime' => 'RUNTIME_NOT_AVAILABLE'],
                     ['runs' => 2, 'score' => 0.5, 'execution' => 'EXECUTION_JUDGE_ERROR', 'output' => 'OUTPUT_EXCEEDED', 'status_memory' => 'MEMORY_NOT_AVAILABLE', 'status_runtime' => 'RUNTIME_NOT_AVAILABLE'],
-                    ['runs' => 3, 'score' => 0.83, 'execution' => 'EXECUTION_INTERRUPTED', 'output' => 'OUTPUT_INTERRUPTED', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_EXCEEDED'],
+                    ['runs' => 3, 'score' => 0.8333, 'execution' => 'EXECUTION_INTERRUPTED', 'output' => 'OUTPUT_INTERRUPTED', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_EXCEEDED'],
                     ['runs' => 4, 'score' => 1.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_CORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
                 ],
                 [
@@ -1351,6 +1403,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                         ],
                     ],
                 ],
+                100,
             ],
         ];
     }
@@ -1364,7 +1417,8 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     public function testScoreboardForContestInMaxPerGroupMode(
         int $scoreboardPercentage,
         array $expectedResultsInEverySubmission,
-        array $runsMapping
+        array $runsMapping,
+        int $pointsPerProblem
     ) {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -1380,7 +1434,8 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         // Add the problem to the contest
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
-            $contestData
+            $contestData,
+            $pointsPerProblem
         );
 
         // Create our contestant
@@ -1433,7 +1488,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
 
             $this->assertSame(
                 $response[0]['problems'][0]['points'],
-                $expectedResultsInEverySubmission[$index]['score']
+                $expectedResultsInEverySubmission[$index]['score'] * $pointsPerProblem
             );
             $this->assertSame(
                 $response[0]['problems'][0]['runs'],
@@ -1455,6 +1510,204 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 $runsList[0]['status_memory'],
                 $expectedResultsInEverySubmission[$index]['status_memory']
             );
+        }
+    }
+
+    /**
+     * A PHPUnit data provider for the contest with max_per_group mode.
+     *
+     * @return array{0: bool, 1: list<array: {total: float, expectedScore: float, points_per_group: list<array: {group_name: string, score: float, verdict: string}>}>}
+     */
+    public function runsMappingPerGroupProvider(): array {
+        return [
+            [
+                true,
+                [
+                    [
+                        'total' => 0.25,
+                        'expectedScore' => 25.0,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'JE'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'OLE'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.25,
+                        'expectedScore' => 50.0,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'TLE'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'TLE'],
+                            ['group_name' => 'hard', 'score' => 0.25,'verdict' => 'AC'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.50,
+                        'expectedScore' => 75.0,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'medium', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                true,
+                [
+                    [
+                        'total' => 0.25,
+                        'expectedScore' => 25.0,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'JE'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'OLE'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.75,
+                        'expectedScore' => 75.0,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'TLE'],
+                            ['group_name' => 'hard', 'score' => 0.25,'verdict' => 'AC'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.5,
+                        'expectedScore' => 100.0,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'medium', 'score' => 0.25, 'verdict' => 'AC'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                false, // No events should be generated for this case
+                [
+                    [
+                        'total' => 0.0,
+                        'expectedScore' => 0.0,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'JE'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'OLE'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.0,
+                        'expectedScore' => 0.0,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'TLE'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                        ],
+                    ],
+                    [
+                        'total' => 0.0,
+                        'expectedScore' => 0.0,
+                        'points_per_group' => [
+                            ['group_name' => 'sample', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'WA'],
+                            ['group_name' => 'hard', 'score' => 0.0,'verdict' => 'WA'],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param list<array: {total: float, expectedScore: float, points_per_group: list<array: {group_name: string, score: float, verdict: string}>}> $runsMapping
+     *
+     * @dataProvider runsMappingPerGroupProvider
+     */
+    public function testScoreboardEventsForContestInMaxPerGroupMode(
+        bool $hasEvents,
+        array $runsMapping
+    ) {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get a contest scoreMode
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'scoreMode' => 'max_per_group',
+                'scoreboardPct' => 100,
+            ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Create our contestant
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $time = \OmegaUp\Time::get();
+
+        // Create and grade some runs every five minutes
+        foreach ($runsMapping as $run) {
+            \OmegaUp\Time::setTimeForTesting($time + (5 * 60));
+
+            $runData = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $identity
+            );
+
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                runData: $runData,
+                points: $run['total'],
+                verdict: 'PA',
+                submitDelay: null,
+                runGuid: null,
+                runId: null,
+                problemsetPoints: 100,
+                outputFilesContent: null,
+                problemsetScoreMode: 'max_per_group',
+                runScoreByGroups: $run['points_per_group']
+            );
+            $time = \OmegaUp\Time::get();
+        }
+
+        // Create request as a contestant
+        $login = self::login($identity);
+        $eventsResponse = \OmegaUp\Controllers\Contest::apiScoreboardEvents(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        )['events'];
+
+        if (!$hasEvents) {
+            $this->assertEmpty($eventsResponse);
+            return;
+        }
+        $delta = $eventsResponse[0]['delta'];
+        $lastExpectedScore = 0.0;
+        foreach ($runsMapping as $index => $run) {
+            $event = $eventsResponse[$index];
+            $this->assertSame($run['expectedScore'], $event['total']['points']);
+            // Assert every 5 seconds one run was submitted
+            $this->assertSame($delta, $event['delta']);
+            $delta += 5;
+            if ($lastExpectedScore != $run['expectedScore']) {
+                $lastExpectedScore = $run['expectedScore'];
+            }
         }
     }
 }

@@ -5,16 +5,20 @@ import { shallowMount } from '@vue/test-utils';
 import omegaup_SubmissionFeedback from './Feedback.vue';
 describe('Feedback.vue', () => {
   const savedFeedbackMessage = 'This is a saved feedback message';
-  const feedbackOptions: types.SubmissionFeedback = {
-    author: 'omegaUp',
-    author_classname: 'user-rank-unranked',
-    date: new Date(),
-    feedback: savedFeedbackMessage,
-  };
+  const feedbackOptions: types.SubmissionFeedback[] = [
+    {
+      author: 'omegaUp',
+      author_classname: 'user-rank-unranked',
+      date: new Date(),
+      feedback: savedFeedbackMessage,
+      feedback_thread: [],
+      submission_feedback_id: 1,
+    },
+  ];
 
   it('Should handle new feedback for admin', async () => {
     const wrapper = shallowMount(omegaup_SubmissionFeedback, {
-      propsData: { feedbackOptions: null, guid: 'afa568', isAdmin: true },
+      propsData: { feedbackOptions: [], guid: 'afa568', isAdmin: true },
     });
 
     expect(

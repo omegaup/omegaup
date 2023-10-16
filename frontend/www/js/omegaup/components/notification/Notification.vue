@@ -17,7 +17,7 @@
       :class="{ 'notification-link': url }"
       @click="handleClick"
     >
-      <img class="d-block" width="80" :src="iconUrl" />
+      <img class="d-block" width="50" :src="iconUrl" />
       <template v-if="notificationMarkdown">
         <omegaup-markdown :markdown="notificationMarkdown"></omegaup-markdown>
       </template>

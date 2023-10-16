@@ -202,13 +202,22 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
         /** @var array<string, bool> $seenUsernames */
         $seenUsernames = [];
+        $duplicatedUsernames = [];
         foreach ($identities as $identity) {
             if (isset($seenUsernames[$identity['username']])) {
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'aliasInUse'
-                );
+                $duplicatedUsernames[] = $identity['username'];
             }
             $seenUsernames[$identity['username']] = true;
+        }
+
+        if (!empty($duplicatedUsernames)) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
+                'groupMemberUsernameInUse',
+                'usernames',
+                // Displaying only the first 20 duplicated usernames in order to
+                // prevent the error message from ruining the UI
+                duplicatedItemsInArray: array_slice($duplicatedUsernames, 0, 20)
+            );
         }
 
         // Save objects into DB
@@ -243,6 +252,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $school = trim($identity['school_name']);
                 }
                 if (!empty($school)) {
+                    \OmegaUp\Validators::validateLengthInRange(
+                        $school,
+                        'school_name',
+                        1,
+                        128
+                    );
                     $state = null;
                     if (!is_null($countryId) && !is_null($stateId)) {
                         $state = \OmegaUp\DAO\States::getByPK(

@@ -1,12 +1,9 @@
 <template>
   <div class="card">
-    <h5 class="card-header">
-      {{ T.wordsProblems }}
-    </h5>
     <div class="table-responsive mb-0">
-      <table class="table table-fixed">
+      <table class="table">
         <thead>
-          <tr>
+          <tr class="sticky-top bg-white text-center">
             <th scope="col" class="align-middle text-nowrap">
               <span
                 >{{ T.wordsID }}
@@ -44,7 +41,7 @@
                 "
               ></omegaup-common-sort-controls>
             </th>
-            <th scope="col" class="text-center align-middle text-nowrap">
+            <th scope="col" class="align-middle text-nowrap">
               <span
                 >{{ T.wordsQuality }}
                 <omegaup-common-sort-controls
@@ -58,7 +55,7 @@
                 ></omegaup-common-sort-controls
               ></span>
             </th>
-            <th scope="col" class="text-center align-middle text-nowrap">
+            <th scope="col" class="align-middle text-nowrap">
               <span
                 >{{ T.wordsDifficulty }}
                 <omegaup-common-sort-controls
@@ -72,7 +69,7 @@
                 ></omegaup-common-sort-controls
               ></span>
             </th>
-            <th scope="col" class="text-right align-middle text-nowrap">
+            <th scope="col" class="align-middle text-nowrap">
               <span
                 >{{ T.wordsRatio }}
                 <omegaup-common-sort-controls
@@ -86,11 +83,7 @@
                 ></omegaup-common-sort-controls
               ></span>
             </th>
-            <th
-              v-if="loggedIn"
-              scope="col"
-              class="text-right align-middle text-nowrap"
-            >
+            <th v-if="loggedIn" scope="col" class="align-middle text-nowrap">
               <span
                 >{{ T.wordsMyScore }}
                 <omegaup-common-sort-controls
@@ -104,7 +97,7 @@
                 ></omegaup-common-sort-controls
               ></span>
             </th>
-            <th scope="col" class="text-right align-middle text-nowrap">
+            <th scope="col" class="align-middle text-nowrap">
               <span>
                 <a
                   data-toggle="tooltip"
@@ -131,9 +124,12 @@
           <tr v-for="problem in problems" :key="problem.problem_id">
             <td class="align-middle">{{ problem.problem_id }}</td>
             <td class="align-middle">
-              <a :href="`/arena/problem/${problem.alias}/`">{{
-                problem.title
-              }}</a>
+              <a
+                :href="`/arena/problem/${problem.alias}/`"
+                class="mr-2"
+                data-problem-title-list
+                >{{ problem.title }}</a
+              >
               <font-awesome-icon
                 v-if="problem.qualitySeal || problem.visibility === 3"
                 :title="T.wordsHighQualityProblem"
@@ -309,6 +305,10 @@ export default class BaseList extends Vue {
 .sticky-offset {
   top: 4rem;
 }
+.card {
+  border-top: none;
+  border-radius: 0rem 0rem 0.25rem 0.25rem;
+}
 
 table {
   border-collapse: separate;
@@ -318,29 +318,7 @@ table {
 .table-responsive {
   max-height: 80vh;
 }
-
-.table-fixed {
-  overflow: auto;
-  thead {
-    th {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      background: white;
-      border-bottom: 0;
-      &:nth-child(2) {
-        position: sticky;
-        left: 0;
-        background: white;
-        z-index: 3;
-      }
-    }
-  }
-  tbody td:nth-child(2) {
-    position: sticky;
-    left: 0;
-    background: white;
-    z-index: 1;
-  }
+thead tr th {
+  border: none;
 }
 </style>

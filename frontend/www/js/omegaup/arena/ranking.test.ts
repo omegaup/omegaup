@@ -14,6 +14,7 @@ import {
 import { rankingStoreConfig } from './rankingStore';
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
+import { ScoreMode } from './navigation';
 
 describe('ranking', () => {
   const now = Date.now();
@@ -264,6 +265,7 @@ describe('ranking', () => {
         startTime: new Date(0),
         finishTime: new Date(1),
         currentUsername: 'omegaUp',
+        scoreMode: ScoreMode.Partial,
       });
 
       expect(store.state.ranking).toEqual([
@@ -384,6 +386,7 @@ describe('ranking', () => {
         currentUsername: 'omegaUp',
         scoreboard: scoreboard,
         navbarProblems: navbarProblems,
+        scoreMode: ScoreMode.Partial,
       };
       const { ranking, users } = onRankingChanged(params);
       expect(ranking[0].total.points).toEqual(200);
@@ -395,6 +398,7 @@ describe('ranking', () => {
         currentUsername: 'omegaUp',
         scoreboard: scoreboard,
         navbarProblems: navbarProblems,
+        scoreMode: ScoreMode.Partial,
       });
       const params = {
         events: scoreboardEvents,
@@ -426,6 +430,7 @@ describe('ranking', () => {
         currentUsername: 'omegaUp',
         scoreboard: scoreboard,
         navbarProblems: navbarProblems,
+        scoreMode: ScoreMode.Partial,
       });
       const params = {
         events: scoreboardEvents,

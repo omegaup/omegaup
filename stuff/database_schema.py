@@ -13,8 +13,9 @@ import subprocess
 import sys
 from typing import Optional
 
+from omegaup_hook_tools import git_tools
+
 import database_utils
-from hook_tools import git_tools
 
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
@@ -63,9 +64,9 @@ def _check_mutually_exclusive_schema_modifications(
         return True
     if schema_sql_modified and dao_schema_sql_modified:
         # Welp, both files got modified, this is bad.
-        print('%s%r and %r cannot be modified in the same commit.%s' %
-              (git_tools.COLORS.FAIL, schema_sql_filename,
-               dao_schema_sql_filename, git_tools.COLORS.NORMAL),
+        print((f'{git_tools.COLORS.FAIL}{schema_sql_filename!r} and '
+               f'{dao_schema_sql_filename!r} cannot be modified in '
+               f'the same commit.{git_tools.COLORS.NORMAL}'),
               file=sys.stderr)
         return False
     if schema_sql_modified:
@@ -76,9 +77,9 @@ def _check_mutually_exclusive_schema_modifications(
     dao_schema_sql = git_tools.file_contents(args, root,
                                              dao_schema_sql_filename)
     if schema_sql != dao_schema_sql:
-        print('%s%r can only have the same contents as %r.%s' %
-              (git_tools.COLORS.FAIL, dao_schema_sql_filename,
-               schema_sql_filename, git_tools.COLORS.NORMAL),
+        print((f'{git_tools.COLORS.FAIL}{dao_schema_sql_filename!r} can only '
+               f'have the same contents as {schema_sql_filename!r}.'
+               f'{git_tools.COLORS.NORMAL}'),
               file=sys.stderr)
         return False
 
@@ -193,18 +194,19 @@ def main() -> None:
                         keepends=True),
                     fromfile=_SCHEMA_FILENAME,
                     tofile=_SCHEMA_FILENAME))
-            print('%sschema.sql validation errors.%s '
-                  'Please run `%s` to fix them.' %
-                  (git_tools.COLORS.FAIL, git_tools.COLORS.NORMAL,
-                   git_tools.get_fix_commandline(args, filtered_files)),
+            print((f'{git_tools.COLORS.FAIL}schema.sql validation '
+                   f'errors.{git_tools.COLORS.NORMAL} '
+                   'Please run '
+                   f'`{git_tools.get_fix_commandline(args, filtered_files)}` '
+                   'to fix them.'),
                   file=sys.stderr)
         else:
-            with open(os.path.join(root,
-                                   'frontend/database/schema.sql'), 'wb') as f:
+            with open(os.path.join(root, 'frontend/database/schema.sql'),
+                      'wb') as f:
                 f.write(expected)
-            print('Files written to working directory. '
-                  '%sPlease commit them before pushing.%s' % (
-                      git_tools.COLORS.HEADER, git_tools.COLORS.NORMAL),
+            print((f'Files written to working directory. '
+                   f'{git_tools.COLORS.HEADER}Please commit them '
+                   f'before pushing.{git_tools.COLORS.NORMAL}'),
                   file=sys.stderr)
         sys.exit(1)
 

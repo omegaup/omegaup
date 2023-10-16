@@ -7,6 +7,7 @@ import {
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
 import {
+  createChart,
   onRankingChanged,
   onRankingEvents,
   onVirtualRankingChanged,
@@ -15,6 +16,7 @@ import { updateRun } from './submissions';
 import { types } from '../api_types';
 import rankingStore from './rankingStore';
 import socketStore from './socketStore';
+import { ScoreMode } from './navigation';
 
 export enum SocketStatus {
   Waiting = '↻',
@@ -38,7 +40,7 @@ export interface SocketOptions {
   currentUsername: string;
   navbarProblems: types.NavbarProblemsetProblem[];
   intervalInMilliseconds: number;
-  isContestModeMaxPerGroup: boolean;
+  scoreMode: ScoreMode;
 }
 
 export class EventsSocket {
@@ -64,7 +66,7 @@ export class EventsSocket {
   private readonly currentUsername: string;
   private readonly navbarProblems: types.NavbarProblemsetProblem[];
   private readonly intervalInMilliseconds: number;
-  private readonly isContestModeMaxPerGroup: boolean;
+  private readonly scoreMode: ScoreMode;
 
   constructor({
     disableSockets = false,
@@ -82,7 +84,7 @@ export class EventsSocket {
     currentUsername,
     navbarProblems,
     intervalInMilliseconds = 5 * 60 * 1000,
-    isContestModeMaxPerGroup,
+    scoreMode = ScoreMode.Partial,
   }: SocketOptions) {
     this.socket = null;
 
@@ -102,7 +104,7 @@ export class EventsSocket {
     this.clarificationInterval = null;
     this.rankingInterval = null;
     this.intervalInMilliseconds = intervalInMilliseconds;
-    this.isContestModeMaxPerGroup = isContestModeMaxPerGroup;
+    this.scoreMode = scoreMode;
 
     const protocol = locationProtocol === 'https:' ? 'wss:' : 'ws:';
     const host = locationHost;
@@ -116,31 +118,22 @@ export class EventsSocket {
     const data = JSON.parse(message.data);
 
     if (data.message == '/run/update/') {
-      data.run.time = time.remoteTime(data.run.time * 1000);
-      updateRun({ run: data.run });
+      const { run } = data;
+      const updatedRun = {
+        ...run,
+        time: time.remoteTime(run.time * 1000),
+      };
+      updateRun({ run: updatedRun });
     } else if (data.message == '/clarification/update/') {
       data.clarification.time = time.remoteTime(data.clarification.time * 1000);
       clarificationStore.commit('addClarification', data.clarification);
     } else if (data.message == '/scoreboard/update/') {
-      if (this.isContestModeMaxPerGroup) {
-        api.Contest.scoreboard({ contest_alias: this.problemsetAlias })
-          .then((result: types.Scoreboard) => {
-            this.processRankings({
-              scoreboard: result,
-              currentTime: result.time.getTime(),
-              startTime: result.start_time.getTime(),
-              finishTime: result.finish_time?.getTime() ?? 0,
-            });
-          })
-          .catch(ui.apiError);
-      } else {
-        this.processRankings({
-          scoreboard: data.scoreboard,
-          currentTime: data.scoreboard.time,
-          startTime: data.scoreboard.start_time,
-          finishTime: data.scoreboard.finish_time,
-        });
-      }
+      this.processRankings({
+        scoreboard: data.scoreboard,
+        currentTime: data.scoreboard.time,
+        startTime: data.scoreboard.start_time,
+        finishTime: data.scoreboard.finish_time,
+      });
     }
   }
 
@@ -173,6 +166,7 @@ export class EventsSocket {
             problems: this.navbarProblems,
             startTime: this.startTime,
             finishTime: this.finishTime,
+            scoreMode: this.scoreMode,
           });
         })
         .catch(ui.ignoreError);
@@ -187,6 +181,7 @@ export class EventsSocket {
       scoreboard,
       currentUsername: this.currentUsername,
       navbarProblems: this.navbarProblems,
+      scoreMode: this.scoreMode,
     });
     rankingStore.commit('updateRanking', ranking);
     rankingStore.commit('updateMiniRankingUsers', users);
@@ -197,12 +192,52 @@ export class EventsSocket {
       token: this.scoreboardToken,
     })
       .then((response) =>
-        onRankingEvents({
+        this.calculateRankingEvents({
           events: response.events,
+          startTimestamp: this.startTime.getTime(),
+          finishTimestamp: Date.now(),
           currentRanking,
         }),
       )
       .catch(ui.ignoreError);
+  }
+
+  private calculateRankingEvents({
+    events,
+    currentRanking,
+    startTimestamp = 0,
+    finishTimestamp = Date.now(),
+    placesToShowInChart = 10,
+  }: {
+    events: types.ScoreboardEvent[];
+    currentRanking: { [username: string]: number };
+    startTimestamp?: number;
+    finishTimestamp?: number;
+    placesToShowInChart?: number;
+  }) {
+    const { series, navigatorData } = onRankingEvents({
+      events,
+      startTimestamp,
+      finishTimestamp,
+      currentRanking,
+      placesToShowInChart,
+    });
+
+    let maxPoints = 0;
+    for (const problem of this.navbarProblems) {
+      maxPoints += problem.maxScore;
+    }
+
+    if (series.length) {
+      const rankingChartOptions = createChart({
+        series,
+        navigatorData,
+        startTimestamp: this.startTime.getTime(),
+        finishTimestamp: Date.now(),
+        maxPoints,
+      });
+      rankingStore.commit('updateRankingChartOptions', rankingChartOptions);
+    }
   }
 
   private onclose() {
@@ -289,6 +324,7 @@ export class EventsSocket {
           scoreboard,
           currentUsername: this.currentUsername,
           navbarProblems: this.navbarProblems,
+          scoreMode: this.scoreMode,
         });
 
         api.Problemset.scoreboardEvents({
@@ -337,6 +373,7 @@ export class EventsSocket {
               scoreboard,
               currentUsername: this.currentUsername,
               navbarProblems: this.navbarProblems,
+              scoreMode: this.scoreMode,
             });
 
             api.Problemset.scoreboardEvents({

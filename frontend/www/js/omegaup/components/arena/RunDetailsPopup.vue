@@ -109,12 +109,20 @@
         <a v-if="data.source_link" download="data.zip" :href="data.source">{{
           T.wordsDownload
         }}</a>
-        <omegaup-arena-code-view
-          v-else
-          :language="data.language"
-          :readonly="true"
-          :value="data.source"
-        ></omegaup-arena-code-view>
+        <slot v-else name="code-view" :guid="data.guid">
+          <omegaup-arena-feedback-code-view
+            :language="language"
+            :value="source"
+            :feedback-map="feedbackMap"
+            :feedback-thread-map="feedbackThreadMap"
+            @save-feedback-list="
+              (feedbackList) => onSaveFeedbackList(feedbackList, data.guid)
+            "
+            @submit-feedback-thread="
+              (feedback) => onSubmitFeedbackThread(feedback, data.guid)
+            "
+          ></omegaup-arena-feedback-code-view>
+        </slot>
         <div v-if="data.compile_error" class="compile_error">
           <h3>{{ T.wordsCompilerOutput }}</h3>
           <pre class="compile_error">
@@ -178,6 +186,8 @@ import arena_CodeView from './CodeView.vue';
 import arena_DiffView from './DiffView.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
+import { ArenaCourseFeedback } from './Feedback.vue';
+import arena_FeedbackCodeView from './FeedbackCodeView.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -201,14 +211,27 @@ const EMPTY_FIELD = '∅';
     'omegaup-arena-code-view': arena_CodeView,
     'omegaup-arena-diff-view': arena_DiffView,
     'omegaup-overlay-popup': omegaup_OverlayPopup,
+    'omegaup-arena-feedback-code-view': arena_FeedbackCodeView,
   },
 })
 export default class ArenaRunDetailsPopup extends Vue {
   @Prop() data!: types.RunDetails;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackMap!: Map<number, ArenaCourseFeedback>;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
 
   EMPTY_FIELD = EMPTY_FIELD;
   T = T;
   groupVisible: GroupVisibility = {};
+
+  get language(): string | undefined {
+    return this.data?.language;
+  }
+
+  get source(): string | undefined {
+    return this.data?.source;
+  }
 
   toggle(group: string): void {
     const visible = this.groupVisible[group];
@@ -236,6 +259,23 @@ export default class ArenaRunDetailsPopup extends Vue {
 
   contestScore(problemCase: types.CaseResult): number {
     return problemCase.contest_score ?? problemCase.score;
+  }
+
+  onSaveFeedbackList(
+    feedbackList: { lineNumber: number; feedback: string }[],
+    guid: string,
+  ) {
+    this.$parent.$parent.$parent.$parent.$emit('save-feedback-list', {
+      feedbackList,
+      guid,
+    });
+  }
+
+  onSubmitFeedbackThread(feedback: ArenaCourseFeedback, guid: string) {
+    this.$parent.$parent.$parent.$parent.$emit('submit-feedback-thread', {
+      feedback,
+      guid,
+    });
   }
 }
 </script>

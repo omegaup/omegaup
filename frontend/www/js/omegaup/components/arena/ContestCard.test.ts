@@ -26,7 +26,7 @@ describe('ContestCard.vue', () => {
     last_updated: yesterday,
     organizer: 'omegaup',
     original_finish_time: tomorrow,
-    partial_score: false,
+    score_mode: 'all_or_nothing',
     participating: true,
     problemset_id: 1,
     recommended: false,
@@ -45,7 +45,7 @@ describe('ContestCard.vue', () => {
     last_updated: today,
     organizer: 'omegaup',
     original_finish_time: new Date(tomorrow.getTime() + daySeconds),
-    partial_score: false,
+    score_mode: 'all_or_nothing',
     participating: true,
     problemset_id: 1,
     recommended: true,
@@ -64,7 +64,7 @@ describe('ContestCard.vue', () => {
     last_updated: new Date(yesterday.getTime() - daySeconds),
     organizer: 'omegaup',
     original_finish_time: yesterday,
-    partial_score: false,
+    score_mode: 'all_or_nothing',
     participating: true,
     problemset_id: 1,
     recommended: false,
@@ -107,8 +107,8 @@ describe('ContestCard.vue', () => {
     const contestButtonEnter = wrapper.findComponent({
       ref: 'contestButtonEnter',
     });
-    const contestButtonSingUp = wrapper.findComponent({
-      ref: 'contestButtonSingUp',
+    const contestButtonSeeDetails = wrapper.findComponent({
+      ref: 'contestButtonSeeDetails',
     });
     const contestIconRecommended = wrapper.findComponent({
       ref: 'contestIconRecommended',
@@ -117,7 +117,7 @@ describe('ContestCard.vue', () => {
     expect(contestEnrollStatus.exists()).toBe(true);
     expect(contestButtonEnter.exists()).toBe(true);
     expect(contestIconRecommended.exists()).toBe(true);
-    expect(contestButtonSingUp.exists()).toBe(false);
+    expect(contestButtonSeeDetails.exists()).toBe(false);
   });
 
   it('Should show the past contest card', async () => {

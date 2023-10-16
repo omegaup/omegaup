@@ -10,18 +10,24 @@ import argparse
 import datetime
 import logging
 
-from typing import Any, Dict, Mapping
+from typing import Any, Dict
 
-from pythonjsonlogger import jsonlogger  # type: ignore
+from pythonjsonlogger import jsonlogger
 
 
-class _CustomJsonFormatter(jsonlogger.JsonFormatter):  # type: ignore
+class _CustomJsonFormatter(jsonlogger.JsonFormatter):
     """A JSON formatter that adds the level."""
+
+    def __init__(self) -> None:
+        # TODO(https://github.com/madzak/python-json-logger/pull/170): Remove
+        # the type: ignore annotation when v2.0.8 is released.
+        super().__init__()  # type: ignore
+
     def add_fields(
             self,
             log_record: Dict[str, str],
             record: logging.LogRecord,
-            message_dict: Mapping[str, Any],
+            message_dict: Dict[str, Any],
     ) -> None:
         """Add fields to the record."""
         super().add_fields(log_record, record, message_dict)
@@ -76,7 +82,7 @@ def init(program: str, args: argparse.Namespace) -> None:
                             handlers=[log_handler],
                             force=True)
     else:
-        logging.basicConfig(filename=args.logfile,
+        logging.basicConfig(filename=args.logfile or '',
                             format='%%(asctime)s:%s:%%(message)s' % program,
                             level=log_level)
 

@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <ul class="nav nav-tabs" role="tablist">
+  <div class="card ranking-width">
+    <ul class="nav nav-tabs justify-content-arround" role="tablist">
       <li class="nav-item">
         <a
           href="#"
@@ -56,14 +56,16 @@
         </a>
       </li>
     </ul>
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover table-responsive-sm">
       <thead>
         <tr>
           <th scope="col" class="text-center"></th>
           <th scope="col" class="text-center">
+            {{ T.codersOfTheMonthUser }}
+          </th>
+          <th scope="col" class="text-center">
             {{ T.codersOfTheMonthCountry }}
           </th>
-          <th scope="col" class="text-center">{{ T.codersOfTheMonthUser }}</th>
           <th
             v-if="selectedTab == 'codersOfTheMonth'"
             scope="col"
@@ -71,27 +73,18 @@
           >
             {{ T.codersOfTheMonthDate }}
           </th>
-          <th
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
-            scope="col"
-            class="text-right"
-          >
-            {{ T.profileStatisticsNumberOfSolvedProblems }}
-          </th>
-          <th
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
-            scope="col"
-            class="text-right"
-          >
-            {{ T.rankScore }}
-          </th>
-          <th
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
-            scope="col"
-            class="text-center"
-          >
-            {{ T.wordsActions }}
-          </th>
+
+          <template v-if="selectedTab == 'candidatesToCoderOfTheMonth'">
+            <th scope="col" class="text-center">
+              {{ T.profileStatisticsNumberOfSolvedProblems }}
+            </th>
+            <th scope="col" class="text-center">
+              {{ T.rankScore }}
+            </th>
+            <th v-if="isMentor" scope="col" class="text-center">
+              {{ T.wordsActions }}
+            </th>
+          </template>
         </tr>
       </thead>
       <tbody>
@@ -99,36 +92,39 @@
           <td class="text-center">
             <img :src="coder.gravatar_32" />
           </td>
-          <td class="text-center">
-            <omegaup-countryflag
-              :country="coder.country_id"
-            ></omegaup-countryflag>
-          </td>
-          <td class="text-center">
+          <td class="text-center align-middle">
             <omegaup-user-username
               :classname="coder.classname"
               :linkify="true"
               :username="coder.username"
             ></omegaup-user-username>
           </td>
-          <td v-if="selectedTab == 'codersOfTheMonth'" class="text-center">
+          <td class="text-center align-middle">
+            <omegaup-countryflag
+              :country="coder.country_id"
+            ></omegaup-countryflag>
+          </td>
+          <td
+            v-if="selectedTab == 'codersOfTheMonth'"
+            class="text-center align-middle"
+          >
             {{ coder.date }}
           </td>
           <td
             v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
-            class="text-right"
+            class="text-center align-middle"
           >
             {{ coder.problems_solved }}
           </td>
           <td
             v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
-            class="text-right"
+            class="text-center align-middle"
           >
             {{ coder.score }}
           </td>
           <td
             v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
-            class="text-center"
+            class="text-center align-middle"
           >
             <button
               v-if="canChooseCoder && !coderIsSelected"
@@ -150,10 +146,10 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
 import country_Flag from '../CountryFlag.vue';
+import { types } from '../../api_types';
 
 @Component({
   components: {
@@ -162,9 +158,9 @@ import country_Flag from '../CountryFlag.vue';
   },
 })
 export default class CoderOfTheMonthList extends Vue {
-  @Prop() codersOfCurrentMonth!: omegaup.CoderOfTheMonth[];
-  @Prop() codersOfPreviousMonth!: omegaup.CoderOfTheMonth[];
-  @Prop() candidatesToCoderOfTheMonth!: omegaup.CoderOfTheMonth[];
+  @Prop() codersOfCurrentMonth!: types.CoderOfTheMonthList[];
+  @Prop() codersOfPreviousMonth!: types.CoderOfTheMonthList[];
+  @Prop() candidatesToCoderOfTheMonth!: types.CoderOfTheMonthList[];
   @Prop() canChooseCoder!: boolean;
   @Prop() coderIsSelected!: boolean;
   @Prop() isMentor!: boolean;
@@ -173,7 +169,7 @@ export default class CoderOfTheMonthList extends Vue {
   T = T;
   selectedTab = 'codersOfTheMonth';
 
-  get visibleCoders(): omegaup.CoderOfTheMonth[] {
+  get visibleCoders(): types.CoderOfTheMonthList[] {
     switch (this.selectedTab) {
       case 'codersOfTheMonth':
       default:
@@ -186,3 +182,27 @@ export default class CoderOfTheMonthList extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.nav-link.active,
+.nav-link:hover {
+  border: none;
+  border-left: 0.0625rem solid #dee2e6;
+  border-right: 0.0625rem solid #dee2e6;
+  border-top-left-radius: 0rem;
+  border-top-right-radius: 0rem;
+}
+.nav .nav-tabs {
+  border-bottom: 0rem;
+}
+
+.nav-link {
+  font-weight: medium;
+  letter-spacing: 0.022rem;
+  padding: 0.65rem 1rem;
+}
+.ranking-width {
+  max-width: 55rem;
+  margin: 0 auto;
+}
+</style>

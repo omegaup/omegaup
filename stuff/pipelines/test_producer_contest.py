@@ -17,7 +17,6 @@ import database.contest
 import producer_contest
 import rabbitmq_connection
 import rabbitmq_client
-import rabbitmq_connection
 import test_credentials
 
 sys.path.insert(
@@ -25,6 +24,7 @@ sys.path.insert(
     os.path.join(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
 import lib.db   # pylint: disable=wrong-import-position
+
 
 @dataclasses.dataclass
 class MessageSavingCallback:
@@ -97,9 +97,11 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
     )
 
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
-        rabbitmq_connection.connect(username=test_credentials.OMEGAUP_USERNAME,
-                                     password=test_credentials.OMEGAUP_PASSWORD,
-                                     host=test_credentials.RABBITMQ_HOST) as channel:
+        rabbitmq_connection.connect(
+            username=test_credentials.OMEGAUP_USERNAME,
+            password=test_credentials.OMEGAUP_PASSWORD,
+            host=test_credentials.RABBITMQ_HOST,
+    ) as channel:
         rabbitmq_connection.initialize_rabbitmq(
             queue='contest',
             exchange='certificates',

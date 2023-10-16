@@ -28,6 +28,7 @@ import lib.logs  # pylint: disable=wrong-import-position
 
 
 class Results(NamedTuple):
+    """Represents the results of analyzing plagiarism for two submissions."""
     contest_id: int
     score_1: int
     score_2: int
@@ -37,6 +38,7 @@ class Results(NamedTuple):
 
 
 class CopyDetectorResult(NamedTuple):
+    """Represents the results of running copydetect on two files."""
     test_similarity: float
     reference_similarity: float
     test_filename: str
@@ -61,6 +63,7 @@ CONTESTS_TO_RUN_PLAGIARISM_ON = """
 
 
 class Contest(TypedDict):
+    """Represents a contest fom the database."""
     contest_id: int
     problemset_id: int
 
@@ -77,6 +80,7 @@ GET_CONTEST_SUBMISSION_IDS = """
 
 
 class Submission(TypedDict):
+    """Represents a submission fom the database."""
     contest_id: int
     submission_id: int
     problemset_id: int
@@ -88,7 +92,14 @@ class Submission(TypedDict):
 
 INSERT_INTO_PLAGIARISMS = """
     INSERT INTO `Plagiarisms`
-        (`contest_id`, `score_1`, `score_2` , `submission_id_1` , `submission_id_2`, `contents`)
+        (
+            `contest_id`,
+            `score_1`,
+            `score_2`,
+            `submission_id_1`,
+            `submission_id_2`,
+            `contents`
+        )
     VALUES
         (%s, %s, %s, %s, %s, %s)
 """
@@ -106,23 +117,24 @@ SubmissionDownloader = Callable[[str, str], None]
 
 
 class S3SubmissionDownloader:
-    ''' A SubmissionDownloader that can download files from an S3 bucket.  '''
+    """A SubmissionDownloader that can download files from an S3 bucket."""
 
     def __init__(self, bucket_name: str = 'omegaup-submissions') -> None:
         self._bucket = boto3.client('s3').Bucket(bucket_name)
 
-    def __call__(self, guid: str, destination_dir: str) -> None:
-        self._bucket.download_file(guid, os.path.join(destination_dir))
+    def __call__(self, guid: str, destination: str) -> None:
+        self._bucket.download_file(guid, os.path.join(destination))
 
 
 class LocalSubmissionDownloader:
+    """A SubmissionDownloader that gets files from a local directory."""
 
-    def __init__(self, dir: str) -> None:
-        self._dir = dir
+    def __init__(self, dirname: str) -> None:
+        self._dir = dirname
 
-    def __call__(self, guid: str, destination_dir: str) -> None:
+    def __call__(self, guid: str, destination: str) -> None:
         shutil.copyfile(os.path.join(self._dir, f'{guid[:2]}/{guid[2:]}'),
-                        os.path.join(destination_dir))
+                        os.path.join(destination))
 
 
 def get_range(code: Sequence[str]) -> Tuple[Tuple[int, int], ...]:
@@ -156,10 +168,12 @@ def get_range(code: Sequence[str]) -> Tuple[Tuple[int, int], ...]:
 def filter_and_format_result(dbconn: lib.db.Connection, contest_id: int,
                              submissions: Iterable[Submission],
                              results: Iterable[CopyDetectorResult]) -> None:
+    """Given a list of submissions and results, format them."""
 
-    # For inserting the result in database we need submission_id, but the result
-    # contains guid (the only thing we can have access to from detector).
-    # so we make a dict to map the guid to submission_id from the submissions.
+    # For inserting the result in database we need submission_id, but the
+    # result contains guid (the only thing we can have access to from
+    # detector).  so we make a dict to map the guid to submission_id from the
+    # submissions.
 
     guid_and_submission_id_dict: Dict[str, int] = {}
 
@@ -200,13 +214,14 @@ def filter_and_format_result(dbconn: lib.db.Connection, contest_id: int,
     dbconn.conn.commit()
 
 
-def run_copy_detect(dbconn: lib.db.Connection, dir: str, contest_id: int,
+def run_copy_detect(dbconn: lib.db.Connection, dirname: str, contest_id: int,
                     submissions: Iterable[Submission]) -> None:
+    """Run copydetect over a list of submissions."""
 
     # we will run detector for each problem.
-    for problem in os.listdir(dir):
+    for problem in os.listdir(dirname):
         detector = copydetect.CopyDetector(
-            test_dirs=[os.path.join(dir, problem)],
+            test_dirs=[os.path.join(dirname, problem)],
             extensions=["cpp", "py", "py3", "java"],
             display_t=0.9,
             autoopen=False,
@@ -228,22 +243,24 @@ def run_copy_detect(dbconn: lib.db.Connection, dir: str, contest_id: int,
                                  copydetector_result)
 
 
-def download_submission_files(dbconn: lib.db.Connection, dir: str,
+def download_submission_files(dirname: str,
                               download: SubmissionDownloader,
                               submission_ids: Iterable[Submission]) -> None:
+    """Given a list of submissions, download them into a directory."""
 
     for submission in submission_ids:
         lang = submission['language']
         if lang in C_LANGS:
             lang = "cpp"
 
-        submission_path = os.path.join(dir, str(submission['problem_id']),
+        submission_path = os.path.join(dirname, str(submission['problem_id']),
                                        f'{submission["guid"]}.{lang}')
         os.makedirs(os.path.dirname(submission_path), exist_ok=True)
         download(submission['guid'], submission_path)
 
 
 def get_contests(dbconn: lib.db.Connection) -> Iterable[Contest]:
+    """Get all contests that need to be analyzed."""
 
     with dbconn.cursor(dictionary=True) as cur:
         cur.execute(CONTESTS_TO_RUN_PLAGIARISM_ON)
@@ -252,6 +269,7 @@ def get_contests(dbconn: lib.db.Connection) -> Iterable[Contest]:
 
 def get_submissions_for_contest(dbconn: lib.db.Connection,
                                 contest_id: int) -> Iterable[Submission]:
+    """Given a list of contests, get all submissions."""
 
     with dbconn.cursor(dictionary=True) as cur:
         cur.execute(GET_CONTEST_SUBMISSION_IDS, (contest_id, ))
@@ -261,10 +279,11 @@ def get_submissions_for_contest(dbconn: lib.db.Connection,
 def run_detector_for_contest(dbconn: lib.db.Connection,
                              download: SubmissionDownloader,
                              contest_id: int) -> None:
+    """Run copydetect for a contest."""
 
     with tempfile.TemporaryDirectory(prefix='plagiarism_detector') as tempdir:
         submissions = get_submissions_for_contest(dbconn, contest_id)
-        download_submission_files(dbconn, tempdir, download, submissions)
+        download_submission_files(tempdir, download, submissions)
         run_copy_detect(dbconn, tempdir, contest_id, submissions)
 
 

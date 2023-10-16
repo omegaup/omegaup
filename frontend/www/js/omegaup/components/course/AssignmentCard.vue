@@ -26,6 +26,7 @@
         <a
           :href="`/course/${courseAlias}/assignment/${assignment.alias}`"
           class="btn btn-primary d-inline-block text-white"
+          data-course-start-assignment-button
           >{{
             assignment.opened ? T.courseCardCourseResume : T.assignmentCardStart
           }}</a

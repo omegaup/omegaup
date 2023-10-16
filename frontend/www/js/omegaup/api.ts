@@ -208,6 +208,14 @@ export const Certificate = {
     messages.CertificateGenerateContestCertificatesRequest,
     messages.CertificateGenerateContestCertificatesResponse
   >('/api/certificate/generateContestCertificates/'),
+  getCertificatePdf: apiCall<
+    messages.CertificateGetCertificatePdfRequest,
+    messages.CertificateGetCertificatePdfResponse
+  >('/api/certificate/getCertificatePdf/'),
+  validateCertificate: apiCall<
+    messages.CertificateValidateCertificateRequest,
+    messages.CertificateValidateCertificateResponse
+  >('/api/certificate/validateCertificate/'),
 };
 
 export const Clarification = {
@@ -1255,6 +1263,21 @@ export const Problem = {
               if (typeof x.feedback !== 'undefined' && x.feedback !== null)
                 x.feedback = ((x) => {
                   x.date = ((x: number) => new Date(x * 1000))(x.date);
+                  if (
+                    typeof x.feedback_thread !== 'undefined' &&
+                    x.feedback_thread !== null
+                  )
+                    x.feedback_thread = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        x.timestamp = ((x: number) => new Date(x * 1000))(
+                          x.timestamp,
+                        );
+                        return x;
+                      });
+                    })(x.feedback_thread);
                   return x;
                 })(x.feedback);
               return x;
@@ -1596,17 +1619,60 @@ export const Run = {
     messages._RunDetailsServerResponse,
     messages.RunDetailsResponse
   >('/api/run/details/', (x) => {
-    if (typeof x.feedback !== 'undefined' && x.feedback !== null)
-      x.feedback = ((x) => {
-        x.date = ((x: number) => new Date(x * 1000))(x.date);
+    x.feedback = ((x) => {
+      if (!Array.isArray(x)) {
         return x;
-      })(x.feedback);
+      }
+      return x.map((x) => {
+        x.date = ((x: number) => new Date(x * 1000))(x.date);
+        if (
+          typeof x.feedback_thread !== 'undefined' &&
+          x.feedback_thread !== null
+        )
+          x.feedback_thread = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+              return x;
+            });
+          })(x.feedback_thread);
+        return x;
+      });
+    })(x.feedback);
     return x;
   }),
   disqualify: apiCall<
     messages.RunDisqualifyRequest,
     messages.RunDisqualifyResponse
   >('/api/run/disqualify/'),
+  getSubmissionFeedback: apiCall<
+    messages.RunGetSubmissionFeedbackRequest,
+    messages._RunGetSubmissionFeedbackServerResponse,
+    messages.RunGetSubmissionFeedbackResponse
+  >('/api/run/getSubmissionFeedback/', (x) => {
+    if (!Array.isArray(x)) {
+      return x;
+    }
+    return x.map((x) => {
+      x.date = ((x: number) => new Date(x * 1000))(x.date);
+      if (
+        typeof x.feedback_thread !== 'undefined' &&
+        x.feedback_thread !== null
+      )
+        x.feedback_thread = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+            return x;
+          });
+        })(x.feedback_thread);
+      return x;
+    });
+  }),
   list: apiCall<
     messages.RunListRequest,
     messages._RunListServerResponse,
@@ -1666,12 +1732,36 @@ export const Scoreboard = {
 export const Session = {
   currentSession: apiCall<
     messages.SessionCurrentSessionRequest,
+    messages._SessionCurrentSessionServerResponse,
     messages.SessionCurrentSessionResponse
-  >('/api/session/currentSession/'),
-  googleLogin: apiCall<
-    messages.SessionGoogleLoginRequest,
-    messages.SessionGoogleLoginResponse
-  >('/api/session/googleLogin/'),
+  >('/api/session/currentSession/', (x) => {
+    if (typeof x.session !== 'undefined' && x.session !== null)
+      x.session = ((x) => {
+        x.api_tokens = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.last_used = ((x: number) => new Date(x * 1000))(x.last_used);
+            x.rate_limit = ((x) => {
+              x.reset = ((x: number) => new Date(x * 1000))(x.reset);
+              return x;
+            })(x.rate_limit);
+            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+            return x;
+          });
+        })(x.api_tokens);
+        if (
+          typeof x.user_verification_deadline !== 'undefined' &&
+          x.user_verification_deadline !== null
+        )
+          x.user_verification_deadline = ((x: number) => new Date(x * 1000))(
+            x.user_verification_deadline,
+          );
+        return x;
+      })(x.session);
+    return x;
+  }),
 };
 
 export const Submission = {

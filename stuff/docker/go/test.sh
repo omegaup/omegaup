@@ -24,16 +24,16 @@ if [[ ! -d "${DIR}/go/gitserver" ]]; then
 	git clone https://github.com/omegaup/gitserver.git "${DIR}/go/gitserver"
 fi
 
-docker build \
+DOCKER_BUILDKIT=1 docker build \
 	--target=base-builder \
 	--tag=omegaup/local-backend-base-builder \
 	--file="${DIR}/Dockerfile.local-backend" \
 	"${DIR}"
-docker build \
+DOCKER_BUILDKIT=1 docker build \
 	--tag=omegaup/local-backend-test \
 	--file="${DIR}/Dockerfile.local-backend-test" \
 	"${DIR}"
-docker run \
+DOCKER_BUILDKIT=1 docker run \
 	--rm \
 	--interactive \
 	--tty \

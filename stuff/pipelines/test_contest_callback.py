@@ -12,12 +12,12 @@ import sys
 import time
 
 from typing import List
-import omegaup.api
 
 import contest_callback
 import test_credentials
 import rabbitmq_connection
 import test_constants
+import omegaup.api
 
 
 sys.path.insert(
@@ -90,7 +90,7 @@ def test_insert_contest_certificate() -> None:
                 alias = %s;
             ''', (alias,))
         result = cur.fetchone()
-        
+
     contest_id = result['contest_id']
     scoreboard_url = result['scoreboard_url']
     with rabbitmq_connection.connect(
@@ -104,7 +104,7 @@ def test_insert_contest_certificate() -> None:
         )
         body = contest_callback.ContestCertificate(
             contest_id=contest_id,
-            certificate_cutoff=3, # setting a default value
+            certificate_cutoff=3,  # setting a default value
             alias=alias,
             scoreboard_url=scoreboard_url,
         )

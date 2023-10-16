@@ -23,9 +23,15 @@ class UserParams {
 
     /**
      * @readonly
-     * @var string
+     * @var null|string
      */
     public $email;
+
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $parentEmail;
 
     /**
      * @readonly
@@ -52,13 +58,15 @@ class UserParams {
     public $birthDate;
 
     /**
-     * @param array{username?: string, name?: string, password?: string, email?: string, isPrivate?: bool, verify?: bool, preferredLanguage?: string, birthDate?: int} $params
+     * @param array{username?: string, name?: string, password?: string, email?: string, parentEmail?: string, isPrivate?: bool, verify?: bool, preferredLanguage?: string, birthDate?: int} $params
      */
     public function __construct(array $params = []) {
+        $emailBase = \OmegaUp\Test\Utils::CreateRandomString();
         $this->username = $params['username'] ?? \OmegaUp\Test\Utils::CreateRandomString();
         $this->name = $params['name'] ?? \OmegaUp\Test\Utils::CreateRandomString();
         $this->password = $params['password'] ?? \OmegaUp\Test\Utils::CreateRandomString();
-        $this->email = $params['email'] ?? \OmegaUp\Test\Utils::CreateRandomString() . '@mail.com';
+        $this->email = $params['email'] ?? "{$emailBase}@mail.com";
+        $this->parentEmail = $params['email'] ?? "parent_{$emailBase}@mail.com";
         $this->isPrivate = $params['isPrivate'] ?? false;
         $this->verify = $params['verify'] ?? true;
         $this->preferredLanguage = $params['preferredLanguage'] ?? null;
@@ -81,16 +89,25 @@ class User {
             $params = new UserParams();
         }
 
+        $createUserParams = [
+            'username' => $params->username,
+            'name' => $params->name,
+            'password' => $params->password,
+            'email' => $params->email,
+            'parent_email' => $params->parentEmail,
+            'is_private' => strval($params->isPrivate),
+            'birth_date' => $params->birthDate,
+        ];
+
+        if ($params->birthDate < strtotime('-13 year', \OmegaUp\Time::get())) {
+            unset($createUserParams['parent_email']);
+        } else {
+            unset($createUserParams['email']);
+        }
+
         // Call the API
         \OmegaUp\Controllers\User::createUser(
-            new \OmegaUp\CreateUserParams([
-                'username' => $params->username,
-                'name' => $params->name,
-                'password' => $params->password,
-                'email' => $params->email,
-                'is_private' => strval($params->isPrivate),
-                'birth_date' => $params->birthDate,
-            ]),
+            new \OmegaUp\CreateUserParams($createUserParams),
             ignorePassword: false,
             forceVerification: true
         );

@@ -7,8 +7,6 @@
     "strict": true,
     "lib": ["DOM", "ES5", "ScriptHost", "ES2020.Promise", "dom.iterable"],
     "types": [
-      "gapi",
-      "gapi.auth2",
       "bootstrap-datepicker",
       "bootstrap.v3.datetimepicker"
     ],

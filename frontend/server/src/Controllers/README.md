@@ -10,6 +10,8 @@
   - [`/api/badge/userList/`](#apibadgeuserlist)
 - [Certificate](#certificate)
   - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
+  - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
+  - [`/api/certificate/validateCertificate/`](#apicertificatevalidatecertificate)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
   - [`/api/clarification/details/`](#apiclarificationdetails)
@@ -188,6 +190,7 @@
   - [`/api/run/create/`](#apiruncreate)
   - [`/api/run/details/`](#apirundetails)
   - [`/api/run/disqualify/`](#apirundisqualify)
+  - [`/api/run/getSubmissionFeedback/`](#apirungetsubmissionfeedback)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
   - [`/api/run/requalify/`](#apirunrequalify)
@@ -201,7 +204,6 @@
   - [`/api/scoreboard/refresh/`](#apiscoreboardrefresh)
 - [Session](#session)
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
-  - [`/api/session/googleLogin/`](#apisessiongooglelogin)
 - [Submission](#submission)
   - [`/api/submission/setFeedback/`](#apisubmissionsetfeedback)
 - [Tag](#tag)
@@ -409,6 +411,42 @@ Creates a Clarification for a contest or an assignment of a course
 ### Returns
 
 _Nothing_
+
+## `/api/certificate/getCertificatePdf/`
+
+### Description
+
+API to generate the certificate PDF
+
+### Parameters
+
+| Name                | Type     | Description |
+| ------------------- | -------- | ----------- |
+| `verification_code` | `string` |             |
+
+### Returns
+
+| Name          | Type     |
+| ------------- | -------- |
+| `certificate` | `string` |
+
+## `/api/certificate/validateCertificate/`
+
+### Description
+
+API to validate a certificate
+
+### Parameters
+
+| Name                | Type     | Description |
+| ------------------- | -------- | ----------- |
+| `verification_code` | `string` |             |
+
+### Returns
+
+| Name    | Type      |
+| ------- | --------- |
+| `valid` | `boolean` |
 
 # Clarification
 
@@ -771,7 +809,6 @@ Creates a new contest
 | `finish_time`               | `mixed`        |             |
 | `languages`                 | `mixed`        |             |
 | `needs_basic_information`   | `bool\|null`   |             |
-| `partial_score`             | `bool\|null`   |             |
 | `penalty`                   | `mixed`        |             |
 | `penalty_calc_policy`       | `mixed`        |             |
 | `penalty_type`              | `mixed`        |             |
@@ -1338,7 +1375,6 @@ Update a Contest
 | `feedback`                                   | `mixed`                                              |             |
 | `languages`                                  | `mixed`                                              |             |
 | `needs_basic_information`                    | `bool\|null`                                         |             |
-| `partial_score`                              | `bool\|null`                                         |             |
 | `penalty`                                    | `int\|null`                                          |             |
 | `penalty_calc_policy`                        | `mixed`                                              |             |
 | `penalty_type`                               | `mixed`                                              |             |
@@ -3813,6 +3849,24 @@ Disqualify a submission
 
 _Nothing_
 
+## `/api/run/getSubmissionFeedback/`
+
+### Description
+
+Get all the comments related to a submission feedback
+
+### Parameters
+
+| Name        | Type     | Description |
+| ----------- | -------- | ----------- |
+| `run_alias` | `string` |             |
+
+### Returns
+
+```typescript
+types.SubmissionFeedback[]
+```
+
 ## `/api/run/list/`
 
 ### Description
@@ -4017,22 +4071,6 @@ contestant's machine and the server.
 | `session` | `types.CurrentSession` |
 | `time`    | `number`               |
 
-## `/api/session/googleLogin/`
-
-### Description
-
-### Parameters
-
-| Name         | Type     | Description |
-| ------------ | -------- | ----------- |
-| `storeToken` | `string` |             |
-
-### Returns
-
-| Name                | Type      |
-| ------------------- | --------- |
-| `isAccountCreation` | `boolean` |
-
 # Submission
 
 SubmissionController
@@ -4045,18 +4083,22 @@ Updates the admin feedback for a submission
 
 ### Parameters
 
-| Name                | Type        | Description |
-| ------------------- | ----------- | ----------- |
-| `assignment_alias`  | `string`    |             |
-| `course_alias`      | `string`    |             |
-| `feedback`          | `string`    |             |
-| `guid`              | `string`    |             |
-| `range_bytes_end`   | `int\|null` |             |
-| `range_bytes_start` | `int\|null` |             |
+| Name                     | Type        | Description |
+| ------------------------ | ----------- | ----------- |
+| `assignment_alias`       | `string`    |             |
+| `course_alias`           | `string`    |             |
+| `feedback`               | `string`    |             |
+| `guid`                   | `string`    |             |
+| `range_bytes_end`        | `int\|null` |             |
+| `range_bytes_start`      | `int\|null` |             |
+| `submission_feedback_id` | `int\|null` |             |
 
 ### Returns
 
-_Nothing_
+| Name                       | Type                           |
+| -------------------------- | ------------------------------ |
+| `submissionFeedback`       | `dao.SubmissionFeedback`       |
+| `submissionFeedbackThread` | `dao.SubmissionFeedbackThread` |
 
 # Tag
 
@@ -4654,9 +4696,9 @@ Returns a list of all the API tokens associated with the user.
 
 ### Returns
 
-| Name     | Type                                                                                                                    |
-| -------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `tokens` | `{ last_used: Date; name: string; rate_limit: { limit: number; remaining: number; reset: Date; }; timestamp: Date; }[]` |
+| Name     | Type               |
+| -------- | ------------------ |
+| `tokens` | `types.ApiToken[]` |
 
 ## `/api/user/listAssociatedIdentities/`
 
@@ -4925,7 +4967,7 @@ Update user profile
 | `scholar_degree`            | `null\|string`                               |             |
 | `school_id`                 | `int\|null`                                  |             |
 | `school_name`               | `null\|string`                               |             |
-| `username`                  | `mixed`                                      |             |
+| `username`                  | `null\|string`                               |             |
 
 ### Returns
 

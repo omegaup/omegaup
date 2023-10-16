@@ -107,6 +107,7 @@ Here we can add code.
     source_link: false,
     source_name: 'Main.py3',
     source_url: 'blob:http://localhost:8001/url',
+    feedback: [],
   };
 
   const user: types.UserInfoForProblem = {
@@ -170,7 +171,6 @@ Here we can add code.
         runs: [] as types.Run[],
         allRuns: [] as types.Run[],
         clarifications: [] as types.Clarification[],
-        solutionStatus: 'not_found',
         histogram,
         showNewRunWindow: false,
         publicTags: [],
@@ -193,7 +193,6 @@ Here we can add code.
         runs,
         allRuns: runs,
         clarifications: [] as types.Clarification[],
-        solutionStatus: 'not_found',
         histogram,
         showNewRunWindow: false,
         publicTags: [],
@@ -223,7 +222,6 @@ Here we can add code.
         runs,
         allRuns: runs,
         clarifications: [] as types.Clarification[],
-        solutionStatus: 'not_found',
         histogram,
         showNewRunWindow: false,
         publicTags: [],
@@ -337,7 +335,6 @@ Here we can add code.
         runs,
         allRuns: runs,
         clarifications: clarifications,
-        solutionStatus: 'not_found',
         histogram,
         showNewRunWindow: false,
         publicTags: [],
@@ -346,7 +343,7 @@ Here we can add code.
     });
     await wrapper.find('a[href="#clarifications"]').trigger('click');
     expect(wrapper.find('.tab-content .show table thead tr th').text()).toBe(
-      T.wordsContest,
+      T.clarificationInfo,
     );
   });
 
@@ -362,7 +359,6 @@ Here we can add code.
         runs,
         allRuns: runs,
         clarifications: [] as types.Clarification[],
-        solutionStatus: 'not_found',
         histogram,
         showNewRunWindow: false,
         publicTags: [],
@@ -400,7 +396,6 @@ int main() {
         runs,
         allRuns: runs,
         clarifications: [] as types.Clarification[],
-        solutionStatus: 'not_found',
         histogram,
         showNewRunWindow: false,
         publicTags: [],
@@ -431,7 +426,6 @@ int main() {
         runs,
         allRuns: runs,
         clarifications: [] as types.Clarification[],
-        solutionStatus: 'not_found',
         histogram,
         showNewRunWindow: false,
         publicTags: [],
@@ -458,7 +452,6 @@ int main() {
         runs,
         allRuns: runs,
         clarifications: [] as types.Clarification[],
-        solutionStatus: 'not_found',
         histogram,
         showNewRunWindow: false,
         publicTags: [],

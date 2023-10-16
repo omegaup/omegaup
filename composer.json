@@ -38,6 +38,8 @@
     "php-amqplib/php-amqplib": ">=3.0",
     "phpmailer/phpmailer": "^v6.5.0",
     "promphp/prometheus_client_php": "^v2.4.0",
+    "setasign/fpdf": "1.8.*",
+    "setasign/fpdi": "^2.0",
     "twig/twig": "^3.0"
   }
 }

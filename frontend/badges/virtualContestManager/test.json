@@ -44,7 +44,7 @@
                 "window_length": "0",
                 "scoreboard": 100,
                 "points_decay_factor": 0,
-                "partial_score": 1,
+                "score_mode": "partial",
                 "submissions_gap": 1200,
                 "penalty": 0,
                 "feedback": "detailed",

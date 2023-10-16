@@ -95,8 +95,8 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
             $virtualContest->points_decay_factor
         );
         $this->assertSame(
-            $originalContest->partial_score,
-            $virtualContest->partial_score
+            $originalContest->score_mode,
+            $virtualContest->score_mode
         );
         $this->assertSame(
             $originalContest->submissions_gap,

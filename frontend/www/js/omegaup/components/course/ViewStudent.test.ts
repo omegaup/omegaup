@@ -28,6 +28,8 @@ describe('ViewStudent.vue', () => {
     author_classname: 'user-rank-unranked',
     date: new Date(),
     feedback: 'Test feedback',
+    feedback_thread: [],
+    submission_feedback_id: 1,
   };
 
   const assignment_a: omegaup.Assignment = {

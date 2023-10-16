@@ -68,7 +68,7 @@ def _parse_b64vlq(s: str) -> Tuple[List[int], int]:
 
 
 def _get_mapping(mapping_filename: str) -> Mapping[str, Any]:
-    with open(mapping_filename, 'r') as f:
+    with open(mapping_filename, 'r', encoding='utf-8') as f:
         mapping_obj: Dict[str, Any] = json.load(f)
     encoded_mappings = mapping_obj['mappings']
     i = 0
@@ -127,7 +127,7 @@ def _map_source(url: str, lineno: str, colno: str) -> str:
         path = 'frontend/www%s' % parsed.path
     except ValueError:
         path = source_filename
-    with open(source_filename, 'r') as f:
+    with open(source_filename, 'r', encoding='utf-8') as f:
         for line in f:
             match = _SOURCE_MAPPING_RE.match(line)
             if not match:

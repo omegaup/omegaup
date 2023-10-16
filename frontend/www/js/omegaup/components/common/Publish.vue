@@ -30,7 +30,7 @@
             v-if="currentAdmissionMode !== AdmissionMode.Private"
             :value.sync="currentDefaultShowAllContestantsInScoreboard"
             :checked-value="currentDefaultShowAllContestantsInScoreboard"
-            :text-description="'Mostrar a todos los concursantes en el scoreboard por defecto'"
+            :text-description="T.showDefaultAllContestantsInScoreboard"
           ></omegaup-toggle-switch>
         </div>
         <button class="btn btn-primary change-admission-mode" type="submit">

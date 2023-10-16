@@ -1,16 +1,14 @@
 <template>
   <div class="card">
     <div class="card-header">
-      <omegaup-countryflag
-        v-if="profile.country_id"
-        class="m-1"
-        :country="profile.country_id"
-      />
-      <div class="text-center rounded-circle bottom-margin">
+      <div class="text-center rounded-circle bottom-margin mt-3">
         <img class="rounded-circle" :src="profile.gravatar_92" />
       </div>
-
-      <div class="mb-3 text-center">
+      <div class="mb-3 text-center mt-2">
+        <omegaup-countryflag
+          v-if="profile.country_id"
+          :country="profile.country_id"
+        />
         <omegaup-user-username
           :classname="profile.classname"
           :username="profile.username"
@@ -28,7 +26,19 @@
             {{ T.profileRank }}
           </small>
         </p>
+        <h4 v-if="profile.rankinfo.author_ranking > 0" class="m-0">
+          {{ `#${profile.rankinfo.author_ranking}` }}
+        </h4>
+        <small v-else>
+          <strong> {{ T.authorRankUnranked }} </strong>
+        </small>
+        <p>
+          <small>
+            {{ T.profileAuthorRank }}
+          </small>
+        </p>
       </div>
+
       <div
         v-if="profile.is_own_profile || !profile.is_private"
         class="mb-3 text-center"
@@ -47,6 +57,7 @@
           (profile.is_own_profile || !profile.is_private)
         "
         class="mb-3 text-center"
+        data-preferred-programming-languages
       >
         <h5 class="m-0">
           {{
@@ -85,13 +96,19 @@ import { Problem } from '../../linkable_resource';
 
 export const urlMapping: { key: string; title: string; visible: boolean }[] = [
   { key: 'view-profile', title: T.userEditViewProfile, visible: true },
-  { key: 'edit-basic-information', title: T.profileEdit, visible: true },
+  {
+    key: 'edit-basic-information',
+    title: T.profileBasicInformation,
+    visible: true,
+  },
   { key: 'edit-preferences', title: T.userEditPreferences, visible: true },
   { key: 'manage-schools', title: T.userEditManageSchools, visible: true },
   { key: 'manage-identities', title: T.profileManageIdentities, visible: true },
+  { key: 'manage-api-tokens', title: T.profileManageApiTokens, visible: true },
   { key: 'change-password', title: T.userEditChangePassword, visible: false },
   { key: 'add-password', title: T.userEditAddPassword, visible: false },
   { key: 'change-email', title: T.userEditChangeEmail, visible: false },
+  { key: 'delete-account', title: T.userEditDeleteAccount, visible: true },
 ];
 
 @Component({
