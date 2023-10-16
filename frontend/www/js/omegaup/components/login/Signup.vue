@@ -270,7 +270,7 @@ export default class Signup extends Vue {
       this.email = '';
       this.isUnder13 = true;
       return;
-    } 
+    }
     this.parentEmail = '';
     this.isUnder13 = false;
   }
