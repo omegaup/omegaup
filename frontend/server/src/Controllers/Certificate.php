@@ -387,6 +387,27 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return list<CertificateListItem>
+     */
+    private static function getUserCertificates(
+        \OmegaUp\DAO\VO\Identities $identity,
+        int $userId
+    ): array {
+        if (
+            $identity->user_id !== $userId &&
+            !\OmegaUp\Authorization::isSystemAdmin($identity)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return \OmegaUp\DAO\Certificates::getUserCertificates(
+            $userId
+        );
+    }
+
+    /**
      * API to generate the certificate PDF
      *
      * @return array{certificate: string}
@@ -433,19 +454,12 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     public static function apiGetUserCertificates(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
-        if (
-            $r->identity->user_id !== $r['user_id'] &&
-            !\OmegaUp\Authorization::isSystemAdmin($r->identity)
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
-
-        $response = \OmegaUp\DAO\Certificates::getUserCertificates(
-            $r['user_id']
-        );
 
         return [
-            'certificates' => $response
+            'certificates' => self::getUserCertificates(
+                $r->identity,
+                $r->ensureInt('user_id')
+            ),
         ];
     }
 
