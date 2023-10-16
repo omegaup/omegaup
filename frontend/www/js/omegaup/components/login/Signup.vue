@@ -269,10 +269,10 @@ export default class Signup extends Vue {
     if (this.over13Checked) {
       this.email = '';
       this.isUnder13 = true;
-    } else {
-      this.parentEmail = '';
-      this.isUnder13 = false;
-    }
+      return;
+    } 
+    this.parentEmail = '';
+    this.isUnder13 = false;
   }
 }
 </script>
