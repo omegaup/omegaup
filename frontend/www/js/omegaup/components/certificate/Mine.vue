@@ -70,15 +70,16 @@ Vue.use(Clipboard);
 @Component
 export default class Mine extends Vue {
   @Prop() certificates!: types.CertificateListItem[];
+  @Prop() location!: string;
 
   T = T;
 
   getDownloadLink(verificationCode: string): string {
-    return `${window.location.origin}/certificate/${verificationCode}.pdf/`;
+    return `${this.location}/certificate/${verificationCode}.pdf/`;
   }
 
   getVerificationLink(verificationCode: string): string {
-    return `${window.location.origin}/cert/${verificationCode}/`;
+    return `${this.location}/cert/${verificationCode}/`;
   }
 
   getReason(name: string | null, type: string): string {
