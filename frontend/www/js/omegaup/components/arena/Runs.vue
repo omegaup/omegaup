@@ -16,7 +16,9 @@
         <span class="font-weight-bold">{{ T.wordsSubmissions }}</span>
         <div v-if="showFilters">
           <div class="filters row">
-            <label v-if="!isCourse" class="col-3 col-sm pr-0 font-weight-bold"
+            <label
+              v-if="!simplifiedView"
+              class="col-3 col-sm pr-0 font-weight-bold"
               >{{ T.wordsVerdict }}:
               <select
                 v-model="filterVerdict"
@@ -70,7 +72,9 @@
               </select>
             </label>
 
-            <label v-if="!isCourse" class="col-3 col-sm pr-0 font-weight-bold"
+            <label
+              v-if="!simplifiedView"
+              class="col-3 col-sm pr-0 font-weight-bold"
               >{{ T.wordsStatus }}:
               <select
                 v-model="filterStatus"
@@ -218,7 +222,7 @@
               <th hidden>{{ T.runGUID }}</th>
               <th v-if="showUser">{{ T.contestParticipant }}</th>
               <th v-if="showContest">{{ T.wordsContest }}</th>
-              <th v-if="contestAlias != null && !isCourse">
+              <th v-if="contestAlias != null && !simplifiedView">
                 {{ T.wordsVerdict }}
               </th>
               <th v-if="showProblem">{{ T.wordsProblem }}</th>
@@ -315,7 +319,7 @@
                 </a>
               </td>
               <td
-                v-show="contestAlias && !isCourse"
+                v-show="contestAlias && !simplifiedView"
                 :class="statusClass(run)"
                 data-run-status
                 class="text-center opacity-4 font-weight-bold"
@@ -599,7 +603,7 @@ export default class Runs extends Vue {
   @Prop() totalRuns!: number;
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
-  @Prop({ default: false }) isCourse!: boolean;
+  @Prop({ default: false }) simplifiedView!: boolean;
   @Prop({ default: 7 }) itemsPerPage!: number;
 
   NumericOutputStatus = NumericOutputStatus;

@@ -146,7 +146,7 @@
         :show-filters="true"
         :show-rejudge="true"
         :show-user="true"
-        :is-course="true"
+        :simplified-view="true"
         :problemset-problems="Object.values(problems)"
         :search-result-users="searchResultUsers"
         :search-result-problems="searchResultProblems"
