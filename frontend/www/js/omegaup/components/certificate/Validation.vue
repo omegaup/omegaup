@@ -6,11 +6,8 @@
     <div class="card-body">
       <div v-if="isValid">
         <p class="title">
-          {{
-            ui.formatString(T.certificateValidationEnteredCode, {
-              code: verificationCode,
-            })
-          }}
+          {{ T.certificateValidationEnteredCode }}
+          <code class="title">{{ verificationCode }}</code>
         </p>
         <p class="description">{{ T.certificateValidationCertifyValidity }}</p>
         <div class="embed-responsive embed-responsive-4by3">
@@ -23,11 +20,8 @@
       </div>
       <div v-else>
         <p class="title">
-          {{
-            ui.formatString(T.certificateValidationEnteredCode, {
-              code: verificationCode,
-            })
-          }}
+          {{ T.certificateValidationEnteredCode }}
+          <code class="title">{{ verificationCode }}</code>
         </p>
         <p class="title">
           {{ T.certificateValidationStatus }}
@@ -36,11 +30,9 @@
           </span>
         </p>
         <p class="description">
-          {{
-            ui.formatString(T.certificateValidationNotFound, {
-              code: verificationCode,
-            })
-          }}
+          {{ T.certificateValidationNotFound1 }}
+          <code class="description">{{ verificationCode }}</code>
+          {{ T.certificateValidationNotFound2 }}
         </p>
       </div>
     </div>
@@ -50,7 +42,6 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as ui from '../../ui';
 
 @Component
 export default class Validation extends Vue {
@@ -59,7 +50,6 @@ export default class Validation extends Vue {
   @Prop() certificate?: string;
 
   T = T;
-  ui = ui;
   certificateUrl: null | string = null;
 
   created() {
@@ -94,5 +84,19 @@ span.title-invalid {
 
 p.description {
   font-size: 1rem;
+}
+
+code.title {
+  color: black;
+  font-size: 1.24rem;
+  background-color: rgba(222, 222, 222, 0.4);
+  padding: 0.25rem 0.5rem;
+}
+
+code.description {
+  color: black;
+  font-size: 1rem;
+  background-color: rgba(222, 222, 222, 0.4);
+  padding: 0.25rem 0.5rem;
 }
 </style>
