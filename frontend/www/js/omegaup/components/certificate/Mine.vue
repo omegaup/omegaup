@@ -37,18 +37,13 @@
             {{ getReason(certificate.name, certificate.certificate_type) }}
           </td>
           <td class="text-left align-middle">
-            <button
+            <a
               class="btn btn-primary"
               type="button"
-              @click="
-                onDownloadCertificate(
-                  certificate.verification_code,
-                  getReason(certificate.name, certificate_type),
-                )
-              "
+              :href="getDownloadLink(certificate.verification_code)"
             >
               {{ T.certificateListMineDownload }}
-            </button>
+            </a>
           </td>
           <td class="text-left align-middle">
             <button
@@ -78,6 +73,10 @@ export default class Mine extends Vue {
 
   T = T;
 
+  getDownloadLink(verificationCode: string): string {
+    return `${window.location.origin}/certificate/${verificationCode}.pdf/`;
+  }
+
   getVerificationLink(verificationCode: string): string {
     return `${window.location.origin}/cert/${verificationCode}/`;
   }
@@ -90,13 +89,6 @@ export default class Mine extends Vue {
       return T.certificateListMineCoderOfTheMonth;
     }
     return T.certificateListMineCoderOfTheMonthFemale;
-  }
-
-  onDownloadCertificate(verificationCode: string, name: string): string {
-    this.$emit('download-pdf-certificate', {
-      verificationCode: verificationCode,
-      name: name,
-    });
   }
 }
 </script>
