@@ -405,13 +405,22 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         // obtain the contest
         $contest = \OmegaUp\DAO\Contests::getByPK($contestID);
 
+        if (
+            is_null($contest)
+            || is_null($contest->problemset_id)
+            || is_null($contest->alias)
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+
         $problemset = \OmegaUp\DAO\Problemsets::getByPK(
             $contest->problemset_id
         );
 
-        if (is_null($contest)) {
+        if (is_null($problemset)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
+
         //check if is a certificate generator
         if (!\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -436,6 +445,10 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $contest->alias
         );
 
+        if (is_null($contestExtraInformation)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+
         // set RabbitMQ client parameters
         $routing_key = 'ContestQueue';
         $exchange = 'certificates';
@@ -451,7 +464,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         );
 
         $ranking = array_map(
-            fn ($rank) => ['username' => $rank['username'] , 'place' => $rank['place']],
+            fn ($rank) => ['username' => $rank['username'] , 'place' => $rank['place'] ?? null],
             $scoreboard['ranking']
         );
 
