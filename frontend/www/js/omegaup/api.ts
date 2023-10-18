@@ -204,6 +204,10 @@ export const Badge = {
 };
 
 export const Certificate = {
+  generateContestCertificates: apiCall<
+    messages.CertificateGenerateContestCertificatesRequest,
+    messages.CertificateGenerateContestCertificatesResponse
+  >('/api/certificate/generateContestCertificates/'),
   getCertificatePdf: apiCall<
     messages.CertificateGetCertificatePdfRequest,
     messages.CertificateGetCertificatePdfResponse

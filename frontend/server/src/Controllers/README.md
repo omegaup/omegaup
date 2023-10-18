@@ -9,6 +9,7 @@
   - [`/api/badge/myList/`](#apibadgemylist)
   - [`/api/badge/userList/`](#apibadgeuserlist)
 - [Certificate](#certificate)
+  - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
   - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
   - [`/api/certificate/validateCertificate/`](#apicertificatevalidatecertificate)
 - [Clarification](#clarification)
@@ -393,6 +394,23 @@ Returns a list of badges owned by a certain user
 # Certificate
 
 CertificateController
+
+## `/api/certificate/generateContestCertificates/`
+
+### Description
+
+Creates a Clarification for a contest or an assignment of a course
+
+### Parameters
+
+| Name                  | Type        | Description |
+| --------------------- | ----------- | ----------- |
+| `certificates_cutoff` | `int\|null` |             |
+| `contest_id`          | `int\|null` |             |
+
+### Returns
+
+_Nothing_
 
 ## `/api/certificate/getCertificatePdf/`
 

@@ -104,6 +104,14 @@ try_define(
 );
 
 # ####################################
+# RABBITMQ CONFIG
+# ####################################
+try_define('OMEGAUP_RABBITMQ_HOST', 'rabbitmq');
+try_define('OMEGAUP_RABBITMQ_PORT', 5672);
+try_define('OMEGAUP_RABBITMQ_USERNAME', 'omegaup');
+try_define('OMEGAUP_RABBITMQ_PASSWORD', 'omegaup');
+
+# ####################################
 # FACEBOOK LOGIN CONFIG
 # ####################################
 try_define('OMEGAUP_FB_APPID', 'xxxxx');
