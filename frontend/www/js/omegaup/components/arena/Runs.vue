@@ -218,8 +218,8 @@
                 <font-awesome-icon :icon="['fas', 'calendar-alt']" />
                 {{ T.wordsTime }}
               </th>
+              <th v-show="showGUID">{{ T.runGUID }}</th>
               <th>{{ T.wordsLanguage }}</th>
-              <th hidden>{{ T.runGUID }}</th>
               <th v-if="showUser">{{ T.contestParticipant }}</th>
               <th v-if="showContest">{{ T.wordsContest }}</th>
               <th v-if="contestAlias != null && !simplifiedView">
@@ -273,7 +273,7 @@
           <tbody>
             <tr v-for="run in paginatedRuns" :key="run.guid">
               <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
-              <td hidden>
+              <td v-show="showGUID">
                 <acronym :title="run.guid" data-run-guid>
                   <tt>{{ getShortGuid(run.guid) }}</tt>
                 </acronym>
@@ -287,8 +287,9 @@
                 <omegaup-user-username
                   :classname="run.classname"
                   :username="run.username"
-                  :country="run.country_id"
+                  :country="run.country"
                   :linkify="true"
+                  :href="'#runs'"
                   :emit-click-event="true"
                   @click="
                     (username) =>
@@ -341,7 +342,12 @@
               <td v-if="showProblem" class="text-break-all">
                 <a
                   href="#runs"
-                  @click.prevent="filterProblem.key = run.alias"
+                  @click="
+                    onEmitFilterChanged({
+                      filter: 'problem',
+                      value: run.alias,
+                    })
+                  "
                   >{{ run.alias }}</a
                 >
                 <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
@@ -605,6 +611,7 @@ export default class Runs extends Vue {
   @Prop() requestFeedback!: boolean;
   @Prop({ default: false }) simplifiedView!: boolean;
   @Prop({ default: 7 }) itemsPerPage!: number;
+  @Prop({ default: false }) showGUID!: boolean;
 
   NumericOutputStatus = NumericOutputStatus;
   PopupDisplayed = PopupDisplayed;
@@ -842,9 +849,8 @@ export default class Runs extends Vue {
 
     if (run.output !== StringOutputStatus.Incorrect) {
       return NumericOutputStatus.Correct;
-    } else {
-      return NumericOutputStatus.Incorrect;
     }
+    return NumericOutputStatus.Incorrect;
   }
 
   showVerdictHelp(ev: Event): void {
@@ -965,6 +971,16 @@ export default class Runs extends Vue {
   @Watch('filterVerdict')
   onFilterVerdictChanged(newValue: string) {
     this.onEmitFilterChanged({ filter: 'verdict', value: newValue });
+  }
+
+  @Watch('filterExecution')
+  onFilterExecutionChanged(newValue: string) {
+    this.onEmitFilterChanged({ filter: 'execution', value: newValue });
+  }
+
+  @Watch('filterOutput')
+  onfilterOutputChanged(newValue: string) {
+    this.onEmitFilterChanged({ filter: 'output', value: newValue });
   }
 
   @Emit('filter-changed')
