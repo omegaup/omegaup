@@ -450,7 +450,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         }
 
         // set RabbitMQ client parameters
-        $routing_key = 'ContestQueue';
+        $routingKey = 'ContestQueue';
         $exchange = 'certificates';
 
         //connection to rabbitmq
@@ -480,7 +480,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $message = new \PhpAmqpLib\Message\AMQPMessage($messageJSON);
 
         // send the message to RabbitMQ
-        $channel->basic_publish($message, $exchange, $routing_key);
+        $channel->basic_publish($message, $exchange, $routingKey);
         $channel->close();
 
         return [
