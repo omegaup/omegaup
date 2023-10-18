@@ -4754,7 +4754,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             // Calculate the remaining solutions the user can view by subtracting the number of solutions they have already seen from the daily allowed limit.
             $allowedSolutionsToSee = max(
                 \OmegaUp\Controllers\ProblemForfeited::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY - $problemsForfeitedCount,
-                $allowedSolutionsToSee
+                0
             );
         }
 
