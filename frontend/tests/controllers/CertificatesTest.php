@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of ContestArchiveContest
+ * Description of CertificatesTest
  */
 class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
     /**

@@ -386,7 +386,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Creates a Clarification for a contest or an assignment of a course
+     * Generates all the certificates for a contest given its contest ID.
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
@@ -421,7 +421,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
-        //check if is a certificate generator
+        // check whether the logged user is a certificate generator
         if (!\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }

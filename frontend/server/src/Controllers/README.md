@@ -399,7 +399,7 @@ CertificateController
 
 ### Description
 
-Creates a Clarification for a contest or an assignment of a course
+Generates all the certificates for a contest given its contest ID.
 
 ### Parameters
 
