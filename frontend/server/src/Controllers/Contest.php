@@ -35,7 +35,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
  * @psalm-type ContestListPayload=array{contests: TimeTypeContests, countContests: array<string, int>, isLogged: bool, query: null|string}
  * @psalm-type ContestListv2Payload=array{contests: ContestList, countContests: array{current: int, future: int, past: int}, query: string | null}
- * @psalm-type ContestNewPayload=array{languages: array<string, string>}
+ * @psalm-type ContestNewPayload=array{languages: array<string, string>, hasVisitedSection?: bool}
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
@@ -1247,6 +1247,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'templateProperties' => [
                 'payload' => [
                     'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+                    'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
+                        'has-visited-create-contest'
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleContestNew'
@@ -1363,7 +1366,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleContestEdit'
-                )
+                ),
             ],
             'entrypoint' => 'contest_edit',
         ];
@@ -2981,7 +2984,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Adds a problem to a contest
      *
-     * @return array{status: string}
+     * @return array{status: string, solutionStatus: string}
      *
      * @omegaup-request-param null|string $commit
      * @omegaup-request-param string $contest_alias
@@ -3082,7 +3085,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
             )
         );
 
-        return ['status' => 'ok'];
+        $solutionStatus = \OmegaUp\Controllers\Problem::SOLUTION_NOT_FOUND;
+
+        if (\OmegaUp\DAO\Problems::isVisible($problem)) {
+            $solutionStatus = \OmegaUp\Controllers\Problem::getProblemSolutionStatus(
+                $problem,
+                $r->identity
+            );
+        }
+
+        return [
+            'status' => 'ok',
+            'solutionStatus' => $solutionStatus,
+        ];
     }
 
     /**
