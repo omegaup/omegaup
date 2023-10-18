@@ -3979,7 +3979,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'omegaUpTitleMyDependents'
                 )
             ],
-            'entrypoint' => 'users_rank', // FIXME: Update this to the right entrypoint
+            'entrypoint' => 'user_dependents', // FIXME: Update this to the right entrypoint
         ];
     }
 
