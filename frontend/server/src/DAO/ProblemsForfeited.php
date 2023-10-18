@@ -12,13 +12,16 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class ProblemsForfeited extends \OmegaUp\DAO\Base\ProblemsForfeited {
-    public static function getProblemsForfeitedCount(\OmegaUp\DAO\VO\Users $user): int {
+    public static function getProblemsForfeitedCountInDay(\OmegaUp\DAO\VO\Users $user): int {
         $sql = 'SELECT
                     COUNT(*)
                 FROM
                     Problems_Forfeited
                 WHERE
-                    user_id = ?;';
+                    user_id = ?
+                AND
+                    DATE(forfeited_date) = CURDATE()';
+                ;
         $args = [$user->user_id];
         /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->getOne($sql, $args);
