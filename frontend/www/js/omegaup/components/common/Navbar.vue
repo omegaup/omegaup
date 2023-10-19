@@ -1,8 +1,8 @@
 <template>
   <header>
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top p-0 text-right">
+    <nav class="navbar navbar-expand-lg navbar-color fixed-top p-0 text-right">
       <div class="container-xl pl-0 pl-xl-3">
-        <a class="navbar-brand p-3" href="/">
+        <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/">
           <img
             alt="omegaUp"
             src="/media/omegaup_curves.png"
@@ -18,16 +18,44 @@
             height="20"
           />
         </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target=".omegaup-navbar"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
+
+        <div class="d-inline-flex d-flex-row order-lg-1">
+          <div
+            v-if="isLoggedIn"
+            class="navbar-nav navbar-right align-items-end d-lg-none"
+          >
+            <omegaup-notifications-clarifications
+              v-if="inContest"
+              :clarifications="clarifications"
+            ></omegaup-notifications-clarifications>
+            <omegaup-notification-list
+              v-else
+              :notifications="notifications"
+              @read="readNotifications"
+            ></omegaup-notification-list>
+          </div>
+          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex">
+            <li class="nav-item">
+              <a
+                class="nav-link nav-login-text"
+                :href="formattedLoginURL"
+                data-login-button
+                >{{ T.navLogIn }}</a
+              >
+            </li>
+          </ul>
+          <button
+            class="navbar-toggler mr-2"
+            type="button"
+            data-toggle="collapse"
+            data-target=".omegaup-navbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+
         <div class="collapse navbar-collapse omegaup-navbar">
           <omegaup-navbar-items
             :omega-up-lock-down="omegaUpLockDown"
@@ -36,6 +64,7 @@
             :is-reviewer="isReviewer"
             :is-admin="isAdmin"
             :is-main-user-identity="isMainUserIdentity"
+            :is-under13-user="isUnder13User"
             :navbar-section="navbarSection"
           >
             <template v-if="hasTeachingObjective" #contests-items>
@@ -95,26 +124,22 @@
             </template>
           </omegaup-navbar-items>
           <!-- in lockdown or contest mode there is no left navbar -->
-          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right">
-            <li class="nav-item">
-              <a
-                class="nav-link px-2"
-                :href="formattedLoginURL"
-                data-login-button
-                >{{ T.navLogIn }}</a
-              >
+
+          <ul
+            v-if="isLoggedIn"
+            class="navbar-nav navbar-right align-items-right"
+          >
+            <li class="d-none d-lg-flex">
+              <omegaup-notifications-clarifications
+                v-if="inContest"
+                :clarifications="clarifications"
+              ></omegaup-notifications-clarifications>
+              <omegaup-notification-list
+                v-else
+                :notifications="notifications"
+                @read="readNotifications"
+              ></omegaup-notification-list>
             </li>
-          </ul>
-          <ul v-else class="navbar-nav navbar-right align-items-end">
-            <omegaup-notifications-clarifications
-              v-if="inContest"
-              :clarifications="clarifications"
-            ></omegaup-notifications-clarifications>
-            <omegaup-notification-list
-              v-else
-              :notifications="notifications"
-              @read="readNotifications"
-            ></omegaup-notification-list>
             <li class="nav-item dropdown nav-user" data-nav-right>
               <a
                 class="nav-link px-2 dropdown-toggle nav-user-link"
@@ -125,8 +150,8 @@
                 aria-haspopup="true"
                 aria-expanded="false"
               >
-                <img :src="gravatarURL51" height="45" class="mr-2" /><span
-                  class="username"
+                <img :src="gravatarURL51" height="45" class="pr-1 pt-1" /><span
+                  class="username mr-2"
                   :title="currentUsername"
                   >{{ currentUsername }}</span
                 >
@@ -134,9 +159,10 @@
                   v-show="isAdmin"
                   :queue-length="graderQueueLength"
                   :error="errorMessage !== null"
+                  class="mr-1"
                 ></omegaup-common-grader-badge>
               </a>
-              <div class="dropdown-menu dropdown-menu-right">
+              <div class="dropdown-menu dropdown-menu-right allow-overflow">
                 <template v-if="!omegaUpLockDown && (!inContest || isAdmin)">
                   <div class="text-center mb-1">
                     <img
@@ -229,7 +255,7 @@
                       data-nav-user-contests
                       >{{ T.navContestsEnrolled }}</a
                     >
-                    <form class="collapse-submenu">
+                    <form v-if="!isUnder13User" class="collapse-submenu">
                       <div class="btn-group">
                         <a
                           class="dropdown-item"
@@ -281,7 +307,7 @@
                   }}</a>
                 </template>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="/logout/">
+                <a class="dropdown-item" href="/logout/" data-logout-button>
                   <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
                   {{ T.navLogOut }}
                 </a>
@@ -294,15 +320,24 @@
               </div>
             </li>
           </ul>
+
+          <a
+            v-if="isLoggedIn"
+            class="navbar justify-content-end mb-2 d-lg-none"
+            href="/logout/"
+          >
+            <font-awesome-icon :icon="['fas', 'power-off']" />
+          </a>
         </div>
+
+        <a
+          v-if="isLoggedIn"
+          class="navbar justify-content-end d-none d-lg-block order-1"
+          href="/logout/"
+        >
+          <font-awesome-icon :icon="['fas', 'power-off']" />
+        </a>
       </div>
-      <a
-        v-if="isLoggedIn"
-        class="navbar d-flex justify-content-end"
-        href="/logout/"
-      >
-        <font-awesome-icon :icon="['fas', 'power-off']" />
-      </a>
     </nav>
     <omegaup-user-objectives-questions
       v-if="
@@ -310,6 +345,11 @@
       "
       @submit="(objectives) => $emit('update-user-objectives', objectives)"
     ></omegaup-user-objectives-questions>
+    <omegaup-user-next-registered-contest
+      v-if="fromLogin && isLoggedIn && nextRegisteredContest !== null"
+      :next-registered-contest="nextRegisteredContest"
+      @redirect="(alias) => $emit('redirect-next-registered-contest', alias)"
+    ></omegaup-user-next-registered-contest>
   </header>
 </template>
 
@@ -322,6 +362,7 @@ import notifications_List from '../notification/List.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
 import common_GraderBadge from '../common/GraderBadge.vue';
 import user_objectives_questions from '../user/ObjectivesQuestions.vue';
+import user_next_registered_contest from '../user/NextRegisteredContest.vue';
 import navbar_items from './NavbarItems.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -337,6 +378,7 @@ library.add(faSignOutAlt, faUser);
     'omegaup-common-grader-status': common_GraderStatus,
     'omegaup-common-grader-badge': common_GraderBadge,
     'omegaup-user-objectives-questions': user_objectives_questions,
+    'omegaup-user-next-registered-contest': user_next_registered_contest,
     'omegaup-navbar-items': navbar_items,
   },
 })
@@ -363,6 +405,8 @@ export default class Navbar extends Vue {
   @Prop() clarifications!: types.Clarification[];
   @Prop() fromLogin!: boolean;
   @Prop() userTypes!: string[];
+  @Prop() nextRegisteredContest!: types.ContestListItem | null;
+  @Prop() isUnder13User!: boolean;
 
   T = T;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
@@ -386,11 +430,21 @@ export default class Navbar extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../../../sass/main.scss';
+
+.navbar-color .navbar-toggler {
+  color: var(--header-navbar-primary-link-color);
+  border-color: var(--header-navbar-primary-link-color);
+}
+
+.navbar-color .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.5%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
 
 nav.navbar {
   background-color: var(--header-primary-color);
+
   .navbar-brand {
     background-color: var(--header-navbar-brand-background-color);
   }
@@ -399,8 +453,34 @@ nav.navbar {
     color: var(--header-navbar-dropdown-item-font-color);
   }
 
+  a {
+    color: var(--header-navbar-primary-link-color);
+  }
+
   .collapse-submenu .btn:focus {
     box-shadow: 0 0 0 0;
+  }
+}
+
+.allow-overflow {
+  overflow-y: scroll;
+  height: 65vh;
+  max-width: 40vw;
+}
+.nav-login-text {
+  font-size: 14px;
+  padding: auto;
+}
+@media only screen and (min-width: 385px) {
+  .nav-login-text {
+    font-size: inherit;
+    padding: 0.5rem;
+  }
+}
+@media only screen and (max-width: 992px) {
+  .allow-overflow {
+    height: 45vh;
+    max-width: 80vw;
   }
 }
 </style>

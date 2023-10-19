@@ -304,7 +304,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
 
     /*
      * Get relevant problems including problemset alias
-     * @return list<\OmegaUp\DAO\VO\Problems>
+     * @return list<array{alias: string, current_version: string, points: int, problem_id: int}>
      */
     final public static function getRelevantProblems(
         int $problemsetId
@@ -312,7 +312,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         // Build SQL statement
         $sql = '
             SELECT
-                p.problem_id, p.alias, pp.version AS current_version
+                p.problem_id, p.alias, pp.version AS current_version, pp.points
             FROM
                 Problemset_Problems pp
             INNER JOIN
@@ -321,17 +321,8 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 pp.problemset_id = ?
             ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
         $val = [$problemsetId];
-        $result = [];
-        /** @var array{alias: string, current_version: string, problem_id: int} $row */
-        foreach (
-            \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sql,
-                $val
-            ) as $row
-        ) {
-            $result[] = new \OmegaUp\DAO\VO\Problems($row);
-        }
-        return $result;
+        /** @var list<array{alias: string, current_version: string, points: float, problem_id: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     /**

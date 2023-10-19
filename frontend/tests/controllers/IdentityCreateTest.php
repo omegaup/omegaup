@@ -384,8 +384,53 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Should not have allowed bulk user creation');
-        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertSame('aliasInUse', $e->getMessage());
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInArrayException $e) {
+            $localizedText = \OmegaUp\Translations::getInstance()->get(
+                'groupMemberUsernameInUse'
+            );
+            $errorMessage = \OmegaUp\ApiUtils::formatString(
+                $localizedText,
+                ['usernames' => join('<br />', $e->duplicatedItemsInArray)]
+            );
+            $this->assertStringContainsString(
+                $e->getErrorMessage(),
+                $errorMessage
+            );
+            $this->assertSame('groupMemberUsernameInUse', $e->getMessage());
+        }
+    }
+
+    /**
+     * Test for uploading csv file with a long school name
+     */
+    public function testUploadCsvFileWithLongSchoolName() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        try {
+            // Call api using identity creator group member
+            \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'identities_long_school_name.csv',
+                    $group['group']->alias
+                ),
+                'group_alias' => $group['group']->alias,
+            ]));
+            $this->fail('Should not have allowed bulk user creation');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterStringTooLong', $e->getMessage());
+            $this->assertSame('school_name', $e->parameter);
         }
     }
 

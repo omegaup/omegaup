@@ -447,4 +447,61 @@ class Users extends \OmegaUp\DAO\Base\Users {
 
         return boolval($count);
     }
+
+    public static function findByParentalToken(string $token): ?\OmegaUp\DAO\VO\Users {
+        $fields = join(
+            ', ',
+            array_map(
+                fn (string $field): string => "u.{$field}",
+                array_keys(
+                    \OmegaUp\DAO\VO\Users::FIELD_NAMES
+                )
+            )
+        );
+        $sql = "SELECT
+                      {$fields}
+
+                    FROM
+                        Users u
+                    INNER JOIN
+                        Identities i ON u.main_identity_id = i.identity_id
+                    WHERE
+                      parental_verification_token = ?
+                    LIMIT 1
+                    FOR UPDATE;";
+        /** @var array{birth_date: null|string, creation_timestamp: \OmegaUp\Timestamp, deletion_token: null|string, facebook_user_id: null|string, git_token: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, parent_email_id: int|null, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_email_verification_initial: \OmegaUp\Timestamp|null, parent_verified: bool|null, parental_verification_token: null|string, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$token]
+        );
+        if (is_null($result)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\Users($result);
+    }
+
+    /**
+     * @return list<array{email: null|string, name: null|string, username: string}>
+     */
+    public static function getUserDependents(\OmegaUp\DAO\VO\Users $user): array {
+        $sql = 'SELECT
+                    i.name,
+                    i.username,
+                    e.email
+                FROM
+                    Users u
+                INNER JOIN
+                    Identities i ON u.main_identity_id = i.identity_id
+                LEFT JOIN
+                    Emails e ON u.main_email_id = e.email_id
+                WHERE
+                    u.parent_email_id = ?';
+
+        /** @var list<array{email: null|string, name: null|string, username: string}> */
+        $dependents = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [ $user->main_email_id ]
+        );
+        return $dependents;
+    }
 }

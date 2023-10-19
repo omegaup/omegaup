@@ -30,7 +30,7 @@
     <div class="tab-content">
       <div
         v-if="problem"
-        class="tab-pane fade p-4"
+        class="tab-pane fade py-4 p-lg-4"
         :class="{ 'show active': selectedTab === 'problems' }"
       >
         <omegaup-problem-settings-summary
@@ -91,6 +91,7 @@
             </div>
             <div v-if="user.loggedIn">
               <button
+                data-report-problem-button
                 class="btn btn-link"
                 @click="onReportInappropriateProblem"
               >
@@ -98,7 +99,11 @@
               </button>
             </div>
             <div v-if="user.reviewer && !nominationStatus.alreadyReviewed">
-              <button class="btn btn-link" @click="onNewPromotionAsReviewer">
+              <button
+                data-rate-problem-button
+                class="btn btn-link"
+                @click="onNewPromotionAsReviewer"
+              >
                 {{ T.reviewerNomination }}
               </button>
             </div>
@@ -121,6 +126,8 @@
             <omegaup-arena-rundetails-popup
               v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
               :data="currentRunDetailsData"
+              :feedback-map="feedbackMap"
+              :feedback-thread-map="feedbackThreadMap"
               @dismiss="onPopupDismissed"
             >
               <template #feedback="data">
@@ -171,12 +178,17 @@
           </template>
         </omegaup-overlay>
         <template v-if="problem.accepts_submissions">
-          <omegaup-arena-ephemeral-grader
-            v-if="!problem.karel_problem"
-            :problem="problem"
-            :can-submit="user.loggedIn && !inContestOrCourse"
-            :accepted-languages="filteredLanguages"
-          ></omegaup-arena-ephemeral-grader>
+          <div class="d-none d-sm-block">
+            <omegaup-arena-ephemeral-grader
+              v-if="!problem.karel_problem"
+              :problem="problem"
+              :can-submit="user.loggedIn && !inContestOrCourse"
+              :accepted-languages="filteredLanguages"
+            ></omegaup-arena-ephemeral-grader>
+          </div>
+          <div class="bg-white text-center p-4 d-sm-none border">
+            {{ T.ephemeralGraderAlert }}
+          </div>
           <omegaup-arena-runs
             :problem-alias="problem.alias"
             :contest-alias="contestAlias"
@@ -211,20 +223,6 @@
             :solvers="solvers"
           ></omegaup-arena-solvers>
         </slot>
-      </div>
-      <div
-        class="tab-pane fade p-4"
-        :class="{ 'show active': selectedTab === 'solution' }"
-      >
-        <omegaup-problem-solution
-          :status="solutionStatus"
-          :solution="solution"
-          :available-tokens="availableTokens"
-          :all-tokens="allTokens"
-          @get-solution="$emit('get-solution')"
-          @get-tokens="$emit('get-tokens')"
-          @unlock-solution="$emit('unlock-solution')"
-        ></omegaup-problem-solution>
       </div>
       <div
         class="tab-pane fade p-4"
@@ -285,10 +283,21 @@
           @clarification-response="onClarificationResponse"
         >
           <template #new-clarification><div></div></template>
-          <template #table-title>
-            <th class="text-center" scope="col">{{ T.wordsContest }}</th>
-          </template>
         </omegaup-arena-clarification-list>
+      </div>
+      <div
+        class="tab-pane fade p-4"
+        :class="{ 'show active': selectedTab === 'solution' }"
+      >
+        <omegaup-problem-solution
+          :status="solutionStatus"
+          :allowed-solutions-to-see="allowedSolutionsToSee"
+          :solution="solution"
+          @get-solution="$emit('get-solution')"
+          @get-allowed-solutions="$emit('get-allowed-solutions')"
+          @unlock-solution="$emit('unlock-solution')"
+        >
+        </omegaup-problem-solution>
       </div>
     </div>
   </div>
@@ -308,13 +317,13 @@ import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummary.vue';
-import problem_Solution from './Solution.vue';
 import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopup.vue';
 import qualitynomination_PromotionPopup from '../qualitynomination/PromotionPopup.vue';
 import qualitynomination_ReviewerPopup from '../qualitynomination/ReviewerPopup.vue';
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
+import problem_soltion from './Solution.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -326,6 +335,7 @@ import {
   faExternalLinkAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { SubmissionRequest } from '../../arena/submissions';
+import { ArenaCourseFeedback } from '../arena/Feedback.vue';
 library.add(
   faExclamationTriangle,
   faEdit,
@@ -351,6 +361,7 @@ export enum PopupDisplayed {
 @Component({
   components: {
     FontAwesomeIcon,
+    'omegaup-problem-solution': problem_soltion,
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-ephemeral-grader': arena_EphemeralGrader,
     'omegaup-arena-runs': arena_Runs,
@@ -362,7 +373,6 @@ export enum PopupDisplayed {
     'omegaup-username': user_Username,
     'omegaup-problem-feedback': problem_Feedback,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
-    'omegaup-problem-solution': problem_Solution,
     'omegaup-quality-nomination-reviewer-popup': qualitynomination_ReviewerPopup,
     'omegaup-quality-nomination-demotion-popup': qualitynomination_DemotionPopup,
     'omegaup-quality-nomination-promotion-popup': qualitynomination_PromotionPopup,
@@ -380,11 +390,10 @@ export default class ProblemDetails extends Vue {
   @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
   @Prop() nominationStatus!: types.NominationStatus;
-  @Prop() runs!: types.Run[];
   @Prop() solutionStatus!: string;
   @Prop({ default: null }) solution!: types.ProblemStatement | null;
-  @Prop({ default: 0 }) availableTokens!: number;
-  @Prop({ default: 0 }) allTokens!: number;
+  @Prop() runs!: types.Run[];
+  @Prop({ default: 0 }) allowedSolutionsToSee!: number;
   @Prop() histogram!: types.Histogram;
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
@@ -410,6 +419,10 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) languages!: null | string[];
   @Prop() totalRuns!: number;
   @Prop({ default: false }) requestFeedback!: boolean;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackMap!: Map<number, ArenaCourseFeedback>;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
@@ -432,11 +445,6 @@ export default class ProblemDetails extends Vue {
         visible: true,
       },
       {
-        name: 'solution',
-        text: T.wordsSolution,
-        visible: this.user.loggedIn,
-      },
-      {
         name: 'runs',
         text: T.wordsRuns,
         visible: this.user.admin,
@@ -445,6 +453,11 @@ export default class ProblemDetails extends Vue {
         name: 'clarifications',
         text: T.wordsClarifications,
         visible: this.user.admin,
+      },
+      {
+        name: 'solution',
+        text: T.wordsSeeSolution,
+        visible: true,
       },
     ];
     return tabs.filter((tab) => tab.visible);

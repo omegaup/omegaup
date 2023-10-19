@@ -1,6 +1,6 @@
 <template>
-  <div class="card mt-4">
-    <div class="card-body">
+  <div class="card mx-auto mt-0 mt-lg-4 col-6 col-sm-3 col-lg-12">
+    <div class="card-body p-0 py-3 p-lg-3">
       <h3>{{ T.wordsQuality }}</h3>
       <div
         v-for="quality in qualityValues"
@@ -51,3 +51,9 @@ export default class FilterQuality extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.section-font-size {
+  font-size: 1.44rem;
+}
+</style>

@@ -17,12 +17,12 @@
     </div>
     <div class="card">
       <h5 class="card-header">{{ T.myproblemsListMyProblems }}</h5>
-      <div class="card-body">
+      <div class="card-body px-2 px-sm-4">
         <div class="row align-items-center mb-3">
-          <div class="col-md-8 col-lg-6">
+          <div class="col-9 col-lg-6">
             <input
               v-model="currentQuery"
-              class="typeahead form-control"
+              class="typeahead form-control px-1 px-sm-3"
               :placeholder="T.wordsKeywordSearch"
             />
           </div>
@@ -56,8 +56,11 @@
           </div>
         </div>
         <div class="row mt-3">
-          <div class="col-6">
-            <select v-model="allProblemsVisibilityOption" class="custom-select">
+          <div class="col-8 col-md-6">
+            <select
+              v-model="allProblemsVisibilityOption"
+              class="custom-select pl-1 pl-sm-3"
+            >
               <option selected value="-1">{{ T.forSelectedItems }}</option>
               <option value="1">{{ T.makePublic }}</option>
               <option value="0">{{ T.makePrivate }}</option>
@@ -142,7 +145,7 @@
                     <a
                       v-for="tag in problem.tags"
                       :key="tag.name"
-                      class="badge custom-badge m-1 p-2"
+                      class="badge custom-badge m-1 p-1 p-lg-2"
                       :class="[
                         {
                           'custom-badge-quality': tag.name.includes(

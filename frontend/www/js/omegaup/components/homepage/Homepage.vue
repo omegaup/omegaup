@@ -96,16 +96,20 @@
       <omegaup-section
         :title="T.homepageCreateSectionTitle"
         :description="T.homepageCreateSectionDescription"
-        :buttons="[
-          {
-            text: T.buttonCreateProblem,
-            href: '/problem/new/',
-          },
-          {
-            text: T.buttonCreateContest,
-            href: '/contest/new/',
-          },
-        ]"
+        :buttons="
+          !isUnder13User
+            ? [
+                {
+                  text: T.buttonCreateProblem,
+                  href: '/problem/new/',
+                },
+                {
+                  text: T.buttonCreateContest,
+                  href: '/contest/new/',
+                },
+              ]
+            : []
+        "
         :image-src="'/media/homepage/create_section.svg'"
       ></omegaup-section>
       <omegaup-section
@@ -123,18 +127,6 @@
       <omegaup-sponsors
         :title="T.homepageSponsorsSectionTitle"
         :logos="[
-          {
-            class: 'img-fluid w-50',
-            src: '/media/homepage/f5_logo.png',
-            alt: 'f5Logo',
-            href: 'https://www.f5.com/',
-          },
-          {
-            class: 'img-fluid',
-            src: '/media/homepage/amazon_logo.png',
-            alt: 'AmazonLogo',
-            href: 'https://www.aboutamazon.com/',
-          },
           {
             class: 'img-fluid',
             src: '/media/homepage/replit_logo.png',
@@ -189,6 +181,7 @@ export default class Homepage extends Vue {
   @Prop() currentUserInfo!: omegaup.User;
   @Prop() rankTable!: omegaup.UserRankTable;
   @Prop() schoolsRank!: omegaup.SchoolRankTable;
+  @Prop() isUnder13User!: boolean;
 
   T = T;
   cookieClickedAccept() {

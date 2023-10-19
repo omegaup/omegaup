@@ -8,10 +8,11 @@
  * @psalm-type ProblemCasesContents=array<string, array{contestantOutput?: string, in: string, out: string}>
  * @psalm-type RunMetadata=array{memory: int, sys_time: int, time: float, verdict: string, wall_time: float}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
- * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp}
  * @psalm-type RunDetailsGroup=array{cases: list<CaseResult>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}
- * @psalm-type RunDetails=array{admin: bool, alias: string, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<RunDetailsGroup>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: null|SubmissionFeedback}
- * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string, execution: null|string, output: null|string, status_memory: null|string, status_runtime: null|string}
+ * @psalm-type SubmissionFeedbackThread=array{author: string, authorClassname: string, submission_feedback_thread_id: int, text: string, timestamp: \OmegaUp\Timestamp}
+ * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int, feedback_thread?: list<SubmissionFeedbackThread>}
+ * @psalm-type RunDetails=array{admin: bool, alias: string, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<RunDetailsGroup>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: list<SubmissionFeedback>}
+ * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
     // All languages that runs can have.
@@ -663,10 +664,25 @@ class Run extends \OmegaUp\Controllers\Controller {
             'run_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        [
-            'run' => $run,
-            'submission' => $submission,
-        ] = self::validateDetailsRequest($runAlias);
+        $submission = \OmegaUp\DAO\Submissions::getByGuid($runAlias);
+        if (
+            is_null(
+                $submission
+            ) || is_null(
+                $submission->current_run_id
+            ) || is_null(
+                $submission->guid
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
+
+        $run = \OmegaUp\DAO\Runs::getByGUID(
+            $submission->guid
+        );
+        if (is_null($run)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
         $problem = \OmegaUp\DAO\Problems::getByPK(
             intval($submission->problem_id)
         );
@@ -700,9 +716,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             $submission->asFilteredArray([
                 'guid', 'language', 'time', 'submit_delay', 'type',
             ]) +
-            $run->asFilteredArray([
-                'status', 'verdict', 'runtime', 'penalty', 'memory', 'score', 'contest_score',
-            ])
+            $run
         );
         /** @var \OmegaUp\Timestamp $filtered['time'] */
         $result = [
@@ -727,10 +741,10 @@ class Run extends \OmegaUp\Controllers\Controller {
                 : ''
             ),
             'classname' => 'user-rank-unranked',
-            'execution' => null,
-            'output' => null,
-            'status_memory' => null,
-            'status_runtime' => null,
+            'execution' => strval($filtered['execution']),
+            'output' => strval($filtered['output']),
+            'status_memory' => strval($filtered['status_memory']),
+            'status_runtime' => strval($filtered['status_runtime']),
         ];
         if (!is_null($filtered['contest_score'])) {
             if (
@@ -952,6 +966,30 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Get all the comments related to a submission feedback
+     *
+     * @return list<SubmissionFeedback>
+     *
+     * @omegaup-request-param string $run_alias
+     */
+    public static function apiGetSubmissionFeedback(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
+
+        [
+            'submission' => $submission,
+        ] = self::validateDetailsRequest(
+            $r->ensureString(
+                'run_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            )
+        );
+
+        return \OmegaUp\DAO\SubmissionFeedback::getSubmissionFeedback(
+            $submission
+        );
+    }
+
+    /**
      * Gets the details of a run. Includes admin details if admin.
      *
      * @return RunDetails
@@ -1020,6 +1058,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 $submission
             ),
         ];
+
         $showRunDetails = !$response['admin'] ? self::shouldShowRunDetails(
             $r->identity->identity_id,
             $problem,

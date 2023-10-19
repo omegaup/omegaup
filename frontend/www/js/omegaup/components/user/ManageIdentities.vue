@@ -18,6 +18,7 @@
           ></font-awesome-icon>
           <input
             v-model="username"
+            data-identity-username
             autocomplete="off"
             class="form-control username-input"
             size="20"
@@ -30,6 +31,7 @@
           {{ T.loginPassword }}
           <input
             v-model="password"
+            data-identity-password
             autocomplete="off"
             class="form-control password-input"
             size="20"
@@ -38,7 +40,7 @@
         </label>
       </div>
       <div class="form-group text-right">
-        <button class="btn btn-primary" type="submit">
+        <button class="btn btn-primary" type="submit" data-add-identity-button>
           {{ T.wordsAddIdentity }}
         </button>
       </div>
@@ -55,7 +57,11 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="identity in identities" :key="identity.username">
+        <tr
+          v-for="identity in identities"
+          :key="identity.username"
+          data-added-identity-username
+        >
           <td>{{ identity.username }}</td>
         </tr>
       </tbody>

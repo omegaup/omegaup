@@ -15,7 +15,7 @@
         </strong>
       </p>
     </div>
-    <div class="card-body">
+    <div class="card-body px-2 px-sm-4">
       <form ref="form" method="POST" class="form" enctype="multipart/form-data">
         <div class="accordion mb-3">
           <div class="card">
@@ -34,7 +34,7 @@
                 </button>
               </h2>
             </div>
-            <div class="collapse show card-body basic-info">
+            <div class="collapse show card-body px-2 px-sm-4 basic-info">
               <div class="row">
                 <div class="form-group col-md-6">
                   <label class="control-label">{{ T.wordsTitle }}</label>
@@ -80,9 +80,6 @@
                   <label class="control-label">{{
                     T.problemEditFormFile
                   }}</label>
-                  <a :href="howToWriteProblemLink" target="_blank">
-                    <span>{{ T.problemEditFormHowToWriteProblems }}</span>
-                  </a>
                   <input
                     :required="!isUpdate"
                     name="problem_contents"
@@ -115,9 +112,9 @@
                   </button>
                 </h2>
               </div>
-              <div class="collapse show card-body tags">
+              <div class="collapse show card-body px-2 px-sm-4 tags">
                 <div
-                  v-show="selectedTags.length === 0"
+                  v-show="selectedTags.length === 0 && currentLanguages !== ''"
                   class="alert alert-info"
                 >
                   {{ T.problemEditTagPublicRequired }}
@@ -132,6 +129,7 @@
                   :selected-public-tags="selectedPublicTags"
                   :can-add-new-tags="true"
                   :errors="errors"
+                  :is-lecture="currentLanguages === ''"
                   @emit-add-tag="addTag"
                   @emit-remove-tag="removeTag"
                   @select-problem-level="selectProblemLevel"
@@ -164,7 +162,7 @@
                 </button>
               </h2>
             </div>
-            <div class="card-body validation">
+            <div class="card-body px-2 px-sm-4 validation">
               <div class="row">
                 <div class="form-group col-md-6">
                   <label>{{ T.problemEditFormLanguages }}</label>
@@ -222,7 +220,7 @@
                 </button>
               </h2>
             </div>
-            <div class="collapse card-body limits">
+            <div class="collapse card-body px-2 px-sm-4 limits">
               <omegaup-problem-settings
                 :errors="errors"
                 :current-languages="currentLanguages"
@@ -252,7 +250,7 @@
                 </button>
               </h2>
             </div>
-            <div class="collapse card-body access">
+            <div class="collapse card-body px-2 px-sm-4 access">
               <div class="row">
                 <div class="form-group col-md-6">
                   <label>{{ T.problemEditEmailClarifications }}</label>
@@ -289,6 +287,7 @@
                     <label class="form-check form-check-inline">
                       <input
                         v-model="isPublic"
+                        data-problem-access-radio-yes
                         type="radio"
                         name="visibility"
                         class="form-check-input"
@@ -329,7 +328,7 @@
                   </button>
                 </h2>
               </div>
-              <div class="collapse card-body evaluation">
+              <div class="collapse card-body px-2 px-sm-4 evaluation">
                 <div class="row">
                   <div class="form-group col-md-6">
                     <label>{{ T.wordsShowCasesDiff }}</label>

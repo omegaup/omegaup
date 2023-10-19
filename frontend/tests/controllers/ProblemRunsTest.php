@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Tests getting runs of a problem.
  */
@@ -16,6 +14,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
             [
                 ['runs' => 3, 'score' => 0.83, 'execution' => 'EXECUTION_INTERRUPTED', 'output' => 'OUTPUT_INTERRUPTED', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_EXCEEDED'],
                 ['runs' => 4, 'score' => 1.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_CORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
+                ['runs' => 1, 'score' => 0, 'execution' => 'EXECUTION_COMPILATION_ERROR', 'output' => 'OUTPUT_INTERRUPTED', 'status_memory' => 'MEMORY_NOT_AVAILABLE', 'status_runtime' => 'RUNTIME_NOT_AVAILABLE'],
             ],
             [
                 [
@@ -36,10 +35,15 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
                         ['group_name' => 'hard', 'score' => (0.4 / 3),'verdict' => 'AC'],     // 0.13
                     ],
                 ],
+                [
+                    'total' => 0,
+                    'finalVerdict' => 'CE',
+                    'points_per_group' => [],
+                ],
             ],
         ];
-        for ($i = 0; $i < 2; ++$i) {
-            ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        for ($i = 0; $i < 3; ++$i) {
+            ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
             $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
                 $problemData,
                 $identity
@@ -120,7 +124,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'show_all' => true,
         ]));
-        $this->assertCount(2, $response['runs']);
+        $this->assertCount(3, $response['runs']);
         // Runs are sorted in reverse order.
         for ($i = 0; $i < count($contestants); ++$i) {
             $this->assertSame(
@@ -132,7 +136,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testUserHasTriedToSolvedProblem() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         // Never tried, never solved
         $this->assertFalse(\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
             $problemData['problem'],
@@ -170,7 +174,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testUserHasTriedToSolveProblemWithDifferentVerdicts() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $pointsGroup = [
             [
                 'execution' => 'EXECUTION_JUDGE_ERROR',
@@ -188,11 +192,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
                 'output' => 'OUTPUT_INTERRUPTED',
                 'status_memory' => 'MEMORY_NOT_AVAILABLE',
                 'status_runtime' => 'RUNTIME_NOT_AVAILABLE',
-                'points_per_group' => [
-                    ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'CE'],
-                    ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'CE'],
-                    ['group_name' => 'hard', 'score' => 0.0, 'verdict' => 'CE'],
-                ],
+                'points_per_group' => [],
             ],
             [
                 'execution' => 'EXECUTION_INTERRUPTED',

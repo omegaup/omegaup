@@ -49,6 +49,12 @@ class SessionManager {
             foreach ($cookies as $cookie) {
                 $parts = explode('=', $cookie);
                 $oldName = trim($parts[0]);
+                if ($oldName !== $name) {
+                    // If there are a lot of cookies set, this could make the
+                    // response header section balloon in size and make nginx
+                    // unhappy.
+                    continue;
+                }
                 setcookie($oldName, '', $oldExpire);
                 setcookie($oldName, '', $oldExpire, '/');
                 // This should clear the cookies with the old pre-RFC 6265

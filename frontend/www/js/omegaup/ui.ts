@@ -11,6 +11,11 @@ export enum MessageType {
 }
 
 export function navigateTo(href: string): void {
+  const [pathname, hash] = href.split('#');
+  if (pathname === window.location.pathname && hash != null) {
+    window.location.hash = hash;
+    return;
+  }
   window.location.href = href;
 }
 
@@ -282,12 +287,36 @@ export function reportPageView(page: string): void {
   window.ga('send', 'pageview', page);
 }
 
+export enum NameDisplayOptions {
+  None = 0,
+  Name = 1,
+  Username = 2,
+  NameAndUsername = Name | Username,
+}
+
 export function rankingUsername(
   rank: omegaup.User & { virtual?: boolean },
+  displayOptions: NameDisplayOptions = NameDisplayOptions.NameAndUsername,
 ): string {
-  let username = rank.username;
-  if (!!rank.name && rank.name != rank.username)
+  let username = '';
+  if (
+    (displayOptions & NameDisplayOptions.Username) ==
+    NameDisplayOptions.Username
+  ) {
+    username = rank.username;
+  }
+  if (
+    (displayOptions & NameDisplayOptions.Name) == NameDisplayOptions.Name &&
+    !!rank.name &&
+    rank.name != rank.username
+  ) {
     username += ` (${escapeString(rank.name)})`;
+  }
+  if (username.length == 0) {
+    // In case we can't use name or don't have it available, fall back to
+    // username.
+    username = rank.username;
+  }
   if (rank.virtual)
     username = formatString(T.virtualSuffix, { username: username });
   return username;

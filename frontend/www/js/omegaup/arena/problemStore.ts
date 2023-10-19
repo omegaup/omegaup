@@ -5,7 +5,7 @@ import { types } from '../api_types';
 Vue.use(Vuex);
 
 export interface ProblemState {
-  // The mapping of problem alias to indices on the problems array
+  // The mapping of problem alias to indexes on the problems array
   problems: Record<string, types.ProblemInfo>;
 }
 

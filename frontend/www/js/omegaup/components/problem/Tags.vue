@@ -19,17 +19,19 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th class="text-center" scope="col">
+            <th class="text-center w-50" scope="col">
               {{ T.contestEditTagName }}
             </th>
-            <th class="text-center" scope="col">
+            <th class="pl-5" scope="col">
               {{ T.contestEditTagDelete }}
               <a
+                v-if="!isLecture"
                 data-toggle="tooltip"
                 rel="tooltip"
                 :title="T.problemEditTagPublicRequired"
-                ><img src="/media/question.png"
-              /></a>
+              >
+                <span class="question"></span>
+              </a>
             </th>
           </tr>
         </thead>
@@ -46,7 +48,7 @@
               <button
                 type="button"
                 class="btn btn-danger"
-                :disabled="selectedPublicTags.length < 2"
+                :disabled="selectedPublicTags.length < 2 && !isLecture"
                 @click="removeTag(tag, /*public=*/ true)"
               >
                 <font-awesome-icon :icon="['fas', 'trash']" />
@@ -79,10 +81,10 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th class="text-center" scope="col">
+            <th class="text-center w-50" scope="col">
               {{ T.contestEditTagName }}
             </th>
-            <th class="text-center" scope="col">
+            <th class="pl-5" scope="col">
               {{ T.contestEditTagDelete }}
             </th>
           </tr>
@@ -192,6 +194,7 @@ export default class ProblemTags extends Vue {
   @Prop({ default: false }) canAddNewTags!: boolean;
   @Prop({ default: false }) isCreate!: boolean;
   @Prop({ default: () => [] }) errors!: string[];
+  @Prop() isLecture!: boolean;
 
   T = T;
   allowTags = this.initialAllowTags;
@@ -259,3 +262,22 @@ export default class ProblemTags extends Vue {
   }
 }
 </script>
+
+<style>
+.question {
+  width: 20px;
+  height: 20px;
+  background: url('/media/question.png');
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.question:hover {
+  width: 25px;
+  height: 25px;
+  background: url('/media/question.png');
+  background-size: 25px 25px;
+  display: inline-block;
+  vertical-align: middle;
+}
+</style>

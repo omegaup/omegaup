@@ -105,7 +105,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testFutureContestIntro() {
-        // Get a contest
+        // Get a future public contest
         $startTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 60 * 60);
         $finishTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 120 * 60);
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -115,8 +115,18 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'finishTime' => $finishTime,
             ])
         );
+
         // Create user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $userLogin = self::login($identity);
+
+        // Should show the contest intro when it is public
+        $this->assertTrue(
+            \OmegaUp\Controllers\Contest::shouldShowIntro(
+                $identity,
+                $contestData['contest']
+            )
+        );
 
         // Add user to our contest
         \OmegaUp\Test\Factories\Contest::addUser(
@@ -124,13 +134,14 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             $identity
         );
 
-        $userLogin = self::login($identity);
+        // Should show the contest intro when the user is registered in the contest
         $this->assertTrue(
             \OmegaUp\Controllers\Contest::shouldShowIntro(
                 $identity,
                 $contestData['contest']
             )
         );
+
         $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
@@ -141,6 +152,48 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame(
             $contestDetails['contest']['start_time']->time,
             $startTime->time
+        );
+
+        // Get a future private contest
+        $startTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 60 * 60);
+        $finishTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 120 * 60);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'requestsUserInformation' => 'optional',
+                'startTime' => $startTime,
+                'finishTime' => $finishTime,
+                'admissionMode' => 'private',
+            ])
+        );
+
+        // Shouldn't show the contest intro when it is private
+        try {
+            $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $userLogin->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                ])
+            )['templateProperties']['payload'];
+
+            $this->fail(
+                'User should not have access to a future contest when it is private'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+
+        // Add user to our contest
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contestData,
+            $identity
+        );
+
+        // Should show the contest intro when the user is registered in the contest
+        $this->assertTrue(
+            \OmegaUp\Controllers\Contest::shouldShowIntro(
+                $identity,
+                $contestData['contest']
+            )
         );
     }
 
@@ -548,6 +601,81 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertSame('originalContestHasNotEnded', $e->getMessage());
+        }
+    }
+
+    /**
+     * A PHPUnit data provider for the test of the next registered contest for a user.
+     *
+     * @return list<array{0: list<\OmegaUp\Timestamp>, 1: list<\OmegaUp\Timestamp>, 2: null|int}>
+     */
+    public function NextRegisteredContestForUserProvider(): array {
+        $currentTime = \OmegaUp\Time::get();
+        $timePast1 =  new \OmegaUp\Timestamp($currentTime - 180 * 60);
+        $timePast2 =  new \OmegaUp\Timestamp($currentTime - 120 * 60);
+        $timePast3 =  new \OmegaUp\Timestamp($currentTime - 60 * 60);
+        $timeFuture1 =  new \OmegaUp\Timestamp($currentTime + 60 * 60);
+        $timeFuture2 =  new \OmegaUp\Timestamp($currentTime + 120 * 60);
+        return [
+            // Get the next registered contest for a user who is not registered in any contest
+            [[], [], null],
+            // Although both contests started at the same time, the second one is scheduled
+            // to finish sooner, making it the next registered contest.
+            [[$timePast1, $timePast1], [$timeFuture2, $timeFuture1], 1],
+            // The first contest started first
+            [[$timePast1, $timeFuture1], [$timeFuture1, $timeFuture2], 0],
+            // The user doesn't have a next registered contest because the two contests already finished
+            [[$timePast1, $timePast2], [$timePast3, $timePast3], null],
+            // The third contest is the only current or upcoming contest
+            [[$timePast1, $timePast2, $timeFuture1], [$timePast3, $timePast3, $timeFuture2], 2],
+        ];
+    }
+
+    /**
+     * @dataProvider NextRegisteredContestForUserProvider
+     *
+     * @param list<\OmegaUp\Timestamp> $startTimes
+     * @param list<\OmegaUp\Timestamp> $finishTimes
+     * @param null|int $nextExpectedRegisteredContestIndex
+     */
+    public function testNextRegisteredContestForUser(
+        $startTimes,
+        $finishTimes,
+        $nextExpectedRegisteredContestIndex
+    ) {
+        // Create user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create contests and add user to them
+        $n = count($startTimes);
+        $contests = [];
+        for ($i = 0; $i < $n; $i++) {
+            $contests[] = \OmegaUp\Test\Factories\Contest::createContest(
+                new \OmegaUp\Test\Factories\ContestParams([
+                    'title' => 'Contest_' . $i,
+                    'startTime' => $startTimes[$i],
+                    'finishTime' => $finishTimes[$i],
+                ])
+            );
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $contests[$i],
+                $identity
+            );
+        }
+
+        // Get the next registered contest for the user
+        $nextRegisteredContestForUser = \OmegaUp\DAO\Contests::getNextRegisteredContestForUser(
+            $identity
+        );
+
+        // Check that the next registered contest for the user is correct
+        if (is_null($nextExpectedRegisteredContestIndex)) {
+            $this->assertNull($nextRegisteredContestForUser);
+        } else {
+            $this->assertSame(
+                $contests[$nextExpectedRegisteredContestIndex]['contest']->title,
+                $nextRegisteredContestForUser['title']
+            );
         }
     }
 

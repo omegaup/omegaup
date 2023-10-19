@@ -1176,9 +1176,9 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     public function scoreModeValueProvider(): array {
         return [
             ['all_or_nothing', 1, 0.0, 0.05],
-            /*['partial',  1, 0.05, 0.0],
+            ['partial',  1, 0.05, 0.0],
             ['all_or_nothing', 100, 0.0, 5.0],
-            ['partial', 100, 5.0, 0.0],]*/
+            ['partial', 100, 5.0, 0.0],
         ];
     }
 

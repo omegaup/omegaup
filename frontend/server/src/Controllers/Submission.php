@@ -81,6 +81,82 @@ class Submission extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Creates the feedback thread for a submission and its corresponding
+     * notification, avoiding duplicating feedbacks
+     *
+     * @param array{assignment_alias: string, author_id: int|null, course_alias: string, course_id: int, problem_alias: string} $courseSubmissionInfo
+     */
+    private static function createFeedbackThread(
+        \OmegaUp\DAO\VO\Identities $feedbackAuthor,
+        int $submissionFeedbackId,
+        string $feedback,
+        string $guid,
+        \OmegaUp\DAO\VO\Courses $course,
+        $courseSubmissionInfo
+    ): \OmegaUp\DAO\VO\SubmissionFeedbackThread {
+        $group = \OmegaUp\Controllers\Course::resolveGroup($course);
+        if (
+            !\OmegaUp\Authorization::canViewCourse(
+                $feedbackAuthor,
+                $course,
+                $group
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $submissionFeedbackThread = new \OmegaUp\DAO\VO\SubmissionFeedbackThread([
+            'identity_id' => $feedbackAuthor->identity_id,
+            'submission_feedback_id' => $submissionFeedbackId,
+            'contents' => $feedback,
+            'date' => gmdate('Y-m-d H:i:s'),
+        ]);
+        \OmegaUp\DAO\Base\SubmissionFeedbackThread::create(
+            $submissionFeedbackThread
+        );
+
+        $participants = \OmegaUp\DAO\SubmissionFeedbackThread::getSubmissionFeedbackThreadParticipants(
+            $submissionFeedbackId
+        );
+
+        if (empty($participants)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'submissionFeedbackParticipantsListEmpty'
+            );
+        }
+        $participantsNotifications = array_filter(
+            $participants,
+            fn ($author) => $author['author_id'] != $feedbackAuthor->user_id
+        );
+
+        $courseAlias = $course->alias;
+        $assignmentAlias = $courseSubmissionInfo['assignment_alias'];
+        $problemAlias = $courseSubmissionInfo['problem_alias'];
+        foreach ($participantsNotifications as $participant) {
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $participant['author_id'],
+                    'contents' =>  json_encode([
+                        'type' => \OmegaUp\DAO\Notifications::COURSE_SUBMISSION_FEEDBACK,
+                        'body' => [
+                            'localizationString' => new \OmegaUp\TranslationString(
+                                'notificationCourseSubmissionFeedback'
+                            ),
+                            'localizationParams' => [
+                                'problemAlias' => $courseSubmissionInfo['problem_alias'],
+                                'courseName' => $course->name,
+                            ],
+                            'url' => "/course/{$courseAlias}/assignment/{$assignmentAlias}/#problems/{$problemAlias}/show-run:{$guid}",
+                            'iconUrl' => '/media/info.png',
+                        ]
+                    ]),
+                ])
+            );
+        }
+
+        return $submissionFeedbackThread;
+    }
+
+    /**
      * Creates the feedback for a submission and its corresponding
      * notification, avoiding duplicating feedbacks
      *
@@ -90,22 +166,25 @@ class Submission extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $feedbackAuthor,
         \OmegaUp\DAO\VO\Submissions $submission,
         \OmegaUp\DAO\VO\Courses $course,
-        ?int $range_bytes_start,
-        ?int $range_bytes_end,
+        ?int $rangeBytesStart,
+        ?int $rangeBytesEnd,
         string $feedback,
         $courseSubmissionInfo
-    ): void {
-        \OmegaUp\DAO\Base\SubmissionFeedback::create(
-            new \OmegaUp\DAO\VO\SubmissionFeedback([
-                'identity_id' => $feedbackAuthor->identity_id,
-                'submission_id' => $submission->submission_id,
-                'range_bytes_start' => $range_bytes_start,
-                'range_bytes_end' => $range_bytes_end,
-                'feedback' => $feedback,
-            ])
-        );
+    ): \OmegaUp\DAO\VO\SubmissionFeedback {
+        $submissionFeedback = new \OmegaUp\DAO\VO\SubmissionFeedback([
+            'identity_id' => $feedbackAuthor->identity_id,
+            'submission_id' => $submission->submission_id,
+            'range_bytes_start' => $rangeBytesStart,
+            'range_bytes_end' => $rangeBytesEnd,
+            'feedback' => $feedback,
+        ]);
+        \OmegaUp\DAO\Base\SubmissionFeedback::create($submissionFeedback);
 
         if (!is_null($courseSubmissionInfo['author_id'])) {
+            $courseAlias = $course->alias;
+            $assignmentAlias = $courseSubmissionInfo['assignment_alias'];
+            $problemAlias = $courseSubmissionInfo['problem_alias'];
+            $guid = $submission->guid;
             \OmegaUp\DAO\Notifications::create(
                 new \OmegaUp\DAO\VO\Notifications([
                     'user_id' => $courseSubmissionInfo['author_id'],
@@ -119,13 +198,15 @@ class Submission extends \OmegaUp\Controllers\Controller {
                                 'problemAlias' => $courseSubmissionInfo['problem_alias'],
                                 'courseName' => $course->name,
                             ],
-                            'url' => "/course/{$course->alias}/assignment/{$courseSubmissionInfo['assignment_alias']}/#problems/{$courseSubmissionInfo['problem_alias']}/",
+                            'url' => "/course/{$courseAlias}/assignment/{$assignmentAlias}/#problems/{$problemAlias}/show-run:{$guid}",
                             'iconUrl' => '/media/info.png',
                         ]
                     ]),
                 ])
             );
         }
+
+        return $submissionFeedback;
     }
 
     /**
@@ -137,16 +218,16 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $feedback
      * @omegaup-request-param int|null $range_bytes_end
      * @omegaup-request-param int|null $range_bytes_start
+     * @omegaup-request-param int|null $submission_feedback_id
      *
-     * @return array{status: string}
+     * @return array{status: string, submissionFeedback: null|\OmegaUp\DAO\VO\SubmissionFeedback, submissionFeedbackThread: null|\OmegaUp\DAO\VO\SubmissionFeedbackThread}
      */
     public static function apiSetFeedback(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
+        $guid = $r->ensureString('guid');
 
-        $submission = \OmegaUp\DAO\Submissions::getByGuid(
-            $r->ensureString('guid')
-        );
-        if (is_null($submission)) {
+        $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
+        if (is_null($submission) || is_null($submission->guid)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'submissionNotFound'
             );
@@ -187,16 +268,37 @@ class Submission extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $range_bytes_start = $r->ensureOptionalInt('range_bytes_start');
-        $range_bytes_end = $r->ensureOptionalInt('range_bytes_end');
+        $submissionFeedbackId = $r->ensureOptionalInt('submission_feedback_id');
+        if (!is_null($submissionFeedbackId)) {
+            $submissionFeedbackThread = self::createFeedbackThread(
+                $r->identity,
+                $submissionFeedbackId,
+                $feedback,
+                $guid,
+                $course,
+                $courseSubmissionInfo
+            );
+            $submissionFeedback = \OmegaUp\DAO\SubmissionFeedback::getByPK(
+                $submissionFeedbackId
+            );
+            return [
+                'status' => 'ok',
+                'submissionFeedback' => $submissionFeedback,
+                'submissionFeedbackThread' => $submissionFeedbackThread,
+            ];
+        }
+
+        // Default values for a general feedback
+        $rangeBytesStart = $r->ensureOptionalInt('range_bytes_start');
+        $rangeBytesEnd = $r->ensureOptionalInt('range_bytes_end');
 
         if (
             !is_null(
-                $range_bytes_start
+                $rangeBytesStart
             ) && !is_null(
-                $range_bytes_end
-            ) && ($range_bytes_start < 0
-            ||  $range_bytes_end < $range_bytes_start)
+                $rangeBytesEnd
+            ) && ($rangeBytesStart < 0
+            ||  $rangeBytesEnd < $rangeBytesStart)
         ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidParameters'
@@ -219,16 +321,17 @@ class Submission extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             $submissionFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
-                $submission
+                $submission->guid,
+                $rangeBytesStart
             );
 
             if (is_null($submissionFeedback)) {
-                self::createFeedback(
+                $submissionFeedback = self::createFeedback(
                     $r->identity,
                     $submission,
                     $course,
-                    $range_bytes_start,
-                    $range_bytes_end,
+                    $rangeBytesStart,
+                    $rangeBytesEnd,
                     $feedback,
                     $courseSubmissionInfo
                 );
@@ -255,6 +358,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
+            'submissionFeedback' => $submissionFeedback,
+            'submissionFeedbackThread' => null,
         ];
     }
 }

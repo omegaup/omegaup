@@ -17,7 +17,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, opened: bool, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, description: string, objective: string|null, level: string|null, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, languages: list<string>|null, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
- * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string, execution: null|string, output: null|string, status_memory: null|string, status_runtime: null|string}
+ * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ScoreboardRankingProblemDetailsGroup=array{cases: list<array{meta: RunMetadata}>}
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
@@ -41,11 +41,12 @@ namespace OmegaUp\Controllers;
  * @psalm-type StudentProgress=array{classname: string, country_id: null|string, name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}
  * @psalm-type StudentProgressInCourse=array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}
  * @psalm-type AssignmentsProblemsPoints=array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
- * @psalm-type CourseNewPayload=array{is_admin: bool, is_curator: bool, languages: array<string, string>}
+ * @psalm-type CourseNewPayload=array{is_admin: bool, hasVisitedSection: bool, is_curator: bool, languages: array<string, string>}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, teachingAssistants: list<CourseAdmin>, allLanguages: array<string, string>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, groupsTeachingAssistants: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, assignmentsProblems: list<AssignmentsProblemsPoints>, students: list<StudentProgressInCourse>, totalRows: int, page: int, length: int, pagerItems: list<PageItem>}
- * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp}
- * @psalm-type CourseRun=array{feedback: null|SubmissionFeedback, guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}
+ * @psalm-type SubmissionFeedbackThread=array{author: string, authorClassname: string, submission_feedback_thread_id: int, text: string, timestamp: \OmegaUp\Timestamp}
+ * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int, feedback_thread?: list<SubmissionFeedbackThread>}
+ * @psalm-type CourseRun=array{feedback: null|array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp, range_bytes_end: int|null, range_bytes_start: int|null}, guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<CourseRun>}
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
  * @psalm-type StudentProgressByAssignmentPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string, problems: list<CourseProblem>, assignment: string}
@@ -53,7 +54,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>}
  * @psalm-type IntroDetailsPayload=array{course: CourseDetails, isFirstTimeAccess: bool, needsBasicInformation: bool, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
- * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
+ * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string, myBestScore?: float|null, hasMyRuns?: bool|null}
  * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, problemset_id: int, runs: list<Run>, start_time: \OmegaUp\Timestamp, totalRuns: int|null}
  * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard?: Scoreboard, courseDetails: CourseDetails, currentAssignment: ArenaAssignment, shouldShowFirstAssociatedIdentityRunWarning: bool, isTeachingAssistant: bool}
  * @psalm-type AssignmentDetails=array{admin: bool, alias: string, assignmentType: string, courseAssignments: list<CourseAssignment>, description: string, director: string, finishTime: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemsetId: int, startTime: \OmegaUp\Timestamp}
@@ -66,7 +67,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseCardPublic=array{alias: string, alreadyStarted: bool, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}
  * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
  * @psalm-type CourseCardFinished=array{alias: string, name: string}
- * @psalm-type CourseTabsPayload=array{courses: array{enrolled: list<CourseCardEnrolled>, finished: list<CourseCardFinished>, public: list<CourseCardPublic>}}
+ * @psalm-type CourseTabsPayload=array{courses: array{enrolled: list<CourseCardEnrolled>, finished: list<CourseCardFinished>, public: list<CourseCardPublic>}, hasVisitedSection: bool}
  * @psalm-type SettingLimits=array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}
  * @psalm-type NominationStatus=array{alreadyReviewed: bool, canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language: string, nominated: bool, nominatedBeforeAc: bool, solved: bool, tried: bool}
  * @psalm-type ProblemsetterInfo=array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}
@@ -78,7 +79,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemCasesContents=array<string, array{contestantOutput?: string, in: string, out: string}>
  * @psalm-type RunDetailsGroup=array{cases: list<CaseResult>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}
  * @psalm-type RunDetailsV2=array{admin: bool, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, groups?: list<RunDetailsGroup>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, judged_by?: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: null|SubmissionFeedback}
- * @psalm-type RunWithDetails=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string, details: null|RunDetailsV2, execution: null|string, output: null|string, status_memory: null|string, status_runtime: null|string}
+ * @psalm-type RunWithDetails=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, details: null|RunDetailsV2, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<RunWithDetails>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type ArenaCourseDetails=array{alias: string, assignments: list<CourseAssignment>, name: string, languages: list<string>|null}
  * @psalm-type ArenaCourseAssignment=array{alias: string, name: string, description: string, problemset_id: int}
@@ -533,7 +534,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    private static function resolveGroup(
+    public static function resolveGroup(
         \OmegaUp\DAO\VO\Courses $course
     ): \OmegaUp\DAO\VO\Groups {
         if (is_null($course->group_id)) {
@@ -1074,6 +1075,60 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @param \OmegaUp\DAO\VO\Courses $course
+     * @param string $assignmentAlias
+     * @param string $notificationType
+     */
+    private static function sendNotificationToStudent(
+        \OmegaUp\DAO\VO\Courses $course,
+        string $assignmentAlias,
+        string $notificationType
+    ): void {
+        if (is_null($course->group_id) || is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseNotFound'
+            );
+        }
+
+        $students = [];
+        $notificationContents = [];
+
+            $students = \OmegaUp\DAO\Courses::getStudentsInCourse(
+                $course->course_id,
+                $course->group_id
+            );
+
+            $notificationContents = [
+                'type' => $notificationType,
+                'body' => [
+                    'localizationParams' => [
+                        'courseName' => $course->name,
+                    ],
+                    'url' => "/course/{$course->alias}/assignment/{$assignmentAlias}/",
+                    'iconUrl' => '/media/info.png',
+                ],
+            ];
+
+            if ($notificationType == \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_PROBLEM_ADDED) {
+                $notificationContents['body']['localizationString'] = new \OmegaUp\TranslationString(
+                    'notificationCourseAssignmentProblemAdded'
+                );
+            } else {
+                $notificationContents['body']['localizationString'] = new \OmegaUp\TranslationString(
+                    'notificationCourseAssignmentAdded'
+                );
+            }
+            foreach ($students as $student) {
+                \OmegaUp\DAO\Notifications::create(
+                    new \OmegaUp\DAO\VO\Notifications([
+                        'user_id' => $student['user_id'],
+                        'contents' =>  json_encode($notificationContents),
+                    ])
+                );
+            }
+    }
+
+    /**
      * API to Create an assignment
      *
      * @return array{status: string}
@@ -1131,6 +1186,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             ]),
             $r->identity,
             $addedProblems
+        );
+
+        self::sendNotificationToStudent(
+            $course,
+            $r['alias'],
+            \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_ADDED
         );
 
         return [
@@ -1298,7 +1359,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Adds a problem to an assignment
      *
-     * @return array{status: 'ok'}
+     * @return array{status: 'ok', solutionStatus: string}
      *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param null|string $commit
@@ -1370,8 +1431,29 @@ class Course extends \OmegaUp\Controllers\Controller {
             $assignmentAlias
         );
 
+        self::sendNotificationToStudent(
+            $course,
+            $assignmentAlias,
+            \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_PROBLEM_ADDED
+        );
+
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
+        $solutionStatus = \OmegaUp\Controllers\Problem::SOLUTION_NOT_FOUND;
+
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        if (\OmegaUp\DAO\Problems::isVisible($problem)) {
+            $solutionStatus = \OmegaUp\Controllers\Problem::getProblemSolutionStatus(
+                $problem,
+                $r->identity
+            );
+        }
+
         return [
             'status' => 'ok',
+            'solutionStatus' => $solutionStatus,
         ];
     }
 
@@ -2252,7 +2334,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'author' => $run['feedback_author'],
                         'author_classname' => $run['feedback_author_classname'],
                         'feedback' => $run['feedback_content'],
-                        'date' => $run['feedback_date']
+                        'date' => $run['feedback_date'],
+                        'range_bytes_end' => null,
+                        'range_bytes_start' => null,
                     ];
                 }
                 unset($run['feedback_author']);
@@ -3679,6 +3763,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                     'is_admin' => true,
                     'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+                    'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
+                        'has-visited-create-course'
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCourseNew'
@@ -4203,6 +4290,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             return [
                 'templateProperties' => [
                     'payload' => [
+                        'hasVisitedSection' => true,
                         'courses' => $courses,
                     ],
                     'title' => new \OmegaUp\TranslationString('courseList'),
@@ -4236,6 +4324,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             'templateProperties' => [
                 'payload' => [
                     'courses' => $courses,
+                    'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
+                        'has-visited-join-course'
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString('courseList'),
                 'fullWidth' => true,
@@ -4584,19 +4675,17 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        $problemsInAssignment = [];
+
         if (
-            !$isAdmin &&
-            $assignment->start_time->time > \OmegaUp\Time::get()
+            $isAdmin ||
+            $assignment->start_time->time <= \OmegaUp\Time::get()
         ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'assignmentNotStarted'
+            $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+                intval($assignment->problemset_id),
+                needSubmissions: false
             );
         }
-
-        $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            intval($assignment->problemset_id),
-            needSubmissions: false
-        );
 
         $problemsResponseArray = [];
         $letter = 0;
@@ -4669,8 +4758,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                     'currentAssignment' => [
                         'name' => $assignment->name,
-                        'alias' => $assignment->alias,
                         'description' => $assignment->description,
+                        'alias' => $assignment->alias,
                         'director' => $director,
                         'assignment_type' => $assignment->assignment_type,
                         'start_time' => $assignment->start_time,
@@ -4699,6 +4788,11 @@ class Course extends \OmegaUp\Controllers\Controller {
                 withRunDetails: false,
                 sortByName: false
             );
+        }
+
+        if (!$isAdmin && $assignment->start_time->time > \OmegaUp\Time::get()) {
+            $response['templateProperties']['payload']['currentAssignment']['name'] = null;
+            $response['templateProperties']['payload']['currentAssignment']['description'] = null;
         }
         return $response;
     }

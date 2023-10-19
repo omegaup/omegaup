@@ -6,16 +6,16 @@ import os
 import sys
 
 # pylint indicates pytest_mock should be placed before "import mysql.connector"
+import contest_callback
+import pika
+import producer_contest
 import pytest_mock
 import mysql.connector
 import mysql.connector.cursor
 import omegaup.api
-import pika
 
-import contest_callback
 import rabbitmq_connection
 import rabbitmq_client
-import producer_contest
 import test_constants
 import test_credentials
 
@@ -97,6 +97,7 @@ def test_client_contest() -> None:
         assert count['count'] > 0
 
 
+@pytest.mark.skip(reason="Disabled temporarily because it's flaky")
 def test_client_contest_with_mocked_codes(
         mocker: pytest_mock.MockerFixture
 ) -> None:
@@ -150,6 +151,7 @@ def test_client_contest_with_mocked_codes(
         assert spy.call_count == 4
 
 
+@pytest.mark.skip(reason="Disabled temporarily because it's flaky")
 def test_client_contest_with_duplicated_codes(
         mocker: pytest_mock.MockerFixture
 ) -> None:

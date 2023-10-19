@@ -9,7 +9,7 @@
         }}
         <small>
           &ndash;
-          <a :href="ui.contestURL(details)">
+          <a :href="ui.contestURL(details)" data-contest-link-button>
             {{ T.contestDetailsGoToContest }}</a
           >
         </small>
@@ -120,6 +120,9 @@
       <div v-if="showTab === 'new_form'" class="tab-pane active">
         <omegaup-contest-new-form
           :admission-mode="details.admission_mode"
+          :default-show-all-contestants-in-scoreboard="
+            details.default_show_all_contestants_in_scoreboard
+          "
           :initial-alias="details.alias"
           :initial-title="details.title"
           :initial-description="details.description"

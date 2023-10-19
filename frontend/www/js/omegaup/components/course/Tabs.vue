@@ -1,6 +1,6 @@
 <template>
-  <div class="container-fluid p-5">
-    <ul class="nav nav-tabs" role="tablist">
+  <div class="container-fluid max-width card pr-0 pl-0 custom-card">
+    <ul class="nav nav-tabs introjs-tabs" role="tablist">
       <li
         v-for="(tabName, tabKey) in tabNames"
         :key="tabKey"
@@ -25,10 +25,10 @@
     </ul>
     <div class="tab-content">
       <div class="row m-0 mt-4">
-        <div class="col-md-6 col-lg-3 p-0">
+        <div class="col-md-6 col-lg-3 p-0 ml-4">
           <input
             v-model="searchText"
-            class="form-control"
+            class="form-control introjs-search"
             type="text"
             :placeholder="T.courseCardsListSearch"
           />
@@ -37,7 +37,7 @@
       <div
         v-for="(tabName, tabKey) in tabNames"
         :key="tabKey"
-        class="tab-pane fade py-4 px-2"
+        class="tab-pane fade"
         :class="{
           show: currentSelectedTab === tabKey,
           active: currentSelectedTab === tabKey,
@@ -46,20 +46,21 @@
       >
         <div
           v-if="tabKey === Tab.Public"
-          class="row row-cols-1 row-cols-md-2 row-cols-xl-3"
+          class="row row-cols-1 row-cols-md-2 row-cols-xl-3 p-4 introjs-join"
         >
           <omegaup-course-card-public
             v-for="course in filteredCards"
             :key="course.alias"
             :course="course"
             :logged-in="loggedIn"
+            :has-visited-section="hasVisitedSection"
           ></omegaup-course-card-public>
         </div>
         <div
           v-if="tabKey === Tab.Enrolled"
           class="row"
           :class="{
-            'row-cols-1 row-cols-md-2 row-cols-xl-3':
+            'row-cols-1 row-cols-md-2 row-cols-xl-3 p-4':
               loggedIn && filteredCards.length,
             'justify-content-center': !loggedIn || !filteredCards.length,
           }"
@@ -84,7 +85,7 @@
           v-if="tabKey === Tab.Finished"
           class="row"
           :class="{
-            'row-cols-1 row-cols-md-2 row-cols-xl-3':
+            'row-cols-1 row-cols-md-2 row-cols-xl-3 p-4':
               loggedIn && filteredCards.length,
             'justify-content-center': !loggedIn || !filteredCards.length,
           }"
@@ -116,6 +117,10 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import latinize from 'latinize';
+import 'intro.js/introjs.css';
+import introJs from 'intro.js';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 import omegaup_Markdown from '../Markdown.vue';
 import course_CardPublic from './CardPublic.vue';
@@ -144,12 +149,48 @@ export default class CourseTabs extends Vue {
   };
   @Prop({ default: false }) loggedIn!: boolean;
   @Prop({ default: Tab.Public }) selectedTab!: Tab;
+  @Prop() hasVisitedSection!: boolean;
 
   T = T;
   ui = ui;
   Tab = Tab;
   currentSelectedTab = this.selectedTab;
   searchText = '';
+
+  mounted() {
+    const title = T.joinCourseInteractiveGuideTitle;
+    if (!this.hasVisitedSection) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title,
+              intro: T.joinCourseInteractiveGuideWelcome,
+            },
+            {
+              element: document.querySelector('.introjs-tabs') as Element,
+              title,
+              intro: T.joinCourseInteractiveGuideTabs,
+            },
+            {
+              element: document.querySelector('.introjs-search') as Element,
+              title,
+              intro: T.joinCourseInteractiveGuideSearch,
+            },
+            {
+              element: document.querySelector('.introjs-join') as Element,
+              title,
+              intro: T.joinCourseInteractiveGuideJoin,
+            },
+          ],
+        })
+        .start();
+      this.$cookies.set('has-visited-join-course', true, -1);
+    }
+  }
 
   get tabNames(): Record<Tab, string> {
     return {
@@ -215,10 +256,19 @@ export default class CourseTabs extends Vue {
 
   .public-course-card {
     background-color: $omegaup-blue;
+    height: 1em;
   }
 
   .enrolled-course-card {
     background-color: $omegaup-pink--lighter;
+    height: 1em;
+  }
+
+  @media only screen and (min-width: 576px) {
+    .public-course-card,
+    .enrolled-course-card {
+      height: auto;
+    }
   }
 
   .finished-course-card {
@@ -239,5 +289,29 @@ export default class CourseTabs extends Vue {
   text-align: center;
   font-size: 2.25rem;
   color: var(--arena-contest-list-empty-category-font-color);
+}
+
+.max-width {
+  max-width: 68.8rem;
+  margin: 4rem auto;
+}
+
+.nav-link {
+  padding: 0.6rem 1.2rem;
+}
+
+.nav-tabs,
+.nav-link,
+.nav-link-active,
+.nav-link-hover {
+  border-top: none !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
+@media (max-width: 576px) {
+  .custom-card {
+    padding: 1.25rem 2rem !important;
+  }
 }
 </style>

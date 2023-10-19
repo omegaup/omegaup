@@ -19,12 +19,12 @@
           </button>
           <hr />
           <div class="form-group">
+            <!-- TODO: Replace word multiple user with ("Separados por espacio, coma, o salto de linea") -->
             <label>{{ T.wordsMultipleUser }}</label>
-            <textarea
-              v-model="bulkContestants"
-              class="form-control contestants"
-              rows="4"
-            ></textarea>
+            <omegaup-multi-user-add-area
+              :users="currentUsers.map((user) => user.username)"
+              @update-users="updateUsersList"
+            ></omegaup-multi-user-add-area>
           </div>
           <button class="btn btn-primary user-add-bulk" type="submit">
             {{ T.contestAdduserAddUsers }}
@@ -34,7 +34,7 @@
       <table class="table table-striped mb-0 participants">
         <thead>
           <tr>
-            <th class="text-center">{{ T.wordsUser }}</th>
+            <th class="text-center">{{ T.contestAddUserContestant }}</th>
             <th class="text-center">
               {{ T.contestAdduserRegisteredUserTime }}
             </th>
@@ -48,7 +48,7 @@
         </thead>
         <tbody>
           <tr v-for="user in currentUsers" :key="user.username">
-            <td class="text-center">
+            <td class="text-center" data-uploaded-contestants>
               <omegaup-user-username
                 :linkify="true"
                 :username="user.username"
@@ -104,6 +104,7 @@ import * as time from '../../time';
 import DateTimePicker from '../DateTimePicker.vue';
 import user_Username from '../user/Username.vue';
 import common_MultiTypeahead from '../common/MultiTypeahead.vue';
+import MultiUserAddArea from '../common/MultiUserAddArea.vue';
 
 import {
   FontAwesomeIcon,
@@ -119,6 +120,7 @@ library.add(fas);
     'omegaup-datetimepicker': DateTimePicker,
     'omegaup-user-username': user_Username,
     'omegaup-common-multi-typeahead': common_MultiTypeahead,
+    'omegaup-multi-user-add-area': MultiUserAddArea,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
@@ -137,16 +139,29 @@ export default class AddContestant extends Vue {
 
   onSubmit(): void {
     let users: string[] = [];
+    // Add each token as a new username chip component
     if (this.bulkContestants !== '') {
       users = this.bulkContestants.split(',');
     }
+
     if (this.typeaheadContestants) {
       users = [...users, ...this.typeaheadContestants.map((user) => user.key)];
     }
+
+    // If no users were added, do nothing
+    if (users.length === 0) {
+      return;
+    }
+
     this.$emit(
       'add-user',
       users.map((user) => user.trim()),
     );
+  }
+
+  // receives a list of users from the MultiUserAddArea component
+  updateUsersList(users: string[]): void {
+    this.bulkContestants = users.join(',');
   }
 
   @Watch('users')

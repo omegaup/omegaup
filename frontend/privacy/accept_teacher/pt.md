@@ -1,1 +1,1 @@
-Aceito que qualquer admin de curso veja minha lista completa de problemas que resolvi ou tentei resolver
+- Aceito que qualquer admin de curso veja minha lista completa de problemas que resolvi ou tentei resolver

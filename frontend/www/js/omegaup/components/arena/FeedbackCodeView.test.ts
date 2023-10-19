@@ -8,6 +8,7 @@ describe('FeedbackCodeView.vue', () => {
     const wrapper = mount(arena_FeedbackCodeView, {
       propsData: {
         language: 'java',
+        readonly: false,
         value: 'This \ncode \nhas \nfour lines;',
       },
     });
@@ -28,6 +29,7 @@ describe('FeedbackCodeView.vue', () => {
         language: 'java',
         value: 'This \ncode \nhas \nfour lines;',
         feedbackMap,
+        readonly: false,
       },
     });
 

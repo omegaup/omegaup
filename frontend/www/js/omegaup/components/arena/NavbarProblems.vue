@@ -1,5 +1,5 @@
 <template>
-  <div class="problem-list">
+  <div class="problem-list mr-3 mr-lg-0">
     <div v-if="inAssignment" class="active" data-breadcrumbs>
       <span>
         <a class="breadcrumbs-link" href="/course/">{{ T.navCourses }}</a> >
@@ -33,22 +33,20 @@
           v-if="problem.acceptsSubmissions"
           class="col-xs-7 solved text-right w-50 pr-3"
         >
-          <span class="mr-1"
-            >({{
-              parseFloat(problem.bestScore).toFixed(digitsAfterDecimalPoint)
-            }}
-            /
-            {{
-              parseFloat(problem.maxScore).toFixed(digitsAfterDecimalPoint)
-            }})</span
-          >
+          <span class="mr-1">{{ getMaxScoreForProblem(problem) }}</span>
           <font-awesome-icon
-            v-if="problem.bestScore == problem.maxScore"
+            v-if="
+              problem.myBestScore == problem.maxScore ||
+              problem.bestScore == problem.maxScore
+            "
             icon="check"
             :style="{ color: 'green' }"
           />
           <font-awesome-icon
-            v-else-if="problem.hasRuns"
+            v-else-if="
+              problem.hasMyRuns ||
+              (problem.hasRuns && problem.hasMyRuns === null)
+            "
             icon="times"
             :style="{ color: 'red' }"
           />
@@ -103,6 +101,13 @@ export default class ArenaNavbarProblems extends Vue {
 
   getProblemTypeTitle(acceptsSubmissions: boolean): string {
     return acceptsSubmissions ? T.wordsProblem : T.wordsLecture;
+  }
+
+  getMaxScoreForProblem(problem: types.NavbarProblemsetProblem): string {
+    const bestScore = problem.myBestScore ?? problem.bestScore;
+    return `(${bestScore.toFixed(
+      this.digitsAfterDecimalPoint,
+    )} / ${problem.maxScore.toFixed(this.digitsAfterDecimalPoint)})`;
   }
 
   get urlAssignment(): string {

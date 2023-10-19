@@ -9,7 +9,7 @@
           <tr>
             <th></th>
             <th></th>
-            <th>{{ T.wordsUser }}</th>
+            <th>{{ T.groupScoreboardDetailsCoder }}</th>
             <th v-for="(contest, index) in contests" :key="contest.alias">
               <a :href="`/arena/${contest.alias}`" :title="contest.title">{{
                 index
