@@ -130,7 +130,6 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    hostname: 'rabbitmq'
     restart: always
     environment:
       RABBITMQ_DEFAULT_USER: 'omegaup'
