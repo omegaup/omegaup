@@ -9,6 +9,7 @@ import sys
 import contest_callback
 import pika
 import producer_contest
+import pytest
 import pytest_mock
 import mysql.connector
 import mysql.connector.cursor
