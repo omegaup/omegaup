@@ -28,16 +28,6 @@ jobs:
         ports:
           - 6379:6379
 
-      rabbitmq:
-        image: "rabbitmq:3-management"
-        ports:
-          - 5672:5672
-          - 15672:15672
-        options: --name rabbitmq
-        env:
-          RABBITMQ_DEFAULT_USER: 'omegaup'
-          RABBITMQ_DEFAULT_PASS: 'omegaup'
-
     steps:
       - uses: actions/checkout@v2
         with:
