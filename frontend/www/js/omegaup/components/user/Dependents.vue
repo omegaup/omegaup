@@ -3,23 +3,23 @@
     <h5
       class="card-header d-flex justify-content-between align-items-center rank-title"
     >
-      klwlgledglk
+      Acceso parental
     </h5>
     <table class="table mb-0">
       <thead>
         <tr>
-          <th scope="col" class="text-center">#</th>
-          <th scope="col" class="text-center">{{ T.contentCreator }}</th>
-          <th scope="col" class="text-center">{{ T.rankScore }}</th>
+          <th scope="col" class="text-center">U</th>
+          <th scope="col" class="text-center">Usuario</th>
+          <th scope="col" class="text-center">informar si la cuenta esta verificada o no</th>
           <th scope="col" class="text-center"></th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(author, index) in rankingData.ranking" :key="index">
+        <tr>
           <th scope="row" class="text-center">
-            {{ author.author_ranking || index }}
+            hhhhhhhhhhhhhhhhhhhh
           </th>
-          <td class="text-center"></td>
+          <td class="text-center">jjjjjjjjjjjjjjj</td>
         </tr>
       </tbody>
     </table>
