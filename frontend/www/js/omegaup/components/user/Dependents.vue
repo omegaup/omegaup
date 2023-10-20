@@ -10,15 +10,15 @@
         <tr>
           <th scope="col" class="text-center">U</th>
           <th scope="col" class="text-center">Usuario</th>
-          <th scope="col" class="text-center">informar si la cuenta esta verificada o no</th>
+          <th scope="col" class="text-center">
+            informar si la cuenta esta verificada o no
+          </th>
           <th scope="col" class="text-center"></th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <th scope="row" class="text-center">
-            hhhhhhhhhhhhhhhhhhhh
-          </th>
+          <th scope="row" class="text-center">hhhhhhhhhhhhhhhhhhhh</th>
           <td class="text-center">jjjjjjjjjjjjjjj</td>
         </tr>
       </tbody>
