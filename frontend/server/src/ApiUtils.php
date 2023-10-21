@@ -127,13 +127,19 @@ class ApiUtils {
         return strtr($string, $chars);
     }
 
+    public static function convertUTFToISO(string $stringUTF8): string {
+        return mb_convert_encoding($stringUTF8, 'ISO-8859-1', 'UTF-8');
+    }
+
     /**
      * @param string $format
      * @param array<string, mixed> $namedArgs
+     * @param bool $convertUTF8ToISO
      */
     public static function formatString(
         string $format,
-        array $namedArgs
+        array $namedArgs,
+        bool $convertUTF8ToISO = false
     ): string {
         /** @var mixed $value*/
         foreach ($namedArgs as $key => $value) {
@@ -142,6 +148,9 @@ class ApiUtils {
                 is_scalar($value) ? strval($value) : '',
                 $format
             );
+        }
+        if ($convertUTF8ToISO) {
+            return self::convertUTFToISO($format);
         }
         return $format;
     }
