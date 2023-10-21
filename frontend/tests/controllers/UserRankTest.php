@@ -427,7 +427,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         $problems = [];
         $extraProblem = \OmegaUp\Test\Factories\Problem::createProblem();
         for (
-            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
+            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY; $i++
         ) {
             $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
             $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -447,7 +447,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         for (
-            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
+            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY; $i++
         ) {
             $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
                 $problems[$i],

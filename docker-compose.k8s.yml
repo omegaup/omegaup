@@ -7,7 +7,7 @@ services:
       dockerfile: ./Dockerfile.frontend
       context: ./stuff/docker/
       target: frontend
-    image: omegaup/frontend:${TAG:-latest}
+    image: omegaup/frontend:${TAG:-20231008}
 
   php:
     build:
