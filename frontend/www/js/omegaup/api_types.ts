@@ -2272,6 +2272,14 @@ export namespace types {
       );
     }
 
+    export function UserDependentsPayload(
+      elementId: string = 'payload',
+    ): types.UserDependentsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function UserDetailsPayload(
       elementId: string = 'payload',
     ): types.UserDetailsPayload {
@@ -2718,25 +2726,14 @@ export namespace types {
     country_id: string;
     date: string;
     gravatar_32: string;
+    problems_solved?: number;
+    score?: number;
     username: string;
   }
   [];
 
   export interface CoderOfTheMonthPayload {
-    candidatesToCoderOfTheMonth: {
-      category: string;
-      classname: string;
-      coder_of_the_month_id: number;
-      country_id: string;
-      description?: string;
-      problems_solved: number;
-      ranking: number;
-      school_id?: number;
-      score: number;
-      selected_by?: number;
-      time: string;
-      username: string;
-    }[];
+    candidatesToCoderOfTheMonth: types.CoderOfTheMonthList;
     category: string;
     codersOfCurrentMonth: types.CoderOfTheMonthList;
     codersOfPreviousMonth: types.CoderOfTheMonthList;
@@ -3027,6 +3024,7 @@ export namespace types {
   }
 
   export interface ContestNewPayload {
+    hasVisitedSection?: boolean;
     languages: { [key: string]: string };
   }
 
@@ -3274,6 +3272,7 @@ export namespace types {
   }
 
   export interface CourseNewPayload {
+    hasVisitedSection: boolean;
     is_admin: boolean;
     is_curator: boolean;
     languages: { [key: string]: string };
@@ -3414,6 +3413,7 @@ export namespace types {
     is_under_13_user: boolean;
     loginIdentity?: dao.Identities;
     user?: dao.Users;
+    user_verification_deadline?: Date;
     valid: boolean;
   }
 
@@ -3487,6 +3487,7 @@ export namespace types {
     groupAlias: string;
     groupDescription?: string;
     groupName?: string;
+    hasVisitedSection?: boolean;
     identities: types.Identity[];
     isOrganizer: boolean;
     scoreboards: types.GroupScoreboard[];
@@ -3837,6 +3838,7 @@ export namespace types {
   export interface ProblemDetailsPayload {
     allRuns?: types.Run[];
     allowUserAddTags?: boolean;
+    allowedSolutionsToSee: number;
     clarifications?: types.Clarification[];
     histogram: types.Histogram;
     levelTags?: string[];
@@ -4661,6 +4663,10 @@ export namespace types {
     [key: string]: types.ContestListItem[];
   }
 
+  export interface UserDependentsPayload {
+    dependents: { email?: string; name?: string; username: string }[];
+  }
+
   export interface UserDetailsPayload {
     emails: string[];
     experiments: string[];
@@ -4848,6 +4854,12 @@ export namespace messages {
   export type _BadgeUserListServerResponse = any;
   export type BadgeUserListResponse = { badges: types.Badge[] };
 
+  // Certificate
+  export type CertificateGetCertificatePdfRequest = { [key: string]: any };
+  export type CertificateGetCertificatePdfResponse = { certificate?: string };
+  export type CertificateValidateCertificateRequest = { [key: string]: any };
+  export type CertificateValidateCertificateResponse = { valid: boolean };
+
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
   export type _ClarificationCreateServerResponse = any;
@@ -4878,7 +4890,7 @@ export namespace messages {
   export type ContestAddGroupAdminRequest = { [key: string]: any };
   export type ContestAddGroupAdminResponse = {};
   export type ContestAddProblemRequest = { [key: string]: any };
-  export type ContestAddProblemResponse = {};
+  export type ContestAddProblemResponse = { solutionStatus: string };
   export type ContestAddUserRequest = { [key: string]: any };
   export type ContestAddUserResponse = {};
   export type ContestAdminDetailsRequest = { [key: string]: any };
@@ -5056,7 +5068,7 @@ export namespace messages {
   export type CourseAddGroupTeachingAssistantRequest = { [key: string]: any };
   export type CourseAddGroupTeachingAssistantResponse = {};
   export type CourseAddProblemRequest = { [key: string]: any };
-  export type CourseAddProblemResponse = {};
+  export type CourseAddProblemResponse = { solutionStatus: string };
   export type CourseAddStudentRequest = { [key: string]: any };
   export type CourseAddStudentResponse = {};
   export type CourseAddTeachingAssistantRequest = { [key: string]: any };
@@ -5736,6 +5748,15 @@ export namespace controllers {
     userList: (
       params?: messages.BadgeUserListRequest,
     ) => Promise<messages.BadgeUserListResponse>;
+  }
+
+  export interface Certificate {
+    getCertificatePdf: (
+      params?: messages.CertificateGetCertificatePdfRequest,
+    ) => Promise<messages.CertificateGetCertificatePdfResponse>;
+    validateCertificate: (
+      params?: messages.CertificateValidateCertificateRequest,
+    ) => Promise<messages.CertificateValidateCertificateResponse>;
   }
 
   export interface Clarification {

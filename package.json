@@ -52,7 +52,7 @@
     "core-js": "^3.6.5",
     "cross-env": "^6.0.3",
     "css-loader": "^3.6",
-    "cypress": "^9.1.1",
+    "cypress": "^13.3.0",
     "cypress-file-upload": "^5.0.8",
     "cypress-wait-until": "^1.7.2",
     "date-fns": "^2.27.0",
@@ -80,6 +80,7 @@
     "mock-socket": "^9.0.3",
     "monaco-editor": "^0.21",
     "monaco-editor-webpack-plugin": "^2.1",
+    "node-gyp": "^9.4.0",
     "pako": "^1.0.7",
     "popper.js": "^1.16.1",
     "prettier": "^2.1.2",
@@ -138,6 +139,5 @@
     "build-development-frontend": "cross-env webpack --config-name=frontend --mode=development",
     "refactor": "cross-env ./stuff/refactor.js",
     "test:e2e": "cypress run --browser chrome"
-  },
-  "dependencies": {}
+  }
 }
