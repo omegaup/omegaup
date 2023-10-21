@@ -121,6 +121,7 @@ Cypress.Commands.add(
   }: Partial<CourseOptions> & Pick<CourseOptions, 'courseAlias'>) => {
     cy.get('[data-nav-courses]').click();
     cy.get('[data-nav-courses-create]').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('[data-course-new-name]').type(courseAlias);
     cy.get('[data-course-new-alias]').type(courseAlias);
     cy.get('[name="show-scoreboard"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
@@ -185,8 +186,11 @@ Cypress.Commands.add(
     requestParticipantInformation = 'no',
     differentStart = false,
     differentStartTime = "",
-  }) => {
+  },shouldShowIntro: boolean = true) => {
     cy.visit('contest/new/');
+    if (shouldShowIntro) {
+      cy.get('.introjs-skipbutton').click();
+    }
     cy.get('[name="title"]').type(contestAlias);
     cy.get('[name="alias"]').type(contestAlias);
     cy.get('[name="description"]').type(description);

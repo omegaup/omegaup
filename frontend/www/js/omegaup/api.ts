@@ -203,6 +203,17 @@ export const Badge = {
   }),
 };
 
+export const Certificate = {
+  getCertificatePdf: apiCall<
+    messages.CertificateGetCertificatePdfRequest,
+    messages.CertificateGetCertificatePdfResponse
+  >('/api/certificate/getCertificatePdf/'),
+  validateCertificate: apiCall<
+    messages.CertificateValidateCertificateRequest,
+    messages.CertificateValidateCertificateResponse
+  >('/api/certificate/validateCertificate/'),
+};
+
 export const Clarification = {
   create: apiCall<
     messages.ClarificationCreateRequest,
@@ -1736,6 +1747,13 @@ export const Session = {
             return x;
           });
         })(x.api_tokens);
+        if (
+          typeof x.user_verification_deadline !== 'undefined' &&
+          x.user_verification_deadline !== null
+        )
+          x.user_verification_deadline = ((x: number) => new Date(x * 1000))(
+            x.user_verification_deadline,
+          );
         return x;
       })(x.session);
     return x;
