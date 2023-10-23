@@ -49,7 +49,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         $sql = '
             SELECT
                 co.title AS contest_title,
-                i.name AS identity_name,
+                COALESCE(i.name, i.username) AS identity_name,
                 ce.contest_place,
                 ce.timestamp
             FROM
@@ -66,7 +66,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
                 ce.verification_code = ?;
         ';
 
-        /** @var array{contest_title: string, identity_name: string, contest_place: int, timestamp: \OmegaUp\Timestamp}|null */
+        /** @var array{contest_title: string, identity_name: string, contest_place: int|null, timestamp: \OmegaUp\Timestamp}|null */
         $data = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$verificationCode]
@@ -86,7 +86,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         $sql = '
             SELECT
                 co.name AS course_name,
-                i.name AS identity_name,
+                COALESCE(i.name, i.username) AS identity_name,
                 ce.timestamp
             FROM
                 Certificates ce
@@ -121,7 +121,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
     ) {
         $sql = '
             SELECT
-                i.name AS identity_name,
+                COALESCE(i.name, i.username) AS identity_name,
                 ce.timestamp
             FROM
                 Certificates ce
