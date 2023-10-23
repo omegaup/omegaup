@@ -65,7 +65,7 @@
                 type="submit"
                 data-start-contest
                 :disabled="isButtonDisabled"
-                class="btn btn-primary btn-lg"
+                class="btn btn-primary"
               >
                 {{ T.startContest }}
               </button>
@@ -108,11 +108,11 @@
       </div>
       <hr />
       <div>
-        <h1>{{ T.registerForContestChallenges }}</h1>
+        <h3 class="ml-4">{{ T.registerForContestChallenges }}</h3>
         <omegaup-markdown :markdown="contest.description"></omegaup-markdown>
       </div>
       <div>
-        <h1>{{ T.registerForContestRules }}</h1>
+        <h3 class="ml-4">{{ T.registerForContestRules }}</h3>
         <ul>
           <li v-if="contest.show_scoreboard_after">
             {{ T.contestNewFormScoreboardAtContestEnd }}
