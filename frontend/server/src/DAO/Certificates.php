@@ -41,7 +41,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
     /**
      * Returns the data of the contest certificate using its verification code
      *
-     * @return array{contest_title: string, identity_name: string, contest_place: int|null, timestamp: \OmegaUp\Timestamp}|null
+     * @return array{contest_place: int|null, contest_title: string, identity_name: string, timestamp: \OmegaUp\Timestamp}|null
      */
     final public static function getContestCertificateByVerificationCode(
         string $verificationCode
@@ -66,7 +66,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
                 ce.verification_code = ?;
         ';
 
-        /** @var array{contest_title: string, identity_name: string, contest_place: int|null, timestamp: \OmegaUp\Timestamp}|null */
+        /** @var array{contest_place: int|null, contest_title: string, identity_name: string, timestamp: \OmegaUp\Timestamp}|null */
         $data = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$verificationCode]
