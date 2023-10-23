@@ -38,13 +38,17 @@ jobs:
         with:
           python-version: '3.8'
 
+      - name: Install wait-for-it
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y wait-for-it
+
       - name: Download the Docker containers
         run: |
           docker-compose pull
 
       - name: Start the Docker containers
         run: |
-          docker-compose up --no-build --detach
+          docker-compose up --detach rabbitmq
 
           # Add the container names as aliases to localhost
           cat << EOF | sudo tee --append /etc/hosts
