@@ -69,8 +69,8 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCreateCertificatePdfCourse() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse();
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         \OmegaUp\DAO\Certificates::create(new \OmegaUp\DAO\VO\Certificates([
             'identity_id' => $identity->identity_id,
