@@ -486,7 +486,13 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         //connection to rabbitmq
         $channel = \OmegaUp\RabbitMQConnection::getInstance()->channel();
 
-        $channel->exchange_declare($exchange, 'direct', false, true, true);
+        $channel->exchange_declare(
+            $exchange,
+            type: 'direct',
+            passive: false,
+            durable: true,
+            auto_delete: false
+        );
 
         $scoreboard = \OmegaUp\Controllers\Contest::getScoreboard(
             $contest,
