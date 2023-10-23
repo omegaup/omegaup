@@ -108,9 +108,6 @@ jobs:
             --database=omegaup-test \
             validate --all < /dev/null
 
-      - name: Check DNS resolution
-        run: ping -c 3 rabbitmq
-
       - name: Run tests
         timeout-minutes: 20
         run: ./stuff/mysql_types.sh
@@ -508,6 +505,9 @@ jobs:
           sudo mkdir -p /var/lib/omegaup
           sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
           docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
+
+      - name: Check DNS resolution
+        run: ping -c 3 rabbitmq
 
       - name: Run Python tests
         run: |
