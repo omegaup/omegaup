@@ -281,7 +281,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         return base64_encode($pdf->Output('', 'S'));
     }
 
-    private static function getPlaceSuffix(int $n): string {
+    public static function getPlaceSuffix(int $n): string {
         $translator = \OmegaUp\Translations::getInstance();
         if ($n >= 11 && $n <= 13) {
             return $translator->get('certificatePdfContestPlaceTh');

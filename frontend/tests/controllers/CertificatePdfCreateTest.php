@@ -9,12 +9,6 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * that doesn't exist
      */
     public function testCreateCertificatePdfWithInvalidVerificationCode() {
-        $r = new \OmegaUp\Request(['verification_code' => 'D89lJ2aOZ3',]);
-
-        $response = \OmegaUp\Controllers\Certificate::apiGetCertificatePdf($r);
-
-        $this->assertEmpty($response['certificate']);
-
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -26,7 +20,9 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'verification_code' => '45KoPi9aM3'
         ]));
 
-        $response = \OmegaUp\Controllers\Certificate::apiGetCertificatePdf($r);
+        $response = \OmegaUp\Controllers\Certificate::apiGetCertificatePdf(
+            new \OmegaUp\Request(['verification_code' => 'D89lJ2aOZ3',])
+        );
 
         $this->assertEmpty($response['certificate']);
     }
@@ -61,8 +57,9 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame($identity->name, $certificateData['identity_name']);
         $this->assertNull($certificateData['contest_place']);
 
-        $r = new \OmegaUp\Request(['verification_code' => '5OpsU8zX80',]);
-        $response = \OmegaUp\Controllers\Certificate::apiGetCertificatePdf($r);
+        $response = \OmegaUp\Controllers\Certificate::apiGetCertificatePdf(
+            new \OmegaUp\Request(['verification_code' => '5OpsU8zX80',])
+        );
         $pdf = $response['certificate'];
         $this->assertNotEmpty($pdf);
     }
@@ -87,7 +84,7 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertSame('course', $certificateType);
 
-        $certificateData = \OmegaUp\DAO\Certificates::getContestCertificateByVerificationCode(
+        $certificateData = \OmegaUp\DAO\Certificates::getCourseCertificateByVerificationCode(
             '9lP5j0aLx6'
         );
         $this->assertSame(
@@ -96,8 +93,9 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertSame($identity->name, $certificateData['identity_name']);
 
-        $r = new \OmegaUp\Request(['verification_code' => '9lP5j0aLx6',]);
-        $response = \OmegaUp\Controllers\Certificate::apiGetCertificatePdf($r);
+        $response = \OmegaUp\Controllers\Certificate::apiGetCertificatePdf(
+            new \OmegaUp\Request(['verification_code' => '9lP5j0aLx6',])
+        );
         $pdf = $response['certificate'];
         $this->assertNotEmpty($pdf);
     }
@@ -120,13 +118,14 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertSame('coder_of_the_month', $certificateType);
 
-        $certificateData = \OmegaUp\DAO\Certificates::getContestCertificateByVerificationCode(
+        $certificateData = \OmegaUp\DAO\Certificates::getCoderOfTheMonthCertificateByVerificationCode(
             'Kp8L30nJQ3'
         );
         $this->assertSame($identity->name, $certificateData['identity_name']);
 
-        $r = new \OmegaUp\Request(['verification_code' => 'Kp8L30nJQ3',]);
-        $response = \OmegaUp\Controllers\Certificate::apiGetCertificatePdf($r);
+        $response = \OmegaUp\Controllers\Certificate::apiGetCertificatePdf(
+            new \OmegaUp\Request(['verification_code' => 'Kp8L30nJQ3',])
+        );
         $pdf = $response['certificate'];
         $this->assertNotEmpty($pdf);
     }
@@ -150,13 +149,14 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertSame('coder_of_the_month_female', $certificateType);
 
-        $certificateData = \OmegaUp\DAO\Certificates::getContestCertificateByVerificationCode(
+        $certificateData = \OmegaUp\DAO\Certificates::getCoderOfTheMonthCertificateByVerificationCode(
             'ao8A22kUmg'
         );
         $this->assertSame($identity->name, $certificateData['identity_name']);
 
-        $r = new \OmegaUp\Request(['verification_code' => 'ao8A22kUmg',]);
-        $response = \OmegaUp\Controllers\Certificate::apiGetCertificatePdf($r);
+        $response = \OmegaUp\Controllers\Certificate::apiGetCertificatePdf(
+            new \OmegaUp\Request(['verification_code' => 'ao8A22kUmg',])
+        );
         $pdf = $response['certificate'];
         $this->assertNotEmpty($pdf);
     }
