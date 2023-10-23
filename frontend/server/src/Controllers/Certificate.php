@@ -257,7 +257,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         int $date
     ): string {
         $pdf = new FPDI('L');
-        $pdf->setSourceFile('/opt/omegaup/stuff/CertificateTemplate.pdf');
+        $pdf->setSourceFile(
+            dirname(__DIR__, 4) . '/stuff/CertificateTemplate.pdf'
+        );
         $templateId = $pdf->importPage(1);
         $pdf->AddPage();
         $pdf->useTemplate($templateId);
