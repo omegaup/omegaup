@@ -10,6 +10,7 @@
   - [`/api/badge/userList/`](#apibadgeuserlist)
 - [Certificate](#certificate)
   - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
+  - [`/api/certificate/validateCertificate/`](#apicertificatevalidatecertificate)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
   - [`/api/clarification/details/`](#apiclarificationdetails)
@@ -411,6 +412,24 @@ API to generate the certificate PDF
 | ------------- | -------- |
 | `certificate` | `string` |
 
+## `/api/certificate/validateCertificate/`
+
+### Description
+
+API to validate a certificate
+
+### Parameters
+
+| Name                | Type     | Description |
+| ------------------- | -------- | ----------- |
+| `verification_code` | `string` |             |
+
+### Returns
+
+| Name    | Type      |
+| ------- | --------- |
+| `valid` | `boolean` |
+
 # Clarification
 
 Description of ClarificationController
@@ -574,7 +593,9 @@ Adds a problem to a contest
 
 ### Returns
 
-_Nothing_
+| Name             | Type     |
+| ---------------- | -------- |
+| `solutionStatus` | `string` |
 
 ## `/api/contest/addUser/`
 
@@ -1491,7 +1512,9 @@ Adds a problem to an assignment
 
 ### Returns
 
-_Nothing_
+| Name             | Type     |
+| ---------------- | -------- |
+| `solutionStatus` | `string` |
 
 ## `/api/course/addStudent/`
 
