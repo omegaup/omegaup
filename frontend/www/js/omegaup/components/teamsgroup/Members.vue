@@ -35,7 +35,7 @@
     <table class="table table-striped" data-table-members>
       <thead>
         <tr>
-          <th>{{ T.wordsUser }}</th>
+          <th>{{ T.teamsGroupMembersAccountName }}</th>
           <th>{{ T.loginPassword }}</th>
           <th>{{ T.wordsActions }}</th>
         </tr>

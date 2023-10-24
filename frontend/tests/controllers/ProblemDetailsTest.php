@@ -436,15 +436,28 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Solutions can be viewed by a user that has solved the problem.
+     * Solutions can be viewed by a user that has not reached the limit of views per day.
      */
     public function testShowSolutionBySolver() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problems = [];
 
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
+        $login = self::login($identity);
+
+        for (
+            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY; $i++
+        ) {
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem()['problem'];
+            \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problems[$i]->alias,
+                'forfeit_problem' => true,
+            ]));
+        }
+
         try {
-            $login = self::login($identity);
             \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],

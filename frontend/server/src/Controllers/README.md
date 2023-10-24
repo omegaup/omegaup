@@ -8,6 +8,9 @@
   - [`/api/badge/myBadgeAssignationTime/`](#apibadgemybadgeassignationtime)
   - [`/api/badge/myList/`](#apibadgemylist)
   - [`/api/badge/userList/`](#apibadgeuserlist)
+- [Certificate](#certificate)
+  - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
+  - [`/api/certificate/validateCertificate/`](#apicertificatevalidatecertificate)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
   - [`/api/clarification/details/`](#apiclarificationdetails)
@@ -387,6 +390,46 @@ Returns a list of badges owned by a certain user
 | -------- | --------------- |
 | `badges` | `types.Badge[]` |
 
+# Certificate
+
+CertificateController
+
+## `/api/certificate/getCertificatePdf/`
+
+### Description
+
+API to generate the certificate PDF
+
+### Parameters
+
+| Name                | Type     | Description |
+| ------------------- | -------- | ----------- |
+| `verification_code` | `string` |             |
+
+### Returns
+
+| Name          | Type     |
+| ------------- | -------- |
+| `certificate` | `string` |
+
+## `/api/certificate/validateCertificate/`
+
+### Description
+
+API to validate a certificate
+
+### Parameters
+
+| Name                | Type     | Description |
+| ------------------- | -------- | ----------- |
+| `verification_code` | `string` |             |
+
+### Returns
+
+| Name    | Type      |
+| ------- | --------- |
+| `valid` | `boolean` |
+
 # Clarification
 
 Description of ClarificationController
@@ -550,7 +593,9 @@ Adds a problem to a contest
 
 ### Returns
 
-_Nothing_
+| Name             | Type     |
+| ---------------- | -------- |
+| `solutionStatus` | `string` |
 
 ## `/api/contest/addUser/`
 
@@ -1467,7 +1512,9 @@ Adds a problem to an assignment
 
 ### Returns
 
-_Nothing_
+| Name             | Type     |
+| ---------------- | -------- |
+| `solutionStatus` | `string` |
 
 ## `/api/course/addStudent/`
 

@@ -136,6 +136,7 @@
         <omegaup-group-create-identities
           :group-alias="groupAlias"
           :user-error-row="userErrorRow"
+          :has-visited-section="hasVisitedSection"
           @bulk-identities="
             (identities) => $emit('bulk-identities', identities)
           "
@@ -188,6 +189,7 @@ export default class GroupEdit extends Vue {
   @Prop() userErrorRow!: null | string;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop() searchResultSchools!: types.SchoolListItem[];
+  @Prop() hasVisitedSection!: boolean;
 
   T = T;
   ui = ui;
@@ -222,3 +224,11 @@ export default class GroupEdit extends Vue {
   }
 }
 </script>
+
+<style scoped lang="scss">
+@media (max-width: 576px) {
+  h2 {
+    text-align: center;
+  }
+}
+</style>

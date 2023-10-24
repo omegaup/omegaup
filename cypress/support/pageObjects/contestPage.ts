@@ -31,6 +31,7 @@ export class ContestPage {
 
   addIdentitiesGroup(): void {
     cy.get('[href="#identities"]').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('[name="identities"]').attachFile('identities.csv');
 
     cy.get('[data-identity-username]').then((rawHTMLElements) => {
@@ -131,8 +132,8 @@ export class ContestPage {
     });
   }
 
-  createContest(contestOptions: ContestOptions, users: Array<string>): void {
-    cy.createContest(contestOptions);
+  createContest(contestOptions: ContestOptions, users: Array<string>, shouldShowIntro: boolean = true): void {
+    cy.createContest(contestOptions, shouldShowIntro);
 
     cy.location('href').should('include', contestOptions.contestAlias);
     cy.get('[name="title"]').should('have.value', contestOptions.contestAlias);
@@ -198,14 +199,14 @@ export class ContestPage {
     const problems: ProblemOptions[] = [];
 
     for (let i = 0; i < noOfProblems; i++) {
-      const userLoginOptions: ProblemOptions = {
+      const problemOptions: ProblemOptions = {
         problemAlias: uuid().slice(0, 10),
-        tag: 'Recursión',
+        tag: 'Recursion',
         autoCompleteTextTag: 'recur',
         problemLevelIndex: 0,
       };
 
-      problems.push(userLoginOptions);
+      problems.push(problemOptions);
     }
 
     return problems;

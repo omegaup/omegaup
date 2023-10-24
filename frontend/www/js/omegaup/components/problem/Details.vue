@@ -91,6 +91,7 @@
             </div>
             <div v-if="user.loggedIn">
               <button
+                data-report-problem-button
                 class="btn btn-link"
                 @click="onReportInappropriateProblem"
               >
@@ -98,7 +99,11 @@
               </button>
             </div>
             <div v-if="user.reviewer && !nominationStatus.alreadyReviewed">
-              <button class="btn btn-link" @click="onNewPromotionAsReviewer">
+              <button
+                data-rate-problem-button
+                class="btn btn-link"
+                @click="onNewPromotionAsReviewer"
+              >
                 {{ T.reviewerNomination }}
               </button>
             </div>
@@ -280,6 +285,20 @@
           <template #new-clarification><div></div></template>
         </omegaup-arena-clarification-list>
       </div>
+      <div
+        class="tab-pane fade p-4"
+        :class="{ 'show active': selectedTab === 'solution' }"
+      >
+        <omegaup-problem-solution
+          :status="solutionStatus"
+          :allowed-solutions-to-see="allowedSolutionsToSee"
+          :solution="solution"
+          @get-solution="$emit('get-solution')"
+          @get-allowed-solutions="$emit('get-allowed-solutions')"
+          @unlock-solution="$emit('unlock-solution')"
+        >
+        </omegaup-problem-solution>
+      </div>
     </div>
   </div>
 </template>
@@ -304,6 +323,7 @@ import qualitynomination_ReviewerPopup from '../qualitynomination/ReviewerPopup.
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
+import problem_soltion from './Solution.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -341,6 +361,7 @@ export enum PopupDisplayed {
 @Component({
   components: {
     FontAwesomeIcon,
+    'omegaup-problem-solution': problem_soltion,
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-ephemeral-grader': arena_EphemeralGrader,
     'omegaup-arena-runs': arena_Runs,
@@ -369,9 +390,10 @@ export default class ProblemDetails extends Vue {
   @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
   @Prop() nominationStatus!: types.NominationStatus;
+  @Prop() solutionStatus!: string;
+  @Prop({ default: null }) solution!: types.ProblemStatement | null;
   @Prop() runs!: types.Run[];
-  @Prop({ default: 0 }) availableTokens!: number;
-  @Prop({ default: 0 }) allTokens!: number;
+  @Prop({ default: 0 }) allowedSolutionsToSee!: number;
   @Prop() histogram!: types.Histogram;
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
@@ -431,6 +453,11 @@ export default class ProblemDetails extends Vue {
         name: 'clarifications',
         text: T.wordsClarifications,
         visible: this.user.admin,
+      },
+      {
+        name: 'solution',
+        text: T.wordsSeeSolution,
+        visible: true,
       },
     ];
     return tabs.filter((tab) => tab.visible);

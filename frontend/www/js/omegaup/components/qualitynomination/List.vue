@@ -134,6 +134,7 @@
               <td class="align-middle">
                 <a
                   :href="nominationDetailsUrl(nomination.qualitynomination_id)"
+                  :class="nomination.problem.title"
                   >{{ T.wordsDetails }}</a
                 >
               </td>

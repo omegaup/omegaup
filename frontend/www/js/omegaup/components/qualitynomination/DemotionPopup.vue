@@ -54,6 +54,7 @@
           </div>
           <div class="text-right">
             <button
+              data-submit-report-button
               class="col-md-4 btn btn-primary"
               type="submit"
               :disabled="

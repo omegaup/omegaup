@@ -2,28 +2,33 @@
   <div class="card">
     <div class="card-body">
       <form class="form" @submit.prevent="onAddMember">
-        <div class="form-group">
-          <label class="d-inline"
-            >{{ T.wordsMember }}
+        <div class="row">
+          <div class="form-group col-md-9 mb-1 mt-1">
+            <label class="d-inline">{{ T.wordsMember }}</label>
             <omegaup-common-typeahead
               :existing-options="searchResultUsers"
               :value.sync="searchedUsername"
               :max-results="10"
+              class="input"
               @update-existing-options="
                 (query) => $emit('update-search-result-users', query)
               "
             ></omegaup-common-typeahead>
-          </label>
+          </div>
+          <div
+            class="form-group mb-0 col-md-3 d-flex align-items-center mt-4 margin-phone"
+          >
+            <button class="btn btn-primary" type="submit">
+              {{ T.wordsAddMember }}
+            </button>
+          </div>
         </div>
-        <button class="btn btn-primary" type="submit">
-          {{ T.wordsAddMember }}
-        </button>
       </form>
     </div>
     <table class="table table-striped" data-table-members>
       <thead>
         <tr>
-          <th>{{ T.wordsUser }}</th>
+          <th>{{ T.groupEditMembersCoder }}</th>
           <th>{{ T.contestEditRegisteredAdminDelete }}</th>
         </tr>
       </thead>
@@ -48,10 +53,10 @@
         </tr>
       </tbody>
     </table>
-    <table class="table table-striped" data-table-identities>
+    <table class="table table-striped responsive-table" data-table-identities>
       <thead>
         <tr>
-          <th>{{ T.wordsIdentity }}</th>
+          <th>{{ T.groupEditMembersCoder }}</th>
           <th>{{ T.wordsName }}</th>
           <th>{{ T.profileCountry }}</th>
           <th>{{ T.profileState }}</th>
@@ -201,3 +206,20 @@ export default class Members extends Vue {
   }
 }
 </script>
+
+<style scoped lang="scss">
+@media (max-width: 576px) {
+  .input {
+    max-width: 13rem;
+    margin-top: 0.6rem;
+  }
+  .responsive-table {
+    width: 100%;
+    overflow-x: auto;
+    display: block;
+  }
+  .margin-phone {
+    margin-top: 0.4rem !important;
+  }
+}
+</style>
