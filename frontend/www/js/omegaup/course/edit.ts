@@ -320,11 +320,16 @@ OmegaUp.on('ready', () => {
               problemParams.commit = problem.commit;
             }
             api.Course.addProblem(problemParams)
-              .then(() => {
+              .then((data) => {
                 if (assignment.assignment_type == 'lesson') {
                   ui.success(T.courseAssignmentLectureAdded);
                 } else {
-                  ui.success(T.courseAssignmentProblemAdded);
+                  console.log(data.solutionStatus);
+                  if (data.solutionStatus === 'not_found') {
+                    ui.success(T.courseAssignmentProblemAdded);
+                  } else {
+                    ui.warning(T.warningPublicSolution);
+                  }
                 }
                 this.refreshProblemList(assignment);
               })

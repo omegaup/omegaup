@@ -294,13 +294,17 @@ OmegaUp.on('ready', () => {
               points: problem.points,
               commit: problem.commit,
             })
-              .then(() => {
+              .then((data) => {
                 this.refreshProblems(true);
                 if (isUpdate) {
                   ui.success(T.problemSuccessfullyUpdated);
                   return;
                 }
-                ui.success(T.problemSuccessfullyAdded);
+                if (data.solutionStatus === 'not_found') {
+                  ui.success(T.problemSuccessfullyAdded);
+                } else {
+                  ui.warning(T.warningPublicSolution);
+                }
               })
               .catch(ui.apiError);
           },

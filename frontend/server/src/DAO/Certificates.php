@@ -18,7 +18,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
      * @return string|null
      */
     final public static function getCertificateTypeByVerificationCode(
-        string $verification_code
+        string $verificationCode
     ) {
         $sql = '
             SELECT
@@ -32,7 +32,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         /** @var string|null */
         $type = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
-            [$verification_code]
+            [$verificationCode]
         );
 
         return $type;
@@ -44,7 +44,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
      * @return array{contest_title: string, identity_name: string, contest_place: int|null, timestamp: \OmegaUp\Timestamp}|null
      */
     final public static function getContestCertificateByVerificationCode(
-        string $verification_code
+        string $verificationCode
     ) {
         $sql = '
             SELECT
@@ -69,7 +69,43 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         /** @var array{contest_title: string, identity_name: string, contest_place: int, timestamp: \OmegaUp\Timestamp}|null */
         $data = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$verification_code]
+            [$verificationCode]
+        );
+
+        return $data;
+    }
+
+     /**
+     * Returns the data of the course certificate using its verification code
+     *
+     * @return array{course_name: string, identity_name: string, timestamp: \OmegaUp\Timestamp}|null
+     */
+    final public static function getCourseCertificateByVerificationCode(
+        string $verificationCode
+    ) {
+        $sql = '
+            SELECT
+                co.name AS course_name,
+                i.name AS identity_name,
+                ce.timestamp
+            FROM
+                Certificates ce
+            INNER JOIN
+                Courses co
+            ON
+                ce.course_id = co.course_id
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = ce.identity_id
+            WHERE
+                ce.verification_code = ?;
+        ';
+
+        /** @var array{course_name: string, identity_name: string, timestamp: \OmegaUp\Timestamp}|null */
+        $data = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$verificationCode]
         );
 
         return $data;
@@ -81,7 +117,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
      * @return array{identity_name: string, timestamp: \OmegaUp\Timestamp}|null
      */
     final public static function getCoderOfTheMonthCertificateByVerificationCode(
-        string $verification_code
+        string $verificationCode
     ) {
         $sql = '
             SELECT
@@ -100,7 +136,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         /** @var array{identity_name: string, timestamp: \OmegaUp\Timestamp}|null */
         $data = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$verification_code]
+            [$verificationCode]
         );
 
         return $data;
@@ -112,7 +148,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
      * @return int
      */
     final public static function isValid(
-        string $verification_code
+        string $verificationCode
     ) {
         $sql = '
         SELECT
@@ -126,7 +162,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         /** @var int */
         $isValid = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
-            [$verification_code]
+            [$verificationCode]
         );
 
         return $isValid;

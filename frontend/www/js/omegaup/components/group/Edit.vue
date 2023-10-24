@@ -224,3 +224,11 @@ export default class GroupEdit extends Vue {
   }
 }
 </script>
+
+<style scoped lang="scss">
+@media (max-width: 576px) {
+  h2 {
+    text-align: center;
+  }
+}
+</style>
