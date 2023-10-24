@@ -797,12 +797,11 @@ export default class Runs extends Vue {
     if (run.verdict == 'JE' || run.verdict == 'VE') return '';
 
     if (run.verdict == 'CE') return 'status-ce';
-    
-    if (run.type === 'disqualified')
-      return 'status-disqualified';
-    
+
+    if (run.type === 'disqualified') return 'status-disqualified';
+
     const scorePercentage = (run.score * 100).toFixed(2);
-    
+
     if (scorePercentage !== '100.00') return '';
 
     return 'status-ac';
