@@ -1370,6 +1370,7 @@ const translations: { [key: string]: string; } = {
   runDetailsIncorrect: "Incorrecta",
   runDetailsInterrupted: "Interrumpida",
   runDetailsJudgeError: "Error del juez",
+  runDetailsMemoryExceeded: "Excedida",
   runDetailsNewFeedback: "Nueva retroalimentaci\u00f3n",
   runDetailsRuntimeError: "Error de ejecuci\u00f3n",
   runDetailsRuntimeFunctionError: "Error de ejecuci\u00f3n",

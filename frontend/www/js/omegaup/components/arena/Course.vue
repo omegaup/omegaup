@@ -161,6 +161,47 @@
       >
         <template #title><div></div></template>
         <template #runs><div></div></template>
+        <template #verdictFilter><div></div></template>
+        <template #statusFilter><div></div></template>
+        <template #executionFilterOptions>
+          <option value="">{{ T.wordsAll }}</option>
+          <option value="EXECUTION_JUDGE_ERROR">
+            {{ T.runDetailsJudgeError }}
+          </option>
+          <option value="EXECUTION_VALIDATOR_ERROR">
+            {{ T.runDetailsValidatorError }}
+          </option>
+          <option value="EXECUTION_COMPILATION_ERROR">
+            {{ T.runDetailsCompilationError }}
+          </option>
+          <option value="EXECUTION_RUNTIME_FUNCTION_ERROR">
+            {{ T.runDetailsRuntimeFunctionError }}
+          </option>
+          <option value="EXECUTION_RUNTIME_ERROR">
+            {{ T.runDetailsRuntimeError }}
+          </option>
+          <option value="EXECUTION_INTERRUPTED">
+            {{ T.runDetailsInterrupted }}
+          </option>
+          <option value="EXECUTION_FINISHED">
+            {{ T.runDetailsFinished }}
+          </option>
+        </template>
+        <template #outputFilterOptions>
+          <option value="">{{ T.wordsAll }}</option>
+          <option value="OUTPUT_EXCEEDED">
+            {{ T.runDetailsExceeded }}
+          </option>
+          <option value="OUTPUT_INCORRECT">
+            {{ T.runDetailsIncorrect }}
+          </option>
+          <option value="OUTPUT_INTERRUPTED">
+            {{ T.runDetailsInterrupted }}
+          </option>
+          <option value="OUTPUT_CORRECT">
+            {{ T.runDetailsCorrect }}
+          </option>
+        </template>
       </omegaup-arena-runs>
       <omegaup-overlay
         v-if="isAdmin"

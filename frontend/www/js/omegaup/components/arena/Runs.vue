@@ -16,102 +16,55 @@
         <span class="font-weight-bold">{{ T.wordsSubmissions }}</span>
         <div v-if="showFilters">
           <div class="filters row">
-            <label
-              v-if="!simplifiedView"
-              class="col-3 col-sm pr-0 font-weight-bold"
-              >{{ T.wordsVerdict }}:
-              <select
-                v-model="filterVerdict"
-                data-select-verdict
-                class="form-control"
-              >
-                <option value="">{{ T.wordsAll }}</option>
-                <option value="AC">AC</option>
-                <option value="PA">PA</option>
-                <option value="WA">WA</option>
-                <option value="TLE">TLE</option>
-                <option value="MLE">MLE</option>
-                <option value="OLE">OLE</option>
-                <option value="RTE">RTE</option>
-                <option value="RFE">RFE</option>
-                <option value="CE">CE</option>
-                <option value="JE">JE</option>
-                <option value="VE">VE</option>
-                <option value="NO-AC">No AC</option>
-              </select>
-            </label>
-            <label v-else class="col-3 col-sm pr-0 font-weight-bold">
-              {{ T.wordsExecution }}
-              <select
-                v-model="filterExecution"
-                data-select-execution
-                class="form-control"
-              >
-                <option value="">{{ T.wordsAll }}</option>
-                <option value="EXECUTION_JUDGE_ERROR">
-                  {{ T.runDetailsJudgeError }}
-                </option>
-                <option value="EXECUTION_VALIDATOR_ERROR">
-                  {{ T.runDetailsValidatorError }}
-                </option>
-                <option value="EXECUTION_COMPILATION_ERROR">
-                  {{ T.runDetailsCompilationError }}
-                </option>
-                <option value="EXECUTION_RUNTIME_FUNCTION_ERROR">
-                  {{ T.runDetailsRuntimeFunctionError }}
-                </option>
-                <option value="EXECUTION_RUNTIME_ERROR">
-                  {{ T.runDetailsRuntimeError }}
-                </option>
-                <option value="EXECUTION_INTERRUPTED">
-                  {{ T.runDetailsInterrupted }}
-                </option>
-                <option value="EXECUTION_FINISHED">
-                  {{ T.runDetailsFinished }}
-                </option>
-              </select>
-            </label>
-
-            <label
-              v-if="!simplifiedView"
-              class="col-3 col-sm pr-0 font-weight-bold"
-              >{{ T.wordsStatus }}:
-              <select
-                v-model="filterStatus"
-                data-select-status
-                class="form-control"
-              >
-                <option value="">{{ T.wordsAll }}</option>
-                <option value="new">new</option>
-                <option value="waiting">waiting</option>
-                <option value="compiling">compiling</option>
-                <option value="running">running</option>
-                <option value="ready">ready</option>
-              </select>
-            </label>
-
-            <label v-else class="col-3 col-sm pr-0 font-weight-bold">
-              {{ T.wordsOutput }}
-              <select
-                v-model="filterOutput"
-                data-select-output
-                class="form-control"
-              >
-                <option value="">{{ T.wordsAll }}</option>
-                <option value="OUTPUT_EXCEEDED">
-                  {{ T.runDetailsExceeded }}
-                </option>
-                <option value="OUTPUT_INCORRECT">
-                  {{ T.runDetailsIncorrect }}
-                </option>
-                <option value="OUTPUT_INTERRUPTED">
-                  {{ T.runDetailsInterrupted }}
-                </option>
-                <option value="OUTPUT_CORRECT">
-                  {{ T.runDetailsCorrect }}
-                </option>
-              </select>
-            </label>
+            <slot name="verdictFilter">
+              <label class="col-3 col-sm pr-0 font-weight-bold"
+                >{{ T.wordsVerdict }}:
+                <select
+                  v-model="filterVerdict"
+                  data-select-verdict
+                  class="form-control"
+                >
+                  <slot name="verdictFilterOptions"></slot>
+                </select>
+              </label>
+            </slot>
+            <slot name="executionFilter">
+              <label class="col-3 col-sm pr-0 font-weight-bold">
+                {{ T.wordsExecution }}
+                <select
+                  v-model="filterExecution"
+                  data-select-execution
+                  class="form-control"
+                >
+                  <slot name="executionFilterOptions"></slot>
+                </select>
+              </label>
+            </slot>
+            <slot name="statusFilter">
+              <label class="col-3 col-sm pr-0 font-weight-bold"
+                >{{ T.wordsStatus }}:
+                <select
+                  v-model="filterStatus"
+                  data-select-status
+                  class="form-control"
+                >
+                  <slot name="statusFilterOptions"></slot>
+                </select>
+              </label>
+            </slot>
+            <slot name="outputFilter">
+              <label class="col-3 col-sm pr-0 font-weight-bold">
+                {{ T.wordsOutput }}
+                <select
+                  v-model="filterOutput"
+                  data-select-output
+                  class="form-control"
+                >
+                  <slot name="outputFilterOptions"></slot
+                  >>
+                </select>
+              </label>
+            </slot>
 
             <label class="col-5 col-sm pr-0 font-weight-bold"
               >{{ T.wordsLanguage }}:
@@ -379,6 +332,15 @@
                   :icon="['fas', 'times-circle']"
                   style="color: red"
                 />
+                <font-awesome-icon
+                  v-else-if="
+                    outputIconColorStatus(run) ===
+                    NumericOutputStatus.Interrupted
+                  "
+                  :icon="['fas', 'exclamation-circle']"
+                  style="color: orange"
+                />
+                <br />
                 {{ output(run) }}
               </td>
               <td class="numeric">{{ memory(run) }}</td>
@@ -557,6 +519,7 @@ export enum NumericOutputStatus {
   None = 0,
   Correct = 1,
   Incorrect = 2,
+  Interrupted = 3,
 }
 
 export enum StringOutputStatus {
@@ -728,7 +691,7 @@ export default class Runs extends Vue {
     )
       return '—';
     if (run.status_memory === MemoryStatus.Exceeded)
-      return T.runDetailsExceeded;
+      return T.runDetailsMemoryExceeded;
     return `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
   }
 
@@ -825,32 +788,35 @@ export default class Runs extends Vue {
   }
 
   statusPercentageClass(run: types.Run): string {
-    if (run.status !== 'ready') {
-      return '';
-    }
+    if (run.status !== 'ready') return '';
 
-    if (run.type == 'disqualified') {
+    if (run.verdict == 'JE' || run.verdict == 'VE') return '';
+
+    if (run.verdict == 'CE') return 'status-ce';
+
+    const scorePercentage = (run.score * 100).toFixed(2);
+
+    if (run.type === 'disqualified' || scorePercentage === '0.00')
       return 'status-disqualified';
-    }
+    if (scorePercentage !== '100.00') return 'status-partial';
 
     return 'status-ac';
   }
 
   outputIconColorStatus(run: types.Run): number {
     if (
-      !(
-        run.status === 'ready' &&
-        run.output !== StringOutputStatus.Exceeded &&
-        run.output !== StringOutputStatus.Interrupted
-      )
+      !(run.status === 'ready' && run.output !== StringOutputStatus.Exceeded)
     ) {
       return NumericOutputStatus.None;
     }
 
-    if (run.output !== StringOutputStatus.Incorrect) {
-      return NumericOutputStatus.Correct;
+    if (run.output === StringOutputStatus.Incorrect) {
+      return NumericOutputStatus.Incorrect;
+    } else if (run.output === StringOutputStatus.Interrupted) {
+      return NumericOutputStatus.Interrupted;
     }
-    return NumericOutputStatus.Incorrect;
+
+    return NumericOutputStatus.Correct;
   }
 
   showVerdictHelp(ev: Event): void {
@@ -1113,5 +1079,9 @@ export default class Runs extends Vue {
 .status-ce {
   background: var(--arena-runs-table-status-ce-background-color);
   color: var(--arena-runs-table-status-ce-font-color);
+}
+
+.status-partial {
+  background: var(--arena-runs-table-status-wa-partial-background-color);
 }
 </style>
