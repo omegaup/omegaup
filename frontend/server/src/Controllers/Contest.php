@@ -1243,6 +1243,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
+        if (\OmegaUp\Authorization::isUnderThirteenUser($r->user)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'under13UserException'
+            );
+        }
         return [
             'templateProperties' => [
                 'payload' => [

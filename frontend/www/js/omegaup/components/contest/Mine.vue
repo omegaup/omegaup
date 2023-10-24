@@ -15,11 +15,11 @@
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
+    <h3 class="text-center mb-4">{{ T.wordsMyContests }}</h3>
     <div class="card">
-      <h5 class="card-header">{{ T.wordsMyContests }}</h5>
-      <div class="card-body">
-        <div class="row align-items-center justify-content-between">
-          <div class="form-check col-md-4">
+      <div class="card-header">
+        <div class="row align-items-center justify-content-around">
+          <div class="form-check col-md-5">
             <label class="form-check-label">
               <input
                 v-model="shouldShowAllContests"
@@ -50,7 +50,7 @@
           </div>
           <select
             v-model="allContestsVisibilityOption"
-            class="custom-select col-md-5"
+            class="custom-select col-md-3"
             @change="onChangeAdmissionMode"
           >
             <option selected value="none">{{ T.forSelectedItems }}</option>

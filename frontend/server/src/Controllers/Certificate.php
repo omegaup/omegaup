@@ -99,10 +99,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->Cell(
             $width,
             $height,
-            utf8_decode(
-                $translator->get(
-                    'certificatePdfHeader'
-                )
+            \OmegaUp\ApiUtils::convertUTFToISO(
+                $translator->get('certificatePdfHeader')
             ),
             $border,
             $ln,
@@ -131,13 +129,14 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->Cell(
             $width,
             $height,
-            utf8_decode(
-                sprintf(
-                    $translator->get('certificatePdfPlaceAndDate'),
-                    $day,
-                    self::getMonthName($month),
-                    $year
-                )
+            \OmegaUp\ApiUtils::formatString(
+                $translator->get('certificatePdfPlaceAndDate'),
+                [
+                    'month' => self::getMonthName($month),
+                    'day' => $day,
+                    'year' => $year,
+                ],
+                convertUTF8ToISO: true
             ),
             $border,
             $ln,
@@ -160,10 +159,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->Cell(
             $width,
             $height,
-            utf8_decode(
-                $translator->get(
-                    'certificatePdfDirector'
-                )
+            \OmegaUp\ApiUtils::convertUTFToISO(
+                $translator->get('certificatePdfDirector')
             ),
             $border,
             $ln,
@@ -225,10 +222,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->Cell(
             $width,
             $height,
-            utf8_decode(
-                $translator->get(
-                    'certificatePdfGrantsRecognition'
-                )
+            \OmegaUp\ApiUtils::convertUTFToISO(
+                $translator->get('certificatePdfGrantsRecognition')
             ),
             $border,
             $ln,
@@ -251,10 +246,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $pdf->Cell(
             $width,
             $height,
-            utf8_decode(
-                $translator->get(
-                    'certificatePdfPerson'
-                )
+            \OmegaUp\ApiUtils::convertUTFToISO(
+                $translator->get('certificatePdfPerson')
             ),
             $border,
             $ln,
@@ -331,9 +324,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         return $translator->get('certificatePdfContestPlaceTh');
     }
 
-    private static function getContestCertificate(string $verification_code): ?string {
+    private static function getContestCertificate(string $verificationCode): ?string {
         $certificateData = \OmegaUp\DAO\Certificates::getContestCertificateByVerificationCode(
-            $verification_code
+            $verificationCode
         );
 
         if (is_null($certificateData)) {
@@ -343,23 +336,57 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $translator = \OmegaUp\Translations::getInstance();
         if (!is_null($certificateData['contest_place'])) {
             $placeNumber = intval($certificateData['contest_place']);
-            $title = utf8_decode(
+            $title = \OmegaUp\ApiUtils::convertUTFToISO(
                 $placeNumber
                 . self::getPlaceSuffix($placeNumber)
             );
         } else {
-            $title = utf8_decode(
-                $translator->get(
-                    'certificatePdfContestParticipation'
-                )
+            $title = \OmegaUp\ApiUtils::convertUTFToISO(
+                $translator->get('certificatePdfContestParticipation')
             );
         }
-        $identityName = utf8_decode($certificateData['identity_name']);
-        $description = utf8_decode(
-            sprintf(
-                $translator->get('certificatePdfContestDescription'),
-                $certificateData['contest_title']
-            )
+        $identityName = \OmegaUp\ApiUtils::convertUTFToISO(
+            $certificateData['identity_name']
+        );
+        $description = \OmegaUp\ApiUtils::formatString(
+            $translator->get('certificatePdfContestDescription'),
+            [
+                'contest_title' => $certificateData['contest_title'],
+            ],
+            convertUTF8ToISO: true
+        );
+        $date = $certificateData['timestamp']->time;
+
+        return self::createCertificatePdf(
+            $title,
+            $identityName,
+            $description,
+            $date
+        );
+    }
+
+    private static function getCourseCertificate(string $verificationCode): ?string {
+        $certificateData = \OmegaUp\DAO\Certificates::getCourseCertificateByVerificationCode(
+            $verificationCode
+        );
+
+        if (is_null($certificateData)) {
+            return null;
+        }
+
+        $translator = \OmegaUp\Translations::getInstance();
+        $title = \OmegaUp\ApiUtils::convertUTFToISO(
+            $translator->get('certificatePdfCourseTitle')
+        );
+        $identityName = \OmegaUp\ApiUtils::convertUTFToISO(
+            $certificateData['identity_name']
+        );
+        $description = \OmegaUp\ApiUtils::formatString(
+            $translator->get('certificatePdfCourseDescription'),
+            [
+                'course_name' => $certificateData['course_name'],
+            ],
+            convertUTF8ToISO: true
         );
         $date = $certificateData['timestamp']->time;
 
@@ -372,11 +399,11 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     }
 
     private static function getCoderOfTheMonthCertificate(
-        string $verification_code,
+        string $verificationCode,
         bool $isFemaleCategory
     ): ?string {
         $certificateData = \OmegaUp\DAO\Certificates::getCoderOfTheMonthCertificateByVerificationCode(
-            $verification_code
+            $verificationCode
         );
 
         if (is_null($certificateData)) {
@@ -385,22 +412,25 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
         $translator = \OmegaUp\Translations::getInstance();
         if ($isFemaleCategory) {
-            $title = utf8_decode(
+            $title = \OmegaUp\ApiUtils::convertUTFToISO(
                 $translator->get('certificatePdfCoderOfTheMonthFemaleTitle')
             );
         } else {
-            $title = utf8_decode(
+            $title = \OmegaUp\ApiUtils::convertUTFToISO(
                 $translator->get('certificatePdfCoderOfTheMonthTitle')
             );
         }
-        $identityName = utf8_decode($certificateData['identity_name']);
+        $identityName = \OmegaUp\ApiUtils::convertUTFToISO(
+            $certificateData['identity_name']
+        );
         $date = $certificateData['timestamp']->time;
         $month = intval(date('n', $date));
-        $description = utf8_decode(
-            sprintf(
-                $translator->get('certificatePdfCoderOfTheMonthDescription'),
-                self::getMonthName($month - 1)
-            )
+        $description = \OmegaUp\ApiUtils::formatString(
+            $translator->get('certificatePdfCoderOfTheMonthDescription'),
+            [
+                'month_name' => self::getMonthName($month - 1),
+            ],
+            convertUTF8ToISO: true
         );
 
         return self::createCertificatePdf(
@@ -418,6 +448,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
         if ($type === 'contest') {
             return self::getContestCertificate($verificationCode);
+        }
+        if ($type === 'course') {
+            return self::getCourseCertificate($verificationCode);
         }
         if ($type === 'coder_of_the_month' || $type === 'coder_of_the_month_female') {
             return self::getCoderOfTheMonthCertificate(
@@ -448,7 +481,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     /**
      * API to validate a certificate
      *
-     * @return array{valid: boolean}
+     * @return array{valid: bool}
      *
      * @omegaup-request-param string $verification_code
      */
