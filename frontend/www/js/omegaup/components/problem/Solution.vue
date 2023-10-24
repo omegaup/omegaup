@@ -1,5 +1,14 @@
 <template>
   <div class="card">
+    <div class="row p-3">
+      <div class="col-12 text-right">
+        <a href="https://blog.omegaup.com/soluciones-de-problemas-en-omegaup/"
+          ><font-awesome-icon :icon="['fas', 'question-circle']" />
+          {{ T.officialSolutionsInfo }}</a
+        >
+      </div>
+    </div>
+
     <omegaup-markdown
       v-if="showSolution"
       :markdown="solution.markdown"
@@ -9,39 +18,38 @@
     <div v-else class="interstitial">
       <omegaup-markdown :markdown="statusMessage"></omegaup-markdown>
       <omegaup-markdown
-        v-show="allTokens !== null && availableTokens !== null"
+        v-show="allowedSolutionsToSee !== null"
         :markdown="
-          ui.formatString(T.solutionTokens, {
-            available: availableTokens,
-            total: allTokens,
-          })
+          ui.formatString(T.solutionViewsLeft, {
+            available: allowedSolutionsToSee,
+            total: 5,
+          }),
         "
       ></omegaup-markdown>
-      <div class="text-center">
+
+      <div class="text-center mt-5">
         <button
           v-if="status === 'unlocked'"
           class="btn btn-primary btn-md"
           @click="$emit('get-solution')"
         >
           {{ T.wordsSeeSolution }}
+          <font-awesome-icon :icon="['fas', 'unlock']" />
         </button>
         <button
-          v-else-if="
-            status === 'locked' &&
-            allTokens === null &&
-            availableTokens === null
-          "
-          class="btn btn-primary btn-md"
-          @click="$emit('get-tokens')"
+          v-else-if="status === 'locked' && allowedSolutionsToSee === null"
+          class="btn btn-secondary btn-md"
+          @click="$emit('get-allowed-solutions')"
         >
-          {{ T.solutionViewCurrentTokens }}
+          {{ T.solutionAvailableViews }}
         </button>
         <button
-          v-else-if="status === 'locked' && availableTokens &gt; 0"
+          v-else-if="status === 'locked' && allowedSolutionsToSee > 0"
           class="btn btn-primary btn-md"
           @click="$emit('unlock-solution')"
         >
           {{ T.wordsUnlockSolution }}
+          <font-awesome-icon :icon="['fas', 'lock']" />
         </button>
       </div>
     </div>
@@ -53,19 +61,30 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
 import { types } from '../../api_types';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faLock,
+  faUnlock,
+  faQuestionCircle,
+} from '@fortawesome/free-solid-svg-icons';
+
+library.add(faLock);
+library.add(faUnlock);
+library.add(faQuestionCircle);
 
 import omegaup_Markdown from '../Markdown.vue';
 
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
+    FontAwesomeIcon,
   },
 })
 export default class ProblemSolution extends Vue {
   @Prop() status!: string;
   @Prop({ default: null }) solution!: types.ProblemStatement | null;
-  @Prop() availableTokens!: number;
-  @Prop() allTokens!: number;
+  @Prop() allowedSolutionsToSee!: number;
 
   T = T;
   ui = ui;
@@ -98,9 +117,5 @@ export default class ProblemSolution extends Vue {
 
 .solution {
   padding: 2em 7em;
-}
-
-.solution-tokens {
-  font-size: 1.25em;
 }
 </style>
