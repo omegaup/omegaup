@@ -3390,7 +3390,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\Controllers\Submission::createFeedback(
+        \OmegaUp\Controllers\Submission::createOrUpdateFeedback(
             $r->identity,
             $submission,
             $course,
