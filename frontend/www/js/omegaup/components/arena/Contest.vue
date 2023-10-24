@@ -155,7 +155,6 @@
         <template #executionFilter><div></div></template>
         <template #outputFilter><div></div></template>
         <template #verdictFilterOptions>
-          <option value="">{{ T.wordsAll }}</option>
           <option value="AC">AC</option>
           <option value="PA">PA</option>
           <option value="WA">WA</option>
@@ -170,7 +169,6 @@
           <option value="NO-AC">No AC</option>
         </template>
         <template #statusFilterOptions>
-          <option value="">{{ T.wordsAll }}</option>
           <option value="new">new</option>
           <option value="waiting">waiting</option>
           <option value="compiling">compiling</option>

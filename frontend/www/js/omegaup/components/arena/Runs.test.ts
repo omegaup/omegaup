@@ -146,6 +146,31 @@ describe('Runs.vue', () => {
   describe.each(filtersMapping)(`A filter:`, (filter) => {
     it(`whose name is ${filter.filter} should have gotten the value ${filter.value}`, async () => {
       const wrapper = shallowMount(arena_Runs, {
+        slots: {
+          executionFilter: '<div></div>',
+          outputFilter: '<div></div>',
+          verdictFilterOptions: `            
+            <option value="AC">AC</option>
+            <option value="PA">PA</option>
+            <option value="WA">WA</option>
+            <option value="TLE">TLE</option>
+            <option value="MLE">MLE</option>
+            <option value="OLE">OLE</option>
+            <option value="RTE">RTE</option>
+            <option value="RFE">RFE</option>
+            <option value="CE">CE</option>
+            <option value="JE">JE</option>
+            <option value="VE">VE</option>
+            <option value="NO-AC">No AC</option>
+          `,
+          statusFilterOptions: `            
+            <option value="new">new</option>
+            <option value="waiting">waiting</option>
+            <option value="compiling">compiling</option>
+            <option value="running">running</option>
+            <option value="ready">ready</option>
+          `,
+        },
         propsData: {
           contestAlias: 'admin',
           runs,

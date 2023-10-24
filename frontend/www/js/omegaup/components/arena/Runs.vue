@@ -24,6 +24,7 @@
                   data-select-verdict
                   class="form-control"
                 >
+                  <option value="">{{ T.wordsAll }}</option>
                   <slot name="verdictFilterOptions"></slot>
                 </select>
               </label>
@@ -36,6 +37,7 @@
                   data-select-execution
                   class="form-control"
                 >
+                  <option value="">{{ T.wordsAll }}</option>
                   <slot name="executionFilterOptions"></slot>
                 </select>
               </label>
@@ -48,6 +50,7 @@
                   data-select-status
                   class="form-control"
                 >
+                  <option value="">{{ T.wordsAll }}</option>
                   <slot name="statusFilterOptions"></slot>
                 </select>
               </label>
@@ -60,6 +63,7 @@
                   data-select-output
                   class="form-control"
                 >
+                  <option value="">{{ T.wordsAll }}</option>
                   <slot name="outputFilterOptions"></slot
                   >>
                 </select>

@@ -164,7 +164,6 @@
         <template #verdictFilter><div></div></template>
         <template #statusFilter><div></div></template>
         <template #executionFilterOptions>
-          <option value="">{{ T.wordsAll }}</option>
           <option value="EXECUTION_JUDGE_ERROR">
             {{ T.runDetailsJudgeError }}
           </option>
@@ -188,7 +187,6 @@
           </option>
         </template>
         <template #outputFilterOptions>
-          <option value="">{{ T.wordsAll }}</option>
           <option value="OUTPUT_EXCEEDED">
             {{ T.runDetailsExceeded }}
           </option>
