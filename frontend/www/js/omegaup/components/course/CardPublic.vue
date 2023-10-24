@@ -9,10 +9,7 @@
           >
             <div>
               <h5 class="card-title mb-0">
-                <a v-if="loggedIn" :href="`/course/${course.alias}/`">{{
-                  course.name
-                }}</a>
-                <template v-else>{{ course.name }}</template>
+                <a :href="`/course/${course.alias}/`">{{ course.name }}</a>
               </h5>
               <p class="card-text">
                 <small>{{ course.school_name }}</small>
