@@ -797,12 +797,13 @@ export default class Runs extends Vue {
     if (run.verdict == 'JE' || run.verdict == 'VE') return '';
 
     if (run.verdict == 'CE') return 'status-ce';
-
-    const scorePercentage = (run.score * 100).toFixed(2);
-
-    if (run.type === 'disqualified' || scorePercentage === '0.00')
+    
+    if (run.type === 'disqualified')
       return 'status-disqualified';
-    if (scorePercentage !== '100.00') return 'status-partial';
+    
+    const scorePercentage = (run.score * 100).toFixed(2);
+    
+    if (scorePercentage !== '100.00') return '';
 
     return 'status-ac';
   }
@@ -1083,9 +1084,5 @@ export default class Runs extends Vue {
 .status-ce {
   background: var(--arena-runs-table-status-ce-background-color);
   color: var(--arena-runs-table-status-ce-font-color);
-}
-
-.status-partial {
-  background: var(--arena-runs-table-status-wa-partial-background-color);
 }
 </style>
