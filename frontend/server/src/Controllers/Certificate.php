@@ -67,7 +67,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $height = 15;
         $border = 0;
         $ln = 1;
-        $center = 'C';
+        $align = 'C';
 
         $pdf->SetXY($x, $y);
         $pdf->Cell(
@@ -78,7 +78,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             ),
             $border,
             $ln,
-            $center
+            $align
         );
     }
 
@@ -94,7 +94,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $height = 15;
         $border = 0;
         $ln = 1;
-        $center = 'C';
+        $align = 'C';
 
         $pdf->SetXY($x, $y);
         $day = intval(date('j', $date));
@@ -114,7 +114,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             ),
             $border,
             $ln,
-            $center
+            $align
         );
     }
 
@@ -127,7 +127,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $height = 15;
         $border = 0;
         $ln = 1;
-        $center = 'C';
+        $align = 'C';
 
         $pdf->SetXY($x, $y);
         $pdf->Cell(
@@ -138,7 +138,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             ),
             $border,
             $ln,
-            $center
+            $align
         );
     }
 
@@ -152,10 +152,10 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $height = 15;
         $border = 0;
         $ln = 1;
-        $center = 'C';
+        $align = 'C';
 
         $pdf->SetXY($x, $y);
-        $pdf->Cell($width, $height, $title, $border, $ln, $center);
+        $pdf->Cell($width, $height, $title, $border, $ln, $align);
     }
 
     private static function printCertificateName(
@@ -168,7 +168,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $height = 15;
         $border = 0;
         $ln = 1;
-        $center = 'C';
+        $align = 'C';
 
         $pdf->SetXY($x, $y);
         $pdf->Cell(
@@ -177,7 +177,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $identityName,
             $border,
             $ln,
-            $center
+            $align
         );
     }
 
@@ -190,7 +190,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $height = 15;
         $border = 0;
         $ln = 1;
-        $center = 'C';
+        $align = 'C';
 
         $pdf->SetXY($x, $y);
         $pdf->Cell(
@@ -201,7 +201,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             ),
             $border,
             $ln,
-            $center
+            $align
         );
     }
 
@@ -214,7 +214,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $height = 15;
         $border = 0;
         $ln = 1;
-        $center = 'C';
+        $align = 'C';
 
         $pdf->SetXY($x, $y);
         $pdf->Cell(
@@ -225,7 +225,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             ),
             $border,
             $ln,
-            $center
+            $align
         );
     }
 
@@ -238,7 +238,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $width = 215;
         $height = 10;
         $border = 0;
-        $center = 'C';
+        $align = 'C';
 
         $pdf->SetXY($x, $y);
         $pdf->MultiCell(
@@ -246,11 +246,72 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $height,
             $description,
             $border,
-            $center
+            $align
+        );
+    }
+
+    private static function printCertificateVerificationCode(
+        FPDI $pdf,
+        string $verificationCode
+    ): void {
+        $translator = \OmegaUp\Translations::getInstance();
+
+        $x = 214;
+        $y = 192;
+        $width = 80;
+        $height = 5;
+        $border = 0;
+        $ln = 1;
+        $align = 'R';
+
+        $pdf->SetXY($x, $y);
+        $pdf->Cell(
+            $width,
+            $height,
+            \OmegaUp\ApiUtils::formatString(
+                $translator->get('certificatePdfVerificationCode'),
+                [
+                    'verification_code' => $verificationCode,
+                ],
+                convertUTF8ToISO: true
+            ),
+            $border,
+            $ln,
+            $align
+        );
+    }
+
+    private static function printCertificateVerificationLink(
+        FPDI $pdf,
+        string $verificationCode
+    ): void {
+        $translator = \OmegaUp\Translations::getInstance();
+
+        $x = 214;
+        $y = 197;
+        $width = 80;
+        $height = 5;
+        $border = 0;
+        $align = 'R';
+
+        $pdf->SetXY($x, $y);
+        $pdf->MultiCell(
+            $width,
+            $height,
+            \OmegaUp\ApiUtils::formatString(
+                $translator->get('certificatePdfVerificationLink'),
+                [
+                    'verification_code' => $verificationCode,
+                ],
+                convertUTF8ToISO: true
+            ),
+            $border,
+            $align
         );
     }
 
     private static function createCertificatePdf(
+        string $verificationCode,
         string $title,
         string $identityName,
         string $description,
@@ -277,6 +338,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         self::printCertificateGrantsRecognition($pdf);
         self::printCertificatePerson($pdf);
         self::printCertificateDescription($pdf, $description);
+        $pdf->SetFont('', '', 10);
+        self::printCertificateVerificationCode($pdf, $verificationCode);
+        self::printCertificateVerificationLink($pdf, $verificationCode);
 
         return base64_encode($pdf->Output('', 'S'));
     }
@@ -332,6 +396,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $date = $certificateData['timestamp']->time;
 
         return self::createCertificatePdf(
+            $verificationCode,
             $title,
             $identityName,
             $description,
@@ -365,6 +430,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $date = $certificateData['timestamp']->time;
 
         return self::createCertificatePdf(
+            $verificationCode,
             $title,
             $identityName,
             $description,
@@ -408,6 +474,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         );
 
         return self::createCertificatePdf(
+            $verificationCode,
             $title,
             $identityName,
             $description,

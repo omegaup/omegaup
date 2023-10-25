@@ -189,6 +189,8 @@ const translations: { [key: string]: string; } = {
   certificatePdfMonth9: "September",
   certificatePdfPerson: "to the person",
   certificatePdfPlaceAndDate: "Bellevue, Washington on %(month) %(day), %(year)",
+  certificatePdfVerificationCode: "Verification code: %(verification_code)",
+  certificatePdfVerificationLink: "Verification link: https://omegaup.com/cert/%(verification_code)/",
   clarificationContest: "Contest:",
   clarificationEmailBody: "<p>Howdy!</p><p><strong><a href=\"https://omegaup.com/profile/%(user_name)\">%(user_name)</a></strong> has requested a clarification for the problem <strong><a href=\"https://omegaup.com/arena/problem/%(problem_alias)\">%(problem_name)</a></strong>:</p><p><blockquote><p>%(clarification_body)</p></blockquote><p>To answer it, please visit the following link: <a href=\"%(url)\">%(url)</a>.</p><p>Thanks!,<br/>omegaUp</p>",
   clarificationEmailSubject: "[omegaUp] New clarification for problem %(problem_name)",
