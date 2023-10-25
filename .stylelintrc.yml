@@ -14,3 +14,4 @@ ignoreFiles:
   - frontend/www/libinteractive/**/*
   - frontend/www/preguntas/**/*
   - frontend/www/third_party/**/*
+  - frontend/www/js/omegaup/components/**/**/*.stories.ts
