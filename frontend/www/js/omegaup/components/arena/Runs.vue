@@ -794,7 +794,7 @@ export default class Runs extends Vue {
   statusPercentageClass(run: types.Run): string {
     if (run.status !== 'ready') return '';
 
-    if (run.verdict == 'JE' || run.verdict == 'VE') return '';
+    if (run.verdict == 'JE' || run.verdict == 'VE') return 'status-je-ve';
 
     if (run.verdict == 'CE') return 'status-ce';
 
