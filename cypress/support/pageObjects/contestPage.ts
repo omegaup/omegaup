@@ -155,9 +155,11 @@ export class ContestPage {
     cy.waitUntil(() => cy.get('[data-table-scoreboard]').should('be.visible'));
   }
 
-  generateContestOptions(loginOption: LoginOptions): ContestOptions {
+  generateContestOptions(loginOption: LoginOptions, firstTimeVisited: boolean = true): ContestOptions {
     const now = new Date();
     const problem = this.generateProblemOptions(1);
+
+    problem[0].firstTimeVisited = firstTimeVisited;
 
     cy.login(loginOption);
     cy.createProblem(problem[0]);
