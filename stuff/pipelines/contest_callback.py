@@ -62,8 +62,8 @@ class ContestsCallback:
         for user_ranking in data.ranking:
             user = Ranking(**user_ranking)
             contest_place: Optional[int] = None
-            if (data.certificate_cutoff and user_ranking.place
-                    and user_ranking.place <= data.certificate_cutoff):
+            if (data.certificate_cutoff and user.place
+                    and user.place <= data.certificate_cutoff):
                 contest_place = user.place
             certificates.append(Certificate(
                 certificate_type='contest',

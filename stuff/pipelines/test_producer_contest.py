@@ -7,12 +7,13 @@ import dataclasses
 import os
 import sys
 
-from typing import Optional
+from typing import List, Optional
 import pytest
 import pika
 import pytest_mock
 import contest_callback
 
+from database.contest import Ranking
 import database.contest
 import producer_contest
 import rabbitmq_connection
@@ -135,4 +136,10 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
                                          routing_key='ContestQueue',
                                          channel=channel,
                                          callback=callback)
+
+        ranking: List[Ranking] = []
+        for username, place in callback.message['ranking']:
+            ranking.append(
+                database.contest.Ranking(username=username, place=place))
+        callback.message['ranking'] = ranking
         assert expected == callback.message

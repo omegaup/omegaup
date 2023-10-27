@@ -69,5 +69,6 @@ def get_contests(
             contest_id=row['contest_id'],
             ranking=ranking
         )
+        ranking = []
         data.append(contest)
     return data

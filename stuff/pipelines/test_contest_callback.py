@@ -14,6 +14,7 @@ import time
 from typing import List
 import omegaup.api
 
+import database.contest
 import contest_callback
 import test_credentials
 import rabbitmq_connection
@@ -93,6 +94,13 @@ def test_insert_contest_certificate() -> None:
     contest_id = result['contest_id']
     scoreboard_url = result['scoreboard_url']
     ranking = []
+    scoreboard = client.contest.scoreboard(
+        contest_alias=alias,
+        token=scoreboard_url)
+    for position in scoreboard.ranking:
+        ranking.append(database.contest.Ranking(
+            username=position.username,
+            place=position.place)._asdict())
     with rabbitmq_connection.connect(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
