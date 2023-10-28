@@ -52,7 +52,7 @@ export const Default: Story = {
     components: { Badge },
     // bind props to badge object and injest as props
     props: Object.keys(argTypes),
-    template: '<Badge :badge="$props" />',
+    template: '<badge :badge="$props" />',
   }),
 };
 
