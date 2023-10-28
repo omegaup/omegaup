@@ -7,13 +7,12 @@ import dataclasses
 import os
 import sys
 
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 import pytest
 import pika
 import pytest_mock
 import contest_callback
 
-from database.contest import Ranking
 import database.contest
 import producer_contest
 import rabbitmq_connection
@@ -40,7 +39,8 @@ class MessageSavingCallback:
                  _properties: pika.spec.BasicProperties,
                  body: bytes) -> None:
         '''Callback function to test'''
-        self.message = json.loads(body.decode())
+        self.message = contest_callback.ContestCertificate(**json.loads(
+            body.decode()))
         channel.close()
 
 
@@ -56,7 +56,8 @@ class MessageSavingCallback:
                     scoreboard_url='abcdef',
                     contest_id=1,
                     ranking=[
-                        database.contest.Ranking(username='user_1', place=1),
+                        database.contest.Ranking(
+                            username='user_1', place=1)._asdict(),
                     ],
                 ),
             ],
@@ -66,7 +67,8 @@ class MessageSavingCallback:
                 scoreboard_url='abcdef',
                 contest_id=1,
                 ranking=[
-                    database.contest.Ranking(username='user_1', place=1),
+                    database.contest.Ranking(
+                        username='user_1', place=1)._asdict(),
                 ],
             )._asdict(),
         ),
@@ -78,9 +80,9 @@ class MessageSavingCallback:
                     scoreboard_url='123456',
                     contest_id=2,
                     ranking=[
-                        database.contest.Ranking(username='user_1', place=1),
+                        database.contest.Ranking(
+                            username='user_1', place=1)._asdict(),
                     ],
-
                 ),
             ],
             database.contest.ContestCertificate(
@@ -89,7 +91,8 @@ class MessageSavingCallback:
                 scoreboard_url='123456',
                 contest_id=2,
                 ranking=[
-                    database.contest.Ranking(username='user_1', place=1),
+                    database.contest.Ranking(
+                        username='user_1', place=1)._asdict(),
                 ],
             )._asdict(),
         ),
@@ -137,9 +140,11 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
                                          channel=channel,
                                          callback=callback)
 
-        ranking: List[Ranking] = []
-        for username, place in callback.message['ranking']:
-            ranking.append(
-                database.contest.Ranking(username=username, place=place))
-        callback.message['ranking'] = ranking
-        assert expected == callback.message
+        if callback.message is not None:
+            ranking: List[Dict[str, Any]] = []
+            for ranking_data in callback.message.ranking:
+                ranking.append(ranking_data)
+
+            callback.message.ranking = ranking
+
+            assert expected == callback.message._asdict()

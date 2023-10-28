@@ -3,7 +3,7 @@
 '''Mysql queries to generate messages for contests'''
 
 import datetime
-from typing import List, NamedTuple, Optional
+from typing import Any, Dict, List, NamedTuple, Optional
 
 import mysql.connector
 import mysql.connector.cursor
@@ -22,7 +22,7 @@ class ContestCertificate(NamedTuple):
     alias: str
     scoreboard_url: str
     contest_id: int
-    ranking: List[Ranking]
+    ranking: List[Dict[str, Any]]
 
 
 def get_contests(
@@ -53,7 +53,7 @@ def get_contests(
               date_upper_limit.replace(hour=23, minute=59, second=59))
     )
     data: List[ContestCertificate] = []
-    ranking: List[Ranking] = []
+    ranking: List[Dict[str, Any]] = []
     for row in cur:
         scoreboard = client.contest.scoreboard(
             contest_alias=row['alias'],
