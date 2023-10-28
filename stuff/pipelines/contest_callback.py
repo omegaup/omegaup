@@ -50,22 +50,25 @@ class ContestsCallback:
                  body: bytes) -> None:
         '''Function to store the certificates by a given contest'''
         response = json.loads(body)
-        data = ContestCertificate(**response)
 
+        ranking = []
+        for user_ranking in response['ranking']:
+            ranking.append(database.contest.Ranking(**user_ranking))
+        response['ranking'] = ranking
+        data = ContestCertificate(**response)
         certificates: List[Certificate] = []
 
         for user_ranking in data.ranking:
-            user = database.contest.Ranking(**user_ranking)
             contest_place: Optional[int] = None
-            if (data.certificate_cutoff and user.place
-                    and user.place <= data.certificate_cutoff):
-                contest_place = user.place
+            if (data.certificate_cutoff and user_ranking.place
+                    and user_ranking.place <= data.certificate_cutoff):
+                contest_place = user_ranking.place
             certificates.append(Certificate(
                 certificate_type='contest',
                 contest_id=data.contest_id,
                 verification_code=generate_contest_code(),
                 contest_place=contest_place,
-                username=user.username
+                username=user_ranking.username
             ))
         with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
             while True:
