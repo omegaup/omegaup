@@ -1,11 +1,14 @@
 <template>
-  <figure v-tooltip="description" class="col-6 col-sm-3 badge-container text-center d-flex flex-column align-items-center">
+  <figure
+    v-tooltip="description"
+    class="col-6 col-sm-3 badge-container text-center d-flex flex-column align-items-center"
+  >
     <a class="badge-icon d-block w-100" :href="`/badge/${badge.badge_alias}/`"
       ><img
         :class="{ 'badge-gray': !badge.unlocked }"
         :src="iconUrl"
         class="img-fluid"
-        style="max-height: 10rem;"
+        style="max-height: 10rem"
         :style="{ filter: badge.unlocked ? '' : 'grayscale(100%)' }"
     /></a>
 
