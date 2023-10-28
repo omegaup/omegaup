@@ -3,6 +3,7 @@ import Markdown from './Markdown.vue';
 
 const meta: Meta<typeof Markdown> = {
     component: Markdown,
+    title: 'Components/Markdown',
 };
 
 export default meta;
