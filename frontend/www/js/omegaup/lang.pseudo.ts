@@ -1381,6 +1381,7 @@ const translations: { [key: string]: string; } = {
   runDetailsJudgeError: "(Judg3 3rr0r)",
   runDetailsMemoryExceeded: "(Exc33d3d)",
   runDetailsNewFeedback: "(N3w f33dback)",
+  runDetailsNotAvailable: "(N07 avai1ab13)",
   runDetailsRuntimeError: "(Run7im3 3rr0r)",
   runDetailsRuntimeFunctionError: "(Run7im3 3rr0r)",
   runDetailsValidatorError: "(Va1ida70r 3rr0r)",

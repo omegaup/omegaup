@@ -185,11 +185,15 @@
               <th v-if="showProblem">{{ T.wordsProblem }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPoints }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPenalty }}</th>
-              <th v-if="!showPoints" class="numeric">
+              <th v-if="!showPoints && contestAlias == null" class="numeric">
                 {{ T.wordsPercentage }}
               </th>
-              <th>{{ T.wordsExecution }}</th>
-              <th>{{ T.wordsOutput }}</th>
+              <th v-if="contestAlias == null || simplifiedView">
+                {{ T.wordsExecution }}
+              </th>
+              <th v-if="contestAlias == null || simplifiedView">
+                {{ T.wordsOutput }}
+              </th>
               <th class="numeric">
                 <font-awesome-icon :icon="['fas', 'database']" />
                 {{ T.wordsMemory }}
@@ -314,14 +318,20 @@
               <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
               <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
               <td
-                v-if="!showPoints"
+                v-if="
+                  (!showPoints && contestAlias == null) ||
+                  (!showPoints && simplifiedView)
+                "
                 :class="statusPercentageClass(run)"
                 class="numeric"
+                data-run-percentage
               >
                 {{ percentage(run) }}
               </td>
-              <td class="numeric">{{ execution(run) }}</td>
-              <td class="numeric">
+              <td v-if="contestAlias == null || simplifiedView" class="numeric">
+                {{ execution(run) }}
+              </td>
+              <td v-if="contestAlias == null || simplifiedView" class="numeric">
                 <font-awesome-icon
                   v-if="
                     outputIconColorStatus(run) === NumericOutputStatus.Correct
@@ -344,7 +354,9 @@
                   :icon="['fas', 'exclamation-circle']"
                   style="color: orange"
                 />
-                <br />
+                <br
+                  v-if="outputIconColorStatus(run) != NumericOutputStatus.None"
+                />
                 {{ output(run) }}
               </td>
               <td class="numeric">{{ memory(run) }}</td>
@@ -598,6 +610,7 @@ export default class Runs extends Vue {
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
   currentPage: number = 1;
+  newFieldsDate: Date = new Date('2023-10-22');
 
   get totalRows(): number {
     return this.filteredRuns.length;
@@ -752,6 +765,10 @@ export default class Runs extends Vue {
   }
 
   execution(run: types.Run): string {
+    if (run.time < this.newFieldsDate) {
+      return T.runDetailsNotAvailable;
+    }
+
     if (run.status !== 'ready') {
       return '—';
     }
@@ -775,6 +792,10 @@ export default class Runs extends Vue {
   }
 
   output(run: types.Run): string {
+    if (run.time < this.newFieldsDate) {
+      return T.runDetailsNotAvailable;
+    }
+
     if (run.status !== 'ready') {
       return '—';
     }
@@ -809,7 +830,8 @@ export default class Runs extends Vue {
 
   outputIconColorStatus(run: types.Run): number {
     if (
-      !(run.status === 'ready' && run.output !== StringOutputStatus.Exceeded)
+      !(run.status === 'ready' && run.output !== StringOutputStatus.Exceeded) ||
+      run.time < this.newFieldsDate
     ) {
       return NumericOutputStatus.None;
     }
