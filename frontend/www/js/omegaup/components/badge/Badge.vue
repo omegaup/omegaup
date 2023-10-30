@@ -7,9 +7,7 @@
       ><img
         :class="{ 'badge-gray': !badge.unlocked }"
         :src="iconUrl"
-        class="img-fluid"
-        style="max-height: 10rem"
-        :style="{ filter: badge.unlocked ? '' : 'grayscale(100%)' }"
+        class="img-fluid badge-img"
     /></a>
 
     <figcaption class="badge-name pt-2">
@@ -46,3 +44,14 @@ export default class Badge extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.badge-gray {
+  filter: grayscale(100%);
+}
+
+.badge-img {
+  max-height: 10rem;
+}
+</style>
+
