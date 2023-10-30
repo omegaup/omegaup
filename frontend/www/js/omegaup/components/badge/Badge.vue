@@ -54,4 +54,3 @@ export default class Badge extends Vue {
   max-height: 10rem;
 }
 </style>
-
