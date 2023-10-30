@@ -11,6 +11,7 @@
 - [Certificate](#certificate)
   - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
   - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
+  - [`/api/certificate/getUserCertificates/`](#apicertificategetusercertificates)
   - [`/api/certificate/validateCertificate/`](#apicertificatevalidatecertificate)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
@@ -430,6 +431,24 @@ API to generate the certificate PDF
 | ------------- | -------- |
 | `certificate` | `string` |
 
+## `/api/certificate/getUserCertificates/`
+
+### Description
+
+Get all the certificates belonging to a user
+
+### Parameters
+
+| Name      | Type        | Description |
+| --------- | ----------- | ----------- |
+| `user_id` | `int\|null` |             |
+
+### Returns
+
+| Name           | Type                          |
+| -------------- | ----------------------------- |
+| `certificates` | `types.CertificateListItem[]` |
+
 ## `/api/certificate/validateCertificate/`
 
 ### Description
@@ -611,7 +630,9 @@ Adds a problem to a contest
 
 ### Returns
 
-_Nothing_
+| Name             | Type     |
+| ---------------- | -------- |
+| `solutionStatus` | `string` |
 
 ## `/api/contest/addUser/`
 
@@ -1528,7 +1549,9 @@ Adds a problem to an assignment
 
 ### Returns
 
-_Nothing_
+| Name             | Type     |
+| ---------------- | -------- |
+| `solutionStatus` | `string` |
 
 ## `/api/course/addStudent/`
 

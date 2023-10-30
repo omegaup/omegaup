@@ -41,8 +41,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemVersion=array{author: Signature, commit: string, committer: Signature, message: string, parents: list<string>, tree: array<string, string>, version: string}
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, groupScorePolicy: null|string, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
- * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, allRuns?: list<Run>, totalRuns?: int, clarifications?: list<Clarification>, histogram: Histogram, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus?: string, solvers: list<BestSolvers>, user: UserInfoForProblem}
- * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, groupScorePolicy: null|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, hasVisitedSection?: bool, allRuns?: list<Run>, totalRuns?: int, clarifications?: list<Clarification>, histogram: Histogram, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus?: string, solvers: list<BestSolvers>, user: UserInfoForProblem, allowedSolutionsToSee: int}
+ * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, hasVisitedSection?: bool, emailClarifications: bool, extraWallTime: int|string, groupScorePolicy: null|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>, query: string|null}
  * @psalm-type ProblemListPayload=array{selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
@@ -2998,14 +2998,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'problemSolutionNotVisible'
                 );
             }
-            $seenSolutions = \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCount(
+            $seenSolutions = \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCountInDay(
                 $r->user
             );
             $allowedSolutions = intval(
-                \OmegaUp\DAO\Problems::getProblemsSolvedCount(
-                    $r->identity
-                ) /
-                \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION
+                \OmegaUp\Controllers\ProblemForfeited::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY
             );
             // Validate that the user will not exceed the number of allowed solutions.
             if ($seenSolutions >= $allowedSolutions) {
@@ -4621,6 +4618,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $allowedSolutionsToSee = 0;
+
         $response = [
             'templateProperties' => [
                 'payload' => [
@@ -4678,6 +4677,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'admin' => false,
                         'reviewer' => false,
                     ],
+                    'allowedSolutionsToSee' => $allowedSolutionsToSee
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblem'
@@ -4745,6 +4745,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
             identityId: intval($r->identity->identity_id)
         );
 
+        if (!is_null($r->user)) {
+            // Get the count of problems forfeited by the user on the current day.
+            $problemsForfeitedCount = \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCountInDay(
+                $r->user
+            );
+
+            // Calculate the remaining solutions the user can view by subtracting the number of solutions they have already seen from the daily allowed limit.
+            $allowedSolutionsToSee = max(
+                \OmegaUp\Controllers\ProblemForfeited::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY - $problemsForfeitedCount,
+                0
+            );
+        }
+
         $response['templateProperties']['payload'] = array_merge(
             $response['templateProperties']['payload'],
             [
@@ -4761,6 +4774,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     offset: null,
                     rowcount: 0,
                 ),
+                'allowedSolutionsToSee' => $allowedSolutionsToSee,
             ]
         );
 
@@ -5470,6 +5484,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'problem_level' => '',
                         'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                         'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
+                        'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
+                            'has-visited-create-problem'
+                        ),
                     ],
                     self::getCommonPayloadForTypeScript()
                 ),

@@ -1243,6 +1243,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
+        if (\OmegaUp\Authorization::isUnderThirteenUser($r->user)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'under13UserException'
+            );
+        }
         return [
             'templateProperties' => [
                 'payload' => [
@@ -2984,7 +2989,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Adds a problem to a contest
      *
-     * @return array{status: string}
+     * @return array{status: string, solutionStatus: string}
      *
      * @omegaup-request-param null|string $commit
      * @omegaup-request-param string $contest_alias
@@ -3085,7 +3090,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
             )
         );
 
-        return ['status' => 'ok'];
+        $solutionStatus = \OmegaUp\Controllers\Problem::SOLUTION_NOT_FOUND;
+
+        if (\OmegaUp\DAO\Problems::isVisible($problem)) {
+            $solutionStatus = \OmegaUp\Controllers\Problem::getProblemSolutionStatus(
+                $problem,
+                $r->identity
+            );
+        }
+
+        return [
+            'status' => 'ok',
+            'solutionStatus' => $solutionStatus,
+        ];
     }
 
     /**
