@@ -10,6 +10,7 @@
   - [`/api/badge/userList/`](#apibadgeuserlist)
 - [Certificate](#certificate)
   - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
+  - [`/api/certificate/getUserCertificates/`](#apicertificategetusercertificates)
   - [`/api/certificate/validateCertificate/`](#apicertificatevalidatecertificate)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
@@ -411,6 +412,24 @@ API to generate the certificate PDF
 | Name          | Type     |
 | ------------- | -------- |
 | `certificate` | `string` |
+
+## `/api/certificate/getUserCertificates/`
+
+### Description
+
+Get all the certificates belonging to a user
+
+### Parameters
+
+| Name      | Type        | Description |
+| --------- | ----------- | ----------- |
+| `user_id` | `int\|null` |             |
+
+### Returns
+
+| Name           | Type                          |
+| -------------- | ----------------------------- |
+| `certificates` | `types.CertificateListItem[]` |
 
 ## `/api/certificate/validateCertificate/`
 
