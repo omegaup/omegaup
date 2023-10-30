@@ -12,7 +12,7 @@
         :style="{ filter: badge.unlocked ? '' : 'grayscale(100%)' }"
     /></a>
 
-    <figcaption class="badge-name pt-">
+    <figcaption class="badge-name pt-2">
       {{ name }}
     </figcaption>
   </figure>
