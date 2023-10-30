@@ -3847,6 +3847,7 @@ export namespace types {
     allowUserAddTags?: boolean;
     allowedSolutionsToSee: number;
     clarifications?: types.Clarification[];
+    hasVisitedSection?: boolean;
     histogram: types.Histogram;
     levelTags?: string[];
     nominationStatus?: types.NominationStatus;
@@ -3905,6 +3906,7 @@ export namespace types {
     emailClarifications: boolean;
     extraWallTime: number | string;
     groupScorePolicy?: string;
+    hasVisitedSection?: boolean;
     inputLimit: number | string;
     languages: string;
     levelTags: string[];

@@ -258,7 +258,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         int $date
     ): string {
         $pdf = new FPDI('L');
-        $pdf->setSourceFile('/opt/omegaup/stuff/CertificateTemplate.pdf');
+        $pdf->setSourceFile(
+            dirname(__DIR__, 4) . '/stuff/CertificateTemplate.pdf'
+        );
         $templateId = $pdf->importPage(1);
         $pdf->AddPage();
         $pdf->useTemplate($templateId);
@@ -282,7 +284,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         return base64_encode($pdf->Output('', 'S'));
     }
 
-    private static function getPlaceSuffix(int $n): string {
+    public static function getPlaceSuffix(int $n): string {
         $translator = \OmegaUp\Translations::getInstance();
         if ($n >= 11 && $n <= 13) {
             return $translator->get('certificatePdfContestPlaceTh');
