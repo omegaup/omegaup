@@ -13,7 +13,9 @@ OmegaUp.on('ready', () => {
     },
     render: function (createElement) {
       return createElement('omegaup-user-dependents', {
-        props: {},
+        props: {
+          dependents: payload.dependents,
+        },
       });
     },
   });

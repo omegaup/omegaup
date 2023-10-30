@@ -8,18 +8,14 @@
     <table class="table mb-0">
       <thead>
         <tr>
-          <th scope="col" class="text-center">U</th>
+          <th scope="col" class="text-center">#</th>
           <th scope="col" class="text-center">Usuario</th>
-          <th scope="col" class="text-center">
-            informar si la cuenta esta verificada o no
-          </th>
-          <th scope="col" class="text-center"></th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <th scope="row" class="text-center">hhhhhhhhhhhhhhhhhhhh</th>
-          <td class="text-center">jjjjjjjjjjjjjjj</td>
+        <tr v-for="(dependent, index) in dependents" :key="index">
+          <th scope="row" class="text-center">{{ index + 1 }}</th>
+          <td class="text-center">{{ dependent.name }}</td>
         </tr>
       </tbody>
     </table>
@@ -27,12 +23,14 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import { types } from '../../api_types';
 //   import * as ui from '../../ui';
 
 @Component
 export default class UserDependents extends Vue {
+  @Prop() dependents!: types.UserDependentsPayload[];
   T = T;
   // ui = ui;
 }
