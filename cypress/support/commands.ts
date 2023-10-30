@@ -69,12 +69,16 @@ Cypress.Commands.add(
     tag,
     autoCompleteTextTag,
     problemLevelIndex,
-    publicAccess = false
+    publicAccess = false,
+    firstTimeVisited = true
   }: ProblemOptions) => {
     cy.visit('/');
     // Select problem nav
     cy.get('[data-nav-problems]').click();
     cy.get('[data-nav-problems-create]').click();
+    if (firstTimeVisited) {
+      cy.get('.introjs-skipbutton').click();
+    }
     // Fill basic problem form
     cy.get('[name="title"]').type(problemAlias).blur();
 
