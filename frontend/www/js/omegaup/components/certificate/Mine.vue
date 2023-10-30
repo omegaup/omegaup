@@ -38,9 +38,10 @@
           </td>
           <td class="text-left align-middle">
             <a
-              class="btn btn-primary"
+              class="btn btn-primary download-file"
               type="button"
               :href="getDownloadLink(certificate.verification_code)"
+              :data-code="certificate.verification_code"
             >
               {{ T.certificateListMineDownload }}
             </a>
@@ -48,8 +49,9 @@
           <td class="text-left align-middle">
             <button
               v-clipboard="getVerificationLink(certificate.verification_code)"
-              class="btn btn-primary"
+              class="btn btn-primary copy-to-clipboard"
               type="button"
+              :data-code="certificate.verification_code"
             >
               {{ T.certificateListMineCopyToClipboard }}
             </button>
