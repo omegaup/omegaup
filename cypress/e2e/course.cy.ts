@@ -350,7 +350,7 @@ describe('Course Test', () => {
 
     cy.login(loginOptions[0]);
     cy.createProblem(problemOptions[0]);
-    cy.createProblem(problemOptions[1]);
+    cy.createProblem({...problemOptions[1], firstTimeVisited: false});    
     coursePage.createCourse(courseOptions);
     coursePage.addStudents(users);
     coursePage.addAssignmentWithProblems(
@@ -457,7 +457,7 @@ describe('Course Test', () => {
 
     cy.login(loginOptions[0]);
     cy.createProblem(problemOptions1[0]);
-    cy.createProblem(problemOptions2[0]);
+    cy.createProblem({...problemOptions2[0], firstTimeVisited: false});
     coursePage.createCourse(courseOptions);
     coursePage.addStudents(users);
     coursePage.addAssignmentWithProblems(

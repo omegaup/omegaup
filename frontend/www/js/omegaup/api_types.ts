@@ -3872,6 +3872,7 @@ export namespace types {
     allowUserAddTags?: boolean;
     allowedSolutionsToSee: number;
     clarifications?: types.Clarification[];
+    hasVisitedSection?: boolean;
     histogram: types.Histogram;
     levelTags?: string[];
     nominationStatus?: types.NominationStatus;
@@ -3930,6 +3931,7 @@ export namespace types {
     emailClarifications: boolean;
     extraWallTime: number | string;
     groupScorePolicy?: string;
+    hasVisitedSection?: boolean;
     inputLimit: number | string;
     languages: string;
     levelTags: string[];
@@ -4889,6 +4891,11 @@ export namespace messages {
   // Certificate
   export type CertificateGetCertificatePdfRequest = { [key: string]: any };
   export type CertificateGetCertificatePdfResponse = { certificate?: string };
+  export type CertificateGetUserCertificatesRequest = { [key: string]: any };
+  export type _CertificateGetUserCertificatesServerResponse = any;
+  export type CertificateGetUserCertificatesResponse = {
+    certificates: types.CertificateListItem[];
+  };
   export type CertificateValidateCertificateRequest = { [key: string]: any };
   export type CertificateValidateCertificateResponse = { valid: boolean };
 
@@ -5786,6 +5793,9 @@ export namespace controllers {
     getCertificatePdf: (
       params?: messages.CertificateGetCertificatePdfRequest,
     ) => Promise<messages.CertificateGetCertificatePdfResponse>;
+    getUserCertificates: (
+      params?: messages.CertificateGetUserCertificatesRequest,
+    ) => Promise<messages.CertificateGetUserCertificatesResponse>;
     validateCertificate: (
       params?: messages.CertificateValidateCertificateRequest,
     ) => Promise<messages.CertificateValidateCertificateResponse>;
