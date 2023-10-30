@@ -2700,16 +2700,16 @@ export namespace types {
     uuid: string;
   }
 
-  export interface CertificateValidationPayload {
-    certificate?: string;
-    valid: boolean;
-    verification_code: string;
-  }
-
   export interface CertificateListItem {
     certificate_type: string;
     date: Date;
     name?: string;
+    verification_code: string;
+  }
+
+  export interface CertificateValidationPayload {
+    certificate?: string;
+    valid: boolean;
     verification_code: string;
   }
 
