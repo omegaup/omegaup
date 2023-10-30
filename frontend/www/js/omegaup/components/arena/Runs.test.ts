@@ -49,11 +49,11 @@ describe('Runs.vue', () => {
         showContest: true,
         showDetails: true,
         showDisqualify: true,
-        showFilters: true,
+        showPager: true,
         showPoints: false,
         showProblem: true,
         showRejudge: true,
-        showUser: false,
+        showUser: true,
         username: null,
       },
     });
@@ -124,7 +124,7 @@ describe('Runs.vue', () => {
         showContest: true,
         showDetails: true,
         showDisqualify: true,
-        showFilters: true,
+        showPager: true,
         showPoints: false,
         showProblem: true,
         showRejudge: true,
@@ -149,7 +149,7 @@ describe('Runs.vue', () => {
         propsData: {
           contestAlias: 'admin',
           runs,
-          showFilters: true,
+          showPager: true,
         },
       });
       await wrapper
@@ -161,36 +161,36 @@ describe('Runs.vue', () => {
     });
   });
 
-  it('Should handle paginator in user view', async () => {
-    const wrapper = mount(arena_Runs, {
-      propsData: {
-        runs,
-        itemsPerPage: 2,
-      },
-    });
-
-    const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
-    expect(paginationComponent.exists()).toBe(true);
-    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(3);
-    expect(paginationComponent.vm.$data.currentPage).toBe(1);
-  });
-
-  it('Should handle paginator in admin view', async () => {
-    const wrapper = mount(arena_Runs, {
+  it('Should handle change page control', async () => {
+    const wrapper = shallowMount(arena_Runs, {
       propsData: {
         contestAlias: 'contest',
         runs,
-        showFilters: true,
-        showUser: true,
-        itemsPerPage: 1,
+        showPager: true,
+        rowCount: 2,
       },
     });
 
-    const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
-    expect(paginationComponent.exists()).toBe(true);
+    expect(
+      wrapper.find('button[data-button-page-previous]').attributes('disabled'),
+    ).toBeTruthy();
+    expect(
+      wrapper.find('button[data-button-page-next]').attributes('disabled'),
+    ).toBeFalsy();
+    expect(wrapper.find('.pager-controls').text()).toContain('1');
+    await wrapper.find('button[data-button-page-next]').trigger('click');
 
-    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(5);
-    expect(paginationComponent.vm.$data.currentPage).toBe(1);
+    expect(wrapper.emitted('filter-changed')).toEqual([
+      [{ filter: 'offset', value: '1' }],
+    ]);
+
+    expect(
+      wrapper.find('button[data-button-page-previous]').attributes('disabled'),
+    ).toBeFalsy();
+    expect(
+      wrapper.find('button[data-button-page-next]').attributes('disabled'),
+    ).toBeFalsy();
+    expect(wrapper.find('.pager-controls').text()).toContain('2');
   });
 
   it('Should handle username filter', async () => {
@@ -198,7 +198,7 @@ describe('Runs.vue', () => {
       propsData: {
         contestAlias: 'contest',
         runs,
-        showFilters: true,
+        showPager: true,
         showUser: true,
       },
     });
@@ -216,7 +216,7 @@ describe('Runs.vue', () => {
       propsData: {
         contestAlias: 'contest',
         runs,
-        showFilters: true,
+        showPager: true,
         showProblem: true,
       },
     });
@@ -309,7 +309,7 @@ describe('Runs.vue', () => {
         showContest: true,
         showDetails: true,
         showDisqualify: true,
-        showFilters: true,
+        showPager: true,
         showPoints: false,
         showProblem: true,
         showRejudge: true,
@@ -335,7 +335,7 @@ describe('Runs.vue', () => {
           showContest: true,
           showDetails: true,
           showDisqualify: true,
-          showFilters: true,
+          showPager: true,
           showPoints: false,
           showProblem: true,
           showRejudge: true,
