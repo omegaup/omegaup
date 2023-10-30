@@ -185,7 +185,7 @@
               <th v-if="showProblem">{{ T.wordsProblem }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPoints }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPenalty }}</th>
-              <th v-if="!showPoints && contestAlias == null" class="numeric">
+              <th v-if="!showPoints" class="numeric">
                 {{ T.wordsPercentage }}
               </th>
               <th v-if="contestAlias == null || simplifiedView">
@@ -318,10 +318,7 @@
               <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
               <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
               <td
-                v-if="
-                  (!showPoints && contestAlias == null) ||
-                  (!showPoints && simplifiedView)
-                "
+                v-if="!showPoints"
                 :class="statusPercentageClass(run)"
                 class="numeric"
                 data-run-percentage
