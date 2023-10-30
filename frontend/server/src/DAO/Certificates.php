@@ -10,6 +10,8 @@ namespace OmegaUp\DAO;
  * {@link \OmegaUp\DAO\VO\Certificates}.
  * @access public
  * @package docs
+ *
+ * @psalm-type CertificateListItem=array{certificate_type: string, date: \OmegaUp\Timestamp, name: null|string, verification_code: string}
  */
 class Certificates extends \OmegaUp\DAO\Base\Certificates {
     /**
@@ -140,6 +142,49 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         );
 
         return $data;
+    }
+
+    /**
+     * Gets an array of a user's certificates using the user id.
+     * @return list<CertificateListItem>
+     */
+    final public static function getUserCertificates(
+        int $userId
+    ): array {
+        $sql = '
+            SELECT
+                `Certificates`.verification_code,
+                `Certificates`.timestamp AS date,
+                `Certificates`.certificate_type,
+                IF(
+                    `Certificates`.certificate_type = "course",
+                    `Courses`.name,
+                    IF(
+                        `Certificates`.certificate_type = "contest",
+                        `Contests`.title,
+                        NULL
+                    )
+                ) AS name
+            FROM `Certificates`
+            LEFT JOIN `Courses`
+                ON `Certificates`.course_id = `Courses`.course_id
+            LEFT JOIN `Contests`
+                ON `Certificates`.contest_id = `Contests`.contest_id
+            INNER JOIN `Identities`
+                ON `Identities`.identity_id = `Certificates`.identity_id
+            INNER JOIN `Users`
+                ON `Identities`.user_id = `Users`.user_id
+            WHERE
+                `Users`.user_id = ?
+            ORDER BY `Certificates`.timestamp DESC;
+        ';
+
+        /** @var list<array{certificate_type: string, date: \OmegaUp\Timestamp, name: null|string, verification_code: string}> */
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$userId]
+        );
+        return $result;
     }
 
     /**
