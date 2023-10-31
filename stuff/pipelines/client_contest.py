@@ -27,8 +27,6 @@ import lib.logs  # pylint: disable=wrong-import-position
 def main() -> None:
     '''
     Main entrypoint for the client contest.
-
-    When API token and URL are given, it is possible to process the messages.
     '''
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)

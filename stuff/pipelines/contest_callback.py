@@ -50,7 +50,7 @@ class ContestCertificate:
 class ContestsCallback:
     '''Contests callback'''
     def __init__(self, dbconn: mysql.connector.MySQLConnection):
-        '''Contructor for contest callback'''
+        '''Constructor for contest callback'''
         self.dbconn = dbconn
 
     def __call__(self,

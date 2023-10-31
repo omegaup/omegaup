@@ -40,6 +40,8 @@ def send_contest_message_to_client(
      By default. the 2005/01/01 date will be taken.
      date-upper-limit: finish time from which to be taken the finish contests.
      By default, the current date will be taken.
+
+     When API token and URL are given, it is possible to send the messages.
     '''
     contest_producer = rabbitmq_producer.RabbitmqProducer(
         queue='client_contest',
