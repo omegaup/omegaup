@@ -24,7 +24,7 @@ import VoerroTagsInput from '@voerro/vue-tagsinput';
 import '@voerro/vue-tagsinput/dist/style.css';
 import T from '../../lang';
 import { types } from '../../api_types';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 const WAIT_TIME_FOR_SEARCH = 500;
 
