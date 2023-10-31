@@ -11,7 +11,7 @@
     :hide-input-on-limit="true"
     :only-existing-tags="onlyExistingTags"
     :typeahead-hide-discard="typeaheadHideDiscard"
-    @change="updateExistingOptions"
+    @change="debouncedSearch"
     @tag-added="onTagAdded"
     @tag-removed="onTagRemoved"
   >
@@ -24,6 +24,9 @@ import VoerroTagsInput from '@voerro/vue-tagsinput';
 import '@voerro/vue-tagsinput/dist/style.css';
 import T from '../../lang';
 import { types } from '../../api_types';
+import { debounce } from 'lodash';
+
+const WAIT_TIME_FOR_SEARCH = 1000;
 
 @Component({
   components: {
@@ -42,6 +45,9 @@ export default class Typeahead extends Vue {
 
   T = T;
   selectedOptions = this.options;
+
+  // we should wait for the user to stop typing before searching
+  debouncedSearch = debounce(this.updateExistingOptions, WAIT_TIME_FOR_SEARCH);
 
   updateExistingOptions(query: string): void {
     if (query.length < this.activationThreshold) return;
