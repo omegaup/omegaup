@@ -79,6 +79,7 @@ export class CoursePage {
       cy.get('.tags-input input[type="text"]').type(
         problemOptions[i].problemAlias,
       );
+      cy.wait(600);
       cy.get('.typeahead-dropdown li').first().click();
       cy.get('button[data-add-problem]').click();
       cy.get('[data-course-problemlist] table.table-striped').should(
@@ -121,7 +122,8 @@ export class CoursePage {
     if (courseOptions.school != undefined)
       cy.get('.tags-input input[type="text"]')
         .first()
-        .type(courseOptions.school);
+        .type(courseOptions.school)
+        .wait(600);
     cy.get('.typeahead-dropdown li').first().click();
     cy.get('textarea[data-course-new-description]')
       .should('be.visible')
@@ -279,6 +281,7 @@ export class CoursePage {
     const now = new Date();
     cy.get('[data-course-start-date]').type(getISODateTime(now));
     cy.get('.tags-input input[type="text"]').type('Sumas');
+    cy.wait(600);
     cy.get('.typeahead-dropdown li').first().click();
     cy.wait(3000);
     cy.get('button[data-add-problem]').click();
