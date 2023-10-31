@@ -25,7 +25,7 @@ describe('Typeahead.vue', () => {
 
     // FIXME: Await until the debounce is done.
     const tagsInput = wrapper.findComponent(VoerroTagsInput);
-    tagsInput.vm.$emit('change', 'query');
+    await tagsInput.vm.$emit('change', 'query');
     expect(wrapper.emitted()).toEqual({
       'update-existing-options': [['query']],
     });
