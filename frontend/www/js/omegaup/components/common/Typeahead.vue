@@ -26,7 +26,7 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import { debounce } from 'lodash';
 
-const WAIT_TIME_FOR_SEARCH = 1000;
+const WAIT_TIME_FOR_SEARCH = 500;
 
 @Component({
   components: {
