@@ -3,7 +3,7 @@
 '''Mysql queries to generate messages for contests'''
 
 import datetime
-from typing import Any, Dict, List, NamedTuple, Optional
+from typing import Dict, List, NamedTuple
 
 import mysql.connector
 import mysql.connector.cursor
@@ -13,7 +13,7 @@ import omegaup.api
 class Ranking(NamedTuple):
     '''Relevant information for ranking users.'''
     username: str
-    place: Optional[int]
+    place: str
 
 
 class ContestCertificate(NamedTuple):
@@ -22,7 +22,7 @@ class ContestCertificate(NamedTuple):
     alias: str
     scoreboard_url: str
     contest_id: int
-    ranking: List[Dict[str, Any]]
+    ranking: List[Dict[str, str]]
 
 
 def get_contests(
@@ -53,7 +53,7 @@ def get_contests(
               date_upper_limit.replace(hour=23, minute=59, second=59))
     )
     data: List[ContestCertificate] = []
-    ranking: List[Dict[str, Any]] = []
+    ranking: List[Dict[str, str]] = []
     for row in cur:
         scoreboard = client.contest.scoreboard(
             contest_alias=row['alias'],
@@ -61,7 +61,7 @@ def get_contests(
         for position in scoreboard.ranking:
             ranking.append(Ranking(
                 username=position.username,
-                place=position.place)._asdict())
+                place=f'{position.place}')._asdict())
         contest = ContestCertificate(
             certificate_cutoff=row['certificate_cutoff'],
             alias=row['alias'],

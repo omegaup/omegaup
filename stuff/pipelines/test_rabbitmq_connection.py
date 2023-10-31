@@ -16,7 +16,7 @@ import test_credentials
         ('wrong_exchange_name', False),
     ],
 )  # type: ignore
-def test_rabbitmq_connection(exchange: str, expected: bool):
+def test_rabbitmq_connection(exchange: str, expected: bool) -> None:
     '''Test rabbitmq'''
     with rabbitmq_connection.connect(
             username=test_credentials.OMEGAUP_USERNAME,

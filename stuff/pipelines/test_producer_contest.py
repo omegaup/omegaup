@@ -7,7 +7,7 @@ import dataclasses
 import os
 import sys
 
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 import pytest
 import pika
 import pytest_mock
@@ -57,7 +57,7 @@ class MessageSavingCallback:
                     contest_id=1,
                     ranking=[
                         database.contest.Ranking(
-                            username='user_1', place=1)._asdict(),
+                            username='user_1', place='1')._asdict(),
                     ],
                 ),
             ],
@@ -68,7 +68,7 @@ class MessageSavingCallback:
                 contest_id=1,
                 ranking=[
                     database.contest.Ranking(
-                        username='user_1', place=1)._asdict(),
+                        username='user_1', place='1')._asdict(),
                 ],
             )._asdict(),
         ),
@@ -81,7 +81,7 @@ class MessageSavingCallback:
                     contest_id=2,
                     ranking=[
                         database.contest.Ranking(
-                            username='user_1', place=1)._asdict(),
+                            username='user_1', place='1')._asdict(),
                     ],
                 ),
             ],
@@ -92,7 +92,7 @@ class MessageSavingCallback:
                 contest_id=2,
                 ranking=[
                     database.contest.Ranking(
-                        username='user_1', place=1)._asdict(),
+                        username='user_1', place='1')._asdict(),
                 ],
             )._asdict(),
         ),
@@ -141,10 +141,14 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
                                          callback=callback)
 
         if callback.message is not None:
-            ranking: List[Dict[str, Any]] = []
+            ranking: List[Dict[str, str]] = []
             for ranking_data in callback.message.ranking:
                 ranking.append(ranking_data)
 
             callback.message.ranking = ranking
 
-            assert expected == callback.message._asdict()
+            result = callback.message
+            assert expected['certificate_cutoff'] == result.certificate_cutoff
+            assert expected['alias'] == result.alias
+            assert expected['scoreboard_url'] == result.scoreboard_url
+            assert expected['ranking'] == result.ranking

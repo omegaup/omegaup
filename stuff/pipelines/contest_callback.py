@@ -6,7 +6,7 @@ import dataclasses
 import json
 import logging
 
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 import mysql.connector
 import mysql.connector.cursor
 from mysql.connector import errors
@@ -34,17 +34,7 @@ class ContestCertificate:
     alias: str
     scoreboard_url: str
     contest_id: int
-    ranking: List[Dict[str, Any]]
-
-    def _asdict(self) -> Dict[str, Optional[Any]]:
-        '''Convert the ContestCertificate instance to a dictionary.'''
-        return {
-            'certificate_cutoff': self.certificate_cutoff,
-            'alias': self.alias,
-            'scoreboard_url': self.scoreboard_url,
-            'contest_id': self.contest_id,
-            'ranking': list(self.ranking)
-        }
+    ranking: List[Dict[str, str]]
 
 
 class ContestsCallback:
@@ -70,8 +60,9 @@ class ContestsCallback:
 
         for user_ranking in data.ranking:
             contest_place: Optional[int] = None
-            if (data.certificate_cutoff and user_ranking.place
-                    and user_ranking.place <= data.certificate_cutoff):
+            place = int(user_ranking.place)
+            cutoff = data.certificate_cutoff
+            if (cutoff and place and place <= cutoff):
                 contest_place = user_ranking.place
             certificates.append(Certificate(
                 certificate_type='contest',

@@ -100,7 +100,7 @@ def test_insert_contest_certificate() -> None:
     for position in scoreboard.ranking:
         ranking.append(database.contest.Ranking(
             username=position.username,
-            place=position.place)._asdict())
+            place=f'{position.place}')._asdict())
     with rabbitmq_connection.connect(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
