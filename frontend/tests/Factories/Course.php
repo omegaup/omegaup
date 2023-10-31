@@ -6,7 +6,7 @@ class Course {
     /**
      * @param list<string>|null $languages
      *
-     * @return array{admin: \OmegaUp\DAO\VO\Identities, course_alias: string, request: \OmegaUp\Request}
+     * @return array{admin: \OmegaUp\DAO\VO\Identities, course_alias: string, course_name: string, request: \OmegaUp\Request}
      */
     public static function createCourse(
         \OmegaUp\DAO\VO\Identities $admin = null,
