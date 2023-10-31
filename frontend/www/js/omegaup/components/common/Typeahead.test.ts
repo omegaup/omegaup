@@ -25,7 +25,6 @@ describe('Typeahead.vue', () => {
       },
     });
 
-    // FIXME: Await until the debounce is done.
     const tagsInput = wrapper.findComponent(VoerroTagsInput);
     tagsInput.vm.$emit('change', 'query');
 
