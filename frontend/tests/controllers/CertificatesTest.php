@@ -58,14 +58,14 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
 
         //Create users
         $identities = [];
-        for ($i = 0; $i < 8; $i++) {
-            ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
+        $numOfIdentities = 8;
+        foreach (range(0, $numOfIdentities - 1) as $index) {
+            ['identity' => $identities[$index]] = \OmegaUp\Test\Factories\User::createUser();
         }
 
-        //login
         $loginIdentity = self::login($certificateGenerator);
 
-        //add role certificate generator to identity user
+        //Add role certificate generator
         \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $loginIdentity->auth_token,
             'username' => $certificateGenerator->username,
@@ -83,7 +83,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             $certificateGenerator
         );
 
-        // Create and add problems to the contest
+        //Create and add problems to the contest
         $problems = [];
         for ($i = 0; $i < 5; $i++) {
             $problems[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -94,15 +94,52 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
-        $submissions = [[0, 1, 2, 3, 4], [1], [0, 1, 2, 3], [2], [3], [0], [0, 1], [0, 1, 2]];
+        //Associate the index of the identity with
+        //the index of problems they are going to send
+        $submissions = [
+            0 => ['problems' => [
+                    ['index' => 0],
+                    ['index' => 1],
+                    ['index' => 2],
+                    ['index' => 3],
+                    ['index' => 4],
+                ]],
+            1 => ['problems' => [
+                    ['index' => 1],
+                ]],
+            2 => ['problems' => [
+                    ['index' => 0],
+                    ['index' => 1],
+                    ['index' => 2],
+                    ['index' => 3],
+                ]],
+            3 => ['problems' => [
+                    ['index' => 2],
+                ]],
+            4 => ['problems' => [
+                    ['index' => 3],
+                ]],
+            5 => ['problems' => [
+                    ['index' => 0],
+                ]],
+            6 => ['problems' => [
+                    ['index' => 0],
+                    ['index' => 1],
+                ]],
+            7 => ['problems' => [
+                    ['index' => 0],
+                    ['index' => 1],
+                    ['index' => 2],
+                ]],
+        ];
 
-        // Send submissions
-        for ($i = 0; $i < sizeof($submissions); $i++) {
-            for ($k = 0; $k < sizeof($submissions[$i]); $k++) {
+        //Send submissions
+        foreach ($submissions as $identityIndex => $problemsOfIdentity) {
+            foreach ($problemsOfIdentity['problems'] as $submission) {
                 $run = \OmegaUp\Test\Factories\Run::createRun(
-                    $problems[$submissions[$i][$k]],
+                    $problems[$submission['index']],
                     $contestData,
-                    $identities[$i]
+                    $identities[$identityIndex]
                 );
                 \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
             }
@@ -118,7 +155,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        // Assert status of new contest
+        //Assert status of new contest
         $this->assertSame('ok', $response['status']);
 
         $contest = \OmegaUp\DAO\Contests::getByAlias(
