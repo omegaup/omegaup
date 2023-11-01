@@ -10,6 +10,8 @@ import {
   Status,
 } from './types';
 
+const MAX_TIMEOUT_TO_WAIT = 10000;
+
 // Logins the user given a username and password
 Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
   const URL =
@@ -233,7 +235,9 @@ Cypress.Commands.add('addProblemsToContest', ({ contestAlias, problems }) => {
 
   for (const idx in problems) {
     cy.get('.tags-input input[type="text"]').type(problems[idx].problemAlias);
-    cy.wait('@listForTypeahead').its('response.statusCode').should('eq', 200);
+    cy.wait(['@listForTypeahead'], { timeout: MAX_TIMEOUT_TO_WAIT })
+      .its('response.statusCode')
+      .should('eq', 200);
     cy.get('.typeahead-dropdown li').first().click();
     cy.get('.add-problem').click();
   }
@@ -288,7 +292,7 @@ Cypress.Commands.add(
       const expectedStatus: Status = runs[idx].status;
       cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
 
-      cy.wait(['@runStatus'], { timeout: 10000 })
+      cy.wait(['@runStatus'], { timeout: MAX_TIMEOUT_TO_WAIT })
         .its('response.statusCode')
         .should('eq', 200);
       cy.get('[data-run-status] > span')
