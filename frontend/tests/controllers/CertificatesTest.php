@@ -54,25 +54,21 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testConnectionRabbitMQ() {
         //Create user
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $certificateGenerator] = \OmegaUp\Test\Factories\User::createUser();
 
         //Create users
-        ['identity' => $test1] = \OmegaUp\Test\Factories\User::createUser();
-        ['identity' => $test2] = \OmegaUp\Test\Factories\User::createUser();
-        ['identity' => $test3] = \OmegaUp\Test\Factories\User::createUser();
-        ['identity' => $test4] = \OmegaUp\Test\Factories\User::createUser();
-        ['identity' => $test5] = \OmegaUp\Test\Factories\User::createUser();
-        ['identity' => $test6] = \OmegaUp\Test\Factories\User::createUser();
-        ['identity' => $test7] = \OmegaUp\Test\Factories\User::createUser();
-        ['identity' => $test8] = \OmegaUp\Test\Factories\User::createUser();
+        $identities = [];
+        for ($i = 0; $i < 8; $i++) {
+            ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
+        }
 
         //login
-        $loginIdentity = self::login($identity);
+        $loginIdentity = self::login($certificateGenerator);
 
         //add role certificate generator to identity user
         \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $loginIdentity->auth_token,
-            'username' => $identity->username,
+            'username' => $certificateGenerator->username,
             'role' => 'CertificateGenerator'
         ]));
 
@@ -82,88 +78,34 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
 
-        // Create problems
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contestData,
+            $certificateGenerator
+        );
+
+        // Create and add problems to the contest
         $problems = [];
         for ($i = 0; $i < 5; $i++) {
-            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
-        }
+            $problems[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        // Add problems to the contest
-        for ($i = 0; $i < 5; $i++) {
             \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problems[$i],
                 $contestData
             );
         }
 
-        /// send submissions test1
-        for ($i = 0; $i < 5; $i++) {
-            $run = \OmegaUp\Test\Factories\Run::createRun(
-                $problems[$i],
-                $contestData,
-                $test1
-            );
-            \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
-        }
-        /// send submissions test2
-        $run = \OmegaUp\Test\Factories\Run::createRun(
-            $problems[1],
-            $contestData,
-            $test2
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
+        $submissions = [[0, 1, 2, 3, 4], [1], [0, 1, 2, 3], [2], [3], [0], [0, 1], [0, 1, 2]];
 
-        /// send submissions test3
-        for ($i = 0; $i < 4; $i++) {
-            $run = \OmegaUp\Test\Factories\Run::createRun(
-                $problems[$i],
-                $contestData,
-                $test3
-            );
-            \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
-        }
-
-        /// send submissions test4
-        $run = \OmegaUp\Test\Factories\Run::createRun(
-            $problems[2],
-            $contestData,
-            $test4
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
-
-        /// send submissions test5
-        $run = \OmegaUp\Test\Factories\Run::createRun(
-            $problems[3],
-            $contestData,
-            $test5
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
-
-        /// send submissions test6
-        $run = \OmegaUp\Test\Factories\Run::createRun(
-            $problems[0],
-            $contestData,
-            $test6
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
-
-        /// send submissions test7
-        for ($i = 0; $i < 2; $i++) {
-            $run = \OmegaUp\Test\Factories\Run::createRun(
-                $problems[$i],
-                $contestData,
-                $test7
-            );
-            \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
-        }
-        /// send submissions test8
-        for ($i = 0; $i < 3; $i++) {
-            $run = \OmegaUp\Test\Factories\Run::createRun(
-                $problems[$i],
-                $contestData,
-                $test8
-            );
-            \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
+        // Send submissions
+        for ($i = 0; $i < sizeof($submissions); $i++) {
+            for ($k = 0; $k < sizeof($submissions[$i]); $k++) {
+                $run = \OmegaUp\Test\Factories\Run::createRun(
+                    $problems[$submissions[$i][$k]],
+                    $contestData,
+                    $identities[$i]
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
+            }
         }
 
         $certificatesCutoff = 4;
