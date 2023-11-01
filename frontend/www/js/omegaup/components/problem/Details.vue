@@ -480,7 +480,7 @@ export default class ProblemDetails extends Vue {
   feedbackMap!: Map<number, ArenaCourseFeedback>;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
-  @Prop({ default: false }) useNewVerdictTable: boolean;
+  @Prop({ default: false }) useNewVerdictTable!: boolean;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 

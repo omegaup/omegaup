@@ -9,7 +9,7 @@ import arena_Runs_v3 from './Runsv3.vue';
 
 describe('Runsv3.vue', () => {
   it('Should handle empty runs', () => {
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs_v3, {
       propsData: {
         contestAlias: 'admin',
         runs: [],
