@@ -103,6 +103,12 @@ class ContestsCallback:
                     self.dbconn.rollback()
                     if err.errno != errorcode.ER_DUP_ENTRY:
                         raise
+                    if err.msg.find('Certificates.contest_identity_key') > 0:
+                        logging.exception(
+                            'At least one certificate for this contest is '
+                            'duplicated'
+                        )
+                        break
                     for certificate in certificates:
                         certificate.verification_code = generate_contest_code()
                     logging.exception(

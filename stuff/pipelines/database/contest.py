@@ -25,11 +25,54 @@ class ContestCertificate(NamedTuple):
     ranking: List[Dict[str, str]]
 
 
+class UserContestCertificate(NamedTuple):
+    '''Relevant information for user contest certificates.'''
+    username: str
+    contest_id: str
+
+
+def get_all_certificates_for_contests(
+    *,
+    cur: mysql.connector.cursor.MySQLCursorDict
+) -> List[UserContestCertificate]:
+    '''
+    Get all certificates previously registered in order to avoid duplicated
+    entries for a user contest
+    '''
+
+    cur.execute(
+        '''
+        SELECT
+            i.username,
+            c.contest_id
+        FROM
+            Certificates ce
+        INNER JOIN
+            Contests c
+        ON
+            c.contest_id = ce.contest_id
+        INNER JOIN
+            Identities i
+        ON
+            i.identity_id = ce.identity_id;
+        ''')
+
+    data: List[UserContestCertificate] = []
+    for row in cur:
+        user_contest = UserContestCertificate(
+            username=row['username'],
+            contest_id=row['contest_id'],
+        )
+        data.append(user_contest)
+    return data
+
+
 def get_contests(
         *,
         cur: mysql.connector.cursor.MySQLCursorDict,
         date_lower_limit: datetime.datetime,
         date_upper_limit: datetime.datetime,
+        certificates: List[UserContestCertificate],
         client: omegaup.api.Client,
 ) -> List[ContestCertificate]:
     '''Get contests information'''
@@ -58,7 +101,17 @@ def get_contests(
         scoreboard = client.contest.scoreboard(
             contest_alias=row['alias'],
             token=row['scoreboard_url'])
+        users_contest: List[UserContestCertificate] = [
+            certificate for certificate in certificates
+            if certificate.contest_id == row['contest_id']
+        ]
         for position in scoreboard.ranking:
+            existing_certificates = [
+                record for record in users_contest
+                if record.username == position.username
+            ]
+            if len(existing_certificates) > 0:
+                continue
             ranking.append(Ranking(
                 username=position.username,
                 place=f'{position.place}')._asdict())

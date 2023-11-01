@@ -70,10 +70,13 @@ def get_contests_from_db(
     client: omegaup.api.Client
 ) -> List[database.contest.ContestCertificate]:
     ''''A intermediate function in order to mock the original one'''
+    certificates = database.contest.get_all_certificates_for_contests(cur=cur)
+
     return database.contest.get_contests(
         cur=cur,
         date_lower_limit=date_lower_limit,
         date_upper_limit=date_upper_limit,
+        certificates=certificates,
         client=client,
     )
 
