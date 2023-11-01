@@ -40,6 +40,16 @@ OmegaUp.on('ready', async () => {
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
 
   const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
+
+  const useNewVerdictTable =
+    new URLSearchParams(window.location.hash.substring(1)).get(
+      'useNewVerdictTable',
+    ) === 'true';
+
+  if (window.location.hash.startsWith('#useNewVerdictTable')) {
+    history.replaceState(null, '', window.location.pathname);
+  }
+
   const searchResultEmpty: types.ListItem[] = [];
   let runDetails: null | types.RunDetails = null;
   try {
@@ -114,6 +124,7 @@ OmegaUp.on('ready', async () => {
           searchResultProblems: this.searchResultProblems,
           problemAlias: payload.problem.alias,
           totalRuns: runsStore.state.totalRuns,
+          useNewVerdictTable: useNewVerdictTable,
         },
         on: {
           'show-run': (request: SubmissionRequest) => {
