@@ -226,13 +226,15 @@ Cypress.Commands.add('addProblemsToContest', ({ contestAlias, problems }) => {
   cy.visit(`contest/${contestAlias}/edit/`);
   cy.get('a[data-nav-contest-edit]').click();
   cy.get('a.dropdown-item.problems').click();
+  cy.intercept({
+    method: 'POST',
+    url: '/api/problem/listForTypeahead/',
+  }).as('listForTypeahead');
 
   for (const idx in problems) {
     cy.get('.tags-input input[type="text"]').type(problems[idx].problemAlias);
-    cy.waitUntil(() =>
-      cy.get('.typeahead-dropdown li').should('exist').first().click(),
-    );
-    // cy.get('.typeahead-dropdown li').first().click();
+    cy.wait('@listForTypeahead').its('response.statusCode').should('eq', 200);
+    cy.get('.typeahead-dropdown li').first().click();
     cy.get('.add-problem').click();
   }
 });
