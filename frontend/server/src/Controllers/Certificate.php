@@ -7,6 +7,7 @@ use setasign\Fpdi\Fpdi;
  * CertificateController
 
  * @psalm-type CertificateDetailsPayload=array{uuid: string}
+ * @psalm-type CertificateListItem=array{certificate_type: string, date: \OmegaUp\Timestamp, name: null|string, verification_code: string}
  */
 class Certificate extends \OmegaUp\Controllers\Controller {
     /**
@@ -418,6 +419,27 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return list<CertificateListItem>
+     */
+    private static function getUserCertificates(
+        \OmegaUp\DAO\VO\Identities $identity,
+        int $userId
+    ): array {
+        if (
+            $identity->user_id !== $userId &&
+            !\OmegaUp\Authorization::isSystemAdmin($identity)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return \OmegaUp\DAO\Certificates::getUserCertificates(
+            $userId
+        );
+    }
+
+    /**
      * API to generate the certificate PDF
      *
      * @return array{certificate: string|null}
@@ -456,6 +478,27 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         }
         return [
             'certificate' => null,
+        ];
+    }
+
+    /**
+     * Get all the certificates belonging to a user
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{certificates: list<CertificateListItem>}
+     *
+     * @omegaup-request-param int|null $user_id
+     */
+    public static function apiGetUserCertificates(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        $r->ensureMainUserIdentity();
+
+        return [
+            'certificates' => self::getUserCertificates(
+                $r->identity,
+                $r->ensureInt('user_id')
+            ),
         ];
     }
 
