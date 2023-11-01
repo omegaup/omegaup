@@ -141,9 +141,9 @@ Cypress.Commands.add(
       cy.get('[name="end-date"]').should('be.disabled');
     }
     cy.get('.tags-input input[type="text"]').first().type(school); // If we use the data attribute, the autocomplete makes multiple elements
-    // wait until the autocomplete is visible
-    cy.wait(600);
-    cy.get('.typeahead-dropdown li').first().click();
+    cy.waitUntil(() =>
+      cy.get('.typeahead-dropdown li').should('exist').first().click(),
+    );
     cy.get('[name="basic-information"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
       .eq(basicInformation ? 0 : 1)
       .click();
@@ -229,8 +229,10 @@ Cypress.Commands.add('addProblemsToContest', ({ contestAlias, problems }) => {
 
   for (const idx in problems) {
     cy.get('.tags-input input[type="text"]').type(problems[idx].problemAlias);
-    cy.wait(600);
-    cy.get('.typeahead-dropdown li').first().click();
+    cy.waitUntil(() =>
+      cy.get('.typeahead-dropdown li').should('exist').first().click(),
+    );
+    // cy.get('.typeahead-dropdown li').first().click();
     cy.get('.add-problem').click();
   }
 });
