@@ -456,7 +456,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
         $contestID = $r->ensureInt('contest_id');
 
-        // obtain the contest
         $contest = \OmegaUp\DAO\Contests::getByPK($contestID);
 
         if (
@@ -475,18 +474,21 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
-        // check whether the logged user is a certificate generator
-        if (!\OmegaUp\Authorization::isCertificateGenerator($r->identity)) {
+        // check whether the logged user is a certificate generator and a contest admin
+        if (
+            !\OmegaUp\Authorization::isCertificateGenerator($r->identity) ||
+            !\OmegaUp\Authorization::isContestAdmin($r->identity, $contest)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         if ($contest->certificates_status !== 'uninitiated' && $contest->certificates_status !== 'retryable_error') {
-            return ['status' => 'ok'];
+            return ['status' => 'error'];
         }
 
         $certificateCutoff = $r->ensureOptionalInt('certificates_cutoff');
 
-        // add certificates_cutoff value to the course
+        // add certificates_cutoff value to the contest
         if (!is_null($certificateCutoff)) {
             $contest->certificate_cutoff = $certificateCutoff;
         }

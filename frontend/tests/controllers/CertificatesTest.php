@@ -28,6 +28,11 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contestData,
+            $identity
+        );
+
         $certificatesCutoff = 3;
 
         $response = \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
@@ -46,5 +51,43 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals(3, $contest->certificate_cutoff);
+    }
+
+    /**
+     * Try to generate certificates in a contest as a certificate generator
+     * but not as a contest admin
+     *
+     */
+    public function testGenerateContestCertificatesOnlyAsCertificateGenerator() {
+        //Create user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $loginIdentity = self::login($identity);
+
+        //add role certificate generator to identity user
+        \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
+            'auth_token' => $loginIdentity->auth_token,
+            'username' => $identity->username,
+            'role' => 'CertificateGenerator'
+        ]));
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'alias' => 'pasado',
+            ])
+        );
+
+        $certificatesCutoff = 3;
+
+        try {
+            \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
+                new \OmegaUp\Request([
+                    'auth_token' => $loginIdentity->auth_token,
+                    'contest_id' => $contestData['contest']->contest_id,
+                    'certificates_cutoff' => $certificatesCutoff
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
     }
 }
