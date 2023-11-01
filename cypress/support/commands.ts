@@ -225,20 +225,32 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('addProblemsToContest', ({ contestAlias, problems }) => {
+  cy.log(`Adding problems to contest ${contestAlias}`);
   cy.visit(`contest/${contestAlias}/edit/`);
   cy.get('a[data-nav-contest-edit]').click();
   cy.get('a.dropdown-item.problems').click();
+  cy.waitUntil(() => cy.get('.tags-input').should('be.visible'));
+
   cy.intercept({
     method: 'POST',
     url: '/api/problem/listForTypeahead/',
-  }).as('listForTypeahead');
+    times: problems.length,
+  }).as('problemListForTypeahead');
 
   for (const idx in problems) {
+    // print the problem alias
+    cy.log(`Adding problem ${problems[idx].problemAlias}`);
     cy.get('.tags-input input[type="text"]').type(problems[idx].problemAlias);
-    cy.wait(['@listForTypeahead'], { timeout: MAX_TIMEOUT_TO_WAIT })
+    cy.debug();
+    cy.wait(200);
+    // After the user types, we should wait until the autocomplete is visible
+
+    cy.wait(['@problemListForTypeahead'], { timeout: MAX_TIMEOUT_TO_WAIT * 10 })
       .its('response.statusCode')
       .should('eq', 200);
+
     cy.get('.typeahead-dropdown li').first().click();
+
     cy.get('.add-problem').click();
   }
 });
