@@ -1871,4 +1871,4 @@ const translations: { [key: string]: string; } = {
   wordsYes: "Yes",
 };
 
-export { translations as default };
+export {translations as default};
