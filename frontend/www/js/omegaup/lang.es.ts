@@ -350,7 +350,7 @@ const translations: { [key: string]: string; } = {
   contestNewFormScoreboardTimePercent: "\u00bfCu\u00e1nto tiempo se mostrar\u00e1 el Scoreboard? (%)",
   contestNewFormScoreboardTimePercentDesc: "Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard ser\u00e1 visible.",
   contestNewFormShortTitleAlias: "Titulo corto (alias)",
-  contestNewFormShortTitleAliasDesc: "El t\u00edtulo corto se usa para construir la URL del concurso (ejemplos: ANPA2010, CONACUP2012, OMI2013, etc..). No puede contener espacios",
+  contestNewFormShortTitleAliasDesc: "El t\u00edtulo corto se usa para construir la URL del concurso (ejemplos: CodingCup2023, OFMI2024, CopaCentroAmericana2024, etc..). No puede contener espacios",
   contestNewFormStartDate: "Fecha de Inicio",
   contestNewFormStartDateDesc: "La fecha (en hora local) en la que inicia el concurso.",
   contestNewFormSubmissionsSeparation: "Separaci\u00f3n de env\u00edos",
