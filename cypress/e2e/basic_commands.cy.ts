@@ -75,7 +75,6 @@ describe('Basic Commands Test', () => {
   it('Should create a problem', () => {
     const loginOptions = loginPage.registerMultipleUsers(1);
     const problemOptions = contestPage.generateProblemOptions(1);
-
     cy.login(loginOptions[0]);
     cy.createProblem(problemOptions[0]);
     coursePage.verifyProblem(problemOptions[0]);
@@ -132,10 +131,10 @@ describe('Basic Commands Test', () => {
     cy.logout();
   });
 
-  it('Should create two contest and merge their scoreboard', () => {
+  it('Should create two contests and merge their scoreboard', () => {
     const loginOptions = loginPage.registerMultipleUsers(4);
     const contestOptions1 = contestPage.generateContestOptions(loginOptions[1]);
-    const contestOptions2 = contestPage.generateContestOptions(loginOptions[2]);
+    const contestOptions2 = contestPage.generateContestOptions(loginOptions[2], false);
     const users1 = [loginOptions[0].username, loginOptions[3].username];
     const users2 = [loginOptions[3].username];
 
@@ -156,7 +155,7 @@ describe('Basic Commands Test', () => {
     cy.logout();
 
     cy.login(loginOptions[2]);
-    contestPage.createContest(contestOptions2, users2);
+    contestPage.createContest(contestOptions2, users2, false);
     cy.logout();
 
     cy.login(loginOptions[3]);

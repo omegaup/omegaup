@@ -69,12 +69,16 @@ Cypress.Commands.add(
     tag,
     autoCompleteTextTag,
     problemLevelIndex,
-    publicAccess = false
+    publicAccess = false,
+    firstTimeVisited = true
   }: ProblemOptions) => {
     cy.visit('/');
     // Select problem nav
     cy.get('[data-nav-problems]').click();
     cy.get('[data-nav-problems-create]').click();
+    if (firstTimeVisited) {
+      cy.get('.introjs-skipbutton').click();
+    }
     // Fill basic problem form
     cy.get('[name="title"]').type(problemAlias).blur();
 
@@ -186,8 +190,11 @@ Cypress.Commands.add(
     requestParticipantInformation = 'no',
     differentStart = false,
     differentStartTime = "",
-  }) => {
+  },shouldShowIntro: boolean = true) => {
     cy.visit('contest/new/');
+    if (shouldShowIntro) {
+      cy.get('.introjs-skipbutton').click();
+    }
     cy.get('[name="title"]').type(contestAlias);
     cy.get('[name="alias"]').type(contestAlias);
     cy.get('[name="description"]').type(description);

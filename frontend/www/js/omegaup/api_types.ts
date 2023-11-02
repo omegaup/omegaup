@@ -2692,6 +2692,13 @@ export namespace types {
     uuid: string;
   }
 
+  export interface CertificateListItem {
+    certificate_type: string;
+    date: Date;
+    name?: string;
+    verification_code: string;
+  }
+
   export interface Clarification {
     answer?: string;
     assignment_alias?: string;
@@ -3024,6 +3031,7 @@ export namespace types {
   }
 
   export interface ContestNewPayload {
+    hasVisitedSection?: boolean;
     languages: { [key: string]: string };
   }
 
@@ -3412,6 +3420,7 @@ export namespace types {
     is_under_13_user: boolean;
     loginIdentity?: dao.Identities;
     user?: dao.Users;
+    user_verification_deadline?: Date;
     valid: boolean;
   }
 
@@ -3836,7 +3845,9 @@ export namespace types {
   export interface ProblemDetailsPayload {
     allRuns?: types.Run[];
     allowUserAddTags?: boolean;
+    allowedSolutionsToSee: number;
     clarifications?: types.Clarification[];
+    hasVisitedSection?: boolean;
     histogram: types.Histogram;
     levelTags?: string[];
     nominationStatus?: types.NominationStatus;
@@ -3895,6 +3906,7 @@ export namespace types {
     emailClarifications: boolean;
     extraWallTime: number | string;
     groupScorePolicy?: string;
+    hasVisitedSection?: boolean;
     inputLimit: number | string;
     languages: string;
     levelTags: string[];
@@ -4853,7 +4865,14 @@ export namespace messages {
 
   // Certificate
   export type CertificateGetCertificatePdfRequest = { [key: string]: any };
-  export type CertificateGetCertificatePdfResponse = { certificate: string };
+  export type CertificateGetCertificatePdfResponse = { certificate?: string };
+  export type CertificateGetUserCertificatesRequest = { [key: string]: any };
+  export type _CertificateGetUserCertificatesServerResponse = any;
+  export type CertificateGetUserCertificatesResponse = {
+    certificates: types.CertificateListItem[];
+  };
+  export type CertificateValidateCertificateRequest = { [key: string]: any };
+  export type CertificateValidateCertificateResponse = { valid: boolean };
 
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
@@ -4885,7 +4904,7 @@ export namespace messages {
   export type ContestAddGroupAdminRequest = { [key: string]: any };
   export type ContestAddGroupAdminResponse = {};
   export type ContestAddProblemRequest = { [key: string]: any };
-  export type ContestAddProblemResponse = {};
+  export type ContestAddProblemResponse = { solutionStatus: string };
   export type ContestAddUserRequest = { [key: string]: any };
   export type ContestAddUserResponse = {};
   export type ContestAdminDetailsRequest = { [key: string]: any };
@@ -5063,7 +5082,7 @@ export namespace messages {
   export type CourseAddGroupTeachingAssistantRequest = { [key: string]: any };
   export type CourseAddGroupTeachingAssistantResponse = {};
   export type CourseAddProblemRequest = { [key: string]: any };
-  export type CourseAddProblemResponse = {};
+  export type CourseAddProblemResponse = { solutionStatus: string };
   export type CourseAddStudentRequest = { [key: string]: any };
   export type CourseAddStudentResponse = {};
   export type CourseAddTeachingAssistantRequest = { [key: string]: any };
@@ -5749,6 +5768,12 @@ export namespace controllers {
     getCertificatePdf: (
       params?: messages.CertificateGetCertificatePdfRequest,
     ) => Promise<messages.CertificateGetCertificatePdfResponse>;
+    getUserCertificates: (
+      params?: messages.CertificateGetUserCertificatesRequest,
+    ) => Promise<messages.CertificateGetUserCertificatesResponse>;
+    validateCertificate: (
+      params?: messages.CertificateValidateCertificateRequest,
+    ) => Promise<messages.CertificateValidateCertificateResponse>;
   }
 
   export interface Clarification {
