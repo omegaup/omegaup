@@ -418,6 +418,11 @@ import {
   faSearchPlus,
   faExternalLinkAlt,
   faTimes,
+  faDatabase,
+  faClock,
+  faCalendarAlt,
+  faCheckCircle,
+  faTimesCircle,
 } from '@fortawesome/free-solid-svg-icons';
 library.add(faQuestionCircle);
 library.add(faRedoAlt);
@@ -425,12 +430,45 @@ library.add(faBan);
 library.add(faSearchPlus);
 library.add(faExternalLinkAlt);
 library.add(faTimes);
+library.add(faDatabase);
+library.add(faClock);
+library.add(faCalendarAlt);
+library.add(faCheckCircle);
+library.add(faTimesCircle);
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface JQuery {
     popover(action: string): JQuery;
   }
+}
+
+export enum MemoryStatus {
+  NotAvailable = 'MEMORY_NOT_AVAILABLE',
+  Exceeded = 'MEMORY_EXCEEDED',
+}
+export enum RuntimeStatus {
+  NotAvailable = 'RUNTIME_NOT_AVAILABLE',
+  Exceeded = 'RUNTIME_EXCEEDED',
+}
+export enum ExecutionStatus {
+  JudgeError = 'EXECUTION_JUDGE_ERROR',
+  ValidatorError = 'EXECUTION_VALIDATOR_ERROR',
+  CompilationError = 'EXECUTION_COMPILATION_ERROR',
+  RuntimeFunctionError = 'EXECUTION_RUNTIME_FUNCTION_ERROR',
+  RuntimeError = 'EXECUTION_RUNTIME_ERROR',
+  Interrupted = 'EXECUTION_INTERRUPTED',
+}
+export enum NumericOutputStatus {
+  None = 0,
+  Correct = 1,
+  Incorrect = 2,
+  Interrupted = 3,
+}
+export enum StringOutputStatus {
+  Exceeded = 'OUTPUT_EXCEEDED',
+  Incorrect = 'OUTPUT_INCORRECT',
+  Interrupted = 'OUTPUT_INTERRUPTED',
 }
 
 export enum PopupDisplayed {
@@ -478,6 +516,7 @@ export default class Runs extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
 
+  NumericOutputStatus = NumericOutputStatus;
   PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
@@ -492,9 +531,14 @@ export default class Runs extends Vue {
   filters: { name: string; value: string }[] = [];
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
+  newFieldsDate: Date = new Date('2023-10-22');
 
   get currentPage(): number {
     return this.filterOffset + 1;
+  }
+
+  getShortGuid(guid: string): string {
+    return guid.substring(0, 8);
   }
 
   get filteredRuns(): types.Run[] {
@@ -566,19 +610,13 @@ export default class Runs extends Vue {
 
   memory(run: types.Run): string {
     if (
-      run.status == 'ready' &&
-      run.verdict != 'JE' &&
-      run.verdict != 'VE' &&
-      run.verdict != 'CE'
-    ) {
-      let prefix = '';
-      if (run.verdict == 'MLE') {
-        prefix = '>';
-      }
-      return `${prefix}${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
-    } else {
+      run.status !== 'ready' ||
+      run.status_memory === MemoryStatus.NotAvailable
+    )
       return '—';
-    }
+    if (run.status_memory === MemoryStatus.Exceeded)
+      return T.runDetailsMemoryExceeded;
+    return `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
   }
 
   penalty(run: types.Run): string {
@@ -620,18 +658,98 @@ export default class Runs extends Vue {
 
   runtime(run: types.Run): string {
     if (
-      run.status == 'ready' &&
-      run.verdict != 'JE' &&
-      run.verdict != 'VE' &&
-      run.verdict != 'CE'
+      run.status !== 'ready' ||
+      run.status_runtime === RuntimeStatus.NotAvailable
     ) {
-      let prefix = '';
-      if (run.verdict == 'TLE') {
-        prefix = '>';
-      }
-      return `${prefix}${(run.runtime / 1000).toFixed(2)} s`;
+      return '—';
     }
-    return '—';
+
+    if (run.status_runtime === RuntimeStatus.Exceeded) {
+      return T.runDetailsExceeded;
+    }
+
+    return `${(run.runtime / 1000).toFixed(2)} s`;
+  }
+
+  execution(run: types.Run): string {
+    if (run.time < this.newFieldsDate) {
+      return T.runDetailsNotAvailable;
+    }
+
+    if (run.status !== 'ready') {
+      return '—';
+    }
+
+    switch (run.execution) {
+      case ExecutionStatus.JudgeError:
+        return T.runDetailsJudgeError;
+      case ExecutionStatus.ValidatorError:
+        return T.runDetailsValidatorError;
+      case ExecutionStatus.CompilationError:
+        return T.runDetailsCompilationError;
+      case ExecutionStatus.RuntimeFunctionError:
+        return T.runDetailsRuntimeFunctionError;
+      case ExecutionStatus.RuntimeError:
+        return T.runDetailsRuntimeError;
+      case ExecutionStatus.Interrupted:
+        return T.runDetailsInterrupted;
+      default:
+        return T.runDetailsFinished;
+    }
+  }
+
+  output(run: types.Run): string {
+    if (run.time < this.newFieldsDate) {
+      return T.runDetailsNotAvailable;
+    }
+
+    if (run.status !== 'ready') {
+      return '—';
+    }
+
+    switch (run.output) {
+      case StringOutputStatus.Exceeded:
+        return T.runDetailsExceeded;
+      case StringOutputStatus.Incorrect:
+        return T.runDetailsIncorrect;
+      case StringOutputStatus.Interrupted:
+        return T.runDetailsInterrupted;
+      default:
+        return T.runDetailsCorrect;
+    }
+  }
+
+  statusPercentageClass(run: types.Run): string {
+    if (run.status !== 'ready') return '';
+
+    if (run.verdict == 'JE' || run.verdict == 'VE') return 'status-je-ve';
+
+    if (run.verdict == 'CE') return 'status-ce';
+
+    if (run.type === 'disqualified') return 'status-disqualified';
+
+    const scorePercentage = (run.score * 100).toFixed(2);
+
+    if (scorePercentage !== '100.00') return '';
+
+    return 'status-ac';
+  }
+
+  outputIconColorStatus(run: types.Run): number {
+    if (
+      !(run.status === 'ready' && run.output !== StringOutputStatus.Exceeded) ||
+      run.time < this.newFieldsDate
+    ) {
+      return NumericOutputStatus.None;
+    }
+
+    if (run.output === StringOutputStatus.Incorrect) {
+      return NumericOutputStatus.Incorrect;
+    } else if (run.output === StringOutputStatus.Interrupted) {
+      return NumericOutputStatus.Interrupted;
+    }
+
+    return NumericOutputStatus.Correct;
   }
 
   showVerdictHelp(ev: Event): void {
