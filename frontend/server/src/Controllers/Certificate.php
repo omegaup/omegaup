@@ -482,7 +482,12 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        if ($contest->certificates_status !== 'uninitiated' && $contest->certificates_status !== 'retryable_error') {
+        // check that the contest has ended and the certificate can be generated
+        if (
+            $contest->finish_time->time > \OmegaUp\Time::get() ||
+            ($contest->certificates_status !== 'uninitiated' &&
+            $contest->certificates_status !== 'retryable_error')
+        ) {
             return ['status' => 'error'];
         }
 
@@ -509,7 +514,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $routingKey = 'ContestQueue';
         $exchange = 'certificates';
 
-        //connection to rabbitmq
+        // connection to rabbitmq
         $channel = \OmegaUp\RabbitMQConnection::getInstance()->channel();
 
         $channel->exchange_declare(
@@ -532,7 +537,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $scoreboard['ranking']
         );
 
-        // Prepare the meessage
+        // prepare the message
         $messageArray = [
             'certificate_cutoff' => $contestExtraInformation['certificate_cutoff'],
             'alias' => $contestExtraInformation['alias'],

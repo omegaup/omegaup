@@ -22,9 +22,14 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             'role' => 'CertificateGenerator'
         ]));
 
+        $currentTime = \OmegaUp\Time::get();
+        $timePast1 =  new \OmegaUp\Timestamp($currentTime - 120 * 60);
+        $timePast2 =  new \OmegaUp\Timestamp($currentTime - 60 * 60);
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'alias' => 'pasado',
+                'startTime' => $timePast1,
+                'finishTime' => $timePast2,
             ])
         );
 
