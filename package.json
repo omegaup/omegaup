@@ -150,6 +150,7 @@
     "build-development-frontend": "cross-env webpack --config-name=frontend --mode=development",
     "refactor": "cross-env ./stuff/refactor.js",
     "test:e2e": "cypress run --browser chrome",
+    "test:e2e:watch": "cypress open",
     "storybook": "storybook dev -p 6006"
   }
 }
