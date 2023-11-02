@@ -1729,7 +1729,6 @@ const translations: { [key: string]: string; } = {
   wordsEndTimeContest: "(End 7im3)",
   wordsEnglish: "(Eng1i5h)",
   wordsExam: "(Exam)",
-  wordsExecution: "(Ex3cu7i0n)",
   wordsExperiments: "(Exp3rim3n75)",
   wordsExtraWallTimeMs: "(Ex7ra 7im3 f0r 1ibin73rac7iv3 (m5))",
   wordsFeedback: "(F33dback)",

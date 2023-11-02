@@ -1729,7 +1729,6 @@ const translations: { [key: string]: string; } = {
   wordsEndTimeContest: "Hora de t\u00e9rmino",
   wordsEnglish: "Ingl\u00eas",
   wordsExam: "Prova",
-  wordsExecution: "Execu\u00e7\u00e3o",
   wordsExperiments: "Experimentos",
   wordsExtraWallTimeMs: "Tempo extra para libinteractive (ms)",
   wordsFeedback: "Feedback sobre envios",
