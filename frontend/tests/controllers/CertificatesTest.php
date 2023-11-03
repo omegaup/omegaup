@@ -91,8 +91,55 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
                     'certificates_cutoff' => $certificatesCutoff
                 ])
             );
+            $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertSame('userNotAllowed', $e->getMessage());
         }
+    }
+
+    /**
+     * Try to generate certificates in a contest that hasn't ended
+     *
+     */
+    public function testGenerateCurrentContestCertificates() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $loginIdentity = self::login($identity);
+
+        //add role certificate generator to identity user
+        \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
+            'auth_token' => $loginIdentity->auth_token,
+            'username' => $identity->username,
+            'role' => 'CertificateGenerator'
+        ]));
+
+        //create a contest that hasn't ended
+        $currentTime = \OmegaUp\Time::get();
+        $timePast =  new \OmegaUp\Timestamp($currentTime - 60 * 60);
+        $timeFuture =  new \OmegaUp\Timestamp($currentTime + 60 * 60);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'alias' => 'pasado',
+                'startTime' => $timePast,
+                'finishTime' => $timeFuture,
+            ])
+        );
+
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contestData,
+            $identity
+        );
+
+        $certificatesCutoff = 3;
+
+        $response = \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
+            new \OmegaUp\Request([
+                'auth_token' => $loginIdentity->auth_token,
+                'contest_id' => $contestData['contest']->contest_id,
+                'certificates_cutoff' => $certificatesCutoff
+            ])
+        );
+
+        $this->assertSame('error', $response['status']);
     }
 }
