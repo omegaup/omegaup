@@ -35,13 +35,17 @@ class Certificate extends \OmegaUp\Controllers\Controller {
      */
     public static function getCertificateListMineForTypeScript(\OmegaUp\Request $r) {
         $r->ensureIdentity();
+        $certificates = [];
+        if (!is_null($r->identity->user_id)) {
+            $certificates = self::getUserCertificates(
+                $r->identity,
+                $r->identity->user_id
+            );
+        }
         return [
             'templateProperties' => [
                 'payload' => [
-                    'certificates' => self::getUserCertificates(
-                        $r->identity,
-                        $r->identity->user_id
-                    ),
+                    'certificates' => $certificates,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleMyDiplomas'
