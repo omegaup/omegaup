@@ -170,6 +170,7 @@ const translations: { [key: string]: string; } = {
   certificateListMineReason: "Reason",
   certificateListMineTitle: "My Diplomas",
   certificateListMineVerificationLink: "Verification link",
+  certificateNotFound: "Diploma not found",
   certificatePdfCoderOfTheMonthDescription: "for the performance in the month of %(month_name) by obtaining the highest score on the omegaUp.com platform",
   certificatePdfCoderOfTheMonthFemaleTitle: "Coder of the month for her",
   certificatePdfCoderOfTheMonthTitle: "Coder of the month",
