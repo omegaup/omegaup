@@ -82,6 +82,7 @@
               :in-contest-or-course="true"
               :feedback-map="feedbackMap"
               :feedback-thread-map="feedbackThreadMap"
+              :use-new-verdict-table="useNewVerdictTable"
               @request-feedback="(guid) => $emit('request-feedback', guid)"
               @update:activeTab="
                 (selectedTab) =>
@@ -301,6 +302,7 @@ export default class ArenaCourse extends Vue {
   feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
   @Prop() currentUsername!: string;
   @Prop() currentUserClassName!: string;
+  @Prop({ default: false }) useNewVerdictTable!: boolean;
 
   T = T;
   omegaup = omegaup;

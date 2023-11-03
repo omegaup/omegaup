@@ -41,14 +41,8 @@ OmegaUp.on('ready', async () => {
 
   const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
 
-  const useNewVerdictTable =
-    new URLSearchParams(window.location.hash.substring(1)).get(
-      'useNewVerdictTable',
-    ) === 'true';
-
-  if (window.location.hash.startsWith('#useNewVerdictTable')) {
-    history.replaceState(null, '', window.location.pathname);
-  }
+  const urlParams = new URLSearchParams(window.location.search);
+  const useNewVerdictTable = urlParams.get('useNewVerdictTable') === 'true';
 
   const searchResultEmpty: types.ListItem[] = [];
   let runDetails: null | types.RunDetails = null;
