@@ -3,7 +3,7 @@ import { shallowMount } from '@vue/test-utils';
 import schools_Profile from './Profile.vue';
 import { SchoolCoderOfTheMonth } from '../../linkable_resource';
 
-describe('List.vue', () => {
+describe('Profile.vue', () => {
   it('Should handle profile view', () => {
     const wrapper = shallowMount(schools_Profile, {
       propsData: {
