@@ -3,13 +3,13 @@
     <h5
       class="card-header d-flex justify-content-between align-items-center rank-title"
     >
-      Acceso parental
+      {{ T.dependentsTitle }}
     </h5>
     <table class="table mb-0">
       <thead>
         <tr>
           <th scope="col" class="text-center">#</th>
-          <th scope="col" class="text-center">Usuario</th>
+          <th scope="col" class="text-center">{{ T.dependentsUser }}</th>
         </tr>
       </thead>
       <tbody>
