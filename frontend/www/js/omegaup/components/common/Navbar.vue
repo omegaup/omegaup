@@ -339,6 +339,9 @@
         </a>
       </div>
     </nav>
+    <div class="container-xl pl-0 pl-xl-3 mt-2">
+      Tu padre o tutor debe aprobar tu cuenta o se eliminará en 7 días.
+    </div>
     <omegaup-user-objectives-questions
       v-if="
         fromLogin && isLoggedIn && isMainUserIdentity && userTypes.length === 0
