@@ -161,6 +161,7 @@ const translations: { [key: string]: string; } = {
   cannotRemoveProblemWithSubmissions: "No puedes eliminar un problema que ya tiene env\u00edos",
   certificateDetailsBody: "Favor de escribirnos a [certificados@omegaup.com](mailto:certificados@omegaup.com?subject=Validar%20certificado%20%(uuid)) para verificar el certificado. Incluye el ID del certificado (%(uuid)) en el asunto del correo.",
   certificateDetailsTitle: "Proceso de verificaci\u00f3n de certificados",
+  certificateNotFound: "Diploma no encontrado",
   certificatePdfCoderOfTheMonthDescription: "por su desempe\u00f1o en el mes de %(month_name) al obtener m\u00e1s puntos en la plataforma omegaUp.com",
   certificatePdfCoderOfTheMonthFemaleTitle: "Coder del mes para ellas",
   certificatePdfCoderOfTheMonthTitle: "Coder del mes",
