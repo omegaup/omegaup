@@ -444,7 +444,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         );
     }
 
-    private static function getCertificatePdf(string $verificationCode): ?string {
+    public static function getCertificatePdf(string $verificationCode): ?string {
         $type = \OmegaUp\DAO\Certificates::getCertificateTypeByVerificationCode(
             $verificationCode
         );
