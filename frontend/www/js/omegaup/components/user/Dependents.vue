@@ -26,12 +26,10 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
-import * as ui from '../../ui';
 
 @Component
 export default class UserDependents extends Vue {
   @Prop() dependents!: types.UserDependentsPayload[];
   T = T;
-  ui = ui;
 }
 </script>
