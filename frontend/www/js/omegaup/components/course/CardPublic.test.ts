@@ -33,4 +33,23 @@ describe('CardPublic.vue', () => {
     );
     expect(wrapper.text()).toContain(T.courseCardPublicLevelIntroductory);
   });
+
+  it('Should click on the course name even when a user is not logged in', async () => {
+    const wrapper = shallowMount(course_CardPublic, {
+      propsData: {
+        course: publicCourse,
+      },
+    });
+
+    expect(
+      wrapper.find(`a[href="/course/${publicCourse.alias}/"]`).text(),
+    ).toBe(publicCourse.name);
+
+    // Now, with the user logged in, the result should remain the same.
+    await wrapper.setProps({ loggedIn: true });
+
+    expect(
+      wrapper.find(`a[href="/course/${publicCourse.alias}/"]`).text(),
+    ).toBe(publicCourse.name);
+  });
 });
