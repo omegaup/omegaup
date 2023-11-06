@@ -132,6 +132,7 @@ describe('Basic Commands Test', () => {
     cy.logout();
   });
 
+  // FIXME: @tech-debt Remove `only` when this test is fixed
   it.only('Should create two contests and merge their scoreboard', () => {
     cy.log('Should create two contests and merge their scoreboard');
     const loginOptions = loginPage.registerMultipleUsers(4);

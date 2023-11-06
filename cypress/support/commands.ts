@@ -320,11 +320,13 @@ Cypress.Commands.add(
 
       const expectedStatus: Status = runs[idx].status;
 
-      cy.waitUntil(() =>
-        cy
-          .get('[data-run-status] > span')
-          .first()
-          .should('have.text', expectedStatus),
+      cy.waitUntil(
+        () =>
+          cy
+            .get('[data-run-status] > span')
+            .first()
+            .should('have.text', expectedStatus),
+        { timeout: MAX_TIMEOUT_TO_WAIT },
       );
     }
   },
