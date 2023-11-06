@@ -260,11 +260,13 @@ export default class Signup extends Vue {
     const currentMonth = (currentDate.getMonth() + 1)
       .toString()
       .padStart(2, '0');
-    const currentDay = currentDate.getDate().toString().padStart(2, '0');
+    const dayFollowingTheCurrent = (currentDate.getDate() + 1)
+      .toString()
+      .padStart(2, '0');
 
     return this.over13Checked
       ? '1900-01-01'
-      : `${currentYear - 13}-${currentMonth}-${currentDay}`;
+      : `${currentYear - 13}-${currentMonth}-${dayFollowingTheCurrent}`;
   }
 
   checkAge() {
