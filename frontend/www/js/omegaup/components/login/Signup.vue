@@ -242,15 +242,29 @@ export default class Signup extends Vue {
   }
 
   get maxDate() {
-    const currentYear = new Date().getFullYear();
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = (currentDate.getMonth() + 1)
+      .toString()
+      .padStart(2, '0');
+    const currentDay = currentDate.getDate().toString().padStart(2, '0');
+
     return this.over13Checked
-      ? `${currentYear - 14}-12-31`
-      : `${currentYear}-12-31`;
+      ? `${currentYear - 13}-${currentMonth}-${currentDay}`
+      : `${currentYear}-${currentMonth}-${currentDay}`;
   }
 
   get minDate() {
-    const currentYear = new Date().getFullYear();
-    return this.over13Checked ? '1900-01-01' : `${currentYear - 13}-01-01`;
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = (currentDate.getMonth() + 1)
+      .toString()
+      .padStart(2, '0');
+    const currentDay = currentDate.getDate().toString().padStart(2, '0');
+
+    return this.over13Checked
+      ? '1900-01-01'
+      : `${currentYear - 13}-${currentMonth}-${currentDay}`;
   }
 
   checkAge() {
