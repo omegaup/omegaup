@@ -418,6 +418,26 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         );
     }
 
+    public static function getCertificatePdf(string $verificationCode): ?string {
+        $type = \OmegaUp\DAO\Certificates::getCertificateTypeByVerificationCode(
+            $verificationCode
+        );
+
+        if ($type === 'contest') {
+            return self::getContestCertificate($verificationCode);
+        }
+        if ($type === 'course') {
+            return self::getCourseCertificate($verificationCode);
+        }
+        if ($type === 'coder_of_the_month' || $type === 'coder_of_the_month_female') {
+            return self::getCoderOfTheMonthCertificate(
+                $verificationCode,
+                isFemaleCategory: $type === 'coder_of_the_month_female'
+            );
+        }
+        return null;
+    }
+
     /**
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -552,35 +572,10 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     public static function apiGetCertificatePdf(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
-        $verificationCode = $r->ensureString('verification_code');
-        $type = \OmegaUp\DAO\Certificates::getCertificateTypeByVerificationCode(
-            $verificationCode
-        );
-
-        if ($type === 'contest') {
-            return [
-                'certificate' => self::getContestCertificate(
-                    $verificationCode
-                ),
-            ];
-        }
-        if ($type === 'course') {
-            return [
-                'certificate' => self::getCourseCertificate(
-                    $verificationCode
-                ),
-            ];
-        }
-        if ($type === 'coder_of_the_month' || $type === 'coder_of_the_month_female') {
-            return [
-                'certificate' => self::getCoderOfTheMonthCertificate(
-                    $verificationCode,
-                    $type === 'coder_of_the_month_female'
-                ),
-            ];
-        }
         return [
-            'certificate' => null,
+            'certificate' => self::getCertificatePdf(
+                $r->ensureString('verification_code')
+            ),
         ];
     }
 
