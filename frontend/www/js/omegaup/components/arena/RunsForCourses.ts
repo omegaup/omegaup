@@ -5,11 +5,11 @@ import { types } from '../../api_types';
 
 import T from '../../lang';
 
-import arena_Runs_v3 from './Runsv3.vue';
+import arena_RunsForCourses from './RunsForCourses.vue';
 
-describe('Runsv3.vue', () => {
+describe('RunsForCourses.vue', () => {
   it('Should handle empty runs', () => {
-    const wrapper = shallowMount(arena_Runs_v3, {
+    const wrapper = shallowMount(arena_RunsForCourses, {
       propsData: {
         contestAlias: 'admin',
         runs: [],
@@ -22,7 +22,7 @@ describe('Runsv3.vue', () => {
 
   it('Should handle runs', async () => {
     const expectedDate = '1/1/2020, 12:00:00 AM';
-    const wrapper = shallowMount(arena_Runs_v3, {
+    const wrapper = shallowMount(arena_RunsForCourses, {
       propsData: {
         contestAlias: 'admin',
         runs: [
@@ -117,7 +117,7 @@ describe('Runsv3.vue', () => {
   ];
 
   it('Should handle order runs', async () => {
-    const wrapper = shallowMount(arena_Runs_v3, {
+    const wrapper = shallowMount(arena_RunsForCourses, {
       propsData: {
         contestAlias: 'admin',
         runs,
@@ -145,7 +145,7 @@ describe('Runsv3.vue', () => {
 
   describe.each(filtersMapping)(`A filter:`, (filter) => {
     it(`whose name is ${filter.filter} should have gotten the value ${filter.value}`, async () => {
-      const wrapper = shallowMount(arena_Runs_v3, {
+      const wrapper = shallowMount(arena_RunsForCourses, {
         propsData: {
           contestAlias: 'admin',
           runs,
@@ -162,7 +162,7 @@ describe('Runsv3.vue', () => {
   });
 
   it('Should handle change page control', async () => {
-    const wrapper = shallowMount(arena_Runs_v3, {
+    const wrapper = shallowMount(arena_RunsForCourses, {
       propsData: {
         contestAlias: 'contest',
         runs,
@@ -194,7 +194,7 @@ describe('Runsv3.vue', () => {
   });
 
   it('Should handle username filter', async () => {
-    const wrapper = shallowMount(arena_Runs_v3, {
+    const wrapper = shallowMount(arena_RunsForCourses, {
       propsData: {
         contestAlias: 'contest',
         runs,
@@ -212,7 +212,7 @@ describe('Runsv3.vue', () => {
   });
 
   it('Should handle problem filter', async () => {
-    const wrapper = shallowMount(arena_Runs_v3, {
+    const wrapper = shallowMount(arena_RunsForCourses, {
       propsData: {
         contestAlias: 'contest',
         runs,
@@ -230,7 +230,7 @@ describe('Runsv3.vue', () => {
   });
 
   it('Should handle the new submission button', async () => {
-    const wrapper = shallowMount(arena_Runs_v3, {
+    const wrapper = shallowMount(arena_RunsForCourses, {
       propsData: {
         problemAlias: 'alias',
         runs,
@@ -250,7 +250,7 @@ describe('Runsv3.vue', () => {
       time: new Date('1/3/2020, 12:25:00 AM'),
       type: 'disqualified',
     });
-    const wrapper = shallowMount(arena_Runs_v3, {
+    const wrapper = shallowMount(arena_RunsForCourses, {
       propsData: {
         contestAlias: 'admin',
         problemAlias: 'alias',
@@ -302,7 +302,7 @@ describe('Runsv3.vue', () => {
   });
 
   it('Should handle filterUsername when username changes', async () => {
-    const wrapper = shallowMount(arena_Runs_v3, {
+    const wrapper = shallowMount(arena_RunsForCourses, {
       propsData: {
         contestAlias: 'admin',
         runs,
@@ -328,7 +328,7 @@ describe('Runsv3.vue', () => {
   const usernamesToBeFiltered = ['username', 'other_username'];
   describe.each(usernamesToBeFiltered)(`A user:`, (username) => {
     it(`whose username is ${username} should be filtered when they are selected.`, async () => {
-      const wrapper = mount(arena_Runs_v3, {
+      const wrapper = mount(arena_RunsForCourses, {
         propsData: {
           contestAlias: 'admin',
           runs,

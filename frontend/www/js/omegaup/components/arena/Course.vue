@@ -136,7 +136,7 @@
     </template>
     <template #arena-runs>
       <omegaup-arena-runs
-        v-if="isAdmin"
+        v-if="isAdmin && !useNewVerdictTable"
         :show-all-runs="true"
         :contest-alias="currentAssignment.alias"
         :runs="allRuns"
@@ -162,6 +162,33 @@
         <template #title><div></div></template>
         <template #runs><div></div></template>
       </omegaup-arena-runs>
+      <omegaup-arena-runs-for-courses
+        v-if="isAdmin && useNewVerdictTable"
+        :show-all-runs="true"
+        :contest-alias="currentAssignment.alias"
+        :runs="allRuns"
+        :total-runs="totalRuns"
+        :show-problem="true"
+        :show-details="true"
+        :show-disqualify="true"
+        :show-pager="true"
+        :show-rejudge="true"
+        :show-user="true"
+        :problemset-problems="Object.values(problems)"
+        :search-result-users="searchResultUsers"
+        :search-result-problems="searchResultProblems"
+        @details="onRunAdminDetails"
+        @rejudge="(run) => $emit('rejudge', run)"
+        @disqualify="(run) => $emit('disqualify', run)"
+        @requalify="(run) => $emit('requalify', run)"
+        @filter-changed="(request) => $emit('apply-filter', request)"
+        @update-search-result-users-contest="
+          (request) => $emit('update-search-result-users-assignment', request)
+        "
+      >
+        <template #title><div></div></template>
+        <template #runs><div></div></template>
+      </omegaup-arena-runs-for-courses>
       <omegaup-overlay
         v-if="isAdmin"
         :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
@@ -243,6 +270,7 @@ import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarAssignments from './NavbarAssignments.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_Runs from './Runs.vue';
+import arena_RunsForCourses from '../arena/RunsForCourses.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import arena_Scoreboard from './Scoreboard.vue';
@@ -262,6 +290,7 @@ import { ArenaCourseFeedback } from './Feedback.vue';
     'omegaup-arena-navbar-assignments': arena_NavbarAssignments,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
     'omegaup-arena-runs': arena_Runs,
+    'omegaup-arena-runs-for-courses': arena_RunsForCourses,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-arena-scoreboard': arena_Scoreboard,

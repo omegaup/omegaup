@@ -211,7 +211,7 @@
             <template #title><div></div></template>
             <template #runs><div></div></template>
           </omegaup-arena-runs>
-          <omegaup-arena-runs-v3
+          <omegaup-arena-runs-for-courses
             v-if="useNewVerdictTable"
             :problem-alias="problem.alias"
             :contest-alias="contestAlias"
@@ -232,7 +232,7 @@
           >
             <template #title><div></div></template>
             <template #runs><div></div></template>
-          </omegaup-arena-runs-v3>
+          </omegaup-arena-runs-for-courses>
         </template>
         <omegaup-problem-feedback
           :quality-histogram="parsedQualityHistogram"
@@ -282,7 +282,7 @@
           <template #title><div></div></template>
           <template #runs><div></div></template>
         </omegaup-arena-runs>
-        <omegaup-arena-runs-v3
+        <omegaup-arena-runs-for-courses
           v-if="useNewVerdictTable"
           :show-all-runs="true"
           :runs="allRuns"
@@ -312,7 +312,7 @@
         >
           <template #title><div></div></template>
           <template #runs><div></div></template>
-        </omegaup-arena-runs-v3>
+        </omegaup-arena-runs-for-courses>
         <omegaup-overlay
           v-if="user.loggedIn"
           :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
@@ -367,7 +367,7 @@ import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
 import arena_Runs from '../arena/Runs.vue';
-import arena_Runs_v3 from '../arena/Runsv3.vue';
+import arena_RunsForCourses from '../arena/RunsForCourses.vue';
 import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import arena_Solvers from '../arena/Solvers.vue';
@@ -421,7 +421,7 @@ export enum PopupDisplayed {
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-ephemeral-grader': arena_EphemeralGrader,
     'omegaup-arena-runs': arena_Runs,
-    'omegaup-arena-runs-v3': arena_Runs_v3,
+    'omegaup-arena-runs-for-courses': arena_RunsForCourses,
     'omegaup-arena-runsubmit-popup': arena_RunSubmitPopup,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-arena-solvers': arena_Solvers,
