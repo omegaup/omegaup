@@ -655,9 +655,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $futureCondition = \OmegaUp\DAO\Enum\ActiveStatus::sql(
             \OmegaUp\DAO\Enum\ActiveStatus::FUTURE
         );
-        if (is_null($dayLimit)) {
-            $withinDayLimitCondition = true;
-        } else {
+        $withinDayLimitCondition = 'TRUE';
+        if (!is_null($dayLimit)) {
             $withinDayLimitCondition = "DATEDIFF(start_time, NOW()) < $dayLimit";
         }
 
