@@ -234,17 +234,23 @@ Cypress.Commands.add('addProblemsToContest', ({ contestAlias, problems }) => {
   cy.intercept({
     method: 'POST',
     url: '/api/problem/listForTypeahead/',
-    times: problems.length,
+    times: 100,
   }).as('problemListForTypeahead');
 
   for (const idx in problems) {
+    const typeChunks = problems[idx].problemAlias.split('-');
     // print the problem alias
     cy.log(`Adding problem ${problems[idx].problemAlias}`);
-    cy.get('.tags-input input[type="text"]').type(problems[idx].problemAlias);
-    cy.debug();
-    cy.wait(200);
+    // type the problem alias
+    cy.waitUntil(() =>
+      cy
+        .get('.tags-input input[type="text"]')
+        .type(typeChunks[0])
+        .type('-')
+        .type(typeChunks[1]),
+    );
+    cy.clock().tick(510);
     // After the user types, we should wait until the autocomplete is visible
-
     cy.wait(['@problemListForTypeahead'], { timeout: MAX_TIMEOUT_TO_WAIT * 10 })
       .its('response.statusCode')
       .should('eq', 200);
@@ -289,6 +295,7 @@ Cypress.Commands.add(
 
       // Only the first submission is created because of server validations
       if (!runs[idx].valid) {
+        cy.log('Only the first submission is created because of validations');
         cy.fixture(runs[idx].fixturePath).then((fileContent) => {
           cy.get('.CodeMirror-line').type(fileContent);
           cy.get('[data-submit-run]').should('be.disabled');
@@ -296,20 +303,29 @@ Cypress.Commands.add(
         break;
       }
 
+      cy.intercept({ method: 'POST', url: '/api/run/create/' }).as('runCreate');
+
       cy.fixture(runs[idx].fixturePath).then((fileContent) => {
         cy.get('.CodeMirror-line').type(fileContent);
         cy.get('[data-submit-run]').click();
       });
 
-      const expectedStatus: Status = runs[idx].status;
-      cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
-
-      cy.wait(['@runStatus'], { timeout: MAX_TIMEOUT_TO_WAIT })
+      cy.wait(['@runCreate'], { timeout: MAX_TIMEOUT_TO_WAIT })
         .its('response.statusCode')
         .should('eq', 200);
-      cy.get('[data-run-status] > span')
-        .first()
-        .should('have.text', expectedStatus);
+
+      cy.waitUntil(() =>
+        cy.get('[data-run-status] > span').should('be.visible'),
+      );
+
+      const expectedStatus: Status = runs[idx].status;
+
+      cy.waitUntil(() =>
+        cy
+          .get('[data-run-status] > span')
+          .first()
+          .should('have.text', expectedStatus),
+      );
     }
   },
 );
