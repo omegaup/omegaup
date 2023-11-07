@@ -26,7 +26,7 @@
         <p class="title">
           {{ T.certificateValidationStatus }}
           <span class="title-invalid">
-            {{ T.certificateValidationInvalid }}
+            {{ T.certificateValidationInvalid.toUpperCase() }}
           </span>
         </p>
         <p class="description">
