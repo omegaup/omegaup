@@ -13,7 +13,7 @@
       }"
     >
       <div>
-        <span class="font-weight-bold">{{ "HOLA" }}</span>
+        <span class="font-weight-bold">{{ 'HOLA' }}</span>
         <div v-if="showPager">
           <div class="pager-controls">
             <button
