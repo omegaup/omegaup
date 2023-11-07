@@ -624,6 +624,8 @@
 	"demotionProblemMultipleQuestion": "Deseja fazer isso para todos os relat\u00f3rios deste problema?",
 	"demotionProblemNotificationBanned": "O problema [%(problem_name)] foi relatado como inadequado. Para mais detalhes, verifique seu e-mail.",
 	"demotionProblemNotificationWarning": "O problema [%(problem_name)] foi marcado com um aviso. Para mais detalhes, verifique seu e-mail.",
+	"dependentsTitle": "Acesso dos pais",
+	"dependentsUser": "Usu\u00e1rio",
 	"duplicateTagsNotAllowed": "As tags duplicadas n\u00e3o s\u00e3o permitidas. H\u00e1 pelo menos uma tag duplicada na lista: %(tags) <br> Por favor, corrija a informa\u00e7\u00e3o.",
 	"editFieldRequired": "Um valor necess\u00e1rio est\u00e1 faltando",
 	"email": "Email",

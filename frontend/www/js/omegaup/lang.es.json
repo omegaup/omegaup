@@ -624,6 +624,8 @@
 	"demotionProblemMultipleQuestion": "\u00bfDeseas realizar esta acci\u00f3n para todos los reportes de este problema?",
 	"demotionProblemNotificationBanned": "El problema [%(problem_name)] ha sido reportado como inapropiado. Para m\u00e1s detalles revisa tu correo electr\u00f3nico.",
 	"demotionProblemNotificationWarning": "El problema [%(problem_name)] ha sido marcado con una advertencia. Para m\u00e1s detalles revisa tu correo electr\u00f3nico.",
+	"dependentsTitle": "Acceso parental",
+	"dependentsUser": "Usuario",
 	"duplicateTagsNotAllowed": "No se permiten etiquetas duplicadas. Hay al menos una etiqueta duplicada en la lista: %(tags) <br> Corrija la informaci\u00f3n.",
 	"editFieldRequired": "Falta un valor requerido",
 	"email": "Correo electr\u00f3nico",
