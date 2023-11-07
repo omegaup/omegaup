@@ -10,6 +10,31 @@ use setasign\Fpdi\Fpdi;
  * @psalm-type CertificateListItem=array{certificate_type: string, date: \OmegaUp\Timestamp, name: null|string, verification_code: string}
  */
 class Certificate extends \OmegaUp\Controllers\Controller {
+    // General certificate PDF constants
+    const CERTIFICATE_PDF_BORDER = 1;
+    const CERTIFICATE_PDF_LN = 1;
+    const CERTIFICATE_PDF_ALIGN_CENTER = 'C';
+    const CERTIFICATE_PDF_ALIGN_RIGHT = 'R';
+    const CERTIFICATE_PDF_CENTERED_WIDTH = 215;
+    const CERTIFICATE_PDF_RIGHT_ALIGNED_WIDTH = 80;
+    const CERTIFICATE_PDF_HEIGHT_SMALL = 5;
+    const CERTIFICATE_PDF_HEIGHT_MEDIUM = 10;
+    const CERTIFICATE_PDF_HEIGHT_BIG = 15;
+    const CERTIFICATE_PDF_CENTERED_X = 50;
+    const CERTIFICATE_PDF_RIGHT_ALIGNED_X = 214;
+
+    // Constants of Y for certificate PDF
+    const CERTIFICATE_PDF_HEADER_Y = 43;
+    const CERTIFICATE_PDF_PLACE_AND_DATE_Y = 150;
+    const CERTIFICATE_PDF_DIRECTOR_Y = 199;
+    const CERTIFICATE_PDF_TITLE_Y = 76;
+    const CERTIFICATE_PDF_NAME_Y = 109;
+    const CERTIFICATE_PDF_GRANTS_RECOGNITION_Y = 60;
+    const CERTIFICATE_PDF_PERSON_Y = 94;
+    const CERTIFICATE_PDF_DESCRIPTION_Y = 132;
+    const CERTIFICATE_PDF_VERIFICATION_CODE_Y = 192;
+    const CERTIFICATE_PDF_VERIFICATION_LINK_Y = 197;
+
     /**
      * @return array{templateProperties: array{payload: CertificateDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
@@ -62,24 +87,19 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     private static function printCertificateHeader(FPDI $pdf): void {
         $translator = \OmegaUp\Translations::getInstance();
 
-        $x = 50;
-        $y = 41;
-        $width = 215;
-        $height = 15;
-        $border = 0;
-        $ln = 1;
-        $center = 'C';
-
-        $pdf->SetXY($x, $y);
+        $pdf->SetXY(
+            self::CERTIFICATE_PDF_CENTERED_X,
+            self::CERTIFICATE_PDF_HEADER_Y
+        );
         $pdf->Cell(
-            $width,
-            $height,
+            self::CERTIFICATE_PDF_CENTERED_WIDTH,
+            self::CERTIFICATE_PDF_HEIGHT_MEDIUM,
             \OmegaUp\ApiUtils::convertUTFToISO(
                 $translator->get('certificatePdfHeader')
             ),
-            $border,
-            $ln,
-            $center
+            self::CERTIFICATE_PDF_BORDER,
+            self::CERTIFICATE_PDF_LN,
+            self::CERTIFICATE_PDF_ALIGN_CENTER
         );
     }
 
@@ -89,21 +109,16 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     ): void {
         $translator = \OmegaUp\Translations::getInstance();
 
-        $x = 50;
-        $y = 148;
-        $width = 215;
-        $height = 15;
-        $border = 0;
-        $ln = 1;
-        $center = 'C';
-
-        $pdf->SetXY($x, $y);
+        $pdf->SetXY(
+            self::CERTIFICATE_PDF_CENTERED_X,
+            self::CERTIFICATE_PDF_PLACE_AND_DATE_Y
+        );
         $day = intval(date('j', $date));
         $month = intval(date('n', $date));
         $year = intval(date('o', $date));
         $pdf->Cell(
-            $width,
-            $height,
+            self::CERTIFICATE_PDF_CENTERED_WIDTH,
+            self::CERTIFICATE_PDF_HEIGHT_MEDIUM,
             \OmegaUp\ApiUtils::formatString(
                 $translator->get('certificatePdfPlaceAndDate'),
                 [
@@ -113,33 +128,28 @@ class Certificate extends \OmegaUp\Controllers\Controller {
                 ],
                 convertUTF8ToISO: true
             ),
-            $border,
-            $ln,
-            $center
+            self::CERTIFICATE_PDF_BORDER,
+            self::CERTIFICATE_PDF_LN,
+            self::CERTIFICATE_PDF_ALIGN_CENTER
         );
     }
 
     private static function printCertificateDirector(FPDI $pdf): void {
         $translator = \OmegaUp\Translations::getInstance();
 
-        $x = 50;
-        $y = 197;
-        $width = 215;
-        $height = 15;
-        $border = 0;
-        $ln = 1;
-        $center = 'C';
-
-        $pdf->SetXY($x, $y);
+        $pdf->SetXY(
+            self::CERTIFICATE_PDF_CENTERED_X,
+            self::CERTIFICATE_PDF_DIRECTOR_Y
+        );
         $pdf->Cell(
-            $width,
-            $height,
+            self::CERTIFICATE_PDF_CENTERED_WIDTH,
+            self::CERTIFICATE_PDF_HEIGHT_MEDIUM,
             \OmegaUp\ApiUtils::convertUTFToISO(
                 $translator->get('certificatePdfDirector')
             ),
-            $border,
-            $ln,
-            $center
+            self::CERTIFICATE_PDF_BORDER,
+            self::CERTIFICATE_PDF_LN,
+            self::CERTIFICATE_PDF_ALIGN_CENTER
         );
     }
 
@@ -147,86 +157,73 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         FPDI $pdf,
         string $title
     ): void {
-        $x = 50;
-        $y = 76;
-        $width = 215;
-        $height = 15;
-        $border = 0;
-        $ln = 1;
-        $center = 'C';
-
-        $pdf->SetXY($x, $y);
-        $pdf->Cell($width, $height, $title, $border, $ln, $center);
+        $pdf->SetXY(
+            self::CERTIFICATE_PDF_CENTERED_X,
+            self::CERTIFICATE_PDF_TITLE_Y
+        );
+        $pdf->Cell(
+            self::CERTIFICATE_PDF_CENTERED_WIDTH,
+            self::CERTIFICATE_PDF_HEIGHT_BIG,
+            $title,
+            self::CERTIFICATE_PDF_BORDER,
+            self::CERTIFICATE_PDF_LN,
+            self::CERTIFICATE_PDF_ALIGN_CENTER
+        );
     }
 
     private static function printCertificateName(
         FPDI $pdf,
         string $identityName
     ): void {
-        $x = 50;
-        $y = 109;
-        $width = 215;
-        $height = 15;
-        $border = 0;
-        $ln = 1;
-        $center = 'C';
-
-        $pdf->SetXY($x, $y);
+        $pdf->SetXY(
+            self::CERTIFICATE_PDF_CENTERED_X,
+            self::CERTIFICATE_PDF_NAME_Y
+        );
         $pdf->Cell(
-            $width,
-            $height,
+            self::CERTIFICATE_PDF_CENTERED_WIDTH,
+            self::CERTIFICATE_PDF_HEIGHT_BIG,
             $identityName,
-            $border,
-            $ln,
-            $center
+            self::CERTIFICATE_PDF_BORDER,
+            self::CERTIFICATE_PDF_LN,
+            self::CERTIFICATE_PDF_ALIGN_CENTER
         );
     }
 
     private static function printCertificateGrantsRecognition(FPDI $pdf): void {
         $translator = \OmegaUp\Translations::getInstance();
 
-        $x = 50;
-        $y = 57;
-        $width = 215;
-        $height = 15;
-        $border = 0;
-        $ln = 1;
-        $center = 'C';
-
-        $pdf->SetXY($x, $y);
+        $pdf->SetXY(
+            self::CERTIFICATE_PDF_CENTERED_X,
+            self::CERTIFICATE_PDF_GRANTS_RECOGNITION_Y
+        );
         $pdf->Cell(
-            $width,
-            $height,
+            self::CERTIFICATE_PDF_CENTERED_WIDTH,
+            self::CERTIFICATE_PDF_HEIGHT_MEDIUM,
             \OmegaUp\ApiUtils::convertUTFToISO(
                 $translator->get('certificatePdfGrantsRecognition')
             ),
-            $border,
-            $ln,
-            $center
+            self::CERTIFICATE_PDF_BORDER,
+            self::CERTIFICATE_PDF_LN,
+            self::CERTIFICATE_PDF_ALIGN_CENTER
         );
     }
 
     private static function printCertificatePerson(FPDI $pdf): void {
         $translator = \OmegaUp\Translations::getInstance();
 
-        $x = 50;
-        $y = 92;
-        $width = 215;
-        $height = 15;
-        $border = 0;
-        $ln = 1;
-        $center = 'C';
-
-        $pdf->SetXY($x, $y);
+        $pdf->SetXY(
+            self::CERTIFICATE_PDF_CENTERED_X,
+            self::CERTIFICATE_PDF_PERSON_Y
+        );
         $pdf->Cell(
-            $width,
-            $height,
+            self::CERTIFICATE_PDF_CENTERED_WIDTH,
+            self::CERTIFICATE_PDF_HEIGHT_MEDIUM,
             \OmegaUp\ApiUtils::convertUTFToISO(
                 $translator->get('certificatePdfPerson')
             ),
-            $border,
-            $ln,
-            $center
+            self::CERTIFICATE_PDF_BORDER,
+            self::CERTIFICATE_PDF_LN,
+            self::CERTIFICATE_PDF_ALIGN_CENTER
         );
     }
 
@@ -234,24 +231,72 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         FPDI $pdf,
         string $description
     ): void {
-        $x = 50;
-        $y = 132;
-        $width = 215;
-        $height = 10;
-        $border = 0;
-        $center = 'C';
-
-        $pdf->SetXY($x, $y);
+        $pdf->SetXY(
+            self::CERTIFICATE_PDF_CENTERED_X,
+            self::CERTIFICATE_PDF_DESCRIPTION_Y
+        );
         $pdf->MultiCell(
-            $width,
-            $height,
+            self::CERTIFICATE_PDF_CENTERED_WIDTH,
+            self::CERTIFICATE_PDF_HEIGHT_MEDIUM,
             $description,
-            $border,
-            $center
+            self::CERTIFICATE_PDF_BORDER,
+            self::CERTIFICATE_PDF_ALIGN_CENTER
+        );
+    }
+
+    private static function printCertificateVerificationCode(
+        FPDI $pdf,
+        string $verificationCode
+    ): void {
+        $translator = \OmegaUp\Translations::getInstance();
+
+        $pdf->SetXY(
+            self::CERTIFICATE_PDF_RIGHT_ALIGNED_X,
+            self::CERTIFICATE_PDF_VERIFICATION_CODE_Y
+        );
+        $pdf->Cell(
+            self::CERTIFICATE_PDF_RIGHT_ALIGNED_WIDTH,
+            self::CERTIFICATE_PDF_HEIGHT_SMALL,
+            \OmegaUp\ApiUtils::formatString(
+                $translator->get('certificatePdfVerificationCode'),
+                [
+                    'verification_code' => $verificationCode,
+                ],
+                convertUTF8ToISO: true
+            ),
+            self::CERTIFICATE_PDF_BORDER,
+            self::CERTIFICATE_PDF_LN,
+            self::CERTIFICATE_PDF_ALIGN_RIGHT
+        );
+    }
+
+    private static function printCertificateVerificationLink(
+        FPDI $pdf,
+        string $verificationCode
+    ): void {
+        $translator = \OmegaUp\Translations::getInstance();
+
+        $pdf->SetXY(
+            self::CERTIFICATE_PDF_RIGHT_ALIGNED_X,
+            self::CERTIFICATE_PDF_VERIFICATION_LINK_Y
+        );
+        $pdf->MultiCell(
+            self::CERTIFICATE_PDF_RIGHT_ALIGNED_WIDTH,
+            self::CERTIFICATE_PDF_HEIGHT_SMALL,
+            \OmegaUp\ApiUtils::formatString(
+                $translator->get('certificatePdfVerificationLink'),
+                [
+                    'verification_code' => $verificationCode,
+                ],
+                convertUTF8ToISO: true
+            ),
+            self::CERTIFICATE_PDF_BORDER,
+            self::CERTIFICATE_PDF_ALIGN_RIGHT
         );
     }
 
     private static function createCertificatePdf(
+        string $verificationCode,
         string $title,
         string $identityName,
         string $description,
@@ -280,6 +325,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         self::printCertificateGrantsRecognition($pdf);
         self::printCertificatePerson($pdf);
         self::printCertificateDescription($pdf, $description);
+        $pdf->SetFont('', '', 10);
+        self::printCertificateVerificationCode($pdf, $verificationCode);
+        self::printCertificateVerificationLink($pdf, $verificationCode);
 
         return base64_encode($pdf->Output('', 'S'));
     }
@@ -335,6 +383,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $date = $certificateData['timestamp']->time;
 
         return self::createCertificatePdf(
+            $verificationCode,
             $title,
             $identityName,
             $description,
@@ -368,6 +417,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $date = $certificateData['timestamp']->time;
 
         return self::createCertificatePdf(
+            $verificationCode,
             $title,
             $identityName,
             $description,
@@ -411,6 +461,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         );
 
         return self::createCertificatePdf(
+            $verificationCode,
             $title,
             $identityName,
             $description,
