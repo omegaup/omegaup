@@ -13,7 +13,7 @@
       }"
     >
       <div>
-        <span class="font-weight-bold">{{ T.wordsSubmissions }}</span>
+        <span class="font-weight-bold">{{ "HOLA" }}</span>
         <div v-if="showPager">
           <div class="pager-controls">
             <button

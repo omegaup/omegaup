@@ -134,9 +134,9 @@
         <template #scoreboard-header><div></div></template>
       </omegaup-arena-scoreboard>
     </template>
-    <template #arena-runs>
+    <template #arena-runs v-if="isAdmin">
       <omegaup-arena-runs
-        v-if="isAdmin && !useNewVerdictTable"
+        v-if="!useNewVerdictTable"
         :show-all-runs="true"
         :contest-alias="currentAssignment.alias"
         :runs="allRuns"
@@ -163,7 +163,7 @@
         <template #runs><div></div></template>
       </omegaup-arena-runs>
       <omegaup-arena-runs-for-courses
-        v-if="isAdmin && useNewVerdictTable"
+        v-else
         :show-all-runs="true"
         :contest-alias="currentAssignment.alias"
         :runs="allRuns"

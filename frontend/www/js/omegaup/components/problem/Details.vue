@@ -212,7 +212,7 @@
             <template #runs><div></div></template>
           </omegaup-arena-runs>
           <omegaup-arena-runs-for-courses
-            v-if="useNewVerdictTable"
+            v-else
             :problem-alias="problem.alias"
             :contest-alias="contestAlias"
             :runs="runsByProblem"
@@ -283,7 +283,7 @@
           <template #runs><div></div></template>
         </omegaup-arena-runs>
         <omegaup-arena-runs-for-courses
-          v-if="useNewVerdictTable"
+          v-else
           :show-all-runs="true"
           :runs="allRuns"
           :show-details="true"
