@@ -190,6 +190,8 @@ const translations: { [key: string]: string; } = {
   certificatePdfMonth9: "(S3p73mb3r)",
   certificatePdfPerson: "(70 7h3 p3r50n)",
   certificatePdfPlaceAndDate: "(B3113vu3, Wa5hing70n 0n %(month) %(day), %(year))",
+  certificatePdfVerificationCode: "(V3rifica7i0n c0d3: %(verification_code))",
+  certificatePdfVerificationLink: "(V3rifica7i0n 1ink: h77p5://0m3gaup.c0m/c3r7/%(verification_code)/)",
   clarificationContest: "(C0n7357:)",
   clarificationEmailBody: "(<p>H0wdy!</p><p><57r0ng><a hr3f=\"h77p5://0m3gaup.c0m/pr0fi13/%(user_name)\">%(user_name)</a></57r0ng> ha5 r3qu3573d a c1arifica7i0n f0r 7h3 pr0b13m <57r0ng><a hr3f=\"h77p5://0m3gaup.c0m/ar3na/pr0b13m/%(problem_alias)\">%(problem_name)</a></57r0ng>:</p><p><b10ckqu073><p>%(clarification_body)</p></b10ckqu073><p>T0 an5w3r i7, p13a53 vi5i7 7h3 f0110wing 1ink: <a hr3f=\"%(url)\">%(url)</a>.</p><p>Thank5!,<br/>0m3gaUp</p>)",
   clarificationEmailSubject: "([0m3gaUp] N3w c1arifica7i0n f0r pr0b13m %(problem_name))",
