@@ -39,6 +39,7 @@ OmegaUp.on('ready', async () => {
   const commonPayload = types.payloadParsers.CommonPayload();
   const payload = types.payloadParsers.AssignmentDetailsPayload();
   const [locationHash] = window.location.hash.substring(1).split('/');
+
   const courseAdmin = Boolean(
     payload.courseDetails.is_admin || payload.courseDetails.is_curator,
   );
@@ -80,6 +81,9 @@ OmegaUp.on('ready', async () => {
       problemDetails?.nextSubmissionTimestamp.getTime(),
     );
   }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const useNewVerdictTable = urlParams.get('useNewVerdictTable') === 'true';
 
   const arenaCourse = new Vue({
     el: '#main-container',
@@ -132,6 +136,7 @@ OmegaUp.on('ready', async () => {
           feedbackThreadMap: this.feedbackThreadMap,
           currentUsername: commonPayload.currentUsername,
           currentUserClassName: commonPayload.userClassname,
+          useNewVerdictTable: useNewVerdictTable,
         },
         on: {
           'navigate-to-assignment': ({
