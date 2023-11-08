@@ -431,6 +431,14 @@ export namespace types {
       );
     }
 
+    export function CertificateValidationPayload(
+      elementId: string = 'payload',
+    ): types.CertificateValidationPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function CoderOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.CoderOfTheMonthPayload {
@@ -2722,6 +2730,12 @@ export namespace types {
 
   export interface CertificateListMinePayload {
     certificates: types.CertificateListItem[];
+  }
+
+  export interface CertificateValidationPayload {
+    certificate?: string;
+    valid: boolean;
+    verification_code: string;
   }
 
   export interface Clarification {

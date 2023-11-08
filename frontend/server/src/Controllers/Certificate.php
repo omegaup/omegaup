@@ -7,6 +7,7 @@ use setasign\Fpdi\Fpdi;
  * CertificateController
  *
  * @psalm-type CertificateDetailsPayload=array{uuid: string}
+ * @psalm-type CertificateValidationPayload=array{certificate: null|string, verification_code: string, valid: bool}
  * @psalm-type CertificateListItem=array{certificate_type: string, date: \OmegaUp\Timestamp, name: null|string, verification_code: string}
  * @psalm-type CertificateListMinePayload=array{certificates: list<CertificateListItem>}
  */
@@ -76,6 +77,31 @@ class Certificate extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'certificate_mine',
+        ];
+    }
+
+    /**
+     * @return array{templateProperties: array{payload: CertificateValidationPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @omegaup-request-param string $verification_code
+     */
+    public static function getValidationForTypeScript(\OmegaUp\Request $r) {
+        $verificationCode = $r->ensureString('verification_code');
+
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'verification_code' => $verificationCode,
+                    'valid' => boolval(\OmegaUp\DAO\Certificates::isValid(
+                        $verificationCode
+                    )),
+                    'certificate' => self::getCertificatePdf($verificationCode),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCertificateValidation'
+                ),
+            ],
+            'entrypoint' => 'certificate_validation',
         ];
     }
 
@@ -583,13 +609,10 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     public static function apiValidateCertificate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
-        $verificationCode = $r->ensureString('verification_code');
-        $isValid = boolval(\OmegaUp\DAO\Certificates::isValid(
-            $verificationCode
-        ));
-
         return [
-            'valid' => $isValid,
+            'valid' => boolval(\OmegaUp\DAO\Certificates::isValid(
+                $r->ensureString('verification_code')
+            )),
         ];
     }
 }
