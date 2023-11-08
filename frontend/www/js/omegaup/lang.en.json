@@ -1412,7 +1412,7 @@
 	"schoolsStartUsingCourses": "Start using Courses",
 	"scoreboardAccountName": "Account name",
 	"scoreboardLastUpdated": "Last time updated: %(datetime)",
-	"scoreboardNameAndAccountName": "Name and user",
+	"scoreboardNameAndAccountName": "Name and account name",
 	"scoreboardShowOnlyInvitedIdentities": "Show official contestants only",
 	"scoreboardShowParticipantsNames": "Show participants' names",
 	"searchUser": "Search coder",
