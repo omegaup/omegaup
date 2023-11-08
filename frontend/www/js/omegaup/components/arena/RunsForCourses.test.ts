@@ -114,6 +114,51 @@ describe('RunsForCourses.vue', () => {
       guid: '121500',
       time: new Date('1/1/2020, 12:15:00 AM'),
     },
+    {
+      ...baseRunData,
+      guid: '122500',
+      time: new Date('1/1/2020, 12:30:00 AM'),
+      execution: 'EXECUTION_INTERRUPTED',
+      output: 'OUTPUT_INTERRUPTED',
+      verdict: 'JE',
+      status_memory: 'MEMORY_NOT_AVAILABLE',
+      status_runtime: 'RUNTIME_NOT_AVAILABLE',
+    },
+    {
+      ...baseRunData,
+      guid: '123000',
+      time: new Date('1/1/2020, 12:40:00 AM'),
+      execution: 'EXECUTION_INTERRUPTED',
+      output: 'OUTPUT_INTERRUPTED',
+      verdict: 'VE',
+      status_memory: 'MEMORY_NOT_AVAILABLE',
+      status_runtime: 'RUNTIME_NOT_AVAILABLE',
+    },
+    {
+      ...baseRunData,
+      guid: '123500',
+      time: new Date('1/1/2020, 12:50:00 AM'),
+      execution: 'EXECUTION_INTERRUPTED',
+      output: 'OUTPUT_INTERRUPTED',
+      verdict: 'CE',
+      status_memory: 'MEMORY_NOT_AVAILABLE',
+      status_runtime: 'RUNTIME_NOT_AVAILABLE',
+    },
+    {
+      ...baseRunData,
+      guid: '124000',
+      time: new Date('1/1/2020, 12:55:00 AM'),
+      type: 'disqualified',
+    },
+    {
+      ...baseRunData,
+      guid: '124500',
+      time: new Date('1/1/2020, 1:00:00 AM'),
+      output: 'OUTPUT_CORRECT',
+      score: 1,
+      contest_score: 1,
+      verdict: 'AC',
+    },
   ];
 
   it('Should handle order runs', async () => {
@@ -134,7 +179,18 @@ describe('RunsForCourses.vue', () => {
     });
     expect(
       wrapper.findAll('acronym[data-run-guid]').wrappers.map((e) => e.text()),
-    ).toEqual(['122000', '121500', '121000', '120500', '120000']);
+    ).toEqual([
+      '124500',
+      '124000',
+      '123500',
+      '123000',
+      '122500',
+      '122000',
+      '121500',
+      '121000',
+      '120500',
+      '120000',
+    ]);
   });
 
   const filtersMapping: { filter: string; value: string }[] = [
@@ -161,6 +217,35 @@ describe('RunsForCourses.vue', () => {
     });
   });
 
+  it('Should handle run percentage color', async () => {
+    const wrapper = mount(arena_RunsForCourses, {
+      propsData: {
+        runs,
+        itemsPerPage: 100,
+      },
+    });
+
+    expect(
+      wrapper.findAll('td[data-run-percentage]').wrappers.map((e) =>
+        e
+          .classes()
+          .filter((c) => c !== 'numeric')
+          .join(''),
+      ),
+    ).toEqual([
+      'status-ac',
+      'status-disqualified',
+      'status-ce',
+      'status-je-ve',
+      'status-je-ve',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ]);
+  });
+
   it('Should handle paginator in user view', async () => {
     const wrapper = mount(arena_RunsForCourses, {
       propsData: {
@@ -171,7 +256,7 @@ describe('RunsForCourses.vue', () => {
 
     const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
     expect(paginationComponent.exists()).toBe(true);
-    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(3);
+    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(5);
     expect(paginationComponent.vm.$data.currentPage).toBe(1);
   });
 
@@ -189,7 +274,7 @@ describe('RunsForCourses.vue', () => {
     const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
     expect(paginationComponent.exists()).toBe(true);
 
-    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(5);
+    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(10);
     expect(paginationComponent.vm.$data.currentPage).toBe(1);
   });
 
@@ -341,6 +426,7 @@ describe('RunsForCourses.vue', () => {
           showRejudge: true,
           showUser: true,
           username: null,
+          itemsPerPage: 100,
         },
       });
 
