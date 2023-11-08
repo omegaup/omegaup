@@ -1,7 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
-import * as ui from '../../ui';
 
 import certificate_Validation from './Validation.vue';
 
@@ -14,18 +13,14 @@ describe('Validation.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(
-      ui.formatString(T.certificateValidationEnteredCode, {
-        code: 'ps9Atr691a',
-      }),
-    );
+    expect(wrapper.text()).toContain(T.certificateValidationEnteredCode);
+    expect(wrapper.text()).toContain('ps9Atr691a');
     expect(wrapper.text()).toContain(T.certificateValidationStatus);
-    expect(wrapper.text()).toContain(T.certificateValidationInvalid);
     expect(wrapper.text()).toContain(
-      ui.formatString(T.certificateValidationNotFound, {
-        code: 'ps9Atr691a',
-      }),
+      T.certificateValidationInvalid.toUpperCase(),
     );
+    expect(wrapper.text()).toContain(T.certificateValidationNotFound1);
+    expect(wrapper.text()).toContain(T.certificateValidationNotFound2);
     expect(wrapper.find('object').exists()).toBeFalsy();
   });
 
@@ -38,11 +33,8 @@ describe('Validation.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(
-      ui.formatString(T.certificateValidationEnteredCode, {
-        code: 'ps9Atr691a',
-      }),
-    );
+    expect(wrapper.text()).toContain(T.certificateValidationEnteredCode);
+    expect(wrapper.text()).toContain('ps9Atr691a');
     expect(wrapper.text()).toContain(T.certificateValidationCertifyValidity);
     expect(wrapper.find('object').exists()).toBeTruthy();
   });
