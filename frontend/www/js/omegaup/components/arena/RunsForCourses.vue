@@ -623,7 +623,7 @@ export default class Runs extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
   @Prop({ default: false }) simplifiedView!: boolean;
-  @Prop({ default: 7 }) itemsPerPage!: number;
+  @Prop({ default: 10 }) itemsPerPage!: number;
   @Prop({ default: false }) showGUID!: boolean;
 
   NumericOutputStatus = NumericOutputStatus;
