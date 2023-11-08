@@ -1,5 +1,7 @@
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
+import * as ui from '../ui';
+import T from '../lang';
 import Vue from 'vue';
 import certificate_Mine from '../components/certificate/Mine.vue';
 
@@ -15,6 +17,14 @@ OmegaUp.on('ready', () => {
         props: {
           certificates: payload.certificates,
           location: window.location.origin,
+        },
+        on: {
+          'show-copy-message': (): void => {
+            ui.success(T.certificateListMineLinkCopiedToClipboard);
+          },
+          'show-download-message': (): void => {
+            ui.success(T.certificateListMineFileDownloaded);
+          },
         },
       });
     },

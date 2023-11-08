@@ -34,7 +34,7 @@
             {{ getReason(certificate.name, certificate.certificate_type) }}
           </td>
           <td class="text-left align-middle d-none d-md-table-cell">
-            <span class="verification-link rounded border">
+            <span class="bg-light rounded border p-2 d-block w-100">
               {{ getVerificationLink(certificate.verification_code) }}
             </span>
           </td>
@@ -45,7 +45,7 @@
               type="button"
               :title="T.certificateListMineCopyToClipboard"
               :data-code="certificate.verification_code"
-              @click="ui.success(T.certificateListMineLinkCopiedToClipboard)"
+              @click="onCopyVerificationLink"
             >
               <font-awesome-icon icon="clipboard" />
             </button>
@@ -55,7 +55,7 @@
               :href="getDownloadLink(certificate.verification_code)"
               :title="T.certificateListMineDownload"
               :data-code="certificate.verification_code"
-              @click="ui.success(T.certificateListMineFileDownloaded)"
+              @click="onDownloadCertificate"
             >
               <font-awesome-icon icon="file-download" />
             </a>
@@ -105,30 +105,26 @@ export default class Mine extends Vue {
   }
 
   getReason(name: string | null, type: string): string {
-    if (name !== null && type === 'contest') {
+    if (name === null) {
+      return type === 'coder_of_the_month'
+        ? T.certificateListMineCoderOfTheMonth
+        : T.certificateListMineCoderOfTheMonthFemale;
+    }
+    if (type === 'contest') {
       return ui.formatString(T.certificateListMineContest, {
         contest_title: name,
       });
     }
-    if (name !== null && type === 'course') {
-      return ui.formatString(T.certificateListMineCourse, {
-        course_name: name,
-      });
-    }
-    if (type === 'coder_of_the_month') {
-      return T.certificateListMineCoderOfTheMonth;
-    }
-    return T.certificateListMineCoderOfTheMonthFemale;
+    return ui.formatString(T.certificateListMineCourse, {
+      course_name: name,
+    });
+  }
+
+  onCopyVerificationLink(): void {
+    this.$emit('show-copy-message');
+  }
+  onDownloadCertificate(): void {
+    this.$emit('show-download-message');
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-span.verification-link {
-  display: block;
-  width: 90%;
-  background-color: rgba(222, 222, 222, 0.4);
-  padding: 0.5rem 0.5rem;
-}
-</style>
