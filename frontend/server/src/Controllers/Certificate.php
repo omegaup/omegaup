@@ -12,7 +12,7 @@ use setasign\Fpdi\Fpdi;
  */
 class Certificate extends \OmegaUp\Controllers\Controller {
     // General certificate PDF constants
-    const CERTIFICATE_PDF_BORDER = 1;
+    const CERTIFICATE_PDF_BORDER = 0;
     const CERTIFICATE_PDF_LN = 1;
     const CERTIFICATE_PDF_ALIGN_CENTER = 'C';
     const CERTIFICATE_PDF_ALIGN_RIGHT = 'R';
@@ -62,8 +62,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
         $certificates = [];
         if (!is_null($r->identity->user_id)) {
-            $certificates = self::getUserCertificates(
-                $r->identity,
+            $certificates = \OmegaUp\DAO\Certificates::getUserCertificates(
                 $r->identity->user_id
             );
         }
