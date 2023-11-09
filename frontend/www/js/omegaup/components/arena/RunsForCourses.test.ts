@@ -175,7 +175,7 @@ describe('RunsForCourses.vue', () => {
         showRejudge: true,
         showUser: true,
         username: null,
-        itemsPerPage: 100,        
+        itemsPerPage: 100,
       },
     });
     expect(
@@ -346,7 +346,7 @@ describe('RunsForCourses.vue', () => {
         showRejudge: true,
         isContestFinished: false,
         useNewSubmissionButton: true,
-        itemsPerPage: 100,        
+        itemsPerPage: 100,
       },
     });
     expect(wrapper.find('[data-actions="120000"]').text()).toContain(
