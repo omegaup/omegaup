@@ -5,7 +5,7 @@ import T from '../../lang';
 import certificate_Validation from './Validation.vue';
 
 describe('Validation.vue', () => {
-  it('Should handle an invalid certificate', async () => {
+  it('Should handle an invalid certificate', () => {
     const wrapper = shallowMount(certificate_Validation, {
       propsData: {
         verificationCode: 'ps9Atr691a',
@@ -24,7 +24,7 @@ describe('Validation.vue', () => {
     expect(wrapper.find('object').exists()).toBeFalsy();
   });
 
-  it('Should handle a valid certificate', async () => {
+  it('Should handle a valid certificate', () => {
     const wrapper = shallowMount(certificate_Validation, {
       propsData: {
         verificationCode: 'ps9Atr691a',
