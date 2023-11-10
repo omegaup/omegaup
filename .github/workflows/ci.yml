@@ -28,6 +28,12 @@ jobs:
         ports:
           - 6379:6379
 
+    env:
+      OMEGAUP_RABBITMQ_HOST: rabbitmq
+      OMEGAUP_RABBITMQ_PORT: 5672
+      OMEGAUP_RABBITMQ_USERNAME: omegaup
+      OMEGAUP_RABBITMQ_PASSWORD: omegaup
+
     steps:
       - uses: actions/checkout@v2
         with:
