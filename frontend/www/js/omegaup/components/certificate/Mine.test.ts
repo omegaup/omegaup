@@ -2,6 +2,7 @@ import { mount, shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
 
 import T from '../../lang';
+import * as ui from '../../ui';
 
 import certificate_Mine from './Mine.vue';
 
@@ -23,11 +24,13 @@ describe('Mine.vue', () => {
       {
         certificate_type: 'coder_of_the_month',
         date: new Date(),
+        name: null,
         verification_code: 'dodp874598',
       },
       {
         certificate_type: 'coder_of_the_month_female',
         date: new Date(),
+        name: null,
         verification_code: 'gkspa12345',
       },
     ],
@@ -53,14 +56,42 @@ describe('Mine.vue', () => {
 
     expect(wrapper.text()).toContain(T.certificateListMineTitle);
     expect(wrapper.find('table').exists()).toBeTruthy();
-    expect(wrapper.text()).toContain('Test contest');
-    expect(wrapper.text()).toContain('Test course');
-    expect(wrapper.text()).toContain(T.certificateListMineCoderOfTheMonth);
-    expect(wrapper.text()).toContain(
+    expect(wrapper.find('table tbody').text()).toContain(
+      ui.formatString(T.certificateListMineContest, {
+        contest_title: 'Test contest',
+      }),
+    );
+    expect(wrapper.find('table tbody').text()).toContain(
+      ui.formatString(T.certificateListMineCourse, {
+        course_name: 'Test course',
+      }),
+    );
+    expect(wrapper.find('table tbody').text()).toContain(
+      T.certificateListMineCoderOfTheMonth,
+    );
+    expect(wrapper.find('table tbody').text()).toContain(
       T.certificateListMineCoderOfTheMonthFemale,
     );
-    expect(wrapper.text()).toContain(T.certificateListMineDownload);
-    expect(wrapper.text()).toContain(T.certificateListMineCopyToClipboard);
+  });
+
+  it('Should copy the verification code', () => {
+    const defineSpy = jest.spyOn(
+      (certificate_Mine as any).options.methods,
+      'getVerificationLink',
+    );
+
+    shallowMount(certificate_Mine, {
+      propsData,
+    });
+
+    expect(defineSpy).toHaveBeenCalledTimes(
+      propsData['certificates'].length * 2,
+    );
+    propsData['certificates'].forEach((certificate) => {
+      expect(defineSpy).toHaveBeenCalledWith(certificate.verification_code);
+    });
+
+    defineSpy.mockRestore();
   });
 
   it('Should download a file', async () => {
@@ -73,7 +104,7 @@ describe('Mine.vue', () => {
       propsData,
     });
 
-    await wrapper.findAll('a').trigger('click');
+    await wrapper.findAll('.download-file').trigger('click');
 
     await wrapper.vm.$nextTick();
 
