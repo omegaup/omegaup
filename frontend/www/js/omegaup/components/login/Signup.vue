@@ -19,7 +19,7 @@
         </div>
 
         <div class="row">
-          <div v-show="!isUnder13" class="col-md-4 offset-md-2">
+          <div v-show="isUnder13" class="col-md-4 offset-md-2">
             <div class="form-group">
               <label class="control-label">{{ T.loginParentEmail }}</label>
               <input
@@ -31,7 +31,7 @@
               />
             </div>
           </div>
-          <div v-show="isUnder13" class="col-md-4 offset-md-2 introjs-email">
+          <div v-show="!isUnder13" class="col-md-4 offset-md-2 introjs-email">
             <div class="form-group">
               <label class="control-label">{{ T.loginEmail }}</label>
               <input
@@ -175,7 +175,7 @@ export default class Signup extends Vue {
   password: string = '';
   passwordConfirmation: string = '';
   recaptchaResponse: string = '';
-  isUnder13: boolean = false;
+  isUnder13: boolean = true;
   over13Checked: boolean = false;
 
   mounted() {
@@ -269,26 +269,12 @@ export default class Signup extends Vue {
       : `${currentYear - 13}-${currentMonth}-${dayFollowingTheCurrent}`;
   }
 
-  checkAge() {
-    const dateOfBirth = new Date(this.dateOfBirth);
-    const today = new Date();
-    const age = today.getFullYear() - dateOfBirth.getFullYear();
-    this.isUnder13 = age > 13;
-    if (this.isUnder13) {
-      this.email = '';
-    }
-  }
-
   updateDateRestriction() {
-    this.checkAge();
-
     if (this.over13Checked) {
-      this.email = '';
-      this.isUnder13 = true;
+      this.isUnder13 = false;
       return;
     }
-    this.parentEmail = '';
-    this.isUnder13 = false;
+    this.isUnder13 = true;
   }
 }
 </script>
