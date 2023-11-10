@@ -70,10 +70,10 @@
     <table v-else class="table mb-0 table-responsive-sm">
       <thead>
         <tr>
-          <th scope="col" class="pl-4 column-width">#</th>
-          <th scope="col">{{ T.contestParticipant }}</th>
-          <th scope="col" class="text-right">{{ T.rankScore }}</th>
-          <th v-if="!isIndex" scope="col" class="text-right pr-4">
+          <th scope="col" class="pl-4 column-width align-middle">#</th>
+          <th scope="col" class="align-middle">{{ T.contestParticipant }}</th>
+          <th scope="col" class="text-right align-middle">{{ T.rankScore }}</th>
+          <th v-if="!isIndex" scope="col" class="text-right pr-4 align-middle">
             {{ T.rankSolved }}
             <!-- id-lint off -->
             <b-button
