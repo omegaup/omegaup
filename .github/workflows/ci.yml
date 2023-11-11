@@ -28,12 +28,6 @@ jobs:
         ports:
           - 6379:6379
 
-    env:
-      OMEGAUP_RABBITMQ_HOST: rabbitmq
-      OMEGAUP_RABBITMQ_PORT: 5672
-      OMEGAUP_RABBITMQ_USERNAME: omegaup
-      OMEGAUP_RABBITMQ_PASSWORD: omegaup
-
     steps:
       - uses: actions/checkout@v2
         with:
@@ -499,6 +493,10 @@ jobs:
           define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
           define('OMEGAUP_GRADER_URL', 'https://grader:21680');
           define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
+          define('OMEGAUP_RABBITMQ_HOST', 'rabbitmq');
+          define('OMEGAUP_RABBITMQ_PORT', '5672');
+          define('OMEGAUP_RABBITMQ_USERNAME', 'omegaup');
+          define('OMEGAUP_RABBITMQ_PASSWORD', 'omegaup');
           define('REDIS_HOST', 'redis');
           define('REDIS_PASS', '');
           define('TEMPLATE_CACHE_DIR', '/tmp');
