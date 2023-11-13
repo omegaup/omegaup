@@ -410,6 +410,14 @@ export namespace types {
       );
     }
 
+    export function CertificateValidationPayload(
+      elementId: string = 'payload',
+    ): types.CertificateValidationPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function CoderOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.CoderOfTheMonthPayload {
@@ -2699,6 +2707,12 @@ export namespace types {
     verification_code: string;
   }
 
+  export interface CertificateValidationPayload {
+    certificate?: string;
+    valid: boolean;
+    verification_code: string;
+  }
+
   export interface Clarification {
     answer?: string;
     assignment_alias?: string;
@@ -4864,6 +4878,10 @@ export namespace messages {
   export type BadgeUserListResponse = { badges: types.Badge[] };
 
   // Certificate
+  export type CertificateGenerateContestCertificatesRequest = {
+    [key: string]: any;
+  };
+  export type CertificateGenerateContestCertificatesResponse = {};
   export type CertificateGetCertificatePdfRequest = { [key: string]: any };
   export type CertificateGetCertificatePdfResponse = { certificate?: string };
   export type CertificateGetUserCertificatesRequest = { [key: string]: any };
@@ -5765,6 +5783,9 @@ export namespace controllers {
   }
 
   export interface Certificate {
+    generateContestCertificates: (
+      params?: messages.CertificateGenerateContestCertificatesRequest,
+    ) => Promise<messages.CertificateGenerateContestCertificatesResponse>;
     getCertificatePdf: (
       params?: messages.CertificateGetCertificatePdfRequest,
     ) => Promise<messages.CertificateGetCertificatePdfResponse>;
