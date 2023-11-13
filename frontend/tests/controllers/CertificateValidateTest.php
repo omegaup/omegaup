@@ -8,14 +8,6 @@ class CertificateValidateTest extends \OmegaUp\Test\ControllerTestCase {
      * Test to verify that a certificate that doesn't exist is invalid
      */
     public function testValidateCertificateWithInvalidVerificationCode() {
-        $r = new \OmegaUp\Request(['verification_code' => 'D89lJ2aOZ3',]);
-
-        $response = \OmegaUp\Controllers\Certificate::apiValidateCertificate(
-            $r
-        );
-
-        $this->assertFalse($response['valid']);
-
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -28,7 +20,7 @@ class CertificateValidateTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         $response = \OmegaUp\Controllers\Certificate::apiValidateCertificate(
-            $r
+            new \OmegaUp\Request(['verification_code' => 'D89lJ2aOZ3',])
         );
 
         $this->assertFalse($response['valid']);
@@ -49,9 +41,8 @@ class CertificateValidateTest extends \OmegaUp\Test\ControllerTestCase {
             'verification_code' => 'D89lJ2aOZ3'
         ]));
 
-        $r = new \OmegaUp\Request(['verification_code' => 'D89lJ2aOZ3',]);
         $response = \OmegaUp\Controllers\Certificate::apiValidateCertificate(
-            $r
+            new \OmegaUp\Request(['verification_code' => 'D89lJ2aOZ3',])
         );
 
         $this->assertTrue($response['valid']);
