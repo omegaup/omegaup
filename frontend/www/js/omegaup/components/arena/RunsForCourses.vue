@@ -644,7 +644,7 @@ export default class Runs extends Vue {
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
   currentPage: number = 1;
-  newFieldsDate: Date = new Date('2023-10-22');
+  newFieldsLaunchDate: Date = new Date('2023-10-22');
 
   get totalRows(): number {
     return this.filteredRuns.length;
@@ -799,7 +799,7 @@ export default class Runs extends Vue {
   }
 
   execution(run: types.Run): string {
-    if (run.time < this.newFieldsDate) {
+    if (run.time < this.newFieldsLaunchDate) {
       return T.runDetailsNotAvailable;
     }
 
@@ -826,7 +826,7 @@ export default class Runs extends Vue {
   }
 
   output(run: types.Run): string {
-    if (run.time < this.newFieldsDate) {
+    if (run.time < this.newFieldsLaunchDate) {
       return T.runDetailsNotAvailable;
     }
 
@@ -847,17 +847,27 @@ export default class Runs extends Vue {
   }
 
   statusPercentageClass(run: types.Run): string {
-    if (run.status !== 'ready') return '';
+    if (run.status !== 'ready') {
+      return '';
+    }
 
-    if (run.verdict == 'JE' || run.verdict == 'VE') return 'status-je-ve';
+    if (run.verdict == 'JE' || run.verdict == 'VE') {
+      return 'status-je-ve';
+    }
 
-    if (run.verdict == 'CE') return 'status-ce';
+    if (run.verdict == 'CE') {
+      return 'status-ce';
+    }
 
-    if (run.type === 'disqualified') return 'status-disqualified';
+    if (run.type === 'disqualified') {
+      return 'status-disqualified';
+    }
 
     const scorePercentage = (run.score * 100).toFixed(2);
 
-    if (scorePercentage !== '100.00') return '';
+    if (scorePercentage !== '100.00') {
+      return '';
+    }
 
     return 'status-ac';
   }
@@ -865,7 +875,7 @@ export default class Runs extends Vue {
   outputIconColorStatus(run: types.Run): number {
     if (
       !(run.status === 'ready' && run.output !== StringOutputStatus.Exceeded) ||
-      run.time < this.newFieldsDate
+      run.time < this.newFieldsLaunchDate
     ) {
       return NumericOutputStatus.None;
     }
