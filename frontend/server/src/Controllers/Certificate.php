@@ -537,6 +537,124 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Generates all the certificates for a contest given its contest ID.
+     *
+     * @throws \OmegaUp\Exceptions\NotFoundException
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param int|null $certificates_cutoff
+     * @omegaup-request-param int|null $contest_id
+     */
+    public static function apiGenerateContestCertificates(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        $r->ensureMainUserIdentity();
+
+        $contestID = $r->ensureInt('contest_id');
+
+        $contest = \OmegaUp\DAO\Contests::getByPK($contestID);
+
+        if (
+            is_null($contest)
+            || is_null($contest->problemset_id)
+            || is_null($contest->alias)
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            $contest->problemset_id
+        );
+
+        if (is_null($problemset)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+
+        // check whether the logged user is a certificate generator and a contest admin
+        if (
+            !\OmegaUp\Authorization::isCertificateGenerator($r->identity) ||
+            !\OmegaUp\Authorization::isContestAdmin($r->identity, $contest)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        // check that the contest has ended and the certificate can be generated
+        if (
+            $contest->finish_time->time > \OmegaUp\Time::get() ||
+            ($contest->certificates_status !== 'uninitiated' &&
+            $contest->certificates_status !== 'retryable_error')
+        ) {
+            return ['status' => 'error'];
+        }
+
+        $certificateCutoff = $r->ensureOptionalInt('certificates_cutoff');
+
+        // add certificates_cutoff value to the contest
+        if (!is_null($certificateCutoff)) {
+            $contest->certificate_cutoff = $certificateCutoff;
+        }
+
+        // update contest with the new value
+        \OmegaUp\DAO\Contests::update($contest);
+
+        // get contest info
+        $contestExtraInformation = \OmegaUp\DAO\Contests::getByAliasWithExtraInformation(
+            $contest->alias
+        );
+
+        if (is_null($contestExtraInformation)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+
+        // set RabbitMQ client parameters
+        $routingKey = 'ContestQueue';
+        $exchange = 'certificates';
+
+        // connection to rabbitmq
+        $channel = \OmegaUp\RabbitMQConnection::getInstance()->channel();
+
+        $channel->exchange_declare(
+            $exchange,
+            type: 'direct',
+            passive: false,
+            durable: true,
+            auto_delete: false
+        );
+
+        $scoreboard = \OmegaUp\Controllers\Contest::getScoreboard(
+            $contest,
+            $problemset,
+            $r->identity,
+            $contestExtraInformation['scoreboard_url']
+        );
+
+        $ranking = array_map(
+            fn ($rank) => ['username' => $rank['username'] , 'place' => $rank['place'] ?? null],
+            $scoreboard['ranking']
+        );
+
+        // prepare the message
+        $messageArray = [
+            'certificate_cutoff' => $contestExtraInformation['certificate_cutoff'],
+            'alias' => $contestExtraInformation['alias'],
+            'scoreboard_url' => $contestExtraInformation['scoreboard_url'],
+            'contest_id' => $contestExtraInformation['contest_id'],
+            'ranking' => $ranking,
+        ];
+        $messageJSON = json_encode($messageArray);
+        $message = new \PhpAmqpLib\Message\AMQPMessage($messageJSON);
+
+        // send the message to RabbitMQ
+        $channel->basic_publish($message, $exchange, $routingKey);
+        $channel->close();
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
      * API to generate the certificate PDF
      *
      * @return array{certificate: string|null}
