@@ -75,3 +75,11 @@ try_define('OMEGAUP_SESSION_API_HOURLY_LIMIT', 10);
 # TEMPLATES
 # #########################
 try_define('TEMPLATE_CACHE_DIR', '/var/tmp/omegaup/');
+
+# ####################################
+# RABBITMQ CONFIG
+# ####################################
+try_define('OMEGAUP_RABBITMQ_HOST', 'rabbitmq');
+try_define('OMEGAUP_RABBITMQ_PORT', '5672');
+try_define('OMEGAUP_RABBITMQ_USERNAME', 'omegaup');
+try_define('OMEGAUP_RABBITMQ_PASSWORD', 'omegaup');
