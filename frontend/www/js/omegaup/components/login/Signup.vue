@@ -11,6 +11,7 @@
               v-model="over13Checked"
               type="checkbox"
               @change="updateDateRestriction"
+              data-over-13-checkbox
             />
             <label for="checkbox" class="pl-1">
               <omegaup-markdown :markdown="T.over13yearsOld"></omegaup-markdown>
