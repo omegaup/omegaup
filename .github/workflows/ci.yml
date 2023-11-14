@@ -33,7 +33,7 @@ jobs:
         ports:
           - 5672:5672
           - 15672:15672
-        options: --name rabbitmq
+        options: --hostname rabbitmq
         env:
           RABBITMQ_DEFAULT_USER: 'omegaup'
           RABBITMQ_DEFAULT_PASS: 'omegaup'
@@ -63,6 +63,10 @@ jobs:
           define('OMEGAUP_DB_HOST', 'localhost:13306');
           define('REDIS_HOST', 'localhost');
           define('REDIS_PASS', '');
+          define('OMEGAUP_RABBITMQ_HOST', 'rabbitmq');
+          define('OMEGAUP_RABBITMQ_PORT', '5672');
+          define('OMEGAUP_RABBITMQ_USERNAME', 'omegaup');
+          define('OMEGAUP_RABBITMQ_PASSWORD', 'omegaup');
           EOF
 
       - name: Download gitserver
