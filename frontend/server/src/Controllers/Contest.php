@@ -4034,7 +4034,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @return Scoreboard
      */
-    public static function getScoreboard(
+    private static function getScoreboard(
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Problemsets $problemset,
         ?\OmegaUp\DAO\VO\Identities $identity,
