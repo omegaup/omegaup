@@ -4878,10 +4878,6 @@ export namespace messages {
   export type BadgeUserListResponse = { badges: types.Badge[] };
 
   // Certificate
-  export type CertificateGenerateContestCertificatesRequest = {
-    [key: string]: any;
-  };
-  export type CertificateGenerateContestCertificatesResponse = {};
   export type CertificateGetCertificatePdfRequest = { [key: string]: any };
   export type CertificateGetCertificatePdfResponse = { certificate?: string };
   export type CertificateGetUserCertificatesRequest = { [key: string]: any };
@@ -5783,9 +5779,6 @@ export namespace controllers {
   }
 
   export interface Certificate {
-    generateContestCertificates: (
-      params?: messages.CertificateGenerateContestCertificatesRequest,
-    ) => Promise<messages.CertificateGenerateContestCertificatesResponse>;
     getCertificatePdf: (
       params?: messages.CertificateGetCertificatePdfRequest,
     ) => Promise<messages.CertificateGetCertificatePdfResponse>;
