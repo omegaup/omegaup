@@ -91,6 +91,21 @@ jobs:
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
 
+      - name: Install wait-for-it
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y wait-for-it
+
+      - name: Start the Docker containers
+        run: |
+          # Add the container names as aliases to localhost
+          cat << EOF | sudo tee --append /etc/hosts
+          127.0.0.1 rabbitmq
+          EOF
+
+          # Wait for some of the containers
+          wait-for-it -t 30 rabbitmq:5672
+          docker-compose exec -T rabbitmq rabbitmqctl await_startup
+
       - name: Create database users
         run: |
           mysql \
