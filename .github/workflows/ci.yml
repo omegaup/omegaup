@@ -29,14 +29,13 @@ jobs:
           - 6379:6379
 
       rabbitmq:
-        image: rabbitmq:latest
+        image: rabbitmq:3-management-alpine
         ports:
-          - 5672/tcp
-        options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
+          - 5672:5672
+          - 15672:15672
         env:
           RABBITMQ_DEFAULT_USER: 'omegaup'
           RABBITMQ_DEFAULT_PASS: 'omegaup'
-          AMQP_URL: 'amqp://omegaup:omegaup@rabbitmq:5672'
 
     steps:
       - uses: actions/checkout@v2
@@ -121,6 +120,9 @@ jobs:
             --username=root --password= --hostname=localhost --port=13306 \
             --database=omegaup-test \
             validate --all < /dev/null
+
+      - name: Check DNS resolution
+        run: ping -c 3 rabbitmq
 
       - name: Run tests
         timeout-minutes: 20
