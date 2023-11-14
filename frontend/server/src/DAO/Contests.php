@@ -524,7 +524,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         p.scoreboard_url,
                         p.scoreboard_url_admin,
-                        COUNT(contestants.identity_id) AS contestants,
+                        0 AS contestants,
                         ANY_VALUE(organizer.username) AS organizer";
 
         $sql = "
@@ -566,8 +566,6 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 Problemsets p
             ON
                 p.problemset_id = Contests.problemset_id
-            LEFT JOIN
-                Problemset_Identities AS contestants
             ON
                 Contests.problemset_id = contestants.problemset_id
             INNER JOIN
