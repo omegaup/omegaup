@@ -73,7 +73,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
                     'certificates' => $certificates,
                 ],
                 'title' => new \OmegaUp\TranslationString(
-                    'omegaupTitleMyDiplomas'
+                    'omegaupTitleMyCertificates'
                 ),
             ],
             'entrypoint' => 'certificate_mine',
