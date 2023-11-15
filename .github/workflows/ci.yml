@@ -51,7 +51,6 @@ jobs:
           docker-compose up --detach rabbitmq
           # Add the container names as aliases to localhost
           echo "127.0.0.1 rabbitmq" | sudo tee --append /etc/hosts
-          EOF
           # Wait for some of the containers
           docker-compose logs rabbitmq
           wait-for-it -t 600 rabbitmq:5672
