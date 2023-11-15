@@ -48,13 +48,15 @@ jobs:
 
       - name: Start the Docker containers
         run: |
-          docker-compose up --detach rabbitmq
+          docker-compose up --no-build --detach rabbitmq
 
           # Add the container names as aliases to localhost
-          echo "127.0.0.1 rabbitmq" | sudo tee --append /etc/hosts
+          cat << EOF | sudo tee --append /etc/hosts
+          127.0.0.1 rabbitmq
+          EOF
 
           # Wait for some of the containers
-          sleep 300
+          wait-for-it -t 600 rabbitmq:5672
           docker-compose exec -T rabbitmq rabbitmqctl await_startup
 
       - name: Use PHP 8.1
