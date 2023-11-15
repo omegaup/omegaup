@@ -47,20 +47,9 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Install wait-for-it
+      - name: Add rabbitmq as alias to localhost
         run: |
-          sudo apt-get update -y && sudo apt-get install -y wait-for-it
-
-      - name: Start the Docker containers
-        run: |
-          # Add the container names as aliases to localhost
           echo "127.0.0.1 rabbitmq" | sudo tee --append /etc/hosts
-
-          # Wait for some of the containers
-          docker-compose logs rabbitmq
-          wait-for-it -t 600 rabbitmq:5672
-          docker-compose logs rabbitmq
-          docker-compose exec -T rabbitmq rabbitmqctl await_startup
 
       - name: Use PHP 8.1
         run: |
