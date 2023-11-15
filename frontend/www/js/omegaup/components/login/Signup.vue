@@ -10,7 +10,7 @@
             <input
               v-model="over13Checked"
               type="checkbox"
-              data-over-13-checkbox
+              data-over-thirteen-checkbox
               @change="updateDateRestriction"
             />
             <label for="checkbox" class="pl-1">
