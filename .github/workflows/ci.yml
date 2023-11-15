@@ -28,6 +28,15 @@ jobs:
         ports:
           - 6379:6379
 
+      rabbitmq:
+        image: rabbitmq:3-management-alpine
+        ports:
+          - 5672:5672
+          - 15672:15672
+        env:
+          RABBITMQ_DEFAULT_USER: 'omegaup'
+          RABBITMQ_DEFAULT_PASS: 'omegaup'
+
     steps:
       - uses: actions/checkout@v2
         with:
@@ -42,15 +51,11 @@ jobs:
         run: |
           sudo apt-get update -y && sudo apt-get install -y wait-for-it
 
-      - name: Download the Docker containers
-        run: |
-          docker-compose pull
-
       - name: Start the Docker containers
         run: |
-          docker-compose up --detach rabbitmq
           # Add the container names as aliases to localhost
           echo "127.0.0.1 rabbitmq" | sudo tee --append /etc/hosts
+
           # Wait for some of the containers
           docker-compose logs rabbitmq
           wait-for-it -t 600 rabbitmq:5672
