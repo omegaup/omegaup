@@ -103,7 +103,7 @@ jobs:
           EOF
 
           # Wait for some of the containers
-          wait-for-it -t 60 rabbitmq:5672
+          wait-for-it -t 600 rabbitmq:5672
           docker-compose exec -T rabbitmq rabbitmqctl await_startup
 
       - name: Create database users
