@@ -360,6 +360,7 @@
                 v-if="!showPoints"
                 :class="statusPercentageClass(run)"
                 class="numeric"
+                data-run-percentage
               >
                 {{ percentage(run) }}
               </td>
@@ -378,6 +379,17 @@
                   "
                   :icon="['fas', 'times-circle']"
                   style="color: red"
+                />
+                <font-awesome-icon
+                  v-else-if="
+                    outputIconColorStatus(run) ===
+                    NumericOutputStatus.Interrupted
+                  "
+                  :icon="['fas', 'exclamation-circle']"
+                  style="color: orange"
+                />
+                <br
+                  v-if="outputIconColorStatus(run) != NumericOutputStatus.None"
                 />
                 {{ output(run) }}
               </td>
@@ -557,6 +569,7 @@ export enum NumericOutputStatus {
   None = 0,
   Correct = 1,
   Incorrect = 2,
+  Interrupted = 3,
 }
 
 export enum StringOutputStatus {
@@ -610,7 +623,7 @@ export default class Runs extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
   @Prop({ default: false }) simplifiedView!: boolean;
-  @Prop({ default: 7 }) itemsPerPage!: number;
+  @Prop({ default: 10 }) itemsPerPage!: number;
   @Prop({ default: false }) showGUID!: boolean;
 
   NumericOutputStatus = NumericOutputStatus;
@@ -631,6 +644,7 @@ export default class Runs extends Vue {
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
   currentPage: number = 1;
+  newFieldsLaunchDate: Date = new Date('2023-10-22');
 
   get totalRows(): number {
     return this.filteredRuns.length;
@@ -728,7 +742,7 @@ export default class Runs extends Vue {
     )
       return '—';
     if (run.status_memory === MemoryStatus.Exceeded)
-      return T.runDetailsExceeded;
+      return T.runDetailsMemoryExceeded;
     return `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
   }
 
@@ -785,6 +799,10 @@ export default class Runs extends Vue {
   }
 
   execution(run: types.Run): string {
+    if (run.time < this.newFieldsLaunchDate) {
+      return T.runDetailsNotAvailable;
+    }
+
     if (run.status !== 'ready') {
       return '—';
     }
@@ -808,6 +826,10 @@ export default class Runs extends Vue {
   }
 
   output(run: types.Run): string {
+    if (run.time < this.newFieldsLaunchDate) {
+      return T.runDetailsNotAvailable;
+    }
+
     if (run.status !== 'ready') {
       return '—';
     }
@@ -829,8 +851,22 @@ export default class Runs extends Vue {
       return '';
     }
 
-    if (run.type == 'disqualified') {
+    if (run.verdict == 'JE' || run.verdict == 'VE') {
+      return 'status-je-ve';
+    }
+
+    if (run.verdict == 'CE') {
+      return 'status-ce';
+    }
+
+    if (run.type === 'disqualified') {
       return 'status-disqualified';
+    }
+
+    const scorePercentage = (run.score * 100).toFixed(2);
+
+    if (scorePercentage !== '100.00') {
+      return '';
     }
 
     return 'status-ac';
@@ -838,19 +874,19 @@ export default class Runs extends Vue {
 
   outputIconColorStatus(run: types.Run): number {
     if (
-      !(
-        run.status === 'ready' &&
-        run.output !== StringOutputStatus.Exceeded &&
-        run.output !== StringOutputStatus.Interrupted
-      )
+      !(run.status === 'ready' && run.output !== StringOutputStatus.Exceeded) ||
+      run.time < this.newFieldsLaunchDate
     ) {
       return NumericOutputStatus.None;
     }
 
-    if (run.output !== StringOutputStatus.Incorrect) {
-      return NumericOutputStatus.Correct;
+    if (run.output === StringOutputStatus.Incorrect) {
+      return NumericOutputStatus.Incorrect;
+    } else if (run.output === StringOutputStatus.Interrupted) {
+      return NumericOutputStatus.Interrupted;
     }
-    return NumericOutputStatus.Incorrect;
+
+    return NumericOutputStatus.Correct;
   }
 
   showVerdictHelp(ev: Event): void {
