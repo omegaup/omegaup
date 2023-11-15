@@ -54,7 +54,7 @@ jobs:
           echo "127.0.0.1 rabbitmq" | sudo tee --append /etc/hosts
 
           # Wait for some of the containers
-          wait-for-it -t 600 rabbitmq:5672
+          sleep 300
           docker-compose exec -T rabbitmq rabbitmqctl await_startup
 
       - name: Use PHP 8.1
