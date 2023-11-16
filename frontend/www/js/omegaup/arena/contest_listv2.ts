@@ -1,7 +1,5 @@
 import { OmegaUp } from '../omegaup';
 import * as time from '../time';
-import * as api from '../api';
-import * as ui from '../ui';
 import { types } from '../api_types';
 import Vue from 'vue';
 import arena_ContestList, {
@@ -13,24 +11,6 @@ import contestStore from './contestStore';
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestListv2Payload();
-  const contestIDs = [
-    ...payload.contests.current.map((contest) => contest.contest_id),
-    ...payload.contests.past.map((contest) => contest.contest_id),
-    ...payload.contests.future.map((contest) => contest.contest_id),
-  ];
-  api.Contest.getNumberOfContestants({ contest_ids: contestIDs })
-    .then(({ response }) => {
-      payload.contests.current.forEach((contest) => {
-        contest.contestants = response[contest.contest_id] ?? 0;
-      });
-      payload.contests.past.forEach((contest) => {
-        contest.contestants = response[contest.contest_id] ?? 0;
-      });
-      payload.contests.future.forEach((contest) => {
-        contest.contestants = response[contest.contest_id] ?? 0;
-      });
-    })
-    .catch(ui.apiError);
   contestStore.commit('updateAll', payload.contests);
   contestStore.commit('updateAllCounts', payload.countContests);
   let tab: ContestTab = ContestTab.Current;
