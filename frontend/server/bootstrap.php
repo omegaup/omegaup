@@ -91,6 +91,7 @@ $contentSecurityPolicy = [
         'https://docs.google.com',
         'https://staticxx.facebook.com',
         'https://syndication.twitter.com',
+        'blob:',
     ],
     'report-uri' => [
         '/cspreport.php',
