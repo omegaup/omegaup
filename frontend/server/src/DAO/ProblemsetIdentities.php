@@ -89,6 +89,9 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
             $problemsetIdentity->end_time = $finishTime;
             $problemsetIdentity->share_user_information = $shareUserInformation;
             \OmegaUp\DAO\ProblemsetIdentities::replace($problemsetIdentity);
+            \OmegaUp\Cache::invalidateAllKeys(
+                \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST
+            );
         }
         return $problemsetIdentity;
     }

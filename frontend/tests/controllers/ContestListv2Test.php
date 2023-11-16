@@ -297,7 +297,9 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testContestantsColumnAsUserNotLoggedIn() {
-        $this->createContestsAndAddContestants();
+        [
+            'firstInvitedUserIdentity' => $firstInvitedUserIdentity,
+        ] = $this->createContestsAndAddContestants();
 
         $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
             new \OmegaUp\Request()
@@ -306,6 +308,9 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         $contests = $contestListPayload['contests']['current'];
         $contestContestants = [];
 
+        // Logging user
+        $login = self::login($firstInvitedUserIdentity);
+
         [
             'response' => $contestants,
         ] = \OmegaUp\Controllers\Contest::apiGetNumberOfContestants(
@@ -313,7 +318,8 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
                 'contest_ids' => join(',', array_map(
                     fn ($contest) => $contest['contest_id'],
                     $contests
-                ))
+                )),
+                'auth_token' => $login->auth_token,
             ])
         );
         foreach ($contests as $contest) {
@@ -350,10 +356,13 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         [
             'response' => $contestants,
         ] = \OmegaUp\Controllers\Contest::apiGetNumberOfContestants(
-            new \OmegaUp\Request(['contest_ids' => join(',', array_map(
-                fn ($contest) => $contest['contest_id'],
-                $contests
-            ))])
+            new \OmegaUp\Request([
+                'contest_ids' => join(',', array_map(
+                    fn ($contest) => $contest['contest_id'],
+                    $contests
+                )),
+                'auth_token' => $login->auth_token,
+            ])
         );
         foreach ($contests as $contest) {
             $contestContestants[$contest['title']] = $contestants[$contest['contest_id']] ?? 0;
@@ -412,10 +421,13 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         [
             'response' => $contestants,
         ] = \OmegaUp\Controllers\Contest::apiGetNumberOfContestants(
-            new \OmegaUp\Request(['contest_ids' => join(',', array_map(
-                fn ($contest) => $contest['contest_id'],
-                $contests
-            ))])
+            new \OmegaUp\Request([
+                'contest_ids' => join(',', array_map(
+                    fn ($contest) => $contest['contest_id'],
+                    $contests
+                )),
+                'auth_token' => $login->auth_token,
+            ])
         );
         foreach ($contests as $contest) {
             $contestContestants[$contest['title']] = $contestants[$contest['contest_id']] ?? 0;
@@ -450,10 +462,13 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         [
             'response' => $contestants,
         ] = \OmegaUp\Controllers\Contest::apiGetNumberOfContestants(
-            new \OmegaUp\Request(['contest_ids' => join(',', array_map(
-                fn ($contest) => $contest['contest_id'],
-                $contests
-            ))])
+            new \OmegaUp\Request([
+                'contest_ids' => join(',', array_map(
+                    fn ($contest) => $contest['contest_id'],
+                    $contests
+                )),
+                'auth_token' => $login->auth_token,
+            ])
         );
         foreach ($contests as $contest) {
             $contestContestants[$contest['title']] = $contestants[$contest['contest_id']] ?? 0;

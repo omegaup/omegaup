@@ -1093,18 +1093,35 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $contest_ids
      */
     public static function apiGetNumberOfContestants(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
         $contestIDsAsString = $r->ensureString('contest_ids');
         $contestIDs = explode(',', $contestIDsAsString);
         $contestIDsAsInts = [];
         foreach ($contestIDs as $contestID) {
             \OmegaUp\Validators::validateNumber($contestID, 'contest_id');
+            $contest = \OmegaUp\DAO\Contests::getByPK(intval($contestID));
+            if (is_null($contest)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'contestNotFound'
+                );
+            }
+            self::validateAccessContest($contest, $r->identity);
             $contestIDsAsInts[] = intval($contestID);
         }
 
+        $cacheKey = "0-{$contestIDsAsString}";
+
+        $callback = /** @return array<int, int> */ fn () => \OmegaUp\DAO\Contests::getNumberOfContestantsForContests(
+            $contestIDsAsInts
+        );
+        $response = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST,
+            $cacheKey,
+            $callback
+        );
+
         return [
-            'response' => \OmegaUp\DAO\Contests::getNumberOfContestantsForContests(
-                $contestIDsAsInts
-            ),
+            'response' => $response,
         ];
     }
 
@@ -3410,6 +3427,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
             throw $e;
         }
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST
+        );
 
         return ['status' => 'ok'];
     }
