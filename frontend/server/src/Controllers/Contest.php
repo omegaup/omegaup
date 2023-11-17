@@ -1088,6 +1088,43 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{response: array<int, int>}
+     *
+     * @omegaup-request-param string $contest_ids
+     */
+    public static function apiGetNumberOfContestants(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
+        $contestIDsAsString = $r->ensureString('contest_ids');
+        $contestIDs = explode(',', $contestIDsAsString);
+        $contestants = [];
+        foreach ($contestIDs as $contestId) {
+            \OmegaUp\Validators::validateNumber($contestId, 'contest_id');
+            $contestID = intval($contestId);
+            $contest = \OmegaUp\DAO\Contests::getByPK(intval($contestID));
+            if (is_null($contest)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'contestNotFound'
+                );
+            }
+            self::validateAccessContest($contest, $r->identity);
+
+            $callback = /** @return int */ fn () => \OmegaUp\DAO\Contests::getNumberOfContestants(
+                $contestID
+            );
+
+            $contestants[$contestID] = \OmegaUp\Cache::getFromCacheOrSet(
+                \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST,
+                $contestId,
+                $callback
+            );
+        }
+
+        return [
+            'response' => $contestants,
+        ];
+    }
+
+    /**
      * @return array{templateProperties: array{payload: ContestListv2Payload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int|null $page
@@ -3389,6 +3426,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
             throw $e;
         }
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST,
+            strval($contest->contest_id)
+        );
 
         return ['status' => 'ok'];
     }
@@ -4034,7 +4075,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @return Scoreboard
      */
-    public static function getScoreboard(
+    private static function getScoreboard(
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Problemsets $problemset,
         ?\OmegaUp\DAO\VO\Identities $identity,

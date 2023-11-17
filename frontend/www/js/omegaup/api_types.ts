@@ -4878,10 +4878,6 @@ export namespace messages {
   export type BadgeUserListResponse = { badges: types.Badge[] };
 
   // Certificate
-  export type CertificateGenerateContestCertificatesRequest = {
-    [key: string]: any;
-  };
-  export type CertificateGenerateContestCertificatesResponse = {};
   export type CertificateGetCertificatePdfRequest = { [key: string]: any };
   export type CertificateGetCertificatePdfResponse = { certificate?: string };
   export type CertificateGetUserCertificatesRequest = { [key: string]: any };
@@ -4956,6 +4952,10 @@ export namespace messages {
   export type ContestDetailsRequest = { [key: string]: any };
   export type _ContestDetailsServerResponse = any;
   export type ContestDetailsResponse = types.ContestDetails;
+  export type ContestGetNumberOfContestantsRequest = { [key: string]: any };
+  export type ContestGetNumberOfContestantsResponse = {
+    response: { [key: number]: number };
+  };
   export type ContestListRequest = { [key: string]: any };
   export type _ContestListServerResponse = any;
   export type ContestListResponse = {
@@ -5783,9 +5783,6 @@ export namespace controllers {
   }
 
   export interface Certificate {
-    generateContestCertificates: (
-      params?: messages.CertificateGenerateContestCertificatesRequest,
-    ) => Promise<messages.CertificateGenerateContestCertificatesResponse>;
     getCertificatePdf: (
       params?: messages.CertificateGetCertificatePdfRequest,
     ) => Promise<messages.CertificateGetCertificatePdfResponse>;
@@ -5861,6 +5858,9 @@ export namespace controllers {
     details: (
       params?: messages.ContestDetailsRequest,
     ) => Promise<messages.ContestDetailsResponse>;
+    getNumberOfContestants: (
+      params?: messages.ContestGetNumberOfContestantsRequest,
+    ) => Promise<messages.ContestGetNumberOfContestantsResponse>;
     list: (
       params?: messages.ContestListRequest,
     ) => Promise<messages.ContestListResponse>;

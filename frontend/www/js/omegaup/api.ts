@@ -204,10 +204,6 @@ export const Badge = {
 };
 
 export const Certificate = {
-  generateContestCertificates: apiCall<
-    messages.CertificateGenerateContestCertificatesRequest,
-    messages.CertificateGenerateContestCertificatesResponse
-  >('/api/certificate/generateContestCertificates/'),
   getCertificatePdf: apiCall<
     messages.CertificateGetCertificatePdfRequest,
     messages.CertificateGetCertificatePdfResponse
@@ -394,6 +390,10 @@ export const Contest = {
       );
     return x;
   }),
+  getNumberOfContestants: apiCall<
+    messages.ContestGetNumberOfContestantsRequest,
+    messages.ContestGetNumberOfContestantsResponse
+  >('/api/contest/getNumberOfContestants/'),
   list: apiCall<
     messages.ContestListRequest,
     messages._ContestListServerResponse,
