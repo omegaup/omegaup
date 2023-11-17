@@ -62,7 +62,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
      * Generate certificates in a contest
      *
      */
-    /*public function testConnectionRabbitMQ() {
+    public function testConnectionRabbitMQ() {
         //Create user
         ['identity' => $certificateGenerator] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -175,7 +175,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::runGenerateContestCertificates();
 
         $this->assertEquals(4, $contest->certificate_cutoff);
-    }*/
+    }
 
     /**
      * try to generate certificates in a contest as a normal user
