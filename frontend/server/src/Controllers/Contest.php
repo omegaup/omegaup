@@ -1096,9 +1096,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
         $contestIDsAsString = $r->ensureString('contest_ids');
         $contestIDs = explode(',', $contestIDsAsString);
-        $contestIDsAsInts = [];
-        foreach ($contestIDs as $contestID) {
-            \OmegaUp\Validators::validateNumber($contestID, 'contest_id');
+        $contestants = [];
+        foreach ($contestIDs as $contestId) {
+            \OmegaUp\Validators::validateNumber($contestId, 'contest_id');
+            $contestID = intval($contestId);
             $contest = \OmegaUp\DAO\Contests::getByPK(intval($contestID));
             if (is_null($contest)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1106,22 +1107,20 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 );
             }
             self::validateAccessContest($contest, $r->identity);
-            $contestIDsAsInts[] = intval($contestID);
+
+            $callback = /** @return int */ fn () => \OmegaUp\DAO\Contests::getNumberOfContestants(
+                $contestID
+            );
+
+            $contestants[$contestID] = \OmegaUp\Cache::getFromCacheOrSet(
+                \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST,
+                $contestId,
+                $callback
+            );
         }
 
-        $cacheKey = "0-{$contestIDsAsString}";
-
-        $callback = /** @return array<int, int> */ fn () => \OmegaUp\DAO\Contests::getNumberOfContestantsForContests(
-            $contestIDsAsInts
-        );
-        $response = \OmegaUp\Cache::getFromCacheOrSet(
-            \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST,
-            $cacheKey,
-            $callback
-        );
-
         return [
-            'response' => $response,
+            'response' => $contestants,
         ];
     }
 
@@ -3427,8 +3426,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
             throw $e;
         }
-        \OmegaUp\Cache::invalidateAllKeys(
-            \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST,
+            strval($contest->contest_id)
         );
 
         return ['status' => 'ok'];

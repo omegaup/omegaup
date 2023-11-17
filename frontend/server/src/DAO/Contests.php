@@ -1238,15 +1238,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         return \OmegaUp\DAO\Contests::getByProblemset($problemsetId);
     }
 
-    /**
-     * @param list<int> $contestIds
-     *
-     * @return array<int, int>
-     */
-    public static function getNumberOfContestantsForContests($contestIds) {
-        $placeholders = join(',', array_fill(0, count($contestIds), '?'));
-        $sql = "SELECT
-                    p.contest_id,
+    public static function getNumberOfContestants(int $contestId): int {
+        $sql = 'SELECT
                     COUNT(*) AS contestants
                 FROM
                     Problemsets p
@@ -1255,23 +1248,16 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 ON
                     p.problemset_id = pi.problemset_id
                 WHERE
-                    p.contest_id IN ({$placeholders})
+                    p.contest_id = ?
                 GROUP BY
                     p.contest_id
-                ;";
+                ;';
 
-        $params = $contestIds;
-
-        /** @var list<array{contest_id: int|null, contestants: int}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
-        $contestants = [];
-        foreach ($rs as $contest) {
-            if (is_null($contest['contest_id'])) {
-                continue;
-            }
-            $contestants[$contest['contest_id']] = $contest['contestants'];
-        }
-        return $contestants;
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$contestId]
+        ) ?? 0;
     }
 
     /**
