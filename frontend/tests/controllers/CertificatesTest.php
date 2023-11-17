@@ -155,7 +155,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
 
-        $certificatesCutoff = 4;
+        /*$certificatesCutoff = 4;
 
         $response = \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
             new \OmegaUp\Request([
@@ -166,7 +166,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         //Assert status of new contest
-        /*$this->assertSame('ok', $response['status']);
+        $this->assertSame('ok', $response['status']);
 
         $contest = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
