@@ -281,13 +281,6 @@ class Group extends \OmegaUp\Controllers\Controller {
 
         $query = $r->ensureString('query');
 
-        \OmegaUp\Validators::validateStringOfLengthInRange(
-            $query,
-            'query',
-            minLength: 2,
-            maxLength: null
-        );
-
         return \OmegaUp\DAO\Groups::searchByNameOrAlias($query);
     }
 

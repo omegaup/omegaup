@@ -61,8 +61,8 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
                 LIMIT
                     100;";
 
-        /** @var list<array{label: string, value: string}> */
         $params = [$name, $name];
+        /** @var list<array{label: string, value: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
