@@ -145,6 +145,7 @@ const translations: { [key: string]: string; } = {
   badge_virtualContestManager_name: "Admin de Concurso Virtual",
   banProblemFormComments: "Comentarios adicionales para el creador del problema",
   banProblemFormQuestion: "\u00bfPor qu\u00e9 se suspender\u00e1 este problema?",
+  bannerMessage: "Es necesario que tu padre o tutor apruebe tu cuenta en un plazo de %(days) d\u00edas. De lo contrario, ser\u00e1 eliminada.",
   banningDeclinedByReviewer: "Suspensi\u00f3n denegada por juez.",
   banningProblemDueToReport: "Suspendiendo problema por reporte de una cuenta.",
   birthdayInTheFuture: "No tienes edad suficiente para usar omegaUp",

@@ -9,6 +9,7 @@ import clarificationsStore from '../arena/clarificationsStore';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload('header-payload');
+  console.log(payload);
   const fromLogin =
     new URL(document.location.toString()).searchParams.get('fromLogin') !==
     null;
@@ -50,6 +51,7 @@ OmegaUp.on('ready', () => {
           userTypes: payload.userTypes,
           nextRegisteredContest: payload.nextRegisteredContestForUser,
           isUnder13User: payload.isUnder13User,
+          userVerificationDeadline: payload.userVerificationDeadline,
         },
         on: {
           'read-notifications': (

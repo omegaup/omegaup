@@ -339,8 +339,16 @@
         </a>
       </div>
     </nav>
-    <div class="container-xl pl-0 pl-xl-3 mt-2">
-      Tu padre o tutor debe aprobar tu cuenta o se eliminará en 7 días.
+    <div
+      v-if="userVerificationDeadline"
+      class="container-xl pl-0 pl-xl-3 mt-2"
+      :class="bannerColor"
+    >
+      {{
+        ui.formatString(T.bannerMessage, {
+          days: daysUntilVerificationDeadline,
+        })
+      }}
     </div>
     <omegaup-user-objectives-questions
       v-if="
@@ -360,6 +368,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 import notifications_Clarifications from '../notification/Clarifications.vue';
 import notifications_List from '../notification/List.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
@@ -410,8 +419,10 @@ export default class Navbar extends Vue {
   @Prop() userTypes!: string[];
   @Prop() nextRegisteredContest!: types.ContestListItem | null;
   @Prop() isUnder13User!: boolean;
+  @Prop() userVerificationDeadline!: Date | null;
 
   T = T;
+  ui = ui;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
   hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
     this.userTypes.includes(teachingType),
@@ -429,6 +440,31 @@ export default class Navbar extends Vue {
 
   readNotifications(notifications: types.Notification[], url?: string): void {
     this.$emit('read-notifications', notifications, url);
+  }
+
+  get bannerColor() {
+    const today = new Date();
+    const deadline = new Date(this.userVerificationDeadline as Date);
+
+    if (deadline.toDateString() === today.toDateString()) {
+      return 'bg-danger';
+    } else {
+      return 'bg-warning';
+    }
+  }
+
+  get daysUntilVerificationDeadline(): number | null {
+    if (this.userVerificationDeadline) {
+      const today = new Date();
+      const deadline = new Date(this.userVerificationDeadline);
+
+      const timeDifference = deadline.getTime() - today.getTime();
+      const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+
+      return daysDifference;
+    } else {
+      return null;
+    }
   }
 }
 </script>

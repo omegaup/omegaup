@@ -143,6 +143,7 @@ badge_virtualContestManager_description = "Concedido a pessoas que administraram
 badge_virtualContestManager_name = "Admin do Concurso Virtual"
 banProblemFormComments = "Comentários adicionais para o criador do problema"
 banProblemFormQuestion = "Por que esse problema será banido?"
+bannerMessage = "É necessário que seu pai ou tutor aprove sua conta dentro de um prazo de %(days) dias. Caso contrário, ela será excluída."
 banningDeclinedByReviewer = "Proibição negada pelo revisor."
 banningProblemDueToReport = "Banido problema devido a um relatório de conta."
 birthdayInTheFuture = "Você não tem idade suficiente para usar omegaUp"
