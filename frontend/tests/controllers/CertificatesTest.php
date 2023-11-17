@@ -63,10 +63,10 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
      *
      */
     public function testConnectionRabbitMQ() {
-        //Create user
+        //Create the certificate generator
         ['identity' => $certificateGenerator] = \OmegaUp\Test\Factories\User::createUser();
 
-        //Create users
+        //Create contestants
         $identities = [];
         $numOfIdentities = 8;
         foreach (range(0, $numOfIdentities - 1) as $index) {
@@ -82,10 +82,16 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             'role' => 'CertificateGenerator'
         ]));
 
+        //Create a contest that hasn't ended to send submissions
+        $currentTime = \OmegaUp\Time::get();
+        $timePast =  new \OmegaUp\Timestamp($currentTime - 60 * 60);
+        $timeFuture =  new \OmegaUp\Timestamp($currentTime + 60 * 60);
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
-            new \OmegaUp\Test\Factories\ContestParams(
-                ['admissionMode' => 'public']
-            )
+            new \OmegaUp\Test\Factories\ContestParams([
+                'admissionMode' => 'public',
+                'startTime' => $timePast,
+                'finishTime' => $timeFuture,
+            ])
         );
 
         \OmegaUp\Test\Factories\Contest::addAdminUser(
@@ -155,7 +161,11 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
 
-        /*$certificatesCutoff = 4;
+        //Finish the contest to generate certificates
+        $contestData['contest']->finish_time = \OmegaUp\Time::get() - 1;
+        \OmegaUp\DAO\Contests::update($contestData['contest']);
+
+        $certificatesCutoff = 4;
 
         $response = \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
             new \OmegaUp\Request([
@@ -172,9 +182,9 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['request']['alias']
         );
 
-        \OmegaUp\Test\Utils::runGenerateContestCertificates();
+        //\OmegaUp\Test\Utils::runGenerateContestCertificates();
 
-        $this->assertEquals(4, $contest->certificate_cutoff);*/
+        $this->assertEquals(4, $contest->certificate_cutoff);
     }
 
     /**
