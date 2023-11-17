@@ -38,9 +38,9 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Install wait-for-it
+      - name: Install retry
         run: |
-          sudo apt-get update -y && sudo apt-get install -y wait-for-it
+          sudo apt-get update -y && sudo apt-get install -y retry
 
       - name: Download the Docker containers
         run: |
@@ -56,8 +56,7 @@ jobs:
           EOF
 
           # Wait for some of the containers
-          wait-for-it -t 600 rabbitmq:5672
-          docker-compose exec -T rabbitmq rabbitmqctl await_startup
+          retry --max=5 --delay=5 docker-compose exec -T rabbitmq rabbitmqctl await_startup
 
       - name: Use PHP 8.1
         run: |
