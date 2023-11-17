@@ -28,6 +28,15 @@ jobs:
         ports:
           - 6379:6379
 
+      rabbitmq:
+        image: rabbitmq:3-management-alpine
+        ports:
+          - 5672:5672
+          - 15672:15672
+        env:
+          RABBITMQ_DEFAULT_USER: 'omegaup'
+          RABBITMQ_DEFAULT_PASS: 'omegaup'
+
     steps:
       - uses: actions/checkout@v2
         with:
@@ -38,26 +47,11 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Install wait-for-it
+      - name: Add rabbitmq as alias to localhost
         run: |
-          sudo apt-get update -y && sudo apt-get install -y wait-for-it
-
-      - name: Download the Docker containers
-        run: |
-          docker-compose pull
-
-      - name: Start the Docker containers
-        run: |
-          docker-compose up --detach rabbitmq
-
-          # Add the container names as aliases to localhost
           cat << EOF | sudo tee --append /etc/hosts
           127.0.0.1 rabbitmq
           EOF
-
-          # Wait for some of the containers
-          wait-for-it -t 30 rabbitmq:5672
-          docker-compose exec -T rabbitmq rabbitmqctl await_startup
 
       - name: Use PHP 8.1
         run: |
