@@ -56,7 +56,7 @@ jobs:
           EOF
 
           # Wait for some of the containers
-          retry --times=5 "docker-compose exec -T rabbitmq rabbitmqctl await_startup"
+          retry -t 5 -d 60 "docker-compose exec -T rabbitmq rabbitmqctl await_startup"
 
       - name: Use PHP 8.1
         run: |
