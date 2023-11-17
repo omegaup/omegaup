@@ -127,9 +127,6 @@ jobs:
             --database=omegaup-test \
             validate --all < /dev/null
 
-      - name: Check DNS resolution
-        run: ping -c 3 rabbitmq
-
       - name: Run tests
         timeout-minutes: 20
         run: ./stuff/mysql_types.sh
