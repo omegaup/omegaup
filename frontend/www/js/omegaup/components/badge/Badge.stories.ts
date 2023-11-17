@@ -26,6 +26,7 @@ const AvailableBadges = [
 
 const meta: Meta<typeof Badge> = {
   component: Badge,
+  title: 'Components/Badge',
   argTypes: {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore FIXME: vue-property-decorator is deprecated, so we can't get prop types from the component
@@ -52,7 +53,7 @@ export const Default: Story = {
     components: { Badge },
     // bind props to badge object and injest as props
     props: Object.keys(argTypes),
-    template: '<Badge :badge="$props" />',
+    template: '<badge :badge="$props" />',
   }),
 };
 
