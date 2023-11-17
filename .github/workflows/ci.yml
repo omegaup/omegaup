@@ -28,6 +28,15 @@ jobs:
         ports:
           - 6379:6379
 
+      rabbitmq:
+        image: rabbitmq:3-management-alpine
+        ports:
+          - 5672:5672
+          - 15672:15672
+        env:
+          RABBITMQ_DEFAULT_USER: 'omegaup'
+          RABBITMQ_DEFAULT_PASS: 'omegaup'
+
     steps:
       - uses: actions/checkout@v2
         with:
@@ -46,6 +55,12 @@ jobs:
           # Enable coverage for XDebug so that codecov can do its magic.
           echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/8.1/cli/conf.d/20-xdebug.ini >/dev/null
 
+      - name: Add rabbitmq as alias to localhost
+        run: |
+          cat << EOF | sudo tee --append /etc/hosts
+          127.0.0.1 rabbitmq
+          EOF
+
       - name: Create default configuration files
         run: |
           cat > frontend/tests/test_config.php <<EOF
@@ -53,6 +68,10 @@ jobs:
           define('OMEGAUP_DB_HOST', 'localhost:13306');
           define('REDIS_HOST', 'localhost');
           define('REDIS_PASS', '');
+          define('OMEGAUP_RABBITMQ_HOST', 'rabbitmq');
+          define('OMEGAUP_RABBITMQ_PORT', '5672');
+          define('OMEGAUP_RABBITMQ_USERNAME', 'omegaup');
+          define('OMEGAUP_RABBITMQ_PASSWORD', 'omegaup');
           EOF
 
       - name: Download gitserver
@@ -107,6 +126,9 @@ jobs:
             --username=root --password= --hostname=localhost --port=13306 \
             --database=omegaup-test \
             validate --all < /dev/null
+
+      - name: Check DNS resolution
+        run: ping -c 3 rabbitmq
 
       - name: Run tests
         timeout-minutes: 20

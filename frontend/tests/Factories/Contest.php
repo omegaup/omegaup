@@ -112,15 +112,23 @@ class ContestParams {
 
     /**
      * @readonly
+     * @var string
+     */
+    public $alias;
+
+    /**
+     * @readonly
      * @var bool
      */
     public $showScoreboardAfter;
 
     /**
      * @param array{title?: string, admissionMode?: string, basicInformation?: bool, contestForTeams?: bool, teamsGroupAlias?: string, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string, scoreMode?: string, checkPlagiarism?: bool, scoreboardPct?: int, showScoreboardAfter?: bool} $params
+     * @param array{alias?: string, title?: string, admissionMode?: string, basicInformation?: bool, contestForTeams?: bool, teamsGroupAlias?: string, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string, scoreMode?: string, checkPlagiarism?: bool, scoreboardPct?: int, showScoreboardAfter?: bool} $params
      */
     public function __construct($params = []) {
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
+        $this->alias = $params['alias'] ?? substr($this->title, 0, 20);
         $this->admissionMode = $params['admissionMode'] ?? 'public';
         $this->basicInformation = $params['basicInformation'] ?? false;
         $this->requestsUserInformation = $params['requestsUserInformation'] ?? 'no';
@@ -196,7 +204,7 @@ class Contest {
             ))->time,
             'window_length' => $params->windowLength,
             'admission_mode' => $params->admissionMode,
-            'alias' => substr($params->title, 0, 20),
+            'alias' => $params->alias,
             'points_decay_factor' => '0.02',
             'score_mode' => $params->scoreMode,
             'submissions_gap' => '60',
