@@ -441,8 +441,7 @@ jobs:
 
           # Wait for some of the containers
           wait-for-it -t 30 mysql:13306
-          wait-for-it -t 30 rabbitmq:5672
-          docker-compose exec -T rabbitmq rabbitmqctl await_startup
+          retry -t 5 -d 5 -- docker-compose exec -T rabbitmq rabbitmqctl await_startup
 
           for i in $(seq 10); do
             if [[ "$(mysql \
