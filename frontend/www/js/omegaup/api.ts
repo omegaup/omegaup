@@ -394,6 +394,10 @@ export const Contest = {
       );
     return x;
   }),
+  getNumberOfContestants: apiCall<
+    messages.ContestGetNumberOfContestantsRequest,
+    messages.ContestGetNumberOfContestantsResponse
+  >('/api/contest/getNumberOfContestants/'),
   list: apiCall<
     messages.ContestListRequest,
     messages._ContestListServerResponse,
