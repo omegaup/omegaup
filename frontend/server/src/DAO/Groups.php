@@ -46,6 +46,26 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
         return $groups;
     }
 
+    /**
+     * @return list<array{label: string, value: string}>
+     */
+    public static function searchByNameOrAlias(string $name) {
+        $sql = "SELECT
+                    `g`.`name` AS `label`,
+                    `g`.`alias` AS `value`
+                FROM
+                    `Groups_` `g`
+                WHERE
+                    `g`.`name` LIKE CONCAT('%', ?, '%')
+                    OR `g`.`alias` LIKE CONCAT('%', ?, '%')
+                LIMIT
+                    100;";
+
+        /** @var list<array{label: string, value: string}> */
+        $params = [$name, $name];
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+    }
+
     public static function getByName(string $name): ?\OmegaUp\DAO\VO\Groups {
         $sql = 'SELECT ' .  \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Groups::FIELD_NAMES,

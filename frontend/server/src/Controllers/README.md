@@ -2437,9 +2437,9 @@ array instead of an object since it is used by typeahead.
 
 ### Parameters
 
-| Name    | Type           | Description |
-| ------- | -------------- | ----------- |
-| `query` | `null\|string` |             |
+| Name    | Type     | Description |
+| ------- | -------- | ----------- |
+| `query` | `string` |             |
 
 ### Returns
 
