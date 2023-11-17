@@ -426,6 +426,10 @@ jobs:
         run: |
           sudo apt-get update -y && sudo apt-get install -y wait-for-it
 
+      - name: Install retry
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y retry
+
       - name: Download the Docker containers
         run: |
           docker-compose pull
