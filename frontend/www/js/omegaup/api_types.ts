@@ -496,6 +496,13 @@ export namespace types {
             x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
             return x;
           })(x.nextRegisteredContestForUser);
+        if (
+          typeof x.userVerificationDeadline !== 'undefined' &&
+          x.userVerificationDeadline !== null
+        )
+          x.userVerificationDeadline = ((x: number) => new Date(x * 1000))(
+            x.userVerificationDeadline,
+          );
         return x;
       })(
         JSON.parse(
@@ -2851,6 +2858,7 @@ export namespace types {
     userClassname: string;
     userCountry: string;
     userTypes: string[];
+    userVerificationDeadline?: Date;
   }
 
   export interface ConsentStatement {
