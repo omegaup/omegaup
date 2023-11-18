@@ -110,50 +110,24 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
-        //Associate the index of the identity with
-        //the index of problems they are going to send
+        //Associate the identity index with
+        //the problem indexes they are going to send
         $submissions = [
-            0 => ['problems' => [
-                    ['index' => 0],
-                    ['index' => 1],
-                    ['index' => 2],
-                    ['index' => 3],
-                    ['index' => 4],
-                ]],
-            1 => ['problems' => [
-                    ['index' => 1],
-                ]],
-            2 => ['problems' => [
-                    ['index' => 0],
-                    ['index' => 1],
-                    ['index' => 2],
-                    ['index' => 3],
-                ]],
-            3 => ['problems' => [
-                    ['index' => 2],
-                ]],
-            4 => ['problems' => [
-                    ['index' => 3],
-                ]],
-            5 => ['problems' => [
-                    ['index' => 0],
-                ]],
-            6 => ['problems' => [
-                    ['index' => 0],
-                    ['index' => 1],
-                ]],
-            7 => ['problems' => [
-                    ['index' => 0],
-                    ['index' => 1],
-                    ['index' => 2],
-                ]],
+            0 => ['problems' => [0, 1, 2, 3, 4]],
+            1 => ['problems' => [1]],
+            2 => ['problems' => [0, 1, 2, 3]],
+            3 => ['problems' => [2]],
+            4 => ['problems' => [3]],
+            5 => ['problems' => [0]],
+            6 => ['problems' => [0, 1]],
+            7 => ['problems' => [0, 1, 2]],
         ];
 
         //Send submissions
         foreach ($submissions as $identityIndex => $problemsOfIdentity) {
-            foreach ($problemsOfIdentity['problems'] as $submission) {
+            foreach ($problemsOfIdentity['problems'] as $problemIndex) {
                 $run = \OmegaUp\Test\Factories\Run::createRun(
-                    $problems[$submission['index']],
+                    $problems[$problemIndex],
                     $contestData,
                     $identities[$identityIndex]
                 );
