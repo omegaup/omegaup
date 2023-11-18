@@ -1391,6 +1391,7 @@ const translations: { [key: string]: string; } = {
   requestDate: "Date of request",
   requestFeedback: "The feedback request has been sent to the all administrators",
   requestFeedbackConfirm: "Do you want to request feedback for this submission?",
+  requestFeedbackMessage: "I need your help in this submission.",
   resourceNotFound: "Resource not found.",
   reviewerNomination: "Rate problem as reviewer",
   reviewerNominationFormTitle: "Qualify this problem!",

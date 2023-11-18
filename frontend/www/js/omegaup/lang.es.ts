@@ -1391,6 +1391,7 @@ const translations: { [key: string]: string; } = {
   requestDate: "Fecha de solicitud",
   requestFeedback: "La solicitud de retroalimentaci\u00f3n ha sido enviada a todos los administradores",
   requestFeedbackConfirm: "\u00bfDeseas solicitar retroalimentaci\u00f3n a tus docentes sobre este env\u00edo?",
+  requestFeedbackMessage: "Necesito su ayuda en este env\u00edo.",
   resourceNotFound: "Recurso no encontrado.",
   reviewerNomination: "Calificar el problema como revisor",
   reviewerNominationFormTitle: "Califica este problema.",
