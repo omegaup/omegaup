@@ -54,7 +54,7 @@ CONTESTS_TO_RUN_PLAGIARISM_ON = """
     FROM `Contests` as c
     WHERE
         c.`check_plagiarism` = 1 AND
-        c.`finish_time` > NOW() - INTERVAL 20 MINUTE AND
+        c.`finish_time` > NOW() - INTERVAL 120 MINUTE AND
         c.`finish_time` < NOW() AND
         c.`contest_id` NOT IN
             (SELECT p.`contest_id`
@@ -102,6 +102,13 @@ INSERT_INTO_PLAGIARISMS = """
         )
     VALUES
         (%s, %s, %s, %s, %s, %s)
+"""
+
+
+UPDATE_PLAGIARISM_FLAG = """
+    UPDATE `Contests`
+    SET `check_plagiarism` = 1
+    WHERE `alias` = %s
 """
 
 # Constants
@@ -259,6 +266,13 @@ def download_submission_files(dirname: str,
         download(submission['guid'], submission_path)
 
 
+def turn_on_plagiarism_flag(dbconn: lib.db.Connection, alias: str) -> None:
+    """For OFMI contests, turn on the flag of check_plagiarism"""
+    with dbconn.cursor() as cur:
+        cur.execute(UPDATE_PLAGIARISM_FLAG, alias)
+        dbconn.conn.commit()
+
+
 def get_contests(dbconn: lib.db.Connection) -> Iterable[Contest]:
     """Get all contests that need to be analyzed."""
 
@@ -308,6 +322,10 @@ def main() -> None:
             args.local_downloader_dir)
     else:
         download = S3SubmissionDownloader()
+
+    # TODO: Remove this line once the contests have been checked
+    turn_on_plagiarism_flag(dbconn, '3AOFMI')
+    turn_on_plagiarism_flag(dbconn, '3aOFMIDIA2')
 
     for contest in get_contests(dbconn):
         run_detector_for_contest(dbconn, download, contest['contest_id'])
