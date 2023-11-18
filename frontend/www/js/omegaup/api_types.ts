@@ -410,6 +410,27 @@ export namespace types {
       );
     }
 
+    export function CertificateListMinePayload(
+      elementId: string = 'payload',
+    ): types.CertificateListMinePayload {
+      return ((x) => {
+        x.certificates = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.date = ((x: number) => new Date(x * 1000))(x.date);
+            return x;
+          });
+        })(x.certificates);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function CertificateValidationPayload(
       elementId: string = 'payload',
     ): types.CertificateValidationPayload {
@@ -2707,6 +2728,10 @@ export namespace types {
     verification_code: string;
   }
 
+  export interface CertificateListMinePayload {
+    certificates: types.CertificateListItem[];
+  }
+
   export interface CertificateValidationPayload {
     certificate?: string;
     valid: boolean;
@@ -4952,6 +4977,10 @@ export namespace messages {
   export type ContestDetailsRequest = { [key: string]: any };
   export type _ContestDetailsServerResponse = any;
   export type ContestDetailsResponse = types.ContestDetails;
+  export type ContestGetNumberOfContestantsRequest = { [key: string]: any };
+  export type ContestGetNumberOfContestantsResponse = {
+    response: { [key: number]: number };
+  };
   export type ContestListRequest = { [key: string]: any };
   export type _ContestListServerResponse = any;
   export type ContestListResponse = {
@@ -5854,6 +5883,9 @@ export namespace controllers {
     details: (
       params?: messages.ContestDetailsRequest,
     ) => Promise<messages.ContestDetailsResponse>;
+    getNumberOfContestants: (
+      params?: messages.ContestGetNumberOfContestantsRequest,
+    ) => Promise<messages.ContestGetNumberOfContestantsResponse>;
     list: (
       params?: messages.ContestListRequest,
     ) => Promise<messages.ContestListResponse>;
