@@ -1104,9 +1104,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contestIDs = explode(',', $contestIDsAsString);
         $contestants = [];
         foreach ($contestIDs as $contestId) {
+            \OmegaUp\Validators::validateNumber($contestId, 'contest_id');
+            $contestID = intval($contestId);
             try {
-                \OmegaUp\Validators::validateNumber($contestId, 'contest_id');
-                $contestID = intval($contestId);
                 $contest = \OmegaUp\DAO\Contests::getByPK(intval($contestID));
                 if (is_null($contest)) {
                     $contestants[$contestID] = 0;
