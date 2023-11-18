@@ -9,10 +9,11 @@ use setasign\Fpdi\Fpdi;
  * @psalm-type CertificateDetailsPayload=array{uuid: string}
  * @psalm-type CertificateValidationPayload=array{certificate: null|string, verification_code: string, valid: bool}
  * @psalm-type CertificateListItem=array{certificate_type: string, date: \OmegaUp\Timestamp, name: null|string, verification_code: string}
+ * @psalm-type CertificateListMinePayload=array{certificates: list<CertificateListItem>}
  */
 class Certificate extends \OmegaUp\Controllers\Controller {
     // General certificate PDF constants
-    const CERTIFICATE_PDF_BORDER = 1;
+    const CERTIFICATE_PDF_BORDER = 0;
     const CERTIFICATE_PDF_LN = 1;
     const CERTIFICATE_PDF_ALIGN_CENTER = 'C';
     const CERTIFICATE_PDF_ALIGN_RIGHT = 'R';
@@ -52,6 +53,30 @@ class Certificate extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'certificate_details',
+        ];
+    }
+
+    /**
+     * @return array{templateProperties: array{payload: CertificateListMinePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     */
+    public static function getCertificateListMineForTypeScript(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
+        $certificates = [];
+        if (!is_null($r->identity->user_id)) {
+            $certificates = \OmegaUp\DAO\Certificates::getUserCertificates(
+                $r->identity->user_id
+            );
+        }
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'certificates' => $certificates,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleMyCertificates'
+                ),
+            ],
+            'entrypoint' => 'certificate_mine',
         ];
     }
 
