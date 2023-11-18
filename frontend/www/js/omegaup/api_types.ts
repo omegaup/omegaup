@@ -410,6 +410,35 @@ export namespace types {
       );
     }
 
+    export function CertificateListMinePayload(
+      elementId: string = 'payload',
+    ): types.CertificateListMinePayload {
+      return ((x) => {
+        x.certificates = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.date = ((x: number) => new Date(x * 1000))(x.date);
+            return x;
+          });
+        })(x.certificates);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CertificateValidationPayload(
+      elementId: string = 'payload',
+    ): types.CertificateValidationPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function CoderOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.CoderOfTheMonthPayload {
@@ -467,6 +496,13 @@ export namespace types {
             x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
             return x;
           })(x.nextRegisteredContestForUser);
+        if (
+          typeof x.userVerificationDeadline !== 'undefined' &&
+          x.userVerificationDeadline !== null
+        )
+          x.userVerificationDeadline = ((x: number) => new Date(x * 1000))(
+            x.userVerificationDeadline,
+          );
         return x;
       })(
         JSON.parse(
@@ -2692,6 +2728,23 @@ export namespace types {
     uuid: string;
   }
 
+  export interface CertificateListItem {
+    certificate_type: string;
+    date: Date;
+    name?: string;
+    verification_code: string;
+  }
+
+  export interface CertificateListMinePayload {
+    certificates: types.CertificateListItem[];
+  }
+
+  export interface CertificateValidationPayload {
+    certificate?: string;
+    valid: boolean;
+    verification_code: string;
+  }
+
   export interface Clarification {
     answer?: string;
     assignment_alias?: string;
@@ -2805,6 +2858,7 @@ export namespace types {
     userClassname: string;
     userCountry: string;
     userTypes: string[];
+    userVerificationDeadline?: Date;
   }
 
   export interface ConsentStatement {
@@ -3840,6 +3894,7 @@ export namespace types {
     allowUserAddTags?: boolean;
     allowedSolutionsToSee: number;
     clarifications?: types.Clarification[];
+    hasVisitedSection?: boolean;
     histogram: types.Histogram;
     levelTags?: string[];
     nominationStatus?: types.NominationStatus;
@@ -3898,6 +3953,7 @@ export namespace types {
     emailClarifications: boolean;
     extraWallTime: number | string;
     groupScorePolicy?: string;
+    hasVisitedSection?: boolean;
     inputLimit: number | string;
     languages: string;
     levelTags: string[];
@@ -4857,6 +4913,11 @@ export namespace messages {
   // Certificate
   export type CertificateGetCertificatePdfRequest = { [key: string]: any };
   export type CertificateGetCertificatePdfResponse = { certificate?: string };
+  export type CertificateGetUserCertificatesRequest = { [key: string]: any };
+  export type _CertificateGetUserCertificatesServerResponse = any;
+  export type CertificateGetUserCertificatesResponse = {
+    certificates: types.CertificateListItem[];
+  };
   export type CertificateValidateCertificateRequest = { [key: string]: any };
   export type CertificateValidateCertificateResponse = { valid: boolean };
 
@@ -4924,6 +4985,10 @@ export namespace messages {
   export type ContestDetailsRequest = { [key: string]: any };
   export type _ContestDetailsServerResponse = any;
   export type ContestDetailsResponse = types.ContestDetails;
+  export type ContestGetNumberOfContestantsRequest = { [key: string]: any };
+  export type ContestGetNumberOfContestantsResponse = {
+    response: { [key: number]: number };
+  };
   export type ContestListRequest = { [key: string]: any };
   export type _ContestListServerResponse = any;
   export type ContestListResponse = {
@@ -5754,6 +5819,9 @@ export namespace controllers {
     getCertificatePdf: (
       params?: messages.CertificateGetCertificatePdfRequest,
     ) => Promise<messages.CertificateGetCertificatePdfResponse>;
+    getUserCertificates: (
+      params?: messages.CertificateGetUserCertificatesRequest,
+    ) => Promise<messages.CertificateGetUserCertificatesResponse>;
     validateCertificate: (
       params?: messages.CertificateValidateCertificateRequest,
     ) => Promise<messages.CertificateValidateCertificateResponse>;
@@ -5823,6 +5891,9 @@ export namespace controllers {
     details: (
       params?: messages.ContestDetailsRequest,
     ) => Promise<messages.ContestDetailsResponse>;
+    getNumberOfContestants: (
+      params?: messages.ContestGetNumberOfContestantsRequest,
+    ) => Promise<messages.ContestGetNumberOfContestantsResponse>;
     list: (
       params?: messages.ContestListRequest,
     ) => Promise<messages.ContestListResponse>;

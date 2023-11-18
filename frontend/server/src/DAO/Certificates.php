@@ -10,6 +10,8 @@ namespace OmegaUp\DAO;
  * {@link \OmegaUp\DAO\VO\Certificates}.
  * @access public
  * @package docs
+ *
+ * @psalm-type CertificateListItem=array{certificate_type: string, date: \OmegaUp\Timestamp, name: null|string, verification_code: string}
  */
 class Certificates extends \OmegaUp\DAO\Base\Certificates {
     /**
@@ -41,7 +43,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
     /**
      * Returns the data of the contest certificate using its verification code
      *
-     * @return array{contest_title: string, identity_name: string, contest_place: int|null, timestamp: \OmegaUp\Timestamp}|null
+     * @return array{contest_place: int|null, contest_title: string, identity_name: string, timestamp: \OmegaUp\Timestamp}|null
      */
     final public static function getContestCertificateByVerificationCode(
         string $verificationCode
@@ -49,7 +51,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         $sql = '
             SELECT
                 co.title AS contest_title,
-                i.name AS identity_name,
+                COALESCE(i.name, i.username) AS identity_name,
                 ce.contest_place,
                 ce.timestamp
             FROM
@@ -66,7 +68,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
                 ce.verification_code = ?;
         ';
 
-        /** @var array{contest_title: string, identity_name: string, contest_place: int, timestamp: \OmegaUp\Timestamp}|null */
+        /** @var array{contest_place: int|null, contest_title: string, identity_name: string, timestamp: \OmegaUp\Timestamp}|null */
         $data = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$verificationCode]
@@ -86,7 +88,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         $sql = '
             SELECT
                 co.name AS course_name,
-                i.name AS identity_name,
+                COALESCE(i.name, i.username) AS identity_name,
                 ce.timestamp
             FROM
                 Certificates ce
@@ -121,7 +123,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
     ) {
         $sql = '
             SELECT
-                i.name AS identity_name,
+                COALESCE(i.name, i.username) AS identity_name,
                 ce.timestamp
             FROM
                 Certificates ce
@@ -143,7 +145,50 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
     }
 
     /**
-     * Returns if a certificate is valid using its verification code
+     * Gets an array of a user's certificates using the user id.
+     * @return list<CertificateListItem>
+     */
+    final public static function getUserCertificates(
+        int $userId
+    ): array {
+        $sql = '
+            SELECT
+                `Certificates`.verification_code,
+                `Certificates`.timestamp AS date,
+                `Certificates`.certificate_type,
+                IF(
+                    `Certificates`.certificate_type = "course",
+                    `Courses`.name,
+                    IF(
+                        `Certificates`.certificate_type = "contest",
+                        `Contests`.title,
+                        NULL
+                    )
+                ) AS name
+            FROM `Certificates`
+            LEFT JOIN `Courses`
+                ON `Certificates`.course_id = `Courses`.course_id
+            LEFT JOIN `Contests`
+                ON `Certificates`.contest_id = `Contests`.contest_id
+            INNER JOIN `Identities`
+                ON `Identities`.identity_id = `Certificates`.identity_id
+            INNER JOIN `Users`
+                ON `Identities`.user_id = `Users`.user_id
+            WHERE
+                `Users`.user_id = ?
+            ORDER BY `Certificates`.timestamp DESC;
+        ';
+
+        /** @var list<array{certificate_type: string, date: \OmegaUp\Timestamp, name: null|string, verification_code: string}> */
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$userId]
+        );
+        return $result;
+    }
+
+    /**
+     * Returns true if a certificate is valid using its verification code
      *
      * @return int
      */
@@ -151,12 +196,12 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
         string $verificationCode
     ) {
         $sql = '
-        SELECT
-            EXISTS(
-                SELECT certificate_id
-                FROM Certificates
-                WHERE verification_code = ?
-            );
+            SELECT
+                EXISTS(
+                    SELECT certificate_id
+                    FROM Certificates
+                    WHERE verification_code = ?
+                );
         ';
 
         /** @var int */
