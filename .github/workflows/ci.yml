@@ -436,6 +436,10 @@ jobs:
         run: |
           sudo apt-get update -y && sudo apt-get install -y wait-for-it
 
+      - name: Install retry
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y retry
+
       - name: Download the Docker containers
         run: |
           docker-compose pull
@@ -451,8 +455,7 @@ jobs:
 
           # Wait for some of the containers
           wait-for-it -t 30 mysql:13306
-          wait-for-it -t 30 rabbitmq:5672
-          docker-compose exec -T rabbitmq rabbitmqctl await_startup
+          retry -t 5 -d 5 -- docker-compose exec -T rabbitmq rabbitmqctl await_startup
 
           for i in $(seq 10); do
             if [[ "$(mysql \
