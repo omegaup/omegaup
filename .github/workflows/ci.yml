@@ -38,27 +38,6 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Install wait-for-it
-        run: |
-          sudo apt-get update -y && sudo apt-get install -y wait-for-it
-
-      - name: Download the Docker containers
-        run: |
-          docker-compose pull
-
-      - name: Start the Docker containers
-        run: |
-          docker-compose up --detach rabbitmq
-
-          # Add the container names as aliases to localhost
-          cat << EOF | sudo tee --append /etc/hosts
-          127.0.0.1 rabbitmq
-          EOF
-
-          # Wait for some of the containers
-          wait-for-it -t 30 rabbitmq:5672
-          docker-compose exec -T rabbitmq rabbitmqctl await_startup
-
       - name: Use PHP 8.1
         run: |
           sudo update-alternatives --install /usr/bin/php php /usr/bin/php8.1 100
@@ -128,9 +107,6 @@ jobs:
             --username=root --password= --hostname=localhost --port=13306 \
             --database=omegaup-test \
             validate --all < /dev/null
-
-      - name: Check DNS resolution
-        run: ping -c 3 rabbitmq
 
       - name: Run tests
         timeout-minutes: 20
@@ -493,10 +469,6 @@ jobs:
           define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
           define('OMEGAUP_GRADER_URL', 'https://grader:21680');
           define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
-          define('OMEGAUP_RABBITMQ_HOST', 'rabbitmq');
-          define('OMEGAUP_RABBITMQ_PORT', '5672');
-          define('OMEGAUP_RABBITMQ_USERNAME', 'omegaup');
-          define('OMEGAUP_RABBITMQ_PASSWORD', 'omegaup');
           define('REDIS_HOST', 'redis');
           define('REDIS_PASS', '');
           define('TEMPLATE_CACHE_DIR', '/tmp');
@@ -533,9 +505,6 @@ jobs:
           sudo mkdir -p /var/lib/omegaup
           sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
           docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
-
-      - name: Check DNS resolution
-        run: ping -c 3 rabbitmq
 
       - name: Run Python tests
         run: |

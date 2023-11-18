@@ -9,7 +9,6 @@
   - [`/api/badge/myList/`](#apibadgemylist)
   - [`/api/badge/userList/`](#apibadgeuserlist)
 - [Certificate](#certificate)
-  - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
   - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
   - [`/api/certificate/getUserCertificates/`](#apicertificategetusercertificates)
   - [`/api/certificate/validateCertificate/`](#apicertificatevalidatecertificate)
@@ -35,6 +34,7 @@
   - [`/api/contest/create/`](#apicontestcreate)
   - [`/api/contest/createVirtual/`](#apicontestcreatevirtual)
   - [`/api/contest/details/`](#apicontestdetails)
+  - [`/api/contest/getNumberOfContestants/`](#apicontestgetnumberofcontestants)
   - [`/api/contest/list/`](#apicontestlist)
   - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
   - [`/api/contest/myList/`](#apicontestmylist)
@@ -395,23 +395,6 @@ Returns a list of badges owned by a certain user
 # Certificate
 
 CertificateController
-
-## `/api/certificate/generateContestCertificates/`
-
-### Description
-
-Generates all the certificates for a contest given its contest ID.
-
-### Parameters
-
-| Name                  | Type        | Description |
-| --------------------- | ----------- | ----------- |
-| `certificates_cutoff` | `int\|null` |             |
-| `contest_id`          | `int\|null` |             |
-
-### Returns
-
-_Nothing_
 
 ## `/api/certificate/getCertificatePdf/`
 
@@ -886,6 +869,22 @@ in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
 ```typescript
 types.ContestDetails;
 ```
+
+## `/api/contest/getNumberOfContestants/`
+
+### Description
+
+### Parameters
+
+| Name          | Type     | Description |
+| ------------- | -------- | ----------- |
+| `contest_ids` | `string` |             |
+
+### Returns
+
+| Name       | Type                         |
+| ---------- | ---------------------------- |
+| `response` | `{ [key: number]: number; }` |
 
 ## `/api/contest/list/`
 
