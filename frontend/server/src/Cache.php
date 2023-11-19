@@ -543,7 +543,6 @@ class Cache {
     const USER_PROFILE = 'profile-';
     const PROBLEMS_SOLVED_RANK = 'problems-solved-rank-';
     const CONTESTS_LIST_PUBLIC = 'contest-list-public';
-    const CONTESTS_CONTESTANTS_LIST = 'contest-contestants-list';
     const CONTESTS_LIST_SYSTEM_ADMIN = 'contest-list-sys-admin';
     const CONTESTS_LIST_USER_ID = 'contest-list-user-id';
     const SCHOOL_RANK = 'school-rank';

@@ -1,4 +1,6 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+
 /**
  * Description of Contest List v2
  */
@@ -110,7 +112,10 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testPublicContestsNotLoggedIn() {
-        $this->createContests();
+        [
+            'contestData' => $contestData,
+            'invitedUserIdentity' => $invitedUserIdentity,
+        ] = $this->createContests();
 
         $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
             new \OmegaUp\Request()
@@ -138,6 +143,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
     public function testPrivateContestsForInvitedUser() {
         [
+            'contestData' => $contestData,
             'invitedUserIdentity' => $invitedUserIdentity,
         ] = $this->createContests();
 
@@ -174,7 +180,9 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testPrivateContestsForNonInvitedUser() {
-        $this->createContests();
+        [
+            'contestData' => $contestData
+        ] = $this->createContests();
 
         // Create user that wont be invited
         ['identity' => $nonInvitedUserIdentity] = \OmegaUp\Test\Factories\User::createUser();
@@ -209,10 +217,12 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testPrivateContestsForSystemAdmin() {
-        $this->createContests();
+        [
+            'contestData' => $contestData
+        ] = $this->createContests();
 
         // Create admin user (system admin)
-        ['identity' => $adminUserIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        ['user' => $user, 'identity' => $adminUserIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         // Logging user
         $login = self::login($adminUserIdentity);
@@ -298,7 +308,10 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
     public function testContestantsColumnAsUserNotLoggedIn() {
         [
+            'firstContestData' => $firstContestData,
+            'secondContestData' => $secondContestData,
             'firstInvitedUserIdentity' => $firstInvitedUserIdentity,
+            'secondInvitedUserIdentity' => $secondInvitedUserIdentity,
         ] = $this->createContestsAndAddContestants();
 
         $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
@@ -308,22 +321,8 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         $contests = $contestListPayload['contests']['current'];
         $contestContestants = [];
 
-        // Logging user
-        $login = self::login($firstInvitedUserIdentity);
-
-        [
-            'response' => $contestants,
-        ] = \OmegaUp\Controllers\Contest::apiGetNumberOfContestants(
-            new \OmegaUp\Request([
-                'contest_ids' => join(',', array_map(
-                    fn ($contest) => $contest['contest_id'],
-                    $contests
-                )),
-                'auth_token' => $login->auth_token,
-            ])
-        );
         foreach ($contests as $contest) {
-            $contestContestants[$contest['title']] = $contestants[$contest['contest_id']] ?? 0;
+            $contestContestants[$contest['title']] = $contest['contestants'];
         }
 
         $this->assertEqualsCanonicalizing(
@@ -337,9 +336,13 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
     public function testContestantsColumnAsCreatorUser() {
         [
+            'firstContestData' => $firstContestData,
             'secondContestData' => $secondContestData,
             'firstInvitedUserIdentity' => $firstInvitedUserIdentity,
+            'secondInvitedUserIdentity' => $secondInvitedUserIdentity,
         ] = $this->createContestsAndAddContestants('private');
+
+        $firstContestCreator = $firstContestData['director'];
 
         // Logging user
         $login = self::login($firstInvitedUserIdentity);
@@ -353,19 +356,8 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         $contests = $contestListPayload['contests']['current'];
         $contestContestants = [];
 
-        [
-            'response' => $contestants,
-        ] = \OmegaUp\Controllers\Contest::apiGetNumberOfContestants(
-            new \OmegaUp\Request([
-                'contest_ids' => join(',', array_map(
-                    fn ($contest) => $contest['contest_id'],
-                    $contests
-                )),
-                'auth_token' => $login->auth_token,
-            ])
-        );
         foreach ($contests as $contest) {
-            $contestContestants[$contest['title']] = $contestants[$contest['contest_id']] ?? 0;
+            $contestContestants[$contest['title']] = $contest['contestants'];
         }
 
         $this->assertEqualsCanonicalizing(
@@ -403,7 +395,10 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
     public function testContestantsColumnAsInvitedUser() {
         [
+            'firstContestData' => $firstContestData,
+            'secondContestData' => $secondContestData,
             'firstInvitedUserIdentity' => $firstInvitedUserIdentity,
+            'secondInvitedUserIdentity' => $secondInvitedUserIdentity,
         ] = $this->createContestsAndAddContestants('private');
 
         // Logging user
@@ -418,19 +413,8 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         $contests = $contestListPayload['contests']['current'];
         $contestContestants = [];
 
-        [
-            'response' => $contestants,
-        ] = \OmegaUp\Controllers\Contest::apiGetNumberOfContestants(
-            new \OmegaUp\Request([
-                'contest_ids' => join(',', array_map(
-                    fn ($contest) => $contest['contest_id'],
-                    $contests
-                )),
-                'auth_token' => $login->auth_token,
-            ])
-        );
         foreach ($contests as $contest) {
-            $contestContestants[$contest['title']] = $contestants[$contest['contest_id']] ?? 0;
+            $contestContestants[$contest['title']] = $contest['contestants'];
         }
 
         $this->assertEqualsCanonicalizing(
@@ -442,10 +426,15 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testContestantsColumnAsSystemAdmin() {
-        $this->createContestsAndAddContestants('private');
+        [
+            'firstContestData' => $firstContestData,
+            'secondContestData' => $secondContestData,
+            'firstInvitedUserIdentity' => $firstInvitedUserIdentity,
+            'secondInvitedUserIdentity' => $secondInvitedUserIdentity,
+        ] = $this->createContestsAndAddContestants('private');
 
         // Create admin user (system admin)
-        ['identity' => $adminUserIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        ['user' => $user, 'identity' => $adminUserIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         // Logging user
         $login = self::login($adminUserIdentity);
@@ -459,19 +448,8 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         $contests = $contestListPayload['contests']['current'];
         $contestContestants = [];
 
-        [
-            'response' => $contestants,
-        ] = \OmegaUp\Controllers\Contest::apiGetNumberOfContestants(
-            new \OmegaUp\Request([
-                'contest_ids' => join(',', array_map(
-                    fn ($contest) => $contest['contest_id'],
-                    $contests
-                )),
-                'auth_token' => $login->auth_token,
-            ])
-        );
         foreach ($contests as $contest) {
-            $contestContestants[$contest['title']] = $contestants[$contest['contest_id']] ?? 0;
+            $contestContestants[$contest['title']] = $contest['contestants'];
         }
 
         $this->assertEqualsCanonicalizing(
@@ -494,7 +472,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create contest
-        \OmegaUp\Test\Factories\Contest::createContest(
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'contestDirector' => $organizerIdentity,
                 'contestDirectorUser' => $organizerUser,
@@ -522,7 +500,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create contest
-        \OmegaUp\Test\Factories\Contest::createContest(
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'contestDirector' => $organizerIdentity,
                 'contestDirectorUser' => $organizerUser,
@@ -598,7 +576,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create contest
-        \OmegaUp\Test\Factories\Contest::createContest(
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'contestDirector' => $organizerIdentity,
                 'contestDirectorUser' => $organizerUser,
@@ -625,7 +603,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testParticipatingColumnAsUserNotLoggedIn() {
-        \OmegaUp\Test\Factories\Contest::createContest(
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'requestsUserInformation' => 'optional',
             ])
@@ -673,7 +651,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
     public function testParticipatingColumnAsNonInvitedUser() {
         // Create contest
-        \OmegaUp\Test\Factories\Contest::createContest(
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'requestsUserInformation' => 'optional',
             ])
@@ -744,7 +722,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
     public function testParticipatingColumnAsSystemAdmin() {
         // Create contest
-        \OmegaUp\Test\Factories\Contest::createContest(
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'requestsUserInformation' => 'optional',
             ])

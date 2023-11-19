@@ -15,16 +15,6 @@
       <div>
         <span class="font-weight-bold">{{ T.wordsSubmissions }}</span>
         <div v-if="showFilters">
-          <b-pagination
-            v-if="showFilters"
-            v-model="currentPage"
-            size="sm"
-            :total-rows="totalRows"
-            :per-page="itemsPerPage"
-            :limit="1"
-            hide-goto-end-buttons
-            @page-click="onPageClick"
-          ></b-pagination>
           <div class="filters row">
             <label
               v-if="!simplifiedView"
@@ -370,7 +360,6 @@
                 v-if="!showPoints"
                 :class="statusPercentageClass(run)"
                 class="numeric"
-                data-run-percentage
               >
                 {{ percentage(run) }}
               </td>
@@ -389,17 +378,6 @@
                   "
                   :icon="['fas', 'times-circle']"
                   style="color: red"
-                />
-                <font-awesome-icon
-                  v-else-if="
-                    outputIconColorStatus(run) ===
-                    NumericOutputStatus.Interrupted
-                  "
-                  :icon="['fas', 'exclamation-circle']"
-                  style="color: orange"
-                />
-                <br
-                  v-if="outputIconColorStatus(run) != NumericOutputStatus.None"
                 />
                 {{ output(run) }}
               </td>
@@ -484,7 +462,6 @@
           </tbody>
         </table>
         <b-pagination
-          v-if="!showFilters"
           v-model="currentPage"
           :total-rows="totalRows"
           :per-page="itemsPerPage"
@@ -580,7 +557,6 @@ export enum NumericOutputStatus {
   None = 0,
   Correct = 1,
   Incorrect = 2,
-  Interrupted = 3,
 }
 
 export enum StringOutputStatus {
@@ -634,7 +610,7 @@ export default class Runs extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
   @Prop({ default: false }) simplifiedView!: boolean;
-  @Prop({ default: 10 }) itemsPerPage!: number;
+  @Prop({ default: 7 }) itemsPerPage!: number;
   @Prop({ default: false }) showGUID!: boolean;
 
   NumericOutputStatus = NumericOutputStatus;
@@ -655,33 +631,13 @@ export default class Runs extends Vue {
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
   currentPage: number = 1;
-  currentDataPage: number = 1;
-  newFieldsLaunchDate: Date = new Date('2023-10-22');
 
   get totalRows(): number {
-    if (this.totalRuns === undefined) {
-      return this.filteredRuns.length;
-    }
-    return this.totalRuns;
-  }
-
-  onPageClick(bvEvent: any, page: number): void {
-    if (page == this.currentPage - 1 || page == this.currentPage + 1) {
-      if (this.currentPage + 1 == page) {
-        this.filterOffset++;
-      } else if (this.currentPage - 1 == page) {
-        this.filterOffset--;
-      }
-    } else {
-      bvEvent.preventDefault();
-    }
+    return this.filteredRuns.length;
   }
 
   get paginatedRuns(): types.Run[] {
-    if (!this.showFilters) {
-      this.currentDataPage = this.currentPage;
-    }
-    const startIndex = (this.currentDataPage - 1) * this.itemsPerPage;
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     return this.filteredRuns.slice(startIndex, endIndex);
   }
@@ -772,7 +728,7 @@ export default class Runs extends Vue {
     )
       return '—';
     if (run.status_memory === MemoryStatus.Exceeded)
-      return T.runDetailsMemoryExceeded;
+      return T.runDetailsExceeded;
     return `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
   }
 
@@ -829,10 +785,6 @@ export default class Runs extends Vue {
   }
 
   execution(run: types.Run): string {
-    if (run.time < this.newFieldsLaunchDate) {
-      return T.runDetailsNotAvailable;
-    }
-
     if (run.status !== 'ready') {
       return '—';
     }
@@ -856,10 +808,6 @@ export default class Runs extends Vue {
   }
 
   output(run: types.Run): string {
-    if (run.time < this.newFieldsLaunchDate) {
-      return T.runDetailsNotAvailable;
-    }
-
     if (run.status !== 'ready') {
       return '—';
     }
@@ -881,22 +829,8 @@ export default class Runs extends Vue {
       return '';
     }
 
-    if (run.verdict == 'JE' || run.verdict == 'VE') {
-      return 'status-je-ve';
-    }
-
-    if (run.verdict == 'CE') {
-      return 'status-ce';
-    }
-
-    if (run.type === 'disqualified') {
+    if (run.type == 'disqualified') {
       return 'status-disqualified';
-    }
-
-    const scorePercentage = (run.score * 100).toFixed(2);
-
-    if (scorePercentage !== '100.00') {
-      return '';
     }
 
     return 'status-ac';
@@ -904,19 +838,19 @@ export default class Runs extends Vue {
 
   outputIconColorStatus(run: types.Run): number {
     if (
-      !(run.status === 'ready' && run.output !== StringOutputStatus.Exceeded) ||
-      run.time < this.newFieldsLaunchDate
+      !(
+        run.status === 'ready' &&
+        run.output !== StringOutputStatus.Exceeded &&
+        run.output !== StringOutputStatus.Interrupted
+      )
     ) {
       return NumericOutputStatus.None;
     }
 
-    if (run.output === StringOutputStatus.Incorrect) {
-      return NumericOutputStatus.Incorrect;
-    } else if (run.output === StringOutputStatus.Interrupted) {
-      return NumericOutputStatus.Interrupted;
+    if (run.output !== StringOutputStatus.Incorrect) {
+      return NumericOutputStatus.Correct;
     }
-
-    return NumericOutputStatus.Correct;
+    return NumericOutputStatus.Incorrect;
   }
 
   showVerdictHelp(ev: Event): void {
@@ -1075,8 +1009,6 @@ export default class Runs extends Vue {
   }
 
   onRemoveFilter(filter: string): void {
-    this.currentPage = 1;
-    this.currentDataPage = 1;
     if (filter === 'all') {
       this.filterLanguage = '';
       this.filterProblem = null;
@@ -1084,8 +1016,6 @@ export default class Runs extends Vue {
       this.filterUsername = null;
       this.filterVerdict = '';
       this.filterContest = '';
-      this.filterExecution = '';
-      this.filterOutput = '';
       this.filterOffset = 0;
 
       this.filters = [];
@@ -1109,12 +1039,6 @@ export default class Runs extends Vue {
         break;
       case 'contest':
         this.filterContest = '';
-        break;
-      case 'Execution':
-        this.filterExecution = '';
-        break;
-      case 'Output':
-        this.filterOutput = '';
     }
     this.filters = this.filters.filter((item) => item.name !== filter);
   }

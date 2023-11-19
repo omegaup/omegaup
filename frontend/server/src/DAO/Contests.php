@@ -524,7 +524,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         p.scoreboard_url,
                         p.scoreboard_url_admin,
-                        0 AS contestants,
+                        COUNT(contestants.identity_id) AS contestants,
                         ANY_VALUE(organizer.username) AS organizer";
 
         $sql = "
@@ -566,6 +566,10 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 Problemsets p
             ON
                 p.problemset_id = Contests.problemset_id
+            LEFT JOIN
+                Problemset_Identities AS contestants
+            ON
+                Contests.problemset_id = contestants.problemset_id
             INNER JOIN
                 ACLs AS a
             ON
@@ -662,7 +666,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         p.scoreboard_url,
                         p.scoreboard_url_admin,
-                        0 AS contestants,
+                        COUNT(contestants.identity_id) AS contestants,
                         ANY_VALUE(organizer.username) AS organizer";
 
         $sql = "
@@ -704,6 +708,10 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 Problemsets p
             ON
                 p.problemset_id = Contests.problemset_id
+            LEFT JOIN
+                Problemset_Identities AS contestants
+            ON
+                Contests.problemset_id = contestants.problemset_id
             INNER JOIN
                 ACLs AS a
             ON
@@ -776,13 +784,17 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $select = "SELECT
                     $columns,
-                    0 AS contestants,
+                    COUNT(contestants.identity_id) AS contestants,
                     ANY_VALUE(organizer.username) AS organizer,
                     (participating.identity_id IS NOT NULL) AS `participating`";
 
         $sql = "
             FROM
                 Contests
+            LEFT JOIN
+                Problemset_Identities AS contestants
+            ON
+                Contests.problemset_id = contestants.problemset_id
             INNER JOIN
                 ACLs AS a
             ON
@@ -987,7 +999,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $select = "SELECT
                         $columns,
-                        0 AS contestants,
+                        COUNT(pi.identity_id) AS contestants,
                         ANY_VALUE(organizer.username) AS organizer,
                         BIT_OR(rc.participating) AS participating";
         $sql = "
@@ -995,6 +1007,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             ($sqlRelevantContests) rc
         INNER JOIN
             Contests ON Contests.contest_id = rc.contest_id
+        LEFT JOIN
+            Problemset_Identities pi ON pi.problemset_id = Contests.problemset_id
         INNER JOIN
             ACLs a ON a.acl_id = Contests.acl_id
         INNER JOIN
@@ -1084,13 +1098,17 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $select = "SELECT
                         $columns,
-                        0 AS `contestants`,
+                        COUNT(contestants.identity_id) AS `contestants`,
                         ANY_VALUE(organizer.username) AS organizer,
                         FALSE AS `participating`
                         ";
         $sql = "
                 FROM
                     `Contests`
+                LEFT JOIN
+                    Problemset_Identities AS contestants
+                ON
+                    Contests.problemset_id = contestants.problemset_id
                 INNER JOIN
                     ACLs AS a
                 ON
@@ -1171,12 +1189,16 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $select = "SELECT
                         $columns,
-                        0 AS contestants,
+                        COUNT(contestants.identity_id) AS contestants,
                         ANY_VALUE(organizer.username) AS organizer,
                         TRUE AS participating";
         $sql = "
                 FROM
                     Contests
+                LEFT JOIN
+                    Problemset_Identities AS contestants
+                ON
+                    Contests.problemset_id = contestants.problemset_id
                 INNER JOIN
                     ACLs AS a
                 ON
@@ -1236,28 +1258,6 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
 
         return \OmegaUp\DAO\Contests::getByProblemset($problemsetId);
-    }
-
-    public static function getNumberOfContestants(int $contestId): int {
-        $sql = 'SELECT
-                    COUNT(*) AS contestants
-                FROM
-                    Problemsets p
-                INNER JOIN
-                    Problemset_Identities pi
-                ON
-                    p.problemset_id = pi.problemset_id
-                WHERE
-                    p.contest_id = ?
-                GROUP BY
-                    p.contest_id
-                ;';
-
-        /** @var int */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            $sql,
-            [$contestId]
-        ) ?? 0;
     }
 
     /**
