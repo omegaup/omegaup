@@ -345,16 +345,16 @@
         </a>
       </div>
     </nav>
-    <div
-      v-if="userVerificationDeadline"
-      class="container-xl pl-0 pl-xl-3 mt-2"
-      :class="bannerColor"
-    >
-      {{
-        ui.formatString(T.bannerMessage, {
-          days: daysUntilVerificationDeadline,
-        })
-      }}
+    <div v-if="userVerificationDeadline" class="py-2 mt-2" :class="bannerColor">
+      <div class="container-xl">
+        {{
+          daysUntilVerificationDeadline > 1
+            ? ui.formatString(T.bannerMessage, {
+                days: daysUntilVerificationDeadline,
+              })
+            : T.bannerRedMessage
+        }}
+      </div>
     </div>
     <omegaup-user-objectives-questions
       v-if="
