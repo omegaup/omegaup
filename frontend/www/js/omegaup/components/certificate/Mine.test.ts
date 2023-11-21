@@ -104,7 +104,7 @@ describe('Mine.vue', () => {
       propsData,
     });
 
-    await wrapper.findAll('.download-file').trigger('click');
+    await wrapper.findAll('a[download-file]').trigger('click');
 
     await wrapper.vm.$nextTick();
 

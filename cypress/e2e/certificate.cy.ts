@@ -20,7 +20,7 @@ describe('Certificate Test', () => {
     });
 
     cy.visit('/certificates/mine/');
-    cy.get('.copy-to-clipboard')
+    cy.get('button[copy-to-clipboard]')
       .each(($button) => {
         cy.wrap($button).click().then(() => {
           cy.window().then((win) => {
@@ -43,7 +43,7 @@ describe('Certificate Test', () => {
     cy.login(loginOptions);
 
     cy.visit('/certificates/mine/');
-    cy.get('.download-file')
+    cy.get('a[download-file]')
       .each(($button) => {
         $button.attr('download', '');
         cy.wrap($button).click();
