@@ -9,7 +9,9 @@
   - [`/api/badge/myList/`](#apibadgemylist)
   - [`/api/badge/userList/`](#apibadgeuserlist)
 - [Certificate](#certificate)
+  - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
   - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
+  - [`/api/certificate/getUserCertificates/`](#apicertificategetusercertificates)
   - [`/api/certificate/validateCertificate/`](#apicertificatevalidatecertificate)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
@@ -33,6 +35,7 @@
   - [`/api/contest/create/`](#apicontestcreate)
   - [`/api/contest/createVirtual/`](#apicontestcreatevirtual)
   - [`/api/contest/details/`](#apicontestdetails)
+  - [`/api/contest/getNumberOfContestants/`](#apicontestgetnumberofcontestants)
   - [`/api/contest/list/`](#apicontestlist)
   - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
   - [`/api/contest/myList/`](#apicontestmylist)
@@ -394,6 +397,23 @@ Returns a list of badges owned by a certain user
 
 CertificateController
 
+## `/api/certificate/generateContestCertificates/`
+
+### Description
+
+Generates all the certificates for a contest given its contest ID.
+
+### Parameters
+
+| Name                  | Type        | Description |
+| --------------------- | ----------- | ----------- |
+| `certificates_cutoff` | `int\|null` |             |
+| `contest_id`          | `int\|null` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/certificate/getCertificatePdf/`
 
 ### Description
@@ -411,6 +431,24 @@ API to generate the certificate PDF
 | Name          | Type     |
 | ------------- | -------- |
 | `certificate` | `string` |
+
+## `/api/certificate/getUserCertificates/`
+
+### Description
+
+Get all the certificates belonging to a user
+
+### Parameters
+
+| Name      | Type        | Description |
+| --------- | ----------- | ----------- |
+| `user_id` | `int\|null` |             |
+
+### Returns
+
+| Name           | Type                          |
+| -------------- | ----------------------------- |
+| `certificates` | `types.CertificateListItem[]` |
 
 ## `/api/certificate/validateCertificate/`
 
@@ -849,6 +887,22 @@ in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
 ```typescript
 types.ContestDetails;
 ```
+
+## `/api/contest/getNumberOfContestants/`
+
+### Description
+
+### Parameters
+
+| Name          | Type     | Description |
+| ------------- | -------- | ----------- |
+| `contest_ids` | `string` |             |
+
+### Returns
+
+| Name       | Type                         |
+| ---------- | ---------------------------- |
+| `response` | `{ [key: number]: number; }` |
 
 ## `/api/contest/list/`
 
@@ -4065,7 +4119,7 @@ SubmissionController
 
 ### Description
 
-Updates the admin feedback for a submission
+Updates the admin feedback for a submission or creates the request feedback
 
 ### Parameters
 
