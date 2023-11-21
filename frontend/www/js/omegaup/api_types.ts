@@ -410,6 +410,27 @@ export namespace types {
       );
     }
 
+    export function CertificateListMinePayload(
+      elementId: string = 'payload',
+    ): types.CertificateListMinePayload {
+      return ((x) => {
+        x.certificates = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.date = ((x: number) => new Date(x * 1000))(x.date);
+            return x;
+          });
+        })(x.certificates);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function CertificateValidationPayload(
       elementId: string = 'payload',
     ): types.CertificateValidationPayload {
@@ -475,6 +496,13 @@ export namespace types {
             x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
             return x;
           })(x.nextRegisteredContestForUser);
+        if (
+          typeof x.userVerificationDeadline !== 'undefined' &&
+          x.userVerificationDeadline !== null
+        )
+          x.userVerificationDeadline = ((x: number) => new Date(x * 1000))(
+            x.userVerificationDeadline,
+          );
         return x;
       })(
         JSON.parse(
@@ -2707,6 +2735,10 @@ export namespace types {
     verification_code: string;
   }
 
+  export interface CertificateListMinePayload {
+    certificates: types.CertificateListItem[];
+  }
+
   export interface CertificateValidationPayload {
     certificate?: string;
     valid: boolean;
@@ -2826,6 +2858,7 @@ export namespace types {
     userClassname: string;
     userCountry: string;
     userTypes: string[];
+    userVerificationDeadline?: Date;
   }
 
   export interface ConsentStatement {
