@@ -297,6 +297,48 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testContestantsColumnAsUserNotLoggedIn() {
+        $this->createContests();
+
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+            new \OmegaUp\Request()
+        )['templateProperties']['payload'];
+
+        $currentContests = $contestListPayload['contests']['current'];
+        $pastContests = $contestListPayload['contests']['past'];
+        $futureContests = $contestListPayload['contests']['future'];
+        $contests = array_merge(
+            $currentContests,
+            $pastContests,
+            $futureContests
+        );
+
+        $contestContestants = [];
+
+        [
+            'response' => $contestants,
+        ] = \OmegaUp\Controllers\Contest::apiGetNumberOfContestants(
+            new \OmegaUp\Request([
+                'contest_ids' => join(',', array_map(
+                    fn ($contest) => $contest['contest_id'],
+                    $contests
+                )),
+            ])
+        );
+        foreach ($contests as $contest) {
+            $contestContestants[$contest['title']] = $contestants[$contest['contest_id']] ?? 0;
+        }
+
+        $this->assertEqualsCanonicalizing(
+            [
+                'current-public' => 0,
+                'past-public' => 0,
+                'future-public' => 0,
+            ],
+            $contestContestants,
+        );
+    }
+
+    public function testContestantsforFutureWithRegistrationContests() {
         [
             'firstInvitedUserIdentity' => $firstInvitedUserIdentity,
         ] = $this->createContestsAndAddContestants();
