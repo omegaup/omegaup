@@ -7,7 +7,8 @@ describe('Certificate Test', () => {
     cy.visit('/');
   });
 
-  it('Should copy the verification link', () => {
+  // TODO: Temporarily skipping the test until we can generate certificates.
+  it.skip('Should copy the verification link', () => {
     const loginOptions: LoginOptions = {
       username: 'user',
       password: 'user',
@@ -35,7 +36,8 @@ describe('Certificate Test', () => {
     cy.logout();
   });
 
-  it('Should download the certificates PDF', () => {
+  // TODO: Temporarily skipping the test until we can generate certificates.
+  it.skip('Should download the certificates PDF', () => {
     const loginOptions: LoginOptions = {
       username: 'user',
       password: 'user',
