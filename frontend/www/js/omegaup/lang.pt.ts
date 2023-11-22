@@ -291,6 +291,8 @@ const translations: { [key: string]: string; } = {
   contestEditCatLanguageAddedWarning: "Adicionado \"cat\" aos idiomas do concurso porque o problema adicionado exige",
   contestEditContestClonedSuccessfully: "Seu concurso foi clonado com sucesso",
   contestEditContestEdited: "O concurso foi editado",
+  contestEditContestLinkCopiedToClipboard: "Link da competi\u00e7\u00e3o copiado para a \u00e1rea de transfer\u00eancia com sucesso",
+  contestEditCopyContestLink: "Copiar link da competi\u00e7\u00e3o",
   contestEditGoToContest: "Exibir concurso",
   contestEditRegisteredAdminDelete: "Remover",
   contestEditRegisteredAdminRole: "Papel",

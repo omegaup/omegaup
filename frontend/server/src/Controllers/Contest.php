@@ -806,6 +806,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param bool|null $start_fresh
      */
     public static function getContestDetailsForTypeScript(
         \OmegaUp\Request $r
@@ -814,6 +815,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+        $startFresh = $r->ensureOptionalBool('start_fresh');
+        if ($startFresh) {
+            if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
+                \OmegaUp\Controllers\Session::unregisterSession();
+            }
+        }
         [
             'contest' => $contest,
             'contestWithDirector' => $contestWithDirector,
