@@ -70,7 +70,6 @@
                 autocomplete="date-of-birth"
                 :max="maxDate"
                 :min="minDate"
-                @input="checkAge"
               />
             </div>
           </div>
