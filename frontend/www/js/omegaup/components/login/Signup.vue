@@ -127,8 +127,8 @@
                 class="btn btn-primary form-control"
                 name="sign_up"
                 @click.prevent="
-                  $emit(
-                    'register-and-login',
+                  $emit('register-and-login', {
+                    over13Checked,
                     username,
                     email,
                     dateOfBirth,
@@ -136,7 +136,7 @@
                     password,
                     passwordConfirmation,
                     recaptchaResponse,
-                  )
+                  })
                 "
               >
                 {{ T.loginSignUp }}

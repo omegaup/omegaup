@@ -68,13 +68,25 @@ OmegaUp.on('ready', () => {
           hasVisitedSection: payload.hasVisitedSection,
         },
         on: {
-          'register-and-login': (
-            username: string,
-            email: string,
-            password: string,
-            passwordConfirmation: string,
-            recaptchaResponse: string,
-          ) => {
+          'register-and-login': ({
+            over13Checked,
+            username,
+            email,
+            dateOfBirth,
+            parentEmail,
+            password,
+            passwordConfirmation,
+            recaptchaResponse,
+          }: {
+            over13Checked: boolean;
+            username: string;
+            email: string;
+            dateOfBirth: Date;
+            parentEmail: string;
+            password: string;
+            passwordConfirmation: string;
+            recaptchaResponse: string;
+          }) => {
             if (password != passwordConfirmation) {
               ui.error(T.passwordMismatch);
               return;
@@ -83,13 +95,26 @@ OmegaUp.on('ready', () => {
               ui.error(T.loginPasswordTooShort);
               return;
             }
-
-            api.User.create({
-              username: username,
-              email: email,
-              password: password,
+            const request: {
+              username: string;
+              email?: string;
+              dateOfBirth: Date;
+              parentEmail?: string;
+              password: string;
+              recaptcha: string;
+            } = {
+              username,
+              dateOfBirth,
+              password,
               recaptcha: recaptchaResponse,
-            })
+            };
+            if (over13Checked) {
+              request.email = email;
+            } else {
+              request.parentEmail = parentEmail;
+            }
+
+            api.User.create(request)
               .then(() => {
                 loginAndRedirect(
                   username,

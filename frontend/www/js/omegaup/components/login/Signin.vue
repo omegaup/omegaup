@@ -9,27 +9,7 @@
     <omegaup-signup
       :has-visited-section="hasVisitedSection"
       :validate-recaptcha="validateRecaptcha"
-      @register-and-login="
-        (
-          username,
-          email,
-          dateOfBirth,
-          parentEmail,
-          password,
-          passwordConfirmation,
-          recaptchaResponse,
-        ) =>
-          $emit(
-            'register-and-login',
-            username,
-            email,
-            dateOfBirth,
-            parentEmail,
-            password,
-            passwordConfirmation,
-            recaptchaResponse,
-          )
-      "
+      @register-and-login="(request) => $emit('register-and-login', request)"
     >
     </omegaup-signup>
   </div>
