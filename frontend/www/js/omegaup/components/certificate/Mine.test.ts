@@ -6,6 +6,15 @@ import * as ui from '../../ui';
 
 import certificate_Mine from './Mine.vue';
 
+interface Mine {
+  options: {
+    methods: {
+      getVerificationLink: (verificationCode: string) => string;
+      getDownloadLink: (verificationCode: string) => string;
+    };
+  };
+}
+
 describe('Mine.vue', () => {
   const propsData = {
     certificates: [
@@ -76,7 +85,7 @@ describe('Mine.vue', () => {
 
   it('Should copy the verification code', () => {
     const defineSpy = jest.spyOn(
-      (certificate_Mine as any).options.methods,
+      ((certificate_Mine as unknown) as Mine).options.methods,
       'getVerificationLink',
     );
 
@@ -96,7 +105,7 @@ describe('Mine.vue', () => {
 
   it('Should download a file', async () => {
     const clickSpy = jest.spyOn(
-      (certificate_Mine as any).options.methods,
+      ((certificate_Mine as unknown) as Mine).options.methods,
       'getDownloadLink',
     );
 
