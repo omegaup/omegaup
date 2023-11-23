@@ -6,7 +6,6 @@
 class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Generate certificates in a contest
-     *
      */
     public function testGenerateContestCertificates() {
         //Create user
@@ -60,7 +59,6 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Generate certificates in a contest
-     *
      */
     public function testConnectionRabbitMQ() {
         //Create the certificate generator
@@ -162,8 +160,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * try to generate certificates in a contest as a normal user
-     *
+     * Try to generate certificates in a contest as a normal user
      */
     public function testGenerateContestCertificatesAsNormalUser() {
         //Create user
@@ -196,7 +193,6 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Try to generate certificates in a contest as a certificate generator
      * but not as a contest admin
-     *
      */
     public function testGenerateContestCertificatesOnlyAsCertificateGenerator() {
         //Create user
@@ -210,9 +206,14 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             'role' => 'CertificateGenerator'
         ]));
 
+        $currentTime = \OmegaUp\Time::get();
+        $timePast1 =  new \OmegaUp\Timestamp($currentTime - 120 * 60);
+        $timePast2 =  new \OmegaUp\Timestamp($currentTime - 60 * 60);
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'alias' => 'pasado',
+                'startTime' => $timePast1,
+                'finishTime' => $timePast2,
             ])
         );
 
@@ -233,8 +234,48 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Try to generate certificates in a contest as a contest admin
+     * but not as a certificate generator
+     */
+    public function testGenerateContestCertificatesOnlyAsContestAdmin() {
+        //Create user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $loginIdentity = self::login($identity);
+
+        $currentTime = \OmegaUp\Time::get();
+        $timePast1 =  new \OmegaUp\Timestamp($currentTime - 120 * 60);
+        $timePast2 =  new \OmegaUp\Timestamp($currentTime - 60 * 60);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'alias' => 'pasado',
+                'startTime' => $timePast1,
+                'finishTime' => $timePast2,
+            ])
+        );
+
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contestData,
+            $identity
+        );
+
+        $certificatesCutoff = 3;
+
+        try {
+            \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
+                new \OmegaUp\Request([
+                    'auth_token' => $loginIdentity->auth_token,
+                    'contest_id' => $contestData['contest']->contest_id,
+                    'certificates_cutoff' => $certificatesCutoff
+                ])
+            );
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+    }
+
+    /**
      * Try to generate certificates in a contest that hasn't ended
-     *
      */
     public function testGenerateCurrentContestCertificates() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
