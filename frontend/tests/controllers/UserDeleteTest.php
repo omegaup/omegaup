@@ -57,6 +57,64 @@ class UserDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         // Verify DB user no longer exists
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
         $this->assertNull($user);
+
+        $user = \OmegaUp\DAO\Emails::existsByEmail($email);
+        $this->assertFalse($user);
+    }
+
+    public function testDeletedUserTriesToUseRegisteredEmail() {
+        $username = \OmegaUp\Test\Utils::createRandomString();
+        $email = "{$username}@{$username}.com";
+        // Creates a user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['email' => $email]
+            )
+        );
+
+        // Call api using admin
+        $login = self::login($identity);
+
+        // Call API to request a token
+        $response = \OmegaUp\Controllers\User::apiDeleteRequest(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertNotNull($response['token']);
+
+        // Call API
+        \OmegaUp\Controllers\User::apiDeleteConfirm(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'token' => $response['token'],
+            ])
+        );
+
+        // Restore the email for testing purposes
+        [$userEmail] = \OmegaUp\DAO\Emails::getByUserId($identity->user_id);
+        $this->assertStringContainsString('deleted', $userEmail->email);
+
+        $userEmail->email = $email;
+
+        \OmegaUp\DAO\Emails::update($userEmail);
+
+        $newUsername = \OmegaUp\Test\Utils::createRandomString();
+        // Call API mailFromUserLikelyRemoved
+        try {
+            \OmegaUp\Controllers\User::apiCreate(
+                new \OmegaUp\Request([
+                    'username' => $newUsername,
+                    'password' => $newUsername,
+                    'email' => $email,
+                    'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
+                    'birth_date' => 946684800, // 01-01-2000
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertSame('mailFromUserLikelyRemoved', $e->getMessage());
+        }
     }
 
     /**
