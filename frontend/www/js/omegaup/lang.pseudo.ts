@@ -646,6 +646,8 @@ const translations: { [key: string]: string; } = {
   demotionProblemMultipleQuestion: "(D0 y0u wan7 70 d0 7hi5 f0r a11 r3p0r75 0f 7hi5 pr0b13m?)",
   demotionProblemNotificationBanned: "(Pr0b13m [%(problem_name)] ha5 b33n r3p0r73d a5 inappr0pria73. F0r m0r3 d37ai15 ch3ck y0ur 3mai1.)",
   demotionProblemNotificationWarning: "(A warning ha5 b33n pu7 0n y0ur pr0b13m %(problem_name). F0r m0r3 d37ai15 ch3ck y0ur 3mai1.)",
+  dependentsMessage: "(I7 i5 n3c355ary 70 appr0v3 y0ur d3p3nd3n7'5 acc0un7 wi7hin %(days) day5. O7h3rwi53, 7h3 acc0un7 wi11 b3 d31373d.)",
+  dependentsRedMessage: "(A773n7i0n! Y0u 0n1y hav3 1 day 13f7 70 appr0v3 y0ur d3p3nd3n7'5 acc0un7. O7h3rwi53, 7h3 acc0un7 wi11 b3 d31373d.)",
   dependentsTitle: "(Par3n7a1 acc355)",
   dependentsUser: "(U53r)",
   duplicateTagsNotAllowed: "(Dup1ica73d 7ag5 ar3 n07 a110w3d. Th3r3 i5 a7 13a57 0n3 dup1ica73d 7ag in 7h3 1i57: %(tags) <br> P13a53 fix 7h3 inf0rma7i0n.)",

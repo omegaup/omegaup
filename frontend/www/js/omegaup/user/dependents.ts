@@ -5,7 +5,8 @@ import { types } from '../api_types';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserDependentsPayload();
-  console.log(payload);
+  const commonPayload = types.payloadParsers.CommonPayload();
+  console.log(commonPayload);
   new Vue({
     el: '#main-container',
     components: {
@@ -15,6 +16,7 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-user-dependents', {
         props: {
           dependents: payload.dependents,
+          userVerificationDeadline: commonPayload.userVerificationDeadline,
         },
       });
     },
