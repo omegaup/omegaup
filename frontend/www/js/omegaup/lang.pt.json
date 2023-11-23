@@ -776,6 +776,7 @@
 	"loginSignUp": "Registrar",
 	"loginSignupHeader": "Criar uma conta omegaUp, r\u00e1pido e f\u00e1cil!",
 	"loginThroughThirdParty": "Sua conta foi criada atrav\u00e9s de um login externo (Google, Facebook, etc.). Por favor, fa\u00e7a login usando esse mecanismo novamente para definir uma senha.",
+	"mailFromUserLikelyRemoved": "Este correo j\u00e1 est\u00e1 em uso. Provavelmente, foi utilizado, mas a conta foi removida. Se deseja usar este e-mail, entre em contato com omegaup-soporte@googlegroups.com para obter suporte.",
 	"mailInUse": "Este e-mail j\u00e1 est\u00e1 em uso. Tente novamente.",
 	"makePrivate": "Tornar privado",
 	"makePublic": "Tornar p\u00fablico",
