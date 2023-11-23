@@ -156,7 +156,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['request']['alias']
         );
 
-        //\OmegaUp\Test\Utils::runGenerateContestCertificates();
+        \OmegaUp\Test\Utils::runGenerateContestCertificates();
 
         $this->assertEquals(4, $contest->certificate_cutoff);
     }
