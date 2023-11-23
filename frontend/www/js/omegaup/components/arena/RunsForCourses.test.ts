@@ -20,49 +20,6 @@ describe('RunsForCourses.vue', () => {
     expect(wrapper.find('table tbody').text()).toBe('');
   });
 
-  it('Should handle runs', async () => {
-    const expectedDate = '1/1/2020, 12:00:00 AM';
-    const wrapper = shallowMount(arena_RunsForCourses, {
-      propsData: {
-        contestAlias: 'admin',
-        runs: [
-          {
-            alias: 'alias',
-            classname: '',
-            contest_score: 0,
-            country: 'xx',
-            guid: '1234',
-            language: 'java',
-            memory: 1933312,
-            penalty: 0,
-            run_id: 227,
-            runtime: 316,
-            score: 0,
-            status: 'ready',
-            submit_delay: 0,
-            time: new Date(expectedDate),
-            type: 'normal',
-            username: 'username',
-            verdict: 'WA',
-          },
-        ],
-        showContest: true,
-        showDetails: true,
-        showDisqualify: true,
-        showPager: true,
-        showPoints: false,
-        showProblem: true,
-        showRejudge: true,
-        showUser: true,
-        username: null,
-      },
-    });
-    const selectedRun = wrapper.find('td button[data-toggle=popover]');
-
-    expect(selectedRun.attributes('data-content')).toContain(T.verdictWA);
-    expect(selectedRun.attributes('data-content')).toContain(T.verdictHelpWA);
-  });
-
   const baseRunData: types.Run = {
     alias: 'alias',
     classname: '',
@@ -114,6 +71,51 @@ describe('RunsForCourses.vue', () => {
       guid: '121500',
       time: new Date('1/1/2020, 12:15:00 AM'),
     },
+    {
+      ...baseRunData,
+      guid: '122500',
+      time: new Date('1/1/2020, 12:30:00 AM'),
+      execution: 'EXECUTION_INTERRUPTED',
+      output: 'OUTPUT_INTERRUPTED',
+      verdict: 'JE',
+      status_memory: 'MEMORY_NOT_AVAILABLE',
+      status_runtime: 'RUNTIME_NOT_AVAILABLE',
+    },
+    {
+      ...baseRunData,
+      guid: '123000',
+      time: new Date('1/1/2020, 12:40:00 AM'),
+      execution: 'EXECUTION_INTERRUPTED',
+      output: 'OUTPUT_INTERRUPTED',
+      verdict: 'VE',
+      status_memory: 'MEMORY_NOT_AVAILABLE',
+      status_runtime: 'RUNTIME_NOT_AVAILABLE',
+    },
+    {
+      ...baseRunData,
+      guid: '123500',
+      time: new Date('1/1/2020, 12:50:00 AM'),
+      execution: 'EXECUTION_INTERRUPTED',
+      output: 'OUTPUT_INTERRUPTED',
+      verdict: 'CE',
+      status_memory: 'MEMORY_NOT_AVAILABLE',
+      status_runtime: 'RUNTIME_NOT_AVAILABLE',
+    },
+    {
+      ...baseRunData,
+      guid: '124000',
+      time: new Date('1/1/2020, 12:55:00 AM'),
+      type: 'disqualified',
+    },
+    {
+      ...baseRunData,
+      guid: '124500',
+      time: new Date('1/1/2020, 1:00:00 AM'),
+      output: 'OUTPUT_CORRECT',
+      score: 1,
+      contest_score: 1,
+      verdict: 'AC',
+    },
   ];
 
   it('Should handle order runs', async () => {
@@ -124,22 +126,34 @@ describe('RunsForCourses.vue', () => {
         showContest: true,
         showDetails: true,
         showDisqualify: true,
-        showPager: true,
+        showFilters: true,
         showPoints: false,
         showProblem: true,
         showRejudge: true,
         showUser: true,
         username: null,
+        itemsPerPage: 100,
       },
     });
     expect(
       wrapper.findAll('acronym[data-run-guid]').wrappers.map((e) => e.text()),
-    ).toEqual(['122000', '121500', '121000', '120500', '120000']);
+    ).toEqual([
+      '124500',
+      '124000',
+      '123500',
+      '123000',
+      '122500',
+      '122000',
+      '121500',
+      '121000',
+      '120500',
+      '120000',
+    ]);
   });
 
   const filtersMapping: { filter: string; value: string }[] = [
-    { filter: 'verdict', value: 'AC' },
-    { filter: 'status', value: 'new' },
+    { filter: 'execution', value: 'EXECUTION_FINISHED' },
+    { filter: 'output', value: 'OUTPUT_CORRECT' },
     { filter: 'language', value: 'py3' },
   ];
 
@@ -149,7 +163,7 @@ describe('RunsForCourses.vue', () => {
         propsData: {
           contestAlias: 'admin',
           runs,
-          showPager: true,
+          showFilters: true,
         },
       });
       await wrapper
@@ -161,36 +175,65 @@ describe('RunsForCourses.vue', () => {
     });
   });
 
-  it('Should handle change page control', async () => {
-    const wrapper = shallowMount(arena_RunsForCourses, {
+  it('Should handle run percentage color', async () => {
+    const wrapper = mount(arena_RunsForCourses, {
       propsData: {
-        contestAlias: 'contest',
         runs,
-        showPager: true,
-        rowCount: 2,
+        itemsPerPage: 100,
       },
     });
 
     expect(
-      wrapper.find('button[data-button-page-previous]').attributes('disabled'),
-    ).toBeTruthy();
-    expect(
-      wrapper.find('button[data-button-page-next]').attributes('disabled'),
-    ).toBeFalsy();
-    expect(wrapper.find('.pager-controls').text()).toContain('1');
-    await wrapper.find('button[data-button-page-next]').trigger('click');
-
-    expect(wrapper.emitted('filter-changed')).toEqual([
-      [{ filter: 'offset', value: '1' }],
+      wrapper.findAll('td[data-run-percentage]').wrappers.map((e) =>
+        e
+          .classes()
+          .filter((c) => c !== 'numeric')
+          .join(''),
+      ),
+    ).toEqual([
+      'status-ac',
+      'status-disqualified',
+      'status-ce',
+      'status-je-ve',
+      'status-je-ve',
+      '',
+      '',
+      '',
+      '',
+      '',
     ]);
+  });
 
-    expect(
-      wrapper.find('button[data-button-page-previous]').attributes('disabled'),
-    ).toBeFalsy();
-    expect(
-      wrapper.find('button[data-button-page-next]').attributes('disabled'),
-    ).toBeFalsy();
-    expect(wrapper.find('.pager-controls').text()).toContain('2');
+  it('Should handle paginator in user view', async () => {
+    const wrapper = mount(arena_RunsForCourses, {
+      propsData: {
+        runs,
+        itemsPerPage: 2,
+      },
+    });
+
+    const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
+    expect(paginationComponent.exists()).toBe(true);
+    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(5);
+    expect(paginationComponent.vm.$data.currentPage).toBe(1);
+  });
+
+  it('Should handle paginator in admin view', async () => {
+    const wrapper = mount(arena_RunsForCourses, {
+      propsData: {
+        contestAlias: 'contest',
+        runs,
+        showFilters: true,
+        showUser: true,
+        itemsPerPage: 1,
+      },
+    });
+
+    const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
+    expect(paginationComponent.exists()).toBe(true);
+
+    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(10);
+    expect(paginationComponent.vm.$data.currentPage).toBe(1);
   });
 
   it('Should handle username filter', async () => {
@@ -198,7 +241,7 @@ describe('RunsForCourses.vue', () => {
       propsData: {
         contestAlias: 'contest',
         runs,
-        showPager: true,
+        showFilters: true,
         showUser: true,
       },
     });
@@ -216,7 +259,7 @@ describe('RunsForCourses.vue', () => {
       propsData: {
         contestAlias: 'contest',
         runs,
-        showPager: true,
+        showFilters: true,
         showProblem: true,
       },
     });
@@ -260,6 +303,7 @@ describe('RunsForCourses.vue', () => {
         showRejudge: true,
         isContestFinished: false,
         useNewSubmissionButton: true,
+        itemsPerPage: 100,
       },
     });
     expect(wrapper.find('[data-actions="120000"]').text()).toContain(
@@ -309,7 +353,7 @@ describe('RunsForCourses.vue', () => {
         showContest: true,
         showDetails: true,
         showDisqualify: true,
-        showPager: true,
+        showFilters: true,
         showPoints: false,
         showProblem: true,
         showRejudge: true,
@@ -335,12 +379,13 @@ describe('RunsForCourses.vue', () => {
           showContest: true,
           showDetails: true,
           showDisqualify: true,
-          showPager: true,
+          showFilters: true,
           showPoints: false,
           showProblem: true,
           showRejudge: true,
           showUser: true,
           username: null,
+          itemsPerPage: 100,
         },
       });
 
