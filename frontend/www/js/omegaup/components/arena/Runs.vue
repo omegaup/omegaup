@@ -332,7 +332,7 @@
                 <div class="dropdown">
                   <button
                     data-runs-actions-button
-                    class="btn-secondary dropdown-toggle"
+                    class="btn btn-secondary dropdown-toggle"
                     type="button"
                     data-toggle="dropdown"
                     aria-haspopup="true"
@@ -360,14 +360,48 @@
                     </button>
                     <template v-if="showDisqualify">
                       <div class="dropdown-divider"></div>
-                      <button
-                        v-if="run.type === 'normal'"
-                        :data-actions-disqualify="run.guid"
-                        class="btn-link dropdown-item"
-                        @click="$emit('disqualify', run)"
-                      >
-                        {{ T.arenaRunsActionsDisqualify }}
-                      </button>
+                      <template v-if="run.type === 'normal'">
+                        <button
+                          :data-actions-disqualify="run.guid"
+                          class="btn-link dropdown-item"
+                          @click="
+                            $emit('disqualify', {
+                              run,
+                              disqualificationType: DisqualificationType.ByGUID,
+                            })
+                          "
+                        >
+                          {{ T.arenaRunsActionsDisqualifyByGUID }}
+                        </button>
+                        <template v-if="inContest">
+                          <button
+                            :data-actions-disqualify="run.guid"
+                            class="btn-link dropdown-item"
+                            @click="
+                              $emit('disqualify', {
+                                run,
+                                disqualificationType:
+                                  DisqualificationType.ByProblem,
+                              })
+                            "
+                          >
+                            {{ T.arenaRunsActionsDisqualifyByProblem }}
+                          </button>
+                          <button
+                            :data-actions-disqualify="run.guid"
+                            class="btn-link dropdown-item"
+                            @click="
+                              $emit('disqualify', {
+                                run,
+                                disqualificationType:
+                                  DisqualificationType.ByUser,
+                              })
+                            "
+                          >
+                            {{ T.arenaRunsActionsDisqualifyByUser }}
+                          </button>
+                        </template>
+                      </template>
                       <button
                         v-else-if="run.type === 'disqualified'"
                         :data-actions-requalify="run.guid"
@@ -437,6 +471,16 @@ declare global {
   }
 }
 
+export enum DisqualificationType {
+  ByGUID,
+  ByProblem,
+  ByUser,
+  ByUsers,
+  ByUsersAndProblem,
+  ByUserAndProblems,
+  ByUsersAndProblems,
+}
+
 export enum PopupDisplayed {
   None,
   RunSubmit,
@@ -481,10 +525,12 @@ export default class Runs extends Vue {
   @Prop() totalRuns!: number;
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
+  @Prop({ default: false }) inContest!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
+  DisqualificationType = DisqualificationType;
 
   filterLanguage: string = '';
   filterOffset: number = 0;

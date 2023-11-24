@@ -5,7 +5,7 @@ import { types } from '../../api_types';
 
 import T from '../../lang';
 
-import arena_Runs from './Runs.vue';
+import arena_Runs, { DisqualificationType } from './Runs.vue';
 
 describe('Runs.vue', () => {
   it('Should handle empty runs', () => {
@@ -263,7 +263,7 @@ describe('Runs.vue', () => {
       },
     });
     expect(wrapper.find('[data-actions="120000"]').text()).toContain(
-      T.arenaRunsActionsDisqualify,
+      T.arenaRunsActionsDisqualifyByGUID,
     );
     expect(wrapper.find('[data-actions="120000"]').text()).not.toContain(
       T.arenaRunsActionsRequalify,
@@ -273,16 +273,19 @@ describe('Runs.vue', () => {
     expect(wrapper.emitted('disqualify')).toEqual([
       [
         {
-          ...baseRunData,
-          guid: '120000',
-          username: 'other_username',
-          time: new Date('1/1/2020, 12:00:00 AM'),
+          disqualificationType: DisqualificationType.ByGUID,
+          run: {
+            ...baseRunData,
+            guid: '120000',
+            username: 'other_username',
+            time: new Date('1/1/2020, 12:00:00 AM'),
+          },
         },
       ],
     ]);
 
     expect(wrapper.find('[data-actions="122600"]').text()).not.toContain(
-      T.arenaRunsActionsDisqualify,
+      T.arenaRunsActionsDisqualifyByGUID,
     );
     expect(wrapper.find('[data-actions="122600"]').text()).toContain(
       T.arenaRunsActionsRequalify,

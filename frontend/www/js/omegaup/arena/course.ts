@@ -324,7 +324,7 @@ OmegaUp.on('ready', async () => {
             }
             refreshRuns();
           },
-          disqualify: (run: types.Run) => {
+          disqualify: ({ run }: { run: types.Run }) => {
             if (!window.confirm(T.runDisqualifyConfirm)) {
               return;
             }

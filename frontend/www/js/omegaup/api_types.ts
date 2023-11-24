@@ -5572,7 +5572,9 @@ export namespace messages {
   export type _RunDetailsServerResponse = any;
   export type RunDetailsResponse = types.RunDetails;
   export type RunDisqualifyRequest = { [key: string]: any };
-  export type RunDisqualifyResponse = {};
+  export type RunDisqualifyResponse = {
+    runs: { guid?: string; username?: string }[];
+  };
   export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
   export type _RunGetSubmissionFeedbackServerResponse = any;
   export type RunGetSubmissionFeedbackResponse = types.SubmissionFeedback[];

@@ -365,4 +365,55 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             ]
         );
     }
+
+    /**
+     * @return list<\OmegaUp\DAO\VO\Submissions>
+     */
+    public static function getAllSubmissionsByUserContest(
+        string $username,
+        string $contestAlias,
+        ?string $problemAlias
+    ) {
+        $fields =  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Submissions::FIELD_NAMES,
+            's'
+        );
+        $clause = '';
+        $params = [
+            $username,
+            $contestAlias,
+        ];
+        if (!is_null($problemAlias)) {
+            $clause = 'AND p.alias = ?';
+            $params[] = $problemAlias;
+        }
+        $sql = "SELECT
+                    {$fields}
+                FROM
+                    Submissions s
+                INNER JOIN
+                    Identities i ON i.identity_id = s.identity_id
+                INNER JOIN
+                    Problems p ON p.problem_id = s.problem_id
+                INNER JOIN
+                    Problemsets ps ON ps.problemset_id = s.problemset_id
+                INNER JOIN
+                    Contests c ON c.contest_id = ps.contest_id
+                WHERE
+                    current_run_id IS NOT NULL
+                    AND username = ?
+                    AND c.alias = ?
+                    {$clause}";
+
+        /** @var array{current_run_id: int|null, guid: string, identity_id: int, language: string, problem_id: int, problemset_id: int|null, school_id: int|null, status: string, submission_id: int, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, verdict: string}|null */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
+        $submissions = [];
+        foreach ($rs as $submission) {
+            $submissions[] = new \OmegaUp\DAO\VO\Submissions($submission);
+        }
+        return $submissions;
+    }
 }
