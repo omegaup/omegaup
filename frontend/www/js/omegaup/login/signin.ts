@@ -104,14 +104,14 @@ OmegaUp.on('ready', () => {
               recaptcha: string;
             } = {
               username,
-              dateOfBirth,
+              birth_date: dateOfBirth,
               password,
               recaptcha: recaptchaResponse,
             };
             if (over13Checked) {
               request.email = email;
             } else {
-              request.parentEmail = parentEmail;
+              request.parent_email = parentEmail;
             }
 
             api.User.create(request)
