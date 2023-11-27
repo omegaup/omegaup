@@ -62,8 +62,9 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 import CountryFlag from '../CountryFlag.vue';
-import GridPaginator from '../common/GridPaginator.vue';
-import UserName from '../user/Username.vue';
+import common_GridPaginator from '../common/GridPaginator.vue';
+import common_TablePaginator from '../common/TablePaginator.vue';
+import user_Username from '../user/Username.vue';
 import { types } from '../../api_types';
 import { SchoolCoderOfTheMonth, SchoolUser } from '../../linkable_resource';
 import { Chart } from 'highcharts-vue';
@@ -71,8 +72,9 @@ import { Chart } from 'highcharts-vue';
 @Component({
   components: {
     'omegaup-country-flag': CountryFlag,
-    'omegaup-grid-paginator': GridPaginator,
-    'omegaup-username': UserName,
+    'omegaup-grid-paginator': common_GridPaginator,
+    'omegaup-table-paginator': common_TablePaginator,
+    'omegaup-username': user_Username,
     highcharts: Chart,
   },
 })
@@ -147,7 +149,7 @@ export default class SchoolProfile extends Vue {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .list-group-item strong {
   display: inline-block;
   width: 60px;
