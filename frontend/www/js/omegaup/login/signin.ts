@@ -98,8 +98,8 @@ OmegaUp.on('ready', () => {
             const request: {
               username: string;
               email?: string;
-              dateOfBirth: Date;
-              parentEmail?: string;
+              birth_date: Date;
+              parent_email?: string;
               password: string;
               recaptcha: string;
             } = {
