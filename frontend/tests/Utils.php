@@ -222,6 +222,7 @@ class Utils {
             'Assignments',
             'Auth_Tokens',
             'API_Tokens',
+            'Certificates',
             'Clarifications',
             'Coder_Of_The_Month',
             'Contest_Log',
@@ -456,8 +457,7 @@ class Utils {
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
              ' --password ' . escapeshellarg(OMEGAUP_DB_PASS) .
-             ' --api-token ' . '92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6' .
-             ' --url ' . escapeshellarg(OMEGAUP_URL))
+             ' --test ' . 'True')
         );
     }
 
