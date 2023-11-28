@@ -206,7 +206,7 @@ class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
-        // Create 3 problem
+        // Create 3 problems
         $problemsData = [];
         foreach ($problemsAliases as $index => $problemAlias) {
             $problemsData[$index] = \OmegaUp\Test\Factories\Problem::createProblem(
@@ -215,7 +215,7 @@ class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
 
-            // Add the problem to the contest
+            // Add the problems to the contest
             \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemsData[$index],
                 $contestData
