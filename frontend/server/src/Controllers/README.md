@@ -3881,13 +3881,18 @@ Disqualify a submission
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `contest_alias` | `null\|string` |             |
+| `problem_alias` | `null\|string` |             |
+| `run_alias`     | `null\|string` |             |
+| `username`      | `null\|string` |             |
 
 ### Returns
 
-_Nothing_
+| Name   | Type                                    |
+| ------ | --------------------------------------- |
+| `runs` | `{ guid: string; username: string; }[]` |
 
 ## `/api/run/getSubmissionFeedback/`
 
@@ -3994,9 +3999,10 @@ Get basic details of a run
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
+| Name        | Type           | Description |
+| ----------- | -------------- | ----------- |
+| `run_alias` | `string`       |             |
+| `username`  | `null\|string` |             |
 
 ### Returns
 
