@@ -12,6 +12,7 @@ import sys
 from typing import List
 import mysql.connector
 import mysql.connector.cursor
+import omegaup.api
 import pika
 
 import database.contest
@@ -32,12 +33,15 @@ def send_contest_message_to_client(
         channel: pika.adapters.blocking_connection.BlockingChannel,
         date_lower_limit: datetime.datetime = datetime.datetime(2005, 1, 1),
         date_upper_limit: datetime.datetime = datetime.datetime.now(),
+        client: omegaup.api.Client,
 ) -> None:
     '''Send messages to contest queue.
      date-lower-limit: initial time from which to be taken the finish contests.
      By default. the 2005/01/01 date will be taken.
      date-upper-limit: finish time from which to be taken the finish contests.
      By default, the current date will be taken.
+
+     When API token and URL are given, it is possible to send the messages.
     '''
     contest_producer = rabbitmq_producer.RabbitmqProducer(
         queue='client_contest',
@@ -50,6 +54,7 @@ def send_contest_message_to_client(
         cur=cur,
         date_lower_limit=date_lower_limit,
         date_upper_limit=date_upper_limit,
+        client=client
     )
 
     for data in contestants:
@@ -62,18 +67,28 @@ def get_contests_from_db(
     cur: mysql.connector.cursor.MySQLCursorDict,
     date_lower_limit: datetime.datetime,
     date_upper_limit: datetime.datetime,
+    client: omegaup.api.Client
 ) -> List[database.contest.ContestCertificate]:
     ''''A intermediate function in order to mock the original one'''
+    certificates = database.contest.get_all_certificates_for_contests(cur=cur)
+
     return database.contest.get_contests(
         cur=cur,
         date_lower_limit=date_lower_limit,
         date_upper_limit=date_upper_limit,
+        certificates=certificates,
+        client=client,
     )
 
 
 def main() -> None:
     '''Main entrypoint.'''
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--api-token', type=str, help='omegaup api token')
+    parser.add_argument('--url',
+                        type=str,
+                        help='omegaup api URL',
+                        default='https://omegaup.com')
     parser.add_argument('--date-lower-limit',
                         type=lambda s:
                         datetime.datetime.strptime(s, '%Y-%m-%d'),
@@ -94,17 +109,19 @@ def main() -> None:
 
     logging.info('Started')
     dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
+    client = omegaup.api.Client(api_token=args.api_token, url=args.url)
     try:
         with dbconn.cursor(buffered=True, dictionary=True) as cur, \
             rabbitmq_connection.connect(username=args.rabbitmq_username,
                                         password=args.rabbitmq_password,
                                         host=args.rabbitmq_host,
-                                        ) as channel:
+                                        for_testing=False) as channel:
             send_contest_message_to_client(
                 cur=cur,
                 channel=channel,
                 date_lower_limit=args.date_lower_limit,
-                date_upper_limit=args.date_upper_limit)
+                date_upper_limit=args.date_upper_limit,
+                client=client)
     finally:
         dbconn.conn.close()
         logging.info('Done')

@@ -67,6 +67,8 @@ def test_get_contests_information() -> None:
             cur=cur,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT,
+            certificates=[],
+            client=client,
         )
 
         assert alias in [contest.alias for contest in contests]

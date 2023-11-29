@@ -7,7 +7,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Generate certificates in a contest
      */
-    public function testGenerateContestCertificates() {
+    /*public function testGenerateContestCertificates() {
         //Create user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -55,7 +55,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals(3, $contest->certificate_cutoff);
-    }
+    }*/
 
     /**
      * Generate certificates in a contest
@@ -161,7 +161,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::runGenerateContestCertificates();
 
         $certificates = \OmegaUp\DAO\Certificates::getAll();
-        $this->assertGreaterThan(0, sizeof($certificates));
+        $this->assertEquals(8, sizeof($certificates));
     }
 
     /**

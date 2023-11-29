@@ -12,12 +12,13 @@ import sys
 import time
 
 from typing import List
+import omegaup.api
 
+import database.contest
 import contest_callback
 import test_credentials
 import rabbitmq_connection
 import test_constants
-import omegaup.api
 
 
 sys.path.insert(
@@ -90,23 +91,33 @@ def test_insert_contest_certificate() -> None:
                 alias = %s;
             ''', (alias,))
         result = cur.fetchone()
-
     contest_id = result['contest_id']
     scoreboard_url = result['scoreboard_url']
+    ranking = []
+    scoreboard = client.contest.scoreboard(
+        contest_alias=alias,
+        token=scoreboard_url)
+    for position in scoreboard.ranking:
+        ranking.append(database.contest.Ranking(
+            username=position.username,
+            place=f'{position.place}')._asdict())
     with rabbitmq_connection.connect(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
-            host=test_credentials.RABBITMQ_HOST
+            host=test_credentials.RABBITMQ_HOST,
+            for_testing=True
     ) as channel:
         callback = contest_callback.ContestsCallback(
             dbconn=dbconn.conn,
-            client=client,
+            for_testing=True
         )
         body = contest_callback.ContestCertificate(
             contest_id=contest_id,
-            certificate_cutoff=3,  # setting a default value
+            # setting a default value
+            certificate_cutoff=3,
             alias=alias,
             scoreboard_url=scoreboard_url,
+            ranking=ranking,
         )
         callback(
             _channel=channel,

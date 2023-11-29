@@ -7,7 +7,7 @@ import dataclasses
 import os
 import sys
 
-from typing import Optional
+from typing import Dict, List, Optional
 import pytest
 import pika
 import pytest_mock
@@ -18,6 +18,8 @@ import producer_contest
 import rabbitmq_connection
 import rabbitmq_client
 import test_credentials
+import test_constants
+import omegaup.api
 
 sys.path.insert(
     0,
@@ -37,7 +39,8 @@ class MessageSavingCallback:
                  _properties: pika.spec.BasicProperties,
                  body: bytes) -> None:
         '''Callback function to test'''
-        self.message = json.loads(body.decode())
+        self.message = contest_callback.ContestCertificate(**json.loads(
+            body.decode()))
         channel.close()
 
 
@@ -52,6 +55,10 @@ class MessageSavingCallback:
                     alias='contest1',
                     scoreboard_url='abcdef',
                     contest_id=1,
+                    ranking=[
+                        database.contest.Ranking(
+                            username='user_1', place='1')._asdict(),
+                    ],
                 ),
             ],
             database.contest.ContestCertificate(
@@ -59,6 +66,10 @@ class MessageSavingCallback:
                 alias='contest1',
                 scoreboard_url='abcdef',
                 contest_id=1,
+                ranking=[
+                    database.contest.Ranking(
+                        username='user_1', place='1')._asdict(),
+                ],
             )._asdict(),
         ),
         (
@@ -68,6 +79,10 @@ class MessageSavingCallback:
                     alias='contest2',
                     scoreboard_url='123456',
                     contest_id=2,
+                    ranking=[
+                        database.contest.Ranking(
+                            username='user_1', place='1')._asdict(),
+                    ],
                 ),
             ],
             database.contest.ContestCertificate(
@@ -75,6 +90,10 @@ class MessageSavingCallback:
                 alias='contest2',
                 scoreboard_url='123456',
                 contest_id=2,
+                ranking=[
+                    database.contest.Ranking(
+                        username='user_1', place='1')._asdict(),
+                ],
             )._asdict(),
         ),
     ],
@@ -101,18 +120,36 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,
+            for_testing=True
     ) as channel:
         rabbitmq_connection.initialize_rabbitmq(
             queue='contest',
             exchange='certificates',
             routing_key='ContestQueue',
             channel=channel)
+        client = omegaup.api.Client(
+            api_token=test_constants.API_TOKEN,
+            url=test_constants.OMEGAUP_API_ENDPOINT,
+        )
         producer_contest.send_contest_message_to_client(cur=cur,
-                                                        channel=channel)
+                                                        channel=channel,
+                                                        client=client)
         callback = MessageSavingCallback()
         rabbitmq_client.receive_messages(queue='contest',
                                          exchange='certificates',
                                          routing_key='ContestQueue',
                                          channel=channel,
                                          callback=callback)
-        assert expected == callback.message
+
+        if callback.message is not None:
+            ranking: List[Dict[str, str]] = []
+            for ranking_data in callback.message.ranking:
+                ranking.append(ranking_data)
+
+            callback.message.ranking = ranking
+
+            result = callback.message
+            assert expected['certificate_cutoff'] == result.certificate_cutoff
+            assert expected['alias'] == result.alias
+            assert expected['scoreboard_url'] == result.scoreboard_url
+            assert expected['ranking'] == result.ranking
