@@ -13,7 +13,7 @@ import pika
 
 @contextlib.contextmanager
 def connect(
-        *, username: str, password: str, host: str, for_testing: bool
+        *, username: str, password: str, host: str, for_testing: bool = False
 ) -> Iterator[pika.adapters.blocking_connection.BlockingChannel]:
     '''Connects to rabbitmq with the arguments provided.'''
     connection = pika.BlockingConnection(pika.ConnectionParameters(

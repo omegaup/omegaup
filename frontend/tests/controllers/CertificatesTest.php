@@ -156,12 +156,12 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(4, $contest->certificate_cutoff);
 
         $certificates = \OmegaUp\DAO\Certificates::getAll();
-        $this->assertEquals(0, sizeof($certificates));
+        $this->assertCount(0, $certificates);
 
         \OmegaUp\Test\Utils::runGenerateContestCertificates();
 
         $certificates = \OmegaUp\DAO\Certificates::getAll();
-        $this->assertEquals(8, sizeof($certificates));
+        $this->assertCount(8, $certificates);
     }
 
     /**

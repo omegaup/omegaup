@@ -42,14 +42,14 @@ class ContestsCallback:
     def __init__(
         self,
         dbconn: mysql.connector.MySQLConnection,
-        for_testing: bool
+        for_testing: bool = False
     ):
         '''Constructor for contest callback'''
         self.dbconn = dbconn
         self.for_testing = for_testing
 
     def __call__(self,
-                 _channel: pika.adapters.blocking_connection.BlockingChannel,
+                 channel: pika.adapters.blocking_connection.BlockingChannel,
                  _method: Optional[pika.spec.Basic.Deliver],
                  _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
@@ -103,11 +103,6 @@ class ContestsCallback:
                                             certificate
                                         ) for certificate in certificates])
                     self.dbconn.commit()
-                    if self.for_testing:
-                        logging.info(
-                            'Closing the connection for testing purposes'
-                        )
-                        _channel.connection.close()
                     break
                 except errors.IntegrityError as err:
                     self.dbconn.rollback()
@@ -124,6 +119,12 @@ class ContestsCallback:
                     logging.exception(
                         'At least one of the verification codes had a conflict'
                     )
+
+        if self.for_testing:
+            logging.info(
+                'Closing the connection for testing purposes'
+            )
+            channel.connection.close()
 
 
 def generate_contest_code() -> str:

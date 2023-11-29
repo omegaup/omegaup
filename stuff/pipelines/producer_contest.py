@@ -114,8 +114,7 @@ def main() -> None:
         with dbconn.cursor(buffered=True, dictionary=True) as cur, \
             rabbitmq_connection.connect(username=args.rabbitmq_username,
                                         password=args.rabbitmq_password,
-                                        host=args.rabbitmq_host,
-                                        for_testing=False) as channel:
+                                        host=args.rabbitmq_host) as channel:
             send_contest_message_to_client(
                 cur=cur,
                 channel=channel,

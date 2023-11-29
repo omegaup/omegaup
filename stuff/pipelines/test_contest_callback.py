@@ -104,13 +104,9 @@ def test_insert_contest_certificate() -> None:
     with rabbitmq_connection.connect(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
-            host=test_credentials.RABBITMQ_HOST,
-            for_testing=False
+            host=test_credentials.RABBITMQ_HOST
     ) as channel:
-        callback = contest_callback.ContestsCallback(
-            dbconn=dbconn.conn,
-            for_testing=False
-        )
+        callback = contest_callback.ContestsCallback(dbconn=dbconn.conn)
         body = contest_callback.ContestCertificate(
             contest_id=contest_id,
             # setting a default value
@@ -120,7 +116,7 @@ def test_insert_contest_certificate() -> None:
             ranking=ranking,
         )
         callback(
-            _channel=channel,
+            channel=channel,
             _method=None,
             _properties=None,
             body=json.dumps(dataclasses.asdict(body)).encode('utf-8')

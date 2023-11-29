@@ -33,10 +33,8 @@ def main() -> None:
     lib.logs.configure_parser(parser)
     rabbitmq_connection.configure_parser(parser)
 
-    parser.add_argument('--test',
-                        type=bool,
-                        help='Determine if the client is for a test',
-                        default=False)
+    parser.add_argument('--test', action='store_true')
+    parser.add_argument('--no-test', dest='test', action='store_false')
 
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)

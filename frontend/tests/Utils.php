@@ -457,7 +457,7 @@ class Utils {
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
              ' --password ' . escapeshellarg(OMEGAUP_DB_PASS) .
-             ' --test True')
+             ' --test')
         );
     }
 
