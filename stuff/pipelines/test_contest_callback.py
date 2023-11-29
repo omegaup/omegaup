@@ -105,11 +105,11 @@ def test_insert_contest_certificate() -> None:
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,
-            for_testing=True
+            for_testing=False
     ) as channel:
         callback = contest_callback.ContestsCallback(
             dbconn=dbconn.conn,
-            for_testing=True
+            for_testing=False
         )
         body = contest_callback.ContestCertificate(
             contest_id=contest_id,

@@ -44,7 +44,7 @@ class ContestsCallbackForTesting:
         '''Function to call the original callback'''
         callback = contest_callback.ContestsCallback(
             dbconn=self.dbconn,
-            for_testing=True
+            for_testing=False
         )
         callback(channel, method, properties, body)
         channel.close()
@@ -68,7 +68,7 @@ def test_client_contest() -> None:
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,
-            for_testing=True) as channel:
+            for_testing=False) as channel:
         rabbitmq_connection.initialize_rabbitmq(queue='contest',
                                                 exchange='certificates',
                                                 routing_key='ContestQueue',
@@ -125,7 +125,7 @@ def test_client_contest_with_mocked_codes(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,
-            for_testing=True) as channel:
+            for_testing=False) as channel:
         rabbitmq_connection.initialize_rabbitmq(queue='contest',
                                                 exchange='certificates',
                                                 routing_key='ContestQueue',
@@ -183,7 +183,7 @@ def test_client_contest_with_duplicated_codes(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,
-            for_testing=True) as channel:
+            for_testing=False) as channel:
         rabbitmq_connection.initialize_rabbitmq(queue='contest',
                                                 exchange='certificates',
                                                 routing_key='ContestQueue',

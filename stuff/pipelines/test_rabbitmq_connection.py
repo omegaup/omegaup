@@ -22,7 +22,7 @@ def test_rabbitmq_connection(exchange: str, expected: bool) -> None:
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,
-            for_testing=True
+            for_testing=False
     ) as channel:
         def on_message(
                 channel: pika.adapters.blocking_connection.BlockingChannel,

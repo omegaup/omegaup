@@ -120,7 +120,7 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,
-            for_testing=True
+            for_testing=False
     ) as channel:
         rabbitmq_connection.initialize_rabbitmq(
             queue='contest',
