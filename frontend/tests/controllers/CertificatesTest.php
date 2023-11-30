@@ -7,60 +7,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Generate certificates in a contest
      */
-    /*public function testGenerateContestCertificates() {
-        //Create user
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-
-        //login
-        $loginIdentity = self::login($identity);
-
-        //add role certificate generator to identity user
-        \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
-            'auth_token' => $loginIdentity->auth_token,
-            'username' => $identity->username,
-            'role' => 'CertificateGenerator'
-        ]));
-
-        $currentTime = \OmegaUp\Time::get();
-        $timePast1 =  new \OmegaUp\Timestamp($currentTime - 120 * 60);
-        $timePast2 =  new \OmegaUp\Timestamp($currentTime - 60 * 60);
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
-            new \OmegaUp\Test\Factories\ContestParams([
-                'alias' => 'pasado',
-                'startTime' => $timePast1,
-                'finishTime' => $timePast2,
-            ])
-        );
-
-        \OmegaUp\Test\Factories\Contest::addAdminUser(
-            $contestData,
-            $identity
-        );
-
-        $certificatesCutoff = 3;
-
-        $response = \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
-            new \OmegaUp\Request([
-                'auth_token' => $loginIdentity->auth_token,
-                'contest_id' => $contestData['contest']->contest_id,
-                'certificates_cutoff' => $certificatesCutoff
-            ])
-        );
-
-        // Assert status of new contest
-        $this->assertSame('ok', $response['status']);
-
-        $contest = \OmegaUp\DAO\Contests::getByAlias(
-            $contestData['request']['alias']
-        );
-
-        $this->assertEquals(3, $contest->certificate_cutoff);
-    }*/
-
-    /**
-     * Generate certificates in a contest
-     */
-    public function testConnectionRabbitMQ() {
+    public function testGenerateContestCertificates() {
         //Create the certificate generator
         ['identity' => $certificateGenerator] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -137,8 +84,11 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData['contest']->finish_time = \OmegaUp\Time::get() - 1;
         \OmegaUp\DAO\Contests::update($contestData['contest']);
 
+        \OmegaUp\Test\Utils::runInitializeRabbitmq();
+
         $certificatesCutoff = 4;
 
+        //Send the message to RabbitMQ using the API
         $response = \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
             new \OmegaUp\Request([
                 'auth_token' => $loginIdentity->auth_token,
@@ -147,7 +97,6 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        //Assert status of new contest
         $this->assertSame('ok', $response['status']);
 
         $contest = \OmegaUp\DAO\Contests::getByAlias(
@@ -158,25 +107,31 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $certificates = \OmegaUp\DAO\Certificates::getAll();
         $this->assertCount(0, $certificates);
 
+        //Adds the certificates only for one contest to the database,
+        //so it must be called after each successful call to the API
         \OmegaUp\Test\Utils::runGenerateContestCertificates();
 
         $certificates = \OmegaUp\DAO\Certificates::getAll();
-        $this->assertCount(8, $certificates);
+        //Should add one certificate per contestant
+        $this->assertCount($numOfIdentities, $certificates);
     }
 
     /**
      * Try to generate certificates in a contest as a normal user
      */
     public function testGenerateContestCertificatesAsNormalUser() {
-        //Create user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        //login
         $loginIdentity = self::login($identity);
 
+        $currentTime = \OmegaUp\Time::get();
+        $timePast1 =  new \OmegaUp\Timestamp($currentTime - 120 * 60);
+        $timePast2 =  new \OmegaUp\Timestamp($currentTime - 60 * 60);
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'alias' => 'pasado',
+                'startTime' => $timePast1,
+                'finishTime' => $timePast2,
             ])
         );
 
@@ -190,6 +145,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
                     'certificates_cutoff' => $certificatesCutoff
                 ])
             );
+            $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertSame('userNotAllowed', $e->getMessage());
         }
@@ -200,11 +156,9 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
      * but not as a contest admin
      */
     public function testGenerateContestCertificatesOnlyAsCertificateGenerator() {
-        //Create user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $loginIdentity = self::login($identity);
 
-        //add role certificate generator to identity user
         \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $loginIdentity->auth_token,
             'username' => $identity->username,
@@ -243,7 +197,6 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
      * but not as a certificate generator
      */
     public function testGenerateContestCertificatesOnlyAsContestAdmin() {
-        //Create user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $loginIdentity = self::login($identity);
 

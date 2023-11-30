@@ -434,6 +434,37 @@ class Utils {
         );
     }
 
+    public static function runInitializeRabbitmq(): void {
+        $queue = 'contest';
+        $exchange = 'certificates';
+        $routingKey = 'ContestQueue';
+        $channel = \OmegaUp\RabbitMQConnection::getInstance()->channel();
+
+        $channel->queue_declare(
+            $queue,
+            passive: false,
+            durable: true,
+            exclusive: false,
+            auto_delete: false
+        );
+
+        $channel->exchange_declare(
+            $exchange,
+            type: 'direct',
+            passive: false,
+            durable: true,
+            auto_delete: false
+        );
+
+        $channel->queue_bind(
+            $queue,
+            $exchange,
+            $routingKey
+        );
+
+        $channel->close();
+    }
+
     public static function runGenerateContestCertificates(): void {
         // Ensure all suggestions are written to the database before invoking
         // the external script.
