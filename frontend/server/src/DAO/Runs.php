@@ -299,9 +299,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 IFNULL(`i`.`country_id`, "xx") `country`,
                 `c`.`alias` AS `contest_alias`,
                 IFNULL(ur.classname, "user-rank-unranked") `classname`,
+                sf.`submission_feedback_id`,
                 ' . $extraFields . '
             FROM
                 Submissions s
+            LEFT JOIN
+                Submission_Feedback sf ON sf.submission_id = s.submission_id
             INNER JOIN
                 Runs r ON r.run_id = s.current_run_id
             INNER JOIN
@@ -323,7 +326,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val[] = $offset * $rowCount;
         $val[] = $rowCount;
 
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: string, status_runtime: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: string, status_runtime: string, submission_feedback_id: int|null, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
         $runs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
 
         return [

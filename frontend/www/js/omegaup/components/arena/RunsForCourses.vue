@@ -15,32 +15,25 @@
       <div>
         <span class="font-weight-bold">{{ T.wordsSubmissions }}</span>
         <div v-if="showFilters">
-          <div class="filters row">
-            <label
-              v-if="!simplifiedView"
-              class="col-3 col-sm pr-0 font-weight-bold"
-              >{{ T.wordsVerdict }}:
-              <select
-                v-model="filterVerdict"
-                data-select-verdict
-                class="form-control"
+          <b-pagination
+            v-if="showFilters"
+            v-model="currentPage"
+            size="sm"
+            :total-rows="totalRows"
+            :per-page="itemsPerPage"
+            :limit="1"
+            hide-goto-end-buttons
+            @page-click="onPageClick"
+          >
+            <template #page="{ page, active }">
+              <b v-if="active"
+                >{{ page }} - {{ Math.ceil(totalRows / itemsPerPage) }}</b
               >
-                <option value="">{{ T.wordsAll }}</option>
-                <option value="AC">AC</option>
-                <option value="PA">PA</option>
-                <option value="WA">WA</option>
-                <option value="TLE">TLE</option>
-                <option value="MLE">MLE</option>
-                <option value="OLE">OLE</option>
-                <option value="RTE">RTE</option>
-                <option value="RFE">RFE</option>
-                <option value="CE">CE</option>
-                <option value="JE">JE</option>
-                <option value="VE">VE</option>
-                <option value="NO-AC">No AC</option>
-              </select>
-            </label>
-            <label v-else class="col-3 col-sm pr-0 font-weight-bold">
+              <i v-else>{{ page }}</i>
+            </template>
+          </b-pagination>
+          <div class="filters row">
+            <label class="col-3 col-sm pr-0 font-weight-bold">
               {{ T.wordsExecution }}
               <select
                 v-model="filterExecution"
@@ -72,25 +65,7 @@
               </select>
             </label>
 
-            <label
-              v-if="!simplifiedView"
-              class="col-3 col-sm pr-0 font-weight-bold"
-              >{{ T.wordsStatus }}:
-              <select
-                v-model="filterStatus"
-                data-select-status
-                class="form-control"
-              >
-                <option value="">{{ T.wordsAll }}</option>
-                <option value="new">new</option>
-                <option value="waiting">waiting</option>
-                <option value="compiling">compiling</option>
-                <option value="running">running</option>
-                <option value="ready">ready</option>
-              </select>
-            </label>
-
-            <label v-else class="col-3 col-sm pr-0 font-weight-bold">
+            <label class="col-3 col-sm pr-0 font-weight-bold">
               {{ T.wordsOutput }}
               <select
                 v-model="filterOutput"
@@ -222,9 +197,6 @@
               <th>{{ T.wordsLanguage }}</th>
               <th v-if="showUser">{{ T.contestParticipant }}</th>
               <th v-if="showContest">{{ T.wordsContest }}</th>
-              <th v-if="contestAlias != null && !simplifiedView">
-                {{ T.wordsVerdict }}
-              </th>
               <th v-if="showProblem">{{ T.wordsProblem }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPoints }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPenalty }}</th>
@@ -319,26 +291,6 @@
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
               </td>
-              <td
-                v-show="contestAlias && !simplifiedView"
-                :class="statusClass(run)"
-                data-run-status
-                class="text-center opacity-4 font-weight-bold"
-              >
-                <span class="mr-1">{{ status(run) }}</span>
-
-                <button
-                  v-if="!!statusHelp(run)"
-                  type="button"
-                  :data-content="statusHelp(run)"
-                  data-toggle="popover"
-                  data-trigger="focus"
-                  class="btn-outline-dark btn-sm"
-                  @click="showVerdictHelp"
-                >
-                  <font-awesome-icon :icon="['fas', 'question-circle']" />
-                </button>
-              </td>
               <td v-if="showProblem" class="text-break-all">
                 <a
                   href="#runs"
@@ -366,6 +318,10 @@
               </td>
               <td class="numeric">{{ execution(run) }}</td>
               <td class="numeric">
+                {{ output(run) }}
+                <br
+                  v-if="outputIconColorStatus(run) != NumericOutputStatus.None"
+                />
                 <font-awesome-icon
                   v-if="
                     outputIconColorStatus(run) === NumericOutputStatus.Correct
@@ -388,10 +344,6 @@
                   :icon="['fas', 'exclamation-circle']"
                   style="color: orange"
                 />
-                <br
-                  v-if="outputIconColorStatus(run) != NumericOutputStatus.None"
-                />
-                {{ output(run) }}
               </td>
               <td class="numeric">{{ memory(run) }}</td>
               <td class="numeric">{{ runtime(run) }}</td>
@@ -474,6 +426,7 @@
           </tbody>
         </table>
         <b-pagination
+          v-if="!showFilters"
           v-model="currentPage"
           :total-rows="totalRows"
           :per-page="itemsPerPage"
@@ -622,7 +575,6 @@ export default class Runs extends Vue {
   @Prop() totalRuns!: number;
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
-  @Prop({ default: false }) simplifiedView!: boolean;
   @Prop({ default: 10 }) itemsPerPage!: number;
   @Prop({ default: false }) showGUID!: boolean;
 
@@ -634,9 +586,7 @@ export default class Runs extends Vue {
   filterLanguage: string = '';
   filterOffset: number = 0;
   filterProblem: null | types.ListItem = null;
-  filterStatus: string = '';
   filterUsername: null | types.ListItem = null;
-  filterVerdict: string = '';
   filterContest: string = '';
   filterExecution: string = '';
   filterOutput: string = '';
@@ -644,14 +594,33 @@ export default class Runs extends Vue {
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
   currentPage: number = 1;
+  currentDataPage: number = 1;
   newFieldsLaunchDate: Date = new Date('2023-10-22');
 
   get totalRows(): number {
-    return this.filteredRuns.length;
+    if (this.totalRuns === undefined) {
+      return this.filteredRuns.length;
+    }
+    return this.totalRuns;
+  }
+
+  onPageClick(bvEvent: any, page: number): void {
+    if (page == this.currentPage - 1 || page == this.currentPage + 1) {
+      if (this.currentPage + 1 == page) {
+        this.filterOffset++;
+      } else if (this.currentPage - 1 == page) {
+        this.filterOffset--;
+      }
+    } else {
+      bvEvent.preventDefault();
+    }
   }
 
   get paginatedRuns(): types.Run[] {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    if (!this.showFilters) {
+      this.currentDataPage = this.currentPage;
+    }
+    const startIndex = (this.currentDataPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     return this.filteredRuns.slice(startIndex, endIndex);
   }
@@ -664,32 +633,18 @@ export default class Runs extends Vue {
     if (
       !this.filterLanguage &&
       !this.filterProblem &&
-      !this.filterStatus &&
       !this.filterUsername &&
       !this.filterContest &&
-      !this.filterVerdict &&
       !this.filterExecution &&
       !this.filterOutput
     ) {
       return this.sortedRuns;
     }
     return this.sortedRuns.filter((run) => {
-      if (this.filterVerdict) {
-        if (this.filterVerdict == 'NO-AC') {
-          if (run.verdict == 'AC') {
-            return false;
-          }
-        } else if (run.verdict != this.filterVerdict) {
-          return false;
-        }
-      }
       if (this.filterLanguage && run.language !== this.filterLanguage) {
         return false;
       }
       if (this.filterProblem && run.alias !== this.filterProblem.key) {
-        return false;
-      }
-      if (this.filterStatus && run.status !== this.filterStatus) {
         return false;
       }
       if (this.filterUsername && run.username !== this.filterUsername.key) {
@@ -742,7 +697,7 @@ export default class Runs extends Vue {
     )
       return '—';
     if (run.status_memory === MemoryStatus.Exceeded)
-      return T.runDetailsMemoryExceeded;
+      return T.runDetailsExceeded;
     return `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
   }
 
@@ -889,50 +844,6 @@ export default class Runs extends Vue {
     return NumericOutputStatus.Correct;
   }
 
-  showVerdictHelp(ev: Event): void {
-    $(ev.target as HTMLElement).popover('show');
-  }
-
-  statusClass(run: types.Run): string {
-    if (run.status != 'ready') return '';
-    if (run.type == 'disqualified') return 'status-disqualified';
-    if (run.verdict == 'AC') {
-      return 'status-ac';
-    }
-    if (run.verdict == 'CE') {
-      return 'status-ce';
-    }
-    if (run.verdict == 'JE' || run.verdict == 'VE') {
-      return 'status-je-ve';
-    }
-    return '';
-  }
-
-  status(run: types.Run): string {
-    if (run.type == 'disqualified') return T.arenaRunsActionsDisqualified;
-
-    return run.status == 'ready' ? run.verdict : run.status;
-  }
-
-  statusHelp(run: types.Run): string {
-    if (run.status != 'ready' || run.verdict == 'AC') {
-      return '';
-    }
-
-    if (run.language == 'kj' || run.language == 'kp') {
-      if (run.verdict == 'RTE' || run.verdict == 'RE') {
-        return T.verdictHelpKarelRTE;
-      } else if (run.verdict == 'TLE' || run.verdict == 'TO') {
-        return T.verdictHelpKarelTLE;
-      }
-    }
-    if (run.type == 'disqualified') return T.verdictHelpDisqualified;
-    const verdict = T[`verdict${run.verdict}`];
-    const verdictHelp = T[`verdictHelp${run.verdict}`];
-
-    return `${verdict}: ${verdictHelp}`;
-  }
-
   onRunDetails(run: types.Run): void {
     this.$emit('details', {
       guid: run.guid,
@@ -990,11 +901,6 @@ export default class Runs extends Vue {
     this.onEmitFilterChanged({ filter: 'problem', value: newValue.key });
   }
 
-  @Watch('filterStatus')
-  onFilterStatusChanged(newValue: string) {
-    this.onEmitFilterChanged({ filter: 'status', value: newValue });
-  }
-
   @Watch('filterUsername')
   onFilterUsernameChanged(newValue: null | types.ListItem) {
     if (!newValue) {
@@ -1002,11 +908,6 @@ export default class Runs extends Vue {
       return;
     }
     this.onEmitFilterChanged({ filter: 'username', value: newValue.key });
-  }
-
-  @Watch('filterVerdict')
-  onFilterVerdictChanged(newValue: string) {
-    this.onEmitFilterChanged({ filter: 'verdict', value: newValue });
   }
 
   @Watch('filterExecution')
@@ -1045,13 +946,15 @@ export default class Runs extends Vue {
   }
 
   onRemoveFilter(filter: string): void {
+    this.currentPage = 1;
+    this.currentDataPage = 1;
     if (filter === 'all') {
       this.filterLanguage = '';
       this.filterProblem = null;
-      this.filterStatus = '';
       this.filterUsername = null;
-      this.filterVerdict = '';
       this.filterContest = '';
+      this.filterExecution = '';
+      this.filterOutput = '';
       this.filterOffset = 0;
 
       this.filters = [];
@@ -1064,17 +967,17 @@ export default class Runs extends Vue {
       case 'problem':
         this.filterProblem = null;
         break;
-      case 'status':
-        this.filterStatus = '';
-        break;
       case 'username':
         this.filterUsername = null;
         break;
-      case 'verdict':
-        this.filterVerdict = '';
-        break;
       case 'contest':
         this.filterContest = '';
+        break;
+      case 'Execution':
+        this.filterExecution = '';
+        break;
+      case 'Output':
+        this.filterOutput = '';
     }
     this.filters = this.filters.filter((item) => item.name !== filter);
   }

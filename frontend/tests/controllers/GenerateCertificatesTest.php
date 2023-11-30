@@ -218,7 +218,8 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Generate certificates in a contest
+     * Obtain a user's certificates using his identity ID, also try
+     * to obtain this user's certificates with another logged user
      */
     public function testGetUserCertificates() {
         // Create contest with 2 hours and a window length 30 of minutes
