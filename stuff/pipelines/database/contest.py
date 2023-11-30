@@ -91,7 +91,9 @@ def get_contests(
         ON
             c.problemset_id = p.problemset_id
         WHERE
-            finish_time >= %s AND finish_time <= %s;
+            finish_time >= %s
+            AND finish_time <= %s
+            AND certificates_status <> 'generated';
         ''', (date_lower_limit,
               date_upper_limit.replace(hour=23, minute=59, second=59))
     )
