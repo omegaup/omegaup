@@ -41,7 +41,8 @@
           <td class="d-flex justify-content-between align-items-center">
             <button
               v-clipboard="getVerificationLink(certificate.verification_code)"
-              class="btn btn-primary copy-to-clipboard"
+              copy-to-clipboard
+              class="btn btn-primary"
               type="button"
               :title="T.certificateListMineCopyToClipboard"
               :data-code="certificate.verification_code"
@@ -50,7 +51,8 @@
               <font-awesome-icon icon="clipboard" />
             </button>
             <a
-              class="btn btn-primary download-file"
+              download-file
+              class="btn btn-primary"
               type="button"
               :href="getDownloadLink(certificate.verification_code)"
               :title="T.certificateListMineDownload"
