@@ -174,7 +174,6 @@
         :show-filters="true"
         :show-rejudge="true"
         :show-user="true"
-        :simplified-view="true"
         :items-per-page="100"
         :problemset-problems="Object.values(problems)"
         :search-result-users="searchResultUsers"
