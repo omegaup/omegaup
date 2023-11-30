@@ -6,7 +6,6 @@ import { types } from '../api_types';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserDependentsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
-  console.log(commonPayload);
   new Vue({
     el: '#main-container',
     components: {

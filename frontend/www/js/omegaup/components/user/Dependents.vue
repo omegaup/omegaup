@@ -18,7 +18,10 @@
           <td class="text-center" :class="bannerColor">
             {{ dependent.name }}
             <br />
-            <span v-if="userVerificationDeadline" class="span-alert">
+            <span
+              v-if="userVerificationDeadline"
+              class="span-alert font-italic"
+            >
               {{
                 daysUntilVerificationDeadline > 1
                   ? ui.formatString(T.dependentsMessage, {
@@ -53,21 +56,19 @@ export default class UserDependents extends Vue {
     const deadline = new Date(this.userVerificationDeadline as Date);
     if (deadline.toDateString() === today.toDateString()) {
       return 'bg-danger';
-    } else {
-      return 'bg-warning';
     }
+    return 'bg-warning';
   }
 
   get daysUntilVerificationDeadline(): number | null {
-    if (this.userVerificationDeadline) {
-      const today = new Date();
-      const deadline = new Date(this.userVerificationDeadline);
-      const timeDifference = deadline.getTime() - today.getTime();
-      const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
-      return daysDifference;
-    } else {
+    if (!this.userVerificationDeadline) {
       return null;
     }
+    const today = new Date();
+    const deadline = new Date(this.userVerificationDeadline);
+    const timeDifference = deadline.getTime() - today.getTime();
+    const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+    return daysDifference;
   }
 }
 </script>
@@ -77,6 +78,5 @@ export default class UserDependents extends Vue {
 
 .span-alert {
   font-size: 0.9rem;
-  font-style: italic;
 }
 </style>
