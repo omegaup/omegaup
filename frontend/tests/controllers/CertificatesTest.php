@@ -84,7 +84,11 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData['contest']->finish_time = \OmegaUp\Time::get() - 1;
         \OmegaUp\DAO\Contests::update($contestData['contest']);
 
-        \OmegaUp\Test\Utils::runInitializeRabbitmq();
+        \OmegaUp\Test\Utils::runInitializeRabbitmq(
+            queue: 'contest',
+            exchange: 'certificates',
+            routingKey: 'ContestQueue'
+        );
 
         $certificatesCutoff = 4;
 

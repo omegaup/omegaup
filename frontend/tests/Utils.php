@@ -434,10 +434,11 @@ class Utils {
         );
     }
 
-    public static function runInitializeRabbitmq(): void {
-        $queue = 'contest';
-        $exchange = 'certificates';
-        $routingKey = 'ContestQueue';
+    public static function runInitializeRabbitmq(
+        string $queue,
+        string $exchange,
+        string $routingKey
+    ): void {
         $channel = \OmegaUp\RabbitMQConnection::getInstance()->channel();
 
         $channel->queue_declare(
