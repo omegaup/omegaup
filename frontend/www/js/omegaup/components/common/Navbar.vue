@@ -454,23 +454,19 @@ export default class Navbar extends Vue {
 
     if (deadline.toDateString() === today.toDateString()) {
       return 'bg-danger';
-    } else {
-      return 'bg-warning';
     }
+    return 'bg-warning';
   }
 
   get daysUntilVerificationDeadline(): number | null {
-    if (this.userVerificationDeadline) {
-      const today = new Date();
-      const deadline = new Date(this.userVerificationDeadline);
-
-      const timeDifference = deadline.getTime() - today.getTime();
-      const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
-
-      return daysDifference;
-    } else {
+    if (!this.userVerificationDeadline) {
       return null;
     }
+    const today = new Date();
+    const deadline = new Date(this.userVerificationDeadline);
+    const timeDifference = deadline.getTime() - today.getTime();
+    const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+    return daysDifference;
   }
 }
 </script>
