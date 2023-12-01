@@ -29,7 +29,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int|null, score_mode: string, scoreboard: int, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null, window_length: int|null}
  * @psalm-type ContestVirtualDetailsPayload=array{contest: ContestPublicDetails}
  * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<ProblemsetProblemWithVersions>, users: list<ContestUser>, groups: list<ContestGroup>, teams_group: ContestGroup|null, requests: list<ContestRequest>, admins: list<ContestAdmin>, group_admins: list<ContestGroupAdmin>, original_contest_admission_mode: null|string}
- * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string}
+ * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string, shouldShowModalToLoginWithRegisteredIdentity: bool}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration?: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestList=array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
@@ -816,11 +816,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $startFresh = $r->ensureOptionalBool('start_fresh');
-        if ($startFresh) {
-            if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
-                \OmegaUp\Controllers\Session::unregisterSession();
-            }
-        }
         [
             'contest' => $contest,
             'contestWithDirector' => $contestWithDirector,
@@ -839,13 +834,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             // Request can proceed unauthenticated.
         }
 
-        $shouldShowIntro = \OmegaUp\Controllers\Contest::shouldShowIntro(
-            $r->identity,
-            $contest
-        );
-
-        // Half-authenticate, in case there is no session in place.
-        \OmegaUp\Controllers\Session::getCurrentSession($r);
         $result = [
             'templateProperties' => [
                 'payload' => [
@@ -853,11 +841,30 @@ class Contest extends \OmegaUp\Controllers\Controller {
                         $contestWithDirector,
                         $r->identity
                     ),
+                    'shouldShowModalToLoginWithRegisteredIdentity' => false,
                 ],
                 'title' => new \OmegaUp\TranslationString('enterContest'),
             ],
             'entrypoint' => 'contest_intro',
         ];
+
+        if (
+            $startFresh
+            && !self::canAccessContest($contest, $r->identity)
+            && $contest->admission_mode === 'private'
+        ) {
+            $result['templateProperties']['payload']['shouldShowModalToLoginWithRegisteredIdentity'] = true;
+            return $result;
+        }
+
+        $shouldShowIntro = \OmegaUp\Controllers\Contest::shouldShowIntro(
+            $r->identity,
+            $contest
+        );
+
+        // Half-authenticate, in case there is no session in place.
+        \OmegaUp\Controllers\Session::getCurrentSession($r);
+
         if (!$shouldShowIntro) {
             [
                 'contest' => $contest,

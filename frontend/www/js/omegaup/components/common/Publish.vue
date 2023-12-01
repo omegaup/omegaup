@@ -107,7 +107,7 @@ export default class Publish extends Vue {
     .defaultShowAllContestantsInScoreboard;
 
   get contestURL(): string {
-    return `${window.location.origin}/contest/${this.alias}/startfresh/`;
+    return `${window.location.origin}/arena/${this.alias}/startfresh/`;
   }
 
   onSubmit(): void {
