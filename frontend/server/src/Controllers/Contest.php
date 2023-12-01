@@ -850,6 +850,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         if (
             $startFresh
+            && !is_null($r->identity)
             && !self::canAccessContest($contest, $r->identity)
             && $contest->admission_mode === 'private'
         ) {
