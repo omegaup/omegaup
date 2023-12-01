@@ -60,6 +60,7 @@ class ContestsCallback:
             token=data.scoreboard_url)
         ranking = scoreboard.ranking
         certificates: List[Certificate] = []
+        usernames: List[str] = []
 
         for user in ranking:
             contest_place: Optional[int] = None
@@ -73,7 +74,27 @@ class ContestsCallback:
                 contest_place=contest_place,
                 username=str(user.username)
             ))
+            usernames.append(user.username)
+
+        notifications = []
         with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
+            users_ids = get_users_ids(usernames, cur)
+            contest_title = get_contest_title(data.contest_id, cur)
+            for user_id in users_ids:
+                notifications.append(
+                    (user_id, json.dumps({
+                        'type': 'certificate',
+                        'body': {
+                            'localizationString':
+                                'notificationNewContestCertificate',
+                            'localizationParams': {
+                                'contest_title': contest_title,
+                            },
+                            'url': "/certificates/mine/",
+                            'iconUrl': '/media/info.png',
+                        },
+                    })))
+
             while True:
                 try:
                     cur.executemany('''
@@ -99,6 +120,11 @@ class ContestsCallback:
                                         dataclasses.astuple(
                                             certificate
                                         ) for certificate in certificates])
+                    cur.executemany(
+                        '''
+                        INSERT INTO
+                            Notifications (user_id, contents)
+                        VALUES (%s, %s)''', notifications)
                     self.dbconn.commit()
                     break
                 except errors.IntegrityError as err:
@@ -110,6 +136,41 @@ class ContestsCallback:
                     logging.exception(
                         'At least one of the verification codes had a conflict'
                     )
+
+
+def get_users_ids(
+    usernames: List[str],
+    cur: mysql.connector.cursor.MySQLCursorDict
+) -> List[int]:
+    '''Returns a list of ids of the contestants.'''
+    users_ids: List[int] = []
+    for username in usernames:
+        cur.execute('''
+            SELECT
+                user_id
+            FROM
+                Identities
+            WHERE
+                username = %s''', (username,))
+        result = cur.fetchone()
+        users_ids.append(result['user_id'])
+    return users_ids
+
+
+def get_contest_title(
+    contest_id: int,
+    cur: mysql.connector.cursor.MySQLCursorDict
+) -> str:
+    '''Returns the title of the contest.'''
+    cur.execute('''
+        SELECT
+            title
+        FROM
+            Contests
+        WHERE
+            contest_id = %s''', (contest_id,))
+    result = cur.fetchone()
+    return str(result['title'])
 
 
 def generate_contest_code() -> str:

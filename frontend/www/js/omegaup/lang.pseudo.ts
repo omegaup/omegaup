@@ -835,6 +835,7 @@ const translations: { [key: string]: string; } = {
   notificationCourseRequestFeedback: "(**%(username)** ha5 r3qu3573d f33dback 70 7h3 a55ignm3n7 %(assignmentName) in 7h3 c0ur53 %(courseName))",
   notificationCourseSubmissionFeedback: "(Th3 f33dback ab0u7 y0ur 5ubmi55i0n f0r pr0b13m *%(problemAlias)* 0f 7h3 c0ur53 %(courseName), ha5 b33n 5ubmi773d.)",
   notificationNewBadge: "(Y0u hav3 r3c3iv3d a n3w badg3: **%(badgeName)**.)",
+  notificationNewContestCertificate: "(C0ngra7u1a7i0n5! Y0u hav3 r3c3iv3d a c3r7ifica73 f0r y0ur r3c3n7 achi3v3m3n7 in 7h3 \"%(contest_title)\" c0n7357. C1ick 70 d0wn10ad i7.)",
   notificationNotFound: "(N07ifica7i0n n07 f0und)",
   notificationsMarkAllAsRead: "(Mark a11 a5 r3ad)",
   notificationsNoNewNotifications: "(N0 n3w n07ifica7i0n5.)",

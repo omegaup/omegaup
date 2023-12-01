@@ -835,6 +835,7 @@ const translations: { [key: string]: string; } = {
   notificationCourseRequestFeedback: "**%(username)** tem solicitado feedback sobre a tarefa %(assignmentName) do curso %(courseName)",
   notificationCourseSubmissionFeedback: "O feedback sobre sua submis\u00e3o para o problema *%(problemAlias)* no curso %(courseName), tem sido submetida.",
   notificationNewBadge: "Voc\u00ea tem recebido um novo distintivo: **%(badgeName)**",
+  notificationNewContestCertificate: "Parab\u00e9ns! Voc\u00ea recebeu um diploma por sua conquista recente no concurso \"%(contest_title)\". Clique para baix\u00e1-lo.",
   notificationNotFound: "Notifica\u00e7\u00e3o n\u00e3o encontrada",
   notificationsMarkAllAsRead: "Marcar tudo como lido",
   notificationsNoNewNotifications: "N\u00e3o h\u00e1 novas notifica\u00e7\u00f5es.",

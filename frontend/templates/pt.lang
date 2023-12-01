@@ -833,6 +833,7 @@ notificationCourseRegistrationRequest = "**%(username)** tem solicitado acceso a
 notificationCourseRequestFeedback = "**%(username)** tem solicitado feedback sobre a tarefa %(assignmentName) do curso %(courseName)"
 notificationCourseSubmissionFeedback = "O feedback sobre sua submisão para o problema *%(problemAlias)* no curso %(courseName), tem sido submetida."
 notificationNewBadge = "Você tem recebido um novo distintivo: **%(badgeName)**"
+notificationNewContestCertificate = "Parabéns! Você recebeu um diploma por sua conquista recente no concurso \"%(contest_title)\". Clique para baixá-lo."
 notificationNotFound = "Notificação não encontrada"
 notificationsMarkAllAsRead = "Marcar tudo como lido"
 notificationsNoNewNotifications = "Não há novas notificações."
