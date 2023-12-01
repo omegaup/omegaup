@@ -9,6 +9,7 @@
   - [`/api/badge/myList/`](#apibadgemylist)
   - [`/api/badge/userList/`](#apibadgeuserlist)
 - [Certificate](#certificate)
+  - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
   - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
   - [`/api/certificate/getUserCertificates/`](#apicertificategetusercertificates)
   - [`/api/certificate/validateCertificate/`](#apicertificatevalidatecertificate)
@@ -395,6 +396,23 @@ Returns a list of badges owned by a certain user
 # Certificate
 
 CertificateController
+
+## `/api/certificate/generateContestCertificates/`
+
+### Description
+
+Generates all the certificates for a contest given its contest ID.
+
+### Parameters
+
+| Name                  | Type        | Description |
+| --------------------- | ----------- | ----------- |
+| `certificates_cutoff` | `int\|null` |             |
+| `contest_id`          | `int\|null` |             |
+
+### Returns
+
+_Nothing_
 
 ## `/api/certificate/getCertificatePdf/`
 
@@ -2454,9 +2472,9 @@ array instead of an object since it is used by typeahead.
 
 ### Parameters
 
-| Name    | Type           | Description |
-| ------- | -------------- | ----------- |
-| `query` | `null\|string` |             |
+| Name    | Type     | Description |
+| ------- | -------- | ----------- |
+| `query` | `string` |             |
 
 ### Returns
 
@@ -4101,7 +4119,7 @@ SubmissionController
 
 ### Description
 
-Updates the admin feedback for a submission
+Updates the admin feedback for a submission or creates the request feedback
 
 ### Parameters
 
