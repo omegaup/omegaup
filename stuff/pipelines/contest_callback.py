@@ -119,6 +119,18 @@ class ContestsCallback:
                     logging.exception(
                         'At least one of the verification codes had a conflict'
                     )
+            try:
+                cur.execute('''
+                    UPDATE
+                        `Contests`
+                    SET
+                        `certificates_status` = 'generated'
+                    WHERE
+                        `contest_id` = %s;
+                    ''', (data.contest_id,))
+                self.dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception('Failed to update the certificate status')
 
         if self.for_testing:
             logging.info(

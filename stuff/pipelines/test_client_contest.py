@@ -64,7 +64,7 @@ def test_client_contest() -> None:
         rabbitmq_connection.connect(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
-            host=test_credentials.RABBITMQ_HOST) as channel:
+            host=test_credentials.RABBITMQ_HOST,) as channel:
         rabbitmq_connection.initialize_rabbitmq(queue='contest',
                                                 exchange='certificates',
                                                 routing_key='ContestQueue',
@@ -120,7 +120,7 @@ def test_client_contest_with_mocked_codes(
         rabbitmq_connection.connect(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
-            host=test_credentials.RABBITMQ_HOST) as channel:
+            host=test_credentials.RABBITMQ_HOST,) as channel:
         rabbitmq_connection.initialize_rabbitmq(queue='contest',
                                                 exchange='certificates',
                                                 routing_key='ContestQueue',
@@ -177,7 +177,7 @@ def test_client_contest_with_duplicated_codes(
         rabbitmq_connection.connect(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
-            host=test_credentials.RABBITMQ_HOST) as channel:
+            host=test_credentials.RABBITMQ_HOST,) as channel:
         rabbitmq_connection.initialize_rabbitmq(queue='contest',
                                                 exchange='certificates',
                                                 routing_key='ContestQueue',
