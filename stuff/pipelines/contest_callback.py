@@ -72,7 +72,7 @@ class ContestsCallback:
                 contest_place=contest_place,
                 username=user_ranking.username
             ))
-            usernames.append(user.username)
+            usernames.append(user_ranking.username)
 
         notifications = []
         with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
