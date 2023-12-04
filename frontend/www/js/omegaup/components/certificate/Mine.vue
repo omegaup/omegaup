@@ -27,7 +27,13 @@
       </thead>
       <tbody>
         <tr v-for="(certificate, index) in certificates" :key="index">
-          <td class="text-left align-middle">
+          <td
+            v-if="newCertificate === certificate.verification_code"
+            class="text-left align-middle border-new"
+          >
+            {{ certificate.date.toLocaleDateString() }}
+          </td>
+          <td v-else class="text-left align-middle">
             {{ certificate.date.toLocaleDateString() }}
           </td>
           <td class="text-left align-middle">
@@ -38,11 +44,11 @@
               {{ getVerificationLink(certificate.verification_code) }}
             </span>
           </td>
-          <td class="d-flex justify-content-between align-items-center">
+          <td class="d-flex align-items-center">
             <button
               v-clipboard="getVerificationLink(certificate.verification_code)"
               copy-to-clipboard
-              class="btn btn-primary"
+              class="btn btn-primary mr-2"
               type="button"
               :title="T.certificateListMineCopyToClipboard"
               :data-code="certificate.verification_code"
@@ -93,6 +99,7 @@ Vue.use(Clipboard);
 })
 export default class Mine extends Vue {
   @Prop() certificates!: types.CertificateListItem[];
+  @Prop() newCertificate?: string;
   @Prop() location!: string;
 
   T = T;
@@ -130,3 +137,11 @@ export default class Mine extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.border-new {
+  border-left: 0.25rem solid #007bff;
+}
+</style>

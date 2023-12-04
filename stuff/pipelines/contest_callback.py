@@ -10,6 +10,7 @@ from typing import List, Optional
 
 import verification_code
 
+import database.contest
 import omegaup.api
 import pika
 import mysql.connector
@@ -78,9 +79,15 @@ class ContestsCallback:
 
         notifications = []
         with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
-            users_ids = get_users_ids(usernames, cur)
-            contest_title = get_contest_title(data.contest_id, cur)
-            for user_id in users_ids:
+            users_ids = database.contest.get_users_ids(
+                cur,
+                usernames
+            )
+            contest_title = database.contest.get_contest_title(
+                cur,
+                data.contest_id
+            )
+            for index, user_id in enumerate(users_ids):
                 notifications.append(
                     (user_id, json.dumps({
                         'type': 'certificate',
@@ -90,7 +97,8 @@ class ContestsCallback:
                             'localizationParams': {
                                 'contest_title': contest_title,
                             },
-                            'url': "/certificates/mine/",
+                            'url': "/certificates/mine/#" +
+                                certificates[index].verification_code,
                             'iconUrl': '/media/info.png',
                         },
                     })))
@@ -131,46 +139,25 @@ class ContestsCallback:
                     self.dbconn.rollback()
                     if err.errno != errorcode.ER_DUP_ENTRY:
                         raise
-                    for certificate in certificates:
+                    for index, certificate in enumerate(certificates):
                         certificate.verification_code = generate_contest_code()
+                        user_id = notifications[index][0]
+                        notifications[index] = (user_id, json.dumps({
+                            'type': 'certificate',
+                            'body': {
+                                'localizationString':
+                                    'notificationNewContestCertificate',
+                                'localizationParams': {
+                                    'contest_title': contest_title,
+                                },
+                                'url': "/certificates/mine/#" +
+                                    certificate.verification_code,
+                                'iconUrl': '/media/info.png',
+                            },
+                        }))
                     logging.exception(
                         'At least one of the verification codes had a conflict'
                     )
-
-
-def get_users_ids(
-    usernames: List[str],
-    cur: mysql.connector.cursor.MySQLCursorDict
-) -> List[int]:
-    '''Returns a list of ids of the contestants.'''
-    users_ids: List[int] = []
-    for username in usernames:
-        cur.execute('''
-            SELECT
-                user_id
-            FROM
-                Identities
-            WHERE
-                username = %s''', (username,))
-        result = cur.fetchone()
-        users_ids.append(result['user_id'])
-    return users_ids
-
-
-def get_contest_title(
-    contest_id: int,
-    cur: mysql.connector.cursor.MySQLCursorDict
-) -> str:
-    '''Returns the title of the contest.'''
-    cur.execute('''
-        SELECT
-            title
-        FROM
-            Contests
-        WHERE
-            contest_id = %s''', (contest_id,))
-    result = cur.fetchone()
-    return str(result['title'])
 
 
 def generate_contest_code() -> str:
