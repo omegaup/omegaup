@@ -12,8 +12,6 @@ import logging
 import os
 import sys
 
-import omegaup.api
-
 import contest_callback
 import rabbitmq_connection
 import rabbitmq_client
@@ -29,19 +27,11 @@ import lib.logs  # pylint: disable=wrong-import-position
 def main() -> None:
     '''
     Main entrypoint for the client contest.
-
-    When API token and URL are given, it is possible to process the messages.
     '''
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
     rabbitmq_connection.configure_parser(parser)
-
-    parser.add_argument('--api-token', type=str, help='omegaup api token')
-    parser.add_argument('--url',
-                        type=str,
-                        help='omegaup api URL',
-                        default='https://omegaup.com')
 
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
@@ -53,11 +43,7 @@ def main() -> None:
                 password=args.rabbitmq_password,
                 host=args.rabbitmq_host
         ) as channel:
-            client = omegaup.api.Client(api_token=args.api_token, url=args.url)
-            callback = contest_callback.ContestsCallback(
-                dbconn=dbconn.conn,
-                client=client,
-            )
+            callback = contest_callback.ContestsCallback(dbconn=dbconn.conn)
             rabbitmq_client.receive_messages(queue='contest',
                                              exchange='certificates',
                                              routing_key='ContestQueue',
