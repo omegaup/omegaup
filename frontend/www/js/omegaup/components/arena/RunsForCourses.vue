@@ -26,9 +26,7 @@
             @page-click="onPageClick"
           >
             <template #page="{ page, active }">
-              <b v-if="active"
-                >{{ page }} - {{ Math.ceil(totalRows / itemsPerPage) }}</b
-              >
+              <b v-if="active">{{ page }} - {{ totalPages }}</b>
               <i v-else>{{ page }}</i>
             </template>
           </b-pagination>
@@ -602,6 +600,13 @@ export default class Runs extends Vue {
       return this.filteredRuns.length;
     }
     return this.totalRuns;
+  }
+
+  get totalPages(): number {
+    if (this.totalRows > 0) {
+      return Math.ceil(this.totalRows / this.itemsPerPage);
+    }
+    return 1;
   }
 
   onPageClick(bvEvent: any, page: number): void {
