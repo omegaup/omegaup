@@ -6,17 +6,15 @@ import dataclasses
 import json
 import logging
 
-from typing import List, Optional
-
-import verification_code
-
-import database.contest
-import omegaup.api
-import pika
+from typing import Dict, List, Optional
 import mysql.connector
 import mysql.connector.cursor
 from mysql.connector import errors
 from mysql.connector import errorcode
+import pika
+
+import database.contest
+import verification_code
 
 
 @dataclasses.dataclass
@@ -36,16 +34,14 @@ class ContestCertificate:
     alias: str
     scoreboard_url: str
     contest_id: int
+    ranking: List[Dict[str, str]]
 
 
 class ContestsCallback:
     '''Contests callback'''
-    def __init__(self,
-                 dbconn: mysql.connector.MySQLConnection,
-                 client: omegaup.api.Client):
-        '''Contructor for contest callback'''
+    def __init__(self, dbconn: mysql.connector.MySQLConnection):
+        '''Constructor for contest callback'''
         self.dbconn = dbconn
-        self.client = client
 
     def __call__(self,
                  _channel: pika.adapters.blocking_connection.BlockingChannel,
@@ -54,26 +50,27 @@ class ContestsCallback:
                  body: bytes) -> None:
         '''Function to store the certificates by a given contest'''
         response = json.loads(body)
-        data = ContestCertificate(**response)
 
-        scoreboard = self.client.contest.scoreboard(
-            contest_alias=data.alias,
-            token=data.scoreboard_url)
-        ranking = scoreboard.ranking
+        ranking = []
+        for user_ranking in response['ranking']:
+            ranking.append(database.contest.Ranking(**user_ranking))
+        response['ranking'] = ranking
+        data = ContestCertificate(**response)
         certificates: List[Certificate] = []
         usernames: List[str] = []
 
-        for user in ranking:
+        for user_ranking in data.ranking:
             contest_place: Optional[int] = None
-            if (data.certificate_cutoff and user.place
-                    and user.place <= data.certificate_cutoff):
-                contest_place = user.place
+            place = int(user_ranking.place)
+            cutoff = data.certificate_cutoff
+            if (cutoff and place and place <= cutoff):
+                contest_place = user_ranking.place
             certificates.append(Certificate(
                 certificate_type='contest',
                 contest_id=data.contest_id,
                 verification_code=generate_contest_code(),
                 contest_place=contest_place,
-                username=str(user.username)
+                username=user_ranking.username
             ))
             usernames.append(user.username)
 
@@ -139,6 +136,12 @@ class ContestsCallback:
                     self.dbconn.rollback()
                     if err.errno != errorcode.ER_DUP_ENTRY:
                         raise
+                    if err.msg.find('Certificates.contest_identity_key') > 0:
+                        logging.exception(
+                            'At least one certificate for this contest is '
+                            'duplicated'
+                        )
+                        break
                     for index, certificate in enumerate(certificates):
                         certificate.verification_code = generate_contest_code()
                         user_id = notifications[index][0]
@@ -158,6 +161,18 @@ class ContestsCallback:
                     logging.exception(
                         'At least one of the verification codes had a conflict'
                     )
+            try:
+                cur.execute('''
+                    UPDATE
+                        `Contests`
+                    SET
+                        `certificates_status` = 'generated'
+                    WHERE
+                        `contest_id` = %s;
+                    ''', (data.contest_id,))
+                self.dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception('Failed to update the certificate status')
 
 
 def generate_contest_code() -> str:
