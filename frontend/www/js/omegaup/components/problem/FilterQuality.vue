@@ -1,7 +1,7 @@
 <template>
-  <div class="card mt-4">
-    <div class="card-body">
-      <h3 class="section-font-size text-center">{{ T.wordsQuality }}</h3>
+  <div class="card mx-auto mt-0 mt-lg-4 col-6 col-sm-3 col-lg-12">
+    <div class="card-body p-0 py-3 p-lg-3">
+      <h3>{{ T.wordsQuality }}</h3>
       <div
         v-for="quality in qualityValues"
         :key="quality.id"

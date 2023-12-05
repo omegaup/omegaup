@@ -524,7 +524,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         p.scoreboard_url,
                         p.scoreboard_url_admin,
-                        COUNT(contestants.identity_id) AS contestants,
+                        0 AS contestants,
                         ANY_VALUE(organizer.username) AS organizer";
 
         $sql = "
@@ -566,10 +566,6 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 Problemsets p
             ON
                 p.problemset_id = Contests.problemset_id
-            LEFT JOIN
-                Problemset_Identities AS contestants
-            ON
-                Contests.problemset_id = contestants.problemset_id
             INNER JOIN
                 ACLs AS a
             ON
@@ -635,6 +631,125 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
+     * Returns the next contest (active or future) a user registered for, when it is
+     * a future contest it can be filtered by a limit of days between the start of the
+     * next registered contest and the current date using the $dayLimit param.
+     *
+     * @return ContestListItem|null
+     */
+    final public static function getNextRegisteredContestForUser(
+        ?\OmegaUp\DAO\VO\Identities $identity,
+        ?int $dayLimit = 15
+    ) {
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            return null;
+        }
+
+        $activeCondition = \OmegaUp\DAO\Enum\ActiveStatus::sql(
+            \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE
+        );
+        $futureCondition = \OmegaUp\DAO\Enum\ActiveStatus::sql(
+            \OmegaUp\DAO\Enum\ActiveStatus::FUTURE
+        );
+        $withinDayLimitCondition = 'TRUE';
+        if (!is_null($dayLimit)) {
+            $withinDayLimitCondition = "DATEDIFF(start_time, NOW()) < $dayLimit";
+        }
+
+        $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
+
+        $select = "SELECT
+                        $columns,
+                        p.scoreboard_url,
+                        p.scoreboard_url_admin,
+                        0 AS contestants,
+                        ANY_VALUE(organizer.username) AS organizer";
+
+        $sql = "
+            FROM
+                (SELECT
+                    pi.problemset_id
+                FROM
+                    Problemset_Identities pi
+                WHERE
+                    pi.identity_id = ?
+                UNION DISTINCT
+                SELECT
+                    p.problemset_id
+                FROM
+                    Groups_Identities gi
+                INNER JOIN
+                    Group_Roles gr ON gi.group_id = gr.group_id
+                INNER JOIN
+                    Problemsets p ON gr.acl_id = p.acl_id
+                WHERE
+                    gi.identity_id = ? AND gr.role_id = ?
+                UNION DISTINCT
+                SELECT
+                    p.problemset_id
+                FROM
+                    Teams t
+                INNER JOIN
+                    Teams_Group_Roles tgr ON t.team_group_id = tgr.team_group_id
+                INNER JOIN
+                    Problemsets p ON tgr.acl_id = p.acl_id
+                WHERE
+                    t.identity_id = ? AND tgr.role_id = ?
+                ) pps
+            INNER JOIN
+                Contests
+            ON
+                Contests.problemset_id = pps.problemset_id
+            INNER JOIN
+                Problemsets p
+            ON
+                p.problemset_id = Contests.problemset_id
+            INNER JOIN
+                ACLs AS a
+            ON
+                Contests.acl_id = a.acl_id
+            INNER JOIN
+                Identities AS organizer
+            ON
+                a.owner_id = organizer.user_id
+            WHERE
+                ($activeCondition OR
+                ($futureCondition AND $withinDayLimitCondition)) AND
+                archived = 0
+            GROUP BY Contests.contest_id
+        ";
+        $params = [
+            // Direct participation
+            $identity->identity_id,
+            // Group participation
+            $identity->identity_id,
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
+            // Team participation
+            $identity->identity_id,
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
+        ];
+
+        $limits = '
+            ORDER BY
+                start_time ASC,
+                finish_time ASC
+            LIMIT 1;
+        ';
+
+        /** @var array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}|null */
+        $contest = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            "{$select} {$sql} {$limits}",
+            $params
+        );
+
+        if (!is_null($contest)) {
+            $contest['participating'] = true;
+        }
+
+        return $contest;
+    }
+
+    /**
      * Returns all recent public contests.
      *
      * @return array{contests: list<ContestListItem>, count: int}
@@ -661,17 +776,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $select = "SELECT
                     $columns,
-                    COUNT(contestants.identity_id) AS contestants,
+                    0 AS contestants,
                     ANY_VALUE(organizer.username) AS organizer,
                     (participating.identity_id IS NOT NULL) AS `participating`";
 
         $sql = "
             FROM
                 Contests
-            LEFT JOIN
-                Problemset_Identities AS contestants
-            ON
-                Contests.problemset_id = contestants.problemset_id
             INNER JOIN
                 ACLs AS a
             ON
@@ -876,7 +987,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $select = "SELECT
                         $columns,
-                        COUNT(pi.identity_id) AS contestants,
+                        0 AS contestants,
                         ANY_VALUE(organizer.username) AS organizer,
                         BIT_OR(rc.participating) AS participating";
         $sql = "
@@ -884,8 +995,6 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             ($sqlRelevantContests) rc
         INNER JOIN
             Contests ON Contests.contest_id = rc.contest_id
-        LEFT JOIN
-            Problemset_Identities pi ON pi.problemset_id = Contests.problemset_id
         INNER JOIN
             ACLs a ON a.acl_id = Contests.acl_id
         INNER JOIN
@@ -975,17 +1084,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $select = "SELECT
                         $columns,
-                        COUNT(contestants.identity_id) AS `contestants`,
+                        0 AS `contestants`,
                         ANY_VALUE(organizer.username) AS organizer,
                         FALSE AS `participating`
                         ";
         $sql = "
                 FROM
                     `Contests`
-                LEFT JOIN
-                    Problemset_Identities AS contestants
-                ON
-                    Contests.problemset_id = contestants.problemset_id
                 INNER JOIN
                     ACLs AS a
                 ON
@@ -1066,16 +1171,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $select = "SELECT
                         $columns,
-                        COUNT(contestants.identity_id) AS contestants,
+                        0 AS contestants,
                         ANY_VALUE(organizer.username) AS organizer,
                         TRUE AS participating";
         $sql = "
                 FROM
                     Contests
-                LEFT JOIN
-                    Problemset_Identities AS contestants
-                ON
-                    Contests.problemset_id = contestants.problemset_id
                 INNER JOIN
                     ACLs AS a
                 ON
@@ -1135,6 +1236,28 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
 
         return \OmegaUp\DAO\Contests::getByProblemset($problemsetId);
+    }
+
+    public static function getNumberOfContestants(int $contestId): int {
+        $sql = 'SELECT
+                    COUNT(*) AS contestants
+                FROM
+                    Problemsets p
+                INNER JOIN
+                    Problemset_Identities pi
+                ON
+                    p.problemset_id = pi.problemset_id
+                WHERE
+                    p.contest_id = ?
+                GROUP BY
+                    p.contest_id
+                ;';
+
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$contestId]
+        ) ?? 0;
     }
 
     /**

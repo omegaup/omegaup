@@ -39,6 +39,7 @@ OmegaUp.on('ready', async () => {
   const commonPayload = types.payloadParsers.CommonPayload();
   const payload = types.payloadParsers.AssignmentDetailsPayload();
   const [locationHash] = window.location.hash.substring(1).split('/');
+
   const courseAdmin = Boolean(
     payload.courseDetails.is_admin || payload.courseDetails.is_curator,
   );
@@ -80,6 +81,9 @@ OmegaUp.on('ready', async () => {
       problemDetails?.nextSubmissionTimestamp.getTime(),
     );
   }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const useNewVerdictTable = urlParams.get('useNewVerdictTable') === 'true';
 
   const arenaCourse = new Vue({
     el: '#main-container',
@@ -132,6 +136,7 @@ OmegaUp.on('ready', async () => {
           feedbackThreadMap: this.feedbackThreadMap,
           currentUsername: commonPayload.currentUsername,
           currentUserClassName: commonPayload.userClassname,
+          useNewVerdictTable: useNewVerdictTable,
         },
         on: {
           'navigate-to-assignment': ({
@@ -459,6 +464,17 @@ OmegaUp.on('ready', async () => {
                 if (!feedbackWithError.length) {
                   ui.success(T.feedbackSuccesfullyAdded);
                   resetHash('runs', null);
+                  api.Run.getSubmissionFeedback({
+                    run_alias: guid,
+                  }).then((response) => {
+                    component.feedbackMap.forEach((feedback) => {
+                      feedback.submissionFeedbackId = response.find(
+                        (fb) => fb.range_bytes_start == feedback.lineNumber,
+                      )?.submission_feedback_id;
+                      feedback.status = FeedbackStatus.Saved;
+                    });
+                  });
+
                   component.currentPopupDisplayed = PopupDisplayed.None;
                 } else {
                   ui.error('There was an error');
@@ -481,9 +497,25 @@ OmegaUp.on('ready', async () => {
               range_bytes_start: feedback.lineNumber,
               submission_feedback_id: feedback.submissionFeedbackId,
             })
-              .then(() => {
+              .then(({ submissionFeedbackThread }) => {
                 ui.success(T.feedbackSuccesfullyAdded);
                 resetHash('runs', null);
+                if (
+                  submissionFeedbackThread &&
+                  submissionFeedbackThread.submission_feedback_thread_id &&
+                  submissionFeedbackThread.identity_id
+                ) {
+                  feedbackThreadMap.set(
+                    submissionFeedbackThread.submission_feedback_thread_id,
+                    {
+                      author: commonPayload.currentUsername,
+                      authorClassname: commonPayload.userClassname,
+                      lineNumber: feedback.lineNumber,
+                      text: feedback.text,
+                      status: FeedbackStatus.Saved,
+                    },
+                  );
+                }
                 component.currentPopupDisplayed = PopupDisplayed.None;
               })
               .catch(ui.error);

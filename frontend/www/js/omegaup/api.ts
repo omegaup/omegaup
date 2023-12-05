@@ -203,6 +203,37 @@ export const Badge = {
   }),
 };
 
+export const Certificate = {
+  generateContestCertificates: apiCall<
+    messages.CertificateGenerateContestCertificatesRequest,
+    messages.CertificateGenerateContestCertificatesResponse
+  >('/api/certificate/generateContestCertificates/'),
+  getCertificatePdf: apiCall<
+    messages.CertificateGetCertificatePdfRequest,
+    messages.CertificateGetCertificatePdfResponse
+  >('/api/certificate/getCertificatePdf/'),
+  getUserCertificates: apiCall<
+    messages.CertificateGetUserCertificatesRequest,
+    messages._CertificateGetUserCertificatesServerResponse,
+    messages.CertificateGetUserCertificatesResponse
+  >('/api/certificate/getUserCertificates/', (x) => {
+    x.certificates = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.date = ((x: number) => new Date(x * 1000))(x.date);
+        return x;
+      });
+    })(x.certificates);
+    return x;
+  }),
+  validateCertificate: apiCall<
+    messages.CertificateValidateCertificateRequest,
+    messages.CertificateValidateCertificateResponse
+  >('/api/certificate/validateCertificate/'),
+};
+
 export const Clarification = {
   create: apiCall<
     messages.ClarificationCreateRequest,
@@ -363,6 +394,10 @@ export const Contest = {
       );
     return x;
   }),
+  getNumberOfContestants: apiCall<
+    messages.ContestGetNumberOfContestantsRequest,
+    messages.ContestGetNumberOfContestantsResponse
+  >('/api/contest/getNumberOfContestants/'),
   list: apiCall<
     messages.ContestListRequest,
     messages._ContestListServerResponse,
@@ -1736,6 +1771,13 @@ export const Session = {
             return x;
           });
         })(x.api_tokens);
+        if (
+          typeof x.user_verification_deadline !== 'undefined' &&
+          x.user_verification_deadline !== null
+        )
+          x.user_verification_deadline = ((x: number) => new Date(x * 1000))(
+            x.user_verification_deadline,
+          );
         return x;
       })(x.session);
     return x;

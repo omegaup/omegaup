@@ -51,11 +51,11 @@ export default class FeedbackCodeView extends Vue {
   mode = languageModeMap[this.language] ?? languageModeMap['cpp17-gcc'];
   mapChangeTracker = 1;
 
-  get feedbackList(): [number, ArenaCourseFeedback][] {
+  get feedbackList(): ArenaCourseFeedback[] {
     if (!this.mapChangeTracker) {
       throw new Error('unreachable code');
     }
-    return Array.from(this.feedbackMap);
+    return Array.from(this.feedbackMap.values());
   }
 
   get numberOfComments(): number {
@@ -237,8 +237,8 @@ export default class FeedbackCodeView extends Vue {
   saveFeedbackList(): void {
     this.$emit(
       'save-feedback-list',
-      this.feedbackList.map(([lineNumber, feedback]) => ({
-        lineNumber,
+      this.feedbackList.map((feedback) => ({
+        lineNumber: feedback.lineNumber,
         feedback: feedback.text,
       })),
     );

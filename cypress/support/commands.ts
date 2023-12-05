@@ -42,6 +42,15 @@ Cypress.Commands.add('logout', () => {
   );
 });
 
+// Logouts the user
+Cypress.Commands.add('logoutUsingApi', () => {
+  const URL = '/logout/?redirect=/';
+  cy.request(URL).then((response) => {
+    expect(response.status).to.equal(200);
+    cy.reload();
+  });
+});
+
 // Registers and logs in a new user given a username and password.
 Cypress.Commands.add('register', ({ username, password }: LoginOptions) => {
   const URL =
@@ -60,11 +69,16 @@ Cypress.Commands.add(
     tag,
     autoCompleteTextTag,
     problemLevelIndex,
+    publicAccess = false,
+    firstTimeVisited = true
   }: ProblemOptions) => {
     cy.visit('/');
     // Select problem nav
     cy.get('[data-nav-problems]').click();
     cy.get('[data-nav-problems-create]').click();
+    if (firstTimeVisited) {
+      cy.get('.introjs-skipbutton').click();
+    }
     // Fill basic problem form
     cy.get('[name="title"]').type(problemAlias).blur();
 
@@ -82,6 +96,11 @@ Cypress.Commands.add(
         .should('have.text', tag) // Maybe theres another way to avoid to hardcode this
         .click(),
     );
+
+    if(publicAccess) {
+      cy.get('[data-target=".access"]').click();
+      cy.get('[data-problem-access-radio-yes]').check();
+    }
 
     cy.get('[name="problem-level"]').select(problemLevelIndex); // How can we assert this with the real text?
 
@@ -106,6 +125,7 @@ Cypress.Commands.add(
   }: Partial<CourseOptions> & Pick<CourseOptions, 'courseAlias'>) => {
     cy.get('[data-nav-courses]').click();
     cy.get('[data-nav-courses-create]').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('[data-course-new-name]').type(courseAlias);
     cy.get('[data-course-new-alias]').type(courseAlias);
     cy.get('[name="show-scoreboard"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
@@ -170,8 +190,11 @@ Cypress.Commands.add(
     requestParticipantInformation = 'no',
     differentStart = false,
     differentStartTime = "",
-  }) => {
+  },shouldShowIntro: boolean = true) => {
     cy.visit('contest/new/');
+    if (shouldShowIntro) {
+      cy.get('.introjs-skipbutton').click();
+    }
     cy.get('[name="title"]').type(contestAlias);
     cy.get('[name="alias"]').type(contestAlias);
     cy.get('[name="description"]').type(description);

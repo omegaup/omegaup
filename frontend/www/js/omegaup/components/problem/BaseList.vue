@@ -1,8 +1,5 @@
 <template>
   <div class="card">
-    <h5 class="card-header">
-      {{ T.wordsProblems }}
-    </h5>
     <div class="table-responsive mb-0">
       <table class="table">
         <thead>
@@ -21,17 +18,16 @@
                 ></omegaup-common-sort-controls
               ></span>
             </th>
-            <th scope="col" class="text-left align-middle text-nowrap">
+            <th scope="col" class="align-middle text-nowrap">
               <span>{{ T.wordsTitle }}</span>
               <span
-                class="badge custom-badge custom-badge-quality mr-1 ml-1 p-1 p-lg-2"
+                class="badge custom-badge custom-badge-quality mr-1 ml-1 p-2"
                 >{{ T.tagSourceLevel }}</span
               >
-              <span
-                class="badge custom-badge custom-badge-owner mr-1 p-1 p-lg-2"
-                >{{ T.tagSourceOwner }}</span
-              >
-              <span class="badge custom-badge custom-badge-voted p-1 p-lg-2">{{
+              <span class="badge custom-badge custom-badge-owner mr-1 p-2">{{
+                T.tagSourceOwner
+              }}</span>
+              <span class="badge custom-badge custom-badge-voted p-2">{{
                 T.tagSourceVoted
               }}</span>
               <omegaup-common-sort-controls
@@ -128,9 +124,12 @@
           <tr v-for="problem in problems" :key="problem.problem_id">
             <td class="align-middle">{{ problem.problem_id }}</td>
             <td class="align-middle">
-              <a :href="`/arena/problem/${problem.alias}/`" class="mr-2">{{
-                problem.title
-              }}</a>
+              <a
+                :href="`/arena/problem/${problem.alias}/`"
+                class="mr-2"
+                data-problem-title-list
+                >{{ problem.title }}</a
+              >
               <font-awesome-icon
                 v-if="problem.qualitySeal || problem.visibility === 3"
                 :title="T.wordsHighQualityProblem"
@@ -161,7 +160,7 @@
                   tag.name.includes('problemLevel')
                     ? 'custom-badge-quality'
                     : ''
-                } m-1 p-1 p-lg-2`"
+                } m-1 p-2`"
                 :href="hrefForProblemTag(selectedTags, tag.name)"
                 >{{
                   Object.prototype.hasOwnProperty.call(T, tag.name)
@@ -306,7 +305,20 @@ export default class BaseList extends Vue {
 .sticky-offset {
   top: 4rem;
 }
+.card {
+  border-top: none;
+  border-radius: 0rem 0rem 0.25rem 0.25rem;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
 .table-responsive {
   max-height: 80vh;
+}
+thead tr th {
+  border: none;
 }
 </style>

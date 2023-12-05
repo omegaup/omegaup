@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { addSubtractDaysToDate, getISODateTime } from '../commands';
+import { addSubtractDaysToDate, getISODate, getISODateTime } from '../commands';
 import { CourseOptions, ProblemOptions, RunOptions, Status } from '../types';
 
 export class CoursePage {
@@ -108,6 +108,7 @@ export class CoursePage {
   createCourse(courseOptions: CourseOptions): void {
     cy.get('a[data-nav-courses]').should('be.visible').click();
     cy.get('a[data-nav-courses-create]').should('be.visible').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('input[data-course-new-name]')
       .should('be.visible')
       .type(courseOptions.courseAlias);
@@ -375,6 +376,69 @@ export class CoursePage {
     cy.get('.tags-input-typeahead-item-highlighted-default').click();
     cy.get(`a[href="/arena/problem/${problems[1]}/"]`).should('be.visible');
     cy.get(`a[href="/arena/problem/${problems[0]}/]"`).should('not.exist');
+  }
+
+  verifyCourseOptions(courseOptions: CourseOptions): void {
+    cy.location('href').should('include', courseOptions.courseAlias); // Url
+    cy.get('[data-course-name]').contains(courseOptions.courseAlias);
+    cy.get('[data-tab-course').click();
+    cy.get('[data-course-new-name]').should(
+      'have.value',
+      courseOptions.courseAlias,
+    );
+    cy.get('[data-course-new-alias]').should(
+      'have.value',
+      courseOptions.courseAlias,
+    );
+    cy.get('[name="show-scoreboard"]')
+      .eq(courseOptions.showScoreboard ? 0 : 1)
+      .should('be.checked');
+    cy.get('[name="start-date"]').should(
+      'have.value',
+      getISODate(courseOptions.startDate),
+    );
+    cy.get('[name="unlimited-duration"]')
+      .eq(courseOptions.unlimitedDuration ? 0 : 1)
+      .should('be.checked');
+    cy.get('.tags-input').should('have.text', courseOptions.school);
+    cy.get('[name="basic-information"]')
+      .eq(courseOptions.basicInformation ? 0 : 1)
+      .should('be.checked');
+    cy.get('[data-course-participant-information]').should(
+      'have.value',
+      courseOptions.requestParticipantInformation,
+    );
+    cy.get('[data-course-problem-level]').should(
+      'have.value',
+      courseOptions.problemLevel,
+    );
+    cy.get('[data-course-objective]').should(
+      'have.value',
+      courseOptions.objective,
+    );
+    cy.get('[data-course-new-description]').should(
+      'have.value',
+      courseOptions.description,
+    );
+  }
+
+  verifyProblem(problemOptions: ProblemOptions): void {
+    cy.location('href').should('include', problemOptions.problemAlias);
+    cy.get('[name="title"]').should('have.value', problemOptions.problemAlias);
+    cy.get('[name="problem_alias"]').should(
+      'have.value',
+      problemOptions.problemAlias,
+    );
+    cy.get('[name="source"]').should('have.value', problemOptions.problemAlias);
+  }
+
+  verifyProblemRun(status: string): void {
+    cy.get('[data-run-status] > span').first().should('have.text', 'new');
+
+    cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
+    cy.wait(['@runStatus'], { timeout: 10000 });
+
+    cy.get('[data-run-status] > span').first().should('have.text', status);
   }
 }
 

@@ -82,5 +82,6 @@ export default class Typeahead extends Vue {
 
 .tags-input-wrapper-default {
   height: 38px;
+  padding: 0.375rem 0.75rem !important;
 }
 </style>

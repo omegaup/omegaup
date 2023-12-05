@@ -1,6 +1,12 @@
 <template>
-  <div class="mb-0 mb-sm-3">
-    <form action="/problem/" method="GET" class="form-inline">
+  <div
+    class="card-header d-flex justify-content-between align-items-center container-lg"
+  >
+    <form
+      action="/problem/"
+      method="GET"
+      class="form-inline d-flex justify-content-center align-items-center flex-wrap form-mobile"
+    >
       <div v-if="tags.length !== 0" class="form-group mr-2">
         <div v-for="tag in tags" :key="tag" class="mr-1">
           <input type="hidden" name="tag[]" :value="tag" />
@@ -12,9 +18,9 @@
           <font-awesome-icon :icon="['fas', 'times']" />
         </a>
       </div>
-      <div class="form-group mr-3 mt-1 col-12 col-md-6 mb-1 mb-sm-0 px-0">
+      <div class="form-group mr-2">
         <omegaup-common-typeahead
-          class="w-100"
+          data-problem-keyword-search
           :only-existing-tags="false"
           :max-results="10"
           :existing-options="searchResultProblems"
@@ -27,13 +33,14 @@
         ></omegaup-common-typeahead>
         <input type="hidden" name="query" :value="currentKeywordValue" />
       </div>
-      <div class="form-group mr-2 mt-1">
+      <div class="form-group mr-2">
         <label>
           {{ T.wordsFilterByLanguage }}
           <select
             v-model="currentLanguage"
+            data-filter-language
             name="language"
-            class="ml-1 form-control"
+            class="ml-2 form-control"
           >
             <option
               v-for="language in languages"
@@ -45,8 +52,21 @@
           </select>
         </label>
       </div>
+      <div class="form-group mr-2">
+        <label>
+          <input
+            v-model="currentOnlyQualitySeal"
+            name="only_quality_seal"
+            class="form-check-input"
+            type="checkbox"
+            :value="true"
+          />
+          {{ T.qualityFormQualityOnly }}
+        </label>
+      </div>
       <input
-        class="btn btn-primary mt-1"
+        data-filter-submit-button
+        class="btn btn-primary mr-2 button-mobile"
         type="submit"
         :value="T.wordsSearch"
       />
@@ -76,12 +96,14 @@ export default class ProblemSearchBar extends Vue {
   @Prop() keyword!: string;
   @Prop() language!: string;
   @Prop() languages!: string[];
+  @Prop() onlyQualitySeal!: boolean;
   @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
 
   currentKeyword: types.ListItem = { key: this.keyword, value: this.keyword };
   currentLanguage = this.language;
+  currentOnlyQualitySeal = this.onlyQualitySeal;
 
   getLanguageText(language: string): string {
     if (language === 'all') return T.wordsAll;
@@ -101,5 +123,22 @@ export default class ProblemSearchBar extends Vue {
   label {
     font-weight: bold;
   }
+}
+.card-header {
+  border: 1px solid var(--header-problem-card-color);
+  border-bottom: none;
+}
+
+@media (max-width: 576px) {
+  .button-mobile {
+    margin-left: 1rem;
+  }
+  .form-control {
+    margin-left: 0 !important;
+  }
+}
+
+[data-problem-keyword-search] {
+  z-index: 9999;
 }
 </style>

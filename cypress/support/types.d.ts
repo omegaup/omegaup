@@ -19,11 +19,35 @@ export interface TeamGroupOptions {
   noOfContestants: string;
 }
 
+export interface UserInformation {
+  name: string;
+  gender: string;
+  country: string;
+  state: string;
+  dateOfBirth: string;
+}
+
+export interface UserPreferences {
+  language: string;
+  programmingLanguage: string;
+  useCase: string;
+  objective: string;
+}
+
+export interface SchoolDetails {
+  name: string;
+  grade: string;
+  enrolledStatus: boolean;
+  graduationDate?: string;
+}
+
 export interface ProblemOptions {
   problemAlias: string;
   tag: string;
   autoCompleteTextTag: string;
   problemLevelIndex: number;
+  publicAccess?: boolean;
+  firstTimeVisited?: boolean;
 }
 
 export interface CourseOptions {

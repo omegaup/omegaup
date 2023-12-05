@@ -105,6 +105,101 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
+     * @return string
+     */
+    final public static function getRunExtraFields() {
+        /** @var string */
+        return '
+        COALESCE(
+        ( SELECT
+            IF(
+                verdict IN ("OLE", "OL"), "OUTPUT_EXCEEDED",
+            IF(
+                verdict IN ("WA", "PA"), "OUTPUT_INCORRECT",
+            IF(
+                verdict IN ("JE", "VE", "CE", "FO", "RFE", "RE", "RTE", "MLE", "TLE"), "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT"
+            )))
+        AS output
+        FROM
+            Runs_Groups
+        WHERE
+            run_id = r.run_id
+        GROUP BY
+            output
+        ORDER BY
+            field(output, "OUTPUT_EXCEEDED", "OUTPUT_INCORRECT", "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT")
+        LIMIT 1
+            ), "OUTPUT_INTERRUPTED") AS output,
+            COALESCE(
+        ( SELECT
+            IF(
+                verdict = "JE", "EXECUTION_JUDGE_ERROR",
+            IF(
+                verdict = "VE", "EXECUTION_VALIDATOR_ERROR",
+            IF(
+                verdict = "CE", "EXECUTION_COMPILATION_ERROR",
+            IF(
+                verdict IN ("OF", "RFE"), "EXECUTION_RUNTIME_FUNCTION_ERROR",
+            IF(
+                verdict IN ("RE", "RTE"), "EXECUTION_RUNTIME_ERROR",
+            IF(
+                verdict IN ("ML", "MLE", "TLE", "OLE", "TO", "OL"), "EXECUTION_INTERRUPTED", "EXECUTION_FINISHED")
+            )))))
+            AS execution
+        FROM
+            Runs_Groups
+        WHERE
+            run_id = r.run_id
+        GROUP BY
+            execution
+        ORDER BY
+            field(
+                execution,
+                "EXECUTION_JUDGE_ERROR",
+                "EXECUTION_VALIDATOR_ERROR",
+                "EXECUTION_COMPILATION_ERROR",
+                "EXECUTION_RUNTIME_FUNCTION_ERROR",
+                "EXECUTION_RUNTIME_ERROR",
+                "EXECUTION_INTERRUPTED",
+                "EXECUTION_FINISHED"
+            )
+        LIMIT 1
+            ), "EXECUTION_COMPILATION_ERROR")AS execution,
+            COALESCE(
+        ( SELECT
+            IF(
+                verdict IN ("JE", "CE"), "RUNTIME_NOT_AVAILABLE",
+            IF(
+                verdict IN ("TLE", "TO"), "RUNTIME_EXCEEDED", "RUNTIME_AVAILABLE"
+            ))
+            AS status_runtime
+        FROM
+            Runs_Groups
+        WHERE
+            run_id = r.run_id
+        ORDER BY
+            field(status_runtime, "RUNTIME_NOT_AVAILABLE", "RUNTIME_EXCEEDED", "RUNTIME_AVAILABLE")
+                LIMIT 1
+            ), "RUNTIME_NOT_AVAILABLE" )AS status_runtime,
+            COALESCE(
+        ( SELECT
+            IF(
+                verdict IN ("JE", "CE"), "MEMORY_NOT_AVAILABLE",
+            IF(
+                verdict IN ("ML", "MLE"), "MEMORY_EXCEEDED", "MEMORY_AVAILABLE"
+            ))
+        AS status_memory
+        FROM
+            Runs_Groups
+        WHERE
+            run_id = r.run_id
+        ORDER BY
+            field(status_memory, "MEMORY_NOT_AVAILABLE", "MEMORY_EXCEEDED", "MEMORY_AVAILABLE")
+        LIMIT 1
+            ), "MEMORY_NOT_AVAILABLE" )AS status_memory';
+    }
+
+    /**
      * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>, totalRuns: int}
      */
     final public static function getAllRuns(
@@ -174,6 +269,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $rowCount = 100;
         }
 
+        $extraFields = self::getRunExtraFields();
+
         $sql = '
             SELECT
                 `r`.`run_id`,
@@ -202,91 +299,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 IFNULL(`i`.`country_id`, "xx") `country`,
                 `c`.`alias` AS `contest_alias`,
                 IFNULL(ur.classname, "user-rank-unranked") `classname`,
-                ( SELECT
-                    IF(
-                        verdict IN ("OLE", "OL"), "OUTPUT_EXCEEDED",
-                    IF(
-                        verdict IN ("WA", "PA"), "OUTPUT_INCORRECT",
-                    IF(
-                        verdict IN ("JE", "VE", "CE", "FO", "RFE", "RE", "RTE", "MLE", "TLE"), "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT"
-                    )))
-                AS output
-                FROM
-                    Runs_Groups
-                WHERE
-                    run_id = `r`.`run_id`
-                GROUP BY
-                    output
-                ORDER BY
-                    field(output, "OUTPUT_EXCEEDED", "OUTPUT_INCORRECT", "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT")
-                LIMIT 1
-                ) AS output,
-                ( SELECT
-                    IF(
-                        verdict = "JE", "EXECUTION_JUDGE_ERROR",
-                    IF(
-                        verdict = "VE", "EXECUTION_VALIDATOR_ERROR",
-                    IF(
-                        verdict = "CE", "EXECUTION_COMPILATION_ERROR",
-                    IF(
-                        verdict IN ("OF", "RFE"), "EXECUTION_RUNTIME_FUNCTION_ERROR",
-                    IF(
-                        verdict IN ("RE", "RTE"), "EXECUTION_RUNTIME_ERROR",
-                    IF(
-                        verdict IN ("ML", "MLE", "TLE", "OLE", "TO", "OL"), "EXECUTION_INTERRUPTED", "EXECUTION_FINISHED")
-                    )))))
-                    AS execution
-                FROM
-                    Runs_Groups
-                WHERE
-                    run_id = `r`.`run_id`
-                GROUP BY
-                    execution
-                ORDER BY
-                    field(
-                        execution,
-                        "EXECUTION_JUDGE_ERROR",
-                        "EXECUTION_VALIDATOR_ERROR",
-                        "EXECUTION_COMPILATION_ERROR",
-                        "EXECUTION_RUNTIME_FUNCTION_ERROR",
-                        "EXECUTION_RUNTIME_ERROR",
-                        "EXECUTION_INTERRUPTED",
-                        "EXECUTION_FINISHED"
-                    )
-                LIMIT 1
-                ) AS execution,
-                ( SELECT
-                    IF(
-                        verdict IN ("JE", "CE"), "RUNTIME_NOT_AVAILABLE",
-                    IF(
-                        verdict IN ("TLE", "TO"), "RUNTIME_EXCEEDED", "RUNTIME_AVAILABLE"
-                    ))
-                    AS status_runtime
-                FROM
-                    Runs_Groups
-                WHERE
-                    run_id = `r`.`run_id`
-                ORDER BY
-                    field(status_runtime, "RUNTIME_NOT_AVAILABLE", "RUNTIME_EXCEEDED", "RUNTIME_AVAILABLE")
-				        LIMIT 1
-                ) AS status_runtime,
-                ( SELECT
-                    IF(
-                        verdict IN ("JE", "CE"), "MEMORY_NOT_AVAILABLE",
-                    IF(
-                        verdict IN ("ML", "MLE"), "MEMORY_EXCEEDED", "MEMORY_AVAILABLE"
-                    ))
-                AS status_memory
-                FROM
-                    Runs_Groups
-                WHERE
-                    run_id = `r`.`run_id`
-                ORDER BY
-                    field(status_memory, "MEMORY_NOT_AVAILABLE", "MEMORY_EXCEEDED", "MEMORY_AVAILABLE")
-                LIMIT 1
-                ) AS status_memory
+                sf.`submission_feedback_id`,
+                ' . $extraFields . '
             FROM
                 Submissions s
+            LEFT JOIN
+                Submission_Feedback sf ON sf.submission_id = s.submission_id
             INNER JOIN
                 Runs r ON r.run_id = s.current_run_id
             INNER JOIN
@@ -308,7 +326,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val[] = $offset * $rowCount;
         $val[] = $rowCount;
 
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: string, status_runtime: string, submission_feedback_id: int|null, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
         $runs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
 
         return [
@@ -873,35 +891,38 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return \OmegaUp\DAO\VO\Runs|null
+     * @return array{commit: string, contest_score: float|null, execution: null|string, judged_by: null|string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: null|string, status_runtime: null|string, submission_id: int, time: \OmegaUp\Timestamp, verdict: string, version: string}|null
      */
     final public static function getByGUID(string $guid) {
+        $extraFields = self::getRunExtraFields();
+
         $sql = '
             SELECT
                 ' .  \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Runs::FIELD_NAMES,
             'r'
-        ) . '
-            FROM
-                `Runs` `r`
-            INNER JOIN
-                `Submissions` `s`
-            ON
-                `r`.`submission_id` = `s`.`submission_id`
-            WHERE
-                `s`.`guid` = ?
-            LIMIT
-                1;
+        ) . ',
+            ' . $extraFields . '
+        FROM
+            `Runs` `r`
+        INNER JOIN
+            `Submissions` `s`
+        ON
+            `r`.`submission_id` = `s`.`submission_id`
+        WHERE
+            `s`.`guid` = ?
+        LIMIT
+            1;
         ';
 
-        /** @var array{commit: string, contest_score: float|null, judged_by: null|string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submission_id: int, time: \OmegaUp\Timestamp, verdict: string, version: string}|null */
-        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$guid]);
+        /** @var array{commit: string, contest_score: float|null, execution: string, judged_by: null|string, memory: int, output: string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: string, status_runtime: string, submission_id: int, time: \OmegaUp\Timestamp, verdict: string, version: string}|null */
+        $run = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$guid]);
 
-        if (is_null($row)) {
+        if (is_null($run)) {
             return null;
         }
 
-        return new \OmegaUp\DAO\VO\Runs($row);
+        return $run;
     }
 
     /**
@@ -943,6 +964,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ?int $problemsetId,
         int $identityId
     ): array {
+        $extraFields = self::getRunExtraFields();
         $sql = '
             SELECT
                 p.alias,
@@ -968,89 +990,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 i.username, IFNULL(i.country_id, "xx") AS country,
                 c.alias AS contest_alias, IFNULL(s.`type`, "normal") AS `type`,
                 IFNULL(ur.classname, "user-rank-unranked") AS classname,
-                ( SELECT
-                    IF(
-                        verdict IN ("OLE", "OL"), "OUTPUT_EXCEEDED",
-                    IF(
-                        verdict IN ("WA", "PA"), "OUTPUT_INCORRECT",
-                    IF(
-                        verdict IN ("JE", "VE", "CE", "FO", "RFE", "RE", "RTE", "MLE", "TLE"), "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT"
-                    )))
-                AS output
-                FROM
-                    Runs_Groups
-                WHERE
-                    run_id = r.run_id
-                GROUP BY
-                    output
-                ORDER BY
-                    field(output, "OUTPUT_EXCEEDED", "OUTPUT_INCORRECT", "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT")
-                LIMIT 1
-                ) AS output,
-                ( SELECT
-                    IF(
-                        verdict = "JE", "EXECUTION_JUDGE_ERROR",
-                    IF(
-                        verdict = "VE", "EXECUTION_VALIDATOR_ERROR",
-                    IF(
-                        verdict = "CE", "EXECUTION_COMPILATION_ERROR",
-                    IF(
-                        verdict IN ("OF", "RFE"), "EXECUTION_RUNTIME_FUNCTION_ERROR",
-                    IF(
-                        verdict IN ("RE", "RTE"), "EXECUTION_RUNTIME_ERROR",
-                    IF(
-                        verdict IN ("ML", "MLE", "TLE", "OLE", "TO", "OL"), "EXECUTION_INTERRUPTED", "EXECUTION_FINISHED")
-                    )))))
-                    AS execution
-                FROM
-                    Runs_Groups
-                WHERE
-                    run_id = r.run_id
-                GROUP BY
-                    execution
-                ORDER BY
-                    field(
-                        execution,
-                        "EXECUTION_JUDGE_ERROR",
-                        "EXECUTION_VALIDATOR_ERROR",
-                        "EXECUTION_COMPILATION_ERROR",
-                        "EXECUTION_RUNTIME_FUNCTION_ERROR",
-                        "EXECUTION_RUNTIME_ERROR",
-                        "EXECUTION_INTERRUPTED",
-                        "EXECUTION_FINISHED"
-                    )
-                LIMIT 1
-                ) AS execution,
-                ( SELECT
-                    IF(
-                        verdict IN ("JE", "CE"), "RUNTIME_NOT_AVAILABLE",
-                    IF(
-                        verdict IN ("TLE", "TO"), "RUNTIME_EXCEEDED", "RUNTIME_AVAILABLE"
-                    ))
-                    AS status_runtime
-                FROM
-                    Runs_Groups
-                WHERE
-                    run_id = r.run_id
-                ORDER BY
-                    field(status_runtime, "RUNTIME_NOT_AVAILABLE", "RUNTIME_EXCEEDED", "RUNTIME_AVAILABLE")
-				        LIMIT 1
-                ) AS status_runtime,
-                ( SELECT
-                    IF(
-                        verdict IN ("JE", "CE"), "MEMORY_NOT_AVAILABLE",
-                    IF(
-                        verdict IN ("ML", "MLE"), "MEMORY_EXCEEDED", "MEMORY_AVAILABLE"
-                    ))
-                AS status_memory
-                FROM
-                    Runs_Groups
-                WHERE
-                    run_id = r.run_id
-                ORDER BY
-                    field(status_memory, "MEMORY_NOT_AVAILABLE", "MEMORY_EXCEEDED", "MEMORY_AVAILABLE")
-                LIMIT 1
-                ) AS status_memory,
+                ' . $extraFields . ',
                 JSON_OBJECTAGG(
                     IFNULL(rg.group_name, ""),
                     rg.score
@@ -1094,7 +1034,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.guid
             ;';
 
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group: null|string, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, runtime: int, score: float, score_by_group: null|string, status: string, status_memory: string, status_runtime: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> $runs */

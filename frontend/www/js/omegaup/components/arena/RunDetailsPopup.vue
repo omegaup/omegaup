@@ -116,12 +116,10 @@
             :feedback-map="feedbackMap"
             :feedback-thread-map="feedbackThreadMap"
             @save-feedback-list="
-              (feedbackList) =>
-                $emit('save-feedback-list', { feedbackList, guid: data.guid })
+              (feedbackList) => onSaveFeedbackList(feedbackList, data.guid)
             "
             @submit-feedback-thread="
-              (feedback) =>
-                $emit('submit-feedback-thread', { feedback, guid: data.guid })
+              (feedback) => onSubmitFeedbackThread(feedback, data.guid)
             "
           ></omegaup-arena-feedback-code-view>
         </slot>
@@ -171,6 +169,12 @@
           <pre>
             <code v-text="data.judged_by"></code>
           </pre>
+        </div>
+        <div>
+          <h3>{{ T.runGUID }}</h3>
+          <acronym :title="data.guid" data-run-guid>
+            <tt>{{ shortGuid }}</tt>
+          </acronym>
         </div>
       </form>
     </div>
@@ -235,6 +239,10 @@ export default class ArenaRunDetailsPopup extends Vue {
     return this.data?.source;
   }
 
+  get shortGuid(): string {
+    return this.data.guid.substring(0, 8);
+  }
+
   toggle(group: string): void {
     const visible = this.groupVisible[group];
     this.$set(this.groupVisible, group, !visible);
@@ -261,6 +269,23 @@ export default class ArenaRunDetailsPopup extends Vue {
 
   contestScore(problemCase: types.CaseResult): number {
     return problemCase.contest_score ?? problemCase.score;
+  }
+
+  onSaveFeedbackList(
+    feedbackList: { lineNumber: number; feedback: string }[],
+    guid: string,
+  ) {
+    this.$parent.$parent.$parent.$parent.$emit('save-feedback-list', {
+      feedbackList,
+      guid,
+    });
+  }
+
+  onSubmitFeedbackThread(feedback: ArenaCourseFeedback, guid: string) {
+    this.$parent.$parent.$parent.$parent.$emit('submit-feedback-thread', {
+      feedback,
+      guid,
+    });
   }
 }
 </script>
