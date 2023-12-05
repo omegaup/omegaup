@@ -137,4 +137,28 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
     }
+
+    public function testCreateNotificationsForNewContestCertificates() {
+        $n = 5;
+        $users = [];
+        $identities = [];
+        $usersIds = [];
+        for ($i = 0; $i < $n; $i++) {
+            ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
+            $usersIds[$i] = $users[$i]->user_id;
+        }
+        $contestTitle = 'Test';
+        $verificationCodes = ['AG8XOPS89L', 'H5J8K9K8K2', 'PF2Y9SPE25', 'EOR5KF9F0L', 'FIR93E22E5'];
+
+        $notifications = \OmegaUp\DAO\Base\Notifications::getAll();
+        $this->assertCount(0, $notifications);
+
+        \OmegaUp\Controllers\Notification::createNotificationsForNewContestCertificates(
+            $usersIds,
+            $contestTitle,
+            $verificationCodes
+        );
+        $notifications = \OmegaUp\DAO\Base\Notifications::getAll();
+        $this->assertCount($n, $notifications);
+    }
 }

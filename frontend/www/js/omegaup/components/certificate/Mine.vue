@@ -28,8 +28,8 @@
       <tbody>
         <tr v-for="(certificate, index) in certificates" :key="index">
           <td
-            v-if="newCertificate === certificate.verification_code"
-            class="text-left align-middle border-new"
+            v-if="selectedCertificate === certificate.verification_code"
+            class="text-left align-middle border-selected"
           >
             {{ certificate.date.toLocaleDateString() }}
           </td>
@@ -99,7 +99,7 @@ Vue.use(Clipboard);
 })
 export default class Mine extends Vue {
   @Prop() certificates!: types.CertificateListItem[];
-  @Prop() newCertificate?: string;
+  @Prop() selectedCertificate?: string;
   @Prop() location!: string;
 
   T = T;
@@ -141,7 +141,8 @@ export default class Mine extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
-.border-new {
-  border-left: 0.25rem solid #007bff;
+.border-selected {
+  border-left: 0.25rem solid
+    var(--certificates-selected-certificate-border-color);
 }
 </style>

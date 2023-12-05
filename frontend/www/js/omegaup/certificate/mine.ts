@@ -16,7 +16,7 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-certificate-mine', {
         props: {
           certificates: payload.certificates,
-          newCertificate: window.location.hash.substr(1).split('/')[0],
+          selectedCertificate: window.location.hash.substr(1).split('/')[0],
           location: window.location.origin,
         },
         on: {

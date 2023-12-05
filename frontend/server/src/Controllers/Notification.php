@@ -14,7 +14,7 @@ class Notification extends \OmegaUp\Controllers\Controller {
      * @param string $contestTitle
      * @param list<string> $verificationCodes
      */
-    public static function createNotificationsNewContestCertificates(
+    public static function createNotificationsForNewContestCertificates(
         array $usersIds,
         string $contestTitle,
         array $verificationCodes
