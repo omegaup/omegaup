@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Tests for NotificationController
  */
@@ -114,7 +112,7 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testReadNotificationsForbbidenAccessException() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $user] = \OmegaUp\Test\Factories\User::createUser();
         $notification = new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(
@@ -141,10 +139,9 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
     public function testCreateNotificationsForNewContestCertificates() {
         $n = 5;
         $users = [];
-        $identities = [];
         $usersIds = [];
         for ($i = 0; $i < $n; $i++) {
-            ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
+            ['user' => $users[$i]] = \OmegaUp\Test\Factories\User::createUser();
             $usersIds[$i] = $users[$i]->user_id;
         }
         $contestTitle = 'Test';
