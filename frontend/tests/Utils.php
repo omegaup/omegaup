@@ -222,6 +222,7 @@ class Utils {
             'Assignments',
             'Auth_Tokens',
             'API_Tokens',
+            'Certificates',
             'Clarifications',
             'Coder_Of_The_Month',
             'Contest_Log',
@@ -430,6 +431,65 @@ class Utils {
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
              ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))
+        );
+    }
+
+    public static function runInitializeRabbitmq(
+        string $queue,
+        string $exchange,
+        string $routingKey
+    ): void {
+        $channel = \OmegaUp\RabbitMQConnection::getInstance()->channel();
+
+        $channel->queue_declare(
+            $queue,
+            passive: false,
+            durable: true,
+            exclusive: false,
+            auto_delete: false
+        );
+
+        $channel->exchange_declare(
+            $exchange,
+            type: 'direct',
+            passive: false,
+            durable: true,
+            auto_delete: false
+        );
+
+        $channel->queue_bind(
+            $queue,
+            $exchange,
+            $routingKey
+        );
+
+        $channel->close();
+    }
+
+    public static function runGenerateContestCertificates(): void {
+        // Ensure all suggestions are written to the database before invoking
+        // the external script.
+        self::commit();
+        $host_arg = '';
+        $host_chunks = explode(':', OMEGAUP_DB_HOST, 2);
+        if (count($host_chunks) == 2) {
+            [$hostname, $port] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+            $host_arg .= ' --port ' . escapeshellarg($port);
+        } else {
+            [$hostname] = $host_chunks;
+            $host_arg .= ' --host ' . escapeshellarg($hostname);
+        }
+        self::shellExec(
+            ('python3 ' .
+            dirname(__DIR__, 2) . '/stuff/pipelines/client_contest.py' .
+             ' --verbose ' .
+             ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
+             $host_arg .
+             ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+             ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+             ' --password ' . escapeshellarg(OMEGAUP_DB_PASS) .
+             ' --test')
         );
     }
 

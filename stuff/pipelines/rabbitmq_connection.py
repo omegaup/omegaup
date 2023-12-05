@@ -7,12 +7,13 @@ import contextlib
 from typing import Iterator
 
 import argparse
+import logging
 import pika
 
 
 @contextlib.contextmanager
 def connect(
-        *, username: str, password: str, host: str
+        *, username: str, password: str, host: str, for_testing: bool = False
 ) -> Iterator[pika.adapters.blocking_connection.BlockingChannel]:
     '''Connects to rabbitmq with the arguments provided.'''
     connection = pika.BlockingConnection(pika.ConnectionParameters(
@@ -33,7 +34,10 @@ def connect(
     try:
         yield channel
     finally:
-        connection.close()
+        if not for_testing:
+            connection.close()
+        else:
+            logging.info('Avoiding close the connection for testing purposes')
 
 
 def configure_parser(parser: argparse.ArgumentParser) -> None:

@@ -33,6 +33,9 @@ def main() -> None:
     lib.logs.configure_parser(parser)
     rabbitmq_connection.configure_parser(parser)
 
+    parser.add_argument('--test', action='store_true')
+    parser.add_argument('--no-test', dest='test', action='store_false')
+
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
     logging.info('Started')
@@ -41,9 +44,13 @@ def main() -> None:
         with rabbitmq_connection.connect(
                 username=args.rabbitmq_username,
                 password=args.rabbitmq_password,
-                host=args.rabbitmq_host
+                host=args.rabbitmq_host,
+                for_testing=args.test
         ) as channel:
-            callback = contest_callback.ContestsCallback(dbconn=dbconn.conn)
+            callback = contest_callback.ContestsCallback(
+                dbconn=dbconn.conn,
+                for_testing=args.test
+            )
             rabbitmq_client.receive_messages(queue='contest',
                                              exchange='certificates',
                                              routing_key='ContestQueue',
