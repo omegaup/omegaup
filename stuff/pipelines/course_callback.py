@@ -6,15 +6,14 @@ import dataclasses
 import json
 import logging
 
-import omegaup.api
-
-from typing import List, Optional
+from typing import Dict, List, Optional
 from mysql.connector import errors
 from mysql.connector import errorcode
 import mysql.connector
 import mysql.connector.cursor
 import pika
 
+import database.course
 import verification_code
 
 
@@ -33,16 +32,15 @@ class CourseCertificate:
     alias: str
     course_id: int
     minimum_progress_for_certificate: int
+    progress: List[Dict[str, str]]
 
 
 class CourseCallback:
     '''Courses callback'''
     def __init__(self,
-                 dbconn: mysql.connector.MySQLConnection,
-                 client: omegaup.api.Client):
+                 dbconn: mysql.connector.MySQLConnection):
         '''Constructor for course callback'''
         self.dbconn = dbconn
-        self.client = client
 
     def __call__(self,
                  _channel: pika.adapters.blocking_connection.BlockingChannel,
@@ -50,18 +48,16 @@ class CourseCallback:
                  _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
         '''Function to store the certificates by a given course'''
+        response = json.loads(body)
+
+        students_progress = []
+        for student_progress in response['progress']:
+            students_progress.append(
+                database.course.Progress(**student_progress))
         data = CourseCertificate(**json.loads(body))
-
-        result = self.client.course.studentsProgress(
-            course=data.alias,
-            length=100,
-            page=1
-        )
-        progress = result.progress
-
         certificates: List[Certificate] = []
 
-        for user in progress:
+        for user in response['progress']:
             minimum_progress = data.minimum_progress_for_certificate
             if user.courseProgress < minimum_progress:
                 continue
@@ -101,6 +97,12 @@ class CourseCallback:
                     self.dbconn.rollback()
                     if err.errno != errorcode.ER_DUP_ENTRY:
                         raise
+                    if err.msg.find('Certificates.course_identity_key') > 0:
+                        logging.exception(
+                            'At least one certificate for this course is '
+                            'duplicated'
+                        )
+                        break
                     for certificate in certificates:
                         certificate.verification_code = generate_course_code()
                     logging.exception(
@@ -109,6 +111,7 @@ class CourseCallback:
 
 
 def generate_course_code() -> str:
+    '''Generates a random verification code.'''
     return verification_code.generate_code()
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

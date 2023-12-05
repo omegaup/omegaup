@@ -13,9 +13,9 @@ import time
 
 from typing import Set
 
-import omegaup.api
-
 import course_callback
+import database.course
+import omegaup.api
 import rabbitmq_connection
 import test_constants
 import test_credentials
@@ -43,11 +43,11 @@ def test_insert_course_certificate() -> None:
         name=course_alias,
         alias=course_alias,
         description='Test course',
-        start_time=time.mktime(current_time.timetuple()),
-        finish_time=time.mktime(future_time.timetuple()),
+        start_time=int(time.mktime(current_time.timetuple())),
+        finish_time=int(time.mktime(future_time.timetuple())),
         objective='Testing',
         level='intermediate',
-        show_scoreboard=1,
+        show_scoreboard=True,
         requests_user_information='no',
     )
 
@@ -61,7 +61,7 @@ def test_insert_course_certificate() -> None:
         finish_time=time.mktime(future_time.timetuple()),
     )
 
-    assignmentDetails = client.course.assignmentDetails(
+    assignment_details = client.course.assignmentDetails(
         course=course_alias,
         assignment=assignment_alias)
 
@@ -83,8 +83,8 @@ def test_insert_course_certificate() -> None:
                                  statement_type='accept_teacher',
                                  accept_teacher=False)
         client.run.create(
-            problemset_id=assignmentDetails.problemset_id,
-            contest_alias='', # Fix the API in order to make optional this param
+            problemset_id=assignment_details.problemset_id,
+            contest_alias='',  # This param should be optional
             problem_alias='sumas',
             language='py3',
             source='print(1)',
@@ -115,19 +115,28 @@ def test_insert_course_certificate() -> None:
         result = cur.fetchone()
 
     course_id = result['course_id']
+    progress = []
+
+    result = client.course.studentsProgress(
+        course=course_alias,
+        length=1000,
+        page=1
+    )
+    for student_progress in result.progress:
+        progress.append(database.course.Progress(
+            username=student_progress.username,
+            progress=f'{student_progress.courseProgress}')._asdict())
     with rabbitmq_connection.connect(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,
     ) as channel:
-        callback = course_callback.CourseCallback(
-            dbconn=dbconn.conn,
-            client=client,
-        )
+        callback = course_callback.CourseCallback(dbconn=dbconn.conn)
         body = course_callback.CourseCertificate(
             course_id=course_id,
-            minimum_progress_for_certificate=50, # setting an arbitrary value
+            minimum_progress_for_certificate=50,  # setting an arbitrary value
             alias=course_alias,
+            progress=progress,
         )
         callback(
             _channel=channel,

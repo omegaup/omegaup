@@ -35,11 +35,11 @@ def test_get_courses_information() -> None:
         name=course_alias,
         alias=course_alias,
         description='Test course',
-        start_time=time.mktime(past_time.timetuple()),
-        finish_time=time.mktime(current_time.timetuple()),
+        start_time=int(time.mktime(past_time.timetuple())),
+        finish_time=int(time.mktime(current_time.timetuple())),
         objective='Testing',
         level='intermediate',
-        show_scoreboard=1,
+        show_scoreboard=True,
         requests_user_information='no',
     )
 
@@ -59,6 +59,8 @@ def test_get_courses_information() -> None:
             cur=cur,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT,
+            certificates=[],
+            client=client,
         )
 
         assert course_alias in [course.alias for course in courses]
