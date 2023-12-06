@@ -230,10 +230,29 @@ describe('RunsForCourses.vue', () => {
     });
 
     const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
+
     expect(paginationComponent.exists()).toBe(true);
 
     expect(paginationComponent.vm.$data.localNumberOfPages).toBe(10);
     expect(paginationComponent.vm.$data.currentPage).toBe(1);
+
+    const pageSlotContent = wrapper.find('[data-page]').text();
+
+    expect(pageSlotContent).toContain('1 - 10');
+  });
+
+  it('Should handle paginator in admin view with no runs', async () => {
+    const wrapper = mount(arena_RunsForCourses, {
+      propsData: {
+        contestAlias: 'contest',
+        showFilters: true,
+        showUser: true,
+        itemsPerPage: 1,
+      },
+    });
+
+    const pageSlotContent = wrapper.find('[data-page]').text();
+    expect(pageSlotContent).toContain('1 - 1');
   });
 
   it('Should handle username filter', async () => {

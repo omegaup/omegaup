@@ -26,7 +26,7 @@
             @page-click="onPageClick"
           >
             <template #page="{ page, active }">
-              <b v-if="active">{{ page }} - {{ totalPages }}</b>
+              <b v-if="active" data-page>{{ page }} - {{ totalPages }}</b>
               <i v-else>{{ page }}</i>
             </template>
           </b-pagination>
