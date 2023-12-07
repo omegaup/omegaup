@@ -39,12 +39,17 @@ class ContestCertificate:
 
 class ContestsCallback:
     '''Contests callback'''
-    def __init__(self, dbconn: mysql.connector.MySQLConnection):
+    def __init__(
+        self,
+        dbconn: mysql.connector.MySQLConnection,
+        for_testing: bool = False
+    ):
         '''Constructor for contest callback'''
         self.dbconn = dbconn
+        self.for_testing = for_testing
 
     def __call__(self,
-                 _channel: pika.adapters.blocking_connection.BlockingChannel,
+                 channel: pika.adapters.blocking_connection.BlockingChannel,
                  _method: Optional[pika.spec.Basic.Deliver],
                  _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
@@ -173,6 +178,12 @@ class ContestsCallback:
                 self.dbconn.commit()
             except:  # noqa: bare-except
                 logging.exception('Failed to update the certificate status')
+
+        if self.for_testing:
+            logging.info(
+                'Closing the connection for testing purposes'
+            )
+            channel.connection.close()
 
 
 def generate_contest_code() -> str:
