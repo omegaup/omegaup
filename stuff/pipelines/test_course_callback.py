@@ -117,12 +117,12 @@ def test_insert_course_certificate() -> None:
     course_id = result['course_id']
     progress = []
 
-    result = client.course.studentsProgress(
+    students_progress = client.course.studentsProgress(
         course=course_alias,
         length=1000,
         page=1
     )
-    for student_progress in result.progress:
+    for student_progress in students_progress.progress:
         progress.append(database.course.Progress(
             username=student_progress.username,
             progress=f'{student_progress.courseProgress}')._asdict())

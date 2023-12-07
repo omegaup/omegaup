@@ -91,8 +91,9 @@ def get_courses(
     data: List[CourseCertificate] = []
     students_progress = []
     for row in cur:
+        course_certificate = CourseCertificate(**row)
         result = client.course.studentsProgress(
-            course=row['alias'],
+            course=course_certificate.alias,
             length=1000,
             page=1
         )
