@@ -116,7 +116,7 @@ def test_insert_contest_certificate() -> None:
             ranking=ranking,
         )
         callback(
-            _channel=channel,
+            channel=channel,
             _method=None,
             _properties=None,
             body=json.dumps(dataclasses.asdict(body)).encode('utf-8')
