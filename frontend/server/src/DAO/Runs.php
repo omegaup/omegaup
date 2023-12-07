@@ -210,7 +210,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ?string $language,
         ?int $identityId,
         ?int $offset = 0,
-        ?int $rowCount = 100
+        ?int $rowCount = 100,
+        ?string $execution = null,
+        ?string $output = null,
     ): array {
         $where = [];
         $val = [];
@@ -243,6 +245,64 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             } else {
                 $where[] = 's.verdict = ?';
                 $val[] = $verdict;
+            }
+        } else {
+            if (!is_null($execution)) {
+                if ($execution === 'EXECUTION_INTERRUPTED') {
+                    $where[] = '(s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ?)';
+                    $val[] = 'ML';
+                    $val[] = 'MLE';
+                    $val[] = 'TLE';
+                    $val[] = 'OLE';
+                    $val[] = 'TO';
+                    $val[] = 'OL';
+                } elseif ($execution === 'EXECUTION_RUNTIME_ERROR') {
+                    $where[] = '(s.verdict = ? OR s.verdict = ?)';
+                    $val[] = 'RE';
+                    $val[] = 'RTE';
+                } elseif ($execution === 'EXECUTION_RUNTIME_FUNCTION_ERROR') {
+                    $where[] = '(s.verdict = ? OR s.verdict = ?)';
+                    $val[] = 'OF';
+                    $val[] = 'RFE';
+                } elseif ($execution === 'EXECUTION_COMPILATION_ERROR') {
+                    $where[] = 's.verdict = ?';
+                    $val[] = 'CE';
+                } elseif ($execution === 'EXECUTION_VALIDATOR_ERROR') {
+                    $where[] = 's.verdict = ?';
+                    $val[] = 'VE';
+                } elseif ($execution === 'EXECUTION_JUDGE_ERROR') {
+                    $where[] = 's.verdict = ?';
+                    $val[] = 'JE';
+                } else {
+                    $where[] = 's.verdict = ?';
+                    $val[] = 'AC';
+                }
+            }
+
+            if (!is_null($output)) {
+                if ($output === 'OUTPUT_INTERRUPTED') {
+                    $where[] = '(s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ?)';
+                    $val[] = 'JE';
+                    $val[] = 'VE';
+                    $val[] = 'CE';
+                    $val[] = 'FO';
+                    $val[] = 'RFE';
+                    $val[] = 'RE';
+                    $val[] = 'RTE';
+                    $val[] = 'MLE';
+                    $val[] = 'TLE';
+                } elseif ($output === 'OUTPUT_INCORRECT') {
+                    $where[] = '(s.verdict = ? OR s.verdict = ?)';
+                    $val[] = 'WA';
+                    $val[] = 'PA';
+                } elseif ($output === 'OUTPUT_EXCEEDED') {
+                    $where[] = '(s.verdict = ? OR s.verdict = ?)';
+                    $val[] = 'OLE';
+                    $val[] = 'OL';
+                } else {
+                    $where[] = 's.verdict = ?';
+                    $val[] = 'AC';
+                }
             }
         }
 

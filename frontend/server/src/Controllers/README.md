@@ -3201,8 +3201,10 @@ Entry point for Problem runs API
 
 | Name            | Type           | Description |
 | --------------- | -------------- | ----------- |
+| `execution`     | `null\|string` |             |
 | `language`      | `null\|string` |             |
 | `offset`        | `int\|null`    |             |
+| `output`        | `null\|string` |             |
 | `problem_alias` | `null\|string` |             |
 | `rowcount`      | `int\|null`    |             |
 | `show_all`      | `bool\|null`   |             |

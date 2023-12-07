@@ -92,6 +92,23 @@ class Run extends \OmegaUp\Controllers\Controller {
         'NO-AC',
     ];
 
+    public const EXECUTION = [
+        'EXECUTION_INTERRUPTED',
+        'EXECUTION_FINISHED',
+        'EXECUTION_RUNTIME_ERROR',
+        'EXECUTION_RUNTIME_FUNCTION_ERROR',
+        'EXECUTION_COMPILATION_ERROR',
+        'EXECUTION_VALIDATOR_ERROR',
+        'EXECUTION_JUDGE_ERROR',
+    ];
+
+    public const OUTPUT = [
+        'OUTPUT_INTERRUPTED',
+        'OUTPUT_CORRECT',
+        'OUTPUT_INCORRECT',
+        'OUTPUT_EXCEEDED',
+    ];
+
     public const STATUS = ['new', 'waiting', 'compiling', 'running', 'ready'];
 
     /**
