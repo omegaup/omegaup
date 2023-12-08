@@ -46,7 +46,7 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Grade the run
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'AC');
 
         // Create request
         $login = self::login($courseData['admin']);
@@ -85,5 +85,47 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertSame($runData['request']['source'], $response['source']);
         $this->assertEmpty($response['feedback']); // Feedback should be empty
+
+        // Create a run for assignment
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $participant
+        );
+
+        // Grade the run
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'MLE');
+
+        // Create a run for assignment
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $participant
+        );
+
+        // Grade the run
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'TLE');
+
+        // Test execution filter
+        $response = \OmegaUp\Controllers\Course::apiRuns(new \OmegaUp\Request([
+            'course_alias' => $courseData['request']['course_alias'],
+            'assignment_alias' => $courseData['request']['alias'],
+            'auth_token' => $login->auth_token,
+            'execution' => 'EXECUTION_INTERRUPTED'
+        ]));
+
+        // Assert
+        $this->assertSame(2, count($response['runs']));
+
+        // Test output filter
+        $response = \OmegaUp\Controllers\Course::apiRuns(new \OmegaUp\Request([
+            'course_alias' => $courseData['request']['course_alias'],
+            'assignment_alias' => $courseData['request']['alias'],
+            'auth_token' => $login->auth_token,
+            'output' => 'OUTPUT_CORRECT'
+        ]));
+
+        // Assert
+        $this->assertSame(1, count($response['runs']));
     }
 }
