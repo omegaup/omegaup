@@ -13,25 +13,10 @@
         </tr>
       </thead>
       <tbody>
-        <!-- <tr v-for="(dependent, index) in dependents" :key="index">
+        <tr v-for="(dependent, index) in dependents" :key="index">
           <th scope="row" class="text-center">{{ index + 1 }}</th>
           <td class="text-center">
             {{ dependent.name }}
-            <br />
-            <span
-              v-if="userVerificationDeadline"
-              class="span-alert font-italic d-block p-1 mt-1 text-light"
-              :class="bannerColor"
-            >
-              {{ dependentsStatusMessage }}
-            </span>
-          </td>
-        </tr> -->
-
-        <tr>
-          <th scope="row" class="text-center">1</th>
-          <td class="text-center">
-            Dependiente 1
             <br />
             <span
               v-if="userVerificationDeadline"
