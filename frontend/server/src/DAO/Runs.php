@@ -249,7 +249,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         } else {
             if (!is_null($execution)) {
                 if ($execution === 'EXECUTION_INTERRUPTED') {
-                    $where[] = '(s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ?)';
+                    $where[] = 's.verdict IN(?, ?, ?, ?, ?, ?)';
                     $val[] = 'ML';
                     $val[] = 'MLE';
                     $val[] = 'TLE';
@@ -257,11 +257,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     $val[] = 'TO';
                     $val[] = 'OL';
                 } elseif ($execution === 'EXECUTION_RUNTIME_ERROR') {
-                    $where[] = '(s.verdict = ? OR s.verdict = ?)';
+                    $where[] = 's.verdict IN(?, ?)';
                     $val[] = 'RE';
                     $val[] = 'RTE';
                 } elseif ($execution === 'EXECUTION_RUNTIME_FUNCTION_ERROR') {
-                    $where[] = '(s.verdict = ? OR s.verdict = ?)';
+                    $where[] = 's.verdict IN(?, ?)';
                     $val[] = 'OF';
                     $val[] = 'RFE';
                 } elseif ($execution === 'EXECUTION_COMPILATION_ERROR') {
@@ -274,7 +274,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     $where[] = 's.verdict = ?';
                     $val[] = 'JE';
                 } else {
-                    $where[] = '(s.verdict = ? OR s.verdict = ? OR s.verdict = ?)';
+                    $where[] = 's.verdict IN(?, ?, ?)';
                     $val[] = 'AC';
                     $val[] = 'WA';
                     $val[] = 'PA';
@@ -283,7 +283,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
 
             if (!is_null($output)) {
                 if ($output === 'OUTPUT_INTERRUPTED') {
-                    $where[] = '(s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ? OR s.verdict = ?)';
+                    $where[] = 's.verdict IN(?, ?, ?, ?, ?, ?, ?, ?, ?)';
                     $val[] = 'JE';
                     $val[] = 'VE';
                     $val[] = 'CE';
@@ -294,11 +294,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     $val[] = 'MLE';
                     $val[] = 'TLE';
                 } elseif ($output === 'OUTPUT_INCORRECT') {
-                    $where[] = '(s.verdict = ? OR s.verdict = ?)';
+                    $where[] = 's.verdict IN(?, ?)';
                     $val[] = 'WA';
                     $val[] = 'PA';
                 } elseif ($output === 'OUTPUT_EXCEEDED') {
-                    $where[] = '(s.verdict = ? OR s.verdict = ?)';
+                    $where[] = 's.verdict IN(?, ?)';
                     $val[] = 'OLE';
                     $val[] = 'OL';
                 } else {

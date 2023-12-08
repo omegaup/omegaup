@@ -122,13 +122,13 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
             $participant
         );
 
-        for ($i = 0; $i < count($verdicts); ++$i) {
+        foreach ($verdicts as $verdictValue) {
             $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
                 $problemData,
                 $courseData,
                 $participant
             );
-            \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, $verdicts[$i]);
+            \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, $verdictValue);
         }
 
         $login = self::login($courseData['admin']);
@@ -187,13 +187,13 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
             $participant
         );
 
-        for ($i = 0; $i < count($outputs); ++$i) {
+        foreach ($outputs as $outputValue) {
             $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
                 $problemData,
                 $courseData,
                 $participant
             );
-            \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, $outputs[$i]);
+            \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, $outputValue);
         }
 
         $login = self::login($courseData['admin']);
