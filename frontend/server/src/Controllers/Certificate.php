@@ -619,15 +619,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             return ['status' => 'error'];
         }
 
-        // get contest info
-        $contestExtraInformation = \OmegaUp\DAO\Contests::getByAliasWithExtraInformation(
-            $contest->alias
-        );
-
-        if (is_null($contestExtraInformation)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
-        }
-
         $certificateCutoff = $r->ensureOptionalInt('certificates_cutoff');
 
         // add certificates_cutoff value to the contest
@@ -636,6 +627,15 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
             // update contest with the new value
             \OmegaUp\DAO\Contests::update($contest);
+        }
+
+        // get contest info
+        $contestExtraInformation = \OmegaUp\DAO\Contests::getByAliasWithExtraInformation(
+            $contest->alias
+        );
+
+        if (is_null($contestExtraInformation)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
         // set RabbitMQ client parameters

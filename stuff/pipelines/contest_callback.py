@@ -55,12 +55,14 @@ class ContestsCallback:
                  body: bytes) -> None:
         '''Function to store the certificates by a given contest'''
         response = json.loads(body)
-        data = ContestCertificate(**response)
+
         try:
             ranking = []
             for user_ranking in response['ranking']:
                 ranking.append(database.contest.Ranking(**user_ranking))
             response['ranking'] = ranking
+            data = ContestCertificate(**response)
+
             certificates: List[Certificate] = []
             usernames: List[str] = []
 
@@ -104,6 +106,7 @@ class ContestsCallback:
                                 'iconUrl': '/media/info.png',
                             },
                         })))
+
                 while True:
                     try:
                         cur.executemany('''
@@ -130,10 +133,10 @@ class ContestsCallback:
                                                 certificate
                                             ) for certificate in certificates])
                         cur.executemany(
-                          '''
-                          INSERT INTO
-                              Notifications (user_id, contents)
-                          VALUES (%s, %s)''', notifications)
+                            '''
+                            INSERT INTO
+                                Notifications (user_id, contents)
+                            VALUES (%s, %s)''', notifications)
                         self.dbconn.commit()
                         break
                     except errors.IntegrityError as err:
@@ -149,21 +152,21 @@ class ContestsCallback:
                             )
                             break
                         for index, cert in enumerate(certificates):
-                          cert.verification_code = generate_contest_code()
-                          user_id = notifications[index][0]
-                          notifications[index] = (user_id, json.dumps({
-                              'type': 'certificate',
-                              'body': {
-                                  'localizationString':
-                                      'notificationNewContestCertificate',
-                                  'localizationParams': {
-                                      'contest_title': contest_title,
-                                  },
-                                  'url': "/certificates/mine/#" +
-                                      cert.verification_code,
-                                  'iconUrl': '/media/info.png',
-                              },
-                          }))
+                            cert.verification_code = generate_contest_code()
+                            user_id = notifications[index][0]
+                            notifications[index] = (user_id, json.dumps({
+                                'type': 'certificate',
+                                'body': {
+                                    'localizationString':
+                                        'notificationNewContestCertificate',
+                                    'localizationParams': {
+                                        'contest_title': contest_title,
+                                    },
+                                    'url': "/certificates/mine/#" +
+                                        cert.verification_code,
+                                    'iconUrl': '/media/info.png',
+                                },
+                            }))
                         logging.exception(
                             'At least one of the verification codes had a '
                             'conflict'
@@ -188,6 +191,7 @@ class ContestsCallback:
                     'Closing the connection for testing purposes'
                 )
                 channel.connection.close()
+
         except:  # noqa: bare-except
             with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
                 cur.execute('''
@@ -197,7 +201,7 @@ class ContestsCallback:
                         `certificates_status` = 'retryable_error'
                     WHERE
                         `contest_id` = %s;
-                    ''', (data.contest_id,))
+                    ''', (response['contest_id'],))
                 self.dbconn.commit()
 
 
