@@ -849,6 +849,7 @@ notificationCourseRegistrationRequest = "**%(username)** has requested access to
 notificationCourseRequestFeedback = "**%(username)** has requested feedback to the assignment %(assignmentName) in the course %(courseName)"
 notificationCourseSubmissionFeedback = "The feedback about your submission for problem *%(problemAlias)* of the course %(courseName), has been submitted."
 notificationNewBadge = "You have received a new badge: **%(badgeName)**."
+notificationNewContestCertificate = "Congratulations! You have received a certificate for your recent achievement in the \"%(contest_title)\" contest. Click to download it."
 notificationNotFound = "Notification not found"
 notificationsMarkAllAsRead = "Mark all as read"
 notificationsNoNewNotifications = "No new notifications."

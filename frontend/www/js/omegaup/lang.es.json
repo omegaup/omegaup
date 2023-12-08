@@ -850,6 +850,7 @@
 	"notificationCourseRequestFeedback": "**%(username)** ha solicitado retroalimentacion en la asignacion %(assignmentName) del curso %(courseName)",
 	"notificationCourseSubmissionFeedback": "Ha sido enviada la retroalimentaci\u00f3n sobre su env\u00edo para el problema *%(problemAlias)* en el curso %(courseName).",
 	"notificationNewBadge": "Has recibido una nueva insignia: **%(badgeName)**.",
+	"notificationNewContestCertificate": "\u00a1Felicidades! Has recibido un diploma por tu reciente logro en el concurso \"%(contest_title)\". Haz clic para descargarlo.",
 	"notificationNotFound": "No se encontr\u00f3 la notificaci\u00f3n",
 	"notificationsMarkAllAsRead": "Marcar todo como le\u00eddo",
 	"notificationsNoNewNotifications": "No hay nuevas notificaciones.",
