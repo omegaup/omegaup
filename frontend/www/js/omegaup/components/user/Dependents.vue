@@ -13,23 +13,34 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(dependent, index) in dependents" :key="index">
+        <!-- <tr v-for="(dependent, index) in dependents" :key="index">
           <th scope="row" class="text-center">{{ index + 1 }}</th>
-          <td class="text-center" :class="bannerColor">
+          <td class="text-center">
             {{ dependent.name }}
             <br />
             <span
               v-if="userVerificationDeadline"
-              class="span-alert font-italic"
+              class="span-alert font-italic d-block p-1 mt-1 text-light"
+              :class="bannerColor"
             >
-              {{
-                daysUntilVerificationDeadline > 1
-                  ? ui.formatString(T.dependentsMessage, {
-                      days: daysUntilVerificationDeadline,
-                    })
-                  : T.dependentsRedMessage
-              }}
+              {{ dependentsStatusMessage }}
             </span>
+          </td>
+        </tr> -->
+
+        <tr>
+          <th scope="row" class="text-center">1</th>
+          <td class="text-center">
+            Dependiente 1
+            <br />
+            <span
+              v-if="userVerificationDeadline"
+              class="font-italic d-block p-1 mt-1 text-light"
+              :class="bannerColor"
+              ><small>
+                {{ dependentsStatusMessage }}
+              </small></span
+            >
           </td>
         </tr>
       </tbody>
@@ -51,15 +62,6 @@ export default class UserDependents extends Vue {
   T = T;
   ui = ui;
 
-  get bannerColor() {
-    const today = new Date();
-    const deadline = new Date(this.userVerificationDeadline as Date);
-    if (deadline.toDateString() === today.toDateString()) {
-      return 'bg-danger';
-    }
-    return 'bg-warning';
-  }
-
   get daysUntilVerificationDeadline(): number | null {
     if (!this.userVerificationDeadline) {
       return null;
@@ -70,13 +72,36 @@ export default class UserDependents extends Vue {
     const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
     return daysDifference;
   }
+
+  get bannerColor(): string {
+    if (this.daysUntilVerificationDeadline !== null) {
+      if (this.daysUntilVerificationDeadline > 7) {
+        return 'bg-secondary';
+      }
+      if (this.daysUntilVerificationDeadline <= 1) {
+        return 'bg-danger';
+      }
+    }
+    return 'bg-warning';
+  }
+
+  get dependentsStatusMessage(): string {
+    if (this.daysUntilVerificationDeadline !== null) {
+      if (this.daysUntilVerificationDeadline > 7) {
+        return ui.formatString(T.dependentsBlockedMessage, {
+          days: this.daysUntilVerificationDeadline,
+        });
+      }
+      if (
+        this.daysUntilVerificationDeadline > 1 &&
+        this.daysUntilVerificationDeadline <= 7
+      ) {
+        return ui.formatString(T.dependentsMessage, {
+          days: this.daysUntilVerificationDeadline,
+        });
+      }
+    }
+    return T.dependentsRedMessage;
+  }
 }
 </script>
-
-<style lang="scss">
-@import '../../../../sass/main.scss';
-
-.span-alert {
-  font-size: 0.9rem;
-}
-</style>
