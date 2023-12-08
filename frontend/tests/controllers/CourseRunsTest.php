@@ -1,5 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of CourseRunsTest
@@ -30,7 +29,7 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our participant
-        ['user' => $user, 'identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add student to course
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
@@ -115,7 +114,7 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our participant
-        ['user' => $user, 'identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add student to course
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
@@ -180,7 +179,7 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our participant
-        ['user' => $user, 'identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add student to course
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
