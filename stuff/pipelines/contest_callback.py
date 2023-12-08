@@ -162,7 +162,7 @@ class ContestsCallback:
                                     'localizationParams': {
                                         'contest_title': contest_title,
                                     },
-                                    'url': "/certificates/mine/#" +
+                                    'url': '/certificates/mine/#' +
                                         cert.verification_code,
                                     'iconUrl': '/media/info.png',
                                 },
