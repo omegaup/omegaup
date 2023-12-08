@@ -643,6 +643,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         $coursePoints = 0.0;
         $assignmentsProblems = [];
+        $initialAssignmentsProblems = [];
         /** @var list<array{assignment_alias: string, assignment_name: string, assignment_order: int, is_extra_problem: bool, problem_alias: string, problem_order: int, problem_points: float, problem_title: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sqlAssignmentsProblems,
@@ -673,6 +674,15 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 'isExtraProblem' => $row['is_extra_problem'],
                 'points' => $row['problem_points'],
                 'order' => $row['problem_order'],
+            ];
+            $initialAssignmentsProblems[$row['assignment_alias']] = [
+                'score' => 0.0,
+                'progress' => 0.0,
+                'problems' => [],
+            ];
+            $initialAssignmentsProblems[$row['assignment_alias']]['problems'][$row['problem_alias']] = [
+                'score' => 0.0,
+                'progress' => 0.0,
             ];
         }
 
@@ -798,7 +808,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     'classname' => $row['classname'],
                     'courseScore' => 0.0,
                     'courseProgress' => 0.0,
-                    'assignments' => [],
+                    'assignments' => $initialAssignmentsProblems,
                 ];
             }
 
@@ -810,18 +820,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 100,
                 $studentsProgress[$username]['courseProgress']
             );
-
-            if (
-                !isset(
-                    $studentsProgress[$username]['assignments'][$assignmentAlias]
-                )
-            ) {
-                $studentsProgress[$username]['assignments'][$assignmentAlias] = [
-                    'score' => 0.0,
-                    'progress' => 0.0,
-                    'problems' => [],
-                ];
-            }
 
             // Assignment score considers the extra problems.
             $studentsProgress[$username]['assignments'][$assignmentAlias]['score'] += $problemScore;
@@ -848,7 +846,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 'classname' => $user['classname'],
                 'courseScore' => 0.0,
                 'courseProgress' => 0.0,
-                'assignments' => [],
+                'assignments' => $initialAssignmentsProblems,
             ];
         }
 

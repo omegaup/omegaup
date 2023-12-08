@@ -59,7 +59,7 @@ class CourseCallback:
 
         for user in response['progress']:
             minimum_progress = data.minimum_progress_for_certificate
-            if user.courseProgress < minimum_progress:
+            if int(user['progress']) < minimum_progress:
                 continue
             certificates.append(Certificate(
                 certificate_type='course',
@@ -68,6 +68,8 @@ class CourseCallback:
                 username=str(user.username),
             ))
         with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
+            if len(certificates) == 0:
+                return
             while True:
                 try:
                     cur.execute('''
