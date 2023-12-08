@@ -274,8 +274,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     $where[] = 's.verdict = ?';
                     $val[] = 'JE';
                 } else {
-                    $where[] = 's.verdict = ?';
+                    $where[] = '(s.verdict = ? OR s.verdict = ? OR s.verdict = ?)';
                     $val[] = 'AC';
+                    $val[] = 'WA';
+                    $val[] = 'PA';
                 }
             }
 
