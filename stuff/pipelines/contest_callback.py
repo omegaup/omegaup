@@ -92,14 +92,14 @@ class ContestsCallback:
             for index, user_id in enumerate(users_ids):
                 notifications.append(
                     (user_id, json.dumps({
-                        'type': 'certificate',
+                        'type': 'certificate-awarded',
                         'body': {
                             'localizationString':
                                 'notificationNewContestCertificate',
                             'localizationParams': {
                                 'contest_title': contest_title,
                             },
-                            'url': "/certificates/mine/#" +
+                            'url': '/certificates/mine/#' +
                                 certificates[index].verification_code,
                             'iconUrl': '/media/info.png',
                         },

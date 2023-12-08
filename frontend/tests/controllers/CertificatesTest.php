@@ -4,18 +4,23 @@
  */
 class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
     /**
-     * Generate certificates in a contest
+     * @param  int     $numOfIdentities
+     * @param  int     $numOfProblems
+     * @param  string  $admissionMode
+     * @param  int     $certificatesCutoff
+     * @param  array   $submissions
+     * @param  array   $places
      */
-    public function testGenerateContestCertificates() {
+    private function createContestCertificates(
+        int $numOfIdentities,
+        int $numOfProblems,
+        string $admissionMode,
+        int $certificatesCutoff,
+        array $submissions,
+        array $places
+    ) {
         //Create the certificate generator
         ['identity' => $certificateGenerator] = \OmegaUp\Test\Factories\User::createUser();
-
-        //Create contestants
-        $identities = [];
-        $numOfIdentities = 8;
-        foreach (range(0, $numOfIdentities - 1) as $index) {
-            ['identity' => $identities[$index]] = \OmegaUp\Test\Factories\User::createUser();
-        }
 
         $loginIdentity = self::login($certificateGenerator);
 
@@ -32,7 +37,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $timeFuture =  new \OmegaUp\Timestamp($currentTime + 60 * 60);
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
-                'admissionMode' => 'public',
+                'admissionMode' => $admissionMode,
                 'startTime' => $timePast,
                 'finishTime' => $timeFuture,
             ])
@@ -45,7 +50,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
 
         //Create and add problems to the contest
         $problems = [];
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < $numOfProblems; $i++) {
             $problems[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
 
             \OmegaUp\Test\Factories\Contest::addProblemToContest(
@@ -54,18 +59,18 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
-        //Associate the identity index with
-        //the problem indexes they are going to send
-        $submissions = [
-            0 => ['problems' => [0, 1, 2, 3, 4]],
-            1 => ['problems' => [1]],
-            2 => ['problems' => [0, 1, 2, 3]],
-            3 => ['problems' => [2]],
-            4 => ['problems' => [3]],
-            5 => ['problems' => [0]],
-            6 => ['problems' => [0, 1]],
-            7 => ['problems' => [0, 1, 2]],
-        ];
+        //Create contestants and add them to the contest
+        $identities = [];
+        $placesWithIdentityId = [];
+        foreach (range(0, $numOfIdentities - 1) as $index) {
+            ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+            $identities[$index] = $identity;
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $contestData,
+                $identity
+            );
+            $placesWithIdentityId[$identity->identity_id] = $places[$index];
+        }
 
         //Send submissions
         foreach ($submissions as $identityIndex => $problemsOfIdentity) {
@@ -79,17 +84,14 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
 
-        //Finish the contest to generate certificates
-        $contestData['contest']->finish_time = \OmegaUp\Time::get() - 1;
-        \OmegaUp\DAO\Contests::update($contestData['contest']);
+        // Now, the contest has finished, and we can generate the certificates
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + (2 * 60 * 60));
 
         \OmegaUp\Test\Utils::runInitializeRabbitmq(
             queue: 'contest',
             exchange: 'certificates',
             routingKey: 'ContestQueue'
         );
-
-        $certificatesCutoff = 4;
 
         //Send the message to RabbitMQ using the API
         $response = \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
@@ -105,10 +107,12 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $contest = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
-        $this->assertEquals(4, $contest->certificate_cutoff);
+        $this->assertEquals($certificatesCutoff, $contest->certificate_cutoff);
 
         $certificates = \OmegaUp\DAO\Certificates::getAll();
         $this->assertCount(0, $certificates);
+        $notifications = \OmegaUp\DAO\Notifications::getAll();
+        $this->assertCount(0, $notifications);
 
         //Adds the certificates only for one contest to the database,
         //so it must be called after each successful call to the API
@@ -117,6 +121,122 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $certificates = \OmegaUp\DAO\Certificates::getAll();
         //Should add one certificate per contestant
         $this->assertCount($numOfIdentities, $certificates);
+
+        $notifications = \OmegaUp\DAO\Notifications::getAll();
+        //Should add one notification per contestant
+        $this->assertCount($numOfIdentities, $notifications);
+
+        //Check the certificates data
+        $verificationCodes = [];
+        foreach ($certificates as $certificate) {
+            $this->assertSame(
+                $placesWithIdentityId[$certificate->identity_id],
+                $certificate->contest_place
+            );
+            $this->assertSame('contest', $certificate->certificate_type);
+            $this->assertSame(
+                $contestData['contest']->contest_id,
+                $certificate->contest_id
+            );
+
+            $identity = \OmegaUp\DAO\Identities::getByPK(
+                $certificate->identity_id
+            );
+            $verificationCodes[$identity->user_id] = $certificate->verification_code;
+        }
+
+        //Check the notifications data
+        foreach ($notifications as $notification) {
+            $contents = json_decode($notification->contents, true);
+            $this->assertSame(
+                \OmegaUp\DAO\Notifications::CERTIFICATE_AWARDED,
+                $contents['type']
+            );
+            $this->assertEquals(
+                'notificationNewContestCertificate',
+                $contents['body']['localizationString']
+            );
+            $this->assertEquals(
+                $contestData['contest']->title,
+                $contents['body']['localizationParams']['contest_title']
+            );
+            $this->assertEquals(
+                "/certificates/mine/#{$verificationCodes[$notification->user_id]}",
+                $contents['body']['url']
+            );
+        }
+    }
+
+    /**
+     * Generate certificates in a public contest
+     */
+    public function testGeneratePublicContestCertificates() {
+        //Associate the identity index with
+        //the problem indexes they are going to send
+        $submissions = [
+            0 => ['problems' => [0, 1, 2, 3, 4]],
+            1 => ['problems' => [1]],
+            2 => ['problems' => [0, 1, 2, 3]],
+            3 => ['problems' => [2]],
+            4 => ['problems' => [3]],
+            5 => ['problems' => [0]],
+            6 => ['problems' => [0, 1]],
+            7 => ['problems' => [0, 1, 2]],
+        ];
+
+        $places = [
+            0 => 1,
+            1 => null,
+            2 => 2,
+            3 => null,
+            4 => null,
+            5 => null,
+            6 => 4,
+            7 => 3,
+        ];
+
+        $this->createContestCertificates(
+            numOfIdentities: 8,
+            numOfProblems: 5,
+            admissionMode: 'public',
+            certificatesCutoff: 4,
+            submissions: $submissions,
+            places: $places
+        );
+    }
+
+    /**
+     * Generate certificates in a private contest
+     */
+    public function testGeneratePrivateContestCertificates() {
+        //Associate the identity index with
+        //the problem indexes they are going to send
+        $submissions = [
+            0 => ['problems' => [0, 1, 2, 3, 4, 5]],
+            1 => ['problems' => [1]],
+            2 => ['problems' => [0, 1, 2, 3]],
+            3 => ['problems' => [3]],
+            4 => ['problems' => [0, 1]],
+            5 => ['problems' => [0, 1, 2]],
+        ];
+
+        $places = [
+            0 => 1,
+            1 => null,
+            2 => 2,
+            3 => null,
+            4 => null,
+            5 => 3,
+        ];
+
+        $this->createContestCertificates(
+            numOfIdentities: 6,
+            numOfProblems: 6,
+            admissionMode: 'private',
+            certificatesCutoff: 3,
+            submissions: $submissions,
+            places: $places
+        );
     }
 
     /**

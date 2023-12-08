@@ -147,7 +147,7 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
         $contestTitle = 'Test';
         $verificationCodes = ['AG8XOPS89L', 'H5J8K9K8K2', 'PF2Y9SPE25', 'EOR5KF9F0L', 'FIR93E22E5'];
 
-        $notifications = \OmegaUp\DAO\Base\Notifications::getAll();
+        $notifications = \OmegaUp\DAO\Notifications::getAll();
         $this->assertCount(0, $notifications);
 
         \OmegaUp\Controllers\Notification::createNotificationsForNewContestCertificates(
@@ -155,7 +155,7 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
             $contestTitle,
             $verificationCodes
         );
-        $notifications = \OmegaUp\DAO\Base\Notifications::getAll();
+        $notifications = \OmegaUp\DAO\Notifications::getAll();
         $this->assertCount($n, $notifications);
     }
 }

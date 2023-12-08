@@ -25,7 +25,7 @@ class Notification extends \OmegaUp\Controllers\Controller {
                     'user_id' => $userId,
                     'contents' =>  json_encode(
                         [
-                            'type' => \OmegaUp\DAO\Notifications::CERTIFICATE,
+                            'type' => \OmegaUp\DAO\Notifications::CERTIFICATE_AWARDED,
                             'body' => [
                                 'localizationString' => new \OmegaUp\TranslationString(
                                     'notificationNewContestCertificate'
