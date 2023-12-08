@@ -155,7 +155,7 @@ class ContestsCallback:
                             cert.verification_code = generate_contest_code()
                             user_id = notifications[index][0]
                             notifications[index] = (user_id, json.dumps({
-                                'type': 'certificate',
+                                'type': 'certificate-awarded',
                                 'body': {
                                     'localizationString':
                                         'notificationNewContestCertificate',
