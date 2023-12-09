@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Tests for NotificationController
  */
@@ -114,7 +112,7 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testReadNotificationsForbbidenAccessException() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $user] = \OmegaUp\Test\Factories\User::createUser();
         $notification = new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(
@@ -136,5 +134,28 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
+    }
+
+    public function testCreateNotificationsForNewContestCertificates() {
+        $n = 5;
+        $users = [];
+        $usersIds = [];
+        for ($i = 0; $i < $n; $i++) {
+            ['user' => $users[$i]] = \OmegaUp\Test\Factories\User::createUser();
+            $usersIds[$i] = $users[$i]->user_id;
+        }
+        $contestTitle = 'Test';
+        $verificationCodes = ['AG8XOPS89L', 'H5J8K9K8K2', 'PF2Y9SPE25', 'EOR5KF9F0L', 'FIR93E22E5'];
+
+        $notifications = \OmegaUp\DAO\Notifications::getAll();
+        $this->assertCount(0, $notifications);
+
+        \OmegaUp\Controllers\Notification::createNotificationsForNewContestCertificates(
+            $usersIds,
+            $contestTitle,
+            $verificationCodes
+        );
+        $notifications = \OmegaUp\DAO\Notifications::getAll();
+        $this->assertCount($n, $notifications);
     }
 }

@@ -62,6 +62,7 @@ class ContestsCallback:
         response['ranking'] = ranking
         data = ContestCertificate(**response)
         certificates: List[Certificate] = []
+        usernames: List[str] = []
 
         for user_ranking in data.ranking:
             contest_place: Optional[int] = None
@@ -76,7 +77,34 @@ class ContestsCallback:
                 contest_place=contest_place,
                 username=user_ranking.username
             ))
+            usernames.append(user_ranking.username)
+
+        notifications = []
         with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
+            users_ids = database.contest.get_users_ids(
+                cur,
+                usernames
+            )
+            contest_title = database.contest.get_contest_title(
+                cur,
+                data.contest_id
+            )
+            for index, user_id in enumerate(users_ids):
+                notifications.append(
+                    (user_id, json.dumps({
+                        'type': 'certificate-awarded',
+                        'body': {
+                            'localizationString':
+                                'notificationNewContestCertificate',
+                            'localizationParams': {
+                                'contest_title': contest_title,
+                            },
+                            'url': '/certificates/mine/#' +
+                                certificates[index].verification_code,
+                            'iconUrl': '/media/info.png',
+                        },
+                    })))
+
             while True:
                 try:
                     cur.executemany('''
@@ -102,6 +130,11 @@ class ContestsCallback:
                                         dataclasses.astuple(
                                             certificate
                                         ) for certificate in certificates])
+                    cur.executemany(
+                        '''
+                        INSERT INTO
+                            Notifications (user_id, contents)
+                        VALUES (%s, %s)''', notifications)
                     self.dbconn.commit()
                     break
                 except errors.IntegrityError as err:
@@ -114,8 +147,22 @@ class ContestsCallback:
                             'duplicated'
                         )
                         break
-                    for certificate in certificates:
+                    for index, certificate in enumerate(certificates):
                         certificate.verification_code = generate_contest_code()
+                        user_id = notifications[index][0]
+                        notifications[index] = (user_id, json.dumps({
+                            'type': 'certificate',
+                            'body': {
+                                'localizationString':
+                                    'notificationNewContestCertificate',
+                                'localizationParams': {
+                                    'contest_title': contest_title,
+                                },
+                                'url': "/certificates/mine/#" +
+                                    certificate.verification_code,
+                                'iconUrl': '/media/info.png',
+                            },
+                        }))
                     logging.exception(
                         'At least one of the verification codes had a conflict'
                     )
