@@ -65,14 +65,17 @@ class CourseCallback:
                 certificate_type='course',
                 course_id=int(data.course_id),
                 verification_code=generate_course_code(),
-                username=str(user.username),
+                username=str(user['username']),
             ))
         with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
             if len(certificates) == 0:
                 return
             while True:
+                certificates_data = [
+                    dataclasses.astuple(
+                        certificate) for certificate in certificates]
                 try:
-                    cur.execute('''
+                    cur.executemany('''
                         INSERT INTO
                             `Certificates` (
                                 `identity_id`,
@@ -88,11 +91,7 @@ class CourseCallback:
                             `Identities`
                         WHERE
                             `username` = %s;
-                        ''',
-                                [
-                                    dataclasses.astuple(
-                                        certificate
-                                    ) for certificate in certificates])
+                        ''', certificates_data)
                     self.dbconn.commit()
                     break
                 except errors.IntegrityError as err:

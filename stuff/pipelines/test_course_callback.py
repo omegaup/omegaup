@@ -31,15 +31,15 @@ import lib.db   # pylint: disable=wrong-import-position
 def test_insert_course_certificate() -> None:
     '''Test get course participants'''
 
-    client = omegaup.api.Client(api_token=test_constants.API_TOKEN,
-                                url=test_constants.OMEGAUP_API_ENDPOINT)
+    client_admin = omegaup.api.Client(api_token=test_constants.API_TOKEN,
+                                      url=test_constants.OMEGAUP_API_ENDPOINT)
     current_time = datetime.datetime.now()
     future_time = current_time + datetime.timedelta(hours=5)
     course_alias = ''.join(random.choices(string.digits, k=8))
     assignment_alias = ''.join(random.choices(string.digits, k=8))
 
     # Creating a course with an assignment and then adding problem and users
-    client.course.create(
+    client_admin.course.create(
         name=course_alias,
         alias=course_alias,
         description='Test course',
@@ -51,7 +51,7 @@ def test_insert_course_certificate() -> None:
         requests_user_information='no',
     )
 
-    client.course.createAssignment(
+    client_admin.course.createAssignment(
         name=assignment_alias,
         alias=assignment_alias,
         course_alias=course_alias,
@@ -61,11 +61,11 @@ def test_insert_course_certificate() -> None:
         finish_time=time.mktime(future_time.timetuple()),
     )
 
-    assignment_details = client.course.assignmentDetails(
+    assignment_details = client_admin.course.assignmentDetails(
         course=course_alias,
         assignment=assignment_alias)
 
-    client.course.addProblem(
+    client_admin.course.addProblem(
         course_alias=course_alias,
         assignment_alias=assignment_alias,
         problem_alias='sumas',
@@ -75,14 +75,20 @@ def test_insert_course_certificate() -> None:
     usernames: Set[str] = set()
     for number in range(3):
         username = f'course_test_user_{number}'
-        client.course.addStudent(course_alias=course_alias,
-                                 usernameOrEmail=username,
-                                 share_user_information=True,
-                                 accept_teacher_git_object_id='0',
-                                 privacy_git_object_id='0',
-                                 statement_type='accept_teacher',
-                                 accept_teacher=False)
-        client.run.create(
+        client_admin.course.addStudent(course_alias=course_alias,
+                                       usernameOrEmail=username,
+                                       share_user_information=True,
+                                       accept_teacher_git_object_id='0',
+                                       privacy_git_object_id='0',
+                                       statement_type='accept_teacher',
+                                       accept_teacher=False)
+        client_user = omegaup.api.Client(
+            username=username,
+            password=username,
+            #  api_token=test_constants.API_TOKEN,
+            url=test_constants.OMEGAUP_API_ENDPOINT,
+        )
+        client_user.run.create(
             problemset_id=assignment_details.problemset_id,
             contest_alias='',  # This param should be optional
             problem_alias='sumas',
@@ -117,7 +123,7 @@ def test_insert_course_certificate() -> None:
     course_id = result['course_id']
     progress = []
 
-    students_progress = client.course.studentsProgress(
+    students_progress = client_admin.course.studentsProgress(
         course=course_alias,
         length=1000,
         page=1
