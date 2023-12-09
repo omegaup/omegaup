@@ -127,3 +127,38 @@ def get_contests(
         ranking = []
         data.append(contest)
     return data
+
+
+def get_users_ids(
+    cur: mysql.connector.cursor.MySQLCursorDict,
+    usernames: List[str]
+) -> List[int]:
+    '''Returns a list of ids of the contestants.'''
+    users_ids: List[int] = []
+    for username in usernames:
+        cur.execute('''
+            SELECT
+                user_id
+            FROM
+                Identities
+            WHERE
+                username = %s''', (username,))
+        result = cur.fetchone()
+        users_ids.append(result['user_id'])
+    return users_ids
+
+
+def get_contest_title(
+    cur: mysql.connector.cursor.MySQLCursorDict,
+    contest_id: int
+) -> str:
+    '''Returns the title of the contest.'''
+    cur.execute('''
+        SELECT
+            title
+        FROM
+            Contests
+        WHERE
+            contest_id = %s''', (contest_id,))
+    result = cur.fetchone()
+    return str(result['title'])
