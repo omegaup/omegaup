@@ -24,7 +24,12 @@
             :limit="1"
             hide-goto-end-buttons
             @page-click="onPageClick"
-          ></b-pagination>
+          >
+            <template #page="{ page, active }">
+              <b v-if="active" data-page>{{ page }} - {{ totalPages }}</b>
+              <i v-else>{{ page }}</i>
+            </template>
+          </b-pagination>
           <div class="filters row">
             <label class="col-3 col-sm pr-0 font-weight-bold">
               {{ T.wordsExecution }}
@@ -311,6 +316,10 @@
               </td>
               <td class="numeric">{{ execution(run) }}</td>
               <td class="numeric">
+                {{ output(run) }}
+                <br
+                  v-if="outputIconColorStatus(run) != NumericOutputStatus.None"
+                />
                 <font-awesome-icon
                   v-if="
                     outputIconColorStatus(run) === NumericOutputStatus.Correct
@@ -333,10 +342,6 @@
                   :icon="['fas', 'exclamation-circle']"
                   style="color: orange"
                 />
-                <br
-                  v-if="outputIconColorStatus(run) != NumericOutputStatus.None"
-                />
-                {{ output(run) }}
               </td>
               <td class="numeric">{{ memory(run) }}</td>
               <td class="numeric">{{ runtime(run) }}</td>
@@ -597,6 +602,13 @@ export default class Runs extends Vue {
     return this.totalRuns;
   }
 
+  get totalPages(): number {
+    if (this.totalRows > 0) {
+      return Math.ceil(this.totalRows / this.itemsPerPage);
+    }
+    return 1;
+  }
+
   onPageClick(bvEvent: any, page: number): void {
     if (page == this.currentPage - 1 || page == this.currentPage + 1) {
       if (this.currentPage + 1 == page) {
@@ -690,7 +702,7 @@ export default class Runs extends Vue {
     )
       return '—';
     if (run.status_memory === MemoryStatus.Exceeded)
-      return T.runDetailsMemoryExceeded;
+      return T.runDetailsExceeded;
     return `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
   }
 
