@@ -34,6 +34,8 @@ module.exports = {
     badge_details: './frontend/www/js/omegaup/badge/details.ts',
     badge_list: './frontend/www/js/omegaup/badge/list.ts',
     certificate_details: './frontend/www/js/omegaup/certificate/details.ts',
+    certificate_mine: './frontend/www/js/omegaup/certificate/mine.ts',
+    certificate_validation: './frontend/www/js/omegaup/certificate/validation.ts',
     coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.ts',
     common_footer: './frontend/www/js/omegaup/common/footer.ts',
     common_index: './frontend/www/js/omegaup/common/index.ts',
@@ -101,6 +103,7 @@ module.exports = {
     teams_group_edit: './frontend/www/js/omegaup/teamsgroup/edit.ts',
     teams_group_list: './frontend/www/js/omegaup/teamsgroup/list.ts',
     teams_group_new: './frontend/www/js/omegaup/teamsgroup/new.ts',
+    user_dependents: './frontend/www/js/omegaup/user/dependents.ts',
     user_edit_email_form: './frontend/www/js/omegaup/user/emailedit.ts',
     user_profile: './frontend/www/js/omegaup/user/profile.ts',
     user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.ts',
@@ -213,7 +216,7 @@ module.exports = {
       {
         test: /\.ts$/,
         loader: 'ts-loader',
-        exclude: /node_modules/,
+        exclude: [/node_modules/, /stories\.ts$/],
         options: {
           appendTsSuffixTo: [/\.vue$/],
           transpileOnly: true,

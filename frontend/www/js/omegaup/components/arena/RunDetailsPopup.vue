@@ -170,6 +170,12 @@
             <code v-text="data.judged_by"></code>
           </pre>
         </div>
+        <div>
+          <h3>{{ T.runGUID }}</h3>
+          <acronym :title="data.guid" data-run-guid>
+            <tt>{{ shortGuid }}</tt>
+          </acronym>
+        </div>
       </form>
     </div>
     <div v-else>
@@ -231,6 +237,10 @@ export default class ArenaRunDetailsPopup extends Vue {
 
   get source(): string | undefined {
     return this.data?.source;
+  }
+
+  get shortGuid(): string {
+    return this.data.guid.substring(0, 8);
   }
 
   toggle(group: string): void {
