@@ -155,6 +155,14 @@ class User extends \OmegaUp\Controllers\Controller {
                     'mailInUse'
                 );
             }
+            // Check if the email is already registered in the database and if,
+            // for any reason, it is not linked to any user or identity to avoid
+            // duplicate records.
+            if (\OmegaUp\DAO\Emails::existsByEmail($createUserParams->email)) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'mailFromUserLikelyRemoved'
+                );
+            }
         }
 
         if (!is_null($identity)) {
