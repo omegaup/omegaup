@@ -97,6 +97,8 @@ CREATE TABLE `Certificates` (
   `contest_place` int DEFAULT NULL COMMENT 'Se guarda el lugar en el que quedo un estudiante si es menor o igual a certificate_cutoff',
   PRIMARY KEY (`certificate_id`),
   UNIQUE KEY `verification_code` (`verification_code`),
+  UNIQUE KEY `contest_identity_key` (`identity_id`,`contest_id`,`certificate_type`),
+  UNIQUE KEY `course_identity_key` (`identity_id`,`course_id`,`certificate_type`),
   KEY `identity_id` (`identity_id`),
   KEY `course_id` (`course_id`),
   KEY `contest_id` (`contest_id`),

@@ -54,4 +54,19 @@ class Emails extends \OmegaUp\DAO\Base\Emails {
         /** @var null|string */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$userId]);
     }
+
+    final public static function existsByEmail(string $email): bool {
+        $sql = 'SELECT
+                    COUNT(*)
+                FROM
+                    `Emails`
+                WHERE
+                    (
+                        `email` = ?
+                    );';
+        $params = [$email];
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
+    }
 }
