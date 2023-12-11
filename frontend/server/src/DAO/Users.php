@@ -362,6 +362,18 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 $identity->identity_id,
             ];
             \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+            $sql = '
+                UPDATE
+                    `Emails`
+                SET
+                    `email` = ?
+                WHERE
+                    `user_id` = ?;';
+            $params = [
+                "deleted_user_{$randomString}@{$randomString}",
+                $identity->user_id,
+            ];
+            \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();

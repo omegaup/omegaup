@@ -40,7 +40,7 @@ def test_get_contests_information() -> None:
         window_length=0,
         scoreboard=100,
         points_decay_factor=0,
-        partial_score=True,
+        score_mode='partial',
         submissions_gap=1200,
         penalty=0,
         feedback='detailed',
@@ -67,6 +67,8 @@ def test_get_contests_information() -> None:
             cur=cur,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT,
+            certificates=[],
+            client=client,
         )
 
         assert alias in [contest.alias for contest in contests]
