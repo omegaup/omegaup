@@ -68,7 +68,7 @@ def test_insert_course_certificate() -> None:
     client_admin.course.addProblem(
         course_alias=course_alias,
         assignment_alias=assignment_alias,
-        problem_alias='sumas',
+        problem_alias='triangulos',
         points=1.0,
     )
 
