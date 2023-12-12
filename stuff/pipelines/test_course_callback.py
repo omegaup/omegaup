@@ -35,8 +35,9 @@ def test_insert_course_certificate() -> None:
                                       url=test_constants.OMEGAUP_API_ENDPOINT)
     current_time = datetime.datetime.now()
     future_time = current_time + datetime.timedelta(hours=5)
-    course_alias = ''.join(random.choices(string.digits, k=8))
-    assignment_alias = ''.join(random.choices(string.digits, k=8))
+    random_string = ''.join(random.choices(string.digits, k=4))
+    course_alias = f'course_{random_string}'
+    assignment_alias = f'assignment_{random_string}'
 
     # Creating a course with an assignment and then adding problem and users
     client_admin.course.create(
@@ -65,10 +66,27 @@ def test_insert_course_certificate() -> None:
         course=course_alias,
         assignment=assignment_alias)
 
+    problem_alias = 'problem_'.join(random.choices(string.digits, k=4))
+
+    file_path = '/opt/omegaup/frontend/tests/resources/testproblem.zip'
+
+    with open(file_path, "rb") as file:
+        files = {'testproblem.zip': file}
+
+        client_admin.problem.create(
+            problem_alias=problem_alias,
+            problem_level='problemLevelBasicIntroductionToProgramming',
+            selected_tags='[{"tagname":"problemTagQueues","public":true}]',
+            source='omegaUp',
+            title=problem_alias,
+            visibility='0',
+            files_=files
+        )
+
     client_admin.course.addProblem(
         course_alias=course_alias,
         assignment_alias=assignment_alias,
-        problem_alias='sumas',
+        problem_alias=problem_alias,
         points=1.0,
     )
 
