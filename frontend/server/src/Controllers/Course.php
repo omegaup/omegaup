@@ -5878,11 +5878,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r->ensureOptionalInt('rowcount') ?? 100,
             $r->ensureOptionalEnum(
                 'execution',
-                \OmegaUp\Controllers\Run::EXECUTION
+                array_keys(\OmegaUp\Controllers\Run::EXECUTION)
             ),
             $r->ensureOptionalEnum(
                 'output',
-                \OmegaUp\Controllers\Run::OUTPUT
+                array_keys(\OmegaUp\Controllers\Run::OUTPUT)
             ),
         );
     }

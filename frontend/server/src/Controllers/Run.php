@@ -93,20 +93,19 @@ class Run extends \OmegaUp\Controllers\Controller {
     ];
 
     public const EXECUTION = [
-        'EXECUTION_INTERRUPTED',
-        'EXECUTION_FINISHED',
-        'EXECUTION_RUNTIME_ERROR',
-        'EXECUTION_RUNTIME_FUNCTION_ERROR',
-        'EXECUTION_COMPILATION_ERROR',
-        'EXECUTION_VALIDATOR_ERROR',
-        'EXECUTION_JUDGE_ERROR',
+        'EXECUTION_INTERRUPTED' => ['ML', 'MLE', 'TLE', 'OLE', 'TO', 'OL'],
+        'EXECUTION_FINISHED' => ['AC', 'WA', 'PA'],
+        'EXECUTION_RUNTIME_ERROR' => ['RE', 'RTE'],
+        'EXECUTION_RUNTIME_FUNCTION_ERROR' => ['OF', 'RFE'],
+        'EXECUTION_COMPILATION_ERROR' => ['CE'],
+        'EXECUTION_VALIDATOR_ERROR' => ['VE'],
+        'EXECUTION_JUDGE_ERROR' => ['JE'],
     ];
-
     public const OUTPUT = [
-        'OUTPUT_INTERRUPTED',
-        'OUTPUT_CORRECT',
-        'OUTPUT_INCORRECT',
-        'OUTPUT_EXCEEDED',
+        'OUTPUT_INTERRUPTED' => ['JE', 'VE', 'CE', 'FO', 'RFE', 'RE', 'RTE', 'MLE', 'TLE'],
+        'OUTPUT_CORRECT' => ['AC'],
+        'OUTPUT_INCORRECT' => ['WA', 'PA'],
+        'OUTPUT_EXCEEDED' => ['OLE', 'OL'],
     ];
 
     public const STATUS = ['new', 'waiting', 'compiling', 'running', 'ready'];

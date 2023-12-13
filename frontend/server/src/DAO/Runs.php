@@ -248,63 +248,19 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             }
         } else {
             if (!is_null($execution)) {
-                if ($execution === 'EXECUTION_INTERRUPTED') {
-                    $where[] = 's.verdict IN(?, ?, ?, ?, ?, ?)';
-                    $val[] = 'ML';
-                    $val[] = 'MLE';
-                    $val[] = 'TLE';
-                    $val[] = 'OLE';
-                    $val[] = 'TO';
-                    $val[] = 'OL';
-                } elseif ($execution === 'EXECUTION_RUNTIME_ERROR') {
-                    $where[] = 's.verdict IN(?, ?)';
-                    $val[] = 'RE';
-                    $val[] = 'RTE';
-                } elseif ($execution === 'EXECUTION_RUNTIME_FUNCTION_ERROR') {
-                    $where[] = 's.verdict IN(?, ?)';
-                    $val[] = 'OF';
-                    $val[] = 'RFE';
-                } elseif ($execution === 'EXECUTION_COMPILATION_ERROR') {
-                    $where[] = 's.verdict = ?';
-                    $val[] = 'CE';
-                } elseif ($execution === 'EXECUTION_VALIDATOR_ERROR') {
-                    $where[] = 's.verdict = ?';
-                    $val[] = 'VE';
-                } elseif ($execution === 'EXECUTION_JUDGE_ERROR') {
-                    $where[] = 's.verdict = ?';
-                    $val[] = 'JE';
-                } else {
-                    $where[] = 's.verdict IN(?, ?, ?)';
-                    $val[] = 'AC';
-                    $val[] = 'WA';
-                    $val[] = 'PA';
-                }
+                $executionArgs = \OmegaUp\Controllers\Run::EXECUTION[$execution];
+                $placeholders = array_fill(0, count($executionArgs), '?');
+                $placeholders = join(',', $placeholders);
+                $where[] = "s.verdict IN ({$placeholders})";
+                $val = array_merge($val, $executionArgs);
             }
 
             if (!is_null($output)) {
-                if ($output === 'OUTPUT_INTERRUPTED') {
-                    $where[] = 's.verdict IN(?, ?, ?, ?, ?, ?, ?, ?, ?)';
-                    $val[] = 'JE';
-                    $val[] = 'VE';
-                    $val[] = 'CE';
-                    $val[] = 'FO';
-                    $val[] = 'RFE';
-                    $val[] = 'RE';
-                    $val[] = 'RTE';
-                    $val[] = 'MLE';
-                    $val[] = 'TLE';
-                } elseif ($output === 'OUTPUT_INCORRECT') {
-                    $where[] = 's.verdict IN(?, ?)';
-                    $val[] = 'WA';
-                    $val[] = 'PA';
-                } elseif ($output === 'OUTPUT_EXCEEDED') {
-                    $where[] = 's.verdict IN(?, ?)';
-                    $val[] = 'OLE';
-                    $val[] = 'OL';
-                } else {
-                    $where[] = 's.verdict = ?';
-                    $val[] = 'AC';
-                }
+                $outputArgs = \OmegaUp\Controllers\Run::OUTPUT[$output];
+                $placeholders = array_fill(0, count($outputArgs), '?');
+                $placeholders = join(',', $placeholders);
+                $where[] = "s.verdict IN ({$placeholders})";
+                $val = array_merge($val, $outputArgs);
             }
         }
 
