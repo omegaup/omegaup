@@ -25,6 +25,8 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-contest-intro', {
         props: {
           requestsUserInformation: payload.requestsUserInformation,
+          shouldShowModalToLoginWithRegisteredIdentity:
+            payload.shouldShowModalToLoginWithRegisteredIdentity,
           needsBasicInformation: payload.needsBasicInformation,
           contest: payload.contest,
           isLoggedIn: headerPayload.isLoggedIn,

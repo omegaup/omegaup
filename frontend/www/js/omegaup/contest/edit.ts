@@ -619,6 +619,9 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'show-copy-message': (): void => {
+            ui.success(T.contestEditContestLinkCopiedToClipboard);
+          },
         },
       });
     },
