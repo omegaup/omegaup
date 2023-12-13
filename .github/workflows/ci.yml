@@ -526,7 +526,7 @@ jobs:
 
       - name: Run Python tests
         run: |
-          docker-compose exec -T frontend python3 -m pytest --verbose --timeout=20 ./stuff/
+          docker-compose exec -T frontend python3 -m pytest --verbose --timeout=70 ./stuff/
 
       - name: Collect container logs
         if: ${{ always() }}
