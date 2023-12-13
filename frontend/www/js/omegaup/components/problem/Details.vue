@@ -189,30 +189,7 @@
           <div class="bg-white text-center p-4 d-sm-none border">
             {{ T.ephemeralGraderAlert }}
           </div>
-          <omegaup-arena-runs
-            v-if="!useNewVerdictTable"
-            :problem-alias="problem.alias"
-            :contest-alias="contestAlias"
-            :runs="runsByProblem"
-            :show-details="true"
-            :problemset-problems="[]"
-            :request-feedback="requestFeedback"
-            :is-contest-finished="isContestFinished"
-            @request-feedback="(guid) => $emit('request-feedback', guid)"
-            @details="(request) => onRunDetails(request, 'problems')"
-            @update-search-result-users-contest="
-              (request) => $emit('update-search-result-users-contest', request)
-            "
-            @update-search-result-users="
-              (request) => $emit('update-search-result-users', request)
-            "
-            @new-submission="onNewSubmission"
-          >
-            <template #title><div></div></template>
-            <template #runs><div></div></template>
-          </omegaup-arena-runs>
           <omegaup-arena-runs-for-courses
-            v-else
             :problem-alias="problem.alias"
             :contest-alias="contestAlias"
             :runs="runsByProblem"
@@ -251,39 +228,7 @@
         class="tab-pane fade p-4"
         :class="{ 'show active': selectedTab === 'runs' }"
       >
-        <omegaup-arena-runs
-          v-if="!useNewVerdictTable"
-          :show-all-runs="true"
-          :runs="allRuns"
-          :show-details="true"
-          :show-user="true"
-          :show-rejudge="true"
-          :show-pager="true"
-          :show-disqualify="true"
-          :problemset-problems="[]"
-          :search-result-users="searchResultUsers"
-          :search-result-problems="searchResultProblems"
-          :total-runs="totalRuns"
-          @details="(request) => onRunDetails(request, 'runs')"
-          @rejudge="(run) => $emit('rejudge', run)"
-          @disqualify="(run) => $emit('disqualify', run)"
-          @requalify="(run) => $emit('requalify', run)"
-          @filter-changed="(request) => $emit('apply-filter', request)"
-          @update-search-result-users-contest="
-            (request) => $emit('update-search-result-users-contest', request)
-          "
-          @update-search-result-problems="
-            (request) => $emit('update-search-result-problems', request)
-          "
-          @update-search-result-users="
-            (request) => $emit('update-search-result-users', request)
-          "
-        >
-          <template #title><div></div></template>
-          <template #runs><div></div></template>
-        </omegaup-arena-runs>
         <omegaup-arena-runs-for-courses
-          v-else
           :show-all-runs="true"
           :runs="allRuns"
           :show-details="true"
@@ -481,7 +426,6 @@ export default class ProblemDetails extends Vue {
   feedbackMap!: Map<number, ArenaCourseFeedback>;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
-  @Prop({ default: false }) useNewVerdictTable!: boolean;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
