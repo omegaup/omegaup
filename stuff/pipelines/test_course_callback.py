@@ -66,32 +66,16 @@ def test_insert_course_certificate() -> None:
         course=course_alias,
         assignment=assignment_alias)
 
-    problem_alias = 'problem_'.join(random.choices(string.digits, k=4))
-
-    file_path = '/opt/omegaup/frontend/tests/resources/testproblem.zip'
-
-    with open(file_path, "rb") as file:
-        files = {'testproblem.zip': file}
-
-        client_admin.problem.create(
-            problem_alias=problem_alias,
-            problem_level='problemLevelBasicIntroductionToProgramming',
-            selected_tags='[{"tagname":"problemTagQueues","public":true}]',
-            source='omegaUp',
-            title=problem_alias,
-            visibility='0',
-            files_=files
-        )
-
     client_admin.course.addProblem(
         course_alias=course_alias,
         assignment_alias=assignment_alias,
-        problem_alias=problem_alias,
+        problem_alias='sumas',
         points=1.0,
     )
 
     usernames: Set[str] = set()
     for number in range(3):
+        time.sleep(61)
         username = f'course_test_user_{number}'
         client_admin.course.addStudent(course_alias=course_alias,
                                        usernameOrEmail=username,
