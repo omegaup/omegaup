@@ -978,10 +978,10 @@ export default class Runs extends Vue {
       case 'contest':
         this.filterContest = '';
         break;
-      case 'Execution':
+      case 'execution':
         this.filterExecution = '';
         break;
-      case 'Output':
+      case 'output':
         this.filterOutput = '';
     }
     this.filters = this.filters.filter((item) => item.name !== filter);

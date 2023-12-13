@@ -12,6 +12,8 @@ export interface RunFilters {
   username?: string;
   problem?: string;
   status?: string;
+  execution?: string;
+  output?: string;
 }
 
 export interface RunsState {
@@ -64,7 +66,9 @@ export const runsStoreConfig = {
         | 'username'
         | 'status'
         | 'offset'
-        | 'problem',
+        | 'problem'
+        | 'execution'
+        | 'output',
     ) {
       if (!state.filters) {
         return;

@@ -210,7 +210,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ?string $language,
         ?int $identityId,
         ?int $offset = 0,
-        ?int $rowCount = 100
+        ?int $rowCount = 100,
+        ?string $execution = null,
+        ?string $output = null,
     ): array {
         $where = [];
         $val = [];
@@ -243,6 +245,22 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             } else {
                 $where[] = 's.verdict = ?';
                 $val[] = $verdict;
+            }
+        } else {
+            if (!is_null($execution)) {
+                $executionArgs = \OmegaUp\Controllers\Run::EXECUTION[$execution];
+                $placeholders = array_fill(0, count($executionArgs), '?');
+                $placeholders = join(',', $placeholders);
+                $where[] = "s.verdict IN ({$placeholders})";
+                $val = array_merge($val, $executionArgs);
+            }
+
+            if (!is_null($output)) {
+                $outputArgs = \OmegaUp\Controllers\Run::OUTPUT[$output];
+                $placeholders = array_fill(0, count($outputArgs), '?');
+                $placeholders = join(',', $placeholders);
+                $where[] = "s.verdict IN ({$placeholders})";
+                $val = array_merge($val, $outputArgs);
             }
         }
 
