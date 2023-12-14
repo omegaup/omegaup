@@ -840,7 +840,16 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Disqualify a submission
+     * Disqualify one or more submissions based on the received parameters:
+     *
+     * - When a run_alias is provided, it will only disqualify a single
+     *   submission.
+     * - When run_alias is not provided, both the username and the contest_alias
+     *   are required.
+     * - If a problem_alias is provided, all submissions belonging to the user
+     *   for this problem and contest will be disqualified.
+     * - If a problem_alias is not provided, all submissions belonging to the
+     *   user in this contest will be disqualified.
      *
      * @return array{status: string, runs: list<array{guid: null|string, username: null|string}>}
      *
@@ -881,7 +890,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 $user
             )
         );
-        $response = [];
+        $runs = [];
         if (!is_null($runAlias)) {
             [
                 'submission' => $submission,
@@ -904,7 +913,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 );
             }
             \OmegaUp\DAO\Submissions::disqualify($submission);
-            $response[] = ['guid' => $runAlias, 'username' => $username];
+            $runs[] = ['guid' => $runAlias, 'username' => $username];
         } elseif (!is_null($username)) {
             if (is_null($contestAlias)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -929,7 +938,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                     );
                 }
                 \OmegaUp\DAO\Submissions::disqualify($submission);
-                $response[] = ['guid' => $submission->guid, 'username' => $username];
+                $runs[] = ['guid' => $submission->guid, 'username' => $username];
             }
         }
 
@@ -937,7 +946,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
         return [
             'status' => 'ok',
-            'runs' => $response,
+            'runs' => $runs,
         ];
     }
 
