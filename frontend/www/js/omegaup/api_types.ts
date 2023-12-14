@@ -3028,6 +3028,7 @@ export namespace types {
     needsBasicInformation: boolean;
     privacyStatement: types.PrivacyStatement;
     requestsUserInformation: string;
+    shouldShowModalToLoginWithRegisteredIdentity: boolean;
   }
 
   export interface ContestList {

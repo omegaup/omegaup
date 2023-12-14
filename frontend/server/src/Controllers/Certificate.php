@@ -604,12 +604,18 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        // check that the contest has ended and the certificate can be generated
+        // check that the certificates can be generated
         if (
-            $contest->finish_time->time > \OmegaUp\Time::get() ||
-            ($contest->certificates_status !== 'uninitiated' &&
-            $contest->certificates_status !== 'retryable_error')
+            $contest->certificates_status !== 'uninitiated' &&
+            $contest->certificates_status !== 'retryable_error'
         ) {
+            return ['status' => 'error'];
+        }
+
+        // check that the contest has ended
+        if ($contest->finish_time->time > \OmegaUp\Time::get()) {
+            $contest->certificates_status = 'retryable_error';
+            \OmegaUp\DAO\Contests::update($contest);
             return ['status' => 'error'];
         }
 
@@ -618,10 +624,10 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         // add certificates_cutoff value to the contest
         if (!is_null($certificateCutoff)) {
             $contest->certificate_cutoff = $certificateCutoff;
-        }
 
-        // update contest with the new value
-        \OmegaUp\DAO\Contests::update($contest);
+            // update contest with the new value
+            \OmegaUp\DAO\Contests::update($contest);
+        }
 
         // get contest info
         $contestExtraInformation = \OmegaUp\DAO\Contests::getByAliasWithExtraInformation(
@@ -638,14 +644,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
         // connection to rabbitmq
         $channel = \OmegaUp\RabbitMQConnection::getInstance()->channel();
-
-        $channel->exchange_declare(
-            $exchange,
-            type: 'direct',
-            passive: false,
-            durable: true,
-            auto_delete: false
-        );
 
         $scoreboard = \OmegaUp\Controllers\Contest::getScoreboard(
             $contest,
@@ -673,6 +671,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         // send the message to RabbitMQ
         $channel->basic_publish($message, $exchange, $routingKey);
         $channel->close();
+
+        $contest->certificates_status = 'queued';
+        \OmegaUp\DAO\Contests::update($contest);
 
         return [
             'status' => 'ok',
