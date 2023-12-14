@@ -97,7 +97,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
             new \OmegaUp\Request([
                 'auth_token' => $loginIdentity->auth_token,
-                'contest_id' => $contestData['contest']->contest_id,
+                'contest_alias' => $contestData['contest']->alias,
                 'certificates_cutoff' => $certificatesCutoff
             ])
         );
@@ -264,7 +264,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
                 new \OmegaUp\Request([
                     'auth_token' => $loginIdentity->auth_token,
-                    'contest_id' => $contestData['contest']->contest_id,
+                    'contest_alias' => $contestData['contest']->alias,
                     'certificates_cutoff' => $certificatesCutoff
                 ])
             );
@@ -305,7 +305,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
                 new \OmegaUp\Request([
                     'auth_token' => $loginIdentity->auth_token,
-                    'contest_id' => $contestData['contest']->contest_id,
+                    'contest_alias' => $contestData['contest']->alias,
                     'certificates_cutoff' => $certificatesCutoff
                 ])
             );
@@ -345,7 +345,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
                 new \OmegaUp\Request([
                     'auth_token' => $loginIdentity->auth_token,
-                    'contest_id' => $contestData['contest']->contest_id,
+                    'contest_alias' => $contestData['contest']->alias,
                     'certificates_cutoff' => $certificatesCutoff
                 ])
             );
@@ -392,7 +392,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
             new \OmegaUp\Request([
                 'auth_token' => $loginIdentity->auth_token,
-                'contest_id' => $contestData['contest']->contest_id,
+                'contest_alias' => $contestData['contest']->alias,
                 'certificates_cutoff' => $certificatesCutoff
             ])
         );

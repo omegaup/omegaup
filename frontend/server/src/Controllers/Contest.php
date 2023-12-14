@@ -28,7 +28,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int|null, score_mode: string, scoreboard: int, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null, window_length: int|null}
  * @psalm-type ContestVirtualDetailsPayload=array{contest: ContestPublicDetails}
- * @psalm-type ContestCertificatesAdminDetails=array{alreadyGenerated: bool, certificateCutoff?: int, isCertificateGenerator: bool}
+ * @psalm-type ContestCertificatesAdminDetails=array{alreadyGenerated: bool, certificateCutoff: int|null, isCertificateGenerator: bool}
  * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<ProblemsetProblemWithVersions>, users: list<ContestUser>, groups: list<ContestGroup>, teams_group: ContestGroup|null, requests: list<ContestRequest>, admins: list<ContestAdmin>, group_admins: list<ContestGroupAdmin>, original_contest_admission_mode: null|string, certificatesDetails: ContestCertificatesAdminDetails}
  * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string, shouldShowModalToLoginWithRegisteredIdentity: bool}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration?: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
@@ -1442,7 +1442,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     ),
                     'original_contest_admission_mode' => $originalContest?->admission_mode,
                     'certificatesDetails' => self::getCertificatesDetailsForAdmin(
-                        $contest->alias,
+                        $contest,
                         $r->identity
                     ),
                 ],
@@ -2067,10 +2067,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return ContestCertificatesAdminDetails
      */
     public static function getCertificatesDetailsForAdmin(
-        string $contestAlias,
+        \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Identities $identity
     ): array {
-        $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
         return [
             'isCertificateGenerator' => \OmegaUp\Authorization::isCertificateGenerator(
                 $identity
