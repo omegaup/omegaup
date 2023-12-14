@@ -196,7 +196,7 @@
               <th v-if="showUser">{{ T.contestParticipant }}</th>
               <th v-if="showContest">{{ T.wordsContest }}</th>
               <th v-if="showProblem">{{ T.wordsProblem }}</th>
-              <th hidden>{{ T.wordsStatus }}</th>              
+              <th hidden>{{ T.wordsStatus }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPoints }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPenalty }}</th>
               <th v-if="!showPoints" class="numeric">
@@ -328,7 +328,7 @@
                   class="position-absolute top-0 end-0 badge badge-pill badge-danger"
                   >1
                 </span>
-              </td>              
+              </td>
               <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
               <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
               <td
@@ -826,7 +826,6 @@ export default class Runs extends Vue {
 
     return `${verdict}: ${verdictHelp}`;
   }
-
 
   execution(run: types.Run): string {
     if (run.time < this.newFieldsLaunchDate) {
