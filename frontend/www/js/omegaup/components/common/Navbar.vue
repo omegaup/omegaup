@@ -349,10 +349,10 @@
       <div class="container-xl">
         {{
           daysUntilVerificationDeadline > 1
-            ? ui.formatString(T.bannerMessage, {
+            ? ui.formatString(T.bannerVerifyAccount, {
                 days: daysUntilVerificationDeadline,
               })
-            : T.bannerRedMessage
+            : T.bannerLastDayToVerifyAccount
         }}
       </div>
     </div>
@@ -448,16 +448,6 @@ export default class Navbar extends Vue {
     this.$emit('read-notifications', notifications, url);
   }
 
-  get bannerColor() {
-    const today = new Date();
-    const deadline = new Date(this.userVerificationDeadline as Date);
-
-    if (deadline.toDateString() === today.toDateString()) {
-      return 'bg-danger';
-    }
-    return 'bg-warning';
-  }
-
   get daysUntilVerificationDeadline(): number | null {
     if (!this.userVerificationDeadline) {
       return null;
@@ -467,6 +457,16 @@ export default class Navbar extends Vue {
     const timeDifference = deadline.getTime() - today.getTime();
     const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
     return daysDifference;
+  }
+
+  get bannerColor() {
+    if (
+      this.daysUntilVerificationDeadline !== null &&
+      this.daysUntilVerificationDeadline <= 1
+    ) {
+      return 'bg-danger';
+    }
+    return 'bg-warning';
   }
 }
 </script>
