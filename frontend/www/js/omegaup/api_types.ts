@@ -2942,6 +2942,12 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ContestCertificatesAdminDetails {
+    alreadyGenerated: boolean;
+    certificateCutoff?: number;
+    isCertificateGenerator: boolean;
+  }
+
   export interface ContestDetails {
     admin: boolean;
     admission_mode: string;
@@ -3002,6 +3008,7 @@ export namespace types {
 
   export interface ContestEditPayload {
     admins: types.ContestAdmin[];
+    certificatesDetails: types.ContestCertificatesAdminDetails;
     details: types.ContestAdminDetails;
     group_admins: types.ContestGroupAdmin[];
     groups: types.ContestGroup[];

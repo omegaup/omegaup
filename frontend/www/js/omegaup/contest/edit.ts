@@ -35,6 +35,7 @@ OmegaUp.on('ready', () => {
       searchResultTeamsGroups,
       searchResultGroups: [] as types.ListItem[],
       teamsGroup: payload.teams_group,
+      certificatesDetails: payload.certificatesDetails,
     }),
     methods: {
       arbitrateRequest: (username: string, resolution: boolean): void => {
@@ -162,6 +163,7 @@ OmegaUp.on('ready', () => {
           searchResultGroups: this.searchResultGroups,
           teamsGroup: this.teamsGroup,
           originalContestAdmissionMode: payload.original_contest_admission_mode,
+          certificatesDetails: this.certificatesDetails,
         },
         on: {
           'update-search-result-problems': ({
@@ -621,6 +623,22 @@ OmegaUp.on('ready', () => {
           },
           'show-copy-message': (): void => {
             ui.success(T.contestEditContestLinkCopiedToClipboard);
+          },
+          'generate-certificates': (certificateCutoff: number) => {
+            api.Certificate.generateContestCertificates({
+              certificates_cutoff: certificateCutoff,
+              contest_alias: payload.details.alias,
+            })
+              .then((result) => {
+                if (result.status == 'ok') {
+                  contestEdit.certificatesDetails.alreadyGenerated = true;
+                  contestEdit.certificatesDetails.certificateCutoff = certificateCutoff;
+                  ui.success(T.contestCertificatesGenerateSuccessfully);
+                } else {
+                  ui.error(T.contestCertificatesGenerateError);
+                }
+              })
+              .catch(ui.apiError);
           },
         },
       });

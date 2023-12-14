@@ -37,6 +37,12 @@ describe('Edit.vue', () => {
     title: 'contest test',
   };
 
+  const certificatesDetails: types.ContestCertificatesAdminDetails = {
+    alreadyGenerated: false,
+    certificateCutoff: 3,
+    isCertificateGenerator: true,
+  };
+
   const propsData: {
     admins: types.ContestAdmin[];
     details: types.ContestAdminDetails;
@@ -46,6 +52,7 @@ describe('Edit.vue', () => {
     requests: types.ContestRequest[];
     users: types.ContestUser[];
     originalContestAdmissionMode: null | string;
+    certificatesDetails: types.ContestCertificatesAdminDetails;
   } = {
     admins: [],
     details,
@@ -55,6 +62,7 @@ describe('Edit.vue', () => {
     requests: [],
     users: [],
     originalContestAdmissionMode: null,
+    certificatesDetails,
   };
   it('Should handle a normal contest', () => {
     const wrapper = shallowMount(contest_Edit, {
