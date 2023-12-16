@@ -1421,7 +1421,7 @@ const translations: { [key: string]: string; } = {
   runDetailsNewFeedback: "New feedback",
   runDetailsNotAvailable: "Not available",
   runDetailsRuntimeError: "Runtime error",
-  runDetailsRuntimeFunctionError: "Runtime error",
+  runDetailsRuntimeFunctionError: "Restricted function error",
   runDetailsValidatorError: "Validator error",
   runDisqualifyConfirm: "Do you really want to disqualify this run?",
   runGUID: "GUID",

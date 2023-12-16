@@ -1421,7 +1421,7 @@ const translations: { [key: string]: string; } = {
   runDetailsNewFeedback: "Novo feedback",
   runDetailsNotAvailable: "N\u00e3o dispon\u00edvel",
   runDetailsRuntimeError: "Erro de execu\u00e7\u00e3o",
-  runDetailsRuntimeFunctionError: "Erro de execu\u00e7\u00e3o",
+  runDetailsRuntimeFunctionError: "Erro de fun\u00e7\u00e3o restrita",
   runDetailsValidatorError: "Erro do validador",
   runDisqualifyConfirm: "Voc\u00ea realmente deseja desqualificar este envio?",
   runGUID: "GUID",
