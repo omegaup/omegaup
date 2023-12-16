@@ -145,6 +145,8 @@ const translations: { [key: string]: string; } = {
   badge_virtualContestManager_name: "Virtual Contest Manager",
   banProblemFormComments: "Additional comments to the problemsetter",
   banProblemFormQuestion: "Why will this problem be banned?",
+  bannerLastDayToVerifyAccount: "Attention! Only 1 day left for your father or guardian to approve your account. Otherwise, your account will be deleted.",
+  bannerVerifyAccount: "It is necessary for your father or guardian to approve your account within %(days) days. Otherwise, your account will be deleted.",
   banningDeclinedByReviewer: "Banning declined by reviewer.",
   banningProblemDueToReport: "Banning problem due to account report.",
   birthdayInTheFuture: "You are not old enough to use omegaUp",

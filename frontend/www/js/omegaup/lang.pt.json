@@ -144,6 +144,8 @@
 	"badge_virtualContestManager_name": "Admin do Concurso Virtual",
 	"banProblemFormComments": "Coment\u00e1rios adicionais para o criador do problema",
 	"banProblemFormQuestion": "Por que esse problema ser\u00e1 banido?",
+	"bannerLastDayToVerifyAccount": "Aten\u00e7\u00e3o! Resta apenas 1 dia para que seu pai ou tutor aprove sua conta. Caso contr\u00e1rio, sua conta ser\u00e1 exclu\u00edda.",
+	"bannerVerifyAccount": "\u00c9 necess\u00e1rio que seu pai ou tutor aprove sua conta dentro de %(days) dias. Caso contr\u00e1rio, sua conta ser\u00e1 exclu\u00edda.",
 	"banningDeclinedByReviewer": "Proibi\u00e7\u00e3o negada pelo revisor.",
 	"banningProblemDueToReport": "Banido problema devido a um relat\u00f3rio de conta.",
 	"birthdayInTheFuture": "Voc\u00ea n\u00e3o tem idade suficiente para usar omegaUp",
