@@ -196,6 +196,7 @@
               <th v-if="showUser">{{ T.contestParticipant }}</th>
               <th v-if="showContest">{{ T.wordsContest }}</th>
               <th v-if="showProblem">{{ T.wordsProblem }}</th>
+              <th hidden>{{ T.wordsStatus }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPoints }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPenalty }}</th>
               <th v-if="!showPoints" class="numeric">
@@ -303,6 +304,30 @@
                 <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
+              </td>
+              <td
+                :class="statusClass(run)"
+                data-run-status
+                class="text-center opacity-4 font-weight-bold"
+                hidden
+              >
+                <span class="mr-1">{{ status(run) }}</span>
+                <button
+                  v-if="!!statusHelp(run)"
+                  type="button"
+                  :data-content="statusHelp(run)"
+                  data-toggle="popover"
+                  data-trigger="focus"
+                  class="btn-outline-dark btn-sm"
+                  @click="showVerdictHelp"
+                >
+                  <font-awesome-icon :icon="['fas', 'question-circle']" />
+                </button>
+                <span
+                  v-if="run.submission_feedback_id !== null && showDisqualify"
+                  class="position-absolute top-0 end-0 badge badge-pill badge-danger"
+                  >1
+                </span>
               </td>
               <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
               <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
@@ -756,6 +781,50 @@ export default class Runs extends Vue {
     }
 
     return `${(run.runtime / 1000).toFixed(2)} s`;
+  }
+
+  showVerdictHelp(ev: Event): void {
+    $(ev.target as HTMLElement).popover('show');
+  }
+
+  statusClass(run: types.Run): string {
+    if (run.status != 'ready') return '';
+    if (run.type == 'disqualified') return 'status-disqualified';
+    if (run.verdict == 'AC') {
+      return 'status-ac';
+    }
+    if (run.verdict == 'CE') {
+      return 'status-ce';
+    }
+    if (run.verdict == 'JE' || run.verdict == 'VE') {
+      return 'status-je-ve';
+    }
+    return '';
+  }
+
+  status(run: types.Run): string {
+    if (run.type == 'disqualified') return T.arenaRunsActionsDisqualified;
+
+    return run.status == 'ready' ? run.verdict : run.status;
+  }
+
+  statusHelp(run: types.Run): string {
+    if (run.status != 'ready' || run.verdict == 'AC') {
+      return '';
+    }
+
+    if (run.language == 'kj' || run.language == 'kp') {
+      if (run.verdict == 'RTE' || run.verdict == 'RE') {
+        return T.verdictHelpKarelRTE;
+      } else if (run.verdict == 'TLE' || run.verdict == 'TO') {
+        return T.verdictHelpKarelTLE;
+      }
+    }
+    if (run.type == 'disqualified') return T.verdictHelpDisqualified;
+    const verdict = T[`verdict${run.verdict}`];
+    const verdictHelp = T[`verdictHelp${run.verdict}`];
+
+    return `${verdict}: ${verdictHelp}`;
   }
 
   execution(run: types.Run): string {
