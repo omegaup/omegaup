@@ -82,9 +82,6 @@ OmegaUp.on('ready', async () => {
     );
   }
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const useNewVerdictTable = urlParams.get('useNewVerdictTable') === 'true';
-
   const arenaCourse = new Vue({
     el: '#main-container',
     components: {
@@ -136,7 +133,6 @@ OmegaUp.on('ready', async () => {
           feedbackThreadMap: this.feedbackThreadMap,
           currentUsername: commonPayload.currentUsername,
           currentUserClassName: commonPayload.userClassname,
-          useNewVerdictTable: useNewVerdictTable,
         },
         on: {
           'navigate-to-assignment': ({
@@ -313,7 +309,14 @@ OmegaUp.on('ready', async () => {
             filter,
             value,
           }: {
-            filter: 'verdict' | 'language' | 'username' | 'status' | 'offset';
+            filter:
+              | 'verdict'
+              | 'language'
+              | 'username'
+              | 'status'
+              | 'offset'
+              | 'execution'
+              | 'output';
             value: string;
           }) => {
             if (value != '') {
@@ -545,6 +548,8 @@ OmegaUp.on('ready', async () => {
       language: runsStore.state.filters?.language,
       username: runsStore.state.filters?.username,
       status: runsStore.state.filters?.status,
+      execution: runsStore.state.filters?.execution,
+      output: runsStore.state.filters?.output,
     })
       .then(time.remoteTimeAdapter)
       .then((response) => {
