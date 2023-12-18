@@ -2943,8 +2943,8 @@ export namespace types {
   }
 
   export interface ContestCertificatesAdminDetails {
-    alreadyGenerated: boolean;
     certificateCutoff?: number;
+    certificatesStatus: string;
     isCertificateGenerator: boolean;
   }
 

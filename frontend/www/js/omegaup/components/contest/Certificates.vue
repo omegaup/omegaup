@@ -7,7 +7,10 @@
       <label>{{ T.contestCertificatesCutoff }}</label>
       <input
         v-model="certificateCutoff"
-        :disabled="certificatesDetails.alreadyGenerated"
+        :disabled="
+          certificatesDetails.certificatesStatus !== 'uninitiated' &&
+          certificatesDetails.certificatesStatus !== 'retryable_error'
+        "
         class="form-control"
         type="text"
         required="required"
@@ -16,7 +19,10 @@
         {{ T.contestCertificatesCutoffHelp }}
       </p>
       <button
-        :disabled="certificatesDetails.alreadyGenerated"
+        :disabled="
+          certificatesDetails.certificatesStatus !== 'uninitiated' &&
+          certificatesDetails.certificatesStatus !== 'retryable_error'
+        "
         type="button"
         class="btn btn-primary d-block mx-auto"
         data-toggle="modal"

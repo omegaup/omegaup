@@ -609,14 +609,18 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $contest->certificates_status !== 'uninitiated' &&
             $contest->certificates_status !== 'retryable_error'
         ) {
-            return ['status' => 'error'];
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestCertificatesError'
+            );
         }
 
         // check that the contest has ended
         if ($contest->finish_time->time > \OmegaUp\Time::get()) {
             $contest->certificates_status = 'retryable_error';
             \OmegaUp\DAO\Contests::update($contest);
-            return ['status' => 'error'];
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestCertificatesCurrentContestError'
+            );
         }
 
         $certificateCutoff = $r->ensureOptionalInt('certificates_cutoff');

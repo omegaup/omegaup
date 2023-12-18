@@ -629,14 +629,10 @@ OmegaUp.on('ready', () => {
               certificates_cutoff: certificateCutoff,
               contest_alias: payload.details.alias,
             })
-              .then((result) => {
-                if (result.status == 'ok') {
-                  contestEdit.certificatesDetails.alreadyGenerated = true;
-                  contestEdit.certificatesDetails.certificateCutoff = certificateCutoff;
-                  ui.success(T.contestCertificatesGenerateSuccessfully);
-                } else {
-                  ui.error(T.contestCertificatesGenerateError);
-                }
+              .then(() => {
+                contestEdit.certificatesDetails.certificatesStatus = 'queued';
+                contestEdit.certificatesDetails.certificateCutoff = certificateCutoff;
+                ui.success(T.contestCertificatesGenerateSuccessfully);
               })
               .catch(ui.apiError);
           },

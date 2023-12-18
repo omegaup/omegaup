@@ -38,8 +38,8 @@ describe('Edit.vue', () => {
   };
 
   const certificatesDetails: types.ContestCertificatesAdminDetails = {
-    alreadyGenerated: false,
     certificateCutoff: 3,
+    certificatesStatus: 'uninitiated',
     isCertificateGenerator: true,
   };
 
