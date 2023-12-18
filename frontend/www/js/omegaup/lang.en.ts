@@ -1418,7 +1418,6 @@ const translations: { [key: string]: string; } = {
   runDetailsIncorrect: "Incorrect",
   runDetailsInterrupted: "Interrupted",
   runDetailsJudgeError: "Judge error",
-  runDetailsMemoryExceeded: "Exceeded",
   runDetailsNewFeedback: "New feedback",
   runDetailsNotAvailable: "Not available",
   runDetailsRuntimeError: "Runtime error",

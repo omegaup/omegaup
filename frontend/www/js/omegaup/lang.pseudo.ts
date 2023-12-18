@@ -1418,7 +1418,6 @@ const translations: { [key: string]: string; } = {
   runDetailsIncorrect: "(Inc0rr3c7)",
   runDetailsInterrupted: "(In73rrup73d)",
   runDetailsJudgeError: "(Judg3 3rr0r)",
-  runDetailsMemoryExceeded: "(Exc33d3d)",
   runDetailsNewFeedback: "(N3w f33dback)",
   runDetailsNotAvailable: "(N07 avai1ab13)",
   runDetailsRuntimeError: "(Run7im3 3rr0r)",

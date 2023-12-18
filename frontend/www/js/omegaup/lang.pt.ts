@@ -1418,7 +1418,6 @@ const translations: { [key: string]: string; } = {
   runDetailsIncorrect: "Incorreto",
   runDetailsInterrupted: "Interrompido",
   runDetailsJudgeError: "Erro do juiz",
-  runDetailsMemoryExceeded: "Excedido",
   runDetailsNewFeedback: "Novo feedback",
   runDetailsNotAvailable: "N\u00e3o dispon\u00edvel",
   runDetailsRuntimeError: "Erro de execu\u00e7\u00e3o",
