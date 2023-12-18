@@ -274,6 +274,8 @@
 	"contestButtonScoreboard": "(Sc0r3b0ard)",
 	"contestButtonSeeDetails": "(S33 d37ai15)",
 	"contestCanNotChangeToContestForTeams": "(A n0rma1 c0n7357 cann07 b3 chang3d 70 a c0n7357 f0r 73am5)",
+	"contestCertificatesCurrentContestError": "(C3r7ifica735 cann07 b3 g3n3ra73d b3cau53 7h3 c0n7357 ha5 n07 3nd3d y37.)",
+	"contestCertificatesError": "(Th3r3 wa5 an 3rr0r g3n3ra7ing 7h3 c3r7ifica735.)",
 	"contestDetailsGoToContest": "(G0 70 c0n7357)",
 	"contestDownloadListOfUsersInContest": "(D0wn10ad 1i57 0f c0d3r5 in 7h3 c0n7357)",
 	"contestDuration": "(Dura7i0n: %(duration))",

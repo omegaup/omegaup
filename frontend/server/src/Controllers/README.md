@@ -401,14 +401,14 @@ CertificateController
 
 ### Description
 
-Generates all the certificates for a contest given its contest ID.
+Generates all the certificates for a contest given its contest alias.
 
 ### Parameters
 
-| Name                  | Type        | Description |
-| --------------------- | ----------- | ----------- |
-| `certificates_cutoff` | `int\|null` |             |
-| `contest_id`          | `int\|null` |             |
+| Name                  | Type           | Description |
+| --------------------- | -------------- | ----------- |
+| `certificates_cutoff` | `int\|null`    |             |
+| `contest_alias`       | `string\|null` |             |
 
 ### Returns
 

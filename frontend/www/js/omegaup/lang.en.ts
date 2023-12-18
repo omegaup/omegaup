@@ -275,6 +275,8 @@ const translations: { [key: string]: string; } = {
   contestButtonScoreboard: "Scoreboard",
   contestButtonSeeDetails: "See details",
   contestCanNotChangeToContestForTeams: "A normal contest cannot be changed to a contest for teams",
+  contestCertificatesCurrentContestError: "Certificates cannot be generated because the contest has not ended yet.",
+  contestCertificatesError: "There was an error generating the certificates.",
   contestDetailsGoToContest: "Go to contest",
   contestDownloadListOfUsersInContest: "Download list of coders in the contest",
   contestDuration: "Duration: %(duration)",
