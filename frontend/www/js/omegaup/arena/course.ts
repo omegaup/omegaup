@@ -43,7 +43,12 @@ OmegaUp.on('ready', async () => {
   const courseAdmin = Boolean(
     payload.courseDetails.is_admin || payload.courseDetails.is_curator,
   );
-  const activeTab = getSelectedValidTab(locationHash, courseAdmin);
+  const activeTab = getSelectedValidTab(
+    locationHash,
+    courseAdmin,
+    payload.showRanking,
+  );
+
   if (activeTab !== locationHash) {
     window.location.hash = activeTab;
   }
@@ -529,12 +534,19 @@ OmegaUp.on('ready', async () => {
     },
   });
 
-  function getSelectedValidTab(tab: string, isAdmin: boolean): string {
-    const validTabs = ['problems', 'ranking', 'runs', 'clarifications'];
-    const defaultTab = 'problems';
-    if (tab === 'runs' && !isAdmin) return defaultTab;
-    const isValidTab = validTabs.includes(tab);
-    return isValidTab ? tab : defaultTab;
+  function getSelectedValidTab(
+    tab: string,
+    isAdmin: boolean,
+    showRanking: boolean,
+  ): string {
+    const validTabs = ['problems', 'clarifications'];
+    if (showRanking) {
+      validTabs.push('ranking');
+    }
+    if (isAdmin) {
+      validTabs.push('runs');
+    }
+    return validTabs.includes(tab) ? tab : validTabs[0];
   }
 
   function refreshRuns(): void {
