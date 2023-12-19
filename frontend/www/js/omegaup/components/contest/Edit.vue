@@ -185,6 +185,8 @@
           :admission-mode="details.admission_mode"
           :should-show-public-option="true"
           :admission-mode-description="T.contestAdmissionModeDescription"
+          :alias="details.alias"
+          @show-copy-message="() => $emit('show-copy-message')"
           @update-admission-mode="
             (request) => $emit('update-admission-mode', request)
           "

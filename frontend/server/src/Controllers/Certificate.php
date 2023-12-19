@@ -624,10 +624,10 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         // add certificates_cutoff value to the contest
         if (!is_null($certificateCutoff)) {
             $contest->certificate_cutoff = $certificateCutoff;
-        }
 
-        // update contest with the new value
-        \OmegaUp\DAO\Contests::update($contest);
+            // update contest with the new value
+            \OmegaUp\DAO\Contests::update($contest);
+        }
 
         // get contest info
         $contestExtraInformation = \OmegaUp\DAO\Contests::getByAliasWithExtraInformation(
@@ -644,14 +644,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
         // connection to rabbitmq
         $channel = \OmegaUp\RabbitMQConnection::getInstance()->channel();
-
-        $channel->exchange_declare(
-            $exchange,
-            type: 'direct',
-            passive: false,
-            durable: true,
-            auto_delete: false
-        );
 
         $scoreboard = \OmegaUp\Controllers\Contest::getScoreboard(
             $contest,
