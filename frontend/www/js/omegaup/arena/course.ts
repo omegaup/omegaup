@@ -82,9 +82,6 @@ OmegaUp.on('ready', async () => {
     );
   }
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const useNewVerdictTable = urlParams.get('useNewVerdictTable') === 'true';
-
   const arenaCourse = new Vue({
     el: '#main-container',
     components: {
@@ -136,7 +133,6 @@ OmegaUp.on('ready', async () => {
           feedbackThreadMap: this.feedbackThreadMap,
           currentUsername: commonPayload.currentUsername,
           currentUserClassName: commonPayload.userClassname,
-          useNewVerdictTable: useNewVerdictTable,
         },
         on: {
           'navigate-to-assignment': ({
