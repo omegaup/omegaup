@@ -27,6 +27,7 @@
         class="btn btn-primary d-block mx-auto"
         data-toggle="modal"
         data-target=".modal"
+        data-button-generate
       >
         {{ T.contestCertificatesGenerate }}
       </button>
@@ -40,6 +41,7 @@
                   type="button"
                   class="btn btn-secondary"
                   data-dismiss="modal"
+                  data-button-close
                 >
                   {{ T.wordsClose }}
                 </button>
@@ -47,6 +49,7 @@
                   type="button"
                   class="btn btn-primary"
                   data-dismiss="modal"
+                  data-button-confirm
                   @click="$emit('generate', certificateCutoff)"
                 >
                   {{ T.wordsConfirm }}
