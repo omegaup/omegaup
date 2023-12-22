@@ -41,9 +41,6 @@ OmegaUp.on('ready', async () => {
 
   const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const useNewVerdictTable = urlParams.get('useNewVerdictTable') === 'true';
-
   const searchResultEmpty: types.ListItem[] = [];
   let runDetails: null | types.RunDetails = null;
   try {
@@ -118,7 +115,6 @@ OmegaUp.on('ready', async () => {
           searchResultProblems: this.searchResultProblems,
           problemAlias: payload.problem.alias,
           totalRuns: runsStore.state.totalRuns,
-          useNewVerdictTable: useNewVerdictTable,
         },
         on: {
           'show-run': (request: SubmissionRequest) => {
