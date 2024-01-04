@@ -1,14 +1,16 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
+    protected $adminUser;
+    protected $identity;
+    protected $courseAliases;
+
     public function setUp(): void {
         parent::setUp();
-        foreach (range(0, 1) as $course) {
+        foreach (range(0, 1) as $index) {
             $publicCourseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
                 admissionMode: \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
             );
-            $this->courseAliases[] = $publicCourseData['course_alias'];
+            $this->courseAliases[$index] = $publicCourseData['course_alias'];
         }
         $privateCourseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType(
             ['homework' => 3, 'test' => 2]
@@ -39,10 +41,6 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->courseAliases[] = $publicArchivedCourseData['course_alias'];
     }
 
-    protected $adminUser;
-    protected $identity;
-    protected $courseAliases;
-
     public function testListCoursesMine() {
         $adminLogin = self::login($this->adminUser);
 
@@ -55,6 +53,39 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame(
             $this->courseAliases[3],
             $archivedCourses[0]['alias']
+        );
+    }
+
+    /**
+     * The course admin should not see duplicated courses even if this user was
+     * added to an admin group.
+     */
+    public function testListNonDuplicatedCoursesMine() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
+            owner: $courseData['admin']
+        );
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $groupData,
+            $courseData['admin']
+        );
+        $login = self::login($courseData['admin']);
+        \OmegaUp\Controllers\Course::apiAddGroupAdmin(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'group' => $groupData['request']['alias'],
+            'course_alias' => $courseData['course_alias'],
+        ]));
+        $courses = \OmegaUp\Controllers\Course::getCourseMineDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['templateProperties']['payload']['courses']['admin'];
+
+        // Only one course should be listed
+        $this->assertCount(
+            1,
+            $courses['filteredCourses']['current']['courses']
         );
     }
 
