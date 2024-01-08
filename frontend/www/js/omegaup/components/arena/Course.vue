@@ -3,7 +3,7 @@
     :active-tab="activeTab"
     :title="currentAssignment.name"
     :should-show-runs="isAdmin || isTeachingAssistant"
-    :should-show-ranking="course.admission_mode !== 'public'"
+    :should-show-ranking="showRanking"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #socket-status>
@@ -82,7 +82,6 @@
               :in-contest-or-course="true"
               :feedback-map="feedbackMap"
               :feedback-thread-map="feedbackThreadMap"
-              :use-new-verdict-table="useNewVerdictTable"
               @request-feedback="(guid) => $emit('request-feedback', guid)"
               @update:activeTab="
                 (selectedTab) =>
@@ -135,35 +134,7 @@
       </omegaup-arena-scoreboard>
     </template>
     <template v-if="isAdmin" #arena-runs>
-      <omegaup-arena-runs
-        v-if="!useNewVerdictTable"
-        :show-all-runs="true"
-        :contest-alias="currentAssignment.alias"
-        :runs="allRuns"
-        :total-runs="totalRuns"
-        :show-problem="true"
-        :show-details="true"
-        :show-disqualify="true"
-        :show-pager="true"
-        :show-rejudge="true"
-        :show-user="true"
-        :problemset-problems="Object.values(problems)"
-        :search-result-users="searchResultUsers"
-        :search-result-problems="searchResultProblems"
-        @details="onRunAdminDetails"
-        @rejudge="(run) => $emit('rejudge', run)"
-        @disqualify="(run) => $emit('disqualify', run)"
-        @requalify="(run) => $emit('requalify', run)"
-        @filter-changed="(request) => $emit('apply-filter', request)"
-        @update-search-result-users-contest="
-          (request) => $emit('update-search-result-users-assignment', request)
-        "
-      >
-        <template #title><div></div></template>
-        <template #runs><div></div></template>
-      </omegaup-arena-runs>
       <omegaup-arena-runs-for-courses
-        v-else
         :show-all-runs="true"
         :contest-alias="currentAssignment.alias"
         :runs="allRuns"
@@ -174,7 +145,6 @@
         :show-filters="true"
         :show-rejudge="true"
         :show-user="true"
-        :simplified-view="true"
         :items-per-page="100"
         :problemset-problems="Object.values(problems)"
         :search-result-users="searchResultUsers"
@@ -324,6 +294,7 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
+  @Prop({ default: false }) showRanking!: boolean;
   @Prop() totalRuns!: number;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: false }) isTeachingAssistant!: boolean;
@@ -333,7 +304,6 @@ export default class ArenaCourse extends Vue {
   feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
   @Prop() currentUsername!: string;
   @Prop() currentUserClassName!: string;
-  @Prop({ default: false }) useNewVerdictTable!: boolean;
 
   T = T;
   omegaup = omegaup;

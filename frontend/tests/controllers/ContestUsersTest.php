@@ -242,6 +242,66 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertArrayNotHasKey('adminPayload', $contestDetails);
     }
 
+    public function testContestJoinWithUnregisteredUserWithoutTheFlag() {
+        // Get a private contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        // Create two users
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'identity' => $unregisteredIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add the first user to our contest
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
+
+        $userLogin = self::login($unregisteredIdentity);
+        try {
+            \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $userLogin->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+    }
+
+    public function testContestJoinWithUnregisteredUserWithTheFlag() {
+        // Get a private contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        // Create two users
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'identity' => $unregisteredIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add the first user to our contest
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
+
+        $userLogin = self::login($unregisteredIdentity);
+
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'start_fresh' => true,
+            ])
+        )['templateProperties']['payload'];
+
+        $this->assertTrue(
+            $contestDetails['shouldShowModalToLoginWithRegisteredIdentity']
+        );
+    }
+
     public function testContestParticipantsReport() {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(

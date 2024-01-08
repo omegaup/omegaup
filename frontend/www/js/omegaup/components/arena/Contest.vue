@@ -82,6 +82,7 @@
               :contest-alias="contest.alias"
               :is-contest-finished="isContestFinished"
               :in-contest-or-course="true"
+              :use-new-verdict-table="false"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', {

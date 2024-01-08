@@ -217,7 +217,6 @@
             :contest-alias="contestAlias"
             :runs="runsByProblem"
             :show-details="true"
-            :simplified-view="true"
             :problemset-problems="[]"
             :request-feedback="requestFeedback"
             :is-contest-finished="isContestFinished"
@@ -292,7 +291,6 @@
           :show-rejudge="true"
           :show-filters="true"
           :show-disqualify="true"
-          :simplified-view="true"
           :items-per-page="100"
           :problemset-problems="[]"
           :search-result-users="searchResultUsers"
@@ -483,7 +481,7 @@ export default class ProblemDetails extends Vue {
   feedbackMap!: Map<number, ArenaCourseFeedback>;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
-  @Prop({ default: false }) useNewVerdictTable!: boolean;
+  @Prop({ default: true }) useNewVerdictTable!: boolean;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 

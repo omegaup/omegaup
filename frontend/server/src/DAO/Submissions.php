@@ -406,10 +406,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                     {$clause}";
 
         /** @var list<array{current_run_id: int|null, guid: string, identity_id: int, language: string, problem_id: int, problemset_id: int|null, school_id: int|null, status: string, submission_id: int, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, verdict: string}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            $params
-        );
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
         $submissions = [];
         foreach ($rs as $submission) {
             $submissions[] = new \OmegaUp\DAO\VO\Submissions($submission);

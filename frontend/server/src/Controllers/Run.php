@@ -92,6 +92,22 @@ class Run extends \OmegaUp\Controllers\Controller {
         'NO-AC',
     ];
 
+    public const EXECUTION = [
+        'EXECUTION_INTERRUPTED' => ['ML', 'MLE', 'TLE', 'OLE', 'TO', 'OL'],
+        'EXECUTION_FINISHED' => ['AC', 'WA', 'PA'],
+        'EXECUTION_RUNTIME_ERROR' => ['RE', 'RTE'],
+        'EXECUTION_RUNTIME_FUNCTION_ERROR' => ['OF', 'RFE'],
+        'EXECUTION_COMPILATION_ERROR' => ['CE'],
+        'EXECUTION_VALIDATOR_ERROR' => ['VE'],
+        'EXECUTION_JUDGE_ERROR' => ['JE'],
+    ];
+    public const OUTPUT = [
+        'OUTPUT_INTERRUPTED' => ['JE', 'VE', 'CE', 'FO', 'RFE', 'RE', 'RTE', 'MLE', 'TLE'],
+        'OUTPUT_CORRECT' => ['AC'],
+        'OUTPUT_INCORRECT' => ['WA', 'PA'],
+        'OUTPUT_EXCEEDED' => ['OLE', 'OL'],
+    ];
+
     public const STATUS = ['new', 'waiting', 'compiling', 'running', 'ready'];
 
     /**
@@ -840,7 +856,16 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Disqualify a submission
+     * Disqualify one or more submissions based on the received parameters:
+     *
+     * - When a run_alias is provided, it will only disqualify a single
+     *   submission.
+     * - When run_alias is not provided, both the username and the contest_alias
+     *   are required.
+     * - If a problem_alias is provided, all submissions belonging to the user
+     *   for this problem and contest will be disqualified.
+     * - If a problem_alias is not provided, all submissions belonging to the
+     *   user in this contest will be disqualified.
      *
      * @return array{status: string, runs: list<array{guid: null|string, username: null|string}>}
      *
@@ -881,7 +906,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 $user
             )
         );
-        $response = [];
+        $runs = [];
         if (!is_null($runAlias)) {
             [
                 'submission' => $submission,
@@ -904,7 +929,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 );
             }
             \OmegaUp\DAO\Submissions::disqualify($submission);
-            $response[] = ['guid' => $runAlias, 'username' => $username];
+            $runs[] = ['guid' => $runAlias, 'username' => $username];
         } elseif (!is_null($username)) {
             if (is_null($contestAlias)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -929,7 +954,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                     );
                 }
                 \OmegaUp\DAO\Submissions::disqualify($submission);
-                $response[] = ['guid' => $submission->guid, 'username' => $username];
+                $runs[] = ['guid' => $submission->guid, 'username' => $username];
             }
         }
 
@@ -937,7 +962,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
         return [
             'status' => 'ok',
-            'runs' => $response,
+            'runs' => $runs,
         ];
     }
 

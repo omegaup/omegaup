@@ -27,7 +27,13 @@
       </thead>
       <tbody>
         <tr v-for="(certificate, index) in certificates" :key="index">
-          <td class="text-left align-middle">
+          <td
+            v-if="selectedCertificate === certificate.verification_code"
+            class="text-left align-middle border-selected"
+          >
+            {{ certificate.date.toLocaleDateString() }}
+          </td>
+          <td v-else class="text-left align-middle">
             {{ certificate.date.toLocaleDateString() }}
           </td>
           <td class="text-left align-middle">
@@ -38,10 +44,11 @@
               {{ getVerificationLink(certificate.verification_code) }}
             </span>
           </td>
-          <td class="d-flex justify-content-between align-items-center">
+          <td class="d-flex align-items-center">
             <button
               v-clipboard="getVerificationLink(certificate.verification_code)"
-              class="btn btn-primary copy-to-clipboard"
+              copy-to-clipboard
+              class="btn btn-primary mr-2"
               type="button"
               :title="T.certificateListMineCopyToClipboard"
               :data-code="certificate.verification_code"
@@ -50,7 +57,8 @@
               <font-awesome-icon icon="clipboard" />
             </button>
             <a
-              class="btn btn-primary download-file"
+              download-file
+              class="btn btn-primary"
               type="button"
               :href="getDownloadLink(certificate.verification_code)"
               :title="T.certificateListMineDownload"
@@ -91,6 +99,7 @@ Vue.use(Clipboard);
 })
 export default class Mine extends Vue {
   @Prop() certificates!: types.CertificateListItem[];
+  @Prop() selectedCertificate?: string;
   @Prop() location!: string;
 
   T = T;
@@ -128,3 +137,12 @@ export default class Mine extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.border-selected {
+  border-left: 0.25rem solid
+    var(--certificates-selected-certificate-border-color);
+}
+</style>

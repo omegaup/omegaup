@@ -10,6 +10,40 @@
  */
 class Notification extends \OmegaUp\Controllers\Controller {
     /**
+     * @param list<string> $usersIds
+     * @param string $contestTitle
+     * @param list<string> $verificationCodes
+     */
+    public static function createNotificationsForNewContestCertificates(
+        array $usersIds,
+        string $contestTitle,
+        array $verificationCodes
+    ): void {
+        foreach ($usersIds as $index => $userId) {
+            \OmegaUp\DAO\Base\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $userId,
+                    'contents' =>  json_encode(
+                        [
+                            'type' => \OmegaUp\DAO\Notifications::CERTIFICATE_AWARDED,
+                            'body' => [
+                                'localizationString' => new \OmegaUp\TranslationString(
+                                    'notificationNewContestCertificate'
+                                ),
+                                'localizationParams' => [
+                                    'contest_title' => $contestTitle,
+                                ],
+                                'url' => "/certificates/mine/#{$verificationCodes[$index]}",
+                                'iconUrl' => '/media/info.png',
+                            ]
+                        ]
+                    ),
+                ])
+            );
+        }
+    }
+
+    /**
      * Returns a list of unread notifications for user
      *
      * @return array{notifications: list<Notification>}

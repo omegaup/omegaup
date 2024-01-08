@@ -3423,7 +3423,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ?string $language = null,
         ?int $identityId = null,
         ?int $offset = 0,
-        ?int $rowCount = 100
+        ?int $rowCount = 100,
+        ?string $execution = null,
+        ?string $output = null,
     ): array {
         // Get our runs
         [
@@ -3438,6 +3440,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             identityId: $identityId,
             offset: $offset,
             rowCount: $rowCount,
+            execution: $execution,
+            output: $output,
         );
 
         $allRuns = [];
@@ -3464,6 +3468,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $status
      * @omegaup-request-param null|string $username
      * @omegaup-request-param null|string $verdict
+     * @omegaup-request-param null|string $execution
+     * @omegaup-request-param null|string $output
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
@@ -3512,7 +3518,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $r->ensureOptionalString('language'),
                 !is_null($identity) ? intval($identity->identity_id) : null,
                 max($r->ensureOptionalInt('offset') ?? 0, 0),
-                $r->ensureOptionalInt('rowcount') ?? 100
+                $r->ensureOptionalInt('rowcount') ?? 100,
+                $r->ensureOptionalString('execution'),
+                $r->ensureOptionalString('output')
             );
         }
         // Get all the available runs

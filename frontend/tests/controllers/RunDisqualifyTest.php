@@ -27,6 +27,7 @@ class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
             ]
         ];
     }
+
     /**
      * @dataProvider proveDisqualifyProvider
      */
@@ -177,5 +178,125 @@ class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
             $response['ranking'][1]['problems'][0]['points']
         );
         $this->assertSame(0, $response['ranking'][1]['problems'][0]['runs']);
+    }
+
+    public function disqualifyTypeProvider(): array {
+        return [
+            ['ByGuid', 'user_3', 1],
+            ['ByUserAndProblem', 'user_1', 3],
+            ['ByUser', 'user_2', 6],
+        ];
+    }
+
+    /**
+     * @dataProvider disqualifyTypeProvider
+     */
+    public function testDisqualifyByType(
+        string $type,
+        string $identityUsername,
+        int $expectedDisqualifiedRuns
+    ) {
+        $problemsAliases = ['problem1', 'problem2', 'problem3'];
+        $contestantsRunsByProblem = [
+            'user_1' => [3, 2, 1],
+            'user_2' => [2, 3, 1],
+            'user_3' => [1, 2, 2],
+        ];
+
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Create 3 problems
+        $problemsData = [];
+        foreach ($problemsAliases as $index => $problemAlias) {
+            $problemsData[$index] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'alias' => $problemAlias,
+                ])
+            );
+
+            // Add the problems to the contest
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
+                $problemsData[$index],
+                $contestData
+            );
+        }
+
+        $identities = [];
+        $runsCount = 0;
+        foreach ($contestantsRunsByProblem as $contestantUsername => $contestantRuns) {
+            // Create 3 contestants
+            [
+                'identity' => $identities[$contestantUsername]
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams([
+                    'username' => $contestantUsername,
+                ])
+            );
+
+            foreach ($contestantRuns as $problemIndex => $runs) {
+                $runsData = [];
+                foreach (range(0, $runs - 1) as $i => $_) {
+                    // Create new runs
+                    $runsData[$i] = \OmegaUp\Test\Factories\Run::createRun(
+                        $problemsData[$problemIndex],
+                        $contestData,
+                        $identities[$contestantUsername]
+                    );
+                    \OmegaUp\Test\Factories\Run::gradeRun($runsData[$i]);
+                    // Two minutes later for every submission
+                    \OmegaUp\Time::setTimeForTesting(
+                        \OmegaUp\Time::get() + 60 * 2
+                    );
+                    $runsCount++;
+                }
+            }
+        }
+
+        $login = self::login($contestData['director']);
+
+        $requestParams = ['auth_token' => $login->auth_token];
+        if ($type === 'ByGuid') {
+            $requestParams['run_alias'] = $runsData[0]['response']['guid'];
+        } else {
+            $requestParams['username'] = $identityUsername;
+            $requestParams['contest_alias'] = $contestData['request']['alias'];
+            if ($type === 'ByUserAndProblem') {
+                $requestParams['problem_alias'] = 'problem1';
+            }
+        }
+        \OmegaUp\Controllers\Run::apiDisqualify(
+            new \OmegaUp\Request($requestParams)
+        );
+
+        [
+            'runs' => $runs,
+            'totalRuns' => $totalRuns,
+        ] = \OmegaUp\Controllers\Contest::apiRuns(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertSame($runsCount, $totalRuns);
+
+        $runTypes = array_map(fn ($run) => [
+            'username' => $run['username'],
+            'problem_alias' => $run['alias'],
+            'contest_alias' => $run['contest_alias'],
+            'type' => $run['type'],
+        ], $runs);
+
+        $disqualifiedRuns = array_filter(
+            $runTypes,
+            fn ($run) => $run['type'] === 'disqualified'
+        );
+
+        $this->assertCount($expectedDisqualifiedRuns, $disqualifiedRuns);
+
+        foreach ($disqualifiedRuns as $run) {
+            $this->assertSame($run['username'], $identityUsername);
+        }
     }
 }
