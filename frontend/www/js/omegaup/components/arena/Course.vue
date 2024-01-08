@@ -3,7 +3,7 @@
     :active-tab="activeTab"
     :title="currentAssignment.name"
     :should-show-runs="isAdmin || isTeachingAssistant"
-    :should-show-ranking="course.admission_mode !== 'public'"
+    :should-show-ranking="showRanking"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #socket-status>
@@ -294,6 +294,7 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
+  @Prop({ default: false }) showRanking!: boolean;
   @Prop() totalRuns!: number;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: false }) isTeachingAssistant!: boolean;

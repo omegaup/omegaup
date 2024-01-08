@@ -302,6 +302,10 @@ class Utils {
                 'ALTER TABLE QualityNominations auto_increment = 18664'
             );
 
+            // Make sure the run_id and submission_id never matches in tests.
+            \OmegaUp\MySQLConnection::getInstance()->Execute(
+                'ALTER TABLE Submissions auto_increment = 100000;'
+            );
             // Make sure the user_id and identity_id never matches in tests.
             \OmegaUp\MySQLConnection::getInstance()->Execute(
                 'ALTER TABLE Identities auto_increment = 100000;'
