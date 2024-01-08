@@ -671,6 +671,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @return Run
      *
      * @omegaup-request-param string $run_alias
+     * @omegaup-request-param null|string $username
      */
     public static function apiStatus(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -679,6 +680,10 @@ class Run extends \OmegaUp\Controllers\Controller {
         $runAlias = $r->ensureString(
             'run_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $username = $r->ensureOptionalString(
+            'username',
+            false
         );
         $submission = \OmegaUp\DAO\Submissions::getByGuid($runAlias);
         if (
@@ -754,7 +759,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'username' => (
                 ($submission->identity_id == $r->identity->identity_id) ?
                 $r->identity->username
-                : ''
+                : $username ?? ''
             ),
             'classname' => 'user-rank-unranked',
             'execution' => strval($filtered['execution']),
@@ -851,11 +856,23 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Disqualify a submission
+     * Disqualify one or more submissions based on the received parameters:
      *
-     * @return array{status: string}
+     * - When a run_alias is provided, it will only disqualify a single
+     *   submission.
+     * - When run_alias is not provided, both the username and the contest_alias
+     *   are required.
+     * - If a problem_alias is provided, all submissions belonging to the user
+     *   for this problem and contest will be disqualified.
+     * - If a problem_alias is not provided, all submissions belonging to the
+     *   user in this contest will be disqualified.
      *
-     * @omegaup-request-param string $run_alias
+     * @return array{status: string, runs: list<array{guid: null|string, username: null|string}>}
+     *
+     * @omegaup-request-param null|string $run_alias
+     * @omegaup-request-param null|string $problem_alias
+     * @omegaup-request-param null|string $contest_alias
+     * @omegaup-request-param null|string $username
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
@@ -863,37 +880,89 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Get the user who is calling this API
         $r->ensureMainUserIdentity();
 
-        $runAlias = $r->ensureString(
+        $runAlias = $r->ensureOptionalString(
             'run_alias',
+            false,
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        [
-            'submission' => $submission,
-        ] = self::validateDetailsRequest($runAlias);
-
-        if (
-            !\OmegaUp\Authorization::canEditSubmission(
-                $r->identity,
-                $submission
+        $problemAlias = $r->ensureOptionalString(
+            'problem_alias',
+            false,
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $contestAlias = $r->ensureOptionalString(
+            'contest_alias',
+            false,
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $username = $r->ensureOptionalString(
+            'username',
+            false,
+            fn (string $user) => \OmegaUp\Validators::normalUsername(
+                $user
+            ) || \OmegaUp\Validators::identityUsername(
+                $user
+            ) || \OmegaUp\Validators::identityTeamUsername(
+                $user
             )
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
-            );
-        }
+        );
+        $runs = [];
+        if (!is_null($runAlias)) {
+            [
+                'submission' => $submission,
+            ] = self::validateDetailsRequest($runAlias);
 
-        if ($submission->type !== 'normal') {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'runCannotBeDisqualified'
-            );
-        }
+            if (
+                !\OmegaUp\Authorization::canEditSubmission(
+                    $r->identity,
+                    $submission
+                )
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userNotAllowed'
+                );
+            }
 
-        \OmegaUp\DAO\Submissions::disqualify($submission);
+            if ($submission->type !== 'normal') {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'runCannotBeDisqualified'
+                );
+            }
+            \OmegaUp\DAO\Submissions::disqualify($submission);
+            $runs[] = ['guid' => $runAlias, 'username' => $username];
+        } elseif (!is_null($username)) {
+            if (is_null($contestAlias)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterNotFound',
+                    'contest_alias'
+                );
+            }
+            $submissions = \OmegaUp\DAO\Submissions::getAllSubmissionsByUserContest(
+                $username,
+                $contestAlias,
+                $problemAlias
+            );
+            foreach ($submissions as $submission) {
+                if (
+                    !\OmegaUp\Authorization::canEditSubmission(
+                        $r->identity,
+                        $submission
+                    )
+                ) {
+                    throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                        'userNotAllowed'
+                    );
+                }
+                \OmegaUp\DAO\Submissions::disqualify($submission);
+                $runs[] = ['guid' => $submission->guid, 'username' => $username];
+            }
+        }
 
         // Expire ranks
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
         return [
-            'status' => 'ok'
+            'status' => 'ok',
+            'runs' => $runs,
         ];
     }
 
