@@ -123,7 +123,13 @@ class ContestParams {
     public $showScoreboardAfter;
 
     /**
-     * @param array{alias?: string, title?: string, admissionMode?: string, basicInformation?: bool, contestForTeams?: bool, teamsGroupAlias?: string, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string, scoreMode?: string, checkPlagiarism?: bool, scoreboardPct?: int, showScoreboardAfter?: bool} $params
+     * @readonly
+     * @var string
+     */
+    public $penaltyType;
+
+    /**
+     * @param array{alias?: string, admissionMode?: string, basicInformation?: bool, checkPlagiarism?: bool, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, contestForTeams?: bool, feedback?: string, finishTime?: \OmegaUp\Timestamp, languages?: ?list<string>, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, penaltyType?: string, requestsUserInformation?: string, scoreboardPct?: int, scoreMode?: string, showScoreboardAfter?: bool, startTime?: \OmegaUp\Timestamp, teamsGroupAlias?: string, title?: string, windowLength?: ?int} $params
      */
     public function __construct($params = []) {
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
@@ -160,6 +166,7 @@ class ContestParams {
             new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 60 * 60)
         );
         $this->penaltyCalcPolicy = $params['penaltyCalcPolicy'] ?? 'sum';
+        $this->penaltyType = $params['penaltyType'] ?? 'contest_start';
         $this->feedback = $params['feedback'] ?? 'detailed';
         $this->contestForTeams = $params['contestForTeams'] ?? false;
         $this->teamsGroupAlias = $params['teamsGroupAlias'] ?? null;
@@ -210,7 +217,7 @@ class Contest {
             'feedback' => $params->feedback,
             'penalty' => 100,
             'scoreboard' => $params->scoreboardPct,
-            'penalty_type' => 'contest_start',
+            'penalty_type' => $params->penaltyType,
             'languages' => $params->languages,
             'recommended' => 0, // This is just a default value, it is not honored by apiCreate.
             'needs_basic_information' => $params->basicInformation,
