@@ -4,4 +4,4 @@ ADD COLUMN `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Alm
 
 -- Schools table
 ALTER TABLE `Schools`
-ADD COLUMN `timestamp` timestamp NULL DEFAULT NULL COMMENT 'Almacena la hora y fecha en que se actualiza el rank de escuelas';
+ADD COLUMN `timestamp` timestamp NULL DEFAULT NULL COMMENT 'Almacena la hora y fecha en que se actualizó el rank de la escuela';

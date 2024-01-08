@@ -964,7 +964,7 @@ CREATE TABLE `Schools` (
   `name` varchar(128) NOT NULL,
   `ranking` int DEFAULT NULL,
   `score` double NOT NULL DEFAULT '0',
-  `timestamp` timestamp NULL DEFAULT NULL COMMENT 'Almacena la hora y fecha en que se actualiza el rank de escuelas',
+  `timestamp` timestamp NULL DEFAULT NULL COMMENT 'Almacena la hora y fecha en que se actualizó el rank de la escuela',
   PRIMARY KEY (`school_id`),
   UNIQUE KEY `name_country_id_state_id` (`name`,`country_id`,`state_id`),
   KEY `country_id` (`country_id`),
