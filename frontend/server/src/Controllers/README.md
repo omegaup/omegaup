@@ -3881,17 +3881,31 @@ types.RunDetails;
 
 ### Description
 
-Disqualify a submission
+Disqualify one or more submissions based on the received parameters:
+
+- When a run_alias is provided, it will only disqualify a single
+  submission.
+- When run_alias is not provided, both the username and the contest_alias
+  are required.
+- If a problem_alias is provided, all submissions belonging to the user
+  for this problem and contest will be disqualified.
+- If a problem_alias is not provided, all submissions belonging to the
+  user in this contest will be disqualified.
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `contest_alias` | `null\|string` |             |
+| `problem_alias` | `null\|string` |             |
+| `run_alias`     | `null\|string` |             |
+| `username`      | `null\|string` |             |
 
 ### Returns
 
-_Nothing_
+| Name   | Type                                    |
+| ------ | --------------------------------------- |
+| `runs` | `{ guid: string; username: string; }[]` |
 
 ## `/api/run/getSubmissionFeedback/`
 
@@ -3998,9 +4012,10 @@ Get basic details of a run
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
+| Name        | Type           | Description |
+| ----------- | -------------- | ----------- |
+| `run_alias` | `string`       |             |
+| `username`  | `null\|string` |             |
 
 ### Returns
 
