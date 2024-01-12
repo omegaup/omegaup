@@ -3939,25 +3939,6 @@ class User extends \OmegaUp\Controllers\Controller {
             $params[ 'filter'] = $currentFilter;
         }
 
-        $response = [
-            'templateProperties' => [
-                'payload' => [
-                    'page' => $page,
-                    'length' => $length,
-                    'filter' => $currentFilter,
-                    'availableFilters' => $availableFilters,
-                    'isIndex' => false,
-                    'isLogged' => false,
-                    'ranking' => [],
-                    'pagerItems' => [],
-                ],
-                'title' => new \OmegaUp\TranslationString(
-                    'omegaupTitleUsersRank'
-                )
-            ],
-            'entrypoint' => 'users_rank',
-        ];
-
         try {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
@@ -3976,12 +3957,26 @@ class User extends \OmegaUp\Controllers\Controller {
                 params: $params,
             );
 
-            $response['templateProperties']['payload']['ranking'] = $ranking;
-            $response['templateProperties']['payload']['pagerItems'] = $pager;
-            return $response;
+            return [
+                'templateProperties' => [
+                    'payload' => [
+                        'page' => $page,
+                        'length' => $length,
+                        'filter' => $currentFilter,
+                        'availableFilters' => $availableFilters,
+                        'isIndex' => false,
+                        'isLogged' => false,
+                        'ranking' => $ranking,
+                        'pagerItems' => $pager,
+                    ],
+                    'title' => new \OmegaUp\TranslationString(
+                        'omegaupTitleUsersRank'
+                    )
+                ],
+                'entrypoint' => 'users_rank',
+            ];
         }
 
-        $response['templateProperties']['payload']['isLogged'] = true;
         if (!is_null($r->identity->country_id)) {
             $availableFilters['country'] =
                 \OmegaUp\Translations::getInstance($r->identity)->get(
@@ -4010,7 +4005,6 @@ class User extends \OmegaUp\Controllers\Controller {
                     'wordsFilterBySchool'
                 );
         }
-        $response['templateProperties']['payload']['availableFilters'] = $availableFilters;
         [
             'ranking' => $ranking,
             'pager' => $pager,
@@ -4022,9 +4016,24 @@ class User extends \OmegaUp\Controllers\Controller {
             params: $params,
         );
 
-        $response['templateProperties']['payload']['ranking'] = $ranking;
-        $response['templateProperties']['payload']['pagerItems'] = $pager;
-        return $response;
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'page' => $page,
+                    'length' => $length,
+                    'filter' => $currentFilter,
+                    'availableFilters' => $availableFilters,
+                    'isIndex' => false,
+                    'isLogged' => true,
+                    'ranking' => $ranking,
+                    'pagerItems' => $pager,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleUsersRank'
+                )
+            ],
+            'entrypoint' => 'users_rank',
+        ];
     }
 
     /**
