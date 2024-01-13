@@ -92,6 +92,7 @@
                     password,
                     passwordConfirmation,
                     recaptchaResponse,
+                    checked,
                   )
                 "
               >
@@ -129,6 +130,7 @@ export default class Signup extends Vue {
   password: string = '';
   passwordConfirmation: string = '';
   recaptchaResponse: string = '';
+  checked: boolean = false;
 
   mounted() {
     const title = T.signUpFormInteractiveGuideTitle;

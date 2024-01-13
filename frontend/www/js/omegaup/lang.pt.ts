@@ -983,6 +983,7 @@ const translations: { [key: string]: string; } = {
   passwordResetTokenWasGeneratedSuccessfully: "O token foi gerado com sucesso",
   pendingRegistrations: "Solicita\u00e7\u00f5es pendentes",
   pendingRegistrationsShowAll: "Mostrar todas as solicita\u00e7\u00f5es",
+  privacyPolicyNotAccepted: "Por favor leia e aceite a [Pol\u00edtica de Uso e Privacidade] do site(http://blog.omegaup.com/privacy-policy/), bem como o [C\u00f3digo de Conduta](https://blog.omegaup.com/codigo -de-conducta-en-omegaup/).",
   privacyStatementNotFound: "Declara\u00e7\u00e3o de privacidade n\u00e3o encontrada.",
   privateTagsPlaceholder: "Ex. faculdade, 2019, aulas-2020",
   problemAliasExists: "J\u00e1 existe este alias de problema. Por favor, tente um diferente.",

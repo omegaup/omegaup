@@ -74,6 +74,7 @@ OmegaUp.on('ready', () => {
             password: string,
             passwordConfirmation: string,
             recaptchaResponse: string,
+            checked: boolean,
           ) => {
             if (password != passwordConfirmation) {
               ui.error(T.passwordMismatch);
@@ -83,7 +84,10 @@ OmegaUp.on('ready', () => {
               ui.error(T.loginPasswordTooShort);
               return;
             }
-
+            if (checked != true) {
+              ui.error(T.privacyPolicyNotAccepted);
+              return;
+            }
             api.User.create({
               username: username,
               email: email,

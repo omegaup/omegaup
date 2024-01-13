@@ -982,6 +982,7 @@
 	"passwordResetTokenWasGeneratedSuccessfully": "El token fue generado exitosamente",
 	"pendingRegistrations": "Solicitudes pendientes",
 	"pendingRegistrationsShowAll": "Mostrar todas las solicitudes",
+	"privacyPolicyNotAccepted": "Lea y acepte la [Pol\u00edtica de uso y privacidad] del sitio (http://blog.omegaup.com/privacy-policy/), as\u00ed como el [C\u00f3digo de conducta](https://blog.omegaup.com/codigo -de-conducta-en-omegaup/).",
 	"privacyStatementNotFound": "La declaraci\u00f3n de privacidad no fue encontrada.",
 	"privateTagsPlaceholder": "Ej. universidad, 2019, clase-2020",
 	"problemAliasExists": "El alias del problema ya existe, por favor selecciona otro.",

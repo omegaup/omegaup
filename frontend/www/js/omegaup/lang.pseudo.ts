@@ -983,6 +983,7 @@ const translations: { [key: string]: string; } = {
   passwordResetTokenWasGeneratedSuccessfully: "(T0k3n wa5 g3n3ra73d 5ucc35fu11y)",
   pendingRegistrations: "(P3nding r3qu3575)",
   pendingRegistrationsShowAll: "(Sh0w a11 r3qu3575)",
+  privacyPolicyNotAccepted: "(P13a53 r3ad and acc3p7 7h3 5i73'5 [U53 and Privacy P01icy](h77p://b10g.0m3gaup.c0m/privacy-p01icy/), a5 w311 a5 7h3 [C0d3 0f C0nduc7](h77p5://b10g.0m3gaup.c0m/c0dig0-d3-c0nduc7a-3n-0m3gaup/).)",
   privacyStatementNotFound: "(Privacy S7a73m3n7 n07 f0und.)",
   privateTagsPlaceholder: "(Ex. univ3r5i7y, 2019, c1a55-2020)",
   problemAliasExists: "(Pr0b13m a1ia5 a1r3ady 3xi575. P13a53 7ry a diff3r3n7 0n3.)",
