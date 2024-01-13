@@ -8,8 +8,8 @@
       <input
         v-model="certificateCutoff"
         :disabled="
-          certificatesDetails.certificatesStatus !== 'uninitiated' &&
-          certificatesDetails.certificatesStatus !== 'retryable_error'
+          certificatesDetails.certificatesStatus === 'queued' ||
+          certificatesDetails.certificatesStatus === 'generated'
         "
         class="form-control"
         type="text"
@@ -20,8 +20,8 @@
       </p>
       <button
         :disabled="
-          certificatesDetails.certificatesStatus !== 'uninitiated' &&
-          certificatesDetails.certificatesStatus !== 'retryable_error'
+          certificatesDetails.certificatesStatus === 'queued' ||
+          certificatesDetails.certificatesStatus === 'generated'
         "
         type="button"
         class="btn btn-primary d-block mx-auto"
