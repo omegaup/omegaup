@@ -7,13 +7,14 @@ import contest_Certificates from './Certificates.vue';
 
 describe('Certificates.vue', () => {
   it('Should handle generated certificates', () => {
+    const certificatesDetails: types.ContestCertificatesAdminDetails = {
+      certificateCutoff: 5,
+      certificatesStatus: 'generated',
+      isCertificateGenerator: true,
+    };
     const wrapper = shallowMount(contest_Certificates, {
       propsData: {
-        certificatesDetails: {
-          certificateCutoff: 5,
-          certificatesStatus: 'generated',
-          isCertificateGenerator: true,
-        } as types.ContestCertificatesAdminDetails,
+        certificatesDetails,
       },
     });
 
@@ -27,13 +28,14 @@ describe('Certificates.vue', () => {
   });
 
   it('Should generate certificates', async () => {
+    const certificatesDetails: types.ContestCertificatesAdminDetails = {
+      certificateCutoff: 5,
+      certificatesStatus: 'uninitiated',
+      isCertificateGenerator: true,
+    };
     const wrapper = mount(contest_Certificates, {
       propsData: {
-        certificatesDetails: {
-          certificateCutoff: 5,
-          certificatesStatus: 'uninitiated',
-          isCertificateGenerator: true,
-        } as types.ContestCertificatesAdminDetails,
+        certificatesDetails,
       },
     });
 
