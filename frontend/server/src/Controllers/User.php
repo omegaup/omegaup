@@ -3916,22 +3916,13 @@ class User extends \OmegaUp\Controllers\Controller {
         $filter = $r->ensureOptionalEnum(
             'filter',
             [
-                '',
-                'country',
-                'state',
-                'school',
+                \OmegaUp\DAO\Enum\RankFilter::NONE,
+                \OmegaUp\DAO\Enum\RankFilter::COUNTRY,
+                \OmegaUp\DAO\Enum\RankFilter::STATE,
+                \OmegaUp\DAO\Enum\RankFilter::SCHOOL,
             ]
         );
-        $currentFilter = \OmegaUp\DAO\Enum\RankFilter::NONE;
-        if (!is_null($filter)) {
-            if ($filter === 'country') {
-                $currentFilter = \OmegaUp\DAO\Enum\RankFilter::COUNTRY;
-            } elseif ($filter === 'state') {
-                $currentFilter = \OmegaUp\DAO\Enum\RankFilter::STATE;
-            } elseif ($filter === 'school') {
-                $currentFilter = \OmegaUp\DAO\Enum\RankFilter::SCHOOL;
-            }
-        }
+        $currentFilter = $filter ?? \OmegaUp\DAO\Enum\RankFilter::NONE;
 
         $availableFilters = [];
         $params = [];
