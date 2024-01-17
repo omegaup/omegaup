@@ -274,9 +274,9 @@ class School extends \OmegaUp\Controllers\Controller {
     public static function getRankForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('length');
-
-        $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null($r['length']) ? 100 : intval($r['length']);
+     
+            $page = $r['page'] ?? 1;
+             $length = $r['length'] ?? 100;
 
         $schoolRank = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_RANK,
