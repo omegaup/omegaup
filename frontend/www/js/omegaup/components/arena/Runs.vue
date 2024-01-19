@@ -362,7 +362,7 @@
                       <div class="dropdown-divider"></div>
                       <template v-if="run.type === 'normal'">
                         <button
-                          :data-actions-disqualify="run.guid"
+                          :data-actions-disqualify-by-guid="run.guid"
                           class="btn-link dropdown-item"
                           @click="
                             $emit('disqualify', {
@@ -375,7 +375,7 @@
                         </button>
                         <template v-if="inContest">
                           <button
-                            :data-actions-disqualify="run.guid"
+                            :data-actions-disqualify-by-problem="run.guid"
                             class="btn-link dropdown-item"
                             @click="
                               $emit('disqualify', {
@@ -388,7 +388,7 @@
                             {{ T.arenaRunsActionsDisqualifyByProblem }}
                           </button>
                           <button
-                            :data-actions-disqualify="run.guid"
+                            :data-actions-disqualify-by-user="run.guid"
                             class="btn-link dropdown-item"
                             @click="
                               $emit('disqualify', {

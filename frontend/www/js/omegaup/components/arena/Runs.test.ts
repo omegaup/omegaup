@@ -260,6 +260,7 @@ describe('Runs.vue', () => {
         showRejudge: true,
         isContestFinished: false,
         useNewSubmissionButton: true,
+        inContest: true,
       },
     });
     expect(wrapper.find('[data-actions="120000"]').text()).toContain(
@@ -269,7 +270,9 @@ describe('Runs.vue', () => {
       T.arenaRunsActionsRequalify,
     );
     await wrapper.find('[data-actions="120000"]').trigger('click');
-    await wrapper.find('[data-actions-disqualify="120000"]').trigger('click');
+    await wrapper
+      .find('[data-actions-disqualify-by-guid="120000"]')
+      .trigger('click');
     expect(wrapper.emitted('disqualify')).toEqual([
       [
         {
@@ -299,6 +302,34 @@ describe('Runs.vue', () => {
           guid: '122600',
           time: new Date('1/3/2020, 12:25:00 AM'),
           type: 'disqualified',
+        },
+      ],
+    ]);
+    await wrapper.find('[data-actions="121500"]').trigger('click');
+    await wrapper
+      .find('[data-actions-disqualify-by-user="121500"]')
+      .trigger('click');
+    expect(wrapper.emitted('disqualify')).toEqual([
+      [
+        {
+          disqualificationType: DisqualificationType.ByGUID,
+          run: {
+            ...baseRunData,
+            guid: '120000',
+            username: 'other_username',
+            time: new Date('1/1/2020, 12:00:00 AM'),
+          },
+        },
+      ],
+      [
+        {
+          disqualificationType: DisqualificationType.ByUser,
+          run: {
+            ...baseRunData,
+            guid: '121500',
+            username: 'username',
+            time: new Date('1/1/2020, 12:15:00 AM'),
+          },
         },
       ],
     ]);
