@@ -1640,6 +1640,7 @@ const translations: { [key: string]: string; } = {
   userOrMailNotFound: "Account name or email not found.",
   userPasswordMustBeSame: "The new passwords must be the same.",
   userProfileIsPrivate: "This account's profile is marked private; some information will not be displayed",
+  userProfileProblemsFilter: "Filter",
   userRankEmptyList: "There is not data to show in the ranking",
   userRankOfTheMonthHeader: "%(count) coders with the most points in the month",
   userRankSolvedProblemsHelp: "The number of solved problems is updated once a day.",
