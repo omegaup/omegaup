@@ -2738,6 +2738,40 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Get rank by problems solved logic. It has its own func so it can be
+     * accesed internally without authentication.
+     *
+     * @return array{pager: list<PageItem>, ranking: UserRank}
+     */
+    public static function getRankByProblemsSolvedWithPager(
+        ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
+        string $filteredBy,
+        int $offset,
+        int $rowCount,
+        array $params
+    ) {
+        $ranking = self::getRankByProblemsSolved(
+            $loggedIdentity,
+            filteredBy: $filteredBy,
+            offset: $offset,
+            rowCount: $rowCount
+        );
+        $pager = \OmegaUp\Pager::paginateWithUrl(
+            $ranking['total'],
+            $rowCount,
+            $offset,
+            '/rank/',
+            adjacent: 5,
+            params: $params,
+        );
+
+        return [
+            'pager' => $pager,
+            'ranking' => $ranking,
+        ];
+    }
+
+    /**
      * Get authors of quality problems
      *
      * @return AuthorsRank
@@ -3872,65 +3906,68 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{templateProperties: array{payload: UserRankTablePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
-     * @omegaup-request-param mixed $filter
-     * @omegaup-request-param int $length
-     * @omegaup-request-param int $page
+     * @omegaup-request-param null|string $filter
+     * @omegaup-request-param int|null $length
+     * @omegaup-request-param int|null $page
      */
     public static function getRankForTypeScript(\OmegaUp\Request $r) {
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('length');
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['filter'],
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? 100;
+        $filter = $r->ensureOptionalEnum(
             'filter',
-            ['', 'country', 'state', 'school']
+            [
+                \OmegaUp\DAO\Enum\RankFilter::NONE,
+                \OmegaUp\DAO\Enum\RankFilter::COUNTRY,
+                \OmegaUp\DAO\Enum\RankFilter::STATE,
+                \OmegaUp\DAO\Enum\RankFilter::SCHOOL,
+            ]
         );
-
-        $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null($r['length']) ? 100 : intval($r['length']);
-        $filter = strval($r['filter']);
+        $currentFilter = $filter ?? \OmegaUp\DAO\Enum\RankFilter::NONE;
 
         $availableFilters = [];
-
-        $ranking = self::getRankByProblemsSolved(
-            $r->identity,
-            $filter,
-            $page,
-            $length
-        );
-        $response = [
-            'templateProperties' => [
-                'payload' => [
-                    'page' => $page,
-                    'length' => $length,
-                    'filter' => $filter,
-                    'availableFilters' => $availableFilters,
-                    'isIndex' => false,
-                    'isLogged' => false,
-                    'ranking' => $ranking,
-                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
-                        $ranking['total'],
-                        $length,
-                        $page,
-                        '/rank/',
-                        adjacent: 5,
-                        params: $filter === '' ? [] : [ 'filter' => $filter ]
-                    ),
-                ],
-                'title' => new \OmegaUp\TranslationString(
-                    'omegaupTitleUsersRank'
-                )
-            ],
-            'entrypoint' => 'users_rank',
-        ];
+        $params = [];
+        if ($currentFilter !== \OmegaUp\DAO\Enum\RankFilter::NONE) {
+            $params[ 'filter'] = $currentFilter;
+        }
 
         try {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing. Not logged user can access here
-            return $response;
+            $r->identity = null;
+        }
+        if (is_null($r->identity)) {
+            [
+                'ranking' => $ranking,
+                'pager' => $pager,
+            ] = self::getRankByProblemsSolvedWithPager(
+                loggedIdentity: null,
+                filteredBy: $currentFilter,
+                offset: $page,
+                rowCount: $length,
+                params: $params,
+            );
+
+            return [
+                'templateProperties' => [
+                    'payload' => [
+                        'page' => $page,
+                        'length' => $length,
+                        'filter' => $currentFilter,
+                        'availableFilters' => $availableFilters,
+                        'isIndex' => false,
+                        'isLogged' => false,
+                        'ranking' => $ranking,
+                        'pagerItems' => $pager,
+                    ],
+                    'title' => new \OmegaUp\TranslationString(
+                        'omegaupTitleUsersRank'
+                    )
+                ],
+                'entrypoint' => 'users_rank',
+            ];
         }
 
-        $response['templateProperties']['payload']['isLogged'] = true;
         if (!is_null($r->identity->country_id)) {
             $availableFilters['country'] =
                 \OmegaUp\Translations::getInstance($r->identity)->get(
@@ -3959,14 +3996,35 @@ class User extends \OmegaUp\Controllers\Controller {
                     'wordsFilterBySchool'
                 );
         }
-        $response['templateProperties']['payload']['availableFilters'] = $availableFilters;
-        $response['templateProperties']['payload']['ranking'] = self::getRankByProblemsSolved(
-            $r->identity,
-            $filter,
-            $page,
-            $length
+        [
+            'ranking' => $ranking,
+            'pager' => $pager,
+        ] = self::getRankByProblemsSolvedWithPager(
+            loggedIdentity: $r->identity,
+            filteredBy: $currentFilter,
+            offset: $page,
+            rowCount: $length,
+            params: $params,
         );
-        return $response;
+
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'page' => $page,
+                    'length' => $length,
+                    'filter' => $currentFilter,
+                    'availableFilters' => $availableFilters,
+                    'isIndex' => false,
+                    'isLogged' => true,
+                    'ranking' => $ranking,
+                    'pagerItems' => $pager,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleUsersRank'
+                )
+            ],
+            'entrypoint' => 'users_rank',
+        ];
     }
 
     /**
