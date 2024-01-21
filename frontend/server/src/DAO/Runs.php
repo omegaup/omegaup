@@ -210,7 +210,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ?string $language,
         ?int $identityId,
         ?int $offset = 0,
-        ?int $rowCount = 100
+        ?int $rowCount = 100,
+        ?string $execution = null,
+        ?string $output = null,
     ): array {
         $where = [];
         $val = [];
@@ -243,6 +245,22 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             } else {
                 $where[] = 's.verdict = ?';
                 $val[] = $verdict;
+            }
+        } else {
+            if (!is_null($execution)) {
+                $executionArgs = \OmegaUp\Controllers\Run::EXECUTION[$execution];
+                $placeholders = array_fill(0, count($executionArgs), '?');
+                $placeholders = join(',', $placeholders);
+                $where[] = "s.verdict IN ({$placeholders})";
+                $val = array_merge($val, $executionArgs);
+            }
+
+            if (!is_null($output)) {
+                $outputArgs = \OmegaUp\Controllers\Run::OUTPUT[$output];
+                $placeholders = array_fill(0, count($outputArgs), '?');
+                $placeholders = join(',', $placeholders);
+                $where[] = "s.verdict IN ({$placeholders})";
+                $val = array_merge($val, $outputArgs);
             }
         }
 
@@ -1270,16 +1288,18 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Recalculate contest runs with the following rules:
      *
-     * + If penalty_type is none then:
+     * + If penaltyType is none then:
      *   - penalty = 0.
-     * + If penalty_type is runtime then:
+     * + If penaltyType is runtime then:
      *   - penalty = runtime.
-     * + If penalty_type is anything else then:
+     * + If penaltyType is anything else then:
      *   - penalty = submit_delay
      */
-    public static function recalculatePenaltyForContest(\OmegaUp\DAO\VO\Contests $contest): int {
-        $penalty_type = $contest->penalty_type;
-        if ($penalty_type == 'none') {
+    public static function recalculatePenaltyForContest(
+        \OmegaUp\DAO\VO\Contests $contest
+    ): int {
+        $penaltyType = $contest->penalty_type;
+        if ($penaltyType == 'none') {
             $sql = '
                 UPDATE
                     Runs r
@@ -1291,7 +1311,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 WHERE
                     s.problemset_id = ?;
             ';
-        } elseif ($penalty_type == 'runtime') {
+        } elseif ($penaltyType == 'runtime') {
             $sql = '
                 UPDATE
                     Runs r
@@ -1303,26 +1323,26 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 WHERE
                     s.problemset_id = ?;
             ';
-        } elseif ($penalty_type == 'contest_start') {
+        } elseif ($penaltyType == 'contest_start') {
             $sql = '
                 UPDATE
                     `Runs` r
                 INNER JOIN
                     `Submissions` s
-                    ON s.submission_id = r.run_id
+                    ON s.submission_id = r.submission_id
                 INNER JOIN `Contests` c ON (c.problemset_id = s.problemset_id)
                 SET
                     r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(s.time, c.start_time))/60)
                 WHERE
                     s.problemset_id = ?;
             ';
-        } elseif ($penalty_type == 'problem_open') {
+        } elseif ($penaltyType == 'problem_open') {
             $sql = '
                 UPDATE
                     `Runs` r
                 INNER JOIN
                     `Submissions` s
-                    ON s.submission_id = r.run_id
+                    ON s.submission_id = r.submission_id
                 INNER JOIN
                     `Problemset_Problem_Opened` ppo
                     ON (ppo.problemset_id = s.problemset_id

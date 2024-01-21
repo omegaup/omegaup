@@ -112,6 +112,15 @@
             @click="showTab = 'archive'"
             >{{ T.contestEditArchive }}</a
           >
+          <a
+            v-if="certificatesDetails.isCertificateGenerator"
+            href="#"
+            data-toggle="tab"
+            class="dropdown-item"
+            :class="{ active: showTab === 'certificates' }"
+            @click="showTab = 'certificates'"
+            >{{ T.contestEditCertificates }}</a
+          >
         </div>
       </li>
     </ul>
@@ -185,6 +194,8 @@
           :admission-mode="details.admission_mode"
           :should-show-public-option="true"
           :admission-mode-description="T.contestAdmissionModeDescription"
+          :alias="details.alias"
+          @show-copy-message="() => $emit('show-copy-message')"
           @update-admission-mode="
             (request) => $emit('update-admission-mode', request)
           "
@@ -282,6 +293,15 @@
           @archive="onArchiveContest"
         ></omegaup-common-archive>
       </div>
+      <div v-if="showTab === 'certificates'" class="tab-pane active">
+        <omegaup-contest-certificates
+          :certificates-details="certificatesDetails"
+          @generate="
+            (certificateCutoff) =>
+              $emit('generate-certificates', certificateCutoff)
+          "
+        ></omegaup-contest-certificates>
+      </div>
     </div>
   </div>
 </template>
@@ -304,6 +324,7 @@ import contest_TeamsGroups from './TeamsGroup.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
 import common_Publish from '../common/Publish.vue';
+import contest_Certificates from './Certificates.vue';
 
 @Component({
   components: {
@@ -319,6 +340,7 @@ import common_Publish from '../common/Publish.vue';
     'omegaup-contest-links': contest_Links,
     'omegaup-contest-new-form': contest_NewForm,
     'omegaup-common-publish': common_Publish,
+    'omegaup-contest-certificates': contest_Certificates,
   },
 })
 export default class Edit extends Vue {
@@ -335,6 +357,7 @@ export default class Edit extends Vue {
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop() searchResultGroups!: types.ListItem[];
   @Prop({ default: null }) originalContestAdmissionMode!: null | string;
+  @Prop() certificatesDetails!: types.ContestCertificatesAdminDetails;
 
   T = T;
   ui = ui;
@@ -372,6 +395,8 @@ export default class Edit extends Vue {
         return T.courseEditClone;
       case 'archive':
         return T.contestEditArchive;
+      case 'certificates':
+        return T.contestEditCertificates;
       default:
         return T.contestEdit;
     }
