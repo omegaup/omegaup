@@ -3179,6 +3179,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        \OmegaUp\DAO\Runs::recalculatePenaltyForContest($contest);
+
         return [
             'status' => 'ok',
             'solutionStatus' => $solutionStatus,
