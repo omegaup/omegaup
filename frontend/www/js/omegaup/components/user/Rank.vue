@@ -35,9 +35,8 @@
       </button>
       <template v-if="Object.keys(availableFilters).length > 0">
         <select
-          v-model="filter"
+          v-model="currentFilter"
           class="filter form-control col-12 col-md-5 mt-2 mt-md-0"
-          @change="onFilterChange"
         >
           <option value="">
             {{ T.wordsSelectFilter }}
@@ -51,7 +50,7 @@
           </option>
         </select>
       </template>
-      <template v-else-if="!isLogged &amp;&amp; !isIndex">
+      <template v-else-if="!isLogged && !isIndex">
         <span
           class="badge badge-info text-wrap p-2 mt-2 mt-lg-0 d-flex align-items-center"
           >{{ T.mustLoginToFilterUsers }}</span
@@ -130,7 +129,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -186,6 +185,7 @@ export default class UserRank extends Vue {
   ui = ui;
   searchedUsername: null | types.ListItem = null;
   showPopover: boolean = false;
+  currentFilter = this.filter;
 
   onSubmit(): void {
     if (!this.searchedUsername) return;
@@ -194,7 +194,8 @@ export default class UserRank extends Vue {
     )}`;
   }
 
-  onFilterChange(): void {
+  @Watch('currentFilter')
+  onFilterChange(newFilter: string): void {
     // change url parameters with jquery
     // https://samaxes.com/2011/09/change-url-parameters-with-jquery/
     let queryParameters: { [key: string]: string } = {};
@@ -204,8 +205,10 @@ export default class UserRank extends Vue {
     while ((m = re.exec(queryString))) {
       queryParameters[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
     }
-    if (this.filter !== '') {
-      queryParameters['filter'] = this.filter;
+    if (newFilter !== '') {
+      queryParameters['filter'] = newFilter;
+      // When a filter is selected, the parameter 'page' must be reset.
+      delete queryParameters['page'];
     } else {
       delete queryParameters['filter'];
     }
@@ -213,17 +216,17 @@ export default class UserRank extends Vue {
   }
 
   get nextPageFilter(): string {
-    if (this.filter)
+    if (this.currentFilter)
       return `/rank?page=${this.page + 1}&filter=${encodeURIComponent(
-        this.filter,
+        this.currentFilter,
       )}`;
     else return `/rank?page=${this.page + 1}`;
   }
 
   get prevPageFilter(): string {
-    if (this.filter)
+    if (this.currentFilter)
       return `/rank?page=${this.page - 1}&filter=${encodeURIComponent(
-        this.filter,
+        this.currentFilter,
       )}`;
     else return `/rank?page=${this.page - 1}`;
   }
