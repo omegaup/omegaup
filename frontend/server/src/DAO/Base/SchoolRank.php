@@ -9,19 +9,19 @@
 
 namespace OmegaUp\DAO\Base;
 
-/** UserRank Data Access Object (DAO) Base.
+/** SchoolRank Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link \OmegaUp\DAO\VO\UserRank}.
+ * {@link \OmegaUp\DAO\VO\SchoolRank}.
  * @access public
  * @abstract
  */
-abstract class UserRank {
+abstract class SchoolRank {
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\UserRank}
+     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\SchoolRank}
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
@@ -30,43 +30,29 @@ abstract class UserRank {
      * @throws \OmegaUp\Exceptions\NotFoundException si las columnas de la
      * llave primaria están vacías.
      *
-     * @param \OmegaUp\DAO\VO\UserRank $User_Rank El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\UserRank}.
+     * @param \OmegaUp\DAO\VO\SchoolRank $School_Rank El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\SchoolRank}.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(
-        \OmegaUp\DAO\VO\UserRank $User_Rank
+        \OmegaUp\DAO\VO\SchoolRank $School_Rank
     ): int {
         if (
-            empty($User_Rank->user_id)
+            empty($School_Rank->school_id)
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
         $sql = '
             REPLACE INTO
-                User_Rank (
-                    `user_id`,
+                School_Rank (
+                    `school_id`,
                     `ranking`,
-                    `problems_solved_count`,
                     `score`,
-                    `username`,
-                    `name`,
                     `country_id`,
                     `state_id`,
-                    `school_id`,
-                    `author_score`,
-                    `author_ranking`,
-                    `classname`,
                     `timestamp`
                 ) VALUES (
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -75,32 +61,17 @@ abstract class UserRank {
                     ?
                 );';
         $params = [
-            $User_Rank->user_id,
+            $School_Rank->school_id,
             (
-                !is_null($User_Rank->ranking) ?
-                intval($User_Rank->ranking) :
+                !is_null($School_Rank->ranking) ?
+                intval($School_Rank->ranking) :
                 null
             ),
-            intval($User_Rank->problems_solved_count),
-            floatval($User_Rank->score),
-            $User_Rank->username,
-            $User_Rank->name,
-            $User_Rank->country_id,
-            $User_Rank->state_id,
-            (
-                !is_null($User_Rank->school_id) ?
-                intval($User_Rank->school_id) :
-                null
-            ),
-            floatval($User_Rank->author_score),
-            (
-                !is_null($User_Rank->author_ranking) ?
-                intval($User_Rank->author_ranking) :
-                null
-            ),
-            $User_Rank->classname,
+            floatval($School_Rank->score),
+            $School_Rank->country_id,
+            $School_Rank->state_id,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $User_Rank->timestamp
+                $School_Rank->timestamp
             ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -110,64 +81,42 @@ abstract class UserRank {
     /**
      * Actualizar registros.
      *
-     * @param \OmegaUp\DAO\VO\UserRank $User_Rank El objeto de tipo UserRank a actualizar.
+     * @param \OmegaUp\DAO\VO\SchoolRank $School_Rank El objeto de tipo SchoolRank a actualizar.
      *
      * @return int Número de filas afectadas
      */
     final public static function update(
-        \OmegaUp\DAO\VO\UserRank $User_Rank
+        \OmegaUp\DAO\VO\SchoolRank $School_Rank
     ): int {
         $sql = '
             UPDATE
-                `User_Rank`
+                `School_Rank`
             SET
                 `ranking` = ?,
-                `problems_solved_count` = ?,
                 `score` = ?,
-                `username` = ?,
-                `name` = ?,
                 `country_id` = ?,
                 `state_id` = ?,
-                `school_id` = ?,
-                `author_score` = ?,
-                `author_ranking` = ?,
-                `classname` = ?,
                 `timestamp` = ?
             WHERE
                 (
-                    `user_id` = ?
+                    `school_id` = ?
                 );';
         $params = [
             (
-                is_null($User_Rank->ranking) ?
+                is_null($School_Rank->ranking) ?
                 null :
-                intval($User_Rank->ranking)
+                intval($School_Rank->ranking)
             ),
-            intval($User_Rank->problems_solved_count),
-            floatval($User_Rank->score),
-            $User_Rank->username,
-            $User_Rank->name,
-            $User_Rank->country_id,
-            $User_Rank->state_id,
-            (
-                is_null($User_Rank->school_id) ?
-                null :
-                intval($User_Rank->school_id)
-            ),
-            floatval($User_Rank->author_score),
-            (
-                is_null($User_Rank->author_ranking) ?
-                null :
-                intval($User_Rank->author_ranking)
-            ),
-            $User_Rank->classname,
+            floatval($School_Rank->score),
+            $School_Rank->country_id,
+            $School_Rank->state_id,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $User_Rank->timestamp
+                $School_Rank->timestamp
             ),
             (
-                is_null($User_Rank->user_id) ?
+                is_null($School_Rank->school_id) ?
                 null :
-                intval($User_Rank->user_id)
+                intval($School_Rank->school_id)
             ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -175,52 +124,45 @@ abstract class UserRank {
     }
 
     /**
-     * Obtener {@link \OmegaUp\DAO\VO\UserRank} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\SchoolRank} por llave primaria.
      *
-     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\UserRank}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\SchoolRank}
      * de la base de datos usando sus llaves primarias.
      *
-     * @return ?\OmegaUp\DAO\VO\UserRank Un objeto del tipo
-     * {@link \OmegaUp\DAO\VO\UserRank} o NULL si no hay tal
+     * @return ?\OmegaUp\DAO\VO\SchoolRank Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\SchoolRank} o NULL si no hay tal
      * registro.
      */
     final public static function getByPK(
-        ?int $user_id
-    ): ?\OmegaUp\DAO\VO\UserRank {
+        ?int $school_id
+    ): ?\OmegaUp\DAO\VO\SchoolRank {
         $sql = '
             SELECT
-                `User_Rank`.`user_id`,
-                `User_Rank`.`ranking`,
-                `User_Rank`.`problems_solved_count`,
-                `User_Rank`.`score`,
-                `User_Rank`.`username`,
-                `User_Rank`.`name`,
-                `User_Rank`.`country_id`,
-                `User_Rank`.`state_id`,
-                `User_Rank`.`school_id`,
-                `User_Rank`.`author_score`,
-                `User_Rank`.`author_ranking`,
-                `User_Rank`.`classname`,
-                `User_Rank`.`timestamp`
+                `School_Rank`.`school_id`,
+                `School_Rank`.`ranking`,
+                `School_Rank`.`score`,
+                `School_Rank`.`country_id`,
+                `School_Rank`.`state_id`,
+                `School_Rank`.`timestamp`
             FROM
-                `User_Rank`
+                `School_Rank`
             WHERE
                 (
-                    `user_id` = ?
+                    `school_id` = ?
                 )
             LIMIT 1;';
-        $params = [$user_id];
+        $params = [$school_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new \OmegaUp\DAO\VO\UserRank($row);
+        return new \OmegaUp\DAO\VO\SchoolRank($row);
     }
 
     /**
-     * Verificar si existe un {@link \OmegaUp\DAO\VO\UserRank} por llave primaria.
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\SchoolRank} por llave primaria.
      *
-     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\UserRank}
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\SchoolRank}
      * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
      *
      * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
@@ -229,18 +171,18 @@ abstract class UserRank {
      * @return bool Si existe o no tal registro.
      */
     final public static function existsByPK(
-        ?int $user_id
+        ?int $school_id
     ): bool {
         $sql = '
             SELECT
                 COUNT(*)
             FROM
-                `User_Rank`
+                `School_Rank`
             WHERE
                 (
-                    `user_id` = ?
+                    `school_id` = ?
                 );';
-        $params = [$user_id];
+        $params = [$school_id];
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
@@ -250,7 +192,7 @@ abstract class UserRank {
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto {@link \OmegaUp\DAO\VO\UserRank} suministrado.
+     * el objeto {@link \OmegaUp\DAO\VO\SchoolRank} suministrado.
      * Una vez que se ha eliminado un objeto, este no puede ser restaurado
      * llamando a {@link replace()}, ya que este último creará un nuevo
      * registro con una llave primaria distinta a la que estaba en el objeto
@@ -259,24 +201,24 @@ abstract class UserRank {
      * Si no puede encontrar el registro a eliminar,
      * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param \OmegaUp\DAO\VO\UserRank $User_Rank El
-     * objeto de tipo \OmegaUp\DAO\VO\UserRank a eliminar
+     * @param \OmegaUp\DAO\VO\SchoolRank $School_Rank El
+     * objeto de tipo \OmegaUp\DAO\VO\SchoolRank a eliminar
      *
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(
-        \OmegaUp\DAO\VO\UserRank $User_Rank
+        \OmegaUp\DAO\VO\SchoolRank $School_Rank
     ): void {
         $sql = '
             DELETE FROM
-                `User_Rank`
+                `School_Rank`
             WHERE
                 (
-                    `user_id` = ?
+                    `school_id` = ?
                 );';
         $params = [
-            $User_Rank->user_id
+            $School_Rank->school_id
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -290,7 +232,7 @@ abstract class UserRank {
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
      * y construirá un arreglo que contiene objetos de tipo
-     * {@link \OmegaUp\DAO\VO\UserRank}.
+     * {@link \OmegaUp\DAO\VO\SchoolRank}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -301,8 +243,8 @@ abstract class UserRank {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return list<\OmegaUp\DAO\VO\UserRank> Un arreglo que contiene objetos del tipo
-     * {@link \OmegaUp\DAO\VO\UserRank}.
+     * @return list<\OmegaUp\DAO\VO\SchoolRank> Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\SchoolRank}.
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -312,21 +254,14 @@ abstract class UserRank {
     ): array {
         $sql = '
             SELECT
-                `User_Rank`.`user_id`,
-                `User_Rank`.`ranking`,
-                `User_Rank`.`problems_solved_count`,
-                `User_Rank`.`score`,
-                `User_Rank`.`username`,
-                `User_Rank`.`name`,
-                `User_Rank`.`country_id`,
-                `User_Rank`.`state_id`,
-                `User_Rank`.`school_id`,
-                `User_Rank`.`author_score`,
-                `User_Rank`.`author_ranking`,
-                `User_Rank`.`classname`,
-                `User_Rank`.`timestamp`
+                `School_Rank`.`school_id`,
+                `School_Rank`.`ranking`,
+                `School_Rank`.`score`,
+                `School_Rank`.`country_id`,
+                `School_Rank`.`state_id`,
+                `School_Rank`.`timestamp`
             FROM
-                `User_Rank`
+                `School_Rank`
         ';
         if (!is_null($orden)) {
             $sql .= (
@@ -348,7 +283,7 @@ abstract class UserRank {
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
         ) {
-            $allData[] = new \OmegaUp\DAO\VO\UserRank(
+            $allData[] = new \OmegaUp\DAO\VO\SchoolRank(
                 $row
             );
         }
@@ -359,43 +294,29 @@ abstract class UserRank {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto {@link \OmegaUp\DAO\VO\UserRank}
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\SchoolRank}
      * suministrado.
      *
-     * @param \OmegaUp\DAO\VO\UserRank $User_Rank El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\UserRank}
+     * @param \OmegaUp\DAO\VO\SchoolRank $School_Rank El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\SchoolRank}
      * a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de
      *             filas afectadas.
      */
     final public static function create(
-        \OmegaUp\DAO\VO\UserRank $User_Rank
+        \OmegaUp\DAO\VO\SchoolRank $School_Rank
     ): int {
         $sql = '
             INSERT INTO
-                `User_Rank` (
-                    `user_id`,
+                `School_Rank` (
+                    `school_id`,
                     `ranking`,
-                    `problems_solved_count`,
                     `score`,
-                    `username`,
-                    `name`,
                     `country_id`,
                     `state_id`,
-                    `school_id`,
-                    `author_score`,
-                    `author_ranking`,
-                    `classname`,
                     `timestamp`
                 ) VALUES (
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -405,35 +326,20 @@ abstract class UserRank {
                 );';
         $params = [
             (
-                is_null($User_Rank->user_id) ?
+                is_null($School_Rank->school_id) ?
                 null :
-                intval($User_Rank->user_id)
+                intval($School_Rank->school_id)
             ),
             (
-                is_null($User_Rank->ranking) ?
+                is_null($School_Rank->ranking) ?
                 null :
-                intval($User_Rank->ranking)
+                intval($School_Rank->ranking)
             ),
-            intval($User_Rank->problems_solved_count),
-            floatval($User_Rank->score),
-            $User_Rank->username,
-            $User_Rank->name,
-            $User_Rank->country_id,
-            $User_Rank->state_id,
-            (
-                is_null($User_Rank->school_id) ?
-                null :
-                intval($User_Rank->school_id)
-            ),
-            floatval($User_Rank->author_score),
-            (
-                is_null($User_Rank->author_ranking) ?
-                null :
-                intval($User_Rank->author_ranking)
-            ),
-            $User_Rank->classname,
+            floatval($School_Rank->score),
+            $School_Rank->country_id,
+            $School_Rank->state_id,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $User_Rank->timestamp
+                $School_Rank->timestamp
             ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
