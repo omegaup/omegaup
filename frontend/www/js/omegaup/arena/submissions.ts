@@ -226,7 +226,7 @@ export function updateRunFallback({ run }: { run: types.Run }): void {
   setTimeout(() => {
     api.Run.status({ run_alias: run.guid, username: run.username })
       .then(time.remoteTimeAdapter)
-      .then((run) => updateRun({ run }))
+      .then((response) => updateRun({ run: response }))
       .catch(ui.ignoreError);
   }, 5000);
 }
