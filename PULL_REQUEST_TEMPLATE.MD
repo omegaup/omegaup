@@ -1,22 +1,14 @@
 # Description
 
-Please include a description of the changes you have made. The text you put
-in this section will be used as the commit message when this PR is merged.
+Please include a description of the changes you have made. The text you put in this section will be used as the **commit message** when this PR is merged.
 
-If you modify the User Interface, please include a screenshot or a video.
+If you modify the **User Interface**, please include a screenshot or a video.
 
 Fixes: #(issue)
 
 # Comments
 
-If there are comments for the reviewers (e.g., indicating the beginning of
-the revision, something where the reviewer needs to pay special attention,
-etc.), everything should be placed in this section.
-
-Also, if there is something else to do, a checklist could be added in this
-section.
-
-If there are no extra comments, this section can be deleted.
+Add any comments for the reviewers (e.g., indicating the beginning of the revision, something where the reviewer needs to pay special attention, etc.). If  there are no extra comments this section can be deleted.
 
 # Checklist:
 
