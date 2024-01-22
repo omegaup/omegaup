@@ -243,7 +243,7 @@ describe('Runs.vue', () => {
     expect(wrapper.find('tfoot button').text()).toBe(T.wordsNewSubmissions);
   });
 
-  it('Should handle the right buttons for run actions', async () => {
+  it('Should handle diqualify by guid button for run actions', async () => {
     runs.push({
       ...baseRunData,
       guid: '122600',
@@ -305,22 +305,26 @@ describe('Runs.vue', () => {
         },
       ],
     ]);
-    await wrapper.find('[data-actions="121500"]').trigger('click');
+  });
+
+  it('Should handle disqualify in batch buttons for run actions', async () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        problemAlias: 'alias',
+        runs,
+        showDetails: true,
+        showDisqualify: true,
+        showRejudge: true,
+        isContestFinished: false,
+        useNewSubmissionButton: true,
+        inContest: true,
+      },
+    });
     await wrapper
       .find('[data-actions-disqualify-by-user="121500"]')
       .trigger('click');
     expect(wrapper.emitted('disqualify')).toEqual([
-      [
-        {
-          disqualificationType: DisqualificationType.ByGUID,
-          run: {
-            ...baseRunData,
-            guid: '120000',
-            username: 'other_username',
-            time: new Date('1/1/2020, 12:00:00 AM'),
-          },
-        },
-      ],
       [
         {
           disqualificationType: DisqualificationType.ByUser,
