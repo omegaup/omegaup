@@ -1639,6 +1639,7 @@
 	"userOrMailNotFound": "Nombre de cuenta o correo electr\u00f3nico no encontrado",
 	"userPasswordMustBeSame": "Los passwords nuevos deben ser iguales.",
 	"userProfileIsPrivate": "El perfil de esta cuenta est\u00e1 marcado como privado; alguna informaci\u00f3n no se mostrar\u00e1",
+	"userProfileProblemsFilter": "Filtrar",
 	"userRankEmptyList": "No hay datos que mostrar en el ranking",
 	"userRankOfTheMonthHeader": "%(count) coders con mayor puntaje del mes",
 	"userRankSolvedProblemsHelp": "El n\u00famero de problemas resueltos se actualiza una vez al d\u00eda.",

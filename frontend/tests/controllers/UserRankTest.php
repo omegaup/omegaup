@@ -179,6 +179,78 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame($response['rank'], 0);
     }
 
+    public function testUserRankFilterPager() {
+        $mappingSchoolUser = [
+            'school_1' => ['studentsCount' => 3],
+            'school_2' => ['studentsCount' => 6],
+            'school_3' => ['studentsCount' => 2],
+        ];
+
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        foreach ($mappingSchoolUser as $name => $studentsSchool) {
+            $school = \OmegaUp\Test\Factories\Schools::createSchool($name);
+            foreach (range(0, $studentsSchool['studentsCount'] - 1) as $id) {
+                ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+                    new \OmegaUp\Test\Factories\UserParams(
+                        ['username' => "user_{$name}_{$id}"]
+                    )
+                );
+                $login = self::login($identity);
+
+                \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'school_id' => $school['school']->school_id,
+                ]));
+
+                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                    $problemData,
+                    $identity
+                );
+
+                \OmegaUp\Test\Factories\Run::gradeRun($runData);
+            }
+        }
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'school_id' => $school['school']->school_id,
+        ]));
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\User::getRankForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'length' => 5,
+            ])
+        )['templateProperties']['payload'];
+
+        $this->assertCount(5, $response['pagerItems']);
+
+        // When school filter is enabled, the pager should show only 1 page
+        // plus navigation buttons (3 in total)
+        $response = \OmegaUp\Controllers\User::getRankForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'length' => 5,
+                'filter' => 'school',
+            ])
+        )['templateProperties']['payload'];
+        $this->assertCount(3, $response['pagerItems']);
+    }
+
     /**
      * Testing filters via API and TypeScript.
      */
