@@ -105,7 +105,7 @@ describe('Basic Commands Test', () => {
     const contestOptions = contestPage.generateContestOptions(loginOptions[0]);
     const users = [loginOptions[1].username];
 
-    loginPage.giveAdminPrivilage(
+    loginPage.giveAdminPrivilege(
       'GroupIdentityCreator',
       loginOptions[0].username,
     );
