@@ -562,23 +562,23 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Generates all the certificates for a contest given its contest ID.
+     * Generates all the certificates for a contest given its contest alias.
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
      * @return array{status: string}
      *
      * @omegaup-request-param int|null $certificates_cutoff
-     * @omegaup-request-param int|null $contest_id
+     * @omegaup-request-param string|null $contest_alias
      */
     public static function apiGenerateContestCertificates(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
 
-        $contestID = $r->ensureInt('contest_id');
+        $contestAlias = $r->ensureString('contest_alias');
 
-        $contest = \OmegaUp\DAO\Contests::getByPK($contestID);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
 
         if (
             is_null($contest)
@@ -604,13 +604,23 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        // check that the contest has ended and the certificate can be generated
+        // check that the certificates can be generated
         if (
-            $contest->finish_time->time > \OmegaUp\Time::get() ||
-            ($contest->certificates_status !== 'uninitiated' &&
-            $contest->certificates_status !== 'retryable_error')
+            $contest->certificates_status !== 'uninitiated' &&
+            $contest->certificates_status !== 'retryable_error'
         ) {
-            return ['status' => 'error'];
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestCertificatesError'
+            );
+        }
+
+        // check that the contest has ended
+        if ($contest->finish_time->time > \OmegaUp\Time::get()) {
+            $contest->certificates_status = 'retryable_error';
+            \OmegaUp\DAO\Contests::update($contest);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestCertificatesCurrentContestError'
+            );
         }
 
         $certificateCutoff = $r->ensureOptionalInt('certificates_cutoff');
@@ -618,10 +628,10 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         // add certificates_cutoff value to the contest
         if (!is_null($certificateCutoff)) {
             $contest->certificate_cutoff = $certificateCutoff;
-        }
 
-        // update contest with the new value
-        \OmegaUp\DAO\Contests::update($contest);
+            // update contest with the new value
+            \OmegaUp\DAO\Contests::update($contest);
+        }
 
         // get contest info
         $contestExtraInformation = \OmegaUp\DAO\Contests::getByAliasWithExtraInformation(
@@ -638,14 +648,6 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
         // connection to rabbitmq
         $channel = \OmegaUp\RabbitMQConnection::getInstance()->channel();
-
-        $channel->exchange_declare(
-            $exchange,
-            type: 'direct',
-            passive: false,
-            durable: true,
-            auto_delete: false
-        );
 
         $scoreboard = \OmegaUp\Controllers\Contest::getScoreboard(
             $contest,
@@ -673,6 +675,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         // send the message to RabbitMQ
         $channel->basic_publish($message, $exchange, $routingKey);
         $channel->close();
+
+        $contest->certificates_status = 'queued';
+        \OmegaUp\DAO\Contests::update($contest);
 
         return [
             'status' => 'ok',

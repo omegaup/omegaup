@@ -27,6 +27,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
         'category' => true,
         'score' => true,
         'problems_solved' => true,
+        'certificate_status' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -93,6 +94,11 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
             $this->problems_solved = intval(
                 $data['problems_solved']
             );
+        }
+        if (isset($data['certificate_status'])) {
+            $this->certificate_status = is_scalar(
+                $data['certificate_status']
+            ) ? strval($data['certificate_status']) : '';
         }
     }
 
@@ -174,4 +180,11 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
      * @var int
      */
     public $problems_solved = 0;
+
+    /**
+     * Estado de la petición de generar diplomas
+     *
+     * @var string
+     */
+    public $certificate_status = 'uninitiated';
 }

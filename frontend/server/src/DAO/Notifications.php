@@ -12,6 +12,7 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Notifications extends \OmegaUp\DAO\Base\Notifications {
+    const CERTIFICATE_AWARDED = 'certificate-awarded';
     const CONTEST_CLARIFICATION_REQUEST = 'contest-clarification-request';
     const CONTEST_CLARIFICATION_RESPONSE = 'contest-clarification-response';
     const COURSE_CLARIFICATION_REQUEST = 'course-clarification-request';

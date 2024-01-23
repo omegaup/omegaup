@@ -16,7 +16,7 @@ import test_credentials
         ('wrong_exchange_name', False),
     ],
 )  # type: ignore
-def test_rabbitmq_connection(exchange: str, expected: bool):
+def test_rabbitmq_connection(exchange: str, expected: bool) -> None:
     '''Test rabbitmq'''
     with rabbitmq_connection.connect(
             username=test_credentials.OMEGAUP_USERNAME,
@@ -41,7 +41,8 @@ def test_rabbitmq_connection(exchange: str, expected: bool):
                 body=body.encode(),
             )
 
-        result = channel.queue_declare(queue='', durable=True, exclusive=True)
+        result = channel.queue_declare(queue='test', durable=True,
+                                       exclusive=True)
         queue_name = result.method.queue
         assert queue_name is not None
 

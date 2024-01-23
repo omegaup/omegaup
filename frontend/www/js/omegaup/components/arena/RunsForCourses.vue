@@ -24,7 +24,12 @@
             :limit="1"
             hide-goto-end-buttons
             @page-click="onPageClick"
-          ></b-pagination>
+          >
+            <template #page="{ page, active }">
+              <b v-if="active" data-page>{{ page }} - {{ totalPages }}</b>
+              <i v-else>{{ page }}</i>
+            </template>
+          </b-pagination>
           <div class="filters row">
             <label class="col-3 col-sm pr-0 font-weight-bold">
               {{ T.wordsExecution }}
@@ -191,6 +196,7 @@
               <th v-if="showUser">{{ T.contestParticipant }}</th>
               <th v-if="showContest">{{ T.wordsContest }}</th>
               <th v-if="showProblem">{{ T.wordsProblem }}</th>
+              <th hidden>{{ T.wordsStatus }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPoints }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPenalty }}</th>
               <th v-if="!showPoints" class="numeric">
@@ -299,6 +305,30 @@
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
               </td>
+              <td
+                :class="statusClass(run)"
+                data-run-status
+                class="text-center opacity-4 font-weight-bold"
+                hidden
+              >
+                <span class="mr-1">{{ status(run) }}</span>
+                <button
+                  v-if="!!statusHelp(run)"
+                  type="button"
+                  :data-content="statusHelp(run)"
+                  data-toggle="popover"
+                  data-trigger="focus"
+                  class="btn-outline-dark btn-sm"
+                  @click="showVerdictHelp"
+                >
+                  <font-awesome-icon :icon="['fas', 'question-circle']" />
+                </button>
+                <span
+                  v-if="run.submission_feedback_id !== null && showDisqualify"
+                  class="position-absolute top-0 end-0 badge badge-pill badge-danger"
+                  >1
+                </span>
+              </td>
               <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
               <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
               <td
@@ -311,6 +341,10 @@
               </td>
               <td class="numeric">{{ execution(run) }}</td>
               <td class="numeric">
+                {{ output(run) }}
+                <br
+                  v-if="outputIconColorStatus(run) != NumericOutputStatus.None"
+                />
                 <font-awesome-icon
                   v-if="
                     outputIconColorStatus(run) === NumericOutputStatus.Correct
@@ -333,10 +367,6 @@
                   :icon="['fas', 'exclamation-circle']"
                   style="color: orange"
                 />
-                <br
-                  v-if="outputIconColorStatus(run) != NumericOutputStatus.None"
-                />
-                {{ output(run) }}
               </td>
               <td class="numeric">{{ memory(run) }}</td>
               <td class="numeric">{{ runtime(run) }}</td>
@@ -597,6 +627,13 @@ export default class Runs extends Vue {
     return this.totalRuns;
   }
 
+  get totalPages(): number {
+    if (this.totalRows > 0) {
+      return Math.ceil(this.totalRows / this.itemsPerPage);
+    }
+    return 1;
+  }
+
   onPageClick(bvEvent: any, page: number): void {
     if (page == this.currentPage - 1 || page == this.currentPage + 1) {
       if (this.currentPage + 1 == page) {
@@ -690,7 +727,7 @@ export default class Runs extends Vue {
     )
       return '—';
     if (run.status_memory === MemoryStatus.Exceeded)
-      return T.runDetailsMemoryExceeded;
+      return T.runDetailsExceeded;
     return `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
   }
 
@@ -744,6 +781,50 @@ export default class Runs extends Vue {
     }
 
     return `${(run.runtime / 1000).toFixed(2)} s`;
+  }
+
+  showVerdictHelp(ev: Event): void {
+    $(ev.target as HTMLElement).popover('show');
+  }
+
+  statusClass(run: types.Run): string {
+    if (run.status != 'ready') return '';
+    if (run.type == 'disqualified') return 'status-disqualified';
+    if (run.verdict == 'AC') {
+      return 'status-ac';
+    }
+    if (run.verdict == 'CE') {
+      return 'status-ce';
+    }
+    if (run.verdict == 'JE' || run.verdict == 'VE') {
+      return 'status-je-ve';
+    }
+    return '';
+  }
+
+  status(run: types.Run): string {
+    if (run.type == 'disqualified') return T.arenaRunsActionsDisqualified;
+
+    return run.status == 'ready' ? run.verdict : run.status;
+  }
+
+  statusHelp(run: types.Run): string {
+    if (run.status != 'ready' || run.verdict == 'AC') {
+      return '';
+    }
+
+    if (run.language == 'kj' || run.language == 'kp') {
+      if (run.verdict == 'RTE' || run.verdict == 'RE') {
+        return T.verdictHelpKarelRTE;
+      } else if (run.verdict == 'TLE' || run.verdict == 'TO') {
+        return T.verdictHelpKarelTLE;
+      }
+    }
+    if (run.type == 'disqualified') return T.verdictHelpDisqualified;
+    const verdict = T[`verdict${run.verdict}`];
+    const verdictHelp = T[`verdictHelp${run.verdict}`];
+
+    return `${verdict}: ${verdictHelp}`;
   }
 
   execution(run: types.Run): string {
@@ -966,10 +1047,10 @@ export default class Runs extends Vue {
       case 'contest':
         this.filterContest = '';
         break;
-      case 'Execution':
+      case 'execution':
         this.filterExecution = '';
         break;
-      case 'Output':
+      case 'output':
         this.filterOutput = '';
     }
     this.filters = this.filters.filter((item) => item.name !== filter);

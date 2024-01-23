@@ -144,6 +144,7 @@ CREATE TABLE `Coder_Of_The_Month` (
   `category` enum('all','female') NOT NULL DEFAULT 'all',
   `score` double NOT NULL DEFAULT '0',
   `problems_solved` int NOT NULL DEFAULT '0',
+  `certificate_status` enum('uninitiated','queued','generated','retryable_error','fatal_error') NOT NULL DEFAULT 'uninitiated' COMMENT 'Estado de la petición de generar diplomas',
   PRIMARY KEY (`coder_of_the_month_id`),
   KEY `coder_of_the_month_id` (`coder_of_the_month_id`),
   KEY `fk_cotmu_user_id` (`user_id`),
@@ -301,6 +302,7 @@ CREATE TABLE `Courses` (
   `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','cpp20-gcc','cpp20-clang','java','kt','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua','go','rs','js') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar en un curso',
   `archived` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el curso ha sido archivado por el administrador.',
   `minimum_progress_for_certificate` int DEFAULT NULL COMMENT 'Progreso mínimo que debe cumplir el estudiante para que se le otorgue el diploma del curso. NULL indica que el curso no da diplomas.',
+  `certificates_status` enum('uninitiated','queued','generated','retryable_error','fatal_error') NOT NULL DEFAULT 'uninitiated' COMMENT 'Estado de la petición de generar diplomas',
   PRIMARY KEY (`course_id`),
   UNIQUE KEY `course_alias` (`alias`),
   KEY `fk_ca_acl_id` (`acl_id`),
@@ -955,6 +957,22 @@ CREATE TABLE `School_Of_The_Month` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `School_Rank` (
+  `school_id` int NOT NULL,
+  `ranking` int DEFAULT NULL,
+  `score` double NOT NULL DEFAULT '0',
+  `country_id` char(3) DEFAULT NULL,
+  `state_id` char(3) DEFAULT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Almacena la hora y fecha en que se actualizó el rank de la escuela',
+  PRIMARY KEY (`school_id`),
+  KEY `rank` (`ranking`),
+  KEY `fk_sr_state_id` (`country_id`,`state_id`),
+  CONSTRAINT `fk_sr_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
+  CONSTRAINT `fk_sr_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda el ranking de escuelas de acuerdo a su puntaje.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Schools` (
   `school_id` int NOT NULL AUTO_INCREMENT,
   `country_id` char(3) DEFAULT NULL,
@@ -1156,6 +1174,7 @@ CREATE TABLE `User_Rank` (
   `author_score` double NOT NULL DEFAULT '0',
   `author_ranking` int DEFAULT NULL,
   `classname` varchar(50) DEFAULT NULL COMMENT 'Almacena la clase precalculada para no tener que determinarla en tiempo de ejecucion.',
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Almacena la hora y fecha en que se actualiza el rank de usuario',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
   KEY `rank` (`ranking`),

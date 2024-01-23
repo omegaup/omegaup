@@ -132,6 +132,26 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
                 $response['runs'][count($contestants) - $i - 1]['guid']
             );
         }
+
+        // Test execution filter
+        $response = \OmegaUp\Controllers\Problem::apiRuns(new \OmegaUp\Request([
+            'problem_alias' => $problemData['problem']->alias,
+            'auth_token' => $login->auth_token,
+            'show_all' => true,
+            'execution' => 'EXECUTION_INTERRUPTED'
+        ]));
+
+        $this->assertCount(1, $response['runs']);
+
+        // Test output filter
+        $response = \OmegaUp\Controllers\Problem::apiRuns(new \OmegaUp\Request([
+            'problem_alias' => $problemData['problem']->alias,
+            'auth_token' => $login->auth_token,
+            'show_all' => true,
+            'output' => 'OUTPUT_INTERRUPTED'
+        ]));
+
+        $this->assertCount(2, $response['runs']);
     }
 
     public function testUserHasTriedToSolvedProblem() {
