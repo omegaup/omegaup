@@ -68,6 +68,7 @@
             <omegaup-datetimepicker
               v-model="startTime"
               data-start-date
+              :start="new Date()"
             ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormStartDateDesc }}</p>
           </div>
