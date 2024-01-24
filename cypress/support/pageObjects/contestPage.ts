@@ -74,8 +74,12 @@ export class ContestPage {
     cy.get('a[data-nav-contestant]').click();
 
     cy.get('textarea[data-contestant-names]').type(users.join(', '));
-    cy.wait(1000); // Wait for the textarea to be updated
+    cy.clock().tick(1000);
+    // cy.wait(1000); // Wait for the textarea to be updated
     cy.get('.user-add-bulk').click();
+    cy.waitUntil(() =>
+      cy.get('[data-uploaded-contestants]').should('be.visible'),
+    );
 
     cy.get('[data-uploaded-contestants]').then((rawHTMLElements) => {
       const constestantNames: Array<string> = [];
@@ -132,7 +136,13 @@ export class ContestPage {
     });
   }
 
-  createContest(contestOptions: ContestOptions, users: Array<string>, shouldShowIntro: boolean = true): void {
+  createContest(
+    contestOptions: ContestOptions,
+    users: Array<string>,
+    shouldShowIntro: boolean = true,
+  ): void {
+    cy.log('Contest Page - Create Contest');
+    cy.log(JSON.stringify(contestOptions));
     cy.createContest(contestOptions, shouldShowIntro);
 
     cy.location('href').should('include', contestOptions.contestAlias);
@@ -143,9 +153,13 @@ export class ContestPage {
       contestOptions.description,
     );
 
+    cy.log('Contest Page - Add Problems');
     cy.addProblemsToContest(contestOptions);
 
+    cy.log('Contest Page - Add Users');
     this.addStudentsBulk(users);
+
+    cy.log('Contest Page - Add Groups');
     cy.changeAdmissionModeContest(contestOptions);
 
     cy.get('a[data-contest-link-button]').click();
@@ -155,7 +169,10 @@ export class ContestPage {
     cy.waitUntil(() => cy.get('[data-table-scoreboard]').should('be.visible'));
   }
 
-  generateContestOptions(loginOption: LoginOptions, firstTimeVisited: boolean = true): ContestOptions {
+  generateContestOptions(
+    loginOption: LoginOptions,
+    firstTimeVisited: boolean = true,
+  ): ContestOptions {
     const now = new Date();
     const problem = this.generateProblemOptions(1);
 

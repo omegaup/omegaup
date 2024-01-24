@@ -79,7 +79,7 @@ export class CoursePage {
       cy.get('.tags-input input[type="text"]').type(
         problemOptions[i].problemAlias,
       );
-      cy.get('.typeahead-dropdown li').first().click();
+      cy.waitUntil(() => cy.get('.typeahead-dropdown li').first().click());
       cy.get('button[data-add-problem]').click();
       cy.get('[data-course-problemlist] table.table-striped').should(
         'be.visible',
@@ -122,7 +122,9 @@ export class CoursePage {
       cy.get('.tags-input input[type="text"]')
         .first()
         .type(courseOptions.school);
-    cy.get('.typeahead-dropdown li').first().click();
+
+    cy.waitUntil(() => cy.get('.typeahead-dropdown li').first().click());
+    // cy.get('.typeahead-dropdown li').first().click();
     cy.get('textarea[data-course-new-description]')
       .should('be.visible')
       .type('course description');
@@ -279,8 +281,10 @@ export class CoursePage {
     const now = new Date();
     cy.get('[data-course-start-date]').type(getISODateTime(now));
     cy.get('.tags-input input[type="text"]').type('Sumas');
-    cy.get('.typeahead-dropdown li').first().click();
-    cy.wait(3000);
+    cy.waitUntil(() => cy.get('.typeahead-dropdown li').first().click());
+
+    // cy.get('.typeahead-dropdown li').first().click();
+    // cy.wait(3000);
     cy.get('button[data-add-problem]').click();
     cy.get('[data-course-problemlist] table.table-striped').should(
       'be.visible',

@@ -10,6 +10,8 @@ import {
   Status,
 } from './types';
 
+const MAX_TIMEOUT_TO_WAIT = 10000;
+
 // Logins the user given a username and password
 Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
   const URL =
@@ -37,9 +39,7 @@ Cypress.Commands.add('loginAdmin', () => {
 Cypress.Commands.add('logout', () => {
   cy.get('a[data-nav-user]').click();
   cy.get('a[data-logout-button]').click();
-  cy.waitUntil(() =>
-    cy.url().should('eq', 'http://127.0.0.1:8001/'),
-  );
+  cy.waitUntil(() => cy.url().should('eq', 'http://127.0.0.1:8001/'));
 });
 
 // Logouts the user
@@ -70,7 +70,7 @@ Cypress.Commands.add(
     autoCompleteTextTag,
     problemLevelIndex,
     publicAccess = false,
-    firstTimeVisited = true
+    firstTimeVisited = true,
   }: ProblemOptions) => {
     cy.visit('/');
     // Select problem nav
@@ -97,7 +97,7 @@ Cypress.Commands.add(
         .click(),
     );
 
-    if(publicAccess) {
+    if (publicAccess) {
       cy.get('[data-target=".access"]').click();
       cy.get('[data-problem-access-radio-yes]').check();
     }
@@ -143,7 +143,9 @@ Cypress.Commands.add(
       cy.get('[name="end-date"]').should('be.disabled');
     }
     cy.get('.tags-input input[type="text"]').first().type(school); // If we use the data attribute, the autocomplete makes multiple elements
-    cy.get('.typeahead-dropdown li').first().click();
+    cy.waitUntil(() =>
+      cy.get('.typeahead-dropdown li').should('exist').first().click(),
+    );
     cy.get('[name="basic-information"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
       .eq(basicInformation ? 0 : 1)
       .click();
@@ -178,19 +180,22 @@ declare enum ScoreMode {
 
 Cypress.Commands.add(
   'createContest',
-  ({
-    contestAlias,
-    startDate,
-    endDate,
-    description = 'Default Description',
-    showScoreboard = true,
-    scoreBoardVisibleTime = "100",
-    scoreMode = ScoreMode.Partial,
-    basicInformation = false,
-    requestParticipantInformation = 'no',
-    differentStart = false,
-    differentStartTime = "",
-  },shouldShowIntro: boolean = true) => {
+  (
+    {
+      contestAlias,
+      startDate,
+      endDate,
+      description = 'Default Description',
+      showScoreboard = true,
+      scoreBoardVisibleTime = '100',
+      scoreMode = ScoreMode.Partial,
+      basicInformation = false,
+      requestParticipantInformation = 'no',
+      differentStart = false,
+      differentStartTime = '',
+    },
+    shouldShowIntro: boolean = true,
+  ) => {
     cy.visit('contest/new/');
     if (shouldShowIntro) {
       cy.get('.introjs-skipbutton').click();
@@ -200,7 +205,9 @@ Cypress.Commands.add(
     cy.get('[name="description"]').type(description);
     cy.get('[data-start-date]').type(getISODateTime(startDate));
     cy.get('[data-end-date]').type(getISODateTime(endDate));
-    cy.get('[data-score-board-visible-time]').clear().type(scoreBoardVisibleTime);
+    cy.get('[data-score-board-visible-time]')
+      .clear()
+      .type(scoreBoardVisibleTime);
     if (differentStart) {
       cy.get('[data-different-start-check]').click();
       cy.get('[data-different-start-time-input]').type(differentStartTime);
@@ -217,57 +224,62 @@ Cypress.Commands.add(
   },
 );
 
-Cypress.Commands.add(
-  'addProblemsToContest',
-  ({
-    contestAlias,
-    problems,
-  }) => {
-    cy.visit(`contest/${contestAlias}/edit/`);
-    cy.get('a[data-nav-contest-edit]').click();
-    cy.get('a.dropdown-item.problems').click();
+Cypress.Commands.add('addProblemsToContest', ({ contestAlias, problems }) => {
+  cy.log(`Adding problems to contest ${contestAlias}`);
+  cy.visit(`contest/${contestAlias}/edit/`);
+  cy.get('a[data-nav-contest-edit]').click();
+  cy.get('a.dropdown-item.problems').click();
+  cy.waitUntil(() => cy.get('.tags-input').should('be.visible'));
 
-    for (const idx in problems) {
-      cy.get('.tags-input input[type="text"]').type(problems[idx].problemAlias)
-      cy.get('.typeahead-dropdown li').first().click();
-      cy.get('.add-problem').click();
-    }
-  },
-);
+  cy.intercept({
+    method: 'POST',
+    url: '/api/problem/listForTypeahead/',
+    times: 100,
+  }).as('problemListForTypeahead');
+
+  for (const idx in problems) {
+    const typeChunks = problems[idx].problemAlias.split('-');
+    // print the problem alias
+    cy.log(`Adding problem ${problems[idx].problemAlias}`);
+    // type the problem alias
+    cy.waitUntil(() =>
+      cy
+        .get('.tags-input input[type="text"]')
+        .type(typeChunks[0])
+        .type('-')
+        .type(typeChunks[1]),
+    );
+    cy.clock().tick(510);
+    // After the user types, we should wait until the autocomplete is visible
+    cy.wait(['@problemListForTypeahead'], { timeout: MAX_TIMEOUT_TO_WAIT * 10 })
+      .its('response.statusCode')
+      .should('eq', 200);
+
+    cy.get('.typeahead-dropdown li').first().click();
+
+    cy.get('.add-problem').click();
+  }
+});
 
 Cypress.Commands.add(
   'changeAdmissionModeContest',
-  ({
-    contestAlias,
-    admissionMode,
-  }) => {
+  ({ contestAlias, admissionMode }) => {
     cy.visit(`contest/${contestAlias}/edit/`);
     cy.get('a[data-nav-contest-edit]').click();
     cy.get('a.dropdown-item.admission-mode').click();
-    cy.get('select[name="admission-mode"]').select(
-      admissionMode,
-    ); // private | registration | public
+    cy.get('select[name="admission-mode"]').select(admissionMode); // private | registration | public
     cy.get('.change-admission-mode').click();
   },
 );
 
-Cypress.Commands.add(
-  'enterContest',
-  ({
-    contestAlias,
-  }) => {
-    cy.visit(`arena/${contestAlias}`);
-    cy.get('button[data-start-contest]').click();
-  },
-);
+Cypress.Commands.add('enterContest', ({ contestAlias }) => {
+  cy.visit(`arena/${contestAlias}`);
+  cy.get('button[data-start-contest]').click();
+});
 
 Cypress.Commands.add(
   'createRunsInsideContest',
-  ({
-    contestAlias,
-    problems,
-    runs,
-  }) => {
+  ({ contestAlias, problems, runs }) => {
     const problem = problems[0];
     if (!problem) {
       return;
@@ -283,6 +295,7 @@ Cypress.Commands.add(
 
       // Only the first submission is created because of server validations
       if (!runs[idx].valid) {
+        cy.log('Only the first submission is created because of validations');
         cy.fixture(runs[idx].fixturePath).then((fileContent) => {
           cy.get('.CodeMirror-line').type(fileContent);
           cy.get('[data-submit-run]').should('be.disabled');
@@ -290,20 +303,31 @@ Cypress.Commands.add(
         break;
       }
 
+      cy.intercept({ method: 'POST', url: '/api/run/create/' }).as('runCreate');
+
       cy.fixture(runs[idx].fixturePath).then((fileContent) => {
         cy.get('.CodeMirror-line').type(fileContent);
         cy.get('[data-submit-run]').click();
       });
 
-      const expectedStatus: Status = runs[idx].status;
-      cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
+      cy.wait(['@runCreate'], { timeout: MAX_TIMEOUT_TO_WAIT })
+        .its('response.statusCode')
+        .should('eq', 200);
 
-      cy.wait(['@runStatus'], { timeout: 10000 }).its(
-        'response.statusCode',
-      ).should('eq', 200);
-      cy.get('[data-run-status] > span')
-        .first()
-        .should('have.text', expectedStatus);
+      cy.waitUntil(() =>
+        cy.get('[data-run-status] > span').should('be.visible'),
+      );
+
+      const expectedStatus: Status = runs[idx].status;
+
+      cy.waitUntil(
+        () =>
+          cy
+            .get('[data-run-status] > span')
+            .first()
+            .should('have.text', expectedStatus),
+        { timeout: MAX_TIMEOUT_TO_WAIT },
+      );
     }
   },
 );
@@ -323,7 +347,9 @@ export const getISODate = (date: Date) => {
  * @returns ISO datetime required to type on a date input inside cypress
  */
 export const getISODateTime = (date: Date) => {
-  const isoDateTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+  const isoDateTime = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60000,
+  ).toISOString();
   return isoDateTime.slice(0, 16);
 };
 
@@ -333,7 +359,10 @@ export const getISODateTime = (date: Date) => {
  * @param days number of days to add to the date
  * @returns Date Relative Date Object
  */
-export const addSubtractDaysToDate = (date: Date, { days }: { days: number }): Date => {
+export const addSubtractDaysToDate = (
+  date: Date,
+  { days }: { days: number },
+): Date => {
   if (days == 0) return date;
   if (days < 0) {
     return new Date(date.getTime() - 24 * 3600 * 1000);

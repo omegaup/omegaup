@@ -3,6 +3,8 @@ import common_Typeahead from './Typeahead.vue';
 import VoerroTagsInput from '@voerro/vue-tagsinput';
 import Vue from 'vue';
 
+jest.mock('lodash/debounce', () => jest.fn((fn) => fn));
+
 describe('Typeahead.vue', () => {
   it('Should not call update-existing-options with a short query', async () => {
     const wrapper = mount(common_Typeahead, {
@@ -25,6 +27,7 @@ describe('Typeahead.vue', () => {
 
     const tagsInput = wrapper.findComponent(VoerroTagsInput);
     tagsInput.vm.$emit('change', 'query');
+
     expect(wrapper.emitted()).toEqual({
       'update-existing-options': [['query']],
     });
