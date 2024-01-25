@@ -46,6 +46,7 @@
           :disabled="currentLanguages === ''"
           type="text"
           class="form-control"
+          @input = "validateOverallWallTimeLimitInput($event)"
           required
         />
       </div>
@@ -124,5 +125,13 @@ export default class Settings extends Vue {
   @Prop() validator!: string;
 
   T = T;
+
+  validateOverallWallTimeLimitInput(event: any) {
+    if (Number(event.target.value) > 60000) {
+      this.overallWallTimeLimit = 60000;
+      const overallWallTimeLimitInput = document.getElementsByName('overall_wall_time_limit')[0] as HTMLInputElement;
+      overallWallTimeLimitInput.value = '60000';
+    }
+  }
 }
 </script>
