@@ -409,9 +409,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
         $submissions = [];
         foreach ($rs as $submission) {
-            $submissions[] = new \OmegaUp\DAO\VO\Submissions(
-                $submission
-            );
+            $submissions[] = new \OmegaUp\DAO\VO\Submissions($submission);
         }
         return $submissions;
     }
