@@ -2446,7 +2446,8 @@ export namespace types {
       elementId: string = 'payload',
     ): types.UserRankTablePayload {
       return ((x) => {
-        x.lastUpdated = ((x: number) => new Date(x * 1000))(x.lastUpdated);
+        if (typeof x.lastUpdated !== 'undefined' && x.lastUpdated !== null)
+          x.lastUpdated = ((x: number) => new Date(x * 1000))(x.lastUpdated);
         x.ranking = ((x) => {
           x.rank = ((x) => {
             if (!Array.isArray(x)) {
@@ -4873,7 +4874,7 @@ export namespace types {
     filter: string;
     isIndex: boolean;
     isLogged: boolean;
-    lastUpdated: Date;
+    lastUpdated?: Date;
     length: number;
     page: number;
     pagerItems: types.PageItem[];
