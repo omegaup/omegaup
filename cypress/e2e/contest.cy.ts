@@ -70,7 +70,7 @@ describe('Contest Test', () => {
       password: '12345678',
     };
 
-    loginPage.giveAdminPrivilage(
+    loginPage.giveAdminPrivilege(
       'GroupIdentityCreator',
       loginOptions[0].username,
     );
@@ -156,7 +156,7 @@ describe('Contest Test', () => {
       groupDescription: 'group description',
     };
 
-    loginPage.giveAdminPrivilage(
+    loginPage.giveAdminPrivilege(
       'GroupIdentityCreator',
       userLoginOptions[0].username,
     );
@@ -225,7 +225,7 @@ describe('Contest Test', () => {
       groupDescription: 'group description',
     };
 
-    loginPage.giveAdminPrivilage(
+    loginPage.giveAdminPrivilege(
       'GroupIdentityCreator',
       userLoginOptions[4].username,
     );
