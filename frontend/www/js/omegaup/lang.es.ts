@@ -1642,6 +1642,7 @@ const translations: { [key: string]: string; } = {
   userProfileIsPrivate: "El perfil de esta cuenta est\u00e1 marcado como privado; alguna informaci\u00f3n no se mostrar\u00e1",
   userProfileProblemsFilter: "Filtrar",
   userRankEmptyList: "No hay datos que mostrar en el ranking",
+  userRankLastUpdated: "\u00daltima actualizaci\u00f3n: %(datetime)",
   userRankOfTheMonthHeader: "%(count) coders con mayor puntaje del mes",
   userRankSolvedProblemsHelp: "El n\u00famero de problemas resueltos se actualiza una vez al d\u00eda.",
   userRemoveSuccess: "Cuenta exitosamente eliminada.",

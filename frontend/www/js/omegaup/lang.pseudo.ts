@@ -1642,6 +1642,7 @@ const translations: { [key: string]: string; } = {
   userProfileIsPrivate: "(Thi5 acc0un7'5 pr0fi13 i5 mark3d priva73; 50m3 inf0rma7i0n wi11 n07 b3 di5p1ay3d)",
   userProfileProblemsFilter: "(Fi173r)",
   userRankEmptyList: "(Th3r3 i5 n07 da7a 70 5h0w in 7h3 ranking)",
+  userRankLastUpdated: "(La57 upda73d: %(datetime))",
   userRankOfTheMonthHeader: "(%(count) c0d3r5 wi7h 7h3 m057 p0in75 in 7h3 m0n7h)",
   userRankSolvedProblemsHelp: "(Th3 numb3r 0f 501v3d pr0b13m5 i5 upda73d 0nc3 a day.)",
   userRemoveSuccess: "(Acc0un7 5ucc355fu11y r3m0v3d!)",
