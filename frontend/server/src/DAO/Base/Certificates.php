@@ -37,6 +37,7 @@ abstract class Certificates {
                 `certificate_type` = ?,
                 `course_id` = ?,
                 `contest_id` = ?,
+                `coder_of_the_month_id` = ?,
                 `verification_code` = ?,
                 `contest_place` = ?
             WHERE
@@ -62,6 +63,11 @@ abstract class Certificates {
                 is_null($Certificates->contest_id) ?
                 null :
                 intval($Certificates->contest_id)
+            ),
+            (
+                is_null($Certificates->coder_of_the_month_id) ?
+                null :
+                intval($Certificates->coder_of_the_month_id)
             ),
             $Certificates->verification_code,
             (
@@ -96,6 +102,7 @@ abstract class Certificates {
                 `Certificates`.`certificate_type`,
                 `Certificates`.`course_id`,
                 `Certificates`.`contest_id`,
+                `Certificates`.`coder_of_the_month_id`,
                 `Certificates`.`verification_code`,
                 `Certificates`.`contest_place`
             FROM
@@ -214,6 +221,7 @@ abstract class Certificates {
                 `Certificates`.`certificate_type`,
                 `Certificates`.`course_id`,
                 `Certificates`.`contest_id`,
+                `Certificates`.`coder_of_the_month_id`,
                 `Certificates`.`verification_code`,
                 `Certificates`.`contest_place`
             FROM
@@ -271,9 +279,11 @@ abstract class Certificates {
                     `certificate_type`,
                     `course_id`,
                     `contest_id`,
+                    `coder_of_the_month_id`,
                     `verification_code`,
                     `contest_place`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -301,6 +311,11 @@ abstract class Certificates {
                 is_null($Certificates->contest_id) ?
                 null :
                 intval($Certificates->contest_id)
+            ),
+            (
+                is_null($Certificates->coder_of_the_month_id) ?
+                null :
+                intval($Certificates->coder_of_the_month_id)
             ),
             $Certificates->verification_code,
             (
