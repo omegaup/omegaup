@@ -41,7 +41,8 @@ abstract class CoderOfTheMonth {
                 `school_id` = ?,
                 `category` = ?,
                 `score` = ?,
-                `problems_solved` = ?
+                `problems_solved` = ?,
+                `certificate_status` = ?
             WHERE
                 (
                     `coder_of_the_month_id` = ?
@@ -73,6 +74,7 @@ abstract class CoderOfTheMonth {
             $Coder_Of_The_Month->category,
             floatval($Coder_Of_The_Month->score),
             intval($Coder_Of_The_Month->problems_solved),
+            $Coder_Of_The_Month->certificate_status,
             intval($Coder_Of_The_Month->coder_of_the_month_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -104,7 +106,8 @@ abstract class CoderOfTheMonth {
                 `Coder_Of_The_Month`.`school_id`,
                 `Coder_Of_The_Month`.`category`,
                 `Coder_Of_The_Month`.`score`,
-                `Coder_Of_The_Month`.`problems_solved`
+                `Coder_Of_The_Month`.`problems_solved`,
+                `Coder_Of_The_Month`.`certificate_status`
             FROM
                 `Coder_Of_The_Month`
             WHERE
@@ -225,7 +228,8 @@ abstract class CoderOfTheMonth {
                 `Coder_Of_The_Month`.`school_id`,
                 `Coder_Of_The_Month`.`category`,
                 `Coder_Of_The_Month`.`score`,
-                `Coder_Of_The_Month`.`problems_solved`
+                `Coder_Of_The_Month`.`problems_solved`,
+                `Coder_Of_The_Month`.`certificate_status`
             FROM
                 `Coder_Of_The_Month`
         ';
@@ -285,8 +289,10 @@ abstract class CoderOfTheMonth {
                     `school_id`,
                     `category`,
                     `score`,
-                    `problems_solved`
+                    `problems_solved`,
+                    `certificate_status`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -325,6 +331,7 @@ abstract class CoderOfTheMonth {
             $Coder_Of_The_Month->category,
             floatval($Coder_Of_The_Month->score),
             intval($Coder_Of_The_Month->problems_solved),
+            $Coder_Of_The_Month->certificate_status,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

@@ -1644,6 +1644,7 @@ const translations: { [key: string]: string; } = {
   userOrMailNotFound: "(Acc0un7 nam3 0r 3mai1 n07 f0und.)",
   userPasswordMustBeSame: "(Th3 n3w pa55w0rd5 mu57 b3 7h3 5am3.)",
   userProfileIsPrivate: "(Thi5 acc0un7'5 pr0fi13 i5 mark3d priva73; 50m3 inf0rma7i0n wi11 n07 b3 di5p1ay3d)",
+  userProfileProblemsFilter: "(Fi173r)",
   userRankEmptyList: "(Th3r3 i5 n07 da7a 70 5h0w in 7h3 ranking)",
   userRankOfTheMonthHeader: "(%(count) c0d3r5 wi7h 7h3 m057 p0in75 in 7h3 m0n7h)",
   userRankSolvedProblemsHelp: "(Th3 numb3r 0f 501v3d pr0b13m5 i5 upda73d 0nc3 a day.)",

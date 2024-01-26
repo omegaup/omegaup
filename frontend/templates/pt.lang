@@ -1642,6 +1642,7 @@ userObjectivesUpdateSuccess = "Obrigado por nos ajudar. Suas respostas foram sal
 userOrMailNotFound = "Nome da conta ou e-mail não encontrado"
 userPasswordMustBeSame = "As novas senhas devem ser as mesmas."
 userProfileIsPrivate = "O perfil desta conta é marcado como privado; algumas informações não serão exibidas"
+userProfileProblemsFilter = "Filtrar"
 userRankEmptyList = "Não há dados para mostrar no ranking"
 userRankOfTheMonthHeader = "%(count) coders com maior pontuação do mês"
 userRankSolvedProblemsHelp = "O número de problemas resolvidos é atualizado uma vez por dia."
