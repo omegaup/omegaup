@@ -7,6 +7,7 @@ import {
   GroupOptions,
   LoginOptions,
   ProblemOptions,
+  RunOptions,
 } from '../types';
 import { addSubtractDaysToDate, getISODateTime } from '../commands';
 
@@ -155,15 +156,37 @@ export class ContestPage {
     cy.waitUntil(() => cy.get('[data-table-scoreboard]').should('be.visible'));
   }
 
-  generateContestOptions(loginOption: LoginOptions, firstTimeVisited: boolean = true): ContestOptions {
+  generateContestOptions(
+    loginOption: LoginOptions,
+    firstTimeVisited: boolean = true,
+    numberOfProblems: number = 1,
+  ): ContestOptions {
     const now = new Date();
-    const problem = this.generateProblemOptions(1);
+    const problems = this.generateProblemOptions(numberOfProblems);
+    const contestProblems: ProblemOptions[] = [];
+    const contestRuns: RunOptions[] = [];
 
-    problem[0].firstTimeVisited = firstTimeVisited;
+    problems.forEach( (problem) => {
+      problem.firstTimeVisited = firstTimeVisited;
 
-    cy.login(loginOption);
-    cy.createProblem(problem[0]);
-    cy.logout();
+      cy.login(loginOption);
+      cy.createProblem(problem);
+      cy.logout();
+      contestProblems.push({
+        problemAlias: problem.problemAlias,
+        tag: problem.tag,
+        autoCompleteTextTag: problem.autoCompleteTextTag,
+        problemLevelIndex: problem.problemLevelIndex,
+      });
+      contestRuns.push({
+        problemAlias: problem.problemAlias,
+        fixturePath: 'main.cpp',
+        language: 'cpp11-gcc',
+        valid: true,
+        status: 'AC',
+      });
+      firstTimeVisited = false;
+    });
 
     const contestOptions: ContestOptions = {
       contestAlias: 'contest' + uuid().slice(0, 5),
@@ -175,23 +198,8 @@ export class ContestPage {
       scoreMode: ScoreMode.Partial,
       requestParticipantInformation: 'no',
       admissionMode: 'public',
-      problems: [
-        {
-          problemAlias: problem[0].problemAlias,
-          tag: problem[0].tag,
-          autoCompleteTextTag: problem[0].autoCompleteTextTag,
-          problemLevelIndex: problem[0].problemLevelIndex,
-        },
-      ],
-      runs: [
-        {
-          problemAlias: problem[0].problemAlias,
-          fixturePath: 'main.cpp',
-          language: 'cpp11-gcc',
-          valid: true,
-          status: 'AC',
-        },
-      ],
+      problems: contestProblems,
+      runs: contestRuns,
     };
 
     return contestOptions;
