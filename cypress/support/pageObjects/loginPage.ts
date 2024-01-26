@@ -19,7 +19,7 @@ export class LoginPage {
     return users;
   }
 
-  giveAdminPrivilage(roleName: string, user: string) {
+  giveAdminPrivilege(roleName: string, user: string) {
     cy.loginAdmin();
     const userAdminUrl = '/admin/user/' + user;
     cy.visit(userAdminUrl);
