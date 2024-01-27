@@ -378,7 +378,7 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.ignoreError);
           },
-          disqualify: (run: types.Run) => {
+          disqualify: ({ run }: { run: types.Run }) => {
             if (!window.confirm(T.runDisqualifyConfirm)) {
               return;
             }
