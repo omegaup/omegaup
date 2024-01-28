@@ -12,13 +12,13 @@ import sys
 import time
 
 from typing import List
-import omegaup.api
 
-import database.contest
 import contest_callback
-import test_credentials
+import database.contest
+import omegaup.api
 import rabbitmq_connection
 import test_constants
+import test_credentials
 
 
 sys.path.insert(

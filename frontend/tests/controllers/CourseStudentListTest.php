@@ -225,9 +225,13 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             100.0,
             $results['studentsProgress'][1]['assignments'][$assignment]['problems'][$problemsData[1]['problem']->alias]['score']
         );
-        $this->assertArrayNotHasKey(
-            $problemsData[2]['problem']->alias,
-            $results['studentsProgress'][1]['assignments'][$assignment]['problems']
+        $this->assertSame(
+            0.0,
+            $results['studentsProgress'][1]['assignments'][$assignment]['problems'][$problemsData[2]['problem']->alias]['progress']
+        );
+        $this->assertSame(
+            0.0,
+            $results['studentsProgress'][1]['assignments'][$assignment]['problems'][$problemsData[2]['problem']->alias]['score']
         );
 
         $this->assertSame(
@@ -413,9 +417,14 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             100.0,
             $results['progress'][1]['assignments'][$assignment]['problems'][$problemsData[1]['problem']->alias]['score']
         );
-        $this->assertArrayNotHasKey(
-            $problemsData[2]['problem']->alias,
-            $results['progress'][1]['assignments'][$assignment]['problems']
+
+        $this->assertSame(
+            0.0,
+            $results['progress'][1]['assignments'][$assignment]['problems'][$problemsData[2]['problem']->alias]['progress']
+        );
+        $this->assertSame(
+            0.0,
+            $results['progress'][1]['assignments'][$assignment]['problems'][$problemsData[2]['problem']->alias]['score']
         );
 
         $this->assertSame(
