@@ -89,7 +89,7 @@ OmegaUp.on('ready', () => {
               ui.error(T.privacyPolicyNotAccepted);
               return;
             }
-           /* api.User.create({
+            api.User.create({
               username: username,
               email: email,
               password: password,
@@ -99,10 +99,10 @@ OmegaUp.on('ready', () => {
                 loginAndRedirect(
                   username,
                   password,
-                  /*isAccountCreation= true,
+                  /*isAccountCreation=*/ true,
                 );
               })
-              .catch(ui.apiError);*/
+              .catch(ui.apiError);
           },
           login: (usernameOrEmail: string, password: string) => {
             loginAndRedirect(
