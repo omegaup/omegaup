@@ -34,6 +34,7 @@ export class LoginPage {
     cy.get('[data-signup-password]').type(loginOptions.password);
     cy.get('[data-signup-repeat-password]').type(loginOptions.password);
     cy.get('[data-signup-email]').type(`${loginOptions.username}@omegaup.com`);
+    cy.get('[data-signup-accept-policies]').check();
     cy.get('[data-signup-submit]').click();
   }
 

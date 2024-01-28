@@ -16,7 +16,7 @@
           password,
           passwordConfirmation,
           recaptchaResponse,
-          checked,
+          termsAndPolicies,
         ) =>
           $emit(
             'register-and-login',
@@ -25,7 +25,7 @@
             password,
             passwordConfirmation,
             recaptchaResponse,
-            checked,
+            termsAndPolicies,
           )
       "
     >

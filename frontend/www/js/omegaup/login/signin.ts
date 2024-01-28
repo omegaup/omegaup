@@ -74,8 +74,9 @@ OmegaUp.on('ready', () => {
             password: string,
             passwordConfirmation: string,
             recaptchaResponse: string,
-            checked: boolean,
+            termsAndPolicies: boolean,
           ) => {
+            console.log("termsAndPolicies is ",termsAndPolicies);
             if (password != passwordConfirmation) {
               ui.error(T.passwordMismatch);
               return;
@@ -84,11 +85,11 @@ OmegaUp.on('ready', () => {
               ui.error(T.loginPasswordTooShort);
               return;
             }
-            if (checked != true) {
+            if (termsAndPolicies != true) {
               ui.error(T.privacyPolicyNotAccepted);
               return;
             }
-            api.User.create({
+           /* api.User.create({
               username: username,
               email: email,
               password: password,
@@ -98,10 +99,10 @@ OmegaUp.on('ready', () => {
                 loginAndRedirect(
                   username,
                   password,
-                  /*isAccountCreation=*/ true,
+                  /*isAccountCreation= true,
                 );
               })
-              .catch(ui.apiError);
+              .catch(ui.apiError);*/
           },
           login: (usernameOrEmail: string, password: string) => {
             loginAndRedirect(
