@@ -1986,7 +1986,13 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-        $response = ['admin' => [], 'student' => [], 'public' => [], 'archived' => [], 'teachingAssistant' => []];
+        $response = [
+            'admin' => [],
+            'student' => [],
+            'public' => [],
+            'archived' => [],
+            'teachingAssistant' => [],
+        ];
 
         if (in_array('admin', $courseTypes)) {
             // TODO(pablo): Cache
