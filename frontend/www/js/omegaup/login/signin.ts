@@ -76,7 +76,6 @@ OmegaUp.on('ready', () => {
             recaptchaResponse: string,
             termsAndPolicies: boolean,
           ) => {
-            console.log('termsAndPolicies is ', termsAndPolicies);
             if (password != passwordConfirmation) {
               ui.error(T.passwordMismatch);
               return;
