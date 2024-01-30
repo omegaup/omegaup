@@ -36,7 +36,7 @@
       <div class="form-group col-md-6">
         <label for="overall_wall_time_limit">{{
           T.problemEditFormWallTimeLimit
-        }} ch test</label>
+        }}</label>
         <input
           v-model="currentOverallWallTimeLimit"
           name="overall_wall_time_limit"
