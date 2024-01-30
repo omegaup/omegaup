@@ -396,7 +396,7 @@
                 <div class="dropdown">
                   <button
                     data-runs-actions-button
-                    class="btn-secondary dropdown-toggle"
+                    class="btn btn-secondary dropdown-toggle"
                     type="button"
                     data-toggle="dropdown"
                     aria-haspopup="true"
@@ -424,14 +424,21 @@
                     </button>
                     <template v-if="showDisqualify">
                       <div class="dropdown-divider"></div>
-                      <button
-                        v-if="run.type === 'normal'"
-                        :data-actions-disqualify="run.guid"
-                        class="btn-link dropdown-item"
-                        @click="$emit('disqualify', run)"
-                      >
-                        {{ T.arenaRunsActionsDisqualify }}
-                      </button>
+                      <template v-if="run.type === 'normal'">
+                        <button
+                          :data-actions-disqualify="run.guid"
+                          class="btn-link dropdown-item"
+                          @click="
+                            $emit('disqualify', {
+                              run,
+                              disqualificationType: DisqualificationType.ByGUID,
+                            })
+                          "
+                        >
+                          {{ T.arenaRunsActionsDisqualifyByGUID }}
+                        </button>
+                      </template>
+
                       <button
                         v-else-if="run.type === 'disqualified'"
                         :data-actions-requalify="run.guid"
@@ -482,6 +489,7 @@ import * as time from '../../time';
 import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import arena_RunDetailsPopup from './RunDetailsPopup.vue';
+import { DisqualificationType } from './Runs.vue';
 import omegaup_Overlay from '../Overlay.vue';
 
 import { PaginationPlugin } from 'bootstrap-vue';
@@ -605,6 +613,7 @@ export default class Runs extends Vue {
   PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
+  DisqualificationType = DisqualificationType;
 
   filterLanguage: string = '';
   filterOffset: number = 0;
