@@ -433,4 +433,46 @@ describe('Contest Test', () => {
     );
     cy.logout();
   });
+
+  it('Should disqualify submissions in batch', () => {
+    const userLoginOptions = loginPage.registerMultipleUsers(5);
+    const contestOptions = contestPage.generateContestOptions(
+      userLoginOptions[4],
+      true,
+      2,
+    );
+
+    const users: Array<string> = [];
+    const contestAdmin = userLoginOptions[4];
+    const contestant1 = userLoginOptions[0];
+    const contestant2 = userLoginOptions[2];
+    userLoginOptions.forEach((loginDetails) => {
+      users.push(loginDetails.username);
+    });
+
+    cy.login(contestAdmin);
+    contestPage.createContest(contestOptions, users);
+    cy.logout();
+
+
+    cy.login(contestant1);
+    cy.enterContest(contestOptions);
+    cy.createRunsInsideContest(contestOptions);
+    cy.logout();
+
+    contestOptions.statusCheck = true;
+    cy.login(contestant2);
+    cy.enterContest(contestOptions);
+    cy.createRunsInsideContest(contestOptions);
+    cy.logout();
+
+    cy.login(contestAdmin);
+    cy.visit(`arena/${contestOptions.contestAlias}`);
+    cy.get('a.nav-link[href="#runs"]').click();
+    cy.get('[data-runs-actions-button]').first().click();
+    cy.get('[data-actions-disqualify-by-user]').first().click();
+    // 2 submissions should be disqualified
+    cy.get('.status-disqualified').its('length').should('eq', 2);
+    cy.logout();
+  });
 });
