@@ -84,7 +84,7 @@ OmegaUp.on('ready', () => {
               ui.error(T.loginPasswordTooShort);
               return;
             }
-            if (termsAndPolicies != true) {
+            if (!termsAndPolicies) {
               ui.error(T.privacyPolicyNotAccepted);
               return;
             }
