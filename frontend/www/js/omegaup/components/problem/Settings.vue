@@ -36,9 +36,9 @@
       <div class="form-group col-md-6">
         <label for="overall_wall_time_limit">{{
           T.problemEditFormWallTimeLimit
-        }}</label>
+        }} ch test</label>
         <input
-          v-model="localOverallWallTimeLimit"
+          v-model="currentOverallWallTimeLimit"
           name="overall_wall_time_limit"
           :class="{
             'is-invalid': errors.includes('overall_wall_time_limit'),
@@ -125,11 +125,12 @@ export default class Settings extends Vue {
 
   T = T;
 
-  localOverallWallTimeLimit = this.overallWallTimeLimit;
-  @Watch('localOverallWallTimeLimit')
+  currentOverallWallTimeLimit = this.overallWallTimeLimit;
+
+  @Watch('currentOverallWallTimeLimit')
   onOverallWallTimeLimitChanged(newVal: number) {
     if (newVal > 60000) {
-      this.localOverallWallTimeLimit = 60000;
+      this.currentOverallWallTimeLimit = 60000;
     }
   }
 }
