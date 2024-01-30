@@ -546,6 +546,7 @@ const translations: { [key: string]: string; } = {
   courseListCurrentCourses: "(Curr3n7 c0ur535)",
   courseListPastCourses: "(Pa57 c0ur535)",
   courseListSubmissionsByGroup: "(Submi55i0n5 mad3 by 57ud3n75 0f 7hi5 c0ur53)",
+  courseListTeachingAssistantCourses: "(C0ur535 I a55i57)",
   courseNew: "(N3w c0ur53)",
   courseNewFormBasicInformationRequired: "(Ba5ic inf0rma7i0n i5 r3quir3d)",
   courseNewFormBasicInformationRequiredDesc: "(If ac7iva73d, a11 c0n7357an75 mu57 hav3 r3gi57r3d 7h3ir ba5ic inf0rma7i0n 70 j0in 7h3 c0ur53 (c0un7ry, 57a73, 5ch001))",
