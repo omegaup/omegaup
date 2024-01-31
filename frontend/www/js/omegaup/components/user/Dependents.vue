@@ -59,13 +59,14 @@ export default class UserDependents extends Vue {
   }
 
   get bannerColor(): string {
-    if (this.daysUntilVerificationDeadline !== null) {
-      if (this.daysUntilVerificationDeadline > 7) {
-        return 'bg-secondary';
-      }
-      if (this.daysUntilVerificationDeadline <= 1) {
-        return 'bg-danger';
-      }
+    if (this.daysUntilVerificationDeadline == null) {
+      return '';
+    }
+    if (this.daysUntilVerificationDeadline > 7) {
+      return 'bg-secondary';
+    }
+    if (this.daysUntilVerificationDeadline <= 1) {
+      return 'bg-danger';
     }
     return 'bg-warning';
   }
