@@ -3876,120 +3876,123 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
-    public static function getRankForTypeScript(\OmegaUp\Request $r) {
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('length');
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['filter'],
-            'filter',
-            ['', 'country', 'state', 'school']
-        );
 
-        $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null($r['length']) ? 100 : intval($r['length']);
-        $filter = strval($r['filter']);
+public static function getRankForTypeScript(\OmegaUp\Request $r) {
+    $r->ensureOptionalInt('page');
+    $r->ensureOptionalInt('length');
+    \OmegaUp\Validators::validateOptionalInEnum(
+        $r['filter'],
+        'filter',
+        ['', 'country', 'state', 'school']
+    );
 
-        $availableFilters = [];
+    $page = is_null($r['page']) ? 1 : intval($r['page']);
+    $length = is_null($r['length']) ? 100 : intval($r['length']);
+    $filter = strval($r['filter']);
 
-        $ranking = self::getRankByProblemsSolved(
-            $r->identity,
-            $filter,
-            $page,
-            $length
-        );
-        $response = [
-            'templateProperties' => [
-                'payload' => [
-                    'page' => $page,
-                    'length' => $length,
-                    'filter' => $filter,
-                    'availableFilters' => $availableFilters,
-                    'isIndex' => false,
-                    'isLogged' => false,
-                    'ranking' => $ranking,
-                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
-                        $ranking['total'],
-                        $length,
-                        $page,
-                        '/rank/',
-                        adjacent: 5,
-                        params: $filter === '' ? [] : [ 'filter' => $filter ]
-                    ),
-                ],
-                'title' => new \OmegaUp\TranslationString(
-                    'omegaupTitleUsersRank'
-                )
+    $availableFilters = [];
+
+    $ranking = self::getRankByProblemsSolved(
+        $r->identity,
+        $filter,
+        $page,
+        $length
+    );
+    $response = [
+        'templateProperties' => [
+            'payload' => [
+                'page' => $page,
+                'length' => $length,
+                'filter' => $filter,
+                'availableFilters' => $availableFilters,
+                'isIndex' => false,
+                'isLogged' => false,
+                'ranking' => $ranking,
+                'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+                    $ranking['total'],
+                    $length,
+                    $page,
+                    '/rank/',
+                    adjacent: 5,
+                    params: $filter === '' ? [] : [ 'filter' => $filter ]
+                ),
             ],
-            'entrypoint' => 'users_rank',
-        ];
+            'title' => new \OmegaUp\TranslationString(
+                'omegaupTitleUsersRank'
+            )
+        ],
+        'entrypoint' => 'users_rank',
+    ];
 
-        try {
-            $r->ensureIdentity();
-        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            // Do nothing. Not logged user can access here
-            return $response;
-        }
-
-        $response['templateProperties']['payload']['isLogged'] = true;
-        if (!is_null($r->identity->country_id)) {
-            $availableFilters['country'] =
-                \OmegaUp\Translations::getInstance($r->identity)->get(
-                    'wordsFilterByCountry'
-                );
-        }
-        if (!is_null($r->identity->state_id)) {
-            $availableFilters['state'] =
-                \OmegaUp\Translations::getInstance($r->identity)->get(
-                    'wordsFilterByState'
-                );
-        }
-
-        $schoolId = null;
-        if (!is_null($r->identity->current_identity_school_id)) {
-            $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
-                $r->identity->current_identity_school_id
-            );
-            if (!is_null($identitySchool)) {
-                $schoolId = $identitySchool->school_id;
-            }
-        }
-        if (!is_null($schoolId)) {
-            $availableFilters['school'] =
-                \OmegaUp\Translations::getInstance($r->identity)->get(
-                    'wordsFilterBySchool'
-                );
-        }
-        $response['templateProperties']['payload']['availableFilters'] = $availableFilters;
-        $response['templateProperties']['payload']['ranking'] = self::getRankByProblemsSolved(
-            $r->identity,
-            $filter,
-            $page,
-            $length
-        );
+    try {
+        $r->ensureIdentity();
+    } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+        // Do nothing. Not logged user can access here
         return $response;
     }
 
-    /**
-     * Gets the list of users that depend on the current user
-     *
-     * @return array{templateProperties: array{payload: UserDependentsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
-     */
-    public static function getUserDependentsForTypeScript(\OmegaUp\Request $r) {
-        $r->ensureMainUserIdentity();
-        return [
-            'templateProperties' => [
-                'payload' => [
-                    'dependents' => \OmegaUp\DAO\Users::getUserDependents(
-                        $r->user
-                    ),
-                ],
-                'title' => new \OmegaUp\TranslationString(
-                    'omegaUpTitleMyDependents'
-                )
-            ],
-            'entrypoint' => 'user_dependents',
-        ];
+    $response['templateProperties']['payload']['isLogged'] = true;
+    if (!is_null($r->identity->country_id)) {
+        $availableFilters['country'] =
+            \OmegaUp\Translations::getInstance($r->identity)->get(
+                'wordsFilterByCountry'
+            );
     }
+    if (!is_null($r->identity->state_id)) {
+        $availableFilters['state'] =
+            \OmegaUp\Translations::getInstance($r->identity)->get(
+                'wordsFilterByState'
+            );
+    }
+
+    $schoolId = null;
+    if (!is_null($r->identity->current_identity_school_id)) {
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $r->identity->current_identity_school_id
+        );
+        if (!is_null($identitySchool)) {
+            $schoolId = $identitySchool->school_id;
+        }
+    }
+    if (!is_null($schoolId)) {
+        $availableFilters['school'] =
+            \OmegaUp\Translations::getInstance($r->identity)->get(
+                'wordsFilterBySchool'
+            );
+    }
+    $response['templateProperties']['payload']['availableFilters'] = $availableFilters;
+    $response['templateProperties']['payload']['ranking'] = self::getRankByProblemsSolved(
+        $r->identity,
+        $filter,
+        $page,
+        $length
+    );
+    return $response;
+}
+
+/**
+ * Gets the list of users that depend on the current user
+ *
+ * @return array{templateProperties: array{payload: UserDependentsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+ */
+public static function getUserDependentsForTypeScript(\OmegaUp\Request $r) {
+    $r->ensureMainUserIdentity();
+    return [
+        'templateProperties' => [
+            'payload' => [
+                'dependents' => \OmegaUp\DAO\Users::getUserDependents(
+                    $r->user
+                ),
+            ],
+            'title' => new \OmegaUp\TranslationString(
+                'omegaUpTitleMyDependents'
+            )
+        ],
+        'entrypoint' => 'user_dependents',
+    ];
+}
+
+
 
     /**
      * @omegaup-request-param mixed $category
