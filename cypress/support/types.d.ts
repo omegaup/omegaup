@@ -85,6 +85,7 @@ export interface ContestOptions {
   admissionMode: AdmissionModeOptions;
   problems: Array<ProblemOptions>;
   runs: Array<RunOptions>;
+  statusCheck?: boolean;
 }
 
 export interface RunOptions {

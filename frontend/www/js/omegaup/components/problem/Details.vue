@@ -117,7 +117,7 @@
           <template #popup>
             <omegaup-arena-runsubmit-popup
               v-show="currentPopupDisplayed === PopupDisplayed.RunSubmit"
-              :preferred-language="problem.preferred_language"
+              :preferred-language="preferredLanguage"
               :languages="filteredLanguages"
               :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
               @dismiss="onPopupDismissed"
@@ -481,7 +481,7 @@ export default class ProblemDetails extends Vue {
   feedbackMap!: Map<number, ArenaCourseFeedback>;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
-  @Prop({ default: false }) useNewVerdictTable!: boolean;
+  @Prop({ default: true }) useNewVerdictTable!: boolean;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
@@ -520,6 +520,14 @@ export default class ProblemDetails extends Vue {
       },
     ];
     return tabs.filter((tab) => tab.visible);
+  }
+
+  get preferredLanguage(): null | string {
+    const [lastRun] = this.runs.slice(-1);
+    if (lastRun) {
+      return lastRun.language;
+    }
+    return this.problem.preferred_language ?? null;
   }
 
   get clarificationsCount(): string {

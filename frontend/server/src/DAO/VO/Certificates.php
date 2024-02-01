@@ -22,6 +22,7 @@ class Certificates extends \OmegaUp\DAO\VO\VO {
         'certificate_type' => true,
         'course_id' => true,
         'contest_id' => true,
+        'coder_of_the_month_id' => true,
         'verification_code' => true,
         'contest_place' => true,
     ];
@@ -74,6 +75,11 @@ class Certificates extends \OmegaUp\DAO\VO\VO {
         if (isset($data['contest_id'])) {
             $this->contest_id = intval(
                 $data['contest_id']
+            );
+        }
+        if (isset($data['coder_of_the_month_id'])) {
+            $this->coder_of_the_month_id = intval(
+                $data['coder_of_the_month_id']
             );
         }
         if (isset($data['verification_code'])) {
@@ -131,6 +137,13 @@ class Certificates extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $contest_id = null;
+
+    /**
+     * Id del Coder del mes que obtuvo el certificado
+     *
+     * @var int|null
+     */
+    public $coder_of_the_month_id = null;
 
     /**
      * Código de verificación del diploma

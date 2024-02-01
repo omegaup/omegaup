@@ -41,9 +41,6 @@ OmegaUp.on('ready', async () => {
 
   const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const useNewVerdictTable = urlParams.get('useNewVerdictTable') === 'true';
-
   const searchResultEmpty: types.ListItem[] = [];
   let runDetails: null | types.RunDetails = null;
   try {
@@ -118,7 +115,6 @@ OmegaUp.on('ready', async () => {
           searchResultProblems: this.searchResultProblems,
           problemAlias: payload.problem.alias,
           totalRuns: runsStore.state.totalRuns,
-          useNewVerdictTable: useNewVerdictTable,
         },
         on: {
           'show-run': (request: SubmissionRequest) => {
@@ -141,7 +137,14 @@ OmegaUp.on('ready', async () => {
             filter,
             value,
           }: {
-            filter: 'verdict' | 'language' | 'username' | 'status' | 'offset';
+            filter:
+              | 'verdict'
+              | 'language'
+              | 'username'
+              | 'status'
+              | 'offset'
+              | 'execution'
+              | 'output';
             value: string;
           }) => {
             if (value) {
@@ -375,7 +378,7 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.ignoreError);
           },
-          disqualify: (run: types.Run) => {
+          disqualify: ({ run }: { run: types.Run }) => {
             if (!window.confirm(T.runDisqualifyConfirm)) {
               return;
             }
@@ -478,6 +481,8 @@ OmegaUp.on('ready', async () => {
       language: runsStore.state.filters?.language,
       username: runsStore.state.filters?.username,
       status: runsStore.state.filters?.status,
+      execution: runsStore.state.filters?.execution,
+      output: runsStore.state.filters?.output,
     })
       .then(time.remoteTimeAdapter)
       .then((response) => {
