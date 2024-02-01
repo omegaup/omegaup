@@ -169,8 +169,8 @@
                 type="date"
                 class="form-control"
                 autocomplete="date-of-birth"
-                :max="maxDate"
-                :min="minDate"
+                :max="maxDateForTimepicker"
+                :min="minDateForTimepicker"
               />
             </div>
           </div>
@@ -349,7 +349,7 @@ export default class Signup extends Vue {
     this.recaptchaResponse = '';
   }
 
-  get maxDate() {
+  get maxDateForTimepicker() {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const currentMonth = (currentDate.getMonth() + 1)
@@ -362,7 +362,7 @@ export default class Signup extends Vue {
       : `${currentYear}-${currentMonth}-${currentDay}`;
   }
 
-  get minDate() {
+  get minDateForTimepicker() {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const currentMonth = (currentDate.getMonth() + 1)
