@@ -93,6 +93,7 @@ CREATE TABLE `Certificates` (
   `certificate_type` enum('course','contest','coder_of_the_month','coder_of_the_month_female') NOT NULL COMMENT 'Tipo de diploma',
   `course_id` int DEFAULT NULL,
   `contest_id` int DEFAULT NULL,
+  `coder_of_the_month_id` int DEFAULT NULL COMMENT 'Id del Coder del mes que obtuvo el certificado',
   `verification_code` varchar(10) NOT NULL COMMENT 'Código de verificación del diploma',
   `contest_place` int DEFAULT NULL COMMENT 'Se guarda el lugar en el que quedo un estudiante si es menor o igual a certificate_cutoff',
   PRIMARY KEY (`certificate_id`),
@@ -102,8 +103,10 @@ CREATE TABLE `Certificates` (
   KEY `identity_id` (`identity_id`),
   KEY `course_id` (`course_id`),
   KEY `contest_id` (`contest_id`),
+  KEY `coder_of_the_month_id` (`coder_of_the_month_id`),
   CONSTRAINT `fk_cc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`),
   CONSTRAINT `fk_cc_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`),
+  CONSTRAINT `fk_ccotm_coder_of_the_month_id` FOREIGN KEY (`coder_of_the_month_id`) REFERENCES `Coder_Of_The_Month` (`coder_of_the_month_id`),
   CONSTRAINT `fk_ci_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Diplomas';
 /*!40101 SET character_set_client = @saved_cs_client */;

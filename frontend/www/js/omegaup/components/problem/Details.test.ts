@@ -7,6 +7,7 @@ import * as time from '../../time';
 
 import problem_Details from './Details.vue';
 import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
+import { DisqualificationType } from '../arena/Runs.vue';
 
 describe('Details.vue', () => {
   const date = new Date();
@@ -263,25 +264,28 @@ Here we can add code.
     expect(wrapper.emitted('disqualify')).toEqual([
       [
         {
-          alias: 'Hello',
-          classname: 'user-rank-unranked',
-          country: 'xx',
-          execution: 'EXECUTION_FINISHED',
-          guid: 'abcdefg',
-          language: 'py3',
-          memory: 0,
-          output: 'OUTPUT_CORRECT',
-          penalty: 0,
-          runtime: 0,
-          score: 1,
-          status: 'ready',
-          status_memory: 'MEMORY_AVAILABLE',
-          status_runtime: 'RUNTIME_AVAILABLE',
-          submit_delay: 0,
-          time: expect.any(Date),
-          username: 'omegaUp',
-          verdict: 'AC',
-          type: 'normal',
+          disqualificationType: DisqualificationType.ByGUID,
+          run: {
+            alias: 'Hello',
+            classname: 'user-rank-unranked',
+            country: 'xx',
+            execution: 'EXECUTION_FINISHED',
+            guid: 'abcdefg',
+            language: 'py3',
+            memory: 0,
+            output: 'OUTPUT_CORRECT',
+            penalty: 0,
+            runtime: 0,
+            score: 1,
+            status: 'ready',
+            status_memory: 'MEMORY_AVAILABLE',
+            status_runtime: 'RUNTIME_AVAILABLE',
+            submit_delay: 0,
+            time: expect.any(Date),
+            username: 'omegaUp',
+            verdict: 'AC',
+            type: 'normal',
+          },
         },
       ],
     ]);
