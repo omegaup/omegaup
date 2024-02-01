@@ -361,7 +361,7 @@ const translations: { [key: string]: string; } = {
   contestNewFormEndDate: "End date",
   contestNewFormEndDateDesc: "The time and date (in local time) in which the contest will end.",
   contestNewFormForTeams: "Contest for teams",
-  contestNewFormForTeamsDesc: "If activated, the contest can only be accessed by teams instead of identities. The teams have to be added to a teams group.",
+  contestNewFormForTeamsDesc: "If activated, the contest can only be accessed by teams instead of identities. The teams have to be added to a teams group. This option is only available for new competitions.",
   contestNewFormICPCStyle: "ICPC style",
   contestNewFormImmediateFeedbackDesc: "After evaluating each submission, the verdict will be shown.",
   contestNewFormImmediateSummaryFeedbackDesc: "After evaluating each submission, the summary of scores and verdicts for each group of cases will be shown.",
