@@ -45,6 +45,9 @@ OmegaUp.on('ready', () => {
   }
 
   const payload = types.payloadParsers.LoginDetailsPayload();
+  const urlParams = new URLSearchParams(window.location.search);
+  const useSignupFormWithBirthDate =
+    urlParams.get('useSignupFormWithBirthDate') === 'true';
   const googleClientId = document
     .querySelector('meta[name="google-signin-client_id"]')
     ?.getAttribute('content');
@@ -66,6 +69,7 @@ OmegaUp.on('ready', () => {
           facebookUrl: payload.facebookUrl,
           googleClientId,
           hasVisitedSection: payload.hasVisitedSection,
+          useSignupFormWithBirthDate,
         },
         on: {
           'register-and-login': ({
@@ -93,6 +97,23 @@ OmegaUp.on('ready', () => {
             }
             if (password.length < 8) {
               ui.error(T.loginPasswordTooShort);
+              return;
+            }
+            if (!useSignupFormWithBirthDate) {
+              api.User.create({
+                username: username,
+                email: email,
+                password: password,
+                recaptcha: recaptchaResponse,
+              })
+                .then(() => {
+                  loginAndRedirect(
+                    username,
+                    password,
+                    /*isAccountCreation=*/ true,
+                  );
+                })
+                .catch(ui.apiError);
               return;
             }
             const request: {

@@ -4,23 +4,124 @@
       <h2 class="card-title">{{ T.loginSignupHeader }}</h2>
     </div>
     <div class="card-body">
-      <form>
-        <div class="row">
-          <div class="col">
-            <input
-              v-model="over13Checked"
-              type="checkbox"
-              data-over-thirteen-checkbox
-              @change="updateDateRestriction"
-            />
-            <label for="checkbox" class="pl-1">
-              <omegaup-markdown :markdown="T.over13yearsOld"></omegaup-markdown>
+      <form v-if="!useSignupFormWithBirthDate">
+        <div class="row justify-content-md-center">
+          <div class="col-md-4 col-md-offset-2 introjs-username">
+            <div class="form-group">
+              <label class="control-label">{{ T.loginAccountName }}</label>
+              <input
+                v-model="username"
+                data-signup-username
+                name="reg_username"
+                class="form-control"
+                autocomplete="username"
+              />
+            </div>
+          </div>
+          <div class="col-md-4 introjs-email">
+            <div class="form-group">
+              <label class="control-label">{{ T.loginEmail }}</label>
+              <input
+                v-model="email"
+                data-signup-email
+                name="reg_email"
+                type="email"
+                class="form-control"
+                autocomplete="email"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="row justify-content-md-center">
+          <div class="col-md-4 col-md-offset-2 introjs-password">
+            <div class="form-group">
+              <label class="control-label">{{ T.loginPasswordCreate }}</label>
+              <input
+                v-model="password"
+                data-signup-password
+                name="reg_password"
+                type="password"
+                class="form-control"
+                autocomplete="new-password"
+              />
+            </div>
+          </div>
+          <div class="col-md-4 introjs-confirmpassword">
+            <div class="form-group">
+              <label class="control-label">{{ T.loginRepeatPassword }}</label>
+              <input
+                v-model="passwordConfirmation"
+                data-signup-repeat-password
+                name="reg_password_confirmation"
+                type="password"
+                class="form-control"
+                autocomplete="new-password"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="row justify-content-md-center">
+          <div class="col-md-8 introjs-terms-and-conditions">
+            <input v-model="checked" type="checkbox" />
+            <label for="checkbox">
+              <omegaup-markdown
+                :markdown="T.acceptPrivacyPolicy"
+              ></omegaup-markdown>
             </label>
+          </div>
+          <div v-if="validateRecaptcha" class="col-md-4">
+            <vue-recaptcha
+              name="recaptcha"
+              sitekey="6LfMqdoSAAAAALS8h-PB_sqY7V4nJjFpGK2jAokS"
+              @verify="verify"
+              @expired="expired"
+            ></vue-recaptcha>
+          </div>
+          <div class="col-md-4 col-md-offset-6">
+            <div class="form-group introjs-register">
+              <button
+                data-signup-submit
+                class="btn btn-primary form-control"
+                name="sign_up"
+                @click.prevent="
+                  $emit('register-and-login', {
+                    username,
+                    email,
+                    password,
+                    passwordConfirmation,
+                    recaptchaResponse,
+                  })
+                "
+              >
+                {{ T.loginSignUp }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <form v-else>
+        <div class="row">
+          <div class="col-md-4 offset-md-2">
+            <div class="form-group">
+              <input
+                v-model="over13Checked"
+                type="checkbox"
+                data-over-thirteen-checkbox
+                @change="updateDateRestriction"
+              />
+              <label for="checkbox" class="pl-1">
+                <omegaup-markdown
+                  :markdown="T.over13yearsOld"
+                ></omegaup-markdown>
+              </label>
+            </div>
           </div>
         </div>
 
         <div class="row">
-          <div v-show="isUnder13" class="col-md-4 offset-md-2">
+          <div v-if="isUnder13" class="col-md-8 offset-md-2">
             <div class="form-group">
               <label class="control-label">{{ T.loginParentEmail }}</label>
               <input
@@ -32,7 +133,7 @@
               />
             </div>
           </div>
-          <div v-show="!isUnder13" class="col-md-4 offset-md-2 introjs-email">
+          <div v-else class="col-md-8 offset-md-2 introjs-email">
             <div class="form-group">
               <label class="control-label">{{ T.loginEmail }}</label>
               <input
@@ -104,7 +205,7 @@
         </div>
 
         <div class="row justify-content-md-center">
-          <div class="col-md-8 introjs-terms-and-conditions">
+          <div class="col-md-10 introjs-terms-and-conditions">
             <input v-model="checked" type="checkbox" />
             <label for="checkbox" class="pl-1">
               <omegaup-markdown
@@ -112,6 +213,9 @@
               ></omegaup-markdown>
             </label>
           </div>
+        </div>
+
+        <div class="row justify-content-md-center">
           <div v-if="validateRecaptcha" class="col-md-4">
             <vue-recaptcha
               name="recaptcha"
@@ -120,6 +224,9 @@
               @expired="expired"
             ></vue-recaptcha>
           </div>
+        </div>
+
+        <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-6">
             <div class="form-group introjs-register">
               <button
@@ -166,6 +273,7 @@ Vue.use(VueCookies, { expire: -1 });
 export default class Signup extends Vue {
   @Prop() validateRecaptcha!: boolean;
   @Prop() hasVisitedSection!: boolean;
+  @Prop({ default: false }) useSignupFormWithBirthDate!: boolean;
 
   T = T;
   username: string = '';
@@ -278,7 +386,3 @@ export default class Signup extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-</style>
