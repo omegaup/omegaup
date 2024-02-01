@@ -2,8 +2,8 @@
   <div class="card mb-3 panel panel-primary">
     <div class="card-body panel-body">
       <form class="form" @submit.prevent="onSubmit">
-        <div class="form-group">
-          <label class="font-weight-bold"
+        <div class="form-group mb-0">
+          <label class="font-weight-bold w-100"
             >{{ T.courseEditTeachingAssistants }}
             <font-awesome-icon
               :title="T.courseEditAddTeachingAssistantsTooltip"
@@ -19,13 +19,9 @@
             />
           </label>
         </div>
-        <div class="row">
-          <div class="action-container col-md-6">
-            <button class="btn btn-primary" type="submit">
-              {{ T.courseEditAddTeachingAssistants }}
-            </button>
-          </div>
-        </div>
+        <button class="btn btn-primary" type="submit">
+          {{ T.courseEditAddTeachingAssistants }}
+        </button>
       </form>
     </div>
     <div v-if="currentTeachingAssistants.length === 0">
