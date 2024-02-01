@@ -138,7 +138,4 @@ export default class ProblemSearchBar extends Vue {
   }
 }
 
-[data-problem-keyword-search] {
-  z-index: 9999;
-}
 </style>
