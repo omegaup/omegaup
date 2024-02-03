@@ -361,7 +361,7 @@ const translations: { [key: string]: string; } = {
   contestNewFormEndDate: "Fecha de Fin",
   contestNewFormEndDateDesc: "La hora (en hora local) en la que termina el concurso.",
   contestNewFormForTeams: "Concurso para equipos",
-  contestNewFormForTeamsDesc: "Si est\u00e1 activado, s\u00f3lo pueden acceder equipos en lugar de identidades. Los equipos deben agregarse a un grupo de equipos. Esta opción sólo está disponible para nuevas competiciones.",
+  contestNewFormForTeamsDesc: "Si est\u00e1 activado, s\u00f3lo pueden acceder equipos en lugar de identidades. Los equipos deben agregarse a un grupo de equipos. Esta opción sólo está disponible para nuevos concursos",
   contestNewFormICPCStyle: "Estilo ICPC",
   contestNewFormImmediateFeedbackDesc: "Despu\u00e9s de evaluar cada env\u00edo, se mostrar\u00e1 el veredicto.",
   contestNewFormImmediateSummaryFeedbackDesc: "Despu\u00e9s de evaluar cada env\u00edo, se mostrar\u00e1 el resumen de puntajes y veredictos para cada grupo de casos.",
