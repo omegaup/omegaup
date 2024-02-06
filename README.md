@@ -3,7 +3,7 @@
 
 [![Forks](https://img.shields.io/github/forks/omegaup/omegaup?style=social)](https://github.com/omegaup/omegaup/network/members) [![Stars](https://img.shields.io/github/stars/omegaup/omegaup?style=social)](https://github.com/omegaup/omegaup/stargazers) [![Twitter](https://img.shields.io/twitter/follow/omegaup.svg?style=social&label=Follow)](https://twitter.com/omegaup)
 
-Ver el contenido en inglés: [español](#español)  
+Ver el contenido en Español: [Español](#Español)  
 View the content in English: [English](#English)  
 Veja o conteúdo em inglês: [português](#português)
 
