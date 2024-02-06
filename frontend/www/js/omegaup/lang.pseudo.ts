@@ -363,7 +363,7 @@ const translations: { [key: string]: string; } = {
   contestNewFormEndDate: "(End da73)",
   contestNewFormEndDateDesc: "(Th3 7im3 and da73 (in 10ca1 7im3) in which 7h3 c0n7357 wi11 3nd.)",
   contestNewFormForTeams: "(C0n7357 f0r 73am5)",
-  contestNewFormForTeamsDesc: "(If ac7iva73d, 7h3 c0n7357 can 0n1y b3 acc3553d by 73am5 in573ad 0f id3n7i7i35. Th3 73am5 hav3 70 b3 add3d 70 a 73am5 gr0up.)",
+  contestNewFormForTeamsDesc: "(If ac7iva73d, 7h3 c0n7357 can 0n1y b3 acc3553d by 73am5 in573ad 0f id3n7i7i35. Th3 73am5 hav3 70 b3 add3d 70 a 73am5 gr0up. Thi5 0p7i0n i5 0n1y avai1ab13 f0r n3w c0n73575.)",
   contestNewFormICPCStyle: "(ICPC 57y13)",
   contestNewFormImmediateFeedbackDesc: "(Af73r 3va1ua7ing 3ach 5ubmi55i0n, 7h3 v3rdic7 wi11 b3 5h0wn.)",
   contestNewFormImmediateSummaryFeedbackDesc: "(Af73r 3va1ua7ing 3ach 5ubmi55i0n, 7h3 5ummary 0f 5c0r35 and v3rdic75 f0r 3ach gr0up 0f ca535 wi11 b3 5h0wn.)",
