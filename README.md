@@ -5,7 +5,7 @@
 
 Ver el contenido en Español: [Español](#Español)  
 View the content in English: [English](#English)  
-Veja o conteúdo em inglês: [português](#português)
+Veja o conteúdo em Português: [Português](#Português)
 
 # español
 [omegaUp](https://omegaup.com) es una plataforma educativa gratuita que ayuda a mejorar las habilidades en programación, usada por decenas de miles de estudiantes y docentes en Latinoamérica.
