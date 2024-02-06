@@ -72,7 +72,7 @@ This also includes all Blink/WebKit-based browsers whose versions are compatible
 
 BSD
 
-# português
+# Português
 [omegaUp](https://omegaup.com) é uma plataforma educacional gratuita que ajuda a melhorar as habilidades de programação, usada por dezenas de milhares de estudantes e professores na América Latina.
 
 ## Diretórios
