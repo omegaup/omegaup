@@ -989,6 +989,7 @@ const translations: { [key: string]: string; } = {
   passwordResetTokenWasGeneratedSuccessfully: "El token fue generado exitosamente",
   pendingRegistrations: "Solicitudes pendientes",
   pendingRegistrationsShowAll: "Mostrar todas las solicitudes",
+  privacyPolicyNotAccepted: "Por favor lea y acepte la Pol\u00edtica de Uso y Privacidad del sitio, as\u00ed como el C\u00f3digo de Conducta.",
   privacyStatementNotFound: "La declaraci\u00f3n de privacidad no fue encontrada.",
   privateTagsPlaceholder: "Ej. universidad, 2019, clase-2020",
   problemAliasExists: "El alias del problema ya existe, por favor selecciona otro.",
