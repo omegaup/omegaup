@@ -58,6 +58,11 @@ export default class Username extends Vue {
 
 <style lang="scss" scope>
 @import '../../../../sass/main.scss';
+
+span {
+  text-wrap: balance;
+}
+
 .user-rank-unranked,
 .user-rank-beginner,
 .user-rank-specialist,
