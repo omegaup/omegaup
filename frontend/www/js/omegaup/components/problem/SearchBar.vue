@@ -137,5 +137,4 @@ export default class ProblemSearchBar extends Vue {
     margin-left: 0 !important;
   }
 }
-
 </style>
