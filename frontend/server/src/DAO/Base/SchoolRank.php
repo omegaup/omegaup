@@ -9,121 +9,160 @@
 
 namespace OmegaUp\DAO\Base;
 
-/** Certificates Data Access Object (DAO) Base.
+/** SchoolRank Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link \OmegaUp\DAO\VO\Certificates}.
+ * {@link \OmegaUp\DAO\VO\SchoolRank}.
  * @access public
  * @abstract
  */
-abstract class Certificates {
+abstract class SchoolRank {
     /**
-     * Actualizar registros.
+     * Guardar registros.
      *
-     * @param \OmegaUp\DAO\VO\Certificates $Certificates El objeto de tipo Certificates a actualizar.
+     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\SchoolRank}
+     * pasado en la base de datos. La llave primaria indicará qué instancia va
+     * a ser actualizada en base de datos. Si la llave primara o combinación de
+     * llaves primarias que describen una fila que no se encuentra en la base de
+     * datos, entonces replace() creará una nueva fila.
      *
-     * @return int Número de filas afectadas
+     * @throws \OmegaUp\Exceptions\NotFoundException si las columnas de la
+     * llave primaria están vacías.
+     *
+     * @param \OmegaUp\DAO\VO\SchoolRank $School_Rank El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\SchoolRank}.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function update(
-        \OmegaUp\DAO\VO\Certificates $Certificates
+    final public static function replace(
+        \OmegaUp\DAO\VO\SchoolRank $School_Rank
     ): int {
+        if (
+            empty($School_Rank->school_id)
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
+        }
         $sql = '
-            UPDATE
-                `Certificates`
-            SET
-                `identity_id` = ?,
-                `timestamp` = ?,
-                `certificate_type` = ?,
-                `course_id` = ?,
-                `contest_id` = ?,
-                `coder_of_the_month_id` = ?,
-                `verification_code` = ?,
-                `contest_place` = ?
-            WHERE
-                (
-                    `certificate_id` = ?
+            REPLACE INTO
+                School_Rank (
+                    `school_id`,
+                    `ranking`,
+                    `score`,
+                    `country_id`,
+                    `state_id`,
+                    `timestamp`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
                 );';
         $params = [
+            $School_Rank->school_id,
             (
-                is_null($Certificates->identity_id) ?
-                null :
-                intval($Certificates->identity_id)
+                !is_null($School_Rank->ranking) ?
+                intval($School_Rank->ranking) :
+                null
             ),
+            floatval($School_Rank->score),
+            $School_Rank->country_id,
+            $School_Rank->state_id,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $Certificates->timestamp
+                $School_Rank->timestamp
             ),
-            $Certificates->certificate_type,
-            (
-                is_null($Certificates->course_id) ?
-                null :
-                intval($Certificates->course_id)
-            ),
-            (
-                is_null($Certificates->contest_id) ?
-                null :
-                intval($Certificates->contest_id)
-            ),
-            (
-                is_null($Certificates->coder_of_the_month_id) ?
-                null :
-                intval($Certificates->coder_of_the_month_id)
-            ),
-            $Certificates->verification_code,
-            (
-                is_null($Certificates->contest_place) ?
-                null :
-                intval($Certificates->contest_place)
-            ),
-            intval($Certificates->certificate_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
-     * Obtener {@link \OmegaUp\DAO\VO\Certificates} por llave primaria.
+     * Actualizar registros.
      *
-     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Certificates}
+     * @param \OmegaUp\DAO\VO\SchoolRank $School_Rank El objeto de tipo SchoolRank a actualizar.
+     *
+     * @return int Número de filas afectadas
+     */
+    final public static function update(
+        \OmegaUp\DAO\VO\SchoolRank $School_Rank
+    ): int {
+        $sql = '
+            UPDATE
+                `School_Rank`
+            SET
+                `ranking` = ?,
+                `score` = ?,
+                `country_id` = ?,
+                `state_id` = ?,
+                `timestamp` = ?
+            WHERE
+                (
+                    `school_id` = ?
+                );';
+        $params = [
+            (
+                is_null($School_Rank->ranking) ?
+                null :
+                intval($School_Rank->ranking)
+            ),
+            floatval($School_Rank->score),
+            $School_Rank->country_id,
+            $School_Rank->state_id,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $School_Rank->timestamp
+            ),
+            (
+                is_null($School_Rank->school_id) ?
+                null :
+                intval($School_Rank->school_id)
+            ),
+        ];
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+    /**
+     * Obtener {@link \OmegaUp\DAO\VO\SchoolRank} por llave primaria.
+     *
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\SchoolRank}
      * de la base de datos usando sus llaves primarias.
      *
-     * @return ?\OmegaUp\DAO\VO\Certificates Un objeto del tipo
-     * {@link \OmegaUp\DAO\VO\Certificates} o NULL si no hay tal
+     * @return ?\OmegaUp\DAO\VO\SchoolRank Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\SchoolRank} o NULL si no hay tal
      * registro.
      */
     final public static function getByPK(
-        int $certificate_id
-    ): ?\OmegaUp\DAO\VO\Certificates {
+        ?int $school_id
+    ): ?\OmegaUp\DAO\VO\SchoolRank {
         $sql = '
             SELECT
-                `Certificates`.`certificate_id`,
-                `Certificates`.`identity_id`,
-                `Certificates`.`timestamp`,
-                `Certificates`.`certificate_type`,
-                `Certificates`.`course_id`,
-                `Certificates`.`contest_id`,
-                `Certificates`.`coder_of_the_month_id`,
-                `Certificates`.`verification_code`,
-                `Certificates`.`contest_place`
+                `School_Rank`.`school_id`,
+                `School_Rank`.`ranking`,
+                `School_Rank`.`score`,
+                `School_Rank`.`country_id`,
+                `School_Rank`.`state_id`,
+                `School_Rank`.`timestamp`
             FROM
-                `Certificates`
+                `School_Rank`
             WHERE
                 (
-                    `certificate_id` = ?
+                    `school_id` = ?
                 )
             LIMIT 1;';
-        $params = [$certificate_id];
+        $params = [$school_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new \OmegaUp\DAO\VO\Certificates($row);
+        return new \OmegaUp\DAO\VO\SchoolRank($row);
     }
 
     /**
-     * Verificar si existe un {@link \OmegaUp\DAO\VO\Certificates} por llave primaria.
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\SchoolRank} por llave primaria.
      *
-     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\Certificates}
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\SchoolRank}
      * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
      *
      * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
@@ -132,18 +171,18 @@ abstract class Certificates {
      * @return bool Si existe o no tal registro.
      */
     final public static function existsByPK(
-        int $certificate_id
+        ?int $school_id
     ): bool {
         $sql = '
             SELECT
                 COUNT(*)
             FROM
-                `Certificates`
+                `School_Rank`
             WHERE
                 (
-                    `certificate_id` = ?
+                    `school_id` = ?
                 );';
-        $params = [$certificate_id];
+        $params = [$school_id];
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
@@ -153,7 +192,7 @@ abstract class Certificates {
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto {@link \OmegaUp\DAO\VO\Certificates} suministrado.
+     * el objeto {@link \OmegaUp\DAO\VO\SchoolRank} suministrado.
      * Una vez que se ha eliminado un objeto, este no puede ser restaurado
      * llamando a {@link replace()}, ya que este último creará un nuevo
      * registro con una llave primaria distinta a la que estaba en el objeto
@@ -162,24 +201,24 @@ abstract class Certificates {
      * Si no puede encontrar el registro a eliminar,
      * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param \OmegaUp\DAO\VO\Certificates $Certificates El
-     * objeto de tipo \OmegaUp\DAO\VO\Certificates a eliminar
+     * @param \OmegaUp\DAO\VO\SchoolRank $School_Rank El
+     * objeto de tipo \OmegaUp\DAO\VO\SchoolRank a eliminar
      *
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(
-        \OmegaUp\DAO\VO\Certificates $Certificates
+        \OmegaUp\DAO\VO\SchoolRank $School_Rank
     ): void {
         $sql = '
             DELETE FROM
-                `Certificates`
+                `School_Rank`
             WHERE
                 (
-                    `certificate_id` = ?
+                    `school_id` = ?
                 );';
         $params = [
-            $Certificates->certificate_id
+            $School_Rank->school_id
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -193,7 +232,7 @@ abstract class Certificates {
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
      * y construirá un arreglo que contiene objetos de tipo
-     * {@link \OmegaUp\DAO\VO\Certificates}.
+     * {@link \OmegaUp\DAO\VO\SchoolRank}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -204,8 +243,8 @@ abstract class Certificates {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return list<\OmegaUp\DAO\VO\Certificates> Un arreglo que contiene objetos del tipo
-     * {@link \OmegaUp\DAO\VO\Certificates}.
+     * @return list<\OmegaUp\DAO\VO\SchoolRank> Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\SchoolRank}.
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -215,17 +254,14 @@ abstract class Certificates {
     ): array {
         $sql = '
             SELECT
-                `Certificates`.`certificate_id`,
-                `Certificates`.`identity_id`,
-                `Certificates`.`timestamp`,
-                `Certificates`.`certificate_type`,
-                `Certificates`.`course_id`,
-                `Certificates`.`contest_id`,
-                `Certificates`.`coder_of_the_month_id`,
-                `Certificates`.`verification_code`,
-                `Certificates`.`contest_place`
+                `School_Rank`.`school_id`,
+                `School_Rank`.`ranking`,
+                `School_Rank`.`score`,
+                `School_Rank`.`country_id`,
+                `School_Rank`.`state_id`,
+                `School_Rank`.`timestamp`
             FROM
-                `Certificates`
+                `School_Rank`
         ';
         if (!is_null($orden)) {
             $sql .= (
@@ -247,7 +283,7 @@ abstract class Certificates {
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
         ) {
-            $allData[] = new \OmegaUp\DAO\VO\Certificates(
+            $allData[] = new \OmegaUp\DAO\VO\SchoolRank(
                 $row
             );
         }
@@ -258,33 +294,29 @@ abstract class Certificates {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto {@link \OmegaUp\DAO\VO\Certificates}
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\SchoolRank}
      * suministrado.
      *
-     * @param \OmegaUp\DAO\VO\Certificates $Certificates El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Certificates}
+     * @param \OmegaUp\DAO\VO\SchoolRank $School_Rank El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\SchoolRank}
      * a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de
      *             filas afectadas.
      */
     final public static function create(
-        \OmegaUp\DAO\VO\Certificates $Certificates
+        \OmegaUp\DAO\VO\SchoolRank $School_Rank
     ): int {
         $sql = '
             INSERT INTO
-                `Certificates` (
-                    `identity_id`,
-                    `timestamp`,
-                    `certificate_type`,
-                    `course_id`,
-                    `contest_id`,
-                    `coder_of_the_month_id`,
-                    `verification_code`,
-                    `contest_place`
+                `School_Rank` (
+                    `school_id`,
+                    `ranking`,
+                    `score`,
+                    `country_id`,
+                    `state_id`,
+                    `timestamp`
                 ) VALUES (
-                    ?,
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -294,34 +326,20 @@ abstract class Certificates {
                 );';
         $params = [
             (
-                is_null($Certificates->identity_id) ?
+                is_null($School_Rank->school_id) ?
                 null :
-                intval($Certificates->identity_id)
+                intval($School_Rank->school_id)
             ),
+            (
+                is_null($School_Rank->ranking) ?
+                null :
+                intval($School_Rank->ranking)
+            ),
+            floatval($School_Rank->score),
+            $School_Rank->country_id,
+            $School_Rank->state_id,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $Certificates->timestamp
-            ),
-            $Certificates->certificate_type,
-            (
-                is_null($Certificates->course_id) ?
-                null :
-                intval($Certificates->course_id)
-            ),
-            (
-                is_null($Certificates->contest_id) ?
-                null :
-                intval($Certificates->contest_id)
-            ),
-            (
-                is_null($Certificates->coder_of_the_month_id) ?
-                null :
-                intval($Certificates->coder_of_the_month_id)
-            ),
-            $Certificates->verification_code,
-            (
-                is_null($Certificates->contest_place) ?
-                null :
-                intval($Certificates->contest_place)
+                $School_Rank->timestamp
             ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -329,9 +347,6 @@ abstract class Certificates {
         if ($affectedRows == 0) {
             return 0;
         }
-        $Certificates->certificate_id = (
-            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
-        );
 
         return $affectedRows;
     }

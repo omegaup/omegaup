@@ -43,7 +43,12 @@ OmegaUp.on('ready', async () => {
   const courseAdmin = Boolean(
     payload.courseDetails.is_admin || payload.courseDetails.is_curator,
   );
-  const activeTab = getSelectedValidTab(locationHash, courseAdmin);
+  const activeTab = getSelectedValidTab(
+    locationHash,
+    courseAdmin,
+    payload.showRanking,
+  );
+
   if (activeTab !== locationHash) {
     window.location.hash = activeTab;
   }
@@ -81,9 +86,6 @@ OmegaUp.on('ready', async () => {
       problemDetails?.nextSubmissionTimestamp.getTime(),
     );
   }
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const useNewVerdictTable = urlParams.get('useNewVerdictTable') === 'true';
 
   const arenaCourse = new Vue({
     el: '#main-container',
@@ -136,7 +138,6 @@ OmegaUp.on('ready', async () => {
           feedbackThreadMap: this.feedbackThreadMap,
           currentUsername: commonPayload.currentUsername,
           currentUserClassName: commonPayload.userClassname,
-          useNewVerdictTable: useNewVerdictTable,
         },
         on: {
           'navigate-to-assignment': ({
@@ -313,7 +314,14 @@ OmegaUp.on('ready', async () => {
             filter,
             value,
           }: {
-            filter: 'verdict' | 'language' | 'username' | 'status' | 'offset';
+            filter:
+              | 'verdict'
+              | 'language'
+              | 'username'
+              | 'status'
+              | 'offset'
+              | 'execution'
+              | 'output';
             value: string;
           }) => {
             if (value != '') {
@@ -324,7 +332,7 @@ OmegaUp.on('ready', async () => {
             }
             refreshRuns();
           },
-          disqualify: (run: types.Run) => {
+          disqualify: ({ run }: { run: types.Run }) => {
             if (!window.confirm(T.runDisqualifyConfirm)) {
               return;
             }
@@ -526,12 +534,19 @@ OmegaUp.on('ready', async () => {
     },
   });
 
-  function getSelectedValidTab(tab: string, isAdmin: boolean): string {
-    const validTabs = ['problems', 'ranking', 'runs', 'clarifications'];
-    const defaultTab = 'problems';
-    if (tab === 'runs' && !isAdmin) return defaultTab;
-    const isValidTab = validTabs.includes(tab);
-    return isValidTab ? tab : defaultTab;
+  function getSelectedValidTab(
+    tab: string,
+    isAdmin: boolean,
+    showRanking: boolean,
+  ): string {
+    const validTabs = ['problems', 'clarifications'];
+    if (showRanking) {
+      validTabs.push('ranking');
+    }
+    if (isAdmin) {
+      validTabs.push('runs');
+    }
+    return validTabs.includes(tab) ? tab : validTabs[0];
   }
 
   function refreshRuns(): void {
@@ -545,6 +560,8 @@ OmegaUp.on('ready', async () => {
       language: runsStore.state.filters?.language,
       username: runsStore.state.filters?.username,
       status: runsStore.state.filters?.status,
+      execution: runsStore.state.filters?.execution,
+      output: runsStore.state.filters?.output,
     })
       .then(time.remoteTimeAdapter)
       .then((response) => {
