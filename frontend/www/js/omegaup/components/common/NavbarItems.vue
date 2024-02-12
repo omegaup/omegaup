@@ -2,7 +2,7 @@
   <div class="mr-auto">
     <ul
       v-if="!omegaUpLockDown && (!inContest || isAdmin)"
-      class="navbar-nav align-items-end"
+      class="navbar-nav align-items-center"
     >
       <li
         v-if="isLoggedIn"
