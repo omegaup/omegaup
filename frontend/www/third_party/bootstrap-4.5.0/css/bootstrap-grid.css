@@ -1487,6 +1487,7 @@ html {
 .align-content-center {
   -ms-flex-line-pack: center !important;
   align-content: center !important;
+  justify-content: start !important;
 }
 
 .align-content-between {
