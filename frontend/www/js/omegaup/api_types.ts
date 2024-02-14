@@ -2445,8 +2445,27 @@ export namespace types {
     export function UserRankTablePayload(
       elementId: string = 'payload',
     ): types.UserRankTablePayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
+      return ((x) => {
+        if (typeof x.lastUpdated !== 'undefined' && x.lastUpdated !== null)
+          x.lastUpdated = ((x: number) => new Date(x * 1000))(x.lastUpdated);
+        x.ranking = ((x) => {
+          x.rank = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (typeof x.timestamp !== 'undefined' && x.timestamp !== null)
+                x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+              return x;
+            });
+          })(x.rank);
+          return x;
+        })(x.ranking);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -4836,6 +4855,7 @@ export namespace types {
       problems_solved: number;
       ranking?: number;
       score: number;
+      timestamp?: Date;
       user_id: number;
       username: string;
     }[];
@@ -4854,6 +4874,7 @@ export namespace types {
     filter: string;
     isIndex: boolean;
     isLogged: boolean;
+    lastUpdated?: Date;
     length: number;
     page: number;
     pagerItems: types.PageItem[];
