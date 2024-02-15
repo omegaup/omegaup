@@ -63,7 +63,12 @@
 
         <div class="row justify-content-md-center">
           <div class="col-md-8 introjs-terms-and-conditions">
-            <input v-model="checked" type="checkbox" />
+            <input
+              v-model="termsAndPolicies"
+              data-signup-accept-policies
+              type="checkbox"
+              required
+            />
             <label for="checkbox">
               <omegaup-markdown
                 :markdown="T.acceptPrivacyPolicy"
@@ -84,6 +89,7 @@
                 data-signup-submit
                 class="btn btn-primary form-control"
                 name="sign_up"
+                type="submit"
                 @click.prevent="
                   $emit('register-and-login', {
                     username,
@@ -206,7 +212,7 @@
 
         <div class="row justify-content-md-center">
           <div class="col-md-10 introjs-terms-and-conditions">
-            <input v-model="checked" type="checkbox" />
+            <input v-model="termsAndPolicies" type="checkbox" />
             <label for="checkbox" class="pl-1">
               <omegaup-markdown
                 :markdown="T.acceptPrivacyPolicy"
@@ -243,6 +249,7 @@
                     password,
                     passwordConfirmation,
                     recaptchaResponse,
+                    termsAndPolicies,
                   })
                 "
               >
@@ -285,6 +292,7 @@ export default class Signup extends Vue {
   recaptchaResponse: string = '';
   isUnder13: boolean = true;
   over13Checked: boolean = false;
+  termsAndPolicies: boolean = false;
 
   mounted() {
     const title = T.signUpFormInteractiveGuideTitle;

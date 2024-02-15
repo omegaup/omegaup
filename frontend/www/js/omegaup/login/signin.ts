@@ -81,6 +81,7 @@ OmegaUp.on('ready', () => {
             password,
             passwordConfirmation,
             recaptchaResponse,
+            termsAndPolicies,
           }: {
             over13Checked: boolean;
             username: string;
@@ -90,7 +91,12 @@ OmegaUp.on('ready', () => {
             password: string;
             passwordConfirmation: string;
             recaptchaResponse: string;
+            termsAndPolicies: boolean;
           }) => {
+            if (!termsAndPolicies) {
+              ui.error(T.privacyPolicyNotAccepted);
+              return;
+            }
             if (password != passwordConfirmation) {
               ui.error(T.passwordMismatch);
               return;
