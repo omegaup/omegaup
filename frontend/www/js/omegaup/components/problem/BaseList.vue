@@ -305,6 +305,9 @@ export default class BaseList extends Vue {
 .sticky-offset {
   top: 4rem;
 }
+.sticky-top {
+  z-index: 1;
+}
 .card {
   border-top: none;
   border-radius: 0rem 0rem 0.25rem 0.25rem;
