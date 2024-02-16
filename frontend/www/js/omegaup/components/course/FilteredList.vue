@@ -141,10 +141,18 @@ export default class CourseFilteredList extends Vue {
   showTab = this.activeTab;
 
   getTabName(timeType: string): string {
-    if (timeType === 'current') return T.courseListCurrentCourses;
-    if (timeType === 'past') return T.courseListPastCourses;
-    if (timeType === 'archived') return T.courseListArchivedCourses;
-    return '';
+    switch (timeType) {
+      case 'current':
+        return T.courseListCurrentCourses;
+      case 'past':
+        return T.courseListPastCourses;
+      case 'archived':
+        return T.courseListArchivedCourses;
+      case 'teachingAssistant':
+        return T.courseListTeachingAssistantCourses;
+      default:
+        return '';
+    }
   }
 }
 </script>
