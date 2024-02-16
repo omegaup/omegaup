@@ -131,7 +131,7 @@ OmegaUp.on('ready', () => {
               recaptcha: string;
             } = {
               username,
-              birth_date: dateOfBirth,
+              birth_date: new Date(dateOfBirth),
               password,
               recaptcha: recaptchaResponse,
             };
