@@ -96,6 +96,7 @@
                   :items="solvedProblems"
                   :items-per-page="30"
                   :title="T.profileSolvedProblems"
+                  :should-show-filter-input="true"
                   class="mb-3"
                 ></omegaup-grid-paginator>
                 <omegaup-grid-paginator

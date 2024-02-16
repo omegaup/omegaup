@@ -19,7 +19,7 @@ export class LoginPage {
     return users;
   }
 
-  giveAdminPrivilage(roleName: string, user: string) {
+  giveAdminPrivilege(roleName: string, user: string) {
     cy.loginAdmin();
     const userAdminUrl = '/admin/user/' + user;
     cy.visit(userAdminUrl);
@@ -34,6 +34,7 @@ export class LoginPage {
     cy.get('[data-signup-password]').type(loginOptions.password);
     cy.get('[data-signup-repeat-password]').type(loginOptions.password);
     cy.get('[data-signup-email]').type(`${loginOptions.username}@omegaup.com`);
+    cy.get('[data-signup-accept-policies]').check();
     cy.get('[data-signup-submit]').click();
   }
 
