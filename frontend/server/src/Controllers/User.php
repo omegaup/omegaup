@@ -211,6 +211,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Translations::getInstance()->get('parentEmailBody'),
                 [
                     'parental_verification_token' => $userData['parental_verification_token'],
+                    'omegaup_url' => OMEGAUP_URL,
                 ]
             );
 

@@ -971,7 +971,7 @@ const translations: { [key: string]: string; } = {
   parameterStringTooLong: "(Param373r i5 10ng3r 7han %(max_length) charac73r5.)",
   parameterStringTooShort: "(Param373r i5 5h0r73r 7han %(min_length) charac73r5.)",
   parameterUsernameInUse: "(Acc0un7 nam3 i5 n07 avai1ab13)",
-  parentEmailBody: "(En73r 7hi5 70k3n 70 1ink y0ur chi1d'5 acc0un7 h77p5://0m3gaup.c0m/u53r/par3n7a1v3rifica7i0n/70k3n/$(70k3n)/)",
+  parentEmailBody: "(En73r 7hi5 70k3n 70 1ink y0ur chi1d'5 acc0un7 %(omegaup_url)/u53r/par3n7a1v3rifica7i0n/70k3n/%(parental_verification_token)/)",
   parentEmailSubject: "(G3n3ra73d T0k3n)",
   parentalTokenNotFound: "(Par3n7a1 70k3n n07 f0und)",
   passwordAddRequestSuccess: "(Y0ur pa55w0rd ha5 b33n add3d.)",

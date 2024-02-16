@@ -971,7 +971,7 @@ const translations: { [key: string]: string; } = {
   parameterStringTooLong: "Par\u00e2metro \u00e9 maior de %(max_length) caracteres",
   parameterStringTooShort: "Par\u00e2metro \u00e9 mais curto que *(MIN_LENGTH) caracteres",
   parameterUsernameInUse: "O nome da conta n\u00e3o est\u00e1 dispon\u00edvel",
-  parentEmailBody: "Insira este token para vincular a conta do seu filho https://omegaup.com/user/parentalverification/token/$(token)/",
+  parentEmailBody: "Insira este token para vincular a conta do seu filho %(omegaup_url)/user/parentalverification/token/%(parental_verification_token)/",
   parentEmailSubject: "Token gerado",
   parentalTokenNotFound: "Token parental n\u00e3o encontrado",
   passwordAddRequestSuccess: "Sua senha foi adicionada.",

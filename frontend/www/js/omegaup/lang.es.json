@@ -970,7 +970,7 @@
 	"parameterStringTooLong": "La longitud de la cadena no debe exceder %(max_length) caracteres",
 	"parameterStringTooShort": "La longitud de la cadena debe ser al menos %(min_length) caracteres",
 	"parameterUsernameInUse": "El nombre de cuenta no est\u00e1 disponible",
-	"parentEmailBody": "Ingrese este token para vincular la cuenta de su hijo https://omegaup.com/user/parentalverification/token/$(token)/",
+	"parentEmailBody": "Ingrese este token para vincular la cuenta de su hijo %(omegaup_url)/user/parentalverification/token/%(parental_verification_token)/",
 	"parentEmailSubject": "Ficha generada",
 	"parentalTokenNotFound": "El token parental no fue encontrado",
 	"passwordAddRequestSuccess": "Se ha agregado tu contrase\u00f1a.",
