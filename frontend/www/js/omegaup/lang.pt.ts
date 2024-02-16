@@ -552,6 +552,7 @@ const translations: { [key: string]: string; } = {
   courseListCurrentCourses: "Cursos atuais",
   courseListPastCourses: "Cursos passados",
   courseListSubmissionsByGroup: "Solu\u00e7\u00f5es feitas por estudantes deste curso",
+  courseListTeachingAssistantCourses: "Cursos a los que asisto",
   courseNew: "Novo curso",
   courseNewFormBasicInformationRequired: "\u00c9 necess\u00e1ria informa\u00e7\u00e3o b\u00e1sica",
   courseNewFormBasicInformationRequiredDesc: "Se ativado, todos os concorrentes devem ter registrado suas informa\u00e7\u00f5es b\u00e1sicas para participar do curso (pa\u00eds, estado, escola)",
