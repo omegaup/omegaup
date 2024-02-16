@@ -552,6 +552,7 @@ const translations: { [key: string]: string; } = {
   courseListCurrentCourses: "Current courses",
   courseListPastCourses: "Past courses",
   courseListSubmissionsByGroup: "Submissions made by students of this course",
+  courseListTeachingAssistantCourses: "Courses I assist",
   courseNew: "New course",
   courseNewFormBasicInformationRequired: "Basic information is required",
   courseNewFormBasicInformationRequiredDesc: "If activated, all contestants must have registred their basic information to join the course (country, state, school)",
