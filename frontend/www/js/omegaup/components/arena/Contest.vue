@@ -82,6 +82,7 @@
               :contest-alias="contest.alias"
               :is-contest-finished="isContestFinished"
               :in-contest-or-course="true"
+              :use-new-verdict-table="false"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', {
@@ -131,16 +132,17 @@
         :show-problem="true"
         :show-details="true"
         :show-disqualify="true"
-        :show-filters="true"
+        :show-pager="true"
         :show-rejudge="true"
         :show-user="true"
         :problemset-problems="Object.values(problems)"
         :is-contest-finished="isContestFinished"
+        :in-contest="true"
         :search-result-users="searchResultUsers"
         :search-result-problems="searchResultProblems"
         @details="(run) => onRunAdminDetails(run.guid)"
         @rejudge="(run) => $emit('rejudge', run)"
-        @disqualify="(run) => $emit('disqualify', run)"
+        @disqualify="(request) => $emit('disqualify', request)"
         @requalify="(run) => $emit('requalify', run)"
         @update-search-result-users-contest="
           (request) => $emit('update-search-result-users-contest', request)

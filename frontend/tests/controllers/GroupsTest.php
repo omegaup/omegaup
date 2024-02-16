@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * GroupsTest
  */
@@ -10,7 +8,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      * Basic create group test
      */
     public function testCreateGroup() {
-        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $name = \OmegaUp\Test\Utils::createRandomString();
         $description = \OmegaUp\Test\Utils::createRandomString();
         $alias = \OmegaUp\Test\Utils::createRandomString();
@@ -111,7 +109,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      * Attempts to create groups with a restricted alias should fail.
      */
     public function testCreateGroupRestrictedAlias() {
-        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         try {
             $login = self::login($identity);
@@ -149,7 +147,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddUserToGroup() {
         $group = \OmegaUp\Test\Factories\Groups::createGroup();
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($group['owner']);
         $response = \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
@@ -171,8 +169,8 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddUserToGroupNotOwned() {
         $group = \OmegaUp\Test\Factories\Groups::createGroup();
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        ['user' => $userCalling, 'identity' => $identityCalling] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identityCalling] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identityCalling);
         try {
@@ -216,7 +214,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRemoveUserFromGroupUserNotInGroup() {
         $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($groupData['owner']);
         try {
@@ -237,7 +235,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRemoveUserFromGroupUserNotOwner() {
         $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         try {
@@ -257,7 +255,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testGroupsMyList() {
         // Create 5 groups for the same owner
-        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $groups = [];
         $n = 5;
         for ($i = 0; $i < $n; $i++) {
@@ -282,11 +280,10 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGroupDetails() {
         // Create a group with 5 users
         $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
-        $users = [];
         $identities = [];
         $nUsers = 5;
         for ($i = 0; $i < $nUsers; $i++) {
-            ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
+            ['identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
             \OmegaUp\Test\Factories\Groups::addUserToGroup(
                 $groupData,
                 $identities[$i]
@@ -343,9 +340,6 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testCreateScoreboardWithInvalidAlias() {
         $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
-        $name = \OmegaUp\Test\Utils::createRandomString();
-        $description = \OmegaUp\Test\Utils::createRandomString();
-        $alias = \OmegaUp\Test\Utils::createRandomString();
 
         $login = self::login($groupData['owner']);
         try {
@@ -475,12 +469,12 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $contestsData = [];
 
         // Create contestants to submit runs
-        ['user' => $contestantInGroup, 'identity' => $identityInGroup] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identityInGroup] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Groups::addUserToGroup(
             $groupData,
             $identityInGroup
         );
-        ['user' => $contestantNotInGroup, 'identity' => $identityNotInGroup] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identityNotInGroup] = \OmegaUp\Test\Factories\User::createUser();
 
         $n = 5;
 
@@ -569,12 +563,12 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $contestsData = [];
 
         // Create contestants to submit runs
-        ['user' => $contestantInGroup, 'identity' => $identityInGroup] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identityInGroup] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Groups::addUserToGroup(
             $groupData,
             $identityInGroup
         );
-        ['user' => $contestantInGroupNoAc, 'identity' => $identityInGroupNoAc] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identityInGroupNoAc] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Groups::addUserToGroup(
             $groupData,
             $identityInGroupNoAc
@@ -751,5 +745,84 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $response['ranking'][0]['contests'][$contestsData[0]['request']['alias']]['points']
         );
         $this->assertSame(700.0, $response['ranking'][0]['total']['points']);
+    }
+
+    public function testGroupApiList() {
+        ['identity' => $owner] = \OmegaUp\Test\Factories\User::createUser();
+        $name = '3a ofmi';
+        $description = 'Contestants for 3a ofmi';
+        $alias = '3a-ofmi';
+        \OmegaUp\Test\Factories\Groups::createGroup(
+            $owner,
+            $name,
+            $description,
+            $alias
+        );
+        $name = '3a OFMI 2023';
+        $description = 'Contestants for 3a OFMI 2023';
+        $alias = '3a-OFMI-2023';
+        \OmegaUp\Test\Factories\Groups::createGroup(
+            $owner,
+            $name,
+            $description,
+            $alias
+        );
+
+        $login = self::login($owner);
+
+        $response = \OmegaUp\Controllers\Group::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'query' => 'ofmi',
+        ]));
+
+        // Both groups should be listed
+        $this->assertEqualsCanonicalizing(
+            [
+                [
+                    'label' => '3a ofmi',
+                    'value' => '3a-ofmi',
+                ],
+                [
+                    'label' => '3a OFMI 2023',
+                    'value' => '3a-OFMI-2023',
+                ],
+            ],
+            $response
+        );
+
+        $response = \OmegaUp\Controllers\Group::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'query' => '3a-',
+        ]));
+
+        // Both groups should be listed
+        $this->assertEqualsCanonicalizing(
+            [
+                [
+                    'label' => '3a ofmi',
+                    'value' => '3a-ofmi',
+                ],
+                [
+                    'label' => '3a OFMI 2023',
+                    'value' => '3a-OFMI-2023',
+                ],
+            ],
+            $response
+        );
+        $response = \OmegaUp\Controllers\Group::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'query' => '2023',
+        ]));
+
+        // In this case, only one group matches with the query
+        $this->assertEqualsCanonicalizing(
+            [
+                [
+                    'label' => '3a OFMI 2023',
+                    'value' => '3a-OFMI-2023',
+                ],
+            ],
+            $response
+        );
     }
 }

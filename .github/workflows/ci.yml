@@ -28,6 +28,15 @@ jobs:
         ports:
           - 6379:6379
 
+      rabbitmq:
+        image: rabbitmq:3-management-alpine
+        ports:
+          - 5672:5672
+          - 15672:15672
+        env:
+          RABBITMQ_DEFAULT_USER: 'omegaup'
+          RABBITMQ_DEFAULT_PASS: 'omegaup'
+
     steps:
       - uses: actions/checkout@v2
         with:
@@ -37,6 +46,12 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.8'
+
+      - name: Add rabbitmq as alias to localhost
+        run: |
+          cat << EOF | sudo tee --append /etc/hosts
+          127.0.0.1 rabbitmq
+          EOF
 
       - name: Use PHP 8.1
         run: |
@@ -426,6 +441,10 @@ jobs:
         run: |
           sudo apt-get update -y && sudo apt-get install -y wait-for-it
 
+      - name: Install retry
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y retry
+
       - name: Download the Docker containers
         run: |
           docker-compose pull
@@ -441,8 +460,7 @@ jobs:
 
           # Wait for some of the containers
           wait-for-it -t 30 mysql:13306
-          wait-for-it -t 30 rabbitmq:5672
-          docker-compose exec -T rabbitmq rabbitmqctl await_startup
+          retry -t 5 -d 5 -- docker-compose exec -T rabbitmq rabbitmqctl await_startup
 
           for i in $(seq 10); do
             if [[ "$(mysql \

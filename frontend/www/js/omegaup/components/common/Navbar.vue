@@ -255,6 +255,12 @@
                       data-nav-user-contests
                       >{{ T.navContestsEnrolled }}</a
                     >
+                    <a
+                      v-if="!isUnder13User"
+                      class="dropdown-item"
+                      href="/dependents"
+                      >{{ T.navDependents }}</a
+                    >
                     <form v-if="!isUnder13User" class="collapse-submenu">
                       <div class="btn-group">
                         <a
@@ -339,6 +345,17 @@
         </a>
       </div>
     </nav>
+    <div v-if="userVerificationDeadline" class="py-2 mt-2" :class="bannerColor">
+      <div class="container-xl">
+        {{
+          daysUntilVerificationDeadline > 1
+            ? ui.formatString(T.bannerVerifyAccount, {
+                days: daysUntilVerificationDeadline,
+              })
+            : T.bannerLastDayToVerifyAccount
+        }}
+      </div>
+    </div>
     <omegaup-user-objectives-questions
       v-if="
         fromLogin && isLoggedIn && isMainUserIdentity && userTypes.length === 0
@@ -357,6 +374,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 import notifications_Clarifications from '../notification/Clarifications.vue';
 import notifications_List from '../notification/List.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
@@ -407,8 +425,10 @@ export default class Navbar extends Vue {
   @Prop() userTypes!: string[];
   @Prop() nextRegisteredContest!: types.ContestListItem | null;
   @Prop() isUnder13User!: boolean;
+  @Prop() userVerificationDeadline!: Date | null;
 
   T = T;
+  ui = ui;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
   hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
     this.userTypes.includes(teachingType),
@@ -426,6 +446,27 @@ export default class Navbar extends Vue {
 
   readNotifications(notifications: types.Notification[], url?: string): void {
     this.$emit('read-notifications', notifications, url);
+  }
+
+  get daysUntilVerificationDeadline(): number | null {
+    if (!this.userVerificationDeadline) {
+      return null;
+    }
+    const today = new Date();
+    const deadline = new Date(this.userVerificationDeadline);
+    const timeDifference = deadline.getTime() - today.getTime();
+    const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+    return daysDifference;
+  }
+
+  get bannerColor() {
+    if (
+      this.daysUntilVerificationDeadline !== null &&
+      this.daysUntilVerificationDeadline <= 1
+    ) {
+      return 'bg-danger';
+    }
+    return 'bg-warning';
   }
 }
 </script>

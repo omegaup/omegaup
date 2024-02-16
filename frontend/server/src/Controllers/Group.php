@@ -274,28 +274,14 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @return list<GroupListItem>
      *
-     * @omegaup-request-param null|string $query
+     * @omegaup-request-param string $query
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringOfLengthInRange(
-            $r['query'],
-            'query',
-            minLength: 2,
-            maxLength: null
-        );
+        $query = $r->ensureString('query');
 
-        $groups = \OmegaUp\DAO\Groups::searchByName($r['query']);
-
-        $response = [];
-        foreach ($groups as $group) {
-            $response[] = [
-                'label' => strval($group->name),
-                'value' => strval($group->alias),
-            ];
-        }
-        return $response;
+        return \OmegaUp\DAO\Groups::searchByNameOrAlias($query);
     }
 
     /**

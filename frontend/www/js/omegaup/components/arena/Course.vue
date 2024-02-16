@@ -3,7 +3,7 @@
     :active-tab="activeTab"
     :title="currentAssignment.name"
     :should-show-runs="isAdmin || isTeachingAssistant"
-    :should-show-ranking="course.admission_mode !== 'public'"
+    :should-show-ranking="showRanking"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #socket-status>
@@ -133,9 +133,8 @@
         <template #scoreboard-header><div></div></template>
       </omegaup-arena-scoreboard>
     </template>
-    <template #arena-runs>
-      <omegaup-arena-runs
-        v-if="isAdmin"
+    <template v-if="isAdmin" #arena-runs>
+      <omegaup-arena-runs-for-courses
         :show-all-runs="true"
         :contest-alias="currentAssignment.alias"
         :runs="allRuns"
@@ -146,7 +145,7 @@
         :show-filters="true"
         :show-rejudge="true"
         :show-user="true"
-        :simplified-view="true"
+        :items-per-page="100"
         :problemset-problems="Object.values(problems)"
         :search-result-users="searchResultUsers"
         :search-result-problems="searchResultProblems"
@@ -161,7 +160,7 @@
       >
         <template #title><div></div></template>
         <template #runs><div></div></template>
-      </omegaup-arena-runs>
+      </omegaup-arena-runs-for-courses>
       <omegaup-overlay
         v-if="isAdmin"
         :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
@@ -243,6 +242,7 @@ import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarAssignments from './NavbarAssignments.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_Runs from './Runs.vue';
+import arena_RunsForCourses from '../arena/RunsForCourses.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import arena_Scoreboard from './Scoreboard.vue';
@@ -262,6 +262,7 @@ import { ArenaCourseFeedback } from './Feedback.vue';
     'omegaup-arena-navbar-assignments': arena_NavbarAssignments,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
     'omegaup-arena-runs': arena_Runs,
+    'omegaup-arena-runs-for-courses': arena_RunsForCourses,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-arena-scoreboard': arena_Scoreboard,
@@ -293,6 +294,7 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
+  @Prop({ default: false }) showRanking!: boolean;
   @Prop() totalRuns!: number;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: false }) isTeachingAssistant!: boolean;

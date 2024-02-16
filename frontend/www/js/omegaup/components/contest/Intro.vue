@@ -9,7 +9,9 @@
           <span>{{ contest.finish_time.long() }}</span>
         </div>
 
-        <template v-if="isLoggedIn">
+        <template
+          v-if="isLoggedIn && !shouldShowModalToLoginWithRegisteredIdentity"
+        >
           <!-- Wait for contest start -->
           <div v-if="now < contest.start_time.getTime()">
             <omegaup-countdown
@@ -94,6 +96,18 @@
           </div>
         </template>
 
+        <template v-else-if="shouldShowModalToLoginWithRegisteredIdentity">
+          <div class="card">
+            <div class="card-body">
+              <p>{{ T.contestIntroLogoutToJoinWithRegisteredUser }}</p>
+              <a href="/" class="card-link">{{ T.contestIntroGoToHomePage }}</a>
+              <a :href="logoutLink" class="card-link">{{
+                T.contestIntroLogout
+              }}</a>
+            </div>
+          </div>
+        </template>
+
         <template v-else>
           <!-- Must login to do anything -->
           <div class="card">
@@ -163,6 +177,8 @@ export default class ContestIntro extends Vue {
   @Prop() requestsUserInformation!: string;
   @Prop() needsBasicInformation!: boolean;
   @Prop() statement!: types.PrivacyStatement;
+  @Prop({ default: false })
+  shouldShowModalToLoginWithRegisteredIdentity!: boolean;
 
   T = T;
   ui = ui;
@@ -184,6 +200,11 @@ export default class ContestIntro extends Vue {
   get redirectURL(): string {
     const url = encodeURIComponent(window.location.pathname);
     return `/login/?redirect=${url}`;
+  }
+
+  get logoutLink(): string {
+    const url = encodeURIComponent(window.location.pathname);
+    return `/logout/?redirect=${url}`;
   }
 
   get differentStartsDescription(): string {

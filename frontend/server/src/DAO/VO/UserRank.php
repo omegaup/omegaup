@@ -28,6 +28,7 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
         'author_score' => true,
         'author_ranking' => true,
         'classname' => true,
+        'timestamp' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -99,6 +100,21 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
             $this->classname = is_scalar(
                 $data['classname']
             ) ? strval($data['classname']) : '';
+        }
+        if (isset($data['timestamp'])) {
+            /**
+             * @var \OmegaUp\Timestamp|string|int|float $data['timestamp']
+             * @var \OmegaUp\Timestamp $this->timestamp
+             */
+            $this->timestamp = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['timestamp']
+                )
+            );
+        } else {
+            $this->timestamp = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
     }
 
@@ -186,4 +202,11 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $classname = null;
+
+    /**
+     * Almacena la hora y fecha en que se actualiza el rank de usuario
+     *
+     * @var \OmegaUp\Timestamp
+     */
+    public $timestamp;  // CURRENT_TIMESTAMP
 }

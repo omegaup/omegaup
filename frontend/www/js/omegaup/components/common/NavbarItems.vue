@@ -2,7 +2,7 @@
   <div class="mr-auto">
     <ul
       v-if="!omegaUpLockDown && (!inContest || isAdmin)"
-      class="navbar-nav align-items-end"
+      class="navbar-nav align-items-center"
     >
       <li
         v-if="isLoggedIn"
@@ -67,7 +67,7 @@
             <a class="dropdown-item" href="/course/" data-nav-courses-all>
               {{ T.navViewCourses }}
             </a>
-            <template v-if="isMainUserIdentity || !isUnder13User">
+            <template v-if="isMainUserIdentity && !isUnder13User">
               <a
                 class="dropdown-item"
                 href="/course/new/"
