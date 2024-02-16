@@ -35,9 +35,8 @@
       </button>
       <template v-if="Object.keys(availableFilters).length > 0">
         <select
-          v-model="filter"
+          v-model="currentFilter"
           class="filter form-control col-12 col-md-5 mt-2 mt-md-0"
-          @change="onFilterChange"
         >
           <option value="">
             {{ T.wordsSelectFilter }}
@@ -51,7 +50,7 @@
           </option>
         </select>
       </template>
-      <template v-else-if="!isLogged &amp;&amp; !isIndex">
+      <template v-else-if="!isLogged && !isIndex">
         <span
           class="badge badge-info text-wrap p-2 mt-2 mt-lg-0 d-flex align-items-center"
           >{{ T.mustLoginToFilterUsers }}</span
@@ -67,57 +66,68 @@
     <div v-if="ranking.length === 0" class="empty-category text-center m-4">
       <h2>{{ T.userRankEmptyList }}</h2>
     </div>
-    <table v-else class="table mb-0 table-responsive-sm">
-      <thead>
-        <tr>
-          <th scope="col" class="pl-4 column-width align-middle">#</th>
-          <th scope="col" class="align-middle">{{ T.contestParticipant }}</th>
-          <th scope="col" class="text-right align-middle">{{ T.rankScore }}</th>
-          <th v-if="!isIndex" scope="col" class="text-right pr-4 align-middle">
-            {{ T.rankSolved }}
-            <!-- id-lint off -->
-            <b-button
-              id="popover-solved-problems"
-              class="ml-1"
-              size="sm"
-              variant="none"
-              @click="showPopover = !showPopover"
+    <div v-else>
+      <p class="text-right mr-3 mb-2 text-muted">{{ lastUpdatedText }}</p>
+      <table class="table mb-0 table-responsive-sm">
+        <thead>
+          <tr>
+            <th scope="col" class="pl-4 column-width align-middle">#</th>
+            <th scope="col" class="align-middle">{{ T.contestParticipant }}</th>
+            <th scope="col" class="text-right align-middle">
+              {{ T.rankScore }}
+            </th>
+            <th
+              v-if="!isIndex"
+              scope="col"
+              class="text-right pr-4 align-middle"
             >
-              <font-awesome-icon :icon="['fas', 'question-circle']" />
-            </b-button>
-            <!-- id-lint on -->
-            <b-popover
-              :show.sync="showPopover"
-              target="popover-solved-problems"
-              placement="right"
-            >
-              {{ T.userRankSolvedProblemsHelp }}
-            </b-popover>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(user, index) in ranking" :key="index">
-          <th scope="row" class="pl-4 column-width">{{ user.rank }}</th>
-          <td>
-            <omegaup-countryflag :country="user.country"></omegaup-countryflag>
-            <omegaup-user-username
-              :classname="user.classname"
-              :linkify="true"
-              :username="user.username"
-            ></omegaup-user-username>
-            <span v-if="user.name && length !== 5"
-              ><br />
-              {{ user.name }}</span
-            >
-          </td>
-          <td class="text-right">{{ user.score.toFixed(2) }}</td>
-          <td v-if="!isIndex" class="text-right pr-4">
-            {{ user.problems_solved }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+              {{ T.rankSolved }}
+              <!-- id-lint off -->
+              <b-button
+                id="popover-solved-problems"
+                class="ml-1"
+                size="sm"
+                variant="none"
+                @click="showPopover = !showPopover"
+              >
+                <font-awesome-icon :icon="['fas', 'question-circle']" />
+              </b-button>
+              <!-- id-lint on -->
+              <b-popover
+                :show.sync="showPopover"
+                target="popover-solved-problems"
+                placement="right"
+              >
+                {{ T.userRankSolvedProblemsHelp }}
+              </b-popover>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(user, index) in ranking" :key="index">
+            <th scope="row" class="pl-4 column-width">{{ user.rank }}</th>
+            <td>
+              <omegaup-countryflag
+                :country="user.country"
+              ></omegaup-countryflag>
+              <omegaup-user-username
+                :classname="user.classname"
+                :linkify="true"
+                :username="user.username"
+              ></omegaup-user-username>
+              <span v-if="user.name && length !== 5"
+                ><br />
+                {{ user.name }}</span
+              >
+            </td>
+            <td class="text-right">{{ user.score.toFixed(2) }}</td>
+            <td v-if="!isIndex" class="text-right pr-4">
+              {{ user.problems_solved }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <div v-if="isIndex" class="card-footer">
       <a href="/rank/">{{ T.wordsSeeGeneralRanking }}</a>
     </div>
@@ -130,11 +140,12 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+import * as time from '../../time';
 import common_Typeahead from '../common/Typeahead.vue';
 import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
@@ -178,6 +189,7 @@ export default class UserRank extends Vue {
   @Prop() availableFilters!: { [key: string]: string };
   @Prop() filter!: string;
   @Prop() ranking!: Rank[];
+  @Prop() lastUpdated!: Date;
   @Prop() resultTotal!: number;
   @Prop() pagerItems!: types.PageItem[];
   @Prop() searchResultUsers!: types.ListItem[];
@@ -186,6 +198,16 @@ export default class UserRank extends Vue {
   ui = ui;
   searchedUsername: null | types.ListItem = null;
   showPopover: boolean = false;
+  currentFilter = this.filter;
+
+  get lastUpdatedText(): null | string {
+    if (!this.lastUpdated) {
+      return null;
+    }
+    return ui.formatString(T.userRankLastUpdated, {
+      datetime: time.formatDateLocalHHMM(this.lastUpdated),
+    });
+  }
 
   onSubmit(): void {
     if (!this.searchedUsername) return;
@@ -194,7 +216,8 @@ export default class UserRank extends Vue {
     )}`;
   }
 
-  onFilterChange(): void {
+  @Watch('currentFilter')
+  onFilterChange(newFilter: string): void {
     // change url parameters with jquery
     // https://samaxes.com/2011/09/change-url-parameters-with-jquery/
     let queryParameters: { [key: string]: string } = {};
@@ -204,8 +227,10 @@ export default class UserRank extends Vue {
     while ((m = re.exec(queryString))) {
       queryParameters[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
     }
-    if (this.filter !== '') {
-      queryParameters['filter'] = this.filter;
+    if (newFilter !== '') {
+      queryParameters['filter'] = newFilter;
+      // When a filter is selected, the parameter 'page' must be reset.
+      delete queryParameters['page'];
     } else {
       delete queryParameters['filter'];
     }
@@ -213,17 +238,17 @@ export default class UserRank extends Vue {
   }
 
   get nextPageFilter(): string {
-    if (this.filter)
+    if (this.currentFilter)
       return `/rank?page=${this.page + 1}&filter=${encodeURIComponent(
-        this.filter,
+        this.currentFilter,
       )}`;
     else return `/rank?page=${this.page + 1}`;
   }
 
   get prevPageFilter(): string {
-    if (this.filter)
+    if (this.currentFilter)
       return `/rank?page=${this.page - 1}&filter=${encodeURIComponent(
-        this.filter,
+        this.currentFilter,
       )}`;
     else return `/rank?page=${this.page - 1}`;
   }

@@ -34,6 +34,7 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         'languages' => true,
         'archived' => true,
         'minimum_progress_for_certificate' => true,
+        'certificates_status' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -151,6 +152,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
             $this->minimum_progress_for_certificate = intval(
                 $data['minimum_progress_for_certificate']
             );
+        }
+        if (isset($data['certificates_status'])) {
+            $this->certificates_status = is_scalar(
+                $data['certificates_status']
+            ) ? strval($data['certificates_status']) : '';
         }
     }
 
@@ -281,4 +287,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $minimum_progress_for_certificate = null;
+
+    /**
+     * Estado de la petición de generar diplomas
+     *
+     * @var string
+     */
+    public $certificates_status = 'uninitiated';
 }
