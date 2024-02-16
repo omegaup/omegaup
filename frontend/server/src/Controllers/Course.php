@@ -1986,7 +1986,13 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-        $response = ['admin' => [], 'student' => [], 'public' => [], 'archived' => [], 'teachingAssistant' => []];
+        $response = [
+            'admin' => [],
+            'student' => [],
+            'public' => [],
+            'archived' => [],
+            'teachingAssistant' => [],
+        ];
 
         if (in_array('admin', $courseTypes)) {
             // TODO(pablo): Cache
@@ -3320,7 +3326,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param string $guid
      */
-
     public static function apiRequestFeedback(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
@@ -3366,6 +3371,38 @@ class Course extends \OmegaUp\Controllers\Controller {
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
+
+        $submission = \OmegaUp\DAO\Submissions::getByGuid(
+            $r->ensureString('guid')
+        );
+
+        if (is_null($submission)) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+
+        //save a feedback by default
+        $feedback = \OmegaUp\Translations::getInstance()->get(
+            'requestFeedbackMessage'
+        );
+
+        $courseSubmissionInfo = \OmegaUp\DAO\Submissions::getCourseSubmissionInfo(
+            $submission,
+            $assignmentAlias,
+            $courseAlias
+        );
+        if (is_null($courseSubmissionInfo)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseSubmissionNotFound'
+            );
+        }
+
+        \OmegaUp\Controllers\Submission::createOrUpdateFeedback(
+            $r->identity,
+            $submission,
+            $course,
+            $courseSubmissionInfo,
+            $feedback
+        );
 
         $getAllAdministrators = \OmegaUp\DAO\UserRoles::getCourseAdministrators(
             $course
@@ -5030,7 +5067,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         ?string $language = null,
         ?int $identityId = null,
         ?int $offset = 0,
-        ?int $rowCount = 100
+        ?int $rowCount = 100,
+        ?string $execution = null,
+        ?string $output = null
     ): array {
         // Get our runs
         [
@@ -5044,7 +5083,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             $language,
             $identityId,
             $offset,
-            $rowCount
+            $rowCount,
+            $execution,
+            $output,
         );
 
         $allRuns = [];
@@ -5779,8 +5820,10 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
+     * @omegaup-request-param 'EXECUTION_COMPILATION_ERROR'|'EXECUTION_FINISHED'|'EXECUTION_INTERRUPTED'|'EXECUTION_JUDGE_ERROR'|'EXECUTION_RUNTIME_ERROR'|'EXECUTION_RUNTIME_FUNCTION_ERROR'|'EXECUTION_VALIDATOR_ERROR'|null $execution
      * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
      * @omegaup-request-param int|null $offset
+     * @omegaup-request-param 'OUTPUT_CORRECT'|'OUTPUT_EXCEEDED'|'OUTPUT_INCORRECT'|'OUTPUT_INTERRUPTED'|null $output
      * @omegaup-request-param null|string $problem_alias
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
@@ -5838,7 +5881,15 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r->ensureOptionalEnum('language', $languages),
             !is_null($identity) ? $identity->identity_id : null,
             max($r->ensureOptionalInt('offset') ?? 0, 0),
-            $r->ensureOptionalInt('rowcount') ?? 100
+            $r->ensureOptionalInt('rowcount') ?? 100,
+            $r->ensureOptionalEnum(
+                'execution',
+                array_keys(\OmegaUp\Controllers\Run::EXECUTION)
+            ),
+            $r->ensureOptionalEnum(
+                'output',
+                array_keys(\OmegaUp\Controllers\Run::OUTPUT)
+            ),
         );
     }
 

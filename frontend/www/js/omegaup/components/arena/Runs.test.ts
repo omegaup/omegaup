@@ -5,7 +5,7 @@ import { types } from '../../api_types';
 
 import T from '../../lang';
 
-import arena_Runs from './Runs.vue';
+import arena_Runs, { DisqualificationType } from './Runs.vue';
 
 describe('Runs.vue', () => {
   it('Should handle empty runs', () => {
@@ -49,11 +49,11 @@ describe('Runs.vue', () => {
         showContest: true,
         showDetails: true,
         showDisqualify: true,
-        showFilters: true,
+        showPager: true,
         showPoints: false,
         showProblem: true,
         showRejudge: true,
-        showUser: false,
+        showUser: true,
         username: null,
       },
     });
@@ -124,7 +124,7 @@ describe('Runs.vue', () => {
         showContest: true,
         showDetails: true,
         showDisqualify: true,
-        showFilters: true,
+        showPager: true,
         showPoints: false,
         showProblem: true,
         showRejudge: true,
@@ -149,7 +149,7 @@ describe('Runs.vue', () => {
         propsData: {
           contestAlias: 'admin',
           runs,
-          showFilters: true,
+          showPager: true,
         },
       });
       await wrapper
@@ -161,36 +161,36 @@ describe('Runs.vue', () => {
     });
   });
 
-  it('Should handle paginator in user view', async () => {
-    const wrapper = mount(arena_Runs, {
-      propsData: {
-        runs,
-        itemsPerPage: 2,
-      },
-    });
-
-    const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
-    expect(paginationComponent.exists()).toBe(true);
-    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(3);
-    expect(paginationComponent.vm.$data.currentPage).toBe(1);
-  });
-
-  it('Should handle paginator in admin view', async () => {
-    const wrapper = mount(arena_Runs, {
+  it('Should handle change page control', async () => {
+    const wrapper = shallowMount(arena_Runs, {
       propsData: {
         contestAlias: 'contest',
         runs,
-        showFilters: true,
-        showUser: true,
-        itemsPerPage: 1,
+        showPager: true,
+        rowCount: 2,
       },
     });
 
-    const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
-    expect(paginationComponent.exists()).toBe(true);
+    expect(
+      wrapper.find('button[data-button-page-previous]').attributes('disabled'),
+    ).toBeTruthy();
+    expect(
+      wrapper.find('button[data-button-page-next]').attributes('disabled'),
+    ).toBeFalsy();
+    expect(wrapper.find('.pager-controls').text()).toContain('1');
+    await wrapper.find('button[data-button-page-next]').trigger('click');
 
-    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(5);
-    expect(paginationComponent.vm.$data.currentPage).toBe(1);
+    expect(wrapper.emitted('filter-changed')).toEqual([
+      [{ filter: 'offset', value: '1' }],
+    ]);
+
+    expect(
+      wrapper.find('button[data-button-page-previous]').attributes('disabled'),
+    ).toBeFalsy();
+    expect(
+      wrapper.find('button[data-button-page-next]').attributes('disabled'),
+    ).toBeFalsy();
+    expect(wrapper.find('.pager-controls').text()).toContain('2');
   });
 
   it('Should handle username filter', async () => {
@@ -198,7 +198,7 @@ describe('Runs.vue', () => {
       propsData: {
         contestAlias: 'contest',
         runs,
-        showFilters: true,
+        showPager: true,
         showUser: true,
       },
     });
@@ -216,7 +216,7 @@ describe('Runs.vue', () => {
       propsData: {
         contestAlias: 'contest',
         runs,
-        showFilters: true,
+        showPager: true,
         showProblem: true,
       },
     });
@@ -243,7 +243,7 @@ describe('Runs.vue', () => {
     expect(wrapper.find('tfoot button').text()).toBe(T.wordsNewSubmissions);
   });
 
-  it('Should handle the right buttons for run actions', async () => {
+  it('Should handle diqualify by guid button for run actions', async () => {
     runs.push({
       ...baseRunData,
       guid: '122600',
@@ -260,29 +260,35 @@ describe('Runs.vue', () => {
         showRejudge: true,
         isContestFinished: false,
         useNewSubmissionButton: true,
+        inContest: true,
       },
     });
     expect(wrapper.find('[data-actions="120000"]').text()).toContain(
-      T.arenaRunsActionsDisqualify,
+      T.arenaRunsActionsDisqualifyByGUID,
     );
     expect(wrapper.find('[data-actions="120000"]').text()).not.toContain(
       T.arenaRunsActionsRequalify,
     );
     await wrapper.find('[data-actions="120000"]').trigger('click');
-    await wrapper.find('[data-actions-disqualify="120000"]').trigger('click');
+    await wrapper
+      .find('[data-actions-disqualify-by-guid="120000"]')
+      .trigger('click');
     expect(wrapper.emitted('disqualify')).toEqual([
       [
         {
-          ...baseRunData,
-          guid: '120000',
-          username: 'other_username',
-          time: new Date('1/1/2020, 12:00:00 AM'),
+          disqualificationType: DisqualificationType.ByGUID,
+          run: {
+            ...baseRunData,
+            guid: '120000',
+            username: 'other_username',
+            time: new Date('1/1/2020, 12:00:00 AM'),
+          },
         },
       ],
     ]);
 
     expect(wrapper.find('[data-actions="122600"]').text()).not.toContain(
-      T.arenaRunsActionsDisqualify,
+      T.arenaRunsActionsDisqualifyByGUID,
     );
     expect(wrapper.find('[data-actions="122600"]').text()).toContain(
       T.arenaRunsActionsRequalify,
@@ -301,6 +307,38 @@ describe('Runs.vue', () => {
     ]);
   });
 
+  it('Should handle disqualify in batch buttons for run actions', async () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        problemAlias: 'alias',
+        runs,
+        showDetails: true,
+        showDisqualify: true,
+        showRejudge: true,
+        isContestFinished: false,
+        useNewSubmissionButton: true,
+        inContest: true,
+      },
+    });
+    await wrapper
+      .find('[data-actions-disqualify-by-user="121500"]')
+      .trigger('click');
+    expect(wrapper.emitted('disqualify')).toEqual([
+      [
+        {
+          disqualificationType: DisqualificationType.ByUser,
+          run: {
+            ...baseRunData,
+            guid: '121500',
+            username: 'username',
+            time: new Date('1/1/2020, 12:15:00 AM'),
+          },
+        },
+      ],
+    ]);
+  });
+
   it('Should handle filterUsername when username changes', async () => {
     const wrapper = shallowMount(arena_Runs, {
       propsData: {
@@ -309,7 +347,7 @@ describe('Runs.vue', () => {
         showContest: true,
         showDetails: true,
         showDisqualify: true,
-        showFilters: true,
+        showPager: true,
         showPoints: false,
         showProblem: true,
         showRejudge: true,
@@ -335,7 +373,7 @@ describe('Runs.vue', () => {
           showContest: true,
           showDetails: true,
           showDisqualify: true,
-          showFilters: true,
+          showPager: true,
           showPoints: false,
           showProblem: true,
           showRejudge: true,

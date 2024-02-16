@@ -410,6 +410,35 @@ export namespace types {
       );
     }
 
+    export function CertificateListMinePayload(
+      elementId: string = 'payload',
+    ): types.CertificateListMinePayload {
+      return ((x) => {
+        x.certificates = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.date = ((x: number) => new Date(x * 1000))(x.date);
+            return x;
+          });
+        })(x.certificates);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CertificateValidationPayload(
+      elementId: string = 'payload',
+    ): types.CertificateValidationPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function CoderOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.CoderOfTheMonthPayload {
@@ -467,6 +496,13 @@ export namespace types {
             x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
             return x;
           })(x.nextRegisteredContestForUser);
+        if (
+          typeof x.userVerificationDeadline !== 'undefined' &&
+          x.userVerificationDeadline !== null
+        )
+          x.userVerificationDeadline = ((x: number) => new Date(x * 1000))(
+            x.userVerificationDeadline,
+          );
         return x;
       })(
         JSON.parse(
@@ -2409,8 +2445,27 @@ export namespace types {
     export function UserRankTablePayload(
       elementId: string = 'payload',
     ): types.UserRankTablePayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
+      return ((x) => {
+        if (typeof x.lastUpdated !== 'undefined' && x.lastUpdated !== null)
+          x.lastUpdated = ((x: number) => new Date(x * 1000))(x.lastUpdated);
+        x.ranking = ((x) => {
+          x.rank = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (typeof x.timestamp !== 'undefined' && x.timestamp !== null)
+                x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+              return x;
+            });
+          })(x.rank);
+          return x;
+        })(x.ranking);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -2692,6 +2747,23 @@ export namespace types {
     uuid: string;
   }
 
+  export interface CertificateListItem {
+    certificate_type: string;
+    date: Date;
+    name?: string;
+    verification_code: string;
+  }
+
+  export interface CertificateListMinePayload {
+    certificates: types.CertificateListItem[];
+  }
+
+  export interface CertificateValidationPayload {
+    certificate?: string;
+    valid: boolean;
+    verification_code: string;
+  }
+
   export interface Clarification {
     answer?: string;
     assignment_alias?: string;
@@ -2805,6 +2877,7 @@ export namespace types {
     userClassname: string;
     userCountry: string;
     userTypes: string[];
+    userVerificationDeadline?: Date;
   }
 
   export interface ConsentStatement {
@@ -2888,6 +2961,12 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ContestCertificatesAdminDetails {
+    certificateCutoff?: number;
+    certificatesStatus: string;
+    isCertificateGenerator: boolean;
+  }
+
   export interface ContestDetails {
     admin: boolean;
     admission_mode: string;
@@ -2948,6 +3027,7 @@ export namespace types {
 
   export interface ContestEditPayload {
     admins: types.ContestAdmin[];
+    certificatesDetails: types.ContestCertificatesAdminDetails;
     details: types.ContestAdminDetails;
     group_admins: types.ContestGroupAdmin[];
     groups: types.ContestGroup[];
@@ -2974,6 +3054,7 @@ export namespace types {
     needsBasicInformation: boolean;
     privacyStatement: types.PrivacyStatement;
     requestsUserInformation: string;
+    shouldShowModalToLoginWithRegisteredIdentity: boolean;
   }
 
   export interface ContestList {
@@ -4774,6 +4855,7 @@ export namespace types {
       problems_solved: number;
       ranking?: number;
       score: number;
+      timestamp?: Date;
       user_id: number;
       username: string;
     }[];
@@ -4792,6 +4874,7 @@ export namespace types {
     filter: string;
     isIndex: boolean;
     isLogged: boolean;
+    lastUpdated?: Date;
     length: number;
     page: number;
     pagerItems: types.PageItem[];
@@ -4857,8 +4940,17 @@ export namespace messages {
   export type BadgeUserListResponse = { badges: types.Badge[] };
 
   // Certificate
+  export type CertificateGenerateContestCertificatesRequest = {
+    [key: string]: any;
+  };
+  export type CertificateGenerateContestCertificatesResponse = {};
   export type CertificateGetCertificatePdfRequest = { [key: string]: any };
   export type CertificateGetCertificatePdfResponse = { certificate?: string };
+  export type CertificateGetUserCertificatesRequest = { [key: string]: any };
+  export type _CertificateGetUserCertificatesServerResponse = any;
+  export type CertificateGetUserCertificatesResponse = {
+    certificates: types.CertificateListItem[];
+  };
   export type CertificateValidateCertificateRequest = { [key: string]: any };
   export type CertificateValidateCertificateResponse = { valid: boolean };
 
@@ -4926,6 +5018,10 @@ export namespace messages {
   export type ContestDetailsRequest = { [key: string]: any };
   export type _ContestDetailsServerResponse = any;
   export type ContestDetailsResponse = types.ContestDetails;
+  export type ContestGetNumberOfContestantsRequest = { [key: string]: any };
+  export type ContestGetNumberOfContestantsResponse = {
+    response: { [key: number]: number };
+  };
   export type ContestListRequest = { [key: string]: any };
   export type _ContestListServerResponse = any;
   export type ContestListResponse = {
@@ -5505,7 +5601,9 @@ export namespace messages {
   export type _RunDetailsServerResponse = any;
   export type RunDetailsResponse = types.RunDetails;
   export type RunDisqualifyRequest = { [key: string]: any };
-  export type RunDisqualifyResponse = {};
+  export type RunDisqualifyResponse = {
+    runs: { guid?: string; username?: string }[];
+  };
   export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
   export type _RunGetSubmissionFeedbackServerResponse = any;
   export type RunGetSubmissionFeedbackResponse = types.SubmissionFeedback[];
@@ -5753,9 +5851,15 @@ export namespace controllers {
   }
 
   export interface Certificate {
+    generateContestCertificates: (
+      params?: messages.CertificateGenerateContestCertificatesRequest,
+    ) => Promise<messages.CertificateGenerateContestCertificatesResponse>;
     getCertificatePdf: (
       params?: messages.CertificateGetCertificatePdfRequest,
     ) => Promise<messages.CertificateGetCertificatePdfResponse>;
+    getUserCertificates: (
+      params?: messages.CertificateGetUserCertificatesRequest,
+    ) => Promise<messages.CertificateGetUserCertificatesResponse>;
     validateCertificate: (
       params?: messages.CertificateValidateCertificateRequest,
     ) => Promise<messages.CertificateValidateCertificateResponse>;
@@ -5825,6 +5929,9 @@ export namespace controllers {
     details: (
       params?: messages.ContestDetailsRequest,
     ) => Promise<messages.ContestDetailsResponse>;
+    getNumberOfContestants: (
+      params?: messages.ContestGetNumberOfContestantsRequest,
+    ) => Promise<messages.ContestGetNumberOfContestantsResponse>;
     list: (
       params?: messages.ContestListRequest,
     ) => Promise<messages.ContestListResponse>;

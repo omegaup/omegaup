@@ -38,6 +38,7 @@ OmegaUp.on('ready', () => {
           resultTotal: payload.ranking.total,
           pagerItems: payload.pagerItems,
           searchResultUsers: this.searchResultUsers,
+          lastUpdated: payload.lastUpdated,
         },
         on: {
           'update-search-result-users': (query: string) => {

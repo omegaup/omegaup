@@ -40,6 +40,7 @@ OmegaUp.on('ready', async () => {
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
 
   const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
+
   const searchResultEmpty: types.ListItem[] = [];
   let runDetails: null | types.RunDetails = null;
   try {
@@ -136,7 +137,14 @@ OmegaUp.on('ready', async () => {
             filter,
             value,
           }: {
-            filter: 'verdict' | 'language' | 'username' | 'status' | 'offset';
+            filter:
+              | 'verdict'
+              | 'language'
+              | 'username'
+              | 'status'
+              | 'offset'
+              | 'execution'
+              | 'output';
             value: string;
           }) => {
             if (value) {
@@ -370,7 +378,7 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.ignoreError);
           },
-          disqualify: (run: types.Run) => {
+          disqualify: ({ run }: { run: types.Run }) => {
             if (!window.confirm(T.runDisqualifyConfirm)) {
               return;
             }
@@ -473,6 +481,8 @@ OmegaUp.on('ready', async () => {
       language: runsStore.state.filters?.language,
       username: runsStore.state.filters?.username,
       status: runsStore.state.filters?.status,
+      execution: runsStore.state.filters?.execution,
+      output: runsStore.state.filters?.output,
     })
       .then(time.remoteTimeAdapter)
       .then((response) => {

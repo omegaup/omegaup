@@ -267,17 +267,18 @@ Cypress.Commands.add(
     contestAlias,
     problems,
     runs,
+    statusCheck = false,
   }) => {
-    const problem = problems[0];
-    if (!problem) {
-      return;
-    }
-    cy.visit(`/arena/${contestAlias}/#problems`);
-    cy.get(`a[data-problem="${problem.problemAlias}"]`).click();
-
     for (const idx in runs) {
+      const problem = problems[idx];
+      if (!problem) {
+        return;
+      }
+      cy.visit(`/arena/${contestAlias}/#problems`);
+      cy.get(`a[data-problem="${problem.problemAlias}"]`).click();
+
       // Mocking date just a few seconds after to allow create new run
-      cy.clock(new Date(), ['Date']).then((clock) => clock.tick(3000));
+      cy.clock(new Date(), ['Date']).then((clock) => clock.tick(9000));
       cy.get('[data-new-run]').click();
       cy.get('[name="language"]').select(runs[idx].language);
 
@@ -295,6 +296,9 @@ Cypress.Commands.add(
         cy.get('[data-submit-run]').click();
       });
 
+      if (statusCheck) {
+        continue;
+      }
       const expectedStatus: Status = runs[idx].status;
       cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
 
@@ -304,6 +308,7 @@ Cypress.Commands.add(
       cy.get('[data-run-status] > span')
         .first()
         .should('have.text', expectedStatus);
+      statusCheck = true;
     }
   },
 );
