@@ -97,6 +97,7 @@
                     password,
                     passwordConfirmation,
                     recaptchaResponse,
+                    termsAndPolicies,
                   })
                 "
               >
