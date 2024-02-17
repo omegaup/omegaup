@@ -71,7 +71,7 @@ export default class DateTimePicker extends Vue {
     // Since test field population is slow, it's necessary to add a delay
     // of a few minutes to prevent the test from failing due to
     // the next minute starting.
-    let delayedDate = new Date(date)
+    let delayedDate = new Date(date);
     const delay = 5;
     delayedDate.setMinutes(delayedDate.getMinutes() - delay);
     return delayedDate;
