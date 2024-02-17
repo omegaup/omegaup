@@ -25,7 +25,7 @@ describe('Contest Test', () => {
 
     const now = new Date();
 
-    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
+    contestOptions.startDate = now;
     const milliseconds = 200 * 1000;
     let newEndDate = new Date();
     newEndDate = new Date(newEndDate.getTime() + milliseconds);
@@ -58,9 +58,9 @@ describe('Contest Test', () => {
     identityContestAlias = contestOptions.contestAlias;
     const now = new Date();
 
-    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
+    contestOptions.startDate = now;
     const milliseconds = 200 * 1000;
-    let newEndDate = new Date();
+    let newEndDate = now;
     newEndDate = new Date(newEndDate.getTime() + milliseconds);
     contestOptions.endDate = newEndDate;
     identityLogin = {
@@ -104,7 +104,7 @@ describe('Contest Test', () => {
     const now = new Date();
     contestOptions.startDate = now;
     const milliseconds = 480 * 1000;
-    let newEndDate = new Date();
+    let newEndDate = now;
     newEndDate = new Date(newEndDate.getTime() + milliseconds);
     contestOptions.endDate = newEndDate;
 
@@ -136,7 +136,7 @@ describe('Contest Test', () => {
 
     contestOptions.differentStart = true;
     contestOptions.differentStartTime = '60';
-    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
+    contestOptions.startDate = now;
     contestOptions.endDate = addSubtractDaysToDate(now, { days: 1 });
     cy.login(userLoginOptions[1]);
     contestPage.createContest(contestOptions, users);
@@ -288,7 +288,7 @@ describe('Contest Test', () => {
     const now = new Date();
     const users = [userLoginOptions[0].username];
 
-    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
+    contestOptions.startDate = now;
     contestOptions.endDate = now;
 
     cy.login(userLoginOptions[1]);

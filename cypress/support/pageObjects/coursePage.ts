@@ -8,7 +8,7 @@ export class CoursePage {
     const courseOptions: CourseOptions = {
       courseAlias: uuid().slice(0, 10),
       showScoreboard: true,
-      startDate: addSubtractDaysToDate(now, { days: -1 }),
+      startDate: now,
       endDate: addSubtractDaysToDate(now, { days: 1 }),
       unlimitedDuration: false,
       school: 'Escuela curso',

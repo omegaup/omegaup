@@ -161,7 +161,6 @@ export class ContestPage {
     firstTimeVisited: boolean = true,
     numberOfProblems: number = 1,
   ): ContestOptions {
-    const now = new Date();
     const problems = this.generateProblemOptions(numberOfProblems);
     const contestProblems: ProblemOptions[] = [];
     const contestRuns: RunOptions[] = [];
@@ -188,10 +187,11 @@ export class ContestPage {
       firstTimeVisited = false;
     });
 
+    const now = new Date();
     const contestOptions: ContestOptions = {
       contestAlias: 'contest' + uuid().slice(0, 5),
       description: 'Test Description',
-      startDate: addSubtractDaysToDate(now, { days: -1 }),
+      startDate: now,
       endDate: addSubtractDaysToDate(now, { days: 2 }),
       showScoreboard: true,
       basicInformation: false,
