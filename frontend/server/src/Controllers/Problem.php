@@ -5914,12 +5914,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ];
             return $response;
         }
-        if (!\OmegaUp\Validators::alias($name)) {
+        try {
+            \OmegaUp\Validators::alias($name);
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $response['templateProperties']['payload']['error'] = [
-                'description' => \OmegaUp\Translations::getInstance()->get(
-                    'parameterInvalidAlias'
-                ),
-                'field' => 'name',
+                'description' => $e->getErrorMessage(),
+                'field' => $e->parameter,
             ];
             return $response;
         }

@@ -215,17 +215,32 @@ class Validators {
     /**
      * Returns whether the alias is valid.
      *
-     * @return boolean
+     * @param string $alias the alias to validate
+     * @param int $maxLength the maximum length of the alias
+     *
+     * @return boolean true if the alias is valid, false otherwise
+     * @throws \OmegaUp\Exceptions\InvalidParameterException if the alias is invalid
      */
     public static function alias(
         string $alias,
         int $maxLength = Validators::ALIAS_MAX_LENGTH
     ): bool {
-        return (
-            preg_match('/^[a-zA-Z0-9_-]+$/', $alias) === 1
-            && !self::isRestrictedAlias($alias)
-            && strlen($alias) <= $maxLength
-        );
+        if (!preg_match('/^[a-zA-Z0-9_-]+$/', $alias)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'alias'
+            );
+        }
+
+        if (strlen($alias) > $maxLength) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterStringTooLong',
+                'alias',
+                ['max_length' => strval($maxLength)]
+            );
+        }
+
+        return true;
     }
 
     /**
