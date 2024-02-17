@@ -19,7 +19,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>, lastUpdated: \OmegaUp\Timestamp|null}
- * @psalm-type UserDependentsPayload=array{dependents:list<array{email: null|string, name: null|string, username: string}>}
+ * @psalm-type UserDependent=array{classname: string, name: null|string, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_verified: bool|null, username: string}
+ * @psalm-type UserDependentsPayload=array{dependents:list<UserDependent>}
  * @psalm-type CoderOfTheMonth=array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}
  * @psalm-type CoderOfTheMonthList=list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string, problems_solved: int|null, score: float|null}>
  * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
@@ -203,6 +204,12 @@ class User extends \OmegaUp\Controllers\Controller {
                 '+7 days',
                 \OmegaUp\Time::get()
             );
+            $parentEmail = \OmegaUp\DAO\Emails::getByEmail(
+                $createUserParams->parentEmail
+            );
+            if (!is_null($parentEmail) && $parentEmail->email_id !== 0) {
+                $userData['parent_email_id'] = $parentEmail->email_id;
+            }
 
             $subject = \OmegaUp\Translations::getInstance()->get(
                 'parentEmailSubject'
