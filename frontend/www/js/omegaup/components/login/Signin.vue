@@ -9,25 +9,8 @@
     <omegaup-signup
       :has-visited-section="hasVisitedSection"
       :validate-recaptcha="validateRecaptcha"
-      @register-and-login="
-        (
-          username,
-          email,
-          password,
-          passwordConfirmation,
-          recaptchaResponse,
-          termsAndPolicies,
-        ) =>
-          $emit(
-            'register-and-login',
-            username,
-            email,
-            password,
-            passwordConfirmation,
-            recaptchaResponse,
-            termsAndPolicies,
-          )
-      "
+      :use-signup-form-with-birth-date="useSignupFormWithBirthDate"
+      @register-and-login="(request) => $emit('register-and-login', request)"
     >
     </omegaup-signup>
   </div>
@@ -52,6 +35,7 @@ export default class Signin extends Vue {
   @Prop() facebookUrl!: string;
   @Prop() googleClientId!: string;
   @Prop() hasVisitedSection!: string;
+  @Prop({ default: false }) useSignupFormWithBirthDate!: boolean;
 
   T = T;
 }
