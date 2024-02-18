@@ -475,4 +475,34 @@ describe('Contest Test', () => {
     cy.get('.status-disqualified').its('length').should('eq', 2);
     cy.logout();
   });
+
+  it('Should disqualify and requalify the submission in the contest', () => {
+    const userLoginOptions = loginPage.registerMultipleUsers(2);
+    const contestOptions = contestPage.generateContestOptions(
+      userLoginOptions[1],
+    );
+    const contestant = [userLoginOptions[0].username];
+    const contestAdmin = userLoginOptions[1];
+
+    cy.login(contestAdmin);
+    contestPage.createContest(contestOptions, contestant);
+    cy.logout();
+
+    cy.login(userLoginOptions[0]);
+    cy.enterContest(contestOptions);
+    cy.createRunsInsideContest(contestOptions);
+    cy.logout();
+
+    cy.login(userLoginOptions[1]);
+    cy.visit(`arena/${contestOptions.contestAlias}`);
+    cy.get('a.nav-link[href="#runs"]').click();
+    cy.get('a[problem-navigation-button]').click();
+    cy.get('a.nav-link[href="#runs"]').click();
+    cy.get('[data-runs-actions-button]').first().click();
+    cy.get('[data-actions-disqualify]').should('be.visible').click();
+    cy.get('td.numeric.status-disqualified').its('length').should('eq', 1);
+    cy.get('[data-actions-requalify]').click({ force: true });
+    cy.get('td.numeric.status-ac').its('length').should('eq', 1);
+    cy.logout();
+  });
 });
