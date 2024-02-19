@@ -301,8 +301,9 @@
                   "
                   >{{ run.alias }}</a
                 >
-                <a :href="`/arena/problem/${run.alias}/`" class="ml-2"
-                  problem-navigation-button>
+                <a
+                  problem-navigation-button
+                  :href="`/arena/problem/${run.alias}/`" class="ml-2">
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
               </td>
