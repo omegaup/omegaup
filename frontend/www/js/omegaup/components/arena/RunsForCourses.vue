@@ -303,7 +303,9 @@
                 >
                 <a
                   problem-navigation-button
-                  :href="`/arena/problem/${run.alias}/`" class="ml-2">
+                  :href="`/arena/problem/${run.alias}/`"
+                  class="ml-2"
+                >
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
               </td>
