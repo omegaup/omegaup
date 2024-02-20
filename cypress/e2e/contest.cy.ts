@@ -475,4 +475,33 @@ describe('Contest Test', () => {
     cy.get('.status-disqualified').its('length').should('eq', 2);
     cy.logout();
   });
+
+  it('Should Reduge the submission in the contest', () => {
+    const userLoginOptions = loginPage.registerMultipleUsers(2);
+    const contestOptions = contestPage.generateContestOptions(
+      userLoginOptions[1],
+    );
+    const contestant = [userLoginOptions[0].username];
+    const contestAdmin = userLoginOptions[1];
+
+    cy.login(contestAdmin);
+    contestPage.createContest(contestOptions, contestant);
+    cy.logout();
+
+    cy.login(userLoginOptions[0]);
+    cy.enterContest(contestOptions);
+    cy.createRunsInsideContest(contestOptions);
+    cy.logout();
+
+    cy.login(userLoginOptions[1]);
+    cy.visit(`arena/${contestOptions.contestAlias}`);
+    cy.get('a.nav-link[href="#runs"]').click();
+    cy.get('[data-runs-actions-button]').first().click();
+    cy.get('[data-actions-rejudge]').should('be.visible').click();
+    cy.get('a[problem-navigation-button]').click();
+    cy.get('a.nav-link[href="#runs"]').click();
+    cy.get('[data-runs-actions-button]').first().click();
+    cy.get('[data-actions-rejudge]').should('be.visible').click();
+    cy.logout();
+  });
 });
