@@ -46,7 +46,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
  * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
- * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool}
+ * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool, message: string}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -4778,9 +4778,23 @@ class User extends \OmegaUp\Controllers\Controller {
                 $token
             ) === 1
         );
-        $hasParentalVerificationToken = false;
+
+        $response = [
+            'templateProperties' => [
+                'payload' => [
+                    'hasParentalVerificationToken' => false,
+                    'message' => \OmegaUp\Translations::getInstance()->get(
+                        'parentalTokenNotFound'
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleParentalVerificationToken'
+                ),
+            ],
+            'entrypoint' => 'user_verification_parental_token',
+        ];
+
         try {
-            \OmegaUp\DAO\DAO::transBegin();
             $user = \OmegaUp\DAO\Users::findByParentalToken($token);
 
             if (is_null($user)) {
@@ -4797,23 +4811,18 @@ class User extends \OmegaUp\Controllers\Controller {
             $user->parent_verified = true;
             $user->parental_verification_token = null;
             \OmegaUp\DAO\Users::update($user);
-            $hasParentalVerificationToken = true;
 
-            \OmegaUp\DAO\DAO::transEnd();
-            return [
-                'templateProperties' => [
-                    'payload' => [
-                        'hasParentalVerificationToken' => $hasParentalVerificationToken,
-                    ],
-                    'title' => new \OmegaUp\TranslationString(
-                        'omegaupTitleParentalVerificationToken'
-                    ),
-                ],
-                'entrypoint' => 'user_verification_parental_token',
+            $response['templateProperties']['payload'] = [
+                'hasParentalVerificationToken' => true,
+                'message' => \OmegaUp\Translations::getInstance()->get(
+                    'parentalTokenVerified'
+                ),
             ];
+
+            return $response;
         } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
-            throw $e;
+            self::$log->error($e);
+            return $response;
         }
     }
 }
