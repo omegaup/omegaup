@@ -17,9 +17,6 @@ OmegaUp.on('ready', () => {
           hasParentalVerificationToken: payload.hasParentalVerificationToken,
           message: payload.message,
         },
-        on: {
-          submit: () => {},
-        },
       });
     },
   });
