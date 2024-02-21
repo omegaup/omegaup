@@ -203,6 +203,37 @@ export const Badge = {
   }),
 };
 
+export const Certificate = {
+  generateContestCertificates: apiCall<
+    messages.CertificateGenerateContestCertificatesRequest,
+    messages.CertificateGenerateContestCertificatesResponse
+  >('/api/certificate/generateContestCertificates/'),
+  getCertificatePdf: apiCall<
+    messages.CertificateGetCertificatePdfRequest,
+    messages.CertificateGetCertificatePdfResponse
+  >('/api/certificate/getCertificatePdf/'),
+  getUserCertificates: apiCall<
+    messages.CertificateGetUserCertificatesRequest,
+    messages._CertificateGetUserCertificatesServerResponse,
+    messages.CertificateGetUserCertificatesResponse
+  >('/api/certificate/getUserCertificates/', (x) => {
+    x.certificates = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.date = ((x: number) => new Date(x * 1000))(x.date);
+        return x;
+      });
+    })(x.certificates);
+    return x;
+  }),
+  validateCertificate: apiCall<
+    messages.CertificateValidateCertificateRequest,
+    messages.CertificateValidateCertificateResponse
+  >('/api/certificate/validateCertificate/'),
+};
+
 export const Clarification = {
   create: apiCall<
     messages.ClarificationCreateRequest,
@@ -363,6 +394,10 @@ export const Contest = {
       );
     return x;
   }),
+  getNumberOfContestants: apiCall<
+    messages.ContestGetNumberOfContestantsRequest,
+    messages.ContestGetNumberOfContestantsResponse
+  >('/api/contest/getNumberOfContestants/'),
   list: apiCall<
     messages.ContestListRequest,
     messages._ContestListServerResponse,
@@ -1248,6 +1283,21 @@ export const Problem = {
               if (typeof x.feedback !== 'undefined' && x.feedback !== null)
                 x.feedback = ((x) => {
                   x.date = ((x: number) => new Date(x * 1000))(x.date);
+                  if (
+                    typeof x.feedback_thread !== 'undefined' &&
+                    x.feedback_thread !== null
+                  )
+                    x.feedback_thread = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        x.timestamp = ((x: number) => new Date(x * 1000))(
+                          x.timestamp,
+                        );
+                        return x;
+                      });
+                    })(x.feedback_thread);
                   return x;
                 })(x.feedback);
               return x;
@@ -1595,6 +1645,19 @@ export const Run = {
       }
       return x.map((x) => {
         x.date = ((x: number) => new Date(x * 1000))(x.date);
+        if (
+          typeof x.feedback_thread !== 'undefined' &&
+          x.feedback_thread !== null
+        )
+          x.feedback_thread = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+              return x;
+            });
+          })(x.feedback_thread);
         return x;
       });
     })(x.feedback);
@@ -1604,6 +1667,32 @@ export const Run = {
     messages.RunDisqualifyRequest,
     messages.RunDisqualifyResponse
   >('/api/run/disqualify/'),
+  getSubmissionFeedback: apiCall<
+    messages.RunGetSubmissionFeedbackRequest,
+    messages._RunGetSubmissionFeedbackServerResponse,
+    messages.RunGetSubmissionFeedbackResponse
+  >('/api/run/getSubmissionFeedback/', (x) => {
+    if (!Array.isArray(x)) {
+      return x;
+    }
+    return x.map((x) => {
+      x.date = ((x: number) => new Date(x * 1000))(x.date);
+      if (
+        typeof x.feedback_thread !== 'undefined' &&
+        x.feedback_thread !== null
+      )
+        x.feedback_thread = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+            return x;
+          });
+        })(x.feedback_thread);
+      return x;
+    });
+  }),
   list: apiCall<
     messages.RunListRequest,
     messages._RunListServerResponse,
@@ -1663,8 +1752,36 @@ export const Scoreboard = {
 export const Session = {
   currentSession: apiCall<
     messages.SessionCurrentSessionRequest,
+    messages._SessionCurrentSessionServerResponse,
     messages.SessionCurrentSessionResponse
-  >('/api/session/currentSession/'),
+  >('/api/session/currentSession/', (x) => {
+    if (typeof x.session !== 'undefined' && x.session !== null)
+      x.session = ((x) => {
+        x.api_tokens = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.last_used = ((x: number) => new Date(x * 1000))(x.last_used);
+            x.rate_limit = ((x) => {
+              x.reset = ((x: number) => new Date(x * 1000))(x.reset);
+              return x;
+            })(x.rate_limit);
+            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+            return x;
+          });
+        })(x.api_tokens);
+        if (
+          typeof x.user_verification_deadline !== 'undefined' &&
+          x.user_verification_deadline !== null
+        )
+          x.user_verification_deadline = ((x: number) => new Date(x * 1000))(
+            x.user_verification_deadline,
+          );
+        return x;
+      })(x.session);
+    return x;
+  }),
 };
 
 export const Submission = {

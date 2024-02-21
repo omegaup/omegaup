@@ -39,6 +39,7 @@ type NavigationForContest = BaseNavigation & {
 type NavigationForSingleProblemOrCourse = BaseNavigation & {
   type: NavigationType.ForSingleProblemOrCourse;
   problemsetId: number;
+  guid?: string;
 };
 
 export type NavigationRequest =
@@ -54,12 +55,13 @@ export function getScoreModeEnum(scoreMode: string): ScoreMode {
 export async function navigateToProblem(
   request: NavigationRequest,
 ): Promise<void> {
-  let contestAlias, problemsetId, contestMode: ScoreMode;
+  let contestAlias, problemsetId, guid, contestMode: ScoreMode;
   if (request.type === NavigationType.ForContest) {
     contestAlias = request.contestAlias;
     contestMode = request.contestMode;
   } else if (request.type === NavigationType.ForSingleProblemOrCourse) {
     problemsetId = request.problemsetId;
+    guid = request.guid;
   }
   const { target, problem, problems } = request;
   if (
@@ -71,6 +73,10 @@ export async function navigateToProblem(
     target.problemInfo = problemsStore.state.problems[problem.alias];
     if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
       setLocationHash(`#problems/${problem.alias}/new-run`);
+      return;
+    }
+    if (guid) {
+      setLocationHash(`#problems/${problem.alias}/show-run:${guid}`);
       return;
     }
     setLocationHash(`#problems/${problem.alias}`);
@@ -96,7 +102,8 @@ export async function navigateToProblem(
       problem.bestScore = getScoreForProblem({
         contestMode,
         problemAlias: problemInfo.alias,
-        problemPoints: 0.0,
+        previousScore: 0.0,
+        maxScore: problem.maxScore,
       });
       problemsStore.commit('addProblem', problemInfo);
       target.problem = problem;
@@ -116,23 +123,26 @@ export async function navigateToProblem(
 export function getScoreForProblem({
   contestMode,
   problemAlias,
-  problemPoints,
+  previousScore,
+  maxScore,
 }: {
   contestMode: ScoreMode;
   problemAlias: string;
-  problemPoints: number;
+  previousScore: number;
+  maxScore: number;
 }) {
   if (contestMode === ScoreMode.MaxPerGroup) {
     return getMaxPerGroupScore(
       myRunsStore.state.runs.filter((run) => run.alias === problemAlias),
       problemAlias,
-      problemPoints,
+      previousScore,
+      maxScore,
     );
   }
   return getMaxScore(
     myRunsStore.state.runs.filter((run) => run.alias === problemAlias),
     problemAlias,
-    problemPoints,
+    previousScore,
   );
 }
 
@@ -151,27 +161,43 @@ export function getMaxScore(
   return maxScore;
 }
 
-function getMaxPerGroupScore(
+export function getMaxPerGroupScore(
   runs: types.Run[],
   alias: string,
   previousScore: number,
+  maxScore: number,
 ): number {
-  if (!runs.length) {
+  const runsWithScoreByGroup = runs
+    .filter((run) => run.alias === alias)
+    .filter((run) => run.score_by_group != undefined);
+  if (!runsWithScoreByGroup.length) {
     return previousScore;
   }
-  const scoreByGroup = Object.keys(runs[0].score_by_group || {}).reduce(
-    (acc: Record<string, number>, key) => {
-      const values = runs
-        .filter((run) => run.alias === alias)
-        .map((run) => (run.score_by_group ? run.score_by_group[key] : 0.0))
-        .filter((value) => value !== null)
-        .map((value) => Number(value));
-      acc[key] = Math.max(...values);
-      return acc;
-    },
-    {},
-  );
+
+  const scoreByGroup = Object.keys(
+    runsWithScoreByGroup[0].score_by_group || {},
+  ).reduce((acc: Record<string, number>, key) => {
+    const values = runsWithScoreByGroup
+      .map((run) => {
+        if (!run.score_by_group) {
+          return 0.0;
+        }
+        return (run.score_by_group[key] as number) * maxScore;
+      })
+      .filter((value) => value !== null)
+      .map((value) => Number(value));
+    acc[key] = Math.max(...values);
+    return acc;
+  }, {});
 
   const values = Object.values(scoreByGroup);
+
+  // Avoid showing NaN in bestScore value
+  for (const value of values) {
+    if (typeof value === 'undefined') {
+      return 0;
+    }
+  }
+
   return values.reduce((acc, value) => acc + value, 0);
 }

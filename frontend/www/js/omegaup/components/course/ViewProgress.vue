@@ -112,6 +112,7 @@
           </div>
           <div class="card-body">
             <a
+              data-scorecard-csv-download-button
               class="btn btn-primary btn-sm w-100 my-1"
               :class="{ disabled: completeStudentsProgress === null }"
               :download="`${course.alias}.csv`"

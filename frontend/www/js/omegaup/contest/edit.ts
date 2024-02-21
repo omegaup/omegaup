@@ -35,6 +35,7 @@ OmegaUp.on('ready', () => {
       searchResultTeamsGroups,
       searchResultGroups: [] as types.ListItem[],
       teamsGroup: payload.teams_group,
+      certificatesDetails: payload.certificatesDetails,
     }),
     methods: {
       arbitrateRequest: (username: string, resolution: boolean): void => {
@@ -162,6 +163,7 @@ OmegaUp.on('ready', () => {
           searchResultGroups: this.searchResultGroups,
           teamsGroup: this.teamsGroup,
           originalContestAdmissionMode: payload.original_contest_admission_mode,
+          certificatesDetails: this.certificatesDetails,
         },
         on: {
           'update-search-result-problems': ({
@@ -294,13 +296,17 @@ OmegaUp.on('ready', () => {
               points: problem.points,
               commit: problem.commit,
             })
-              .then(() => {
+              .then((data) => {
                 this.refreshProblems(true);
                 if (isUpdate) {
                   ui.success(T.problemSuccessfullyUpdated);
                   return;
                 }
-                ui.success(T.problemSuccessfullyAdded);
+                if (data.solutionStatus === 'not_found') {
+                  ui.success(T.problemSuccessfullyAdded);
+                } else {
+                  ui.warning(T.warningPublicSolution);
+                }
               })
               .catch(ui.apiError);
           },
@@ -403,7 +409,7 @@ OmegaUp.on('ready', () => {
                 api.Contest.addUser({
                   contest_alias: payload.details.alias,
                   usernameOrEmail: user,
-                }).catch(() => user),
+                }).catch(() => Promise.reject(user)),
               ),
             )
               .then((results) => {
@@ -612,6 +618,21 @@ OmegaUp.on('ready', () => {
                   table.push(row);
                 }
                 this.downloadCsvFile(`${contestAlias}_scoreboard.csv`, table);
+              })
+              .catch(ui.apiError);
+          },
+          'show-copy-message': (): void => {
+            ui.success(T.contestEditContestLinkCopiedToClipboard);
+          },
+          'generate-certificates': (certificateCutoff: number) => {
+            api.Certificate.generateContestCertificates({
+              certificates_cutoff: certificateCutoff,
+              contest_alias: payload.details.alias,
+            })
+              .then(() => {
+                contestEdit.certificatesDetails.certificatesStatus = 'queued';
+                contestEdit.certificatesDetails.certificateCutoff = certificateCutoff;
+                ui.success(T.contestCertificatesGenerateSuccessfully);
               })
               .catch(ui.apiError);
           },

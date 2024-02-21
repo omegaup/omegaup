@@ -1,13 +1,16 @@
 <template>
-  <figure v-tooltip="description" class="col-md-3 col-sm-3 badge-container">
-    <a class="badge-icon" :href="`/badge/${badge.badge_alias}/`"
+  <figure
+    v-tooltip="description"
+    class="col-6 col-sm-3 badge-container text-center d-flex flex-column align-items-center"
+  >
+    <a class="badge-icon d-block w-100" :href="`/badge/${badge.badge_alias}/`"
       ><img
         :class="{ 'badge-gray': !badge.unlocked }"
         :src="iconUrl"
-        class="img-fluid"
+        class="img-fluid badge-img"
     /></a>
 
-    <figcaption class="badge-name">
+    <figcaption class="badge-name pt-2">
       {{ name }}
     </figcaption>
   </figure>
@@ -42,30 +45,12 @@ export default class Badge extends Vue {
 }
 </script>
 
-<style>
-.badge-container {
-  align-items: center;
-  text-align: center;
-}
-
-img {
-  max-height: 10rem !important;
-}
-
-.badge-icon {
-  display: block;
-  width: 100%;
-}
-
-.badge-icon img {
-  max-height: 100%;
-}
-
-.badge-name {
-  padding-top: 0.5rem;
-}
-
+<style lang="scss" scoped>
 .badge-gray {
   filter: grayscale(100%);
+}
+
+.badge-img {
+  max-height: 10rem;
 }
 </style>

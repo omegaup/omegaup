@@ -9,7 +9,9 @@
           <span>{{ contest.finish_time.long() }}</span>
         </div>
 
-        <template v-if="isLoggedIn">
+        <template
+          v-if="isLoggedIn && !shouldShowModalToLoginWithRegisteredIdentity"
+        >
           <!-- Wait for contest start -->
           <div v-if="now < contest.start_time.getTime()">
             <omegaup-countdown
@@ -65,7 +67,7 @@
                 type="submit"
                 data-start-contest
                 :disabled="isButtonDisabled"
-                class="btn btn-primary btn-lg"
+                class="btn btn-primary"
               >
                 {{ T.startContest }}
               </button>
@@ -94,6 +96,18 @@
           </div>
         </template>
 
+        <template v-else-if="shouldShowModalToLoginWithRegisteredIdentity">
+          <div class="card">
+            <div class="card-body">
+              <p>{{ T.contestIntroLogoutToJoinWithRegisteredUser }}</p>
+              <a href="/" class="card-link">{{ T.contestIntroGoToHomePage }}</a>
+              <a :href="logoutLink" class="card-link">{{
+                T.contestIntroLogout
+              }}</a>
+            </div>
+          </div>
+        </template>
+
         <template v-else>
           <!-- Must login to do anything -->
           <div class="card">
@@ -108,11 +122,11 @@
       </div>
       <hr />
       <div>
-        <h1>{{ T.registerForContestChallenges }}</h1>
+        <h3 class="ml-4">{{ T.registerForContestChallenges }}</h3>
         <omegaup-markdown :markdown="contest.description"></omegaup-markdown>
       </div>
       <div>
-        <h1>{{ T.registerForContestRules }}</h1>
+        <h3 class="ml-4">{{ T.registerForContestRules }}</h3>
         <ul>
           <li v-if="contest.show_scoreboard_after">
             {{ T.contestNewFormScoreboardAtContestEnd }}
@@ -163,6 +177,8 @@ export default class ContestIntro extends Vue {
   @Prop() requestsUserInformation!: string;
   @Prop() needsBasicInformation!: boolean;
   @Prop() statement!: types.PrivacyStatement;
+  @Prop({ default: false })
+  shouldShowModalToLoginWithRegisteredIdentity!: boolean;
 
   T = T;
   ui = ui;
@@ -184,6 +200,11 @@ export default class ContestIntro extends Vue {
   get redirectURL(): string {
     const url = encodeURIComponent(window.location.pathname);
     return `/login/?redirect=${url}`;
+  }
+
+  get logoutLink(): string {
+    const url = encodeURIComponent(window.location.pathname);
+    return `/logout/?redirect=${url}`;
   }
 
   get differentStartsDescription(): string {

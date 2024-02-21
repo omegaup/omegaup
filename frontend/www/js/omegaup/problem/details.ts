@@ -40,6 +40,7 @@ OmegaUp.on('ready', async () => {
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
 
   const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
+
   const searchResultEmpty: types.ListItem[] = [];
   let runDetails: null | types.RunDetails = null;
   try {
@@ -69,8 +70,7 @@ OmegaUp.on('ready', async () => {
       runDetailsData: runDetails,
       solutionStatus: payload.solutionStatus,
       solution: null as types.ProblemStatement | null,
-      availableTokens: 0,
-      allTokens: 0,
+      allowedSolutionsToSee: payload.allowedSolutionsToSee,
       activeTab: window.location.hash ? locationHash[0] : 'problems',
       nominationStatus: payload.nominationStatus,
       hasBeenNominated:
@@ -96,8 +96,7 @@ OmegaUp.on('ready', async () => {
           clarifications: clarificationStore.state.clarifications,
           solutionStatus: this.solutionStatus,
           solution: this.solution,
-          availableTokens: this.availableTokens,
-          allTokens: this.allTokens,
+          allowedSolutionsToSee: this.allowedSolutionsToSee,
           popupDisplayed: this.popupDisplayed,
           runDetailsData: this.runDetailsData,
           allowUserAddTags: payload.allowUserAddTags,
@@ -138,7 +137,14 @@ OmegaUp.on('ready', async () => {
             filter,
             value,
           }: {
-            filter: 'verdict' | 'language' | 'username' | 'status' | 'offset';
+            filter:
+              | 'verdict'
+              | 'language'
+              | 'username'
+              | 'status'
+              | 'offset'
+              | 'execution'
+              | 'output';
             value: string;
           }) => {
             if (value) {
@@ -289,9 +295,9 @@ OmegaUp.on('ready', async () => {
                 this.solutionStatus = 'unlocked';
                 this.solution = data.solution;
                 ui.info(
-                  ui.formatString(T.solutionTokens, {
-                    available: this.availableTokens - 1,
-                    total: this.allTokens,
+                  ui.formatString(T.solutionViewsLeft, {
+                    available: this.allowedSolutionsToSee - 1,
+                    total: 5,
                   }),
                 );
               })
@@ -303,13 +309,12 @@ OmegaUp.on('ready', async () => {
                 ui.apiError(error);
               });
           },
-          'get-tokens': () => {
+          'get-allowed-solutions': () => {
             api.ProblemForfeited.getCounts()
               .then((data) => {
-                this.allTokens = data.allowed;
-                this.availableTokens = data.allowed - data.seen;
-                if (this.availableTokens <= 0) {
-                  ui.warning(T.solutionNoTokens);
+                this.allowedSolutionsToSee = data.allowed - data.seen;
+                if (this.allowedSolutionsToSee <= 0) {
+                  ui.warning(T.allowedSolutionsLimitReached);
                 }
               })
               .catch(ui.apiError);
@@ -373,7 +378,7 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.ignoreError);
           },
-          disqualify: (run: types.Run) => {
+          disqualify: ({ run }: { run: types.Run }) => {
             if (!window.confirm(T.runDisqualifyConfirm)) {
               return;
             }
@@ -476,6 +481,8 @@ OmegaUp.on('ready', async () => {
       language: runsStore.state.filters?.language,
       username: runsStore.state.filters?.username,
       status: runsStore.state.filters?.status,
+      execution: runsStore.state.filters?.execution,
+      output: runsStore.state.filters?.output,
     })
       .then(time.remoteTimeAdapter)
       .then((response) => {

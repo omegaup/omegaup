@@ -33,6 +33,7 @@
           <label>{{ T.wordsMultipleUser }}</label>
           <textarea
             v-model="participants"
+            data-course-multiple-students-add
             class="form-control pariticipants"
             rows="4"
           ></textarea>
@@ -55,7 +56,7 @@
       <table v-else class="table table-striped table-over">
         <thead>
           <tr>
-            <th>{{ T.wordsUser }}</th>
+            <th>{{ T.courseEditAddStudentsStudent }}</th>
             <th class="align-right">
               {{ T.contestEditRegisteredAdminDelete }}
             </th>
@@ -63,7 +64,7 @@
         </thead>
         <tbody>
           <tr v-for="student in students" :key="student.username">
-            <td>
+            <td data-uploaded-students>
               <a :href="studentProgressUrl(student)">{{
                 student.name || student.username
               }}</a>
@@ -80,6 +81,11 @@
           </tr>
         </tbody>
       </table>
+      <div class="float-right">
+        <a class="btn btn-primary" :href="studentsProgressUrl()">
+          {{ T.courseStudentsProgress }}
+        </a>
+      </div>
     </div>
     <omegaup-common-requests
       :data="identityRequests"
@@ -117,6 +123,10 @@ export default class CourseAddStudents extends Vue {
 
   studentProgressUrl(student: types.CourseStudent): string {
     return `/course/${this.courseAlias}/student/${student.username}/`;
+  }
+
+  studentsProgressUrl(): string {
+    return `/course/${this.courseAlias}/students/`;
   }
 
   addParticipantToList(): void {

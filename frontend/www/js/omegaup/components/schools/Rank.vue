@@ -1,6 +1,8 @@
 <template>
-  <div class="card table-responsive-sm">
-    <h5 class="card-header">
+  <div class="card">
+    <h5
+      class="card-header d-flex justify-content-between align-items-center school-rank-title"
+    >
       {{
         showHeader
           ? ui.formatString(T.schoolRankOfTheMonthHeader, {
@@ -11,21 +13,25 @@
               highCount: page * length,
             })
       }}
+      <a href="https://blog.omegaup.com/ranking-de-escuelas-en-omegaup/"
+        ><font-awesome-icon :icon="['fas', 'question-circle']" />
+        {{ T.wordsRankingMeasurement }}</a
+      >
     </h5>
     <table class="table mb-0">
       <thead>
         <tr>
-          <th scope="col">#</th>
-          <th scope="col">{{ T.profileSchool }}</th>
-          <th class="text-right" scope="col">{{ T.wordsScore }}</th>
+          <th class="text-center" scope="col">#</th>
+          <th class="text-center" scope="col">{{ T.profileSchool }}</th>
+          <th class="text-center" scope="col">{{ T.wordsScore }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(school, index) in rank" :key="index">
-          <th scope="row">
+          <th class="text-center" scope="row">
             {{ showHeader ? index + 1 : school.ranking || '' }}
           </th>
-          <td class="text-truncate">
+          <td class="text-truncate text-center">
             <omegaup-countryflag
               :country="school.country_id"
             ></omegaup-countryflag>
@@ -33,8 +39,8 @@
               school.name
             }}</a>
           </td>
-          <td class="text-right">
-            {{ school.score }}
+          <td class="text-center">
+            {{ school.score.toFixed(2) }}
           </td>
         </tr>
       </tbody>
@@ -59,9 +65,11 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import CountryFlag from '../CountryFlag.vue';
 import common_Paginator from '../common/Paginator.vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 @Component({
   components: {
+    FontAwesomeIcon,
     'omegaup-countryflag': CountryFlag,
     'omegaup-common-paginator': common_Paginator,
   },
@@ -86,5 +94,14 @@ export default class SchoolRank extends Vue {
 // Another solution should  be taken in the future.
 .text-truncate {
   max-width: 250px;
+}
+
+.table-width {
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.school-rank-title {
+  font-size: 1.25rem;
 }
 </style>

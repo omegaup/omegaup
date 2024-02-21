@@ -372,14 +372,19 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testUpdatePenaltyTypeFromAContest() {
         $originalTime = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
 
+        $penaltyType = 'contest_start';
+
         // Create a contest with one problem.
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
-            'startTime' => $originalTime,
-            'lastUpdated' => $originalTime,
-            'finishTime' => new \OmegaUp\Timestamp(
-                $originalTime->time + 60 * 60
-            ),
-        ]));
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'penaltyType' => $penaltyType,
+                'startTime' => $originalTime,
+                'lastUpdated' => $originalTime,
+                'finishTime' => new \OmegaUp\Timestamp(
+                    $originalTime->time + 60 * 60
+                ),
+            ])
+        );
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
@@ -1652,5 +1657,153 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertSame($response->score_mode, $newScoreModeExpected);
+    }
+
+    /**
+     * A PHPUnit data provider for the test with different penalty types.
+     *
+     * @return list<array{0:string, 1: int, 2: float, 3: float}>
+     */
+    public function penaltyTypeProvider(): array {
+        return [
+            ['contest_start', 'runtime', null],
+            ['contest_start', 'none', 0],
+            ['contest_start', 'problem_open', 5],
+            ['runtime', 'none', 0],
+            ['runtime', 'problem_open', 5],
+            ['runtime', 'contest_start', 10],
+            ['none', 'problem_open', 5],
+            ['none', 'contest_start', 10],
+            ['none', 'runtime', null],
+            ['problem_open', 'contest_start', 10],
+            ['problem_open', 'runtime', null],
+            ['problem_open', 'none', 0],
+        ];
+    }
+
+    /**
+     * Contestant submits runs and admin edits the problem version and then
+     * edits the penalty type of an active contest
+     *
+     * @dataProvider penaltyTypeProvider
+     */
+    public function testUpdatePenaltyTypeFromAContestWhenProblemVersionIsUpdated(
+        string $originalPenaltyType,
+        string $updatedPenaltyType,
+        ?int $expectedPenalty
+    ) {
+        $originalTime = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
+
+        // Create a contest with one problem.
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'penaltyType' => $originalPenaltyType,
+                'startTime' => $originalTime,
+                'lastUpdated' => $originalTime,
+                'finishTime' => new \OmegaUp\Timestamp(
+                    $originalTime->time + 60 * 60
+                ),
+            ])
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Create a run
+        {
+            \OmegaUp\Time::setTimeForTesting($originalTime->time + 5 * 60);
+            ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+            \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
+
+            // The problem is opened 5 minutes after contest starts.
+            \OmegaUp\Test\Factories\Contest::openContest(
+                $contestData['contest'],
+                $identity
+            );
+            \OmegaUp\Test\Factories\Contest::openProblemInContest(
+                $contestData,
+                $problemData,
+                $identity
+            );
+
+            // The run is sent 10 minutes after contest starts.
+            \OmegaUp\Time::setTimeForTesting($originalTime->time + 10 * 60);
+            $runData = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $identity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.0, 'AC', 10);
+            \OmegaUp\Time::setTimeForTesting($originalTime->time);
+        }
+
+        $problemAdminLogin = self::login($problemData['author']);
+
+        // Change the problem to something completely different.
+        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'mrkareltastic.zip';
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $problemAdminLogin->auth_token,
+            'problem_alias' => $problemData['problem']->alias,
+            'message' => 'Changed to mrkareltastic',
+            'validator' => 'token',
+            'time_limit' => 1000,
+            'overall_wall_time_limit' => 30000,
+            'validator_time_limit' => 0,
+            'extra_wall_time' => 1000,
+            'memory_limit' => 64000,
+            'output_limit' => 20480,
+        ]));
+        $this->assertTrue($response['rejudged']);
+        $this->assertSame(1, $detourGrader->getGraderCallCount());
+        unset($_FILES['problem_contents']);
+        foreach ($detourGrader->getRuns() as $run) {
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                null,
+                0,
+                'WA',
+                null,
+                null,
+                $run->run_id
+            );
+        }
+
+        $versionData = \OmegaUp\Controllers\Problem::apiVersions(
+            new \OmegaUp\Request([
+                'auth_token' => $problemAdminLogin->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+            ])
+        );
+
+        $directorLogin = self::login($contestData['director']);
+
+        // Call API
+        \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
+            'auth_token' => $directorLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'points' => 100,
+            'commit' => $versionData['published'],
+        ]));
+
+        // Update penalty type
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $directorLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'penalty_type' => $updatedPenaltyType,
+            'languages' => 'c11-gcc',
+        ]));
+        ['runs' => $runs] = \OmegaUp\Controllers\Contest::apiRuns(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $directorLogin->auth_token,
+            ])
+        );
+        if ($updatedPenaltyType === 'runtime') {
+            $expectedPenalty = $runs[0]['runtime'];
+        }
+        $this->assertSame($runs[0]['penalty'], $expectedPenalty);
     }
 }

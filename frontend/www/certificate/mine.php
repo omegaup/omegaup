@@ -3,7 +3,7 @@ namespace OmegaUp;
 require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
 \OmegaUp\UITools::render(
-    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Certificate::getCertificateListMineForTypeScript(
         $r
     )
 );

@@ -11,6 +11,8 @@ describe('Feedback.vue', () => {
       author_classname: 'user-rank-unranked',
       date: new Date(),
       feedback: savedFeedbackMessage,
+      feedback_thread: [],
+      submission_feedback_id: 1,
     },
   ];
 

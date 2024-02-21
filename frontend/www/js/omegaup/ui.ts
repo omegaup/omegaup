@@ -11,6 +11,11 @@ export enum MessageType {
 }
 
 export function navigateTo(href: string): void {
+  const [pathname, hash] = href.split('#');
+  if (pathname === window.location.pathname && hash != null) {
+    window.location.hash = hash;
+    return;
+  }
   window.location.href = href;
 }
 

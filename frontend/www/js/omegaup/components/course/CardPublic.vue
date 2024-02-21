@@ -9,17 +9,14 @@
           >
             <div>
               <h5 class="card-title mb-0">
-                <a v-if="loggedIn" :href="`/course/${course.alias}/`">{{
-                  course.name
-                }}</a>
-                <template v-else>{{ course.name }}</template>
+                <a :href="`/course/${course.alias}/`">{{ course.name }}</a>
               </h5>
               <p class="card-text">
                 <small>{{ course.school_name }}</small>
               </p>
             </div>
             <div class="card-text course-data">
-              <p class="mb-0">
+              <p class="mb-2">
                 {{
                   ui.formatString(T.publicCourseCardMetrics, {
                     lessonCount: course.lessonCount,
@@ -30,7 +27,7 @@
                   })
                 }}
               </p>
-              <p class="mb-0">{{ courseLevelText(course.level) }}</p>
+              <p class="mb-2">{{ courseLevelText(course.level) }}</p>
               <div v-if="loggedIn" class="text-center mt-1">
                 <a
                   class="btn btn-primary text-white"

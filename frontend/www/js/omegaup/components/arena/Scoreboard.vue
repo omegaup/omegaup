@@ -1,5 +1,5 @@
 <template>
-  <div class="omegaup-scoreboard">
+  <div class="omegaup-scoreboard px-2">
     <slot name="scoreboard-header">
       <div class="text-center mt-4 pt-2">
         <h2 class="mb-4">
@@ -19,9 +19,12 @@
       </div>
     </slot>
     <highcharts
-      v-if="rankingChartOptions"
+      v-if="rankingChartOptions && Object.keys(rankingChartOptions).length"
       :options="rankingChartOptions"
     ></highcharts>
+    <div v-else class="bg-white text-center p-4 mb-3">
+      {{ T.rankingNoUsers }}
+    </div>
     <label v-if="showInvitedUsersFilter">
       <input
         v-model="onlyShowExplicitlyInvited"
@@ -32,80 +35,88 @@
     >
     <label class="float-right"
       >{{ T.scoreboardShowParticipantsNames }}:
-      <select v-model="nameDisplayOptions" class="form-control">
+      <select
+        v-model="nameDisplayOptions"
+        class="form-control"
+        data-scoreboard-options
+      >
         <option :value="ui.NameDisplayOptions.Name">{{ T.wordsName }}</option>
         <option :value="ui.NameDisplayOptions.Username">
-          {{ T.wordsUser }}
+          {{ T.scoreboardAccountName }}
         </option>
         <option :value="ui.NameDisplayOptions.NameAndUsername">
-          {{ T.arenaNameAndUsername }}
+          {{ T.scoreboardNameAndAccountName }}
         </option>
       </select>
     </label>
-    <table data-table-scoreboard>
-      <thead>
-        <tr>
-          <th><!-- legend --></th>
-          <th><!-- position --></th>
-          <th>{{ T.contestParticipant }}</th>
-          <th v-for="(problem, index) in problems" :key="problem.alias">
-            <a :href="'#problems/' + problem.alias" :title="problem.alias">{{
-              ui.columnName(index)
-            }}</a>
-          </th>
-          <th :colspan="2 + problems.length">{{ T.wordsTotal }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <template v-for="(user, userIndex) in ranking">
-          <tr
-            v-if="showUser(user.is_invited)"
-            :key="`${user.username}-${user.virtual}`"
-            :class="user.username"
-          >
-            <td class="legend" :class="legendClass(userIndex)"></td>
-            <td class="position">{{ user.place || '—' }}</td>
-            <td class="user">
-              {{ ui.rankingUsername(user, nameDisplayOptions) }}
-              <img
-                v-if="user.country"
-                alt=""
-                height="11"
-                :src="`/media/flags/${user.country.toLowerCase()}.png`"
-                :title="user.country"
-                width="16"
-              />
-            </td>
-
-            <td
-              v-for="(problem, problemIndex) in user.problems"
-              :key="problem.alias"
-              :class="problemClass(problem, problems[problemIndex].alias)"
+    <div class="table-responsive">
+      <table data-table-scoreboard class="table">
+        <thead>
+          <tr>
+            <th><!-- legend --></th>
+            <th><!-- position --></th>
+            <th>{{ T.contestParticipant }}</th>
+            <th v-for="(problem, index) in problems" :key="problem.alias">
+              <a :href="'#problems/' + problem.alias" :title="problem.alias">{{
+                ui.columnName(index)
+              }}</a>
+            </th>
+            <th :colspan="2 + problems.length">{{ T.wordsTotal }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-for="(user, userIndex) in ranking">
+            <tr
+              v-if="showUser(user.is_invited)"
+              :key="`${user.username}-${user.virtual}`"
+              :class="user.username"
             >
-              <template v-if="problem.runs > 0">
+              <td class="legend" :class="legendClass(userIndex)"></td>
+              <td class="position" data-table-scoreboard-position>
+                {{ user.place || '—' }}
+              </td>
+              <td class="user" data-table-scoreboard-username>
+                {{ ui.rankingUsername(user, nameDisplayOptions) }}
+                <img
+                  v-if="user.country"
+                  alt=""
+                  height="11"
+                  :src="`/media/flags/${user.country.toLowerCase()}.png`"
+                  :title="user.country"
+                  width="16"
+                />
+              </td>
+
+              <td
+                v-for="(problem, problemIndex) in user.problems"
+                :key="problem.alias"
+                :class="problemClass(problem, problems[problemIndex].alias)"
+              >
+                <template v-if="problem.runs > 0">
+                  <div class="points">
+                    {{ renderPoints(problem) }}
+                  </div>
+                  <div class="penalty">
+                    <span v-if="showPenalty">{{ problem.penalty }}</span> ({{
+                      problem.runs
+                    }})
+                  </div>
+                </template>
+                <template v-else> - </template>
+              </td>
+              <td>
                 <div class="points">
-                  {{ renderPoints(problem) }}
+                  {{ user.total.points.toFixed(digitsAfterDecimalPoint) }}
                 </div>
                 <div class="penalty">
-                  <span v-if="showPenalty">{{ problem.penalty }}</span> ({{
-                    problem.runs
-                  }})
+                  {{ user.total.penalty }} ({{ totalRuns(user) }})
                 </div>
-              </template>
-              <template v-else> - </template>
-            </td>
-            <td>
-              <div class="points">
-                {{ user.total.points.toFixed(digitsAfterDecimalPoint) }}
-              </div>
-              <div class="penalty">
-                {{ user.total.penalty }} ({{ totalRuns(user) }})
-              </div>
-            </td>
-          </tr>
-        </template>
-      </tbody>
-    </table>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
     <div class="footer">
       {{ lastUpdatedString }}
     </div>
@@ -243,6 +254,7 @@ export default class ArenaScoreboard extends Vue {
   th {
     padding: 0.2em;
     text-align: center;
+    border: none;
   }
 
   td {
@@ -279,10 +291,6 @@ export default class ArenaScoreboard extends Vue {
 
   .accepted.recent-event {
     background: var(--arena-scoreboard-accepted-recent-event-background-color);
-  }
-
-  .position {
-    width: 3.5em;
   }
 
   .legend-1 {

@@ -1,14 +1,14 @@
 <template>
-  <div class="card mb-3" omegaup-collection-problem>
-    <div class="row no-gutters">
-      <div class="col-md-4">
-        <div class="card-body">
+  <div class="card align-items-center mx-2 my-2" omegaup-collection-problem>
+    <div class="row no-gutters align-items-center justify-content-center">
+      <div class="col-md-3">
+        <div class="card-body text-center">
           <h1>
             <slot name="icon"></slot>
           </h1>
         </div>
       </div>
-      <div class="col-md-8">
+      <div class="col-md-9">
         <div class="card-body">
           <h6 class="card-title">
             {{ title }}
@@ -40,7 +40,7 @@ export default class CollectionProblem extends Vue {
 
 <style>
 [omegaup-collection-problem] {
-  width: 290px;
+  width: 310px;
   margin-right: 0.5em;
 }
 </style>

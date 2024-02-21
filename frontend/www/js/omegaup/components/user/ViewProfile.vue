@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-md-12">
         <div class="card">
-          <div class="card-header">
+          <div class="card-header" data-profile-tabs>
             <nav class="nav nav-tabs" role="tablist" data-profile-navtabs>
               <a
                 v-if="profile.is_own_profile || !profile.is_private"
@@ -96,6 +96,7 @@
                   :items="solvedProblems"
                   :items-per-page="30"
                   :title="T.profileSolvedProblems"
+                  :should-show-filter-input="true"
                   class="mb-3"
                 ></omegaup-grid-paginator>
                 <omegaup-grid-paginator
@@ -119,22 +120,12 @@
                 role="tab"
                 aria-labelledby="nav-contests-tab"
               >
-                <omegaup-grid-paginator
-                  :columns="1"
+                <omegaup-table-paginator
+                  :column-names="columnNames"
                   :items="contests"
                   :items-per-page="15"
                 >
-                  <template #table-header>
-                    <thead>
-                      <tr>
-                        <th>{{ T.profileContestsTableContest }}</th>
-                        <th class="text-right">
-                          {{ T.profileContestsTablePlace }}
-                        </th>
-                      </tr>
-                    </thead>
-                  </template>
-                </omegaup-grid-paginator>
+                </omegaup-table-paginator>
               </div>
               <div
                 v-if="currentSelectedTab == ViewProfileTabs.CreatedContent"
@@ -150,9 +141,11 @@
                   class="mb-3"
                 >
                   <template v-if="profile.is_own_profile" #header-link
-                    ><a href="/problem/mine/" class="float-right">{{
-                      T.profileCreatedContentSeeAll
-                    }}</a></template
+                    ><a
+                      href="/problem/mine/"
+                      class="float-right align-self-center"
+                      >{{ T.profileCreatedContentSeeAll }}</a
+                    ></template
                   >
                 </omegaup-grid-paginator>
                 <omegaup-grid-paginator
@@ -163,9 +156,11 @@
                   class="mb-3"
                 >
                   <template v-if="profile.is_own_profile" #header-link
-                    ><a href="/contest/mine/" class="float-right">{{
-                      T.profileCreatedContentSeeAll
-                    }}</a></template
+                    ><a
+                      href="/contest/mine/"
+                      class="float-right align-self-center"
+                      >{{ T.profileCreatedContentSeeAll }}</a
+                    ></template
                   >
                 </omegaup-grid-paginator>
                 <omegaup-grid-paginator
@@ -176,9 +171,11 @@
                   class="mb-3"
                 >
                   <template v-if="profile.is_own_profile" #header-link
-                    ><a href="/course/mine/" class="float-right">{{
-                      T.profileCreatedContentSeeAll
-                    }}</a></template
+                    ><a
+                      href="/course/mine/"
+                      class="float-right align-self-center"
+                      >{{ T.profileCreatedContentSeeAll }}</a
+                    ></template
                   >
                 </omegaup-grid-paginator>
               </div>
@@ -223,6 +220,7 @@ import user_Charts from './Chartsv2.vue';
 import user_MainInfo from './MainInfo.vue';
 import badge_List from '../badge/List.vue';
 import common_GridPaginator from '../common/GridPaginator.vue';
+import common_TablePaginator from '../common/TablePaginator.vue';
 import { types } from '../../api_types';
 import * as Highcharts from 'highcharts/highstock';
 import * as ui from '../../ui';
@@ -260,6 +258,7 @@ function getInitialSelectedTab(
     'omegaup-user-maininfo': user_MainInfo,
     'omegaup-badge-list': badge_List,
     'omegaup-grid-paginator': common_GridPaginator,
+    'omegaup-table-paginator': common_TablePaginator,
     'omegaup-countryflag': country_Flag,
   },
 })
@@ -314,6 +313,14 @@ export default class ViewProfile extends Vue {
     if (!this.data?.unsolvedProblems) return [];
     return this.data.unsolvedProblems.map((problem) => new Problem(problem));
   }
+
+  get columnNames(): Array<{ name: string; style: string }> {
+    return [
+      { name: T.profileContestsTableContest, style: 'text-left' },
+      { name: T.profileContestsTablePlace, style: 'text-right' },
+    ];
+  }
+
   get solvedProblems(): Problem[] {
     if (!this.data?.solvedProblems) return [];
     return this.data.solvedProblems.map((problem) => new Problem(problem));
@@ -342,7 +349,7 @@ export default class ViewProfile extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 a:hover {
   cursor: pointer;
 }

@@ -10,6 +10,8 @@ import {
   NavigationType,
   navigateToProblem,
   getScoreModeEnum,
+  getMaxScore,
+  getMaxPerGroupScore,
 } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { storeConfig } from './problemStore';
@@ -234,7 +236,252 @@ describe('navigation.ts', () => {
         `#problems/${params.problem.alias}/new-run`,
       );
       expect(vueInstance.problem).not.toBeNull();
-      expect(vueInstance.problem?.bestScore).toBe(0.8);
+      expect(vueInstance.problem?.bestScore).toBe(80);
+    });
+  });
+
+  describe('getMaxScore', () => {
+    const runs: types.Run[] = [
+      {
+        alias: 'sumas',
+        classname: 'user-rank-unranked',
+        country: 'mx',
+        guid: 'abcdef1212',
+        language: 'py3',
+        memory: 0,
+        penalty: 0,
+        runtime: 0,
+        score: 0.6,
+        contest_score: 60,
+        score_by_group: {
+          sample: 0.25,
+          easy: 0.2,
+          medium: 0.15,
+          hard: 0.0,
+        },
+        status: 'ready',
+        submit_delay: 0,
+        time: new Date(0),
+        username: 'omegaup',
+        verdict: 'PA',
+      },
+      {
+        alias: 'triangulos',
+        classname: 'user-rank-unranked',
+        country: 'mx',
+        guid: 'fefefe1211',
+        language: 'py3',
+        memory: 0,
+        penalty: 0,
+        runtime: 0,
+        score: 1.0,
+        contest_score: 100,
+        score_by_group: {
+          sample: 0.25,
+          easy: 0.25,
+          medium: 0.25,
+          hard: 0.25,
+        },
+        status: 'ready',
+        submit_delay: 0,
+        time: new Date(0),
+        username: 'omegaup',
+        verdict: 'AC',
+      },
+      {
+        alias: 'sumas',
+        classname: 'user-rank-unranked',
+        country: 'mx',
+        guid: 'efad3456334',
+        language: 'py3',
+        memory: 0,
+        penalty: 0,
+        runtime: 0,
+        score: 0.7,
+        contest_score: 70,
+        score_by_group: {
+          sample: 0.15,
+          easy: 0.25,
+          medium: 0.1,
+          hard: 0.2,
+        },
+        status: 'ready',
+        submit_delay: 0,
+        time: new Date(0),
+        username: 'omegaup',
+        verdict: 'PA',
+      },
+    ];
+
+    it('Should get the max score for a problem', () => {
+      const alias = 'sumas';
+      const previousScore = 0.0;
+      const maxScore = getMaxScore(runs, alias, previousScore);
+
+      expect(maxScore).toEqual(70);
+    });
+
+    it('Should get the max score by group for a problem', () => {
+      const alias = 'sumas';
+      const previousScore = 0.0;
+      const maxScore = 1;
+      const maxScoreForProblem = getMaxPerGroupScore(
+        runs,
+        alias,
+        previousScore,
+        maxScore,
+      );
+
+      expect(parseFloat(maxScoreForProblem.toFixed(2))).toEqual(0.85);
+    });
+
+    it('Should get 0 as max score for a problem when score_by_group is not provided', () => {
+      const runs: types.Run[] = [
+        {
+          alias: 'sumas',
+          classname: 'user-rank-unranked',
+          country: 'mx',
+          guid: 'abcdef1212',
+          language: 'py3',
+          memory: 0,
+          penalty: 0,
+          runtime: 0,
+          score: 0.6,
+          contest_score: 60,
+          status: 'ready',
+          submit_delay: 0,
+          time: new Date(0),
+          username: 'omegaup',
+          verdict: 'PA',
+        },
+        {
+          alias: 'triangulos',
+          classname: 'user-rank-unranked',
+          country: 'mx',
+          guid: 'fefefe1211',
+          language: 'py3',
+          memory: 0,
+          penalty: 0,
+          runtime: 0,
+          score: 1.0,
+          contest_score: 100,
+          status: 'ready',
+          submit_delay: 0,
+          time: new Date(0),
+          username: 'omegaup',
+          verdict: 'AC',
+        },
+        {
+          alias: 'sumas',
+          classname: 'user-rank-unranked',
+          country: 'mx',
+          guid: 'efad3456334',
+          language: 'py3',
+          memory: 0,
+          penalty: 0,
+          runtime: 0,
+          score: 0.9,
+          contest_score: 70,
+          status: 'ready',
+          submit_delay: 0,
+          time: new Date(0),
+          username: 'omegaup',
+          verdict: 'PA',
+        },
+      ];
+      const alias = 'sumas';
+      const previousScore = 0.0;
+      const maxScore = 100;
+      const maxScoreForProblem = getMaxPerGroupScore(
+        runs,
+        alias,
+        previousScore,
+        maxScore,
+      );
+
+      expect(maxScoreForProblem).toEqual(0);
+    });
+
+    it('Should max score for a problem when submission verdict is CE', () => {
+      const runs: types.Run[] = [
+        {
+          alias: 'sumas',
+          classname: 'user-rank-unranked',
+          country: 'mx',
+          guid: 'abcdef1212',
+          language: 'py3',
+          memory: 0,
+          penalty: 0,
+          runtime: 0,
+          score: 0,
+          status: 'ready',
+          submit_delay: 0,
+          time: new Date(0),
+          username: 'omegaup',
+          verdict: 'CE',
+        },
+        {
+          alias: 'triangulos',
+          classname: 'user-rank-unranked',
+          country: 'mx',
+          guid: 'fefefe1211',
+          language: 'py3',
+          memory: 0,
+          penalty: 0,
+          runtime: 0,
+          score: 0.6,
+          contest_score: 60,
+          score_by_group: {
+            sample: 0.25,
+            easy: 0.0,
+            medium: 0.25,
+            hard: 0.1,
+          },
+          status: 'ready',
+          submit_delay: 0,
+          time: new Date(0),
+          username: 'omegaup',
+          verdict: 'AC',
+        },
+        {
+          alias: 'sumas',
+          classname: 'user-rank-unranked',
+          country: 'mx',
+          guid: 'efad3456334',
+          language: 'py3',
+          memory: 0,
+          penalty: 0,
+          runtime: 0,
+          score: 0.7,
+          contest_score: 70,
+          score_by_group: {
+            sample: 0.15,
+            easy: 0.25,
+            medium: 0.1,
+            hard: 0.2,
+          },
+          status: 'ready',
+          submit_delay: 0,
+          time: new Date(0),
+          username: 'omegaup',
+          verdict: 'PA',
+        },
+      ];
+
+      const alias = 'sumas';
+      const previousScore = 0.0;
+      const maxScore = 100;
+
+      // The function should ignore the submissions where the field
+      // score_by_group is not provided
+      const maxScoreForProblem = getMaxPerGroupScore(
+        runs,
+        alias,
+        previousScore,
+        maxScore,
+      );
+
+      expect(maxScoreForProblem).toEqual(70);
     });
   });
 });

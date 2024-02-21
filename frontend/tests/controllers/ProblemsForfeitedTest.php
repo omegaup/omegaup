@@ -10,18 +10,6 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        for (
-            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
-        ) {
-            $problem = \OmegaUp\Test\Factories\Problem::createProblem();
-            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
-                $problem,
-                $identity,
-                $login
-            );
-            \OmegaUp\Test\Factories\Run::gradeRun($run);
-        }
-
         $problemForfeited = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\DAO\ProblemsForfeited::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
             'user_id' => $user->user_id,
@@ -32,7 +20,7 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
         ]));
 
-        $this->assertSame(1, $results['allowed']);
+        $this->assertSame(5, $results['allowed']);
         $this->assertSame(1, $results['seen']);
     }
 
@@ -40,17 +28,6 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $problems = [];
-        for (
-            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
-        ) {
-            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
-            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
-                $problems[$i],
-                $identity,
-                $login
-            );
-            \OmegaUp\Test\Factories\Run::gradeRun($run);
-        }
 
         $extraProblem = \OmegaUp\Test\Factories\Problem::createProblem();
 
@@ -83,13 +60,26 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
         $results = \OmegaUp\Controllers\ProblemForfeited::apiGetCounts(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertSame(1, $results['allowed']);
+        $this->assertSame(5, $results['allowed']);
         $this->assertSame(1, $results['seen']);
     }
 
     public function testGetSolutionForbiddenAccessException() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
+        $problems = [];
+
+        for (
+            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY; $i++
+        ) {
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem()['problem'];
+            \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problems[$i]->alias,
+                'forfeit_problem' => true,
+            ]));
+        }
+
         $problem = \OmegaUp\Test\Factories\Problem::createProblem()['problem'];
         try {
             \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
@@ -108,25 +98,14 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
         $results = \OmegaUp\Controllers\ProblemForfeited::apiGetCounts(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertSame(0, $results['allowed']);
-        $this->assertSame(0, $results['seen']);
+        $this->assertSame(5, $results['allowed']);
+        $this->assertSame(5, $results['seen']);
     }
 
     public function testGetNonexistentSolution() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $problems = [];
-        for (
-            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
-        ) {
-            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
-            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
-                $problems[$i],
-                $identity,
-                $login
-            );
-            \OmegaUp\Test\Factories\Run::gradeRun($run);
-        }
 
         $extraProblem = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
@@ -160,7 +139,7 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
         $results = \OmegaUp\Controllers\ProblemForfeited::apiGetCounts(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertSame(1, $results['allowed']);
+        $this->assertSame(5, $results['allowed']);
         $this->assertSame(0, $results['seen']);
     }
 }

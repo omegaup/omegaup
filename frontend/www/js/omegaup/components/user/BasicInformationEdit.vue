@@ -51,7 +51,7 @@
         </option>
       </select>
     </div>
-    <div class="form-group">
+    <div class="form-group" data-date-of-birth>
       <label>{{ T.userEditBirthDate }}</label>
       <omegaup-datepicker
         v-model="birthDate"
@@ -60,7 +60,11 @@
       ></omegaup-datepicker>
     </div>
     <div class="mt-3">
-      <button type="submit" class="btn btn-primary mr-2">
+      <button
+        type="submit"
+        class="btn btn-primary mr-2"
+        data-save-profile-changes-button
+      >
         {{ T.wordsSaveChanges }}
       </button>
       <a href="/profile/" class="btn btn-cancel">{{ T.wordsCancel }}</a>

@@ -319,11 +319,9 @@ class ApiCaller {
             );
         }
         if ($apiException->getCode() == 401) {
-            header(
-                'Location: /login/?redirect=' . urlencode(
-                    \OmegaUp\Request::getServerVar('REQUEST_URI') ?? '/'
-                )
-            );
+            $uri = \OmegaUp\Request::getServerVar('REQUEST_URI') ?? '/';
+            $newURI = str_replace('startfresh/', '', $uri);
+            header('Location: /login/?redirect=' . urlencode($newURI));
             die();
         }
         if ($apiException->getCode() == 403) {

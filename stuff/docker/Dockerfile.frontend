@@ -7,22 +7,23 @@ RUN apt-get update -y && \
         && \
     apt-get update -y && \
     apt-get install --no-install-recommends -y \
-        git \
+        build-essential \
         ca-certificates \
-        gnupg2 \
         curl \
+        git \
+        gnupg2 \
         php8.1-cli \
         php8.1-curl \
         php8.1-gmp \
         php8.1-mbstring \
-        php8.1-zip \
         php8.1-xml \
+        php8.1-zip \
         && \
     /usr/sbin/update-ca-certificates && \
     apt-get autoremove -y && \
     apt-get clean
 
-RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs && \
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list

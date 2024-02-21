@@ -1,5 +1,5 @@
 <template>
-  <div data-user-profile-edit class="m-5">
+  <div data-user-profile-edit class="mx-auto">
     <omegaup-user-profile-wrapper
       :profile="profile"
       :data="data"
@@ -12,7 +12,7 @@
         </h1>
       </template>
       <template #title>
-        <h3>{{ currentTitle }}</h3>
+        <h3 class="text-center mt-1">{{ currentTitle }}</h3>
       </template>
       <template #content>
         <template v-if="currentSelectedTab === 'view-profile'">
@@ -63,6 +63,13 @@
             @add-identity="(request) => $emit('add-identity', request)"
           ></omegaup-user-manage-identities>
         </template>
+        <template v-else-if="currentSelectedTab === 'manage-api-tokens'">
+          <omegaup-user-manage-api-tokens
+            :api-tokens="apiTokens"
+            @create-api-token="(request) => $emit('create-api-token', request)"
+            @revoke-api-token="(request) => $emit('revoke-api-token', request)"
+          ></omegaup-user-manage-api-tokens>
+        </template>
         <template v-else-if="currentSelectedTab === 'change-password'">
           <omegaup-user-edit-password
             @update-password="(request) => $emit('update-password', request)"
@@ -73,6 +80,12 @@
             :username="profile.username"
             @add-password="(request) => $emit('add-password', request)"
           ></omegaup-user-add-password>
+        </template>
+        <template v-else-if="currentSelectedTab === 'delete-account'">
+          <omegaup-user-delete-account
+            :username="profile.username"
+            @request-delete-account="$emit('request-delete-account')"
+          ></omegaup-user-delete-account>
         </template>
         <div v-else>
           {{ currentSelectedTab }}
@@ -96,6 +109,8 @@ import user_PasswordAdd from './PasswordAdd.vue';
 import { urlMapping } from './SidebarMainInfo.vue';
 import user_ManageSchools from './ManageSchools.vue';
 import user_ManageIdentities from './ManageIdentities.vue';
+import user_ManageApiTokens from './ManageApiTokens.vue';
+import userDeleteAccount from './DeleteAccount.vue';
 
 @Component({
   components: {
@@ -106,7 +121,9 @@ import user_ManageIdentities from './ManageIdentities.vue';
     'omegaup-user-edit-password': user_PasswordEdit,
     'omegaup-user-add-password': user_PasswordAdd,
     'omegaup-user-manage-identities': user_ManageIdentities,
+    'omegaup-user-manage-api-tokens': user_ManageApiTokens,
     'omegaup-user-manage-schools': user_ManageSchools,
+    'omegaup-user-delete-account': userDeleteAccount,
   },
 })
 export default class Profile extends Vue {
@@ -115,6 +132,7 @@ export default class Profile extends Vue {
   @Prop({ default: 'view-profile' }) selectedTab!: string;
   @Prop({ default: null }) viewProfileSelectedTab!: string | null;
   @Prop() identities!: types.Identity[];
+  @Prop() apiTokens!: types.ApiToken[];
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
   @Prop() countries!: dao.Countries[];
@@ -143,3 +161,10 @@ export default class Profile extends Vue {
   }
 }
 </script>
+
+<style scoped>
+[data-user-profile-edit] {
+  max-width: 69rem;
+  margin: 3rem 0;
+}
+</style>

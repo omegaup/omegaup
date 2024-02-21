@@ -1,5 +1,5 @@
 <template>
-  <tr>
+  <tr :class="studentProgress.username">
     <th scope="row" class="text-center align-middle">
       <a :href="studentProgressUrl">
         <omegaup-user-username

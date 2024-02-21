@@ -14,6 +14,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
             [
                 ['runs' => 3, 'score' => 0.83, 'execution' => 'EXECUTION_INTERRUPTED', 'output' => 'OUTPUT_INTERRUPTED', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_EXCEEDED'],
                 ['runs' => 4, 'score' => 1.0, 'execution' => 'EXECUTION_FINISHED', 'output' => 'OUTPUT_CORRECT', 'status_memory' => 'MEMORY_AVAILABLE', 'status_runtime' => 'RUNTIME_AVAILABLE'],
+                ['runs' => 1, 'score' => 0, 'execution' => 'EXECUTION_COMPILATION_ERROR', 'output' => 'OUTPUT_INTERRUPTED', 'status_memory' => 'MEMORY_NOT_AVAILABLE', 'status_runtime' => 'RUNTIME_NOT_AVAILABLE'],
             ],
             [
                 [
@@ -34,9 +35,14 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
                         ['group_name' => 'hard', 'score' => (0.4 / 3),'verdict' => 'AC'],     // 0.13
                     ],
                 ],
+                [
+                    'total' => 0,
+                    'finalVerdict' => 'CE',
+                    'points_per_group' => [],
+                ],
             ],
         ];
-        for ($i = 0; $i < 2; ++$i) {
+        for ($i = 0; $i < 3; ++$i) {
             ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
             $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
                 $problemData,
@@ -118,7 +124,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'show_all' => true,
         ]));
-        $this->assertCount(2, $response['runs']);
+        $this->assertCount(3, $response['runs']);
         // Runs are sorted in reverse order.
         for ($i = 0; $i < count($contestants); ++$i) {
             $this->assertSame(
@@ -126,6 +132,26 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
                 $response['runs'][count($contestants) - $i - 1]['guid']
             );
         }
+
+        // Test execution filter
+        $response = \OmegaUp\Controllers\Problem::apiRuns(new \OmegaUp\Request([
+            'problem_alias' => $problemData['problem']->alias,
+            'auth_token' => $login->auth_token,
+            'show_all' => true,
+            'execution' => 'EXECUTION_INTERRUPTED'
+        ]));
+
+        $this->assertCount(1, $response['runs']);
+
+        // Test output filter
+        $response = \OmegaUp\Controllers\Problem::apiRuns(new \OmegaUp\Request([
+            'problem_alias' => $problemData['problem']->alias,
+            'auth_token' => $login->auth_token,
+            'show_all' => true,
+            'output' => 'OUTPUT_INTERRUPTED'
+        ]));
+
+        $this->assertCount(2, $response['runs']);
     }
 
     public function testUserHasTriedToSolvedProblem() {
@@ -186,11 +212,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
                 'output' => 'OUTPUT_INTERRUPTED',
                 'status_memory' => 'MEMORY_NOT_AVAILABLE',
                 'status_runtime' => 'RUNTIME_NOT_AVAILABLE',
-                'points_per_group' => [
-                    ['group_name' => 'easy', 'score' => 0.0, 'verdict' => 'CE'],
-                    ['group_name' => 'medium', 'score' => 0.0, 'verdict' => 'CE'],
-                    ['group_name' => 'hard', 'score' => 0.0, 'verdict' => 'CE'],
-                ],
+                'points_per_group' => [],
             ],
             [
                 'execution' => 'EXECUTION_INTERRUPTED',

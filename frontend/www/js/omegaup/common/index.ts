@@ -5,6 +5,7 @@ import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.IndexPayload();
+  const commonPayload = types.payloadParsers.CommonPayload();
 
   const ranking = payload.userRank.map((user, index) => ({
     rank: index + 1,
@@ -48,6 +49,7 @@ OmegaUp.on('ready', () => {
             totalRows: payload.schoolRank.length,
           },
           schoolOfTheMonth: payload.schoolOfTheMonthData,
+          isUnder13User: commonPayload.isUnder13User,
         },
       });
     },

@@ -3,11 +3,51 @@ export interface LoginOptions {
   password: string;
 }
 
+export interface Identities {
+  usernames: string;
+  passwords: string;
+}
+
+export interface GroupOptions {
+  groupTitle: string;
+  groupDescription: string;
+}
+
+export interface TeamGroupOptions {
+  groupTitle: string;
+  groupDescription: string;
+  noOfContestants: string;
+}
+
+export interface UserInformation {
+  name: string;
+  gender: string;
+  country: string;
+  state: string;
+  dateOfBirth: string;
+}
+
+export interface UserPreferences {
+  language: string;
+  programmingLanguage: string;
+  useCase: string;
+  objective: string;
+}
+
+export interface SchoolDetails {
+  name: string;
+  grade: string;
+  enrolledStatus: boolean;
+  graduationDate?: string;
+}
+
 export interface ProblemOptions {
   problemAlias: string;
   tag: string;
   autoCompleteTextTag: string;
   problemLevelIndex: number;
+  publicAccess?: boolean;
+  firstTimeVisited?: boolean;
 }
 
 export interface CourseOptions {
@@ -36,12 +76,16 @@ export interface ContestOptions {
   startDate: Date;
   endDate: Date;
   showScoreboard?: boolean;
+  scoreBoardVisibleTime?: string;
+  differentStart?: boolean;
+  differentStartTime?: string;
   scoreMode: ScoreMode;
   basicInformation?: boolean;
   requestParticipantInformation?: RequestParticipantInformation;
   admissionMode: AdmissionModeOptions;
   problems: Array<ProblemOptions>;
   runs: Array<RunOptions>;
+  statusCheck?: boolean;
 }
 
 export interface RunOptions {
@@ -49,6 +93,7 @@ export interface RunOptions {
   fixturePath: string;
   language: Language;
   valid: boolean;
+  status: Status;
 }
 
 export type AdmissionModeOptions = 'private' | 'registration' | 'public';
@@ -75,4 +120,4 @@ export type Language =
   | 'go'
   | 'rs'
   | 'js';
-export type Status = 'AC' | 'TLE' | 'MLE' | 'PA';
+export type Status = 'AC' | 'TLE' | 'MLE' | 'PA' | 'WA';

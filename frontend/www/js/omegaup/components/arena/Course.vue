@@ -3,7 +3,7 @@
     :active-tab="activeTab"
     :title="currentAssignment.name"
     :should-show-runs="isAdmin || isTeachingAssistant"
-    :should-show-ranking="course.admission_mode !== 'public'"
+    :should-show-ranking="showRanking"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #socket-status>
@@ -80,6 +80,8 @@
               :run-details-data="runDetailsData"
               :problem-alias="problemAlias"
               :in-contest-or-course="true"
+              :feedback-map="feedbackMap"
+              :feedback-thread-map="feedbackThreadMap"
               @request-feedback="(guid) => $emit('request-feedback', guid)"
               @update:activeTab="
                 (selectedTab) =>
@@ -131,9 +133,8 @@
         <template #scoreboard-header><div></div></template>
       </omegaup-arena-scoreboard>
     </template>
-    <template #arena-runs>
-      <omegaup-arena-runs
-        v-if="isAdmin"
+    <template v-if="isAdmin" #arena-runs>
+      <omegaup-arena-runs-for-courses
         :show-all-runs="true"
         :contest-alias="currentAssignment.alias"
         :runs="allRuns"
@@ -141,9 +142,10 @@
         :show-problem="true"
         :show-details="true"
         :show-disqualify="true"
-        :show-pager="true"
+        :show-filters="true"
         :show-rejudge="true"
         :show-user="true"
+        :items-per-page="100"
         :problemset-problems="Object.values(problems)"
         :search-result-users="searchResultUsers"
         :search-result-problems="searchResultProblems"
@@ -158,7 +160,7 @@
       >
         <template #title><div></div></template>
         <template #runs><div></div></template>
-      </omegaup-arena-runs>
+      </omegaup-arena-runs-for-courses>
       <omegaup-overlay
         v-if="isAdmin"
         :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
@@ -178,10 +180,23 @@
                 @set-feedback="(request) => $emit('set-feedback', request)"
               ></omegaup-submission-feedback>
             </template>
-            <template #code-view>
+            <template #code-view="{ guid }">
               <omegaup-arena-feedback-code-view
-                :language="runDetailsData.language"
-                :value="runDetailsData.source"
+                :language="language"
+                :value="source"
+                :readonly="false"
+                :feedback-map="feedbackMap"
+                :feedback-thread-map="feedbackThreadMap"
+                :current-user-class-name="currentUserClassName"
+                :current-username="currentUsername"
+                @save-feedback-list="
+                  (feedbackList) =>
+                    $emit('save-feedback-list', { feedbackList, guid })
+                "
+                @submit-feedback-thread="
+                  (feedback) =>
+                    $emit('submit-feedback-thread', { feedback, guid })
+                "
               ></omegaup-arena-feedback-code-view>
             </template>
           </omegaup-arena-rundetails-popup>
@@ -227,6 +242,7 @@ import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarAssignments from './NavbarAssignments.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_Runs from './Runs.vue';
+import arena_RunsForCourses from '../arena/RunsForCourses.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import arena_Scoreboard from './Scoreboard.vue';
@@ -237,6 +253,7 @@ import submission_Feedback from '../submissions/Feedback.vue';
 import { SocketStatus } from '../../arena/events_socket';
 import { SubmissionRequest } from '../../arena/submissions';
 import arena_FeedbackCodeView from './FeedbackCodeView.vue';
+import { ArenaCourseFeedback } from './Feedback.vue';
 
 @Component({
   components: {
@@ -245,6 +262,7 @@ import arena_FeedbackCodeView from './FeedbackCodeView.vue';
     'omegaup-arena-navbar-assignments': arena_NavbarAssignments,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
     'omegaup-arena-runs': arena_Runs,
+    'omegaup-arena-runs-for-courses': arena_RunsForCourses,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-arena-scoreboard': arena_Scoreboard,
@@ -276,9 +294,16 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
+  @Prop({ default: false }) showRanking!: boolean;
   @Prop() totalRuns!: number;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: false }) isTeachingAssistant!: boolean;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackMap!: Map<number, ArenaCourseFeedback>;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
+  @Prop() currentUsername!: string;
+  @Prop() currentUserClassName!: string;
 
   T = T;
   omegaup = omegaup;
@@ -367,6 +392,14 @@ export default class ArenaCourse extends Vue {
       key: problem.alias,
       value: problem.text,
     }));
+  }
+
+  get language(): string | undefined {
+    return this.runDetailsData?.language;
+  }
+
+  get source(): string | undefined {
+    return this.runDetailsData?.source;
   }
 
   onPopupDismissed(): void {

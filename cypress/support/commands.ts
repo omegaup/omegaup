@@ -20,6 +20,37 @@ Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
   });
 });
 
+// Logins the user as an admin
+Cypress.Commands.add('loginAdmin', () => {
+  const username = 'omegaup';
+  const password = 'omegaup';
+
+  const URL =
+    '/api/user/login?' + buildURLQuery({ usernameOrEmail: username, password });
+  cy.request(URL).then((response) => {
+    expect(response.status).to.equal(200);
+    cy.reload();
+  });
+});
+
+// Logouts the user
+Cypress.Commands.add('logout', () => {
+  cy.get('a[data-nav-user]').click();
+  cy.get('a[data-logout-button]').click();
+  cy.waitUntil(() =>
+    cy.url().should('eq', 'http://127.0.0.1:8001/'),
+  );
+});
+
+// Logouts the user
+Cypress.Commands.add('logoutUsingApi', () => {
+  const URL = '/logout/?redirect=/';
+  cy.request(URL).then((response) => {
+    expect(response.status).to.equal(200);
+    cy.reload();
+  });
+});
+
 // Registers and logs in a new user given a username and password.
 Cypress.Commands.add('register', ({ username, password }: LoginOptions) => {
   const URL =
@@ -38,11 +69,16 @@ Cypress.Commands.add(
     tag,
     autoCompleteTextTag,
     problemLevelIndex,
+    publicAccess = false,
+    firstTimeVisited = true
   }: ProblemOptions) => {
     cy.visit('/');
     // Select problem nav
     cy.get('[data-nav-problems]').click();
     cy.get('[data-nav-problems-create]').click();
+    if (firstTimeVisited) {
+      cy.get('.introjs-skipbutton').click();
+    }
     // Fill basic problem form
     cy.get('[name="title"]').type(problemAlias).blur();
 
@@ -60,6 +96,11 @@ Cypress.Commands.add(
         .should('have.text', tag) // Maybe theres another way to avoid to hardcode this
         .click(),
     );
+
+    if(publicAccess) {
+      cy.get('[data-target=".access"]').click();
+      cy.get('[data-problem-access-radio-yes]').check();
+    }
 
     cy.get('[name="problem-level"]').select(problemLevelIndex); // How can we assert this with the real text?
 
@@ -84,6 +125,7 @@ Cypress.Commands.add(
   }: Partial<CourseOptions> & Pick<CourseOptions, 'courseAlias'>) => {
     cy.get('[data-nav-courses]').click();
     cy.get('[data-nav-courses-create]').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('[data-course-new-name]').type(courseAlias);
     cy.get('[data-course-new-alias]').type(courseAlias);
     cy.get('[name="show-scoreboard"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
@@ -142,16 +184,27 @@ Cypress.Commands.add(
     endDate,
     description = 'Default Description',
     showScoreboard = true,
+    scoreBoardVisibleTime = "100",
     scoreMode = ScoreMode.Partial,
     basicInformation = false,
     requestParticipantInformation = 'no',
-  }) => {
+    differentStart = false,
+    differentStartTime = "",
+  },shouldShowIntro: boolean = true) => {
     cy.visit('contest/new/');
+    if (shouldShowIntro) {
+      cy.get('.introjs-skipbutton').click();
+    }
     cy.get('[name="title"]').type(contestAlias);
     cy.get('[name="alias"]').type(contestAlias);
     cy.get('[name="description"]').type(description);
     cy.get('[data-start-date]').type(getISODateTime(startDate));
     cy.get('[data-end-date]').type(getISODateTime(endDate));
+    cy.get('[data-score-board-visible-time]').clear().type(scoreBoardVisibleTime);
+    if (differentStart) {
+      cy.get('[data-different-start-check]').click();
+      cy.get('[data-different-start-time-input]').type(differentStartTime);
+    }
     cy.get('[data-show-scoreboard-at-end]').select(`${showScoreboard}`); // "true" | "false"
     cy.get('[data-score-mode]').select(`${scoreMode}`);
     if (basicInformation) {
@@ -203,8 +256,7 @@ Cypress.Commands.add(
   ({
     contestAlias,
   }) => {
-    cy.visit('arena/');
-    cy.get(`a[href="/arena/${contestAlias}/"]`).first().click();
+    cy.visit(`arena/${contestAlias}`);
     cy.get('button[data-start-contest]').click();
   },
 );
@@ -215,17 +267,18 @@ Cypress.Commands.add(
     contestAlias,
     problems,
     runs,
+    statusCheck = false,
   }) => {
-    const problem = problems[0];
-    if (!problem) {
-      return;
-    }
-    cy.visit(`/arena/${contestAlias}/#problems`);
-    cy.get(`a[data-problem="${problem.problemAlias}"]`).click();
-
     for (const idx in runs) {
+      const problem = problems[idx];
+      if (!problem) {
+        return;
+      }
+      cy.visit(`/arena/${contestAlias}/#problems`);
+      cy.get(`a[data-problem="${problem.problemAlias}"]`).click();
+
       // Mocking date just a few seconds after to allow create new run
-      cy.clock(new Date(), ['Date']).then((clock) => clock.tick(3000));
+      cy.clock(new Date(), ['Date']).then((clock) => clock.tick(9000));
       cy.get('[data-new-run]').click();
       cy.get('[name="language"]').select(runs[idx].language);
 
@@ -243,8 +296,10 @@ Cypress.Commands.add(
         cy.get('[data-submit-run]').click();
       });
 
-      const expectedStatus: Status = 'AC';
-      cy.get('[data-run-status] > span').first().should('have.text', 'new');
+      if (statusCheck) {
+        continue;
+      }
+      const expectedStatus: Status = runs[idx].status;
       cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
 
       cy.wait(['@runStatus'], { timeout: 10000 }).its(
@@ -253,6 +308,7 @@ Cypress.Commands.add(
       cy.get('[data-run-status] > span')
         .first()
         .should('have.text', expectedStatus);
+      statusCheck = true;
     }
   },
 );
@@ -272,7 +328,8 @@ export const getISODate = (date: Date) => {
  * @returns ISO datetime required to type on a date input inside cypress
  */
 export const getISODateTime = (date: Date) => {
-  return date.toISOString().slice(0, 16);
+  const isoDateTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+  return isoDateTime.slice(0, 16);
 };
 
 /**

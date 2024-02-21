@@ -3,7 +3,7 @@
     <div class="container-fluid" data-feedback-code-mirror>
       <textarea v-show="false" ref="cm-editor" v-model="value"></textarea>
     </div>
-    <div class="container-fluid text-right py-2">
+    <div v-if="!readonly" class="container-fluid text-right py-2">
       <button
         class="btn btn-primary mx-2"
         :disabled="!numberOfComments"
@@ -16,13 +16,17 @@
 </template>
 
 <script lang="ts">
+// TODO: Only display the gutters in the component if the logged-in user is an
+// admin or teaching assistant.
 import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
 import T from '../../lang';
 import CodeMirror from 'codemirror';
 import { EditorOptions, languageModeMap, modeList } from './CodeView.vue';
 import Feedback, { ArenaCourseFeedback, FeedbackStatus } from './Feedback.vue';
+import FeedbackThread from './FeedbackThread.vue';
 
 const FeedbackClass = Vue.extend(Feedback);
+const FeedbackThreadClass = Vue.extend(FeedbackThread);
 
 for (const mode of modeList) {
   require(`codemirror/mode/${mode}/${mode}.js`);
@@ -34,19 +38,24 @@ for (const mode of modeList) {
 export default class FeedbackCodeView extends Vue {
   @Prop() language!: string;
   @Prop() value!: string;
+  @Prop({ default: true }) readonly!: boolean;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackMap!: Map<number, ArenaCourseFeedback>;
+  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
+  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
   @Ref('cm-editor') private readonly cmEditor!: HTMLTextAreaElement;
+  @Prop() currentUsername!: string;
+  @Prop() currentUserClassName!: string;
 
   T = T;
   mode = languageModeMap[this.language] ?? languageModeMap['cpp17-gcc'];
   mapChangeTracker = 1;
 
-  get feedbackList(): [number, ArenaCourseFeedback][] {
+  get feedbackList(): ArenaCourseFeedback[] {
     if (!this.mapChangeTracker) {
       throw new Error('unreachable code');
     }
-    return Array.from(this.feedbackMap);
+    return Array.from(this.feedbackMap.values());
   }
 
   get numberOfComments(): number {
@@ -59,12 +68,99 @@ export default class FeedbackCodeView extends Vue {
       lineNumbers: true,
       mode: this.mode,
       readOnly: true,
-      gutters: ['CodeMirror-linenumbers', 'breakpoints'],
+      gutters: ['CodeMirror-linenumbers', 'custom-gutter'],
     };
   }
 
   mounted() {
     const editor = CodeMirror.fromTextArea(this.cmEditor, this.editorOptions);
+
+    for (const [feedbackKey, feedback] of this.feedbackMap) {
+      const feedbackForm = new FeedbackClass({
+        propsData: { feedback },
+      });
+      feedbackForm.$mount();
+
+      editor.addLineWidget(
+        feedback.lineNumber,
+        feedbackForm.$el as HTMLElement,
+        {
+          className: 'px-2',
+        },
+      );
+
+      const feedbackThreadMap = [...this.feedbackThreadMap]
+        .filter(
+          ([, feedbackThreadValue]) =>
+            feedbackThreadValue.lineNumber == feedbackKey,
+        )
+        .sort(
+          (
+            a: [number, ArenaCourseFeedback],
+            b: [number, ArenaCourseFeedback],
+          ) => a[0] - b[0],
+        );
+      for (const [, feedbackThread] of feedbackThreadMap) {
+        const feedbackThreadForm = new FeedbackThreadClass({
+          propsData: {
+            feedbackThread,
+            saved: true,
+          },
+        });
+        feedbackThreadForm.$mount();
+        editor.addLineWidget(
+          feedback.lineNumber,
+          feedbackThreadForm.$el as HTMLElement,
+          {
+            className: 'px-2',
+          },
+        );
+
+        feedbackThreadForm.$on(
+          'submit-feedback-thread',
+          (feedbackThread: ArenaCourseFeedback) => {
+            this.$emit('submit-feedback-thread', {
+              ...feedbackThread,
+              submissionFeedbackId: feedback.submissionFeedbackId,
+            });
+          },
+        );
+      }
+
+      const feedbackThreadNewForm = new FeedbackThreadClass({
+        propsData: {
+          feedbackThread: {
+            lineNumber: feedback.lineNumber,
+            text: null,
+            status: FeedbackStatus.New,
+            author: this.currentUsername,
+            authorClassname: this.currentUserClassName,
+          },
+        },
+      });
+      feedbackThreadNewForm.$mount();
+      editor.addLineWidget(
+        feedback.lineNumber,
+        feedbackThreadNewForm.$el as HTMLElement,
+        {
+          className: 'px-2',
+        },
+      );
+
+      feedbackThreadNewForm.$on(
+        'submit-feedback-thread',
+        (feedbackThread: ArenaCourseFeedback) => {
+          this.$emit('submit-feedback-thread', {
+            ...feedbackThread,
+            submissionFeedbackId: feedback.submissionFeedbackId,
+          });
+        },
+      );
+    }
+
+    if (this.readonly) {
+      return;
+    }
 
     editor.on(
       'gutterClick',
@@ -112,13 +208,6 @@ export default class FeedbackCodeView extends Vue {
           editor.removeLineWidget(lineWidget);
           feedbackForm.$destroy();
         });
-
-        Vue.nextTick(() => {
-          // Now that the DOM has changed, we need to tell CodeMirror to
-          // recalculate the height of the line widget so that it knows which y
-          // coordinate corresponds to which line.
-          lineWidget.changed();
-        });
       },
     );
   }
@@ -148,8 +237,8 @@ export default class FeedbackCodeView extends Vue {
   saveFeedbackList(): void {
     this.$emit(
       'save-feedback-list',
-      this.feedbackList.map(([lineNumber, feedback]) => ({
-        lineNumber,
+      this.feedbackList.map((feedback) => ({
+        lineNumber: feedback.lineNumber,
         feedback: feedback.text,
       })),
     );

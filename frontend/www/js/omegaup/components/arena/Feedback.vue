@@ -1,9 +1,19 @@
 <template>
   <div class="card">
     <div class="card-header">
-      {{ !saved ? T.runDetailsNewFeedback : T.runDetailsFeedbackCreated }}
+      <template v-if="!saved">
+        {{ T.runDetailsNewFeedback }}
+      </template>
+      <template v-else>
+        <omegaup-user-username
+          :classname="feedback.authorClassname"
+          :username="feedback.author"
+          :linkify="true"
+        ></omegaup-user-username>
+        {{ currentFeedbackTimestamp }}
+      </template>
       <button
-        v-if="saved"
+        v-if="currentFeedback.status === FeedbackStatus.InProgress"
         class="close btn-sm"
         type="button"
         @click.prevent="onDeleteFeedback"
@@ -50,23 +60,32 @@
 <script lang="ts">
 import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
 import T from '../../lang';
+import * as time from '../../time';
+import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
 
 export enum FeedbackStatus {
   New = 'New',
   InProgress = 'InProgress',
   Saved = 'Saved',
+  Updated = 'Updated',
+  Deleted = 'Deleted',
 }
 
 export interface ArenaCourseFeedback {
+  author?: string;
+  authorClassname?: string;
   lineNumber: number;
   text: null | string;
   status: FeedbackStatus;
+  timestamp?: Date;
+  submissionFeedbackId?: number;
 }
 
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class Feedback extends Vue {
@@ -75,10 +94,16 @@ export default class Feedback extends Vue {
 
   FeedbackStatus = FeedbackStatus;
   T = T;
-  saved: boolean = false;
+  time = time;
+  saved: boolean = this.feedback.status == FeedbackStatus.Saved;
   currentFeedback = this.feedback;
 
+  get currentFeedbackTimestamp(): string {
+    return time.formatDateTimeLocal(this.feedback.timestamp ?? new Date());
+  }
+
   mounted() {
+    if (this.feedback.status === FeedbackStatus.Saved) return;
     this.$nextTick(() => this.feedbackForm.focus());
   }
 

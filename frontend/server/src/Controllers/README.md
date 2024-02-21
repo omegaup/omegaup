@@ -8,6 +8,11 @@
   - [`/api/badge/myBadgeAssignationTime/`](#apibadgemybadgeassignationtime)
   - [`/api/badge/myList/`](#apibadgemylist)
   - [`/api/badge/userList/`](#apibadgeuserlist)
+- [Certificate](#certificate)
+  - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
+  - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
+  - [`/api/certificate/getUserCertificates/`](#apicertificategetusercertificates)
+  - [`/api/certificate/validateCertificate/`](#apicertificatevalidatecertificate)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
   - [`/api/clarification/details/`](#apiclarificationdetails)
@@ -30,6 +35,7 @@
   - [`/api/contest/create/`](#apicontestcreate)
   - [`/api/contest/createVirtual/`](#apicontestcreatevirtual)
   - [`/api/contest/details/`](#apicontestdetails)
+  - [`/api/contest/getNumberOfContestants/`](#apicontestgetnumberofcontestants)
   - [`/api/contest/list/`](#apicontestlist)
   - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
   - [`/api/contest/myList/`](#apicontestmylist)
@@ -186,6 +192,7 @@
   - [`/api/run/create/`](#apiruncreate)
   - [`/api/run/details/`](#apirundetails)
   - [`/api/run/disqualify/`](#apirundisqualify)
+  - [`/api/run/getSubmissionFeedback/`](#apirungetsubmissionfeedback)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
   - [`/api/run/requalify/`](#apirunrequalify)
@@ -386,6 +393,81 @@ Returns a list of badges owned by a certain user
 | -------- | --------------- |
 | `badges` | `types.Badge[]` |
 
+# Certificate
+
+CertificateController
+
+## `/api/certificate/generateContestCertificates/`
+
+### Description
+
+Generates all the certificates for a contest given its contest alias.
+
+### Parameters
+
+| Name                  | Type           | Description |
+| --------------------- | -------------- | ----------- |
+| `certificates_cutoff` | `int\|null`    |             |
+| `contest_alias`       | `string\|null` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/certificate/getCertificatePdf/`
+
+### Description
+
+API to generate the certificate PDF
+
+### Parameters
+
+| Name                | Type     | Description |
+| ------------------- | -------- | ----------- |
+| `verification_code` | `string` |             |
+
+### Returns
+
+| Name          | Type     |
+| ------------- | -------- |
+| `certificate` | `string` |
+
+## `/api/certificate/getUserCertificates/`
+
+### Description
+
+Get all the certificates belonging to a user
+
+### Parameters
+
+| Name      | Type        | Description |
+| --------- | ----------- | ----------- |
+| `user_id` | `int\|null` |             |
+
+### Returns
+
+| Name           | Type                          |
+| -------------- | ----------------------------- |
+| `certificates` | `types.CertificateListItem[]` |
+
+## `/api/certificate/validateCertificate/`
+
+### Description
+
+API to validate a certificate
+
+### Parameters
+
+| Name                | Type     | Description |
+| ------------------- | -------- | ----------- |
+| `verification_code` | `string` |             |
+
+### Returns
+
+| Name    | Type      |
+| ------- | --------- |
+| `valid` | `boolean` |
+
 # Clarification
 
 Description of ClarificationController
@@ -549,7 +631,9 @@ Adds a problem to a contest
 
 ### Returns
 
-_Nothing_
+| Name             | Type     |
+| ---------------- | -------- |
+| `solutionStatus` | `string` |
 
 ## `/api/contest/addUser/`
 
@@ -803,6 +887,22 @@ in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
 ```typescript
 types.ContestDetails;
 ```
+
+## `/api/contest/getNumberOfContestants/`
+
+### Description
+
+### Parameters
+
+| Name          | Type     | Description |
+| ------------- | -------- | ----------- |
+| `contest_ids` | `string` |             |
+
+### Returns
+
+| Name       | Type                         |
+| ---------- | ---------------------------- |
+| `response` | `{ [key: number]: number; }` |
 
 ## `/api/contest/list/`
 
@@ -1466,7 +1566,9 @@ Adds a problem to an assignment
 
 ### Returns
 
-_Nothing_
+| Name             | Type     |
+| ---------------- | -------- |
+| `solutionStatus` | `string` |
 
 ## `/api/course/addStudent/`
 
@@ -2116,8 +2218,10 @@ Returns all runs for a course
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | `assignment_alias` | `string`                                                                                                                                                                                                            |             |
 | `course_alias`     | `string`                                                                                                                                                                                                            |             |
+| `execution`        | `'EXECUTION_COMPILATION_ERROR'\|'EXECUTION_FINISHED'\|'EXECUTION_INTERRUPTED'\|'EXECUTION_JUDGE_ERROR'\|'EXECUTION_RUNTIME_ERROR'\|'EXECUTION_RUNTIME_FUNCTION_ERROR'\|'EXECUTION_VALIDATOR_ERROR'\|null`           |             |
 | `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |
 | `offset`           | `int\|null`                                                                                                                                                                                                         |             |
+| `output`           | `'OUTPUT_CORRECT'\|'OUTPUT_EXCEEDED'\|'OUTPUT_INCORRECT'\|'OUTPUT_INTERRUPTED'\|null`                                                                                                                               |             |
 | `problem_alias`    | `null\|string`                                                                                                                                                                                                      |             |
 | `rowcount`         | `int\|null`                                                                                                                                                                                                         |             |
 | `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |
@@ -2370,9 +2474,9 @@ array instead of an object since it is used by typeahead.
 
 ### Parameters
 
-| Name    | Type           | Description |
-| ------- | -------------- | ----------- |
-| `query` | `null\|string` |             |
+| Name    | Type     | Description |
+| ------- | -------- | ----------- |
+| `query` | `string` |             |
 
 ### Returns
 
@@ -3099,8 +3203,10 @@ Entry point for Problem runs API
 
 | Name            | Type           | Description |
 | --------------- | -------------- | ----------- |
+| `execution`     | `null\|string` |             |
 | `language`      | `null\|string` |             |
 | `offset`        | `int\|null`    |             |
+| `output`        | `null\|string` |             |
 | `problem_alias` | `null\|string` |             |
 | `rowcount`      | `int\|null`    |             |
 | `show_all`      | `bool\|null`   |             |
@@ -3775,7 +3881,37 @@ types.RunDetails;
 
 ### Description
 
-Disqualify a submission
+Disqualify one or more submissions based on the received parameters:
+
+- When a run_alias is provided, it will only disqualify a single
+  submission.
+- When run_alias is not provided, both the username and the contest_alias
+  are required.
+- If a problem_alias is provided, all submissions belonging to the user
+  for this problem and contest will be disqualified.
+- If a problem_alias is not provided, all submissions belonging to the
+  user in this contest will be disqualified.
+
+### Parameters
+
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `contest_alias` | `null\|string` |             |
+| `problem_alias` | `null\|string` |             |
+| `run_alias`     | `null\|string` |             |
+| `username`      | `null\|string` |             |
+
+### Returns
+
+| Name   | Type                                    |
+| ------ | --------------------------------------- |
+| `runs` | `{ guid: string; username: string; }[]` |
+
+## `/api/run/getSubmissionFeedback/`
+
+### Description
+
+Get all the comments related to a submission feedback
 
 ### Parameters
 
@@ -3785,7 +3921,9 @@ Disqualify a submission
 
 ### Returns
 
-_Nothing_
+```typescript
+types.SubmissionFeedback[]
+```
 
 ## `/api/run/list/`
 
@@ -3874,9 +4012,10 @@ Get basic details of a run
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
+| Name        | Type           | Description |
+| ----------- | -------------- | ----------- |
+| `run_alias` | `string`       |             |
+| `username`  | `null\|string` |             |
 
 ### Returns
 
@@ -3999,22 +4138,26 @@ SubmissionController
 
 ### Description
 
-Updates the admin feedback for a submission
+Updates the admin feedback for a submission or creates the request feedback
 
 ### Parameters
 
-| Name                | Type        | Description |
-| ------------------- | ----------- | ----------- |
-| `assignment_alias`  | `string`    |             |
-| `course_alias`      | `string`    |             |
-| `feedback`          | `string`    |             |
-| `guid`              | `string`    |             |
-| `range_bytes_end`   | `int\|null` |             |
-| `range_bytes_start` | `int\|null` |             |
+| Name                     | Type        | Description |
+| ------------------------ | ----------- | ----------- |
+| `assignment_alias`       | `string`    |             |
+| `course_alias`           | `string`    |             |
+| `feedback`               | `string`    |             |
+| `guid`                   | `string`    |             |
+| `range_bytes_end`        | `int\|null` |             |
+| `range_bytes_start`      | `int\|null` |             |
+| `submission_feedback_id` | `int\|null` |             |
 
 ### Returns
 
-_Nothing_
+| Name                       | Type                           |
+| -------------------------- | ------------------------------ |
+| `submissionFeedback`       | `dao.SubmissionFeedback`       |
+| `submissionFeedbackThread` | `dao.SubmissionFeedbackThread` |
 
 # Tag
 
@@ -4612,9 +4755,9 @@ Returns a list of all the API tokens associated with the user.
 
 ### Returns
 
-| Name     | Type                                                                                                                    |
-| -------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `tokens` | `{ last_used: Date; name: string; rate_limit: { limit: number; remaining: number; reset: Date; }; timestamp: Date; }[]` |
+| Name     | Type               |
+| -------- | ------------------ |
+| `tokens` | `types.ApiToken[]` |
 
 ## `/api/user/listAssociatedIdentities/`
 
@@ -4883,7 +5026,7 @@ Update user profile
 | `scholar_degree`            | `null\|string`                               |             |
 | `school_id`                 | `int\|null`                                  |             |
 | `school_name`               | `null\|string`                               |             |
-| `username`                  | `mixed`                                      |             |
+| `username`                  | `null\|string`                               |             |
 
 ### Returns
 

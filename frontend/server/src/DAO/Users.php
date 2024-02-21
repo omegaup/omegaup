@@ -362,6 +362,18 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 $identity->identity_id,
             ];
             \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+            $sql = '
+                UPDATE
+                    `Emails`
+                SET
+                    `email` = ?
+                WHERE
+                    `user_id` = ?;';
+            $params = [
+                "deleted_user_{$randomString}@{$randomString}",
+                $identity->user_id,
+            ];
+            \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
@@ -478,5 +490,30 @@ class Users extends \OmegaUp\DAO\Base\Users {
             return null;
         }
         return new \OmegaUp\DAO\VO\Users($result);
+    }
+
+    /**
+     * @return list<array{email: null|string, name: null|string, username: string}>
+     */
+    public static function getUserDependents(\OmegaUp\DAO\VO\Users $user): array {
+        $sql = 'SELECT
+                    i.name,
+                    i.username,
+                    e.email
+                FROM
+                    Users u
+                INNER JOIN
+                    Identities i ON u.main_identity_id = i.identity_id
+                LEFT JOIN
+                    Emails e ON u.main_email_id = e.email_id
+                WHERE
+                    u.parent_email_id = ?';
+
+        /** @var list<array{email: null|string, name: null|string, username: string}> */
+        $dependents = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [ $user->main_email_id ]
+        );
+        return $dependents;
     }
 }

@@ -1,7 +1,7 @@
 <template>
   <div v-if="isAdmin || generalFeedback" data-submission-feedback>
     <h3>{{ T.feedbackTitle }}</h3>
-    <pre><code>{{
+    <pre data-run-feedback><code>{{
       generalFeedback ? generalFeedback.feedback : T.feedbackNotSentYet
     }}</code></pre>
     <div v-if="generalFeedback">
@@ -17,19 +17,27 @@
       ></omegaup-user-username>
     </div>
     <div v-if="isAdmin" class="feedback-section">
-      <a role="button" @click="showFeedbackForm = !showFeedbackForm">{{
-        !generalFeedback
-          ? T.submissionFeedbackSendButton
-          : T.submissionFeedbackUpdateButton
-      }}</a>
+      <a
+        data-run-leave-feedback-button
+        role="button"
+        class="btn btn-sm btn-primary"
+        @click="showFeedbackForm = !showFeedbackForm"
+        >{{
+          !generalFeedback
+            ? T.submissionFeedbackSendButton
+            : T.submissionFeedbackUpdateButton
+        }}</a
+      >
       <div v-show="showFeedbackForm" class="form-group">
         <textarea
           v-model="feedback"
+          data-run-feedback-text
           class="form-control"
           rows="3"
           maxlength="200"
         ></textarea>
         <button
+          data-run-send-feedback-button
           class="btn btn-sm btn-primary"
           :disabled="!feedback"
           @click.prevent="
@@ -78,12 +86,11 @@ export default class SubmissionFeedback extends Vue {
   feedback = this.generalFeedback?.feedback ?? null;
 
   get generalFeedback(): null | types.SubmissionFeedback {
+    if (!this.feedbackOptions.length) return null;
     const [feedback] = this.feedbackOptions.filter(
-      (feedback) =>
-        feedback.range_bytes_start === undefined ||
-        feedback.range_bytes_start === null,
+      (feedback) => feedback.range_bytes_start == null,
     );
-    return feedback ?? null;
+    return feedback;
   }
 }
 </script>

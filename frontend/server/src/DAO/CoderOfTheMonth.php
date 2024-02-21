@@ -17,7 +17,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * time period.
      * category.
      *
-     * @return list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}>
+     * @return list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, email: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}>
      */
     public static function getCandidatesToCoderOfTheMonth(
         string $time,
@@ -32,20 +32,25 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             {$fields},
             i.username,
             IFNULL(i.country_id, 'xx') AS country_id,
-            IFNULL(ur.classname, 'user-rank-unranked') AS classname
+            IFNULL(ur.classname, 'user-rank-unranked') AS classname,
+            e.email
           FROM
             Coder_Of_The_Month cm
           INNER JOIN
             Identities AS i ON i.user_id = cm.user_id
           LEFT JOIN
             User_Rank ur ON ur.user_id = cm.user_id
+          LEFT JOIN
+            Users u ON i.user_id = u.user_id
+          LEFT JOIN
+            Emails e ON u.main_email_id = e.email_id
           WHERE
             `time` = ? AND
             category = ?
           LIMIT ?;
         ";
 
-        /** @var list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}> */
+        /** @var list<array{category: string, certificate_status: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, email: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$time, $category, $rowCount]
@@ -54,7 +59,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
     /**
      * Get all first coders of the month
-     * @return list<array{time: string, username: string, country_id: string, email: string|null, classname: string}>
+     * @return list<array{classname: string, country_id: string, email: null|string, time: string, username: string}>
      */
     final public static function getCodersOfTheMonth(string $category = 'all'): array {
         $date = date('Y-m-01', \OmegaUp\Time::get());
@@ -242,7 +247,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
                     category = ?
                 AND
                     `selected_by` {$clause};";
-        /** @var list<array{category: string, coder_of_the_month_id: int, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int}> */
+        /** @var list<array{category: string, certificate_status: string, coder_of_the_month_id: int, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$time,$category]
@@ -274,7 +279,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
                     `time` = ? AND
                     category = ?;';
 
-        /** @var list<array{category: string, coder_of_the_month_id: int, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int}> */
+        /** @var list<array{category: string, certificate_status: string, coder_of_the_month_id: int, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$time, $category]

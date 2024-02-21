@@ -115,16 +115,16 @@ class Scoreboard {
             );
         }
 
-        /** @var array<int, array{order: int, alias: string}> */
+        /** @var array<int, array{order: int, alias: string, maxScore: int}> */
         $problemMapping = [];
 
         $order = 0;
-        /** @var \OmegaUp\DAO\VO\Problems $problem */
         foreach ($rawProblemsetProblems as $problem) {
-            /** @var int $problem->problem_id */
-            $problemMapping[$problem->problem_id] = [
+            /** @var int $problem['problem_id'] */
+            $problemMapping[$problem['problem_id']] = [
                 'order' => $order++,
-                'alias' => strval($problem->alias),
+                'alias' => strval($problem['alias']),
+                'maxScore' => intval($problem['points']),
             ];
         }
 
@@ -228,12 +228,12 @@ class Scoreboard {
         $problemMapping = [];
 
         $order = 0;
-        /** @var \OmegaUp\DAO\VO\Problems $problem */
         foreach ($rawProblemsetProblems as $problem) {
-            /** @var int $problem->problem_id */
-            $problemMapping[$problem->problem_id] = [
+            /** @var int $problem['problem_id'] */
+            $problemMapping[$problem['problem_id']] = [
                 'order' => $order++,
-                'alias' => strval($problem->alias),
+                'alias' => strval($problem['alias']),
+                'maxScore' => intval($problem['points']),
             ];
         }
 
@@ -244,7 +244,7 @@ class Scoreboard {
             $problemMapping
         );
 
-        $timeout =  is_null($this->params->finish_time) ?
+        $timeout = is_null($this->params->finish_time) ?
             0 :
             max(
                 0,
@@ -302,9 +302,6 @@ class Scoreboard {
                 'problemsetNotFound'
             );
         }
-        $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
-            $params->problemset_id
-        );
 
         // Get all distinct contestants participating in the contest
         $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
@@ -326,18 +323,31 @@ class Scoreboard {
         $problemMapping = [];
 
         $order = 0;
-        /** @var \OmegaUp\DAO\VO\Problems $problem */
         foreach ($rawProblemsetProblems as $problem) {
-            /** @var int $problem->problem_id */
-            $problemMapping[$problem->problem_id] = [
+            /** @var int $problem['problem_id'] */
+            $problemMapping[$problem['problem_id']] = [
                 'order' => $order++,
-                'alias' => strval($problem->alias),
+                'alias' => strval($problem['alias']),
+                'maxScore' => intval($problem['points']),
             ];
         }
 
         $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitTimestamp(
             $params
         );
+
+        $contestRunsForEvents = \OmegaUp\DAO\Runs::getProblemsetRuns(
+            $params->problemset_id
+        );
+        if ($params->score_mode === 'max_per_group') {
+            // The way to calculate the score is different in this mode
+            $contestRuns = \OmegaUp\DAO\RunsGroups::getProblemsetRunsGroups(
+                $params->problemset_id,
+                $scoreboardTimeLimit
+            );
+        } else {
+            $contestRuns = $contestRunsForEvents;
+        }
 
         // Cache scoreboard until the contest ends (or forever if it has already ended).
         // Contestant cache
@@ -375,7 +385,7 @@ class Scoreboard {
         );
         $contestantEventCache->set(\OmegaUp\Scoreboard::calculateEvents(
             $params,
-            $contestRuns,
+            $contestRunsForEvents,
             $rawContestIdentities,
             $problemMapping
         ), $timeout);
@@ -415,7 +425,7 @@ class Scoreboard {
         );
         $adminEventCache->set(\OmegaUp\Scoreboard::calculateEvents(
             $params,
-            $contestRuns,
+            $contestRunsForEvents,
             $rawContestIdentities,
             $problemMapping
         ), $timeout);
@@ -784,7 +794,7 @@ class Scoreboard {
      * @param \OmegaUp\ScoreboardParams $params
      * @param list<array{contest_score: float, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}> $contestRuns
      * @param list<array{identity_id: int, username: string, classname: string, name: string|null, country_id: null|string, is_invited: bool}> $rawContestIdentities
-     * @param array<int, array{order: int, alias: string}> $problemMapping
+     * @param array<int, array{order: int, alias: string, maxScore: int}> $problemMapping
      * @return list<ScoreboardEvent>
      */
     private static function calculateEvents(
@@ -817,8 +827,9 @@ class Scoreboard {
             }
 
             if (
-                !is_null($scoreboardTimeLimit) &&
-                $run['time']->time >= $scoreboardTimeLimit->time
+                !is_null($scoreboardTimeLimit)
+                && !empty($run['time'])
+                && $run['time']->time >= $scoreboardTimeLimit->time
             ) {
                 continue;
             }
@@ -826,11 +837,18 @@ class Scoreboard {
             $identityId = $run['identity_id'];
             $problemId = $run['problem_id'];
             if ($params->score_mode === 'max_per_group') {
+                if (!isset($run['score_by_group'])) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterInvalid',
+                        'score_by_group'
+                    );
+                }
                 $contestScore = self::getMaxPerGroupScore(
                     $identityProblemsScoreByGroup,
                     $run['score_by_group'],
                     $identityId,
-                    $problemId
+                    $problemId,
+                    $problemMapping[$problemId]['maxScore']
                 );
             } else {
                 $contestScore = $run['contest_score'];
@@ -927,7 +945,8 @@ class Scoreboard {
         array &$identityProblemsScoreByGroup,
         ?string $scoreByGroup,
         int $identityId,
-        int $problemId
+        int $problemId,
+        int $maxScore
     ): float {
         if (is_null($scoreByGroup)) {
             return 0.0;
@@ -963,7 +982,7 @@ class Scoreboard {
 
         return array_sum(
             $identityProblemsScoreByGroup[$identityId][$problemId]
-        );
+        ) * $maxScore;
     }
 
     /**

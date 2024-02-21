@@ -1,9 +1,10 @@
 <template>
   <div class="card">
-    <h5 v-if="title" class="card-header">
-      {{ title }} <span class="badge badge-secondary">{{ items.length }}</span>
+    <h6 v-if="title" class="card-header">
+      {{ title }}
+      <span class="badge badge-secondary">{{ filteredItems.length }}</span>
       <slot name="header-link"></slot>
-    </h5>
+    </h6>
     <div v-if="sortOptions.length > 0" class="card-body text-center">
       <div class="form-check form-check-inline">
         <label
@@ -23,7 +24,7 @@
       </div>
     </div>
     <table
-      v-if="items.length > 0"
+      v-if="filteredItems.length > 0"
       class="table table-striped mb-0 table-responsive col-12 table-typo"
     >
       <slot name="table-header"></slot>
@@ -50,11 +51,24 @@
         </tr>
       </tbody>
     </table>
-    <div v-if="items.length > 0" class="card-footer text-center">
+    <form
+      v-if="shouldShowFilterInput"
+      class="form-inline m-3"
+      @submit.prevent=""
+    >
+      <input
+        v-model="filter"
+        class="form-control mr-sm-2 mb-2"
+        type="search"
+        :placeholder="filterByProblemText"
+      />
+    </form>
+    <div v-if="filteredItems.length > 0" class="card-footer text-center">
       <div class="btn-group" role="group">
         <button
           class="btn btn-primary"
           type="button"
+          data-button-previous
           :disabled="totalPagesCount === 1 || currentPageNumber === 0"
           @click="previousPage"
         >
@@ -63,6 +77,7 @@
         <button
           class="btn btn-primary"
           type="button"
+          data-button-next
           :disabled="
             totalPagesCount === 1 || currentPageNumber >= totalPagesCount - 1
           "
@@ -97,12 +112,15 @@ export default class GridPaginator extends Vue {
   @Prop({ default: 3 }) columns!: number;
   @Prop() title!: string;
   @Prop({ default: false }) showPageOffset!: boolean;
+  @Prop({ default: false }) shouldShowFilterInput!: boolean;
   @Prop({ default: () => [] }) sortOptions!: SortOption[];
 
   private T = T;
   private currentPageNumber = 0;
   private currentSortOption =
     this.sortOptions.length > 0 ? this.sortOptions[0].value : '';
+  filter: null | string = null;
+  filteredItems: LinkableResource[] = this.items;
 
   private nextPage(): void {
     this.currentPageNumber++;
@@ -113,7 +131,7 @@ export default class GridPaginator extends Vue {
   }
 
   private get totalPagesCount(): number {
-    const totalRows = Math.ceil(this.items.length / this.columns);
+    const totalRows = Math.ceil(this.filteredItems.length / this.columns);
     return Math.ceil(totalRows / this.rowsPerPage);
   }
 
@@ -123,8 +141,8 @@ export default class GridPaginator extends Vue {
 
   private get itemsRows(): LinkableResource[][] {
     const groups = [];
-    for (let i = 0; i < this.items.length; i += this.columns) {
-      groups.push(this.items.slice(i, i + this.columns));
+    for (let i = 0; i < this.filteredItems.length; i += this.columns) {
+      groups.push(this.filteredItems.slice(i, i + this.columns));
     }
     return groups;
   }
@@ -133,6 +151,17 @@ export default class GridPaginator extends Vue {
     const start = this.currentPageNumber * this.rowsPerPage;
     const end = start + this.rowsPerPage;
     return this.itemsRows.slice(start, end);
+  }
+
+  get filterByProblemText(): string {
+    return T.userProfileProblemsFilter;
+  }
+
+  @Watch('filter')
+  onFilterChange(newFilter: string) {
+    this.filteredItems = this.items.filter((item: LinkableResource) =>
+      item.toString().toLowerCase().includes(newFilter.toLowerCase()),
+    );
   }
 
   @Watch('currentSortOption')

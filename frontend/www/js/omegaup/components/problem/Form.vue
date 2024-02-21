@@ -15,7 +15,7 @@
         </strong>
       </p>
     </div>
-    <div class="card-body">
+    <div class="card-body px-2 px-sm-4">
       <form ref="form" method="POST" class="form" enctype="multipart/form-data">
         <div class="accordion mb-3">
           <div class="card">
@@ -34,9 +34,9 @@
                 </button>
               </h2>
             </div>
-            <div class="collapse show card-body basic-info">
+            <div class="collapse show card-body px-2 px-sm-4 basic-info">
               <div class="row">
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 introjs-title">
                   <label class="control-label">{{ T.wordsTitle }}</label>
                   <input
                     v-model="title"
@@ -48,7 +48,7 @@
                     @blur="onGenerateAlias"
                   />
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 introjs-short-title">
                   <label class="control-label">{{ T.wordsAlias }}</label>
                   <input
                     ref="alias"
@@ -65,7 +65,7 @@
                 </div>
               </div>
               <div class="row">
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 introjs-origin">
                   <label class="control-label">{{ T.problemEditSource }}</label>
                   <input
                     v-model="source"
@@ -76,7 +76,7 @@
                     :class="{ 'is-invalid': errors.includes('source') }"
                   />
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 introjs-file">
                   <label class="control-label">{{
                     T.problemEditFormFile
                   }}</label>
@@ -112,37 +112,40 @@
                   </button>
                 </h2>
               </div>
-              <div class="collapse show card-body tags">
+              <div class="collapse show card-body px-2 px-sm-4 tags">
                 <div
-                  v-show="selectedTags.length === 0"
+                  v-show="selectedTags.length === 0 && currentLanguages !== ''"
                   class="alert alert-info"
                 >
                   {{ T.problemEditTagPublicRequired }}
                 </div>
-                <omegaup-problem-tags
-                  :public-tags="data.publicTags"
-                  :level-tags="data.levelTags"
-                  :alias="data.alias"
-                  :is-create="true"
-                  :problem-level="problemLevel"
-                  :selected-private-tags="selectedPrivateTags"
-                  :selected-public-tags="selectedPublicTags"
-                  :can-add-new-tags="true"
-                  :errors="errors"
-                  @emit-add-tag="addTag"
-                  @emit-remove-tag="removeTag"
-                  @select-problem-level="selectProblemLevel"
-                ></omegaup-problem-tags>
-                <input
-                  name="selected_tags"
-                  :value="selectedTagsList"
-                  type="hidden"
-                />
-                <input
-                  name="problem_level"
-                  :value="problemLevel"
-                  type="hidden"
-                />
+                <div class="introjs-tags-and-level">
+                  <omegaup-problem-tags
+                    :public-tags="data.publicTags"
+                    :level-tags="data.levelTags"
+                    :alias="data.alias"
+                    :is-create="true"
+                    :problem-level="problemLevel"
+                    :selected-private-tags="selectedPrivateTags"
+                    :selected-public-tags="selectedPublicTags"
+                    :can-add-new-tags="true"
+                    :errors="errors"
+                    :is-lecture="currentLanguages === ''"
+                    @emit-add-tag="addTag"
+                    @emit-remove-tag="removeTag"
+                    @select-problem-level="selectProblemLevel"
+                  ></omegaup-problem-tags>
+                  <input
+                    name="selected_tags"
+                    :value="selectedTagsList"
+                    type="hidden"
+                  />
+                  <input
+                    name="problem_level"
+                    :value="problemLevel"
+                    type="hidden"
+                  />
+                </div>
               </div>
             </div>
           </template>
@@ -161,9 +164,9 @@
                 </button>
               </h2>
             </div>
-            <div class="card-body validation">
+            <div class="card-body px-2 px-sm-4 validation">
               <div class="row">
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 introjs-type">
                   <label>{{ T.problemEditFormLanguages }}</label>
                   <select
                     v-model="currentLanguages"
@@ -181,7 +184,7 @@
                     </option>
                   </select>
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 introjs-validator">
                   <label>{{ T.problemEditFormValidatorType }}</label>
                   <select
                     v-model="validator"
@@ -219,7 +222,7 @@
                 </button>
               </h2>
             </div>
-            <div class="collapse card-body limits">
+            <div class="collapse card-body px-2 px-sm-4 limits">
               <omegaup-problem-settings
                 :errors="errors"
                 :current-languages="currentLanguages"
@@ -231,6 +234,7 @@
                 :overall-wall-time-limit="overallWallTimeLimit"
                 :validator="validator"
                 :validator-time-limit="validatorTimeLimit"
+                :has-visited-section="hasVisitedSection"
               ></omegaup-problem-settings>
             </div>
           </div>
@@ -249,7 +253,7 @@
                 </button>
               </h2>
             </div>
-            <div class="collapse card-body access">
+            <div class="collapse card-body px-2 px-sm-4 access">
               <div class="row">
                 <div class="form-group col-md-6">
                   <label>{{ T.problemEditEmailClarifications }}</label>
@@ -286,6 +290,7 @@
                     <label class="form-check form-check-inline">
                       <input
                         v-model="isPublic"
+                        data-problem-access-radio-yes
                         type="radio"
                         name="visibility"
                         class="form-check-input"
@@ -326,7 +331,7 @@
                   </button>
                 </h2>
               </div>
-              <div class="collapse card-body evaluation">
+              <div class="collapse card-body px-2 px-sm-4 evaluation">
                 <div class="row">
                   <div class="form-group col-md-6">
                     <label>{{ T.wordsShowCasesDiff }}</label>
@@ -451,6 +456,10 @@ import problem_Tags from './Tags.vue';
 import T from '../../lang';
 import latinize from 'latinize';
 import { types } from '../../api_types';
+import 'intro.js/introjs.css';
+import introJs from 'intro.js';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 @Component({
   components: {
@@ -463,6 +472,7 @@ export default class ProblemForm extends Vue {
   @Prop({ default: () => [] }) errors!: string[];
   @Prop({ default: false }) isUpdate!: boolean;
   @Prop({ default: 0 }) originalVisibility!: number;
+  @Prop({ default: true }) hasVisitedSection!: boolean;
 
   @Ref('basic-info') basicInfoRef!: HTMLDivElement;
   @Ref('tags') tagsRef!: HTMLDivElement;
@@ -496,6 +506,65 @@ export default class ProblemForm extends Vue {
   validLanguages = this.data.validLanguages;
   validatorTypes = this.data.validatorTypes;
   currentLanguages = this.data.languages;
+
+  mounted() {
+    const title = T.createProblemInteractiveGuideTitle;
+    if (!this.hasVisitedSection) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title,
+              intro: T.createProblemInteractiveGuideWelcome,
+            },
+            {
+              element: document.querySelector('.introjs-title') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideProblemTitle,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-short-title',
+              ) as Element,
+              title,
+              intro: T.createProblemInteractiveGuideShortTitle,
+            },
+            {
+              element: document.querySelector('.introjs-origin') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideOrigin,
+            },
+            {
+              element: document.querySelector('.introjs-file') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideFile,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-tags-and-level',
+              ) as Element,
+              title,
+              intro: T.createProblemInteractiveGuideTagsAndLevel,
+            },
+            {
+              element: document.querySelector('.introjs-type') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideType,
+            },
+            {
+              element: document.querySelector('.introjs-validator') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideValidator,
+            },
+          ],
+        })
+        .start();
+      this.$cookies.set('has-visited-create-problem', true, -1);
+    }
+  }
 
   get howToWriteProblemLink(): string {
     return 'https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup';

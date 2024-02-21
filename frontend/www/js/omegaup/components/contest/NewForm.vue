@@ -3,8 +3,8 @@
     <div v-if="!update" class="card-header bg-primary text-white panel-heading">
       <h3 class="card-title mb-0">{{ T.contestNew }}</h3>
     </div>
-    <div class="card-body">
-      <div class="btn-group d-block mb-3 text-center">
+    <div class="card-body px-2 px-sm-4">
+      <div class="btn-group d-block mb-3 text-center introjs-style">
         <button class="btn btn-secondary" data-contest-omi @click="fillOmi">
           {{ T.contestNewFormOmiStyle }}
         </button>
@@ -32,7 +32,7 @@
             <label>{{ T.wordsTitle }}</label>
             <input
               v-model="title"
-              class="form-control"
+              class="form-control introjs-contest-title"
               :class="{
                 'is-invalid': invalidParameterName === 'title',
               }"
@@ -48,7 +48,7 @@
             <label>{{ T.contestNewFormShortTitleAlias }}</label>
             <input
               v-model="alias"
-              class="form-control"
+              class="form-control introjs-short-title"
               :class="{
                 'is-invalid': invalidParameterName === 'alias',
               }"
@@ -82,7 +82,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-6 introjs-description">
             <label>{{ T.contestNewFormDescription }}</label>
             <textarea
               v-model="description"
@@ -100,13 +100,18 @@
             <label>{{ T.contestNewFormDifferentStarts }}</label>
             <div class="checkbox">
               <label
-                ><input v-model="windowLengthEnabled" type="checkbox" />
+                ><input
+                  v-model="windowLengthEnabled"
+                  data-different-start-check
+                  type="checkbox"
+                />
                 {{ T.wordsEnable }}</label
               >
             </div>
             <input
               v-model="windowLength"
               class="form-control"
+              data-different-start-time-input
               :class="{
                 'is-invalid': invalidParameterName === 'window_length',
               }"
@@ -122,6 +127,7 @@
             <label>{{ T.contestNewFormScoreboardTimePercent }}</label>
             <input
               v-model="scoreboard"
+              data-score-board-visible-time
               class="form-control scoreboard-time-percent"
               :class="{
                 'is-invalid': invalidParameterName === 'scoreboard',
@@ -363,7 +369,7 @@
           </div>
         </div>
         <div class="form-group">
-          <button class="btn btn-primary" type="submit">
+          <button class="btn btn-primary introjs-schedule" type="submit">
             {{
               update
                 ? T.contestNewFormUpdateContest
@@ -383,6 +389,10 @@ import common_Typeahead from '../common/Typeahead.vue';
 import DateTimePicker from '../DateTimePicker.vue';
 import Multiselect from 'vue-multiselect';
 import { types } from '../../api_types';
+import 'intro.js/introjs.css';
+import introJs from 'intro.js';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 export enum ScoreMode {
   AllOrNothing = 'all_or_nothing',
@@ -425,6 +435,7 @@ export default class NewForm extends Vue {
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop({ default: false }) contestForTeams!: boolean;
   @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
+  @Prop({ default: true }) hasVisitedSection!: boolean;
 
   T = T;
   ScoreMode = ScoreMode;
@@ -452,6 +463,57 @@ export default class NewForm extends Vue {
   currentTeamsGroupAlias = this.teamsGroupAlias;
   titlePlaceHolder = '';
   checkPlagiarism = false;
+
+  mounted() {
+    const title = T.createContestInteractiveGuideTitle;
+    if (!this.hasVisitedSection) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title,
+              intro: T.createContestInteractiveGuideWelcome,
+            },
+            {
+              element: document.querySelector('.introjs-style') as Element,
+              title,
+              intro: T.createContestInteractiveGuideStyle,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-contest-title',
+              ) as Element,
+              title,
+              intro: T.createContestInteractiveGuideContestTitle,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-short-title',
+              ) as Element,
+              title,
+              intro: T.createContestInteractiveGuideShortTitle,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-description',
+              ) as Element,
+              title,
+              intro: T.createContestInteractiveGuideDescription,
+            },
+            {
+              element: document.querySelector('.introjs-schedule') as Element,
+              title,
+              intro: T.createContestInteractiveGuideSchedule,
+            },
+          ],
+        })
+        .start();
+      this.$cookies.set('has-visited-create-contest', true, -1);
+    }
+  }
 
   @Watch('windowLengthEnabled')
   onPropertyChange(newValue: boolean): void {

@@ -2,7 +2,7 @@
   <div class="mr-auto">
     <ul
       v-if="!omegaUpLockDown && (!inContest || isAdmin)"
-      class="navbar-nav align-items-end"
+      class="navbar-nav align-items-center"
     >
       <li
         v-if="isLoggedIn"
@@ -30,6 +30,7 @@
                 {{ T.contestsJoinScoreboards }}
               </a>
               <a
+                v-if="!isUnder13User"
                 class="dropdown-item"
                 href="/contest/new/"
                 data-nav-contests-create
@@ -66,7 +67,7 @@
             <a class="dropdown-item" href="/course/" data-nav-courses-all>
               {{ T.navViewCourses }}
             </a>
-            <template v-if="isMainUserIdentity">
+            <template v-if="isMainUserIdentity && !isUnder13User">
               <a
                 class="dropdown-item"
                 href="/course/new/"
@@ -108,11 +109,17 @@
               data-nav-problems-collection
               >{{ T.navViewProblems }}</a
             >
+            <a class="dropdown-item" href="/problem/" data-nav-problems-list>{{
+              T.navViewProblemsAll
+            }}</a>
+            <hr
+              style="margin-top: 0em; margin-bottom: 0em; border-width: 2px"
+            />
             <a class="dropdown-item" href="/submissions/">{{
               T.navViewLatestSubmissions
             }}</a>
             <a
-              v-if="isLoggedIn && isMainUserIdentity"
+              v-if="isLoggedIn && isMainUserIdentity && !isUnder13User"
               class="dropdown-item"
               href="/problem/new/"
               data-nav-problems-create
@@ -213,6 +220,7 @@ export default class NavbarItems extends Vue {
   @Prop() isAdmin!: boolean;
   @Prop() isMainUserIdentity!: boolean;
   @Prop() navbarSection!: string;
+  @Prop() isUnder13User!: boolean;
 
   T = T;
 }

@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Tests for apiCreate in ProblemController
  */
@@ -258,7 +256,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
             try {
                 // Call the API
-                $response = \OmegaUp\Controllers\Problem::apiCreate($r);
+                \OmegaUp\Controllers\Problem::apiCreate($r);
             } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
                 // We're OK, clean up our mess and continue
                 unset($_REQUEST);
@@ -285,7 +283,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $r['languages'] = $languages;
             try {
                 // Call the API
-                $response = \OmegaUp\Controllers\Problem::apiCreate($r);
+                \OmegaUp\Controllers\Problem::apiCreate($r);
             } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
                 // We're OK, clean up our mess and continue
                 unset($_REQUEST);
@@ -670,7 +668,7 @@ if __name__ == \'__main__\':
 
         try {
             // Call the API
-            $response = \OmegaUp\Controllers\Problem::apiCreate($r);
+            \OmegaUp\Controllers\Problem::apiCreate($r);
             $this->fail('Exception was expected. Wrong attribute');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertSame($e->getMessage(), 'parameterEmpty');
@@ -827,6 +825,104 @@ if __name__ == \'__main__\':
                 TEMPLATES_PATH . "/{$problem->alias}/{$problem->commit}/{$problem->alias}_windows_cpp.zip"
             )
         );
+    }
+
+    /**
+     * Test that we are able to submit a lecture problem without public tags.
+     */
+    public function testValidLecture() {
+        // Get the problem data
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'readonlylecture.zip',
+                'languages' => '',
+                'selectedTags' => '',
+            ])
+        );
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call the API
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
+
+        // Verify response
+        $this->assertSame('ok', $response['status']);
+
+        // Verify data in DB
+        $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
+
+        // Check that we only retreived 1 element
+        $this->assertCount(1, $problems);
+        $problem = $problems[0];
+
+        // Verify problem was found
+        $this->assertNotNull($problem);
+        $this->assertNotNull($problem->problem_id);
+
+        // Verify DB data
+        $this->assertSame($r['title'], $problem->title);
+        $this->assertSame(
+            substr(
+                $r['title'],
+                0,
+                \OmegaUp\Validators::ALIAS_MAX_LENGTH
+            ),
+            $problem->alias
+        );
+        $this->assertSame($r['order'], $problem->order);
+        $this->assertSame($r['source'], $problem->source);
+        $this->assertSameSets($r['languages'], $problem->languages);
+
+        // Verify author username -> author id conversion
+        $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
+        $identity = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id);
+        $this->assertSame($identity->username, $r['author_username']);
+
+        // Verify problem settings
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
+        $this->assertTrue($problemArtifacts->exists('settings.json'));
+        $problemSettings = json_decode($problemArtifacts->get('settings.json'));
+        $this->assertSame(false, $problemSettings->Slow);
+        $this->assertSame($r['validator'], $problemSettings->Validator->Name);
+        $this->assertSame(5000.0, $r['time_limit']);
+        $this->assertSame('5s', $problemSettings->Limits->TimeLimit);
+        $this->assertSame(
+            $r['memory_limit'] * 1024,
+            $problemSettings->Limits->MemoryLimit
+        );
+
+        // Verify problem contents were copied
+        $this->assertTrue($problemArtifacts->exists('statements/en.markdown'));
+
+        // Default data
+        $this->assertSame(0, $problem->visits);
+        $this->assertSame(0, $problem->submissions);
+        $this->assertSame(0, $problem->accepted);
+        $this->assertNull($problem->difficulty);
+
+        // Verify problem has the expected tags
+        [
+            'tags' => $tags,
+        ] = \OmegaUp\Controllers\Problem::apiTags(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+
+        $expectedTags = [
+            'problemLevelBasicIntroductionToProgramming',
+            'problemRestrictedTagNoSubmissions',
+        ];
+
+        foreach ($expectedTags as $selectedTag) {
+            $this->assertArrayContainsWithPredicate(
+                $tags,
+                fn ($tag) => $tag['name'] == $selectedTag
+            );
+        }
     }
 
     /**
@@ -1019,9 +1115,7 @@ if __name__ == \'__main__\':
 
     public function testCreateProblemWithInvalidShowDiffValue() {
         try {
-            [
-                'problem' => $problem,
-            ] = \OmegaUp\Test\Factories\Problem::createProblem(
+            \OmegaUp\Test\Factories\Problem::createProblem(
                 new \OmegaUp\Test\Factories\ProblemParams([
                     'show_diff' => 'invalid',
                 ])
