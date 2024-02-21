@@ -38,11 +38,11 @@
           T.problemEditFormWallTimeLimit
         }}</label>
         <input
+          v-model="currentOverallWallTimeLimit"
           name="overall_wall_time_limit"
           :class="{
             'is-invalid': errors.includes('overall_wall_time_limit'),
           }"
-          :value="overallWallTimeLimit"
           :disabled="currentLanguages === ''"
           type="text"
           class="form-control"
@@ -107,7 +107,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component
@@ -124,5 +124,14 @@ export default class Settings extends Vue {
   @Prop() validator!: string;
 
   T = T;
+
+  currentOverallWallTimeLimit = this.overallWallTimeLimit;
+
+  @Watch('currentOverallWallTimeLimit')
+  onOverallWallTimeLimitChanged(newVal: number) {
+    if (newVal > 60000) {
+      this.currentOverallWallTimeLimit = 60000;
+    }
+  }
 }
 </script>
