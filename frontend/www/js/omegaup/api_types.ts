@@ -3336,6 +3336,7 @@ export namespace types {
     groupsAdmins: types.CourseGroupAdmin[];
     groupsTeachingAssistants: types.CourseGroupAdmin[];
     identityRequests: types.IdentityRequest[];
+    isTeachingAssistant: boolean;
     selectedAssignment?: types.CourseAssignment;
     students: types.CourseStudent[];
     tags: string[];

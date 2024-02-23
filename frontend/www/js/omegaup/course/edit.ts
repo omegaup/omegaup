@@ -118,6 +118,7 @@ OmegaUp.on('ready', () => {
           searchResultProblems: this.searchResultProblems,
           searchResultGroups: this.searchResultGroups,
           searchResultSchools: this.searchResultSchools,
+          isTeachingAssistant: payload.isTeachingAssistant,
         },
         on: {
           'update-search-result-groups': (query: string) => {

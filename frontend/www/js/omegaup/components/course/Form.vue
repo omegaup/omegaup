@@ -11,6 +11,7 @@
               >{{ T.wordsName }}
               <input
                 v-model="name"
+                :disabled="readOnly"
                 class="form-control"
                 :class="{ 'is-invalid': invalidParameterName === 'name' }"
                 data-course-new-name
@@ -32,7 +33,7 @@
                 }"
                 type="text"
                 data-course-new-alias
-                :disabled="update"
+                :disabled="update || readOnly"
                 required="required"
             /></label>
           </div>
@@ -48,6 +49,7 @@
               :value.sync="showScoreboard"
               :selected-value="showScoreboard"
               name="show-scoreboard"
+              :readonly="readOnly"
             ></omegaup-radio-switch>
           </div>
         </div>
@@ -61,6 +63,7 @@
               <omegaup-datepicker
                 v-model="startTime"
                 name="start-date"
+                :disabled="readOnly"
               ></omegaup-datepicker
             ></label>
           </div>
@@ -74,6 +77,7 @@
             </span>
             <omegaup-radio-switch
               :value.sync="unlimitedDuration"
+              :readonly="readOnly"
               :selected-value="unlimitedDuration"
               name="unlimited-duration"
             ></omegaup-radio-switch>
@@ -86,6 +90,7 @@
                 icon="info-circle" />
               <omegaup-datepicker
                 v-model="finishTime"
+                :disabled="readOnly"
                 name="end-date"
                 :enabled="!unlimitedDuration"
                 :is-invalid="invalidParameterName === 'finish_time'"
@@ -100,6 +105,7 @@
               <omegaup-common-typeahead
                 :existing-options="searchResultSchools"
                 :options="searchResultSchools"
+                :readonly="readOnly"
                 :value.sync="school"
                 @update-existing-options="
                   (query) => $emit('update-search-result-schools', query)
@@ -117,6 +123,7 @@
             </span>
             <omegaup-radio-switch
               name="basic-information"
+              :readonly="readOnly"
               :value.sync="needsBasicInformation"
               :selected-value="needsBasicInformation"
             ></omegaup-radio-switch>
@@ -132,6 +139,7 @@
             <select
               v-model="requestsUserInformation"
               data-course-participant-information
+              :disabled="readOnly"
               class="form-control"
             >
               <option value="no">
@@ -157,6 +165,7 @@
             </label>
             <select
               v-model="level"
+              :disabled="readOnly"
               data-course-problem-level
               class="form-control introjs-level"
             >
@@ -173,6 +182,7 @@
             <label class="font-weight-bold w-100">{{ T.wordsLanguages }}</label>
             <vue-multiselect
               v-model="selectedLanguages"
+              :disabled="readOnly"
               :options="Object.keys(allLanguages)"
               :multiple="true"
               :placeholder="T.courseNewFormLanguages"
@@ -192,6 +202,7 @@
               />
               <textarea
                 v-model="objective"
+                :disabled="readOnly"
                 data-course-objective
                 class="form-control"
                 :class="{
@@ -207,6 +218,7 @@
               >{{ T.courseNewFormDescription }}
               <textarea
                 v-model="description"
+                :disabled="readOnly"
                 data-course-new-description
                 class="form-control"
                 :class="{
@@ -219,7 +231,7 @@
             </label>
           </div>
         </div>
-        <div class="row">
+        <div v-if="!readOnly" class="row">
           <div class="form-group col-md-12 text-right">
             <button
               class="btn btn-primary mr-2 submit introjs-submit"
@@ -290,6 +302,7 @@ const levelOptions = [
 })
 export default class CourseDetails extends Vue {
   @Prop({ default: false }) update!: boolean;
+  @Prop({ default: false }) readOnly!: boolean;
   @Prop() course!: types.CourseDetails;
   @Prop({ default: '' }) invalidParameterName!: string;
   @Prop() allLanguages!: string[];

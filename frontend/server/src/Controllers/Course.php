@@ -42,7 +42,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type StudentProgressInCourse=array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}
  * @psalm-type AssignmentsProblemsPoints=array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
  * @psalm-type CourseNewPayload=array{is_admin: bool, hasVisitedSection: bool, is_curator: bool, languages: array<string, string>}
- * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, teachingAssistants: list<CourseAdmin>, allLanguages: array<string, string>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, groupsTeachingAssistants: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
+ * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, isTeachingAssistant: bool, teachingAssistants: list<CourseAdmin>, allLanguages: array<string, string>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, groupsTeachingAssistants: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, assignmentsProblems: list<AssignmentsProblemsPoints>, students: list<StudentProgressInCourse>, totalRows: int, page: int, length: int, pagerItems: list<PageItem>}
  * @psalm-type SubmissionFeedbackThread=array{author: string, authorClassname: string, submission_feedback_thread_id: int, text: string, timestamp: \OmegaUp\Timestamp}
  * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int, feedback_thread?: list<SubmissionFeedbackThread>}
@@ -3861,11 +3861,25 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($course->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
-        self::resolveGroup($course);
+        $group = self::resolveGroup($course);
 
-        if (!\OmegaUp\Authorization::isCourseAdmin($identity, $course)) {
+        if (
+            !\OmegaUp\Authorization::isCourseAdmin($identity, $course) &&
+            !\OmegaUp\Authorization::isTeachingAssistant($identity, $course) &&
+            !\OmegaUp\Authorization::isGroupTeachingAssistantMember(
+                $identity,
+                $group
+            )
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
+        $isTeachingAssistant = \OmegaUp\Authorization::isTeachingAssistant(
+            $identity,
+            $course
+        ) || \OmegaUp\Authorization::isGroupTeachingAssistantMember(
+            $identity,
+            $group
+        );
         $admins = \OmegaUp\DAO\UserRoles::getCourseAdmins($course);
         foreach ($admins as &$admin) {
             unset($admin['user_id']);
@@ -3901,6 +3915,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'teachingAssistants' => \OmegaUp\DAO\UserRoles::getCourseTeachingAssistants(
                 $course
             ),
+            'isTeachingAssistant' => $isTeachingAssistant,
         ];
     }
 

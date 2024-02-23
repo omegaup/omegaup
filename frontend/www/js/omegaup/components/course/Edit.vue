@@ -2,7 +2,9 @@
   <div class="course-edit">
     <div class="page-header">
       <h1>
-        {{ T.wordsEditCourse }}
+        {{
+          isTeachingAssistant ? T.omegaupTitleCourseDetails : T.wordsEditCourse
+        }}
         <span
           data-course-name
           :class="{ 'text-secondary': data.course.archived }"
@@ -16,7 +18,7 @@
         </small>
       </h1>
     </div>
-    <ul class="nav nav-pills mt-4">
+    <ul v-if="!isTeachingAssistant" class="nav nav-pills mt-4">
       <li class="nav-item" role="presentation">
         <a
           href="#course"
@@ -96,6 +98,7 @@
           :course="data.course"
           :all-languages="data.allLanguages"
           :search-result-schools="searchResultSchools"
+          :read-only="isTeachingAssistant"
           @emit-cancel="onCancel"
           @submit="(request) => $emit('submit-edit-course', request)"
           @update-search-result-schools="
@@ -390,6 +393,7 @@ export default class CourseEdit extends Vue {
   @Prop() searchResultTeachingAssistants!: types.ListItem[];
   @Prop() searchResultGroupsTeachingAssistants!: types.ListItem[];
   @Prop() searchResultSchools!: types.SchoolListItem[];
+  @Prop() isTeachingAssistant!: boolean;
 
   T = T;
   showTab = this.initialTab;
