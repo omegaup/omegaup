@@ -1,3 +1,17 @@
+"""
+demo_autofill.py - Module for populating the system with dummy data.
+
+This module provides a main function to populate the system with dummy data 
+by calling various API methods.
+It serves as the entry point for filling up the system with dummy data for 
+testing or demonstration purposes.
+
+Example:
+    To fill up the system with dummy data:
+
+        python3 demo_autofill.py
+"""
+
 from base import Base
 
 def main():

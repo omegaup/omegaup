@@ -1,3 +1,18 @@
+"""
+base.py - Module containing Base class for handling API methods.
+
+This module defines the Base class, which provides methods for interacting with 
+various APIs such as user registration, creating contests, courses, etc.
+
+Example:
+    To use the Base class to register a new user:
+
+        from base import Base
+
+        base_instance = Base('https://localhost:8001')
+        base_instance.register('example_user', 'example_password')
+"""
+
 from endpoints import OMEGAUP_ENDPOINTS
 
 import requests
