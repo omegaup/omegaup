@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { ContestOptions, GroupOptions, LoginOptions } from '../support/types';
 import { contestPage } from '../support/pageObjects/contestPage';
 import { loginPage } from '../support/pageObjects/loginPage';
-import { addSubtractDateTime } from '../support/commands';
+import { getISODateTime, addSubtractDateTime } from '../support/commands';
 import { profilePage } from '../support/pageObjects/profilePage';
 
 describe('Contest Test', () => {
@@ -289,10 +289,22 @@ describe('Contest Test', () => {
     const users = [userLoginOptions[0].username];
 
     contestOptions.startDate = now;
-    contestOptions.endDate = now;
+    contestOptions.endDate = addSubtractDateTime(now, { minutes: 5 });
 
     cy.login(userLoginOptions[1]);
     contestPage.createContest(contestOptions, users);
+
+    // Update start time to 5 minutes ago and end time to 1 minute ago
+    cy.get(`a[href="/contest/${contestOptions.contestAlias}/edit/"]`).click();
+    cy.waitUntil(() =>
+      cy.url().should('include', `/contest/${contestOptions.contestAlias}/edit/`),
+    );
+    const startDate = addSubtractDateTime(now, { minutes: -5 });
+    const endDate = addSubtractDateTime(now, { minutes: -1 });
+    cy.get('[data-start-date]').type(getISODateTime(startDate));
+    cy.get('[data-end-date]').type(getISODateTime(endDate));
+    cy.get('button[type="submit"]').click();
+
     cy.logout();
 
     cy.login(userLoginOptions[0]);
