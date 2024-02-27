@@ -211,7 +211,7 @@
           :problem-alias="problems.length != 0 ? problems[0].alias : null"
           :username="isAdmin && users.length != 0 ? users[0].username : null"
           :clarifications="currentClarifications"
-          :is-admin="isAdmin"
+          :is-admin="isAdmin || isTeachingAssistant"
           :allow-filter-by-assignment="true"
           :show-new-clarification-popup="showNewClarificationPopup"
           @new-clarification="(request) => $emit('new-clarification', request)"

@@ -12,7 +12,7 @@
         <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
     </h3>
-    <div v-if="course.is_admin" class="my-5">
+    <div v-if="isAdminOrTeachingAssistant" class="my-5">
       <div class="my-4 markdown">
         <omegaup-markdown
           :markdown="course.description"
@@ -25,76 +25,78 @@
         })
       }}</span>
       <div class="mt-2 row float-sm-right">
-        <div class="col">
-          <div class="dropdown">
-            <a
-              data-button-statistics
-              class="btn btn-primary dropdown-toggle p-1 p-sm-2"
-              href="#"
-              role="button"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              {{ T.wordsStatistics }}
-            </a>
-            <div class="dropdown-menu">
+        <template v-if="course.is_admin">
+          <div class="col">
+            <div class="dropdown">
               <a
-                data-button-progress-students
-                class="dropdown-item"
-                :href="`/course/${course.alias}/students/`"
-                >{{ T.courseStudentsProgress }}</a
+                data-button-statistics
+                class="btn btn-primary dropdown-toggle p-1 p-sm-2"
+                href="#"
+                role="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
               >
-              <a
-                data-button-activity-report
-                class="dropdown-item"
-                :href="`/course/${course.alias}/activity/`"
-                >{{ T.activityReport }}</a
-              >
-              <a
-                data-button-activity-report
-                class="dropdown-item"
-                :href="`/course/${course.alias}/statistics/`"
-                >{{ T.omegaupTitleCourseStatistics }}</a
-              >
+                {{ T.wordsStatistics }}
+              </a>
+              <div class="dropdown-menu">
+                <a
+                  data-button-progress-students
+                  class="dropdown-item"
+                  :href="`/course/${course.alias}/students/`"
+                  >{{ T.courseStudentsProgress }}</a
+                >
+                <a
+                  data-button-activity-report
+                  class="dropdown-item"
+                  :href="`/course/${course.alias}/activity/`"
+                  >{{ T.activityReport }}</a
+                >
+                <a
+                  data-button-activity-report
+                  class="dropdown-item"
+                  :href="`/course/${course.alias}/statistics/`"
+                  >{{ T.omegaupTitleCourseStatistics }}</a
+                >
+              </div>
             </div>
           </div>
-        </div>
-        <div class="col d-flex justify-content-center">
-          <div class="dropdown">
-            <a
-              data-button-manage-course
-              class="btn btn-primary dropdown-toggle p-1 p-sm-2"
-              href="#"
-              role="button"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              {{ T.courseDetailsSettings }}
-            </a>
-            <div class="dropdown-menu">
+          <div class="col d-flex justify-content-center">
+            <div class="dropdown">
               <a
-                data-button-manage-students
-                class="dropdown-item"
-                :href="`/course/${course.alias}/edit/#students`"
-                >{{ T.wordsAddStudent }}</a
+                data-button-manage-course
+                class="btn btn-primary dropdown-toggle p-1 p-sm-2"
+                href="#"
+                role="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
               >
-              <a
-                data-button-manage-content
-                class="dropdown-item"
-                :href="`/course/${course.alias}/edit/#content`"
-                >{{ T.wordsContentEdit }}</a
-              >
-              <a
-                data-button-manage-content
-                class="dropdown-item"
-                :href="`/course/${course.alias}/edit/#clone`"
-                >{{ T.wordsCloneThisCourse }}</a
-              >
+                {{ T.courseDetailsSettings }}
+              </a>
+              <div class="dropdown-menu">
+                <a
+                  data-button-manage-students
+                  class="dropdown-item"
+                  :href="`/course/${course.alias}/edit/#students`"
+                  >{{ T.wordsAddStudent }}</a
+                >
+                <a
+                  data-button-manage-content
+                  class="dropdown-item"
+                  :href="`/course/${course.alias}/edit/#content`"
+                  >{{ T.wordsContentEdit }}</a
+                >
+                <a
+                  data-button-manage-content
+                  class="dropdown-item"
+                  :href="`/course/${course.alias}/edit/#clone`"
+                  >{{ T.wordsCloneThisCourse }}</a
+                >
+              </div>
             </div>
           </div>
-        </div>
+        </template>
         <div class="col">
           <a
             :href="`/course/${course.alias}/clarification/`"
@@ -114,11 +116,19 @@
                   {{ T.wordsContentType }}
                 </th>
                 <th class="align-middle" scope="col">{{ T.wordsName }}</th>
-                <th v-if="!course.is_admin" class="align-middle" scope="col">
+                <th
+                  v-if="!isAdminOrTeachingAssistant"
+                  class="align-middle"
+                  scope="col"
+                >
                   {{ T.wordsCompletedPercentage }}
                 </th>
                 <th class="align-middle" scope="col">{{ T.wordsDueDate }}</th>
-                <th v-if="course.is_admin" class="align-middle" scope="col">
+                <th
+                  v-if="isAdminOrTeachingAssistant"
+                  class="align-middle"
+                  scope="col"
+                >
                   {{ T.wordsActions }}
                 </th>
               </tr>
@@ -129,62 +139,65 @@
                   {{ T.courseContentEmpty }}
                 </td>
               </tr>
-              <tr
-                v-for="assignment in course.assignments"
-                v-else
-                :key="assignment.alias"
-                :data-content-alias="assignment.alias"
-                class="text-center"
-              >
-                <td class="align-middle">
-                  <template v-if="assignment.assignment_type === 'homework'">
-                    <font-awesome-icon icon="file-alt" />
-                    <span class="ml-2">{{ T.wordsHomework }}</span>
-                  </template>
-                  <template v-else-if="assignment.assignment_type === 'lesson'">
-                    <font-awesome-icon icon="chalkboard-teacher" />
-                    <span class="ml-2">{{ T.wordsLesson }}</span>
-                  </template>
-                  <template v-else>
-                    <font-awesome-icon icon="list-alt" />
-                    <span class="ml-2">{{ T.wordsExam }}</span>
-                  </template>
-                </td>
-                <td>
-                  <a
-                    data-course-homework-button
-                    class="align-middle"
-                    :href="`/course/${course.alias}/assignment/${assignment.alias}/`"
-                  >
-                    {{ assignment.name }}
-                  </a>
-                </td>
-                <td v-if="!course.is_admin" class="align-middle">
-                  {{ getAssignmentProgress(progress[assignment.alias]) }}
-                </td>
-                <td class="align-middle">
-                  {{ getFormattedTime(assignment.finish_time) }}
-                </td>
-                <td v-if="course.is_admin" class="align-middle">
-                  <a
-                    data-course-scoreboard-button
-                    class="mr-2"
-                    :href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
-                  >
-                    <font-awesome-icon :icon="['fas', 'link']" />{{
-                      T.courseActionScoreboard
-                    }}</a
-                  >
-                  <a
-                    data-course-submisson-button
-                    class="mr-2"
-                    :href="`/course/${course.alias}/assignment/${assignment.alias}/#runs`"
-                  >
-                    <font-awesome-icon :icon="['fas', 'tachometer-alt']" />
-                    {{ T.wordsRuns }}
-                  </a>
-                </td>
-              </tr>
+              <template v-else>
+                <tr
+                  v-for="assignment in course.assignments"
+                  :key="assignment.alias"
+                  :data-content-alias="assignment.alias"
+                  class="text-center"
+                >
+                  <td class="align-middle">
+                    <template v-if="assignment.assignment_type === 'homework'">
+                      <font-awesome-icon icon="file-alt" />
+                      <span class="ml-2">{{ T.wordsHomework }}</span>
+                    </template>
+                    <template
+                      v-else-if="assignment.assignment_type === 'lesson'"
+                    >
+                      <font-awesome-icon icon="chalkboard-teacher" />
+                      <span class="ml-2">{{ T.wordsLesson }}</span>
+                    </template>
+                    <template v-else>
+                      <font-awesome-icon icon="list-alt" />
+                      <span class="ml-2">{{ T.wordsExam }}</span>
+                    </template>
+                  </td>
+                  <td>
+                    <a
+                      data-course-homework-button
+                      class="align-middle"
+                      :href="`/course/${course.alias}/assignment/${assignment.alias}/`"
+                    >
+                      {{ assignment.name }}
+                    </a>
+                  </td>
+                  <td v-if="!isAdminOrTeachingAssistant" class="align-middle">
+                    {{ getAssignmentProgress(progress[assignment.alias]) }}
+                  </td>
+                  <td class="align-middle">
+                    {{ getFormattedTime(assignment.finish_time) }}
+                  </td>
+                  <td v-if="isAdminOrTeachingAssistant" class="align-middle">
+                    <a
+                      data-course-scoreboard-button
+                      class="mr-2"
+                      :href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
+                    >
+                      <font-awesome-icon :icon="['fas', 'link']" />{{
+                        T.courseActionScoreboard
+                      }}</a
+                    >
+                    <a
+                      data-course-submisson-button
+                      class="mr-2"
+                      :href="`/course/${course.alias}/assignment/${assignment.alias}/#runs`"
+                    >
+                      <font-awesome-icon :icon="['fas', 'tachometer-alt']" />
+                      {{ T.wordsRuns }}
+                    </a>
+                  </td>
+                </tr>
+              </template>
             </tbody>
           </table>
         </div>
@@ -390,6 +403,10 @@ export default class CourseDetails extends Vue {
       completed_points: score,
       total_points: maxScore,
     });
+  }
+
+  get isAdminOrTeachingAssistant(): boolean {
+    return this.course.is_admin || this.course.is_teaching_assistant;
   }
 
   getAssignmentProgress(progress: types.Progress): number {
