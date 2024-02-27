@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { addSubtractDaysToDate, getISODate, getISODateTime } from '../commands';
+import { addSubtractDateTime, getISODate, getISODateTime } from '../commands';
 import { CourseOptions, ProblemOptions, RunOptions, Status } from '../types';
 
 export class CoursePage {
@@ -9,7 +9,7 @@ export class CoursePage {
       courseAlias: uuid().slice(0, 10),
       showScoreboard: true,
       startDate: now,
-      endDate: addSubtractDaysToDate(now, { days: 1 }),
+      endDate: addSubtractDateTime(now, { days: 1 }),
       unlimitedDuration: false,
       school: 'Escuela curso',
       basicInformation: false,

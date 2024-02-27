@@ -335,11 +335,22 @@ export const getISODateTime = (date: Date) => {
 /**
  * Return a date relative to another date
  * @param date original Date object
- * @param days number of days to add to the date
+ * @param object number of days, hours, minutes or seconds to add to the date
  * @returns Date Relative Date Object
  */
-export const addSubtractDaysToDate = (date: Date, { days }: { days: number }): Date => {
+export const addSubtractDateTime = (
+  date: Date,
+  { days = 0, hours = 0, minutes = 0, seconds = 0 }: {
+    days?: number,
+    hours?: number,
+    minutes?: number,
+    seconds?: number
+  }
+): Date => {
   const newDate = new Date(date.getTime());
   newDate.setDate(newDate.getDate() + days);
+  newDate.setHours(newDate.getHours() + hours);
+  newDate.setMinutes(newDate.getMinutes() + minutes);
+  newDate.setSeconds(newDate.getSeconds() + seconds);
   return newDate;
 };

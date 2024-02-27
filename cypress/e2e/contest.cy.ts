@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { ContestOptions, GroupOptions, LoginOptions } from '../support/types';
 import { contestPage } from '../support/pageObjects/contestPage';
 import { loginPage } from '../support/pageObjects/loginPage';
-import { addSubtractDaysToDate } from '../support/commands';
+import { addSubtractDateTime } from '../support/commands';
 import { profilePage } from '../support/pageObjects/profilePage';
 
 describe('Contest Test', () => {
@@ -137,7 +137,7 @@ describe('Contest Test', () => {
     contestOptions.differentStart = true;
     contestOptions.differentStartTime = '60';
     contestOptions.startDate = now;
-    contestOptions.endDate = addSubtractDaysToDate(now, { days: 1 });
+    contestOptions.endDate = addSubtractDateTime(now, { days: 1 });
     cy.login(userLoginOptions[1]);
     contestPage.createContest(contestOptions, users);
     cy.logout();

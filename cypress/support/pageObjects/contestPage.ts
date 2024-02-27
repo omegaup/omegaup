@@ -9,7 +9,7 @@ import {
   ProblemOptions,
   RunOptions,
 } from '../types';
-import { addSubtractDaysToDate, getISODateTime } from '../commands';
+import { addSubtractDateTime, getISODateTime } from '../commands';
 
 enum ScoreMode {
   AllOrNothing = 'all_or_nothing',
@@ -192,7 +192,7 @@ export class ContestPage {
       contestAlias: 'contest' + uuid().slice(0, 5),
       description: 'Test Description',
       startDate: now,
-      endDate: addSubtractDaysToDate(now, { days: 2 }),
+      endDate: addSubtractDateTime(now, { days: 2 }),
       showScoreboard: true,
       basicInformation: false,
       scoreMode: ScoreMode.Partial,
