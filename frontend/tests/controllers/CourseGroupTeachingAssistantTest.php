@@ -37,7 +37,7 @@ class CourseGroupTeachingAssistantTest extends \OmegaUp\Test\ControllerTestCase 
         $this->assertTrue(
             \OmegaUp\Authorization::isGroupTeachingAssistantMember(
                 $identity,
-                $groupData['group']
+                [$groupData['group']]
             )
         );
 

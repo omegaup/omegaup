@@ -3288,6 +3288,8 @@ export namespace types {
 
   export interface CourseClarificationsPayload {
     clarifications: types.Clarification[];
+    is_admin: boolean;
+    is_teaching_assistant: boolean;
     length: number;
     page: number;
     pagerItems: types.PageItem[];

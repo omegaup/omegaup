@@ -1,7 +1,7 @@
 <template>
   <omegaup-clarification-list
     :clarifications="clarifications"
-    :is-admin="isAdmin"
+    :is-admin="isAdmin || isTeachingAssistant"
     :allow-filter-by-assignment="true"
     :page-size="pageSize"
     :page="page"
@@ -27,6 +27,7 @@ import clarification_List from '../arena/ClarificationList.vue';
 })
 export default class CourseClarifications extends Vue {
   @Prop() isAdmin!: boolean;
+  @Prop() isTeachingAssistant!: boolean;
   @Prop() clarifications!: types.Clarification[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() pageSize!: number;
