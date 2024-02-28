@@ -114,7 +114,6 @@ OmegaUp.on('ready', async () => {
           clarifications: clarificationStore.state.clarifications,
           course: payload.courseDetails,
           currentAssignment: payload.currentAssignment,
-          isTeachingAssistant: payload.isTeachingAssistant,
           problemInfo: this.problemInfo,
           problem: this.problem,
           problemAlias: this.problemAlias,

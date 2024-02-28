@@ -17,8 +17,7 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-course-clarifications', {
         props: {
-          isAdmin: payload.is_admin,
-          isTeachingAssistant: payload.is_teaching_assistant,
+          isAdmin: payload.is_admin || payload.is_teaching_assistant,
           clarifications: payload.clarifications,
           pagerItems: payload.pagerItems,
           pageSize: payload.length,
