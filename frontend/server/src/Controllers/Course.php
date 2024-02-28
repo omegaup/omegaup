@@ -4640,8 +4640,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'details' => self::getCommonCourseDetails(
                         $course,
-                        $r->identity,
-                        $group
+                        $r->identity
                     ),
                     'progress' => \OmegaUp\DAO\Courses::getAssignmentsProgress(
                         $course->course_id,
@@ -5372,8 +5371,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      */
     private static function getCommonCourseDetails(
         \OmegaUp\DAO\VO\Courses $course,
-        ?\OmegaUp\DAO\VO\Identities $identity = null,
-        ?\OmegaUp\DAO\VO\Groups $group = null
+        ?\OmegaUp\DAO\VO\Identities $identity = null
     ): array {
         $isAdmin = false;
         $isCurator = false;
