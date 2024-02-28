@@ -41,7 +41,9 @@ OmegaUp.on('ready', async () => {
   const [locationHash] = window.location.hash.substring(1).split('/');
 
   const courseAdmin = Boolean(
-    payload.courseDetails.is_admin || payload.courseDetails.is_curator,
+    payload.courseDetails.is_admin ||
+      payload.courseDetails.is_curator ||
+      payload.courseDetails.is_teaching_assistant,
   );
   const activeTab = getSelectedValidTab(
     locationHash,

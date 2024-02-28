@@ -4783,7 +4783,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $runs = [];
         $totalRuns = null;
-        if ($isAdmin) {
+        if ($isAdmin || $isTeachingAssistant) {
             [
                 'runs' => $runs,
                 'totalRuns' => $totalRuns,
