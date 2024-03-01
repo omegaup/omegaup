@@ -5777,7 +5777,6 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             if (
                 is_null($identity)
-                || is_null($identity->user_id)
                 || is_null($identity->identity_id)
             ) {
                 $nominationStatus = [
