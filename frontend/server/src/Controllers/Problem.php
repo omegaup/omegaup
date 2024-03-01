@@ -4696,7 +4696,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         if (
             is_null($r->identity)
-            || is_null($r->identity->user_id)
             || is_null($problem->problem_id)
         ) {
             return $response;
