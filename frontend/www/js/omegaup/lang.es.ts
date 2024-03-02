@@ -1096,7 +1096,7 @@ const translations: { [key: string]: string; } = {
   problemEditFormUpdateSolution: "Actualizar soluci\u00f3n",
   problemEditFormValidatorTimeLimit: "Tiempo l\u00edmite para el validador (ms)",
   problemEditFormValidatorType: "Tipo de validador de salida",
-  problemEditFormWallTimeLimit: "Tiempo l\u00edmite total (ms)",
+  problemEditFormWallTimeLimit: "Tiempo l\u00edmite total (ms) (m\u00e1ximo 60000)",
   problemEditGoToProblem: "Ir al problema",
   problemEditGroupScorePolicy: "Puntaje de grupos",
   problemEditGroupScorePolicyMin: "M\u00ednimo",
