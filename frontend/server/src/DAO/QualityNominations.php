@@ -22,7 +22,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      */
     public static function getNominationStatusForProblem(
         int $problemId,
-        int $userId
+        ?int $userId
     ): array {
         $response = [
             'nominated' => false,
@@ -30,6 +30,10 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             'nominatedBeforeAc' => false,
             'dismissedBeforeAc' => false,
         ];
+
+        if (is_null($userId)) {
+            return $response;
+        }
 
         $sql = "SELECT
                     qnn.contents

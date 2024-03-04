@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Tests API's where unassociated identities does not have access.
  */
@@ -20,7 +18,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
         ] = self::createGroupIdentityCreatorAndGroup($password);
 
         // Create a new user to associate with identity
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Associate identity with user
@@ -57,7 +55,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
         ] = self::createGroupIdentityCreatorAndGroup($password);
 
         // Create a new user to associate with identity
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Associate identity with user
@@ -91,7 +89,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
         ] = self::createGroupIdentityCreatorAndGroup($password);
 
         // Create a new user to associate with identity
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Associate identity with user
@@ -123,7 +121,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
         ] = self::createGroupIdentityCreatorAndGroup($password);
 
         // Create a new user to associate with identity
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Associate identity with user
@@ -147,7 +145,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
         string $password
     ): array {
         // Add a new user with identity groups creator privileges, and login
-        ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        ['identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
 
         // Create a group, where identities will be added
@@ -279,9 +277,9 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             // try to create a problem
-            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
-                null,
-                $login
+            \OmegaUp\Test\Factories\Problem::createProblem(
+                params: null,
+                login: $login
             );
             $this->fail("{$identityStatus} identity can not create problems");
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
