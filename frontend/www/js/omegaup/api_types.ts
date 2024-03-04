@@ -4893,6 +4893,7 @@ export namespace types {
 
   export interface VerificationParentalTokenDetailsPayload {
     hasParentalVerificationToken: boolean;
+    message: string;
   }
 }
 
