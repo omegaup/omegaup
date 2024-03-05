@@ -207,6 +207,12 @@ class User extends \OmegaUp\Controllers\Controller {
             $parentEmail = \OmegaUp\DAO\Emails::getByEmail(
                 $createUserParams->parentEmail
             );
+
+            // When the parent email is registered in the database, we can link
+            // the email owner with their dependent. In the other case, we will
+            // simply send an email to the parent with the verification token
+            // and wait until the parent registers in omegaUp. Then, they can
+            // verify the dependent account.
             if (!is_null($parentEmail) && $parentEmail->email_id !== 0) {
                 $userData['parent_email_id'] = $parentEmail->email_id;
             }
