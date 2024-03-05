@@ -266,10 +266,10 @@ export const casesStore: Module<CasesState, RootState> = {
           name: caseName,
           groupID: multipleCaseRequest.groupID,
         });
+        // Autopoints depends if the group is ungrouped
         const caseRequest = generateCaseRequest({
           ...newCase,
-          points: 0,
-          autoPoints: false,
+          autoPoints: multipleCaseRequest.groupID === UUID_NIL,
         });
         commit('addCase', caseRequest);
       }
