@@ -51,9 +51,9 @@ export default class UserDependents extends Vue {
     if (!this.userVerificationDeadline) {
       return null;
     }
-    const today = new Date();
+    const today = Date.now();
     const deadline = new Date(this.userVerificationDeadline);
-    const timeDifference = deadline.getTime() - today.getTime();
+    const timeDifference = deadline.getTime() - today;
     const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
     return daysDifference;
   }
@@ -71,21 +71,22 @@ export default class UserDependents extends Vue {
     return 'bg-warning';
   }
 
-  get dependentsStatusMessage(): string {
-    if (this.daysUntilVerificationDeadline !== null) {
-      if (this.daysUntilVerificationDeadline > 7) {
-        return ui.formatString(T.dependentsBlockedMessage, {
-          days: this.daysUntilVerificationDeadline,
-        });
-      }
-      if (
-        this.daysUntilVerificationDeadline > 1 &&
-        this.daysUntilVerificationDeadline <= 7
-      ) {
-        return ui.formatString(T.dependentsMessage, {
-          days: this.daysUntilVerificationDeadline,
-        });
-      }
+  get dependentsStatusMessage(): null | string {
+    if (this.daysUntilVerificationDeadline == null) {
+      return null;
+    }
+    if (this.daysUntilVerificationDeadline > 7) {
+      return ui.formatString(T.dependentsBlockedMessage, {
+        days: this.daysUntilVerificationDeadline,
+      });
+    }
+    if (
+      this.daysUntilVerificationDeadline > 1 &&
+      this.daysUntilVerificationDeadline <= 7
+    ) {
+      return ui.formatString(T.dependentsMessage, {
+        days: this.daysUntilVerificationDeadline,
+      });
     }
     return T.dependentsRedMessage;
   }
