@@ -629,5 +629,32 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(2, $feedbackList);
         $this->assertNull($feedbackList[0]['range_bytes_start']);
         $this->assertSame(1, $feedbackList[1]['range_bytes_start']);
+        $this->assertSame($feedback, $feedbackList[1]['feedback']);
+
+        // Even when the feedback is updated, the feedback in the line 1 should
+        // remain the same as originally set because updating the feedback in
+        // the lines of code is not implemented yet.
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'guid' => $runData['response']['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback' => 'Updated Test feedback!',
+                'range_bytes_start' => 1,
+            ])
+        );
+
+        $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'run_alias' => $runData['response']['guid'],
+            ])
+        );
+
+        $this->assertCount(2, $feedbackList);
+        $this->assertNull($feedbackList[0]['range_bytes_start']);
+        $this->assertSame(1, $feedbackList[1]['range_bytes_start']);
+        $this->assertSame($feedback, $feedbackList[1]['feedback']);
     }
 }
