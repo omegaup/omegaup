@@ -67,6 +67,13 @@ OmegaUp.on('ready', () => {
               showProblems(showAllProblems, pageNumber);
             }
           },
+          remove: (problemAlias: string) => {
+            api.Problem.delete({ problem_alias: problemAlias })
+              .then(() => {
+                window.location.href = '/problem/mine/';
+              })
+              .catch(ui.apiError);
+          },
         },
       });
     },

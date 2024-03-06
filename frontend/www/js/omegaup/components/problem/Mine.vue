@@ -85,6 +85,7 @@
               <th scope="col" class="text-center">{{ T.wordsID }}</th>
               <th scope="col" class="text-center">{{ T.wordsTitle }}</th>
               <th scope="col" class="text-center">{{ T.wordsEdit }}</th>
+              <th scope="col" class="text-center">{{ T.wordsDelete }}</th>
               <th scope="col" class="text-center">{{ T.wordsStatistics }}</th>
             </tr>
           </thead>
@@ -172,10 +173,28 @@
                 </a>
               </td>
               <td class="text-center align-middle">
+                <button
+                  class="btn btn-danger"
+                  @click.prevent="showConfirmationModal = true"
+                >
+                  <font-awesome-icon :icon="['fas', 'trash']" />
+                </button>
+              </td>
+              <td class="text-center align-middle">
                 <a :href="`/problem/${problem.alias}/stats/`">
                   <font-awesome-icon :icon="['fas', 'chart-bar']" />
                 </a>
               </td>
+              <b-modal
+              v-model="showConfirmationModal"
+              :title="T.problemEditDeleteRequireConfirmation"
+              :ok-title="T.problemEditDeleteOk"
+              ok-variant="danger"
+              :cancel-title="T.problemEditDeleteCancel"
+              @ok="$emit('remove', problem.alias)"
+            >
+              <p>{{ T.problemEditDeleteConfirmationMessage }} test -50</p>
+            </b-modal>
             </tr>
           </tbody>
         </table>
@@ -234,6 +253,7 @@ export default class ProblemMine extends Vue {
   shouldShowAllProblems = false;
   selectedProblems: types.ProblemListItem[] = [];
   allProblemsVisibilityOption = -1;
+  showConfirmationModal = false;
 
   get statementShowAllProblems(): string {
     return this.isSysadmin
