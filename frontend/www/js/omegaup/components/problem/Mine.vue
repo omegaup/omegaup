@@ -16,7 +16,7 @@
       </button>
     </div>
     <div class="card">
-      <h5 class="card-header">{{ T.myproblemsListMyProblems }} test 100</h5>
+      <h5 class="card-header">{{ T.myproblemsListMyProblems }}</h5>
       <div class="card-body px-2 px-sm-4">
         <div class="row align-items-center mb-3">
           <div class="col-9 col-lg-6">
@@ -64,6 +64,7 @@
               <option selected value="-1">{{ T.forSelectedItems }}</option>
               <option value="1">{{ T.makePublic }}</option>
               <option value="0">{{ T.makePrivate }}</option>
+              <option value="2">{{ T.wordsDelete }}</option>
             </select>
           </div>
           <div class="col px-0">
@@ -189,10 +190,10 @@
                 ok-variant="danger"
                 :cancel-title="T.problemEditDeleteCancel"
                 @ok="
-                  $emit('remove', 
-                    problem.alias,
-                    shouldShowAllProblems,
-                  )
+                  $emit('remove', {
+                    alias: problem.alias,
+                    shouldShowAll: shouldShowAllProblems,
+                  })
                 "
               >
                 <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
@@ -201,6 +202,23 @@
           </tbody>
         </table>
       </div>
+      <b-modal
+        v-model="showConfirmationModalDeleteAll"
+        :title="T.problemEditDeleteRequireConfirmation"
+        :ok-title="T.problemEditDeleteOk"
+        ok-variant="danger"
+        :cancel-title="T.problemEditDeleteCancel"
+        @ok="
+          $emit('remove-all-problems', {
+            selectedProblems: selectedProblems,
+            shouldShowAll: shouldShowAllProblems,
+          });
+          selectedProblems = [];
+          allProblemsVisibilityOption = '-1';
+        "
+      >
+        <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
+      </b-modal>
       <div class="card-footer">
         <omegaup-common-paginator
           :pager-items="pagerItems"
@@ -254,8 +272,9 @@ export default class ProblemMine extends Vue {
   currentQuery = this.query ?? '';
   shouldShowAllProblems = false;
   selectedProblems: types.ProblemListItem[] = [];
-  allProblemsVisibilityOption = -1;
+  allProblemsVisibilityOption = '-1';
   showConfirmationModal = false;
+  showConfirmationModalDeleteAll = false;
 
   get statementShowAllProblems(): string {
     return this.isSysadmin
@@ -265,7 +284,8 @@ export default class ProblemMine extends Vue {
 
   onChangeVisibility(): void {
     if (
-      this.allProblemsVisibilityOption !== -1 &&
+      (this.allProblemsVisibilityOption === '1' ||
+        this.allProblemsVisibilityOption === '0') &&
       this.selectedProblems.length
     ) {
       this.$emit(
@@ -274,7 +294,14 @@ export default class ProblemMine extends Vue {
         this.allProblemsVisibilityOption,
       );
       this.selectedProblems = [];
-      this.allProblemsVisibilityOption = -1;
+      this.allProblemsVisibilityOption = '-1';
+    }
+
+    if (
+      this.allProblemsVisibilityOption === '2' &&
+      this.selectedProblems.length
+    ) {
+      this.showConfirmationModalDeleteAll = true;
     }
   }
 }
