@@ -16,7 +16,7 @@
       </button>
     </div>
     <div class="card">
-      <h5 class="card-header">{{ T.myproblemsListMyProblems }}</h5>
+      <h5 class="card-header">{{ T.myproblemsListMyProblems }} test 100</h5>
       <div class="card-body px-2 px-sm-4">
         <div class="row align-items-center mb-3">
           <div class="col-9 col-lg-6">
@@ -189,10 +189,10 @@
                 ok-variant="danger"
                 :cancel-title="T.problemEditDeleteCancel"
                 @ok="
-                  $emit('remove', {
-                    alias: problem.alias,
-                    shouldShowAll: shouldShowAllProblems,
-                  })
+                  $emit('remove', 
+                    problem.alias,
+                    shouldShowAllProblems,
+                  )
                 "
               >
                 <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
