@@ -186,15 +186,15 @@
                 </a>
               </td>
               <b-modal
-              v-model="showConfirmationModal"
-              :title="T.problemEditDeleteRequireConfirmation"
-              :ok-title="T.problemEditDeleteOk"
-              ok-variant="danger"
-              :cancel-title="T.problemEditDeleteCancel"
-              @ok="$emit('remove', problem.alias)"
-            >
-              <p>{{ T.problemEditDeleteConfirmationMessage }} test -50</p>
-            </b-modal>
+                v-model="showConfirmationModal"
+                :title="T.problemEditDeleteRequireConfirmation"
+                :ok-title="T.problemEditDeleteOk"
+                ok-variant="danger"
+                :cancel-title="T.problemEditDeleteCancel"
+                @ok="$emit('remove', problem.alias)"
+              >
+                <p>{{ T.problemEditDeleteConfirmationMessage }} test -50</p>
+              </b-modal>
             </tr>
           </tbody>
         </table>
