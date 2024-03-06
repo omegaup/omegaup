@@ -85,8 +85,8 @@
               <th scope="col" class="text-center">{{ T.wordsID }}</th>
               <th scope="col" class="text-center">{{ T.wordsTitle }}</th>
               <th scope="col" class="text-center">{{ T.wordsEdit }}</th>
-              <th scope="col" class="text-center">{{ T.wordsDelete }}</th>
               <th scope="col" class="text-center">{{ T.wordsStatistics }}</th>
+              <th scope="col" class="text-center">{{ T.wordsDelete }}</th>
             </tr>
           </thead>
           <tbody>
@@ -173,16 +173,13 @@
                 </a>
               </td>
               <td class="text-center align-middle">
-                <button
-                  class="btn btn-danger"
-                  @click.prevent="showConfirmationModal = true"
-                >
-                  <font-awesome-icon :icon="['fas', 'trash']" />
-                </button>
-              </td>
-              <td class="text-center align-middle">
                 <a :href="`/problem/${problem.alias}/stats/`">
                   <font-awesome-icon :icon="['fas', 'chart-bar']" />
+                </a>
+              </td>
+              <td class="text-center align-middle">
+                <a href="#" @click.prevent="showConfirmationModal = true">
+                  <font-awesome-icon :icon="['fas', 'trash']" />
                 </a>
               </td>
               <b-modal
@@ -191,9 +188,14 @@
                 :ok-title="T.problemEditDeleteOk"
                 ok-variant="danger"
                 :cancel-title="T.problemEditDeleteCancel"
-                @ok="$emit('remove', problem.alias)"
+                @ok="
+                  $emit('remove', {
+                    alias: problem.alias,
+                    shouldShowAll: shouldShowAllProblems,
+                  })
+                "
               >
-                <p>{{ T.problemEditDeleteConfirmationMessage }} test -50</p>
+                <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
               </b-modal>
             </tr>
           </tbody>

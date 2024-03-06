@@ -67,10 +67,19 @@ OmegaUp.on('ready', () => {
               showProblems(showAllProblems, pageNumber);
             }
           },
-          remove: (problemAlias: string) => {
-            api.Problem.delete({ problem_alias: problemAlias })
+          remove: ({
+            alias,
+            shouldShowAll,
+          }: {
+            alias: string;
+            shouldShowAll: boolean;
+          }) => {
+            api.Problem.delete({ problem_alias: alias })
               .then(() => {
-                window.location.href = '/problem/mine/';
+                console.log('in then in min.ts line 73');
+                ui.success(T.problemSuccessfullyRemoved);
+                showAllProblems = shouldShowAll;
+                showProblems(shouldShowAll);
               })
               .catch(ui.apiError);
           },
