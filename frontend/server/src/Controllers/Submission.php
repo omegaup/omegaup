@@ -168,9 +168,14 @@ class Submission extends \OmegaUp\Controllers\Controller {
         }
         $submissionFeedback = \OmegaUp\DAO\SubmissionFeedback::getFeedbackBySubmission(
             $submission->guid,
-            rangeBytesStart: null
+            $rangeBytesStart
         );
         if (!is_null($submissionFeedback)) {
+            // Edit the feedback for specific range bytes is not supported yet
+            // so we just return the existing submission feedback
+            if (!is_null($rangeBytesStart)) {
+                return $submissionFeedback;
+            }
             return self::updateFeedback(
                 $submissionFeedback,
                 $feedbackAuthor->identity_id,
@@ -291,7 +296,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
             fn (string $feedback) => \OmegaUp\Validators::stringOfLengthInRange(
                 $feedback,
                 1,
-                200
+                400
             )
         );
 
