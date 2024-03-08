@@ -161,7 +161,15 @@ table.submissions-table > tbody > tr > td {
 .verdict-AC {
   background: var(--arena-submissions-list-verdict-ac-background-color);
 }
-
+.verdict-WA {
+  background: #c0392b;
+}
+.verdict-MLE {
+  background: #a569bd;
+}
+.verdict-TLE {
+  background: #dc7633;
+}
 .verdict-CE {
   background: --arena-submissions-list-verdict-ce-background-color;
 }
