@@ -61,6 +61,7 @@
               <omegaup-datepicker
                 v-model="startTime"
                 name="start-date"
+                :min="new Date()"
               ></omegaup-datepicker
             ></label>
           </div>

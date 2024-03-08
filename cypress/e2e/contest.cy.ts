@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { ContestOptions, GroupOptions, LoginOptions } from '../support/types';
 import { contestPage } from '../support/pageObjects/contestPage';
 import { loginPage } from '../support/pageObjects/loginPage';
-import { addSubtractDaysToDate } from '../support/commands';
+import { getISODateTime, addSubtractDateTime } from '../support/commands';
 import { profilePage } from '../support/pageObjects/profilePage';
 
 describe('Contest Test', () => {
@@ -25,7 +25,7 @@ describe('Contest Test', () => {
 
     const now = new Date();
 
-    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
+    contestOptions.startDate = now;
     const milliseconds = 200 * 1000;
     let newEndDate = new Date();
     newEndDate = new Date(newEndDate.getTime() + milliseconds);
@@ -58,9 +58,9 @@ describe('Contest Test', () => {
     identityContestAlias = contestOptions.contestAlias;
     const now = new Date();
 
-    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
+    contestOptions.startDate = now;
     const milliseconds = 200 * 1000;
-    let newEndDate = new Date();
+    let newEndDate = now;
     newEndDate = new Date(newEndDate.getTime() + milliseconds);
     contestOptions.endDate = newEndDate;
     identityLogin = {
@@ -104,7 +104,7 @@ describe('Contest Test', () => {
     const now = new Date();
     contestOptions.startDate = now;
     const milliseconds = 480 * 1000;
-    let newEndDate = new Date();
+    let newEndDate = now;
     newEndDate = new Date(newEndDate.getTime() + milliseconds);
     contestOptions.endDate = newEndDate;
 
@@ -136,8 +136,8 @@ describe('Contest Test', () => {
 
     contestOptions.differentStart = true;
     contestOptions.differentStartTime = '60';
-    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
-    contestOptions.endDate = addSubtractDaysToDate(now, { days: 1 });
+    contestOptions.startDate = now;
+    contestOptions.endDate = addSubtractDateTime(now, { days: 1 });
     cy.login(userLoginOptions[1]);
     contestPage.createContest(contestOptions, users);
     cy.logout();
@@ -288,11 +288,23 @@ describe('Contest Test', () => {
     const now = new Date();
     const users = [userLoginOptions[0].username];
 
-    contestOptions.startDate = addSubtractDaysToDate(now, { days: -1 });
-    contestOptions.endDate = now;
+    contestOptions.startDate = now;
+    contestOptions.endDate = addSubtractDateTime(now, { minutes: 5 });
 
     cy.login(userLoginOptions[1]);
     contestPage.createContest(contestOptions, users);
+
+    // Update start time to 5 minutes ago and end time to 1 minute ago
+    cy.get(`a[href="/contest/${contestOptions.contestAlias}/edit/"]`).click();
+    cy.waitUntil(() =>
+      cy.url().should('include', `/contest/${contestOptions.contestAlias}/edit/`),
+    );
+    const startDate = addSubtractDateTime(now, { minutes: -5 });
+    const endDate = addSubtractDateTime(now, { minutes: -1 });
+    cy.get('[data-start-date]').type(getISODateTime(startDate));
+    cy.get('[data-end-date]').type(getISODateTime(endDate));
+    cy.get('button[type="submit"]').click();
+
     cy.logout();
 
     cy.login(userLoginOptions[0]);
@@ -473,6 +485,35 @@ describe('Contest Test', () => {
     cy.get('[data-actions-disqualify-by-user]').first().click();
     // 2 submissions should be disqualified
     cy.get('.status-disqualified').its('length').should('eq', 2);
+    cy.logout();
+  });
+
+  it('Should Reduge the submission in the contest', () => {
+    const userLoginOptions = loginPage.registerMultipleUsers(2);
+    const contestOptions = contestPage.generateContestOptions(
+      userLoginOptions[1],
+    );
+    const contestant = [userLoginOptions[0].username];
+    const contestAdmin = userLoginOptions[1];
+
+    cy.login(contestAdmin);
+    contestPage.createContest(contestOptions, contestant);
+    cy.logout();
+
+    cy.login(userLoginOptions[0]);
+    cy.enterContest(contestOptions);
+    cy.createRunsInsideContest(contestOptions);
+    cy.logout();
+
+    cy.login(userLoginOptions[1]);
+    cy.visit(`arena/${contestOptions.contestAlias}`);
+    cy.get('a.nav-link[href="#runs"]').click();
+    cy.get('[data-runs-actions-button]').first().click();
+    cy.get('[data-actions-rejudge]').should('be.visible').click();
+    cy.get('a[problem-navigation-button]').click();
+    cy.get('a.nav-link[href="#runs"]').click();
+    cy.get('[data-runs-actions-button]').first().click();
+    cy.get('[data-actions-rejudge]').should('be.visible').click();
     cy.logout();
   });
 });
