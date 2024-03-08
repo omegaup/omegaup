@@ -14,7 +14,6 @@
 import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { codemirror } from 'vue-codemirror-lite';
-import eventBus from '../../grader/eventBus';
 
 export const languageModeMap: {
   [language: string]: string;
@@ -116,10 +115,6 @@ export default class CodeView extends Vue {
   @Watch('language')
   onLanguageChange(newLanguage: string) {
     this.mode = languageModeMap[newLanguage];
-  }
-  mounted() {
-    // emit mount event to trigger source and language update
-    eventBus.$emit('modal-mount');
   }
 }
 </script>

@@ -5,7 +5,7 @@
 <script>
 import * as Util from './util';
 import * as monaco from 'monaco-editor';
-import eventBus from './eventBus';
+
 export default {
   props: {
     store: {
@@ -81,10 +81,6 @@ export default {
     },
   },
   mounted: function () {
-    // update modal component code and language here
-    // eventBus.$on('modal-mount', (modalComponent) => {
-    //
-    // });
     this._editor = monaco.editor.create(this.$el, {
       autoIndent: true,
       formatOnPaste: true,
@@ -98,9 +94,6 @@ export default {
     this._model.onDidChangeContent(() => {
       this.contents = this._model.getValue();
     });
-  },
-  unmounted: function () {
-    eventBus.$off('modal-mount');
   },
   methods: {
     onResize: function () {
