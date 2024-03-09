@@ -49,17 +49,19 @@ OmegaUp.on('ready', () => {
         },
         on: {
           submit: (request: messages.CourseCreateRequest) => {
-            new Promise<number | null>((accept) => {
-              if (request.school.key) {
-                accept(request.school.key);
-              } else if (request.school.value) {
+            new Promise<number | null>((resolve, reject) => {
+              if (request.school && request.school.key) {
+                resolve(request.school.key);
+              } else if (request.school && request.school.value) {
                 api.School.create({ name: request.school.value })
                   .then((data) => {
-                    accept(data.school_id);
+                    resolve(data.school_id);
                   })
-                  .catch(ui.apiError);
+                  .catch((error) => {
+                    ui.apiError({ error: error.message });
+                  });
               } else {
-                accept(null);
+                reject(new Error('No school selected'));
               }
             })
               .then((schoolId) => {
@@ -74,11 +76,13 @@ OmegaUp.on('ready', () => {
                     );
                   })
                   .catch((error) => {
-                    ui.apiError(error);
+                    ui.apiError({ error: error.message });
                     this.invalidParameterName = error.parameter || '';
                   });
               })
-              .catch(ui.apiError);
+              .catch((error) => {
+                ui.apiError({ error: error.message });
+              });
           },
           cancel: () => {
             window.location.href = '/course/';
