@@ -906,7 +906,18 @@ export default class Runs extends Vue {
     if (scorePercentage !== '100.00') {
       return '';
     }
-
+    if (run.verdict == 'AC') {
+      return 'status-ac';
+    }
+    if (run.verdict == 'TLE') {
+      return 'status-tle';
+    }
+    if (run.verdict == 'MLE') {
+      return 'status-mle';
+    }
+    if (run.verdict == 'WA') {
+      return 'status-wa';
+    }
     return 'status-ac';
   }
 
@@ -1124,14 +1135,32 @@ export default class Runs extends Vue {
   background: var(--arena-runs-table-status-disqualified-background-color);
   color: var(--arena-runs-table-status-disqualified-font-color);
 }
+
 .status-je-ve {
   background: var(--arena-runs-table-status-je-ve-background-color);
   color: var(--arena-runs-table-status-je-ve-font-color);
 }
+
 .status-ac {
   background: var(--arena-runs-table-status-ac-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
 }
+
+.status-wa {
+  background: #e74c3c;
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+
+.status-mle {
+  background: #a569bd;
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+
+.status-tle {
+  background: #f5b041;
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+
 .status-ce {
   background: var(--arena-runs-table-status-ce-background-color);
   color: var(--arena-runs-table-status-ce-font-color);
