@@ -1455,6 +1455,7 @@ const translations: { [key: string]: string; } = {
   runNotInsideContest: "Tempo de concurso expirou ou n\u00e3o foi iniciado ainda.",
   runWaitGap: "Voc\u00ea tem que esperar entre solu\u00e7\u00f5es consecutivas.",
   schoolNotFound: "Escola n\u00e3o encontrada",
+  schoolNotSelected: "Nenhuma escola selecionada",
   schoolOfTheMonth: "Escola do M\u00eas",
   schoolOfTheMonthAlreadySelected: "A escola do m\u00eas foi selecionada anteriormente",
   schoolOfTheMonthChooseAsSchool: "Escolha como Escola do M\u00eas",

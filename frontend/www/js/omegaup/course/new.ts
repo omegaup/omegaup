@@ -4,6 +4,7 @@ import { messages, types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
+import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const now = new Date();
@@ -61,7 +62,7 @@ OmegaUp.on('ready', () => {
                     ui.apiError({ error: error.message });
                   });
               } else {
-                reject(new Error('No school selected'));
+                reject(new Error(T.schoolNotSelected));
               }
             })
               .then((schoolId) => {
