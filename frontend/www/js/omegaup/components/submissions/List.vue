@@ -164,15 +164,15 @@ table.submissions-table > tbody > tr > td {
 }
 
 .verdict-WA {
-  background: #e74c3c;
+  background: var(--arena-runs-table-status-wa-background-color);
 }
 
 .verdict-MLE {
-  background: #a569bd;
+  background: var(--arena-runs-table-status-mle-background-color);
 }
 
 .verdict-TLE {
-  background: #f5b041;
+  background: var(--arena-runs-table-status-tle-background-color);
 }
 
 .verdict-CE {

@@ -945,15 +945,15 @@ export default class Runs extends Vue {
   color: var(--arena-runs-table-status-ac-font-color);
 }
 .status-wa {
-  background: #e74c3c;
+  background: var(--arena-runs-table-status-wa-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
 }
 .status-mle {
-  background: #a569bd;
+  background: var(--arena-runs-table-status-mle-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
 }
 .status-tle {
-  background: #f5b041;
+  background: var(--arena-runs-table-status-tle-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
 }
 .status-ce {
