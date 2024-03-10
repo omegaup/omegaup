@@ -4044,6 +4044,7 @@ export namespace types {
   export interface ProblemListItem {
     accepted: number;
     alias: string;
+    can_be_removed: boolean;
     difficulty?: number;
     difficulty_histogram: number[];
     points: number;
