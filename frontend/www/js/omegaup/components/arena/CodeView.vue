@@ -116,6 +116,16 @@ export default class CodeView extends Vue {
   onLanguageChange(newLanguage: string) {
     this.mode = languageModeMap[newLanguage];
   }
+  mounted() {
+    const codeAndLanguage = { code: this.value, language: 'cpp17-gcc' };
+    window.dispatchEvent(
+      new CustomEvent('code-and-language-set', { detail: codeAndLanguage }),
+    );
+
+    this.onInput(codeAndLanguage.code);
+    this.onChange(codeAndLanguage.code);
+    this.$emit('change-language', codeAndLanguage.language);
+  }
 }
 </script>
 
