@@ -34,8 +34,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration?: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestList=array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
- * @psalm-type ContestListPayload=array{contests: TimeTypeContests, countContests: array<string, int>, isLogged: bool, query: null|string}
- * @psalm-type ContestListv2Payload=array{contests: ContestList, countContests: array{current: int, future: int, past: int}, query: string | null}
+ * @psalm-type ContestListPayload=array{contests: ContestList, countContests: array{current: int, future: int, past: int}, query: string | null}
  * @psalm-type ContestNewPayload=array{languages: array<string, string>, hasVisitedSection?: bool}
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
@@ -1161,13 +1160,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{templateProperties: array{payload: ContestListv2Payload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: ContestListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int|null $page
      * @omegaup-request-param int|null $page_size
      * @omegaup-request-param null|string $query
      */
-    public static function getContestListDetailsv2ForTypeScript(
+    public static function getContestListDetailsForTypeScript(
         \OmegaUp\Request $r
     ) {
         try {
@@ -1247,7 +1246,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'omegaupTitleContestList'
                 ),
             ],
-            'entrypoint' => 'arena_contest_listv2',
+            'entrypoint' => 'arena_contest_list',
         ];
     }
 

@@ -91,7 +91,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
 
-            $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+            $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                 ])

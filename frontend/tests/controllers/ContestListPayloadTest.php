@@ -1,9 +1,8 @@
 <?php
 /**
- * Description of Contest List v2
+ * Description of Contest List Payload method
  */
-
-class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
+class ContestListPayloadTest extends \OmegaUp\Test\ControllerTestCase {
     private const ADMISSION_MODES = [
         'public',
         'private'
@@ -112,7 +111,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
     public function testPublicContestsNotLoggedIn() {
         $this->createContests();
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request()
         )['templateProperties']['payload'];
 
@@ -144,7 +143,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         // Logging user
         $login = self::login($invitedUserIdentity);
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -182,7 +181,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         // Logging user
         $login = self::login($nonInvitedUserIdentity);
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -217,7 +216,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         // Logging user
         $login = self::login($adminUserIdentity);
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -299,7 +298,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
     public function testContestantsColumnAsUserNotLoggedIn() {
         $this->createContests();
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request()
         )['templateProperties']['payload'];
 
@@ -343,7 +342,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             'firstInvitedUserIdentity' => $firstInvitedUserIdentity,
         ] = $this->createContestsAndAddContestants();
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request()
         )['templateProperties']['payload'];
 
@@ -386,7 +385,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         // Logging user
         $login = self::login($firstInvitedUserIdentity);
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -422,7 +421,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         // Logging user
         $login = self::login($secondContestCreator);
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -451,7 +450,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         // Logging user
         $login = self::login($firstInvitedUserIdentity);
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -492,7 +491,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         // Logging user
         $login = self::login($adminUserIdentity);
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -544,7 +543,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request()
         )['templateProperties']['payload'];
 
@@ -576,7 +575,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         // Logging user
         $login = self::login($organizerIdentity);
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -618,7 +617,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         // Logging user
         $login = self::login($invitedUserIdentity);
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -655,7 +654,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         // Logging user
         $login = self::login($adminUserIdentity);
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -673,7 +672,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request()
         )['templateProperties']['payload'];
 
@@ -702,7 +701,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         // Logging user
         $login = self::login($invitedUserIdentity);
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -727,7 +726,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         // Logging user
         $login = self::login($nonInvitedUserIdentity);
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -773,7 +772,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($invitedUserIdentity);
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -798,7 +797,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         // Logging user
         $login = self::login($adminUserIdentity);
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])

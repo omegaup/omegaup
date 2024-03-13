@@ -8,10 +8,10 @@ import arena_ContestList, {
   ContestOrder,
   ContestTab,
   ContestFilter,
-} from './ContestListv2.vue';
+} from './ContestList.vue';
 import each from 'jest-each';
 
-describe('ContestListv2.vue', () => {
+describe('ContestList.vue', () => {
   const daySeconds = 24 * 60 * 60 * 1000;
   const today = new Date();
   const yesterday = new Date(today.getTime() - daySeconds);

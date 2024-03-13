@@ -23,7 +23,7 @@ module.exports = {
     admin_user: './frontend/www/js/omegaup/admin/user.ts',
     arena_contest_contestant:
       './frontend/www/js/omegaup/arena/contest_contestant.ts',
-    arena_contest_listv2: './frontend/www/js/omegaup/arena/contest_listv2.ts',
+    arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
     arena_contest_practice:
       './frontend/www/js/omegaup/arena/contest_practice.ts',
     arena_course: './frontend/www/js/omegaup/arena/course.ts',

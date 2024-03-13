@@ -7,12 +7,12 @@ import Vue from 'vue';
 import arena_ContestList, {
   ContestTab,
   ContestOrder,
-} from '../components/arena/ContestListv2.vue';
+} from '../components/arena/ContestList.vue';
 import contestStore from './contestStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
-  const payload = types.payloadParsers.ContestListv2Payload();
+  const payload = types.payloadParsers.ContestListPayload();
   const contestIDs = [
     ...payload.contests.current.map((contest) => contest.contest_id),
     ...payload.contests.past.map((contest) => contest.contest_id),

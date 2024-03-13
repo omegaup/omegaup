@@ -1,11 +1,7 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Description of ListContests
  */
-
 class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Check request and response durations match.
@@ -45,7 +41,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Log as a random contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
@@ -100,7 +96,6 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Get a user for our scenario
         [
-            'user' => $contestant,
             'identity' => $identity,
         ] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -144,7 +139,6 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Get a user for our scenario
         [
-            'user' => $contestant,
             'identity' => $identity,
         ] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -204,12 +198,12 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contest
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
@@ -230,7 +224,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
 
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = self::login($identity);
 
         $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
@@ -256,9 +250,6 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    /**
-     *
-     */
     public function testPrivateContestForContestAdmin() {
         // Create new private contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -268,7 +259,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contest
         \OmegaUp\Test\Factories\Contest::addAdminUser($contestData, $identity);
@@ -310,8 +301,8 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $title = $contestData['request']['title'];
 
-        ['user' => $admin1, 'identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
-        ['user' => $admin2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity1);
         $r = new \OmegaUp\Request([
@@ -373,8 +364,8 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         $author = $contestData['director'];
         $title = $contestData['request']['title'];
 
-        ['user' => $admin1, 'identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
-        ['user' => $admin2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contest
         $group = \OmegaUp\Test\Factories\Groups::createGroup($author);
@@ -421,10 +412,10 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         ));
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Turn recommended ON
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -469,12 +460,13 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRecommendedContestsList() {
         // Create 2 contests not-recommended
-        $recommendedContest[0] = \OmegaUp\Test\Factories\Contest::createContest();
-        $recommendedContest[1] = \OmegaUp\Test\Factories\Contest::createContest();
+        $recommendedContest = [
+            \OmegaUp\Test\Factories\Contest::createContest(),
+            \OmegaUp\Test\Factories\Contest::createContest(),
+        ];
 
         // Get a user for our scenario
         [
-            'user' => $contestant,
             'identity' => $contestantIdentity,
         ] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -496,13 +488,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertFalse($contest['recommended']);
         }
 
-        // Turn recommended ON
-        // php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariablecbf does not like a block just for scoping purposes and
-        // messes up the alignment pretty badly.
         [
-            'user' => $user,
             'identity' => $identity,
         ] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = self::login($identity);
@@ -556,7 +542,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         ));
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contests
         \OmegaUp\Test\Factories\Contest::addUser(
@@ -603,7 +589,6 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Get a user for our scenario
         [
-            'user' => $contestant,
             'identity' => $identity,
         ] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -646,7 +631,6 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Get a user for our scenario
         [
-            'user' => $contestant,
             'identity' => $identity,
         ] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -687,6 +671,8 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         // Create a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
+        $contests = [];
+
         // Create three PUBLIC contests
         $contests[0] = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
@@ -720,7 +706,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         ];
 
         // Log as a random contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $loginContestant = self::login($identity);
         $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
