@@ -530,6 +530,11 @@ export default class ArenaContestList extends Vue {
         return this.contests.current;
     }
   }
+  mounted() {
+    if (window.location.hash === '#participating') {
+      this.filterBySignedUp();
+    }
+  }
 }
 </script>
 
