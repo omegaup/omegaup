@@ -1,4 +1,4 @@
-export function vuexGet(store: any, name: string) {
+export function vuexGet(store: any, name: string): string | void {
   if (typeof store.getters[name] !== 'undefined') return store.getters[name];
   let o = store.state;
   for (const p of name.split('.')) {
@@ -9,11 +9,11 @@ export function vuexGet(store: any, name: string) {
   return o;
 }
 
-export function vuexSet(store: any, name: string, value: string) {
+export function vuexSet(store: any, name: string, value: string): void {
   store.commit(name, value);
 }
 
-export function parseDuration(value: number | string) {
+export function parseDuration(value: number | string): number {
   if (typeof value === 'number') {
     return value;
   }
@@ -258,7 +258,7 @@ export const supportedLanguages: Record<
   },
 };
 
-export function asyncError(err: Error) {
+export function asyncError(err: Error): void {
   console.error('Async error', err);
 }
 
