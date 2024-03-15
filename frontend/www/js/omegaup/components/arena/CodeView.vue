@@ -78,9 +78,9 @@ export interface EditorOptions {
   },
 })
 export default class CodeView extends Vue {
-  @Prop() language!: string;
+  @Prop({ default: 'cpp17-gcc' }) language!: string;
   @Prop({ default: false }) readonly!: boolean;
-  @Prop({ default: 'cpp17-gcc' }) value!: string;
+  @Prop() value!: string;
   @Ref('cm-wrapper') readonly cmWrapper!: codemirror;
 
   T = T;
