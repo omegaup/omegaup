@@ -39,22 +39,28 @@ export function parseDuration(value) {
 }
 
 export const languageMonacoModelMapping = {
-  cpp11: 'cpp',
+  c: 'cpp',
+  'c11-gcc': 'cpp',
+  'c11-clang': 'cpp',
+  cpp: 'cpp',
   'cpp11-gcc': 'cpp',
   'cpp11-clang': 'cpp',
   'cpp17-gcc': 'cpp',
   'cpp17-clang': 'cpp',
   'cpp20-gcc': 'cpp',
   'cpp20-clang': 'cpp',
-  cpp: 'cpp',
-  cs: 'csharp',
   java: 'java',
   kt: 'kotlin',
-  lua: 'lua',
   py: 'python',
   py2: 'python',
   py3: 'python',
   rb: 'ruby',
+  pl: 'perl',
+  cs: 'csharp',
+  pas: 'pascal',
+  cat: 'cat', // Not supported by Monaco editor
+  hs: 'haskell', // Not supported by Monaco editor
+  lua: 'lua',
   go: 'go',
   rs: 'rust',
   js: 'javascript',
@@ -67,22 +73,28 @@ export const languageMonacoModelMapping = {
 };
 
 export const languageExtensionMapping = {
-  cpp11: 'cpp',
+  c: 'c',
+  'c11-gcc': 'c',
+  'c11-clang': 'c',
+  cpp: 'cpp',
   'cpp11-gcc': 'cpp',
   'cpp11-clang': 'cpp',
   'cpp17-gcc': 'cpp',
   'cpp17-clang': 'cpp',
   'cpp20-gcc': 'cpp',
   'cpp20-clang': 'cpp',
-  cpp: 'cpp',
-  cs: 'cs',
   java: 'java',
   kt: 'kt',
-  lua: 'lua',
   py: 'py',
   py2: 'py',
   py3: 'py',
   rb: 'rb',
+  pl: 'pl',
+  cs: 'cs',
+  pas: 'pas',
+  cat: 'cat',
+  hs: 'hs',
+  lua: 'lua',
   go: 'go',
   rs: 'rs',
   js: 'js',
@@ -93,7 +105,6 @@ export const languageExtensionMapping = {
   out: 'out',
   err: 'err',
 };
-
 export function asyncError(err) {
   console.error('Async error', err);
 }
