@@ -80,7 +80,7 @@ export interface EditorOptions {
 export default class CodeView extends Vue {
   @Prop() language!: string;
   @Prop({ default: false }) readonly!: boolean;
-  @Prop() value!: string;
+  @Prop({ default: 'cpp17-gcc' }) value!: string;
   @Ref('cm-wrapper') readonly cmWrapper!: codemirror;
 
   T = T;
@@ -119,7 +119,7 @@ export default class CodeView extends Vue {
   mounted() {
     const codeAndLanguage = {
       code: this.value,
-      language: !this.language ? 'cpp17-gcc' : this.language,
+      language: this.language,
     };
     window.dispatchEvent(
       new CustomEvent('code-and-language-set', { detail: codeAndLanguage }),
