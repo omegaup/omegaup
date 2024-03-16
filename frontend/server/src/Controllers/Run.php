@@ -34,7 +34,6 @@ class Run extends \OmegaUp\Controllers\Controller {
         'rb' => 'Ruby (2.7)',
         'cs' => 'C# (10, dotnet 6.0)',
         'pas' => 'Pascal (fpc 3.0)',
-        'cat' => 'Output Only',
         'hs' => 'Haskell (ghc 8.8)',
         'lua' => 'Lua (5.3)',
         'go' => 'Go (1.18.beta2)',
