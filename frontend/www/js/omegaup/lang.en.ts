@@ -1097,7 +1097,7 @@ const translations: { [key: string]: string; } = {
   problemEditFormUpdateSolution: "Update solution",
   problemEditFormValidatorTimeLimit: "Validator time limit (ms)",
   problemEditFormValidatorType: "Output validator type",
-  problemEditFormWallTimeLimit: "Total time limit (ms) (max 60000)",
+  problemEditFormWallTimeLimit: "Total time limit (ms) (max 60000 ms)",
   problemEditGoToProblem: "Go to problem",
   problemEditGroupScorePolicy: "Group scores",
   problemEditGroupScorePolicyMin: "Min",
