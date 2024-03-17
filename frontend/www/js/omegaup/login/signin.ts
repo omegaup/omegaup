@@ -45,6 +45,9 @@ OmegaUp.on('ready', () => {
   }
 
   const payload = types.payloadParsers.LoginDetailsPayload();
+  const urlParams = new URLSearchParams(window.location.search);
+  const useSignupFormWithBirthDate =
+    urlParams.get('useSignupFormWithBirthDate') === 'true';
   const googleClientId = document
     .querySelector('meta[name="google-signin-client_id"]')
     ?.getAttribute('content');
@@ -66,16 +69,34 @@ OmegaUp.on('ready', () => {
           facebookUrl: payload.facebookUrl,
           googleClientId,
           hasVisitedSection: payload.hasVisitedSection,
+          useSignupFormWithBirthDate,
         },
         on: {
-          'register-and-login': (
-            username: string,
-            email: string,
-            password: string,
-            passwordConfirmation: string,
-            recaptchaResponse: string,
-            termsAndPolicies: boolean,
-          ) => {
+          'register-and-login': ({
+            over13Checked,
+            username,
+            email,
+            dateOfBirth,
+            parentEmail,
+            password,
+            passwordConfirmation,
+            recaptchaResponse,
+            termsAndPolicies,
+          }: {
+            over13Checked: boolean;
+            username: string;
+            email: string;
+            dateOfBirth: Date;
+            parentEmail: string;
+            password: string;
+            passwordConfirmation: string;
+            recaptchaResponse: string;
+            termsAndPolicies: boolean;
+          }) => {
+            if (!termsAndPolicies) {
+              ui.error(T.privacyPolicyNotAccepted);
+              return;
+            }
             if (password != passwordConfirmation) {
               ui.error(T.passwordMismatch);
               return;
@@ -84,16 +105,43 @@ OmegaUp.on('ready', () => {
               ui.error(T.loginPasswordTooShort);
               return;
             }
-            if (!termsAndPolicies) {
-              ui.error(T.privacyPolicyNotAccepted);
+            if (!useSignupFormWithBirthDate) {
+              api.User.create({
+                username: username,
+                email: email,
+                password: password,
+                recaptcha: recaptchaResponse,
+              })
+                .then(() => {
+                  loginAndRedirect(
+                    username,
+                    password,
+                    /*isAccountCreation=*/ true,
+                  );
+                })
+                .catch(ui.apiError);
               return;
             }
-            api.User.create({
-              username: username,
-              email: email,
-              password: password,
+            const request: {
+              username: string;
+              email?: string;
+              birth_date: Date;
+              parent_email?: string;
+              password: string;
+              recaptcha: string;
+            } = {
+              username,
+              birth_date: new Date(dateOfBirth),
+              password,
               recaptcha: recaptchaResponse,
-            })
+            };
+            if (over13Checked) {
+              request.email = email;
+            } else {
+              request.parent_email = parentEmail;
+            }
+
+            api.User.create(request)
               .then(() => {
                 loginAndRedirect(
                   username,

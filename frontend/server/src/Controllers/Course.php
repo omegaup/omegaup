@@ -4293,6 +4293,20 @@ class Course extends \OmegaUp\Controllers\Controller {
             )
         ) {
             $filteredCourses['admin']['activeTab'] = 'past';
+        } elseif (
+            $filteredCourses['admin']['activeTab'] === ''
+            && !empty(
+                $filteredCourses['admin']['filteredCourses']['archived']['courses']
+            )
+        ) {
+            $filteredCourses['admin']['activeTab'] = 'archived';
+        } elseif (
+            $filteredCourses['admin']['activeTab'] === ''
+            && !empty(
+                $filteredCourses['admin']['filteredCourses']['teachingAssistant']['courses']
+            )
+        ) {
+            $filteredCourses['admin']['activeTab'] = 'teachingAssistant';
         }
         return [
             'templateProperties' => [
