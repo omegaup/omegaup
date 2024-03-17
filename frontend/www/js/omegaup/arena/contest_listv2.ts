@@ -7,6 +7,7 @@ import Vue from 'vue';
 import arena_ContestList, {
   ContestTab,
   ContestOrder,
+  ContestFilter
 } from '../components/arena/ContestListv2.vue';
 import contestStore from './contestStore';
 
@@ -50,8 +51,7 @@ OmegaUp.on('ready', () => {
   }
   let page: number = 1;
   let sortOrder: ContestOrder = ContestOrder.None;
-  let filterBySignedUp: boolean = false;
-  let filterByRecommended: boolean = false;
+  let filter: ContestFilter = ContestFilter.All;
   const queryString = window.location.search;
   if (queryString) {
     const urlParams = new URLSearchParams(queryString);
@@ -89,16 +89,12 @@ OmegaUp.on('ready', () => {
         page = parseInt(pageParam);
       }
     }
-    if (urlParams.get('participating')) {
-      const participatingParam = urlParams.get('participating');
-      if (participatingParam === 'true') {
-        filterBySignedUp = true;
-      }
-    }
-    if (urlParams.get('recommended')) {
-      const recommendedParam = urlParams.get('recommended');
-      if (recommendedParam === 'true') {
-        filterByRecommended = true;
+    if (urlParams.get('filter')) {
+      const filterParam = urlParams.get('filter');
+      if (filterParam === 'participating') {
+        filter = ContestFilter.SignedUp;
+      } else if (filterParam === 'recommended') {
+        filter = ContestFilter.OnlyRecommended;
       }
     }
     if (urlParams.get('tab_name')) {
@@ -136,8 +132,7 @@ OmegaUp.on('ready', () => {
           tab,
           page,
           sortOrder,
-          filterBySignedUp,
-          filterByRecommended,
+          filter,
         },
       });
     },
