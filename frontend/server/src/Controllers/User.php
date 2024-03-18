@@ -2458,6 +2458,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 $graduationDate = new \OmegaUp\Timestamp(
                     intval($r['graduation_date'])
                 );
+                $graduationDate->time += 7200;
             } else {
                 \OmegaUp\Validators::validateDate(
                     $r['graduation_date'],
@@ -2471,7 +2472,9 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         if (!is_null($r['birth_date'])) {
             if (is_numeric($r['birth_date'])) {
+                // time is behind by two hours, add these hours back
                 $birthDate = intval($r['birth_date']);
+                $birthDate += 7200;
             } else {
                 \OmegaUp\Validators::validateDate(
                     $r['birth_date'],
