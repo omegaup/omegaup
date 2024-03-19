@@ -84,6 +84,7 @@
                     :required="!isUpdate"
                     name="problem_contents"
                     type="file"
+                    accept=".zip"
                     class="form-control"
                     :class="{
                       'is-invalid': errors.includes('problem_contents'),
