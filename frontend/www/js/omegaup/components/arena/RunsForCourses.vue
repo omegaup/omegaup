@@ -1,4 +1,4 @@
-<template>
+​​<template>
   <div class="mt-2" data-runs>
     <slot name="title">
       <div class="card-header">
@@ -243,41 +243,19 @@
           </tfoot>
           <tbody>
             <tr v-for="run in paginatedRuns" :key="run.guid">
-              <td>
-                <template v-if="time.formatDateLocalHHMM(run.time) === '—'">
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif"
-                    alt="Loading"
-                  />
-                </template>
-                <template v-else>
-                  {{ time.formatDateLocalHHMM(run.time) }}
-                </template>
-              </td>
+              <template v-if="run.status!=='ready'">
+                <td colspan="16">
+                     <div class="line"></div>
+                 </td>
+              </template>
+              <template v-else>
+              <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
               <td v-show="showGUID">
-                <template v-if="getShortGuid(run.guid) === '—'">
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif"
-                    alt="Loading"
-                  />
-                </template>
-                <template v-else>
-                  <acronym :title="run.guid" data-run-guid>
-                    <tt>{{ getShortGuid(run.guid) }}</tt>
-                  </acronym>
-                </template>
+                <acronym :title="run.guid" data-run-guid>
+                  <tt>{{ getShortGuid(run.guid) }}</tt>
+                </acronym>
               </td>
-              <td>
-                <template v-if="run.language === '—'">
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif"
-                    alt="Loading"
-                  />
-                </template>
-                <template v-else>
-                  {{ run.language }}
-                </template>
-              </td>
+              <td>{{ run.language }}</td>
               <td
                 v-if="showUser"
                 class="text-break-all text-nowrap"
@@ -357,71 +335,19 @@
                   >1
                 </span>
               </td>
-              <td v-if="showPoints" class="numeric">
-                <template v-if="points(run) === '—'">
-                  <img
-                    class="loader"
-                    src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif"
-                    alt="Loading"
-                  />
-                </template>
-                <template v-else>
-                  {{ points(run) }}
-                </template>
-              </td>
-              <td v-if="showPoints" class="numeric">
-                <template v-if="penalty(run) === '—'">
-                  <img
-                    class="loader"
-                    src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif"
-                    alt="Loading"
-                  />
-                </template>
-                <template v-else>
-                  {{ penalty(run) }}
-                </template>
-              </td>
+              <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
+              <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
               <td
                 v-if="!showPoints"
                 :class="statusPercentageClass(run)"
                 class="numeric"
                 data-run-percentage
               >
-                <template v-if="percentage(run) === '—'">
-                  <img
-                    class="loader"
-                    src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif"
-                    alt="Loading"
-                  />
-                </template>
-                <template v-else>
-                  {{ percentage(run) }}
-                </template>
+                {{ percentage(run) }}
               </td>
+              <td class="numeric">{{ execution(run) }}</td>
               <td class="numeric">
-                <template v-if="execution(run) === '—'">
-                  <img
-                    class="loader"
-                    src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif"
-                    alt="Loading"
-                  />
-                </template>
-                <template v-else>
-                  {{ execution(run) }}
-                </template>
-              </td>
-              <td class="numeric">
-                <template v-if="output(run) === '—'">
-                  <img
-                    class="loader"
-                    src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif"
-                    alt="Loading"
-                  />
-                </template>
-                <template v-else>
-                  {{ output(run) }}
-                </template>
-
+                {{ output(run) }}
                 <br
                   v-if="outputIconColorStatus(run) != NumericOutputStatus.None"
                 />
@@ -448,30 +374,8 @@
                   style="color: orange"
                 />
               </td>
-              <td class="numeric">
-                <template v-if="memory(run) === '—'">
-                  <img
-                    class="loader"
-                    src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif"
-                    alt="Loading"
-                  />
-                </template>
-                <template v-else>
-                  {{ memory(run) }}
-                </template>
-              </td>
-              <td class="numeric">
-                <template v-if="runtime(run) === '—'">
-                  <img
-                    class="loader"
-                    src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif"
-                    alt="Loading"
-                  />
-                </template>
-                <template v-else>
-                  {{ runtime(run) }}
-                </template>
-              </td>
+              <td class="numeric">{{ memory(run) }}</td>
+              <td class="numeric">{{ runtime(run) }}</td>
               <td v-if="showDetails && !showDisqualify && !showRejudge">
                 <button
                   class="details btn-outline-dark btn-sm"
@@ -553,7 +457,7 @@
                   </div>
                 </div>
               </td>
-              <td v-else></td>
+              </template>
             </tr>
           </tbody>
         </table>
@@ -581,23 +485,23 @@
       </omegaup-overlay>
     </slot>
   </div>
-</template>
+  </template>
 
-<script lang="ts">
-import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
-import T from '../../lang';
-import { types } from '../../api_types';
-import * as time from '../../time';
-import user_Username from '../user/Username.vue';
-import common_Typeahead from '../common/Typeahead.vue';
-import arena_RunDetailsPopup from './RunDetailsPopup.vue';
-import { DisqualificationType } from './Runs.vue';
-import omegaup_Overlay from '../Overlay.vue';
+  <script lang="ts">
+  import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+  import T from '../../lang';
+  import { types } from '../../api_types';
+  import * as time from '../../time';
+  import user_Username from '../user/Username.vue';
+  import common_Typeahead from '../common/Typeahead.vue';
+  import arena_RunDetailsPopup from './RunDetailsPopup.vue';
+  import { DisqualificationType } from './Runs.vue';
+  import omegaup_Overlay from '../Overlay.vue';
 
-import { PaginationPlugin } from 'bootstrap-vue';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {
+  import { PaginationPlugin } from 'bootstrap-vue';
+  import { library } from '@fortawesome/fontawesome-svg-core';
+  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+  import {
   faQuestionCircle,
   faRedoAlt,
   faBan,
@@ -609,71 +513,71 @@ import {
   faCalendarAlt,
   faCheckCircle,
   faTimesCircle,
-} from '@fortawesome/free-solid-svg-icons';
+  } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faQuestionCircle);
-library.add(faRedoAlt);
-library.add(faBan);
-library.add(faSearchPlus);
-library.add(faExternalLinkAlt);
-library.add(faTimes);
-library.add(faDatabase);
-library.add(faClock);
-library.add(faCalendarAlt);
-library.add(faCheckCircle);
-library.add(faTimesCircle);
+  library.add(faQuestionCircle);
+  library.add(faRedoAlt);
+  library.add(faBan);
+  library.add(faSearchPlus);
+  library.add(faExternalLinkAlt);
+  library.add(faTimes);
+  library.add(faDatabase);
+  library.add(faClock);
+  library.add(faCalendarAlt);
+  library.add(faCheckCircle);
+  library.add(faTimesCircle);
 
-Vue.use(PaginationPlugin);
+  Vue.use(PaginationPlugin);
 
-declare global {
+  declare global {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface JQuery {
     popover(action: string): JQuery;
   }
-}
+  }
 
-export enum MemoryStatus {
+  export enum MemoryStatus {
   NotAvailable = 'MEMORY_NOT_AVAILABLE',
   Exceeded = 'MEMORY_EXCEEDED',
-}
+  }
 
-export enum RuntimeStatus {
+  export enum RuntimeStatus {
   NotAvailable = 'RUNTIME_NOT_AVAILABLE',
   Exceeded = 'RUNTIME_EXCEEDED',
-}
+  }
 
-export enum ExecutionStatus {
+  export enum ExecutionStatus {
   JudgeError = 'EXECUTION_JUDGE_ERROR',
   ValidatorError = 'EXECUTION_VALIDATOR_ERROR',
   CompilationError = 'EXECUTION_COMPILATION_ERROR',
   RuntimeFunctionError = 'EXECUTION_RUNTIME_FUNCTION_ERROR',
   RuntimeError = 'EXECUTION_RUNTIME_ERROR',
   Interrupted = 'EXECUTION_INTERRUPTED',
-}
+  }
 
-export enum NumericOutputStatus {
+  export enum NumericOutputStatus {
   None = 0,
   Correct = 1,
   Incorrect = 2,
   Interrupted = 3,
-}
+  }
 
-export enum StringOutputStatus {
+  export enum StringOutputStatus {
   Exceeded = 'OUTPUT_EXCEEDED',
   Incorrect = 'OUTPUT_INCORRECT',
   Interrupted = 'OUTPUT_INTERRUPTED',
-}
+  }
 
-export enum PopupDisplayed {
+  export enum PopupDisplayed {
   None,
   RunSubmit,
   RunDetails,
   Promotion,
   Demotion,
   Reviewer,
-}
+  }
 
-@Component({
+  @Component({
   components: {
     FontAwesomeIcon,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
@@ -681,8 +585,8 @@ export enum PopupDisplayed {
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-user-username': user_Username,
   },
-})
-export default class Runs extends Vue {
+  })
+  export default class Runs extends Vue {
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: true }) isProblemsetOpened!: boolean;
   @Prop({ default: false }) showContest!: boolean;
@@ -1177,40 +1081,35 @@ export default class Runs extends Vue {
     }
     this.$emit('update-search-result-users', { query });
   }
-}
-</script>
+  }
+  </script>
 
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
+  <style lang="scss" scoped>
+  @import '../../../../sass/main.scss';
 
-.text-break-all {
+  .text-break-all {
   word-break: break-all;
-}
+  }
 
-.runs {
+  .runs {
   border: 1px solid var(--arena-runs-table-border-color);
   margin-top: 2em;
-}
+  }
 
-.loader {
-  width: 55px;
-  height: 55px;
-}
-
-.runs.filters {
+  .runs.filters {
   font-weight: bold;
   font-size: 1em;
   margin-bottom: 1em;
-}
+  }
 
-.runs td,
-.runs th {
+  .runs td,
+  .runs th {
   border: 1px solid var(--arena-runs-table-td-border-color);
   border-width: 1px 0;
   text-align: center;
-}
+  }
 
-.runs tfoot td {
+  .runs tfoot td {
   a,
   button {
     display: block;
@@ -1225,31 +1124,40 @@ export default class Runs extends Vue {
   button:hover {
     background: var(--arena-runs-table-tfoot-background-color--hoover);
   }
-}
+  }
 
-.status-disqualified {
+  .status-disqualified {
   background: var(--arena-runs-table-status-disqualified-background-color);
   color: var(--arena-runs-table-status-disqualified-font-color);
-}
-
-.status-je-ve {
+  }
+  .status-je-ve {
   background: var(--arena-runs-table-status-je-ve-background-color);
   color: var(--arena-runs-table-status-je-ve-font-color);
-}
-
-.status-ac {
+  }
+  .status-ac {
   background: var(--arena-runs-table-status-ac-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
-}
-
-.status-ce {
+  }
+  .status-ce {
   background: var(--arena-runs-table-status-ce-background-color);
   color: var(--arena-runs-table-status-ce-font-color);
-}
-
-.loader {
-  width: 50px;
-  height: 35px;
-  object-fit: cover;
-}
-</style>
+  }
+  .line {
+     height: 49px;
+     background: #e0e0e0;
+     border-radius: 8px;
+     animation: loading 1.5s infinite;
+  }
+  @keyframes loading {
+     0% {
+         background: #e0e0e0;
+     }
+     50% {
+         background: #f5f5f5;
+     }
+     100% {
+         background: #e0e0e0;
+     }
+  }
+  </style>
+  
