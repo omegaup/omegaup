@@ -493,12 +493,11 @@ class Authorization {
         $identity,
         $groups = []
     ): bool {
-        if (empty($groups) || is_null($identity->user_id)) {
-            return false;
-        }
-
         if (self::isSystemAdmin($identity)) {
             return true;
+        }
+        if (empty($groups) || is_null($identity->user_id)) {
+            return false;
         }
         return \OmegaUp\DAO\GroupsIdentities::existsByGroupId(
             $identity,
