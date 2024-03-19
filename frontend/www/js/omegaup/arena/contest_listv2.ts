@@ -7,7 +7,7 @@ import Vue from 'vue';
 import arena_ContestList, {
   ContestTab,
   ContestOrder,
-  ContestFilter
+  ContestFilter,
 } from '../components/arena/ContestListv2.vue';
 import contestStore from './contestStore';
 
