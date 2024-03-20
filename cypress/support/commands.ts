@@ -164,7 +164,7 @@ Cypress.Commands.add(
     cy.get('[data-new-run]').click();
     cy.get('[name="language"]').select(language);
     cy.fixture(fixturePath).then((fileContent) => {
-      cy.get('.CodeMirror-line').type(fileContent);
+      cy.get('.CodeMirror-line').first().type(fileContent);
       cy.get('[data-submit-run]').click();
     });
   },
@@ -285,14 +285,14 @@ Cypress.Commands.add(
       // Only the first submission is created because of server validations
       if (!runs[idx].valid) {
         cy.fixture(runs[idx].fixturePath).then((fileContent) => {
-          cy.get('.CodeMirror-line').type(fileContent);
+          cy.get('.CodeMirror-line').first().type(fileContent);
           cy.get('[data-submit-run]').should('be.disabled');
         });
         break;
       }
 
       cy.fixture(runs[idx].fixturePath).then((fileContent) => {
-        cy.get('.CodeMirror-line').type(fileContent);
+        cy.get('.CodeMirror-line').first().type(fileContent);
         cy.get('[data-submit-run]').click();
       });
 
