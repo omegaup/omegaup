@@ -68,7 +68,7 @@
             <omegaup-datetimepicker
               v-model="startTime"
               data-start-date
-              :start="new Date()"
+              :start="minDateTimeForContest"
             ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormStartDateDesc }}</p>
           </div>
@@ -613,6 +613,13 @@ export default class NewForm extends Vue {
       return;
     }
     this.$emit('create-contest', request);
+  }
+
+  get minDateTimeForContest(): null | Date {
+    if (this.update) {
+      return null;
+    }
+    return new Date();
   }
 
   get teamsGroupName(): null | string {
