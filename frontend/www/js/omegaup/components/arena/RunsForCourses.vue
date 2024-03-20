@@ -1,4 +1,4 @@
-​​<template>
+<template>
   <div class="mt-2" data-runs>
     <slot name="title">
       <div class="card-header">
