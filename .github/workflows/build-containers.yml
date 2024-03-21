@@ -18,7 +18,13 @@ jobs:
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
 
-      - name: Build docker containers
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: "latest"
+          install: true
+
+      - name: Build docker containers with Buildx
         env:
           COMPOSE_DOCKER_CLI_BUILD: 1
           DOCKER_BUILDKIT: 1
@@ -29,7 +35,9 @@ jobs:
             frontend \
             frontend-sidecar \
             nginx \
-            php
+            php \
+            --cache-from type=registry,ref=docker.pkg.github.com/${{ github.repository }}/cache-image \
+            --cache-to type=registry,ref=docker.pkg.github.com/${{ github.repository }}/cache-image
 
       - name: Push containers to GitHub registry
         run: |
@@ -56,6 +64,7 @@ jobs:
             docker tag "omegaup/${container}:${{ github.sha }}" "${container_name}"
             docker push "${container_name}"
           done
+
 
       - name: Update k8s sandbox manifests
         if: ${{ github.ref == 'refs/heads/main' }}
