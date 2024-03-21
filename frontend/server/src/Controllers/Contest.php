@@ -34,7 +34,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration?: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestList=array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
- * @psalm-type ContestListPayload=array{contests: TimeTypeContests, countContests: array<string, int>, isLogged: bool, query: null|string}
+ * @psalm-type ContestListPayload=array{contests: list<ContestListItem>, countContests: int, query: string | null}
  * @psalm-type ContestListv2Payload=array{contests: ContestList, countContests: array{current: int, future: int, past: int}, query: string | null}
  * @psalm-type ContestNewPayload=array{languages: array<string, string>, hasVisitedSection?: bool}
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
@@ -214,9 +214,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         int $activeContests,
         int $recommended,
         bool $public = false,
-        ?int $participating = null
+        ?int $participating = null,
+        ?string $orderBy = null
     ) {
-        $cacheKey = "0-{$activeContests}-{$recommended}-{$page}-{$pageSize}";
+        $cacheKey = "0-{$activeContests}-{$recommended}-{$participating}-{$page}-{$pageSize}";
         if (is_null($identity) || is_null($identity->identity_id)) {
             // Get all public contests
             $callback = /** @return array{contests: list<ContestListItem>, count: int} */ fn () => \OmegaUp\DAO\Contests::getAllPublicContests(
@@ -224,7 +225,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $pageSize,
                 $activeContests,
                 $recommended,
-                $query
+                $query,
+                $orderBy
             );
             if (empty($query)) {
                 [
@@ -250,7 +252,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $page,
                 $pageSize,
                 $activeContests,
-                $query
+                $query,
+                $orderBy
             );
         } elseif ($public) {
             [
@@ -260,7 +263,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $identity->identity_id,
                 $page,
                 $pageSize,
-                $query
+                $query,
+                $orderBy
             );
         } elseif (\OmegaUp\Authorization::isSystemAdmin($identity)) {
             // Get all contests
@@ -269,7 +273,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $pageSize,
                 $activeContests,
                 $recommended,
-                $query
+                $query,
+                $orderBy
             );
             if (empty($query)) {
                 [
@@ -297,7 +302,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $pageSize,
                 $activeContests,
                 $recommended,
-                $query
+                $query,
+                $orderBy
             );
         }
         $addedContests = [];
@@ -5496,6 +5502,106 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'contest_report',
+        ];
+    }
+
+    /**
+     * @return array{templateProperties: array{payload: ContestListv2Payload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param null|string $sort_order
+     * @omegaup-request-param null|string $filter
+     * @omegaup-request-param null|string $tab_name
+     * @omegaup-request-param null|string $query
+     */
+    public static function getContestListDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ) {
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing.
+            $r->identity = null;
+        }
+
+        $page = $r->ensureOptionalInt('page') ?? 1; // The default page is 1 always
+        $pageSize = $r->ensureOptionalInt(
+            'page_size'
+        ) ?? \OmegaUp\Controllers\Contest::CONTEST_LIST_PAGE_SIZE;
+        $query = $r->ensureOptionalString(
+            key: 'query',
+            required: false,
+            validator: fn (string $query) => \OmegaUp\Validators::stringOfLengthInRange(
+                $query,
+                0,
+                250
+            )
+        );
+        $order = $r->ensureOptionalEnum(
+            'sort_order',
+            \OmegaUp\DAO\Enum\ContestOrderStatus::getAll(),
+            required: false
+        ) ?? \OmegaUp\DAO\Enum\ContestOrderStatus::NONE;
+        $filter = $r->ensureOptionalEnum(
+            'filter',
+            \OmegaUp\DAO\Enum\ContestFilterStatus::getAll(),
+            required: false
+        ) ?? \OmegaUp\DAO\Enum\ContestFilterStatus::ALL;
+        $tab = $r->ensureOptionalEnum(
+            'tab_name',
+            \OmegaUp\DAO\Enum\ContestTabStatus::getAll(),
+            required: false
+        ) ?? \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT;
+        switch ($tab) {
+            case \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT:
+                $activeStatus = \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE;
+                break;
+            case \OmegaUp\DAO\Enum\ContestTabStatus::PAST:
+                $activeStatus = \OmegaUp\DAO\Enum\ActiveStatus::PAST;
+                break;
+            case \OmegaUp\DAO\Enum\ContestTabStatus::FUTURE:
+                $activeStatus = \OmegaUp\DAO\Enum\ActiveStatus::FUTURE;
+                break;
+        }
+
+        $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
+        if ($filter === \OmegaUp\DAO\Enum\ContestFilterStatus::ONLY_RECOMMENDED) {
+            $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::RECOMMENDED;
+        }
+
+        $participating = null;
+        if ($filter === \OmegaUp\DAO\Enum\ContestFilterStatus::SIGNED_UP) {
+            $participating = \OmegaUp\DAO\Enum\ParticipatingStatus::YES;
+        }
+
+        [
+            'contests' => $contests,
+            'count' => $count,
+        ] = self::getContestList(
+            $r->identity,
+            $query,
+            $page,
+            $pageSize,
+            $activeStatus,
+            $recommended,
+            public: false,
+            participating: $participating,
+            orderBy: $order
+        );
+
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'contests' => $contests,
+                    'countContests' => $count,
+                    'query' => $query,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleContestList'
+                ),
+            ],
+            'entrypoint' => 'arena_contest_list',
         ];
     }
 
