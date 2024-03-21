@@ -408,7 +408,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'languages',
                 array_merge(
                     [''],
-                    array_keys(getSuportedProgrammingLanguages())
+                    array_keys(
+                        \OmegaUp\Controllers\User::getSuportedProgrammingLanguages()
+                    )
                 )
             );
         }

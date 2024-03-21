@@ -1587,7 +1587,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'country' => null,
             'country_id' => $userData['country_id'],
             'classname' => $userData['classname'],
-            'programming_languages' => getSuportedProgrammingLanguages(),
+            'programming_languages' => \OmegaUp\Controllers\User::getSuportedProgrammingLanguages(),
             'email' => null,
             'gender' => null,
             'graduation_date' => null,
@@ -1646,7 +1646,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'classname' => \OmegaUp\DAO\Users::getRankingClassName(
                     $identity->user_id
                 ),
-                'programming_languages' => getSuportedProgrammingLanguages()
+                'programming_languages' => \OmegaUp\Controllers\User::getSuportedProgrammingLanguages()
             ]
         );
     }
@@ -4283,7 +4283,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         100,
                         'name'
                     ),
-                    'programmingLanguages' => getSuportedProgrammingLanguages(),
+                    'programmingLanguages' => \OmegaUp\Controllers\User::getSuportedProgrammingLanguages(),
                     'extraProfileDetails' => null,
                     'identities' => [],
                 ],

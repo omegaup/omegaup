@@ -283,7 +283,9 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue(
             !array_diff(
                 $course['languages'],
-                array_keys(getSuportedProgrammingLanguages())
+                array_keys(
+                    \OmegaUp\Controllers\User::getSuportedProgrammingLanguages()
+                )
             )
         );
 

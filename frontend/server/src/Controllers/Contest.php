@@ -1324,7 +1324,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return [
             'templateProperties' => [
                 'payload' => [
-                    'languages' => getSuportedProgrammingLanguages(),
+                    'languages' => \OmegaUp\Controllers\User::getSuportedProgrammingLanguages(),
                     'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
                         'has-visited-create-contest'
                     ),
@@ -2059,7 +2059,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             intval($adminIdentity->identity_id),
             $contest->problemset_id
         );
-        $result['available_languages'] = getSuportedProgrammingLanguages();
+        $result['available_languages'] = \OmegaUp\Controllers\User::getSuportedProgrammingLanguages();
         $result['admin'] = true;
         $result['scoreboard_url'] = $problemset->scoreboard_url;
         $result['scoreboard_url_admin'] = $problemset->scoreboard_url_admin;
@@ -2859,7 +2859,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $language,
                     'languages',
                     array_keys(
-                        getSuportedProgrammingLanguages()
+                        \OmegaUp\Controllers\User::getSuportedProgrammingLanguages()
                     )
                 );
             }
@@ -5131,7 +5131,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        $languages = array_keys(getSuportedProgrammingLanguages());
+        $languages = array_keys(
+            \OmegaUp\Controllers\User::getSuportedProgrammingLanguages()
+        );
 
         // Get our runs
         return self::getAllRuns(

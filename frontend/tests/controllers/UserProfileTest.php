@@ -703,10 +703,14 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         'rs' => 'Rust (1.56.1)',
         'js' => 'JavaScript (Node.js 16)',
     ];
-    public function testGetSupportedProgrammingLanguages($excludedLanguage, $expectedLanguages)
-    {
-        $result = \OmegaUp\Controllers\User::getSupportedProgrammingLanguages($excludedLanguage);
-        $this->assertSame($self::SUPPORTED_LANGUAGES, $result);
+    public function testGetSupportedProgrammingLanguages(
+        $excludedLanguage,
+        $expectedLanguages
+    ) {
+        $result = \OmegaUp\Controllers\User::getSupportedProgrammingLanguages(
+            $excludedLanguage
+        );
+        $this->assertSame(self::SUPPORTED_LANGUAGES, $result);
     }
 
     public function testGetUserDependents() {
