@@ -31,7 +31,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestCertificatesAdminDetails=array{certificateCutoff: int|null, certificatesStatus: string, isCertificateGenerator: bool}
  * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<ProblemsetProblemWithVersions>, users: list<ContestUser>, groups: list<ContestGroup>, teams_group: ContestGroup|null, requests: list<ContestRequest>, admins: list<ContestAdmin>, group_admins: list<ContestGroupAdmin>, original_contest_admission_mode: null|string, certificatesDetails: ContestCertificatesAdminDetails}
  * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string, shouldShowModalToLoginWithRegisteredIdentity: bool}
- * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration?: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestList=array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
  * @psalm-type ContestListPayload=array{contests: list<ContestListItem>, countContests: int, query: string | null}
@@ -5506,7 +5506,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{templateProperties: array{payload: ContestListv2Payload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: ContestListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int|null $page
      * @omegaup-request-param int|null $page_size
@@ -5543,6 +5543,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Enum\ContestOrderStatus::getAll(),
             required: false
         ) ?? \OmegaUp\DAO\Enum\ContestOrderStatus::NONE;
+        $orderBy = strval($order);
         $filter = $r->ensureOptionalEnum(
             'filter',
             \OmegaUp\DAO\Enum\ContestFilterStatus::getAll(),
@@ -5563,6 +5564,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             case \OmegaUp\DAO\Enum\ContestTabStatus::FUTURE:
                 $activeStatus = \OmegaUp\DAO\Enum\ActiveStatus::FUTURE;
                 break;
+            default:
+                $activeStatus = \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE;
         }
 
         $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
@@ -5587,7 +5590,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $recommended,
             public: false,
             participating: $participating,
-            orderBy: $order
+            orderBy: $orderBy
         );
 
         return [
