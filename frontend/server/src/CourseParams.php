@@ -169,7 +169,7 @@ class CourseParams {
             \OmegaUp\Validators::validateValidSubset(
                 $languages,
                 'languages',
-                array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
+                array_keys(getSuportedProgrammingLanguages())
             );
         }
 
