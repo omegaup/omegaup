@@ -647,7 +647,6 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Languages must be validated against the problem's allowed languages.
      */
-
     public function testRunInvalidProblemLanguage() {
         // Create public problem without C as an option.
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
