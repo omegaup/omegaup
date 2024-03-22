@@ -138,7 +138,7 @@ export class CoursePage {
     cy.get('[data-new-run]').click();
     cy.get('[name="language"]').select(runOptions.language);
     cy.fixture(runOptions.fixturePath).then((fileContent) => {
-      cy.get('.CodeMirror-line').type(fileContent);
+      cy.get('.CodeMirror-line').first().type(fileContent);
       cy.get('[data-submit-run]').click();
     });
     cy.get('.alert-danger').should('be.visible');
@@ -152,7 +152,7 @@ export class CoursePage {
     cy.get('[data-new-run]').click();
     cy.get('[name="language"]').select(runOptions.language);
     cy.fixture(runOptions.fixturePath).then((fileContent) => {
-      cy.get('.CodeMirror-line').type(fileContent);
+      cy.get('.CodeMirror-line').first().type(fileContent);
       cy.get('[data-submit-run]').click();
     });
     const expectedStatus: Status = runOptions.status;
