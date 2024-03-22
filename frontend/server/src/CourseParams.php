@@ -170,7 +170,6 @@ class CourseParams {
                 $languages,
                 'languages',
                 array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
-            )
             );
         }
 

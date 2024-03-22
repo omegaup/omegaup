@@ -285,7 +285,6 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 $course['languages'],
                 array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
             )
-        )
         );
 
         $expectedNewLanguages = ['py2', 'py3'];
