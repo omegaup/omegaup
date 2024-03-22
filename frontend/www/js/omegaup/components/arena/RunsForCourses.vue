@@ -243,220 +243,224 @@
           </tfoot>
           <tbody>
             <tr v-for="run in paginatedRuns" :key="run.guid">
-              <template v-if="run.status!=='ready'">
+              <template v-if="run.status !== 'ready'">
                 <td colspan="16">
-                     <div class="line"></div>
-                 </td>
+                  <div class="line"></div>
+                </td>
               </template>
               <template v-else>
-              <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
-              <td v-show="showGUID">
-                <acronym :title="run.guid" data-run-guid>
-                  <tt>{{ getShortGuid(run.guid) }}</tt>
-                </acronym>
-              </td>
-              <td>{{ run.language }}</td>
-              <td
-                v-if="showUser"
-                class="text-break-all text-nowrap"
-                :data-username="run.username"
-              >
-                <omegaup-user-username
-                  :classname="run.classname"
-                  :username="run.username"
-                  :country="run.country"
-                  :linkify="true"
-                  :href="'#runs'"
-                  :emit-click-event="true"
-                  @click="
-                    (username) =>
-                      (filterUsername = { key: username, value: username })
-                  "
-                ></omegaup-user-username>
-                <a :href="`/profile/${run.username}/`" class="ml-2">
-                  <font-awesome-icon :icon="['fas', 'external-link-alt']" />
-                </a>
-              </td>
-              <td v-if="showContest" class="text-break-all">
-                <a
-                  href="#runs"
-                  @click="
-                    onEmitFilterChanged({
-                      filter: 'contest',
-                      value: run.contest_alias,
-                    })
-                  "
-                  >{{ run.contest_alias }}</a
+                <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
+                <td v-show="showGUID">
+                  <acronym :title="run.guid" data-run-guid>
+                    <tt>{{ getShortGuid(run.guid) }}</tt>
+                  </acronym>
+                </td>
+                <td>{{ run.language }}</td>
+                <td
+                  v-if="showUser"
+                  class="text-break-all text-nowrap"
+                  :data-username="run.username"
                 >
-                <a
-                  v-if="run.contest_alias"
-                  :href="`/arena/${run.contest_alias}/`"
-                  class="ml-2"
-                >
-                  <font-awesome-icon :icon="['fas', 'external-link-alt']" />
-                </a>
-              </td>
-              <td v-if="showProblem" class="text-break-all">
-                <a
-                  href="#runs"
-                  @click="
-                    onEmitFilterChanged({
-                      filter: 'problem',
-                      value: run.alias,
-                    })
-                  "
-                  >{{ run.alias }}</a
-                >
-                <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
-                  <font-awesome-icon :icon="['fas', 'external-link-alt']" />
-                </a>
-              </td>
-              <td
-                :class="statusClass(run)"
-                data-run-status
-                class="text-center opacity-4 font-weight-bold"
-                hidden
-              >
-                <span class="mr-1">{{ status(run) }}</span>
-                <button
-                  v-if="!!statusHelp(run)"
-                  type="button"
-                  :data-content="statusHelp(run)"
-                  data-toggle="popover"
-                  data-trigger="focus"
-                  class="btn-outline-dark btn-sm"
-                  @click="showVerdictHelp"
-                >
-                  <font-awesome-icon :icon="['fas', 'question-circle']" />
-                </button>
-                <span
-                  v-if="run.submission_feedback_id !== null && showDisqualify"
-                  class="position-absolute top-0 end-0 badge badge-pill badge-danger"
-                  >1
-                </span>
-              </td>
-              <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
-              <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
-              <td
-                v-if="!showPoints"
-                :class="statusPercentageClass(run)"
-                class="numeric"
-                data-run-percentage
-              >
-                {{ percentage(run) }}
-              </td>
-              <td class="numeric">{{ execution(run) }}</td>
-              <td class="numeric">
-                {{ output(run) }}
-                <br
-                  v-if="outputIconColorStatus(run) != NumericOutputStatus.None"
-                />
-                <font-awesome-icon
-                  v-if="
-                    outputIconColorStatus(run) === NumericOutputStatus.Correct
-                  "
-                  :icon="['fas', 'check-circle']"
-                  style="color: green"
-                />
-                <font-awesome-icon
-                  v-else-if="
-                    outputIconColorStatus(run) === NumericOutputStatus.Incorrect
-                  "
-                  :icon="['fas', 'times-circle']"
-                  style="color: red"
-                />
-                <font-awesome-icon
-                  v-else-if="
-                    outputIconColorStatus(run) ===
-                    NumericOutputStatus.Interrupted
-                  "
-                  :icon="['fas', 'exclamation-circle']"
-                  style="color: orange"
-                />
-              </td>
-              <td class="numeric">{{ memory(run) }}</td>
-              <td class="numeric">{{ runtime(run) }}</td>
-              <td v-if="showDetails && !showDisqualify && !showRejudge">
-                <button
-                  class="details btn-outline-dark btn-sm"
-                  :data-run-details="run.guid"
-                  @click="onRunDetails(run)"
-                >
-                  <font-awesome-icon :icon="['fas', 'search-plus']" />
-                </button>
-                <button
-                  v-if="requestFeedback"
-                  class="details btn-outline-dark btn-sm"
-                  @click="$emit('request-feedback', run.guid)"
-                >
-                  <font-awesome-icon
-                    :title="T.courseRequestFeedback"
-                    icon="comment-dots"
-                  />
-                </button>
-              </td>
-              <td
-                v-else-if="showDetails || showDisqualify || showRejudge"
-                :data-actions="run.guid"
-              >
-                <div class="dropdown">
-                  <button
-                    data-runs-actions-button
-                    class="btn btn-secondary dropdown-toggle"
-                    type="button"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
+                  <omegaup-user-username
+                    :classname="run.classname"
+                    :username="run.username"
+                    :country="run.country"
+                    :linkify="true"
+                    :href="'#runs'"
+                    :emit-click-event="true"
+                    @click="
+                      (username) =>
+                        (filterUsername = { key: username, value: username })
+                    "
+                  ></omegaup-user-username>
+                  <a :href="`/profile/${run.username}/`" class="ml-2">
+                    <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+                  </a>
+                </td>
+                <td v-if="showContest" class="text-break-all">
+                  <a
+                    href="#runs"
+                    @click="
+                      onEmitFilterChanged({
+                        filter: 'contest',
+                        value: run.contest_alias,
+                      })
+                    "
+                    >{{ run.contest_alias }}</a
                   >
-                    {{ T.arenaRunsActions }}
+                  <a
+                    v-if="run.contest_alias"
+                    :href="`/arena/${run.contest_alias}/`"
+                    class="ml-2"
+                  >
+                    <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+                  </a>
+                </td>
+                <td v-if="showProblem" class="text-break-all">
+                  <a
+                    href="#runs"
+                    @click="
+                      onEmitFilterChanged({
+                        filter: 'problem',
+                        value: run.alias,
+                      })
+                    "
+                    >{{ run.alias }}</a
+                  >
+                  <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
+                    <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+                  </a>
+                </td>
+                <td
+                  :class="statusClass(run)"
+                  data-run-status
+                  class="text-center opacity-4 font-weight-bold"
+                  hidden
+                >
+                  <span class="mr-1">{{ status(run) }}</span>
+                  <button
+                    v-if="!!statusHelp(run)"
+                    type="button"
+                    :data-content="statusHelp(run)"
+                    data-toggle="popover"
+                    data-trigger="focus"
+                    class="btn-outline-dark btn-sm"
+                    @click="showVerdictHelp"
+                  >
+                    <font-awesome-icon :icon="['fas', 'question-circle']" />
                   </button>
-                  <div class="dropdown-menu">
+                  <span
+                    v-if="run.submission_feedback_id !== null && showDisqualify"
+                    class="position-absolute top-0 end-0 badge badge-pill badge-danger"
+                    >1
+                  </span>
+                </td>
+                <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
+                <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
+                <td
+                  v-if="!showPoints"
+                  :class="statusPercentageClass(run)"
+                  class="numeric"
+                  data-run-percentage
+                >
+                  {{ percentage(run) }}
+                </td>
+                <td class="numeric">{{ execution(run) }}</td>
+                <td class="numeric">
+                  {{ output(run) }}
+                  <br
+                    v-if="
+                      outputIconColorStatus(run) != NumericOutputStatus.None
+                    "
+                  />
+                  <font-awesome-icon
+                    v-if="
+                      outputIconColorStatus(run) === NumericOutputStatus.Correct
+                    "
+                    :icon="['fas', 'check-circle']"
+                    style="color: green"
+                  />
+                  <font-awesome-icon
+                    v-else-if="
+                      outputIconColorStatus(run) ===
+                      NumericOutputStatus.Incorrect
+                    "
+                    :icon="['fas', 'times-circle']"
+                    style="color: red"
+                  />
+                  <font-awesome-icon
+                    v-else-if="
+                      outputIconColorStatus(run) ===
+                      NumericOutputStatus.Interrupted
+                    "
+                    :icon="['fas', 'exclamation-circle']"
+                    style="color: orange"
+                  />
+                </td>
+                <td class="numeric">{{ memory(run) }}</td>
+                <td class="numeric">{{ runtime(run) }}</td>
+                <td v-if="showDetails && !showDisqualify && !showRejudge">
+                  <button
+                    class="details btn-outline-dark btn-sm"
+                    :data-run-details="run.guid"
+                    @click="onRunDetails(run)"
+                  >
+                    <font-awesome-icon :icon="['fas', 'search-plus']" />
+                  </button>
+                  <button
+                    v-if="requestFeedback"
+                    class="details btn-outline-dark btn-sm"
+                    @click="$emit('request-feedback', run.guid)"
+                  >
+                    <font-awesome-icon
+                      :title="T.courseRequestFeedback"
+                      icon="comment-dots"
+                    />
+                  </button>
+                </td>
+                <td
+                  v-else-if="showDetails || showDisqualify || showRejudge"
+                  :data-actions="run.guid"
+                >
+                  <div class="dropdown">
                     <button
-                      v-if="showDetails"
-                      data-runs-show-details-button
-                      :data-run-details="run.guid"
-                      class="btn-link dropdown-item"
-                      @click="onRunDetails(run)"
+                      data-runs-actions-button
+                      class="btn btn-secondary dropdown-toggle"
+                      type="button"
+                      data-toggle="dropdown"
+                      aria-haspopup="true"
+                      aria-expanded="false"
                     >
-                      {{ T.arenaRunsActionsDetails }}
+                      {{ T.arenaRunsActions }}
                     </button>
-                    <button
-                      v-if="showRejudge"
-                      :data-actions-rejudge="run.guid"
-                      class="btn-link dropdown-item"
-                      @click="$emit('rejudge', run)"
-                    >
-                      {{ T.arenaRunsActionsRejudge }}
-                    </button>
-                    <template v-if="showDisqualify">
-                      <div class="dropdown-divider"></div>
-                      <template v-if="run.type === 'normal'">
+                    <div class="dropdown-menu">
+                      <button
+                        v-if="showDetails"
+                        data-runs-show-details-button
+                        :data-run-details="run.guid"
+                        class="btn-link dropdown-item"
+                        @click="onRunDetails(run)"
+                      >
+                        {{ T.arenaRunsActionsDetails }}
+                      </button>
+                      <button
+                        v-if="showRejudge"
+                        :data-actions-rejudge="run.guid"
+                        class="btn-link dropdown-item"
+                        @click="$emit('rejudge', run)"
+                      >
+                        {{ T.arenaRunsActionsRejudge }}
+                      </button>
+                      <template v-if="showDisqualify">
+                        <div class="dropdown-divider"></div>
+                        <template v-if="run.type === 'normal'">
+                          <button
+                            :data-actions-disqualify="run.guid"
+                            class="btn-link dropdown-item"
+                            @click="
+                              $emit('disqualify', {
+                                run,
+                                disqualificationType:
+                                  DisqualificationType.ByGUID,
+                              })
+                            "
+                          >
+                            {{ T.arenaRunsActionsDisqualifyByGUID }}
+                          </button>
+                        </template>
+
                         <button
-                          :data-actions-disqualify="run.guid"
+                          v-else-if="run.type === 'disqualified'"
+                          :data-actions-requalify="run.guid"
                           class="btn-link dropdown-item"
-                          @click="
-                            $emit('disqualify', {
-                              run,
-                              disqualificationType: DisqualificationType.ByGUID,
-                            })
-                          "
+                          @click="$emit('requalify', run)"
                         >
-                          {{ T.arenaRunsActionsDisqualifyByGUID }}
+                          {{ T.arenaRunsActionsRequalify }}
                         </button>
                       </template>
-
-                      <button
-                        v-else-if="run.type === 'disqualified'"
-                        :data-actions-requalify="run.guid"
-                        class="btn-link dropdown-item"
-                        @click="$emit('requalify', run)"
-                      >
-                        {{ T.arenaRunsActionsRequalify }}
-                      </button>
-                    </template>
+                    </div>
                   </div>
-                </div>
-              </td>
+                </td>
               </template>
             </tr>
           </tbody>
@@ -485,23 +489,23 @@
       </omegaup-overlay>
     </slot>
   </div>
-  </template>
+</template>
 
-  <script lang="ts">
-  import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
-  import T from '../../lang';
-  import { types } from '../../api_types';
-  import * as time from '../../time';
-  import user_Username from '../user/Username.vue';
-  import common_Typeahead from '../common/Typeahead.vue';
-  import arena_RunDetailsPopup from './RunDetailsPopup.vue';
-  import { DisqualificationType } from './Runs.vue';
-  import omegaup_Overlay from '../Overlay.vue';
+<script lang="ts">
+import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import T from '../../lang';
+import { types } from '../../api_types';
+import * as time from '../../time';
+import user_Username from '../user/Username.vue';
+import common_Typeahead from '../common/Typeahead.vue';
+import arena_RunDetailsPopup from './RunDetailsPopup.vue';
+import { DisqualificationType } from './Runs.vue';
+import omegaup_Overlay from '../Overlay.vue';
 
-  import { PaginationPlugin } from 'bootstrap-vue';
-  import { library } from '@fortawesome/fontawesome-svg-core';
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import {
+import { PaginationPlugin } from 'bootstrap-vue';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
   faQuestionCircle,
   faRedoAlt,
   faBan,
@@ -513,71 +517,71 @@
   faCalendarAlt,
   faCheckCircle,
   faTimesCircle,
-  } from '@fortawesome/free-solid-svg-icons';
+} from '@fortawesome/free-solid-svg-icons';
 
-  library.add(faQuestionCircle);
-  library.add(faRedoAlt);
-  library.add(faBan);
-  library.add(faSearchPlus);
-  library.add(faExternalLinkAlt);
-  library.add(faTimes);
-  library.add(faDatabase);
-  library.add(faClock);
-  library.add(faCalendarAlt);
-  library.add(faCheckCircle);
-  library.add(faTimesCircle);
+library.add(faQuestionCircle);
+library.add(faRedoAlt);
+library.add(faBan);
+library.add(faSearchPlus);
+library.add(faExternalLinkAlt);
+library.add(faTimes);
+library.add(faDatabase);
+library.add(faClock);
+library.add(faCalendarAlt);
+library.add(faCheckCircle);
+library.add(faTimesCircle);
 
-  Vue.use(PaginationPlugin);
+Vue.use(PaginationPlugin);
 
-  declare global {
+declare global {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface JQuery {
     popover(action: string): JQuery;
   }
-  }
+}
 
-  export enum MemoryStatus {
+export enum MemoryStatus {
   NotAvailable = 'MEMORY_NOT_AVAILABLE',
   Exceeded = 'MEMORY_EXCEEDED',
-  }
+}
 
-  export enum RuntimeStatus {
+export enum RuntimeStatus {
   NotAvailable = 'RUNTIME_NOT_AVAILABLE',
   Exceeded = 'RUNTIME_EXCEEDED',
-  }
+}
 
-  export enum ExecutionStatus {
+export enum ExecutionStatus {
   JudgeError = 'EXECUTION_JUDGE_ERROR',
   ValidatorError = 'EXECUTION_VALIDATOR_ERROR',
   CompilationError = 'EXECUTION_COMPILATION_ERROR',
   RuntimeFunctionError = 'EXECUTION_RUNTIME_FUNCTION_ERROR',
   RuntimeError = 'EXECUTION_RUNTIME_ERROR',
   Interrupted = 'EXECUTION_INTERRUPTED',
-  }
+}
 
-  export enum NumericOutputStatus {
+export enum NumericOutputStatus {
   None = 0,
   Correct = 1,
   Incorrect = 2,
   Interrupted = 3,
-  }
+}
 
-  export enum StringOutputStatus {
+export enum StringOutputStatus {
   Exceeded = 'OUTPUT_EXCEEDED',
   Incorrect = 'OUTPUT_INCORRECT',
   Interrupted = 'OUTPUT_INTERRUPTED',
-  }
+}
 
-  export enum PopupDisplayed {
+export enum PopupDisplayed {
   None,
   RunSubmit,
   RunDetails,
   Promotion,
   Demotion,
   Reviewer,
-  }
+}
 
-  @Component({
+@Component({
   components: {
     FontAwesomeIcon,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
@@ -585,8 +589,8 @@
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-user-username': user_Username,
   },
-  })
-  export default class Runs extends Vue {
+})
+export default class Runs extends Vue {
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: true }) isProblemsetOpened!: boolean;
   @Prop({ default: false }) showContest!: boolean;
@@ -1081,35 +1085,35 @@
     }
     this.$emit('update-search-result-users', { query });
   }
-  }
-  </script>
+}
+</script>
 
-  <style lang="scss" scoped>
-  @import '../../../../sass/main.scss';
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 
-  .text-break-all {
+.text-break-all {
   word-break: break-all;
-  }
+}
 
-  .runs {
+.runs {
   border: 1px solid var(--arena-runs-table-border-color);
   margin-top: 2em;
-  }
+}
 
-  .runs.filters {
+.runs.filters {
   font-weight: bold;
   font-size: 1em;
   margin-bottom: 1em;
-  }
+}
 
-  .runs td,
-  .runs th {
+.runs td,
+.runs th {
   border: 1px solid var(--arena-runs-table-td-border-color);
   border-width: 1px 0;
   text-align: center;
-  }
+}
 
-  .runs tfoot td {
+.runs tfoot td {
   a,
   button {
     display: block;
@@ -1124,40 +1128,39 @@
   button:hover {
     background: var(--arena-runs-table-tfoot-background-color--hoover);
   }
-  }
+}
 
-  .status-disqualified {
+.status-disqualified {
   background: var(--arena-runs-table-status-disqualified-background-color);
   color: var(--arena-runs-table-status-disqualified-font-color);
-  }
-  .status-je-ve {
+}
+.status-je-ve {
   background: var(--arena-runs-table-status-je-ve-background-color);
   color: var(--arena-runs-table-status-je-ve-font-color);
-  }
-  .status-ac {
+}
+.status-ac {
   background: var(--arena-runs-table-status-ac-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
-  }
-  .status-ce {
+}
+.status-ce {
   background: var(--arena-runs-table-status-ce-background-color);
   color: var(--arena-runs-table-status-ce-font-color);
+}
+.line {
+  height: 49px;
+  background: #e0e0e0;
+  border-radius: 8px;
+  animation: loading 1.5s infinite;
+}
+@keyframes loading {
+  0% {
+    background: #e0e0e0;
   }
-  .line {
-     height: 49px;
-     background: #e0e0e0;
-     border-radius: 8px;
-     animation: loading 1.5s infinite;
+  50% {
+    background: #f5f5f5;
   }
-  @keyframes loading {
-     0% {
-         background: #e0e0e0;
-     }
-     50% {
-         background: #f5f5f5;
-     }
-     100% {
-         background: #e0e0e0;
-     }
+  100% {
+    background: #e0e0e0;
   }
-  </style>
-  
+}
+</style>
