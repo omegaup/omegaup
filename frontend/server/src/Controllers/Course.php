@@ -5352,7 +5352,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Courses $course,
         \OmegaUp\DAO\VO\Identities $identity
     ): bool {
-        $groupsTeachingAssistants = \OmegaUp\DAO\Courses::getCourseTeachingAssistantsGroups(
+        $groupsTeachingAssistants = \OmegaUp\DAO\Courses::getCourseTeachingAssistantGroups(
             $course,
         );
         return \OmegaUp\Authorization::isTeachingAssistant(

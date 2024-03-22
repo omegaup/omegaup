@@ -1611,7 +1611,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * @return list<\OmegaUp\DAO\VO\Groups>
      */
-    public static function getCourseTeachingAssistantsGroups(
+    public static function getCourseTeachingAssistantGroups(
         \OmegaUp\DAO\VO\Courses $course
     ) {
         $fields = \OmegaUp\DAO\DAO::getFields(
