@@ -3873,7 +3873,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-
         $admins = \OmegaUp\DAO\UserRoles::getCourseAdmins($course);
         foreach ($admins as &$admin) {
             unset($admin['user_id']);
@@ -5447,8 +5446,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             ) : null,
             'finish_time' => $course->finish_time,
             'is_admin' => $isAdmin,
-            'is_curator' => $isCurator,
             'is_teaching_assistant' => $isTeachingAssistant,
+            'is_curator' => $isCurator,
             'admission_mode' => $course->admission_mode,
             'needs_basic_information' => $course->needs_basic_information,
             'show_scoreboard' => boolval($course->show_scoreboard),
