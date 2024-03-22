@@ -2,7 +2,7 @@
   <omegaup-arena
     :active-tab="activeTab"
     :title="currentAssignment.name"
-    :should-show-runs="isAdmin || isTeachingAssistant"
+    :should-show-runs="isAdmin"
     :should-show-ranking="showRanking"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
@@ -297,7 +297,6 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: false }) showRanking!: boolean;
   @Prop() totalRuns!: number;
   @Prop() searchResultUsers!: types.ListItem[];
-  @Prop({ default: false }) isTeachingAssistant!: boolean;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackMap!: Map<number, ArenaCourseFeedback>;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
@@ -308,7 +307,10 @@ export default class ArenaCourse extends Vue {
   T = T;
   omegaup = omegaup;
   PopupDisplayed = PopupDisplayed;
-  isAdmin = this.course.is_admin || this.course.is_curator;
+  isAdmin =
+    this.course.is_admin ||
+    this.course.is_curator ||
+    this.course.is_teaching_assistant;
   currentClarifications = this.clarifications;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
   currentRunDetailsData = this.runDetailsData;
