@@ -56,12 +56,12 @@
             <th><!-- legend --></th>
             <th><!-- position --></th>
             <th>{{ T.contestParticipant }}</th>
+            <th>{{ T.wordsTotal }}</th>
             <th v-for="(problem, index) in problems" :key="problem.alias">
               <a :href="'#problems/' + problem.alias" :title="problem.alias">{{
                 ui.columnName(index)
               }}</a>
             </th>
-            <th :colspan="2 + problems.length">{{ T.wordsTotal }}</th>
           </tr>
         </thead>
         <tbody>
@@ -86,6 +86,14 @@
                   width="16"
                 />
               </td>
+              <td>
+                <div class="points">
+                  {{ user.total.points.toFixed(digitsAfterDecimalPoint) }}
+                </div>
+                <div class="penalty">
+                  {{ user.total.penalty }} ({{ totalRuns(user) }})
+                </div>
+              </td>
 
               <td
                 v-for="(problem, problemIndex) in user.problems"
@@ -103,14 +111,6 @@
                   </div>
                 </template>
                 <template v-else> - </template>
-              </td>
-              <td>
-                <div class="points">
-                  {{ user.total.points.toFixed(digitsAfterDecimalPoint) }}
-                </div>
-                <div class="penalty">
-                  {{ user.total.penalty }} ({{ totalRuns(user) }})
-                </div>
               </td>
             </tr>
           </template>
@@ -232,7 +232,6 @@ export default class ArenaScoreboard extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 .omegaup-scoreboard {
-  max-width: 900px;
   margin: 0 auto;
 
   a {
@@ -270,6 +269,12 @@ export default class ArenaScoreboard extends Vue {
     .penalty {
       font-size: 70%;
     }
+  }
+
+  .user {
+    text-wrap: balance;
+    overflow-wrap: break-word;
+    max-width: 200px;
   }
 
   .accepted {
