@@ -3703,7 +3703,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         return ['filteredBy' => null, 'value' => null];
     }
-    public static function getSupportedProgrammingLanguages() {
+    public static function getSupportedProgrammingLanguages(): array {
         return array_filter(
             \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
             fn($key) => $key !== 'cat',
