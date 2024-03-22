@@ -5881,7 +5881,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'assignmentNotFound'
             );
         }
-        $languages = array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
+        $languages = array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES);
         // Get our runs
         return self::getAllRuns(
             $assignment->problemset_id,

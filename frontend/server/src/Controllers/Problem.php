@@ -410,7 +410,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     [''],
                     array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
                 )
-            )
             );
         }
 
