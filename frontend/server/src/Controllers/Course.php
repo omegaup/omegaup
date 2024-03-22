@@ -3868,7 +3868,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             !\OmegaUp\Authorization::isTeachingAssistant($identity, $course) &&
             !\OmegaUp\Authorization::isGroupTeachingAssistantMember(
                 $identity,
-                $group
+                [$group]
             )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -5407,7 +5407,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $course
             ) || \OmegaUp\Authorization::isGroupTeachingAssistantMember(
                 $identity,
-                $group
+                [$group]
             );
         }
 
