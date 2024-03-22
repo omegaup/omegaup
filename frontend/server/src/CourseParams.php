@@ -170,7 +170,7 @@ class CourseParams {
                 $languages,
                 'languages',
                 array_keys(
-                    \OmegaUp\Controllers\User::getSuportedProgrammingLanguages()
+                    \OmegaUp\Controllers\User::getSupportedProgrammingLanguages()
                 )
             );
         }

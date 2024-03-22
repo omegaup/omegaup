@@ -409,7 +409,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 array_merge(
                     [''],
                     array_keys(
-                        \OmegaUp\Controllers\User::getSuportedProgrammingLanguages()
+                        \OmegaUp\Controllers\User::getSupportedProgrammingLanguages()
                     )
                 )
             );

@@ -480,7 +480,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $languagesSet,
                 'languages',
                 array_keys(
-                    \OmegaUp\Controllers\User::getSuportedProgrammingLanguages()
+                    \OmegaUp\Controllers\User::getSupportedProgrammingLanguages()
                 )
             );
         }
@@ -3801,7 +3801,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $r->identity
                     ),
                     'is_admin' => true,
-                    'languages' => \OmegaUp\Controllers\User::getSuportedProgrammingLanguages(),
+                    'languages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages(),
                     'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
                         'has-visited-create-course'
                     ),
@@ -3889,7 +3889,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 intval($course->course_id),
                 intval($course->group_id)
             ),
-            'allLanguages' => \OmegaUp\Controllers\User::getSuportedProgrammingLanguages(),
+            'allLanguages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages(),
             'identityRequests' => \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourseWithFirstAdmin(
                 intval($course->course_id)
             ),
@@ -5884,7 +5884,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
         $languages = array_keys(
-            \OmegaUp\Controllers\User::getSuportedProgrammingLanguages()
+            \OmegaUp\Controllers\User::getSupportedProgrammingLanguages()
         );
         // Get our runs
         return self::getAllRuns(

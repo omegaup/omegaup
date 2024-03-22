@@ -678,39 +678,34 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame($profile['is_own_profile'], $isOwnProfile);
         $this->assertSame($profile['is_private'], $isPrivate);
     }
-    public const SUPPORTED_LANGUAGES = [
-        'kp' => 'Karel (Pascal)',
-        'kj' => 'Karel (Java)',
-        'c11-gcc' => 'C11 (gcc 10.3)',
-        'c11-clang' => 'C11 (clang 10.0)',
-        'cpp11-gcc' => 'C++11 (g++ 10.3)',
-        'cpp11-clang' => 'C++11 (clang++ 10.0)',
-        'cpp17-gcc' => 'C++17 (g++ 10.3)',
-        'cpp17-clang' => 'C++17 (clang++ 10.0)',
-        'cpp20-gcc' => 'C++20 (g++ 10.3)',
-        'cpp20-clang' => 'C++20 (clang++ 10.0)',
-        'java' => 'Java (openjdk 16.0)',
-        'kt' => 'Kotlin (1.6.10)',
-        'py2' => 'Python (2.7)',
-        'py3' => 'Python (3.9)',
-        'rb' => 'Ruby (2.7)',
-        'cs' => 'C# (10, dotnet 6.0)',
-        'pas' => 'Pascal (fpc 3.0)',
-        'cat' => 'Output Only',
-        'hs' => 'Haskell (ghc 8.8)',
-        'lua' => 'Lua (5.3)',
-        'go' => 'Go (1.18.beta2)',
-        'rs' => 'Rust (1.56.1)',
-        'js' => 'JavaScript (Node.js 16)',
-    ];
-    public function testGetSupportedProgrammingLanguages(
-        $excludedLanguage,
-        $expectedLanguages
-    ) {
-        $result = \OmegaUp\Controllers\User::getSupportedProgrammingLanguages(
-            $excludedLanguage
-        );
-        $this->assertSame(self::SUPPORTED_LANGUAGES, $result);
+    public function testGetSupportedProgrammingLanguages() {
+        $SUPPORTED_LANGUAGES = [
+            'kp' => 'Karel (Pascal)',
+            'kj' => 'Karel (Java)',
+            'c11-gcc' => 'C11 (gcc 10.3)',
+            'c11-clang' => 'C11 (clang 10.0)',
+            'cpp11-gcc' => 'C++11 (g++ 10.3)',
+            'cpp11-clang' => 'C++11 (clang++ 10.0)',
+            'cpp17-gcc' => 'C++17 (g++ 10.3)',
+            'cpp17-clang' => 'C++17 (clang++ 10.0)',
+            'cpp20-gcc' => 'C++20 (g++ 10.3)',
+            'cpp20-clang' => 'C++20 (clang++ 10.0)',
+            'java' => 'Java (openjdk 16.0)',
+            'kt' => 'Kotlin (1.6.10)',
+            'py2' => 'Python (2.7)',
+            'py3' => 'Python (3.9)',
+            'rb' => 'Ruby (2.7)',
+            'cs' => 'C# (10, dotnet 6.0)',
+            'pas' => 'Pascal (fpc 3.0)',
+            'hs' => 'Haskell (ghc 8.8)',
+            'lua' => 'Lua (5.3)',
+            'go' => 'Go (1.18.beta2)',
+            'rs' => 'Rust (1.56.1)',
+            'js' => 'JavaScript (Node.js 16)',
+        ];
+
+        $result = \OmegaUp\Controllers\User::getSupportedProgrammingLanguages();
+        $this->assertSame($SUPPORTED_LANGUAGES, $result);
     }
 
     public function testGetUserDependents() {

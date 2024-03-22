@@ -1587,7 +1587,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'country' => null,
             'country_id' => $userData['country_id'],
             'classname' => $userData['classname'],
-            'programming_languages' => \OmegaUp\Controllers\User::getSuportedProgrammingLanguages(),
+            'programming_languages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages(),
             'email' => null,
             'gender' => null,
             'graduation_date' => null,
@@ -1646,7 +1646,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'classname' => \OmegaUp\DAO\Users::getRankingClassName(
                     $identity->user_id
                 ),
-                'programming_languages' => \OmegaUp\Controllers\User::getSuportedProgrammingLanguages()
+                'programming_languages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages()
             ]
         );
     }
@@ -3703,7 +3703,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         return ['filteredBy' => null, 'value' => null];
     }
-    public static function getSuportedProgrammingLanguages() {
+    public static function getSupportedProgrammingLanguages() {
         return array_filter(
             \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
             fn($key) => $key !== 'cat',
@@ -4283,7 +4283,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         100,
                         'name'
                     ),
-                    'programmingLanguages' => \OmegaUp\Controllers\User::getSuportedProgrammingLanguages(),
+                    'programmingLanguages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages(),
                     'extraProfileDetails' => null,
                     'identities' => [],
                 ],
