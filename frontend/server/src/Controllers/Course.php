@@ -479,9 +479,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Validators::validateValidSubset(
                 $languagesSet,
                 'languages',
-                array_keys(
-                    \OmegaUp\Controllers\User::getSupportedProgrammingLanguages()
-                )
+                array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
             );
         }
 
@@ -3801,7 +3799,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $r->identity
                     ),
                     'is_admin' => true,
-                    'languages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages(),
+                    'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
                     'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
                         'has-visited-create-course'
                     ),
@@ -3889,7 +3887,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 intval($course->course_id),
                 intval($course->group_id)
             ),
-            'allLanguages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages(),
+            'allLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
             'identityRequests' => \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourseWithFirstAdmin(
                 intval($course->course_id)
             ),
@@ -5883,9 +5881,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'assignmentNotFound'
             );
         }
-        $languages = array_keys(
-            \OmegaUp\Controllers\User::getSupportedProgrammingLanguages()
-        );
+        $languages = array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
         // Get our runs
         return self::getAllRuns(
             $assignment->problemset_id,
