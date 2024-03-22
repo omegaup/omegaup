@@ -88,7 +88,7 @@ export default class Typeahead extends Vue {
 }
 
 .tags-input.disabled {
-  background-color: #e9ecef;
+  background-color: var(--typeahead-disabled);
   opacity: 1;
 }
 </style>

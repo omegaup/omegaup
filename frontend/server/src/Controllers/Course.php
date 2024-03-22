@@ -5456,7 +5456,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'unlimited_duration' => false,
         ];
 
-        if ($isAdmin) {
+        if ($isAdmin || $isTeachingAssistant) {
             $result['student_count'] =
                 \OmegaUp\DAO\GroupsIdentities::GetMemberCountById(
                     $group->group_id

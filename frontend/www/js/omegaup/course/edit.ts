@@ -15,7 +15,6 @@ Vue.directive('Sortable', {
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseEditPayload();
-  console.log(payload);
   const courseAlias = payload.course.alias;
   const searchResultEmpty: types.ListItem[] = [];
   const searchResultSchools: types.SchoolListItem[] = [];
