@@ -45,7 +45,7 @@ export class ProblemPage {
   }
 
   verifySubmission(username: string): void {
-    cy.get('a[href="#runs"]').click();
+    cy.get('a.nav-link[href="#runs"]').click();
     cy.get(`[data-username=${username}]`).should('be.visible');
     cy.get('[data-run-status]').should('contain', 'AC');
   }
