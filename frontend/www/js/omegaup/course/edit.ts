@@ -15,6 +15,7 @@ Vue.directive('Sortable', {
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseEditPayload();
+  console.log(payload);
   const courseAlias = payload.course.alias;
   const searchResultEmpty: types.ListItem[] = [];
   const searchResultSchools: types.SchoolListItem[] = [];
@@ -118,7 +119,7 @@ OmegaUp.on('ready', () => {
           searchResultProblems: this.searchResultProblems,
           searchResultGroups: this.searchResultGroups,
           searchResultSchools: this.searchResultSchools,
-          isTeachingAssistant: payload.isTeachingAssistant,
+          readOnly: !this.data.course.is_admin && !this.data.course.is_curator,
         },
         on: {
           'update-search-result-groups': (query: string) => {

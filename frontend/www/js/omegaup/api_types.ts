@@ -3309,6 +3309,7 @@ export namespace types {
     finish_time?: Date;
     is_admin: boolean;
     is_curator: boolean;
+    is_teaching_assistant: boolean;
     languages?: string[];
     level?: string;
     name: string;
@@ -3336,7 +3337,6 @@ export namespace types {
     groupsAdmins: types.CourseGroupAdmin[];
     groupsTeachingAssistants: types.CourseGroupAdmin[];
     identityRequests: types.IdentityRequest[];
-    isTeachingAssistant: boolean;
     selectedAssignment?: types.CourseAssignment;
     students: types.CourseStudent[];
     tags: string[];

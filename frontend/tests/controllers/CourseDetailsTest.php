@@ -127,7 +127,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertTrue($response['isTeachingAssistant']);
+        $this->assertTrue($response['course']['is_teaching_assistant']);
     }
 
     public function testGetCourseDetailsForTeachingAssistantAddedByGroup() {
@@ -161,7 +161,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertTrue($response['isTeachingAssistant']);
+        $this->assertTrue($response['course']['is_teaching_assistant']);
     }
 
     /**
