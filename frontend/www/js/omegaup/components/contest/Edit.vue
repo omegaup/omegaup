@@ -375,7 +375,7 @@ export default class Edit extends Vue {
       case 'new_form':
         return T.contestEdit;
       case 'problems':
-        return T.wordsAddProblem;
+        return T.contestEditAddProblems;
       case 'publish':
         return T.contestNewFormAdmissionMode;
       case 'contestants':
