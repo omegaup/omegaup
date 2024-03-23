@@ -34,7 +34,7 @@
           class="nav-link problems"
           :class="{ active: showTab === 'problems' }"
           @click="showTab = 'problems'"
-          >{{ T.wordsAddProblem }}</a
+          >{{ T.contestEditAddProblems }}</a
         >
       </li>  
       <li class="nav-item" role="presentation">
