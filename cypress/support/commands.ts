@@ -243,7 +243,7 @@ Cypress.Commands.add(
   }) => {
     cy.visit(`contest/${contestAlias}/edit/`);
     cy.get('a[data-nav-contest-edit]').click();
-    cy.get('a.nav-link.problems').click();
+    cy.get('a.nav-link.admission-mode').click();
     cy.get('select[name="admission-mode"]').select(
       admissionMode,
     ); // private | registration | public
