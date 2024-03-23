@@ -120,7 +120,7 @@
       </li>
     </ul>
 
-    <div class="tab-content">
+    <div class="tab-content mt-2">
       <div v-if="showTab === 'new_form'" class="tab-pane active">
         <omegaup-contest-new-form
           :admission-mode="details.admission_mode"
