@@ -117,7 +117,6 @@
           @click="showTab = 'certificates'"
           >{{ T.contestEditCertificates }}</a
         >
-        <!-- </div> -->
       </li>
     </ul>
 
