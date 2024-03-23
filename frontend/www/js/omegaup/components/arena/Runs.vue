@@ -238,6 +238,7 @@
                   :username="run.username"
                   :country="run.country_id"
                   :linkify="true"
+                  :href="'#runs'"
                   :emit-click-event="true"
                   @click="
                     (username) =>
@@ -268,11 +269,9 @@
                 </a>
               </td>
               <td v-if="showProblem" class="text-break-all">
-                <a
-                  href="#runs"
-                  @click.prevent="filterProblem.key = run.alias"
-                  >{{ run.alias }}</a
-                >
+                <a href="#runs" @click="setFilterProblem(run.alias)">{{
+                  run.alias
+                }}</a>
                 <a
                   problem-navigation-button
                   :href="`/arena/problem/${run.alias}/`"
@@ -886,6 +885,10 @@ export default class Runs extends Vue {
       return;
     }
     this.$emit('update-search-result-users', { query });
+  }
+
+  setFilterProblem(problemAlias: string): void {
+    this.filterProblem = { key: problemAlias, value: problemAlias };
   }
 }
 </script>
