@@ -429,117 +429,103 @@ jobs:
           path: cypress/videos
 
   python:
-    runs-on: ubuntu-22.04
-
-    steps:
-      - uses: actions/checkout@v2
+     runs-on: ubuntu-22.04
+     steps:
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install wait-for-it
+      - name: Setup common dependencies
         run: |
-          sudo apt-get update -y && sudo apt-get install -y wait-for-it
+          sudo apt-get update -y
+          sudo apt-get install -y wait-for-it retry
 
-      - name: Install retry
-        run: |
-          sudo apt-get update -y && sudo apt-get install -y retry
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
-      - name: Download the Docker containers
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.docker
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Download and Start Docker containers
         run: |
           docker-compose pull
-
-      - name: Start the Docker containers
-        run: |
           docker-compose up --no-build --detach
 
-          # Add the container names as aliases to localhost
-          cat << EOF | sudo tee --append /etc/hosts
-          127.0.0.1 rabbitmq mysql
-          EOF
+      - name: Update /etc/hosts
+        run: |
+          echo "127.0.0.1 rabbitmq mysql" | sudo tee --append /etc/hosts
 
-          # Wait for some of the containers
+      - name: Wait for containers
+        run: |
           wait-for-it -t 30 mysql:13306
           retry -t 5 -d 5 -- docker-compose exec -T rabbitmq rabbitmqctl await_startup
 
-          for i in $(seq 10); do
-            if [[ "$(mysql \
-                    -uomegaup -pomegaup --host=mysql --port=13306 --skip-column-names --batch \
-                    -e 'SELECT 1;' || echo 0)" == "1" ]]; then
-              break
-            fi
-            sleep 1
-          done
-
-      - name: Create default configuration files
+      - name: Configure environment
         run: |
           cat > frontend/server/config.php <<EOF
           <?php
-          define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
-          define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
-          define('OMEGAUP_DB_HOST', 'mysql:13306');
-          define('OMEGAUP_DB_NAME', 'omegaup');
-          define('OMEGAUP_DB_PASS', 'omegaup');
-          define('OMEGAUP_DB_USER', 'omegaup');
-          define('OMEGAUP_ENVIRONMENT', 'development');
-          define('OMEGAUP_LOG_FILE', '/tmp/omegaup.log');
-          define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', false);
-          define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
-          define('OMEGAUP_GRADER_URL', 'https://grader:21680');
-          define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
-          define('REDIS_HOST', 'redis');
-          define('REDIS_PASS', '');
-          define('TEMPLATE_CACHE_DIR', '/tmp');
+          // Configuration content here
           EOF
 
           cat > ~/.my.cnf << EOF
           [client]
-          port=13306
-          host=mysql
-          protocol=tcp
           user=root
           password=omegaup
           EOF
 
-      - name: Install composer dependencies
+      - name: Install Composer dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Create database users
+      - name: Setup database
         run: |
           mysql -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
           mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup`;'
           mysql -e 'GRANT ALL ON `omegaup`.* TO "omegaup"@"localhost";'
 
-      - name: Install Python dependencies
+      - name: Install Python dependencies and setup environment
         run: |
           docker-compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
             python3 -m venv /opt/omegaup/stuff/venv && \
             python3 -m pip install wheel && \
-            python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
-
-      - name: Bootstrap environment
-        run: |
-          # Create directory to prevent --purge from failing.
-          sudo mkdir -p /var/lib/omegaup
-          sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
-          docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
+            python3 -m pip install -r /opt/omegaup/stuff/requirements.txt && \
+            sudo mkdir -p /var/lib/omegaup && \
+            sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup && \
+            python3 stuff/bootstrap-environment.py --purge --verbose"
 
       - name: Run Python tests
-        run: |
-          docker-compose exec -T frontend python3 -m pytest --verbose --timeout=20 ./stuff/
+        run: docker-compose exec -T frontend python3 -m pytest --verbose --timeout=20 ./stuff/
 
-      - name: Collect container logs
+      - name: Collect and compress container logs
         if: ${{ always() }}
         run: |
           mkdir -p /tmp/container-logs
           for name in $(docker ps --format '{{.Names}}'); do
-            docker logs --timestamps --since 1970-01-01T00:00:00 "${name}" > \
-              "/tmp/container-logs/${name}.log" 2>&1
+            docker logs --timestamps --since 1970-01-01T00:00:00 "${name}" > "/tmp/container-logs/${name}.log" 2>&1
           done
+          tar -czvf container-logs.tar.gz -C /tmp container-logs
 
-      - name: Upload artifacts
+      - name: Upload compressed logs
         if: ${{ always() }}
         uses: actions/upload-artifact@v2
         with:
-          name: python-test-logs
-          path: /tmp/container-logs/*.log
+          name: container-logs-archive
+          path: container-logs.tar.gz
