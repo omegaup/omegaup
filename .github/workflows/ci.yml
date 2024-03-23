@@ -430,29 +430,45 @@ jobs:
 
   python:
     runs-on: ubuntu-22.04
-
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install wait-for-it
+      - name: Setup common dependencies
         run: |
-          sudo apt-get update -y && sudo apt-get install -y wait-for-it
+          sudo apt-get update -y
+          sudo apt-get install -y wait-for-it retry
 
-      - name: Install retry
-        run: |
-          sudo apt-get update -y && sudo apt-get install -y retry
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
-      - name: Download the Docker containers
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.docker
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Download and Start Docker containers
         run: |
           docker-compose pull
-
-      - name: Start the Docker containers
-        run: |
           docker-compose up --no-build --detach
-
           # Add the container names as aliases to localhost
           cat << EOF | sudo tee --append /etc/hosts
           127.0.0.1 rabbitmq mysql
@@ -539,7 +555,7 @@ jobs:
 
       - name: Upload artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: python-test-logs
           path: /tmp/container-logs/*.log
