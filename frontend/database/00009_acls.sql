@@ -165,4 +165,3 @@ ALTER TABLE `Group_Roles`
   ADD CONSTRAINT `fk_gra_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- vim: set expandtab:ts=2:sw=2
-
