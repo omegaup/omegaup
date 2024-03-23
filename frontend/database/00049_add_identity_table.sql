@@ -32,7 +32,7 @@ ALTER TABLE `Users`
 START TRANSACTION;
 
 INSERT INTO `Identities` (
-  `identity_id`, 
+  `identity_id`,
   `username`,
   `password`,
   `name`,
