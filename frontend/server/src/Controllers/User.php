@@ -3703,6 +3703,10 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         return ['filteredBy' => null, 'value' => null];
     }
+
+    /**
+     * @return array<string,string>
+     */
     public static function getSupportedProgrammingLanguages(): array {
         return array_filter(
             \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
@@ -3710,6 +3714,7 @@ class User extends \OmegaUp\Controllers\Controller {
             ARRAY_FILTER_USE_KEY
         );
     }
+
     /**
      * Gets the last privacy policy accepted by user
      *
