@@ -86,7 +86,7 @@ describe('Course Test', () => {
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
     cy.get('[data-table-scoreboard-username]').should('have.length', 3);
-    cy.get(`.${loginOptions[0].username} > td:nth-child(4)`).should(
+    cy.get(`.${loginOptions[0].username} > td:nth-child(5)`).should(
       'contain',
       '+100.00',
     );
@@ -99,7 +99,7 @@ describe('Course Test', () => {
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
     cy.get('[data-table-scoreboard-username]').should('have.length', 3);
-    cy.get(`.${loginOptions[2].username} > td:nth-child(4)`).should(
+    cy.get(`.${loginOptions[2].username} > td:nth-child(5)`).should(
       'contain',
       '+100.00',
     );
@@ -112,7 +112,7 @@ describe('Course Test', () => {
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
     cy.get('[data-table-scoreboard-username]').should('have.length', 3);
-    cy.get(`.${loginOptions[3].username} > td:nth-child(4)`).should(
+    cy.get(`.${loginOptions[3].username} > td:nth-child(5)`).should(
       'contain',
       '+100.00',
     );
@@ -121,15 +121,15 @@ describe('Course Test', () => {
     cy.login(loginOptions[1]);
     coursePage.enterCourseAssignmentPage(courseOptions.courseAlias);
     cy.get('[data-course-scoreboard-button]').click();
-    cy.get(`.${loginOptions[0].username} > td:nth-child(4)`).should(
+    cy.get(`.${loginOptions[0].username} > td:nth-child(5)`).should(
       'contain',
       '+100.00',
     );
-    cy.get(`.${loginOptions[2].username} > td:nth-child(4)`).should(
+    cy.get(`.${loginOptions[2].username} > td:nth-child(5)`).should(
       'contain',
       '+100.00',
     );
-    cy.get(`.${loginOptions[3].username} > td:nth-child(4)`).should(
+    cy.get(`.${loginOptions[3].username} > td:nth-child(5)`).should(
       'contain',
       '+100.00',
     );
@@ -297,7 +297,7 @@ describe('Course Test', () => {
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
     cy.get('[data-table-scoreboard-username]').should('have.length', 2);
-    cy.get(`.${loginOptions[1].username} > td:nth-child(4)`).should(
+    cy.get(`.${loginOptions[1].username} > td:nth-child(5)`).should(
       'contain',
       '+100.00',
     );
@@ -311,7 +311,7 @@ describe('Course Test', () => {
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
     cy.get('[data-table-scoreboard-username]').should('have.length', 2);
-    cy.get(`.${loginOptions[2].username} > td:nth-child(4)`).should(
+    cy.get(`.${loginOptions[2].username} > td:nth-child(5)`).should(
       'contain',
       '+100.00',
     );
@@ -320,11 +320,11 @@ describe('Course Test', () => {
     cy.login(loginOptions[0]);
     coursePage.enterCourseAssignmentPage(courseOptions.courseAlias);
     cy.get('[data-course-scoreboard-button]').click();
-    cy.get(`.${loginOptions[1].username} > td:nth-child(4)`).should(
+    cy.get(`.${loginOptions[1].username} > td:nth-child(5)`).should(
       'contain',
       '+100.00',
     );
-    cy.get(`.${loginOptions[2].username} > td:nth-child(4)`).should(
+    cy.get(`.${loginOptions[2].username} > td:nth-child(5)`).should(
       'contain',
       '+100.00',
     );
@@ -369,7 +369,7 @@ describe('Course Test', () => {
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
     cy.get('[data-table-scoreboard-username]').should('have.length', 2);
-    cy.get(`.${loginOptions[1].username} > td:nth-child(4)`).should(
+    cy.get(`.${loginOptions[1].username} > td:nth-child(5)`).should(
       'contain',
       '+100.00',
     );
@@ -384,7 +384,7 @@ describe('Course Test', () => {
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
     cy.get('[data-table-scoreboard-username]').should('have.length', 2);
-    cy.get(`.${loginOptions[2].username} > td:nth-child(4)`).should(
+    cy.get(`.${loginOptions[2].username} > td:nth-child(5)`).should(
       'contain',
       '+100.00',
     );
