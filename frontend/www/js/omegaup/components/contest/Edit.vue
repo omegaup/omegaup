@@ -26,7 +26,7 @@
           @click="showTab = 'new_form'"
           >{{ T.contestEdit }}</a
         >
-      </li>  
+      </li>
       <li class="nav-item" role="presentation">
         <a
           v-if="!virtual"
@@ -36,7 +36,7 @@
           @click="showTab = 'problems'"
           >{{ T.contestEditAddProblems }}</a
         >
-      </li>  
+      </li>
       <li class="nav-item" role="presentation">
         <a
           v-if="!virtual && !details.contest_for_teams"
@@ -46,7 +46,7 @@
           @click="showTab = 'publish'"
           >{{ T.contestNewFormAdmissionMode }}</a
         >
-      </li>  
+      </li>
       <li class="nav-item" role="presentation">
         <a
           v-if="
@@ -60,7 +60,7 @@
           @click="showTab = 'contestants'"
           >{{ T.contestAdduserAddContestant }}</a
         >
-      </li>  
+      </li>
       <li class="nav-item" role="presentation">
         <a
           v-if="details.contest_for_teams"
@@ -71,6 +71,8 @@
           @click="showTab = 'groups'"
           >{{ T.contestAddgroupAddGroup }}</a
         >
+      </li>
+
       <li class="nav-item" role="presentation">
         <a
           v-if="!virtual"
@@ -80,7 +82,7 @@
           @click="showTab = 'admins'"
           >{{ T.omegaupTitleContestAddAdmin }}</a
         >
-      </li>  
+      </li>
       <li class="nav-item" role="presentation">
         <a
           href="#links"
@@ -89,7 +91,7 @@
           @click="showTab = 'links'"
           >{{ T.showLinks }}</a
         >
-      </li>  
+      </li>
       <li class="nav-item" role="presentation">
         <a
           href="#clone"
@@ -98,7 +100,7 @@
           @click="showTab = 'clone'"
           >{{ T.courseEditClone }}</a
         >
-      </li>  
+      </li>
       <li class="nav-item" role="presentation">
         <a
           href="#archive"
@@ -107,7 +109,7 @@
           @click="showTab = 'archive'"
           >{{ T.contestEditArchive }}</a
         >
-      </li>  
+      </li>
       <li class="nav-item" role="presentation">
         <a
           v-if="certificatesDetails.isCertificateGenerator"
