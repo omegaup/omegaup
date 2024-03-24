@@ -114,11 +114,11 @@ export default class QualityPromotionPopup extends Vue {
   difficultyLevels!: DifficultyLevel[];
   @Prop({
     default: () => [
-      { id: 1, description: T.qualityFormQualityVeryBad },
-      { id: 2, description: T.qualityFormQualityBad },
-      { id: 3, description: T.qualityFormQualityFair },
-      { id: 4, description: T.qualityFormQualityGood },
-      { id: 5, description: T.qualityFormQualityVeryGood },
+      { id: '0', description: T.qualityFormQualityVeryBad },
+      { id: '1', description: T.qualityFormQualityBad },
+      { id: '2', description: T.qualityFormQualityFair },
+      { id: '3', description: T.qualityFormQualityGood },
+      { id: '4', description: T.qualityFormQualityVeryGood },
     ],
   })
   qualityLevels!: QualityLevel[];
