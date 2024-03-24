@@ -244,7 +244,7 @@
           <tbody>
             <tr v-for="run in paginatedRuns" :key="run.guid">
               <template v-if="run.status !== 'ready'">
-                <td colspan="8">
+                <td colspan="8" data-new-run>
                   <div class="line"></div>
                 </td>
               </template>
