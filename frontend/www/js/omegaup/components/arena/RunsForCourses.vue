@@ -461,7 +461,6 @@
                     </div>
                   </div>
                 </td>
-                <td v-else></td>
               </template>
             </tr>
           </tbody>
