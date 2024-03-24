@@ -120,7 +120,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Problem::apiCreate($r);
             $this->fail('Problem creation should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertSame($e->getMessage(), 'parameterInvalid');
+            $this->assertSame($e->getMessage(), 'parameterStringTooLong');
         }
     }
 
