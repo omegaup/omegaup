@@ -595,11 +595,6 @@ export default class ArenaContestList extends Vue {
   }
 }
 
-.scroll-content {
-  overflow-y: auto;
-  max-height: 800px;
-}
-
 .empty-category {
   text-align: center;
   font-size: 200%;
