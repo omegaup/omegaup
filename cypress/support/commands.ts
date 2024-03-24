@@ -224,7 +224,6 @@ Cypress.Commands.add(
     problems,
   }) => {
     cy.visit(`contest/${contestAlias}/edit/`);
-    cy.get('a[data-nav-contest-edit]').click();
     cy.get('a.nav-link.problems').click();
 
     for (const idx in problems) {
@@ -242,7 +241,6 @@ Cypress.Commands.add(
     admissionMode,
   }) => {
     cy.visit(`contest/${contestAlias}/edit/`);
-    cy.get('a[data-nav-contest-edit]').click();
     cy.get('a.nav-link.admission-mode').click();
     cy.get('select[name="admission-mode"]').select(
       admissionMode,
