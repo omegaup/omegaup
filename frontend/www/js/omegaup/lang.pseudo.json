@@ -1096,7 +1096,7 @@
 	"problemEditFormUpdateSolution": "(Upda73 501u7i0n)",
 	"problemEditFormValidatorTimeLimit": "(Va1ida70r 7im3 1imi7 (m5))",
 	"problemEditFormValidatorType": "(Ou7pu7 va1ida70r 7yp3)",
-	"problemEditFormWallTimeLimit": "(T07a1 7im3 1imi7 (m5))",
+	"problemEditFormWallTimeLimit": "(T07a1 7im3 1imi7 (m5) (max 60000 m5))",
 	"problemEditGoToProblem": "(G0 70 pr0b13m)",
 	"problemEditGroupScorePolicy": "(Gr0up 5c0r35)",
 	"problemEditGroupScorePolicyMin": "(Min)",
