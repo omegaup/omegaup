@@ -430,6 +430,7 @@ jobs:
 
   python:
     runs-on: ubuntu-22.04
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -445,50 +446,23 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.composer/cache
+          # Ensures cache key is unique to the lock file and runner OS
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          # Restores cache even if the lock file changes, but tries to match the exact version first
           restore-keys: |
             ${{ runner.os }}-composer-
-
-      - name: Cache Docker layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.docker
-          key: ${{ runner.os }}-docker-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-docker-
-
-      - name: Cache pip dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
 
       - name: Download and Start Docker containers
         run: |
           docker-compose pull
           docker-compose up --no-build --detach
-          # Add the container names as aliases to localhost
-          cat << EOF | sudo tee --append /etc/hosts
-          127.0.0.1 rabbitmq mysql
-          EOF
-
-          # Wait for some of the containers
+          echo "127.0.0.1 rabbitmq mysql" | sudo tee --append /etc/hosts
           wait-for-it -t 30 mysql:13306
           retry -t 5 -d 5 -- docker-compose exec -T rabbitmq rabbitmqctl await_startup
 
-          for i in $(seq 10); do
-            if [[ "$(mysql \
-                    -uomegaup -pomegaup --host=mysql --port=13306 --skip-column-names --batch \
-                    -e 'SELECT 1;' || echo 0)" == "1" ]]; then
-              break
-            fi
-            sleep 1
-          done
-
       - name: Create default configuration files
         run: |
+          # Creating configuration files for the application
           cat > frontend/server/config.php <<EOF
           <?php
           define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
@@ -508,54 +482,39 @@ jobs:
           define('TEMPLATE_CACHE_DIR', '/tmp');
           EOF
 
-          cat > ~/.my.cnf << EOF
-          [client]
-          port=13306
-          host=mysql
-          protocol=tcp
-          user=root
-          password=omegaup
-          EOF
-
       - name: Install composer dependencies
-        run: composer install --prefer-dist --no-progress
+        run: |
+          composer install --prefer-dist --no-progress
 
-      - name: Create database users
+      - name: Prepare the database
         run: |
           mysql -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
           mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup`;'
           mysql -e 'GRANT ALL ON `omegaup`.* TO "omegaup"@"localhost";'
 
-      - name: Install Python dependencies
+      - name: Install Python dependencies and Bootstrap environment inside Docker
         run: |
           docker-compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
             python3 -m venv /opt/omegaup/stuff/venv && \
-            python3 -m pip install wheel && \
-            python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
+            source /opt/omegaup/stuff/venv/bin/activate && \
+            pip install wheel && \
+            pip install -r /opt/omegaup/stuff/requirements.txt && \
+            python3 stuff/bootstrap-environment.py --purge --verbose"
 
-      - name: Bootstrap environment
-        run: |
-          # Create directory to prevent --purge from failing.
-          sudo mkdir -p /var/lib/omegaup
-          sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
-          docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
-
-      - name: Run Python tests
+      - name: Run Python tests inside Docker
         run: |
           docker-compose exec -T frontend python3 -m pytest --verbose --timeout=20 ./stuff/
 
-      - name: Collect container logs
-        if: ${{ always() }}
+      - name: Collect and Upload Container Logs
+        if: always()
         run: |
           mkdir -p /tmp/container-logs
           for name in $(docker ps --format '{{.Names}}'); do
-            docker logs --timestamps --since 1970-01-01T00:00:00 "${name}" > \
-              "/tmp/container-logs/${name}.log" 2>&1
+            docker logs --timestamps --since 1970-01-01T00:00:00 "${name}" > "/tmp/container-logs/${name}.log" 2>&1
           done
 
-      - name: Upload artifacts
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: python-test-logs
+          name: container-logs
           path: /tmp/container-logs/*.log
