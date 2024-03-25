@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="course-edit">
     <div class="page-header">
       <h1>
         {{
@@ -16,116 +16,113 @@
       </h1>
     </div>
 
-    <ul class="nav nav-pills my-3">
-      <li class="nav-item dropdown">
+    <ul class="nav nav-pills mt-4">
+      <li class="nav-item" role="presentation">
         <a
-          href="#"
-          data-toggle="dropdown"
-          role="button"
-          data-nav-contest-edit
-          class="nav-link active dropdown-toggle"
-          aria-haspopup="true"
-          aria-expanded="false"
-          >{{ activeTab }}</a
+          v-if="!virtual"
+          href="#new_form"
+          class="nav-link"
+          :class="{ active: showTab === 'new_form' }"
+          @click="showTab = 'new_form'"
+          >{{ T.contestEdit }}</a
         >
-        <div class="dropdown-menu">
-          <a
-            v-if="!virtual"
-            href="#"
-            data-toggle="tab"
-            class="dropdown-item"
-            :class="{ active: showTab === 'new_form' }"
-            @click="showTab = 'new_form'"
-            >{{ T.contestEdit }}</a
-          >
-          <a
-            v-if="!virtual"
-            href="#"
-            data-toggle="tab"
-            class="dropdown-item problems"
-            :class="{ active: showTab === 'problems' }"
-            @click="showTab = 'problems'"
-            >{{ T.wordsAddProblem }}</a
-          >
-          <a
-            v-if="!virtual && !details.contest_for_teams"
-            href="#"
-            data-toggle="tab"
-            class="dropdown-item admission-mode"
-            :class="{ active: showTab === 'publish' }"
-            @click="showTab = 'publish'"
-            >{{ T.contestNewFormAdmissionMode }}</a
-          >
-          <a
-            v-if="
-              originalContestAdmissionMode != 'private' &&
-              !details.contest_for_teams
-            "
-            href="#"
-            data-toggle="tab"
-            data-nav-contestant
-            class="dropdown-item contestants"
-            :class="{ active: showTab === 'contestants' }"
-            @click="showTab = 'contestants'"
-            >{{ T.contestAdduserAddContestant }}</a
-          >
-          <a
-            v-if="details.contest_for_teams"
-            href="#"
-            data-toggle="tab"
-            data-nav-group
-            class="dropdown-item groups"
-            :class="{ active: showTab === 'groups' }"
-            @click="showTab = 'groups'"
-            >{{ T.contestAddgroupAddGroup }}</a
-          >
-          <a
-            v-if="!virtual"
-            href="#"
-            data-toggle="tab"
-            class="dropdown-item"
-            :class="{ active: showTab === 'admins' }"
-            @click="showTab = 'admins'"
-            >{{ T.omegaupTitleContestAddAdmin }}</a
-          >
-          <a
-            href="#"
-            data-toggle="tab"
-            class="dropdown-item"
-            :class="{ active: showTab === 'links' }"
-            @click="showTab = 'links'"
-            >{{ T.showLinks }}</a
-          >
-          <a
-            href="#"
-            data-toggle="tab"
-            class="dropdown-item"
-            :class="{ active: showTab === 'clone' }"
-            @click="showTab = 'clone'"
-            >{{ T.courseEditClone }}</a
-          >
-          <a
-            href="#"
-            data-toggle="tab"
-            class="dropdown-item"
-            :class="{ active: showTab === 'archive' }"
-            @click="showTab = 'archive'"
-            >{{ T.contestEditArchive }}</a
-          >
-          <a
-            v-if="certificatesDetails.isCertificateGenerator"
-            href="#"
-            data-toggle="tab"
-            class="dropdown-item"
-            :class="{ active: showTab === 'certificates' }"
-            @click="showTab = 'certificates'"
-            >{{ T.contestEditCertificates }}</a
-          >
-        </div>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          v-if="!virtual"
+          href="#problems"
+          class="nav-link problems"
+          :class="{ active: showTab === 'problems' }"
+          @click="showTab = 'problems'"
+          >{{ T.contestEditAddProblems }}</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          v-if="!virtual && !details.contest_for_teams"
+          href="#publish"
+          class="nav-link admission-mode"
+          :class="{ active: showTab === 'publish' }"
+          @click="showTab = 'publish'"
+          >{{ T.contestNewFormAdmissionMode }}</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          v-if="
+            originalContestAdmissionMode != 'private' &&
+            !details.contest_for_teams
+          "
+          href="#contestants"
+          data-nav-contestant
+          class="nav-link contestants"
+          :class="{ active: showTab === 'contestants' }"
+          @click="showTab = 'contestants'"
+          >{{ T.contestAdduserAddContestant }}</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          v-if="details.contest_for_teams"
+          href="#groups"
+          data-nav-group
+          class="nav-link groups"
+          :class="{ active: showTab === 'groups' }"
+          @click="showTab = 'groups'"
+          >{{ T.contestAddgroupAddGroup }}</a
+        >
+      </li>
+
+      <li class="nav-item" role="presentation">
+        <a
+          v-if="!virtual"
+          href="#admins"
+          class="nav-link"
+          :class="{ active: showTab === 'admins' }"
+          @click="showTab = 'admins'"
+          >{{ T.omegaupTitleContestAddAdmin }}</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          href="#links"
+          class="nav-link"
+          :class="{ active: showTab === 'links' }"
+          @click="showTab = 'links'"
+          >{{ T.showLinks }}</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          href="#clone"
+          class="nav-link"
+          :class="{ active: showTab === 'clone' }"
+          @click="showTab = 'clone'"
+          >{{ T.courseEditClone }}</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          href="#archive"
+          class="nav-link"
+          :class="{ active: showTab === 'archive' }"
+          @click="showTab = 'archive'"
+          >{{ T.contestEditArchive }}</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          v-if="certificatesDetails.isCertificateGenerator"
+          href="#certificates"
+          class="nav-link"
+          :class="{ active: showTab === 'certificates' }"
+          @click="showTab = 'certificates'"
+          >{{ T.contestEditCertificates }}</a
+        >
       </li>
     </ul>
 
-    <div class="tab-content">
+    <div class="tab-content mt-2">
       <div v-if="showTab === 'new_form'" class="tab-pane active">
         <omegaup-contest-new-form
           :admission-mode="details.admission_mode"
@@ -380,7 +377,7 @@ export default class Edit extends Vue {
       case 'new_form':
         return T.contestEdit;
       case 'problems':
-        return T.wordsAddProblem;
+        return T.contestEditAddProblems;
       case 'publish':
         return T.contestNewFormAdmissionMode;
       case 'contestants':
