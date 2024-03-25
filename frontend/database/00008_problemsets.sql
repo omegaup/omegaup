@@ -15,6 +15,21 @@ CREATE TABLE `Problemset_Problems` (
   KEY `problem_id` (`problem_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Los problemas de cada conjunto';
 
+
+DELIMITER //
+CREATE TRIGGER before_insert_into_Problemset_Problems
+BEFORE INSERT ON Problemset_Problems
+FOR EACH ROW
+BEGIN
+    DECLARE max_order INT;
+    SELECT MAX(`order`) INTO max_order FROM Problemset_Problems where Problemset_Problems.problemset_id = NEW.problemset_id;
+    SET NEW.`order` = COALESCE(max_order, 0) + 1;
+END;
+//
+DELIMITER ;
+
+
+
 CREATE TABLE `ACLs` (
   `acl_id` int(11) NOT NULL,
   `owner_id` int(11) NOT NULL COMMENT 'El usuario que creó el objeto y que tiene un rol de administrador implícito',

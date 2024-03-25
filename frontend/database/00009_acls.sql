@@ -164,4 +164,23 @@ ALTER TABLE `Group_Roles`
   CHANGE COLUMN `contest_id` `acl_id` INT(11) NOT NULL,
   ADD CONSTRAINT `fk_gra_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
+-- DELIMITER //
+
+-- CREATE TRIGGER update_count_trigger
+-- AFTER INSERT ON Problemset_Problems
+-- FOR EACH ROW
+-- BEGIN
+--     DECLARE row_count INT;
+
+--     SELECT COUNT(*) INTO row_count FROM Problemset_Problems;
+
+--     UPDATE Problemset_Problems
+--     SET Problemset_Problems.order = row_count
+--     WHERE problem_id = NEW.problem_id;
+-- END;
+-- //
+
+-- DELIMITER ;
+
 -- vim: set expandtab:ts=2:sw=2
+
