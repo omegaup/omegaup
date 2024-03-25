@@ -224,8 +224,7 @@ Cypress.Commands.add(
     problems,
   }) => {
     cy.visit(`contest/${contestAlias}/edit/`);
-    cy.get('a[data-nav-contest-edit]').click();
-    cy.get('a.dropdown-item.problems').click();
+    cy.get('a.nav-link.problems').click();
 
     for (const idx in problems) {
       cy.get('.tags-input input[type="text"]').type(problems[idx].problemAlias)
@@ -242,8 +241,7 @@ Cypress.Commands.add(
     admissionMode,
   }) => {
     cy.visit(`contest/${contestAlias}/edit/`);
-    cy.get('a[data-nav-contest-edit]').click();
-    cy.get('a.dropdown-item.admission-mode').click();
+    cy.get('a.nav-link.admission-mode').click();
     cy.get('select[name="admission-mode"]').select(
       admissionMode,
     ); // private | registration | public
