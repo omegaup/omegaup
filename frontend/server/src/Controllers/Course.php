@@ -1408,7 +1408,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'problemsetNotFound'
             );
         }
-
+        
+        $cntProblems = \OmegaUp\DAO\ProblemsetProblems::countProblemsetProblems($problemset);
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['commit'],
             'commit',
@@ -1423,7 +1424,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             validateVisibility: true,
             isExtraProblem: $isExtraProblem,
             points: $r->ensureOptionalFloat('points') ?? 100.0,
-            commit: $r['commit']
+            commit: $r['commit'],
+            order: $cntProblems + 1,
         );
 
         \OmegaUp\DAO\Courses::updateAssignmentMaxPoints(
