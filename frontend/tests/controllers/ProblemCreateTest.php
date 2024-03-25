@@ -94,17 +94,20 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function invalidAliasValueProvider(): array {
         return [
-            ['this has a space'],
-            ['this-alias-is-way-too-long-and-should-be-rejected'],
-            ['colons:are-disallowed'],
-            ['new'],  // restricted alias
+            ['this has a space', 'parameterInvalid'],
+            ['this-alias-is-way-too-long-and-should-be-rejected', 'parameterStringTooLong'],
+            ['colons:are-disallowed', 'parameterInvalid'],
+            ['new', 'parameterInvalid'],  // restricted alias
         ];
     }
 
     /**
      * @dataProvider invalidAliasValueProvider
      */
-    public function testCreateWithInvalidAlias(string $alias) {
+    public function testCreateWithInvalidAlias(
+        string $alias,
+        string $expectedMessage
+    ) {
         // Get the problem data
         $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
         $problemAuthor = $problemData['author'];
@@ -120,7 +123,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Problem::apiCreate($r);
             $this->fail('Problem creation should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertSame($e->getMessage(), 'parameterStringTooLong');
+            $this->assertSame($e->getMessage(), $expectedMessage);
         }
     }
 
