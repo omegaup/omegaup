@@ -219,7 +219,7 @@
           </thead>
           <tfoot v-if="problemAlias != null">
             <tr>
-              <td colspan="10">
+              <td colspan="10" data-new-run>
                 <a
                   v-if="isContestFinished"
                   :href="`/arena/${contestAlias}/practice/`"
@@ -243,11 +243,9 @@
           </tfoot>
           <tbody>
             <tr v-for="run in paginatedRuns" :key="run.guid">
-              <template v-if="run.status !== 'ready'">
-                <td colspan="8" data-new-run>
-                  <div class="line"></div>
-                </td>
-              </template>
+              <td v-if="run.status !== 'ready'" colspan="10" data-new-run="">
+                <div class="line"></div>
+              </td>
               <template v-else>
                 <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
                 <td v-show="showGUID">
@@ -1148,19 +1146,27 @@ export default class Runs extends Vue {
 }
 .line {
   height: 49px;
-  background: #e0e0e0;
+  background: var(
+    --arena-submissions-list-skeletonloader-initial-background-color
+  );
   border-radius: 8px;
   animation: loading 1.5s infinite;
 }
 @keyframes loading {
   0% {
-    background: #e0e0e0;
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
   }
   50% {
-    background: #f5f5f5;
+    background: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
   }
   100% {
-    background: #e0e0e0;
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
   }
 }
 </style>
