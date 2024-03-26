@@ -677,6 +677,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame($identityName, $profile['name']);
         $this->assertSame($profile['is_own_profile'], $isOwnProfile);
         $this->assertSame($profile['is_private'], $isPrivate);
+        $this->assertArrayNotHasKey('cat', $profile['programming_languages']);
     }
 
     public function testGetUserDependents() {
