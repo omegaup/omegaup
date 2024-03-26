@@ -243,7 +243,7 @@
           </tfoot>
           <tbody>
             <tr v-for="run in paginatedRuns" :key="run.guid">
-              <td v-if="run.status !== 'ready'" colspan="8" data-new-run>
+              <td v-if="run.status !== 'ready'" colspan="8">
                 <div class="line"></div>
               </td>
               <template v-else>
