@@ -18,6 +18,7 @@ const baseCourseFormProps = {
     finish_time: new Date(),
     is_admin: true,
     is_curator: true,
+    is_teaching_assistant: false,
     name: 'Nuevo',
     objective: 'Objetivo de prueba',
     level: '',

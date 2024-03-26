@@ -41,6 +41,7 @@
           v-model="code"
           :language="selectedLanguage"
           :readonly="false"
+          @change-language="handleChangeLanguage($event)"
         ></omegaup-arena-code-view>
       </div>
       <div class="form-group row mt-3 align-items-center">
@@ -108,6 +109,9 @@ export default class ArenaRunSubmitPopup extends Vue {
   code = '';
   now: number = Date.now();
 
+  handleChangeLanguage(language: string): void {
+    this.selectedLanguage = language;
+  }
   get canSubmit(): boolean {
     return this.nextSubmissionTimestamp.getTime() <= this.now;
   }

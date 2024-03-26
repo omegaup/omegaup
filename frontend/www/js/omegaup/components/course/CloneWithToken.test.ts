@@ -22,6 +22,7 @@ describe('CloneWithToken.vue', () => {
           finish_time: new Date(),
           is_curator: true,
           is_admin: true,
+          is_teaching_assistant: false,
           name: courseName,
           public: true,
           requests_user_information: 'no',

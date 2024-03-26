@@ -8,7 +8,6 @@ import course_Clarifications from '../components/course/Clarifications.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseClarificationsPayload();
-  const headerPayload = types.payloadParsers.CommonPayload();
 
   new Vue({
     el: '#main-container',
@@ -18,7 +17,7 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-course-clarifications', {
         props: {
-          isAdmin: headerPayload.isAdmin,
+          isAdmin: payload.is_admin || payload.is_teaching_assistant,
           clarifications: payload.clarifications,
           pagerItems: payload.pagerItems,
           pageSize: payload.length,

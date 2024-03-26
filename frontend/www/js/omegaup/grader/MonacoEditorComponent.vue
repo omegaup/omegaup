@@ -81,6 +81,10 @@ export default {
     },
   },
   mounted: function () {
+    window.parent.addEventListener('code-and-language-set', (e) => {
+      e.detail.code = this.contents;
+      e.detail.language = this.language;
+    });
     this._editor = monaco.editor.create(this.$el, {
       autoIndent: true,
       formatOnPaste: true,
@@ -94,6 +98,9 @@ export default {
     this._model.onDidChangeContent(() => {
       this.contents = this._model.getValue();
     });
+  },
+  unmounted: function () {
+    window.parent.removeEventListener('code-and-language-set');
   },
   methods: {
     onResize: function () {
