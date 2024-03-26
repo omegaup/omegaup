@@ -364,7 +364,7 @@ export default class Edit extends Vue {
   alreadyArchived = this.details.archived;
 
   selectedTab(): string {
-    if (this.initialTab != '') {
+    if (this.initialTab != null && this.initialTab != '') {
       return this.initialTab;
     }
     if (!ui.isVirtual(this.details)) {
