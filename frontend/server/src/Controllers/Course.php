@@ -1409,7 +1409,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
         
-        $cntProblems = \OmegaUp\DAO\ProblemsetProblems::countProblemsetProblems($problemset);
+        $countProblems = \OmegaUp\DAO\ProblemsetProblems::countProblemsetProblems($problemset);
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['commit'],
             'commit',
