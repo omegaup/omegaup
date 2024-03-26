@@ -83,9 +83,11 @@ import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { supportedLanguages } from '../../grader/util';
+import {
+  LanguageInfo,
+  supportedExtensions,
+  supportedLanguages,
+} from '../../grader/util';
 @Component({
   components: {
     'omegaup-arena-code-view': arena_CodeView,
@@ -118,9 +120,9 @@ export default class ArenaRunSubmitPopup extends Vue {
     let allowedLanguages: omegaup.Languages = {};
     const allLanguages: { language: string; name: string }[] = Object.values(
       supportedLanguages,
-    ).map((info: any) => ({
-      language: info.language,
-      name: info.name,
+    ).map((languageInfo: LanguageInfo) => ({
+      language: languageInfo.language,
+      name: languageInfo.name,
     }));
     // dont forget about cat ext
     allLanguages.push({ language: 'cat', name: T.outputOnly });
@@ -183,22 +185,8 @@ export default class ArenaRunSubmitPopup extends Vue {
         this.$emit('submit-run', result as string, this.selectedLanguage);
       };
 
-      const validExtensions = [
-        'cpp',
-        'c',
-        'cs',
-        'java',
-        'txt',
-        'hs',
-        'kp',
-        'kj',
-        'p',
-        'pas',
-        'py',
-        'rb',
-        'lua',
-      ];
-
+      // add txt, p extensions
+      const validExtensions = [...supportedExtensions, 'p', 'txt'];
       if (
         this.selectedLanguage !== 'cat' ||
         file.type.indexOf('text/') === 0 ||
