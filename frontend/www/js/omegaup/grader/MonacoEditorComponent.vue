@@ -58,7 +58,7 @@ export default {
       return (
         this.module +
         '.' +
-        (this.extension || Util.languageExtensionMapping[this.language])
+        (this.extension || Util.supportedLanguages[this.language].extension)
       );
     },
     title: function () {
@@ -73,7 +73,7 @@ export default {
     language: function (value) {
       monaco.editor.setModelLanguage(
         this._model,
-        Util.languageMonacoModelMapping[value],
+        Util.supportedLanguages[value].modelMapping,
       );
     },
     contents: function (value) {
@@ -89,7 +89,7 @@ export default {
       autoIndent: true,
       formatOnPaste: true,
       formatOnType: true,
-      language: Util.languageMonacoModelMapping[this.language],
+      language: Util.supportedLanguages[this.language].modelMapping,
       readOnly: this.readOnly,
       theme: this.theme,
       value: this.contents,
