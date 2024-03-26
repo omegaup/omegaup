@@ -1425,7 +1425,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             isExtraProblem: $isExtraProblem,
             points: $r->ensureOptionalFloat('points') ?? 100.0,
             commit: $r['commit'],
-            order: $cntProblems + 1,
+            order: $countProblems + 1,
         );
 
         \OmegaUp\DAO\Courses::updateAssignmentMaxPoints(
