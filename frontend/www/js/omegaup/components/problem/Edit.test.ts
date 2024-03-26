@@ -11,7 +11,6 @@ describe('Edit.vue', () => {
         data: {
           title: 'problem',
           alias: 'problem-alias',
-          initialTab: 'edit',
           timeLimit: 1000,
           extraWallTime: 0,
           memoryLimit: 32768,
@@ -38,6 +37,7 @@ describe('Edit.vue', () => {
           },
         },
         initialLanguage: 'es',
+        initialTab: 'edit',
       },
     });
 
