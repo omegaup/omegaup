@@ -71,7 +71,6 @@ export class ContestPage {
   // FIXME: When trying to bulk users, cypress is not able to find the results table
   // TODO: Replace multiuser add for courses/contests
   addStudentsBulk(users: Array<string>): void {
-    cy.get('a[data-nav-contest-edit]').click();
     cy.get('a[data-nav-contestant]').click();
 
     cy.get('textarea[data-contestant-names]').type(users.join(', '));
