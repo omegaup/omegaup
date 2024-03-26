@@ -236,7 +236,7 @@ export class CoursePage {
 
   verifyFeedback(feedback: string): void {
     cy.get('.notification-toggle').last().click();
-    cy.get('[data-notification-list]').last().click();
+    cy.get('[data-notification-list]').filter(':visible').first().click();
     cy.get('[data-run-feedback]').should('contain', feedback);
     cy.get('.CodeMirror-lines').should('be.visible');
     cy.get('.CodeMirror-line').then((rawHTMLElements) => {
