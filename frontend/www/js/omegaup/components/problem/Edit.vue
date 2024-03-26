@@ -301,6 +301,7 @@ Vue.use(ModalPlugin);
 export default class ProblemEdit extends Vue {
   @Prop() data!: types.ProblemEditPayload;
   @Prop() admins!: types.ProblemAdmin[];
+  @Prop() initialTab!: string;
   @Prop() groups!: types.ProblemGroupAdmin[];
   @Prop({ default: null }) solution!: types.ProblemStatement | null;
   @Prop() statement!: types.ProblemStatement;
@@ -309,7 +310,7 @@ export default class ProblemEdit extends Vue {
 
   T = T;
   alias = this.data.alias;
-  showTab = 'edit';
+  showTab = this.initialTab;
   currentStatement: types.ProblemStatement = this.statement;
   showConfirmationModal = false;
 
