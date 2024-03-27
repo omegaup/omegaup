@@ -119,7 +119,7 @@ describe('Contest Test', () => {
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
     cy.get('[data-table-scoreboard-username]').should('have.length', 1);
-    cy.get(`.${userLoginOptions[0].username} > td:nth-child(4)`).should(
+    cy.get(`.${userLoginOptions[0].username} > td:nth-child(5)`).should(
       'contain',
       '+100.00',
     );
@@ -358,11 +358,11 @@ describe('Contest Test', () => {
       cy.get('a[href="#ranking"]').click();
       cy.get('[data-table-scoreboard]').should('be.visible');
       cy.get('[data-table-scoreboard-username]').should('have.length', 2);
-      cy.get(`.${userLoginOptions[0].username} > td:nth-child(4)`).should(
+      cy.get(`.${userLoginOptions[0].username} > td:nth-child(5)`).should(
         'contain',
         '+100.00',
       );
-      cy.get(`.${userLoginOptions[1].username} > td:nth-child(4)`).should(
+      cy.get(`.${userLoginOptions[1].username} > td:nth-child(5)`).should(
         'contain',
         '-',
       );
@@ -388,7 +388,7 @@ describe('Contest Test', () => {
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
     cy.get('[data-table-scoreboard-username]').should('have.length', 1);
-    cy.get(`.${userLoginOptions[0].username} > td:nth-child(4)`).should(
+    cy.get(`.${userLoginOptions[0].username} > td:nth-child(5)`).should(
       'contain',
       '0.00',
     );
@@ -426,7 +426,7 @@ describe('Contest Test', () => {
     cy.get('a[href="#ranking"]').click();
     cy.get('[data-table-scoreboard]').should('be.visible');
     cy.get('[data-table-scoreboard-username]').should('have.length', 2);
-    cy.get(`.${userLoginOptions[0].username} > td:nth-child(4)`).should(
+    cy.get(`.${userLoginOptions[0].username} > td:nth-child(5)`).should(
       'contain',
       '+100.00',
     );
