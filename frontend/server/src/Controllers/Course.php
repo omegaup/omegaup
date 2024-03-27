@@ -3861,9 +3861,17 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($course->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
-        self::resolveGroup($course);
-
-        if (!\OmegaUp\Authorization::isCourseAdmin($identity, $course)) {
+        $groupsTeachingAssistants = \OmegaUp\DAO\Courses::getCourseTeachingAssistantGroups(
+            $course,
+        );
+        if (
+            !\OmegaUp\Authorization::isCourseAdmin($identity, $course) &&
+            !\OmegaUp\Authorization::isTeachingAssistant($identity, $course) &&
+            !\OmegaUp\Authorization::isGroupTeachingAssistantMember(
+                $identity,
+                $groupsTeachingAssistants
+            )
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
         $admins = \OmegaUp\DAO\UserRoles::getCourseAdmins($course);
@@ -5376,6 +5384,17 @@ class Course extends \OmegaUp\Controllers\Controller {
         $isAdmin = false;
         $isCurator = false;
         $isTeachingAssistant = false;
+        if (is_null($course->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseNotFound'
+            );
+        }
+        $group = \OmegaUp\DAO\Groups::getByPK($course->group_id);
+        if (is_null($group) || is_null($group->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseGroupNotFound'
+            );
+        }
         if (!is_null($identity)) {
             $isAdmin = \OmegaUp\Authorization::isCourseAdmin(
                 $identity,
@@ -5384,10 +5403,19 @@ class Course extends \OmegaUp\Controllers\Controller {
             $isCurator = \OmegaUp\Authorization::canCreatePublicCourse(
                 $identity
             );
-            $isTeachingAssistant = self::isTeachingAssistant(
-                $course,
-                $identity
+            $isTeachingAssistant = \OmegaUp\Authorization::isTeachingAssistant(
+                $identity,
+                $course
             );
+            if (!$isTeachingAssistant) {
+                $groupsTeachingAssistants = \OmegaUp\DAO\Courses::getCourseTeachingAssistantGroups(
+                    $course,
+                );
+                $isTeachingAssistant = \OmegaUp\Authorization::isGroupTeachingAssistantMember(
+                    $identity,
+                    $groupsTeachingAssistants
+                );
+            }
         }
 
         $result = [
@@ -5435,17 +5463,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         ];
 
         if ($isAdmin || $isTeachingAssistant) {
-            if (is_null($course->group_id)) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'courseNotFound'
-                );
-            }
-            $group = \OmegaUp\DAO\Groups::getByPK($course->group_id);
-            if (is_null($group) || is_null($group->group_id)) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'courseGroupNotFound'
-                );
-            }
             $result['student_count'] =
                 \OmegaUp\DAO\GroupsIdentities::GetMemberCountById(
                     $group->group_id

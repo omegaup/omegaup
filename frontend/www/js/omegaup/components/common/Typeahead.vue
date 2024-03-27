@@ -8,6 +8,7 @@
     :typeahead-activation-threshold="activationThreshold"
     :placeholder="placeholder"
     :limit="1"
+    :disabled="readonly"
     :hide-input-on-limit="true"
     :only-existing-tags="onlyExistingTags"
     :typeahead-hide-discard="typeaheadHideDiscard"
@@ -37,6 +38,7 @@ export default class Typeahead extends Vue {
   @Prop({ default: 5 }) maxResults!: number;
   @Prop({ default: null }) value!: null | types.ListItem;
   @Prop({ default: true }) onlyExistingTags!: boolean;
+  @Prop({ default: false }) readonly!: boolean;
   @Prop({ default: true }) typeaheadHideDiscard!: boolean;
   @Prop({ default: T.typeaheadSearchPlaceholder }) placeholder!: string;
 
@@ -83,5 +85,10 @@ export default class Typeahead extends Vue {
 .tags-input-wrapper-default {
   height: 38px;
   padding: 0.375rem 0.75rem !important;
+}
+
+.tags-input.disabled {
+  background-color: var(--typeahead-disabled);
+  opacity: 1;
 }
 </style>
