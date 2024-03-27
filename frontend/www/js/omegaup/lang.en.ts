@@ -1456,6 +1456,7 @@ const translations: { [key: string]: string; } = {
   runNotInsideContest: "Contest time has expired or not started yet.",
   runWaitGap: "You have to wait between consecutive submissions.",
   schoolNotFound: "School not found",
+  schoolNotSelected: "No school selected",
   schoolOfTheMonth: "School of the Month",
   schoolOfTheMonthAlreadySelected: "School of the month has been previously selected",
   schoolOfTheMonthChooseAsSchool: "Choose as School of the Month",
