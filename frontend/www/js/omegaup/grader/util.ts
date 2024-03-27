@@ -1,44 +1,10 @@
-export function vuexGet(store, name) {
-  if (typeof store.getters[name] !== 'undefined') return store.getters[name];
-  var o = store.state;
-  for (let p of name.split('.')) {
-    if (typeof o === 'undefined') return undefined;
-    if (!Object.prototype.hasOwnProperty.call(o, p)) return undefined;
-    o = o[p];
-  }
-  return o;
+export interface LanguageInfo {
+  extension: string;
+  name: string;
+  modelMapping: string;
+  language: string;
 }
-
-export function vuexSet(store, name, value) {
-  store.commit(name, value);
-}
-
-export function parseDuration(value) {
-  if (typeof value === 'number') {
-    return value;
-  }
-
-  let result = 0.0;
-  for (let chunk of value.match(/\d+(ns|us|µs|m|s)?/g)) {
-    let scale = 1.0;
-    if (chunk.indexOf('ns') === chunk.length - 2) {
-      scale = 1e-9;
-    } else if (
-      chunk.indexOf('us') === chunk.length - 2 ||
-      chunk.indexOf('µs') === chunk.length - 2
-    ) {
-      scale = 1e-6;
-    } else if (chunk.indexOf('ms') === chunk.length - 2) {
-      scale = 1e-3;
-    } else if (chunk.indexOf('m') === chunk.length - 1) {
-      scale = 60;
-    }
-    result += scale * parseFloat(chunk);
-  }
-  return result;
-}
-
-export const supportedLanguages = {
+export const supportedLanguages: Record<string, LanguageInfo> = {
   '': { extension: '', name: '', modelMapping: '', language: '' },
   kp: {
     extension: 'kp',
@@ -197,55 +163,8 @@ export const supportedLanguages = {
     language: 'js',
   },
 };
-export const validExtensions = [
+export const supportedExtensions: string[] = [
   ...new Set(
     Object.values(supportedLanguages).map((language) => language.extension),
   ),
 ];
-export function asyncError(err) {
-  console.error('Async error', err);
-}
-
-// Wraps a function `f(...args)` into `f(key)(...args)` that is called at most
-// once every `delay` milliseconds. `f(key).flush()` will cause the function to
-// be called immediately.
-export function throttle(f, delay) {
-  let timeouts = {};
-  const throttled = (key) => {
-    let wrapped;
-    if (Object.prototype.hasOwnProperty.call(timeouts, key)) {
-      wrapped = (...args) => {
-        timeouts[key].args = args;
-      };
-    } else {
-      wrapped = (...args) => {
-        f(...args);
-        timeouts[key] = {
-          timeout: setTimeout(() => {
-            const { args } = timeouts[key];
-            delete timeouts[key];
-            if (args !== null) {
-              throttled(key)(...args);
-            }
-          }, delay),
-          args: null,
-        };
-      };
-    }
-    wrapped.flush = () => {
-      if (!Object.prototype.hasOwnProperty.call(timeouts, key)) {
-        return;
-      }
-      const { timeout, args } = timeouts[key];
-      delete timeouts[key];
-      clearTimeout(timeout);
-      if (args !== null) {
-        f(...args);
-      }
-    };
-
-    return wrapped;
-  };
-
-  return throttled;
-}

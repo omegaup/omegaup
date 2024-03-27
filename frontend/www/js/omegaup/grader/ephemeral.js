@@ -170,6 +170,12 @@ def sumas(a: int, b: int) -> int:
   rb: '# not supported',
 };
 const interactiveTemplates = { ...originalInteractiveTemplates };
+const languageExtensionMapping = Object.fromEntries(
+  Object.entries(Util.supportedLanguages).map(([key, value]) => [
+    key,
+    value.extension,
+  ]),
+);
 
 Vue.use(Vuex);
 let store = new Vuex.Store({
@@ -355,7 +361,7 @@ let store = new Vuex.Store({
       state.request.language = state.sessionStorageSources.language;
       state.request.source =
         state.sessionStorageSources.sources[
-          Util.languageExtensionMapping[state.sessionStorageSources.language]
+          languageExtensionMapping[state.sessionStorageSources.language]
         ];
       document.getElementById('language').value = state.request.language;
     },
@@ -398,12 +404,9 @@ let store = new Vuex.Store({
       }
       state.request.language = value;
       if (
-        Object.prototype.hasOwnProperty.call(
-          Util.languageExtensionMapping,
-          value,
-        )
+        Object.prototype.hasOwnProperty.call(languageExtensionMapping, value)
       ) {
-        const language = Util.languageExtensionMapping[value];
+        const language = languageExtensionMapping[value];
         if (state.sessionStorageSources) {
           if (
             Object.prototype.hasOwnProperty.call(
@@ -439,7 +442,7 @@ let store = new Vuex.Store({
       state.request.source = value;
       if (!state.updatingSettings && state.sessionStorageSources) {
         state.sessionStorageSources.sources[
-          Util.languageExtensionMapping[state.sessionStorageSources.language]
+          languageExtensionMapping[state.sessionStorageSources.language]
         ] = value;
         persistToSessionStorage(state.alias)({
           alias: state.alias,
@@ -1212,7 +1215,7 @@ document.getElementById('upload').addEventListener('change', (e) => {
             let extension = fileName.substring('validator.'.length);
             if (
               !Object.prototype.hasOwnProperty.call(
-                Util.languageExtensionMapping,
+                languageExtensionMapping,
                 extension,
               )
             )
@@ -1250,7 +1253,7 @@ document.getElementById('upload').addEventListener('change', (e) => {
             let extension = fileName.substring('interactive/Main.'.length);
             if (
               !Object.prototype.hasOwnProperty.call(
-                Util.languageExtensionMapping,
+                languageExtensionMapping,
                 extension,
               )
             )
