@@ -238,6 +238,7 @@
                   :username="run.username"
                   :country="run.country_id"
                   :linkify="true"
+                  :href="'#runs'"
                   :emit-click-event="true"
                   @click="
                     (username) =>
@@ -268,11 +269,9 @@
                 </a>
               </td>
               <td v-if="showProblem" class="text-break-all">
-                <a
-                  href="#runs"
-                  @click.prevent="filterProblem.key = run.alias"
-                  >{{ run.alias }}</a
-                >
+                <a href="#runs" @click="setFilterProblem(run.alias)">{{
+                  run.alias
+                }}</a>
                 <a
                   problem-navigation-button
                   :href="`/arena/problem/${run.alias}/`"
@@ -698,6 +697,15 @@ export default class Runs extends Vue {
     if (run.verdict == 'AC') {
       return 'status-ac';
     }
+    if (run.verdict == 'TLE') {
+      return 'status-tle';
+    }
+    if (run.verdict == 'MLE') {
+      return 'status-mle';
+    }
+    if (run.verdict == 'WA') {
+      return 'status-wa';
+    }
     if (run.verdict == 'CE') {
       return 'status-ce';
     }
@@ -878,6 +886,10 @@ export default class Runs extends Vue {
     }
     this.$emit('update-search-result-users', { query });
   }
+
+  setFilterProblem(problemAlias: string): void {
+    this.filterProblem = { key: problemAlias, value: problemAlias };
+  }
 }
 </script>
 
@@ -933,6 +945,18 @@ export default class Runs extends Vue {
 }
 .status-ac {
   background: var(--arena-runs-table-status-ac-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+.status-wa {
+  background: var(--arena-runs-table-status-wa-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+.status-mle {
+  background: var(--arena-runs-table-status-mle-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+.status-tle {
+  background: var(--arena-runs-table-status-tle-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
 }
 .status-ce {
