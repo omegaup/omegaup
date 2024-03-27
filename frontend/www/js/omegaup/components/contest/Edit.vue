@@ -374,7 +374,7 @@ export default class Edit extends Vue {
     if (this.originalContestAdmissionMode != 'private') {
       return 'contestants';
     }
-    return 'problems';
+    return 'links';
   }
 
   get activeTab(): string {
