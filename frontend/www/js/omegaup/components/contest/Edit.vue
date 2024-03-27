@@ -365,16 +365,16 @@ export default class Edit extends Vue {
   alreadyArchived = this.details.archived;
 
   selectedTab(): string {
-    if (this.initialTab != null && this.initialTab != '') {
+    if (this.initialTab != '') {
       return this.initialTab;
     }
     if (!ui.isVirtual(this.details)) {
-      return 'new_form';
+      return 'problems';
     }
     if (this.originalContestAdmissionMode != 'private') {
       return 'contestants';
     }
-    return 'links';
+    return 'problems';
   }
 
   get activeTab(): string {

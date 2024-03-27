@@ -94,6 +94,6 @@ describe('Edit.vue', () => {
       propsData,
     });
 
-    expect(wrapper.vm.showTab).toBe('links');
+    expect(wrapper.vm.showTab).toBe('problems');
   });
 });
