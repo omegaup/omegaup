@@ -67,6 +67,44 @@ OmegaUp.on('ready', () => {
               showProblems(showAllProblems, pageNumber);
             }
           },
+          remove: ({
+            alias,
+            shouldShowAll,
+          }: {
+            alias: string;
+            shouldShowAll: boolean;
+          }) => {
+            api.Problem.delete({ problem_alias: alias })
+              .then(() => {
+                ui.success(T.problemSuccessfullyRemoved);
+                showAllProblems = shouldShowAll;
+                showProblems(shouldShowAll);
+              })
+              .catch(ui.apiError);
+          },
+          'remove-all-problems': ({
+            selectedProblems,
+            shouldShowAll,
+          }: {
+            selectedProblems: types.ProblemListItem[];
+            shouldShowAll: boolean;
+          }) => {
+            Promise.all(
+              selectedProblems.map((problem: types.ProblemListItem) =>
+                api.Problem.delete({ problem_alias: problem.alias }),
+              ),
+            )
+              .then(() => {
+                ui.success(T.problemSuccessfullyRemoved);
+              })
+              .catch((error) => {
+                ui.error(ui.formatString(T.bulkOperationError, error));
+              })
+              .finally(() => {
+                showAllProblems = shouldShowAll;
+                showProblems(shouldShowAll);
+              });
+          },
         },
       });
     },

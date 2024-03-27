@@ -64,6 +64,7 @@
               <option selected value="-1">{{ T.forSelectedItems }}</option>
               <option value="1">{{ T.makePublic }}</option>
               <option value="0">{{ T.makePrivate }}</option>
+              <option value="2">{{ T.wordsDelete }}</option>
             </select>
           </div>
           <div class="col px-0">
@@ -86,6 +87,7 @@
               <th scope="col" class="text-center">{{ T.wordsTitle }}</th>
               <th scope="col" class="text-center">{{ T.wordsEdit }}</th>
               <th scope="col" class="text-center">{{ T.wordsStatistics }}</th>
+              <th scope="col" class="text-center">{{ T.wordsDelete }}</th>
             </tr>
           </thead>
           <tbody>
@@ -176,10 +178,47 @@
                   <font-awesome-icon :icon="['fas', 'chart-bar']" />
                 </a>
               </td>
+              <td class="text-center align-middle">
+                <a href="#" @click.prevent="showConfirmationModal = true">
+                  <font-awesome-icon :icon="['fas', 'trash']" />
+                </a>
+              </td>
+              <b-modal
+                v-model="showConfirmationModal"
+                :title="T.problemEditDeleteRequireConfirmation"
+                :ok-title="T.problemEditDeleteOk"
+                ok-variant="danger"
+                :cancel-title="T.problemEditDeleteCancel"
+                @ok="
+                  $emit('remove', {
+                    alias: problem.alias,
+                    shouldShowAll: shouldShowAllProblems,
+                  })
+                "
+              >
+                <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
+              </b-modal>
             </tr>
           </tbody>
         </table>
       </div>
+      <b-modal
+        v-model="showConfirmationModalDeleteAll"
+        :title="T.problemEditDeleteRequireConfirmation"
+        :ok-title="T.problemEditDeleteOk"
+        ok-variant="danger"
+        :cancel-title="T.problemEditDeleteCancel"
+        @ok="
+          $emit('remove-all-problems', {
+            selectedProblems: selectedProblems,
+            shouldShowAll: shouldShowAllProblems,
+          });
+          selectedProblems = [];
+          allProblemsVisibilityOption = '-1';
+        "
+      >
+        <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
+      </b-modal>
       <div class="card-footer">
         <omegaup-common-paginator
           :pager-items="pagerItems"
@@ -214,6 +253,8 @@ library.add(
   faExclamationTriangle,
   faBan,
 );
+import { ModalPlugin } from 'bootstrap-vue';
+Vue.use(ModalPlugin);
 
 @Component({
   components: {
@@ -233,7 +274,9 @@ export default class ProblemMine extends Vue {
   currentQuery = this.query ?? '';
   shouldShowAllProblems = false;
   selectedProblems: types.ProblemListItem[] = [];
-  allProblemsVisibilityOption = -1;
+  allProblemsVisibilityOption = '-1';
+  showConfirmationModal = false;
+  showConfirmationModalDeleteAll = false;
 
   get statementShowAllProblems(): string {
     return this.isSysadmin
@@ -243,7 +286,8 @@ export default class ProblemMine extends Vue {
 
   onChangeVisibility(): void {
     if (
-      this.allProblemsVisibilityOption !== -1 &&
+      (this.allProblemsVisibilityOption === '1' ||
+        this.allProblemsVisibilityOption === '0') &&
       this.selectedProblems.length
     ) {
       this.$emit(
@@ -252,7 +296,14 @@ export default class ProblemMine extends Vue {
         this.allProblemsVisibilityOption,
       );
       this.selectedProblems = [];
-      this.allProblemsVisibilityOption = -1;
+      this.allProblemsVisibilityOption = '-1';
+    }
+
+    if (
+      this.allProblemsVisibilityOption === '2' &&
+      this.selectedProblems.length
+    ) {
+      this.showConfirmationModalDeleteAll = true;
     }
   }
 }
