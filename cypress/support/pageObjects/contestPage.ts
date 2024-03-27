@@ -134,8 +134,8 @@ export class ContestPage {
 
   createContest(contestOptions: ContestOptions, users: Array<string>, shouldShowIntro: boolean = true): void {
     cy.createContest(contestOptions, shouldShowIntro);
-
     cy.location('href').should('include', contestOptions.contestAlias);
+    cy.get('a[data-contest-new-form]').trigger('click');
     cy.get('[name="title"]').should('have.value', contestOptions.contestAlias);
     cy.get('[name="alias"]').should('have.value', contestOptions.contestAlias);
     cy.get('[name="description"]').should(
