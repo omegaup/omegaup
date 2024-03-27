@@ -369,7 +369,7 @@ export default class Edit extends Vue {
       return this.initialTab;
     }
     if (!ui.isVirtual(this.details)) {
-      return 'problems';
+      return 'new_form';
     }
     if (this.originalContestAdmissionMode != 'private') {
       return 'contestants';
