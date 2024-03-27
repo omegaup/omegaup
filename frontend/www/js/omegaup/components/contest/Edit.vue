@@ -21,7 +21,7 @@
         <a
           v-if="!virtual"
           href="#new_form"
-          data-contest-new_form
+          data-contest-new-form
           class="nav-link"
           :class="{ active: showTab === 'new_form' }"
           @click="showTab = 'new_form'"
