@@ -54,6 +54,7 @@ OmegaUp.on('ready', () => {
               if (request.school?.key) {
                 resolve(request.school.key);
               } else if (request.school?.value) {
+                resolve(request.school.key);
                 api.School.create({ name: request.school.value })
                   .then((data) => {
                     resolve(data.school_id);
