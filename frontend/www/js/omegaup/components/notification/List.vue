@@ -84,14 +84,14 @@ export default class NotificationList extends Vue {
 }
 
 .navbar-expand-lg .navbar-nav .dropdown-menu {
-  min-width: 84vw;
+  min-width: 55vw;
   @media only screen and (min-width: 767px) {
     min-width: 35rem;
   }
 }
 
 .notification-dropdown {
-  max-width: 100vw;
+  max-width: 75vw;
   max-height: 600px;
   overflow-y: auto;
 }
