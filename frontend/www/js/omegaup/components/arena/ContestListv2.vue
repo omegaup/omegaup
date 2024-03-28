@@ -541,6 +541,9 @@ export default class ArenaContestList extends Vue {
 }
 
 .card-group-menu {
+  position: sticky;
+  top: 62px;
+  z-index: 10;
   border: none;
   border-bottom: 1px solid var(--arena-scoreboard-hover-color);
   border-radius: 0.25rem 0.25rem 0 0;
