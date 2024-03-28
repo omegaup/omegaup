@@ -46,6 +46,16 @@ class StatusBase {
     }
 
     /**
+     * @return list<int>|list<string>
+     */
+    public static function getAll(): array {
+        $reflectionClass = new \ReflectionClass(get_called_class());
+        $constants = $reflectionClass->getConstants();
+
+        return array_values($constants);
+    }
+
+    /**
      * @param class-string $className The derived class name.
      * @return array{constants: array<string, int>, min: int, max: int}
      */
