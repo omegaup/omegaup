@@ -21,6 +21,7 @@
         <a
           v-if="!virtual"
           href="#new_form"
+          data-contest-new-form
           class="nav-link"
           :class="{ active: showTab === 'new_form' }"
           @click="showTab = 'new_form'"
@@ -343,6 +344,7 @@ import contest_Certificates from './Certificates.vue';
 export default class Edit extends Vue {
   @Prop() admins!: types.ContestAdmin[];
   @Prop() details!: types.ContestAdminDetails;
+  @Prop() initialTab!: string;
   @Prop() groups!: types.ContestGroup[];
   @Prop() groupAdmins!: types.ContestGroupAdmin[];
   @Prop() problems!: types.ProblemsetProblemWithVersions[];
@@ -363,6 +365,9 @@ export default class Edit extends Vue {
   alreadyArchived = this.details.archived;
 
   selectedTab(): string {
+    if (this.initialTab != '') {
+      return this.initialTab;
+    }
     if (!ui.isVirtual(this.details)) {
       return 'new_form';
     }
