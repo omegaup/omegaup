@@ -1408,8 +1408,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'problemsetNotFound'
             );
         }
-        
-        $countProblems = \OmegaUp\DAO\ProblemsetProblems::countProblemsetProblems($problemset);
+
+        $countProblems = \OmegaUp\DAO\ProblemsetProblems::countProblemsetProblems(
+            $problemset
+        );
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['commit'],
             'commit',
