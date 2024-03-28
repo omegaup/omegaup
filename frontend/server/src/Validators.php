@@ -221,11 +221,29 @@ class Validators {
         string $alias,
         int $maxLength = Validators::ALIAS_MAX_LENGTH
     ): bool {
-        return (
-            preg_match('/^[a-zA-Z0-9_-]+$/', $alias) === 1
-            && !self::isRestrictedAlias($alias)
-            && strlen($alias) <= $maxLength
-        );
+        if (!preg_match('/^[a-zA-Z0-9_-]+$/', $alias)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'alias'
+            );
+        }
+
+        if (strlen($alias) > $maxLength) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterStringTooLong',
+                'alias',
+                ['max_length' => strval($maxLength)]
+            );
+        }
+
+        if (self::isRestrictedAlias($alias)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'alias',
+            );
+        }
+
+        return true;
     }
 
     /**

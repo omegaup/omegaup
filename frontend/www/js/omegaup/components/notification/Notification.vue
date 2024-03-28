@@ -117,7 +117,7 @@ export default class Notification extends Vue {
   }
 
   get date() {
-    return time.formatDate(this.notification.timestamp);
+    return time.formatDateLocalHHMM(this.notification.timestamp);
   }
 
   handleClick(): void {

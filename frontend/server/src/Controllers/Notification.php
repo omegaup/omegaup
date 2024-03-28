@@ -64,6 +64,7 @@ class Notification extends \OmegaUp\Controllers\Controller {
             );
             $notifications[] = $notification;
         }
+        $notifications = array_reverse($notifications);
         return [
             'notifications' => $notifications,
         ];
