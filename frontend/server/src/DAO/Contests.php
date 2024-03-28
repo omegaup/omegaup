@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  *
  * @psalm-type Contest=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, score_mode: string, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type Contestv2=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, score_mode: string, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
- * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration?: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  */
 class Contests extends \OmegaUp\DAO\Base\Contests {
     /** @var string */
@@ -502,7 +502,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $page = 1,
         int $pageSize = 1000,
         int $active = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
-        ?string $query = null
+        ?string $query = null,
+        ?string $orderBy = null
     ) {
         $activeCondition = \OmegaUp\DAO\Enum\ActiveStatus::sql(
             $active
@@ -525,6 +526,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         p.scoreboard_url,
                         p.scoreboard_url_admin,
                         0 AS contestants,
+                        DATEDIFF(finish_time, start_time) AS duration,
                         ANY_VALUE(organizer.username) AS organizer";
 
         $sql = "
@@ -604,16 +606,29 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params
         );
 
-        $limits = '
+        if ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::ENDS) {
+            $orderBy = 'finish_time';
+        } elseif ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::NONE) {
+            $orderBy = null;
+        }
+
+        $order = '';
+        if (!is_null($orderBy)) {
+            $order = "`{$orderBy}` DESC";
+        } else {
+            $order = '`finish_time` DESC';
+        }
+
+        $limits = "
             ORDER BY
                 recommended DESC,
-                finish_time DESC
+                {$order}
             LIMIT ?, ?;
-        ';
+        ";
         $params[] = max(0, $page - 1) * $pageSize;
         $params[] = intval($pageSize);
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql} {$limits}",
             $params
@@ -663,6 +678,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         p.scoreboard_url,
                         p.scoreboard_url_admin,
                         0 AS contestants,
+                        DATEDIFF(finish_time, start_time) AS duration,
                         ANY_VALUE(organizer.username) AS organizer";
 
         $sql = "
@@ -736,7 +752,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             LIMIT 1;
         ';
 
-        /** @var array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}|null */
+        /** @var array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}|null */
         $contest = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             "{$select} {$sql} {$limits}",
             $params
@@ -758,7 +774,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $identity_id,
         int $page = 1,
         int $pageSize = 1000,
-        ?string $query = null
+        ?string $query = null,
+        ?string $orderBy = null
     ) {
         $endCheck = \OmegaUp\DAO\Enum\ActiveStatus::sql(
             \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE
@@ -778,6 +795,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     $columns,
                     0 AS contestants,
                     ANY_VALUE(organizer.username) AS organizer,
+                    DATEDIFF(finish_time, start_time) AS duration,
                     (participating.identity_id IS NOT NULL) AS `participating`";
 
         $sql = "
@@ -817,17 +835,31 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params
         );
 
-        $limits = '
+        if ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::ENDS) {
+            $orderBy = 'finish_time';
+        } elseif ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::NONE) {
+            $orderBy = null;
+        }
+
+        $order = '';
+        if (!is_null($orderBy)) {
+            $order = "`{$orderBy}` DESC";
+        } else {
+            $order = '`original_finish_time` DESC';
+        }
+
+        $limits = "
             ORDER BY
+                {$order},
                 `last_updated` DESC,
                 `recommended` DESC,
                 `finish_time` DESC,
                 `contest_id` DESC
-            LIMIT ?, ?;';
+            LIMIT ?, ?;";
         $params[] = max(0, $page - 1) * $pageSize;
         $params[] = intval($pageSize);
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql} {$limits}",
             $params
@@ -872,7 +904,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $rowsPerPage = 1000,
         int $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
         int $recommendedContests = \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
-        ?string $query = null
+        ?string $query = null,
+        ?string $orderBy = null
     ): array {
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
         $endCheck = \OmegaUp\DAO\Enum\ActiveStatus::sql($activeContests);
@@ -989,6 +1022,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         0 AS contestants,
                         ANY_VALUE(organizer.username) AS organizer,
+                        DATEDIFF(finish_time, start_time) AS duration,
                         BIT_OR(rc.participating) AS participating";
         $sql = "
         FROM
@@ -1033,16 +1067,29 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params
         );
 
-        $limits = '
+        if ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::ENDS) {
+            $orderBy = 'finish_time';
+        } elseif ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::NONE) {
+            $orderBy = null;
+        }
+
+        $order = '';
+        if (!is_null($orderBy)) {
+            $order = "`{$orderBy}` DESC";
+        } else {
+            $order = '`original_finish_time` DESC';
+        }
+
+        $limits = "
             ORDER BY
-                CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                 recommended DESC,
-                original_finish_time DESC
-            LIMIT ?, ?';
+                {$order},
+                CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC
+            LIMIT ?, ?";
 
         $params[] = max(0, $page - 1) * $rowsPerPage;
         $params[] = intval($rowsPerPage);
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql} {$limits}",
             $params
@@ -1067,7 +1114,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $rowsPerPage = 1000,
         int $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
         int $recommendedContests = \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
-        ?string $query = null
+        ?string $query = null,
+        ?string $orderBy = null
     ): array {
         $endCheck = \OmegaUp\DAO\Enum\ActiveStatus::sql($activeContests);
         $recommendedCheck = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
@@ -1086,6 +1134,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         0 AS `contestants`,
                         ANY_VALUE(organizer.username) AS organizer,
+                        DATEDIFF(finish_time, start_time) AS duration,
                         FALSE AS `participating`
                         ";
         $sql = "
@@ -1123,15 +1172,28 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params
         );
 
-        $limits = '
+        if ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::ENDS) {
+            $orderBy = 'finish_time';
+        } elseif ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::NONE) {
+            $orderBy = null;
+        }
+
+        $order = '';
+        if (!is_null($orderBy)) {
+            $order = "`{$orderBy}` DESC";
+        } else {
+            $order = '`original_finish_time` DESC';
+        }
+
+        $limits = "
                 ORDER BY
-                CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                 `recommended` DESC,
-                `original_finish_time` DESC
-            LIMIT ?, ?';
+                {$order},
+                CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC
+            LIMIT ?, ?";
         $params[] = max(0, $page - 1) * $rowsPerPage;
         $params[] = intval($rowsPerPage);
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql} {$limits}",
             $params
@@ -1155,7 +1217,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $rowsPerPage = 1000,
         int $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
         int $recommendedContests = \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
-        ?string $query = null
+        ?string $query = null,
+        ?string $orderBy = null
     ) {
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
         $endCheck = \OmegaUp\DAO\Enum\ActiveStatus::sql($activeContests);
@@ -1173,6 +1236,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         0 AS contestants,
                         ANY_VALUE(organizer.username) AS organizer,
+                        DATEDIFF(finish_time, start_time) AS duration,
                         TRUE AS participating";
         $sql = "
                 FROM
@@ -1204,16 +1268,29 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params
         );
 
-        $limits = '
+        if ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::ENDS) {
+            $orderBy = 'finish_time';
+        } elseif ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::NONE) {
+            $orderBy = null;
+        }
+
+        $order = '';
+        if (!is_null($orderBy)) {
+            $order = "`{$orderBy}` DESC";
+        } else {
+            $order = '`original_finish_time` DESC';
+        }
+
+        $limits = "
             ORDER BY
-                CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                 `recommended` DESC,
-                `original_finish_time` DESC
-            LIMIT ?, ?;';
+                {$order},
+                CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC
+            LIMIT ?, ?;";
 
         $params[] = max(0, $page - 1) * $rowsPerPage;
         $params[] = intval($rowsPerPage);
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql} {$limits}",
             $params
