@@ -253,6 +253,8 @@ library.add(
   faExclamationTriangle,
   faBan,
 );
+import { ModalPlugin } from 'bootstrap-vue';
+Vue.use(ModalPlugin);
 
 @Component({
   components: {
