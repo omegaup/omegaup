@@ -1409,6 +1409,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $countProblems = \OmegaUp\DAO\ProblemsetProblems::countProblemsetProblems(
+            $problemset
+        );
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['commit'],
             'commit',
@@ -1423,7 +1426,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             validateVisibility: true,
             isExtraProblem: $isExtraProblem,
             points: $r->ensureOptionalFloat('points') ?? 100.0,
-            commit: $r['commit']
+            commit: $r['commit'],
+            order: $countProblems + 1,
         );
 
         \OmegaUp\DAO\Courses::updateAssignmentMaxPoints(
