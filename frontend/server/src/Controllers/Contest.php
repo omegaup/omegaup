@@ -1677,12 +1677,37 @@ class Contest extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $contest = self::validateContest($contestAlias);
+        $admins = \OmegaUp\DAO\UserRoles::getContestAdmins($contest);
+        $notificationContents = [
+            'type' => \OmegaUp\DAO\Notifications::CONTEST_REGISTRATION_REQUEST,
+            'body' => [
+                'localizationString' => new \OmegaUp\TranslationString(
+                    'notificationContestRegisterRequest'
+                ),
+                'localizationParams' => [
+                    'username' => $r->identity->username,
+                    'contestTitle' => $contest->title,
+                ],
+                // 'url' => "/arena/{$contest->alias}/#problems/{$problem->alias}/",
+                'url' => "/contest/{$contest->alias}/edit/#contestants",
+                'iconUrl' => '/media/info.png',
+            ],
+        ];
 
         \OmegaUp\DAO\ProblemsetIdentityRequest::create(new \OmegaUp\DAO\VO\ProblemsetIdentityRequest([
             'identity_id' => $r->identity->identity_id,
             'problemset_id' => $contest->problemset_id,
             'request_time' => \OmegaUp\Time::get(),
         ]));
+
+        foreach ($admins as $admin) {
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $admin['user_id'],
+                    'contents' =>  json_encode($notificationContents),
+                ])
+            );
+        }
 
         return ['status' => 'ok'];
     }
@@ -4580,6 +4605,40 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'Arbitrated contest for user, new accepted username='
             . $targetIdentity->username . ', state=' . $resolution
         );
+
+        if (!is_null($targetIdentity->user_id)) {
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $targetIdentity->user_id,
+                    'contents' =>  json_encode(
+                        [
+                            'type' => (
+                                $request->accepted ?
+                                \OmegaUp\DAO\Notifications::CONTEST_REGISTRATION_ACCEPTED :
+                                \OmegaUp\DAO\Notifications::CONTEST_REGISTRATION_REJECTED
+                            ),
+                            'body' => [
+                                'localizationString' => (
+                                    $request->accepted ?
+                                    new \OmegaUp\TranslationString(
+                                        'notificationContestRegisterationAccepted'
+                                    ) :
+                                    new \OmegaUp\TranslationString(
+                                        'notificationContestRegisterationRejected'
+                                    )
+                                ),
+                                'localizationParams' => [
+                                    'contestTitle' => $contest->title,
+                                ],
+                                // 'url' => "/course/{$course->alias}/",
+                                'url' => "/arena/{$contest->alias}/",
+                                'iconUrl' => '/media/info.png',
+                            ],
+                        ]
+                    ),
+                ])
+            );
+        }
 
         return ['status' => 'ok'];
     }
