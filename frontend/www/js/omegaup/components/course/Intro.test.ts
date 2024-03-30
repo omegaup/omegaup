@@ -18,6 +18,7 @@ const courseDetails: types.CourseDetails = {
   finish_time: new Date(),
   is_curator: true,
   is_admin: true,
+  is_teaching_assistant: false,
   name: 'Course name',
   requests_user_information: 'yes',
   school_name: '',
