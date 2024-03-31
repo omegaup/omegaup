@@ -25,6 +25,9 @@ OmegaUp.on('ready', () => {
     data: () => ({
       admins: payload.admins,
       groups: payload.groupAdmins,
+      initialTab: window.location.hash
+        ? window.location.hash.substring(1)
+        : 'edit',
       publishedRevision: payload.publishedRevision,
       statement: payload.statement,
       solution: payload.solution || {
@@ -52,6 +55,7 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-problem-edit', {
         props: {
           data: payload,
+          initialTab: this.initialTab,
           originalVisibility: payload.visibility,
           admins: this.admins,
           groups: this.groups,
