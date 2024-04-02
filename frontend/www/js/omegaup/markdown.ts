@@ -539,6 +539,20 @@ export class Converter {
         );
       },
     );
+
+    this._converter.hooks.chain('postConversion', (text: string): string => {
+      return text.replace(/<a href="[^"]+?"/g, (match: string) => {
+        const url = match.slice(9, -1);
+        if (
+          !url.startsWith('https://omegaup') &&
+          !url.startsWith('http://omegaup')
+        ) {
+          return match + ' target="_blank" rel="noopener noreferrer"';
+        } else {
+          return match;
+        }
+      });
+    });
   }
 
   public get converter(): Markdown.Converter {
