@@ -52,7 +52,7 @@
             !generalFeedback
               ? T.submissionSendFeedback
               : T.submissionUpdateFeedback
-          }}
+          }} test 20
         </button>
       </div>
     </div>
@@ -77,12 +77,12 @@ export default class SubmissionFeedback extends Vue {
   @Prop() guid!: string;
   @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: () => [] }) feedbackOptions!: types.SubmissionFeedback[];
-
+  @Prop({ default: false }) showFeedbackForm!: boolean;
   T = T;
   ui = ui;
   time = time;
 
-  showFeedbackForm = false;
+  // showFeedbackForm = false;
   feedback = this.generalFeedback?.feedback ?? null;
 
   get generalFeedback(): null | types.SubmissionFeedback {

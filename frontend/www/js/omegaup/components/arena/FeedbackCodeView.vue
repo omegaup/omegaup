@@ -9,7 +9,7 @@
         :disabled="!numberOfComments"
         @click.prevent="saveFeedbackList"
       >
-        {{ T.submissionSendFeedback }}
+        {{ T.submissionSendFeedback }} test 29
       </button>
     </div>
   </div>
@@ -46,7 +46,9 @@ export default class FeedbackCodeView extends Vue {
   @Ref('cm-editor') private readonly cmEditor!: HTMLTextAreaElement;
   @Prop() currentUsername!: string;
   @Prop() currentUserClassName!: string;
+  @Prop({ default: false }) showFeedbackForm!: boolean;
 
+  
   T = T;
   mode = languageModeMap[this.language] ?? languageModeMap['cpp17-gcc'];
   mapChangeTracker = 1;
@@ -235,6 +237,9 @@ export default class FeedbackCodeView extends Vue {
   }
 
   saveFeedbackList(): void {
+    this.showFeedbackForm = !this.showFeedbackForm;
+    this.$emit('feedback-form-changed', this.showFeedbackForm);
+    // console.log(this.showFeedbackForm)
     this.$emit(
       'save-feedback-list',
       this.feedbackList.map((feedback) => ({

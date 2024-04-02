@@ -174,6 +174,7 @@
           >
             <template #feedback="{ guid, isAdmin, feedback }">
               <omegaup-submission-feedback
+                :showFeedbackForm.sync = "showFeedbackForm"
                 :guid="guid"
                 :is-admin="isAdmin"
                 :feedback-options="feedback"
@@ -189,6 +190,8 @@
                 :feedback-thread-map="feedbackThreadMap"
                 :current-user-class-name="currentUserClassName"
                 :current-username="currentUsername"
+                :showFeedbackForm.sync = "showFeedbackForm"
+                @feedback-form-changed="handleFeedbackFormChanged"
                 @save-feedback-list="
                   (feedbackList) =>
                     $emit('save-feedback-list', { feedbackList, guid })
@@ -318,6 +321,7 @@ export default class ArenaCourse extends Vue {
   currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
   now = new Date();
   INF = '∞';
+  showFeedbackForm = false;
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;
@@ -433,6 +437,12 @@ export default class ArenaCourse extends Vue {
       ...request,
       hash: `#problems/${this.activeProblemAlias}/show-run:${request.guid}`,
     });
+  }
+
+  handleFeedbackFormChanged(newShowFeedbackForm: boolean) {
+    console.log("in course.vue, value of before newShowFeedbackForm: ", this.showFeedbackForm)
+    this.showFeedbackForm = newShowFeedbackForm;
+    console.log("in course.vue, value of newShowFeedbackForm: ", this.showFeedbackForm)
   }
 
   @Watch('problem')
