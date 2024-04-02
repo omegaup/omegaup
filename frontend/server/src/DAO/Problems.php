@@ -82,7 +82,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
      * @param list<string> $authors
-     * @return array{count: int, problems: list<array{accepted: int, alias: string, can_be_removed: bool, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}>}
+     * @return array{count: int, problems: list<array{accepted: int, alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}>}
      */
     final public static function byIdentityType(
         string $identityType,
@@ -474,7 +474,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $problem = $problemObject->asFilteredArray($filters);
 
             // score, points and ratio are not actually fields of a Problems object.
-            $problem['can_be_removed'] = false;
             $problem['score'] = floatval($row['score']);
             $problem['points'] = floatval($row['points']);
             $problem['ratio'] = floatval($row['ratio']);
@@ -957,10 +956,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
-     * @return array{problems: list<array{accepted: int, alias: string, can_be_removed: bool, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}>, count: int}
+     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, count: int}
      */
     public static function getAllWithCount(
-        int $identityId,
         int $page,
         int $pageSize,
         string $query = ''
@@ -972,47 +970,16 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 COUNT(*)
         ';
 
-        $fields = \OmegaUp\DAO\DAO::getFields(
+        $select = '
+            SELECT
+                ' .  \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
             'p'
         );
-        $select = "
-            SELECT
-                {$fields},
-                ppp.problemsets_count,
-                ps.submissions_count";
 
         $sql = '
             FROM
                 Problems AS p
-            LEFT JOIN
-                (
-                    SELECT
-                        p.problem_id,
-                        count(pp.problem_id) AS problemsets_count
-                    FROM
-                        Problems p
-                    INNER JOIN
-                        Problemset_Problems pp
-                    ON
-                        pp.problem_id = p.problem_id
-                    GROUP BY
-                        p.problem_id
-                ) AS ppp ON ppp.problem_id = p.problem_id
-            LEFT JOIN
-                (
-                    SELECT
-                        p.problem_id,
-                        count(s.problem_id) AS submissions_count
-                    FROM
-                        Problems p
-                    INNER JOIN
-                        Submissions s
-                    ON
-                        s.problem_id = p.problem_id
-                    GROUP BY
-                        p.problem_id
-                ) AS ps ON ps.problem_id = p.problem_id
         ';
         if (!empty($query)) {
             $sql .= '
@@ -1039,45 +1006,17 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $params[] = max(0, $page - 1) * $pageSize;
         $params[] = $pageSize;
 
-        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, problemsets_count: int|null, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, submissions_count: int|null, title: string, visibility: int, visits: int}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            "{$select} {$sql} {$limits};",
-            $params
-        );
         $problems = [];
-        $hiddenTags = \OmegaUp\DAO\Users::getHideTags($identityId);
-        foreach ($rs as $row) {
-            $canBeRemoved = $row['problemsets_count'] == 0 && $row['submissions_count'] == 0;
-            unset($row['problemsets_count']);
-            unset($row['submissions_count']);
-            $problem = new \OmegaUp\DAO\VO\Problems($row);
-            $tags = [];
-            if (!$hiddenTags) {
-                $tags = \OmegaUp\DAO\Problems::getTagsForProblem(
-                    $problem,
-                    public: true,
-                    showUserTags: $problem->allow_user_add_tags
-                );
-            }
-            $problemArray = [
-                'accepted' => $row['accepted'],
-                'alias' => $row['alias'],
-                'difficulty' => $row['difficulty'],
-                'difficulty_histogram' => [],
-                'points' => 0.0,
-                'problem_id' => $row['problem_id'],
-                'quality' => $row['quality'],
-                'quality_histogram' => [],
-                'ratio' => 0.0,
-                'score' => 0.0,
-                'submissions' => $row['submissions'],
-                'tags' => $tags,
-                'title' => $row['title'],
-                'visibility' => $row['visibility'],
-                'quality_seal' => $row['quality_seal'],
-                'can_be_removed' => $canBeRemoved,
-            ];
-            $problems[] = $problemArray;
+        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                "{$select} {$sql} {$limits}",
+                $params
+            ) as $row
+        ) {
+            $problems[] = new \OmegaUp\DAO\VO\Problems(
+                $row,
+            );
         }
 
         return [
@@ -1089,7 +1028,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     /**
      * Returns all problems that an identity can manage.
      *
-     * @return array{problems: list<array{accepted: int, alias: string, can_be_removed: bool, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}>, count: int}
+     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, count: int}
      */
     final public static function getAllProblemsAdminedByIdentity(
         int $identityId,
@@ -1097,15 +1036,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $pageSize,
         string $query = ''
     ): array {
-        $fields = \OmegaUp\DAO\DAO::getFields(
+        $select = '
+            SELECT
+            ' .  \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
             'p'
         );
-        $select = "
-            SELECT
-                {$fields},
-                ppp.problemsets_count,
-                ps.submissions_count";
         $sql = '
             FROM
                 Problems AS p
@@ -1121,34 +1057,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 Group_Roles gr ON gr.acl_id = p.acl_id
             LEFT JOIN
                 Groups_Identities gi ON gi.group_id = gr.group_id
-            LEFT JOIN
-                (
-                    SELECT
-                        p.problem_id,
-                        count(pp.problem_id) AS problemsets_count
-                    FROM
-                        Problems p
-                    INNER JOIN
-                        Problemset_Problems pp
-                    ON
-                        pp.problem_id = p.problem_id
-                    GROUP BY
-                        p.problem_id
-                ) AS ppp ON ppp.problem_id = p.problem_id
-            LEFT JOIN
-                (
-                    SELECT
-                        p.problem_id,
-                        count(s.problem_id) AS submissions_count
-                    FROM
-                        Problems p
-                    INNER JOIN
-                        Submissions s
-                    ON
-                        s.problem_id = p.problem_id
-                    GROUP BY
-                        p.problem_id
-                ) AS ps ON ps.problem_id = p.problem_id
             WHERE
                 (ai.identity_id = ? OR
                 (ur.role_id = ? AND uri.identity_id = ?) OR
@@ -1190,46 +1098,15 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $params[] = max(0, $page - 1) * $pageSize;
         $params[] = $pageSize;
 
-        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, problemsets_count: int|null, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, submissions_count: int|null, title: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql} {$sqlQuery} {$limits};",
             $params
         );
 
         $problems = [];
-        $hiddenTags = \OmegaUp\DAO\Users::getHideTags($identityId);
         foreach ($rs as $row) {
-            $canBeRemoved = $row['problemsets_count'] == 0 && $row['submissions_count'] == 0;
-            unset($row['problemsets_count']);
-            unset($row['submissions_count']);
-            $problem = new \OmegaUp\DAO\VO\Problems($row);
-            $tags = [];
-            if (!$hiddenTags) {
-                $tags = \OmegaUp\DAO\Problems::getTagsForProblem(
-                    $problem,
-                    public: true,
-                    showUserTags: $problem->allow_user_add_tags
-                );
-            }
-            $problemArray = [
-                'accepted' => $row['accepted'],
-                'alias' => $row['alias'],
-                'difficulty' => $row['difficulty'],
-                'difficulty_histogram' => [],
-                'points' => 0.0,
-                'problem_id' => $row['problem_id'],
-                'quality' => $row['quality'],
-                'quality_histogram' => [],
-                'ratio' => 0.0,
-                'score' => 0.0,
-                'submissions' => $row['submissions'],
-                'tags' => $tags,
-                'title' => $row['title'],
-                'visibility' => $row['visibility'],
-                'quality_seal' => $row['quality_seal'],
-                'can_be_removed' => $canBeRemoved,
-            ];
-            $problems[] = $problemArray;
+            $problems[] = new \OmegaUp\DAO\VO\Problems($row);
         }
 
         return [
@@ -1241,57 +1118,25 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     /**
      * Returns all problems owned by a user.
      *
-     * @return array{problems: list<array{accepted: int, alias: string, can_be_removed: bool, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}>, count: int}
+     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, count: int}
      */
     final public static function getAllProblemsOwnedByUser(
         int $userId,
-        int $identityId,
         int $page,
         int $pageSize,
         string $query = ''
     ) {
-        $fields = \OmegaUp\DAO\DAO::getFields(
+        $select = '
+            SELECT
+            ' .  \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
             'p'
         );
-        $select = "
-            SELECT
-                {$fields},
-                ppp.problemsets_count,
-                ps.submissions_count";
         $sql = '
             FROM
                 Problems AS p
             INNER JOIN
                 ACLs AS a ON a.acl_id = p.acl_id
-            LEFT JOIN
-                (
-                    SELECT
-                        p.problem_id,
-                        count(pp.problem_id) AS problemsets_count
-                    FROM
-                        Problems p
-                    INNER JOIN
-                        Problemset_Problems pp
-                    ON
-                        pp.problem_id = p.problem_id
-                    GROUP BY
-                        p.problem_id
-                ) AS ppp ON ppp.problem_id = p.problem_id
-            LEFT JOIN
-                (
-                    SELECT
-                        p.problem_id,
-                        count(s.problem_id) AS submissions_count
-                    FROM
-                        Problems p
-                    INNER JOIN
-                        Submissions s
-                    ON
-                        s.problem_id = p.problem_id
-                    GROUP BY
-                        p.problem_id
-                ) AS ps ON ps.problem_id = p.problem_id
             WHERE
                 a.owner_id = ? AND
                 p.visibility > ?';
@@ -1325,46 +1170,15 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $params[] = max(0, $page - 1) * $pageSize;
         $params[] = $pageSize;
 
-        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, problemsets_count: int|null, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, submissions_count: int|null, title: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql} {$sqlQuery} {$limits};",
             $params
         );
 
         $problems = [];
-        $hiddenTags = \OmegaUp\DAO\Users::getHideTags($identityId);
         foreach ($rs as $row) {
-            $canBeRemoved = $row['problemsets_count'] == 0 && $row['submissions_count'] == 0;
-            unset($row['problemsets_count']);
-            unset($row['submissions_count']);
-            $problem = new \OmegaUp\DAO\VO\Problems($row);
-            $tags = [];
-            if (!$hiddenTags) {
-                $tags = \OmegaUp\DAO\Problems::getTagsForProblem(
-                    $problem,
-                    public: true,
-                    showUserTags: $problem->allow_user_add_tags
-                );
-            }
-            $problemArray = [
-                'accepted' => $row['accepted'],
-                'alias' => $row['alias'],
-                'difficulty' => $row['difficulty'],
-                'difficulty_histogram' => [],
-                'points' => 0.0,
-                'problem_id' => $row['problem_id'],
-                'quality' => $row['quality'],
-                'quality_histogram' => [],
-                'ratio' => 0.0,
-                'score' => 0.0,
-                'submissions' => $row['submissions'],
-                'tags' => $tags,
-                'title' => $row['title'],
-                'visibility' => $row['visibility'],
-                'quality_seal' => $row['quality_seal'],
-                'can_be_removed' => $canBeRemoved,
-            ];
-            $problems[] = $problemArray;
+            $problems[] = new \OmegaUp\DAO\VO\Problems($row);
         }
 
         return [

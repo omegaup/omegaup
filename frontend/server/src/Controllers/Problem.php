@@ -4139,7 +4139,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'problems' => $problems,
                 'count' => $count,
             ] = \OmegaUp\DAO\Problems::getAllWithCount(
-                $r->identity->identity_id,
                 $page,
                 $pageSize,
                 $query
@@ -4156,6 +4155,38 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $addedProblems = [];
+
+        $hiddenTags = \OmegaUp\DAO\Users::getHideTags(
+            $r->identity->identity_id
+        );
+        foreach ($problems as $problem) {
+            /** @var ProblemListItem */
+            $problemArray = $problem->asFilteredArray([
+                'accepted',
+                'alias',
+                'difficulty',
+                'difficulty_histogram',
+                'points',
+                'problem_id',
+                'quality',
+                'quality_histogram',
+                'ratio',
+                'score',
+                'submissions',
+                'tags',
+                'title',
+                'visibility',
+                'quality_seal',
+            ]);
+            $problemArray['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
+                $problem,
+                public: false,
+                showUserTags: $problem->allow_user_add_tags
+            );
+            $addedProblems[] = $problemArray;
+        }
+
         $pagerItems = \OmegaUp\Pager::paginate(
             $count,
             $pageSize,
@@ -4165,7 +4196,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'problems' => $problems,
+            'problems' => $addedProblems,
             'pagerItems' => $pagerItems,
         ];
     }
@@ -4199,11 +4230,42 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'count' => $count,
         ] = \OmegaUp\DAO\Problems::getAllProblemsOwnedByUser(
             $r->user->user_id,
-            $r->identity->identity_id,
             $page,
             $pageSize,
             $query
         );
+
+        $addedProblems = [];
+
+        $hiddenTags = \OmegaUp\DAO\Users::getHideTags(
+            $r->identity->identity_id
+        );
+        foreach ($problems as $problem) {
+            /** @var ProblemListItem */
+            $problemArray = $problem->asFilteredArray([
+                'accepted',
+                'alias',
+                'difficulty',
+                'difficulty_histogram',
+                'points',
+                'problem_id',
+                'quality',
+                'quality_histogram',
+                'ratio',
+                'score',
+                'submissions',
+                'tags',
+                'title',
+                'visibility',
+                'quality_seal',
+            ]);
+            $problemArray['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
+                $problem,
+                public: false,
+                showUserTags: $problem->allow_user_add_tags
+            );
+            $addedProblems[] = $problemArray;
+        }
 
         $pagerItems = \OmegaUp\Pager::paginate(
             $count,
@@ -4214,7 +4276,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'problems' => $problems,
+            'problems' => $addedProblems,
             'pagerItems' => $pagerItems,
         ];
     }
