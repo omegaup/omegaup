@@ -1306,6 +1306,41 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         ) > 0;
     }
 
+    public static function hasSubmissionsOrHasBeenUsedInCoursesOrContests(
+        \OmegaUp\DAO\VO\Problems $problem
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                Submissions s
+            WHERE
+                s.problem_id = ?;
+        ';
+        /** @var int */
+        $submissions = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$problem->problem_id]
+        );
+        if ($submissions > 0) {
+            return true;
+        }
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                Problemset_Problems pp
+            WHERE
+                pp.problem_id = ?;
+        ';
+        /** @var int */
+        $inProblemset = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$problem->problem_id]
+        );
+        return $inProblemset > 0;
+    }
+
     /**
      * @return list<\OmegaUp\DAO\VO\Problems>
      */

@@ -4184,6 +4184,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 public: false,
                 showUserTags: $problem->allow_user_add_tags
             );
+            $problemArray['can_be_removed'] = \OmegaUp\DAO\Problems::hasSubmissionsOrHasBeenUsedInCoursesOrContests(
+                $problem
+            );
             $addedProblems[] = $problemArray;
         }
 
@@ -4263,6 +4266,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problem,
                 public: false,
                 showUserTags: $problem->allow_user_add_tags
+            );
+            $problemArray['can_be_removed'] = \OmegaUp\DAO\Problems::hasSubmissionsOrHasBeenUsedInCoursesOrContests(
+                $problem
             );
             $addedProblems[] = $problemArray;
         }
