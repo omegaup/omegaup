@@ -131,7 +131,9 @@ export default class UserBasicInformationEdit extends Vue {
       gender: this.gender,
       country_id: this.countryId,
       state_id: this.stateId,
-      birth_date: isNaN(this.birthDate.getTime()) ? null : this.birthDate,
+      birth_date: isNaN(this.birthDate.getTime())
+        ? null
+        : this.birthDate.toLocaleDateString(),
     });
   }
 
