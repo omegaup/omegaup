@@ -3143,7 +3143,7 @@ export namespace types {
     default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
-    extra_note: string;
+    extra_note?: string;
     feedback: string;
     finish_time: Date;
     languages: string;
