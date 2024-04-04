@@ -30,8 +30,9 @@ describe('markdown', () => {
     });
 
     it('Should handle OmegaUp domain links', () => {
-      expect(converter.makeHtml('[OmegaUp](http://omegaup.com/)')).toEqual(
-        '<p><a href="http://omegaup.com/">OmegaUp</a></p>',
+      const url = window.location.origin;
+      expect(converter.makeHtml(`[OmegaUp](${url})`)).toEqual(
+        `<p><a href="${url}">OmegaUp</a></p>`,
       );
     });
 
