@@ -541,16 +541,11 @@ export class Converter {
     );
 
     this._converter.hooks.chain('postConversion', (text: string): string => {
-      return text.replace(/<a href="[^"]+?"/g, (match: string) => {
-        const url = match.slice(9, -1);
-        if (
-          !url.startsWith('https://omegaup') &&
-          !url.startsWith('http://omegaup')
-        ) {
-          return match + ' target="_blank" rel="noopener noreferrer"';
-        } else {
+      return text.replace(/<a href="([^"]+?)"/g, (match: string, url: string) => {
+        if (url.startsWith(window.location.origin)) {
           return match;
         }
+        return `${match} target="_blank" rel="noopener noreferrer"`;
       });
     });
   }
