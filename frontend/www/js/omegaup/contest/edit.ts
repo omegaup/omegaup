@@ -39,8 +39,15 @@ OmegaUp.on('ready', () => {
       certificatesDetails: payload.certificatesDetails,
     }),
     methods: {
-      arbitrateRequest: (username: string, resolution: boolean): void => {
-        const resolutionText = resolution ? T.wordAccepted : T.wordsDenied;
+      arbitrateRequest: (
+        username: string,
+        resolution: boolean,
+        resolutionText: string = '',
+      ): void => {
+        console.log(resolutionText);
+        if (resolutionText == '') {
+          resolutionText = resolution ? T.wordAccepted : T.wordsDenied;
+        }
         api.Contest.arbitrateRequest({
           contest_alias: payload.details.alias,
           username,
@@ -467,8 +474,8 @@ OmegaUp.on('ready', () => {
           'accept-request': ({ username }: { username: string }) => {
             this.arbitrateRequest(username, true);
           },
-          'deny-request': ({ username }: { username: string }) => {
-            this.arbitrateRequest(username, false);
+          'deny-request': (username: string, resolutionText: string = '') => {
+            this.arbitrateRequest(username, false, resolutionText);
           },
           'add-admin': (username: string) => {
             api.Contest.addAdmin({

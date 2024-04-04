@@ -33,11 +33,17 @@ describe('Requests.vue', () => {
   it('Should handle deny request event', async () => {
     const wrapper = shallowMount(common_Requests, { propsData });
 
+    expect(wrapper.vm.showFeedbackModal).toBe(false);
     await wrapper.find('button.text-danger').trigger('click');
+    expect(wrapper.vm.showFeedbackModal).toBe(true);
+
+    const feedbackModal = wrapper.find('b-modal-stub');
+    expect(feedbackModal.exists()).toBe(true);
+
+    wrapper.vm.resolutionText = 'Hello';
+    feedbackModal.vm.$emit('ok');
     expect(wrapper.emitted('deny-request')).toBeDefined();
-    expect(wrapper.emitted('deny-request')).toEqual([
-      [{ username: 'test_user' }],
-    ]);
+    expect(wrapper.emitted('deny-request')).toEqual([['test_user', 'Hello']]);
   });
 
   it('Should handle accept request event', async () => {

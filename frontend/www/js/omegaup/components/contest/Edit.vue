@@ -215,7 +215,10 @@
           :data="requests"
           :text-add-participant="T.contestAdduserAddContestant"
           @accept-request="(request) => $emit('accept-request', request)"
-          @deny-request="(request) => $emit('deny-request', request)"
+          @deny-request="
+            (request, resolutionText) =>
+              $emit('deny-request', request, resolutionText)
+          "
         ></omegaup-common-requests>
         <omegaup-contest-groups
           :groups="groups"
