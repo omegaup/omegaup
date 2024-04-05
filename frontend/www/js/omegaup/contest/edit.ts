@@ -45,7 +45,7 @@ OmegaUp.on('ready', () => {
         resolutionText: string = '',
       ): void => {
         console.log(resolutionText);
-        if (resolutionText == '') {
+        if (!resolutionText) {
           resolutionText = resolution ? T.wordAccepted : T.wordsDenied;
         }
         api.Contest.arbitrateRequest({
