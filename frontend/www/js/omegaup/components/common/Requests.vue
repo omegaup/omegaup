@@ -113,7 +113,7 @@ export default class Requests extends Vue {
   requests: types.IdentityRequest[] = this.data;
   showAllRequests = false;
   resolutionText: null | string = null;
-  showFeedbackModal = false;
+  modalStates: { [key: string]: boolean } = {};
 
   @Watch('data')
   onDataChange(): void {
