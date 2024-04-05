@@ -117,7 +117,7 @@ export default class Requests extends Vue {
   time = time;
   requests: types.IdentityRequest[] = this.data;
   showAllRequests = false;
-  resolutionText = '';
+  resolutionText: null | string = null;
   showFeedbackModal = false;
 
   @Watch('data')
