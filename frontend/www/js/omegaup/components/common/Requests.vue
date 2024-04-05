@@ -59,10 +59,7 @@
               ok-variant="success"
               :cancel-title="T.submitFeedbackCancel"
               cancel-variant="danger"
-              @ok="
-                $emit('deny-request', request.username, resolutionText);
-                resolutionText = '';
-              "
+              @ok="onDenyRequest(request.username, resolutionText)"
             >
               <b-form-input
                 v-model="resolutionText"
