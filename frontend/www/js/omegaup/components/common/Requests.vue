@@ -91,8 +91,6 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 import {
-  ButtonPlugin,
-  FormGroupPlugin,
   FormInputPlugin,
   ModalPlugin,
 } from 'bootstrap-vue';
