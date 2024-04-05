@@ -42,7 +42,7 @@ OmegaUp.on('ready', () => {
       arbitrateRequest: (
         username: string,
         resolution: boolean,
-        resolutionText: string = '',
+        resolutionText: null | string = null,
       ): void => {
         console.log(resolutionText);
         if (!resolutionText) {
