@@ -44,7 +44,6 @@ OmegaUp.on('ready', () => {
         resolution: boolean,
         resolutionText: null | string = null,
       ): void => {
-        console.log(resolutionText);
         if (!resolutionText) {
           resolutionText = resolution ? T.wordAccepted : T.wordsDenied;
         }
