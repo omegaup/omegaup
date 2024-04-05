@@ -53,7 +53,7 @@
               ×
             </button>
             <b-modal
-              v-model="showFeedbackModal"
+              v-model="modalStates[request.username]"
               :title="T.submitFeedbackRequireConfirmation"
               :ok-title="T.submitFeedbackSubmit"
               ok-variant="success"
