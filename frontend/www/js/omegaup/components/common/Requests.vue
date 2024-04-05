@@ -48,7 +48,7 @@
           <td v-if="!request.accepted" class="text-center">
             <button
               class="close float-none text-danger mx-2"
-              @click="showFeedbackModal = !showFeedbackModal"
+              @click="toggleFeedbackModal(request.username)"
             >
               ×
             </button>
