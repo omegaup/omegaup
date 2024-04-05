@@ -32,7 +32,6 @@ describe('Contest.vue', () => {
     alias: 'omegaUp',
     description: 'hello omegaUp',
     director: 'omegaUpDirector',
-    extra_note: 'hello',
     feedback: 'detailed',
     finish_time: futureDate,
     languages: 'py3',
