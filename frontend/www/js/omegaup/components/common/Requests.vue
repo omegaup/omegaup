@@ -94,8 +94,6 @@ import {
   FormInputPlugin,
   ModalPlugin,
 } from 'bootstrap-vue';
-Vue.use(ButtonPlugin);
-Vue.use(FormGroupPlugin);
 Vue.use(FormInputPlugin);
 Vue.use(ModalPlugin);
 
