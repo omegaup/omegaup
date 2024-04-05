@@ -474,7 +474,13 @@ OmegaUp.on('ready', () => {
           'accept-request': ({ username }: { username: string }) => {
             this.arbitrateRequest(username, true);
           },
-          'deny-request': (username: string, resolutionText: string = '') => {
+          'deny-request': ({
+            username,
+            resolutionText,
+          }: {
+            username: string;
+            resolutionText: null | string;
+          }) => {
             this.arbitrateRequest(username, false, resolutionText);
           },
           'add-admin': (username: string) => {
