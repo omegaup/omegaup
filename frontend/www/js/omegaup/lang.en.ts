@@ -1533,7 +1533,7 @@ const translations: { [key: string]: string; } = {
   submissionsListTitle: "Submissions on the last 24 hours",
   submitFeedbackCancel: "Cancel",
   submitFeedbackPlaceholder: "Enter your feedback (optionally blank)",
-  submitFeedbackRequireConfirmation: "Submit your feedback",
+  submitFeedbackRequireConfirmation: "Submit feedback",
   submitFeedbackSubmit: "Submit",
   tagAdded: "Tag successfully added!",
   tagNotFound: "Tag not found",

@@ -10,11 +10,21 @@ describe('Requests.vue', () => {
     {
       accepted: false,
       admin: {
-        username: 'test_user',
+        username: 'test_user_1',
       },
       last_update: new Date(),
       request_time: new Date(),
-      username: 'test_user',
+      username: 'test_user_1',
+      classname: 'user-rank-unranked',
+    },
+    {
+      accepted: false,
+      admin: {
+        username: 'test_user_2',
+      },
+      last_update: new Date(),
+      request_time: new Date(),
+      username: 'test_user_2',
       classname: 'user-rank-unranked',
     },
   ];
@@ -33,17 +43,28 @@ describe('Requests.vue', () => {
   it('Should handle deny request event', async () => {
     const wrapper = shallowMount(common_Requests, { propsData });
 
-    expect(wrapper.vm.showFeedbackModal).toBe(false);
-    await wrapper.find('button.text-danger').trigger('click');
-    expect(wrapper.vm.showFeedbackModal).toBe(true);
+    const buttons = wrapper.findAll('button.text-danger');
+    const feedbackModals = wrapper.findAll('b-modal-stub');
 
-    const feedbackModal = wrapper.find('b-modal-stub');
-    expect(feedbackModal.exists()).toBe(true);
+    expect('test_user_1' in wrapper.vm.modalStates).toBe(false);
+    await buttons.at(0).trigger('click');
+    expect(wrapper.vm.modalStates['test_user_1']).toBe(true);
+
+    expect('test_user_2' in wrapper.vm.modalStates).toBe(false);
+    await buttons.at(1).trigger('click');
+    expect(wrapper.vm.modalStates['test_user_2']).toBe(true);
 
     wrapper.vm.resolutionText = 'Hello';
-    feedbackModal.vm.$emit('ok');
+    feedbackModals.at(0).vm.$emit('ok');
+
+    wrapper.vm.resolutionText = 'There';
+    feedbackModals.at(1).vm.$emit('ok');
+
     expect(wrapper.emitted('deny-request')).toBeDefined();
-    expect(wrapper.emitted('deny-request')).toEqual([['test_user', 'Hello']]);
+    expect(wrapper.emitted('deny-request')).toEqual([
+      [{ username: 'test_user_1', resolutionText: 'Hello' }],
+      [{ username: 'test_user_2', resolutionText: 'There' }],
+    ]);
   });
 
   it('Should handle accept request event', async () => {
@@ -52,7 +73,7 @@ describe('Requests.vue', () => {
     await wrapper.find('button.text-success').trigger('click');
     expect(wrapper.emitted('accept-request')).toBeDefined();
     expect(wrapper.emitted('accept-request')).toEqual([
-      [{ username: 'test_user' }],
+      [{ username: 'test_user_1' }],
     ]);
   });
 

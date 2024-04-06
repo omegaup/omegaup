@@ -90,10 +90,7 @@ import omegaup_Username from '../user/Username.vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
-import {
-  FormInputPlugin,
-  ModalPlugin,
-} from 'bootstrap-vue';
+import { FormInputPlugin, ModalPlugin } from 'bootstrap-vue';
 Vue.use(FormInputPlugin);
 Vue.use(ModalPlugin);
 
@@ -116,6 +113,16 @@ export default class Requests extends Vue {
   @Watch('data')
   onDataChange(): void {
     this.requests = this.data;
+  }
+
+  onDenyRequest(username: string, resolutionText: null | string): void {
+    this.$emit('deny-request', { username, resolutionText });
+    this.resolutionText = null;
+    this.toggleFeedbackModal(username);
+  }
+
+  toggleFeedbackModal(username: string): void {
+    this.$set(this.modalStates, username, !this.modalStates[username]);
   }
 
   get filteredRequests(): types.IdentityRequest[] {
