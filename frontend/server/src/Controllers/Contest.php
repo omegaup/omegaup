@@ -91,6 +91,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $tab_name
      * @omegaup-request-param int|null $participating
      * @omegaup-request-param string $query
+     * @omegaup-request-param null|string $sort_order
      * @omegaup-request-param int|null $recommended
      */
     public static function apiList(\OmegaUp\Request $r): array {
@@ -182,6 +183,34 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 250
             )
         );
+        $order = $r->ensureOptionalEnum(
+            'sort_order',
+            \OmegaUp\DAO\Enum\ContestOrderStatus::NAME_FOR_STATUS,
+            required: false
+        );
+
+        $orderBy = 0;
+        if (!is_null($order)) {
+            $index = array_search(
+                $order,
+                \OmegaUp\DAO\Enum\ContestOrderStatus::NAME_FOR_STATUS
+            );
+            if ($index === false) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'sort_order'
+                );
+            }
+            $orderBy = \OmegaUp\DAO\Enum\ContestOrderStatus::getIntValue(
+                $index
+            );
+            if (is_null($orderBy)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'sort_order'
+                );
+            }
+        }
 
         [
             'contests' => $contests,
@@ -194,7 +223,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $activeContests,
             $recommended,
             $public,
-            $participating
+            $participating,
+            $orderBy
         );
 
         return [
@@ -214,9 +244,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         int $activeContests,
         int $recommended,
         bool $public = false,
-        ?int $participating = null
+        ?int $participating = null,
+        int $orderBy = 0
     ) {
-        $cacheKey = "0-{$activeContests}-{$recommended}-{$page}-{$pageSize}";
+        $cacheKey = "0-{$activeContests}-{$recommended}-{$participating}-{$page}-{$pageSize}";
         if (is_null($identity) || is_null($identity->identity_id)) {
             // Get all public contests
             $callback = /** @return array{contests: list<ContestListItem>, count: int} */ fn () => \OmegaUp\DAO\Contests::getAllPublicContests(
@@ -224,7 +255,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $pageSize,
                 $activeContests,
                 $recommended,
-                $query
+                $query,
+                $orderBy
             );
             if (empty($query)) {
                 [
@@ -250,7 +282,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $page,
                 $pageSize,
                 $activeContests,
-                $query
+                $query,
+                $orderBy
             );
         } elseif ($public) {
             [
@@ -260,7 +293,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $identity->identity_id,
                 $page,
                 $pageSize,
-                $query
+                $query,
+                $orderBy
             );
         } elseif (\OmegaUp\Authorization::isSystemAdmin($identity)) {
             // Get all contests
@@ -269,7 +303,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $pageSize,
                 $activeContests,
                 $recommended,
-                $query
+                $query,
+                $orderBy
             );
             if (empty($query)) {
                 [
@@ -297,7 +332,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $pageSize,
                 $activeContests,
                 $recommended,
-                $query
+                $query,
+                $orderBy
             );
         }
         $addedContests = [];

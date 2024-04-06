@@ -912,16 +912,17 @@ Returns a list of contests
 
 ### Parameters
 
-| Name             | Type        | Description |
-| ---------------- | ----------- | ----------- |
-| `page`           | `int`       |             |
-| `page_size`      | `int`       |             |
-| `query`          | `string`    |             |
-| `tab_name`       | `string`    |             |
-| `active`         | `int\|null` |             |
-| `admission_mode` | `mixed`     |             |
-| `participating`  | `int\|null` |             |
-| `recommended`    | `int\|null` |             |
+| Name             | Type           | Description |
+| ---------------- | -------------- | ----------- |
+| `page`           | `int`          |             |
+| `page_size`      | `int`          |             |
+| `query`          | `string`       |             |
+| `tab_name`       | `string`       |             |
+| `active`         | `int\|null`    |             |
+| `admission_mode` | `mixed`        |             |
+| `participating`  | `int\|null`    |             |
+| `recommended`    | `int\|null`    |             |
+| `sort_order`     | `null\|string` |             |
 
 ### Returns
 

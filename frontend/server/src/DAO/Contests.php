@@ -503,7 +503,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $pageSize = 1000,
         int $active = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
         ?string $query = null,
-        ?string $orderBy = null
+        int $orderBy = 0
     ) {
         $activeCondition = \OmegaUp\DAO\Enum\ActiveStatus::sql(
             $active
@@ -526,7 +526,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         p.scoreboard_url,
                         p.scoreboard_url_admin,
                         0 AS contestants,
-                        DATEDIFF(finish_time, start_time) AS duration,
+                        TIMESTAMPDIFF(HOUR, start_time, finish_time) AS duration,
+                        1 AS participating,
                         ANY_VALUE(organizer.username) AS organizer";
 
         $sql = "
@@ -606,18 +607,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params
         );
 
-        if ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::ENDS) {
-            $orderBy = 'finish_time';
-        } elseif ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::NONE) {
-            $orderBy = null;
-        }
-
-        $order = '';
-        if (!is_null($orderBy)) {
-            $order = "`{$orderBy}` DESC";
-        } else {
-            $order = '`finish_time` DESC';
-        }
+        $order = self::getOrder($orderBy, 'finish_time');
 
         $limits = "
             ORDER BY
@@ -628,7 +618,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $params[] = max(0, $page - 1) * $pageSize;
         $params[] = intval($pageSize);
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql} {$limits}",
             $params
@@ -636,7 +626,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $contests = [];
         foreach ($rs as $row) {
-            $row['participating'] = true;
+            $row['participating'] = boolval($row['participating']);
             $contests[] = $row;
         }
         return [
@@ -678,7 +668,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         p.scoreboard_url,
                         p.scoreboard_url_admin,
                         0 AS contestants,
-                        DATEDIFF(finish_time, start_time) AS duration,
+                        TIMESTAMPDIFF(HOUR, start_time, finish_time) AS duration,
                         ANY_VALUE(organizer.username) AS organizer";
 
         $sql = "
@@ -775,7 +765,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $page = 1,
         int $pageSize = 1000,
         ?string $query = null,
-        ?string $orderBy = null
+        int $orderBy = 0
     ) {
         $endCheck = \OmegaUp\DAO\Enum\ActiveStatus::sql(
             \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE
@@ -795,7 +785,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     $columns,
                     0 AS contestants,
                     ANY_VALUE(organizer.username) AS organizer,
-                    DATEDIFF(finish_time, start_time) AS duration,
+                    TIMESTAMPDIFF(HOUR, start_time, finish_time) AS duration,
                     (participating.identity_id IS NOT NULL) AS `participating`";
 
         $sql = "
@@ -835,18 +825,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params
         );
 
-        if ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::ENDS) {
-            $orderBy = 'finish_time';
-        } elseif ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::NONE) {
-            $orderBy = null;
-        }
-
-        $order = '';
-        if (!is_null($orderBy)) {
-            $order = "`{$orderBy}` DESC";
-        } else {
-            $order = '`original_finish_time` DESC';
-        }
+        $order = self::getOrder($orderBy);
 
         $limits = "
             ORDER BY
@@ -905,7 +884,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
         int $recommendedContests = \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
         ?string $query = null,
-        ?string $orderBy = null
+        int $orderBy = 0
     ): array {
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
         $endCheck = \OmegaUp\DAO\Enum\ActiveStatus::sql($activeContests);
@@ -1022,7 +1001,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         0 AS contestants,
                         ANY_VALUE(organizer.username) AS organizer,
-                        DATEDIFF(finish_time, start_time) AS duration,
+                        TIMESTAMPDIFF(HOUR, start_time, finish_time) AS duration,
                         BIT_OR(rc.participating) AS participating";
         $sql = "
         FROM
@@ -1067,18 +1046,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params
         );
 
-        if ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::ENDS) {
-            $orderBy = 'finish_time';
-        } elseif ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::NONE) {
-            $orderBy = null;
-        }
-
-        $order = '';
-        if (!is_null($orderBy)) {
-            $order = "`{$orderBy}` DESC";
-        } else {
-            $order = '`original_finish_time` DESC';
-        }
+        $order = self::getOrder($orderBy);
 
         $limits = "
             ORDER BY
@@ -1115,7 +1083,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
         int $recommendedContests = \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
         ?string $query = null,
-        ?string $orderBy = null
+        int $orderBy = 0
     ): array {
         $endCheck = \OmegaUp\DAO\Enum\ActiveStatus::sql($activeContests);
         $recommendedCheck = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
@@ -1134,7 +1102,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         0 AS `contestants`,
                         ANY_VALUE(organizer.username) AS organizer,
-                        DATEDIFF(finish_time, start_time) AS duration,
+                        TIMESTAMPDIFF(HOUR, start_time, finish_time) AS duration,
                         FALSE AS `participating`
                         ";
         $sql = "
@@ -1172,18 +1140,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params
         );
 
-        if ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::ENDS) {
-            $orderBy = 'finish_time';
-        } elseif ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::NONE) {
-            $orderBy = null;
-        }
-
-        $order = '';
-        if (!is_null($orderBy)) {
-            $order = "`{$orderBy}` DESC";
-        } else {
-            $order = '`original_finish_time` DESC';
-        }
+        $order = self::getOrder($orderBy);
 
         $limits = "
                 ORDER BY
@@ -1218,7 +1175,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
         int $recommendedContests = \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
         ?string $query = null,
-        ?string $orderBy = null
+        int $orderBy = 0
     ) {
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
         $endCheck = \OmegaUp\DAO\Enum\ActiveStatus::sql($activeContests);
@@ -1236,7 +1193,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         0 AS contestants,
                         ANY_VALUE(organizer.username) AS organizer,
-                        DATEDIFF(finish_time, start_time) AS duration,
+                        TIMESTAMPDIFF(HOUR, start_time, finish_time) AS duration,
                         TRUE AS participating";
         $sql = "
                 FROM
@@ -1268,18 +1225,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params
         );
 
-        if ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::ENDS) {
-            $orderBy = 'finish_time';
-        } elseif ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::NONE) {
-            $orderBy = null;
-        }
-
-        $order = '';
-        if (!is_null($orderBy)) {
-            $order = "`{$orderBy}` DESC";
-        } else {
-            $order = '`original_finish_time` DESC';
-        }
+        $order = self::getOrder($orderBy);
 
         $limits = "
             ORDER BY
@@ -1558,5 +1504,23 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             'activity' => $activity,
             'totalRows' => $totalRows,
         ];
+    }
+
+    private static function getOrder(
+        int $orderBy,
+        string $defaultOrder = '`original_finish_time`',
+        string $orderMode = 'DESC'
+    ): string {
+        if ($orderBy === 0) {
+            $order = $defaultOrder;
+        } else {
+            $order = \OmegaUp\DAO\Enum\ContestOrderStatus::sql(
+                $orderBy
+            );
+        }
+
+        // Temporary value until we get the order mode from the frontend
+        $orderMode = 'DESC';
+        return "{$order} {$orderMode}";
     }
 }
