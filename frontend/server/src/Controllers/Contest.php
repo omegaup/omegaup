@@ -3123,11 +3123,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         $problemsetId = $problemset->problemset_id;
+        if (is_null($problemsetId)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemsetNotFound'
+            );
+        }
         $existingProblemsetProblems = \OmegaUp\DAO\ProblemsetProblems::getByProblemset(
             $problemsetId
         );
 
-        $existingProblemsetProblemsIds = array_map(function ($problemsetProblem) {
+        $existingProblemsetProblemsIds = array_map(function ($problemsetProblem): int {
             return $problemsetProblem->problem_id;
         }, $existingProblemsetProblems);
 
