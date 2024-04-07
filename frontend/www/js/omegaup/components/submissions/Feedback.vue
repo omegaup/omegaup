@@ -17,17 +17,6 @@
       ></omegaup-user-username>
     </div>
     <div v-if="isAdmin" class="feedback-section">
-      <a
-        data-run-leave-feedback-button
-        role="button"
-        class="btn btn-sm btn-primary"
-        @click="showFeedbackForm = !showFeedbackForm"
-        >{{
-          !generalFeedback
-            ? T.submissionFeedbackSendButton
-            : T.submissionFeedbackUpdateButton
-        }}</a
-      >
       <div v-show="showFeedbackForm" class="form-group">
         <textarea
           v-model="feedback"
@@ -40,19 +29,13 @@
           data-run-send-feedback-button
           class="btn btn-sm btn-primary"
           :disabled="!feedback"
-          @click.prevent="
-            $emit('set-feedback', {
-              guid,
-              feedback,
-              isUpdate: Boolean(generalFeedback),
-            })
-          "
+          @click.prevent="submitFeedback"
         >
           {{
             !generalFeedback
               ? T.submissionSendFeedback
               : T.submissionUpdateFeedback
-          }} test 20
+          }} test 99
         </button>
       </div>
     </div>
@@ -67,6 +50,7 @@ import * as ui from '../../ui';
 import * as time from '../../time';
 
 import user_Username from '../user/Username.vue';
+import { ArenaCourseFeedback } from '../arena/Feedback.vue';
 
 @Component({
   components: {
@@ -78,11 +62,12 @@ export default class SubmissionFeedback extends Vue {
   @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: () => [] }) feedbackOptions!: types.SubmissionFeedback[];
   @Prop({ default: false }) showFeedbackForm!: boolean;
+  @Prop({ default: () => [] }) feedbackList!: ArenaCourseFeedback[];
+
   T = T;
   ui = ui;
   time = time;
 
-  // showFeedbackForm = false;
   feedback = this.generalFeedback?.feedback ?? null;
 
   get generalFeedback(): null | types.SubmissionFeedback {
@@ -91,6 +76,15 @@ export default class SubmissionFeedback extends Vue {
       (feedback) => feedback.range_bytes_start == null,
     );
     return feedback;
+  }
+
+  submitFeedback(): void {
+    this.$emit('save-feedback-list', this.feedbackList);
+    this.$emit('set-feedback', {
+      guid: this.guid,
+      feedback: this.feedback,
+      isUpdate: Boolean(this.generalFeedback),
+    });
   }
 }
 </script>
