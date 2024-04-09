@@ -1532,7 +1532,7 @@ const translations: { [key: string]: string; } = {
   submissionsListCoder: "Coder",
   submissionsListTitle: "Submiss\u00f5es realizadas nas \u00faltimas 24 horas",
   submitFeedbackCancel: "Cancelar",
-  submitFeedbackPlaceholder: "Insira seus coment\u00e1rios (opcionalmente em branco)",
+  submitFeedbackPlaceholder: "Insira seus coment\u00e1rios (opcional)",
   submitFeedbackRequireConfirmation: "Enviar coment\u00e1rios",
   submitFeedbackSubmit: "Enviar",
   tagAdded: "Tag adicionado com sucesso!",
