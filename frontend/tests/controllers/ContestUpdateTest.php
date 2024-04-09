@@ -10,7 +10,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      * @param array $contestData
      * @param \OmegaUp\Request $r
      */
-    public static function assertProblemAddedToContest(
+    public static function assertProblemAddedToOrUpdatedInContest(
         $problemData,
         $contestData,
         $r
@@ -156,7 +156,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Update when there are too many problems in the contest.
      */
-    public function UpdateTooManyProblemsToContest() {
+    public function testUpdateWhenTooManyProblemsToContest() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         $login = self::login($contestData['director']);
 
@@ -175,7 +175,11 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]);
             $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
             $this->assertSame('ok', $response['status']);
-            self::assertProblemAddedToContest($problemData, $contestData, $r);
+            self::assertProblemAddedToOrUpdatedInContest(
+                $problemData,
+                $contestData,
+                $r
+            );
         }
 
         // Add the last allowed problem to the contest.
@@ -193,8 +197,8 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
         $lastProblemResponse = \OmegaUp\Controllers\Contest::apiAddProblem($r);
         $this->assertSame('ok', $lastProblemResponse['status']);
-        self::assertProblemAddedToContest(
-            $lastProblemResponse,
+        self::assertProblemAddedToOrUpdatedInContest(
+            $lastProblemData,
             $contestData,
             $r
         );
@@ -232,6 +236,11 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $r
         );
         $this->assertSame('ok', $lastProblemUpdateResponse['status']);
+        self::assertProblemAddedToOrUpdatedInContest(
+            $lastProblemData,
+            $contestData,
+            $r
+        );
     }
 
     /**
