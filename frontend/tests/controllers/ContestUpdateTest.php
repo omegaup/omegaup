@@ -4,7 +4,7 @@
  */
 class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
-     * Check in DB for problem added to contest
+     * Check in DB for problem added to or updated in contest
      *
      * @param array $problemData
      * @param array $contestData
@@ -156,7 +156,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Update when there are too many problems in the contest.
      */
-    public function testUpdateWhenTooManyProblemsToContest() {
+    public function testUpdateWhenTooManyProblemsInContest() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         $login = self::login($contestData['director']);
 
