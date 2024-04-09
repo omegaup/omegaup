@@ -3121,17 +3121,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'problemsetNotFound'
             );
         }
-
-        $existingProblemsetProblems = \OmegaUp\DAO\ProblemsetProblems::getByProblemset(
-            intval($problemset->problemset_id)
+        // Extract the problem from the problemset if exists
+        $originalProblemsetProblem = \OmegaUp\DAO\Base\ProblemsetProblems::getByPK(
+            $contest->problemset_id,
+            $problem->problem_id
         );
 
-        $existingProblemsetProblemsIds = array_map(function ($problemsetProblem): int {
-            return $problemsetProblem->problem_id;
-        }, $existingProblemsetProblems);
-
         if (
-            !in_array($problem->problem_id, $existingProblemsetProblemsIds)
+            is_null($originalProblemsetProblem)
             &&
             \OmegaUp\DAO\ProblemsetProblems::countProblemsetProblems(
                 $problemset
@@ -3166,7 +3163,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $currentVersion,
             $r->identity,
             $points,
-            $orderInContest
+            $orderInContest,
+            $originalProblemsetProblem
         );
 
         // Invalidar cache
