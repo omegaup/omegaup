@@ -4695,7 +4695,6 @@ export namespace types {
 
   export interface SubmissionsListPayload {
     includeUser: boolean;
-    page: number;
     submissions: types.Submission[];
   }
 
