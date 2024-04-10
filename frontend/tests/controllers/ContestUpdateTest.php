@@ -227,15 +227,14 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Update a problem that's already in the contest, it will work again.
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['contest']->alias,
-            'problem_alias' => $lastProblemData['request']['problem_alias'],
-            'points' => 50,
-            'order_in_contest' => MAX_PROBLEMS_IN_CONTEST,
-        ]);
         $lastProblemUpdateResponse = \OmegaUp\Controllers\Contest::apiAddProblem(
-            $r
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['contest']->alias,
+                'problem_alias' => $lastProblemData['request']['problem_alias'],
+                'points' => 50,
+                'order_in_contest' => MAX_PROBLEMS_IN_CONTEST,
+            ])
         );
         $this->assertSame('ok', $lastProblemUpdateResponse['status']);
         self::assertProblemAddedToOrUpdatedInContest(
