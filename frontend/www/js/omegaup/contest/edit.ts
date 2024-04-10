@@ -25,6 +25,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       admins: payload.admins,
       details: payload.details,
+      initialTab: window.location.hash?.substring(1) || '',
       groupAdmins: payload.group_admins,
       groups: payload.groups,
       problems: payload.problems,
@@ -152,6 +153,7 @@ OmegaUp.on('ready', () => {
         props: {
           admins: this.admins,
           details: this.details,
+          initialTab: this.initialTab,
           groupAdmins: this.groupAdmins,
           groups: this.groups,
           problems: this.problems,
