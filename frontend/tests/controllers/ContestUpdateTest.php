@@ -24,7 +24,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get problem-contest and verify it
-        $problemset_problems = \OmegaUp\DAO\ProblemsetProblems::getByPK(
+        $problemsetProblems = \OmegaUp\DAO\ProblemsetProblems::getByPK(
             $contest->problemset_id,
             $problem->problem_id
         );
