@@ -203,7 +203,6 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        /** @var array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string} */
         foreach ($admins as $admin) {
             \OmegaUp\DAO\Notifications::create(
                 new \OmegaUp\DAO\VO\Notifications([
