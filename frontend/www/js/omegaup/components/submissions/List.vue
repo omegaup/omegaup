@@ -1,29 +1,32 @@
 <template>
-  <div submissions-problem>
+  <div submissions-problem 
+    v-infinite-scroll="() => $emit('fetch-more-data')"
+    infinite-scroll-disabled="isScrollDisabled" 
+    infinite-scroll-distance="10">
     <div class="text-center mb-5 submissions-title">
       <h2>
         {{ T.submissionsListTitle }}
       </h2>
       <h4 v-if="!includeUser && submissions.length > 0">
         {{ T.wordsBy }}
-        <omegaup-username
-          :username="submissions[0].username"
+        <omegaup-username 
+          :username="submissions[0].username" 
           :classname="submissions[0].classname"
           :linkify="true"
-        ></omegaup-username>
+          ></omegaup-username>
       </h4>
     </div>
     <div class="card">
       <div v-if="includeUser" class="card-body d-flex align-items-center">
-        <omegaup-common-typeahead
-          :existing-options="searchResultUsers"
-          :value.sync="searchedUsername"
+        <omegaup-common-typeahead 
+          :existing-options="searchResultUsers" 
+          :value.sync="searchedUsername" 
           :max-results="10"
-          class="mr-2"
+          class="mr-2" 
           @update-existing-options="
             (query) => $emit('update-search-result-users', query)
-          "
-        />
+            "
+          />
 
         <a :href="hrefSearchUser">
           <button class="btn btn-primary" type="button">
@@ -41,10 +44,10 @@
               </th>
               <th scope="col" class="text-center">{{ T.wordsProblem }}</th>
               <th
-                :class="{ 'fixed-width-column': includeUser }"
-                class="text-center"
-                scope="col"
-              >
+                 :class="{ 'fixed-width-column': includeUser }"
+                  class="text-center" 
+                  scope="col"
+                  >
                 {{ T.wordsLanguage }}
               </th>
               <th scope="col" class="text-center fixed-with-column">
@@ -63,49 +66,49 @@
                 <omegaup-username
                   :username="submission.username"
                   :classname="submission.classname"
-                  :linkify="true"
-                >
+                   :linkify="true"
+                   >
                 </omegaup-username>
                 <br />
                 <a
-                  class="school-text"
+                  class="school-text" 
                   :href="`/schools/profile/${submission.school_id}/`"
                   >{{ submission.school_name }}</a
-                >
+                  >
               </td>
               <td class="text-center">
                 <a :href="`/arena/problem/${submission.alias}/`">{{
-                  submission.title
-                }}</a>
+    submission.title
+  }}</a>
               </td>
               <td class="text-center">{{ submission.language }}</td>
-              <td
-                class="text-center verdict"
-                :class="`verdict-${submission.verdict}`"
-              >
+              <td 
+                  class="text-center verdict" 
+                  :class="`verdict-${submission.verdict}`"
+                  >
                 {{ T[`verdict${submission.verdict}`] }}
               </td>
               <td class="text-center">
                 {{
-                  submission.runtime === 0
-                    ? '—'
-                    : ui.formatString(T.submissionRunTimeInSeconds, {
-                        value: (
-                          parseFloat(submission.runtime || '0') / 1000
-                        ).toFixed(2),
-                      })
-                }}
+    submission.runtime === 0
+      ? '—'
+      : ui.formatString(T.submissionRunTimeInSeconds, {
+        value: (
+          parseFloat(submission.runtime || '0') / 1000
+        ).toFixed(2),
+      })
+  }}
               </td>
               <td class="text-center">
                 {{
-                  submission.memory === 0
-                    ? '—'
-                    : ui.formatString(T.submissionMemoryInMegabytes, {
-                        value: (
-                          parseFloat(submission.memory) /
-                          (1024 * 1024)
-                        ).toFixed(2),
-                      })
+      submission.memory === 0
+        ? '—'
+        : ui.formatString(T.submissionMemoryInMegabytes, {
+          value: (
+                parseFloat(submission.memory) /
+                (1024 * 1024)
+                ).toFixed(2),
+                })
                 }}
               </td>
             </tr>
@@ -125,6 +128,7 @@ import * as time from '../../time';
 import UserName from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import common_Paginator from '../common/Paginator.vue';
+import infiniteScroll from 'vue-infinite-scroll';
 
 @Component({
   components: {
@@ -132,11 +136,16 @@ import common_Paginator from '../common/Paginator.vue';
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-paginator': common_Paginator,
   },
-})
+  directives: {
+    infiniteScroll,
+  })
 export default class SubmissionsList extends Vue {
+  @Prop() page!: number;
   @Prop() includeUser!: boolean;
   @Prop() submissions!: types.Submission[];
+  @Prop() showHeader!: boolean;
   @Prop() searchResultUsers!: types.ListItem[];
+
 
   T = T;
   ui = ui;
@@ -149,13 +158,16 @@ export default class SubmissionsList extends Vue {
     }
     return `/submissions/${encodeURIComponent(this.searchedUsername?.key)}/`;
   }
+  get isScrollDisabled() {
+    return this.loading || this.endOfResults;
+  }
 }
 </script>
 
 <style lang="scss">
 @import '../../../../sass/main.scss';
 
-table.submissions-table > tbody > tr > td {
+table.submissions-table>tbody>tr>td {
   vertical-align: middle;
 }
 
