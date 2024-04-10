@@ -6,21 +6,23 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Check in DB for problem added to or updated in contest
      *
-     * @param array $problemData
-     * @param array $contestData
-     * @param \OmegaUp\Request $r
+     * @param string $problemData
+     * @param string $contestData
+     * @param float $points
+     * @param int $orderInContest
      */
     public static function assertProblemAddedToOrUpdatedInContest(
-        $problemData,
-        $contestData,
-        $r
+        string $problemAlias,
+        string $contestAlias,
+        float $points,
+        int $orderInContest
     ) {
         // Get problem and contest from DB
         $problem = \OmegaUp\DAO\Problems::getByAlias(
-            $problemData['request']['problem_alias']
+            $problemAlias
         );
         $contest = \OmegaUp\DAO\Contests::getByAlias(
-            $contestData['request']['alias']
+            $contestAlias
         );
 
         // Get problem-contest and verify it
@@ -28,9 +30,9 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $contest->problemset_id,
             $problem->problem_id
         );
-        self::assertNotNull($problemset_problems);
-        self::assertSame($r['points'], $problemset_problems->points);
-        self::assertSame($r['order_in_contest'], $problemset_problems->order);
+        self::assertNotNull($problemsetProblems);
+        self::assertSame($points, $problemsetProblems->points);
+        self::assertSame($orderInContest, $problemsetProblems->order);
     }
 
     /**
@@ -166,19 +168,19 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $login
             );
 
-            $r = new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['contest']->alias,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'points' => 100,
                 'order_in_contest' => $i + 1,
-            ]);
-            $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
+            ]));
             $this->assertSame('ok', $response['status']);
             self::assertProblemAddedToOrUpdatedInContest(
-                $problemData,
-                $contestData,
-                $r
+                $problemData['request']['problem_alias'],
+                $contestData['contest']->alias,
+                100,
+                $i + 1
             );
         }
 
@@ -188,19 +190,19 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $login
         );
 
-        $r = new \OmegaUp\Request([
+        $lastProblemResponse = \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['contest']->alias,
             'problem_alias' => $lastProblemData['request']['problem_alias'],
             'points' => 100,
             'order_in_contest' => MAX_PROBLEMS_IN_CONTEST,
-        ]);
-        $lastProblemResponse = \OmegaUp\Controllers\Contest::apiAddProblem($r);
+        ]));
         $this->assertSame('ok', $lastProblemResponse['status']);
         self::assertProblemAddedToOrUpdatedInContest(
-            $lastProblemData,
-            $contestData,
-            $r
+            $lastProblemData['request']['problem_alias'],
+            $contestData['contest']->alias,
+            100,
+            $i + 1
         );
 
         // Try to insert one more problem than is allowed, and it should fail this time.
@@ -237,9 +239,10 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertSame('ok', $lastProblemUpdateResponse['status']);
         self::assertProblemAddedToOrUpdatedInContest(
-            $lastProblemData,
-            $contestData,
-            $r
+            $lastProblemData['request']['problem_alias'],
+            $contestData['contest']->alias,
+            50,
+            $i + 1
         );
     }
 
