@@ -1,11 +1,11 @@
 <template>
   <div submissions-problem 
-    v-infinite-scroll="() => $emit('fetch-more-data')"
-    infinite-scroll-disabled="isScrollDisabled" 
-    infinite-scroll-distance="10">
-    <div class="text-center mb-5 submissions-title">
-      <h2>
-        {{ T.submissionsListTitle }}
+  v-infinite-scroll="() => $emit('fetch-more-data')"
+  infinite-scroll-disabled="isScrollDisabled" 
+  infinite-scroll-distance="10">
+  <div class="text-center mb-5 submissions-title">
+    <h2>
+      {{ T.submissionsListTitle }}
       </h2>
       <h4 v-if="!includeUser && submissions.length > 0">
         {{ T.wordsBy }}
@@ -44,7 +44,7 @@
               </th>
               <th scope="col" class="text-center">{{ T.wordsProblem }}</th>
               <th
-                 :class="{ 'fixed-width-column': includeUser }"
+              :class="{ 'fixed-width-column': includeUser }"
                   class="text-center" 
                   scope="col"
                   >
@@ -66,49 +66,49 @@
                 <omegaup-username
                   :username="submission.username"
                   :classname="submission.classname"
-                   :linkify="true"
-                   >
+                  :linkify="true"
+                  >
                 </omegaup-username>
                 <br />
                 <a
-                  class="school-text" 
-                  :href="`/schools/profile/${submission.school_id}/`"
-                  >{{ submission.school_name }}</a
-                  >
+                class="school-text" 
+                :href="`/schools/profile/${submission.school_id}/`"
+                >{{ submission.school_name }}</a
+                >
               </td>
               <td class="text-center">
                 <a :href="`/arena/problem/${submission.alias}/`">{{
-    submission.title
-  }}</a>
+                  submission.title
+                }}</a>
               </td>
               <td class="text-center">{{ submission.language }}</td>
               <td 
-                  class="text-center verdict" 
-                  :class="`verdict-${submission.verdict}`"
+              class="text-center verdict" 
+              :class="`verdict-${submission.verdict}`"
                   >
-                {{ T[`verdict${submission.verdict}`] }}
+                  {{ T[`verdict${submission.verdict}`] }}
               </td>
               <td class="text-center">
                 {{
-    submission.runtime === 0
-      ? '—'
-      : ui.formatString(T.submissionRunTimeInSeconds, {
-        value: (
-          parseFloat(submission.runtime || '0') / 1000
-        ).toFixed(2),
-      })
-  }}
+                  submission.runtime === 0
+                  ? '—'
+                  : ui.formatString(T.submissionRunTimeInSeconds, {
+                      value: (
+                        parseFloat(submission.runtime || '0') / 1000
+                        ).toFixed(2),
+                    })
+                  }}
               </td>
               <td class="text-center">
                 {{
-      submission.memory === 0
-        ? '—'
-        : ui.formatString(T.submissionMemoryInMegabytes, {
-          value: (
-                parseFloat(submission.memory) /
-                (1024 * 1024)
-                ).toFixed(2),
-                })
+                  submission.memory === 0
+                  ? '—'
+                  : ui.formatString(T.submissionMemoryInMegabytes, {
+                    value: (
+                            parseFloat(submission.memory) /
+                            (1024 * 1024)
+                            ).toFixed(2),
+                            })
                 }}
               </td>
             </tr>
@@ -116,7 +116,14 @@
         </table>
       </div>
     </div>
-  </div>
+    <center>
+    <font-awesome-icon
+           v-if="loading"
+          :icon="['fas', 'spinner']"
+          class="ml-2 fa-spin"
+    ></font-awesome-icon>
+    </center>
+    </div>
 </template>
 
 <script lang="ts">
@@ -129,23 +136,27 @@ import UserName from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import common_Paginator from '../common/Paginator.vue';
 import infiniteScroll from 'vue-infinite-scroll';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 @Component({
   components: {
     'omegaup-username': UserName,
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-paginator': common_Paginator,
+    FontAwesomeIcon,
+
   },
   directives: {
     infiniteScroll,
-  })
+  },
+})
 export default class SubmissionsList extends Vue {
   @Prop() page!: number;
   @Prop() includeUser!: boolean;
   @Prop() submissions!: types.Submission[];
-  @Prop() showHeader!: boolean;
   @Prop() searchResultUsers!: types.ListItem[];
-
+  @Prop() loading!: boolean;
+  @Prop() endOfResults!: boolean;
 
   T = T;
   ui = ui;
