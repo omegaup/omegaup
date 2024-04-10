@@ -21,7 +21,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ListItem=array{key: string, value: string}
- * @psalm-type ProblemListItem=array{accepted: int, alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}
+ * @psalm-type ProblemListItem=array{accepted: int, alias: string, can_be_removed?: bool, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}
  * @psalm-type Statements=array<string, string>
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type ArenaProblemDetails=array{accepts_submissions: bool, alias: string, commit: string, input_limit: int, languages: list<string>, letter?: string, points: float, problem_id?: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>,  settings?: ProblemSettingsDistrib, source?: string, statement?: ProblemStatement, title: string, visibility: int}
@@ -4184,6 +4184,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 public: false,
                 showUserTags: $problem->allow_user_add_tags
             );
+            $problemArray['can_be_removed'] = \OmegaUp\DAO\Problems::hasSubmissionsOrHasBeenUsedInCoursesOrContests(
+                $problem
+            );
             $addedProblems[] = $problemArray;
         }
 
@@ -4263,6 +4266,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problem,
                 public: false,
                 showUserTags: $problem->allow_user_add_tags
+            );
+            $problemArray['can_be_removed'] = \OmegaUp\DAO\Problems::hasSubmissionsOrHasBeenUsedInCoursesOrContests(
+                $problem
             );
             $addedProblems[] = $problemArray;
         }
@@ -5914,11 +5920,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ];
             return $response;
         }
-        if (!\OmegaUp\Validators::alias($name)) {
+        try {
+            \OmegaUp\Validators::alias($name);
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $response['templateProperties']['payload']['error'] = [
-                'description' => \OmegaUp\Translations::getInstance()->get(
-                    'parameterInvalidAlias'
-                ),
+                'description' => $e->getErrorMessage(),
                 'field' => 'name',
             ];
             return $response;

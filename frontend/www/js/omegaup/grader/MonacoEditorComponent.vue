@@ -58,7 +58,7 @@ export default {
       return (
         this.module +
         '.' +
-        (this.extension || Util.languageExtensionMapping[this.language])
+        (this.extension || Util.supportedLanguages[this.language].extension)
       );
     },
     title: function () {
@@ -73,7 +73,7 @@ export default {
     language: function (value) {
       monaco.editor.setModelLanguage(
         this._model,
-        Util.languageMonacoModelMapping[value],
+        Util.supportedLanguages[value].modelMapping,
       );
     },
     contents: function (value) {
@@ -81,11 +81,15 @@ export default {
     },
   },
   mounted: function () {
+    window.parent.addEventListener('code-and-language-set', (e) => {
+      e.detail.code = this.contents;
+      e.detail.language = this.language;
+    });
     this._editor = monaco.editor.create(this.$el, {
       autoIndent: true,
       formatOnPaste: true,
       formatOnType: true,
-      language: Util.languageMonacoModelMapping[this.language],
+      language: Util.supportedLanguages[this.language].modelMapping,
       readOnly: this.readOnly,
       theme: this.theme,
       value: this.contents,
@@ -94,6 +98,9 @@ export default {
     this._model.onDidChangeContent(() => {
       this.contents = this._model.getValue();
     });
+  },
+  unmounted: function () {
+    window.parent.removeEventListener('code-and-language-set');
   },
   methods: {
     onResize: function () {
