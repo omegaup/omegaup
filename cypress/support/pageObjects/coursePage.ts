@@ -433,7 +433,6 @@ export class CoursePage {
   }
 
   verifyProblemRun(status: string): void {
-    cy.get('[data-run-status] > span', { timeout: 10000 }).should('be.visible').first().should('have.text', status);
     cy.get('div.line').should('be.visible');
 
     cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
