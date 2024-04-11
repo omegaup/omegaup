@@ -5675,7 +5675,6 @@ export namespace messages {
   export type SubmissionListRequest = { [key: string]: any };
   export type SubmissionListResponse = {
     submissions: types.Submission[];
-    page?: number;
   };
 
   // Tag
