@@ -3,6 +3,7 @@ const path = require('path');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   name: 'grader',
@@ -39,6 +40,9 @@ module.exports = {
         use: ['file-loader'],
       },
     ],
+  },
+  optimization: {
+    realContentHash: true,
   },
   resolve: {
     alias: {
@@ -78,6 +82,11 @@ module.exports = {
         'index.html',
       ),
       scriptLoading: 'defer',
+    }),
+    new CleanWebpackPlugin({
+      verbose: true,
+      dry: false,
+      dangerouslyAllowCleanPatternsOutsideProject: true,
     }),
   ],
   output: {
