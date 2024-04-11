@@ -75,7 +75,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     ];
 
     /** @var int */
-    public static $defaultSubmissionGap = 60; // seconds.
+    public static $defaultSubmissionGap = 0; // seconds.
 
     public const VERDICTS = [
         'AC',

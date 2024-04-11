@@ -14882,6 +14882,11 @@ vue-inbrowser-compiler-independent-utils@^4.69.0:
   resolved "https://registry.yarnpkg.com/vue-inbrowser-compiler-independent-utils/-/vue-inbrowser-compiler-independent-utils-4.71.1.tgz#dc6830b204f7cfdc30ffc4f31ba81b0c72c52136"
   integrity sha512-K3wt3iVmNGaFEOUR4JIThQRWfqokxLfnPslD41FDZB2ajXp789+wCqJyGYlIFsvEQ2P61PInw6/ph5iiqg51gg==
 
+vue-infinite-scroll@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/vue-infinite-scroll/-/vue-infinite-scroll-2.0.2.tgz#ca37a91fe92ee0ad3b74acf8682c00917144b711"
+  integrity sha512-n+YghR059YmciANGJh9SsNWRi1YZEBVlODtmnb/12zI+4R72QZSWd+EuZ5mW6auEo/yaJXgxzwsuhvALVnm73A==
+
 vue-jest@^3.0.7:
   version "3.0.7"
   resolved "https://registry.yarnpkg.com/vue-jest/-/vue-jest-3.0.7.tgz#a6d29758a5cb4d750f5d1242212be39be4296a33"

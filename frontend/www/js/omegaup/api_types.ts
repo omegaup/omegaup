@@ -2311,26 +2311,8 @@ export namespace types {
     export function UserDependentsPayload(
       elementId: string = 'payload',
     ): types.UserDependentsPayload {
-      return ((x) => {
-        x.dependents = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            if (
-              typeof x.parent_email_verification_deadline !== 'undefined' &&
-              x.parent_email_verification_deadline !== null
-            )
-              x.parent_email_verification_deadline = ((x: number) =>
-                new Date(x * 1000))(x.parent_email_verification_deadline);
-            return x;
-          });
-        })(x.dependents);
-        return x;
-      })(
-        JSON.parse(
-          (document.getElementById(elementId) as HTMLElement).innerText,
-        ),
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -4712,7 +4694,7 @@ export namespace types {
   }
 
   export interface SubmissionsListPayload {
-    includeUser: boolean;
+    includeUser: boolean; 
     submissions: types.Submission[];
   }
 
@@ -4768,16 +4750,8 @@ export namespace types {
     [key: string]: types.ContestListItem[];
   }
 
-  export interface UserDependent {
-    classname: string;
-    name?: string;
-    parent_email_verification_deadline?: Date;
-    parent_verified?: boolean;
-    username: string;
-  }
-
   export interface UserDependentsPayload {
-    dependents: types.UserDependent[];
+    dependents: { email?: string; name?: string; username: string }[];
   }
 
   export interface UserDetailsPayload {
@@ -5697,6 +5671,11 @@ export namespace messages {
   export type SubmissionSetFeedbackResponse = {
     submissionFeedback?: dao.SubmissionFeedback;
     submissionFeedbackThread?: dao.SubmissionFeedbackThread;
+  };
+  export type SubmissionListRequest = { [key: string]: any };
+  export type SubmissionListResponse = {
+    submissions: types.Submission[];
+    page?: number;
   };
 
   // Tag
