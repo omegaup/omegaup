@@ -114,17 +114,13 @@
                 }}
               </td>
             </tr>
+              <td v-if="loading" colspan="16">
+                <div class="line"></div>
+              </td>
           </tbody>
         </table>
       </div>
     </div>
-    <center>
-      <font-awesome-icon
-        v-if="loading"
-        :icon="['fas', 'spinner']"
-        class="ml-2 fa-spin"
-      ></font-awesome-icon>
-    </center>
   </div>
 </template>
 
@@ -222,5 +218,28 @@ table.submissions-table > tbody > tr > td {
 
 [submissions-problem] .tags-input-wrapper-default {
   padding: 0.35rem 0.25rem 0.7rem 0.25rem;
+}
+.line {
+  height: 49px;
+  background: #e0e0e0;
+  border-radius: 8px;
+  animation: loading 1.5s infinite;
+}
+@keyframes loading {
+  0% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+  50% {
+    background: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
+  }
+  100% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
 }
 </style>
