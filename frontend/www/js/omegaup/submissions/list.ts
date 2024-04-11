@@ -47,20 +47,20 @@ OmegaUp.on('ready', () => {
           },
           'fetch-more-data': () => {
             if (this.loading || this.endOfResults) return;
-              this.loading = true;
-              api.Submission.list({ page: this.page + 1 })
-                .then(({ submissions }) => {
-                  if (submissions.length === 0) {
-                    this.endOfResults = true; // No more results available
-                  } else {
-                    this.page++;
-                    this.submissions = [...this.submissions, ...submissions]; // Append new results to existing ones
-                  }
-                })
-                .catch(ui.apiError)
-                .finally(() => {
-                  this.loading = false;
-                });
+            this.loading = true;
+            api.Submission.list({ page: this.page + 1 })
+              .then(({ submissions }) => {
+                if (submissions.length === 0) {
+                  this.endOfResults = true; // No more results available
+                } else {
+                  this.page++;
+                  this.submissions = [...this.submissions, ...submissions]; // Append new results to existing ones
+                }
+              })
+              .catch(ui.apiError)
+              .finally(() => {
+                this.loading = false;
+              });
           },
         },
       });

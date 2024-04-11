@@ -4694,7 +4694,7 @@ export namespace types {
   }
 
   export interface SubmissionsListPayload {
-    includeUser: boolean; 
+    includeUser: boolean;
     submissions: types.Submission[];
   }
 
