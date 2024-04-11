@@ -2311,8 +2311,26 @@ export namespace types {
     export function UserDependentsPayload(
       elementId: string = 'payload',
     ): types.UserDependentsPayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
+      return ((x) => {
+        x.dependents = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (
+              typeof x.parent_email_verification_deadline !== 'undefined' &&
+              x.parent_email_verification_deadline !== null
+            )
+              x.parent_email_verification_deadline = ((x: number) =>
+                new Date(x * 1000))(x.parent_email_verification_deadline);
+            return x;
+          });
+        })(x.dependents);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -4750,8 +4768,16 @@ export namespace types {
     [key: string]: types.ContestListItem[];
   }
 
+  export interface UserDependent {
+    classname: string;
+    name?: string;
+    parent_email_verification_deadline?: Date;
+    parent_verified?: boolean;
+    username: string;
+  }
+
   export interface UserDependentsPayload {
-    dependents: { email?: string; name?: string; username: string }[];
+    dependents: types.UserDependent[];
   }
 
   export interface UserDetailsPayload {
