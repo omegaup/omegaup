@@ -70,21 +70,21 @@ export default class UserDependents extends Vue {
 
   bannerColor(dependent: types.UserDependent): string {
     if (dependent.parent_verified) {
-      return 'bg-success';
+      return 'background-success';
     }
     const daysUntilVerificationDeadline = this.daysUntilVerificationDeadline(
       dependent.parent_email_verification_deadline ?? null,
     );
     if (daysUntilVerificationDeadline == null) {
-      return 'bg-success';
+      return 'background-success';
     }
     if (daysUntilVerificationDeadline > 1) {
-      return 'bg-warning';
+      return 'background-warning';
     }
     if (daysUntilVerificationDeadline == 1) {
-      return 'bg-danger';
+      return 'background-danger';
     }
-    return 'bg-secondary';
+    return 'background-secondary';
   }
 
   dependentsStatusMessage(dependent: types.UserDependent): string {
@@ -125,3 +125,23 @@ export default class UserDependents extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.background-success {
+  background-color: var(--status-success-color);
+}
+
+.background-warning {
+  background-color: var(--status-warning-color);
+}
+
+.background-danger {
+  background-color: var(--status-error-color);
+}
+
+.background-secondary {
+  background-color: var(--status-secondary-color);
+}
+</style>
