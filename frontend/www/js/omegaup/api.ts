@@ -1793,7 +1793,6 @@ export const Submission = {
     messages.SubmissionListRequest,
     messages.SubmissionListResponse
   >('/api/submission/list/'),
-  
 };
 
 export const Tag = {
