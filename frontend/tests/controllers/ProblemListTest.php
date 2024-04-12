@@ -882,7 +882,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         if ($problemType === 'contest') {
             // Create a contest
             $contestData = \OmegaUp\Test\Factories\Contest::createContest();
-            // Add problem 2 and 5 to the contest
+            // Add problem to the contest
             \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData,
                 $contestData
@@ -919,7 +919,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 $adminLogin
             );
 
-            // Add problem 3 and 6 to the assignment
+            // Add problem to the assignment
             \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
                 $adminLogin,
                 $courseData['course_alias'],
