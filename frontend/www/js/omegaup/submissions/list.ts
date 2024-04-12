@@ -17,6 +17,7 @@ OmegaUp.on('ready', () => {
       searchResultUsers: [] as types.ListItem[],
       page: 1,
       submissions: payload.submissions,
+      searchedUsername: null as string | null,
       loading: false, // Flag to prevent multiple simultaneous requests
       endOfResults: false, // Flag to indicate if all results have been loaded
     }),
@@ -29,6 +30,7 @@ OmegaUp.on('ready', () => {
           searchResultUsers: this.searchResultUsers,
           loading: this.loading,
           endOfResults: this.endOfResults,
+          searchedUsername: this.searchedUsername,
         },
         on: {
           'update-search-result-users': (query: string) => {
@@ -44,20 +46,31 @@ OmegaUp.on('ready', () => {
                 );
               })
               .catch(ui.apiError);
-          },
-          'fetch-more-data': () => {
-            if (this.loading || this.endOfResults) return;
-            this.loading = true;
-            api.Submission.list({ page: this.page + 1 })
+            },
+            'fetch-more-data': () => {
+              if (this.loading || this.endOfResults) return;
+              this.loading = true;
+              // Get Username
+              const currentUrlParts = window.location.pathname.split('/').filter(part => part !== '');
+              const username = currentUrlParts[currentUrlParts.indexOf('submissions') + 1];
+              this.searchedUsername = username ?? null;
+
+              api.Submission.list({
+                username: this.searchedUsername,
+                page: this.page + 1,
+              })
               .then(({ submissions }) => {
-                if (submissions.length === 0) {
-                  this.endOfResults = true; // No more results available
+                if (submissions === null || submissions.length === 0) {
+                  this.endOfResults = true; 
                 } else {
                   this.page++;
-                  this.submissions = [...this.submissions, ...submissions]; // Append new results to existing ones
+                  this.submissions = [...this.submissions, ...submissions]; 
                 }
               })
-              .catch(ui.apiError)
+              .catch((error) => {
+                this.endOfResults = true;
+                ui.apiError(error);
+              })
               .finally(() => {
                 this.loading = false;
               });

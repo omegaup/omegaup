@@ -114,11 +114,13 @@
                 }}
               </td>
             </tr>
-            <tr v-if="loading" v-for="index in 3" :key="index">
-              <td colspan="16">
-                <div class="line"></div>
-              </td>
-            </tr>
+            <template v-if="loading">
+              <tr v-for="index in 3" :key="index">
+                <td colspan="16">
+                  <div class="line"></div>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -127,7 +129,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -154,17 +156,12 @@ export default class SubmissionsList extends Vue {
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop() loading!: boolean;
   @Prop() endOfResults!: boolean;
-  @Prop() searchedUsername!: types.ListItem | null;
 
   T = T;
   ui = ui;
   time = time;
   searchedUsernameLocal: types.ListItem | null = null;
 
-  @Watch('searchedUsernameLocal')
-  onSearchedUsernameLocalChanged(newVal: types.ListItem | null): void {
-    this.$emit('update-searched-username', newVal);
-  }
   get hrefSearchUser(): string {
     if (!this.searchedUsernameLocal?.key) {
       return '/submissions/';
