@@ -86,6 +86,7 @@ module.exports = {
     new CleanWebpackPlugin({
       verbose: true,
       dry: false,
+      cleanOnceBeforeBuildPatterns: [],
       dangerouslyAllowCleanPatternsOutsideProject: true,
     }),
   ],
