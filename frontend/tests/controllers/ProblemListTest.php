@@ -843,12 +843,12 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         // 5. Problem with runs and it belongs to a contest
         // 6. Problem with runs and it belongs to an assignment
         $problemsMapping = [
-            'noRunsNoContestNoAssignment' => false,
-            'noRunsContest' => true,
-            'noRunsAssignment' => true,
-            'runsNoContestNoAssignment' => true,
-            'runsContest' => true,
-            'runsAssignment' => true,
+            'noRunsNoContestNoAssignment' => true,
+            'noRunsContest' => false,
+            'noRunsAssignment' => false,
+            'runsNoContestNoAssignment' => false,
+            'runsContest' => false,
+            'runsAssignment' => false,
         ];
         $problemData = [];
         foreach ($problemsMapping as $problemAlias => $_) {
@@ -955,9 +955,32 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
         foreach ($problemsToRemove as $problem) {
             if ($problem['alias'] === 'noRunsNoContestNoAssignment') {
-                $this->assertFalse($problem['can_be_removed']);
-            } else {
                 $this->assertTrue($problem['can_be_removed']);
+            } else {
+                $this->assertFalse($problem['can_be_removed']);
+            }
+        }
+
+        $response = \OmegaUp\Controllers\Problem::apiAdminList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $problemsToRemove = array_map(
+            fn ($problem) => [
+                'problem_id' => $problem['problem_id'],
+                'alias' => $problem['alias'],
+                'can_be_removed' => $problem['can_be_removed'],
+            ],
+            $response['problems']
+        );
+
+        foreach ($problemsToRemove as $problem) {
+            if ($problem['alias'] === 'noRunsNoContestNoAssignment') {
+                $this->assertTrue($problem['can_be_removed']);
+            } else {
+                $this->assertFalse($problem['can_be_removed']);
             }
         }
     }
