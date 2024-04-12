@@ -1792,7 +1792,18 @@ export const Submission = {
   list: apiCall<
     messages.SubmissionListRequest,
     messages.SubmissionListResponse
-  >('/api/submission/list/'),
+  >('/api/submission/list/', (x) => {
+    x.submissions = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.submissions);
+    return x;
+  }),
 };
 
 export const Tag = {

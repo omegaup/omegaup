@@ -22,7 +22,7 @@
       <div v-if="includeUser" class="card-body d-flex align-items-center">
         <omegaup-common-typeahead
           :existing-options="searchResultUsers"
-          :value.sync="searchedUsername"
+          :value.sync="searchedUsernameLocal"
           :max-results="10"
           class="mr-2"
           @update-existing-options="
@@ -114,9 +114,11 @@
                 }}
               </td>
             </tr>
-              <td v-if="loading" colspan="16">
+            <tr v-if="loading" v-for="index in 3" :key="index">
+              <td colspan="16">
                 <div class="line"></div>
               </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -125,7 +127,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -134,14 +136,12 @@ import UserName from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import common_Paginator from '../common/Paginator.vue';
 import infiniteScroll from 'vue-infinite-scroll';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 @Component({
   components: {
     'omegaup-username': UserName,
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-paginator': common_Paginator,
-    FontAwesomeIcon,
   },
   directives: {
     infiniteScroll,
@@ -154,17 +154,24 @@ export default class SubmissionsList extends Vue {
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop() loading!: boolean;
   @Prop() endOfResults!: boolean;
+  @Prop() searchedUsername!: types.ListItem | null;
 
   T = T;
   ui = ui;
   time = time;
-  searchedUsername: null | types.ListItem = null;
+  searchedUsernameLocal: types.ListItem | null = null;
 
+  @Watch('searchedUsernameLocal')
+  onSearchedUsernameLocalChanged(newVal: types.ListItem | null): void {
+    this.$emit('update-searched-username', newVal);
+  }
   get hrefSearchUser(): string {
-    if (!this.searchedUsername?.key) {
+    if (!this.searchedUsernameLocal?.key) {
       return '/submissions/';
     }
-    return `/submissions/${encodeURIComponent(this.searchedUsername?.key)}/`;
+    return `/submissions/${encodeURIComponent(
+      this.searchedUsernameLocal?.key,
+    )}/`;
   }
   get isScrollDisabled() {
     return this.loading || this.endOfResults;
