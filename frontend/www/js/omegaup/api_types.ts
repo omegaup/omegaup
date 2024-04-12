@@ -4681,6 +4681,8 @@ export namespace types {
 
   export interface Submission {
     alias: string;
+    classname: string;
+    guid: string;
     language: string;
     memory: number;
     runtime: number;
@@ -4713,6 +4715,7 @@ export namespace types {
 
   export interface SubmissionsListPayload {
     includeUser: boolean;
+    page: number;
     submissions: types.Submission[];
   }
 
@@ -5693,6 +5696,9 @@ export namespace messages {
   };
 
   // Submission
+  export type SubmissionListRequest = { [key: string]: any };
+  export type _SubmissionListServerResponse = any;
+  export type SubmissionListResponse = { results: types.Submission[] };
   export type SubmissionSetFeedbackRequest = { [key: string]: any };
   export type SubmissionSetFeedbackResponse = {
     submissionFeedback?: dao.SubmissionFeedback;
@@ -6476,6 +6482,9 @@ export namespace controllers {
   }
 
   export interface Submission {
+    list: (
+      params?: messages.SubmissionListRequest,
+    ) => Promise<messages.SubmissionListResponse>;
     setFeedback: (
       params?: messages.SubmissionSetFeedbackRequest,
     ) => Promise<messages.SubmissionSetFeedbackResponse>;
