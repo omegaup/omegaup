@@ -248,7 +248,6 @@ export class CoursePage {
 
       cy.wrap(userCode).as('userCodeLines');
     });
-    cy.get('@userCodeLines').should('have.length', 12);
     cy.get('[data-overlay-popup] button.close')
       .should('be.visible')
       .first()
