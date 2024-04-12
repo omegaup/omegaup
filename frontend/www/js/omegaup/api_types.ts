@@ -5693,14 +5693,13 @@ export namespace messages {
   };
 
   // Submission
+  export type SubmissionListRequest = { [key: string]: any };
+  export type _SubmissionListServerResponse = any;
+  export type SubmissionListResponse = { submissions: types.Submission[] };
   export type SubmissionSetFeedbackRequest = { [key: string]: any };
   export type SubmissionSetFeedbackResponse = {
     submissionFeedback?: dao.SubmissionFeedback;
     submissionFeedbackThread?: dao.SubmissionFeedbackThread;
-  };
-  export type SubmissionListRequest = { [key: string]: any };
-  export type SubmissionListResponse = {
-    submissions: types.Submission[];
   };
 
   // Tag
@@ -6480,12 +6479,12 @@ export namespace controllers {
   }
 
   export interface Submission {
-    setFeedback: (
-      params?: messages.SubmissionSetFeedbackRequest,
-    ) => Promise<messages.SubmissionSetFeedbackResponse>;
     list: (
       params?: messages.SubmissionListRequest,
     ) => Promise<messages.SubmissionListResponse>;
+    setFeedback: (
+      params?: messages.SubmissionSetFeedbackRequest,
+    ) => Promise<messages.SubmissionSetFeedbackResponse>;
   }
 
   export interface Tag {

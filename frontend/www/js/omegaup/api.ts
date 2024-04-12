@@ -1785,12 +1785,9 @@ export const Session = {
 };
 
 export const Submission = {
-  setFeedback: apiCall<
-    messages.SubmissionSetFeedbackRequest,
-    messages.SubmissionSetFeedbackResponse
-  >('/api/submission/setFeedback/'),
   list: apiCall<
     messages.SubmissionListRequest,
+    messages._SubmissionListServerResponse,
     messages.SubmissionListResponse
   >('/api/submission/list/', (x) => {
     x.submissions = ((x) => {
@@ -1804,6 +1801,10 @@ export const Submission = {
     })(x.submissions);
     return x;
   }),
+  setFeedback: apiCall<
+    messages.SubmissionSetFeedbackRequest,
+    messages.SubmissionSetFeedbackResponse
+  >('/api/submission/setFeedback/'),
 };
 
 export const Tag = {

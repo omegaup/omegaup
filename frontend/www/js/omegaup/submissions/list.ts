@@ -46,25 +46,28 @@ OmegaUp.on('ready', () => {
                 );
               })
               .catch(ui.apiError);
-            },
-            'fetch-more-data': () => {
-              if (this.loading || this.endOfResults) return;
-              this.loading = true;
-              // Get Username
-              const currentUrlParts = window.location.pathname.split('/').filter(part => part !== '');
-              const username = currentUrlParts[currentUrlParts.indexOf('submissions') + 1];
-              this.searchedUsername = username ?? null;
+          },
+          'fetch-more-data': () => {
+            if (this.loading || this.endOfResults) return;
+            this.loading = true;
+            // Get Username
+            const currentUrlParts = window.location.pathname
+              .split('/')
+              .filter((part) => part !== '');
+            const username =
+              currentUrlParts[currentUrlParts.indexOf('submissions') + 1];
+            this.searchedUsername = username ?? null;
 
-              api.Submission.list({
-                username: this.searchedUsername,
-                page: this.page + 1,
-              })
+            api.Submission.list({
+              username: this.searchedUsername,
+              page: this.page + 1,
+            })
               .then(({ submissions }) => {
                 if (submissions === null || submissions.length === 0) {
-                  this.endOfResults = true; 
+                  this.endOfResults = true;
                 } else {
                   this.page++;
-                  this.submissions = [...this.submissions, ...submissions]; 
+                  this.submissions = [...this.submissions, ...submissions];
                 }
               })
               .catch((error) => {
