@@ -57,6 +57,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $page
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param string $username
+     * 
      */
     public static function getLatestUserSubmissionsForTypeScript(\OmegaUp\Request $r): array {
         $username = $r->ensureString('username');
