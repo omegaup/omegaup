@@ -343,6 +343,8 @@ let store = new Vuex.Store({
       }
       if (!state.sessionStorageSources) {
         if (state.request.input.interactive) {
+          // not all languages are interactive implpied by interactive templates above
+          // leave it as default 'cpp17-gcc'
           state.sessionStorageSources = {
             language: 'cpp17-gcc',
             sources: {
@@ -351,7 +353,7 @@ let store = new Vuex.Store({
           };
         } else {
           state.sessionStorageSources = {
-            language: 'cpp17-gcc',
+            language: document.getElementById('language').value,
             sources: {
               ...sourceTemplates,
             },

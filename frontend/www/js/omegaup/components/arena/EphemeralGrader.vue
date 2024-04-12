@@ -16,11 +16,20 @@ export default class EphemeralGrader extends Vue {
   @Prop() problem!: types.ProblemInfo;
   @Prop({ default: false }) canSubmit!: boolean;
   @Prop({ default: () => [] }) acceptedLanguages!: string[];
+  @Prop({ default: 'cpp17-gcc' }) userPreferredLanguage!: string;
 
   loaded = false;
 
   mounted(): void {
-    (this.$refs.grader as HTMLIFrameElement).onload = () => this.iframeLoaded();
+    (this.$refs.grader as HTMLIFrameElement).onload = () => {
+      this.iframeLoaded();
+      const languageSelectElement: HTMLSelectElement = ((this.$refs
+        .grader as HTMLIFrameElement)
+        .contentWindow as Window).document.getElementById(
+        'language',
+      ) as HTMLSelectElement;
+      languageSelectElement.value = this.userPreferredLanguage;
+    };
   }
 
   @Watch('problem')
