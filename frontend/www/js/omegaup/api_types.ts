@@ -6483,6 +6483,9 @@ export namespace controllers {
     setFeedback: (
       params?: messages.SubmissionSetFeedbackRequest,
     ) => Promise<messages.SubmissionSetFeedbackResponse>;
+    list: (
+      params?: messages.SubmissionListRequest,
+    ) => Promise<messages.SubmissionListResponse>;
   }
 
   export interface Tag {
