@@ -1,5 +1,12 @@
 <template>
   <div>
+    <button
+      class="btn btn-primary col-1 col-md-1"
+      type="button"
+      @click="printPage"
+    >
+      Print
+    </button>
     <div v-for="problem in problems" :key="problem.alias" class="mt-3">
       <omegaup-problem-settings-summary
         :problem="problem"
@@ -31,6 +38,10 @@ import omegaup_Markdown from '../Markdown.vue';
 export default class ProblemPrint extends Vue {
   @Prop() problems!: types.ProblemDetails[];
   @Prop() contestTitle!: string;
+
+  printPage(): void {
+    window.print();
+  }
 }
 </script>
 

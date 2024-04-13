@@ -49,9 +49,9 @@
 
   <body class="d-flex flex-column h-100{% if OMEGAUP_LOCKDOWN %} lockdown{% endif %}">
     <script type="text/json" id="header-payload">{{ headerPayload|json_encode|raw }}</script>
+    {% jsInclude 'common_navbar' omitRuntime %}
     {% if not hideFooterAndHeader %}
       <div id="common-navbar"></div>
-      {% jsInclude 'common_navbar' omitRuntime %}
     {% endif %}
     <main role="main" {% if not fullWidth %}class="container-lg py-5 px-3 px-md-5"{% endif %}>
       <div class="alert mt-0" id="status" style="display: none;">
