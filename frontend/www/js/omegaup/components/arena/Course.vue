@@ -173,14 +173,6 @@
             @dismiss="onPopupDismissed"
           >
             <template #feedback="{ guid, isAdmin, feedback }">
-              <!-- <omegaup-submission-feedback
-              :guid="guid"
-              :is-admin="isAdmin"
-              :feedback-options="feedback"
-              @set-feedback="(request) => $emit('set-feedback', request)"
-              ></omegaup-submission-feedback> -->
-                            <!-- </template>
-              <template #code-view="{ guid, feedback }"> -->
               <omegaup-arena-feedback-code-view
                 :language="language"
                 :value="source"
