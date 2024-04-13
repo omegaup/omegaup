@@ -4629,7 +4629,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
                                 'localizationParams' => [
                                     'contestTitle' => $contest->title,
                                 ],
-                                // 'url' => "/course/{$course->alias}/",
                                 'url' => "/arena/{$contest->alias}/",
                                 'iconUrl' => '/media/info.png',
                             ],
