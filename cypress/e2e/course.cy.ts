@@ -106,8 +106,8 @@ describe('Course Test', () => {
     coursePage.createSubmission(problemOptions[0], runOptions);
     coursePage.closePopup(problemOptions[0]);
     // reload the page, check the language again
-    // before reloading wait some time
-    cy.wait(300);
+    // clear session storage before reloading
+    cy.clearAllSessionStorage();
     cy.reload();
     cy.get(`a[data-problem="${problemOptions[0].problemAlias}"]`).click();
     iframeBody = getEditorIframeBody();
