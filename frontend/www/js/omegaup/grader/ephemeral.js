@@ -366,6 +366,7 @@ let store = new Vuex.Store({
           languageExtensionMapping[state.sessionStorageSources.language]
         ];
       document.getElementById('language').value = state.request.language;
+      document.getElementById('language').dispatchEvent(new Event('change'));
     },
     showSubmitButton(state, value) {
       state.problemsetId = value;
@@ -975,7 +976,7 @@ const persistToSessionStorage = Util.throttle(({ alias, contents }) => {
     `ephemeral-sources-${alias}`,
     JSON.stringify(contents),
   );
-}, 10000);
+}, 1000);
 
 function initialize() {
   layout.init();
