@@ -5,7 +5,7 @@
       type="button"
       @click="printPage"
     >
-      Print
+      {{ T.contestAndProblemPrintButtonDesc }}
     </button>
     <div v-for="problem in problems" :key="problem.alias" class="mt-3">
       <omegaup-problem-settings-summary
@@ -26,6 +26,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import T from '../../lang';
 import problem_SettingsSummary from '../problem/SettingsSummary.vue';
 import omegaup_Markdown from '../Markdown.vue';
 
@@ -38,6 +39,8 @@ import omegaup_Markdown from '../Markdown.vue';
 export default class ProblemPrint extends Vue {
   @Prop() problems!: types.ProblemDetails[];
   @Prop() contestTitle!: string;
+
+  T = T;
 
   printPage(): void {
     window.print();

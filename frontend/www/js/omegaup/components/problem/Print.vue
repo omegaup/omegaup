@@ -1,5 +1,12 @@
 <template>
   <div class="mt-4">
+    <button
+      class="btn btn-primary col-1 col-md-1"
+      type="button"
+      @click="printPage"
+    >
+      {{ T.contestAndProblemPrintButtonDesc }}
+    </button>
     <omegaup-problem-settings-summary
       :problem="problem"
     ></omegaup-problem-settings-summary>
@@ -15,6 +22,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import T from '../../lang';
 import problem_SettingsSummary from './SettingsSummary.vue';
 import omegaup_Markdown from '../Markdown.vue';
 
@@ -26,6 +34,12 @@ import omegaup_Markdown from '../Markdown.vue';
 })
 export default class ProblemPrint extends Vue {
   @Prop() problem!: types.ProblemInfo;
+
+  T = T;
+
+  printPage(): void {
+    window.print();
+  }
 }
 </script>
 
