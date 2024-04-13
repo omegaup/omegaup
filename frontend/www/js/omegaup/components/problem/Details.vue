@@ -524,9 +524,17 @@ export default class ProblemDetails extends Vue {
   }
 
   get preferredLanguage(): null | string {
-    const [lastRun] = this.runs.slice(-1);
-    if (lastRun) {
-      return lastRun.language;
+    // this will not work, runs are not fetched orderly by time
+    // const [lastRun] = this.runs.slice(-1);
+
+    // return language with the highest time
+    if (this.runs && this.runs.length > 0) {
+      const mostRecentRun = this.runs.reduce(function (prev, current) {
+        return prev && prev.time.getTime() > current.time.getTime()
+          ? prev
+          : current;
+      });
+      return mostRecentRun.language;
     }
     return this.problem.preferred_language ?? null;
   }
