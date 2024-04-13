@@ -2,12 +2,6 @@
   <omegaup-overlay-popup @dismiss="$emit('dismiss')">
     <div v-if="data">
       <form data-run-details-view>
-        <slot
-          name="feedback"
-          :feedback="data.feedback"
-          :guid="data.guid"
-          :is-admin="data.admin"
-        ></slot>
         <div v-if="data.groups">
           <h3>{{ T.wordsCases }}</h3>
           <div></div>
@@ -77,9 +71,9 @@
                     <tr :key="`input-${problemCase.name}`">
                       <td colspan="6">
                         <pre>
-                          <code>{{
-                            showDataCase(data.cases, problemCase.name, 'in')
-                          }}</code>
+                        <code>{{
+                        showDataCase(data.cases, problemCase.name, 'in')
+                        }}</code>
                         </pre>
                       </td>
                     </tr>
@@ -109,31 +103,38 @@
         <a v-if="data.source_link" download="data.zip" :href="data.source">{{
           T.wordsDownload
         }}</a>
-        <slot v-else name="code-view" :guid="data.guid">
-          <omegaup-arena-feedback-code-view
-            :language="language"
-            :value="source"
-            :feedback-map="feedbackMap"
-            :feedback-thread-map="feedbackThreadMap"
-            @save-feedback-list="
-              (feedbackList) => onSaveFeedbackList(feedbackList, data.guid)
-            "
-            @submit-feedback-thread="
-              (feedback) => onSubmitFeedbackThread(feedback, data.guid)
-            "
-          ></omegaup-arena-feedback-code-view>
-        </slot>
+        <slot
+          name="feedback"
+          :feedback="data.feedback"
+          :guid="data.guid"
+          :is-admin="data.admin"
+        ></slot>
+
+        <!-- <slot v-else name="code-view" :guid="data.guid">
+        <omegaup-arena-feedback-code-view
+        :language="language"
+        :value="source"
+        :feedback-map="feedbackMap"
+        :feedback-thread-map="feedbackThreadMap"
+        @save-feedback-list="
+        (feedbackList) => onSaveFeedbackList(feedbackList, data.guid)
+        "
+        @submit-feedback-thread="
+        (feedback) => onSubmitFeedbackThread(feedback, data.guid)
+        "
+        ></omegaup-arena-feedback-code-view>
+        </slot> -->
         <div v-if="data.compile_error" class="compile_error">
           <h3>{{ T.wordsCompilerOutput }}</h3>
           <pre class="compile_error">
-            <code v-text="data.compile_error"></code>
-          </pre>
+<code v-text="data.compile_error"></code>
+</pre>
         </div>
         <div v-if="data.logs" class="logs">
           <h3>{{ T.wordsLogs }}</h3>
           <pre>
-            <code v-text="data.logs"></code>
-          </pre>
+<code v-text="data.logs"></code>
+</pre>
         </div>
         <div class="download">
           <h3>{{ T.wordsDownload }}</h3>
@@ -167,8 +168,8 @@
         <div v-if="data.judged_by" class="judged_by">
           <h3>{{ T.wordsJudgedBy }}</h3>
           <pre>
-            <code v-text="data.judged_by"></code>
-          </pre>
+<code v-text="data.judged_by"></code>
+</pre>
         </div>
         <div>
           <h3>{{ T.runGUID }}</h3>

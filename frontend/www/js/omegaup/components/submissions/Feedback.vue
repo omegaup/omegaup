@@ -35,7 +35,7 @@
             !generalFeedback
               ? T.submissionSendFeedback
               : T.submissionUpdateFeedback
-          }} test 99
+          }}
         </button>
       </div>
     </div>

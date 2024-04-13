@@ -110,14 +110,14 @@
               <template #best-solvers-list>
                 <div></div>
               </template>
-              <template #feedback="{ guid, isAdmin, feedback }">
-                <omegaup-submission-feedback
-                  :guid="guid"
-                  :is-admin="isAdmin"
-                  :feedback-options="feedback"
-                  @set-feedback="(request) => $emit('set-feedback', request)"
-                ></omegaup-submission-feedback>
-              </template>
+              <!-- <template #feedback="{ guid, isAdmin, feedback }">
+              <omegaup-submission-feedback
+              :guid="guid"
+              :is-admin="isAdmin"
+              :feedback-options="feedback"
+              @set-feedback="(request) => $emit('set-feedback', request)"
+              ></omegaup-submission-feedback>
+              </template> -->
             </omegaup-problem-details>
           </div>
         </div>
@@ -172,7 +172,15 @@
             :data="currentRunDetailsData"
             @dismiss="onPopupDismissed"
           >
-            <template #code-view="{ guid }">
+            <template #feedback="{ guid, isAdmin, feedback }">
+              <!-- <omegaup-submission-feedback
+              :guid="guid"
+              :is-admin="isAdmin"
+              :feedback-options="feedback"
+              @set-feedback="(request) => $emit('set-feedback', request)"
+              ></omegaup-submission-feedback> -->
+                            <!-- </template>
+              <template #code-view="{ guid, feedback }"> -->
               <omegaup-arena-feedback-code-view
                 :language="language"
                 :value="source"
@@ -181,28 +189,19 @@
                 :feedback-thread-map="feedbackThreadMap"
                 :current-user-class-name="currentUserClassName"
                 :current-username="currentUsername"
-                :showFeedbackForm.sync="showFeedbackForm"
-                @feedback-form-changed="handleFeedbackFormChanged"
-                @submit-feedback-thread="
-                  (feedback) =>
-                    $emit('submit-feedback-thread', { feedback, guid })
-                "
-              ></omegaup-arena-feedback-code-view>
-            </template>
-
-            <template #feedback="{ guid, isAdmin, feedback }">
-              <omegaup-submission-feedback
-                :showFeedbackForm.sync="showFeedbackForm"
                 :guid="guid"
                 :is-admin="isAdmin"
                 :feedback-options="feedback"
-                :feedbackList="feedbackList"
                 @set-feedback="(request) => $emit('set-feedback', request)"
                 @save-feedback-list="
                   (feedbackList) =>
                     $emit('save-feedback-list', { feedbackList, guid })
                 "
-              ></omegaup-submission-feedback>
+                @submit-feedback-thread="
+                  (feedback) =>
+                    $emit('submit-feedback-thread', { feedback, guid })
+                "
+              ></omegaup-arena-feedback-code-view>
             </template>
           </omegaup-arena-rundetails-popup>
         </template>
@@ -323,8 +322,6 @@ export default class ArenaCourse extends Vue {
   currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
   now = new Date();
   INF = '∞';
-  showFeedbackForm = false;
-  feedbackList: ArenaCourseFeedback[] = [];
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;
@@ -440,17 +437,6 @@ export default class ArenaCourse extends Vue {
       ...request,
       hash: `#problems/${this.activeProblemAlias}/show-run:${request.guid}`,
     });
-  }
-
-  handleFeedbackFormChanged({
-    newShowFeedbackForm,
-    feedbackList,
-  }: {
-    newShowFeedbackForm: boolean;
-    feedbackList: ArenaCourseFeedback[];
-  }) {
-    this.showFeedbackForm = newShowFeedbackForm;
-    this.feedbackList = feedbackList;
   }
 
   @Watch('problem')

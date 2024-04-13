@@ -1,16 +1,68 @@
 <template>
   <div>
-    <div class="container-fluid" data-feedback-code-mirror>
-      <textarea v-show="false" ref="cm-editor" v-model="value"></textarea>
+    <div v-if="generalFeedback" data-submission-feedback>
+      <h3>{{ T.feedbackTitle }}</h3>
+      <pre
+        data-run-feedback
+      ><code>{{generalFeedback ? generalFeedback.feedback : T.feedbackNotSentYet}}</code></pre>
+      <div v-if="generalFeedback">
+        {{
+          ui.formatString(T.feedbackLeftBy, {
+            date: time.formatDate(generalFeedback.date),
+          })
+        }}
+        <omegaup-user-username
+          :username="generalFeedback.author"
+          :classname="generalFeedback.author_classname"
+          :linkify="true"
+        ></omegaup-user-username>
+      </div>
     </div>
-    <div v-if="!readonly" class="container-fluid text-right py-2">
-      <button
-        class="btn btn-primary mx-2"
-        :disabled="!numberOfComments"
-        @click.prevent="saveFeedbackList"
-      >
-        {{ T.submissionSendFeedback }} test 29
-      </button>
+
+    <div>
+      <div class="container-fluid" data-feedback-code-mirror>
+        <textarea v-show="false" ref="cm-editor" v-model="value"></textarea>
+      </div>
+      <div v-if="!readonly" class="container-fluid text-right py-2">
+        <a
+          data-run-leave-feedback-button
+          role="button"
+          class="btn btn-sm btn-primary"
+          :disabled="!numberOfComments"
+          @click="showFeedbackForm = !showFeedbackForm"
+          >{{
+            !generalFeedback
+              ? T.submissionFeedbackSendButton
+              : T.submissionFeedbackUpdateButton
+          }}test 90000</a
+        >
+      </div>
+    </div>
+
+    <div v-if="isAdmin">
+      <div v-if="isAdmin" class="feedback-section">
+        <div v-show="showFeedbackForm" class="form-group">
+          <textarea
+            v-model="feedback"
+            data-run-feedback-text
+            class="form-control"
+            rows="3"
+            maxlength="200"
+          ></textarea>
+          <button
+            data-run-send-feedback-button
+            class="btn btn-sm btn-primary"
+            :disabled="!feedback"
+            @click.prevent="saveFeedbackList"
+          >
+            {{
+              !generalFeedback
+                ? T.submissionSendFeedback
+                : T.submissionUpdateFeedback
+            }}test 6000
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -24,6 +76,10 @@ import CodeMirror from 'codemirror';
 import { EditorOptions, languageModeMap, modeList } from './CodeView.vue';
 import Feedback, { ArenaCourseFeedback, FeedbackStatus } from './Feedback.vue';
 import FeedbackThread from './FeedbackThread.vue';
+import { types } from '../../api_types';
+import * as ui from '../../ui';
+import * as time from '../../time';
+import user_Username from '../user/Username.vue';
 
 const FeedbackClass = Vue.extend(Feedback);
 const FeedbackThreadClass = Vue.extend(FeedbackThread);
@@ -33,7 +89,9 @@ for (const mode of modeList) {
 }
 
 @Component({
-  components: {},
+  components: {
+    'omegaup-user-username': user_Username,
+  },
 })
 export default class FeedbackCodeView extends Vue {
   @Prop() language!: string;
@@ -46,9 +104,27 @@ export default class FeedbackCodeView extends Vue {
   @Ref('cm-editor') private readonly cmEditor!: HTMLTextAreaElement;
   @Prop() currentUsername!: string;
   @Prop() currentUserClassName!: string;
-  @Prop({ default: false }) showFeedbackForm!: boolean;
+  @Prop() guid!: string;
+  @Prop({ default: false }) isAdmin!: boolean;
+  @Prop({ default: () => [] }) feedbackOptions!: types.SubmissionFeedback[];
 
   T = T;
+  ui = ui;
+  time = time;
+
+  showFeedbackForm = false;
+  feedback = this.generalFeedback?.feedback ?? null;
+
+  get generalFeedback(): null | types.SubmissionFeedback {
+    if (!this.feedbackOptions.length) {
+      return null;
+    }
+    const [feedback] = this.feedbackOptions.filter(
+      (feedback) => feedback.range_bytes_start == null,
+    ) || [null];
+    return feedback;
+  }
+
   mode = languageModeMap[this.language] ?? languageModeMap['cpp17-gcc'];
   mapChangeTracker = 1;
 
@@ -236,12 +312,18 @@ export default class FeedbackCodeView extends Vue {
   }
 
   saveFeedbackList(): void {
-    this.$emit('feedback-form-changed', {
-      newShowFeedbackForm: !this.showFeedbackForm,
-      feedbackList: this.feedbackList.map((feedback) => ({
+    this.$emit(
+      'save-feedback-list',
+      this.feedbackList.map((feedback) => ({
         lineNumber: feedback.lineNumber,
         feedback: feedback.text,
       })),
+    );
+
+    this.$emit('set-feedback', {
+      guid: this.guid,
+      feedback: this.feedback,
+      isUpdate: Boolean(this.generalFeedback),
     });
   }
 }
