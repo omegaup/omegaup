@@ -1688,7 +1688,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'username' => $r->identity->username,
                     'contestTitle' => $contest->title,
                 ],
-                // 'url' => "/arena/{$contest->alias}/#problems/{$problem->alias}/",
                 'url' => "/contest/{$contest->alias}/edit/#contestants",
                 'iconUrl' => '/media/info.png',
             ],
