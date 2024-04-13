@@ -10,8 +10,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type SubmissionsListPayload=array{includeUser: bool, page: int, submissions: list<Submission>}
  */
 class Submission extends \OmegaUp\Controllers\Controller {
-    const SUBMIT_LIST_PAGE_SIZE = 100;
-
+    const SUBMISSION_LIST_PAGE_SIZE = 100;
     public static function getSource(string $guid): string {
         return \OmegaUp\Grader::GetInstance()->getSource($guid);
     }
@@ -26,17 +25,16 @@ class Submission extends \OmegaUp\Controllers\Controller {
      */
     public static function getLatestSubmissionsForTypeScript(\OmegaUp\Request $r): array {
         $page = $r->ensureOptionalInt('page') ?? 1;
-        $rowcount = $r->ensureOptionalInt(
-            'rowcount'
-        ) ?? self::SUBMIT_LIST_PAGE_SIZE;
+        $pageSize = $r->ensureOptionalInt(
+            'pageSize'
+        ) ?? self::SUBMISSION_LIST_PAGE_SIZE;
         return [
             'templateProperties' => [
                 'payload' => [
                     'includeUser' => true,
                     'submissions' => \OmegaUp\DAO\Submissions::getLatestSubmissions(
-                        identityId: null,
                         page: $page,
-                        rowsPerPage: $rowcount,
+                        rowsPerPage: $pageSize,
                     ),
                     'page' => $page,
                 ],
@@ -63,9 +61,10 @@ class Submission extends \OmegaUp\Controllers\Controller {
     public static function getLatestUserSubmissionsForTypeScript(\OmegaUp\Request $r): array {
         $username = $r->ensureString('username');
         $page = $r->ensureOptionalInt('page') ?? 1;
-        $rowcount = $r->ensureOptionalInt(
-            'rowcount'
-        ) ?? self::SUBMIT_LIST_PAGE_SIZE;
+        $pageSize = $r->ensureOptionalInt(
+            'pageSize'
+        ) ?? self::SUBMISSION_LIST_PAGE_SIZE;
+
         $identity = \OmegaUp\DAO\Identities::FindByUsername($username);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -90,9 +89,9 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'includeUser' => false,
                     'submissions' => \OmegaUp\DAO\Submissions::getLatestSubmissions(
-                        $identity->identity_id,
-                        $page,
-                        $rowcount,
+                        identityId: $identity->identity_id,
+                        page: $page,
+                        rowsPerPage: $pageSize,
                     ),
                     'page' => $page,
                 ],
