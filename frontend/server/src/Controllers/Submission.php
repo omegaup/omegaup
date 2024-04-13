@@ -20,16 +20,11 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @return array{templateProperties: array{payload: SubmissionsListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getLatestSubmissionsForTypeScript(\OmegaUp\Request $r): array {
-        $page = $r->ensureOptionalInt('page') ?? 1;
         return [
             'templateProperties' => [
                 'payload' => [
                     'includeUser' => true,
-                    'submissions' => \OmegaUp\DAO\Submissions::getLatestSubmissions(
-                        null,
-                        $page
-                    ),
-                    'page' => $page,
+                    'submissions' => \OmegaUp\DAO\Submissions::getLatestSubmissions(),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleLatestSubmissions'
@@ -49,7 +44,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      */
     public static function getLatestUserSubmissionsForTypeScript(\OmegaUp\Request $r): array {
         $username = $r->ensureString('username');
-        $page = $r->ensureOptionalInt('page') ?? 1;
+
         $identity = \OmegaUp\DAO\Identities::FindByUsername($username);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -75,7 +70,6 @@ class Submission extends \OmegaUp\Controllers\Controller {
                     'includeUser' => false,
                     'submissions' => \OmegaUp\DAO\Submissions::getLatestSubmissions(
                         $identity->identity_id,
-                        $page
                     ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
