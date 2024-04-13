@@ -468,7 +468,6 @@ OmegaUp.on('ready', () => {
             this.arbitrateRequest(username, true);
           },
           'deny-request': ({ username }: { username: string }) => {
-            console.log('deny-request here in line 471');
             this.arbitrateRequest(username, false);
           },
           'add-admin': (username: string) => {
