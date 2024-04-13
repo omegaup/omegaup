@@ -184,7 +184,7 @@
               :problem="problem"
               :can-submit="user.loggedIn && !inContestOrCourse"
               :accepted-languages="filteredLanguages"
-              :user-preferred-language="userPreferredLanguage"
+              :preferred-language="preferredLanguage"
             ></omegaup-arena-ephemeral-grader>
           </div>
           <div class="bg-white text-center p-4 d-sm-none border">
@@ -448,7 +448,6 @@ export default class ProblemDetails extends Vue {
   @Prop() problem!: types.ProblemInfo;
   @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
-  @Prop() userPreferredLanguage!: null | string;
   @Prop() nominationStatus!: types.NominationStatus;
   @Prop() solutionStatus!: string;
   @Prop({ default: null }) solution!: types.ProblemStatement | null;

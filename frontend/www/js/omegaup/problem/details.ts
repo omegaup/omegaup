@@ -91,7 +91,6 @@ OmegaUp.on('ready', async () => {
           runs: myRunsStore.state.runs,
           solvers: payload.solvers,
           user: payload.user,
-          userPreferredLanguage: payload.problem.preferred_language,
           nominationStatus: this.nominationStatus,
           histogram: payload.histogram,
           clarifications: clarificationStore.state.clarifications,

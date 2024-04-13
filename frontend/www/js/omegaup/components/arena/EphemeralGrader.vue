@@ -16,7 +16,7 @@ export default class EphemeralGrader extends Vue {
   @Prop() problem!: types.ProblemInfo;
   @Prop({ default: false }) canSubmit!: boolean;
   @Prop({ default: () => [] }) acceptedLanguages!: string[];
-  @Prop({ default: 'cpp17-gcc' }) userPreferredLanguage!: string;
+  @Prop({ default: 'cpp17-gcc' }) preferredLanguage!: string;
 
   loaded = false;
 
@@ -28,7 +28,7 @@ export default class EphemeralGrader extends Vue {
         .contentWindow as Window).document.getElementById(
         'language',
       ) as HTMLSelectElement;
-      languageSelectElement.value = this.userPreferredLanguage;
+      languageSelectElement.value = this.preferredLanguage;
     };
   }
 
