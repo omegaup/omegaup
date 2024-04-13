@@ -30,11 +30,7 @@
           class="btn btn-sm btn-primary"
           :disabled="!numberOfComments"
           @click="showFeedbackForm = !showFeedbackForm"
-          >{{
-            !generalFeedback
-              ? T.submissionFeedbackSendButton
-              : T.submissionFeedbackUpdateButton
-          }}test 90000</a
+          >{{ T.submissionFeedbackAddFinishComment }}</a
         >
       </div>
     </div>
@@ -55,11 +51,7 @@
             :disabled="!feedback"
             @click.prevent="saveFeedbackList"
           >
-            {{
-              !generalFeedback
-                ? T.submissionSendFeedback
-                : T.submissionUpdateFeedback
-            }}test 6000
+            {{ T.submissionFeedbackFinsihReview }}
           </button>
         </div>
       </div>
