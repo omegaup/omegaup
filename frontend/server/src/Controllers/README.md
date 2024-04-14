@@ -4146,8 +4146,8 @@ Returns a list of submissions created in the last 24 hours
 | Name       | Type           | Description |
 | ---------- | -------------- | ----------- |
 | `page`     | `int\|null`    |             |
-| `rowcount` | `int\|null`    |             |
-| `username` | `null\|string` |             |
+| `pageSize` | `int\|null`    |             |
+| `username` | `string\|null` |             |
 
 ### Returns
 
