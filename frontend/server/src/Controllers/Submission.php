@@ -111,9 +111,9 @@ class Submission extends \OmegaUp\Controllers\Controller {
      *
      * @return array{results: list<Submission>}
      *
+     * @omegaup-request-param string|null $username
      * @omegaup-request-param int|null $page
-     * @omegaup-request-param int|null $rowcount
-     * @omegaup-request-param null|string $username
+     * @omegaup-request-param int|null $pageSize
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $page = $r->ensureOptionalInt('page') ?? 1;
