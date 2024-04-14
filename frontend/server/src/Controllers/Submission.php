@@ -21,7 +21,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @return array{templateProperties: array{payload: SubmissionsListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int|null $page
-     * @omegaup-request-param int|null $rowcount
+     * @omegaup-request-param int|null $pageSize
      */
     public static function getLatestSubmissionsForTypeScript(\OmegaUp\Request $r): array {
         $page = $r->ensureOptionalInt('page') ?? 1;
@@ -56,6 +56,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param string $username
      * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $pageSize
      *
      */
     public static function getLatestUserSubmissionsForTypeScript(\OmegaUp\Request $r): array {
