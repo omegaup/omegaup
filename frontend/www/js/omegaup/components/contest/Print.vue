@@ -1,12 +1,10 @@
 <template>
   <div>
-    <button
-      class="btn btn-primary col-1 col-md-1"
-      type="button"
-      @click="printPage"
-    >
-      {{ T.contestAndProblemPrintButtonDesc }}
-    </button>
+    <a @click="() => $emit('print-page')">
+      <font-awesome-icon
+        :title="T.contestAndProblemPrintButtonDesc"
+        :icon="['fas', 'print']"
+    /></a>
     <div v-for="problem in problems" :key="problem.alias" class="mt-3">
       <omegaup-problem-settings-summary
         :problem="problem"
@@ -30,8 +28,14 @@ import T from '../../lang';
 import problem_SettingsSummary from '../problem/SettingsSummary.vue';
 import omegaup_Markdown from '../Markdown.vue';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faPrint } from '@fortawesome/free-solid-svg-icons';
+library.add(faPrint);
+
 @Component({
   components: {
+    FontAwesomeIcon,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
   },
@@ -41,10 +45,6 @@ export default class ProblemPrint extends Vue {
   @Prop() contestTitle!: string;
 
   T = T;
-
-  printPage(): void {
-    window.print();
-  }
 }
 </script>
 
