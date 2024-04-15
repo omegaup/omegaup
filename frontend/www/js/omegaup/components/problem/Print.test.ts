@@ -75,6 +75,11 @@ Here we can add code.
       },
     });
 
+    const printIcon = wrapper.find('svg[data-prefix="fas"]');
+    expect(printIcon.text()).toContain('Imprimir');
+    printIcon.trigger('click');
+    expect(wrapper.emitted('print-page')).toBeDefined();
+
     expect(wrapper.find('h3[data-problem-title]').text()).toBe(problem.title);
   });
 });
