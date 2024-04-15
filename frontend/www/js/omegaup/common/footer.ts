@@ -6,18 +6,21 @@ import Vue from 'vue';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload();
 
-  new Vue({
-    el: '#common-footer',
-    components: {
-      'omegaup-common-footer': omegaup_Footer,
-    },
-    render: function (createElement) {
-      return createElement('omegaup-common-footer', {
-        props: {
-          isLoggedIn: (payload && payload.isLoggedIn) || false,
-          omegaUpLockDown: (payload && payload.omegaUpLockDown) || false,
-        },
-      });
-    },
-  });
+  const commonFooterExists = document.getElementById('common-footer');
+  if (commonFooterExists) {
+    new Vue({
+      el: '#common-footer',
+      components: {
+        'omegaup-common-footer': omegaup_Footer,
+      },
+      render: function (createElement) {
+        return createElement('omegaup-common-footer', {
+          props: {
+            isLoggedIn: (payload && payload.isLoggedIn) || false,
+            omegaUpLockDown: (payload && payload.omegaUpLockDown) || false,
+          },
+        });
+      },
+    });
+  }
 });
