@@ -4,6 +4,38 @@
  */
 class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
+     * Check in DB for problem added to or updated in contest
+     *
+     * @param string $problemData
+     * @param string $contestData
+     * @param float $points
+     * @param int $orderInContest
+     */
+    public static function assertProblemAddedToOrUpdatedInContest(
+        string $problemAlias,
+        string $contestAlias,
+        float $points,
+        int $orderInContest
+    ) {
+        // Get problem and contest from DB
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemAlias
+        );
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestAlias
+        );
+
+        // Get problem-contest and verify it
+        $problemsetProblems = \OmegaUp\DAO\ProblemsetProblems::getByPK(
+            $contest->problemset_id,
+            $problem->problem_id
+        );
+        self::assertNotNull($problemsetProblems);
+        self::assertSame($points, $problemsetProblems->points);
+        self::assertSame($orderInContest, $problemsetProblems->order);
+    }
+
+    /**
      * Only update the contest title. Rest should stay the same
      */
     public function testUpdateContestTitle() {
@@ -120,6 +152,96 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertTrue(
             $contest->default_show_all_contestants_in_scoreboard
+        );
+    }
+
+    /**
+     * Update when there are too many problems in the contest.
+     */
+    public function testUpdateWhenTooManyProblemsInContest() {
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $login = self::login($contestData['director']);
+
+        for ($i = 0; $i < MAX_PROBLEMS_IN_CONTEST - 1; $i++) {
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+                $contestData['director'],
+                $login
+            );
+
+            $response = \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['contest']->alias,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'points' => 100,
+                'order_in_contest' => $i + 1,
+            ]));
+            $this->assertSame('ok', $response['status']);
+            self::assertProblemAddedToOrUpdatedInContest(
+                $problemData['request']['problem_alias'],
+                $contestData['contest']->alias,
+                100,
+                $i + 1
+            );
+        }
+
+        // Add the last allowed problem to the contest.
+        $lastProblemData = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+            $contestData['director'],
+            $login
+        );
+
+        $lastProblemResponse = \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['contest']->alias,
+            'problem_alias' => $lastProblemData['request']['problem_alias'],
+            'points' => 100,
+            'order_in_contest' => MAX_PROBLEMS_IN_CONTEST,
+        ]));
+        $this->assertSame('ok', $lastProblemResponse['status']);
+        self::assertProblemAddedToOrUpdatedInContest(
+            $lastProblemData['request']['problem_alias'],
+            $contestData['contest']->alias,
+            100,
+            $i + 1
+        );
+
+        // Try to insert one more problem than is allowed, and it should fail this time.
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+            $contestData['director'],
+            $login
+        );
+        try {
+            $response = \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['contest']->alias,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'points' => 100,
+                'order_in_contest' => MAX_PROBLEMS_IN_CONTEST + 1,
+            ]));
+            $this->fail('Should have failed adding the problem to the contest');
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            $this->assertSame(
+                $e->getMessage(),
+                'contestAddproblemTooManyProblems'
+            );
+        }
+
+        // Update a problem that's already in the contest, it will work again.
+        $lastProblemUpdateResponse = \OmegaUp\Controllers\Contest::apiAddProblem(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['contest']->alias,
+                'problem_alias' => $lastProblemData['request']['problem_alias'],
+                'points' => 50,
+                'order_in_contest' => MAX_PROBLEMS_IN_CONTEST,
+            ])
+        );
+        $this->assertSame('ok', $lastProblemUpdateResponse['status']);
+        self::assertProblemAddedToOrUpdatedInContest(
+            $lastProblemData['request']['problem_alias'],
+            $contestData['contest']->alias,
+            50,
+            $i + 1
         );
     }
 
@@ -950,7 +1072,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Director extends time to user that joined the contest when it is almost is over
+     * Director extends time to user that joined the contest when it is almost over
      */
     public function testExtendTimeAtTheEndOfTheContest() {
         // Get a problem
