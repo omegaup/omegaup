@@ -7,7 +7,10 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload();
 
   const commonFooterExists = document.getElementById('common-footer');
-  if (commonFooterExists) {
+  if (!commonFooterExists) {
+      return;
+  }
+  new Vue ...
     new Vue({
       el: '#common-footer',
       components: {
