@@ -42,7 +42,7 @@ class SubmissionListTest extends \OmegaUp\Test\ControllerTestCase {
         )['submissions'];
          $this->assertCount(3, $submissions);
     }
-    
+
     /**
      * Create 2 users, 2 problems and grades each of them 6 times.
      *
