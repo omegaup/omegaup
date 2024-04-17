@@ -30,7 +30,6 @@ OmegaUp.on('ready', () => {
           searchResultUsers: this.searchResultUsers,
           loading: this.loading,
           endOfResults: this.endOfResults,
-          searchedUsername: this.searchedUsername,
         },
         on: {
           'update-search-result-users': (query: string) => {

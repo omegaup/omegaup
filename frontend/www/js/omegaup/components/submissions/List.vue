@@ -22,7 +22,7 @@
       <div v-if="includeUser" class="card-body d-flex align-items-center">
         <omegaup-common-typeahead
           :existing-options="searchResultUsers"
-          :value.sync="searchedUsernameLocal"
+          :value.sync="searchedUsername"
           :max-results="10"
           class="mr-2"
           @update-existing-options="
@@ -160,15 +160,13 @@ export default class SubmissionsList extends Vue {
   T = T;
   ui = ui;
   time = time;
-  searchedUsernameLocal: types.ListItem | null = null;
+  searchedUsername: types.ListItem | null = null;
 
   get hrefSearchUser(): string {
-    if (!this.searchedUsernameLocal?.key) {
+    if (!this.searchedUsername?.key) {
       return '/submissions/';
     }
-    return `/submissions/${encodeURIComponent(
-      this.searchedUsernameLocal?.key,
-    )}/`;
+    return `/submissions/${encodeURIComponent(this.searchedUsername?.key)}/`;
   }
   get isScrollDisabled() {
     return this.loading || this.endOfResults;
