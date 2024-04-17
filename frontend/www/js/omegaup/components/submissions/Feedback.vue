@@ -18,6 +18,17 @@
     </div>
     <div v-if="isAdmin" class="feedback-section">
       <div v-show="showFeedbackForm" class="form-group">
+        <a
+          data-run-leave-feedback-button
+          role="button"
+          class="btn btn-sm btn-primary"
+          @click="showFeedbackForm = !showFeedbackForm"
+          >{{
+            !generalFeedback
+              ? T.submissionFeedbackSendButton
+              : T.submissionFeedbackUpdateButton
+          }}</a
+        >
         <textarea
           v-model="feedback"
           data-run-feedback-text
