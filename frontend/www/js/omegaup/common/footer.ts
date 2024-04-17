@@ -8,22 +8,20 @@ OmegaUp.on('ready', () => {
 
   const commonFooterExists = document.getElementById('common-footer');
   if (!commonFooterExists) {
-      return;
+    return;
   }
-  new Vue ...
-    new Vue({
-      el: '#common-footer',
-      components: {
-        'omegaup-common-footer': omegaup_Footer,
-      },
-      render: function (createElement) {
-        return createElement('omegaup-common-footer', {
-          props: {
-            isLoggedIn: (payload && payload.isLoggedIn) || false,
-            omegaUpLockDown: (payload && payload.omegaUpLockDown) || false,
-          },
-        });
-      },
-    });
-  }
+  new Vue({
+    el: '#common-footer',
+    components: {
+      'omegaup-common-footer': omegaup_Footer,
+    },
+    render: function (createElement) {
+      return createElement('omegaup-common-footer', {
+        props: {
+          isLoggedIn: (payload && payload.isLoggedIn) || false,
+          omegaUpLockDown: (payload && payload.omegaUpLockDown) || false,
+        },
+      });
+    },
+  });
 });
