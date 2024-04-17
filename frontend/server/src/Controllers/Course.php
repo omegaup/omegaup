@@ -3866,11 +3866,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
         if (
             !\OmegaUp\Authorization::isCourseAdmin($identity, $course) &&
-            !\OmegaUp\Authorization::isTeachingAssistant($identity, $course) &&
-            !\OmegaUp\Authorization::isGroupTeachingAssistantMember(
-                $identity,
-                $groupsTeachingAssistants
-            )
+            !self::isTeachingAssistant($course, $identity)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
