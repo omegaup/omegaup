@@ -1060,6 +1060,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             $commit
         );
 
+        $problemToAdd = \OmegaUp\DAO\Base\ProblemsetProblems::getByPK(
+            $problemsetId,
+            $problem->problem_id
+        );
+
         $assignedPoints = $points ?? 100.0;
         \OmegaUp\Controllers\Problemset::addProblem(
             $problemsetId,
@@ -1069,6 +1074,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $identity,
             $problem->languages === '' ? 0 : $assignedPoints,
             is_null($order) ? 1 : $order,
+            $problemToAdd,
             $validateVisibility,
             $isExtraProblem
         );
