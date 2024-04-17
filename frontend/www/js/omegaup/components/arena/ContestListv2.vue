@@ -541,6 +541,9 @@ export default class ArenaContestListv2 extends Vue {
 }
 
 .card-group-menu {
+  position: sticky;
+  top: 62px;
+  z-index: 10;
   border: none;
   border-bottom: 1px solid var(--arena-scoreboard-hover-color);
   border-radius: 0.25rem 0.25rem 0 0;
@@ -593,11 +596,6 @@ export default class ArenaContestListv2 extends Vue {
       ) !important;
     }
   }
-}
-
-.scroll-content {
-  overflow-y: auto;
-  max-height: 800px;
 }
 
 .empty-category {

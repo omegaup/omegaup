@@ -37,6 +37,7 @@ describe('Edit.vue', () => {
           },
         },
         initialLanguage: 'es',
+        initialTab: 'edit',
       },
     });
 

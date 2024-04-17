@@ -32,25 +32,38 @@
 					<span class="fa fa-file-archive-o" title="Download" aria-hidden="true" id="download-label"></span>
 				</a>
 				<select class="form-control form-control-sm mr-sm-2" data-language-select id="language">
+					<option value="c">C11 (gcc 10.3)</option>
+					<option value="c11-gcc">C11 (gcc 10.3)</option>
+					<option value="c11-clang">C11 (clang 10.0)</option>
+					<option value="cpp">C++03 (g++ 10.3)</option>
+					<option value="cpp11">C++11 (g++ 10.3)</option>
+					<option value="cpp11-gcc">C++11 (g++ 10.3)</option>
+					<option value="cpp11-clang">C++11 (clang++ 10.0)</option>
+					<option value="cpp17-gcc">C++17 (g++ 10.3)</option>
+					<option value="cpp17-clang">C++17 (clang++ 10.0)</option>
 					<option value="cpp20-gcc">C++20 (g++ 10.3)</option>
-					<option value="cs">C# (10, dotnet 6.0)</option>
-					<option value="go">Go (1.18.beta2)</option>
-					<option value="hs">Haskell (ghc 8.8)</option>
+					<option value="cpp20-clang">C++20 (clang++ 10.0)</option>
 					<option value="java">Java (openjdk 16.0)</option>
-					<option value="js">JavaScript (Node.js 16)</option>
 					<option value="kt">Kotlin (1.6.10)</option>
-					<option value="lua">Lua (5.3)</option>
+					<option value="py">Python (2.7)</option>
+					<option value="py2">Python (2.7)</option>
 					<option value="py3">Python (3.9)</option>
 					<option value="rb">Ruby (2.7)</option>
+					<option value="cs">C# (10, dotnet 6.0)</option>
+					<option value="pas">Pascal (fpc 3.0)</option>
+					<option value="hs">Haskell (ghc 8.8)</option>
+					<option value="lua">Lua (5.3)</option>
+					<option value="go">Go (1.18.beta2)</option>
 					<option value="rs">Rust (1.56.1)</option>
+					<option value="js">JavaScript (Node.js 16)</option>
 				</select>
 				<button class="btn btn-sm btn-secondary mr-2 my-sm-0 ephemeral-button" data-run-button type="button">
 					<span>Run</span>
-					<img src="http://samherbert.net/svg-loaders/svg-loaders/tail-spin.svg" height="16" />
+					<img src="https://samherbert.net/svg-loaders/svg-loaders/tail-spin.svg" height="16" />
 				</button>
 				<button class="btn btn-sm btn-dark my-2 my-sm-0 ephemeral-button d-none" data-submit-button type="submit">
 					<span>Submit</span>
-					<img src="http://samherbert.net/svg-loaders/svg-loaders/tail-spin.svg" height="16" />
+					<img src="https://samherbert.net/svg-loaders/svg-loaders/tail-spin.svg" height="16" />
 				</button>
 			</form>
 		</nav>

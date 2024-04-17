@@ -15,7 +15,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, opened: bool, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, description: string, objective: string|null, level: string|null, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, languages: list<string>|null, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
+ * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, description: string, objective: string|null, level: string|null, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, is_teaching_assistant: bool, languages: list<string>|null, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -63,7 +63,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
- * @psalm-type CourseClarificationsPayload=array{page: int, length: int, pagerItems: list<PageItem>, clarifications: list<Clarification>}
+ * @psalm-type CourseClarificationsPayload=array{page: int, length: int, pagerItems: list<PageItem>, clarifications: list<Clarification>, is_admin: bool, is_teaching_assistant: bool}
  * @psalm-type CourseCardPublic=array{alias: string, alreadyStarted: bool, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}
  * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
  * @psalm-type CourseCardFinished=array{alias: string, name: string}
@@ -1060,6 +1060,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             $commit
         );
 
+        $problemToAdd = \OmegaUp\DAO\Base\ProblemsetProblems::getByPK(
+            $problemsetId,
+            $problem->problem_id
+        );
+
         $assignedPoints = $points ?? 100.0;
         \OmegaUp\Controllers\Problemset::addProblem(
             $problemsetId,
@@ -1069,6 +1074,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $identity,
             $problem->languages === '' ? 0 : $assignedPoints,
             is_null($order) ? 1 : $order,
+            $problemToAdd,
             $validateVisibility,
             $isExtraProblem
         );
@@ -1409,6 +1415,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $countProblems = \OmegaUp\DAO\ProblemsetProblems::countProblemsetProblems(
+            $problemset
+        );
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['commit'],
             'commit',
@@ -1423,7 +1432,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             validateVisibility: true,
             isExtraProblem: $isExtraProblem,
             points: $r->ensureOptionalFloat('points') ?? 100.0,
-            commit: $r['commit']
+            commit: $r['commit'],
+            order: $countProblems + 1,
         );
 
         \OmegaUp\DAO\Courses::updateAssignmentMaxPoints(
@@ -3874,6 +3884,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         $teachingAssistants = \OmegaUp\DAO\UserRoles::getCourseTeachingAssistants(
             $course
         );
+        $groupsTeachingAssistants = \OmegaUp\DAO\GroupRoles::getCourseTeachingAssistants(
+            $course
+        );
         foreach ($teachingAssistants as &$teachingAssistant) {
             unset($teachingAssistant['user_id']);
         }
@@ -3895,9 +3908,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'groupsAdmins' => \OmegaUp\DAO\GroupRoles::getCourseAdmins(
                 $course
             ),
-            'groupsTeachingAssistants' => \OmegaUp\DAO\GroupRoles::getCourseTeachingAssistants(
-                $course
-            ),
+            'groupsTeachingAssistants' => $groupsTeachingAssistants,
             'teachingAssistants' => \OmegaUp\DAO\UserRoles::getCourseTeachingAssistants(
                 $course
             ),
@@ -4652,10 +4663,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             ],
             'entrypoint' => 'course_details',
         ];
-        if (
-            \OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
-            && !$showAssignment
-        ) {
+
+        $isAdmin = \OmegaUp\Authorization::isCourseAdmin($r->identity, $course);
+        $isTeachingAssistant = self::isTeachingAssistant(
+            $course,
+            $r->identity
+        );
+
+        if (($isAdmin || $isTeachingAssistant) && !$showAssignment) {
             return $detailsResponse;
         }
         if (
@@ -4711,13 +4726,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             )
         );
 
-        $isTeachingAssistant = \OmegaUp\Authorization::isTeachingAssistant(
-            $currentIdentity,
-            $course
+        $isTeachingAssistant = self::isTeachingAssistant(
+            $course,
+            $currentIdentity
         );
 
         if (
             !$isAdmin &&
+            !$isTeachingAssistant &&
             !\OmegaUp\DAO\GroupRoles::isContestant(
                 intval($currentIdentity->identity_id),
                 intval($assignment->acl_id)
@@ -4777,7 +4793,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $runs = [];
         $totalRuns = null;
-        if ($isAdmin) {
+        if ($isAdmin || $isTeachingAssistant) {
             [
                 'runs' => $runs,
                 'totalRuns' => $totalRuns,
@@ -5342,6 +5358,22 @@ class Course extends \OmegaUp\Controllers\Controller {
         ];
     }
 
+    private static function isTeachingAssistant(
+        \OmegaUp\DAO\VO\Courses $course,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): bool {
+        $groupsTeachingAssistants = \OmegaUp\DAO\Courses::getCourseTeachingAssistantGroups(
+            $course,
+        );
+        return \OmegaUp\Authorization::isTeachingAssistant(
+            $identity,
+            $course
+        ) || \OmegaUp\Authorization::isGroupTeachingAssistantMember(
+            $identity,
+            $groupsTeachingAssistants
+        );
+    }
+
     /**
      * Returns course details common between admin & non-admin
      *
@@ -5353,12 +5385,17 @@ class Course extends \OmegaUp\Controllers\Controller {
     ): array {
         $isAdmin = false;
         $isCurator = false;
+        $isTeachingAssistant = false;
         if (!is_null($identity)) {
             $isAdmin = \OmegaUp\Authorization::isCourseAdmin(
                 $identity,
                 $course
             );
             $isCurator = \OmegaUp\Authorization::canCreatePublicCourse(
+                $identity
+            );
+            $isTeachingAssistant = self::isTeachingAssistant(
+                $course,
                 $identity
             );
         }
@@ -5375,7 +5412,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 : \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
                     contest: null,
                     course: $course,
-                    isAdmin: ($isAdmin || $isCurator),
+                    isAdmin: ($isAdmin || $isCurator || $isTeachingAssistant),
                     currentIdentity: $identity,
                     offset: null,
                     rowcount: 100,
@@ -5398,6 +5435,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             ) : null,
             'finish_time' => $course->finish_time,
             'is_admin' => $isAdmin,
+            'is_teaching_assistant' => $isTeachingAssistant,
             'is_curator' => $isCurator,
             'admission_mode' => $course->admission_mode,
             'needs_basic_information' => $course->needs_basic_information,
@@ -5406,7 +5444,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'unlimited_duration' => false,
         ];
 
-        if ($isAdmin) {
+        if ($isAdmin || $isTeachingAssistant) {
             if (is_null($course->group_id)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'courseNotFound'
@@ -6168,25 +6206,28 @@ class Course extends \OmegaUp\Controllers\Controller {
                 fn (string $alias) => \OmegaUp\Validators::alias($alias)
             )
         );
+        $group = self::resolveGroup($course);
 
         if (
             !\OmegaUp\Authorization::canViewCourse(
                 $r->identity,
                 $course,
-                self::resolveGroup($course)
+                $group
             )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
+        $isAdmin = \OmegaUp\Authorization::isCourseAdmin($r->identity, $course);
+        $isTeachingAssistant = self::isTeachingAssistant(
+            $course,
+            $r->identity
+        );
 
         return [
             'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
                 contest: null,
                 course: $course,
-                isAdmin: \OmegaUp\Authorization::isCourseAdmin(
-                    $r->identity,
-                    $course
-                ),
+                isAdmin: $isAdmin || $isTeachingAssistant,
                 currentIdentity: $r->identity,
                 offset: $offset,
                 rowcount: $rowcount
@@ -6215,12 +6256,17 @@ class Course extends \OmegaUp\Controllers\Controller {
                 fn (string $alias) => \OmegaUp\Validators::alias($alias)
             )
         );
-
+        $group = self::resolveGroup($course);
+        $isAdmin = \OmegaUp\Authorization::isCourseAdmin($r->identity, $course);
+        $isTeachingAssistant = self::isTeachingAssistant(
+            $course,
+            $r->identity
+        );
         if (
             !\OmegaUp\Authorization::canViewCourse(
                 $r->identity,
                 $course,
-                self::resolveGroup($course)
+                $group
             )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -6229,10 +6275,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $list = \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
             contest: null,
             course: $course,
-            isAdmin: \OmegaUp\Authorization::isCourseAdmin(
-                $r->identity,
-                $course
-            ),
+            isAdmin: $isAdmin || $isTeachingAssistant,
             currentIdentity: $r->identity,
             offset: $page,
             rowcount: $pageSize
@@ -6253,6 +6296,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                         adjacent: 2,
                         params: [],
                     ),
+                    'is_admin' => $isAdmin,
+                    'is_teaching_assistant' => $isTeachingAssistant,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCourseClarifications'
