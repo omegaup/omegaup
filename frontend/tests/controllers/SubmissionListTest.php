@@ -1,5 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class SubmissionListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
@@ -8,8 +7,6 @@ class SubmissionListTest extends \OmegaUp\Test\ControllerTestCase {
      * - Page 1 should have 5 submissions since row count is given
      *
      * - Page 2 should have 3 submissions given the row count is given
-     *
-     * -
      */
     public function testSubmissionsList() {
         $usersCount = 4;
@@ -45,14 +42,13 @@ class SubmissionListTest extends \OmegaUp\Test\ControllerTestCase {
         )['submissions'];
          $this->assertCount(3, $submissions);
     }
+    
     /**
      * Create 2 users, 2 problems and grades each of them 6 times.
      *
      * - Page 1 should have 5 submissions since row count is given to be 5
      *
      * - Page 2 should have 1 submission given the row count is given.
-     *
-     * -
      */
     public function testUserSubmissionsList() {
         $usersCount = 2;
