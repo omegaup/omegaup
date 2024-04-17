@@ -3861,9 +3861,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($course->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
-        $groupsTeachingAssistants = \OmegaUp\DAO\Courses::getCourseTeachingAssistantGroups(
-            $course,
-        );
         if (
             !\OmegaUp\Authorization::isCourseAdmin($identity, $course) &&
             !self::isTeachingAssistant($course, $identity)
@@ -5399,19 +5396,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             $isCurator = \OmegaUp\Authorization::canCreatePublicCourse(
                 $identity
             );
-            $isTeachingAssistant = \OmegaUp\Authorization::isTeachingAssistant(
-                $identity,
-                $course
+            $isTeachingAssistant = self::isTeachingAssistant(
+                $course,
+                $identity
             );
-            if (!$isTeachingAssistant) {
-                $groupsTeachingAssistants = \OmegaUp\DAO\Courses::getCourseTeachingAssistantGroups(
-                    $course,
-                );
-                $isTeachingAssistant = \OmegaUp\Authorization::isGroupTeachingAssistantMember(
-                    $identity,
-                    $groupsTeachingAssistants
-                );
-            }
         }
 
         $result = [
