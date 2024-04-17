@@ -828,13 +828,11 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test myList API
+     * A PHPUnit data provider for some problems used in different scenarios.
+     *
+     * @return list<array:{0: string, 1: bool, 2: bool, 3: string, 4: bool}>
      */
-    public function testPrepareProblemToRemoveMyList() {
-        // Create an admin and a student
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
-
+    public function problemProvider(): array {
         // Create 6 problems which each one is used in a different way:
         // 1. Problem with no runs and it doesn't belong to a contest nor an assignment
         // 2. Problem with no runs and it belongs to a contest
@@ -842,124 +840,144 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         // 4. Problem with runs and it doesn't belong to a contest nor an assignment
         // 5. Problem with runs and it belongs to a contest
         // 6. Problem with runs and it belongs to an assignment
-        $problemsMapping = [
-            'noRunsNoContestNoAssignment' => false,
-            'noRunsContest' => true,
-            'noRunsAssignment' => true,
-            'runsNoContestNoAssignment' => true,
-            'runsContest' => true,
-            'runsAssignment' => true,
+        return [
+            ['noRunsNoContestNoAssignment', true,  false, 'none',    true],
+            ['noRunsContest',               true,  false, 'contest', false],
+            ['noRunsAssignment',            true,  false, 'course',  false],
+            ['runsNoContestNoAssignment',   true,  true,  'none',    false],
+            ['runsContest',                 true,  true,  'contest', false],
+            ['runsAssignment',              true,  true,  'course',  false],
+            ['noRunsNoContestNoAssignment', false, false, 'none',    true],
+            ['noRunsContest',               false, false, 'contest', false],
+            ['noRunsAssignment',            false, false, 'course',  false],
+            ['runsNoContestNoAssignment',   false, true,  'none',    false],
+            ['runsContest',                 false, true,  'contest', false],
+            ['runsAssignment',              false, true,  'course',  false],
         ];
-        $problemData = [];
-        foreach ($problemsMapping as $problemAlias => $_) {
-            $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem(
-                new \OmegaUp\Test\Factories\ProblemParams([
-                    'author' => $identity,
-                    'alias' => $problemAlias,
+    }
+
+    /**
+     * Test myList API
+     *
+     * @dataProvider problemProvider
+     */
+    public function testPrepareProblemToRemoveMyList(
+        string $problemAlias,
+        bool $adminedByMe,
+        bool $hasRuns,
+        string $problemType,
+        bool $expectedCanBeRemoved
+    ) {
+        // Create an admin and a student
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'author' => $admin,
+                'alias' => $problemAlias,
+            ])
+        );
+
+        if ($problemType === 'contest') {
+            // Create a contest
+            $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+            // Add problem to the contest
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
+                $problemData,
+                $contestData
+            );
+
+            // Add a student to the contest
+            \OmegaUp\Test\Factories\Contest::addUser($contestData, $student);
+
+            // Student opens the contest
+            $login = self::login($student);
+
+            $response = \OmegaUp\Controllers\Contest::apiOpen(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $contestData['request']['alias']
                 ])
             );
-        }
-        // Create a contest
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
-        // Add problem 2 and 5 to the contest
-        \OmegaUp\Test\Factories\Contest::addProblemToContest(
-            $problemData[1],
-            $contestData
-        );
-        \OmegaUp\Test\Factories\Contest::addProblemToContest(
-            $problemData[4],
-            $contestData
-        );
 
-        // Add a student to the contest
-        \OmegaUp\Test\Factories\Contest::addUser($contestData, $student);
-
-        // Student opens the contest
-        $login = self::login($student);
-        $response = \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias']
-        ]));
-
-        // Student creates a run for problem 5
-        $runData = \OmegaUp\Test\Factories\Run::createRun(
-            $problemData[4],
-            $contestData,
-            $student
-        );
-
-        // The run is graded
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        $login = self::login($identity);
-        // Create a course with one assignment
-        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
-            $identity,
-            $login
-        );
-        // Add problem 3 and 6 to the assignment
-        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
-            $login,
-            $courseData['course_alias'],
-            $courseData['assignment_alias'],
-            [$problemData[2]]
-        );
-
-        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
-            $login,
-            $courseData['course_alias'],
-            $courseData['assignment_alias'],
-            [$problemData[5]]
-        );
-
-        // Add a student to the course
-        \OmegaUp\Test\Factories\Course::addStudentToCourse(
-            $courseData,
-            $student
-        );
-
-        // Create a run for problem 6
-        \OmegaUp\Test\Factories\Run::createAssignmentRun(
-            $courseData['course_alias'],
-            $courseData['assignment_alias'],
-            $problemData[5],
-            $student
-        );
-
-        // The run is graded
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        // Create a run for problem 4, even if this problem is not in a contest
-        // or an assignment
-        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-            $problemData[3],
-            $student
-        );
-
-        // The run is graded
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        $login = self::login($identity);
-        $response = \OmegaUp\Controllers\Problem::apiMyList(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-        ]));
-
-        $problemsToRemove = array_map(
-            fn ($problem) => [
-                'problem_id' => $problem['problem_id'],
-                'alias' => $problem['alias'],
-                'can_be_removed' => $problem['can_be_removed'],
-            ],
-            $response['problems']
-        );
-
-        foreach ($problemsToRemove as $problem) {
-            if ($problem['alias'] === 'noRunsNoContestNoAssignment') {
-                $this->assertFalse($problem['can_be_removed']);
-            } else {
-                $this->assertTrue($problem['can_be_removed']);
+            if ($hasRuns) {
+                // Student creates a run for problem
+                $runData = \OmegaUp\Test\Factories\Run::createRun(
+                    $problemData,
+                    $contestData,
+                    $student
+                );
             }
+        } elseif ($problemType === 'course') {
+            // Login as admin
+            $adminLogin = self::login($admin);
+
+            // Create a course with one assignment
+            $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+                $admin,
+                $adminLogin
+            );
+
+            // Add problem to the assignment
+            \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+                $adminLogin,
+                $courseData['course_alias'],
+                $courseData['assignment_alias'],
+                [$problemData]
+            );
+
+            // Add a student to the course
+            \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData,
+                $student
+            );
+
+            if ($hasRuns) {
+                // Student creates a run for problem
+                $runData = \OmegaUp\Test\Factories\Run::createAssignmentRun(
+                    $courseData['course_alias'],
+                    $courseData['assignment_alias'],
+                    $problemData,
+                    $student
+                );
+            }
+        } elseif ($hasRuns) {
+            // Student creates a run for problem
+            $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problemData,
+                $student
+            );
         }
+
+        if ($hasRuns) {
+            // The run is graded
+            \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        }
+
+        // Login as admin
+        $adminLogin = self::login($admin);
+
+        if ($adminedByMe) {
+            $response = \OmegaUp\Controllers\Problem::apiAdminList(
+                new \OmegaUp\Request([
+                    'auth_token' => $adminLogin->auth_token,
+                ])
+            )['problems'];
+        } else {
+            $response = \OmegaUp\Controllers\Problem::apiMyList(
+                new \OmegaUp\Request([
+                    'auth_token' => $adminLogin->auth_token,
+                ])
+            )['problems'];
+        }
+
+        $canBeRemoved = array_filter(
+            $response,
+            fn($problem) => $problem['alias'] === $problemAlias
+        )[0]['can_be_removed'];
+
+        $this->assertSame($canBeRemoved, $expectedCanBeRemoved);
     }
 
     /**

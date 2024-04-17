@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Testing delete problems feature
  */
@@ -12,7 +10,6 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
     public function testProblemCanNotBeDeletedAfterSubmissionsInACourseOrContest() {
         // Get a user
         [
-            'user' => $userLogin,
             'identity' => $identity,
         ] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -35,7 +32,6 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create our contestant
         [
-            'user' => $contestant,
             'identity' => $identity,
         ] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -70,7 +66,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAnonymousUserCannotSeeDeletedProblems() {
         // Get a user
-        ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get problems
         $deletedProblemData = \OmegaUp\Test\Factories\Problem::createProblem(
@@ -103,7 +99,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Asserting deleted problem is not in the list
-        foreach ($response['results'] as $key => $problem) {
+        foreach ($response['results'] as $problem) {
             $this->assertNotEquals(
                 $deletedProblemData['request']['problem_alias'],
                 $problem['alias']
@@ -112,7 +108,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Asserting not deleted problem is in the list
         $problemIsInTheList = false;
-        foreach ($response['results'] as $key => $problem) {
+        foreach ($response['results'] as $problem) {
             if ($problemData['request']['problem_alias'] == $problem['alias']) {
                 $problemIsInTheList = true;
                 break;
@@ -126,7 +122,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testLoggedUserCannotSeeDeletedProblems() {
         // Get a user
-        ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get problems
         $deletedProblemData = \OmegaUp\Test\Factories\Problem::createProblem(
@@ -156,7 +152,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Asserting deleted problem is not in the list
-        foreach ($response['results'] as $key => $problem) {
+        foreach ($response['results'] as $problem) {
             $this->assertNotEquals(
                 $deletedProblemData['request']['problem_alias'],
                 $problem['alias']
@@ -165,7 +161,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Asserting not deleted problem is in the list
         $problemIsInTheList = false;
-        foreach ($response['results'] as $key => $problem) {
+        foreach ($response['results'] as $problem) {
             if ($problemData['request']['problem_alias'] == $problem['alias']) {
                 $problemIsInTheList = true;
                 break;
@@ -179,7 +175,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Asserting deleted problem is not in the list
-        foreach ($response['problems'] as $key => $problem) {
+        foreach ($response['problems'] as $problem) {
             $this->assertNotEquals(
                 $deletedProblemData['request']['problem_alias'],
                 $problem['alias']
@@ -188,7 +184,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Asserting not deleted problem is in the list
         $problemIsInTheList = false;
-        foreach ($response['problems'] as $key => $problem) {
+        foreach ($response['problems'] as $problem) {
             if ($problemData['request']['problem_alias'] == $problem['alias']) {
                 $problemIsInTheList = true;
                 break;
@@ -202,7 +198,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testSysadminCanSeeDeletedProblemsOnlyInAdminList() {
         // Get a user
-        ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $userLogin] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get problems
         $deletedProblemData = \OmegaUp\Test\Factories\Problem::createProblem(
@@ -219,7 +215,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get admin user
-        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        ['identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         $login = self::login($identityAdmin);
 
@@ -235,7 +231,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Asserting deleted problem is not in the list
-        foreach ($response['results'] as $key => $problem) {
+        foreach ($response['results'] as $problem) {
             $this->assertNotEquals(
                 $deletedProblemData['request']['problem_alias'],
                 $problem['alias']
@@ -244,7 +240,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Asserting not deleted problem is in the list
         $problemIsInTheList = false;
-        foreach ($response['results'] as $key => $problem) {
+        foreach ($response['results'] as $problem) {
             if ($problemData['request']['problem_alias'] == $problem['alias']) {
                 $problemIsInTheList = true;
                 break;
@@ -259,7 +255,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Asserting deleted problem is in the list
         $deletedProblemIsInTheList = false;
-        foreach ($response['problems'] as $key => $problem) {
+        foreach ($response['problems'] as $problem) {
             if ($deletedProblemData['request']['problem_alias'] == $problem['alias']) {
                 $deletedProblemIsInTheList = true;
                 break;
@@ -269,7 +265,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Asserting not deleted problem is in the list
         $problemIsInTheList = false;
-        foreach ($response['problems'] as $key => $problem) {
+        foreach ($response['problems'] as $problem) {
             if ($problemData['request']['problem_alias'] == $problem['alias']) {
                 $problemIsInTheList = true;
                 break;
