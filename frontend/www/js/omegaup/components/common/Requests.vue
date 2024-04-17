@@ -48,10 +48,24 @@
           <td v-if="!request.accepted" class="text-center">
             <button
               class="close float-none text-danger mx-2"
-              @click="$emit('deny-request', { username: request.username })"
+              @click="toggleFeedbackModal(request.username)"
             >
               ×
             </button>
+            <b-modal
+              v-model="modalStates[request.username]"
+              :title="T.submitFeedbackRequireConfirmation"
+              :ok-title="T.submitFeedbackSubmit"
+              ok-variant="success"
+              :cancel-title="T.submitFeedbackCancel"
+              cancel-variant="danger"
+              @ok="onDenyRequest(request.username, resolutionText)"
+            >
+              <b-form-input
+                v-model="resolutionText"
+                :placeholder="T.submitFeedbackPlaceholder"
+              ></b-form-input>
+            </b-modal>
             <button
               class="close float-none text-success mx-2"
               @click="$emit('accept-request', { username: request.username })"
@@ -73,6 +87,13 @@ import T from '../../lang';
 import * as time from '../../time';
 import omegaup_Username from '../user/Username.vue';
 
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+
+import { FormInputPlugin, ModalPlugin } from 'bootstrap-vue';
+Vue.use(FormInputPlugin);
+Vue.use(ModalPlugin);
+
 @Component({
   components: {
     'omegaup-username': omegaup_Username,
@@ -86,10 +107,22 @@ export default class Requests extends Vue {
   time = time;
   requests: types.IdentityRequest[] = this.data;
   showAllRequests = false;
+  resolutionText: null | string = null;
+  modalStates: { [key: string]: boolean } = {};
 
   @Watch('data')
   onDataChange(): void {
     this.requests = this.data;
+  }
+
+  onDenyRequest(username: string, resolutionText: null | string): void {
+    this.$emit('deny-request', { username, resolutionText });
+    this.resolutionText = null;
+    this.toggleFeedbackModal(username);
+  }
+
+  toggleFeedbackModal(username: string): void {
+    this.$set(this.modalStates, username, !this.modalStates[username]);
   }
 
   get filteredRequests(): types.IdentityRequest[] {
