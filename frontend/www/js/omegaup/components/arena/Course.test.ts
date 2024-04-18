@@ -50,6 +50,7 @@ describe('Course.vue', () => {
     finish_time: new Date(),
     is_curator: true,
     is_admin: false,
+    is_teaching_assistant: false,
     name: 'Curso de prueba',
     requests_user_information: 'no',
     school_name: '',

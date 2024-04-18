@@ -127,6 +127,7 @@ export default class ProblemSearchBar extends Vue {
 .card-header {
   border: 1px solid var(--header-problem-card-color);
   border-bottom: none;
+  background-color: var(--header-problem-card-color-no-opacity);
 }
 
 @media (max-width: 576px) {
@@ -136,9 +137,5 @@ export default class ProblemSearchBar extends Vue {
   .form-control {
     margin-left: 0 !important;
   }
-}
-
-[data-problem-keyword-search] {
-  z-index: 9999;
 }
 </style>

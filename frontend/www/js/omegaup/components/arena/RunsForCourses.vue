@@ -396,7 +396,7 @@
                 <div class="dropdown">
                   <button
                     data-runs-actions-button
-                    class="btn-secondary dropdown-toggle"
+                    class="btn btn-secondary dropdown-toggle"
                     type="button"
                     data-toggle="dropdown"
                     aria-haspopup="true"
@@ -424,14 +424,21 @@
                     </button>
                     <template v-if="showDisqualify">
                       <div class="dropdown-divider"></div>
-                      <button
-                        v-if="run.type === 'normal'"
-                        :data-actions-disqualify="run.guid"
-                        class="btn-link dropdown-item"
-                        @click="$emit('disqualify', run)"
-                      >
-                        {{ T.arenaRunsActionsDisqualify }}
-                      </button>
+                      <template v-if="run.type === 'normal'">
+                        <button
+                          :data-actions-disqualify="run.guid"
+                          class="btn-link dropdown-item"
+                          @click="
+                            $emit('disqualify', {
+                              run,
+                              disqualificationType: DisqualificationType.ByGUID,
+                            })
+                          "
+                        >
+                          {{ T.arenaRunsActionsDisqualifyByGUID }}
+                        </button>
+                      </template>
+
                       <button
                         v-else-if="run.type === 'disqualified'"
                         :data-actions-requalify="run.guid"
@@ -482,6 +489,7 @@ import * as time from '../../time';
 import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import arena_RunDetailsPopup from './RunDetailsPopup.vue';
+import { DisqualificationType } from './Runs.vue';
 import omegaup_Overlay from '../Overlay.vue';
 
 import { PaginationPlugin } from 'bootstrap-vue';
@@ -605,6 +613,7 @@ export default class Runs extends Vue {
   PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
+  DisqualificationType = DisqualificationType;
 
   filterLanguage: string = '';
   filterOffset: number = 0;
@@ -897,7 +906,18 @@ export default class Runs extends Vue {
     if (scorePercentage !== '100.00') {
       return '';
     }
-
+    if (run.verdict == 'AC') {
+      return 'status-ac';
+    }
+    if (run.verdict == 'TLE') {
+      return 'status-tle';
+    }
+    if (run.verdict == 'MLE') {
+      return 'status-mle';
+    }
+    if (run.verdict == 'WA') {
+      return 'status-wa';
+    }
     return 'status-ac';
   }
 
@@ -1115,14 +1135,32 @@ export default class Runs extends Vue {
   background: var(--arena-runs-table-status-disqualified-background-color);
   color: var(--arena-runs-table-status-disqualified-font-color);
 }
+
 .status-je-ve {
   background: var(--arena-runs-table-status-je-ve-background-color);
   color: var(--arena-runs-table-status-je-ve-font-color);
 }
+
 .status-ac {
   background: var(--arena-runs-table-status-ac-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
 }
+
+.status-wa {
+  background: var(--arena-runs-table-status-wa-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+
+.status-mle {
+  background: var(--arena-runs-table-status-mle-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+
+.status-tle {
+  background: var(--arena-runs-table-status-tle-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+
 .status-ce {
   background: var(--arena-runs-table-status-ce-background-color);
   color: var(--arena-runs-table-status-ce-font-color);
