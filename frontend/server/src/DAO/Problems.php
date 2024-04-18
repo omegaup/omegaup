@@ -470,7 +470,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     \OmegaUp\DAO\VO\Problems::FIELD_NAMES
                 )
             );
-            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, accepted: int, visibility: int,quality_histogram: list<int>, difficulty_histogram: list<int>, quality_seal: bool, submissions: int, problem_id: int} */
+            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, accepted: int, visibility: int, quality_histogram: list<int>, difficulty_histogram: list<int>, quality_seal: bool, submissions: int, problem_id: int} */
             $problem = $problemObject->asFilteredArray($filters);
 
             // score, points and ratio are not actually fields of a Problems object.
@@ -1007,7 +1007,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $params[] = $pageSize;
 
         $problems = [];
-         /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 "{$select} {$sql} {$limits}",
@@ -1304,6 +1304,41 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 [$problem->problem_id]
             )
         ) > 0;
+    }
+
+    public static function hasSubmissionsOrHasBeenUsedInCoursesOrContests(
+        \OmegaUp\DAO\VO\Problems $problem
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                Submissions s
+            WHERE
+                s.problem_id = ?;
+        ';
+        /** @var int */
+        $submissions = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$problem->problem_id]
+        );
+        if ($submissions > 0) {
+            return true;
+        }
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                Problemset_Problems pp
+            WHERE
+                pp.problem_id = ?;
+        ';
+        /** @var int */
+        $inProblemset = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$problem->problem_id]
+        );
+        return $inProblemset > 0;
     }
 
     /**
