@@ -19,7 +19,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>, lastUpdated: \OmegaUp\Timestamp|null}
- * @psalm-type UserDependentsPayload=array{dependents:list<array{email: null|string, name: null|string, username: string}>}
+ * @psalm-type UserDependent=array{classname: string, name: null|string, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_verified: bool|null, username: string}
+ * @psalm-type UserDependentsPayload=array{dependents:list<UserDependent>}
  * @psalm-type CoderOfTheMonth=array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}
  * @psalm-type CoderOfTheMonthList=list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string, problems_solved: int|null, score: float|null}>
  * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
@@ -46,7 +47,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
  * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
- * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool}
+ * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool, message: string}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -203,6 +204,18 @@ class User extends \OmegaUp\Controllers\Controller {
                 '+7 days',
                 \OmegaUp\Time::get()
             );
+            $parentEmail = \OmegaUp\DAO\Emails::getByEmail(
+                $createUserParams->parentEmail
+            );
+
+            // When the parent email is registered in the database, we can link
+            // the email owner with their dependent. In the other case, we will
+            // simply send an email to the parent with the verification token
+            // and wait until the parent registers in omegaUp. Then, they can
+            // verify the dependent account.
+            if (!is_null($parentEmail) && $parentEmail->email_id !== 0) {
+                $userData['parent_email_id'] = $parentEmail->email_id;
+            }
 
             $subject = \OmegaUp\Translations::getInstance()->get(
                 'parentEmailSubject'
@@ -211,6 +224,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Translations::getInstance()->get('parentEmailBody'),
                 [
                     'parental_verification_token' => $userData['parental_verification_token'],
+                    'omegaup_url' => OMEGAUP_URL,
                 ]
             );
 
@@ -1586,7 +1600,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'country' => null,
             'country_id' => $userData['country_id'],
             'classname' => $userData['classname'],
-            'programming_languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+            'programming_languages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages(),
             'email' => null,
             'gender' => null,
             'graduation_date' => null,
@@ -1645,7 +1659,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'classname' => \OmegaUp\DAO\Users::getRankingClassName(
                     $identity->user_id
                 ),
-                'programming_languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
+                'programming_languages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages()
             ]
         );
     }
@@ -3704,6 +3718,17 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array<string,string>
+     */
+    public static function getSupportedProgrammingLanguages(): array {
+        return array_filter(
+            \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+            fn($key) => $key !== 'cat',
+            ARRAY_FILTER_USE_KEY
+        );
+    }
+
+    /**
      * Gets the last privacy policy accepted by user
      *
      * @param \OmegaUp\Request $r
@@ -4276,7 +4301,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         100,
                         'name'
                     ),
-                    'programmingLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+                    'programmingLanguages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages(),
                     'extraProfileDetails' => null,
                     'identities' => [],
                 ],
@@ -4777,9 +4802,23 @@ class User extends \OmegaUp\Controllers\Controller {
                 $token
             ) === 1
         );
-        $hasParentalVerificationToken = false;
+
+        $response = [
+            'templateProperties' => [
+                'payload' => [
+                    'hasParentalVerificationToken' => false,
+                    'message' => \OmegaUp\Translations::getInstance()->get(
+                        'parentalTokenNotFound'
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleParentalVerificationToken'
+                ),
+            ],
+            'entrypoint' => 'user_verification_parental_token',
+        ];
+
         try {
-            \OmegaUp\DAO\DAO::transBegin();
             $user = \OmegaUp\DAO\Users::findByParentalToken($token);
 
             if (is_null($user)) {
@@ -4796,23 +4835,18 @@ class User extends \OmegaUp\Controllers\Controller {
             $user->parent_verified = true;
             $user->parental_verification_token = null;
             \OmegaUp\DAO\Users::update($user);
-            $hasParentalVerificationToken = true;
 
-            \OmegaUp\DAO\DAO::transEnd();
-            return [
-                'templateProperties' => [
-                    'payload' => [
-                        'hasParentalVerificationToken' => $hasParentalVerificationToken,
-                    ],
-                    'title' => new \OmegaUp\TranslationString(
-                        'omegaupTitleParentalVerificationToken'
-                    ),
-                ],
-                'entrypoint' => 'user_verification_parental_token',
+            $response['templateProperties']['payload'] = [
+                'hasParentalVerificationToken' => true,
+                'message' => \OmegaUp\Translations::getInstance()->get(
+                    'parentalTokenVerified'
+                ),
             ];
+
+            return $response;
         } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
-            throw $e;
+            self::$log->error($e);
+            return $response;
         }
     }
 }

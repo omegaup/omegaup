@@ -318,9 +318,6 @@ table {
   border-spacing: 0;
 }
 
-.table-responsive {
-  max-height: 80vh;
-}
 thead tr th {
   border: none;
 }

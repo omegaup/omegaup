@@ -43,6 +43,7 @@ describe('Edit.vue', () => {
             finish_time: undefined,
             is_curator: true,
             is_admin: true,
+            is_teaching_assistant: false,
             name: courseName,
             public: true,
             requests_user_information: 'no',

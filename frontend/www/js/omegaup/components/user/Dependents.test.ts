@@ -2,10 +2,19 @@ import { shallowMount } from '@vue/test-utils';
 import user_Dependents from './Dependents.vue';
 import T from '../../lang';
 import * as ui from '../../ui';
+import { types } from '../../api_types';
 
 describe('Dependents.vue', () => {
   const now = new Date('2024-01-20');
   let dateNowSpy: jest.SpyInstance<number, []> | null = null;
+  const dependents: types.UserDependent[] = [
+    {
+      username: 'omegaup',
+      name: 'omegaup',
+      classname: 'user-rank-unranked',
+      parent_email_verification_deadline: new Date('2024-01-31'),
+    },
+  ];
 
   beforeEach(() => {
     dateNowSpy = jest
@@ -21,75 +30,83 @@ describe('Dependents.vue', () => {
       dateNowSpy.mockRestore();
     }
   });
-  it('calculates the correct number of days until verification deadline', () => {
-    const userVerificationDeadline = new Date('2024-01-31');
+
+  it('Displays correctly with the verification deadline message when user has more than 7 days to verify their child account', () => {
     const wrapper = shallowMount(user_Dependents, {
       propsData: {
-        userVerificationDeadline,
+        dependents,
       },
     });
 
     const expectedDaysDifference = 11;
-
-    expect(wrapper.vm.daysUntilVerificationDeadline).toBe(
-      expectedDaysDifference,
+    expect(wrapper.find('tbody>tr>td>small').text()).toBe(
+      ui.formatString(T.dependentsMessage, {
+        days: expectedDaysDifference,
+      }),
     );
+    expect(
+      wrapper.find('omegaup-user-username-stub').attributes('username'),
+    ).toBe('omegaup');
+    expect(
+      wrapper.find('table tbody tr > td:nth-child(3)').attributes('class'),
+    ).toContain('background-warning');
   });
 
-  it('returns null when userVerificationDeadline is not set', () => {
-    const wrapper = shallowMount(user_Dependents);
+  it('Displays correctly with the verification deadline message when user has only 1 day to verify their child account', () => {
+    dependents[0].parent_email_verification_deadline = new Date('2024-01-21');
 
-    expect(wrapper.vm.daysUntilVerificationDeadline).toBeNull();
-  });
-
-  it('returns an empty string when daysUntilVerificationDeadline is null', () => {
     const wrapper = shallowMount(user_Dependents, {
       propsData: {
-        userVerificationDeadline: null,
+        dependents,
       },
     });
 
-    expect(wrapper.vm.bannerColor).toBe('');
-    expect(wrapper.vm.dependentsStatusMessage).toBeNull();
+    expect(wrapper.find('tbody>tr>td>small').text()).toBe(
+      T.dependentsOneDayUntilVerificationDeadline,
+    );
+    expect(
+      wrapper.find('omegaup-user-username-stub').attributes('username'),
+    ).toBe('omegaup');
+    expect(
+      wrapper.find('table tbody tr > td:nth-child(3)').attributes('class'),
+    ).toContain('background-danger');
   });
 
-  it('returns "bg-secondary" when daysUntilVerificationDeadline is greater than 7', () => {
-    const userVerificationDeadline = new Date('2024-01-30');
+  it("Displays correctly with the verification deadline message when their user's child account is blocked", () => {
+    dependents[0].parent_email_verification_deadline = new Date('2024-01-19');
+
     const wrapper = shallowMount(user_Dependents, {
       propsData: {
-        userVerificationDeadline,
+        dependents,
       },
     });
 
-    expect(wrapper.vm.bannerColor).toBe('bg-secondary');
-    ui.formatString(T.dependentsBlockedMessage, {
-      days: 10,
-    });
+    expect(wrapper.find('tbody>tr>td>small').text()).toBe(
+      T.dependentsBlockedMessage,
+    );
+    expect(
+      wrapper.find('omegaup-user-username-stub').attributes('username'),
+    ).toBe('omegaup');
+    expect(
+      wrapper.find('table tbody tr > td:nth-child(3)').attributes('class'),
+    ).toContain('background-secondary');
   });
 
-  it('returns "bg-danger" when daysUntilVerificationDeadline is less than or equal to 1', () => {
-    const userVerificationDeadline = new Date('2024-01-21');
+  it('Displays correctly with the verification deadline message when user has already verified thier child account', () => {
+    dependents[0].parent_verified = true;
+
     const wrapper = shallowMount(user_Dependents, {
       propsData: {
-        userVerificationDeadline,
+        dependents,
       },
     });
 
-    expect(wrapper.vm.bannerColor).toBe('bg-danger');
-    expect(wrapper.vm.dependentsStatusMessage).toBe(T.dependentsRedMessage);
-  });
-
-  it('returns "bg-warning" when daysUntilVerificationDeadline is between 1 and 7 (inclusive)', () => {
-    const userVerificationDeadline = new Date('2024-01-25');
-    const wrapper = shallowMount(user_Dependents, {
-      propsData: {
-        userVerificationDeadline,
-      },
-    });
-
-    expect(wrapper.vm.bannerColor).toBe('bg-warning');
-    ui.formatString(T.dependentsBlockedMessage, {
-      days: 5,
-    });
+    expect(wrapper.find('tbody>tr>td>small').text()).toBe(T.dependentsVerified);
+    expect(
+      wrapper.find('omegaup-user-username-stub').attributes('username'),
+    ).toBe('omegaup');
+    expect(
+      wrapper.find('table tbody tr > td:nth-child(3)').attributes('class'),
+    ).toContain('background-success');
   });
 });
