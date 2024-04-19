@@ -2620,6 +2620,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         bool $preventProblemsetOpen,
         ?string $contestAlias = null
     ): ?array {
+        if (is_null($problem->problem_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
         // Get the expected commit version.
         $commit = $problem->commit;
         $version = strval($problem->current_version);
@@ -2664,7 +2667,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         // Add the problem to the response
-        $response['problem_id'] = intval($problem->problem_id);
+        $response['problem_id'] = $problem->problem_id;
         $response['title'] = strval($problem->title);
         $response['alias'] = strval($problem->alias);
         $response['input_limit'] = $problem->input_limit;
@@ -2803,16 +2806,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         } elseif ($showSolvers) {
             $response['solvers'] = \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
-                intval($problem->problem_id)
+                $problem->problem_id
             );
         }
 
-        if (!is_null($loggedIdentity)) {
+        if (
+            !is_null(
+                $loggedIdentity
+            ) && !is_null(
+                $loggedIdentity->identity_id
+            )
+        ) {
             // Get all the available runs done by the current_user
             $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
-                intval($problem->problem_id),
+                $problem->problem_id,
                 $isPracticeMode ? null : $problemsetId,
-                intval($loggedIdentity->identity_id)
+                $loggedIdentity->identity_id
             );
 
             // Add each filtered run to an array
@@ -2826,8 +2835,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $response['runs'] = $results;
 
             \OmegaUp\DAO\ProblemViewed::MarkProblemViewed(
-                intval($loggedIdentity->identity_id),
-                intval($problem->problem_id)
+                $loggedIdentity->identity_id,
+                $problem->problem_id
             );
             if ($container instanceof \OmegaUp\DAO\VO\Contests) {
                 $lastRunTime = null;
@@ -2844,8 +2853,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
             // Fill nomination status
             $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
-                intval($problem->problem_id),
-                intval($loggedIdentity->user_id)
+                $problem->problem_id,
+                $loggedIdentity->user_id
             );
             $response['nominationStatus'] = [
                 'alreadyReviewed' => \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
@@ -4702,7 +4711,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         if (
             is_null($r->identity)
-            || is_null($r->identity->user_id)
             || is_null($problem->problem_id)
         ) {
             return $response;
