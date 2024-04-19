@@ -7,6 +7,7 @@
   --status-success-color: #468847;
   --status-error-color: #b94a48;
   --status-warning-color: #c09853;
+  --status-secondary-color: #4b4b4b;
 
   // HEADER
   --header-primary-color: #678dd7;
@@ -19,6 +20,7 @@
   --header-active-color: #5f87d4;
   --header-accent-color: #577dc7;
   --header-problem-card-color: #00000020;
+  --header-problem-card-color-no-opacity: #f7f7f7;
   --header-font-primary-color: #ffffff;
   --header-font-secondary-color: #333333;
   --header-dropdown-active-item: #f5f5f5;
@@ -90,7 +92,10 @@
   --arena-runs-table-status-disqualified-font-color: #fff;
   --arena-runs-table-status-je-ve-background-color: #f00;
   --arena-runs-table-status-je-ve-font-color: #fff;
-  --arena-runs-table-status-ac-background-color: #cf6;
+  --arena-runs-table-status-ac-background-color: #8d5;
+  --arena-runs-table-status-wa-background-color: #d58;
+  --arena-runs-table-status-mle-background-color: #85d;
+  --arena-runs-table-status-tle-background-color: #fd0;
   --arena-runs-table-status-ac-font-color: #333;
   --arena-runs-table-status-ce-background-color: #f90;
   --arena-runs-table-status-ce-font-color: #fff;
