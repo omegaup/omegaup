@@ -16,6 +16,11 @@ OmegaUp.on('ready', () => {
         props: {
           problem: payload.details,
         },
+        on: {
+          'print-page': () => {
+            window.print();
+          },
+        },
       });
     },
   });
