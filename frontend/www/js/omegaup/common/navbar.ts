@@ -12,6 +12,11 @@ OmegaUp.on('ready', () => {
   const fromLogin =
     new URL(document.location.toString()).searchParams.get('fromLogin') !==
     null;
+
+  const commonNavbarExists = document.getElementById('common-navbar');
+  if (!commonNavbarExists) {
+    return;
+  }
   const commonNavbar = new Vue({
     el: '#common-navbar',
     components: {
