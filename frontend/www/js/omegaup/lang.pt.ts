@@ -272,6 +272,7 @@ const translations: { [key: string]: string; } = {
   contestAdduserRegisteredUserDelete: "Remover",
   contestAdduserRegisteredUserTime: "Primeiro tempo de acesso",
   contestAdmissionModeDescription: "Selecione o modo do concurso. Existem tr\u00eas modalidades diferentes:\n\n- **Privado:** O concurso s\u00f3 \u00e9 vis\u00edvel para coders que foram explicitamente convidados.\n\n- **Registo/aberto:** Qualquer pessoa pode registar-se, apenas as pessoas admitidas pelos administradores t\u00eam acesso.\n\n- **P\u00fablico:** Qualquer pessoa pode participar.",
+  contestAndProblemPrintButtonDesc: "imprimir",
   contestBasicInformationNeeded: "Para participar do concurso, voc\u00ea deve preencher sua informa\u00e7\u00f5e b\u00e1sica. V\u00e1 para o [Meu perfil](/profile/#edit-basic-information)",
   contestButtonEnter: "Entrar",
   contestButtonScoreboard: "Scoreboard",
