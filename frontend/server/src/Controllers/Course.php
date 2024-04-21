@@ -1060,6 +1060,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             $commit
         );
 
+        $problemToAdd = \OmegaUp\DAO\Base\ProblemsetProblems::getByPK(
+            $problemsetId,
+            $problem->problem_id
+        );
+
         $assignedPoints = $points ?? 100.0;
         \OmegaUp\Controllers\Problemset::addProblem(
             $problemsetId,
@@ -1069,6 +1074,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $identity,
             $problem->languages === '' ? 0 : $assignedPoints,
             is_null($order) ? 1 : $order,
+            $problemToAdd,
             $validateVisibility,
             $isExtraProblem
         );
@@ -3865,9 +3871,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($course->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
-        self::resolveGroup($course);
-
-        if (!\OmegaUp\Authorization::isCourseAdmin($identity, $course)) {
+        if (
+            !\OmegaUp\Authorization::isCourseAdmin($identity, $course) &&
+            !self::isTeachingAssistant($course, $identity)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
         $admins = \OmegaUp\DAO\UserRoles::getCourseAdmins($course);
@@ -5380,6 +5387,17 @@ class Course extends \OmegaUp\Controllers\Controller {
         $isAdmin = false;
         $isCurator = false;
         $isTeachingAssistant = false;
+        if (is_null($course->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseNotFound'
+            );
+        }
+        $group = \OmegaUp\DAO\Groups::getByPK($course->group_id);
+        if (is_null($group) || is_null($group->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseGroupNotFound'
+            );
+        }
         if (!is_null($identity)) {
             $isAdmin = \OmegaUp\Authorization::isCourseAdmin(
                 $identity,
@@ -5439,17 +5457,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         ];
 
         if ($isAdmin || $isTeachingAssistant) {
-            if (is_null($course->group_id)) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'courseNotFound'
-                );
-            }
-            $group = \OmegaUp\DAO\Groups::getByPK($course->group_id);
-            if (is_null($group) || is_null($group->group_id)) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'courseGroupNotFound'
-                );
-            }
             $result['student_count'] =
                 \OmegaUp\DAO\GroupsIdentities::GetMemberCountById(
                     $group->group_id
@@ -5809,7 +5816,6 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             if (
                 is_null($identity)
-                || is_null($identity->user_id)
                 || is_null($identity->identity_id)
             ) {
                 $nominationStatus = [

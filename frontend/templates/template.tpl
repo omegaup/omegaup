@@ -49,9 +49,9 @@
 
   <body class="d-flex flex-column h-100{% if OMEGAUP_LOCKDOWN %} lockdown{% endif %}">
     <script type="text/json" id="header-payload">{{ headerPayload|json_encode|raw }}</script>
+    {% jsInclude 'common_navbar' omitRuntime %}
     {% if not hideFooterAndHeader %}
       <div id="common-navbar"></div>
-      {% jsInclude 'common_navbar' omitRuntime %}
     {% endif %}
     <main role="main" {% if not fullWidth %}class="container-lg py-5 px-3 px-md-5"{% endif %}>
       <div class="alert mt-0" id="status" style="display: none;">
@@ -72,9 +72,9 @@
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-PBDCQK1GEQ"></script>
       <script type="text/javascript" src="{% versionHash '/js/analytics.js' %}"></script>
     {% endif %}
-    {% if not headerPayload.inContest and not hideFooterAndHeader %}
-    <div id="common-footer"></div>
     {% jsInclude 'common_footer' omitRuntime %}
+    {% if not headerPayload.inContest and not hideFooterAndHeader %}
+      <div id="common-footer"></div>
     {% endif %}
 
   </body>
