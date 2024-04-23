@@ -390,11 +390,15 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.apiError);
           },
-          'dismiss-promotion': (
-            solved: boolean,
-            tried: boolean,
-            isDismissed: boolean,
-          ) => {
+          'dismiss-promotion': ({
+            solved,
+            tried,
+            isDismissed,
+          }: {
+            solved: boolean;
+            tried: boolean;
+            isDismissed: boolean;
+          }) => {
             const contents: { before_ac?: boolean } = {};
             if (!solved && tried) {
               contents.before_ac = true;
