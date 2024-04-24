@@ -5369,7 +5369,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Authorization::isTeachingAssistant(
             $identity,
             $course
-        ) || \OmegaUp\Authorization::isGroupTeachingAssistantMember(
+        ) || \OmegaUp\Authorization::isMemberOfAnyGroup(
             $identity,
             $groupsTeachingAssistants
         );
