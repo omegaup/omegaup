@@ -241,7 +241,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
      */
     public static function getLatestSubmissions(
         int $identityId = null,
-        int $page = 1,
+        ?int $page = 1,
         int $rowsPerPage = 100,
     ): array {
         if (is_null($identityId)) {
