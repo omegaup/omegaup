@@ -4682,6 +4682,8 @@ export namespace types {
 
   export interface Submission {
     alias: string;
+    classname: string;
+    guid: string;
     language: string;
     memory: number;
     runtime: number;
@@ -4714,6 +4716,7 @@ export namespace types {
 
   export interface SubmissionsListPayload {
     includeUser: boolean;
+    page: number;
     submissions: types.Submission[];
   }
 
