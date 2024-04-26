@@ -2,6 +2,8 @@ const path = require('path');
 
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   name: 'grader',
@@ -39,6 +41,9 @@ module.exports = {
       },
     ],
   },
+  optimization: {
+    realContentHash: true,
+  },
   resolve: {
     alias: {
       vue$: 'vue/dist/vue.common.js',
@@ -49,11 +54,46 @@ module.exports = {
       stream: require.resolve('stream-browserify'),
     },
   },
-  plugins: [new VueLoaderPlugin(), new MonacoWebpackPlugin()],
+  plugins: [
+    new VueLoaderPlugin(),
+    new MonacoWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      template: path.resolve(
+        __dirname,
+        'frontend/www/grader/ephemeral/templates',
+        'index-light.html',
+      ),
+      filename: path.resolve(
+        __dirname,
+        'frontend/www/grader/ephemeral',
+        'index-light.html',
+      ),
+      scriptLoading: 'defer',
+    }),
+    new HtmlWebpackPlugin({
+      template: path.resolve(
+        __dirname,
+        'frontend/www/grader/ephemeral/templates',
+        'index.html',
+      ),
+      filename: path.resolve(
+        __dirname,
+        'frontend/www/grader/ephemeral',
+        'index.html',
+      ),
+      scriptLoading: 'defer',
+    }),
+    new CleanWebpackPlugin({
+      verbose: true,
+      dry: false,
+      cleanOnceBeforeBuildPatterns: ['grader_ephemeral-*'],
+      dangerouslyAllowCleanPatternsOutsideProject: true,
+    }),
+  ],
   output: {
     path: path.resolve(__dirname, './frontend/www/js/dist/'),
     publicPath: '/js/dist/',
-    filename: '[name].js',
+    filename: '[name]-[contenthash].js',
     library: '[name]',
     libraryTarget: 'umd',
   },
