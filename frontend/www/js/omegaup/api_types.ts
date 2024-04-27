@@ -2311,8 +2311,26 @@ export namespace types {
     export function UserDependentsPayload(
       elementId: string = 'payload',
     ): types.UserDependentsPayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
+      return ((x) => {
+        x.dependents = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (
+              typeof x.parent_email_verification_deadline !== 'undefined' &&
+              x.parent_email_verification_deadline !== null
+            )
+              x.parent_email_verification_deadline = ((x: number) =>
+                new Date(x * 1000))(x.parent_email_verification_deadline);
+            return x;
+          });
+        })(x.dependents);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -3143,6 +3161,7 @@ export namespace types {
     default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
+    extra_note?: string;
     feedback: string;
     finish_time: Date;
     languages: string;
@@ -4047,6 +4066,7 @@ export namespace types {
   export interface ProblemListItem {
     accepted: number;
     alias: string;
+    can_be_removed?: boolean;
     difficulty?: number;
     difficulty_histogram: number[];
     points: number;
@@ -4662,6 +4682,8 @@ export namespace types {
 
   export interface Submission {
     alias: string;
+    classname: string;
+    guid: string;
     language: string;
     memory: number;
     runtime: number;
@@ -4694,6 +4716,7 @@ export namespace types {
 
   export interface SubmissionsListPayload {
     includeUser: boolean;
+    page: number;
     submissions: types.Submission[];
   }
 
@@ -4749,8 +4772,16 @@ export namespace types {
     [key: string]: types.ContestListItem[];
   }
 
+  export interface UserDependent {
+    classname: string;
+    name?: string;
+    parent_email_verification_deadline?: Date;
+    parent_verified?: boolean;
+    username: string;
+  }
+
   export interface UserDependentsPayload {
-    dependents: { email?: string; name?: string; username: string }[];
+    dependents: types.UserDependent[];
   }
 
   export interface UserDetailsPayload {
@@ -5666,6 +5697,9 @@ export namespace messages {
   };
 
   // Submission
+  export type SubmissionListRequest = { [key: string]: any };
+  export type _SubmissionListServerResponse = any;
+  export type SubmissionListResponse = { results: types.Submission[] };
   export type SubmissionSetFeedbackRequest = { [key: string]: any };
   export type SubmissionSetFeedbackResponse = {
     submissionFeedback?: dao.SubmissionFeedback;
@@ -6449,6 +6483,9 @@ export namespace controllers {
   }
 
   export interface Submission {
+    list: (
+      params?: messages.SubmissionListRequest,
+    ) => Promise<messages.SubmissionListResponse>;
     setFeedback: (
       params?: messages.SubmissionSetFeedbackRequest,
     ) => Promise<messages.SubmissionSetFeedbackResponse>;

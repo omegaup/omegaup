@@ -26,7 +26,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ArenaContest=array{alias: string, director: string, finish_time: \OmegaUp\Timestamp|null, start_time: \OmegaUp\Timestamp|null, rerun_id?: int, title: string, window_length?: int}
  * @psalm-type ContestAdminDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, available_languages: array<string, string>, contest_for_teams: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems?: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, score_mode: string, scoreboard: int, scoreboard_url: null|string, scoreboard_url_admin: null|string, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
- * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int|null, score_mode: string, scoreboard: int, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null, window_length: int|null}
+ * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, director: string, extra_note?: string|null, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int|null, score_mode: string, scoreboard: int, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null, window_length: int|null}
  * @psalm-type ContestVirtualDetailsPayload=array{contest: ContestPublicDetails}
  * @psalm-type ContestCertificatesAdminDetails=array{certificateCutoff: int|null, certificatesStatus: string, isCertificateGenerator: bool}
  * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<ProblemsetProblemWithVersions>, users: list<ContestUser>, groups: list<ContestGroup>, teams_group: ContestGroup|null, requests: list<ContestRequest>, admins: list<ContestAdmin>, group_admins: list<ContestGroupAdmin>, original_contest_admission_mode: null|string, certificatesDetails: ContestCertificatesAdminDetails}
@@ -1693,6 +1693,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $registration->accepted
                 );
                 $contest['user_registration_accepted'] = $registration->accepted;
+                $contest['extra_note'] = $registration->extra_note;
             }
         }
 
@@ -3157,8 +3158,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'problemsetNotFound'
             );
         }
+        // Extract the problem from the problemset if exists
+        $originalProblemsetProblem = \OmegaUp\DAO\Base\ProblemsetProblems::getByPK(
+            $contest->problemset_id,
+            $problem->problem_id
+        );
 
         if (
+            is_null($originalProblemsetProblem)
+            &&
             \OmegaUp\DAO\ProblemsetProblems::countProblemsetProblems(
                 $problemset
             )
@@ -3192,7 +3200,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $currentVersion,
             $r->identity,
             $points,
-            $orderInContest
+            $orderInContest,
+            $originalProblemsetProblem
         );
 
         // Invalidar cache
