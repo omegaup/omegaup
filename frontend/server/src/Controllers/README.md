@@ -207,6 +207,7 @@
 - [Session](#session)
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
 - [Submission](#submission)
+  - [`/api/submission/list/`](#apisubmissionlist)
   - [`/api/submission/setFeedback/`](#apisubmissionsetfeedback)
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
@@ -4133,6 +4134,26 @@ contestant's machine and the server.
 # Submission
 
 SubmissionController
+
+## `/api/submission/list/`
+
+### Description
+
+Returns a list of submissions created in the last 24 hours
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `page`     | `int\|null`    |             |
+| `rowcount` | `int\|null`    |             |
+| `username` | `null\|string` |             |
+
+### Returns
+
+| Name      | Type                 |
+| --------- | -------------------- |
+| `results` | `types.Submission[]` |
 
 ## `/api/submission/setFeedback/`
 
