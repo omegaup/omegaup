@@ -237,10 +237,12 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     }
 
     /**
-     * @return list<array{alias: string, classname: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}>
+     * @return list<array{alias: string, classname: string, guid: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}>
      */
     public static function getLatestSubmissions(
         int $identityId = null,
+        ?int $page = 1,
+        int $rowsPerPage = 100,
     ): array {
         if (is_null($identityId)) {
             $indexHint = 'USE INDEX(PRIMARY)';
@@ -251,6 +253,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             SELECT
                 s.`time`,
                 i.username,
+                s.guid,
                 s.school_id,
                 sc.name as school_name,
                 p.alias,
@@ -306,10 +309,12 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         $sql .= '
             ORDER BY
                 s.submission_id DESC
-            LIMIT 0, 100;
+            LIMIT ?, ?;
         ';
+        $params[] = max(0, $page - 1) * $rowsPerPage;
+        $params[] = intval($rowsPerPage);
 
-        /** @var list<array{alias: string, classname: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, guid: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
