@@ -163,3 +163,132 @@ export default class ArenaContestList extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.btn {
+  padding: 0.5rem 1rem !important;
+}
+
+.card-group-menu {
+  position: sticky;
+  top: 62px;
+  z-index: 10;
+  border: none;
+  border-bottom: 1px solid var(--arena-scoreboard-hover-color);
+  border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1.8rem;
+}
+
+.btn-style {
+  border-color: var(--arena-button-border-color);
+}
+
+.form-control {
+  height: auto;
+}
+
+.reset-btn {
+  line-height: 1.5;
+  color: var(--arena-reset-text-color);
+  background-color: var(--arena-runs-table-status-je-ve-font-color);
+  background-clip: padding-box;
+  border: none;
+  border-top: 1px solid var(--arena-reset-border-color);
+  border-bottom: 1px solid var(--arena-reset-border-color);
+  border-radius: unset;
+}
+
+.btn-primary {
+  background-color: var(--arena-button-border-color) !important;
+}
+
+.sidebar {
+  >>> .contest-list-nav {
+    background-color: var(
+      --arena-contest-list-sidebar-tab-list-background-color
+    );
+
+    .active-title-link {
+      background-color: var(
+        --arena-contest-list-sidebar-tab-list-link-background-color--active
+      ) !important;
+    }
+
+    .title-link {
+      color: var(
+        --arena-contest-list-sidebar-tab-list-link-font-color
+      ) !important;
+    }
+  }
+}
+
+.empty-category {
+  text-align: center;
+  font-size: 200%;
+  margin: 1em;
+  color: var(--arena-contest-list-empty-category-font-color);
+}
+
+.btns-group {
+  justify-content: flex-end;
+
+  .dropdown {
+    margin-right: 1rem;
+  }
+}
+
+.line {
+  height: 49px;
+  background: var(
+    --arena-submissions-list-skeletonloader-initial-background-color
+  );
+  border-radius: 8px;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+  50% {
+    background: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
+  }
+  100% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .tabs {
+    flex-direction: column;
+  }
+
+  .btns-group {
+    justify-content: flex-start;
+
+    .dropdown {
+      flex: 1;
+      gap: 1rem;
+      margin-right: 0.8rem;
+    }
+  }
+}
+</style>
