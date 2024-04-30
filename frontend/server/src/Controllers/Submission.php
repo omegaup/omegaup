@@ -6,12 +6,12 @@ namespace OmegaUp\Controllers;
  * SubmissionController
  *
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
- * @psalm-type Submission=array{alias: string, classname: string, guid: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}
- * @psalm-type SubmissionsListPayload=array{includeUser: bool, page: int, submissions: list<Submission>}
+ * @psalm-type Submission=array{time: \OmegaUp\Timestamp, username: string, school_id: int|null, school_name: string|null, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}
+ * @psalm-type SubmissionsListPayload=array{includeUser: bool, submissions: list<Submission>}
  */
 class Submission extends \OmegaUp\Controllers\Controller {
-    const SUBMIT_LIST_PAGE_SIZE = 100;
-
+    const SUBMISSION_LIST_PAGE_SIZE_DEFAULT = 100;
+    const MAX_SUBMISSION_LIST_PAGE_SIZE = 500;
     public static function getSource(string $guid): string {
         return \OmegaUp\Grader::GetInstance()->getSource($guid);
     }
@@ -22,23 +22,27 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @return array{templateProperties: array{payload: SubmissionsListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int|null $page
-     * @omegaup-request-param int|null $rowcount
+     * @omegaup-request-param int|null $pageSize
      */
     public static function getLatestSubmissionsForTypeScript(\OmegaUp\Request $r): array {
         $page = $r->ensureOptionalInt('page') ?? 1;
-        $rowcount = $r->ensureOptionalInt(
-            'rowcount'
-        ) ?? self::SUBMIT_LIST_PAGE_SIZE;
+        $pageSize = $r->ensureOptionalInt(
+            'pageSize'
+        ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT ;
+        \OmegaUp\Validators::validateNumberInRange(
+            $pageSize,
+            'pageSize',
+            null,
+            self::MAX_SUBMISSION_LIST_PAGE_SIZE
+        );
         return [
             'templateProperties' => [
                 'payload' => [
                     'includeUser' => true,
                     'submissions' => \OmegaUp\DAO\Submissions::getLatestSubmissions(
-                        identityId: null,
                         page: $page,
-                        rowsPerPage: $rowcount,
+                        rowsPerPage: $pageSize,
                     ),
-                    'page' => $page,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleLatestSubmissions'
@@ -54,8 +58,6 @@ class Submission extends \OmegaUp\Controllers\Controller {
      *
      * @return array{templateProperties: array{payload: SubmissionsListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
-     * @omegaup-request-param int|null $page
-     * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param string $username
      * @omegaup-request-param int|null $page
      * @omegaup-request-param int|null $pageSize
@@ -64,9 +66,15 @@ class Submission extends \OmegaUp\Controllers\Controller {
     public static function getLatestUserSubmissionsForTypeScript(\OmegaUp\Request $r): array {
         $username = $r->ensureString('username');
         $page = $r->ensureOptionalInt('page') ?? 1;
-        $rowcount = $r->ensureOptionalInt(
-            'rowcount'
-        ) ?? self::SUBMIT_LIST_PAGE_SIZE;
+        $pageSize = $r->ensureOptionalInt(
+            'pageSize'
+        ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT ;
+        \OmegaUp\Validators::validateNumberInRange(
+            $pageSize,
+            'pageSize',
+            null,
+            self::MAX_SUBMISSION_LIST_PAGE_SIZE
+        );
         $identity = \OmegaUp\DAO\Identities::FindByUsername($username);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -91,11 +99,10 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'includeUser' => false,
                     'submissions' => \OmegaUp\DAO\Submissions::getLatestSubmissions(
-                        $identity->identity_id,
-                        $page,
-                        $rowcount,
+                        identityId: $identity->identity_id,
+                        page: $page,
+                        rowsPerPage: $pageSize,
                     ),
-                    'page' => $page,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleLatestSubmissions'
@@ -104,30 +111,34 @@ class Submission extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'submissions_list',
         ];
     }
-
     /**
-     * Returns a list of submissions created in the last 24 hours
-     *
+     * Returns a list of submissions in the last 24 hours
+     * for given page and username.
      * @param \OmegaUp\Request $r
      *
-     * @return array{results: list<Submission>}
+     * @return array{submissions: list<Submission>}
      *
+     * @omegaup-request-param string|null $username
      * @omegaup-request-param int|null $page
-     * @omegaup-request-param int|null $rowcount
-     * @omegaup-request-param null|string $username
+     * @omegaup-request-param int|null $pageSize
      */
     public static function apiList(\OmegaUp\Request $r): array {
-        $page = $r->ensureOptionalInt('page') ?? 1;
-        $rowcount = $r->ensureOptionalInt(
-            'rowcount'
-        ) ?? self::SUBMIT_LIST_PAGE_SIZE;
         $username = $r->ensureOptionalString('username');
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt(
+            'pageSize'
+        ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT ;
+        \OmegaUp\Validators::validateNumberInRange(
+            $pageSize,
+            'pageSize',
+            null,
+            self::MAX_SUBMISSION_LIST_PAGE_SIZE
+        );
         if (is_null($username)) {
             return [
-                'results' => \OmegaUp\DAO\Submissions::getLatestSubmissions(
-                    identityId: null,
+                'submissions' =>  \OmegaUp\DAO\Submissions::getLatestSubmissions(
                     page: $page,
-                    rowsPerPage: $rowcount,
+                    rowsPerPage: $pageSize,
                 ),
             ];
         }
@@ -135,7 +146,6 @@ class Submission extends \OmegaUp\Controllers\Controller {
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
         if (
             !is_null(
@@ -149,16 +159,14 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 'userInformationIsPrivate'
             );
         }
-
         return [
-            'results' => \OmegaUp\DAO\Submissions::getLatestSubmissions(
-                $identity->identity_id,
-                $page,
-                $rowcount,
+            'submissions' =>  \OmegaUp\DAO\Submissions::getLatestSubmissions(
+                identityId: $identity->identity_id,
+                page: $page,
+                rowsPerPage: $pageSize,
             ),
         ];
     }
-
     /**
      * Creates the feedback thread for a submission and its corresponding
      * notification, avoiding duplicating feedbacks
@@ -323,17 +331,24 @@ class Submission extends \OmegaUp\Controllers\Controller {
         string $assignmentAlias,
         string $guid
     ): void {
-        \OmegaUp\Controllers\Notification::setCommonNotification(
-            [$authorUserId],
-            new \OmegaUp\TranslationString(
-                'notificationCourseSubmissionFeedback'
-            ),
-            \OmegaUp\DAO\Notifications::COURSE_SUBMISSION_FEEDBACK,
-            "/course/{$courseAlias}/assignment/{$assignmentAlias}/#problems/{$problemAlias}/show-run:{$guid}",
-            [
-                'problemAlias' => $problemAlias,
-                'courseName' => $courseName,
-            ]
+        \OmegaUp\DAO\Notifications::create(
+            new \OmegaUp\DAO\VO\Notifications([
+                'user_id' => $authorUserId,
+                'contents' =>  json_encode([
+                    'type' => \OmegaUp\DAO\Notifications::COURSE_SUBMISSION_FEEDBACK,
+                    'body' => [
+                        'localizationString' => new \OmegaUp\TranslationString(
+                            'notificationCourseSubmissionFeedback'
+                        ),
+                        'localizationParams' => [
+                            'problemAlias' => $problemAlias,
+                            'courseName' => $courseName,
+                        ],
+                        'url' => "/course/{$courseAlias}/assignment/{$assignmentAlias}/#problems/{$problemAlias}/show-run:{$guid}",
+                        'iconUrl' => '/media/info.png',
+                    ]
+                ]),
+            ])
         );
     }
 

@@ -85,4 +85,33 @@ class SubmissionListTest extends \OmegaUp\Test\ControllerTestCase {
         )['submissions'];
         $this->assertCount(1, $submissions);
     }
+
+    public function testSubmissionPageSize() {
+        $usersCount = 4;
+        $pageSize =  501; //pageSize > MaxSubmissionPageSize i.e. 500 
+        foreach (range(0, $usersCount - 1) as $_) {
+            [
+                'identity' => $identity,
+            ] = \OmegaUp\Test\Factories\User::createUser();
+            $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+            $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData);
+            
+        }
+        try{
+            $submissions = \OmegaUp\Controllers\Submission::apiList(
+                new \OmegaUp\Request([
+                     'page' => 1,
+                     'pageSize' => $pageSize,
+                 ])
+            )['submissions'];
+            $this->fail('should have failed');
+        }
+        catch(\OmegaUp\Exceptions\InvalidParameterException $e){
+            $this->assertSame('parameterNumberTooLarge', $e->getMessage());
+        }
+    }
 }
