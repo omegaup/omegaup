@@ -840,15 +840,15 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
      * A PHPUnit data provider for all the sorting option available in contest
      * list API.
      *
-     * @return list<array{0: string, 1:list<int>}>
+     * @return list<array{0: string, 1:list<int>, 2: bool}>
      */
     public function sortOrderProvider(): array {
         return [
-            ['title', [4, 3, 2, 1]],
-            ['ends', [2, 3, 1, 4]],
-            ['duration', [3, 2, 4, 1]],
-            ['organizer', [4, 1, 2, 3]],
-            ['signedup', [3, 1, 2, 4]],
+            ['title', [4, 3, 2, 1], false],
+            ['ends', [2, 3, 1, 4], false],
+            ['duration', [3, 2, 4, 1], true],
+            ['organizer', [4, 1, 2, 3], false],
+            ['signedup', [3, 1, 2, 4], true],
         ];
     }
 
@@ -858,7 +858,11 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
      *
      * @dataProvider sortOrderProvider
      */
-    public function testContestListOrder($sortOrder, $expectedOrder) {
+    public function testContestListOrder(
+        $sortOrder,
+        $expectedOrder,
+        $expectedParticipating
+    ) {
         $now = \OmegaUp\Time::get();
 
         // Create 4 contests_mapping with the following configuration:
@@ -946,10 +950,15 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         ]))['results'];
 
         foreach ($expectedOrder as $index => $expectedContest) {
-            $this->assertEquals(
+            $this->assertSame(
                 "contest_{$expectedContest}",
                 $response[$index]['alias']
             );
         }
+
+        $this->assertSame(
+            $expectedParticipating,
+            $response[0]['participating']
+        );
     }
 }
