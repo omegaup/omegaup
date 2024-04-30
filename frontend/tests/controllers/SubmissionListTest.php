@@ -67,27 +67,55 @@ class SubmissionListTest extends \OmegaUp\Test\ControllerTestCase {
                     $users[$i]['identity']
                 );
                 \OmegaUp\Test\Factories\Run::gradeRun($runData);
-             }
-         }
- 
-         $submissions = \OmegaUp\Controllers\Submission::apiList(
-             new \OmegaUp\Request([
-                 'page' => 1,
-                 'pageSize' => 5,
-                 'username' => $users[0]['identity']->username,
-             ])
-         )['submissions'];
-         $this->assertCount(5, $submissions);
- 
-         // When visiting the second page, there should be 1 submissions left.
-         $submissions = \OmegaUp\Controllers\Submission::apiList(
-             new \OmegaUp\Request([
-                 'page' => 2,
-                 'pageSize' => 5,
-                 'username' => $users[0]['identity']->username,
-             ])
-         )['submissions'];
-         $this->assertCount(1, $submissions);
-     }
+            }
+        }
 
+        $submissions = \OmegaUp\Controllers\Submission::apiList(
+            new \OmegaUp\Request([
+                'page' => 1,
+                'pageSize' => 5,
+                'username' => $users[0]['identity']->username,
+            ])
+        )['submissions'];
+        $this->assertCount(5, $submissions);
+
+        // When visiting the second page, there should be 1 submissions left.
+        $submissions = \OmegaUp\Controllers\Submission::apiList(
+            new \OmegaUp\Request([
+                'page' => 2,
+                'pageSize' => 5,
+                'username' => $users[0]['identity']->username,
+            ])
+        )['submissions'];
+        $this->assertCount(1, $submissions);
+    }
+
+    public function testSubmissionPageSize() {
+        $usersCount = 4;
+        $pageSize =  501; //pageSize > MaxSubmissionPageSize i.e. 500 
+        foreach (range(0, $usersCount - 1) as $_) {
+            [
+                'identity' => $identity,
+            ] = \OmegaUp\Test\Factories\User::createUser();
+            $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+            $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData);
+            
+        }
+        try{
+            $submissions = \OmegaUp\Controllers\Submission::apiList(
+                new \OmegaUp\Request([
+                     'page' => 1,
+                     'pageSize' => $pageSize,
+                 ])
+            )['submissions'];
+            $this->fail('should have failed');
+        }
+        catch(\OmegaUp\Exceptions\InvalidParameterException $e){
+            $this->assertSame('parameterNumberTooLarge', $e->getMessage());
+        }
+    }
 }

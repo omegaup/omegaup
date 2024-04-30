@@ -6,8 +6,8 @@ namespace OmegaUp\Controllers;
  * SubmissionController
  *
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
- * @psalm-type Submission=array{alias: string, classname: string, guid: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}
- * @psalm-type SubmissionsListPayload=array{includeUser: bool, page: int, submissions: list<Submission>}
+ * @psalm-type Submission=array{time: \OmegaUp\Timestamp, username: string, school_id: int|null, school_name: string|null, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}
+ * @psalm-type SubmissionsListPayload=array{includeUser: bool, submissions: list<Submission>}
  */
 class Submission extends \OmegaUp\Controllers\Controller {
     const SUBMISSION_LIST_PAGE_SIZE_DEFAULT = 100;
@@ -22,7 +22,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @return array{templateProperties: array{payload: SubmissionsListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int|null $page
-     * @omegaup-request-param int|null $rowcount
+     * @omegaup-request-param int|null $pageSize
      */
     public static function getLatestSubmissionsForTypeScript(\OmegaUp\Request $r): array {
         $page = $r->ensureOptionalInt('page') ?? 1;
@@ -40,9 +40,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'includeUser' => true,
                     'submissions' => \OmegaUp\DAO\Submissions::getLatestSubmissions(
-                        identityId: null,
                         page: $page,
-                        rowsPerPage: $rowcount,
+                        rowsPerPage: $pageSize,
                     ),
                     'page' => $page,
                     'submissions' => \OmegaUp\DAO\Submissions::getLatestSubmissions(
@@ -64,8 +63,6 @@ class Submission extends \OmegaUp\Controllers\Controller {
      *
      * @return array{templateProperties: array{payload: SubmissionsListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
-     * @omegaup-request-param int|null $page
-     * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param string $username
      * @omegaup-request-param int|null $page
      * @omegaup-request-param int|null $pageSize
@@ -77,7 +74,12 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $pageSize = $r->ensureOptionalInt(
             'pageSize'
         ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT ;
-
+        \OmegaUp\Validators::validateNumberInRange(
+            $pageSize,
+            'pageSize',
+            null,
+            self::MAX_SUBMISSION_LIST_PAGE_SIZE
+        );
         $identity = \OmegaUp\DAO\Identities::FindByUsername($username);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -112,7 +114,6 @@ class Submission extends \OmegaUp\Controllers\Controller {
                         page: $page,
                         rowsPerPage: $pageSize,
                     ),
-                    'page' => $page,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleLatestSubmissions'
