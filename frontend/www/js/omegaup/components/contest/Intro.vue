@@ -91,6 +91,13 @@
               <!-- Registration denied -->
               <div v-else-if="!contest.user_registration_accepted">
                 <p>{{ T.registrationDenied }}</p>
+                <p>
+                  {{
+                    ui.formatString(T.registrationRejectionFeedback, {
+                      extra_note: contest.extra_note,
+                    })
+                  }}
+                </p>
               </div>
             </form>
           </div>

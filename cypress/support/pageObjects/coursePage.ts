@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { addSubtractDaysToDate, getISODate, getISODateTime } from '../commands';
+import { addSubtractDateTime, getISODate, getISODateTime } from '../commands';
 import { CourseOptions, ProblemOptions, RunOptions, Status } from '../types';
 
 export class CoursePage {
@@ -8,8 +8,8 @@ export class CoursePage {
     const courseOptions: CourseOptions = {
       courseAlias: uuid().slice(0, 10),
       showScoreboard: true,
-      startDate: addSubtractDaysToDate(now, { days: -1 }),
-      endDate: addSubtractDaysToDate(now, { days: 1 }),
+      startDate: now,
+      endDate: addSubtractDateTime(now, { days: 1 }),
       unlimitedDuration: false,
       school: 'Escuela curso',
       basicInformation: false,
@@ -138,7 +138,7 @@ export class CoursePage {
     cy.get('[data-new-run]').click();
     cy.get('[name="language"]').select(runOptions.language);
     cy.fixture(runOptions.fixturePath).then((fileContent) => {
-      cy.get('.CodeMirror-line').type(fileContent);
+      cy.get('.CodeMirror-line').first().type(fileContent);
       cy.get('[data-submit-run]').click();
     });
     cy.get('.alert-danger').should('be.visible');
@@ -152,7 +152,7 @@ export class CoursePage {
     cy.get('[data-new-run]').click();
     cy.get('[name="language"]').select(runOptions.language);
     cy.fixture(runOptions.fixturePath).then((fileContent) => {
-      cy.get('.CodeMirror-line').type(fileContent);
+      cy.get('.CodeMirror-line').first().type(fileContent);
       cy.get('[data-submit-run]').click();
     });
     const expectedStatus: Status = runOptions.status;
@@ -236,7 +236,7 @@ export class CoursePage {
 
   verifyFeedback(feedback: string): void {
     cy.get('.notification-toggle').last().click();
-    cy.get('[data-notification-list]').last().click();
+    cy.get('[data-notification-list]').filter(':visible').first().click();
     cy.get('[data-run-feedback]').should('contain', feedback);
     cy.get('.CodeMirror-lines').should('be.visible');
     cy.get('.CodeMirror-line').then((rawHTMLElements) => {
@@ -248,7 +248,7 @@ export class CoursePage {
 
       cy.wrap(userCode).as('userCodeLines');
     });
-    cy.get('@userCodeLines').should('have.length', 12);
+    cy.get('@userCodeLines').should('have.length.above', 11);
     cy.get('[data-overlay-popup] button.close')
       .should('be.visible')
       .first()

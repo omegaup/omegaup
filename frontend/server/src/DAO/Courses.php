@@ -1608,4 +1608,39 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             'totalRows' => $totalRows,
         ];
     }
+    /**
+     * @return list<\OmegaUp\DAO\VO\Groups>
+     */
+    public static function getCourseTeachingAssistantGroups(
+        \OmegaUp\DAO\VO\Courses $course
+    ) {
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Groups::FIELD_NAMES,
+            'g'
+        );
+        $sql = "
+            SELECT
+                {$fields}
+            FROM
+                Group_Roles gr
+            INNER JOIN
+                `Groups_` AS g ON g.group_id = gr.group_id
+            WHERE
+                gr.role_id = ? AND gr.acl_id IN (?);";
+        $params = [
+            \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE,
+            $course->acl_id,
+        ];
+
+        /** @var list<array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}> */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
+        $groups = [];
+        foreach ($row as $group) {
+            $groups[] = new \OmegaUp\DAO\VO\Groups($group);
+        }
+        return $groups;
+    }
 }
