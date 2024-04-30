@@ -271,6 +271,7 @@
 	"contestAdduserRegisteredUserDelete": "Eliminar",
 	"contestAdduserRegisteredUserTime": "Tiempo de primer acceso",
 	"contestAdmissionModeDescription": "Selecciona el modo de acceso del concurso. Existen tres modalidades distintas:\n\n- **Privado:** El concurso s\u00f3lo es visible para coders que hayan sido invitados expl\u00edcitamente.\n\n- **Registro/abierto:** Cualquier persona se puede registrar, s\u00f3lo tienen acceso las personas admitidas por admins.\n\n- **P\u00fablico:** Cualquier persona puede participar.",
+	"contestAndProblemPrintButtonDesc": "Imprimir",
 	"contestBasicInformationNeeded": "Para unirte al concurso debes completar tu informaci\u00f3n b\u00e1sica. Ir a [Mi perfil](/profile/#edit-basic-information)",
 	"contestButtonEnter": "Entrar",
 	"contestButtonScoreboard": "Scoreboard",

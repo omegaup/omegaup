@@ -478,6 +478,9 @@ export default class ArenaContestList extends Vue {
 }
 
 .card-group-menu {
+  position: sticky;
+  top: 62px;
+  z-index: 10;
   border: none;
   border-bottom: 1px solid var(--arena-scoreboard-hover-color);
   border-radius: 0.25rem 0.25rem 0 0;
@@ -499,7 +502,7 @@ export default class ArenaContestList extends Vue {
 
 .reset-btn {
   line-height: 1.5;
-  color: #6c757d;
+  color: var(--arena-reset-text-color);
   background-color: var(--arena-runs-table-status-je-ve-font-color);
   background-clip: padding-box;
   border: none;
@@ -532,11 +535,6 @@ export default class ArenaContestList extends Vue {
   }
 }
 
-.scroll-content {
-  overflow-y: auto;
-  max-height: 800px;
-}
-
 .empty-category {
   text-align: center;
   font-size: 200%;
@@ -554,19 +552,28 @@ export default class ArenaContestList extends Vue {
 
 .line {
   height: 49px;
-  background: #e0e0e0;
+  background: var(
+    --arena-submissions-list-skeletonloader-initial-background-color
+  );
   border-radius: 8px;
   animation: loading 1.5s infinite;
 }
+
 @keyframes loading {
   0% {
-    background: #e0e0e0;
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
   }
   50% {
-    background: #f5f5f5;
+    background: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
   }
   100% {
-    background: #e0e0e0;
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
   }
 }
 

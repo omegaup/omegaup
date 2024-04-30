@@ -118,6 +118,7 @@ OmegaUp.on('ready', () => {
           searchResultProblems: this.searchResultProblems,
           searchResultGroups: this.searchResultGroups,
           searchResultSchools: this.searchResultSchools,
+          readOnly: !this.data.course.is_admin && !this.data.course.is_curator,
         },
         on: {
           'update-search-result-groups': (query: string) => {
