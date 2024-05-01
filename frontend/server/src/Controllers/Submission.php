@@ -44,10 +44,6 @@ class Submission extends \OmegaUp\Controllers\Controller {
                         rowsPerPage: $pageSize,
                     ),
                     'page' => $page,
-                    'submissions' => \OmegaUp\DAO\Submissions::getLatestSubmissions(
-                        page: $page,
-                        rowsPerPage: $pageSize,
-                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleLatestSubmissions'
@@ -84,12 +80,6 @@ class Submission extends \OmegaUp\Controllers\Controller {
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-        \OmegaUp\Validators::validateNumberInRange(
-            $pageSize,
-            'pageSize',
-            null,
-            self::MAX_SUBMISSION_LIST_PAGE_SIZE
-        );
 
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
         if (

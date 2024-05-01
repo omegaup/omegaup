@@ -26,23 +26,23 @@ class SubmissionListTest extends \OmegaUp\Test\ControllerTestCase {
                     $identity
                 );
                 \OmegaUp\Test\Factories\Run::gradeRun($runData);
-             }
-         }
- 
-         $submissions = \OmegaUp\Controllers\Submission::apiList(
-             new \OmegaUp\Request([
+            }
+        }
+
+        $submissions = \OmegaUp\Controllers\Submission::apiList(
+            new \OmegaUp\Request([
                  'page' => 1,
                  'pageSize' => 5,
              ])
-         )['submissions'];
+        )['submissions'];
          $this->assertCount(5, $submissions);
          // When visiting the second page, there should be 3 submissions left.
-         $submissions = \OmegaUp\Controllers\Submission::apiList(
-             new \OmegaUp\Request([
+        $submissions = \OmegaUp\Controllers\Submission::apiList(
+            new \OmegaUp\Request([
                  'page' => 2,
                  'pageSize' => 5,
              ])
-         )['submissions'];
+        )['submissions'];
          $this->assertCount(3, $submissions);
     }
     /**
@@ -92,7 +92,7 @@ class SubmissionListTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testSubmissionPageSize() {
         $usersCount = 4;
-        $pageSize =  501; //pageSize > MaxSubmissionPageSize i.e. 500 
+        $pageSize =  501; //pageSize > MaxSubmissionPageSize i.e. 500
         foreach (range(0, $usersCount - 1) as $_) {
             [
                 'identity' => $identity,
@@ -103,9 +103,8 @@ class SubmissionListTest extends \OmegaUp\Test\ControllerTestCase {
                 $identity
             );
             \OmegaUp\Test\Factories\Run::gradeRun($runData);
-            
         }
-        try{
+        try {
             $submissions = \OmegaUp\Controllers\Submission::apiList(
                 new \OmegaUp\Request([
                      'page' => 1,
@@ -113,8 +112,7 @@ class SubmissionListTest extends \OmegaUp\Test\ControllerTestCase {
                  ])
             )['submissions'];
             $this->fail('should have failed');
-        }
-        catch(\OmegaUp\Exceptions\InvalidParameterException $e){
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertSame('parameterNumberTooLarge', $e->getMessage());
         }
     }
