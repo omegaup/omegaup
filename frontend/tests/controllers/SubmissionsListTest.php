@@ -101,7 +101,7 @@ class SubmissionsListTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Test\Factories\Run::gradeRun($runData);
         }
         try {
-            $submissions = \OmegaUp\Controllers\Submission::apiList(
+            \OmegaUp\Controllers\Submission::apiList(
                 new \OmegaUp\Request([
                      'page' => 1,
                      'pageSize' => $pageSize,
