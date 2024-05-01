@@ -332,24 +332,17 @@ class Submission extends \OmegaUp\Controllers\Controller {
         string $assignmentAlias,
         string $guid
     ): void {
-        \OmegaUp\DAO\Notifications::create(
-            new \OmegaUp\DAO\VO\Notifications([
-                'user_id' => $authorUserId,
-                'contents' =>  json_encode([
-                    'type' => \OmegaUp\DAO\Notifications::COURSE_SUBMISSION_FEEDBACK,
-                    'body' => [
-                        'localizationString' => new \OmegaUp\TranslationString(
-                            'notificationCourseSubmissionFeedback'
-                        ),
-                        'localizationParams' => [
-                            'problemAlias' => $problemAlias,
-                            'courseName' => $courseName,
-                        ],
-                        'url' => "/course/{$courseAlias}/assignment/{$assignmentAlias}/#problems/{$problemAlias}/show-run:{$guid}",
-                        'iconUrl' => '/media/info.png',
-                    ]
-                ]),
-            ])
+        \OmegaUp\Controllers\Notification::setCommonNotification(
+            [$authorUserId],
+            new \OmegaUp\TranslationString(
+                'notificationCourseSubmissionFeedback'
+            ),
+            \OmegaUp\DAO\Notifications::COURSE_SUBMISSION_FEEDBACK,
+            "/course/{$courseAlias}/assignment/{$assignmentAlias}/#problems/{$problemAlias}/show-run:{$guid}",
+            [
+                'problemAlias' => $problemAlias,
+                'courseName' => $courseName,
+            ]
         );
     }
 
