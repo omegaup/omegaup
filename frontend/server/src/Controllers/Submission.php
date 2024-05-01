@@ -69,7 +69,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $pageSize = $r->ensureOptionalInt(
             'pageSize'
         ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT ;
-        
+
         $identity = \OmegaUp\DAO\Identities::FindByUsername($username);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
