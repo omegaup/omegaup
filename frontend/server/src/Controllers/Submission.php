@@ -29,6 +29,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $pageSize = $r->ensureOptionalInt(
             'pageSize'
         ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT ;
+        /** @psalm-suppress RedundantCondition Function checking if $pageSize is numeric */
         \OmegaUp\Validators::validateNumberInRange(
             $pageSize,
             'pageSize',
@@ -69,7 +70,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt(
             'pageSize'
-        ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT ;
+        ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT;
+        /** @psalm-suppress RedundantCondition Function checking if $pageSize is numeric */
         \OmegaUp\Validators::validateNumberInRange(
             $pageSize,
             'pageSize',
@@ -129,6 +131,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $pageSize = $r->ensureOptionalInt(
             'pageSize'
         ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT;
+        /** @psalm-suppress RedundantCondition Function checking if $pageSize is  numeric */
         \OmegaUp\Validators::validateNumberInRange(
             $pageSize,
             'pageSize',
