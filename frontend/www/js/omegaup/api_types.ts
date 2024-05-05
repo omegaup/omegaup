@@ -3087,7 +3087,7 @@ export namespace types {
     contest_id: number;
     contestants: number;
     description: string;
-    duration?: number;
+    duration_minutes?: number;
     finish_time: Date;
     last_updated: Date;
     organizer: string;
