@@ -4140,21 +4140,22 @@ SubmissionController
 
 ### Description
 
-Returns a list of submissions created in the last 24 hours
+Returns a list of submissions in the last 24 hours
+for given page and username.
 
 ### Parameters
 
 | Name       | Type           | Description |
 | ---------- | -------------- | ----------- |
 | `page`     | `int\|null`    |             |
-| `rowcount` | `int\|null`    |             |
-| `username` | `null\|string` |             |
+| `pageSize` | `int\|null`    |             |
+| `username` | `string\|null` |             |
 
 ### Returns
 
-| Name      | Type                 |
-| --------- | -------------------- |
-| `results` | `types.Submission[]` |
+| Name          | Type                 |
+| ------------- | -------------------- |
+| `submissions` | `types.Submission[]` |
 
 ## `/api/submission/setFeedback/`
 
