@@ -1790,7 +1790,7 @@ export const Submission = {
     messages._SubmissionListServerResponse,
     messages.SubmissionListResponse
   >('/api/submission/list/', (x) => {
-    x.results = ((x) => {
+    x.submissions = ((x) => {
       if (!Array.isArray(x)) {
         return x;
       }
@@ -1798,7 +1798,7 @@ export const Submission = {
         x.time = ((x: number) => new Date(x * 1000))(x.time);
         return x;
       });
-    })(x.results);
+    })(x.submissions);
     return x;
   }),
   setFeedback: apiCall<
