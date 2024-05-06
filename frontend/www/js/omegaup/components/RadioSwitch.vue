@@ -1,9 +1,10 @@
 <template>
-  <div class="form-control container-fluid">
+  <div class="form-control container-fluid" :readonly="readonly">
     <div class="form-check form-check-inline">
       <label class="form-check-label">
         <input
           v-model="radioValue"
+          :disabled="readonly"
           class="form-check-input"
           type="radio"
           :name="name"
@@ -16,6 +17,7 @@
       <label class="form-check-label">
         <input
           v-model="radioValue"
+          :disabled="readonly"
           class="form-check-input"
           type="radio"
           :name="name"
@@ -34,6 +36,7 @@ import T from '../lang';
 @Component
 export default class RadioSwitch extends Vue {
   @Prop() name!: string;
+  @Prop({ default: false }) readonly!: boolean;
   @Prop() selectedValue!: any;
   @Prop({ default: true }) valueForTrue!: any;
   @Prop({ default: false }) valueForFalse!: any;

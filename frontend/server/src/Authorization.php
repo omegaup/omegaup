@@ -489,7 +489,7 @@ class Authorization {
      * @param \OmegaUp\DAO\VO\Identities $identity
      * @param list<\OmegaUp\DAO\VO\Groups> $groups
      */
-    public static function isGroupTeachingAssistantMember(
+    public static function isMemberOfAnyGroup(
         $identity,
         $groups = []
     ): bool {

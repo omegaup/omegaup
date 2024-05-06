@@ -140,6 +140,7 @@
   --arena-scoreboard-hover-color: #00000020;
   --arena-button-border-color: #007bff;
   --arena-reset-border-color: #ced4da;
+  --arena-reset-text-color: #6c757d;
 
   // FINDER WIZARD
   --finder-wizard-modal-mask-background-color: #000000;
@@ -258,4 +259,7 @@
 
   // CERTIFICATES
   --certificates-selected-certificate-border-color: #007bff;
+
+  // TYPEAHEAD
+  --typeahead-disabled: #e9ecef;
 }
