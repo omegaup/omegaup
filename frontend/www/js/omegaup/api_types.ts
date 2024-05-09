@@ -3087,7 +3087,7 @@ export namespace types {
     contest_id: number;
     contestants: number;
     description: string;
-    duration?: number;
+    duration_minutes?: number;
     finish_time: Date;
     last_updated: Date;
     organizer: string;
@@ -4682,8 +4682,6 @@ export namespace types {
 
   export interface Submission {
     alias: string;
-    classname: string;
-    guid: string;
     language: string;
     memory: number;
     runtime: number;
@@ -4716,7 +4714,6 @@ export namespace types {
 
   export interface SubmissionsListPayload {
     includeUser: boolean;
-    page: number;
     submissions: types.Submission[];
   }
 
@@ -5699,7 +5696,7 @@ export namespace messages {
   // Submission
   export type SubmissionListRequest = { [key: string]: any };
   export type _SubmissionListServerResponse = any;
-  export type SubmissionListResponse = { results: types.Submission[] };
+  export type SubmissionListResponse = { submissions: types.Submission[] };
   export type SubmissionSetFeedbackRequest = { [key: string]: any };
   export type SubmissionSetFeedbackResponse = {
     submissionFeedback?: dao.SubmissionFeedback;
