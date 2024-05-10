@@ -89,22 +89,40 @@ export async function navigateToProblem(
     problemset_id: problemsetId,
   })
     .then(time.remoteTimeAdapter)
-    .then((problemInfo) => {
-      for (const run of problemInfo.runs ?? []) {
+    .then((problemDetails) => {
+      for (const run of problemDetails.runs ?? []) {
         trackRun({ run });
       }
       const currentProblem = problems?.find(
-        ({ alias }: { alias: string }) => alias === problemInfo.alias,
+        ({ alias }: { alias: string }) => alias === problemDetails.alias,
       );
-      problemInfo.title = currentProblem?.text ?? '';
-      target.problemInfo = problemInfo;
-      problem.alias = problemInfo.alias;
+      problemDetails.title = currentProblem?.text ?? '';
+      target.problemInfo = problemDetails;
+      problem.alias = problemDetails.alias;
       problem.bestScore = getScoreForProblem({
         contestMode,
-        problemAlias: problemInfo.alias,
+        problemAlias: problemDetails.alias,
         previousScore: 0.0,
         maxScore: problem.maxScore,
       });
+      const problemInfo: types.ProblemInfo = {
+        accepts_submissions: problemDetails.accepts_submissions,
+        alias: problemDetails.alias,
+        commit: problemDetails.commit,
+        input_limit: problemDetails.input_limit,
+        karel_problem: problemDetails.karel_problem,
+        lastOpenedTimestamp: Date.now(),
+        languages: problemDetails.languages,
+        limits: problemDetails.limits,
+        points: problemDetails.points,
+        problem_id: problemDetails.problem_id,
+        quality_seal: problemDetails.quality_seal,
+        secondsToNextSubmission: problemDetails.secondsToNextSubmission,
+        settings: problemDetails.settings,
+        statement: problemDetails.statement,
+        title: problemDetails.title,
+        visibility: problemDetails.visibility,
+      };
       problemsStore.commit('addProblem', problemInfo);
       target.problem = problem;
       if (target.popupDisplayed === PopupDisplayed.RunSubmit) {

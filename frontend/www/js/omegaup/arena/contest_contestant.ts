@@ -1,6 +1,6 @@
 import { omegaup, OmegaUp } from '../omegaup';
 import * as time from '../time';
-import { messages, types } from '../api_types';
+import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
@@ -233,7 +233,7 @@ OmegaUp.on('ready', async () => {
               source: code,
             })
               .then(time.remoteTimeAdapter)
-              .then((response: messages.RunCreateResponse) => {
+              .then((response) => {
                 submitRun({
                   guid: response.guid,
                   submitDelay: response.submit_delay,

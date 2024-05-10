@@ -624,10 +624,6 @@ class Run extends \OmegaUp\Controllers\Controller {
             $contest,
             $submission->time
         );
-        $response['submissionTime'] = \OmegaUp\DAO\Runs::getSecondsToNextSubmission(
-            $contest,
-            $submission->time
-        );
 
         if (is_null($submission->guid)) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');

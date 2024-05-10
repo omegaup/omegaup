@@ -68,7 +68,7 @@
               "
               @finish="currentSecondsToNextSubmission = 0"
             ></omegaup-countdown>
-            <span v-else>Aceptar</span>
+            <span v-else>{{ T.wordsSend }}</span>
           </button>
         </div>
       </div>

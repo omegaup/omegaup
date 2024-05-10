@@ -121,7 +121,26 @@ export async function getProblemAndRunDetails({
       ({ alias }: { alias: string }) => alias === problemDetails?.alias,
     );
     problemDetails.title = currentProblem?.text ?? '';
-    problemsStore.commit('addProblem', problemDetails);
+
+    const problemInfo: types.ProblemInfo = {
+      accepts_submissions: problemDetails.accepts_submissions,
+      alias: problemDetails.alias,
+      commit: problemDetails.commit,
+      input_limit: problemDetails.input_limit,
+      karel_problem: problemDetails.karel_problem,
+      lastOpenedTimestamp: Date.now(),
+      languages: problemDetails.languages,
+      limits: problemDetails.limits,
+      points: problemDetails.points,
+      problem_id: problemDetails.problem_id,
+      quality_seal: problemDetails.quality_seal,
+      secondsToNextSubmission: problemDetails.secondsToNextSubmission,
+      settings: problemDetails.settings,
+      statement: problemDetails.statement,
+      title: problemDetails.title,
+      visibility: problemDetails.visibility,
+    };
+    problemsStore.commit('addProblem', problemInfo);
   }
 
   return { problemDetails, runDetails };

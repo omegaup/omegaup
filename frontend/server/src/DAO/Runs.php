@@ -1170,7 +1170,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * Returns the remaining time for the next submission, expressed in seconds
+     * Returns the remaining time for the next submission to the current problem,
+     * expressed in seconds
      */
     final public static function getSecondsToNextSubmission(
         ?\OmegaUp\DAO\VO\Contests $contest = null,
