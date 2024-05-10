@@ -50,6 +50,7 @@ describe('Print.vue', () => {
       username: 'omegaup',
     },
     quality_seal: false,
+    secondsToNextSubmission: 0,
     settings: {
       cases: {
         statement_001: {

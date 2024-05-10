@@ -12,6 +12,9 @@ use OmegaUp\Exceptions\NotFoundException;
  * @psalm-type ProblemStatement=array{images: array<string, string>, sources: array<string, string>, language: string, markdown: string}
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type ProblemDetails=array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettingsDistrib, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type RunInfo=array{guid: string, submission_deadline: \OmegaUp\Timestamp, secondsToNextSubmission: int}
+ * @psalm-type RunData=array{participant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: RunInfo}
+
  */
 class Run {
     const RUN_SOLUTIONS = [
@@ -99,7 +102,7 @@ class Run {
      * @param \OmegaUp\DAO\VO\Identities $participant
      * @param string $language
      *
-     * @return array{participant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}}
+     * @return RunData
      */
     public static function createCourseAssignmentRun(
         $problemData,
@@ -167,7 +170,7 @@ class Run {
      * @param \OmegaUp\DAO\VO\Identities $participant
      * @param string $language
      *
-     * @return array{participant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}}
+     * @return RunData
      */
     public static function createAssignmentRun(
         string $courseAlias,
@@ -229,7 +232,7 @@ class Run {
      * @param array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request} $problemData
      * @param array{contest: \OmegaUp\DAO\VO\Contests, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
      * @param \OmegaUp\DAO\VO\Identities $contestant
-     * @return array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}, details: ProblemDetails}
+     * @return array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: RunInfo, details: ProblemDetails}
      */
     public static function createRun(
         array $problemData,
@@ -274,7 +277,7 @@ class Run {
      *
      * @param array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request} $problemData
      * @param \OmegaUp\DAO\VO\Identities $contestant
-     * @return array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}}
+     * @return array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: RunInfo}
      */
     public static function createRunToProblem(
         array $problemData,
@@ -317,17 +320,17 @@ class Run {
     /**
      * Given a run, set a score to a given run
      *
-     * @param ?array{participant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}}  $runData     The run.
-     * @param float   $points              The score of the run
-     * @param string  $verdict             The verdict of the run.
-     * @param ?int    $submitDelay         The number of minutes worth of penalty.
-     * @param ?string $runGuid             The GUID of the submission.
-     * @param ?int    $runID               The ID of the run.
-     * @param int     $problemsetPoints    The max score of the run for the problemset.
-     * @param ?string $outputFilesContent  The content to compress in files.zip.
-     * @param string  $problemsetScoreMode The score mode for a problemset. The
-     *                                     points will be calulated in a different
-     *                                     way when score mode is `max_per_group`.
+     * @param ?RunData $runData             The run.
+     * @param float    $points              The score of the run
+     * @param string   $verdict             The verdict of the run.
+     * @param ?int     $submitDelay         The number of minutes worth of penalty.
+     * @param ?string  $runGuid             The GUID of the submission.
+     * @param ?int     $runID               The ID of the run.
+     * @param int      $problemsetPoints    The max score of the run for the problemset.
+     * @param ?string  $outputFilesContent  The content to compress in files.zip.
+     * @param string   $problemsetScoreMode The score mode for a problemset. The
+     *                                      points will be calulated in a different
+     *                                      way when score mode is `max_per_group`.
      * @param list<array{group_name: string, score: float, verdict: string}>   $runScoreByGroups    The score by groups.
      */
     public static function gradeRun(

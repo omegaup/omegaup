@@ -1257,13 +1257,6 @@ export const Problem = {
     messages.ProblemDetailsResponse
   >('/api/problem/details/', (x) => {
     x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date);
-    if (
-      typeof x.nextSubmissionTimestamp !== 'undefined' &&
-      x.nextSubmissionTimestamp !== null
-    )
-      x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
-        x.nextSubmissionTimestamp,
-      );
     if (typeof x.problemsetter !== 'undefined' && x.problemsetter !== null)
       x.problemsetter = ((x) => {
         if (typeof x.creation_date !== 'undefined' && x.creation_date !== null)
@@ -1626,9 +1619,6 @@ export const Run = {
     messages._RunCreateServerResponse,
     messages.RunCreateResponse
   >('/api/run/create/', (x) => {
-    x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
-      x.nextSubmissionTimestamp,
-    );
     x.submission_deadline = ((x: number) => new Date(x * 1000))(
       x.submission_deadline,
     );

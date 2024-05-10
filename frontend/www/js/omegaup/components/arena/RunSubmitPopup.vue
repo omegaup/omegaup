@@ -66,9 +66,9 @@
               :countdown-format="
                 omegaup.CountdownFormat.WaitBetweenUploadsSeconds
               "
-              @finish="now = Date.now()"
+              @finish="currentSecondsToNextSubmission = 0"
             ></omegaup-countdown>
-            <span v-else>{{ T.wordsSend }}</span>
+            <span v-else>Aceptar</span>
           </button>
         </div>
       </div>
@@ -99,7 +99,7 @@ import {
 export default class ArenaRunSubmitPopup extends Vue {
   @Ref() inputFile!: HTMLInputElement;
   @Prop() languages!: string[];
-  @Prop({ required: true }) nextSubmissionTimestamp!: Date;
+  @Prop({ required: true }) secondsToNextSubmission!: number;
   @Prop() inputLimit!: number;
   @Prop({ default: null }) preferredLanguage!: null | string;
 
@@ -108,12 +108,18 @@ export default class ArenaRunSubmitPopup extends Vue {
   selectedLanguage = this.preferredLanguage;
   code = '';
   now: number = Date.now();
+  currentSecondsToNextSubmission = this.secondsToNextSubmission;
 
   handleChangeLanguage(language: string): void {
     this.selectedLanguage = language;
   }
+
+  get nextSubmissionTimestamp(): Date {
+    return new Date(this.now + this.currentSecondsToNextSubmission * 1000);
+  }
+
   get canSubmit(): boolean {
-    return this.nextSubmissionTimestamp.getTime() <= this.now;
+    return this.currentSecondsToNextSubmission <= 0;
   }
 
   get filename(): string {

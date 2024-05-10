@@ -127,12 +127,7 @@ OmegaUp.on('ready', async () => {
     }, refreshTime);
   }
 
-  let nextSubmissionTimestamp: null | Date = null;
-  if (problemDetails?.nextSubmissionTimestamp != null) {
-    nextSubmissionTimestamp = time.remoteTime(
-      problemDetails?.nextSubmissionTimestamp.getTime(),
-    );
-  }
+  const secondsToNextSubmission = problemDetails?.secondsToNextSubmission ?? 0;
 
   const contestContestant = new Vue({
     el: '#main-container',
@@ -147,7 +142,7 @@ OmegaUp.on('ready', async () => {
       problemAlias,
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
-      nextSubmissionTimestamp,
+      secondsToNextSubmission,
       runDetailsData: runDetails,
     }),
     render: function (createElement) {
@@ -173,7 +168,7 @@ OmegaUp.on('ready', async () => {
           showPenalty: this.showPenalty,
           socketStatus: socketStore.state.socketStatus,
           runs: myRunsStore.state.runs,
-          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          secondsToNextSubmission: this.secondsToNextSubmission,
           runDetailsData: this.runDetailsData,
         },
         on: {
@@ -216,7 +211,9 @@ OmegaUp.on('ready', async () => {
             problem: types.NavbarProblemsetProblem;
             code: string;
             language: string;
-            target: Vue & { currentNextSubmissionTimestamp: Date };
+            target: Vue & {
+              currentSecondsToNextSubmission: number;
+            };
           }) => {
             api.Run.create({
               contest_alias: payload.contest.alias,
@@ -234,8 +231,8 @@ OmegaUp.on('ready', async () => {
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
                 });
-                target.currentNextSubmissionTimestamp =
-                  response.nextSubmissionTimestamp;
+                target.currentSecondsToNextSubmission =
+                  response.secondsToNextSubmission;
 
                 if (
                   Object.prototype.hasOwnProperty.call(
@@ -245,8 +242,8 @@ OmegaUp.on('ready', async () => {
                 ) {
                   const problemInfo =
                     problemsStore.state.problems[problem.alias];
-                  problemInfo.nextSubmissionTimestamp =
-                    response.nextSubmissionTimestamp;
+                  problemInfo.secondsToNextSubmission =
+                    response.secondsToNextSubmission;
                   problemsStore.commit('addProblem', problemInfo);
                 }
               })

@@ -168,13 +168,6 @@ export namespace types {
               x.creation_date,
             );
             if (
-              typeof x.nextSubmissionTimestamp !== 'undefined' &&
-              x.nextSubmissionTimestamp !== null
-            )
-              x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
-                x.nextSubmissionTimestamp,
-              );
-            if (
               typeof x.problemsetter !== 'undefined' &&
               x.problemsetter !== null
             )
@@ -939,12 +932,6 @@ export namespace types {
                   x.creation_date = ((x: number) => new Date(x * 1000))(
                     x.creation_date,
                   );
-                  if (
-                    typeof x.nextSubmissionTimestamp !== 'undefined' &&
-                    x.nextSubmissionTimestamp !== null
-                  )
-                    x.nextSubmissionTimestamp = ((x: number) =>
-                      new Date(x * 1000))(x.nextSubmissionTimestamp);
                   if (
                     typeof x.problemsetter !== 'undefined' &&
                     x.problemsetter !== null
@@ -1802,13 +1789,6 @@ export namespace types {
           })(x.clarifications);
         x.problem = ((x) => {
           if (
-            typeof x.nextSubmissionTimestamp !== 'undefined' &&
-            x.nextSubmissionTimestamp !== null
-          )
-            x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
-              x.nextSubmissionTimestamp,
-            );
-          if (
             typeof x.problemsetter !== 'undefined' &&
             x.problemsetter !== null
           )
@@ -1937,13 +1917,6 @@ export namespace types {
           x.creation_date = ((x: number) => new Date(x * 1000))(
             x.creation_date,
           );
-          if (
-            typeof x.nextSubmissionTimestamp !== 'undefined' &&
-            x.nextSubmissionTimestamp !== null
-          )
-            x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
-              x.nextSubmissionTimestamp,
-            );
           if (
             typeof x.problemsetter !== 'undefined' &&
             x.problemsetter !== null
@@ -3916,7 +3889,6 @@ export namespace types {
     languages: string[];
     letter?: string;
     limits: types.SettingLimits;
-    nextSubmissionTimestamp?: Date;
     nominationStatus: types.NominationStatus;
     order: string;
     points: number;
@@ -3926,6 +3898,7 @@ export namespace types {
     quality_seal: boolean;
     runs?: types.RunWithDetails[];
     score: number;
+    secondsToNextSubmission: number;
     settings: types.ProblemSettingsDistrib;
     show_diff: string;
     solvers?: types.BestSolvers[];
@@ -4041,15 +4014,16 @@ export namespace types {
     input_limit: number;
     karel_problem: boolean;
     languages: string[];
+    lastOpenedTimestamp?: number;
     letter?: string;
     limits: types.SettingLimits;
-    nextSubmissionTimestamp?: Date;
     points: number;
     preferred_language?: string;
     problem_id: number;
     problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
     sample_input?: string;
+    secondsToNextSubmission: number;
     settings: types.ProblemSettingsDistrib;
     source?: string;
     statement: types.ProblemStatement;
@@ -5625,7 +5599,7 @@ export namespace messages {
   export type _RunCreateServerResponse = any;
   export type RunCreateResponse = {
     guid: string;
-    nextSubmissionTimestamp: Date;
+    secondsToNextSubmission: number;
     submission_deadline: Date;
     submit_delay: number;
   };

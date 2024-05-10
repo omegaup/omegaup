@@ -33,7 +33,7 @@
           <div v-else class="problem main">
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
-              :next-submission-timestamp="currentNextSubmissionTimestamp"
+              :seconds-to-next-submission="currentSecondsToNextSubmission"
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="runs"
@@ -52,9 +52,7 @@
               "
               @submit-run="onRunSubmitted"
               @show-run="onRunDetails"
-              @new-submission-popup-displayed="
-                $emit('new-submission-popup-displayed')
-              "
+              @new-submission-popup-displayed="onNewSubmissionPopupDisplayed"
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -157,7 +155,7 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
-  @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
+  @Prop({ default: 0 }) secondsToNextSubmission!: number;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
 
@@ -166,7 +164,7 @@ export default class ArenaContestPractice extends Vue {
   currentClarifications = this.clarifications;
   ContestClarificationType = ContestClarificationType;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+  currentSecondsToNextSubmission = this.secondsToNextSubmission;
   currentRunDetailsData = this.runDetailsData;
 
   get activeProblemAlias(): null | string {
@@ -187,6 +185,13 @@ export default class ArenaContestPractice extends Vue {
       ...run,
       problem: this.activeProblem,
       target: this,
+    });
+  }
+
+  onNewSubmissionPopupDisplayed(): void {
+    this.$emit('new-submission-popup-displayed', {
+      target: this,
+      problemAlias: this.activeProblem?.alias,
     });
   }
 
@@ -222,8 +227,7 @@ export default class ArenaContestPractice extends Vue {
     if (!newValue) {
       return;
     }
-    this.currentNextSubmissionTimestamp =
-      newValue.nextSubmissionTimestamp ?? null;
+    this.currentSecondsToNextSubmission = newValue.secondsToNextSubmission;
   }
 
   @Watch('clarifications')

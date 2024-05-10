@@ -55,12 +55,7 @@ OmegaUp.on('ready', async () => {
   }
   trackClarifications(payload.clarifications);
 
-  let nextSubmissionTimestamp: null | Date = null;
-  if (problemDetails?.nextSubmissionTimestamp != null) {
-    nextSubmissionTimestamp = time.remoteTime(
-      problemDetails?.nextSubmissionTimestamp.getTime(),
-    );
-  }
+  const secondsToNextSubmission = problemDetails?.secondsToNextSubmission ?? 0;
 
   const contestPractice = new Vue({
     el: '#main-container',
@@ -73,7 +68,7 @@ OmegaUp.on('ready', async () => {
       showNewClarificationPopup,
       guid,
       problemAlias,
-      nextSubmissionTimestamp,
+      secondsToNextSubmission,
       runDetailsData: runDetails,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
@@ -94,7 +89,7 @@ OmegaUp.on('ready', async () => {
           guid: this.guid,
           problemAlias: this.problemAlias,
           runs: myRunsStore.state.runs,
-          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          secondsToNextSubmission: this.secondsToNextSubmission,
           runDetailsData: this.runDetailsData,
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
@@ -139,7 +134,9 @@ OmegaUp.on('ready', async () => {
             code: string;
             language: string;
             problem: types.NavbarProblemsetProblem;
-            target: Vue & { currentNextSubmissionTimestamp: Date };
+            target: Vue & {
+              currentSecondsToNextSubmission: number;
+            };
           }) => {
             api.Run.create({
               problem_alias: problem.alias,
@@ -156,8 +153,8 @@ OmegaUp.on('ready', async () => {
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
                 });
-                target.currentNextSubmissionTimestamp =
-                  response.nextSubmissionTimestamp;
+                target.currentSecondsToNextSubmission =
+                  response.secondsToNextSubmission;
               })
               .catch((run) => {
                 submitRunFailed({

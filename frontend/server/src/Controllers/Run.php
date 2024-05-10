@@ -391,7 +391,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @throws \Exception
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{guid: string, submit_delay: int, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}
+     * @return array{guid: string, submit_delay: int, submission_deadline: \OmegaUp\Timestamp, secondsToNextSubmission: int}
      *
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param string $language
@@ -620,9 +620,13 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         // Happy ending
-        $response['nextSubmissionTimestamp'] = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
+        $response['secondsToNextSubmission'] = \OmegaUp\DAO\Runs::getSecondsToNextSubmission(
             $contest,
-            lastSubmissionTime: $submission->time
+            $submission->time
+        );
+        $response['submissionTime'] = \OmegaUp\DAO\Runs::getSecondsToNextSubmission(
+            $contest,
+            $submission->time
         );
 
         if (is_null($submission->guid)) {
