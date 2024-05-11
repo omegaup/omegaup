@@ -94,6 +94,7 @@ const problemDetails: types.ProblemDetails = {
   problem_id: 1,
   quality_seal: true,
   runs,
+  secondsToNextSubmission: 0,
   settings: {
     cases: { easy: { in: '2', out: '4', weight: 1 } },
     limits: {

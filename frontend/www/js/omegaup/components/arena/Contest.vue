@@ -71,7 +71,7 @@
           <div v-else class="problem main">
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
-              :next-submission-timestamp="currentNextSubmissionTimestamp"
+              :seconds-to-next-submission="currentSecondsToNextSubmission"
               :languages="contest.languages.split(',')"
               :problem="problemInfo"
               :active-tab="'problems'"
@@ -92,9 +92,7 @@
               "
               @submit-run="onRunSubmitted"
               @show-run="onRunDetails"
-              @new-submission-popup-displayed="
-                $emit('new-submission-popup-displayed')
-              "
+              @new-submission-popup-displayed="onNewSubmissionPopupDisplayed"
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -282,7 +280,7 @@ export default class ArenaContest extends Vue {
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
-  @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
+  @Prop({ default: 0 }) secondsToNextSubmission!: number;
   @Prop({ default: false }) lockdown!: boolean;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
@@ -295,7 +293,7 @@ export default class ArenaContest extends Vue {
   ContestClarificationType = ContestClarificationType;
   currentClarifications = this.clarifications;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+  currentSecondsToNextSubmission = this.secondsToNextSubmission;
   currentRunDetailsData = this.runDetailsData;
   now = new Date();
   currentPopupDisplayed = this.popupDisplayed;
@@ -388,6 +386,13 @@ export default class ArenaContest extends Vue {
     });
   }
 
+  onNewSubmissionPopupDisplayed(): void {
+    this.$emit('new-submission-popup-displayed', {
+      target: this,
+      problemAlias: this.activeProblem?.alias,
+    });
+  }
+
   onRunAdminDetails(guid: string): void {
     this.$emit('show-run', {
       guid,
@@ -425,8 +430,7 @@ export default class ArenaContest extends Vue {
     if (!newValue) {
       return;
     }
-    this.currentNextSubmissionTimestamp =
-      newValue.nextSubmissionTimestamp ?? null;
+    this.currentSecondsToNextSubmission = newValue.secondsToNextSubmission;
   }
 
   @Watch('clarifications')
