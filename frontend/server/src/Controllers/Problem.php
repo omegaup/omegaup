@@ -2841,7 +2841,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if ($container instanceof \OmegaUp\DAO\VO\Contests) {
                 $lastRunTime = null;
 
-                if (($n = count($runsArray)) > 0) {
+                if (count($runsArray) > 0) {
                     $lastRunTime = max(
                         array_map(
                             fn($run) => $run['time'],
@@ -4806,7 +4806,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $lastRunTime = null;
 
-        if (($n = count($runsPayload)) > 0) {
+        if (count($runsPayload) > 0) {
             $lastRunTime = max(
                 array_map(
                     fn($run) => $run['time'],
