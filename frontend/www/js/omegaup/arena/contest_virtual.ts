@@ -206,14 +206,10 @@ OmegaUp.on('ready', async () => {
             problem,
             code,
             language,
-            target,
           }: {
             problem: types.NavbarProblemsetProblem;
             code: string;
             language: string;
-            target: Vue & {
-              currentSecondsToNextSubmission: number;
-            };
           }) => {
             api.Run.create({
               contest_alias: payload.contest.alias,
@@ -231,8 +227,6 @@ OmegaUp.on('ready', async () => {
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
                 });
-                target.currentSecondsToNextSubmission =
-                  response.secondsToNextSubmission;
 
                 if (
                   Object.prototype.hasOwnProperty.call(
@@ -244,6 +238,7 @@ OmegaUp.on('ready', async () => {
                     problemsStore.state.problems[problem.alias];
                   problemInfo.secondsToNextSubmission =
                     response.secondsToNextSubmission;
+                  problemInfo.lastOpenedTimestamp = Date.now();
                   problemsStore.commit('addProblem', problemInfo);
                 }
               })
@@ -254,6 +249,26 @@ OmegaUp.on('ready', async () => {
                   run,
                 });
               });
+          },
+          'new-submission-popup-displayed': ({
+            target,
+            problemAlias,
+          }: {
+            target: Vue & {
+              currentSecondsToNextSubmission: number;
+            };
+            problemAlias: string;
+          }) => {
+            const submitTimestamp = Date.now();
+            const activeProblem = problemsStore.state.problems[problemAlias];
+            if (activeProblem.lastOpenedTimestamp == null) {
+              return;
+            }
+            target.currentSecondsToNextSubmission =
+              activeProblem.secondsToNextSubmission -
+              Math.ceil(
+                (submitTimestamp - activeProblem.lastOpenedTimestamp) / 1000,
+              );
           },
           'new-clarification': ({
             clarification,

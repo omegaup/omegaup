@@ -13,6 +13,7 @@ import {
   submitRunFailed,
 } from './submissions';
 import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
+import problemsStore from './problemStore';
 import {
   ContestClarification,
   ContestClarificationType,
@@ -129,14 +130,10 @@ OmegaUp.on('ready', async () => {
             problem,
             code,
             language,
-            target,
           }: {
             code: string;
             language: string;
             problem: types.NavbarProblemsetProblem;
-            target: Vue & {
-              currentSecondsToNextSubmission: number;
-            };
           }) => {
             api.Run.create({
               problem_alias: problem.alias,
@@ -153,8 +150,20 @@ OmegaUp.on('ready', async () => {
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
                 });
-                target.currentSecondsToNextSubmission =
-                  response.secondsToNextSubmission;
+
+                if (
+                  Object.prototype.hasOwnProperty.call(
+                    problemsStore.state.problems,
+                    problem.alias,
+                  )
+                ) {
+                  const problemInfo =
+                    problemsStore.state.problems[problem.alias];
+                  problemInfo.secondsToNextSubmission =
+                    response.secondsToNextSubmission;
+                  problemInfo.lastOpenedTimestamp = Date.now();
+                  problemsStore.commit('addProblem', problemInfo);
+                }
               })
               .catch((run) => {
                 submitRunFailed({
@@ -215,11 +224,29 @@ OmegaUp.on('ready', async () => {
               `#${selectedTab}/${alias}`,
             );
           },
-          'new-submission-popup-displayed': () => {
+          'new-submission-popup-displayed': ({
+            target,
+            problemAlias,
+          }: {
+            target: Vue & {
+              currentSecondsToNextSubmission: number;
+            };
+            problemAlias: string;
+          }) => {
             if (this.shouldShowFirstAssociatedIdentityRunWarning) {
               this.shouldShowFirstAssociatedIdentityRunWarning = false;
               ui.warning(T.firstSumbissionWithIdentity);
             }
+            const submitTimestamp = Date.now();
+            const activeProblem = problemsStore.state.problems[problemAlias];
+            if (activeProblem.lastOpenedTimestamp == null) {
+              return;
+            }
+            target.currentSecondsToNextSubmission =
+              activeProblem.secondsToNextSubmission -
+              Math.ceil(
+                (submitTimestamp - activeProblem.lastOpenedTimestamp) / 1000,
+              );
           },
         },
       });
