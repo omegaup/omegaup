@@ -2842,8 +2842,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $lastRunTime = null;
 
                 if (($n = count($runsArray)) > 0) {
-                    $lastRun = $runsArray[$n - 1];
-                    $lastRunTime = $lastRun['time'];
+                    $lastRunTime = max(array_map(fn($run) => $run['time'], $runsArray));
                 }
                 $response['nextSubmissionTimestamp'] = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
                     $container,
@@ -4803,8 +4802,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $lastRunTime = null;
 
         if (($n = count($runsPayload)) > 0) {
-            $lastRun = $runsPayload[$n - 1];
-            $lastRunTime = $lastRun['time'];
+            $lastRunTime = max(array_map(fn($run) => $run['time'], $runsPayload));
         }
 
         $nextSubmissionTimestamp = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
