@@ -111,9 +111,7 @@ OmegaUp.on('ready', async () => {
 
   let nextSubmissionTimestamp: null | Date = null;
   if (problemDetails?.nextSubmissionTimestamp != null) {
-    nextSubmissionTimestamp = time.remoteTime(
-      problemDetails?.nextSubmissionTimestamp.getTime(),
-    );
+    nextSubmissionTimestamp = problemDetails?.nextSubmissionTimestamp;
   }
 
   const contestContestant = new Vue({
