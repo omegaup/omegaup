@@ -1,6 +1,6 @@
 -- User_Rank table
 ALTER TABLE `User_Rank`
-ADD COLUMN `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Almacena la hora y fecha en que se actualiza el rank de usuario';
+ADD COLUMN IF NOT EXISTS `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Almacena la hora y fecha en que se actualiza el rank de usuario';
 
 -- Add School_Rank table
 CREATE TABLE `School_Rank` (

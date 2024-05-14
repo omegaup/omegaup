@@ -295,21 +295,12 @@ def migrate(args: argparse.Namespace,
                 comment = "skipped"
             else:
                 for dbname in databases:
-                    try:
-                        output = subprocess.check_output(
-                            [
-                                'mysql',
-                                auth[0],
-                                dbname,
-                                '-NBe',
-                                'source ' + path
-                            ],
-                            stderr=subprocess.STDOUT
-                        )
-                        if output:
-                            print(output.decode())
-                    except subprocess.CalledProcessError as e:
-                        print(e.stderr .decode())
+                    database_utils.mysql(
+                        'source %s;' % database_utils.quote(path),
+                        dbname=dbname,
+                        auth=auth,
+                        container_check=not args.skip_container_check,
+                    )
             if update_metadata:
                 database_utils.mysql(
                     ('INSERT INTO `Revision` '
