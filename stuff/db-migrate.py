@@ -297,8 +297,13 @@ def migrate(args: argparse.Namespace,
                 for dbname in databases:
                     try:
                         output = subprocess.check_output(
-                            ['mysql', '-u', auth[0], '-p' + auth[1], '-h',
-                             auth[2], dbname, '-e', 'source ' + path],
+                            [
+                                'mysql',
+                                auth[0],
+                                dbname,
+                                '-NBe',
+                                'source ' + path
+                            ],
                             stderr=subprocess.STDOUT
                         )
                         if output:
