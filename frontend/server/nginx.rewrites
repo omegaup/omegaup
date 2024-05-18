@@ -69,7 +69,6 @@ rewrite ^/group/([a-zA-Z0-9_+:-]+)/edit/?$ /group/edit.php?group=$1 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /groupscoreboard.php?group=$1&scoreboard=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/edit/?$ /group/scoreboardedit.php?group=$1&scoreboard=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/stats/?$ /groupstats.php?group=$1 last;
-rewrite ^/img/libropre3.pdf/?$ /docs/assets/libroluisvargas.pdf last;
 rewrite ^/login/?$ /login.php last;
 rewrite ^/login/google/?$ /logingoogle.php last;
 rewrite ^/login/password/recover/?$ /loginpasswordrecover.php last;
