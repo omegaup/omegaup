@@ -243,215 +243,223 @@
           </tfoot>
           <tbody>
             <tr v-for="run in paginatedRuns" :key="run.guid">
-              <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
-              <td v-show="showGUID">
-                <acronym :title="run.guid" data-run-guid>
-                  <tt>{{ getShortGuid(run.guid) }}</tt>
-                </acronym>
+              <td v-if="run.status !== 'ready'" colspan="8">
+                <div class="line"></div>
               </td>
-              <td>{{ run.language }}</td>
-              <td
-                v-if="showUser"
-                class="text-break-all text-nowrap"
-                :data-username="run.username"
-              >
-                <omegaup-user-username
-                  :classname="run.classname"
-                  :username="run.username"
-                  :country="run.country"
-                  :linkify="true"
-                  :href="'#runs'"
-                  :emit-click-event="true"
-                  @click="
-                    (username) =>
-                      (filterUsername = { key: username, value: username })
-                  "
-                ></omegaup-user-username>
-                <a :href="`/profile/${run.username}/`" class="ml-2">
-                  <font-awesome-icon :icon="['fas', 'external-link-alt']" />
-                </a>
-              </td>
-              <td v-if="showContest" class="text-break-all">
-                <a
-                  href="#runs"
-                  @click="
-                    onEmitFilterChanged({
-                      filter: 'contest',
-                      value: run.contest_alias,
-                    })
-                  "
-                  >{{ run.contest_alias }}</a
+              <template v-else>
+                <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
+                <td v-show="showGUID">
+                  <acronym :title="run.guid" data-run-guid>
+                    <tt>{{ getShortGuid(run.guid) }}</tt>
+                  </acronym>
+                </td>
+                <td>{{ run.language }}</td>
+                <td
+                  v-if="showUser"
+                  class="text-break-all text-nowrap"
+                  :data-username="run.username"
                 >
-                <a
-                  v-if="run.contest_alias"
-                  :href="`/arena/${run.contest_alias}/`"
-                  class="ml-2"
-                >
-                  <font-awesome-icon :icon="['fas', 'external-link-alt']" />
-                </a>
-              </td>
-              <td v-if="showProblem" class="text-break-all">
-                <a
-                  href="#runs"
-                  @click="
-                    onEmitFilterChanged({
-                      filter: 'problem',
-                      value: run.alias,
-                    })
-                  "
-                  >{{ run.alias }}</a
-                >
-                <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
-                  <font-awesome-icon :icon="['fas', 'external-link-alt']" />
-                </a>
-              </td>
-              <td
-                :class="statusClass(run)"
-                data-run-status
-                class="text-center opacity-4 font-weight-bold"
-                hidden
-              >
-                <span class="mr-1">{{ status(run) }}</span>
-                <button
-                  v-if="!!statusHelp(run)"
-                  type="button"
-                  :data-content="statusHelp(run)"
-                  data-toggle="popover"
-                  data-trigger="focus"
-                  class="btn-outline-dark btn-sm"
-                  @click="showVerdictHelp"
-                >
-                  <font-awesome-icon :icon="['fas', 'question-circle']" />
-                </button>
-                <span
-                  v-if="run.submission_feedback_id !== null && showDisqualify"
-                  class="position-absolute top-0 end-0 badge badge-pill badge-danger"
-                  >1
-                </span>
-              </td>
-              <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
-              <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
-              <td
-                v-if="!showPoints"
-                :class="statusPercentageClass(run)"
-                class="numeric"
-                data-run-percentage
-              >
-                {{ percentage(run) }}
-              </td>
-              <td class="numeric">{{ execution(run) }}</td>
-              <td class="numeric">
-                {{ output(run) }}
-                <br
-                  v-if="outputIconColorStatus(run) != NumericOutputStatus.None"
-                />
-                <font-awesome-icon
-                  v-if="
-                    outputIconColorStatus(run) === NumericOutputStatus.Correct
-                  "
-                  :icon="['fas', 'check-circle']"
-                  style="color: green"
-                />
-                <font-awesome-icon
-                  v-else-if="
-                    outputIconColorStatus(run) === NumericOutputStatus.Incorrect
-                  "
-                  :icon="['fas', 'times-circle']"
-                  style="color: red"
-                />
-                <font-awesome-icon
-                  v-else-if="
-                    outputIconColorStatus(run) ===
-                    NumericOutputStatus.Interrupted
-                  "
-                  :icon="['fas', 'exclamation-circle']"
-                  style="color: orange"
-                />
-              </td>
-              <td class="numeric">{{ memory(run) }}</td>
-              <td class="numeric">{{ runtime(run) }}</td>
-              <td v-if="showDetails && !showDisqualify && !showRejudge">
-                <button
-                  class="details btn-outline-dark btn-sm"
-                  :data-run-details="run.guid"
-                  @click="onRunDetails(run)"
-                >
-                  <font-awesome-icon :icon="['fas', 'search-plus']" />
-                </button>
-                <button
-                  v-if="requestFeedback"
-                  class="details btn-outline-dark btn-sm"
-                  @click="$emit('request-feedback', run.guid)"
-                >
-                  <font-awesome-icon
-                    :title="T.courseRequestFeedback"
-                    icon="comment-dots"
-                  />
-                </button>
-              </td>
-              <td
-                v-else-if="showDetails || showDisqualify || showRejudge"
-                :data-actions="run.guid"
-              >
-                <div class="dropdown">
-                  <button
-                    data-runs-actions-button
-                    class="btn btn-secondary dropdown-toggle"
-                    type="button"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
+                  <omegaup-user-username
+                    :classname="run.classname"
+                    :username="run.username"
+                    :country="run.country"
+                    :linkify="true"
+                    :href="'#runs'"
+                    :emit-click-event="true"
+                    @click="
+                      (username) =>
+                        (filterUsername = { key: username, value: username })
+                    "
+                  ></omegaup-user-username>
+                  <a :href="`/profile/${run.username}/`" class="ml-2">
+                    <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+                  </a>
+                </td>
+                <td v-if="showContest" class="text-break-all">
+                  <a
+                    href="#runs"
+                    @click="
+                      onEmitFilterChanged({
+                        filter: 'contest',
+                        value: run.contest_alias,
+                      })
+                    "
+                    >{{ run.contest_alias }}</a
                   >
-                    {{ T.arenaRunsActions }}
+                  <a
+                    v-if="run.contest_alias"
+                    :href="`/arena/${run.contest_alias}/`"
+                    class="ml-2"
+                  >
+                    <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+                  </a>
+                </td>
+                <td v-if="showProblem" class="text-break-all">
+                  <a
+                    href="#runs"
+                    @click="
+                      onEmitFilterChanged({
+                        filter: 'problem',
+                        value: run.alias,
+                      })
+                    "
+                    >{{ run.alias }}</a
+                  >
+                  <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
+                    <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+                  </a>
+                </td>
+                <td
+                  :class="statusClass(run)"
+                  data-run-status
+                  class="text-center opacity-4 font-weight-bold"
+                  hidden
+                >
+                  <span class="mr-1">{{ status(run) }}</span>
+                  <button
+                    v-if="!!statusHelp(run)"
+                    type="button"
+                    :data-content="statusHelp(run)"
+                    data-toggle="popover"
+                    data-trigger="focus"
+                    class="btn-outline-dark btn-sm"
+                    @click="showVerdictHelp"
+                  >
+                    <font-awesome-icon :icon="['fas', 'question-circle']" />
                   </button>
-                  <div class="dropdown-menu">
+                  <span
+                    v-if="run.submission_feedback_id !== null && showDisqualify"
+                    class="position-absolute top-0 end-0 badge badge-pill badge-danger"
+                    >1
+                  </span>
+                </td>
+                <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
+                <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
+                <td
+                  v-if="!showPoints"
+                  :class="statusPercentageClass(run)"
+                  class="numeric"
+                  data-run-percentage
+                >
+                  {{ percentage(run) }}
+                </td>
+                <td class="numeric">{{ execution(run) }}</td>
+                <td class="numeric">
+                  {{ output(run) }}
+                  <br
+                    v-if="
+                      outputIconColorStatus(run) != NumericOutputStatus.None
+                    "
+                  />
+                  <font-awesome-icon
+                    v-if="
+                      outputIconColorStatus(run) === NumericOutputStatus.Correct
+                    "
+                    :icon="['fas', 'check-circle']"
+                    style="color: green"
+                  />
+                  <font-awesome-icon
+                    v-else-if="
+                      outputIconColorStatus(run) ===
+                      NumericOutputStatus.Incorrect
+                    "
+                    :icon="['fas', 'times-circle']"
+                    style="color: red"
+                  />
+                  <font-awesome-icon
+                    v-else-if="
+                      outputIconColorStatus(run) ===
+                      NumericOutputStatus.Interrupted
+                    "
+                    :icon="['fas', 'exclamation-circle']"
+                    style="color: orange"
+                  />
+                </td>
+                <td class="numeric">{{ memory(run) }}</td>
+                <td class="numeric">{{ runtime(run) }}</td>
+                <td v-if="showDetails && !showDisqualify && !showRejudge">
+                  <button
+                    class="details btn-outline-dark btn-sm"
+                    :data-run-details="run.guid"
+                    @click="onRunDetails(run)"
+                  >
+                    <font-awesome-icon :icon="['fas', 'search-plus']" />
+                  </button>
+                  <button
+                    v-if="requestFeedback"
+                    class="details btn-outline-dark btn-sm"
+                    @click="$emit('request-feedback', run.guid)"
+                  >
+                    <font-awesome-icon
+                      :title="T.courseRequestFeedback"
+                      icon="comment-dots"
+                    />
+                  </button>
+                </td>
+                <td
+                  v-else-if="showDetails || showDisqualify || showRejudge"
+                  :data-actions="run.guid"
+                >
+                  <div class="dropdown">
                     <button
-                      v-if="showDetails"
-                      data-runs-show-details-button
-                      :data-run-details="run.guid"
-                      class="btn-link dropdown-item"
-                      @click="onRunDetails(run)"
+                      data-runs-actions-button
+                      class="btn btn-secondary dropdown-toggle"
+                      type="button"
+                      data-toggle="dropdown"
+                      aria-haspopup="true"
+                      aria-expanded="false"
                     >
-                      {{ T.arenaRunsActionsDetails }}
+                      {{ T.arenaRunsActions }}
                     </button>
-                    <button
-                      v-if="showRejudge"
-                      :data-actions-rejudge="run.guid"
-                      class="btn-link dropdown-item"
-                      @click="$emit('rejudge', run)"
-                    >
-                      {{ T.arenaRunsActionsRejudge }}
-                    </button>
-                    <template v-if="showDisqualify">
-                      <div class="dropdown-divider"></div>
-                      <template v-if="run.type === 'normal'">
+                    <div class="dropdown-menu">
+                      <button
+                        v-if="showDetails"
+                        data-runs-show-details-button
+                        :data-run-details="run.guid"
+                        class="btn-link dropdown-item"
+                        @click="onRunDetails(run)"
+                      >
+                        {{ T.arenaRunsActionsDetails }}
+                      </button>
+                      <button
+                        v-if="showRejudge"
+                        :data-actions-rejudge="run.guid"
+                        class="btn-link dropdown-item"
+                        @click="$emit('rejudge', run)"
+                      >
+                        {{ T.arenaRunsActionsRejudge }}
+                      </button>
+                      <template v-if="showDisqualify">
+                        <div class="dropdown-divider"></div>
+                        <template v-if="run.type === 'normal'">
+                          <button
+                            :data-actions-disqualify="run.guid"
+                            class="btn-link dropdown-item"
+                            @click="
+                              $emit('disqualify', {
+                                run,
+                                disqualificationType:
+                                  DisqualificationType.ByGUID,
+                              })
+                            "
+                          >
+                            {{ T.arenaRunsActionsDisqualifyByGUID }}
+                          </button>
+                        </template>
+
                         <button
-                          :data-actions-disqualify="run.guid"
+                          v-else-if="run.type === 'disqualified'"
+                          :data-actions-requalify="run.guid"
                           class="btn-link dropdown-item"
-                          @click="
-                            $emit('disqualify', {
-                              run,
-                              disqualificationType: DisqualificationType.ByGUID,
-                            })
-                          "
+                          @click="$emit('requalify', run)"
                         >
-                          {{ T.arenaRunsActionsDisqualifyByGUID }}
+                          {{ T.arenaRunsActionsRequalify }}
                         </button>
                       </template>
-
-                      <button
-                        v-else-if="run.type === 'disqualified'"
-                        :data-actions-requalify="run.guid"
-                        class="btn-link dropdown-item"
-                        @click="$emit('requalify', run)"
-                      >
-                        {{ T.arenaRunsActionsRequalify }}
-                      </button>
-                    </template>
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td v-else></td>
+                </td>
+              </template>
             </tr>
           </tbody>
         </table>
@@ -1164,5 +1172,30 @@ export default class Runs extends Vue {
 .status-ce {
   background: var(--arena-runs-table-status-ce-background-color);
   color: var(--arena-runs-table-status-ce-font-color);
+}
+.line {
+  height: 49px;
+  background: var(
+    --arena-submissions-list-skeletonloader-initial-background-color
+  );
+  border-radius: 8px;
+  animation: loading 1.5s infinite;
+}
+@keyframes loading {
+  0% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+  50% {
+    background: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
+  }
+  100% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
 }
 </style>
