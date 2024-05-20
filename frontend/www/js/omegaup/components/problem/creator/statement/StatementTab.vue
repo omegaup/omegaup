@@ -34,7 +34,6 @@
 
 <script lang="ts">
 import { Vue, Component, Ref } from 'vue-property-decorator';
-import creatorStore from '../../../../problem/creator/store';
 import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../../../markdown';
 import T from '../../../../lang';
@@ -72,8 +71,8 @@ export default class StatementTab extends Vue {
   }
 
   triggerMarkdown() {
-    creatorStore.commit('updateMarkdown', this.currentMarkdown);
-    this.currentMarkdownTriggered = creatorStore.state.problemMarkdown;
+    this.$store.commit('updateMarkdown', this.currentMarkdown);
+    this.currentMarkdownTriggered = this.$store.state.problemMarkdown;
   }
 }
 </script>

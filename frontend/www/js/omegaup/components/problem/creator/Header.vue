@@ -34,7 +34,6 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import T from '../../../lang';
-import creatorStore from '../../../problem/creator/store';
 
 @Component
 export default class Header extends Vue {
@@ -43,7 +42,7 @@ export default class Header extends Vue {
 
   @Watch('name')
   onNameChanged(newProblemName: string) {
-    creatorStore.commit('updateName', newProblemName);
+    this.$store.commit('updateName', newProblemName);
   }
 }
 </script>
