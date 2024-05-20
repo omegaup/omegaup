@@ -19,12 +19,8 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <button
-            class="btn btn-primary"
-            type="submit"
-            @click="triggerMarkdown"
-          >
-            {{ T.problemCreatorTriggerMarkdown }}
+          <button class="btn btn-primary" type="submit" @click="updateMarkdown">
+            {{ T.problemCreatorMarkdownSave }}
           </button>
         </div>
       </div>
@@ -70,7 +66,7 @@ export default class StatementTab extends Vue {
     this.markdownEditor.run();
   }
 
-  triggerMarkdown() {
+  updateMarkdown() {
     this.$store.commit('updateMarkdown', this.currentMarkdown);
     this.currentMarkdownTriggered = this.$store.state.problemMarkdown;
   }
