@@ -2,35 +2,32 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 
 import StatementTab from './StatementTab.vue';
 import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
-import T from '../../../../lang';
-import Vue from 'vue';
+import store from '@/js/omegaup/problem/creator/store';
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 localVue.use(IconsPlugin);
 
 describe('StatementTab.vue', () => {
-  it('Should contain all 4 inputs', async () => {
+  it('Should contain markdown buttons and contents and update the store accordingly', async () => {
     const wrapper = shallowMount(StatementTab, {
       localVue,
       store,
     });
 
-    const expectedTextInputText = [
-      T.problemCreatorCaseName,
-      T.problemCreatorGroupName,
-      T.problemCreatorPoints,
-      T.problemCreatorAutomaticPointsRecommended,
-    ];
+    const markdownButtons = wrapper.find('div.wmd-button-bar');
+    expect(markdownButtons.exists()).toBe(true);
 
-    await Vue.nextTick();
+    wrapper.vm.currentMarkdown = 'Hello omegaUp';
 
-    const inputElements = wrapper.findAll('[label]');
+    const markdownSaveButton = wrapper.find('button');
+    expect(markdownSaveButton.exists()).toBe(true);
+    await markdownSaveButton.trigger('click');
 
-    expect(inputElements.length).toBe(expectedTextInputText.length);
+    expect(wrapper.vm.$store.state.problemMarkdown).toBe('Hello omegaUp');
 
-    inputElements.wrappers.forEach((element, index) => {
-      expect(element.attributes('label')).toBe(expectedTextInputText[index]); // We need to make it like this because that's how Vue-Bootstrap input element works
-    });
+    const markdownContent = wrapper.find('omegaup-markdown-stub');
+    expect(markdownContent.exists()).toBe(true);
+    expect(markdownContent.props()['markdown']).toBe('Hello omegaUp');
   });
 });

@@ -12,7 +12,7 @@
         </div>
         <div class="col-md-6">
           <omegaup-markdown
-            :markdown="currentMarkdownTriggered"
+            :markdown="currentMarkdownUpdated"
             preview="true"
           ></omegaup-markdown>
         </div>
@@ -53,7 +53,7 @@ export default class StatementTab extends Vue {
   markdownEditor: Markdown.Editor | null = null;
 
   currentMarkdown: string = T.problemCreatorEmpty;
-  currentMarkdownTriggered: string = T.problemCreatorEmpty;
+  currentMarkdownUpdated: string = T.problemCreatorEmpty;
 
   mounted(): void {
     this.markdownEditor = new Markdown.Editor(markdownConverter.converter, '', {
@@ -68,7 +68,7 @@ export default class StatementTab extends Vue {
 
   updateMarkdown() {
     this.$store.commit('updateMarkdown', this.currentMarkdown);
-    this.currentMarkdownTriggered = this.$store.state.problemMarkdown;
+    this.currentMarkdownUpdated = this.$store.state.problemMarkdown;
   }
 }
 </script>
