@@ -32,11 +32,18 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import T from '../../../lang';
+import creatorStore from '../../../problem/creator/store';
 
 @Component
 export default class Header extends Vue {
   T = T;
+  name: string = T.problemCreatorEmpty;
+
+  @Watch('name')
+  onNameChanged(newProblemName: string) {
+    creatorStore.commit('updateName', newProblemName);
+  }
 }
 </script>

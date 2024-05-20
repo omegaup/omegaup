@@ -5,6 +5,7 @@
         <BIconPencil class="mr-1" />
         <span name="writing" data-tab> {{ T.problemCreatorStatement }}</span>
       </template>
+      <statement-tab />
     </b-tab>
     <b-tab>
       <template #title>
@@ -31,9 +32,10 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import cases_Tab from './cases/CasesTab.vue';
+import statement_Tab from './statement/StatementTab.vue';
 import T from '../../../lang';
 @Component({
-  components: { 'cases-tab': cases_Tab },
+  components: { 'statement-tab': statement_Tab, 'cases-tab': cases_Tab },
 })
 export default class Tabs extends Vue {
   T = T;
