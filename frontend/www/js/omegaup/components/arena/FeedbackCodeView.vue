@@ -1,7 +1,11 @@
 <template>
   <div>
     <div class="container-fluid" data-feedback-code-mirror>
-      <textarea v-show="false" ref="cm-editor" v-model="value"></textarea>
+      <textarea
+        v-show="false"
+        ref="cm-editor"
+        v-model="valueWithEmptyLines"
+      ></textarea>
     </div>
     <div v-if="!readonly" class="container-fluid text-right py-2">
       <button
@@ -210,6 +214,24 @@ export default class FeedbackCodeView extends Vue {
         });
       },
     );
+  }
+
+  get valueWithEmptyLines(): string {
+    const totalLines = 10;
+
+    let lines = this.value.split('\n');
+
+    if (lines.length >= totalLines) {
+      return this.value;
+    }
+
+    let linesToAdd = totalLines - lines.length;
+
+    for (let i = 0; i < linesToAdd; i++) {
+      lines.push('');
+    }
+
+    return lines.join('\n');
   }
 
   setFeedback({
