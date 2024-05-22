@@ -975,7 +975,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}>
+     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}>
      */
     final public static function getForProblemDetails(
         int $problemId,
@@ -983,63 +983,79 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         int $identityId
     ): array {
         $extraFields = self::getRunExtraFields();
-        $sql = '
-            SELECT
-                p.alias,
-                s.guid,
-                s.language,
-                s.status,
-                s.verdict,
-                r.runtime,
-                r.penalty,
-                r.memory,
-                IF(
-                    c.score_mode = "all_or_nothing" AND r.score <> 1,
-                        0,
-                        r.score
-                ) AS score,
-                IF(
-                    c.score_mode = "all_or_nothing" AND r.score <> 1,
-                        0,
-                        r.contest_score
-                ) AS contest_score,
-                s.`time`,
-                s.submit_delay,
-                i.username, IFNULL(i.country_id, "xx") AS country,
-                c.alias AS contest_alias, IFNULL(s.`type`, "normal") AS `type`,
-                IFNULL(ur.classname, "user-rank-unranked") AS classname,
-                ' . $extraFields . ',
-                JSON_OBJECTAGG(
-                    IFNULL(rg.group_name, ""),
-                    rg.score
-                ) AS score_by_group
-            FROM
-                Submissions s
-            INNER JOIN
-                Runs r
-            ON
-                r.run_id = s.current_run_id
-            LEFT JOIN
-                Runs_Groups rg ON r.run_id = rg.run_id
-            INNER JOIN
-                Identities i
-            ON
-                i.identity_id = s.identity_id
-            LEFT JOIN
-                User_Rank ur
-            ON
-                ur.user_id = i.user_id
-            INNER JOIN
-                Problems p
-            ON
-                p.problem_id = s.problem_id
-            LEFT JOIN
-                Contests c
-            ON
-                c.problemset_id = s.problemset_id
-            WHERE
-                s.problem_id = ? AND s.identity_id = ?
-        ';
+        $sql = "SELECT
+                    p.alias,
+                    s.guid,
+                    s.language,
+                    s.status,
+                    s.verdict,
+                    r.runtime,
+                    r.penalty,
+                    r.memory,
+                    IF(
+                        c.score_mode = \"all_or_nothing\" AND r.score <> 1,
+                            0,
+                            r.score
+                    ) AS score,
+                    IF(
+                        c.score_mode = \"all_or_nothing\" AND r.score <> 1,
+                            0,
+                            r.contest_score
+                    ) AS contest_score,
+                    s.`time`,
+                    s.submit_delay,
+                    i.username, IFNULL(i.country_id, \"xx\") AS country,
+                    c.alias AS contest_alias, IFNULL(s.`type`, \"normal\") AS `type`,
+                    IFNULL(ur.classname, \"user-rank-unranked\") AS classname,
+                    {$extraFields},
+                    JSON_OBJECTAGG(
+                        IFNULL(rg.group_name, \"\"),
+                        rg.score
+                    ) AS score_by_group,
+                    COALESCE(sf.suggestions, 0) AS suggestions
+                FROM
+                    Submissions s
+                INNER JOIN
+                    Runs r
+                ON
+                    r.run_id = s.current_run_id
+                LEFT JOIN
+                    (
+                        SELECT
+                            ss.submission_id,
+                            COUNT(*) AS suggestions
+                        FROM
+                            Submission_Feedback sf
+                        INNER JOIN
+                            Submissions ss
+                        ON
+                            ss.submission_id = sf.submission_id
+                        GROUP BY
+                            ss.submission_id
+                    ) sf
+                ON
+                    sf.submission_id = s.submission_id
+                LEFT JOIN
+                    Runs_Groups rg ON r.run_id = rg.run_id
+                INNER JOIN
+                    Identities i
+                ON
+                    i.identity_id = s.identity_id
+                LEFT JOIN
+                    User_Rank ur
+                ON
+                    ur.user_id = i.user_id
+                INNER JOIN
+                    Problems p
+                ON
+                    p.problem_id = s.problem_id
+                LEFT JOIN
+                    Contests c
+                ON
+                    c.problemset_id = s.problemset_id
+                WHERE
+                    s.problem_id = ? AND s.identity_id = ?
+        ";
         $params = [$problemId, $identityId];
         if (!is_null($problemsetId)) {
             $sql .= ' AND s.problemset_id = ?';
@@ -1052,10 +1068,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.guid
             ;';
 
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, runtime: int, score: float, score_by_group: null|string, status: string, status_memory: string, status_runtime: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, runtime: int, score: float, score_by_group: null|string, status: string, status_memory: string, status_runtime: string, submit_delay: int, suggestions: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> $runs */
         $runs = [];
         foreach ($rs as &$record) {
             /** @var array<string, float|null>|null */
