@@ -421,15 +421,6 @@
                   </button>
                   <div class="dropdown-menu">
                     <button
-                      v-if="showDetails"
-                      data-runs-show-details-button
-                      :data-run-details="run.guid"
-                      class="btn-link dropdown-item"
-                      @click="onRunDetails(run)"
-                    >
-                      {{ T.arenaRunsActionsDetails }}
-                    </button>
-                    <button
                       v-if="showRejudge"
                       :data-actions-rejudge="run.guid"
                       class="btn-link dropdown-item"
