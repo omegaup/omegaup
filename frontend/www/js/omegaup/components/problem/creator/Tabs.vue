@@ -32,7 +32,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import cases_Tab from './cases/CasesTab.vue';
-import problemCreator_Statement_Tab from './statement/StatementTab.vue';
+import problemCreator_StatementTab from './statement/StatementTab.vue';
 import T from '../../../lang';
 @Component({
   components: {
