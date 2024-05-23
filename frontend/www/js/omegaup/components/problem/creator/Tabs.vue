@@ -5,7 +5,7 @@
         <BIconPencil class="mr-1" />
         <span name="writing" data-tab> {{ T.problemCreatorStatement }}</span>
       </template>
-      <omegaup-statement-tab />
+      <omegaup-problem-creator-statement-tab />
     </b-tab>
     <b-tab>
       <template #title>
