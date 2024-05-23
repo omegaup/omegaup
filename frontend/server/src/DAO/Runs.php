@@ -200,7 +200,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>, totalRuns: int}
+     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>, totalRuns: int}
      */
     final public static function getAllRuns(
         ?int $problemsetId,
@@ -289,51 +289,67 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
 
         $extraFields = self::getRunExtraFields();
 
-        $sql = '
-            SELECT
-                `r`.`run_id`,
-                `s`.`guid`,
-                `s`.`language`,
-                `r`.`status`,
-                `r`.`verdict`,
-                `r`.`runtime`,
-                `r`.`penalty`,
-                `r`.`memory`,
-                IF(
-                    `c`.`score_mode` = \'all_or_nothing\' AND `r`.`score` <> 1,
-                        0,
-                        `r`.`score`
-                ) AS `score`,
-                IF(
-                    `c`.`score_mode` = \'all_or_nothing\' AND `r`.`score` <> 1,
-                        0,
-                        `r`.`contest_score`
-                ) AS `contest_score`,
-                `s`.`time`,
-                `s`.`submit_delay`,
-                `s`.`type`,
-                `i`.`username`,
-                `p`.`alias`,
-                IFNULL(`i`.`country_id`, "xx") `country`,
-                `c`.`alias` AS `contest_alias`,
-                IFNULL(ur.classname, "user-rank-unranked") `classname`,
-                sf.`submission_feedback_id`,
-                ' . $extraFields . '
-            FROM
-                Submissions s
-            LEFT JOIN
-                Submission_Feedback sf ON sf.submission_id = s.submission_id
-            INNER JOIN
-                Runs r ON r.run_id = s.current_run_id
-            INNER JOIN
-                Problems p ON p.problem_id = s.problem_id
-            INNER JOIN
-                Identities i ON i.identity_id = s.identity_id
-            LEFT JOIN
-                User_Rank ur ON ur.user_id = i.user_id
-            LEFT JOIN
-                Contests c ON c.problemset_id = s.problemset_id
-        ';
+        $sql = "SELECT
+                    `r`.`run_id`,
+                    `s`.`guid`,
+                    `s`.`language`,
+                    `r`.`status`,
+                    `r`.`verdict`,
+                    `r`.`runtime`,
+                    `r`.`penalty`,
+                    `r`.`memory`,
+                    IF(
+                        `c`.`score_mode` = 'all_or_nothing' AND `r`.`score` <> 1,
+                            0,
+                            `r`.`score`
+                    ) AS `score`,
+                    IF(
+                        `c`.`score_mode` = 'all_or_nothing' AND `r`.`score` <> 1,
+                            0,
+                            `r`.`contest_score`
+                    ) AS `contest_score`,
+                    `s`.`time`,
+                    `s`.`submit_delay`,
+                    `s`.`type`,
+                    `i`.`username`,
+                    `p`.`alias`,
+                    IFNULL(`i`.`country_id`, \"xx\") `country`,
+                    `c`.`alias` AS `contest_alias`,
+                    IFNULL(ur.classname, \"user-rank-unranked\") `classname`,
+                    sf.`submission_feedback_id`,
+                    {$extraFields},
+                    COALESCE(ssff.suggestions, 0) AS suggestions
+                FROM
+                    Submissions s
+                LEFT JOIN
+                    (
+                        SELECT
+                            ss.submission_id,
+                            COUNT(*) AS suggestions
+                        FROM
+                            Submission_Feedback sf
+                        INNER JOIN
+                            Submissions ss
+                        ON
+                            ss.submission_id = sf.submission_id
+                        GROUP BY
+                            ss.submission_id
+                    ) ssff
+                ON
+                    ssff.submission_id = s.submission_id
+                LEFT JOIN
+                    Submission_Feedback sf ON sf.submission_id = s.submission_id
+                INNER JOIN
+                    Runs r ON r.run_id = s.current_run_id
+                INNER JOIN
+                    Problems p ON p.problem_id = s.problem_id
+                INNER JOIN
+                    Identities i ON i.identity_id = s.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
+                LEFT JOIN
+                    Contests c ON c.problemset_id = s.problemset_id
+        ";
         if (!empty($where)) {
             $sql .= 'WHERE ' . implode(' AND ', $where);
         }
@@ -344,7 +360,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val[] = $offset * $rowCount;
         $val[] = $rowCount;
 
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: string, status_runtime: string, submission_feedback_id: int|null, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: string, status_runtime: string, submission_feedback_id: int|null, submit_delay: int, suggestions: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
         $runs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
 
         return [

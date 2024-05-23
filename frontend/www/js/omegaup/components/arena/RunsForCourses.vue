@@ -393,7 +393,22 @@
                 v-else-if="showDetails || showDisqualify || showRejudge"
                 :data-actions="run.guid"
               >
-                <div class="dropdown">
+                <div class="d-inline-block mr-2">
+                  <button
+                    class="details btn-outline-dark btn-sm"
+                    data-runs-show-details-button
+                    :data-run-details="run.guid"
+                    @click="onRunDetails(run)"
+                  >
+                    <font-awesome-icon :icon="['fas', 'search-plus']" />
+                    <span
+                      v-if="run.suggestions && run.suggestions > 0"
+                      class="position-absolute badge badge-danger"
+                      >{{ run.suggestions }}
+                    </span>
+                  </button>
+                </div>
+                <div class="dropdown d-inline-block">
                   <button
                     data-runs-actions-button
                     class="btn btn-secondary dropdown-toggle"
