@@ -36,7 +36,7 @@ import problemCreator_StatementTab from './statement/StatementTab.vue';
 import T from '../../../lang';
 @Component({
   components: {
-    'omegaup-statement-tab': problemCreator_Statement_Tab,
+    'omegaup-problem-creator-statement-tab': problemCreator_StatementTab,
     'cases-tab': cases_Tab,
   },
 })
