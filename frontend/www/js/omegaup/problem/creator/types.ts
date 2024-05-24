@@ -10,10 +10,12 @@ export type LineID = string;
  * @alias StoreState
  * @typedef {object}
  * @property {string} problemName Name of the problem
+ * @property {string} problemMarkdown Markdown of the problem
  * @property {CasesState} casesStore Module containing all the cases tab logic
  */
 export interface StoreState {
   problemName: string;
+  problemMarkdown: string;
   casesStore: CasesState;
 }
 
