@@ -1039,6 +1039,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorPoints: "Pontua\u00e7\u00e3o",
   problemCreatorPrefix: "Prefixo",
   problemCreatorSolution: "Solu\u00e7\u00e3o",
+  problemCreatorSolutionMarkdownSave: "Salvar",
   problemCreatorStatement: "Esbo\u00e7o",
   problemCreatorSuffix: "Sufixo",
   problemCreatorTestCases: "Casos de teste",
