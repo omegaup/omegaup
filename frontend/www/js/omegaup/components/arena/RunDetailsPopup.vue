@@ -8,7 +8,27 @@
           :guid="data.guid"
           :is-admin="data.admin"
         ></slot>
-        <div v-if="data.groups">
+        <div class="source_code">
+          <h3>{{ T.wordsSource }}</h3>
+          <a v-if="data.source_link" download="data.zip" :href="data.source">{{
+            T.wordsDownload
+          }}</a>
+          <slot v-else name="code-view" :guid="data.guid">
+            <omegaup-arena-feedback-code-view
+              :language="language"
+              :value="source"
+              :feedback-map="feedbackMap"
+              :feedback-thread-map="feedbackThreadMap"
+              @save-feedback-list="
+                (feedbackList) => onSaveFeedbackList(feedbackList, data.guid)
+              "
+              @submit-feedback-thread="
+                (feedback) => onSubmitFeedbackThread(feedback, data.guid)
+              "
+            ></omegaup-arena-feedback-code-view>
+          </slot>
+        </div>
+        <div v-if="data.groups" class="cases">
           <h3>{{ T.wordsCases }}</h3>
           <div></div>
           <table class="w-100">
@@ -105,24 +125,6 @@
             </tbody>
           </table>
         </div>
-        <h3>{{ T.wordsSource }}</h3>
-        <a v-if="data.source_link" download="data.zip" :href="data.source">{{
-          T.wordsDownload
-        }}</a>
-        <slot v-else name="code-view" :guid="data.guid">
-          <omegaup-arena-feedback-code-view
-            :language="language"
-            :value="source"
-            :feedback-map="feedbackMap"
-            :feedback-thread-map="feedbackThreadMap"
-            @save-feedback-list="
-              (feedbackList) => onSaveFeedbackList(feedbackList, data.guid)
-            "
-            @submit-feedback-thread="
-              (feedback) => onSubmitFeedbackThread(feedback, data.guid)
-            "
-          ></omegaup-arena-feedback-code-view>
-        </slot>
         <div v-if="data.compile_error" class="compile_error">
           <h3>{{ T.wordsCompilerOutput }}</h3>
           <pre class="compile_error">
@@ -170,7 +172,7 @@
             <code v-text="data.judged_by"></code>
           </pre>
         </div>
-        <div>
+        <div class="guid">
           <h3>{{ T.runGUID }}</h3>
           <acronym :title="data.guid" data-run-guid>
             <tt>{{ shortGuid }}</tt>
