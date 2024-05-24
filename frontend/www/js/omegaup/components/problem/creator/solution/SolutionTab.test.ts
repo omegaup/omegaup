@@ -24,7 +24,9 @@ describe('StatementTab.vue', () => {
     expect(markdownSaveButton.exists()).toBe(true);
     await markdownSaveButton.trigger('click');
 
-    expect(wrapper.vm.$store.state.problemSolutionMarkdown).toBe('Hello omegaUp');
+    expect(wrapper.vm.$store.state.problemSolutionMarkdown).toBe(
+      'Hello omegaUp',
+    );
 
     const markdownContent = wrapper.find('omegaup-markdown-stub');
     expect(markdownContent.exists()).toBe(true);
