@@ -137,6 +137,7 @@
           :group-alias="groupAlias"
           :user-error-row="userErrorRow"
           :has-visited-section="hasVisitedSection"
+          :is-organizer="isOrganizer"
           @bulk-identities="
             (identities) => $emit('bulk-identities', identities)
           "
