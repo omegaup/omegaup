@@ -729,6 +729,7 @@
 	"groupEditScoreboardsContestsRemoved": "Concurso removido com sucesso!",
 	"groupEditScoreboardsEdit": "Editar painel de avalia\u00e7\u00e3o %(scoreboard)",
 	"groupEditTitleWithName": "Editar grupo %(name)",
+	"groupIdentitiesNotRequiredPrivileges": "Voc\u00ea n\u00e3o tem as permiss\u00f5es necess\u00e1rias para criar identidades. Para obt\u00ea-las, envie um email para *[engineering@omegaup.com](mailto:engineering@omegaup.com?subject=Solicita\u00e7\u00e3o%20de%20Acesso%20para%20Cria\u00e7\u00e3o%20de%20Identidades)* com o assunto \"Solicita\u00e7\u00e3o de Acesso para Cria\u00e7\u00e3o de Identidades\" e inclua os seguintes detalhes:\n\n- Nome do concurso\n- Institui\u00e7\u00e3o organizadora\n- Nome do contato na institui\u00e7\u00e3o organizadora\n- Nome de usu\u00e1rio do contato no omegaUp\n- N\u00famero aproximado de concorrentes\n- Data do concurso\n\nSe o seu concurso come\u00e7ar em menos de 48 horas, inclua a palavra **\"URGENTE\"** no assunto do seu email.",
 	"groupMemberUsernameInUse": "H\u00e1 pelo menos um nome de conta duplicado nas identidades do grupo: <br> %(usernames) <br> Corrija as informa\u00e7\u00f5es.",
 	"groupNewFormCreateGroup": "Criar grupo",
 	"groupNewFormDescription": "Descri\u00e7\u00e3o do Grupo",
