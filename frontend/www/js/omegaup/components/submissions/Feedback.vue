@@ -1,10 +1,8 @@
 <template>
-  <div v-if="isAdmin || generalFeedback" data-submission-feedback>
-    <h3>{{ T.feedbackTitle }}</h3>
-    <pre data-run-feedback><code>{{
-      generalFeedback ? generalFeedback.feedback : T.feedbackNotSentYet
-    }}</code></pre>
-    <div v-if="generalFeedback">
+  <div>
+    <div v-if="generalFeedback" data-submission-feedback>
+      <h3>{{ T.feedbackTitle }}</h3>
+      <pre data-run-feedback><code>{{ generalFeedback.feedback }}</code></pre>
       {{
         ui.formatString(T.feedbackLeftBy, {
           date: time.formatDate(generalFeedback.date),
@@ -17,44 +15,7 @@
       ></omegaup-user-username>
     </div>
     <div v-if="isAdmin" class="feedback-section">
-      <a
-        data-run-leave-feedback-button
-        role="button"
-        class="btn btn-sm btn-primary"
-        @click="showFeedbackForm = !showFeedbackForm"
-        >{{
-          !generalFeedback
-            ? T.submissionFeedbackSendButton
-            : T.submissionFeedbackUpdateButton
-        }}</a
-      >
-      <div v-show="showFeedbackForm" class="form-group">
-        <textarea
-          v-model="feedback"
-          data-run-feedback-text
-          class="form-control"
-          rows="3"
-          maxlength="200"
-        ></textarea>
-        <button
-          data-run-send-feedback-button
-          class="btn btn-sm btn-primary"
-          :disabled="!feedback"
-          @click.prevent="
-            $emit('set-feedback', {
-              guid,
-              feedback,
-              isUpdate: Boolean(generalFeedback),
-            })
-          "
-        >
-          {{
-            !generalFeedback
-              ? T.submissionSendFeedback
-              : T.submissionUpdateFeedback
-          }}
-        </button>
-      </div>
+      <img src="/media/submission_feedback_demo.gif" />
     </div>
   </div>
 </template>
@@ -82,7 +43,6 @@ export default class SubmissionFeedback extends Vue {
   ui = ui;
   time = time;
 
-  showFeedbackForm = false;
   feedback = this.generalFeedback?.feedback ?? null;
 
   get generalFeedback(): null | types.SubmissionFeedback {
