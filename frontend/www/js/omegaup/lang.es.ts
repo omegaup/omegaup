@@ -1040,7 +1040,6 @@ const translations: { [key: string]: string; } = {
   problemCreatorPoints: "Puntaje",
   problemCreatorPrefix: "Prefix",
   problemCreatorSolution: "Soluci\u00f3n",
-  problemCreatorSolutionMarkdownSave: "Salvar",
   problemCreatorStatement: "Redacci\u00f3n",
   problemCreatorSuffix: "Sufijo",
   problemCreatorTestCases: "Casos de prueba",

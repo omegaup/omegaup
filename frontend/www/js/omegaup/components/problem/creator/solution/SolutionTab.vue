@@ -20,7 +20,7 @@
       <div class="row">
         <div class="col-md-12">
           <button class="btn btn-primary" type="submit" @click="updateMarkdown">
-            {{ T.problemCreatorSolutionMarkdownSave }}
+            {{ T.problemCreatorMarkdownSave }}
           </button>
         </div>
       </div>
