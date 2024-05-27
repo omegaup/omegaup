@@ -8,11 +8,20 @@ Vue.use(Vuex);
 
 const state: StoreState = {
   problemName: T.problemCreatorNewProblem,
+  problemMarkdown: T.problemCreatorEmpty,
 } as StoreState;
 
 export default new Vuex.Store({
   state,
   modules: {
     casesStore,
+  },
+  mutations: {
+    updateMarkdown(state: StoreState, newMarkdown: string) {
+      state.problemMarkdown = newMarkdown;
+    },
+    updateName(state: StoreState, newName: string) {
+      state.problemName = newName;
+    },
   },
 });
