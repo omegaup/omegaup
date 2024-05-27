@@ -4,7 +4,7 @@
       <textarea
         v-show="false"
         ref="cm-editor"
-        v-model="valueWithEmptyLines"
+        v-model="ensureTenLinesInSolution"
       ></textarea>
     </div>
     <div v-if="!readonly" class="container-fluid text-right py-2">
@@ -216,22 +216,14 @@ export default class FeedbackCodeView extends Vue {
     );
   }
 
-  get valueWithEmptyLines(): string {
-    const totalLines = 10;
-
-    let lines = this.value.split('\n');
-
-    if (lines.length >= totalLines) {
+  // Ensures that the solution provided always has at least 10 lines by adding
+  // empty lines if necessary
+  get ensureTenLinesInSolution(): string {
+    let linesToAdd = 10 - this.value.split('\n').length;
+    if (linesToAdd <= 0) {
       return this.value;
     }
-
-    let linesToAdd = totalLines - lines.length;
-
-    for (let i = 0; i < linesToAdd; i++) {
-      lines.push('');
-    }
-
-    return lines.join('\n');
+    return this.value + '\n'.repeat(linesToAdd);
   }
 
   setFeedback({
