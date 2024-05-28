@@ -45,7 +45,7 @@ const markdownConverter = new markdown.Converter({
     'omegaup-markdown': omegaup_Markdown,
   },
 })
-export default class StatementTab extends Vue {
+export default class SolutionTab extends Vue {
   @Ref() readonly markdownButtonBar!: HTMLDivElement;
   @Ref() readonly markdownInput!: HTMLTextAreaElement;
 
