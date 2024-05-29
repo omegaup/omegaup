@@ -216,8 +216,8 @@ export default class FeedbackCodeView extends Vue {
     );
   }
 
-  // Ensures that the solution provided always has at least 10 lines by adding
-  // empty lines if necessary
+  // Ensures that the code displayed always has at least 10 lines by adding
+  // empty lines if necessary. This makes a better UX.
   get ensureTenLinesInSolution(): string {
     let linesToAdd = 10 - this.value.split('\n').length;
     if (linesToAdd <= 0) {
