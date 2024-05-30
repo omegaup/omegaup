@@ -181,11 +181,12 @@
         role="tabpanel"
       >
         <omegaup-course-admision-mode
-          :initial-admission-mode="data.course.admission_mode"
+          :admission-mode="data.course.admission_mode"
           :should-show-public-option="data.course.is_curator"
           :course-alias="data.course.alias"
-          @emit-update-admission-mode="
-            (admisionMode) => $emit('update-admission-mode', admisionMode)
+          :show-in-public-courses-list="data.course.recommended"
+          @update-admission-mode="
+            (request) => $emit('update-admission-mode', request)
           "
         ></omegaup-course-admision-mode>
       </div>

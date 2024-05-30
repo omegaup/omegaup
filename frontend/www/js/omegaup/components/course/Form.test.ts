@@ -22,6 +22,7 @@ const baseCourseFormProps = {
     name: 'Nuevo',
     objective: 'Objetivo de prueba',
     level: '',
+    recommended: false,
     requests_user_information: 'no',
     school_id: 1,
     school_name: 'Escuela curso',
