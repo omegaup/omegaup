@@ -1530,6 +1530,7 @@ const translations: { [key: string]: string; } = {
   studentProgressTooltipDescription: "%(problem):\n\n%(score) of %(points) points (%(progress)% progress)",
   studentsProgressRangeHeader: "Students progress (from %(lowCount) to %(highCount))",
   submissionFeedbackAlreadyExists: "The feedback for this submission already exists.",
+  submissionFeedbackAnimationButton: "Leave your feedback line by line as shown in the animation:",
   submissionFeedbackParticipantsListEmpty: "The list of participants in this thread is empty",
   submissionFeedbackSendButton: "Leave feedback \ud83d\udd3d",
   submissionFeedbackUpdateButton: "Update feedback \ud83d\udd3d",

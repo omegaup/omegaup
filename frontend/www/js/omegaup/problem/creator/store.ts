@@ -11,6 +11,7 @@ const state: StoreState = {
   problemMarkdown: T.problemCreatorEmpty,
   problemCodeContent: T.problemCreatorEmpty,
   problemCodeExtension: T.problemCreatorEmpty,
+  problemSolutionMarkdown: T.problemCreatorEmpty,
 } as StoreState;
 
 export default new Vuex.Store({
@@ -19,6 +20,9 @@ export default new Vuex.Store({
     casesStore,
   },
   mutations: {
+    updateSolutionMarkdown(state: StoreState, newSolutionMarkdown: string) {
+      state.problemSolutionMarkdown = newSolutionMarkdown;
+    },
     updateMarkdown(state: StoreState, newMarkdown: string) {
       state.problemMarkdown = newMarkdown;
     },

@@ -13,6 +13,7 @@ export type LineID = string;
  * @property {string} problemMarkdown Markdown of the problem
  * @property {string} problemCodeContent Content of the code file
  * @property {string} problemCodeExtension Extebsion of the code file
+ * @property {string} problemSolutionMarkdown Markdown of the solution to the problem
  * @property {CasesState} casesStore Module containing all the cases tab logic
  */
 export interface StoreState {
@@ -20,6 +21,7 @@ export interface StoreState {
   problemMarkdown: string;
   problemCodeContent: string;
   problemCodeExtension: string;
+  problemSolutionMarkdown: string;
   casesStore: CasesState;
 }
 
@@ -40,30 +42,30 @@ export interface RootState {
  */
 export type CaseLineData =
   | {
-      kind: 'line';
-      value: string;
-    }
+    kind: 'line';
+    value: string;
+  }
   | {
-      kind: 'multiline';
-      value: string;
-    }
+    kind: 'multiline';
+    value: string;
+  }
   | {
-      kind: 'array';
-      size: number;
-      min: number;
-      max: number;
-      distinct: boolean;
-      value: number[];
-    }
+    kind: 'array';
+    size: number;
+    min: number;
+    max: number;
+    distinct: boolean;
+    value: number[];
+  }
   | {
-      kind: 'matrix';
-      rows: number;
-      cols: number;
-      min: number;
-      max: number;
-      distinct: 'none' | 'rows' | 'cols' | 'both';
-      value: number[][];
-    };
+    kind: 'matrix';
+    rows: number;
+    cols: number;
+    min: number;
+    max: number;
+    distinct: 'none' | 'rows' | 'cols' | 'both';
+    value: number[][];
+  };
 
 /**
  * InLine
