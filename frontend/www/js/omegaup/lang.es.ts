@@ -1527,6 +1527,7 @@ const translations: { [key: string]: string; } = {
   studentProgressTooltipDescription: "%(problem):\n\n%(score) de %(points) puntos (%(progress)% de progreso)",
   studentsProgressRangeHeader: "Progreso de los estudiantes (del %(lowCount) al %(highCount))",
   submissionFeedbackAlreadyExists: "Ya existe retroalimentaci\u00f3n para este env\u00edo.",
+  submissionFeedbackAnimationButton: "Deja tu retroalimentaci\u00f3n l\u00ednea por l\u00ednea como se muestra en la animaci\u00f3n:",
   submissionFeedbackParticipantsListEmpty: "La lista de participantes en este hilo est\u00e1 vac\u00eda",
   submissionFeedbackSendButton: "Dejar retroalimentaci\u00f3n \ud83d\udd3d",
   submissionFeedbackUpdateButton: "Actualizar retroalimentaci\u00f3n \ud83d\udd3d",
