@@ -12,6 +12,7 @@
         <BIconFileCode class="mr-1" />
         <span name="code" data-tab> {{ T.problemCreatorCode }}</span>
       </template>
+      <omegaup-problem-creator-code-tab />
     </b-tab>
     <b-tab>
       <template #title>
@@ -33,10 +34,12 @@
 import { Component, Vue } from 'vue-property-decorator';
 import cases_Tab from './cases/CasesTab.vue';
 import problemCreator_StatementTab from './statement/StatementTab.vue';
+import problemCreator_CodeTab from './code/CodeTab.vue';
 import T from '../../../lang';
 @Component({
   components: {
     'omegaup-problem-creator-statement-tab': problemCreator_StatementTab,
+    'omegaup-problem-creator-code-tab': problemCreator_CodeTab,
     'cases-tab': cases_Tab,
   },
 })

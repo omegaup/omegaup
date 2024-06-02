@@ -11,11 +11,15 @@ export type LineID = string;
  * @typedef {object}
  * @property {string} problemName Name of the problem
  * @property {string} problemMarkdown Markdown of the problem
+ * @property {string} problemCodeContent Content of the code file
+ * @property {string} problemCodeExtension Extebsion of the code file
  * @property {CasesState} casesStore Module containing all the cases tab logic
  */
 export interface StoreState {
   problemName: string;
   problemMarkdown: string;
+  problemCodeContent: string;
+  problemCodeExtension: string;
   casesStore: CasesState;
 }
 
