@@ -42,30 +42,30 @@ export interface RootState {
  */
 export type CaseLineData =
   | {
-    kind: 'line';
-    value: string;
-  }
+      kind: 'line';
+      value: string;
+    }
   | {
-    kind: 'multiline';
-    value: string;
-  }
+      kind: 'multiline';
+      value: string;
+    }
   | {
-    kind: 'array';
-    size: number;
-    min: number;
-    max: number;
-    distinct: boolean;
-    value: number[];
-  }
+      kind: 'array';
+      size: number;
+      min: number;
+      max: number;
+      distinct: boolean;
+      value: number[];
+    }
   | {
-    kind: 'matrix';
-    rows: number;
-    cols: number;
-    min: number;
-    max: number;
-    distinct: 'none' | 'rows' | 'cols' | 'both';
-    value: number[][];
-  };
+      kind: 'matrix';
+      rows: number;
+      cols: number;
+      min: number;
+      max: number;
+      distinct: 'none' | 'rows' | 'cols' | 'both';
+      value: number[][];
+    };
 
 /**
  * InLine
