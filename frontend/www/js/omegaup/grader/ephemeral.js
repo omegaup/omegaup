@@ -254,7 +254,7 @@ const interactiveIdlSettings = {
       contents: 'request.input.interactive.idl',
       module: 'request.input.interactive.module_name',
     },
-    initialLanguage: 'idl',
+    initialLanguage: 'c',
     readOnly: isEmbedded,
     theme,
   },
