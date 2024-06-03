@@ -40,7 +40,6 @@
         </label>
         <div class="col-sm-7">
           <input
-            ref="inputFile"
             class="w-100"
             type="file"
             name="file"
@@ -60,17 +59,12 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Ref, Watch } from 'vue-property-decorator';
+import { Vue, Component, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../../../omegaup';
 import * as ui from '../../../../ui';
 import T from '../../../../lang';
 import creator_CodeView from '../../../arena/CodeView.vue';
-import {
-  LanguageInfo,
-  supportedExtensions,
-  supportedLanguages,
-  supportedLanguagesAliases,
-} from '../../../../grader/util';
+import { LanguageInfo, supportedLanguages } from '../../../../grader/util';
 
 @Component({
   components: {
@@ -78,9 +72,6 @@ import {
   },
 })
 export default class CodeTab extends Vue {
-  @Ref() inputFile!: HTMLInputElement;
-
-  languages = supportedLanguagesAliases;
   inputLimit = 512 * 1024; // Hardcoded as 512kiB _must_ be enough for anybody.
   T = T;
   omegaup = omegaup;
@@ -96,6 +87,14 @@ export default class CodeTab extends Vue {
     return allowedLanguages;
   }
 
+  get allowedExtensions(): string[] {
+    let allowedExtensions: string[] = [];
+    Object.values(supportedLanguages).forEach((languageInfo: LanguageInfo) => {
+      allowedExtensions.push(languageInfo.extension);
+    });
+    return allowedExtensions;
+  }
+
   @Watch('selectedLanguage')
   onSelectedLanguageChanged() {
     const languageInfo = Object.values(supportedLanguages).find(
@@ -106,8 +105,13 @@ export default class CodeTab extends Vue {
     }
   }
 
-  handleInputFile(): void {
-    const file = this.inputFile.files?.[0];
+  readFile(e: HTMLInputElement): File | null {
+    return (e.files && e.files[0]) || null;
+  }
+
+  handleInputFile(ev: Event): void {
+    const file = this.readFile(ev.target as HTMLInputElement);
+
     if (file) {
       if (this.inputLimit && file.size >= this.inputLimit) {
         alert(
@@ -117,10 +121,10 @@ export default class CodeTab extends Vue {
         );
         return;
       }
-      let extension = file.name.split('.').pop()?.toLowerCase();
-      if (extension && supportedExtensions.includes(extension)) {
+      let fileExtension = file.name.split('.').pop()?.toLowerCase();
+      if (fileExtension && this.allowedExtensions.includes(fileExtension)) {
         const languageInfo = Object.values(supportedLanguages).find(
-          (language) => language.extension === extension,
+          (language) => language.extension === fileExtension,
         );
         if (languageInfo) {
           this.selectedLanguage = languageInfo.language;

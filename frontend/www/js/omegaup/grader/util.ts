@@ -168,9 +168,3 @@ export const supportedExtensions: string[] = [
     Object.values(supportedLanguages).map((language) => language.extension),
   ),
 ];
-
-export const supportedLanguagesAliases: string[] = [
-  ...new Set(
-    Object.values(supportedLanguages).map((language) => language.language),
-  ),
-];
