@@ -5,6 +5,7 @@ import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import course_Edit from '../components/course/Edit.vue';
+import { AdmissionMode } from '../components/common/Publish.vue';
 import Sortable from 'sortablejs';
 
 Vue.directive('Sortable', {
@@ -391,15 +392,22 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'update-admission-mode': (admissionMode: string) => {
+          'update-admission-mode': ({
+            admissionMode,
+            showInPublicCoursesList,
+          }: {
+            admissionMode: AdmissionMode;
+            showInPublicCoursesList: boolean;
+          }) => {
             courseEdit.data.course.admission_mode = admissionMode;
             api.Course.update({
               alias: courseAlias,
               admission_mode: admissionMode,
+              recommended: showInPublicCoursesList,
             })
               .then(() => {
                 ui.success(T.courseEditCourseEdited);
-                if (admissionMode === 'registration') {
+                if (admissionMode === AdmissionMode.Registration) {
                   this.refreshStudentList();
                 }
               })

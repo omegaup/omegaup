@@ -93,7 +93,7 @@ export enum AdmissionMode {
     'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
-export default class Publish extends Vue {
+export default class ContestEditPublish extends Vue {
   @Prop() admissionMode!: AdmissionMode;
   @Prop() admissionModeDescription!: string;
   @Prop() alias!: string;

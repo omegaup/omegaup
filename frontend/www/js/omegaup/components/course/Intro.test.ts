@@ -20,6 +20,7 @@ const courseDetails: types.CourseDetails = {
   is_admin: true,
   is_teaching_assistant: false,
   name: 'Course name',
+  recommended: false,
   requests_user_information: 'yes',
   school_name: '',
   show_scoreboard: false,

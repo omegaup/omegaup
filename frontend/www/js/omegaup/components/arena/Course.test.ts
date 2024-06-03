@@ -52,6 +52,7 @@ describe('Course.vue', () => {
     is_admin: false,
     is_teaching_assistant: false,
     name: 'Curso de prueba',
+    recommended: false,
     requests_user_information: 'no',
     school_name: '',
     show_scoreboard: false,
