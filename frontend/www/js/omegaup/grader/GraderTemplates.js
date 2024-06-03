@@ -331,20 +331,85 @@ long long sumas(long long a, long long b) {
   // FIXME
   return 0;
 }`,
+  'c11-gcc': `#include "sumas.h"
+
+long long sumas(long long a, long long b) {
+  // FIXME
+  return 0;
+}`,
+  'c11-clang': `#include "sumas.h"
+
+long long sumas(long long a, long long b) {
+  // FIXME
+  return 0;
+}`,
   cpp: `#include "sumas.h"
 
 long long sumas(long long a, long long b) {
   // FIXME
   return 0;
 }`,
-  cs: '// not supported',
+  cpp11: `#include "sumas.h"
+
+long long sumas(long long a, long long b) {
+  // FIXME
+  return 0;
+}`,
+  'cpp11-gcc': `#include "sumas.h"
+
+long long sumas(long long a, long long b) {
+  // FIXME
+  return 0;
+}`,
+  'cpp11-clang': `#include "sumas.h"
+
+long long sumas(long long a, long long b) {
+  // FIXME
+  return 0;
+}`,
+  'cpp17-gcc': `#include "sumas.h"
+
+long long sumas(long long a, long long b) {
+  // FIXME
+  return 0;
+}`,
+  'cpp17-clang': `#include "sumas.h"
+
+long long sumas(long long a, long long b) {
+  // FIXME
+  return 0;
+}`,
+  'cpp20-gcc': `#include "sumas.h"
+
+long long sumas(long long a, long long b) {
+  // FIXME
+  return 0;
+}`,
+  'cpp20-clang': `#include "sumas.h"
+
+long long sumas(long long a, long long b) {
+  // FIXME
+  return 0;
+}`,
   java: `public class sumas {
   public static long sumas(long a, long b) {
     // FIXME
     return 0;
   }
 }`,
-  lua: '-- not supported',
+  kt: '// not supported',
+  py: `#!/usr/bin/python3
+
+import Main
+
+def sumas(a: int, b: int) -> int:
+    """ sumas """
+    # FIXME
+    return 0`,
+  py2: '# not supported',
+  py3: '# not supported',
+  rb: '# not supported',
+  cs: '// not supported',
   pas: `unit sumas;
 {
  unit Main;
@@ -364,13 +429,9 @@ begin
 end;
 
 end.`,
-  py: `#!/usr/bin/python3
-
-import Main
-
-def sumas(a: int, b: int) -> int:
-    """ sumas """
-    // FIXME
-    return 0`,
-  rb: '# not supported',
+  hs: '-- not supported',
+  lua: '-- not supported',
+  go: '// not supported',
+  rs: '// not supported',
+  js: '// not supported',
 };
