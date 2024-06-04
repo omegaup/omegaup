@@ -20,8 +20,8 @@ describe('SolutionTab.vue', () => {
 
     wrapper.vm.currentSolutionMarkdown = 'Hello omegaUp';
 
-    const markdownPreviewButton = wrapper.findAll('button.btn-success');
-    const markdownSaveButton = wrapper.findAll('button.btn-primary');
+    const markdownPreviewButton = wrapper.find('button.btn-success');
+    const markdownSaveButton = wrapper.find('button.btn-primary');
 
     expect(markdownPreviewButton.exists()).toBe(true);
     await markdownPreviewButton.trigger('click');
