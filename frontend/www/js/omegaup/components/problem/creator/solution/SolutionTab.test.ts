@@ -3,6 +3,7 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 import SolutionTab from './SolutionTab.vue';
 import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
+import T from '../../../../lang';
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
@@ -28,7 +29,9 @@ describe('SolutionTab.vue', () => {
 
     const markdownContent = wrapper.find('omegaup-markdown-stub');
     expect(markdownContent.exists()).toBe(true);
-    expect(markdownContent.props()['markdown']).toBe('Hello omegaUp');
+    expect(markdownContent.props()['markdown']).toBe(
+      T.problemCreatorMarkdownPreviewInitialRender + 'Hello omegaUp',
+    );
 
     expect(wrapper.vm.$store.state.problemSolutionMarkdown).toBe('');
 
@@ -38,7 +41,8 @@ describe('SolutionTab.vue', () => {
     await markdownSaveButton.trigger('click');
 
     expect(markdownContent.props()['markdown']).toBe(
-      'Hello omegaUp creator store',
+      T.problemCreatorMarkdownPreviewInitialRender +
+        'Hello omegaUp creator store',
     );
 
     expect(wrapper.vm.$store.state.problemSolutionMarkdown).toBe(

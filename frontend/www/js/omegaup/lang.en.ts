@@ -1031,6 +1031,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorGroups: "Groups",
   problemCreatorLoadProblem: "Load Problem",
   problemCreatorMarkdownPreview: "Preview",
+  problemCreatorMarkdownPreviewInitialRender: "#Preview\n",
   problemCreatorMarkdownSave: "Save",
   problemCreatorMultipleCases: "Multiple cases",
   problemCreatorName: "Name",

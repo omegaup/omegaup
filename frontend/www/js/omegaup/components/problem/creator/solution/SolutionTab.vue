@@ -12,7 +12,10 @@
         </div>
         <div class="col-md-6">
           <omegaup-markdown
-            :markdown="currentSolutionMarkdownUpdated"
+            :markdown="
+              T.problemCreatorMarkdownPreviewInitialRender +
+              currentSolutionMarkdownUpdated
+            "
             preview="true"
           ></omegaup-markdown>
         </div>
