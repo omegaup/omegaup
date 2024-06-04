@@ -1030,6 +1030,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorGroupName: "Nombre del grupo",
   problemCreatorGroups: "Grupos",
   problemCreatorLoadProblem: "Cargar Problema",
+  problemCreatorMarkdownPreview: "Avance",
   problemCreatorMarkdownSave: "Salvar",
   problemCreatorMultipleCases: "M\u00faltiples casos",
   problemCreatorName: "Nombre",

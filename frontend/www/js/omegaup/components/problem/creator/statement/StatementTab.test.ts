@@ -20,14 +20,29 @@ describe('StatementTab.vue', () => {
 
     wrapper.vm.currentMarkdown = 'Hello omegaUp';
 
-    const markdownSaveButton = wrapper.find('button');
-    expect(markdownSaveButton.exists()).toBe(true);
-    await markdownSaveButton.trigger('click');
+    const markdownPreviewButton = wrapper.findAll('button.btn-success');
+    const markdownSaveButton = wrapper.findAll('button.btn-primary');
 
-    expect(wrapper.vm.$store.state.problemMarkdown).toBe('Hello omegaUp');
+    expect(markdownPreviewButton.exists()).toBe(true);
+    await markdownPreviewButton.trigger('click');
 
     const markdownContent = wrapper.find('omegaup-markdown-stub');
     expect(markdownContent.exists()).toBe(true);
     expect(markdownContent.props()['markdown']).toBe('Hello omegaUp');
+
+    expect(wrapper.vm.$store.state.problemMarkdown).toBe('');
+
+    wrapper.vm.currentMarkdown = 'Hello omegaUp creator store';
+
+    expect(markdownSaveButton.exists()).toBe(true);
+    await markdownSaveButton.trigger('click');
+
+    expect(markdownContent.props()['markdown']).toBe(
+      'Hello omegaUp creator store',
+    );
+
+    expect(wrapper.vm.$store.state.problemMarkdown).toBe(
+      'Hello omegaUp creator store',
+    );
   });
 });
