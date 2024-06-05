@@ -12,6 +12,23 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Runs extends \OmegaUp\DAO\Base\Runs {
+    /** @var string */
+    private static $ctesubmissionFeedbackForProblemset = 'WITH ssff AS (
+        SELECT
+            ss.submission_id,
+            COUNT(*) AS suggestions
+        FROM
+            Submission_Feedback sf
+        INNER JOIN
+            Submissions ss
+        ON
+            ss.submission_id = sf.submission_id
+        WHERE
+            ss.problem_id = ?
+        GROUP BY
+            ss.submission_id
+    )';
+
     /**
      * Gets an array of the best solving runs for a problem.
      * @return list<array{classname: string, username: string, language: string, runtime: float, memory: float, time: \OmegaUp\Timestamp}>
@@ -216,8 +233,17 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): array {
         $where = [];
         $val = [];
+        $cteSubmissionsFeedback = '';
+        $suggestionsCountField = '';
+        $suggestionsJoin = '';
 
         if (!is_null($problemsetId)) {
+            $cteSubmissionsFeedback = self::$ctesubmissionFeedbackForProblemset;
+            $val[] = $problemsetId;
+
+            $suggestionsCountField = ', IFNULL(ssff.suggestions, 0) AS suggestions';
+            $suggestionsJoin = 'LEFT JOIN ssff ON ssff.submission_id = s.submission_id';
+
             $where[] = 's.problemset_id = ?';
             $val[] = $problemsetId;
         }
@@ -289,66 +315,52 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
 
         $extraFields = self::getRunExtraFields();
 
-        $sql = "SELECT
-                    `r`.`run_id`,
-                    `s`.`guid`,
-                    `s`.`language`,
-                    `r`.`status`,
-                    `r`.`verdict`,
-                    `r`.`runtime`,
-                    `r`.`penalty`,
-                    `r`.`memory`,
-                    IF(
-                        `c`.`score_mode` = 'all_or_nothing' AND `r`.`score` <> 1,
-                            0,
-                            `r`.`score`
-                    ) AS `score`,
-                    IF(
-                        `c`.`score_mode` = 'all_or_nothing' AND `r`.`score` <> 1,
-                            0,
-                            `r`.`contest_score`
-                    ) AS `contest_score`,
-                    `s`.`time`,
-                    `s`.`submit_delay`,
-                    `s`.`type`,
-                    `i`.`username`,
-                    `p`.`alias`,
-                    IFNULL(`i`.`country_id`, \"xx\") `country`,
-                    `c`.`alias` AS `contest_alias`,
-                    IFNULL(ur.classname, \"user-rank-unranked\") `classname`,
-                    sf.`submission_feedback_id`,
-                    {$extraFields},
-                    COALESCE(ssff.suggestions, 0) AS suggestions
-                FROM
-                    Submissions s
-                LEFT JOIN
-                    (
-                        SELECT
-                            ss.submission_id,
-                            COUNT(*) AS suggestions
-                        FROM
-                            Submission_Feedback sf
-                        INNER JOIN
-                            Submissions ss
-                        ON
-                            ss.submission_id = sf.submission_id
-                        GROUP BY
-                            ss.submission_id
-                    ) ssff
-                ON
-                    ssff.submission_id = s.submission_id
-                LEFT JOIN
-                    Submission_Feedback sf ON sf.submission_id = s.submission_id
-                INNER JOIN
-                    Runs r ON r.run_id = s.current_run_id
-                INNER JOIN
-                    Problems p ON p.problem_id = s.problem_id
-                INNER JOIN
-                    Identities i ON i.identity_id = s.identity_id
-                LEFT JOIN
-                    User_Rank ur ON ur.user_id = i.user_id
-                LEFT JOIN
-                    Contests c ON c.problemset_id = s.problemset_id
+        $sql = "{$cteSubmissionsFeedback}
+            SELECT
+                `r`.`run_id`,
+                `s`.`guid`,
+                `s`.`language`,
+                `r`.`status`,
+                `r`.`verdict`,
+                `r`.`runtime`,
+                `r`.`penalty`,
+                `r`.`memory`,
+                IF(
+                    `c`.`score_mode` = 'all_or_nothing' AND `r`.`score` <> 1,
+                        0,
+                        `r`.`score`
+                ) AS `score`,
+                IF(
+                    `c`.`score_mode` = 'all_or_nothing' AND `r`.`score` <> 1,
+                        0,
+                        `r`.`contest_score`
+                ) AS `contest_score`,
+                `s`.`time`,
+                `s`.`submit_delay`,
+                `s`.`type`,
+                `i`.`username`,
+                `p`.`alias`,
+                IFNULL(`i`.`country_id`, \"xx\") `country`,
+                `c`.`alias` AS `contest_alias`,
+                IFNULL(ur.classname, \"user-rank-unranked\") `classname`,
+                sf.`submission_feedback_id`,
+                {$extraFields}
+                {$suggestionsCountField}
+            FROM
+                Submissions s
+            {$suggestionsJoin}
+            LEFT JOIN
+                Submission_Feedback sf ON sf.submission_id = s.submission_id
+            INNER JOIN
+                Runs r ON r.run_id = s.current_run_id
+            INNER JOIN
+                Problems p ON p.problem_id = s.problem_id
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
+            LEFT JOIN
+                Contests c ON c.problemset_id = s.problemset_id
         ";
         if (!empty($where)) {
             $sql .= 'WHERE ' . implode(' AND ', $where);
@@ -999,84 +1011,79 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         int $identityId
     ): array {
         $extraFields = self::getRunExtraFields();
-        $sql = "SELECT
-                    p.alias,
-                    s.guid,
-                    s.language,
-                    s.status,
-                    s.verdict,
-                    r.runtime,
-                    r.penalty,
-                    r.memory,
-                    IF(
-                        c.score_mode = \"all_or_nothing\" AND r.score <> 1,
-                            0,
-                            r.score
-                    ) AS score,
-                    IF(
-                        c.score_mode = \"all_or_nothing\" AND r.score <> 1,
-                            0,
-                            r.contest_score
-                    ) AS contest_score,
-                    s.`time`,
-                    s.submit_delay,
-                    i.username, IFNULL(i.country_id, \"xx\") AS country,
-                    c.alias AS contest_alias, IFNULL(s.`type`, \"normal\") AS `type`,
-                    IFNULL(ur.classname, \"user-rank-unranked\") AS classname,
-                    {$extraFields},
-                    JSON_OBJECTAGG(
-                        IFNULL(rg.group_name, \"\"),
-                        rg.score
-                    ) AS score_by_group,
-                    COALESCE(sf.suggestions, 0) AS suggestions
-                FROM
-                    Submissions s
-                INNER JOIN
-                    Runs r
-                ON
-                    r.run_id = s.current_run_id
-                LEFT JOIN
-                    (
-                        SELECT
-                            ss.submission_id,
-                            COUNT(*) AS suggestions
-                        FROM
-                            Submission_Feedback sf
-                        INNER JOIN
-                            Submissions ss
-                        ON
-                            ss.submission_id = sf.submission_id
-                        GROUP BY
-                            ss.submission_id
-                    ) sf
-                ON
-                    sf.submission_id = s.submission_id
-                LEFT JOIN
-                    Runs_Groups rg ON r.run_id = rg.run_id
-                INNER JOIN
-                    Identities i
-                ON
-                    i.identity_id = s.identity_id
-                LEFT JOIN
-                    User_Rank ur
-                ON
-                    ur.user_id = i.user_id
-                INNER JOIN
-                    Problems p
-                ON
-                    p.problem_id = s.problem_id
-                LEFT JOIN
-                    Contests c
-                ON
-                    c.problemset_id = s.problemset_id
-                WHERE
-                    s.problem_id = ? AND s.identity_id = ?
-        ";
+        $cteSubmissionsFeedback = '';
+        $suggestionsCountField = '';
+        $suggestionsJoin = '';
+        $whereClause = '';
         $params = [$problemId, $identityId];
+
         if (!is_null($problemsetId)) {
-            $sql .= ' AND s.problemset_id = ?';
-            $params[] = $problemsetId;
+            $cteSubmissionsFeedback = self::$ctesubmissionFeedbackForProblemset;
+            $suggestionsCountField = ', IFNULL(ssff.suggestions, 0) AS suggestions';
+            $suggestionsJoin = 'LEFT JOIN ssff ON ssff.submission_id = s.submission_id';
+            $whereClause = ' AND s.problemset_id = ?';
+            $params = [$problemsetId, $problemId, $identityId, $problemsetId];
         }
+
+        $sql = "{$cteSubmissionsFeedback}
+            SELECT
+                p.alias,
+                s.guid,
+                s.language,
+                s.status,
+                s.verdict,
+                r.runtime,
+                r.penalty,
+                r.memory,
+                IF(
+                    c.score_mode = \"all_or_nothing\" AND r.score <> 1,
+                        0,
+                        r.score
+                ) AS score,
+                IF(
+                    c.score_mode = \"all_or_nothing\" AND r.score <> 1,
+                        0,
+                        r.contest_score
+                ) AS contest_score,
+                s.`time`,
+                s.submit_delay,
+                i.username, IFNULL(i.country_id, \"xx\") AS country,
+                c.alias AS contest_alias, IFNULL(s.`type`, \"normal\") AS `type`,
+                IFNULL(ur.classname, \"user-rank-unranked\") AS classname,
+                {$extraFields},
+                JSON_OBJECTAGG(
+                    IFNULL(rg.group_name, \"\"),
+                    rg.score
+                ) AS score_by_group
+                {$suggestionsCountField}
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            {$suggestionsJoin}
+            LEFT JOIN
+                Runs_Groups rg ON r.run_id = rg.run_id
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = s.identity_id
+            LEFT JOIN
+                User_Rank ur
+            ON
+                ur.user_id = i.user_id
+            INNER JOIN
+                Problems p
+            ON
+                p.problem_id = s.problem_id
+            LEFT JOIN
+                Contests c
+            ON
+                c.problemset_id = s.problemset_id
+            WHERE
+                s.problem_id = ? AND s.identity_id = ? {$whereClause}
+        ";
         $sql .= '
             GROUP BY
                 c.score_mode,
