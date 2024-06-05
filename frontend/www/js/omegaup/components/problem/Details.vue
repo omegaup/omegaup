@@ -524,19 +524,15 @@ export default class ProblemDetails extends Vue {
   }
 
   get preferredLanguage(): null | string {
-    // this will not work, runs are not fetched orderly by time
-    // const [lastRun] = this.runs.slice(-1);
-
-    // return language with the highest time
-    if (this.runs && this.runs.length > 0) {
-      const mostRecentRun = this.runs.reduce(function (prev, current) {
-        return prev && prev.time.getTime() > current.time.getTime()
-          ? prev
-          : current;
-      });
-      return mostRecentRun.language;
+    if (!(this.runs?.length > 0)) {
+      return this.problem.preferred_language ?? null;
     }
-    return this.problem.preferred_language ?? null;
+    const mostRecentRun = this.runs.reduce(function (prev, current) {
+      return prev && prev.time.getTime() > current.time.getTime()
+        ? prev
+        : current;
+    });
+    return mostRecentRun.language;
   }
 
   get clarificationsCount(): string {
