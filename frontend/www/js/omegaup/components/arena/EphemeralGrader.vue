@@ -22,13 +22,17 @@ export default class EphemeralGrader extends Vue {
 
   mounted(): void {
     (this.$refs.grader as HTMLIFrameElement).onload = () => {
-      this.iframeLoaded();
       const languageSelectElement: HTMLSelectElement = ((this.$refs
         .grader as HTMLIFrameElement)
         .contentWindow as Window).document.getElementById(
         'language',
       ) as HTMLSelectElement;
-      languageSelectElement.value = this.preferredLanguage;
+      if (!this.acceptedLanguages.includes(this.preferredLanguage)) {
+        languageSelectElement.value = this.acceptedLanguages[0];
+      } else {
+        languageSelectElement.value = this.preferredLanguage;
+      }
+      this.iframeLoaded();
     };
   }
 
