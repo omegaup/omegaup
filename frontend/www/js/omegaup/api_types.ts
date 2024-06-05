@@ -3087,7 +3087,7 @@ export namespace types {
     contest_id: number;
     contestants: number;
     description: string;
-    duration?: number;
+    duration_minutes?: number;
     finish_time: Date;
     last_updated: Date;
     organizer: string;
@@ -3161,6 +3161,7 @@ export namespace types {
     default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
+    extra_note?: string;
     feedback: string;
     finish_time: Date;
     languages: string;
@@ -5693,6 +5694,9 @@ export namespace messages {
   };
 
   // Submission
+  export type SubmissionListRequest = { [key: string]: any };
+  export type _SubmissionListServerResponse = any;
+  export type SubmissionListResponse = { submissions: types.Submission[] };
   export type SubmissionSetFeedbackRequest = { [key: string]: any };
   export type SubmissionSetFeedbackResponse = {
     submissionFeedback?: dao.SubmissionFeedback;
@@ -6476,6 +6480,9 @@ export namespace controllers {
   }
 
   export interface Submission {
+    list: (
+      params?: messages.SubmissionListRequest,
+    ) => Promise<messages.SubmissionListResponse>;
     setFeedback: (
       params?: messages.SubmissionSetFeedbackRequest,
     ) => Promise<messages.SubmissionSetFeedbackResponse>;
