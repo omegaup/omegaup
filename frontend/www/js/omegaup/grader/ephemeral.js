@@ -910,9 +910,10 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
       }
     }
   }
+  // reset before all other operations
+  store.commit('reset');
   store.commit('languages', languages);
   store.commit('updatingSettings', true);
-  store.commit('reset');
   store.commit('Interactive', !!settings.interactive);
   store.commit('alias', alias);
   store.commit('showSubmitButton', showSubmitButton);
@@ -946,9 +947,9 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
     store.commit('createCase', {
       name: caseName,
       weight: caseData.weight,
+      in: caseData['in'],
+      out: caseData['out'],
     });
-    store.commit('inputIn', caseData['in']);
-    store.commit('inputOut', caseData.out);
   }
 
   // Given that the current case will change several times, schedule the
