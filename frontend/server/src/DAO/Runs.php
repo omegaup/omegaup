@@ -340,9 +340,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `s`.`type`,
                 `i`.`username`,
                 `p`.`alias`,
-                IFNULL(`i`.`country_id`, \"xx\") `country`,
+                IFNULL(`i`.`country_id`, 'xx') `country`,
                 `c`.`alias` AS `contest_alias`,
-                IFNULL(ur.classname, \"user-rank-unranked\") `classname`,
+                IFNULL(ur.classname, 'user-rank-unranked') `classname`,
                 sf.`submission_feedback_id`,
                 {$extraFields},
                 {$suggestionsCountField}
@@ -1036,23 +1036,23 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 r.penalty,
                 r.memory,
                 IF(
-                    c.score_mode = \"all_or_nothing\" AND r.score <> 1,
+                    c.score_mode = 'all_or_nothing' AND r.score <> 1,
                         0,
                         r.score
                 ) AS score,
                 IF(
-                    c.score_mode = \"all_or_nothing\" AND r.score <> 1,
+                    c.score_mode = 'all_or_nothing' AND r.score <> 1,
                         0,
                         r.contest_score
                 ) AS contest_score,
                 s.`time`,
                 s.submit_delay,
-                i.username, IFNULL(i.country_id, \"xx\") AS country,
-                c.alias AS contest_alias, IFNULL(s.`type`, \"normal\") AS `type`,
-                IFNULL(ur.classname, \"user-rank-unranked\") AS classname,
+                i.username, IFNULL(i.country_id, 'xx') AS country,
+                c.alias AS contest_alias, IFNULL(s.`type`, 'normal') AS `type`,
+                IFNULL(ur.classname, 'user-rank-unranked') AS classname,
                 {$extraFields},
                 JSON_OBJECTAGG(
-                    IFNULL(rg.group_name, \"\"),
+                    IFNULL(rg.group_name, ''),
                     rg.score
                 ) AS score_by_group,
                 {$suggestionsCountField}
