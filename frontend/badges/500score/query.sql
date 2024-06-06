@@ -3,4 +3,4 @@ SELECT
 FROM
     `User_Rank` AS `ur`
 WHERE
-    `ur`.`score` >= 5000;
+    `ur`.`score` >= 500;
