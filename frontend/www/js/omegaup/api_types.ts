@@ -3336,6 +3336,7 @@ export namespace types {
     name: string;
     needs_basic_information: boolean;
     objective?: string;
+    recommended: boolean;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;

@@ -2314,6 +2314,7 @@ Edit Course contents
 | `name`                      | `null\|string`                              |             |
 | `needs_basic_information`   | `bool\|null`                                |             |
 | `objective`                 | `null\|string`                              |             |
+| `recommended`               | `bool\|null`                                |             |
 | `requests_user_information` | `'no'\|'optional'\|'required'\|null`        |             |
 | `show_scoreboard`           | `bool\|null`                                |             |
 | `start_time`                | `\OmegaUp\Timestamp\|null`                  |             |
