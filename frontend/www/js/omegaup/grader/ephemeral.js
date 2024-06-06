@@ -18,6 +18,7 @@ import store from './GraderStore';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
 const theme = document.getElementById('theme').value;
+let isInitialised = false;
 
 const originalInteractiveTemplates = {
   ...Templates.originalInteractiveTemplates,
@@ -458,8 +459,9 @@ function initialize() {
 function onResized() {
   const layoutRoot = document.getElementById('layout-root');
   if (!layoutRoot.clientWidth) return;
-  if (!layout.isInitialised) {
+  if (!isInitialised) {
     initialize();
+    isInitialised = true;
   }
   layout.updateSize();
 }
@@ -955,7 +957,7 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
   // Also change to the main column in case it was not previously selected.
   setTimeout(() => {
     store.commit('updatingSettings', false);
-    if (!layout.isInitialised) return;
+    if (!isInitialised) return;
     let mainColumn = layout.root.getItemsById('main-column')[0];
     mainColumn.parent.setActiveContentItem(mainColumn);
   });
