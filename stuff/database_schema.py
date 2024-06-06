@@ -127,15 +127,40 @@ def strip_mysql_extensions(sql: bytes) -> bytes:
                   flags=re.MULTILINE | re.DOTALL)
 
 
-def file_exists_in_repo(file: str) -> bool:
+def file_exists_in_remote_repo(file: str) -> bool:
     '''Check if a file exists in the repository.'''
     result = subprocess.run(
-        ['git', 'ls-tree', '-r', 'HEAD', '--name-only'],
+        ['git', 'ls-tree', '-r', 'origin/main', '--name-only'],
         capture_output=True,
         text=True,
         check=True,
     )
     return file in result.stdout.strip().split('\n')
+
+
+def contains_drop_table_statement(filename: str) -> bool:
+    '''Check if the migration script file contains "DROP TABLE" statement.'''
+    with open(filename, 'r', encoding='utf-8') as file:
+        content = file.read()
+    return 'DROP TABLE' in content
+
+
+def get_extra_validations_passes(filename: str) -> None:
+    '''Run extra validations for migration script files.'''
+    pattern = r'^frontend/database/\d{5}_[a-zA-Z0-9_-]+\.sql$'
+    if re.match(pattern, filename):
+        if file_exists_in_remote_repo(filename):
+            print((f'{git_tools.COLORS.FAIL}{filename!r} already exists in the'
+                   f' remote repository and cannot be modified.'
+                   f'{git_tools.COLORS.NORMAL}'),
+                  file=sys.stderr)
+            sys.exit(1)
+        elif contains_drop_table_statement(filename):
+            print((f'{git_tools.COLORS.FAIL}{filename!r} contains "DROP TABLE"'
+                   f' statement and cannot be pushed.'
+                   f'{git_tools.COLORS.NORMAL}'),
+                  file=sys.stderr)
+            sys.exit(1)
 
 
 def main() -> None:
@@ -172,15 +197,9 @@ def main() -> None:
         if not line.strip():
             continue
 
-        [file] = line.split(maxsplit=1)
+        [filename] = line.split(maxsplit=1)
 
-        pattern = r'^frontend/database/\d{5}_[a-zA-Z0-9_-]+\.sql$'
-        if re.match(pattern, file):
-            if file_exists_in_repo(file):
-                print((f'Error: The file "{file}" already exists and cannot be'
-                       f' modified.'),
-                      file=sys.stderr)
-                sys.exit(1)
+        get_extra_validations_passes(filename)
 
     if not args.skip_container_check:
         database_utils.check_inside_container()
