@@ -234,14 +234,14 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $where = [];
         $val = [];
         $cteSubmissionsFeedback = '';
-        $suggestionsCountField = '';
+        $suggestionsCountField = '0 AS suggestions';
         $suggestionsJoin = '';
 
         if (!is_null($problemsetId)) {
             $cteSubmissionsFeedback = self::$ctesubmissionFeedbackForProblemset;
             $val[] = $problemsetId;
 
-            $suggestionsCountField = ', IFNULL(ssff.suggestions, 0) AS suggestions';
+            $suggestionsCountField = 'IFNULL(ssff.suggestions, 0) AS suggestions';
             $suggestionsJoin = 'LEFT JOIN ssff ON ssff.submission_id = s.submission_id';
 
             $where[] = 's.problemset_id = ?';
@@ -290,12 +290,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             }
         }
 
-        $sqlCount = '
+        $sqlCount = "{$cteSubmissionsFeedback}
             SELECT
                 COUNT(*) AS total
             FROM
                 Submissions s
-        ';
+        ";
         if (!empty($where)) {
             $sqlCount .= 'WHERE ' . implode(' AND ', $where) . ' ';
         }
@@ -344,7 +344,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `c`.`alias` AS `contest_alias`,
                 IFNULL(ur.classname, \"user-rank-unranked\") `classname`,
                 sf.`submission_feedback_id`,
-                {$extraFields}
+                {$extraFields},
                 {$suggestionsCountField}
             FROM
                 Submissions s
@@ -1012,14 +1012,14 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): array {
         $extraFields = self::getRunExtraFields();
         $cteSubmissionsFeedback = '';
-        $suggestionsCountField = '';
+        $suggestionsCountField = '0 AS suggestions';
         $suggestionsJoin = '';
         $whereClause = '';
         $params = [$problemId, $identityId];
 
         if (!is_null($problemsetId)) {
             $cteSubmissionsFeedback = self::$ctesubmissionFeedbackForProblemset;
-            $suggestionsCountField = ', IFNULL(ssff.suggestions, 0) AS suggestions';
+            $suggestionsCountField = 'IFNULL(ssff.suggestions, 0) AS suggestions';
             $suggestionsJoin = 'LEFT JOIN ssff ON ssff.submission_id = s.submission_id';
             $whereClause = ' AND s.problemset_id = ?';
             $params = [$problemsetId, $problemId, $identityId, $problemsetId];
@@ -1054,7 +1054,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 JSON_OBJECTAGG(
                     IFNULL(rg.group_name, \"\"),
                     rg.score
-                ) AS score_by_group
+                ) AS score_by_group,
                 {$suggestionsCountField}
             FROM
                 Submissions s
@@ -1083,13 +1083,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 c.problemset_id = s.problemset_id
             WHERE
                 s.problem_id = ? AND s.identity_id = ? {$whereClause}
-        ";
-        $sql .= '
             GROUP BY
                 c.score_mode,
                 c.alias,
                 s.guid
-            ;';
+        ;";
 
         /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, runtime: int, score: float, score_by_group: null|string, status: string, status_memory: string, status_runtime: string, submit_delay: int, suggestions: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
