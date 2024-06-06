@@ -6,32 +6,23 @@
           <div ref="markdownButtonBar" class="wmd-button-bar"></div>
           <textarea
             ref="markdownInput"
-            v-model.lazy="currentMarkdown"
+            v-model="currentMarkdown"
             class="wmd-input"
           ></textarea>
         </div>
         <div class="col-md-6">
           <omegaup-markdown
             :markdown="
-              T.problemCreatorMarkdownPreviewInitialRender +
-              currentMarkdownUpdated
+              T.problemCreatorMarkdownPreviewInitialRender + currentMarkdown
             "
             preview="true"
           ></omegaup-markdown>
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
           <button class="btn btn-primary" type="submit" @click="updateMarkdown">
             {{ T.problemCreatorMarkdownSave }}
-          </button>
-          &nbsp;
-          <button
-            class="btn btn-success"
-            type="submit"
-            @click="previewMarkdown"
-          >
-            {{ T.problemCreatorMarkdownPreview }}
           </button>
         </div>
       </div>
@@ -64,7 +55,6 @@ export default class StatementTab extends Vue {
   markdownEditor: Markdown.Editor | null = null;
 
   currentMarkdown: string = T.problemCreatorEmpty;
-  currentMarkdownUpdated: string = T.problemCreatorEmpty;
 
   mounted(): void {
     this.markdownEditor = new Markdown.Editor(markdownConverter.converter, '', {
@@ -77,13 +67,8 @@ export default class StatementTab extends Vue {
     this.markdownEditor.run();
   }
 
-  previewMarkdown() {
-    this.currentMarkdownUpdated = this.currentMarkdown;
-  }
-
   updateMarkdown() {
     this.$store.commit('updateMarkdown', this.currentMarkdown);
-    this.currentMarkdownUpdated = this.$store.state.problemMarkdown;
   }
 }
 </script>
