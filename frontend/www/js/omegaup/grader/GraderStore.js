@@ -28,7 +28,6 @@ const languageExtensionMapping = Object.fromEntries(
     value.extension,
   ]),
 );
-console.log('hello');
 // simple copy paste of the vuex store here
 Vue.use(Vuex);
 let store = new Vuex.Store({
@@ -39,7 +38,6 @@ let store = new Vuex.Store({
     dirty: true,
     languages: [],
     logs: '',
-    max_score: 1,
     outputs: {},
     problemsetId: false,
     request: {
@@ -51,7 +49,6 @@ let store = new Vuex.Store({
       language: '',
       source: '',
     },
-    result: null,
     results: {
       compile_meta: {},
       contest_score: 0,
@@ -208,7 +205,6 @@ let store = new Vuex.Store({
       // if state alias is set, this means its a problem
       // from a list of problems, so delete old alias info
       if (state.alias) {
-        console.log('alias already exists');
         persistToSessionStorage(state.alias).flush();
       }
       state.alias = value;
@@ -460,25 +456,22 @@ let store = new Vuex.Store({
       state.updatingSettings = value;
     },
     createCase(state, caseData) {
-      // if case doesnt already exist create it
-      if (
-        Object.prototype.hasOwnProperty.call(
-          state.request.input.cases,
-          caseData.name,
-        )
-      ) {
-        return;
-      }
+      // if case doesnt already exist create it?
+      // no! always create a case
+      // 2 cases can be of same name and different data
 
       Vue.set(state.request.input.cases, caseData.name, {
         in: caseData.in || '',
         out: caseData.out || '',
         weight: caseData.weight,
       });
+      // if we call this function, we must set current case
+      // or it could cause errors
       state.currentCase = caseData.name;
       state.dirty = true;
     },
     removeCase(state, name) {
+      // what if the case to be deleted is the current case
       if (
         !Object.prototype.hasOwnProperty.call(state.request.input.cases, name)
       )
@@ -514,10 +507,8 @@ let store = new Vuex.Store({
       store.commit('clearOutputs');
       store.commit('logs', '');
       store.commit('compilerOutput', '');
+      store.commit('updatingSettings', false);
 
-      state.result = null;
-      state.max_score = 1;
-      state.updatingSettings = false;
       state.dirty = true;
     },
   },
