@@ -145,7 +145,7 @@ def contains_drop_table_statement(filename: str) -> bool:
     return 'DROP TABLE' in content
 
 
-def get_extra_validations_passes(filename: str) -> None:
+def check_extra_validations(filename: str) -> None:
     '''Run extra validations for migration script files.'''
     pattern = r'^frontend/database/\d{5}_[a-zA-Z0-9_-]+\.sql$'
     if re.match(pattern, filename):
@@ -199,7 +199,7 @@ def main() -> None:
 
         [filename] = line.split(maxsplit=1)
 
-        get_extra_validations_passes(filename)
+        check_extra_validations(filename)
 
     if not args.skip_container_check:
         database_utils.check_inside_container()
