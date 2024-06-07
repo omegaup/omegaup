@@ -1030,7 +1030,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorGroupName: "(Gr0up Nam3)",
   problemCreatorGroups: "(Gr0up5)",
   problemCreatorLoadProblem: "(L0ad Pr0b13m)",
-  problemCreatorMarkdownPreviewInitialRender: "(#Pr3vi3w\n)",
+  problemCreatorMarkdownPreviewInitialRender: "(# Pr3vi3w\n)",
   problemCreatorMarkdownSave: "(Sav3)",
   problemCreatorMultipleCases: "(Mu17ip13 ca535)",
   problemCreatorName: "(Nam3)",
