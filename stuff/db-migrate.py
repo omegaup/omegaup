@@ -326,14 +326,13 @@ def migrate(args: argparse.Namespace,
 
                     except subprocess.CalledProcessError as e:
                         # Rollback the transaction in case of error
-                        for dbname in databases:
-                            database_utils.mysql(
-                                'ROLLBACK;',
-                                dbname=dbname,
-                                auth=auth,
-                                container_check=not args.skip_container_check,
-                            )
-                        logging.error('Transaction rolled back due to  error '
+                        database_utils.mysql(
+                            'ROLLBACK;',
+                            dbname=dbname,
+                            auth=auth,
+                            container_check=not args.skip_container_check,
+                        )
+                        logging.error('Transaction rolled back due to error '
                                       'in script %r: %s', path, e.stderr)
                         raise
 
