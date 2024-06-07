@@ -479,6 +479,18 @@ let store = new Vuex.Store({
       Vue.delete(state.request.input.cases, name);
       state.dirty = true;
     },
+    limits(state, limits) {
+      if (!Object.prototype.hasOwnProperty.call(limits, 'MemoryLimit')) {
+        store.commit('MemoryLimit', limits.MemoryLimit * 1024);
+      }
+      if (!Object.prototype.hasOwnProperty.call(limits, 'OutputLimit')) {
+        store.commit('OutputLimit', limits.OutputLimit);
+      }
+      for (let name of ['TimeLimit', 'OverallWallTimeLimit', 'ExtraWallTime']) {
+        if (!Object.prototype.hasOwnProperty.call(limits, name)) continue;
+        store.commit(name, Util.parseDuration(limits[name]));
+      }
+    },
     reset(state) {
       store.commit('request.language', 'cpp17-gcc');
       store.commit('request.source', sourceTemplates.cpp);
