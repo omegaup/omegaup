@@ -3,6 +3,7 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 import StatementTab from './StatementTab.vue';
 import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
+import T from '../../../../lang';
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
@@ -18,16 +19,27 @@ describe('StatementTab.vue', () => {
     const markdownButtons = wrapper.find('div.wmd-button-bar');
     expect(markdownButtons.exists()).toBe(true);
 
-    wrapper.vm.currentMarkdown = 'Hello omegaUp';
+    const textArea = wrapper.find('textarea.wmd-input');
+    expect(textArea.exists()).toBe(true);
+    textArea.setValue('Hello omegaUp');
 
-    const markdownSaveButton = wrapper.find('button');
+    expect(wrapper.vm.currentMarkdown).toBe('Hello omegaUp');
+
+    const markdownContent = wrapper.find('omegaup-markdown-stub');
+    expect(markdownContent.exists()).toBe(true);
+
+    await wrapper.trigger('click');
+
+    expect(markdownContent.props()['markdown']).toBe(
+      T.problemCreatorMarkdownPreviewInitialRender + 'Hello omegaUp',
+    );
+
+    expect(wrapper.vm.$store.state.problemMarkdown).toBe('');
+
+    const markdownSaveButton = wrapper.find('button.btn-primary');
     expect(markdownSaveButton.exists()).toBe(true);
     await markdownSaveButton.trigger('click');
 
     expect(wrapper.vm.$store.state.problemMarkdown).toBe('Hello omegaUp');
-
-    const markdownContent = wrapper.find('omegaup-markdown-stub');
-    expect(markdownContent.exists()).toBe(true);
-    expect(markdownContent.props()['markdown']).toBe('Hello omegaUp');
   });
 });
