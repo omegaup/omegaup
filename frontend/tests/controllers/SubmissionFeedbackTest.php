@@ -484,12 +484,12 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
+        $studentLogin = self::login($student['identity']);
+
         // Adding a feedback thread as student
         \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
-                'auth_token' => self::login(
-                    $student['identity']
-                )->auth_token,
+                'auth_token' => $studentLogin->auth_token,
                 'guid' => $runData['response']['guid'],
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment_alias'],
@@ -525,11 +525,12 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Trying to add a comment with a user who does not belong to the course
         $user = \OmegaUp\Test\Factories\User::createUser();
+        $userLogin = self::login($user['identity']);
 
         try {
             \OmegaUp\Controllers\Submission::apiSetFeedback(
                 new \OmegaUp\Request([
-                    'auth_token' => self::login($user['identity'])->auth_token,
+                    'auth_token' => $userLogin->auth_token,
                     'guid' => $runData['response']['guid'],
                     'course_alias' => $courseData['course_alias'],
                     'assignment_alias' => $courseData['assignment_alias'],
@@ -540,6 +541,17 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertSame('userNotAllowed', $e->getMessage());
         }
+
+        ['runs' => $runs] = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'problemset_id' => $courseData['problemset_id'],
+                'prevent_problemset_open' => false,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        );
+
+        $this->assertSame(2, $runs[0]['suggestions']);
     }
 
     public function testSubmissionFeedbackGeneralAndByLine() {
