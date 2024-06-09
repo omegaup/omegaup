@@ -44,7 +44,7 @@ describe('AddPanel.vue', () => {
     expect(groups[0].autoPoints).toBe(true);
     expect(groups[0].ungroupedCase).toBe(true);
   });
-  it('Should add a group to the store', async () => {
+  it('Should add a group to the store and add a case to the group', async () => {
     const wrapper: Wrapper<AddPanel> = mount(AddPanel, {
       localVue,
       store: vuexStore,
@@ -57,7 +57,7 @@ describe('AddPanel.vue', () => {
     const nameInput = wrapper.find('input[name="group-name"]');
     const pointsInput = wrapper.find('input[name="group-points"]');
 
-    await nameInput.setValue('groupname');
+    await nameInput.setValue('testgroup');
     await pointsInput.setValue(10);
 
     const updatedNameInput = wrapper.find('input[name="group-name"]')
@@ -65,7 +65,7 @@ describe('AddPanel.vue', () => {
     const updatedPointsInput = wrapper.find('input[name="group-points"]')
       .element as HTMLInputElement;
 
-    expect(updatedNameInput.value).toBe('groupname');
+    expect(updatedNameInput.value).toBe('testgroup');
     expect(updatedPointsInput.value).toBe('10');
 
     await (wrapper.vm as any).addItemToStore();
@@ -74,10 +74,65 @@ describe('AddPanel.vue', () => {
     const groups = store.state.casesStore.groups;
 
     expect(groups.length).toBe(1);
-    expect(groups[0].name).toBe('groupname');
+    expect(groups[0].name).toBe('testgroup');
     expect(groups[0].autoPoints).toBe(false);
     expect(groups[0].points).toBe(10);
     expect(groups[0].ungroupedCase).toBe(false);
+
+    const groupId = groups?.[0].groupID;
+
+    wrapper.setData({ tab: 'case' });
+    await Vue.nextTick();
+
+    const caseNameInput = wrapper.find('input[name="case-name"]');
+    const casePointsInput = wrapper.find('input[name="case-points"]');
+    const caseGroupName = wrapper.find('select[name="case-group"]');
+
+    await caseNameInput.setValue('groupedtestcase');
+    await casePointsInput.setValue(10);
+    await caseGroupName.setValue(groupId);
+
+    await wrapper.find('form').trigger('submit.prevent');
+
+    const groupedCases = store.state.casesStore.groups?.[0].cases;
+    expect(groupedCases.length).toBe(1);
+    expect(groupedCases[0].name).toBe('groupedtestcase');
+    expect(groupedCases[0].groupID).toBe(groupId);
+    expect(groupedCases[0].points).toBe(10);
+  });
+  it('Should add an ungrouped case to the store', async () => {
+    const wrapper: Wrapper<AddPanel> = mount(AddPanel, {
+      localVue,
+      store: vuexStore,
+    });
+
+    wrapper.setData({ tab: 'case' });
+    await Vue.nextTick();
+
+    const nameInput = wrapper.find('input[name="case-name"]');
+    const pointsInput = wrapper.find('input[name="case-points"]');
+
+    await nameInput.setValue('testcase');
+    await pointsInput.setValue(50);
+
+    const updatedNameInput = wrapper.find('input[name="case-name"]')
+      .element as HTMLInputElement;
+    const updatedPointsInput = wrapper.find('input[name="case-points"]')
+      .element as HTMLInputElement;
+
+    expect(updatedNameInput.value).toBe('testcase');
+    expect(updatedPointsInput.value).toBe('50');
+
+    await wrapper.find('form').trigger('submit.prevent');
+
+    const store = wrapper.vm.$store as Store<StoreState>;
+    const groups = store.state.casesStore.groups;
+
+    expect(groups.length).toBe(1);
+    expect(groups[0].name).toBe('testcase');
+    expect(groups[0].autoPoints).toBe(false);
+    expect(groups[0].points).toBe(50);
+    expect(groups[0].ungroupedCase).toBe(true);
   });
   it('Should contain 3 tabs', async () => {
     const wrapper = mount(AddPanel, {
