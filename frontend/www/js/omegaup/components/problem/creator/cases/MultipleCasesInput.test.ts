@@ -53,7 +53,7 @@ describe('MultipleCasesInput.vue', () => {
     await Vue.nextTick();
 
     expect(wrapper.find('[description]').attributes('description')).toContain(
-      'case#',
+      'case',
     ); // Again, the description is stored inside the attribute
   });
 

@@ -11,9 +11,9 @@
         >
           <b-form-input
             v-model="multipleCasesPrefix"
-            lazy
             lazy-formatter
             :formatter="formatter"
+            name="multiple-cases-prefix"
             autocomplete="off"
           />
         </b-form-group>
@@ -26,8 +26,8 @@
         >
           <b-form-input
             v-model="multipleCasesSuffix"
-            lazy
             lazy-formatter
+            name="multiple-cases-suffix"
             :formatter="formatter"
             autocomplete="off"
           />
@@ -43,6 +43,7 @@
         v-model="multipleCasesCount"
         lazy-formatter
         :formatter="numberFormatter"
+        name="multiple-cases-count"
         type="number"
         number
       />
@@ -89,7 +90,11 @@ export default class MultipleCasesInput extends Vue {
   }
 
   get caseNamePreview() {
-    return `${this.multipleCasesPrefix}1${this.multipleCasesSuffix}, ${this.multipleCasesPrefix}2${this.multipleCasesSuffix}...`;
+    return `${this.formatter(this.multipleCasesPrefix)}1${this.formatter(
+      this.multipleCasesSuffix,
+    )}, ${this.formatter(this.multipleCasesPrefix)}2${this.formatter(
+      this.multipleCasesSuffix,
+    )}...`;
   }
 
   // Ensure that the prefix and suffix always contain alpha-numeric characters in addition to _ and -
