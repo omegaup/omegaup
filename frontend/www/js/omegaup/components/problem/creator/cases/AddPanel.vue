@@ -137,6 +137,7 @@ export default class AddPanel extends Vue {
           return;
         }
       }
+
       this.addCase({
         caseID: uuid(),
         groupID: caseGroup,

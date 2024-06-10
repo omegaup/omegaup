@@ -27,8 +27,8 @@
           <b-form-input
             v-model="multipleCasesSuffix"
             lazy-formatter
-            name="multiple-cases-suffix"
             :formatter="formatter"
+            name="multiple-cases-suffix"
             autocomplete="off"
           />
         </b-form-group>
