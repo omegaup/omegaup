@@ -44,6 +44,7 @@ describe('AddPanel.vue', () => {
     expect(groups[0].autoPoints).toBe(true);
     expect(groups[0].ungroupedCase).toBe(true);
   });
+
   it('Should add a group to the store and add a case to the group', async () => {
     const wrapper: Wrapper<AddPanel> = mount(AddPanel, {
       localVue,
@@ -100,6 +101,7 @@ describe('AddPanel.vue', () => {
     expect(groupedCases[0].groupID).toBe(groupId);
     expect(groupedCases[0].points).toBe(10);
   });
+  
   it('Should add an ungrouped case to the store', async () => {
     const wrapper: Wrapper<AddPanel> = mount(AddPanel, {
       localVue,
@@ -134,6 +136,7 @@ describe('AddPanel.vue', () => {
     expect(groups[0].points).toBe(50);
     expect(groups[0].ungroupedCase).toBe(true);
   });
+
   it('Should add multiple ungrouped cases to the store', async () => {
     const wrapper: Wrapper<AddPanel> = mount(AddPanel, {
       localVue,
