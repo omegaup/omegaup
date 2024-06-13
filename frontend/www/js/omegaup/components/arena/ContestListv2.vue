@@ -359,7 +359,7 @@ export enum ContestFilter {
     FontAwesomeIcon,
   },
 })
-export default class ArenaContestList extends Vue {
+export default class ArenaContestListv2 extends Vue {
   @Prop({ default: null }) countContests!: { [key: string]: number } | null;
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
