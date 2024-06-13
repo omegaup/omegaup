@@ -178,6 +178,13 @@ export default class AddPanel extends Vue {
         (_, i) => multipleCasesPrefix + `${i + 1}` + multipleCasesSuffix,
       );
 
+      const multipleCaseRequest: MultipleCaseAddRequest = {
+        groupID: multipleCasesGroup,
+        numberOfCases: multipleCasesCount,
+        prefix: multipleCasesPrefix,
+        suffix: multipleCasesSuffix,
+      };
+
       if (multipleCasesGroup === NIL) {
         // In this case we just need to check if there is a group with the same name. Since everytime a new ungrouped case is created, a coressponding group is created too
         const nameAlreadyExists = this.groups.find((g) =>
@@ -187,24 +194,22 @@ export default class AddPanel extends Vue {
           this.invalidCaseName = true;
           return;
         }
-      } else {
-        const group = this.groups.find((g) => g.groupID === multipleCasesGroup);
-        if (!group) return;
-        const nameAlreadyExists = group.cases.find((c) =>
-          multipleCaseNameArray.includes(c.name),
-        );
-        if (nameAlreadyExists) {
-          this.invalidCaseName = true;
-          return;
-        }
+        this.addMultipleCases(multipleCaseRequest);
+        this.$emit('close-add-window');
+        return;
       }
-      const multipleCaseRequest: MultipleCaseAddRequest = {
-        groupID: multipleCasesGroup,
-        numberOfCases: multipleCasesCount,
-        prefix: multipleCasesPrefix,
-        suffix: multipleCasesSuffix,
-      };
+      const group = this.groups.find((g) => g.groupID === multipleCasesGroup);
+      if (!group) return;
+      const nameAlreadyExists = group.cases.find((c) =>
+        multipleCaseNameArray.includes(c.name),
+      );
+      if (nameAlreadyExists) {
+        this.invalidCaseName = true;
+        return;
+      }
       this.addMultipleCases(multipleCaseRequest);
+      this.$emit('close-add-window');
+      return;
     }
     this.$emit('close-add-window');
   }
