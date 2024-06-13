@@ -74,6 +74,7 @@ import { LanguageInfo, supportedLanguages } from '../../../../grader/util';
 export default class CodeTab extends Vue {
   inputLimit = 512 * 1024; // Hardcoded as 512kiB _must_ be enough for anybody.
   T = T;
+  ui = ui;
   omegaup = omegaup;
   selectedLanguage = '';
   code = '';
@@ -148,6 +149,7 @@ export default class CodeTab extends Vue {
   updateCode() {
     this.$store.commit('updateCodeContent', this.code);
     this.$store.commit('updateCodeExtension', this.extension);
+    ui.success(T.problemCreatorUpdateAlert);
   }
 }
 </script>

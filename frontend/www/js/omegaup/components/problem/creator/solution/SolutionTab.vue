@@ -35,6 +35,7 @@
 import { Vue, Component, Ref } from 'vue-property-decorator';
 import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../../../markdown';
+import * as ui from '../../../../ui';
 import T from '../../../../lang';
 
 import omegaup_Markdown from '../../../Markdown.vue';
@@ -53,6 +54,7 @@ export default class SolutionTab extends Vue {
   @Ref() readonly markdownInput!: HTMLTextAreaElement;
 
   T = T;
+  ui = ui;
   markdownEditor: Markdown.Editor | null = null;
 
   currentSolutionMarkdown: string = T.problemCreatorEmpty;
@@ -70,6 +72,7 @@ export default class SolutionTab extends Vue {
 
   updateMarkdown() {
     this.$store.commit('updateSolutionMarkdown', this.currentSolutionMarkdown);
+    ui.success(T.problemCreatorUpdateAlert);
   }
 }
 </script>
