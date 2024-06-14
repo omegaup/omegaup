@@ -85,8 +85,7 @@ describe('AddPanel.vue', () => {
 
     const groupId = groups[0].groupID;
 
-    wrapper.setData({ tab: 'case' });
-    await Vue.nextTick();
+    await wrapper.setData({ tab: 'case' });
 
     const caseNameInput = wrapper.find('input[name="case-name"]');
     const casePointsInput = wrapper.find('input[name="case-points"]');
