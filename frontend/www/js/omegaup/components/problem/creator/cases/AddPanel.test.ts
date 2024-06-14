@@ -83,7 +83,7 @@ describe('AddPanel.vue', () => {
     expect(groups[0].points).toBe(10);
     expect(groups[0].ungroupedCase).toBe(false);
 
-    const groupId = groups?.[0].groupID;
+    const groupId = groups[0].groupID;
 
     wrapper.setData({ tab: 'case' });
     await Vue.nextTick();
