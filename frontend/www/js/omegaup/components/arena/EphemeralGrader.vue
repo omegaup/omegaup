@@ -58,6 +58,6 @@ export default class EphemeralGrader extends Vue {
 <style lang="scss" scoped>
 iframe {
   width: 100%;
-  min-height: 40em;
+  min-height: 60em;
 }
 </style>
