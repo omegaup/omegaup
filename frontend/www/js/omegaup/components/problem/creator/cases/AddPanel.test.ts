@@ -94,11 +94,10 @@ describe('AddPanel.vue', () => {
 
     await wrapper.find('form').trigger('submit.prevent');
 
-    const groupedCases = store.state.casesStore.groups?.[0].cases;
-    expect(groupedCases.length).toBe(1);
-    expect(groupedCases[0].name).toBe('groupedtestcase');
-    expect(groupedCases[0].groupID).toBe(groupId);
-    expect(groupedCases[0].points).toBe(10);
+    const [groupedCases] = store.state.casesStore.groups[0].cases;
+    expect(groupedCase.name).toBe('groupedtestcase');
+    expect(groupedCase.groupID).toBe(groupId);
+    expect(groupedCase.points).toBe(10);
   });
 
   it('Should add an ungrouped case to the store', async () => {
