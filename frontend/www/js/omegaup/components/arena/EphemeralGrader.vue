@@ -21,8 +21,22 @@ export default class EphemeralGrader extends Vue {
 
   mounted(): void {
     (this.$refs.grader as HTMLIFrameElement).onload = () => this.iframeLoaded();
-  }
 
+    window.addEventListener('resize', this.handleWindowResize);
+  }
+  unmounted(): void {
+    window.removeEventListener('resize', this.handleWindowResize);
+  }
+  handleWindowResize(): void {
+    const iframe = this.$refs.grader as HTMLIFrameElement;
+
+    // zoom in/out manually using device pixel ratio
+    // zoom property was recently supported on firefox browser
+    // so this approach works on most browsers
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    iframe.style.zoom = 1 / window.devicePixelRatio;
+  }
   @Watch('problem')
   onProblemChanged() {
     if (!this.loaded) {
