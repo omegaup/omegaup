@@ -5,14 +5,22 @@
         <BIconPencil class="mr-1" />
         <span name="writing" data-tab> {{ T.problemCreatorStatement }}</span>
       </template>
-      <omegaup-problem-creator-statement-tab />
+      <omegaup-problem-creator-statement-tab
+        @show-update-success-message="
+          () => $emit('show-update-success-message')
+        "
+      />
     </b-tab>
     <b-tab>
       <template #title>
         <BIconFileCode class="mr-1" />
         <span name="code" data-tab> {{ T.problemCreatorCode }}</span>
       </template>
-      <omegaup-problem-creator-code-tab />
+      <omegaup-problem-creator-code-tab
+        @show-update-success-message="
+          () => $emit('show-update-success-message')
+        "
+      />
     </b-tab>
     <b-tab>
       <template #title>
@@ -26,7 +34,11 @@
         <BIconArrowUpRight class="mr-1" />
         <span name="solution" data-tab> {{ T.problemCreatorSolution }}</span>
       </template>
-      <omegaup-problem-creator-solution-tab />
+      <omegaup-problem-creator-solution-tab
+        @show-update-success-message="
+          () => $emit('show-update-success-message')
+        "
+      />
     </b-tab>
   </b-tabs>
 </template>

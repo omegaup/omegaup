@@ -71,7 +71,7 @@ export default class StatementTab extends Vue {
 
   updateMarkdown() {
     this.$store.commit('updateMarkdown', this.currentMarkdown);
-    ui.success(T.problemCreatorUpdateAlert);
+    this.$emit('show-update-success-message');
   }
 }
 </script>

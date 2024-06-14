@@ -149,7 +149,7 @@ export default class CodeTab extends Vue {
   updateCode() {
     this.$store.commit('updateCodeContent', this.code);
     this.$store.commit('updateCodeExtension', this.extension);
-    ui.success(T.problemCreatorUpdateAlert);
+    this.$emit('show-update-success-message');
   }
 }
 </script>

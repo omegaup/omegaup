@@ -72,7 +72,7 @@ export default class SolutionTab extends Vue {
 
   updateMarkdown() {
     this.$store.commit('updateSolutionMarkdown', this.currentSolutionMarkdown);
-    ui.success(T.problemCreatorUpdateAlert);
+    this.$emit('show-update-success-message');
   }
 }
 </script>
