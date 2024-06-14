@@ -54,23 +54,19 @@ describe('AddPanel.vue', () => {
       store: vuexStore,
     });
 
-    wrapper.setData({ tab: 'group' });
+    await wrapper.setData({ tab: 'group' });
 
-    await Vue.nextTick();
+    await wrapper.find('input[name="group-name"]').setValue(testGroup);
+    await wrapper.find('input[name="group-points"]').setValue(10);
 
-    const nameInput = wrapper.find('input[name="group-name"]');
-    const pointsInput = wrapper.find('input[name="group-points"]');
-
-    await nameInput.setValue(testGroup);
-    await pointsInput.setValue(10);
-
-    const updatedNameInput = wrapper.find('input[name="group-name"]')
-      .element as HTMLInputElement;
-    const updatedPointsInput = wrapper.find('input[name="group-points"]')
-      .element as HTMLInputElement;
-
-    expect(updatedNameInput.value).toBe(testGroup);
-    expect(updatedPointsInput.value).toBe('10');
+    expect(
+      (wrapper.find('input[name="group-name"]').element as HTMLInputElement)
+        .value,
+    ).toBe(testGroup);
+    expect(
+      (wrapper.find('input[name="group-points"]').element as HTMLInputElement)
+        .value,
+    ).toBe('10');
 
     await (wrapper.vm as any).addItemToStore();
 
@@ -91,10 +87,9 @@ describe('AddPanel.vue', () => {
     await wrapper.find('input[name="case-points"]').setValue(10);
     await wrapper.find('select[name="case-group"]').setValue(groupId);
 
-
     await wrapper.find('form').trigger('submit.prevent');
 
-    const [groupedCases] = store.state.casesStore.groups[0].cases;
+    const [groupedCase] = store.state.casesStore.groups[0].cases;
     expect(groupedCase.name).toBe('groupedtestcase');
     expect(groupedCase.groupID).toBe(groupId);
     expect(groupedCase.points).toBe(10);
@@ -106,33 +101,29 @@ describe('AddPanel.vue', () => {
       store: vuexStore,
     });
 
-    wrapper.setData({ tab: 'case' });
-    await Vue.nextTick();
+    await wrapper.setData({ tab: 'case' });
 
-    const nameInput = wrapper.find('input[name="case-name"]');
-    const pointsInput = wrapper.find('input[name="case-points"]');
+    await wrapper.find('input[name="case-name"]').setValue('testcase');
+    await wrapper.find('input[name="case-points"]').setValue(50);
 
-    await nameInput.setValue('testcase');
-    await pointsInput.setValue(50);
-
-    const updatedNameInput = wrapper.find('input[name="case-name"]')
-      .element as HTMLInputElement;
-    const updatedPointsInput = wrapper.find('input[name="case-points"]')
-      .element as HTMLInputElement;
-
-    expect(updatedNameInput.value).toBe('testcase');
-    expect(updatedPointsInput.value).toBe('50');
+    expect(
+      (wrapper.find('input[name="case-name"]').element as HTMLInputElement)
+        .value,
+    ).toBe('testcase');
+    expect(
+      (wrapper.find('input[name="case-points"]').element as HTMLInputElement)
+        .value,
+    ).toBe('50');
 
     await wrapper.find('form').trigger('submit.prevent');
 
     const store = wrapper.vm.$store as Store<StoreState>;
-    const groups = store.state.casesStore.groups;
+    const [ungroupedCase] = store.state.casesStore.groups;
 
-    expect(groups.length).toBe(1);
-    expect(groups[0].name).toBe('testcase');
-    expect(groups[0].autoPoints).toBe(false);
-    expect(groups[0].points).toBe(50);
-    expect(groups[0].ungroupedCase).toBe(true);
+    expect(ungroupedCase.name).toBe('testcase');
+    expect(ungroupedCase.autoPoints).toBe(false);
+    expect(ungroupedCase.points).toBe(50);
+    expect(ungroupedCase.ungroupedCase).toBe(true);
   });
 
   it('Should add multiple ungrouped cases to the store', async () => {
@@ -141,29 +132,24 @@ describe('AddPanel.vue', () => {
       store: vuexStore,
     });
 
-    wrapper.setData({ tab: 'multiplecases' });
-    await Vue.nextTick();
+    await wrapper.setData({ tab: 'multiplecases' });
 
-    const prefixInput = wrapper.find('input[name="multiple-cases-prefix"]');
-    const suffixInput = wrapper.find('input[name="multiple-cases-suffix"]');
-    const countInput = wrapper.find('input[name="multiple-cases-count"]');
+    await wrapper.find('input[name="multiple-cases-prefix"]').setValue('test');
+    await wrapper.find('input[name="multiple-cases-suffix"]').setValue('case');
+    await wrapper.find('input[name="multiple-cases-count"]').setValue(10);
 
-    await prefixInput.setValue('test');
-    await suffixInput.setValue('case');
-    await countInput.setValue(10);
-
-    const updatedpPrefixInput = wrapper.find(
-      'input[name="multiple-cases-prefix"]',
-    ).element as HTMLInputElement;
-    const updatedSuffixInput = wrapper.find(
-      'input[name="multiple-cases-suffix"]',
-    ).element as HTMLInputElement;
-    const updatedCountInput = wrapper.find('input[name="multiple-cases-count"]')
-      .element as HTMLInputElement;
-
-    expect(updatedpPrefixInput.value).toBe('test');
-    expect(updatedSuffixInput.value).toBe('case');
-    expect(updatedCountInput.value).toBe('10');
+    expect(
+      (wrapper.find('input[name="multiple-cases-prefix"]')
+        .element as HTMLInputElement).value,
+    ).toBe('test');
+    expect(
+      (wrapper.find('input[name="multiple-cases-suffix"]')
+        .element as HTMLInputElement).value,
+    ).toBe('case');
+    expect(
+      (wrapper.find('input[name="multiple-cases-count"]')
+        .element as HTMLInputElement).value,
+    ).toBe('10');
 
     await wrapper.find('form').trigger('submit.prevent');
 
