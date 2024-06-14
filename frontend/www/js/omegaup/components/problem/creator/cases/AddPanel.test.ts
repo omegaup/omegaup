@@ -87,13 +87,10 @@ describe('AddPanel.vue', () => {
 
     await wrapper.setData({ tab: 'case' });
 
-    const caseNameInput = wrapper.find('input[name="case-name"]');
-    const casePointsInput = wrapper.find('input[name="case-points"]');
-    const caseGroupName = wrapper.find('select[name="case-group"]');
+    await wrapper.find('input[name="case-name"]').setValue('groupedtestcase');
+    await wrapper.find('input[name="case-points"]').setValue(10);
+    await wrapper.find('select[name="case-group"]').setValue(groupId);
 
-    await caseNameInput.setValue('groupedtestcase');
-    await casePointsInput.setValue(10);
-    await caseGroupName.setValue(groupId);
 
     await wrapper.find('form').trigger('submit.prevent');
 
