@@ -4682,6 +4682,7 @@ export namespace types {
   }
 
   export interface Submission {
+    guid: string;
     alias: string;
     language: string;
     memory: number;

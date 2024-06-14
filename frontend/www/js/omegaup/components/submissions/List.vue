@@ -1,6 +1,6 @@
 <template>
   <div
-    v-infinite-scroll="() => $emit('fetch-more-data')"
+    v-infinite-scroll="() => $emit('fetch-more-data', submissions[0].username)"
     submissions-problem
     infinite-scroll-disabled="isScrollDisabled"
     infinite-scroll-distance="10"
@@ -60,7 +60,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(submission, index) in submissions" :key="index">
+            <tr v-for="submission in submissions" :key="submission.guid">
               <td class="text-center">
                 {{ time.formatDateTime(submission.time) }}
               </td>
@@ -223,7 +223,9 @@ table.submissions-table > tbody > tr > td {
 }
 .line {
   height: 49px;
-  background: #e0e0e0;
+  background: var(
+    --arena-submissions-list-skeletonloader-final-background-color
+  );
   border-radius: 8px;
   animation: loading 1.5s infinite;
 }

@@ -46,15 +46,9 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'fetch-more-data': () => {
+          'fetch-more-data': (username: string) => {
             if (this.loading || this.endOfResults) return;
             this.loading = true;
-            // Get Username
-            const currentUrlParts = window.location.pathname
-              .split('/')
-              .filter((part) => part !== '');
-            const username =
-              currentUrlParts[currentUrlParts.indexOf('submissions') + 1];
             this.searchedUsername = username ?? null;
 
             api.Submission.list({
