@@ -4147,7 +4147,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Prepare all the properties to be sent to the rank table view via TypeScript
      *
-     * @omegaup-request-param mixed $category
+     * @omegaup-request-param 'all'|'female'|null $category
      *
      * @return array{templateProperties: array{payload: CoderOfTheMonthPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
@@ -4172,12 +4172,20 @@ class User extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
 
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['category'],
+        $category = $r->ensureOptionalEnum(
             'category',
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
-        );
-        $category = $r['category'] ?? 'all';
+        ) ?? 'all';
+
+        if ($category === 'all') {
+            $title = new \OmegaUp\TranslationString(
+                'omegaupTitleCodersofthemonth'
+            );
+        } else {
+            $title = new \OmegaUp\TranslationString(
+                'omegaupTitleCodersofthemonthFemale'
+            );
+        }
 
         $candidates = \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
             $dateToSelect,
@@ -4185,7 +4193,6 @@ class User extends \OmegaUp\Controllers\Controller {
         );
         $bestCoders = [];
         foreach ($candidates as $candidate) {
-            /** @psalm-suppress InvalidArrayOffset Even though $candidate does have this index, psalm cannot see it :/ */
             unset($candidate['user_id']);
             $bestCoders[] = $candidate;
         }
@@ -4213,15 +4220,7 @@ class User extends \OmegaUp\Controllers\Controller {
             return [
                 'templateProperties' => [
                     'payload' => $response,
-                    'title' => (
-                        (strval($category) === 'female') ?
-                        new \OmegaUp\TranslationString(
-                            'omegaupTitleCodersofthemonthFemale'
-                        ) :
-                        new \OmegaUp\TranslationString(
-                            'omegaupTitleCodersofthemonth'
-                        )
-                    ),
+                    'title' => $title,
                 ],
                 'entrypoint' => 'coder_of_the_month',
             ];
@@ -4244,15 +4243,7 @@ class User extends \OmegaUp\Controllers\Controller {
         return [
             'templateProperties' => [
                 'payload' => $response,
-                'title' => (
-                    (strval($category) === 'female') ?
-                    new \OmegaUp\TranslationString(
-                        'omegaupTitleCodersofthemonthFemale'
-                    ) :
-                    new \OmegaUp\TranslationString(
-                        'omegaupTitleCodersofthemonth'
-                    )
-                ),
+                'title' => $title,
             ],
             'entrypoint' => 'coder_of_the_month',
         ];
