@@ -355,6 +355,17 @@ export const casesStore: Module<CasesState, RootState> = {
         ) ?? null
       );
     },
+    getUngroupedCases: (state) => {
+      return state.groups.filter((group) => group.ungroupedCase === true);
+    },
+    getGroupsButUngroupedCases: (state) => {
+      return state.groups.filter((group) => group.ungroupedCase === false);
+    },
+    getTotalPointsForUngroupedCases: (state) => {
+      return state.groups
+        .filter((group) => group.ungroupedCase === true)
+        .reduce((accumulator, group) => accumulator + (group.points || 0), 0);
+    },
   },
 };
 
