@@ -323,11 +323,6 @@
                 >
                   <font-awesome-icon :icon="['fas', 'question-circle']" />
                 </button>
-                <span
-                  v-if="run.submission_feedback_id !== null && showDisqualify"
-                  class="position-absolute top-0 end-0 badge badge-pill badge-danger"
-                  >1
-                </span>
               </td>
               <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
               <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
@@ -377,10 +372,15 @@
                   @click="onRunDetails(run)"
                 >
                   <font-awesome-icon :icon="['fas', 'search-plus']" />
+                  <span
+                    v-if="run.suggestions && run.suggestions > 0"
+                    class="position-absolute badge badge-danger"
+                    >{{ run.suggestions }}
+                  </span>
                 </button>
                 <button
                   v-if="requestFeedback"
-                  class="details btn-outline-dark btn-sm"
+                  class="details btn-outline-dark btn-sm ml-1"
                   @click="$emit('request-feedback', run.guid)"
                 >
                   <font-awesome-icon
@@ -393,7 +393,22 @@
                 v-else-if="showDetails || showDisqualify || showRejudge"
                 :data-actions="run.guid"
               >
-                <div class="dropdown">
+                <div class="d-inline-block mr-2">
+                  <button
+                    class="details btn-outline-dark btn-sm"
+                    data-runs-show-details-button
+                    :data-run-details="run.guid"
+                    @click="onRunDetails(run)"
+                  >
+                    <font-awesome-icon :icon="['fas', 'search-plus']" />
+                    <span
+                      v-if="run.suggestions && run.suggestions > 0"
+                      class="position-absolute badge badge-danger"
+                      >{{ run.suggestions }}
+                    </span>
+                  </button>
+                </div>
+                <div class="dropdown d-inline-block">
                   <button
                     data-runs-actions-button
                     class="btn btn-secondary dropdown-toggle"
@@ -405,15 +420,6 @@
                     {{ T.arenaRunsActions }}
                   </button>
                   <div class="dropdown-menu">
-                    <button
-                      v-if="showDetails"
-                      data-runs-show-details-button
-                      :data-run-details="run.guid"
-                      class="btn-link dropdown-item"
-                      @click="onRunDetails(run)"
-                    >
-                      {{ T.arenaRunsActionsDetails }}
-                    </button>
                     <button
                       v-if="showRejudge"
                       :data-actions-rejudge="run.guid"
@@ -580,7 +586,7 @@ export enum PopupDisplayed {
     'omegaup-user-username': user_Username,
   },
 })
-export default class Runs extends Vue {
+export default class RunsForCourses extends Vue {
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: true }) isProblemsetOpened!: boolean;
   @Prop({ default: false }) showContest!: boolean;
