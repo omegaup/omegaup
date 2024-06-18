@@ -162,38 +162,31 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
      */
     final public static function isInsideSubmissionGap(
         \OmegaUp\DAO\VO\Submissions $submission,
-        ?int $problemsetId,
-        ?\OmegaUp\DAO\VO\Contests $contest,
         int $problemId,
-        int $identityId
+        int $identityId,
+        ?\OmegaUp\DAO\VO\Contests $contest = null
     ): bool {
+        $problemsetId = $contest?->problemset_id;
         // Acquire row-level locks using `FOR UPDATE` so that multiple
         // concurrent queries cannot all obtain the same submission time and
         // incorrectly insert several submissions, thinking that they were all
         // within the submission gap.
-        if (is_null($problemsetId)) {
-            $sql = '
-                SELECT
-                    MAX(s.time)
-                FROM
-                    Submissions s
-                WHERE
-                    s.identity_id = ? AND s.problem_id = ?
-                FOR UPDATE;
-            ';
-            $val = [$identityId, $problemId];
-        } else {
-            $sql = '
-                SELECT
-                    MAX(s.time)
-                FROM
-                    Submissions s
-                WHERE
-                    s.identity_id = ? AND s.problem_id = ? AND s.problemset_id = ?
-                FOR UPDATE;
-            ';
-            $val = [$identityId, $problemId, $problemsetId];
+        $problemsetIdFilter = '';
+        $val = [$identityId, $problemId];
+
+        if (!is_null($problemsetId)) {
+            $problemsetIdFilter = 'AND s.problemset_id = ?';
+            $val[] = $problemsetId;
         }
+
+        $sql = "SELECT
+                    MAX(s.time)
+                FROM
+                    Submissions s
+                WHERE
+                    s.identity_id = ? AND s.problem_id = ? {$problemsetIdFilter}
+                FOR UPDATE;
+        ";
 
         /** @var \OmegaUp\Timestamp|null */
         $lastRunTime = \OmegaUp\MySQLConnection::getInstance()->GetOne(
