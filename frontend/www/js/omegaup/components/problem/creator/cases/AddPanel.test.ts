@@ -79,6 +79,49 @@ describe('AddPanel.vue', () => {
     expect(groups[0].points).toBe(10);
     expect(groups[0].ungroupedCase).toBe(false);
   });
+  it('Should add multiple cases to the store', async () => {
+    const wrapper: Wrapper<AddPanel> = mount(AddPanel, {
+      localVue,
+      store: vuexStore,
+    });
+
+    wrapper.setData({ tab: 'multiplecases' });
+
+    await Vue.nextTick();
+
+    const prefixInput = wrapper.find('input[name="multiple-cases-prefix"]');
+    const suffixInput = wrapper.find('input[name="multiple-cases-suffix"]');
+    const countInput = wrapper.find('input[name="multiple-cases-count"]');
+
+    await prefixInput.setValue('case-');
+    await suffixInput.setValue('-easy');
+    await countInput.setValue(3);
+
+    const updatedPrefixInput = wrapper.find(
+      'input[name="multiple-cases-prefix"]',
+    ).element as HTMLInputElement;
+    const updatedSuffixInput = wrapper.find(
+      'input[name="multiple-cases-suffix"]',
+    ).element as HTMLInputElement;
+    const updatedCountInput = wrapper.find('input[name="multiple-cases-count"]')
+      .element as HTMLInputElement;
+
+    expect(updatedPrefixInput.value).toBe('case-');
+    expect(updatedSuffixInput.value).toBe('-easy');
+    expect(updatedCountInput.value).toBe('3');
+
+    await (wrapper.vm as any).addItemToStore();
+
+    const store = wrapper.vm.$store as Store<StoreState>;
+    const groups = store.state.casesStore.groups;
+
+    expect(groups.length).toBe(3);
+    for (let i = 0; i < 3; i++) {
+      expect(groups[i].name).toBe(`case-${i + 1}-easy`);
+      expect(groups[i].autoPoints).toBe(true);
+      expect(groups[i].ungroupedCase).toBe(true);
+    }
+  });
   it('Should contain 3 tabs', async () => {
     const wrapper = mount(AddPanel, {
       localVue,

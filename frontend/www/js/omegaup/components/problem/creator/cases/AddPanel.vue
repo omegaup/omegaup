@@ -41,7 +41,7 @@
             name="modal-form"
             @click="tab = 'multiplecases'"
           >
-            <multiple-cases-input />
+            <multiple-cases-input ref="multiple-cases-input" />
           </b-tab>
         </b-tabs>
       </div>
@@ -70,6 +70,7 @@ import {
   Group,
   CaseRequest,
   AddTabTypes,
+  MultipleCaseAddRequest,
 } from '@/js/omegaup/problem/creator/types';
 import { NIL, v4 as uuid } from 'uuid';
 
@@ -91,9 +92,13 @@ export default class AddPanel extends Vue {
 
   @Ref('case-input') caseInputRef!: cases_CaseInput;
   @Ref('group-input') groupInputRef!: cases_GroupInput;
+  @Ref('multiple-cases-input') multipleCasesInputRef!: cases_MultipleCasesInput;
 
   @casesStore.Mutation('addCase') addCase!: (caseRequest: CaseRequest) => void;
   @casesStore.Mutation('addGroup') addGroup!: (groupRequest: Group) => void;
+  @casesStore.Action('addMultipleCases') addMultipleCases!: (
+    multipleCasesRequest: MultipleCaseAddRequest,
+  ) => void;
   @casesStore.State('groups') groups!: Group[];
 
   addItemToStore() {
@@ -133,6 +138,7 @@ export default class AddPanel extends Vue {
         autoPoints: caseAutoPoints,
       });
     } else if (this.tab === 'group') {
+      // Group input
       const groupName = this.groupInputRef.groupName;
       const groupPoints = this.groupInputRef.groupPoints;
       const groupAutoPoints = groupPoints === null;
@@ -151,6 +157,21 @@ export default class AddPanel extends Vue {
         autoPoints: groupAutoPoints,
         ungroupedCase: false,
         cases: [],
+      });
+    } else if (this.tab === 'multiplecases') {
+      // Multiple cases input
+      const multipleCasesPrefix = this.multipleCasesInputRef
+        .multipleCasesPrefix;
+      const multipleCasesSuffix = this.multipleCasesInputRef
+        .multipleCasesSuffix;
+      const multipleCasesCount = this.multipleCasesInputRef.multipleCasesCount;
+      const multipleCasesGroup = this.multipleCasesInputRef.multipleCasesGroup;
+
+      this.addMultipleCases({
+        prefix: multipleCasesPrefix,
+        suffix: multipleCasesSuffix,
+        numberOfCases: multipleCasesCount,
+        groupID: multipleCasesGroup,
       });
     }
     this.$emit('close-add-window');

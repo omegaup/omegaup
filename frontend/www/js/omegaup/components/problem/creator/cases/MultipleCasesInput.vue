@@ -11,6 +11,7 @@
         >
           <b-form-input
             v-model="multipleCasesPrefix"
+            name="multiple-cases-prefix"
             :formatter="formatter"
             autocomplete="off"
           />
@@ -24,6 +25,7 @@
         >
           <b-form-input
             v-model="multipleCasesSuffix"
+            name="multiple-cases-suffix"
             :formatter="formatter"
             autocomplete="off"
           />
@@ -37,13 +39,18 @@
     >
       <b-form-input
         v-model="multipleCasesCount"
+        name="multiple-cases-count"
         :formatter="numberFormatter"
         type="number"
         number
       />
     </b-form-group>
     <b-form-group :label="T.problemCreatorGroupName" label-for="case-group">
-      <b-form-select v-model="multipleCasesGroup" />
+      <b-form-select
+        v-model="multipleCasesGroup"
+        name="multiple-cases-group"
+        :options="options"
+      />
     </b-form-group>
   </div>
 </template>
@@ -53,15 +60,30 @@ import { GroupID } from '../../../../problem/creator/types';
 import { NIL } from 'uuid';
 import { Component, Vue } from 'vue-property-decorator';
 import T from '../../../../lang';
+import { namespace } from 'vuex-class';
+
+const casesStore = namespace('casesStore');
 
 @Component
 export default class MultipleCasesInput extends Vue {
+  @casesStore.Getter('getGroupIdsAndNames') storedGroups!: {
+    value: string;
+    text: string;
+  }[];
+
   multipleCasesPrefix = '';
   multipleCasesSuffix = '';
   multipleCasesCount = 1;
   multipleCasesGroup: GroupID = NIL;
 
   T = T;
+
+  get options() {
+    return [
+      { value: NIL, text: T.problemCreatorNoGroup },
+      ...this.storedGroups,
+    ];
+  }
 
   get caseNamePreview() {
     return `${this.multipleCasesPrefix}1${this.multipleCasesSuffix}, ${this.multipleCasesPrefix}2${this.multipleCasesSuffix}...`;
@@ -74,7 +96,7 @@ export default class MultipleCasesInput extends Vue {
 
   // Ensures the numebr is always above 1
   numberFormatter(number: number) {
-    return Math.max(number, 1);
+    return Math.max(number, 0);
   }
 }
 </script>
