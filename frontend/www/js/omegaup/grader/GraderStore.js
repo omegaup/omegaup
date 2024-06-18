@@ -446,6 +446,18 @@ let store = new Vuex.Store({
         !Object.prototype.hasOwnProperty.call(state.request.input.cases, name)
       )
         return;
+
+      let keys = Object.keys(store.state.request.input.cases);
+
+      // do not delete if there is only one test case
+      if (keys.length === 1) {
+        return;
+      }
+
+      // switch to a random case
+      let caseName = keys[0] === name ? keys[1] : keys[0];
+      store.commit('currentCase', caseName);
+
       Vue.delete(state.request.input.cases, name);
       state.dirty = true;
     },
