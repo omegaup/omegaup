@@ -7,11 +7,12 @@
 </template>
 
 <script lang="ts">
+import { Component, Vue, Prop, Ref, Watch } from 'vue-property-decorator';
+import { types } from '../../api_types';
+
 interface CSSStyleDeclaration {
   zoom?: string | number;
 }
-import { Component, Vue, Prop, Ref, Watch } from 'vue-property-decorator';
-import { types } from '../../api_types';
 
 @Component
 export default class EphemeralGrader extends Vue {
