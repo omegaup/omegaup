@@ -164,6 +164,12 @@ export const casesStore: Module<CasesState, RootState> = {
       );
       state = assignMissingPoints(state);
     },
+    deleteUngroupedCases(state) {
+      state.groups = state.groups.filter(
+        (group) => group.ungroupedCase === false,
+      );
+      state = assignMissingPoints(state);
+    },
     deleteCase(state, caseGroupIDToBeDeleted: CaseGroupID) {
       const groupTarget = state.groups.find(
         (group) => group.groupID == caseGroupIDToBeDeleted.groupID,

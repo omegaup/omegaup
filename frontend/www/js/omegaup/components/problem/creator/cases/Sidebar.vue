@@ -36,13 +36,39 @@
               <b-badge variant="primary">{{ ungroupedCases.length }}</b-badge
               >&nbsp;
               <b-badge variant="info">
-                {{ Math.round(getTotalPointsForUngroupedCases) }} pts</b-badge
+                {{ Math.round(getTotalPointsForUngroupedCases) }}
+                {{ T.problemCreatorPointsAbbreviation }}</b-badge
               >
             </div></b-button
           >
-          <b-button variant="light" size="sm">
-            <BIconThreeDotsVertical />
-          </b-button>
+          <b-dropdown variant="light" size="sm" right no-caret>
+            <template #button-content>
+              <BIconThreeDotsVertical />
+            </template>
+            <b-dropdown-item disabled
+              ><b-row
+                ><div><BIconTrash variant="danger" font-scale=".95" /></div>
+                &ensp;&ensp;
+                <div style="margin-left: 8%">
+                  {{ T.problemCreatorDeleteGroup }}
+                </div></b-row
+              >
+            </b-dropdown-item>
+            <b-dropdown-item
+              @click="
+                () => {
+                  deleteUngroupedCases();
+                }
+              "
+              ><b-row
+                ><div><BIconTrash variant="danger" font-scale=".95" /></div>
+                &ensp;&ensp;
+                <div style="margin-left: 8%">
+                  {{ T.problemCreatorDeleteCases }}
+                </div></b-row
+              >
+            </b-dropdown-item>
+          </b-dropdown>
           <b-collapse v-model="visible[0]" style="width: 100%">
             <b-card style="border: none; width: 100%">
               <b-row
@@ -58,13 +84,32 @@
                   ><div style="float: left">{{ truncate(name) }}&nbsp;</div>
                   <div style="float: right">
                     <b-badge variant="info">
-                      {{ Math.round(points || 0) }}</b-badge
+                      {{ Math.round(points || 0) }}
+                      {{ T.problemCreatorPointsAbbreviation }}</b-badge
                     >
                   </div></b-button
                 >
-                <b-button variant="light" size="sm">
-                  <BIconThreeDotsVertical />
-                </b-button>
+                <b-dropdown variant="light" size="sm" right no-caret>
+                  <template #button-content>
+                    <BIconThreeDotsVertical />
+                  </template>
+                  <b-dropdown-item
+                    @click="
+                      () => {
+                        deleteCase({ groupID, caseID: '' });
+                      }
+                    "
+                    ><b-row
+                      ><div>
+                        <BIconTrash variant="danger" font-scale=".95" />
+                      </div>
+                      &ensp;&ensp;
+                      <div style="margin-left: 8%">
+                        {{ T.problemCreatorDeleteCase }}
+                      </div></b-row
+                    >
+                  </b-dropdown-item>
+                </b-dropdown>
               </b-row>
             </b-card>
           </b-collapse>
@@ -85,13 +130,44 @@
               <b-badge variant="primary">{{ cases.length }}</b-badge
               >&nbsp;
               <b-badge variant="info"
-                >{{ Math.round(points || 0) }} pts</b-badge
+                >{{ Math.round(points || 0) }}
+                {{ T.problemCreatorPointsAbbreviation }}</b-badge
               >
             </div></b-button
           >
-          <b-button variant="light" size="sm">
-            <BIconThreeDotsVertical />
-          </b-button>
+          <b-dropdown variant="light" size="sm" right no-caret>
+            <template #button-content>
+              <BIconThreeDotsVertical />
+            </template>
+            <b-dropdown-item
+              @click="
+                () => {
+                  deleteGroup(groupID);
+                }
+              "
+              ><b-row
+                ><div><BIconTrash variant="danger" font-scale=".95" /></div>
+                &ensp;&ensp;
+                <div style="margin-left: 8%">
+                  {{ T.problemCreatorDeleteGroup }}
+                </div></b-row
+              >
+            </b-dropdown-item>
+            <b-dropdown-item
+              @click="
+                () => {
+                  deleteGroupCases(groupID);
+                }
+              "
+              ><b-row
+                ><div><BIconTrash variant="danger" font-scale=".95" /></div>
+                &ensp;&ensp;
+                <div style="margin-left: 8%">
+                  {{ T.problemCreatorDeleteCases }}
+                </div></b-row
+              >
+            </b-dropdown-item>
+          </b-dropdown>
           <b-collapse v-model="visible[groupID]" style="width: 100%">
             <b-card style="border: none; width: 100%">
               <b-row
@@ -107,13 +183,32 @@
                   ><div style="float: left">{{ truncate(caseName) }}&nbsp;</div>
                   <div style="float: right">
                     <b-badge variant="info">
-                      {{ Math.round(casePoints || 0) }}</b-badge
+                      {{ Math.round(casePoints || 0) }}
+                      {{ T.problemCreatorPointsAbbreviation }}</b-badge
                     >
                   </div></b-button
                 >
-                <b-button variant="light" size="sm">
-                  <BIconThreeDotsVertical />
-                </b-button>
+                <b-dropdown variant="light" size="sm" right no-caret>
+                  <template #button-content>
+                    <BIconThreeDotsVertical />
+                  </template>
+                  <b-dropdown-item
+                    @click="
+                      () => {
+                        deleteCase({ groupID, caseID });
+                      }
+                    "
+                    ><b-row
+                      ><div>
+                        <BIconTrash variant="danger" font-scale=".95" />
+                      </div>
+                      &ensp;&ensp;
+                      <div style="margin-left: 8%">
+                        {{ T.problemCreatorDeleteCase }}
+                      </div></b-row
+                    >
+                  </b-dropdown-item>
+                </b-dropdown>
               </b-row>
             </b-card>
           </b-collapse>
@@ -127,7 +222,11 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import T from '../../../../lang';
-import { Group } from '@/js/omegaup/problem/creator/types';
+import {
+  Group,
+  GroupID,
+  CaseGroupID,
+} from '@/js/omegaup/problem/creator/types';
 
 const casesStore = namespace('casesStore');
 
@@ -143,13 +242,29 @@ export default class Sidebar extends Vue {
   groupsButUngroupedCases!: Group[];
   @casesStore.Getter('getTotalPointsForUngroupedCases')
   getTotalPointsForUngroupedCases!: number;
+  @casesStore.Mutation('deleteGroup') deleteGroup!: (groupID: GroupID) => void;
+  @casesStore.Mutation('deleteCase') deleteCase!: ({
+    groupID,
+    caseID,
+  }: CaseGroupID) => void;
+  @casesStore.Mutation('deleteGroupCases') deleteGroupCases!: (
+    groupID: GroupID,
+  ) => void;
+  @casesStore.Mutation('deleteUngroupedCases')
+  deleteUngroupedCases!: () => void;
 
   visible: any = {};
 
   truncate(str: string) {
-    const truncatedStr = str.slice(0, 7);
+    const truncatedStr = str.slice(0, 5);
     if (truncatedStr === str) return str;
-    return truncatedStr + '...';
+    return truncatedStr + '..';
   }
 }
 </script>
+
+<style>
+.dropdown-menu {
+  min-width: 9rem !important;
+}
+</style>
