@@ -7,6 +7,9 @@
 </template>
 
 <script lang="ts">
+interface CSSStyleDeclaration {
+  zoom?: string | number;
+}
 import { Component, Vue, Prop, Ref, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 
@@ -30,12 +33,9 @@ export default class EphemeralGrader extends Vue {
   handleWindowResize(): void {
     const iframe = this.$refs.grader as HTMLIFrameElement;
 
-    // zoom in/out manually using device pixel ratio
-    // zoom property was recently supported on firefox browser
-    // so this approach works on most browsers
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    iframe.style.zoom = 1 / window.devicePixelRatio;
+    (iframe.style as CSSStyleDeclaration).zoom = String(
+      1 / window.devicePixelRatio,
+    );
   }
   @Watch('problem')
   onProblemChanged() {
