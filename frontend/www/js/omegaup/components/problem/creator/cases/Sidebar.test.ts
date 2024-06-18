@@ -15,7 +15,7 @@ describe('Tabs.vue', () => {
     const wrapper = shallowMount(Sidebar, { localVue, store });
 
     const buttons = wrapper.findAllComponents(BButton);
-    expect(buttons.length).toBe(5);
+    expect(buttons.length).toBe(4);
     let shouldContainAddText = false;
     buttons.wrappers.forEach((button) => {
       if (button.text() === T.problemCreatorAdd) shouldContainAddText = true;
