@@ -27,7 +27,7 @@
         <BIconCheckCircle class="mr-1" />
         <span name="testcases" data-tab> {{ T.problemCreatorTestCases }}</span>
       </template>
-      <cases-tab />
+      <omegaup-problem-creator-cases-tab />
     </b-tab>
     <b-tab>
       <template #title>
@@ -45,7 +45,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import cases_Tab from './cases/CasesTab.vue';
+import problemCreator_CasesTab from './cases/CasesTab.vue';
 import problemCreator_StatementTab from './statement/StatementTab.vue';
 import problemCreator_CodeTab from './code/CodeTab.vue';
 import problemCreator_SolutionTab from './solution/SolutionTab.vue';
@@ -55,7 +55,7 @@ import T from '../../../lang';
     'omegaup-problem-creator-statement-tab': problemCreator_StatementTab,
     'omegaup-problem-creator-code-tab': problemCreator_CodeTab,
     'omegaup-problem-creator-solution-tab': problemCreator_SolutionTab,
-    'cases-tab': cases_Tab,
+    'omegaup-problem-creator-cases-tab': problemCreator_CasesTab,
   },
 })
 export default class Tabs extends Vue {

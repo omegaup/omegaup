@@ -17,7 +17,7 @@
             >
               {{ T.problemCreatorCannotHaveSameName }}</b-alert
             >
-            <case-input ref="case-input" />
+            <omegaup-problem-creator-case-input ref="case-input" />
           </b-tab>
           <b-tab
             :active="tab === 'group'"
@@ -33,7 +33,7 @@
             >
               {{ T.problemCreatorCannotHaveSameName }}</b-alert
             >
-            <group-input ref="group-input" />
+            <omegaup-problem-creator-group-input ref="group-input" />
           </b-tab>
           <b-tab
             :active="tab === 'multiplecases'"
@@ -41,18 +41,18 @@
             name="modal-form"
             @click="tab = 'multiplecases'"
           >
-            <multiple-cases-input />
+            <omegaup-problem-creator-multiple-cases-input />
           </b-tab>
         </b-tabs>
       </div>
       <b-button
-        variant="light"
+        variant="danger"
         size="sm"
         class="mr-2"
         @click="$emit('close-add-window')"
         >{{ T.wordsCancel }}</b-button
       >
-      <b-button type="submit" variant="primary" size="sm">{{
+      <b-button type="submit" variant="success" size="sm">{{
         T.problemCreatorAdd
       }}</b-button>
     </form>
@@ -62,9 +62,9 @@
 <script lang="ts">
 import { Component, Ref, Vue } from 'vue-property-decorator';
 import T from '../../../../lang';
-import cases_CaseInput from './CaseInput.vue';
-import cases_MultipleCasesInput from './MultipleCasesInput.vue';
-import cases_GroupInput from './GroupInput.vue';
+import problemCreator_Cases_CaseInput from './CaseInput.vue';
+import problemCreator_Cases_MultipleCasesInput from './MultipleCasesInput.vue';
+import problemCreator_Cases_GroupInput from './GroupInput.vue';
 import { namespace } from 'vuex-class';
 import {
   Group,
@@ -77,9 +77,9 @@ const casesStore = namespace('casesStore');
 
 @Component({
   components: {
-    'case-input': cases_CaseInput,
-    'multiple-cases-input': cases_MultipleCasesInput,
-    'group-input': cases_GroupInput,
+    'omegaup-problem-creator-case-input': problemCreator_Cases_CaseInput,
+    'omegaup-problem-creator-multiple-cases-input': problemCreator_Cases_MultipleCasesInput,
+    'omegaup-problem-creator-group-input': problemCreator_Cases_GroupInput,
   },
 })
 export default class AddPanel extends Vue {
@@ -89,8 +89,8 @@ export default class AddPanel extends Vue {
   invalidGroupName = false;
   T = T;
 
-  @Ref('case-input') caseInputRef!: cases_CaseInput;
-  @Ref('group-input') groupInputRef!: cases_GroupInput;
+  @Ref('case-input') caseInputRef!: problemCreator_Cases_CaseInput;
+  @Ref('group-input') groupInputRef!: problemCreator_Cases_GroupInput;
 
   @casesStore.Mutation('addCase') addCase!: (caseRequest: CaseRequest) => void;
   @casesStore.Mutation('addGroup') addGroup!: (groupRequest: Group) => void;
