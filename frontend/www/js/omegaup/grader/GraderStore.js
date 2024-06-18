@@ -4,18 +4,18 @@ import * as Util from './util';
 import * as templates from './GraderTemplates';
 
 // persist function only used in the store when some data get updated
+const languageSelectElement = document.getElementById('language');
 const persistToSessionStorage = Util.throttle(({ alias, contents }) => {
   sessionStorage.setItem(
     `ephemeral-sources-${alias}`,
     JSON.stringify(contents),
   );
-}, 10000);
+}, 1000);
 
 // literal strings
 const defaultValidatorSource = templates.defaultValidatorSource;
 const defaultInteractiveIdlSource = templates.defaultInteractiveIdlSource;
 const defaultInteractiveMainSource = templates.defaultInteractiveMainSource;
-
 // objects
 const sourceTemplates = { ...templates.sourceTemplates };
 const originalInteractiveTemplates = {
@@ -197,14 +197,14 @@ let store = new Vuex.Store({
       if (!state.sessionStorageSources) {
         if (state.request.input.interactive) {
           state.sessionStorageSources = {
-            language: 'cpp17-gcc',
+            language: languageSelectElement.value,
             sources: {
               ...interactiveTemplates,
             },
           };
         } else {
           state.sessionStorageSources = {
-            language: 'cpp17-gcc',
+            language: languageSelectElement.value,
             sources: {
               ...sourceTemplates,
             },
@@ -216,7 +216,7 @@ let store = new Vuex.Store({
         state.sessionStorageSources.sources[
           languageExtensionMapping[state.sessionStorageSources.language]
         ];
-      document.getElementById('language').value = state.request.language;
+      languageSelectElement.value = state.request.language;
     },
     showSubmitButton(state, value) {
       state.problemsetId = value;
