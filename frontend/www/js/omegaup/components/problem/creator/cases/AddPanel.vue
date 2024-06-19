@@ -49,7 +49,9 @@
             >
               {{ T.problemCreatorCannotHaveSameName }}</b-alert
             >
-            <omegaup-problem-creator-multiple-cases-input ref="multiple-cases-input" />
+            <omegaup-problem-creator-multiple-cases-input
+              ref="multiple-cases-input"
+            />
           </b-tab>
         </b-tabs>
       </div>
@@ -98,7 +100,8 @@ export default class AddPanel extends Vue {
   invalidGroupName = false;
   T = T;
 
-  @Ref('multiple-cases-input') multipleCasesInputRef!: problemCreator_Cases_MultipleCasesInput;
+  @Ref('multiple-cases-input')
+  multipleCasesInputRef!: problemCreator_Cases_MultipleCasesInput;
   @Ref('case-input') caseInputRef!: problemCreator_Cases_CaseInput;
   @Ref('group-input') groupInputRef!: problemCreator_Cases_GroupInput;
 
