@@ -1047,6 +1047,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorStatement: "Esbo\u00e7o",
   problemCreatorSuffix: "Sufixo",
   problemCreatorTestCases: "Casos de teste",
+  problemCreatorUpdateAlert: "O problema foi atualizado com \u00eaxito.",
   problemDeployerChangeMissingSettingsJson: "O problema precisa ter um arquivo 'settings.json'.",
   problemDeployerConfigBadLayout: "O commit para 'refs/meta/config' tem uma estrutura incorreta.",
   problemDeployerConfigInvalidPublishingMode: "O modo de publica\u00e7\u00e3o escolhido n\u00e3o \u00e9 suportado.",
