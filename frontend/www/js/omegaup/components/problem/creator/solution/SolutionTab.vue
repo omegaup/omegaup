@@ -6,14 +6,15 @@
           <div ref="markdownButtonBar" class="wmd-button-bar"></div>
           <textarea
             ref="markdownInput"
-            v-model="currentMarkdown"
+            v-model="currentSolutionMarkdown"
             class="wmd-input"
           ></textarea>
         </div>
         <div class="col-md-6">
           <omegaup-markdown
             :markdown="
-              T.problemCreatorMarkdownPreviewInitialRender + currentMarkdown
+              T.problemCreatorMarkdownPreviewInitialRender +
+              currentSolutionMarkdown
             "
             preview="true"
           ></omegaup-markdown>
@@ -34,8 +35,8 @@
 import { Vue, Component, Ref } from 'vue-property-decorator';
 import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../../../markdown';
-import T from '../../../../lang';
 import * as ui from '../../../../ui';
+import T from '../../../../lang';
 
 import omegaup_Markdown from '../../../Markdown.vue';
 
@@ -48,7 +49,7 @@ const markdownConverter = new markdown.Converter({
     'omegaup-markdown': omegaup_Markdown,
   },
 })
-export default class StatementTab extends Vue {
+export default class SolutionTab extends Vue {
   @Ref() readonly markdownButtonBar!: HTMLDivElement;
   @Ref() readonly markdownInput!: HTMLTextAreaElement;
 
@@ -56,7 +57,7 @@ export default class StatementTab extends Vue {
   ui = ui;
   markdownEditor: Markdown.Editor | null = null;
 
-  currentMarkdown: string = T.problemCreatorEmpty;
+  currentSolutionMarkdown: string = T.problemCreatorEmpty;
 
   mounted(): void {
     this.markdownEditor = new Markdown.Editor(markdownConverter.converter, '', {
@@ -70,7 +71,7 @@ export default class StatementTab extends Vue {
   }
 
   updateMarkdown() {
-    this.$store.commit('updateMarkdown', this.currentMarkdown);
+    this.$store.commit('updateSolutionMarkdown', this.currentSolutionMarkdown);
     this.$emit('show-update-success-message');
   }
 }

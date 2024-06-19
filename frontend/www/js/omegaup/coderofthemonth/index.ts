@@ -24,20 +24,17 @@ OmegaUp.on('ready', () => {
           codersOfPreviousMonth: payload.codersOfPreviousMonth,
           candidatesToCoderOfTheMonth: payload.candidatesToCoderOfTheMonth,
           isMentor: payload.isMentor,
-          canChooseCoder:
-            payload.isMentor &&
-            payload.options &&
-            payload.options.canChooseCoder,
+          canChooseCoder: payload.isMentor && payload.options?.canChooseCoder,
           coderIsSelected: this.coderIsSelected,
           category: payload.category,
         },
         on: {
-          'select-coder': function (coderUsername: string, category: string) {
+          'select-coder': (coderUsername: string, category: string) => {
             api.User.selectCoderOfTheMonth({
               username: coderUsername,
               category: category,
             })
-              .then(function () {
+              .then(() => {
                 ui.success(
                   payload.category == 'all'
                     ? T.coderOfTheMonthSelectedSuccessfully

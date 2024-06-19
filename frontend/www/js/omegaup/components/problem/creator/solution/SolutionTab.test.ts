@@ -1,6 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 
-import StatementTab from './StatementTab.vue';
+import SolutionTab from './SolutionTab.vue';
 import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 import T from '../../../../lang';
@@ -9,9 +9,9 @@ const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 localVue.use(IconsPlugin);
 
-describe('StatementTab.vue', () => {
+describe('SolutionTab.vue', () => {
   it('Should contain markdown buttons and contents and update the store accordingly', async () => {
-    const wrapper = shallowMount(StatementTab, {
+    const wrapper = shallowMount(SolutionTab, {
       localVue,
       store,
     });
@@ -23,7 +23,7 @@ describe('StatementTab.vue', () => {
     expect(textArea.exists()).toBe(true);
     textArea.setValue('Hello omegaUp');
 
-    expect(wrapper.vm.currentMarkdown).toBe('Hello omegaUp');
+    expect(wrapper.vm.currentSolutionMarkdown).toBe('Hello omegaUp');
 
     const markdownContent = wrapper.find('omegaup-markdown-stub');
     expect(markdownContent.exists()).toBe(true);
@@ -34,12 +34,14 @@ describe('StatementTab.vue', () => {
       T.problemCreatorMarkdownPreviewInitialRender + 'Hello omegaUp',
     );
 
-    expect(wrapper.vm.$store.state.problemMarkdown).toBe('');
+    expect(wrapper.vm.$store.state.problemSolutionMarkdown).toBe('');
 
     const markdownSaveButton = wrapper.find('button.btn-primary');
     expect(markdownSaveButton.exists()).toBe(true);
     await markdownSaveButton.trigger('click');
 
-    expect(wrapper.vm.$store.state.problemMarkdown).toBe('Hello omegaUp');
+    expect(wrapper.vm.$store.state.problemSolutionMarkdown).toBe(
+      'Hello omegaUp',
+    );
   });
 });
