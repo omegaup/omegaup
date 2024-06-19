@@ -7,7 +7,7 @@ namespace OmegaUp\Controllers;
  *
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type Submission=array{time: \OmegaUp\Timestamp, username: string, school_id: int|null, school_name: string|null, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}
- * @psalm-type SubmissionsListPayload=array{includeUser: bool, username: string|null, submissions: list<Submission>}
+ * @psalm-type SubmissionsListPayload=array{includeUser: bool, username?: string, submissions: list<Submission>}
  */
 class Submission extends \OmegaUp\Controllers\Controller {
     const SUBMISSION_LIST_PAGE_SIZE_DEFAULT = 100;
