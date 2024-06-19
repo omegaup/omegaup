@@ -1,6 +1,6 @@
 <template>
   <div
-    v-infinite-scroll="() => $emit('fetch-more-data', submissions[0].username)"
+    v-infinite-scroll="() => $emit('fetch-more-data')"
     submissions-problem
     infinite-scroll-disabled="isScrollDisabled"
     infinite-scroll-distance="10"

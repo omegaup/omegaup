@@ -16,8 +16,8 @@ OmegaUp.on('ready', () => {
     data: () => ({
       searchResultUsers: [] as types.ListItem[],
       page: 1,
+      username: payload.username,
       submissions: payload.submissions,
-      searchedUsername: null as string | null,
       loading: false, // Flag to prevent multiple simultaneous requests
       endOfResults: false, // Flag to indicate if all results have been loaded
     }),
@@ -31,6 +31,7 @@ OmegaUp.on('ready', () => {
           loading: this.loading,
           endOfResults: this.endOfResults,
         },
+
         on: {
           'update-search-result-users': (query: string) => {
             api.User.list({ query })
@@ -46,13 +47,11 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'fetch-more-data': (username: string) => {
+          'fetch-more-data': () => {
             if (this.loading || this.endOfResults) return;
             this.loading = true;
-            this.searchedUsername = username ?? null;
-
             api.Submission.list({
-              username: this.searchedUsername,
+              username: this.username,
               page: this.page + 1,
             })
               .then(({ submissions }) => {
