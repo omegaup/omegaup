@@ -110,7 +110,7 @@ describe('BasicInformationEdit.vue', () => {
           gender: 'other',
           country_id: 'CA',
           state_id: 'AB',
-          birth_date: new Date('2001-01-01'),
+          birth_date: new Date('2001-01-01').toLocaleDateString(),
         },
       ],
     ]);

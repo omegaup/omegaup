@@ -64,7 +64,7 @@ describe('ManageSchools.vue', () => {
     expect(wrapper.emitted('update-user-schools')).toEqual([
       [
         {
-          graduation_date: new Date('2010-10-10'),
+          graduation_date: new Date('2010-10-10').toLocaleDateString(),
           school_id: 1,
           school_name: 'escuela',
           scholar_degree: 'bachelors',

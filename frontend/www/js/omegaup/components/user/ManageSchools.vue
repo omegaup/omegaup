@@ -95,7 +95,7 @@ export default class UserManageSchools extends Vue {
       graduation_date:
         this.isCurrentlyEnrolled || isNaN(this.graduationDate.getTime())
           ? null
-          : this.graduationDate,
+          : this.graduationDate.toLocaleDateString(),
       school_id:
         !this.school ||
         (this.school.key === this.profile.school_id &&
