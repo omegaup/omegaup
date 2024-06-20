@@ -23,22 +23,24 @@
       </div>
     </div>
     <div>
-      <b-card style="border: none">
+      <b-card class="border-0">
         <b-row class="mb-2">
           <b-button
             variant="light"
             data-placement="top"
             title="Ungrouped cases"
-            style="width: 84%"
+            class="w-84"
             @click="visible[0] = !visible[0]"
-            ><div style="float: left">ungrouped&nbsp;</div>
-            <div style="float: right">
-              <b-badge variant="primary">{{ ungroupedCases.length }}</b-badge
-              >&nbsp;
-              <b-badge variant="info">
-                {{ Math.round(getTotalPointsForUngroupedCases) }}
-                {{ T.problemCreatorPointsAbbreviation }}</b-badge
-              >
+            ><div class="d-flex justify-content-between">
+              <div>ungrouped&nbsp;</div>
+              <div>
+                <b-badge variant="primary">{{ ungroupedCases.length }}</b-badge
+                >&nbsp;
+                <b-badge variant="info">
+                  {{ Math.round(getTotalPointsForUngroupedCases) }}
+                  {{ T.problemCreatorPointsAbbreviation }}</b-badge
+                >
+              </div>
             </div></b-button
           >
           <b-dropdown variant="light" size="sm" right no-caret>
@@ -49,28 +51,23 @@
               ><b-row
                 ><div><BIconTrash variant="danger" font-scale=".95" /></div>
                 &ensp;&ensp;
-                <div style="margin-left: 8%">
+                <div class="ml-8">
                   {{ T.problemCreatorDeleteGroup }}
                 </div></b-row
               >
             </b-dropdown-item>
-            <b-dropdown-item
-              @click="
-                () => {
-                  deleteUngroupedCases();
-                }
-              "
+            <b-dropdown-item @click="deleteUngroupedCases()"
               ><b-row
                 ><div><BIconTrash variant="danger" font-scale=".95" /></div>
                 &ensp;&ensp;
-                <div style="margin-left: 8%">
+                <div class="ml-8">
                   {{ T.problemCreatorDeleteCases }}
                 </div></b-row
               >
             </b-dropdown-item>
           </b-dropdown>
-          <b-collapse v-model="visible[0]" style="width: 100%">
-            <b-card style="border: none; width: 100%">
+          <b-collapse v-model="visible[0]" class="w-100">
+            <b-card class="border-0 w-100">
               <b-row
                 v-for="{ name, points, groupID } in ungroupedCases"
                 :key="groupID"
@@ -80,31 +77,28 @@
                   variant="light"
                   data-placement="top"
                   :title="name"
-                  style="width: 70%"
-                  ><div style="float: left">{{ truncate(name) }}&nbsp;</div>
-                  <div style="float: right">
-                    <b-badge variant="info">
-                      {{ Math.round(points || 0) }}
-                      {{ T.problemCreatorPointsAbbreviation }}</b-badge
-                    >
+                  class="w-82"
+                  ><div class="d-flex justify-content-between">
+                    <div>{{ truncate(name) }}&nbsp;</div>
+                    <div>
+                      <b-badge variant="info">
+                        {{ Math.round(points || 0) }}
+                        {{ T.problemCreatorPointsAbbreviation }}</b-badge
+                      >
+                    </div>
                   </div></b-button
                 >
                 <b-dropdown variant="light" size="sm" right no-caret>
                   <template #button-content>
                     <BIconThreeDotsVertical />
                   </template>
-                  <b-dropdown-item
-                    @click="
-                      () => {
-                        deleteCase({ groupID, caseID: '' });
-                      }
-                    "
+                  <b-dropdown-item @click="deleteCase({ groupID, caseID: '' })"
                     ><b-row
                       ><div>
                         <BIconTrash variant="danger" font-scale=".95" />
                       </div>
                       &ensp;&ensp;
-                      <div style="margin-left: 8%">
+                      <div class="ml-8">
                         {{ T.problemCreatorDeleteCase }}
                       </div></b-row
                     >
@@ -123,53 +117,45 @@
             variant="light"
             data-placement="top"
             :title="name"
-            style="width: 84%"
+            class="w-84"
             @click="visible[groupID] = !visible[groupID]"
-            ><div style="float: left">{{ truncate(name) }} &nbsp;</div>
-            <div style="float: right">
-              <b-badge variant="primary">{{ cases.length }}</b-badge
-              >&nbsp;
-              <b-badge variant="info"
-                >{{ Math.round(points || 0) }}
-                {{ T.problemCreatorPointsAbbreviation }}</b-badge
-              >
+            ><div class="d-flex justify-content-between">
+              <div>{{ truncate(name) }} &nbsp;</div>
+              <div>
+                <b-badge variant="primary">{{ cases.length }}</b-badge
+                >&nbsp;
+                <b-badge variant="info"
+                  >{{ Math.round(points || 0) }}
+                  {{ T.problemCreatorPointsAbbreviation }}</b-badge
+                >
+              </div>
             </div></b-button
           >
           <b-dropdown variant="light" size="sm" right no-caret>
             <template #button-content>
               <BIconThreeDotsVertical />
             </template>
-            <b-dropdown-item
-              @click="
-                () => {
-                  deleteGroup(groupID);
-                }
-              "
+            <b-dropdown-item @click="deleteGroup(groupID)"
               ><b-row
                 ><div><BIconTrash variant="danger" font-scale=".95" /></div>
                 &ensp;&ensp;
-                <div style="margin-left: 8%">
+                <div class="ml-8">
                   {{ T.problemCreatorDeleteGroup }}
                 </div></b-row
               >
             </b-dropdown-item>
-            <b-dropdown-item
-              @click="
-                () => {
-                  deleteGroupCases(groupID);
-                }
-              "
+            <b-dropdown-item @click="deleteGroupCases(groupID)"
               ><b-row
                 ><div><BIconTrash variant="danger" font-scale=".95" /></div>
                 &ensp;&ensp;
-                <div style="margin-left: 8%">
+                <div class="ml-8">
                   {{ T.problemCreatorDeleteCases }}
                 </div></b-row
               >
             </b-dropdown-item>
           </b-dropdown>
-          <b-collapse v-model="visible[groupID]" style="width: 100%">
-            <b-card style="border: none; width: 100%">
+          <b-collapse v-model="visible[groupID]" class="w-100">
+            <b-card class="border-0 w-100">
               <b-row
                 v-for="{ name: caseName, points: casePoints, caseID } in cases"
                 :key="caseID"
@@ -179,31 +165,28 @@
                   variant="light"
                   data-placement="top"
                   :title="caseName"
-                  style="width: 70%"
-                  ><div style="float: left">{{ truncate(caseName) }}&nbsp;</div>
-                  <div style="float: right">
-                    <b-badge variant="info">
-                      {{ Math.round(casePoints || 0) }}
-                      {{ T.problemCreatorPointsAbbreviation }}</b-badge
-                    >
+                  class="w-82"
+                  ><div class="d-flex justify-content-between">
+                    <div class="float-left">{{ truncate(caseName) }}&nbsp;</div>
+                    <div class="float-right">
+                      <b-badge variant="info">
+                        {{ Math.round(casePoints || 0) }}
+                        {{ T.problemCreatorPointsAbbreviation }}</b-badge
+                      >
+                    </div>
                   </div></b-button
                 >
                 <b-dropdown variant="light" size="sm" right no-caret>
                   <template #button-content>
                     <BIconThreeDotsVertical />
                   </template>
-                  <b-dropdown-item
-                    @click="
-                      () => {
-                        deleteCase({ groupID, caseID });
-                      }
-                    "
+                  <b-dropdown-item @click="deleteCase({ groupID, caseID })"
                     ><b-row
                       ><div>
                         <BIconTrash variant="danger" font-scale=".95" />
                       </div>
                       &ensp;&ensp;
-                      <div style="margin-left: 8%">
+                      <div class="ml-8">
                         {{ T.problemCreatorDeleteCase }}
                       </div></b-row
                     >
@@ -256,15 +239,24 @@ export default class Sidebar extends Vue {
   visible: any = {};
 
   truncate(str: string) {
-    const truncatedStr = str.slice(0, 5);
+    const truncatedStr = str.slice(0, 7);
     if (truncatedStr === str) return str;
     return truncatedStr + '..';
   }
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 .dropdown-menu {
   min-width: 9rem !important;
+}
+.ml-8 {
+  margin-left: 8% !important;
+}
+.w-84 {
+  width: 84%;
+}
+.w-82 {
+  width: 82%;
 }
 </style>
