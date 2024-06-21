@@ -318,11 +318,7 @@ let store = new Vuex.Store({
     },
     'request.source'(state, value) {
       state.request.source = value;
-      if (state.updatingSettings) {
-        state.dirty = true;
-        return;
-      }
-      if (!state.sessionStorageSources) {
+      if (state.updatingSettings || !state.sessionStorageSources) {
         state.dirty = true;
         return;
       }
