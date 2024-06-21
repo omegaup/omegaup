@@ -463,7 +463,7 @@ let store = new Vuex.Store({
       Vue.set(state.request.input.cases, caseData.name, {
         in: caseData.in || '',
         out: caseData.out || '',
-        weight: caseData.weight,
+        weight: caseData.weight || 1,
       });
       // if we call this function, we must set current case
       // or it could cause errors
