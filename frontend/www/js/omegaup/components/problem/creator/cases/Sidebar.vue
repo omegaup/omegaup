@@ -32,8 +32,8 @@
             class="w-84"
             @click="showUngroupedCases = !showUngroupedCases"
             ><div class="d-flex justify-content-between">
-              <div class="mr-2 truncate">ungrouped</div>
-              <div>
+              <div class="mr-2 truncate">{{ T.problemCreatorUngrouped }}</div>
+              <div class="fixed">
                 <b-badge variant="primary" class="mr-1">{{
                   ungroupedCases.length
                 }}</b-badge>
@@ -79,7 +79,7 @@
                   class="w-82"
                   ><div class="d-flex justify-content-between">
                     <div class="mr-2 truncate">{{ name }}</div>
-                    <div>
+                    <div class="fixed">
                       <b-badge variant="info">
                         {{ Math.round(points || 0) }}
                         {{ T.problemCreatorPointsAbbreviation }}</b-badge
@@ -165,7 +165,7 @@
                   class="w-82"
                   ><div class="d-flex justify-content-between">
                     <div class="mr-2 truncate">{{ caseName }}</div>
-                    <div>
+                    <div class="fixed">
                       <b-badge variant="info">
                         {{ Math.round(casePoints || 0) }}
                         {{ T.problemCreatorPointsAbbreviation }}</b-badge

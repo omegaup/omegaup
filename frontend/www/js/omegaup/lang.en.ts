@@ -1051,6 +1051,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorStatement: "Statement",
   problemCreatorSuffix: "Suffix",
   problemCreatorTestCases: "Test cases",
+  problemCreatorUngrouped: "Ungrouped",
   problemCreatorUpdateAlert: "The problem has been updated succesfully.",
   problemDeployerChangeMissingSettingsJson: "The problem is missing a 'settings.json' file.",
   problemDeployerConfigBadLayout: "The commit to 'refs/meta/config' has the wrong layout.",

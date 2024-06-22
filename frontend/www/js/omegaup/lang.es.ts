@@ -1051,6 +1051,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorStatement: "Redacci\u00f3n",
   problemCreatorSuffix: "Sufijo",
   problemCreatorTestCases: "Casos de prueba",
+  problemCreatorUngrouped: "Sin grupo",
   problemCreatorUpdateAlert: "El problema se ha actualizado correctamente.",
   problemDeployerChangeMissingSettingsJson: "El problema necesita tener un archivo 'settings.json'.",
   problemDeployerConfigBadLayout: "El commit a 'refs/meta/config' tiene una estructura incorrecta.",
