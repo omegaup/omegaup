@@ -30,7 +30,7 @@
             data-placement="top"
             title="Ungrouped cases"
             class="w-84"
-            @click="visible[0] = !visible[0]"
+            @click="showUngroupedCases = !showUngroupedCases"
             ><div class="d-flex justify-content-between">
               <div>ungrouped&nbsp;</div>
               <div>
@@ -66,7 +66,7 @@
               >
             </b-dropdown-item>
           </b-dropdown>
-          <b-collapse v-model="visible[0]" class="w-100">
+          <b-collapse v-model="showUngroupedCases" class="w-100">
             <b-card class="border-0 w-100">
               <b-row
                 v-for="{ name, points, groupID } in ungroupedCases"
@@ -118,7 +118,7 @@
             data-placement="top"
             :title="name"
             class="w-84"
-            @click="visible[groupID] = !visible[groupID]"
+            @click="showCases[groupID] = !showCases[groupID]"
             ><div class="d-flex justify-content-between">
               <div>{{ truncate(name) }} &nbsp;</div>
               <div>
@@ -154,7 +154,7 @@
               >
             </b-dropdown-item>
           </b-dropdown>
-          <b-collapse v-model="visible[groupID]" class="w-100">
+          <b-collapse v-model="showCases[groupID]" class="w-100">
             <b-card class="border-0 w-100">
               <b-row
                 v-for="{ name: caseName, points: casePoints, caseID } in cases"
@@ -236,7 +236,8 @@ export default class Sidebar extends Vue {
   @casesStore.Mutation('deleteUngroupedCases')
   deleteUngroupedCases!: () => void;
 
-  visible: any = {};
+  showUngroupedCases = false;
+  showCases: { [key: string]: boolean } = {};
 
   truncate(str: string) {
     const truncatedStr = str.slice(0, 7);
