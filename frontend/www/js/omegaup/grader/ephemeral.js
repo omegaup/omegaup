@@ -993,7 +993,7 @@ window.addEventListener(
   },
   false,
 );
-// when does this piece of code run
+
 function onHashChanged() {
   if (window.location.hash.length == 0) {
     store.commit('reset');
