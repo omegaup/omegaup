@@ -36,6 +36,8 @@ describe('Tabs.vue', () => {
   it('should show ungrouped testcases', async () => {
     const wrapper = shallowMount(Sidebar, { localVue, store });
 
+    expect(wrapper.text()).toContain(T.problemCreatorUngrouped)
+
     const newGroup1 = generateGroup({
       name: 'ungroupedCase1',
       ungroupedCase: true,
@@ -52,7 +54,7 @@ describe('Tabs.vue', () => {
     expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(3);
     expect(
       wrapper.find('b-button-stub[title="ungroupedCase1"]').text(),
-    ).toContain('ungroup..');
+    ).toContain('ungroupedCase1');
 
     store.commit('casesStore/deleteGroup', newGroup1.groupID);
     await Vue.nextTick();
@@ -89,7 +91,7 @@ describe('Tabs.vue', () => {
     const group2 = wrapper.find('b-button-stub[title="group2withlongname"]');
 
     expect(group1.text()).toContain('group1');
-    expect(group2.text()).toContain('group2w..');
+    expect(group2.text()).toContain('group2withlongname');
 
     const newCase1 = generateCase({
       name: 'case1',
