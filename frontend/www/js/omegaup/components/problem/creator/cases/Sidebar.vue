@@ -24,7 +24,7 @@
     </div>
     <div>
       <b-card class="border-0">
-        <b-row class="mb-2">
+        <b-row class="mb-1">
           <b-button
             variant="light"
             data-placement="top"
@@ -51,7 +51,6 @@
             <b-dropdown-item disabled
               ><b-row
                 ><div><BIconTrash variant="danger" font-scale=".95" /></div>
-                &ensp;&ensp;
                 <div class="ml-8">
                   {{ T.problemCreatorDeleteGroup }}
                 </div></b-row
@@ -60,7 +59,6 @@
             <b-dropdown-item @click="deleteUngroupedCases()"
               ><b-row
                 ><div><BIconTrash variant="danger" font-scale=".95" /></div>
-                &ensp;&ensp;
                 <div class="ml-8">
                   {{ T.problemCreatorDeleteCases }}
                 </div></b-row
@@ -72,7 +70,7 @@
               <b-row
                 v-for="{ name, points, groupID } in ungroupedCases"
                 :key="groupID"
-                class="mb-2"
+                class="mb-1"
               >
                 <b-button
                   variant="light"
@@ -98,7 +96,6 @@
                       ><div>
                         <BIconTrash variant="danger" font-scale=".95" />
                       </div>
-                      &ensp;&ensp;
                       <div class="ml-8">
                         {{ T.problemCreatorDeleteCase }}
                       </div></b-row
@@ -112,7 +109,7 @@
         <b-row
           v-for="{ name, groupID, cases, points } in groupsButUngroupedCases"
           :key="groupID"
-          class="mb-2"
+          class="mb-1"
         >
           <b-button
             variant="light"
@@ -140,7 +137,6 @@
             <b-dropdown-item @click="deleteGroup(groupID)"
               ><b-row
                 ><div><BIconTrash variant="danger" font-scale=".95" /></div>
-                &ensp;&ensp;
                 <div class="ml-8">
                   {{ T.problemCreatorDeleteGroup }}
                 </div></b-row
@@ -149,7 +145,6 @@
             <b-dropdown-item @click="deleteGroupCases(groupID)"
               ><b-row
                 ><div><BIconTrash variant="danger" font-scale=".95" /></div>
-                &ensp;&ensp;
                 <div class="ml-8">
                   {{ T.problemCreatorDeleteCases }}
                 </div></b-row
@@ -161,7 +156,7 @@
               <b-row
                 v-for="{ name: caseName, points: casePoints, caseID } in cases"
                 :key="caseID"
-                class="mb-2"
+                class="mb-1"
               >
                 <b-button
                   variant="light"
@@ -187,7 +182,6 @@
                       ><div>
                         <BIconTrash variant="danger" font-scale=".95" />
                       </div>
-                      &ensp;&ensp;
                       <div class="ml-8">
                         {{ T.problemCreatorDeleteCase }}
                       </div></b-row
