@@ -36,7 +36,7 @@ describe('Tabs.vue', () => {
   it('should show ungrouped testcases', async () => {
     const wrapper = shallowMount(Sidebar, { localVue, store });
 
-    expect(wrapper.text()).toContain(T.problemCreatorUngrouped)
+    expect(wrapper.text()).toContain(T.problemCreatorUngrouped);
 
     const newGroup1 = generateGroup({
       name: 'ungroupedCase1',
