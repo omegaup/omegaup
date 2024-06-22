@@ -32,7 +32,7 @@
             class="w-84"
             @click="showUngroupedCases = !showUngroupedCases"
             ><div class="d-flex justify-content-between">
-              <div class="mr-1">ungrouped</div>
+              <div class="mr-2 truncate">ungrouped</div>
               <div>
                 <b-badge variant="primary" class="mr-1">{{
                   ungroupedCases.length
@@ -78,7 +78,7 @@
                   :title="name"
                   class="w-82"
                   ><div class="d-flex justify-content-between">
-                    <div class="mr-1">{{ truncate(name) }}</div>
+                    <div class="mr-2 truncate">{{ name }}</div>
                     <div>
                       <b-badge variant="info">
                         {{ Math.round(points || 0) }}
@@ -118,8 +118,8 @@
             class="w-84"
             @click="showCases[groupID] = !showCases[groupID]"
             ><div class="d-flex justify-content-between">
-              <div class="mr-1">{{ truncate(name) }}</div>
-              <div>
+              <div class="mr-2 truncate">{{ name }}</div>
+              <div class="fixed">
                 <b-badge variant="primary" class="mr-1">{{
                   cases.length
                 }}</b-badge>
@@ -164,7 +164,7 @@
                   :title="caseName"
                   class="w-82"
                   ><div class="d-flex justify-content-between">
-                    <div class="mr-1">{{ truncate(caseName) }}</div>
+                    <div class="mr-2 truncate">{{ caseName }}</div>
                     <div>
                       <b-badge variant="info">
                         {{ Math.round(casePoints || 0) }}
@@ -234,12 +234,6 @@ export default class Sidebar extends Vue {
 
   showUngroupedCases = false;
   showCases: { [key: string]: boolean } = {};
-
-  truncate(str: string) {
-    const truncatedStr = str.slice(0, 7);
-    if (truncatedStr === str) return str;
-    return truncatedStr + '..';
-  }
 }
 </script>
 
@@ -255,5 +249,14 @@ export default class Sidebar extends Vue {
 }
 .w-82 {
   width: 82%;
+}
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fixed {
+  white-space: nowrap;
+  display: inline-block;
 }
 </style>
