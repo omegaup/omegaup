@@ -4300,6 +4300,7 @@ export namespace types {
     status_memory?: string;
     status_runtime?: string;
     submit_delay: number;
+    suggestions?: number;
     time: Date;
     type?: string;
     username: string;
