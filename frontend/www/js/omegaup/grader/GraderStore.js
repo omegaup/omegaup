@@ -4,18 +4,18 @@ import * as Util from './util';
 import * as templates from './GraderTemplates';
 
 // persist function only used in the store when some data get updated
+const languageSelectElement = document.getElementById('language');
 const persistToSessionStorage = Util.throttle(({ alias, contents }) => {
   sessionStorage.setItem(
     `ephemeral-sources-${alias}`,
     JSON.stringify(contents),
   );
-}, 10000);
+}, 1000);
 
 // literal strings
 const defaultValidatorSource = templates.defaultValidatorSource;
 const defaultInteractiveIdlSource = templates.defaultInteractiveIdlSource;
 const defaultInteractiveMainSource = templates.defaultInteractiveMainSource;
-
 // objects
 const sourceTemplates = { ...templates.sourceTemplates };
 const originalInteractiveTemplates = {
@@ -28,28 +28,42 @@ const languageExtensionMapping = Object.fromEntries(
     value.extension,
   ]),
 );
-
 // simple copy paste of the vuex store here
 Vue.use(Vuex);
 let store = new Vuex.Store({
   state: {
-    alias: null,
-    showSubmitButton: false,
+    alias: '',
+    compilerOutput: '',
+    currentCase: '',
+    dirty: true,
     languages: [],
-    sessionStorageSources: null,
+    logs: '',
+    outputs: {},
+    problemsetId: false,
     request: {
       input: {
         limits: {},
+        validator: {},
+        cases: {},
       },
+      language: '',
+      source: '',
     },
-    dirty: true,
+    results: {
+      compile_meta: {},
+      contest_score: 0,
+      groups: [],
+      judged_by: '',
+      max_score: 0,
+      memory: 0,
+      score: 0,
+      time: 0,
+      verdict: '',
+      wall_time: 0,
+    },
+    sessionStorageSources: null,
+    showSubmitButton: false,
     updatingSettings: false,
-    max_score: 1,
-    results: null,
-    outputs: {},
-    currentCase: '',
-    logs: '',
-    compilerOutput: '',
   },
   getters: {
     alias(state) {
@@ -65,12 +79,16 @@ let store = new Vuex.Store({
       return state.sessionStorageSources;
     },
     moduleName(state) {
+      // whats a module for an interactive problem?
       if (state.request.input.interactive) {
         return state.request.input.interactive.module_name;
       }
       return 'Main';
     },
     flatCaseResults(state) {
+      // result variable is returns result of run on
+      // each test case, like verdict, score, ...
+      // this will later be used in caseSelectorComponent
       let result = {};
       if (!state.results || !state.results.groups) return result;
       for (let group of state.results.groups) {
@@ -104,6 +122,7 @@ let store = new Vuex.Store({
       return state.outputs[filename];
     },
     settingsCases(state) {
+      // compute cases to be stored on zip file
       let resultMap = {};
       for (let caseName in state.request.input.cases) {
         if (
@@ -183,6 +202,8 @@ let store = new Vuex.Store({
   },
   mutations: {
     alias(state, value) {
+      // if state alias is set, this means its a problem
+      // from a list of problems, so delete old alias info
       if (state.alias) {
         persistToSessionStorage(state.alias).flush();
       }
@@ -197,26 +218,25 @@ let store = new Vuex.Store({
       if (!state.sessionStorageSources) {
         if (state.request.input.interactive) {
           state.sessionStorageSources = {
-            language: 'cpp17-gcc',
+            language: languageSelectElement.value,
             sources: {
               ...interactiveTemplates,
             },
           };
         } else {
           state.sessionStorageSources = {
-            language: 'cpp17-gcc',
+            language: languageSelectElement.value,
             sources: {
               ...sourceTemplates,
             },
           };
         }
+        persistToSessionStorage(state.alias)({
+          alias: state.alias,
+          contents: state.sessionStorageSources,
+        });
       }
-      state.request.language = state.sessionStorageSources.language;
-      state.request.source =
-        state.sessionStorageSources.sources[
-          languageExtensionMapping[state.sessionStorageSources.language]
-        ];
-      document.getElementById('language').value = state.request.language;
+      store.commit('request.language', state.sessionStorageSources.language);
     },
     showSubmitButton(state, value) {
       state.problemsetId = value;
@@ -228,6 +248,7 @@ let store = new Vuex.Store({
       }
     },
     languages(state, value) {
+      // hide languages that are not accepted
       state.languages = value;
       document
         .querySelectorAll('select[data-language-select] option')
@@ -240,6 +261,7 @@ let store = new Vuex.Store({
         });
     },
     currentCase(state, value) {
+      // no extra work is done when case toggles?
       state.currentCase = value;
     },
     compilerOutput(state, value) {
@@ -252,10 +274,12 @@ let store = new Vuex.Store({
       Vue.set(state, 'request', value);
     },
     'request.language'(state, value) {
+      // this unnecessairly complex
       if (state.request.language == value) {
         return;
       }
       state.request.language = value;
+      languageSelectElement.value = value;
       if (
         Object.prototype.hasOwnProperty.call(languageExtensionMapping, value)
       ) {
@@ -289,19 +313,23 @@ let store = new Vuex.Store({
           });
         }
       }
+      // what is the use of this boolean?
       state.dirty = true;
     },
     'request.source'(state, value) {
       state.request.source = value;
-      if (!state.updatingSettings && state.sessionStorageSources) {
-        state.sessionStorageSources.sources[
-          languageExtensionMapping[state.sessionStorageSources.language]
-        ] = value;
-        persistToSessionStorage(state.alias)({
-          alias: state.alias,
-          contents: state.sessionStorageSources,
-        });
+      if (state.updatingSettings || !state.sessionStorageSources) {
+        state.dirty = true;
+        return;
       }
+
+      state.sessionStorageSources.sources[
+        languageExtensionMapping[state.sessionStorageSources.language]
+      ] = value;
+      persistToSessionStorage(state.alias)({
+        alias: state.alias,
+        contents: state.sessionStorageSources,
+      });
       state.dirty = true;
     },
     inputIn(state, value) {
@@ -320,6 +348,7 @@ let store = new Vuex.Store({
       Vue.set(state, 'outputs', {});
     },
     output(state, payload) {
+      // should provide a uniform way to set state
       Vue.set(state.outputs, payload.name, payload.contents);
     },
     'request.input.validator.custom_validator.source'(state, value) {
@@ -337,7 +366,6 @@ let store = new Vuex.Store({
       state.request.input.interactive.main_source = value;
       state.dirty = true;
     },
-
     TimeLimit(state, value) {
       state.request.input.limits.TimeLimit = value;
       state.dirty = true;
@@ -423,25 +451,23 @@ let store = new Vuex.Store({
     updatingSettings(state, value) {
       state.updatingSettings = value;
     },
-
     createCase(state, caseData) {
-      if (
-        !Object.prototype.hasOwnProperty.call(
-          state.request.input.cases,
-          caseData.name,
-        )
-      ) {
-        Vue.set(state.request.input.cases, caseData.name, {
-          in: '',
-          out: '',
-          weight: 1,
-        });
-      }
-      state.request.input.cases[caseData.name].weight = caseData.weight;
+      // if case doesnt already exist create it?
+      // no! always create a case
+      // 2 cases can be of same name and different data
+
+      Vue.set(state.request.input.cases, caseData.name, {
+        in: caseData.in || '',
+        out: caseData.out || '',
+        weight: caseData.weight || 1,
+      });
+      // if we call this function, we must set current case
+      // or it could cause errors
       state.currentCase = caseData.name;
       state.dirty = true;
     },
     removeCase(state, name) {
+      // what if the case to be deleted is the current case
       if (
         !Object.prototype.hasOwnProperty.call(state.request.input.cases, name)
       )
@@ -449,43 +475,48 @@ let store = new Vuex.Store({
       Vue.delete(state.request.input.cases, name);
       state.dirty = true;
     },
+    limits(state, limits) {
+      if (!Object.prototype.hasOwnProperty.call(limits, 'MemoryLimit')) {
+        store.commit('MemoryLimit', limits.MemoryLimit * 1024);
+      }
+      if (!Object.prototype.hasOwnProperty.call(limits, 'OutputLimit')) {
+        store.commit('OutputLimit', limits.OutputLimit);
+      }
+      for (let name of ['TimeLimit', 'OverallWallTimeLimit', 'ExtraWallTime']) {
+        if (!Object.prototype.hasOwnProperty.call(limits, name)) continue;
+        store.commit(name, Util.parseDuration(limits[name]));
+      }
+    },
     reset(state) {
-      Vue.set(state, 'request', {
-        source: sourceTemplates.cpp,
-        language: 'cpp17-gcc',
-        input: {
-          limits: {
-            TimeLimit: 1.0, // 1s
-            MemoryLimit: 67108864, // 64MB
-            OverallWallTimeLimit: 5.0, // 5s
-            ExtraWallTime: 0, // 0s
-            OutputLimit: 10240, // 10k
-          },
-          validator: {
-            name: 'token-caseless',
-          },
-          cases: {
-            sample: {
-              in: '1 2\n',
-              out: '3\n',
-              weight: 1,
-            },
-            long: {
-              in: '123456789012345678 123456789012345678\n',
-              out: '246913578024691356\n',
-              weight: 1,
-            },
-          },
-          interactive: undefined,
-        },
+      store.commit('request.language', 'cpp17-gcc');
+      store.commit('request.source', sourceTemplates.cpp);
+
+      store.commit('TimeLimit', 1.0);
+      store.commit('MemoryLimit', 67108864);
+      store.commit('OverallWallTimeLimit', 5.0);
+      store.commit('ExtraWallTime', 0);
+      store.commit('OutputLimit', 10240);
+      store.commit('Validator', 'token-caseless');
+
+      store.commit('createCase', {
+        name: 'sample',
+        in: '1 2\n',
+        out: '3\n',
+        weight: 1,
       });
-      state.result = null;
-      state.max_score = 1;
-      Vue.set(state, 'outputs', {});
-      state.currentCase = 'sample';
-      state.logs = '';
-      state.compilerOutput = '';
-      state.updatingSettings = false;
+      store.commit('createCase', {
+        name: 'long',
+        in: '123456789012345678 123456789012345678\n',
+        out: '246913578024691356\n',
+        weight: 1,
+      });
+      store.commit('Interactive', undefined);
+
+      store.commit('clearOutputs');
+      store.commit('logs', '');
+      store.commit('compilerOutput', '');
+      store.commit('updatingSettings', false);
+
       state.dirty = true;
     },
   },

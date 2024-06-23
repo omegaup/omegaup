@@ -1,7 +1,9 @@
 <template>
   <b-container fluid="lg">
     <creator-header />
-    <creator-tabs />
+    <creator-tabs
+      @show-update-success-message="() => $emit('show-update-success-message')"
+    />
   </b-container>
 </template>
 

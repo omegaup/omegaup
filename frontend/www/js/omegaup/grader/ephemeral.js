@@ -18,6 +18,7 @@ import store from './GraderStore';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
 const theme = document.getElementById('theme').value;
+let isInitialised = false;
 
 const originalInteractiveTemplates = {
   ...Templates.originalInteractiveTemplates,
@@ -361,6 +362,8 @@ RegisterVueComponent(
 function initialize() {
   layout.init();
 
+  // is custome validator this like another mode other than
+  // interactive and non interactive problems?
   let sourceAndSettings = layout.root.getItemsById('source-and-settings')[0];
   if (store.getters.isCustomValidator) {
     const activeContentItem = sourceAndSettings.getActiveContentItem();
@@ -391,6 +394,8 @@ function initialize() {
       sourceAndSettings.setActiveContentItem(activeContentItem);
     }
   }
+  // if we load an interactive problem from a list like a course or
+  // a contest make sure to change to interactive settings
   store.watch(
     Object.getOwnPropertyDescriptor(store.getters, 'isInteractive').get,
     function (value) {
@@ -458,8 +463,9 @@ function initialize() {
 function onResized() {
   const layoutRoot = document.getElementById('layout-root');
   if (!layoutRoot.clientWidth) return;
-  if (!layout.isInitialised) {
+  if (!isInitialised) {
     initialize();
+    isInitialised = true;
   }
   layout.updateSize();
 }
@@ -890,9 +896,12 @@ runButton.addEventListener('click', () => {
 });
 
 function setSettings({ alias, settings, languages, showSubmitButton }) {
-  if (!settings) {
+  // if there is not an alias for some reason
+  // should also return early
+  if (!settings || !alias) {
     return;
   }
+  // this will get saved in session storage when setting alias
   if (settings.interactive) {
     for (let language in settings.interactive.templates) {
       if (
@@ -908,22 +917,29 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
       }
     }
   }
-  store.commit('languages', languages);
   store.commit('updatingSettings', true);
-  store.commit('reset');
-  store.commit('Interactive', !!settings.interactive);
+
   store.commit('alias', alias);
+  store.commit('languages', languages);
   store.commit('showSubmitButton', showSubmitButton);
-  store.commit('removeCase', 'long');
-  store.commit('MemoryLimit', settings.limits.MemoryLimit * 1024);
-  store.commit('OutputLimit', settings.limits.OutputLimit);
-  for (let name of ['TimeLimit', 'OverallWallTimeLimit', 'ExtraWallTime']) {
-    if (!Object.prototype.hasOwnProperty.call(settings.limits, name)) continue;
-    store.commit(name, Util.parseDuration(settings.limits[name]));
-  }
+  store.commit('limits', settings.limits);
   store.commit('Validator', settings.validator.name);
   store.commit('Tolerance', settings.validator.tolerance);
 
+  for (let name in store.state.request.input.cases) {
+    store.commit('removeCase', name);
+  }
+  // create sample case if there are no cases for the problem
+  if (!Object.keys(settings.cases).length) {
+    store.commit('createCase', {
+      name: 'sample',
+      in: '1 2\n',
+      out: '3\n',
+      weight: 1,
+    });
+  }
+  // if the problem is interactive, we need to init remaining settings
+  store.commit('Interactive', !!settings.interactive);
   if (settings.interactive) {
     store.commit('InteractiveLanguage', settings.interactive.language);
     store.commit('InteractiveModuleName', settings.interactive.module_name);
@@ -933,10 +949,7 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
       settings.interactive.main_source,
     );
   }
-
-  // If there are cases for a problem, then delete the sample case
-  if (Object.keys(settings.cases).length) store.commit('removeCase', 'sample');
-
+  // create cases for current problem
   for (let caseName in settings.cases) {
     if (!Object.prototype.hasOwnProperty.call(settings.cases, caseName))
       continue;
@@ -944,18 +957,17 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
     store.commit('createCase', {
       name: caseName,
       weight: caseData.weight,
+      in: caseData['in'],
+      out: caseData['out'],
     });
-    store.commit('inputIn', caseData['in']);
-    store.commit('inputOut', caseData.out);
   }
-
   // Given that the current case will change several times, schedule the
   // flag to avoid swapping into the cases view for the next tick.
   //
   // Also change to the main column in case it was not previously selected.
   setTimeout(() => {
     store.commit('updatingSettings', false);
-    if (!layout.isInitialised) return;
+    if (!isInitialised) return;
     let mainColumn = layout.root.getItemsById('main-column')[0];
     mainColumn.parent.setActiveContentItem(mainColumn);
   });
@@ -990,7 +1002,6 @@ function onHashChanged() {
     onFilesZipReady(null);
     return;
   }
-
   let token = window.location.hash.substring(1);
   fetch(`run/${token}/request.json`)
     .then((response) => {
