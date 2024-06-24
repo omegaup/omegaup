@@ -50,7 +50,9 @@
             </template>
             <b-dropdown-item disabled
               ><b-row
-                ><div><BIconTrash variant="danger" font-scale=".95" /></div>
+                ><div class="ml-6">
+                  <BIconTrash variant="danger" font-scale=".95" />
+                </div>
                 <div class="ml-8">
                   {{ T.problemCreatorDeleteGroup }}
                 </div></b-row
@@ -58,7 +60,9 @@
             </b-dropdown-item>
             <b-dropdown-item @click="deleteUngroupedCases()"
               ><b-row
-                ><div><BIconTrash variant="danger" font-scale=".95" /></div>
+                ><div class="ml-6">
+                  <BIconTrash variant="danger" font-scale=".95" />
+                </div>
                 <div class="ml-8">
                   {{ T.problemCreatorDeleteCases }}
                 </div></b-row
@@ -93,7 +97,7 @@
                   </template>
                   <b-dropdown-item @click="deleteCase({ groupID, caseID: '' })"
                     ><b-row
-                      ><div>
+                      ><div class="ml-6">
                         <BIconTrash variant="danger" font-scale=".95" />
                       </div>
                       <div class="ml-8">
@@ -136,7 +140,9 @@
             </template>
             <b-dropdown-item @click="deleteGroup(groupID)"
               ><b-row
-                ><div><BIconTrash variant="danger" font-scale=".95" /></div>
+                ><div class="ml-6">
+                  <BIconTrash variant="danger" font-scale=".95" />
+                </div>
                 <div class="ml-8">
                   {{ T.problemCreatorDeleteGroup }}
                 </div></b-row
@@ -144,7 +150,9 @@
             </b-dropdown-item>
             <b-dropdown-item @click="deleteGroupCases(groupID)"
               ><b-row
-                ><div><BIconTrash variant="danger" font-scale=".95" /></div>
+                ><div class="ml-6">
+                  <BIconTrash variant="danger" font-scale=".95" />
+                </div>
                 <div class="ml-8">
                   {{ T.problemCreatorDeleteCases }}
                 </div></b-row
@@ -179,7 +187,7 @@
                   </template>
                   <b-dropdown-item @click="deleteCase({ groupID, caseID })"
                     ><b-row
-                      ><div>
+                      ><div class="ml-6">
                         <BIconTrash variant="danger" font-scale=".95" />
                       </div>
                       <div class="ml-8">
@@ -238,11 +246,11 @@ export default class Sidebar extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.dropdown-menu {
-  min-width: 9rem !important;
-}
 .ml-8 {
-  margin-left: 8% !important;
+  margin-left: 8%;
+}
+.ml-6 {
+  margin-left: 6%;
 }
 .w-84 {
   width: 84%;
