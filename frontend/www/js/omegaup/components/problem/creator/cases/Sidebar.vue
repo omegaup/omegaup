@@ -32,8 +32,10 @@
             class="w-84"
             @click="showUngroupedCases = !showUngroupedCases"
             ><div class="d-flex justify-content-between">
-              <div class="mr-2 truncate">{{ T.problemCreatorUngrouped }}</div>
-              <div class="fixed">
+              <div class="mr-2 text-truncate">
+                {{ T.problemCreatorUngrouped }}
+              </div>
+              <div class="d-inline-block text-nowrap">
                 <b-badge variant="primary" class="mr-1">{{
                   ungroupedCases.length
                 }}</b-badge>
@@ -82,8 +84,8 @@
                   :title="name"
                   class="w-82"
                   ><div class="d-flex justify-content-between">
-                    <div class="mr-2 truncate">{{ name }}</div>
-                    <div class="fixed">
+                    <div class="mr-2 text-truncate">{{ name }}</div>
+                    <div class="d-inline-block text-nowrap">
                       <b-badge variant="info">
                         {{ Math.round(points || 0) }}
                         {{ T.problemCreatorPointsAbbreviation }}</b-badge
@@ -122,8 +124,8 @@
             class="w-84"
             @click="showCases[groupID] = !showCases[groupID]"
             ><div class="d-flex justify-content-between">
-              <div class="mr-2 truncate">{{ name }}</div>
-              <div class="fixed">
+              <div class="mr-2 text-truncate">{{ name }}</div>
+              <div class="d-inline-block text-nowrap">
                 <b-badge variant="primary" class="mr-1">{{
                   cases.length
                 }}</b-badge>
@@ -172,8 +174,8 @@
                   :title="caseName"
                   class="w-82"
                   ><div class="d-flex justify-content-between">
-                    <div class="mr-2 truncate">{{ caseName }}</div>
-                    <div class="fixed">
+                    <div class="mr-2 text-truncate">{{ caseName }}</div>
+                    <div class="d-inline-block text-nowrap">
                       <b-badge variant="info">
                         {{ Math.round(casePoints || 0) }}
                         {{ T.problemCreatorPointsAbbreviation }}</b-badge
@@ -257,14 +259,5 @@ export default class Sidebar extends Vue {
 }
 .w-82 {
   width: 82%;
-}
-.truncate {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.fixed {
-  white-space: nowrap;
-  display: inline-block;
 }
 </style>
