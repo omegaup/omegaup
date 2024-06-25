@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="h-75">
+<html class="h-100 border">
 	<head>
 		<meta charset="UTF-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -12,14 +12,13 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/golden-layout/1.5.9/goldenlayout.min.js"></script>
 
 		<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/golden-layout/1.5.9/css/goldenlayout-base.css" />
-		<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/golden-layout/1.5.9/css/goldenlayout-dark-theme.css" />
+		<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/golden-layout/1.5.9/css/goldenlayout-light-theme.css" />
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 		<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-		<link type="text/css" rel="stylesheet" href="style.css" />
-		<script src="/js/dist/grader_ephemeral.js" async></script>
+		<link type="text/css" rel="stylesheet" href="style-light.css" />
 	</head>
-	<body class="d-flex flex-column h-100 bg-dark text-white">
-		<nav class="navbar navbar-dark bg-dark py-0">
+	<body class="d-flex flex-column h-100 bg-light">
+		<nav class="navbar navbar-light bg-light py-0 border-bottom">
 			<span class="navbar-brand">omegaUp ephemeral grader<sup>&alpha;</sup></span>
 			<form class="form-inline my-2 my-lg-0 ephemeral-form">
 				<label for="upload">
@@ -59,15 +58,15 @@
 				</select>
 				<button class="btn btn-sm btn-secondary mr-2 my-sm-0 ephemeral-button" data-run-button type="button">
 					<span>Run</span>
-					<img src="http://samherbert.net/svg-loaders/svg-loaders/tail-spin.svg" height="16" />
+					<img src="https://samherbert.net/svg-loaders/svg-loaders/tail-spin.svg" height="16" />
 				</button>
-				<button class="btn btn-sm btn-dark my-2 my-sm-0 ephemeral-button d-none" data-submit-button type="submit">
+				<button class="btn btn-sm btn-primary my-2 my-sm-0 ephemeral-button d-none" data-submit-button type="submit">
 					<span>Submit</span>
-					<img src="http://samherbert.net/svg-loaders/svg-loaders/tail-spin.svg" height="16" />
+					<img src="https://samherbert.net/svg-loaders/svg-loaders/tail-spin.svg" height="16" />
 				</button>
 			</form>
 		</nav>
-		<section id="layout-root" class="col px-0"></section>
-		<input type="hidden" id="theme" value="vs-dark">
+		<section id="layout-root" class="col px-0 "></section>
+		<input type="hidden" id="theme" value="vs">
 	</body>
 </html>
