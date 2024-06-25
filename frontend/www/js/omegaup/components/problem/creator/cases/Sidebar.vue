@@ -28,7 +28,7 @@
           <b-button
             variant="light"
             data-placement="top"
-            title="Ungrouped cases"
+            :title="T.problemCreatorUngroupedCases"
             class="w-84"
             @click="showUngroupedCases = !showUngroupedCases"
             ><div class="d-flex justify-content-between">

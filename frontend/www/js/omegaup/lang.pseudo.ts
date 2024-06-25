@@ -1052,6 +1052,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorSuffix: "(Suffix)",
   problemCreatorTestCases: "(T357 ca535)",
   problemCreatorUngrouped: "(Ungr0up3d)",
+  problemCreatorUngroupedCases: "(Ungr0up3d ca535)",
   problemCreatorUpdateAlert: "(Th3 pr0b13m ha5 b33n upda73d 5ucc35fu11y.)",
   problemDeployerChangeMissingSettingsJson: "(Th3 pr0b13m i5 mi55ing a '5377ing5.j50n' fi13.)",
   problemDeployerConfigBadLayout: "(Th3 c0mmi7 70 'r3f5/m37a/c0nfig' ha5 7h3 wr0ng 1ay0u7.)",
