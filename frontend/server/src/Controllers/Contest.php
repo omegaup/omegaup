@@ -4606,41 +4606,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
             . $targetIdentity->username . ', state=' . $resolution
         );
 
-        if (!is_null($targetIdentity->user_id)) {
-            \OmegaUp\DAO\Notifications::create(
-                new \OmegaUp\DAO\VO\Notifications([
-                    'user_id' => $targetIdentity->user_id,
-                    'contents' =>  json_encode(
-                        [
-                            'type' => (
-                                $request->accepted ?
-                                \OmegaUp\DAO\Notifications::CONTEST_REGISTRATION_ACCEPTED :
-                                \OmegaUp\DAO\Notifications::CONTEST_REGISTRATION_REJECTED
-                            ),
-                            'body' => [
-                                'localizationString' => (
-                                    $request->accepted ?
-                                    new \OmegaUp\TranslationString(
-                                        'notificationContestRegisterationAccepted'
-                                    ) :
-                                    new \OmegaUp\TranslationString(
-                                        'notificationContestRegisterationRejected'
-                                    )
-                                ),
-                                'localizationParams' => [
-                                    'contestTitle' => $contest->title,
-                                ],
-                                // 'url' => "/course/{$course->alias}/",
-                                'url' => "/arena/{$contest->alias}/",
-                                'iconUrl' => '/media/info.png',
-                            ],
-                        ]
-                    ),
-                ])
-            );
+        $response = ['status' => 'ok'];
+
+        if (is_null($targetIdentity->user_id)) {
+            return $response;
         }
 
-        return ['status' => 'ok'];
+        \OmegaUp\Controllers\Notification::createForArbitrateRequest(
+            $contest,
+            $targetIdentity->user_id,
+            $request->accepted
+        );
+
+        return $response;
     }
 
     /**
