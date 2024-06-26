@@ -69,25 +69,25 @@ OmegaUp.on('ready', () => {
           },
           remove: ({
             alias,
-            shouldShowAll,
+            shouldShowAllProblems,
           }: {
             alias: string;
-            shouldShowAll: boolean;
+            shouldShowAllProblems: boolean;
           }) => {
             api.Problem.delete({ problem_alias: alias })
               .then(() => {
                 ui.success(T.problemSuccessfullyRemoved);
-                showAllProblems = shouldShowAll;
-                showProblems(shouldShowAll);
+                showAllProblems = shouldShowAllProblems;
+                showProblems(shouldShowAllProblems);
               })
               .catch(ui.apiError);
           },
           'remove-all-problems': ({
             selectedProblems,
-            shouldShowAll,
+            shouldShowAllProblems,
           }: {
             selectedProblems: types.ProblemListItem[];
-            shouldShowAll: boolean;
+            shouldShowAllProblems: boolean;
           }) => {
             Promise.all(
               selectedProblems.map((problem: types.ProblemListItem) =>
@@ -101,8 +101,8 @@ OmegaUp.on('ready', () => {
                 ui.error(ui.formatString(T.bulkOperationError, error));
               })
               .finally(() => {
-                showAllProblems = shouldShowAll;
-                showProblems(shouldShowAll);
+                showAllProblems = shouldShowAllProblems;
+                showProblems(shouldShowAllProblems);
               });
           },
         },
