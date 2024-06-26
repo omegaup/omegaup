@@ -870,7 +870,7 @@ const translations: { [key: string]: string; } = {
   notProblemLevelTag: "La etiqueta enviada no es una etiqueta de nivel.",
   notificationContestClarificationRequest: "Ha sido solicitada una nueva clarificaci\u00f3n para el problema %(problemAlias) del concurso %(contestAlias), que administras.",
   notificationContestClarificationResponse: "Su pedido de clarificaci\u00f3n para el problema %(problemAlias) del concurso %(contestAlias), ha sido respondido.",
-  notificationContestRegisterRequest: "A new contestant %(username) has requested to register for the contest %(contestTitle), that you manage.",
+  notificationContestRegisterRequest: "%(username) ha pedido registrarse para el concurso %(contestTitle) que t\u00fa manejas.",
   notificationContestRegisterationAccepted: "Your registration request for contest %(contestTitle) has been **accepted**.",
   notificationContestRegisterationRejected: "Your registration request for contest %(contestTitle) has been **rejected**.",
   notificationCourseAddAdmin: "Has sido invitado a ser administrador del curso %(courseName).",

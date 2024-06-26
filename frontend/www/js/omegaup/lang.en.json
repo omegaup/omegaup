@@ -869,7 +869,7 @@
 	"notProblemLevelTag": "The tag sent is not a level tag.",
 	"notificationContestClarificationRequest": "A new clarification has been requested for problem %(problemAlias) of the contest %(contestAlias), that you manage.",
 	"notificationContestClarificationResponse": "Your clarification request for problem %(problemAlias) of the contest %(contestAlias), has been answered.",
-	"notificationContestRegisterRequest": "A new contestant %(username) has requested to register for the contest %(contestTitle), that you manage.",
+	"notificationContestRegisterRequest": "%(username) has requested to register for the contest %(contestTitle) that you manage.",
 	"notificationContestRegisterationAccepted": "Your registration request for contest %(contestTitle) has been **accepted**.",
 	"notificationContestRegisterationRejected": "Your registration request for contest %(contestTitle) has been **rejected**.",
 	"notificationCourseAddAdmin": "You have been invited to be an administrator for course %(courseName).",

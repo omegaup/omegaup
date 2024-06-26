@@ -17,7 +17,7 @@ class Notification extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Contests $contest,
         int $userId,
         bool $isAccepted
-    ) {
+    ): void {
         \OmegaUp\DAO\Notifications::create(
             new \OmegaUp\DAO\VO\Notifications([
                 'user_id' => $userId,
