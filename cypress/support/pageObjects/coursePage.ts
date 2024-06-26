@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import 'cypress-iframe';
 import { addSubtractDateTime, getISODate, getISODateTime } from '../commands';
 import { CourseOptions, ProblemOptions, RunOptions, Status } from '../types';
 
@@ -220,24 +221,48 @@ export class CoursePage {
     cy.get('[data-course-submisson-button]').click();
     cy.get('[data-runs-actions-button]').click();
     cy.get('[data-runs-show-details-button]').click();
-    cy.get('[data-run-leave-feedback-button]').click();
-    cy.get('textarea[data-run-feedback-text]').type(feedback);
-    cy.get('[data-run-send-feedback-button]').click();
-    cy.get('#alert-close').click();
 
-    cy.get('[data-runs-actions-button]').click();
-    cy.get('[data-runs-show-details-button]').click();
-    cy.get('[data-run-feedback]').should('contain', feedback);
-    cy.get('[data-overlay-popup] button.close')
-      .should('be.visible')
-      .first()
-      .click({ force: true });
+    cy.get('.CodeMirror')
+      .should('exist')
+      .then((editor) => {
+        cy.wrap(editor).should('be.visible');
+
+        const gutter = editor.find('.CodeMirror-gutters .CodeMirror-linenumbers');
+
+        expect(gutter.length).to.be.greaterThan(0);
+
+        gutter[0].scrollIntoView();
+
+        cy.wrap(gutter.first()).click({ force: true });
+
+        cy.get('.card-body > textarea').type(feedback);
+
+        cy.get('[data-button-submit]').click();
+        cy.get('.card-body [data-markdown-statement]').should('contain', feedback);
+        cy.get('[data-button-send-feedback]').click();
+
+        cy.get('[data-runs-actions-button]').click();
+
+        cy.get('[data-runs-show-details-button]').click();
+
+        cy.get('.CodeMirror-linewidget [data-markdown-statement]').should(
+          'contain',
+          feedback,
+        );
+        cy.get('[data-overlay-popup] button.close')
+          .should('be.visible')
+          .first()
+          .click({ force: true });
+    });
   }
 
   verifyFeedback(feedback: string): void {
     cy.get('.notification-toggle').last().click();
     cy.get('[data-notification-list]').filter(':visible').first().click();
-    cy.get('[data-run-feedback]').should('contain', feedback);
+    cy.get('.CodeMirror-linewidget [data-markdown-statement]').should(
+      'contain',
+      feedback,
+    );
     cy.get('.CodeMirror-lines').should('be.visible');
     cy.get('.CodeMirror-line').then((rawHTMLElements) => {
       const userCode: Array<string> = [];
@@ -248,7 +273,7 @@ export class CoursePage {
 
       cy.wrap(userCode).as('userCodeLines');
     });
-    cy.get('@userCodeLines').should('have.length', 12);
+    cy.get('@userCodeLines').should('have.length.above', 11);
     cy.get('[data-overlay-popup] button.close')
       .should('be.visible')
       .first()

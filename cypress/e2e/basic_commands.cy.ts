@@ -78,7 +78,6 @@ describe('Basic Commands Test', () => {
     cy.login(loginOptions[0]);
     cy.createProblem(problemOptions[0]);
     coursePage.verifyProblem(problemOptions[0]);
-    coursePage.verifyProblem(problemOptions[0]);
     cy.logout();
   });
 

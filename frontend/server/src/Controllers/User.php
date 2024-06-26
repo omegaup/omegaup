@@ -11,7 +11,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Badge=array{assignation_time: \OmegaUp\Timestamp|null, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}
  * @psalm-type ApiToken=array{name: string, timestamp: \OmegaUp\Timestamp, last_used: \OmegaUp\Timestamp, rate_limit: array{reset: \OmegaUp\Timestamp, limit: int, remaining: int}}
  * @psalm-type AssociatedIdentity=array{username: string, default: bool}
- * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration?: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration_minutes: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, isUnder13User: bool, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>, apiTokens: list<ApiToken>, nextRegisteredContestForUser: ContestListItem|null, userVerificationDeadline: \OmegaUp\Timestamp|null}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, timestamp: \OmegaUp\Timestamp|null, user_id: int, username: string}>, total: int}
@@ -4147,7 +4147,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Prepare all the properties to be sent to the rank table view via TypeScript
      *
-     * @omegaup-request-param mixed $category
+     * @omegaup-request-param 'all'|'female'|null $category
      *
      * @return array{templateProperties: array{payload: CoderOfTheMonthPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
@@ -4172,12 +4172,20 @@ class User extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
 
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['category'],
+        $category = $r->ensureOptionalEnum(
             'category',
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
-        );
-        $category = $r['category'] ?? 'all';
+        ) ?? 'all';
+
+        if ($category === 'all') {
+            $title = new \OmegaUp\TranslationString(
+                'omegaupTitleCodersofthemonth'
+            );
+        } else {
+            $title = new \OmegaUp\TranslationString(
+                'omegaupTitleCodersofthemonthFemale'
+            );
+        }
 
         $candidates = \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
             $dateToSelect,
@@ -4185,7 +4193,6 @@ class User extends \OmegaUp\Controllers\Controller {
         );
         $bestCoders = [];
         foreach ($candidates as $candidate) {
-            /** @psalm-suppress InvalidArrayOffset Even though $candidate does have this index, psalm cannot see it :/ */
             unset($candidate['user_id']);
             $bestCoders[] = $candidate;
         }
@@ -4213,15 +4220,7 @@ class User extends \OmegaUp\Controllers\Controller {
             return [
                 'templateProperties' => [
                     'payload' => $response,
-                    'title' => (
-                        (strval($category) === 'female') ?
-                        new \OmegaUp\TranslationString(
-                            'omegaupTitleCodersofthemonthFemale'
-                        ) :
-                        new \OmegaUp\TranslationString(
-                            'omegaupTitleCodersofthemonth'
-                        )
-                    ),
+                    'title' => $title,
                 ],
                 'entrypoint' => 'coder_of_the_month',
             ];
@@ -4244,15 +4243,7 @@ class User extends \OmegaUp\Controllers\Controller {
         return [
             'templateProperties' => [
                 'payload' => $response,
-                'title' => (
-                    (strval($category) === 'female') ?
-                    new \OmegaUp\TranslationString(
-                        'omegaupTitleCodersofthemonthFemale'
-                    ) :
-                    new \OmegaUp\TranslationString(
-                        'omegaupTitleCodersofthemonth'
-                    )
-                ),
+                'title' => $title,
             ],
             'entrypoint' => 'coder_of_the_month',
         ];

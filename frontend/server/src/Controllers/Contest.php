@@ -31,13 +31,13 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestCertificatesAdminDetails=array{certificateCutoff: int|null, certificatesStatus: string, isCertificateGenerator: bool}
  * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<ProblemsetProblemWithVersions>, users: list<ContestUser>, groups: list<ContestGroup>, teams_group: ContestGroup|null, requests: list<ContestRequest>, admins: list<ContestAdmin>, group_admins: list<ContestGroupAdmin>, original_contest_admission_mode: null|string, certificatesDetails: ContestCertificatesAdminDetails}
  * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string, shouldShowModalToLoginWithRegisteredIdentity: bool}
- * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration?: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration_minutes: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestList=array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
  * @psalm-type ContestListPayload=array{contests: TimeTypeContests, countContests: array<string, int>, isLogged: bool, query: null|string}
  * @psalm-type ContestListv2Payload=array{contests: ContestList, countContests: array{current: int, future: int, past: int}, query: string | null}
  * @psalm-type ContestNewPayload=array{languages: array<string, string>, hasVisitedSection?: bool}
- * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
+ * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -91,6 +91,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $tab_name
      * @omegaup-request-param int|null $participating
      * @omegaup-request-param string $query
+     * @omegaup-request-param null|string $sort_order
      * @omegaup-request-param int|null $recommended
      */
     public static function apiList(\OmegaUp\Request $r): array {
@@ -182,6 +183,34 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 250
             )
         );
+        $order = $r->ensureOptionalEnum(
+            'sort_order',
+            \OmegaUp\DAO\Enum\ContestOrderStatus::NAME_FOR_STATUS,
+            required: false
+        );
+
+        $orderBy = 0;
+        if (!is_null($order)) {
+            $index = array_search(
+                $order,
+                \OmegaUp\DAO\Enum\ContestOrderStatus::NAME_FOR_STATUS
+            );
+            if ($index === false) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'sort_order'
+                );
+            }
+            $orderBy = \OmegaUp\DAO\Enum\ContestOrderStatus::getIntValue(
+                $index
+            );
+            if (is_null($orderBy)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'sort_order'
+                );
+            }
+        }
 
         [
             'contests' => $contests,
@@ -194,7 +223,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $activeContests,
             $recommended,
             $public,
-            $participating
+            $participating,
+            $orderBy
         );
 
         return [
@@ -214,9 +244,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         int $activeContests,
         int $recommended,
         bool $public = false,
-        ?int $participating = null
+        ?int $participating = null,
+        int $orderBy = 0
     ) {
-        $cacheKey = "0-{$activeContests}-{$recommended}-{$page}-{$pageSize}";
+        $cacheKey = "0-{$activeContests}-{$recommended}-{$participating}-{$page}-{$pageSize}";
         if (is_null($identity) || is_null($identity->identity_id)) {
             // Get all public contests
             $callback = /** @return array{contests: list<ContestListItem>, count: int} */ fn () => \OmegaUp\DAO\Contests::getAllPublicContests(
@@ -224,7 +255,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $pageSize,
                 $activeContests,
                 $recommended,
-                $query
+                $query,
+                $orderBy
             );
             if (empty($query)) {
                 [
@@ -250,7 +282,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $page,
                 $pageSize,
                 $activeContests,
-                $query
+                $query,
+                $orderBy
             );
         } elseif ($public) {
             [
@@ -260,7 +293,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $identity->identity_id,
                 $page,
                 $pageSize,
-                $query
+                $query,
+                $orderBy
             );
         } elseif (\OmegaUp\Authorization::isSystemAdmin($identity)) {
             // Get all contests
@@ -269,7 +303,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $pageSize,
                 $activeContests,
                 $recommended,
-                $query
+                $query,
+                $orderBy
             );
             if (empty($query)) {
                 [
@@ -297,12 +332,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $pageSize,
                 $activeContests,
                 $recommended,
-                $query
+                $query,
+                $orderBy
             );
         }
         $addedContests = [];
         foreach ($contests as $contestInfo) {
-            $contestInfo['duration'] = (is_null($contestInfo['window_length']) ?
+            $contestInfo['duration_minutes'] = (is_null(
+                $contestInfo['window_length']
+            ) ?
                 $contestInfo['finish_time']->time - $contestInfo['start_time']->time :
                 ($contestInfo['window_length'] * 60)
             );

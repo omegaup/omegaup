@@ -207,6 +207,7 @@
 - [Session](#session)
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
 - [Submission](#submission)
+  - [`/api/submission/list/`](#apisubmissionlist)
   - [`/api/submission/setFeedback/`](#apisubmissionsetfeedback)
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
@@ -912,16 +913,17 @@ Returns a list of contests
 
 ### Parameters
 
-| Name             | Type        | Description |
-| ---------------- | ----------- | ----------- |
-| `page`           | `int`       |             |
-| `page_size`      | `int`       |             |
-| `query`          | `string`    |             |
-| `tab_name`       | `string`    |             |
-| `active`         | `int\|null` |             |
-| `admission_mode` | `mixed`     |             |
-| `participating`  | `int\|null` |             |
-| `recommended`    | `int\|null` |             |
+| Name             | Type           | Description |
+| ---------------- | -------------- | ----------- |
+| `page`           | `int`          |             |
+| `page_size`      | `int`          |             |
+| `query`          | `string`       |             |
+| `tab_name`       | `string`       |             |
+| `active`         | `int\|null`    |             |
+| `admission_mode` | `mixed`        |             |
+| `participating`  | `int\|null`    |             |
+| `recommended`    | `int\|null`    |             |
+| `sort_order`     | `null\|string` |             |
 
 ### Returns
 
@@ -4133,6 +4135,27 @@ contestant's machine and the server.
 # Submission
 
 SubmissionController
+
+## `/api/submission/list/`
+
+### Description
+
+Returns a list of submissions in the last 24 hours
+for given page and username.
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `page`     | `int\|null`    |             |
+| `pageSize` | `int\|null`    |             |
+| `username` | `string\|null` |             |
+
+### Returns
+
+| Name          | Type                 |
+| ------------- | -------------------- |
+| `submissions` | `types.Submission[]` |
 
 ## `/api/submission/setFeedback/`
 
