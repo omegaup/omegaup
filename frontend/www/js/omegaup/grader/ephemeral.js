@@ -13,17 +13,12 @@ import TextEditorComponent from './TextEditorComponent.vue';
 import ZipViewerComponent from './ZipViewerComponent.vue';
 
 // imports from new files
-import * as Templates from './GraderTemplates';
 import store from './GraderStore';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
 const theme = document.getElementById('theme').value;
 let isInitialised = false;
 
-const originalInteractiveTemplates = {
-  ...Templates.originalInteractiveTemplates,
-};
-const interactiveTemplates = { ...originalInteractiveTemplates };
 const languageExtensionMapping = Object.fromEntries(
   Object.entries(Util.supportedLanguages).map(([key, value]) => [
     key,
