@@ -926,18 +926,6 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
   store.commit('Validator', settings.validator.name);
   store.commit('Tolerance', settings.validator.tolerance);
 
-  for (let name in store.state.request.input.cases) {
-    store.commit('removeCase', name);
-  }
-  // create sample case if there are no cases for the problem
-  if (!Object.keys(settings.cases).length) {
-    store.commit('createCase', {
-      name: 'sample',
-      in: '1 2\n',
-      out: '3\n',
-      weight: 1,
-    });
-  }
   // if the problem is interactive, we need to init remaining settings
   store.commit('Interactive', !!settings.interactive);
   if (settings.interactive) {
@@ -960,6 +948,12 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
       in: caseData['in'],
       out: caseData['out'],
     });
+  }
+  // delete cases that are not in settings cases
+  for (let caseName of Object.keys(store.state.request.input.cases)) {
+    if (Object.prototype.hasOwnProperty.call(settings.cases, caseName))
+      continue;
+    store.commit('removeCase', caseName);
   }
   // Given that the current case will change several times, schedule the
   // flag to avoid swapping into the cases view for the next tick.
