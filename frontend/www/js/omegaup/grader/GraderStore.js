@@ -274,10 +274,6 @@ let store = new Vuex.Store({
       Vue.set(state, 'request', value);
     },
     'request.language'(state, value) {
-      // this unnecessairly complex
-      if (state.request.language == value) {
-        return;
-      }
       state.request.language = value;
       languageSelectElement.value = value;
       if (
@@ -425,18 +421,63 @@ let store = new Vuex.Store({
       state.dirty = true;
     },
     Interactive(state, value) {
-      if (value) {
-        if (state.request.input.interactive) return;
-        Vue.set(state.request.input, 'interactive', {
-          idl: defaultInteractiveIdlSource,
-          module_name: 'sumas',
-          language: 'cpp17-gcc',
-          main_source: defaultInteractiveMainSource,
-        });
-      } else {
-        if (!state.request.input.interactive) return;
+      const isInteractive = !!value;
+      if (!isInteractive) {
+        if (!state.request.input.interactive) {
+          return;
+        }
         Vue.delete(state.request.input, 'interactive');
+        state.dirty = true;
+        return;
       }
+
+      // initialize interactive if its not present in state
+      if (
+        !Object.prototype.hasOwnProperty.call(
+          state.request.input,
+          'interactive',
+        )
+      ) {
+        Vue.set(state.request.input, 'interactive', {});
+      }
+
+      // update interactive problem data
+      const {
+        idl = state.request.input.interactive.idl ||
+          defaultInteractiveIdlSource,
+        module_name = state.request.input.interactive.module_name || 'sumas',
+        language = state.request.input.interactive.language || 'cpp17-gcc',
+        main_source = state.request.input.interactive.module_name.main_source ||
+          defaultInteractiveMainSource,
+        templates = state.request.input.interactive.templates ||
+          originalInteractiveTemplates,
+      } = value;
+
+      store.commit('request.input.interactive.idl', idl);
+      store.commit('InteractiveLanguage', language);
+      store.commit('InteractiveModuleName', module_name);
+      store.commit('request.input.interactive.main_source', main_source);
+      // if its the same template from before, no need to update
+      if (templates == state.request.input.interactive.templates) {
+        state.dirty = true;
+        return;
+      }
+
+      // update with interactive problem templates for each language
+      // dont forget to update all cppxx and pyx templates
+      for (let extension in templates) {
+        if (Object.prototype.hasOwnProperty.call(templates, extension)) {
+          for (const language of Util.extensionToLanguages[extension]) {
+            interactiveTemplates[language] = templates[extension];
+          }
+        } else {
+          for (const language of Util.extensionToLanguages[extension]) {
+            interactiveTemplates[language] =
+              originalInteractiveTemplates[extension];
+          }
+        }
+      }
+
       state.dirty = true;
     },
     InteractiveLanguage(state, value) {
@@ -488,10 +529,10 @@ let store = new Vuex.Store({
       state.dirty = true;
     },
     limits(state, limits) {
-      if (!Object.prototype.hasOwnProperty.call(limits, 'MemoryLimit')) {
+      if (Object.prototype.hasOwnProperty.call(limits, 'MemoryLimit')) {
         store.commit('MemoryLimit', limits.MemoryLimit * 1024);
       }
-      if (!Object.prototype.hasOwnProperty.call(limits, 'OutputLimit')) {
+      if (Object.prototype.hasOwnProperty.call(limits, 'OutputLimit')) {
         store.commit('OutputLimit', limits.OutputLimit);
       }
       for (let name of ['TimeLimit', 'OverallWallTimeLimit', 'ExtraWallTime']) {
