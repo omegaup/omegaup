@@ -243,7 +243,8 @@ export default {
         return this.store.getters.isInteractive;
       },
       set(value) {
-        this.store.commit('Interactive', value);
+        if (value) this.store.commit('Interactive', {});
+        else this.store.commit('Interactive', undefined);
       },
     },
     interactiveLanguage: {
