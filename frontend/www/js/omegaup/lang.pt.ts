@@ -1539,7 +1539,6 @@ const translations: { [key: string]: string; } = {
   submissionNotFound: "Envio n\u00e3o encontrado.",
   submissionRunTimeInSeconds: "%(value) s",
   submissionSendFeedback: "Enviar feedback",
-  submissionUpdateFeedback: "Atualizar feedback",
   submissionsListCoder: "Coder",
   submissionsListTitle: "Submiss\u00f5es realizadas nas \u00faltimas 24 horas",
   submitFeedbackCancel: "Cancelar",

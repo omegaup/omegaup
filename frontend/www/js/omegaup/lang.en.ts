@@ -1539,7 +1539,6 @@ const translations: { [key: string]: string; } = {
   submissionNotFound: "Submission not found.",
   submissionRunTimeInSeconds: "%(value) s",
   submissionSendFeedback: "Send feedback",
-  submissionUpdateFeedback: "Update feedback",
   submissionsListCoder: "Coder",
   submissionsListTitle: "Submissions in the last 24 hours",
   submitFeedbackCancel: "Cancel",

@@ -1539,7 +1539,6 @@ const translations: { [key: string]: string; } = {
   submissionNotFound: "No se encontr\u00f3 el env\u00edo.",
   submissionRunTimeInSeconds: "%(value) s",
   submissionSendFeedback: "Enviar retroalimentaci\u00f3n",
-  submissionUpdateFeedback: "Actualizar retroalimentaci\u00f3n",
   submissionsListCoder: "Coder",
   submissionsListTitle: "Env\u00edos realizados en las \u00faltimas 24 horas",
   submitFeedbackCancel: "Cancelar",
