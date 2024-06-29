@@ -13,16 +13,12 @@ import TextEditorComponent from './TextEditorComponent.vue';
 import ZipViewerComponent from './ZipViewerComponent.vue';
 
 // imports from new files
-import * as Templates from './GraderTemplates';
 import store from './GraderStore';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
 const theme = document.getElementById('theme').value;
+let isInitialised = false;
 
-const originalInteractiveTemplates = {
-  ...Templates.originalInteractiveTemplates,
-};
-const interactiveTemplates = { ...originalInteractiveTemplates };
 const languageExtensionMapping = Object.fromEntries(
   Object.entries(Util.supportedLanguages).map(([key, value]) => [
     key,
@@ -368,8 +364,9 @@ function initialize() {
 function onResized() {
   const layoutRoot = document.getElementById('layout-root');
   if (!layoutRoot.clientWidth) return;
-  if (!layout.isInitialised) {
+  if (!isInitialised) {
     initialize();
+    isInitialised = true;
   }
   layout.updateSize();
 }
@@ -537,9 +534,10 @@ document.getElementById('upload').addEventListener('change', (e) => {
               .file(fileName)
               .async('string')
               .then((value) => {
-                store.commit('Interactive', true);
-                store.commit('InteractiveModuleName', moduleName);
-                store.commit('request.input.interactive.idl', value);
+                store.commit('Interactive', {
+                  idl: value,
+                  module_name: moduleName,
+                });
               })
               .catch(Util.asyncError);
           } else if (fileName.startsWith('interactive/Main.')) {
@@ -555,9 +553,10 @@ document.getElementById('upload').addEventListener('change', (e) => {
               .file(fileName)
               .async('string')
               .then((value) => {
-                store.commit('Interactive', true);
-                store.commit('InteractiveLanguage', extension);
-                store.commit('request.input.interactive.main_source', value);
+                store.commit('Interactive', {
+                  language: extension,
+                  main_source: value,
+                });
               })
               .catch(Util.asyncError);
           }
@@ -800,53 +799,35 @@ runButton.addEventListener('click', () => {
 });
 
 function setSettings({ alias, settings, languages, showSubmitButton }) {
-  if (!settings) {
+  // if there is not an alias for some reason
+  // should also return early
+  if (!settings || !alias) {
     return;
   }
-  if (settings.interactive) {
-    for (let language in settings.interactive.templates) {
-      if (
-        Object.prototype.hasOwnProperty.call(
-          settings.interactive.templates,
-          language,
-        )
-      ) {
-        interactiveTemplates[language] =
-          settings.interactive.templates[language];
-      } else {
-        interactiveTemplates[language] = originalInteractiveTemplates[language];
-      }
-    }
-  }
-  store.commit('languages', languages);
   store.commit('updatingSettings', true);
-  store.commit('reset');
-  store.commit('Interactive', !!settings.interactive);
+
+  store.commit('Interactive', settings.interactive);
   store.commit('alias', alias);
+  store.commit('languages', languages);
   store.commit('showSubmitButton', showSubmitButton);
-  store.commit('removeCase', 'long');
-  store.commit('MemoryLimit', settings.limits.MemoryLimit * 1024);
-  store.commit('OutputLimit', settings.limits.OutputLimit);
-  for (let name of ['TimeLimit', 'OverallWallTimeLimit', 'ExtraWallTime']) {
-    if (!Object.prototype.hasOwnProperty.call(settings.limits, name)) continue;
-    store.commit(name, Util.parseDuration(settings.limits[name]));
-  }
+  store.commit('limits', settings.limits);
   store.commit('Validator', settings.validator.name);
   store.commit('Tolerance', settings.validator.tolerance);
 
-  if (settings.interactive) {
-    store.commit('InteractiveLanguage', settings.interactive.language);
-    store.commit('InteractiveModuleName', settings.interactive.module_name);
-    store.commit('request.input.interactive.idl', settings.interactive.idl);
-    store.commit(
-      'request.input.interactive.main_source',
-      settings.interactive.main_source,
-    );
+  for (let name in store.state.request.input.cases) {
+    store.commit('removeCase', name);
+  }
+  // create sample case if there are no cases for the problem
+  if (!Object.keys(settings.cases).length) {
+    store.commit('createCase', {
+      name: 'sample',
+      in: '1 2\n',
+      out: '3\n',
+      weight: 1,
+    });
   }
 
-  // If there are cases for a problem, then delete the sample case
-  if (Object.keys(settings.cases).length) store.commit('removeCase', 'sample');
-
+  // create cases for current problem
   for (let caseName in settings.cases) {
     if (!Object.prototype.hasOwnProperty.call(settings.cases, caseName))
       continue;
@@ -854,9 +835,9 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
     store.commit('createCase', {
       name: caseName,
       weight: caseData.weight,
+      in: caseData['in'],
+      out: caseData['out'],
     });
-    store.commit('inputIn', caseData['in']);
-    store.commit('inputOut', caseData.out);
   }
 
   // Given that the current case will change several times, schedule the
@@ -865,7 +846,7 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
   // Also change to the main column in case it was not previously selected.
   setTimeout(() => {
     store.commit('updatingSettings', false);
-    if (!layout.isInitialised) return;
+    if (!isInitialised) return;
     let mainColumn = layout.root.getItemsById('main-column')[0];
     mainColumn.parent.setActiveContentItem(mainColumn);
   });
@@ -900,7 +881,6 @@ function onHashChanged() {
     onFilesZipReady(null);
     return;
   }
-
   let token = window.location.hash.substring(1);
   fetch(`run/${token}/request.json`)
     .then((response) => {
