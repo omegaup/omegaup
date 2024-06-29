@@ -13,17 +13,12 @@ import TextEditorComponent from './TextEditorComponent.vue';
 import ZipViewerComponent from './ZipViewerComponent.vue';
 
 // imports from new files
-import * as Templates from './GraderTemplates';
 import store from './GraderStore';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
 const theme = document.getElementById('theme').value;
 let isInitialised = false;
 
-const originalInteractiveTemplates = {
-  ...Templates.originalInteractiveTemplates,
-};
-const interactiveTemplates = { ...originalInteractiveTemplates };
 const languageExtensionMapping = Object.fromEntries(
   Object.entries(Util.supportedLanguages).map(([key, value]) => [
     key,
@@ -633,9 +628,10 @@ document.getElementById('upload').addEventListener('change', (e) => {
               .file(fileName)
               .async('string')
               .then((value) => {
-                store.commit('Interactive', true);
-                store.commit('InteractiveModuleName', moduleName);
-                store.commit('request.input.interactive.idl', value);
+                store.commit('Interactive', {
+                  idl: value,
+                  module_name: moduleName,
+                });
               })
               .catch(Util.asyncError);
           } else if (fileName.startsWith('interactive/Main.')) {
@@ -651,9 +647,10 @@ document.getElementById('upload').addEventListener('change', (e) => {
               .file(fileName)
               .async('string')
               .then((value) => {
-                store.commit('Interactive', true);
-                store.commit('InteractiveLanguage', extension);
-                store.commit('request.input.interactive.main_source', value);
+                store.commit('Interactive', {
+                  language: extension,
+                  main_source: value,
+                });
               })
               .catch(Util.asyncError);
           }
@@ -901,24 +898,9 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
   if (!settings || !alias) {
     return;
   }
-  // this will get saved in session storage when setting alias
-  if (settings.interactive) {
-    for (let language in settings.interactive.templates) {
-      if (
-        Object.prototype.hasOwnProperty.call(
-          settings.interactive.templates,
-          language,
-        )
-      ) {
-        interactiveTemplates[language] =
-          settings.interactive.templates[language];
-      } else {
-        interactiveTemplates[language] = originalInteractiveTemplates[language];
-      }
-    }
-  }
   store.commit('updatingSettings', true);
 
+  store.commit('Interactive', settings.interactive);
   store.commit('alias', alias);
   store.commit('languages', languages);
   store.commit('showSubmitButton', showSubmitButton);
@@ -926,17 +908,6 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
   store.commit('Validator', settings.validator.name);
   store.commit('Tolerance', settings.validator.tolerance);
 
-  // if the problem is interactive, we need to init remaining settings
-  store.commit('Interactive', !!settings.interactive);
-  if (settings.interactive) {
-    store.commit('InteractiveLanguage', settings.interactive.language);
-    store.commit('InteractiveModuleName', settings.interactive.module_name);
-    store.commit('request.input.interactive.idl', settings.interactive.idl);
-    store.commit(
-      'request.input.interactive.main_source',
-      settings.interactive.main_source,
-    );
-  }
   // create cases for current problem
   for (let caseName in settings.cases) {
     if (!Object.prototype.hasOwnProperty.call(settings.cases, caseName))
