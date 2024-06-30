@@ -228,49 +228,6 @@ const goldenLayoutSettings = {
     },
   ],
 };
-const validatorSettings = {
-  type: 'component',
-  componentName: 'monaco-editor-component',
-  componentState: {
-    storeMapping: {
-      contents: 'request.input.validator.custom_validator.source',
-      language: 'request.input.validator.custom_validator.language',
-    },
-    initialModule: 'validator',
-    theme,
-  },
-  id: 'validator',
-  isClosable: false,
-};
-const interactiveIdlSettings = {
-  type: 'component',
-  componentName: 'monaco-editor-component',
-  componentState: {
-    storeMapping: {
-      contents: 'request.input.interactive.idl',
-      module: 'request.input.interactive.module_name',
-    },
-    initialLanguage: 'idl',
-    readOnly: isEmbedded,
-    theme,
-  },
-  id: 'interactive-idl',
-  isClosable: false,
-};
-const interactiveMainSourceSettings = {
-  type: 'component',
-  componentName: 'monaco-editor-component',
-  componentState: {
-    storeMapping: {
-      contents: 'request.input.interactive.main_source',
-      language: 'request.input.interactive.language',
-    },
-    initialModule: 'Main',
-    theme,
-  },
-  id: 'interactive-main-source',
-  isClosable: false,
-};
 
 // eslint-disable-next-line no-undef
 const layout = new GoldenLayout(
@@ -356,57 +313,6 @@ RegisterVueComponent(
 
 function initialize() {
   layout.init();
-
-  // is custome validator this like another mode other than
-  // interactive and non interactive problems?
-  let sourceAndSettings = layout.root.getItemsById('source-and-settings')[0];
-  if (store.getters.isCustomValidator) {
-    const activeContentItem = sourceAndSettings.getActiveContentItem();
-    sourceAndSettings.addChild(validatorSettings);
-    if (activeContentItem) {
-      sourceAndSettings.setActiveContentItem(activeContentItem);
-    }
-  }
-  store.watch(
-    Object.getOwnPropertyDescriptor(store.getters, 'isCustomValidator').get,
-    function (value) {
-      if (value) {
-        const activeContentItem = sourceAndSettings.getActiveContentItem();
-        sourceAndSettings.addChild(validatorSettings);
-        if (activeContentItem) {
-          sourceAndSettings.setActiveContentItem(activeContentItem);
-        }
-      } else {
-        layout.root.getItemsById(validatorSettings.id)[0].remove();
-      }
-    },
-  );
-  if (store.getters.isInteractive) {
-    const activeContentItem = sourceAndSettings.getActiveContentItem();
-    sourceAndSettings.addChild(interactiveIdlSettings);
-    sourceAndSettings.addChild(interactiveMainSourceSettings);
-    if (activeContentItem) {
-      sourceAndSettings.setActiveContentItem(activeContentItem);
-    }
-  }
-  // if we load an interactive problem from a list like a course or
-  // a contest make sure to change to interactive settings
-  store.watch(
-    Object.getOwnPropertyDescriptor(store.getters, 'isInteractive').get,
-    function (value) {
-      if (value) {
-        const activeContentItem = sourceAndSettings.getActiveContentItem();
-        sourceAndSettings.addChild(interactiveIdlSettings);
-        sourceAndSettings.addChild(interactiveMainSourceSettings);
-        if (activeContentItem) {
-          sourceAndSettings.setActiveContentItem(activeContentItem);
-        }
-      } else {
-        layout.root.getItemsById(interactiveIdlSettings.id)[0].remove();
-        layout.root.getItemsById(interactiveMainSourceSettings.id)[0].remove();
-      }
-    },
-  );
 
   if (isEmbedded) {
     // Embedded layout should not be able to modify the settings.
