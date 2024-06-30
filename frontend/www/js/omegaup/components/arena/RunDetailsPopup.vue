@@ -190,7 +190,6 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import arena_CodeView from './CodeView.vue';
 import arena_DiffView from './DiffView.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
@@ -216,7 +215,6 @@ const EMPTY_FIELD = '∅';
   components: {
     FontAwesomeIcon,
     'clip-loader': ClipLoader,
-    'omegaup-arena-code-view': arena_CodeView,
     'omegaup-arena-diff-view': arena_DiffView,
     'omegaup-overlay-popup': omegaup_OverlayPopup,
     'omegaup-arena-feedback-code-view': arena_FeedbackCodeView,
