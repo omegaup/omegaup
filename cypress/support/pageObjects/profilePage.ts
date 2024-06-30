@@ -15,7 +15,14 @@ export class ProfilePage {
     cy.get('[data-save-profile-changes-button]').click();
     cy.get('#alert-close').click();
   }
-
+  updatePreferredLanguage(preferredLanguage: string): void {
+    cy.get('[data-nav-user]').click();
+    cy.get('[data-nav-profile]').click();
+    cy.get('a[href="/profile/#edit-preferences"]').click();
+    cy.get('[data-preferred-language]').select(preferredLanguage);
+    cy.get('[data-preference-save-button]').click();
+    cy.get('#alert-close').click();
+  }
   createTeamGroup(teamGroupOptions: TeamGroupOptions): void {
     cy.get('[data-nav-user]').click();
     cy.get('[data-nav-user-teams-groups]').click();

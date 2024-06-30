@@ -10,19 +10,46 @@
 import { Component, Vue, Prop, Ref, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 
+interface CSSStyleDeclaration {
+  zoom?: string | number;
+}
+
 @Component
 export default class EphemeralGrader extends Vue {
   @Ref() grader!: HTMLIFrameElement;
   @Prop() problem!: types.ProblemInfo;
   @Prop({ default: false }) canSubmit!: boolean;
   @Prop({ default: () => [] }) acceptedLanguages!: string[];
+  @Prop({ default: 'cpp17-gcc' }) preferredLanguage!: string;
 
   loaded = false;
 
   mounted(): void {
-    (this.$refs.grader as HTMLIFrameElement).onload = () => this.iframeLoaded();
+    (this.$refs.grader as HTMLIFrameElement).onload = () => {
+      const languageSelectElement: HTMLSelectElement = ((this.$refs
+        .grader as HTMLIFrameElement)
+        .contentWindow as Window).document.getElementById(
+        'language',
+      ) as HTMLSelectElement;
+      if (!this.acceptedLanguages.includes(this.preferredLanguage)) {
+        languageSelectElement.value = this.acceptedLanguages[0];
+      } else {
+        languageSelectElement.value = this.preferredLanguage;
+      }
+      this.iframeLoaded();
+    };
+    window.addEventListener('resize', this.handleWindowResize);
   }
+  unmounted(): void {
+    window.removeEventListener('resize', this.handleWindowResize);
+  }
+  handleWindowResize(): void {
+    const iframe = this.$refs.grader as HTMLIFrameElement;
 
+    (iframe.style as CSSStyleDeclaration).zoom = String(
+      1 / window.devicePixelRatio,
+    );
+  }
   @Watch('problem')
   onProblemChanged() {
     if (!this.loaded) {
@@ -58,6 +85,6 @@ export default class EphemeralGrader extends Vue {
 <style lang="scss" scoped>
 iframe {
   width: 100%;
-  min-height: 40em;
+  min-height: 60em;
 }
 </style>
