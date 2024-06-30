@@ -508,7 +508,6 @@ let store = new Vuex.Store({
       state.dirty = true;
     },
     removeCase(state, name) {
-      // what if the case to be deleted is the current case
       if (
         !Object.prototype.hasOwnProperty.call(state.request.input.cases, name)
       )
