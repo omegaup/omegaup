@@ -21,33 +21,30 @@ class SubmissionFeedbackThread extends \OmegaUp\DAO\Base\SubmissionFeedbackThrea
     public static function getSubmissionFeedbackThreadParticipants(
         int $submissionFeedbackId,
     ) {
-        $sql = 'SELECT
-                    u.user_id AS author_id
-                FROM
-                    Submission_Feedback_Thread sft
-                INNER JOIN
-                    Identities i ON sft.identity_id = i.identity_id
-                INNER JOIN
-                    Users u ON u.user_id = i.user_id
-                WHERE
-                    sft.submission_feedback_id = ?
-                UNION DISTINCT
-                SELECT
-                    u.user_id AS author_id
-                FROM
-                    Submission_Feedback sf
-                INNER JOIN
-                    Identities i
-                ON
-                    sf.identity_id = i.identity_id
-                INNER JOIN
-                    Users u
-                ON
-                    u.user_id = i.user_id
-                WHERE
-                    sf.submission_feedback_id = ?;
-
-        ';
+        $sql = 'WITH FeedbackAuthors AS (
+                    SELECT
+                        u.user_id AS author_id
+                    FROM
+                        Submission_Feedback_Thread sft
+                    INNER JOIN
+                        Identities i ON sft.identity_id = i.identity_id
+                    INNER JOIN
+                        Users u ON u.user_id = i.user_id
+                    WHERE
+                        sft.submission_feedback_id = ?
+                    UNION
+                    SELECT
+                        u.user_id AS author_id
+                    FROM
+                        Submission_Feedback sf
+                    INNER JOIN
+                        Identities i ON sf.identity_id = i.identity_id
+                    INNER JOIN
+                        Users u ON u.user_id = i.user_id
+                    WHERE
+                        sf.submission_feedback_id = ?
+                )
+                SELECT DISTINCT author_id FROM FeedbackAuthors;';
 
         /** @var list<array{author_id: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
