@@ -1030,6 +1030,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorDeleteCase: "Excluir caso",
   problemCreatorDeleteCases: "Excluir casos",
   problemCreatorDeleteGroup: "Excluir grupo",
+  problemCreatorEditCase: "Editar caso",
   problemCreatorEmpty: "",
   problemCreatorGenerateProblem: "Generate Problem",
   problemCreatorGroup: "Grupo",
