@@ -64,7 +64,7 @@ describe('CaseEdit.vue', () => {
     ).toContain(T.problemCreatorDeleteCase);
     expect(wrapper.find('biconthreedotsvertical-stub').exists()).toBe(true);
   });
-  it('Should show an grouped case', async () => {
+  it('Should show a grouped case', async () => {
     const wrapper = shallowMount(CaseEdit, { localVue, store: store });
 
     const groupID = newGroup.groupID;
