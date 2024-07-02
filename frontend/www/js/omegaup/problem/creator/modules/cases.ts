@@ -202,6 +202,7 @@ export const casesStore: Module<CasesState, RootState> = {
     addLayoutLine(state) {
       const payload: CaseLine = {
         lineID: uuid(),
+        caseID: null,
         label: 'NEW',
         data: {
           kind: 'line',
@@ -288,6 +289,7 @@ export const casesStore: Module<CasesState, RootState> = {
       const selectedCase: Case = getters.getSelectedCase;
       const newLine: CaseLine = {
         lineID: uuid(),
+        caseID: selectedCase.caseID,
         label: 'NEW',
         data: {
           kind: 'line',

@@ -74,7 +74,7 @@
           <b-collapse v-model="showUngroupedCases" class="w-100">
             <b-card class="border-0 w-100">
               <b-row
-                v-for="{ name, points, groupID } in ungroupedCases"
+                v-for="{ name, points, cases, groupID } in ungroupedCases"
                 :key="groupID"
                 class="mb-1"
               >
@@ -83,6 +83,7 @@
                   data-placement="top"
                   :title="name"
                   class="w-82"
+                  @click="editCase(groupID, cases[0].caseID)"
                   ><div class="d-flex justify-content-between">
                     <div class="mr-2 text-truncate">{{ name }}</div>
                     <div class="d-inline-block text-nowrap">
@@ -173,6 +174,7 @@
                   data-placement="top"
                   :title="caseName"
                   class="w-82"
+                  @click="editCase(groupID, caseID)"
                   ><div class="d-flex justify-content-between">
                     <div class="mr-2 text-truncate">{{ caseName }}</div>
                     <div class="d-inline-block text-nowrap">
@@ -214,6 +216,7 @@ import T from '../../../../lang';
 import {
   Group,
   GroupID,
+  CaseID,
   CaseGroupID,
 } from '@/js/omegaup/problem/creator/types';
 
@@ -241,9 +244,20 @@ export default class Sidebar extends Vue {
   ) => void;
   @casesStore.Mutation('deleteUngroupedCases')
   deleteUngroupedCases!: () => void;
+  @casesStore.Mutation('setSelected') setSelected!: (
+    CaseGroupsIDToBeSelected: CaseGroupID,
+  ) => void;
 
   showUngroupedCases = false;
   showCases: { [key: string]: boolean } = {};
+
+  editCase(groupID: GroupID, caseID: CaseID) {
+    this.setSelected({
+      groupID: groupID,
+      caseID: caseID,
+    });
+    this.$emit('open-case-edit-window');
+  }
 }
 </script>
 

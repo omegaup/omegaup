@@ -1028,6 +1028,7 @@ problemCreatorCodeUploadFilesize = "The file size limit for uploaded files is %(
 problemCreatorDeleteCase = "Delete case"
 problemCreatorDeleteCases = "Delete cases"
 problemCreatorDeleteGroup = "Delete group"
+problemCreatorEditCase = "Edit case"
 problemCreatorEmpty = ""
 problemCreatorGenerateProblem = "Generate Problem"
 problemCreatorGroup = "Group"
