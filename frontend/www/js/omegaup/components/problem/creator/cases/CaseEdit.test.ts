@@ -39,7 +39,7 @@ describe('CaseEdit.vue', () => {
     store.commit('casesStore/addGroup', newGroup);
     store.commit('casesStore/addCase', newCase);
   });
-  it('Should contain 3 buttons and Groups text', async () => {
+  it('Should show an ungrouped case', async () => {
     const wrapper = shallowMount(CaseEdit, { localVue, store: store });
 
     const groupID = newUngroupedCasegroup.groupID;
@@ -55,6 +55,31 @@ describe('CaseEdit.vue', () => {
 
     expect(wrapper.text()).toContain(newUngroupedCase.name);
     expect(wrapper.text()).toContain(newUngroupedCasegroup.name);
+
+    expect(
+      wrapper.find('biconpencilfill-stub').element.parentElement?.textContent,
+    ).toContain(T.problemCreatorEditCase);
+    expect(
+      wrapper.find('bicontrashfill-stub').element.parentElement?.textContent,
+    ).toContain(T.problemCreatorDeleteCase);
+    expect(wrapper.find('biconthreedotsvertical-stub').exists()).toBe(true);
+  });
+  it('Should show an grouped case', async () => {
+    const wrapper = shallowMount(CaseEdit, { localVue, store: store });
+
+    const groupID = newGroup.groupID;
+    const caseID = newCase.caseID;
+    store.commit('casesStore/setSelected', {
+      groupID,
+      caseID,
+    });
+    await Vue.nextTick();
+
+    const buttons = wrapper.findAllComponents(BButton);
+    expect(buttons.length).toBe(3);
+
+    expect(wrapper.text()).toContain(newCase.name);
+    expect(wrapper.text()).toContain(newGroup.name);
 
     expect(
       wrapper.find('biconpencilfill-stub').element.parentElement?.textContent,
