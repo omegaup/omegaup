@@ -59,16 +59,21 @@
           <div class="col-8 col-md-6">
             <select
               v-model="allProblemsVisibilityOption"
+              data-selected-problems
               class="custom-select pl-1 pl-sm-3"
             >
               <option selected value="-1">{{ T.forSelectedItems }}</option>
               <option value="1">{{ T.makePublic }}</option>
               <option value="0">{{ T.makePrivate }}</option>
+              <option v-if="canDeleteSelectedProblems" value="2">
+                {{ T.wordsDelete }}
+              </option>
             </select>
           </div>
           <div class="col px-0">
             <button
               :disabled="allProblemsVisibilityOption === -1"
+              data-visibility-action
               class="btn btn-primary"
               @click="onChangeVisibility"
             >
@@ -86,6 +91,7 @@
               <th scope="col" class="text-center">{{ T.wordsTitle }}</th>
               <th scope="col" class="text-center">{{ T.wordsEdit }}</th>
               <th scope="col" class="text-center">{{ T.wordsStatistics }}</th>
+              <th scope="col" class="text-center">{{ T.wordsDelete }}</th>
             </tr>
           </thead>
           <tbody>
@@ -95,6 +101,7 @@
                   v-model="selectedProblems"
                   type="checkbox"
                   :disabled="problem.visibility === -10"
+                  :data-selected-problem="problem.alias"
                   :value="problem"
                 />
               </td>
@@ -176,10 +183,57 @@
                   <font-awesome-icon :icon="['fas', 'chart-bar']" />
                 </a>
               </td>
+              <td class="text-center align-middle">
+                <button
+                  v-if="problemCanBeDeleted(problem)"
+                  :data-delete-problem="problem.alias"
+                  class="btn btn-danger"
+                  @click.prevent="toggleConfirmationModal(problem.alias)"
+                >
+                  <font-awesome-icon :icon="['fas', 'trash']" />
+                </button>
+              </td>
+              <b-modal
+                v-if="problemCanBeDeleted(problem)"
+                v-model="confirmationModal[problem.alias]"
+                :title="
+                  ui.formatString(T.problemEditDeleteRequireConfirmation, {
+                    problemAlias: problem.alias,
+                  })
+                "
+                :ok-title="T.problemEditDeleteOk"
+                ok-variant="danger"
+                :cancel-title="T.problemEditDeleteCancel"
+                @ok="
+                  $emit('remove', {
+                    alias: problem.alias,
+                    shouldShowAllProblems,
+                  })
+                "
+              >
+                <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
+              </b-modal>
             </tr>
           </tbody>
         </table>
       </div>
+      <b-modal
+        v-model="showConfirmationModalDeleteAll"
+        :title="T.problemEditDeleteSelectedProblemsRequireConfirmation"
+        :ok-title="T.problemEditDeleteOk"
+        ok-variant="danger"
+        :cancel-title="T.problemEditDeleteCancel"
+        @ok="
+          $emit('remove-all-problems', {
+            selectedProblems,
+            shouldShowAllProblems,
+          });
+          selectedProblems = [];
+          allProblemsVisibilityOption = -1;
+        "
+      >
+        <p>{{ T.problemEditDeleteSelectedProblemsConfirmationMessage }}</p>
+      </b-modal>
       <div class="card-footer">
         <omegaup-common-paginator
           :pager-items="pagerItems"
@@ -195,6 +249,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import common_Paginator from '../common/Paginator.vue';
+import * as ui from '../../ui';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -214,6 +269,8 @@ library.add(
   faExclamationTriangle,
   faBan,
 );
+import { ModalPlugin } from 'bootstrap-vue';
+Vue.use(ModalPlugin);
 
 @Component({
   components: {
@@ -226,14 +283,17 @@ export default class ProblemMine extends Vue {
   @Prop() pagerItems!: types.PageItem[];
   @Prop() privateProblemsAlert!: boolean;
   @Prop() isSysadmin!: boolean;
-  @Prop() visibilityStatuses!: Array<string>;
+  @Prop() visibilityStatuses!: Record<string, number>;
   @Prop() query!: string | null;
 
   T = T;
+  ui = ui;
   currentQuery = this.query ?? '';
   shouldShowAllProblems = false;
   selectedProblems: types.ProblemListItem[] = [];
   allProblemsVisibilityOption = -1;
+  confirmationModal: Record<string, boolean> = {};
+  showConfirmationModalDeleteAll = false;
 
   get statementShowAllProblems(): string {
     return this.isSysadmin
@@ -241,19 +301,49 @@ export default class ProblemMine extends Vue {
       : T.problemListShowAdminProblems;
   }
 
+  get canDeleteSelectedProblems(): boolean {
+    if (!this.selectedProblems.length) return false;
+    return this.selectedProblems.every(
+      (problem) => problem.can_be_removed === true,
+    );
+  }
+
+  problemCanBeDeleted(problem: types.ProblemListItem): boolean {
+    return (
+      problem.can_be_removed === true &&
+      problem.visibility !== this.visibilityStatuses['deleted']
+    );
+  }
+
+  toggleConfirmationModal(problemAlias: string): void {
+    this.$set(
+      this.confirmationModal,
+      problemAlias,
+      !this.confirmationModal[problemAlias],
+    );
+  }
+
   onChangeVisibility(): void {
-    if (
-      this.allProblemsVisibilityOption !== -1 &&
-      this.selectedProblems.length
-    ) {
-      this.$emit(
-        'change-visibility',
-        this.selectedProblems,
-        this.allProblemsVisibilityOption,
-      );
-      this.selectedProblems = [];
-      this.allProblemsVisibilityOption = -1;
+    // If no problems are selected, exit the function
+    if (!this.selectedProblems.length) {
+      return;
     }
+
+    // If the option is "Remove", show the confirmation modal and exit
+    if (this.allProblemsVisibilityOption == 2) {
+      this.showConfirmationModalDeleteAll = true;
+      return;
+    }
+
+    // Otherwise, emit the "change-visibility" action and reset the selected
+    // problems and visibility option
+    this.$emit(
+      'change-visibility',
+      this.selectedProblems,
+      this.allProblemsVisibilityOption,
+    );
+    this.selectedProblems = [];
+    this.allProblemsVisibilityOption = -1;
   }
 }
 </script>
