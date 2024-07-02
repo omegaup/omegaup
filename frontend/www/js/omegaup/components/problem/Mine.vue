@@ -59,6 +59,7 @@
           <div class="col-8 col-md-6">
             <select
               v-model="allProblemsVisibilityOption"
+              data-selected-problems
               class="custom-select pl-1 pl-sm-3"
             >
               <option selected value="-1">{{ T.forSelectedItems }}</option>
@@ -72,6 +73,7 @@
           <div class="col px-0">
             <button
               :disabled="allProblemsVisibilityOption === -1"
+              data-visibility-action
               class="btn btn-primary"
               @click="onChangeVisibility"
             >
@@ -99,6 +101,7 @@
                   v-model="selectedProblems"
                   type="checkbox"
                   :disabled="problem.visibility === -10"
+                  :data-selected-problem="problem.alias"
                   :value="problem"
                 />
               </td>
@@ -183,6 +186,7 @@
               <td class="text-center align-middle">
                 <button
                   v-if="problemCanBeDeleted(problem)"
+                  :data-delete-problem="problem.alias"
                   class="btn btn-danger"
                   @click.prevent="toggleConfirmationModal(problem.alias)"
                 >
