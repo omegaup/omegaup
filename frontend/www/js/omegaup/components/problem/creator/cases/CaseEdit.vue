@@ -40,7 +40,7 @@
         </b-button>
       </div>
     </div>
-    <div class="border-top my-2"></div>
+    <hr class="border-top my-2"></hr>
   </div>
 </template>
 
