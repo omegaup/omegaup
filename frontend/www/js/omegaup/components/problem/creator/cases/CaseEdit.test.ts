@@ -39,6 +39,7 @@ describe('CaseEdit.vue', () => {
     store.commit('casesStore/addGroup', newGroup);
     store.commit('casesStore/addCase', newCase);
   });
+
   it('Should show an ungrouped case', async () => {
     const wrapper = shallowMount(CaseEdit, { localVue, store: store });
 
