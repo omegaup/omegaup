@@ -243,7 +243,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'nomination' => 'quality_tag',
                 'contents' => json_encode([
                     'quality_seal' => false,
-                    'tag' => 'problemLevel',
+                    'level' => 'problemLevel',
                     'tags' => ['problemTagFunctions', 'problemTagRecursion'],
                 ]),
             ]));
