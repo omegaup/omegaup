@@ -472,6 +472,8 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             $expectedCommentsLines[$index]['submission_feedback_id'] = $feedback['submission_feedback_id'];
         }
 
+        $submissionFeedbackId = $expectedCommentsLines[0]['submission_feedback_id'];
+
         // Adding a feedback thread as admin
         \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
@@ -480,7 +482,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment_alias'],
                 'feedback' => 'First feedback reply',
-                'submission_feedback_id' => $expectedCommentsLines[0]['submission_feedback_id'],
+                'submission_feedback_id' => $submissionFeedbackId,
             ])
         );
 
@@ -494,9 +496,27 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment_alias'],
                 'feedback' => 'Second feedback reply',
-                'submission_feedback_id' => $expectedCommentsLines[0]['submission_feedback_id'],
+                'submission_feedback_id' => $submissionFeedbackId,
             ])
         );
+
+        // The participants in the thread should be the admin and the student
+        $participants = \OmegaUp\DAO\SubmissionFeedbackThread::getSubmissionFeedbackThreadParticipants(
+            $submissionFeedbackId
+        );
+
+        $expectedParticipants = [
+            ['author_id' => $admin['identity']->user_id],
+            ['author_id' => $student['identity']->user_id],
+        ];
+
+        // Comparing the participants versus expected participants
+        foreach ($participants as $index => $participant) {
+            $this->assertArrayContainsWithPredicate(
+                $expectedParticipants,
+                fn ($expectedParticipant) => $expectedParticipant['author_id'] == $participant['author_id']
+            );
+        }
 
         $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
             new \OmegaUp\Request([
