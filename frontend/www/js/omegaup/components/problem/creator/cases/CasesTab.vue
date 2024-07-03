@@ -22,14 +22,14 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import proeblemCreator_Cases_CaseEdit from './CaseEdit.vue';
+import problemCreator_Cases_CaseEdit from './CaseEdit.vue';
 import problemCreator_Cases_Sidebar from './Sidebar.vue';
 import probleCreator_Cases_AddPanel from './AddPanel.vue';
 @Component({
   components: {
     'omegaup-problem-creator-cases-sidebar': problemCreator_Cases_Sidebar,
     'omegaup-problem-creator-cases-add-panel': probleCreator_Cases_AddPanel,
-    'omegaup-problem-creator-cases-case-edit': proeblemCreator_Cases_CaseEdit,
+    'omegaup-problem-creator-cases-case-edit': problemCreator_Cases_CaseEdit,
   },
 })
 export default class CasesTab extends Vue {
