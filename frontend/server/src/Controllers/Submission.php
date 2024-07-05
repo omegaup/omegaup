@@ -8,8 +8,6 @@ namespace OmegaUp\Controllers;
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type Submission=array{time: \OmegaUp\Timestamp, username: string, school_id: int|null, school_name: string|null, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}
  * @psalm-type SubmissionsListPayload=array{includeUser: bool, submissions: list<Submission>}
- * @psalm-type SubmissionFeedbackThread=array{author: string, authorClassname: string, submission_feedback_thread_id: int, text: string, timestamp: \OmegaUp\Timestamp}
- * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int, feedback_thread?: list<SubmissionFeedbackThread>}
  */
 class Submission extends \OmegaUp\Controllers\Controller {
     const SUBMISSION_LIST_PAGE_SIZE_DEFAULT = 100;
