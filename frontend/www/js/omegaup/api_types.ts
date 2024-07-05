@@ -5703,6 +5703,8 @@ export namespace messages {
     submissionFeedback?: dao.SubmissionFeedback;
     submissionFeedbackThread?: dao.SubmissionFeedbackThread;
   };
+  export type SubmissionSetFeedbackListRequest = { [key: string]: any };
+  export type SubmissionSetFeedbackListResponse = {};
 
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
@@ -6487,6 +6489,9 @@ export namespace controllers {
     setFeedback: (
       params?: messages.SubmissionSetFeedbackRequest,
     ) => Promise<messages.SubmissionSetFeedbackResponse>;
+    setFeedbackList: (
+      params?: messages.SubmissionSetFeedbackListRequest,
+    ) => Promise<messages.SubmissionSetFeedbackListResponse>;
   }
 
   export interface Tag {
