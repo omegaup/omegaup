@@ -37,6 +37,18 @@ export interface RootState {
 }
 
 /**
+ * CaseLineKind
+ * Contains the possible values of Caseline kind
+ */
+export type CaseLineKind = 'line' | 'multiline' | 'array' | 'matrix';
+
+/**
+ * MatrixDistinctType
+ * Defines the different ways matrix can be distinct
+ */
+export type MatrixDistinctType = 'none' | 'rows' | 'cols' | 'both';
+
+/**
  * CaseLineData
  * Contains the type and the corresponding parameters for each type
  */
@@ -55,7 +67,7 @@ export type CaseLineData =
       min: number;
       max: number;
       distinct: boolean;
-      value: number[];
+      value: string;
     }
   | {
       kind: 'matrix';
@@ -63,19 +75,19 @@ export type CaseLineData =
       cols: number;
       min: number;
       max: number;
-      distinct: 'none' | 'rows' | 'cols' | 'both';
-      value: number[][];
+      distinct: MatrixDistinctType;
+      value: string;
     };
 
 /**
- * InLine
+ * CaseLine
  * Line in the editor
  * @alias CaseLine
  * @typedef {object}
  * @property {LineID} lineID UUID of the line
  * @property {CaseID | null} caseID UUID referencing to the parent case
  * @property {string} label Label of the line
- * @property {CaseLineData} content content of the line
+ * @property {CaseLineData} data data of the line
  */
 export interface CaseLine {
   lineID: LineID;
