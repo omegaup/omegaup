@@ -20,11 +20,7 @@
         role="button"
         class="btn btn-sm btn-primary"
         @click="showFeedbackForm = !showFeedbackForm"
-        >{{
-          !generalFeedback
-            ? T.submissionFeedbackSendButton
-            : T.submissionFeedbackUpdateButton
-        }}</a
+        >{{ T.submissionFeedbackSendButton }}</a
       >
       <div v-show="showFeedbackForm" class="form-group">
         <p>{{ T.submissionFeedbackAnimationButton }}</p>
