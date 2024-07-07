@@ -4,7 +4,6 @@ import Header from './Header.vue';
 import BootstrapVue, { IconsPlugin, BButton, BFormInput } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 import T from '../../../lang';
-import Vue from 'vue';
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
