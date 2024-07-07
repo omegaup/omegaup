@@ -55,7 +55,7 @@ export type CaseLineData =
       min: number;
       max: number;
       distinct: boolean;
-      value: number[];
+      value: string;
     }
   | {
       kind: 'matrix';
@@ -64,7 +64,7 @@ export type CaseLineData =
       min: number;
       max: number;
       distinct: 'none' | 'rows' | 'cols' | 'both';
-      value: number[][];
+      value: string;
     };
 
 /**

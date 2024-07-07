@@ -8,6 +8,7 @@ import {
   LineID,
   CaseRequest,
   MultipleCaseAddRequest,
+  CaseID,
 } from '../types';
 import { Module } from 'vuex';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
@@ -320,6 +321,9 @@ export const casesStore: Module<CasesState, RootState> = {
         state.groups.find((group) => group.groupID === groupID)?.cases ?? null
       );
     },
+    getAllGroups: (state) => {
+      return state.groups;
+    },
     getGroupIdsAndNames: (state) => {
       // We use reduce because we don't want to show the ungrouped cases/groups
       // Also this way we avoid chaining a map and a filter
@@ -353,6 +357,27 @@ export const casesStore: Module<CasesState, RootState> = {
           (_case) => _case.caseID === state.selected.caseID,
         ) ?? null
       );
+    },
+    getStringifiedLinesFromCaseGroupID: (state) => (
+      caseGroupID: CaseGroupID,
+    ) => {
+      const groupID: GroupID = caseGroupID.groupID;
+      const caseID: CaseID = caseGroupID.caseID;
+      const _group = state.groups.find((group) => group.groupID === groupID);
+      if (_group === undefined) {
+        return '';
+      }
+      const _case = _group.cases.find((thisCase) => thisCase.caseID === caseID);
+      if (_group === undefined) {
+        return '';
+      }
+      if (_case == undefined) {
+        return '';
+      }
+      const stringifiedLine: string = _case.lines
+        .map((line) => line.data.value)
+        .join('\n');
+      return stringifiedLine;
     },
     getSelectedGroup: (state) => {
       return (
