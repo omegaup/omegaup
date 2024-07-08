@@ -19,7 +19,7 @@
         class="mr-2"
         variant="primary"
         size="sm"
-        @click="generateProblem"
+        @click="generateProblem()"
       >
         <BIconDownload class="mr-1" />
         <span class="d-none d-md-inline">
