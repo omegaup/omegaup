@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue, mount} from '@vue/test-utils';
+import { shallowMount, createLocalVue, mount } from '@vue/test-utils';
 
 import Header from './Header.vue';
 import BootstrapVue, { IconsPlugin, BButton, BFormInput } from 'bootstrap-vue';
@@ -42,6 +42,5 @@ describe('Header.vue', () => {
     expect(generateProblemSpy).toHaveBeenCalled();
 
     jest.restoreAllMocks();
-
-  })
+  });
 });
