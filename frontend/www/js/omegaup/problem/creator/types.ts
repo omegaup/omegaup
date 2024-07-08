@@ -95,12 +95,14 @@ export interface CaseLine {
  * @property {stirng} name Name of the case
  * @property {number | null} points Points of the case
  * @property {Array<InLine>} lines Lines containing .IN information of the cases
+ * @property {string} output output of the case
  */
 export interface Case {
   caseID: string;
   groupID: string;
   name: string;
   lines: CaseLine[];
+  output: string,
   points: number | null;
 }
 

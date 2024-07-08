@@ -365,7 +365,7 @@ describe('cases.ts', () => {
           max: 10,
           min: 1,
           size: 2,
-          value: [1, 2],
+          value: "1 2",
         },
       },
     ];
@@ -420,7 +420,7 @@ describe('cases.ts', () => {
         max: 10,
         min: 1,
         size: 2,
-        value: [1, 2],
+        value: "1 2",
       },
     };
     store.dispatch('casesStore/updateLine', updatedLine);

@@ -77,14 +77,17 @@ export default class Header extends Vue {
 
     this.getAllGroups.forEach((_group) => {
       _group.cases.forEach((_case) => {
-        const fileName = _group.name + '.' + _case.name;
+        let fileName = _case.name;
+        if(_group.ungroupedCase === false) {
+          fileName = _group.name + '.' + fileName;
+        }
         const caseGroupID: CaseGroupID = {
           groupID: _group.groupID,
           caseID: _case.caseID,
         };
         const input = this.getStringifiedLinesFromCaseGroupID(caseGroupID);
         folder?.file(fileName + '.in', input);
-        folder?.file(fileName + '.out', '');
+        folder?.file(fileName + '.out', _case.output);
         testPlanData += fileName + ' ' + _case.points;
       });
     });
