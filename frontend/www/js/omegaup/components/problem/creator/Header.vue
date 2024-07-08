@@ -78,7 +78,7 @@ export default class Header extends Vue {
     this.getAllGroups.forEach((_group) => {
       _group.cases.forEach((_case) => {
         let fileName = _case.name;
-        if(_group.ungroupedCase === false) {
+        if (_group.ungroupedCase === false) {
           fileName = _group.name + '.' + fileName;
         }
         const caseGroupID: CaseGroupID = {

@@ -102,7 +102,7 @@ export interface Case {
   groupID: string;
   name: string;
   lines: CaseLine[];
-  output: string,
+  output: string;
   points: number | null;
 }
 
