@@ -88,7 +88,7 @@ export default class Header extends Vue {
         const input = this.getStringifiedLinesFromCaseGroupID(caseGroupID);
         folder?.file(fileName + '.in', input);
         folder?.file(fileName + '.out', _case.output);
-        testPlanData += fileName + ' ' + _case.points;
+        testPlanData += fileName + ' ' + _case.points + '\n';
       });
     });
 
