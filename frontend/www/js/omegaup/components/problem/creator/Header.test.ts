@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount, createLocalVue, mount } from '@vue/test-utils';
 
 import Header from './Header.vue';
 import BootstrapVue, { IconsPlugin, BButton, BFormInput } from 'bootstrap-vue';
@@ -36,9 +36,12 @@ describe('Header.vue', () => {
       value: { reload: jest.fn() },
     });
 
-    const wrapper = shallowMount(Header, { localVue, store });
+    const wrapper = mount(Header, { localVue, store });
 
-    const resetButton = wrapper.find('b-button-stub[variant="warning"]');
+    const buttonsList = wrapper.findAll('button');
+    expect(buttonsList.length).toBe(3);
+
+    const resetButton = buttonsList.at(2);
     expect(resetButton.exists()).toBe(true);
 
     const testText = 'Hello';
@@ -49,7 +52,7 @@ describe('Header.vue', () => {
     wrapper.vm.$store.state.problemCodeExtension = testText;
     wrapper.vm.$store.state.problemSolutionMarkdown = testText;
 
-    wrapper.vm.createNewProblem();
+    await resetButton.trigger('click');
 
     expect(window.location.reload).toHaveBeenCalledTimes(1);
 
