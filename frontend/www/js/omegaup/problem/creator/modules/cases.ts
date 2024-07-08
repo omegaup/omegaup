@@ -368,9 +368,6 @@ export const casesStore: Module<CasesState, RootState> = {
         return '';
       }
       const _case = _group.cases.find((thisCase) => thisCase.caseID === caseID);
-      if (_group === undefined) {
-        return '';
-      }
       if (_case == undefined) {
         return '';
       }
