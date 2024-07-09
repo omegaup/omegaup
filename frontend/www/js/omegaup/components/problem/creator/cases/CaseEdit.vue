@@ -35,15 +35,11 @@
             </div>
           </div>
         </b-button>
-        <b-dropdown variant="light" class="h-100" ref="dropdown" right no-caret>
+        <b-dropdown ref="dropdown" variant="light" class="h-100" right no-caret>
           <template #button-content>
             <BIconThreeDotsVertical />
           </template>
-          <b-button
-            variant="light"
-            class="w-100"
-            @click="deleteLines()"
-          >
+          <b-button variant="light" class="w-100" @click="deleteLines()">
             <div class="d-flex">
               <BIconTrash variant="danger" class="pt-1 mr-3" font-scale="1.2" />
               {{ T.problemCreatorLinesDelete }}
@@ -245,7 +241,7 @@ export default class CaseEdit extends Vue {
 
   deleteLines() {
     this.deleteLinesForSelectedCase();
-   ((this.$refs.dropdown) as any ).hide(true);
+    (this.$refs.dropdown as any).hide(true);
   }
 
   updateLinesOrder(event: any) {
