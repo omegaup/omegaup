@@ -14,13 +14,13 @@ import { Vue, Prop, Component } from 'vue-property-decorator';
 import * as Util from '../grader/util';
 
 @Component
-export default class MonacoEditorComponent extends Vue {
-  @Prop({ type: Object, required: true }) store!: any;
-  @Prop({ type: Object, required: true }) storeMapping!: any;
-  @Prop({ type: String, required: true }) extension!: string;
-  @Prop({ type: String, default: null }) module!: string | null;
-  @Prop({ type: Boolean, default: false }) readOnly!: boolean;
-  @Prop({ type: String, default: 'vs' }) theme!: string;
+export default class TextEditorComponent extends Vue {
+  @Prop({ required: true }) store!: any;
+  @Prop({ required: true }) storeMapping!: any;
+  @Prop({ required: true }) extension!: string;
+  @Prop({ default: null }) module!: string | null;
+  @Prop({ default: false }) readOnly!: boolean;
+  @Prop({ default: 'vs' }) theme!: string;
 
   get filename(): string {
     if (typeof this.storeMapping.module !== 'undefined') {
@@ -48,13 +48,14 @@ export default class MonacoEditorComponent extends Vue {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import '../../../sass/main.scss';
 .textarea.vs-dark {
-  background: #222;
+  background: var(--textarea-vs-dark-background-color);
   border: 0px;
   font-family: 'Droid Sans Mono', 'Courier New', monospace,
     'Droid Sans Fallback';
-  color: #d4d4d4;
+  color: var(--textarea-vs-dark-font-color);
 }
 
 .textarea.vs {
