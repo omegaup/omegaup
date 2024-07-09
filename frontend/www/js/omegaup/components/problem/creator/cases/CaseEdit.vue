@@ -35,14 +35,14 @@
             </div>
           </div>
         </b-button>
-        <b-dropdown variant="light" class="h-100" right no-caret>
+        <b-dropdown variant="light" class="h-100" ref="dropdown" right no-caret>
           <template #button-content>
             <BIconThreeDotsVertical />
           </template>
           <b-button
             variant="light"
             class="w-100"
-            @click="deleteLinesForSelectedCase()"
+            @click="deleteLines()"
           >
             <div class="d-flex">
               <BIconTrash variant="danger" class="pt-1 mr-3" font-scale="1.2" />
@@ -242,6 +242,11 @@ export default class CaseEdit extends Vue {
   ) => void;
   @casesStore.Action('deleteLinesForSelectedCase')
   deleteLinesForSelectedCase!: () => void;
+
+  deleteLines() {
+    this.deleteLinesForSelectedCase();
+   ((this.$refs.dropdown) as any ).hide(true);
+  }
 
   updateLinesOrder(event: any) {
     this.sortLines([event.oldIndex, event.newIndex]);
