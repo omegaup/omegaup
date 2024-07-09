@@ -396,7 +396,7 @@ describe('cases.ts', () => {
     const lineToBeExpected: CaseLine = {
       lineID: lineID,
       caseID: store.state.casesStore.groups[0].cases[0].caseID,
-      label: 'NEW',
+      label: '',
       data: { kind: 'line', value: '' },
     };
     expect(store.state.casesStore.groups[0].cases[0].lines.length).toBe(1);
