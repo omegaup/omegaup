@@ -217,7 +217,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>, totalRuns: int}
+     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: string, status_runtime: string, submit_delay: int, suggestions: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>, totalRuns: int}
      */
     final public static function getAllRuns(
         ?int $problemsetId,
@@ -369,7 +369,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val[] = $offset * $rowCount;
         $val[] = $rowCount;
 
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: string, status_runtime: string, submission_feedback_id: int|null, submit_delay: int, suggestions: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: string, status_runtime: string, submit_delay: int, suggestions: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
         $runs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
 
         return [
