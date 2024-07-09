@@ -52,7 +52,7 @@ describe('CaseEdit.vue', () => {
     await Vue.nextTick();
 
     const buttons = wrapper.findAllComponents(BButton);
-    expect(buttons.length).toBe(3);
+    expect(buttons.length).toBe(6);
 
     expect(wrapper.text()).toContain(newUngroupedCase.name);
     expect(wrapper.text()).toContain(newUngroupedCasegroup.name);
@@ -63,7 +63,7 @@ describe('CaseEdit.vue', () => {
     expect(
       wrapper.find('bicontrashfill-stub').element.parentElement?.textContent,
     ).toContain(T.problemCreatorDeleteCase);
-    expect(wrapper.find('biconthreedotsvertical-stub').exists()).toBe(true);
+    expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
   });
 
   it('Should show a grouped case', async () => {
@@ -78,7 +78,7 @@ describe('CaseEdit.vue', () => {
     await Vue.nextTick();
 
     const buttons = wrapper.findAllComponents(BButton);
-    expect(buttons.length).toBe(3);
+    expect(buttons.length).toBe(6);
 
     expect(wrapper.text()).toContain(newCase.name);
     expect(wrapper.text()).toContain(newGroup.name);
@@ -89,6 +89,25 @@ describe('CaseEdit.vue', () => {
     expect(
       wrapper.find('bicontrashfill-stub').element.parentElement?.textContent,
     ).toContain(T.problemCreatorDeleteCase);
-    expect(wrapper.find('biconthreedotsvertical-stub').exists()).toBe(true);
+    expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
+  });
+
+  it('calls deleteLinesForSelectedCase when the delete option is clicked', async () => {
+    const wrapper = shallowMount(CaseEdit, { localVue, store: store });
+
+    const groupID = newGroup.groupID;
+    const caseID = newCase.caseID;
+    store.commit('casesStore/setSelected', {
+      groupID,
+      caseID,
+    });
+    await Vue.nextTick();
+
+    expect(wrapper.findAll('b-button-stub[class="w-100"]').length).toBe(3);
+    const dropdownButtons = wrapper.findAll('b-button-stub[class="w-100"]');
+
+    expect(dropdownButtons.at(0).text()).toBe(T.problemCreatorLinesDelete);
+    expect(dropdownButtons.at(1).text()).toBe(T.problemCreatorCaseDownloadIn);
+    expect(dropdownButtons.at(2).text()).toBe(T.problemCreatorCaseDownloadTxt);
   });
 });

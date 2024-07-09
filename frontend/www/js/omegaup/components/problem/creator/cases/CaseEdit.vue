@@ -39,14 +39,22 @@
           <template #button-content>
             <BIconThreeDotsVertical />
           </template>
-          <b-dropdown-item @click="deleteLinesForSelectedCase">
+          <b-button
+            variant="light"
+            class="w-100"
+            @click="deleteLinesForSelectedCase()"
+          >
             <div class="d-flex">
               <BIconTrash variant="danger" class="pt-1 mr-3" font-scale="1.2" />
               {{ T.problemCreatorLinesDelete }}
             </div>
-          </b-dropdown-item>
+          </b-button>
           <b-dropdown-divider></b-dropdown-divider>
-          <b-dropdown-item @click="downloadInputFile('.in')">
+          <b-button
+            variant="light"
+            class="w-100"
+            @click="downloadInputFile('.in')"
+          >
             <div class="d-flex">
               <BIconBoxArrowDown
                 variant="info"
@@ -55,8 +63,12 @@
               />
               {{ T.problemCreatorCaseDownloadIn }}
             </div>
-          </b-dropdown-item>
-          <b-dropdown-item @click="downloadInputFile('.txt')">
+          </b-button>
+          <b-button
+            variant="light"
+            class="w-100"
+            @click="downloadInputFile('.txt')"
+          >
             <div class="d-flex">
               <BIconTextLeft
                 variant="info"
@@ -65,7 +77,7 @@
               />
               {{ T.problemCreatorCaseDownloadTxt }}
             </div>
-          </b-dropdown-item>
+          </b-button>
         </b-dropdown>
       </div>
     </div>
