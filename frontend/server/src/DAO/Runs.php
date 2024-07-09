@@ -343,14 +343,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 IFNULL(`i`.`country_id`, 'xx') `country`,
                 `c`.`alias` AS `contest_alias`,
                 IFNULL(ur.classname, 'user-rank-unranked') `classname`,
-                sf.`submission_feedback_id`,
                 {$extraFields},
                 {$suggestionsCountField}
             FROM
                 Submissions s
             {$suggestionsJoin}
-            LEFT JOIN
-                Submission_Feedback sf ON sf.submission_id = s.submission_id
             INNER JOIN
                 Runs r ON r.run_id = s.current_run_id
             INNER JOIN
@@ -1009,7 +1006,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         int $problemId,
         ?int $problemsetId,
         int $identityId
-    ): array {
+    ) {
         $extraFields = self::getRunExtraFields();
         $cteSubmissionsFeedback = '';
         $suggestionsCountField = '0 AS suggestions';
@@ -1022,7 +1019,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $suggestionsCountField = 'IFNULL(ssff.suggestions, 0) AS suggestions';
             $suggestionsJoin = 'LEFT JOIN ssff ON ssff.submission_id = s.submission_id';
             $whereClause = ' AND s.problemset_id = ?';
-            $params = [$problemsetId, $problemId, $identityId, $problemsetId];
+            $params = [$problemId, $problemId, $identityId, $problemsetId];
         }
 
         $sql = "{$cteSubmissionsFeedback}
