@@ -8,6 +8,7 @@ import {
   LineID,
   CaseRequest,
   MultipleCaseAddRequest,
+  CaseID,
 } from '../types';
 import { Module } from 'vuex';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
@@ -328,6 +329,10 @@ export const casesStore: Module<CasesState, RootState> = {
         (line) => line.lineID !== lineIDToBeDeleted,
       );
     },
+    deleteLinesForSelectedCase({ getters }) {
+      const selectedCase: Case = getters.getSelectedCase;
+      selectedCase.lines = [];
+    },
     sortLines({ commit }, exchangePair: [number, number]) {
       commit('sortLines', exchangePair);
     },
@@ -371,6 +376,24 @@ export const casesStore: Module<CasesState, RootState> = {
           (_case) => _case.caseID === state.selected.caseID,
         ) ?? null
       );
+    },
+    getStringifiedLinesFromCaseGroupID: (state) => (
+      caseGroupID: CaseGroupID,
+    ) => {
+      const groupID: GroupID = caseGroupID.groupID;
+      const caseID: CaseID = caseGroupID.caseID;
+      const _group = state.groups.find((group) => group.groupID === groupID);
+      if (_group === undefined) {
+        return '';
+      }
+      const _case = _group.cases.find((thisCase) => thisCase.caseID === caseID);
+      if (_case == undefined) {
+        return '';
+      }
+      const stringifiedLine: string = _case.lines
+        .map((line) => line.data.value)
+        .join('\n');
+      return stringifiedLine;
     },
     getSelectedGroup: (state) => {
       return (

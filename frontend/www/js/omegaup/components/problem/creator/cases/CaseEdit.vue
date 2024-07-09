@@ -35,9 +35,38 @@
             </div>
           </div>
         </b-button>
-        <b-button class="h-100" variant="light">
-          <BIconThreeDotsVertical />
-        </b-button>
+        <b-dropdown variant="light" class="h-100" right no-caret>
+          <template #button-content>
+            <BIconThreeDotsVertical />
+          </template>
+          <b-dropdown-item @click="deleteLinesForSelectedCase">
+            <div class="d-flex">
+              <BIconTrash variant="danger" class="pt-1 mr-3" font-scale="1.2" />
+              {{ T.problemCreatorLinesDelete }}
+            </div>
+          </b-dropdown-item>
+          <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-item @click="downloadInputFile('.in')">
+            <div class="d-flex">
+              <BIconBoxArrowDown
+                variant="info"
+                class="pt-1 mr-3"
+                font-scale="1.2"
+              />
+              {{ T.problemCreatorCaseDownloadIn }}
+            </div>
+          </b-dropdown-item>
+          <b-dropdown-item @click="downloadInputFile('.txt')">
+            <div class="d-flex">
+              <BIconTextLeft
+                variant="info"
+                class="pt-1 mr-3"
+                font-scale="1.2"
+              />
+              {{ T.problemCreatorCaseDownloadTxt }}
+            </div>
+          </b-dropdown-item>
+        </b-dropdown>
       </div>
     </div>
     <hr class="border-top my-2" />
@@ -158,6 +187,7 @@ import {
   CaseLineKind,
   CaseLine,
   LineID,
+  CaseGroupID,
 } from '@/js/omegaup/problem/creator/types';
 import {
   FontAwesomeIcon,
@@ -190,12 +220,16 @@ export default class CaseEdit extends Vue {
   @casesStore.Getter('getLinesFromSelectedCase')
   getLinesFromSelectedCase!: CaseLine[];
   @casesStore.Getter('getSelectedGroup') getSelectedGroup!: Group;
+  @casesStore.Getter('getStringifiedLinesFromCaseGroupID')
+  getStringifiedLinesFromCaseGroupID!: (caseGroupID: CaseGroupID) => string;
 
   @casesStore.Action('addNewLine') addNewLine!: () => void;
   @casesStore.Action('deleteLine') deleteLine!: (line: LineID) => void;
   @casesStore.Action('sortLines') sortLines!: (
     exchangePair: [number, number],
   ) => void;
+  @casesStore.Action('deleteLinesForSelectedCase')
+  deleteLinesForSelectedCase!: () => void;
 
   updateLinesOrder(event: any) {
     this.sortLines([event.oldIndex, event.newIndex]);
@@ -213,6 +247,22 @@ export default class CaseEdit extends Vue {
 
   getLineNameFromKind(kind: CaseLineKind) {
     return this.lineOptions.find((line) => line.kind === kind)?.type;
+  }
+
+  downloadInputFile(ext: '.txt' | '.in') {
+    const caseGroupID: CaseGroupID = {
+      groupID: this.getSelectedGroup.groupID,
+      caseID: this.getSelectedCase.caseID,
+    };
+    const input = this.getStringifiedLinesFromCaseGroupID(caseGroupID);
+    const blob = new Blob([input], { type: 'text/plain' });
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = this.getSelectedCase.name + ext;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 }
 </script>
