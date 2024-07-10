@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div
-      v-if="getSelectedCase && getSelectedGroup"
-      class="d-flex justify-content-between"
-    >
+    <div v-if="getSelectedCase && getSelectedGroup" class="d-flex justify-content-between">
       <div>
         <h3 class="mb-0 d-md-inline mr-2">{{ getSelectedCase.name }}</h3>
         <h5 class="mb-0 d-none d-md-inline text-muted">
@@ -14,11 +11,7 @@
         <b-button variant="light" class="mr-2">
           <div class="container">
             <div class="row">
-              <BIconPencilFill
-                variant="info"
-                font-scale="1.10"
-                class="mr-1 pt-1"
-              />
+              <BIconPencilFill variant="info" font-scale="1.10" class="mr-1 pt-1" />
               {{ T.problemCreatorEditCase }}
             </div>
           </div>
@@ -26,11 +19,7 @@
         <b-button variant="light" class="mr-2">
           <div class="container">
             <div class="row">
-              <BIconTrashFill
-                variant="danger"
-                font-scale="1.20"
-                class="mr-1 pt-1"
-              />
+              <BIconTrashFill variant="danger" font-scale="1.20" class="mr-1 pt-1" />
               {{ T.problemCreatorDeleteCase }}
             </div>
           </div>
@@ -49,78 +38,41 @@
               <b-container fluid class="bg-light">
                 <b-row class="d-flex justify-content-between" align-v="center">
                   <b-col cols="1">
-                    <b-button
-                      class="btn btn-link"
-                      type="button"
-                      :title="T.problemCreatorLinesReorder"
-                      variant="light"
-                    >
+                    <b-button class="btn btn-link" type="button" :title="T.problemCreatorLinesReorder" variant="light">
                       <font-awesome-icon icon="sort" />
                     </b-button>
                   </b-col>
                   <b-col cols="2" class="pl-0 pr-2">
-                    <b-form-input
-                      v-model="line.label"
-                      size="sm"
-                      :placeholder="T.problemCreatorLabelPlaceHolder"
-                    />
+                    <b-form-input v-model="line.label" size="sm" :placeholder="T.problemCreatorLabelPlaceHolder" />
                   </b-col>
                   <b-col cols="5" class="pr-0 text-center">
-                    <b-form-input
-                      v-if="
-                        line.data.kind === 'line' || line.data.kind === 'array'
-                      "
-                      v-model="line.data.value"
-                      size="sm"
-                      class="mt-3 mb-3"
-                      :placeholder="T.problemCreatorContentPlaceHolder"
-                    />
-                    <b-form-textarea
-                      v-if="
-                        line.data.kind === 'multiline' ||
-                        line.data.kind === 'matrix'
-                      "
-                      v-model="line.data.value"
-                      class="mt-3 mb-3 text-nowrap overflow-auto w-100"
-                      rows="2"
-                      max-rows="3"
-                      :placeholder="T.problemCreatorContentPlaceHolder"
-                    ></b-form-textarea>
+                    <b-form-input v-if="
+                      line.data.kind === 'line' || line.data.kind === 'array'
+                    " v-model="line.data.value" size="sm" class="mt-3 mb-3"
+                      :placeholder="T.problemCreatorContentPlaceHolder" />
+                    <b-form-textarea v-if="
+                      line.data.kind === 'multiline' ||
+                      line.data.kind === 'matrix'
+                    " v-model="line.data.value" class="mt-3 mb-3 text-nowrap overflow-auto w-100" rows="2"
+                      max-rows="3" :placeholder="T.problemCreatorContentPlaceHolder"></b-form-textarea>
                   </b-col>
                   <b-col cols="3" class="pl-2 pr-0 text-center">
-                    <b-dropdown
-                      :text="getLineNameFromKind(line.data.kind)"
-                      variant="light"
-                    >
-                      <b-dropdown-item
-                        v-for="lineoption in lineOptions"
-                        :key="lineoption.kind"
-                        @click="line.data.kind = lineoption.kind"
-                      >
+                    <b-dropdown :text="getLineNameFromKind(line.data.kind)" variant="light">
+                      <b-dropdown-item v-for="lineoption in lineOptions" :key="lineoption.kind"
+                        @click="line.data.kind = lineoption.kind">
                         {{ lineoption.type }}
                       </b-dropdown-item>
                     </b-dropdown>
-                    <b-button
-                      v-if="
-                        line.data.kind === 'array' ||
-                        line.data.kind === 'matrix'
-                      "
-                      size="sm"
-                      type="button"
-                      :title="T.problemCreatorLineEdit"
-                      variant="light"
-                    >
+                    <b-button v-if="
+                      line.data.kind === 'array' ||
+                      line.data.kind === 'matrix'
+                    " size="sm" type="button" :title="T.problemCreatorLineEdit" variant="light">
                       <BIconPencilSquare variant="info" font-scale="1.20" />
                     </b-button>
                   </b-col>
                   <b-col cols="1">
-                    <b-button
-                      size="sm"
-                      type="button"
-                      :title="T.problemCreatorLineDelete"
-                      variant="light"
-                      @click="deleteLine(line.lineID)"
-                    >
+                    <b-button size="sm" type="button" :title="T.problemCreatorLineDelete" variant="light"
+                      @click="deleteLine(line.lineID)">
                       <BIconTrashFill variant="danger" font-scale="1.20" />
                     </b-button>
                   </b-col>
@@ -135,11 +87,7 @@
       <b-button variant="light" class="mr-2" @click="addNewLine">
         <div class="container">
           <div class="row">
-            <BIconPlusSquare
-              variant="info"
-              font-scale="1.25"
-              class="mr-2 pt-1"
-            />
+            <BIconPlusSquare variant="info" font-scale="1.25" class="mr-2 pt-1" />
             {{ T.problemCreatorAddLine }}
           </div>
         </div>
@@ -205,11 +153,11 @@ export default class CaseEdit extends Vue {
     type: string;
     kind: CaseLineKind;
   }[] = [
-    { type: T.problemCreatorLineLine, kind: 'line' },
-    { type: T.problemCreatorLineMultiline, kind: 'multiline' },
-    { type: T.problemCreatorLineArray, kind: 'array' },
-    { type: T.problemCreatorLineMatrix, kind: 'matrix' },
-  ];
+      { type: T.problemCreatorLineLine, kind: 'line' },
+      { type: T.problemCreatorLineMultiline, kind: 'multiline' },
+      { type: T.problemCreatorLineArray, kind: 'array' },
+      { type: T.problemCreatorLineMatrix, kind: 'matrix' },
+    ];
 
   getLineNameFromKind(kind: CaseLineKind) {
     return this.lineOptions.find((line) => line.kind === kind)?.type;
