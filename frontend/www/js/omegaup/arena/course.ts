@@ -455,7 +455,6 @@ OmegaUp.on('ready', async () => {
             feedbackList: { lineNumber: number; feedback: string }[];
             guid: string;
           }) => {
-            console.log(feedbackList);
             api.Submission.setFeedbackList({
               guid,
               course_alias: payload.courseDetails.alias,
