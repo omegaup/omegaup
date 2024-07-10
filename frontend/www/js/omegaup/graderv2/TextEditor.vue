@@ -10,11 +10,12 @@
 </template>
 
 <script lang="ts">
+// TODO: replace all instances of any with correct type
 import { Vue, Prop, Component } from 'vue-property-decorator';
 import * as Util from '../grader/util';
 
 @Component
-export default class TextEditorComponent extends Vue {
+export default class TextEditor extends Vue {
   @Prop({ required: true }) store!: any;
   @Prop({ required: true }) storeMapping!: any;
   @Prop({ required: true }) extension!: string;
@@ -24,13 +25,11 @@ export default class TextEditorComponent extends Vue {
 
   get filename(): string {
     if (typeof this.storeMapping.module !== 'undefined') {
-      return (
-        Util.vuexGet(this.store, this.storeMapping.module) +
-        '.' +
+      return `${Util.vuexGet(this.store, this.storeMapping.module)}.${
         this.extension
-      );
+      }`;
     }
-    return this.module + '.' + this.extension;
+    return `${this.module}.${this.extension}`;
   }
 
   get contents(): string {
