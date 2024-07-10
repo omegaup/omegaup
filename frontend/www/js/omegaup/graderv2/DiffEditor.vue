@@ -3,18 +3,18 @@
 </template>
 
 <script lang="ts">
+// TODO: replace all instances of any with correct type
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import * as Util from '../grader/util';
 import * as monaco from 'monaco-editor';
 
 @Component
-export default class DiffEditorComponent extends Vue {
-  @Prop({ type: Object, required: true }) store!: any;
-  @Prop({ type: Object, required: true }) storeMapping!: any;
-  @Prop({ type: String, default: 'vs-dark' }) theme!: string;
-  @Prop({ type: Boolean, default: false }) readOnly!: boolean;
+export default class DiffEditor extends Vue {
+  @Prop({ required: true }) store!: any;
+  @Prop({ required: true }) storeMapping!: any;
+  @Prop({ default: 'vs-dark' }) theme!: string;
+  @Prop({ default: false }) readOnly!: boolean;
 
-  title: string = 'diff';
   _originalModel: monaco.editor.ITextModel | null = null;
   _modifiedModel: monaco.editor.ITextModel | null = null;
   _editor: monaco.editor.IStandaloneDiffEditor | null = null;
@@ -28,20 +28,20 @@ export default class DiffEditorComponent extends Vue {
   }
 
   @Watch('originalContents')
-  onOriginalContentsChange(value: string) {
+  onOriginalContentsChange(value: string): void {
     if (this._originalModel) {
       this._originalModel.setValue(value);
     }
   }
 
   @Watch('modifiedContents')
-  onModifiedContentsChange(value: string) {
+  onModifiedContentsChange(value: string): void {
     if (this._modifiedModel) {
       this._modifiedModel.setValue(value);
     }
   }
 
-  mounted() {
+  mounted(): void {
     this._originalModel = monaco.editor.createModel(
       this.originalContents,
       'text/plain',
@@ -62,7 +62,7 @@ export default class DiffEditorComponent extends Vue {
     });
   }
 
-  onResize() {
+  onResize(): void {
     if (this._editor) {
       this._editor.layout();
     }
