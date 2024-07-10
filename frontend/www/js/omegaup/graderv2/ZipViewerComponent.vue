@@ -13,7 +13,7 @@
           class="list-group-item list-group-item-action disabled"
           type="button"
         >
-          <em>Empty</em>
+          <em>{{ T.wordsEmpty }}</em>
         </button>
         <button
           v-for="(item, name) in zip.files"
@@ -36,15 +36,17 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import * as Util from '../grader/util';
+import T from '../lang';
 import JSZip, { JSZipObject } from 'jszip';
 
 @Component
 export default class ZipViewer extends Vue {
-  @Prop({ type: String, default: 'vs' }) theme!: string;
+  @Prop({ default: 'vs' }) theme!: string;
 
   zip: JSZip | null = null;
   active: string | null = null;
   contents: string = '';
+  T = T;
 
   select(item: JSZipObject): void {
     this.active = item.name;
