@@ -13,6 +13,7 @@
           class="list-group-item list-group-item-action disabled"
           type="button"
         >
+          <!-- TODO: use the empty word translation after the other components merge -->
           <em>Empty</em>
         </button>
         <template v-for="group in groups" v-else :title="name">
@@ -59,7 +60,7 @@
             </div>
             <button
               v-if="groups.length > 1"
-              aria-label="Close"
+              :aria-label="T.wordsClose"
               class="close"
               type="button"
               @click.prevent.stop="removeCase(item.name)"
@@ -94,17 +95,20 @@
 </template>
 
 <script lang="ts">
+// TODO: replace all instances of any with correct type
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import * as Util from '../grader/util';
+import T from '../lang';
 
 @Component
-export default class MyComponent extends Vue {
-  @Prop({ type: Object, required: true }) store!: any;
-  @Prop({ type: Object, required: true }) storeMapping!: any;
-  @Prop({ type: String, default: 'vs-dark' }) theme!: string;
+export default class CaseSelector extends Vue {
+  @Prop({ required: true }) store!: any;
+  @Prop({ required: true }) storeMapping!: any;
+  @Prop({ default: 'vs-dark' }) theme!: string;
 
   newCaseWeight: number = 1;
   newCaseName: string = '';
+  T = T;
 
   get summary(): string {
     if (
@@ -119,13 +123,13 @@ export default class MyComponent extends Vue {
     )}`;
   }
 
-  get groups() {
+  get groups(): { [key: string]: any }[] {
     const flatCases: any = Util.vuexGet(this.store, this.storeMapping.cases);
-    let resultMap: { [key: string]: any } = {};
+    const resultMap: { [key: string]: any } = {};
 
-    for (let caseName in flatCases) {
+    for (const caseName in flatCases) {
       if (!Object.prototype.hasOwnProperty.call(flatCases, caseName)) continue;
-      let tokens = caseName.split('.', 2);
+      const tokens = caseName.split('.', 2);
       if (!Object.prototype.hasOwnProperty.call(resultMap, tokens[0])) {
         resultMap[tokens[0]] = {
           explicit: tokens.length > 1,
@@ -138,9 +142,8 @@ export default class MyComponent extends Vue {
         item: flatCases[caseName],
       });
     }
-
-    let result: { [key: string]: any }[] = [];
-    for (let groupName in resultMap) {
+    const result: { [key: string]: any }[] = [];
+    for (const groupName in resultMap) {
       if (!Object.prototype.hasOwnProperty.call(resultMap, groupName)) continue;
       resultMap[groupName].cases.sort((a: any, b: any) =>
         a.name < b.name ? -1 : a.name > b.name ? 1 : 0,
@@ -153,7 +156,7 @@ export default class MyComponent extends Vue {
     return result;
   }
 
-  get currentCase() {
+  get currentCase(): string {
     return Util.vuexGet(this.store, this.storeMapping.currentCase);
   }
 
@@ -161,8 +164,8 @@ export default class MyComponent extends Vue {
     Util.vuexSet(this.store, this.storeMapping.currentCase, value);
   }
 
-  caseResult(caseName: string) {
-    let flatCaseResults = this.store.getters.flatCaseResults;
+  caseResult(caseName: string): null | any {
+    const flatCaseResults = this.store.getters.flatCaseResults;
     if (
       this.store.state.dirty ||
       !Object.prototype.hasOwnProperty.call(flatCaseResults, caseName)
@@ -171,16 +174,16 @@ export default class MyComponent extends Vue {
     return flatCaseResults[caseName];
   }
 
-  groupResult(groupName: string) {
-    let results = this.store.state.results;
+  groupResult(groupName: string): null | any {
+    const results = this.store.state.results;
     if (this.store.state.dirty || !results || !results.groups) return null;
-    for (let group of results.groups) {
+    for (const group of results.groups) {
       if (group.group == groupName) return group;
     }
     return null;
   }
 
-  verdictLabel(result: any) {
+  verdictLabel(result: any): string {
     if (!result) return '…';
     if (typeof result.verdict === 'undefined') {
       if (result.contest_score == result.max_score) return '✓';
@@ -201,38 +204,37 @@ export default class MyComponent extends Vue {
     return ' ☹';
   }
 
-  verdictClass(result: any) {
+  verdictClass(result: any): any {
     if (!result) return '';
     return result.verdict;
   }
 
-  verdictTooltip(result: any) {
+  verdictTooltip(result: any): string {
     if (!result) return '';
-    let tooltip = '';
     if (typeof result.verdict !== 'undefined') {
-      tooltip = result.verdict + ' ';
+      return `${result.verdict} ${this.score(result)}`;
     }
-    return tooltip + this.score(result);
+    return this.score(result);
   }
 
-  score(result: any) {
+  score(result: any): string {
     if (!result) return '…';
     return `${this.formatNumber(result.contest_score)}/${this.formatNumber(
       result.max_score,
     )}`;
   }
 
-  formatNumber(value: number) {
-    let str = value.toFixed(2);
+  formatNumber(value: number): string {
+    const str = value.toFixed(2);
     if (str.endsWith('.00')) return str.substring(0, str.length - 3);
     return str;
   }
 
-  selectCase(name: string) {
+  selectCase(name: string): void {
     this.currentCase = name;
   }
 
-  createCase() {
+  createCase(): void {
     if (!this.newCaseName) return;
     this.store.commit('createCase', {
       name: this.newCaseName,
@@ -243,7 +245,7 @@ export default class MyComponent extends Vue {
     this.newCaseName = '';
   }
 
-  removeCase(name: string) {
+  removeCase(name: string): void {
     this.store.commit('removeCase', name);
   }
 }
