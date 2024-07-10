@@ -30,12 +30,12 @@ export class ProfilePage {
     cy.get('a[href="/problem/mine/"]').click();
   }
 
-  verifyProblemVisibility(problemAlias: string, visible: boolean = true): void {
-    if (!visible) {
-      cy.get(`a[href="/arena/problem/${problemAlias}/"]`).should('not.exist');
-      return;
-    }
+  verifyProblemIsVisible(problemAlias: string): void {
     cy.get(`a[href="/arena/problem/${problemAlias}/"]`).should('be.visible');
+  }
+
+  verifyProblemIsNotVisible(problemAlias: string): void {
+    cy.get(`a[href="/arena/problem/${problemAlias}/"]`).should('not.exist');
   }
 
   deleteProblem(problemAlias: string): void {
