@@ -2,7 +2,7 @@
   <form>
     <div class="form-row">
       <div class="form-group col-md-4">
-        <label for="inputTimeLimit">Time Limit</label>
+        <label for="inputTimeLimit">{{ T.settingsTimeLimit }}</label>
         <input
           v-model="timeLimit"
           class="form-control"
@@ -13,7 +13,9 @@
         />
       </div>
       <div class="form-group col-md-4">
-        <label for="inputOverallWallTimeLimit">Overall Wall Time Limit</label>
+        <label for="inputOverallWallTimeLimit">{{
+          T.settingsOverallWallTimeLimit
+        }}</label>
         <input
           v-model="overallWallTimeLimit"
           class="form-control"
@@ -24,7 +26,7 @@
         />
       </div>
       <div class="form-group col-md-4">
-        <label for="inputExtraWallTime">Extra Wall Time</label>
+        <label for="inputExtraWallTime">{{ T.settingsExtraWallTime }}</label>
         <input
           v-model="extraWallTime"
           class="form-control"
@@ -37,7 +39,7 @@
     </div>
     <div class="form-row">
       <div class="form-group col-md-6">
-        <label for="inputMemoryLimit">Memory Limit</label>
+        <label for="inputMemoryLimit">{{ T.settingsMemoryLimit }}</label>
         <input
           v-model="memoryLimit"
           class="form-control"
@@ -48,7 +50,7 @@
         />
       </div>
       <div class="form-group col-md-6">
-        <label for="inputOutputLimit">Output Limit</label>
+        <label for="inputOutputLimit">{{ T.settingsOutputLimit }}</label>
         <input
           v-model="outputLimit"
           class="form-control"
@@ -61,7 +63,7 @@
     </div>
     <div class="form-row">
       <div class="form-group col-md-6">
-        <label for="inputValidator">Validator</label>
+        <label for="inputValidator">{{ T.settingsValidator }}</label>
         <select v-model="validator" class="form-control">
           <option value="custom">Custom</option>
           <option value="literal">Literal</option>
@@ -71,7 +73,7 @@
         </select>
       </div>
       <div v-if="validator == 'token-numeric'" class="form-group col-md-6">
-        <label for="inputTolerance">Tolerance</label>
+        <label for="inputTolerance">{{ T.settingsTolerance }}</label>
         <input
           v-model="tolerance"
           class="form-control"
@@ -81,7 +83,7 @@
         />
       </div>
       <div v-if="validator == 'custom'" class="form-group col-md-6">
-        <label for="inputValidatorLanguage">Language</label>
+        <label for="inputValidatorLanguage">{{ T.settingsLanguage }}</label>
         <select v-model="validatorLanguage" class="form-control">
           <option value="cpp17-gcc">C++17</option>
           <option value="py3">Python 3.6</option>
@@ -90,18 +92,20 @@
     </div>
     <div class="form-row">
       <div class="form-group col-md-4">
-        <label for="inputInteractive">Interactive</label>
+        <label for="inputInteractive">{{ T.settingsInteractive }}</label>
         <select v-model="interactive" class="form-control">
-          <option :value="false">No</option>
-          <option :value="true">Yes</option>
+          <option :value="false">{{ T.wordsNo }}</option>
+          <option :value="true">{{ T.wordsYes }}</option>
         </select>
       </div>
       <div v-if="interactive" class="form-group col-md-4">
-        <label for="inputInteractiveModuleName">Module Name</label>
+        <label for="inputInteractiveModuleName">{{
+          T.settingsModuleName
+        }}</label>
         <input v-model="interactiveModuleName" class="form-control" />
       </div>
       <div v-if="interactive" class="form-group col-md-4">
-        <label for="inputInteractiveLanguage">Language</label>
+        <label for="inputInteractiveLanguage">{{ T.settingsLanguage }}</label>
         <select v-model="interactiveLanguage" class="form-control">
           <option value="cpp17-gcc">C++17</option>
           <option value="py3">Python</option>
@@ -113,14 +117,14 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import T from '../lang';
 
 @Component
-export default class FormComponent extends Vue {
+export default class SettingsComponent extends Vue {
   @Prop({ required: true }) store!: any;
   @Prop({ required: true }) storeMapping!: any;
 
-  title = 'settings';
-
+  T = T;
   get timeLimit() {
     return this.store.state.request.input.limits.TimeLimit;
   }
@@ -214,7 +218,3 @@ export default class FormComponent extends Vue {
   }
 }
 </script>
-
-<style scoped>
-/* Add your styles here */
-</style>
