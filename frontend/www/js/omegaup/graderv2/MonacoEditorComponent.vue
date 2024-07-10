@@ -9,13 +9,13 @@ import * as monaco from 'monaco-editor';
 
 @Component
 export default class MonacoEditorComponent extends Vue {
-  @Prop({ type: Object, required: true }) store!: any;
-  @Prop({ type: Object, required: true }) storeMapping!: any;
-  @Prop({ type: String, default: 'vs-dark' }) theme!: string;
-  @Prop({ type: String, default: null }) initialModule!: string | null;
-  @Prop({ type: Boolean, default: false }) readOnly!: boolean;
-  @Prop({ type: String, default: null }) extension!: string | null;
-  @Prop({ type: String, default: null }) initialLanguage!: string | null;
+  @Prop({ required: true }) store!: any;
+  @Prop({ required: true }) storeMapping!: any;
+  @Prop({ default: 'vs-dark' }) theme!: string;
+  @Prop({ default: null }) initialModule!: string | null;
+  @Prop({ default: false }) readOnly!: boolean;
+  @Prop({ default: null }) extension!: string | null;
+  @Prop({ default: null }) initialLanguage!: string | null;
 
   _editor: monaco.editor.IStandaloneCodeEditor | null = null;
   _model: monaco.editor.ITextModel | null = null;
@@ -76,15 +76,18 @@ export default class MonacoEditorComponent extends Vue {
       'code-and-language-set',
       this.onCodeAndLanguageSet,
     );
-    this._editor = monaco.editor.create(this.$el as HTMLElement, {
-      autoIndent: 'brackets',
-      formatOnPaste: true,
-      formatOnType: true,
-      language: Util.supportedLanguages[this.language].modelMapping,
-      readOnly: this.readOnly,
-      theme: this.theme,
-      value: this.contents,
-    });
+    this._editor = monaco.editor.create(
+      this.$el as HTMLElement,
+      {
+        autoIndent: 'brackets',
+        formatOnPaste: true,
+        formatOnType: true,
+        language: Util.supportedLanguages[this.language].modelMapping,
+        readOnly: this.readOnly,
+        theme: this.theme,
+        value: this.contents,
+      } as monaco.editor.IStandaloneEditorConstructionOptions,
+    );
     this._model = this._editor.getModel();
     if (!this._model) return;
 
