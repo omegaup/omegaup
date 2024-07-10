@@ -52,7 +52,7 @@ describe('CaseEdit.vue', () => {
     await Vue.nextTick();
 
     const buttons = wrapper.findAllComponents(BButton);
-    expect(buttons.length).toBe(3);
+    expect(buttons.length).toBe(4);
 
     expect(wrapper.text()).toContain(newUngroupedCase.name);
     expect(wrapper.text()).toContain(newUngroupedCasegroup.name);
@@ -78,7 +78,7 @@ describe('CaseEdit.vue', () => {
     await Vue.nextTick();
 
     const buttons = wrapper.findAllComponents(BButton);
-    expect(buttons.length).toBe(3);
+    expect(buttons.length).toBe(4);
 
     expect(wrapper.text()).toContain(newCase.name);
     expect(wrapper.text()).toContain(newGroup.name);
