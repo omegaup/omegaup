@@ -3,12 +3,13 @@
 </template>
 
 <script lang="ts">
+// TODO: replace all instances of any with correct type
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import * as Util from '../grader/util';
 import * as monaco from 'monaco-editor';
 
 @Component
-export default class MonacoEditorComponent extends Vue {
+export default class MonacoEditor extends Vue {
   @Prop({ required: true }) store!: any;
   @Prop({ required: true }) storeMapping!: any;
   @Prop({ default: 'vs-dark' }) theme!: string;
@@ -33,25 +34,17 @@ export default class MonacoEditorComponent extends Vue {
   get contents(): string {
     return Util.vuexGet(this.store, this.storeMapping.contents);
   }
+
   set contents(value: string) {
     Util.vuexSet(this.store, this.storeMapping.contents, value);
   }
 
   get filename(): string {
-    return (
-      this.module +
-      '.' +
-      (this.extension || Util.supportedLanguages[this.language].extension)
-    );
+    return `${this.module}.${Util.supportedLanguages[this.language].extension}`;
   }
 
   get title(): string {
     return this.filename;
-  }
-
-  get visible(): boolean {
-    if (!this.storeMapping.visible) return true;
-    return Util.vuexGet(this.store, this.storeMapping.visible);
   }
 
   @Watch('language')
@@ -109,7 +102,7 @@ export default class MonacoEditorComponent extends Vue {
     }
   }
 
-  onCodeAndLanguageSet(e: any): void {
+  onCodeAndLanguageSet(e: any) {
     e.detail.code = this.contents;
     e.detail.language = this.language;
   }
