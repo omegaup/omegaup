@@ -123,36 +123,22 @@ class Run extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Contests $contest
     ): void {
+        $isInsideSubmissionGap = \OmegaUp\DAO\Submissions::isInsideSubmissionGap(
+            $submission,
+            intval($problem->problem_id),
+            intval($identity->identity_id),
+            $contest
+        );
         if (is_null($contest)) {
-            if (
-                !\OmegaUp\DAO\Submissions::isInsideSubmissionGap(
-                    $submission,
-                    null,
-                    null,
-                    intval($problem->problem_id),
-                    intval($identity->identity_id)
-                ) &&
-                !\OmegaUp\Authorization::isSystemAdmin($identity)
-            ) {
-                    throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
-                        'runWaitGap'
-                    );
-            }
+            $isAdmin = \OmegaUp\Authorization::isSystemAdmin($identity);
         } else {
-            if (
-                !\OmegaUp\DAO\Submissions::isInsideSubmissionGap(
-                    $submission,
-                    intval($contest->problemset_id),
-                    $contest,
-                    intval($problem->problem_id),
-                    intval($identity->identity_id)
-                ) &&
-                !\OmegaUp\Authorization::isAdmin($identity, $contest)
-            ) {
-                throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
-                    'runWaitGap'
-                );
-            }
+            $isAdmin = \OmegaUp\Authorization::isAdmin($identity, $contest);
+        }
+
+        if (!$isInsideSubmissionGap && !$isAdmin) {
+            throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
+                'runWaitGap'
+            );
         }
     }
 
