@@ -1,6 +1,6 @@
 <template>
   <div
-    class="root d-flex flex-row h-100 bg-dark text-white"
+    class="root d-flex flex-row h-100"
     :class="{
       'bg-dark': theme === 'vs-dark',
       'text-white': theme === 'vs-dark',
