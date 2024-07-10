@@ -12,7 +12,7 @@
  * @psalm-type SubmissionFeedbackThread=array{author: string, authorClassname: string, submission_feedback_thread_id: int, text: string, timestamp: \OmegaUp\Timestamp}
  * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int, feedback_thread?: list<SubmissionFeedbackThread>}
  * @psalm-type RunDetails=array{admin: bool, alias: string, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<RunDetailsGroup>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: list<SubmissionFeedback>}
- * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
+ * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
     // All languages that runs can have.
@@ -123,36 +123,22 @@ class Run extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Contests $contest
     ): void {
+        $isInsideSubmissionGap = \OmegaUp\DAO\Submissions::isInsideSubmissionGap(
+            $submission,
+            intval($problem->problem_id),
+            intval($identity->identity_id),
+            $contest
+        );
         if (is_null($contest)) {
-            if (
-                !\OmegaUp\DAO\Submissions::isInsideSubmissionGap(
-                    $submission,
-                    null,
-                    null,
-                    intval($problem->problem_id),
-                    intval($identity->identity_id)
-                ) &&
-                !\OmegaUp\Authorization::isSystemAdmin($identity)
-            ) {
-                    throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
-                        'runWaitGap'
-                    );
-            }
+            $isAdmin = \OmegaUp\Authorization::isSystemAdmin($identity);
         } else {
-            if (
-                !\OmegaUp\DAO\Submissions::isInsideSubmissionGap(
-                    $submission,
-                    intval($contest->problemset_id),
-                    $contest,
-                    intval($problem->problem_id),
-                    intval($identity->identity_id)
-                ) &&
-                !\OmegaUp\Authorization::isAdmin($identity, $contest)
-            ) {
-                throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
-                    'runWaitGap'
-                );
-            }
+            $isAdmin = \OmegaUp\Authorization::isAdmin($identity, $contest);
+        }
+
+        if (!$isInsideSubmissionGap && !$isAdmin) {
+            throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
+                'runWaitGap'
+            );
         }
     }
 

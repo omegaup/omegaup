@@ -6,13 +6,15 @@
           <div ref="markdownButtonBar" class="wmd-button-bar"></div>
           <textarea
             ref="markdownInput"
-            v-model.lazy="currentMarkdown"
+            v-model="currentMarkdown"
             class="wmd-input"
           ></textarea>
         </div>
         <div class="col-md-6">
           <omegaup-markdown
-            :markdown="currentMarkdownUpdated"
+            :markdown="
+              T.problemCreatorMarkdownPreviewInitialRender + currentMarkdown
+            "
             preview="true"
           ></omegaup-markdown>
         </div>
@@ -33,6 +35,7 @@ import { Vue, Component, Ref } from 'vue-property-decorator';
 import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../../../markdown';
 import T from '../../../../lang';
+import * as ui from '../../../../ui';
 
 import omegaup_Markdown from '../../../Markdown.vue';
 
@@ -50,10 +53,10 @@ export default class StatementTab extends Vue {
   @Ref() readonly markdownInput!: HTMLTextAreaElement;
 
   T = T;
+  ui = ui;
   markdownEditor: Markdown.Editor | null = null;
 
   currentMarkdown: string = T.problemCreatorEmpty;
-  currentMarkdownUpdated: string = T.problemCreatorEmpty;
 
   mounted(): void {
     this.markdownEditor = new Markdown.Editor(markdownConverter.converter, '', {
@@ -68,7 +71,7 @@ export default class StatementTab extends Vue {
 
   updateMarkdown() {
     this.$store.commit('updateMarkdown', this.currentMarkdown);
-    this.currentMarkdownUpdated = this.$store.state.problemMarkdown;
+    this.$emit('show-update-success-message');
   }
 }
 </script>

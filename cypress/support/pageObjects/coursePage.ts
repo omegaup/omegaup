@@ -235,6 +235,10 @@ export class CoursePage {
 
         cy.wrap(gutter.first()).click({ force: true });
 
+        cy.waitUntil(() =>
+          cy.get('.card-body > textarea').should('be.visible'),
+        );
+
         cy.get('.card-body > textarea').type(feedback);
 
         cy.get('[data-button-submit]').click();

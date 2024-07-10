@@ -15,6 +15,42 @@ export class ProfilePage {
     cy.get('[data-save-profile-changes-button]').click();
     cy.get('#alert-close').click();
   }
+  updatePreferredLanguage(preferredLanguage: string): void {
+    cy.get('[data-nav-user]').click();
+    cy.get('[data-nav-profile]').click();
+    cy.get('a[href="/profile/#edit-preferences"]').click();
+    cy.get('[data-preferred-language]').select(preferredLanguage);
+    cy.get('[data-preference-save-button]').click();
+    cy.get('#alert-close').click();
+  }
+
+  navigateToMyProblemsPage(): void {
+    cy.get('[data-nav-user]').click();
+    cy.get('a[href="/profile/#created-content"]').click();
+    cy.get('a[href="/problem/mine/"]').click();
+  }
+
+  verifyProblemIsVisible(problemAlias: string): void {
+    cy.get(`a[href="/arena/problem/${problemAlias}/"]`).should('be.visible');
+  }
+
+  verifyProblemIsNotVisible(problemAlias: string): void {
+    cy.get(`a[href="/arena/problem/${problemAlias}/"]`).should('not.exist');
+  }
+
+  deleteProblem(problemAlias: string): void {
+    cy.get(`[data-delete-problem="${problemAlias}"]`).click();
+    cy.get('.modal-footer>button.btn-danger').click();
+  }
+
+  deleteProblemsInBatch(problemAliases: string[]): void {
+    problemAliases.forEach((problemAlias) => {
+      cy.get(`input[type="checkbox"][data-selected-problem="${problemAlias}"]`).click();
+    });
+    cy.get('select[data-selected-problems]').select("2");
+    cy.get("[data-visibility-action]").click();
+    cy.get('.modal-footer>button.btn-danger').click();
+  }
 
   createTeamGroup(teamGroupOptions: TeamGroupOptions): void {
     cy.get('[data-nav-user]').click();
