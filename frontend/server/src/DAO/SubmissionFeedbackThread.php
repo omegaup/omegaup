@@ -21,24 +21,26 @@ class SubmissionFeedbackThread extends \OmegaUp\DAO\Base\SubmissionFeedbackThrea
     public static function getSubmissionFeedbackThreadParticipants(
         int $submissionFeedbackId,
     ) {
-        $sql = 'SELECT
-                    u.user_id AS author_id
-                FROM
-                    Submission_Feedback_Thread sft
-                INNER JOIN
-                    Identities i ON sft.identity_id = i.identity_id
-                INNER JOIN
-                    Users u ON u.user_id = i.user_id
-                WHERE
-                    sft.submission_feedback_id = ?
-        ';
+        $sql = 'WITH participants AS (
+                    SELECT identity_id
+                    FROM Submission_Feedback_Thread
+                    WHERE submission_feedback_id = ?
+
+                    UNION ALL
+
+                    SELECT identity_id
+                    FROM Submission_Feedback
+                    WHERE submission_feedback_id = ?
+                )
+                SELECT DISTINCT u.user_id AS author_id
+                FROM participants p
+                INNER JOIN Identities i ON i.identity_id = p.identity_id
+                INNER JOIN Users u ON u.user_id = i.user_id;';
 
         /** @var list<array{author_id: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [
-               $submissionFeedbackId
-            ]
+            [ $submissionFeedbackId, $submissionFeedbackId ]
         );
     }
 }
