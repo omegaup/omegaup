@@ -120,7 +120,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../lang';
 
 @Component
-export default class SettingsComponent extends Vue {
+export default class IDESettings extends Vue {
   @Prop({ required: true }) store!: any;
   @Prop({ required: true }) storeMapping!: any;
 
