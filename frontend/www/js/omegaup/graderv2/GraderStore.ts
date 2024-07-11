@@ -1,3 +1,5 @@
+// TODO: add return types to each of the getters
+// TODO: move logic from components inside this store
 import Vuex, { StoreOptions } from 'vuex';
 import Vue from 'vue';
 
