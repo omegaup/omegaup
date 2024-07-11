@@ -35,7 +35,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import * as Util from '../grader/util';
+import * as Util from './util';
 import T from '../lang';
 import JSZip, { JSZipObject } from 'jszip';
 
