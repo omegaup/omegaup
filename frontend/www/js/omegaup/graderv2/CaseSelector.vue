@@ -97,7 +97,7 @@
 <script lang="ts">
 // TODO: replace all instances of any with correct type
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import * as Util from '../grader/util';
+import * as Util from './util';
 import T from '../lang';
 
 @Component
