@@ -576,8 +576,8 @@ export default class ArenaContestList extends Vue {
 
 .btn-primary {
   background-color: var(--arena-button-border-color) !important;
-  height: 45px;
-  width: 150px;
+  height: 2.5rem;
+  width: 7.5rem;
   display: flex;
   justify-content: center;
   align-items: center;
