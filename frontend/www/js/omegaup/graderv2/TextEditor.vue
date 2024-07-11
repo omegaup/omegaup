@@ -12,7 +12,7 @@
 <script lang="ts">
 // TODO: replace all instances of any with correct type
 import { Vue, Prop, Component } from 'vue-property-decorator';
-import * as Util from '../grader/util';
+import * as Util from './util';
 
 @Component
 export default class TextEditor extends Vue {
