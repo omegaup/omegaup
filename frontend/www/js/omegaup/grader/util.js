@@ -202,6 +202,17 @@ export const validExtensions = [
     Object.values(supportedLanguages).map((language) => language.extension),
   ),
 ];
+export const extensionToLanguages = Object.values(supportedLanguages).reduce(
+  (acc, languageInfo) => {
+    const { extension, language } = languageInfo;
+    if (!acc[extension]) {
+      acc[extension] = [];
+    }
+    acc[extension].push(language);
+    return acc;
+  },
+  {},
+);
 export function asyncError(err) {
   console.error('Async error', err);
 }
