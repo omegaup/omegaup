@@ -164,6 +164,12 @@ export const casesStore: Module<CasesState, RootState> = {
       );
       state = assignMissingPoints(state);
     },
+    deleteUngroupedCases(state) {
+      state.groups = state.groups.filter(
+        (group) => group.ungroupedCase === false,
+      );
+      state = assignMissingPoints(state);
+    },
     deleteCase(state, caseGroupIDToBeDeleted: CaseGroupID) {
       const groupTarget = state.groups.find(
         (group) => group.groupID == caseGroupIDToBeDeleted.groupID,
@@ -196,6 +202,7 @@ export const casesStore: Module<CasesState, RootState> = {
     addLayoutLine(state) {
       const payload: CaseLine = {
         lineID: uuid(),
+        caseID: null,
         label: 'NEW',
         data: {
           kind: 'line',
@@ -282,6 +289,7 @@ export const casesStore: Module<CasesState, RootState> = {
       const selectedCase: Case = getters.getSelectedCase;
       const newLine: CaseLine = {
         lineID: uuid(),
+        caseID: selectedCase.caseID,
         label: 'NEW',
         data: {
           kind: 'line',
@@ -354,6 +362,17 @@ export const casesStore: Module<CasesState, RootState> = {
           (group) => group.groupID === state.selected.groupID,
         ) ?? null
       );
+    },
+    getUngroupedCases: (state) => {
+      return state.groups.filter((group) => group.ungroupedCase === true);
+    },
+    getGroupsButUngroupedCases: (state) => {
+      return state.groups.filter((group) => group.ungroupedCase === false);
+    },
+    getTotalPointsForUngroupedCases: (state) => {
+      return state.groups
+        .filter((group) => group.ungroupedCase === true)
+        .reduce((accumulator, group) => accumulator + (group.points || 0), 0);
     },
   },
 };
