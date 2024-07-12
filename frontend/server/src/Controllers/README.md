@@ -207,6 +207,7 @@
 - [Session](#session)
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
 - [Submission](#submission)
+  - [`/api/submission/list/`](#apisubmissionlist)
   - [`/api/submission/setFeedback/`](#apisubmissionsetfeedback)
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
@@ -401,14 +402,14 @@ CertificateController
 
 ### Description
 
-Generates all the certificates for a contest given its contest ID.
+Generates all the certificates for a contest given its contest alias.
 
 ### Parameters
 
-| Name                  | Type        | Description |
-| --------------------- | ----------- | ----------- |
-| `certificates_cutoff` | `int\|null` |             |
-| `contest_id`          | `int\|null` |             |
+| Name                  | Type           | Description |
+| --------------------- | -------------- | ----------- |
+| `certificates_cutoff` | `int\|null`    |             |
+| `contest_alias`       | `string\|null` |             |
 
 ### Returns
 
@@ -912,16 +913,17 @@ Returns a list of contests
 
 ### Parameters
 
-| Name             | Type        | Description |
-| ---------------- | ----------- | ----------- |
-| `page`           | `int`       |             |
-| `page_size`      | `int`       |             |
-| `query`          | `string`    |             |
-| `tab_name`       | `string`    |             |
-| `active`         | `int\|null` |             |
-| `admission_mode` | `mixed`     |             |
-| `participating`  | `int\|null` |             |
-| `recommended`    | `int\|null` |             |
+| Name             | Type           | Description |
+| ---------------- | -------------- | ----------- |
+| `page`           | `int`          |             |
+| `page_size`      | `int`          |             |
+| `query`          | `string`       |             |
+| `tab_name`       | `string`       |             |
+| `active`         | `int\|null`    |             |
+| `admission_mode` | `mixed`        |             |
+| `participating`  | `int\|null`    |             |
+| `recommended`    | `int\|null`    |             |
+| `sort_order`     | `null\|string` |             |
 
 ### Returns
 
@@ -2218,8 +2220,10 @@ Returns all runs for a course
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | `assignment_alias` | `string`                                                                                                                                                                                                            |             |
 | `course_alias`     | `string`                                                                                                                                                                                                            |             |
+| `execution`        | `'EXECUTION_COMPILATION_ERROR'\|'EXECUTION_FINISHED'\|'EXECUTION_INTERRUPTED'\|'EXECUTION_JUDGE_ERROR'\|'EXECUTION_RUNTIME_ERROR'\|'EXECUTION_RUNTIME_FUNCTION_ERROR'\|'EXECUTION_VALIDATOR_ERROR'\|null`           |             |
 | `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |
 | `offset`           | `int\|null`                                                                                                                                                                                                         |             |
+| `output`           | `'OUTPUT_CORRECT'\|'OUTPUT_EXCEEDED'\|'OUTPUT_INCORRECT'\|'OUTPUT_INTERRUPTED'\|null`                                                                                                                               |             |
 | `problem_alias`    | `null\|string`                                                                                                                                                                                                      |             |
 | `rowcount`         | `int\|null`                                                                                                                                                                                                         |             |
 | `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |
@@ -3201,8 +3205,10 @@ Entry point for Problem runs API
 
 | Name            | Type           | Description |
 | --------------- | -------------- | ----------- |
+| `execution`     | `null\|string` |             |
 | `language`      | `null\|string` |             |
 | `offset`        | `int\|null`    |             |
+| `output`        | `null\|string` |             |
 | `problem_alias` | `null\|string` |             |
 | `rowcount`      | `int\|null`    |             |
 | `show_all`      | `bool\|null`   |             |
@@ -3877,17 +3883,31 @@ types.RunDetails;
 
 ### Description
 
-Disqualify a submission
+Disqualify one or more submissions based on the received parameters:
+
+- When a run_alias is provided, it will only disqualify a single
+  submission.
+- When run_alias is not provided, both the username and the contest_alias
+  are required.
+- If a problem_alias is provided, all submissions belonging to the user
+  for this problem and contest will be disqualified.
+- If a problem_alias is not provided, all submissions belonging to the
+  user in this contest will be disqualified.
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `contest_alias` | `null\|string` |             |
+| `problem_alias` | `null\|string` |             |
+| `run_alias`     | `null\|string` |             |
+| `username`      | `null\|string` |             |
 
 ### Returns
 
-_Nothing_
+| Name   | Type                                    |
+| ------ | --------------------------------------- |
+| `runs` | `{ guid: string; username: string; }[]` |
 
 ## `/api/run/getSubmissionFeedback/`
 
@@ -3994,9 +4014,10 @@ Get basic details of a run
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
+| Name        | Type           | Description |
+| ----------- | -------------- | ----------- |
+| `run_alias` | `string`       |             |
+| `username`  | `null\|string` |             |
 
 ### Returns
 
@@ -4114,6 +4135,27 @@ contestant's machine and the server.
 # Submission
 
 SubmissionController
+
+## `/api/submission/list/`
+
+### Description
+
+Returns a list of submissions in the last 24 hours
+for given page and username.
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `page`     | `int\|null`    |             |
+| `pageSize` | `int\|null`    |             |
+| `username` | `string\|null` |             |
+
+### Returns
+
+| Name          | Type                 |
+| ------------- | -------------------- |
+| `submissions` | `types.Submission[]` |
 
 ## `/api/submission/setFeedback/`
 

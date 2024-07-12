@@ -12,6 +12,11 @@ OmegaUp.on('ready', () => {
   const fromLogin =
     new URL(document.location.toString()).searchParams.get('fromLogin') !==
     null;
+
+  const commonNavbarExists = document.getElementById('common-navbar');
+  if (!commonNavbarExists) {
+    return;
+  }
   const commonNavbar = new Vue({
     el: '#common-navbar',
     components: {
@@ -50,6 +55,7 @@ OmegaUp.on('ready', () => {
           userTypes: payload.userTypes,
           nextRegisteredContest: payload.nextRegisteredContestForUser,
           isUnder13User: payload.isUnder13User,
+          userVerificationDeadline: payload.userVerificationDeadline,
         },
         on: {
           'read-notifications': (

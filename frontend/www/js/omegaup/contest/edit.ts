@@ -25,6 +25,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       admins: payload.admins,
       details: payload.details,
+      initialTab: window.location.hash?.substring(1) || '',
       groupAdmins: payload.group_admins,
       groups: payload.groups,
       problems: payload.problems,
@@ -35,10 +36,17 @@ OmegaUp.on('ready', () => {
       searchResultTeamsGroups,
       searchResultGroups: [] as types.ListItem[],
       teamsGroup: payload.teams_group,
+      certificatesDetails: payload.certificatesDetails,
     }),
     methods: {
-      arbitrateRequest: (username: string, resolution: boolean): void => {
-        const resolutionText = resolution ? T.wordAccepted : T.wordsDenied;
+      arbitrateRequest: (
+        username: string,
+        resolution: boolean,
+        resolutionText: null | string = null,
+      ): void => {
+        if (!resolutionText) {
+          resolutionText = resolution ? T.wordAccepted : T.wordsDenied;
+        }
         api.Contest.arbitrateRequest({
           contest_alias: payload.details.alias,
           username,
@@ -151,6 +159,7 @@ OmegaUp.on('ready', () => {
         props: {
           admins: this.admins,
           details: this.details,
+          initialTab: this.initialTab,
           groupAdmins: this.groupAdmins,
           groups: this.groups,
           problems: this.problems,
@@ -162,6 +171,7 @@ OmegaUp.on('ready', () => {
           searchResultGroups: this.searchResultGroups,
           teamsGroup: this.teamsGroup,
           originalContestAdmissionMode: payload.original_contest_admission_mode,
+          certificatesDetails: this.certificatesDetails,
         },
         on: {
           'update-search-result-problems': ({
@@ -463,8 +473,14 @@ OmegaUp.on('ready', () => {
           'accept-request': ({ username }: { username: string }) => {
             this.arbitrateRequest(username, true);
           },
-          'deny-request': ({ username }: { username: string }) => {
-            this.arbitrateRequest(username, false);
+          'deny-request': ({
+            username,
+            resolutionText,
+          }: {
+            username: string;
+            resolutionText: null | string;
+          }) => {
+            this.arbitrateRequest(username, false, resolutionText);
           },
           'add-admin': (username: string) => {
             api.Contest.addAdmin({
@@ -616,6 +632,21 @@ OmegaUp.on('ready', () => {
                   table.push(row);
                 }
                 this.downloadCsvFile(`${contestAlias}_scoreboard.csv`, table);
+              })
+              .catch(ui.apiError);
+          },
+          'show-copy-message': (): void => {
+            ui.success(T.contestEditContestLinkCopiedToClipboard);
+          },
+          'generate-certificates': (certificateCutoff: number) => {
+            api.Certificate.generateContestCertificates({
+              certificates_cutoff: certificateCutoff,
+              contest_alias: payload.details.alias,
+            })
+              .then(() => {
+                contestEdit.certificatesDetails.certificatesStatus = 'queued';
+                contestEdit.certificatesDetails.certificateCutoff = certificateCutoff;
+                ui.success(T.contestCertificatesGenerateSuccessfully);
               })
               .catch(ui.apiError);
           },

@@ -36,6 +36,7 @@ import rankingStore from './rankingStore';
 import socketStore from './socketStore';
 import { myRunsStore, RunFilters, runsStore } from './runsStore';
 import T from '../lang';
+import { DisqualificationType } from '../components/arena/Runs.vue';
 
 OmegaUp.on('ready', async () => {
   time.setSugarLocale();
@@ -110,9 +111,7 @@ OmegaUp.on('ready', async () => {
 
   let nextSubmissionTimestamp: null | Date = null;
   if (problemDetails?.nextSubmissionTimestamp != null) {
-    nextSubmissionTimestamp = time.remoteTime(
-      problemDetails?.nextSubmissionTimestamp.getTime(),
-    );
+    nextSubmissionTimestamp = problemDetails?.nextSubmissionTimestamp;
   }
 
   const contestContestant = new Vue({
@@ -322,14 +321,53 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.ignoreError);
           },
-          disqualify: (run: types.Run) => {
-            if (!window.confirm(T.runDisqualifyConfirm)) {
+          disqualify: ({
+            run,
+            disqualificationType,
+          }: {
+            run: types.Run;
+            disqualificationType: DisqualificationType;
+          }) => {
+            const request: {
+              run_alias: null | string;
+              problem_alias: null | string;
+              username: string;
+              contest_alias: null | string;
+            } = {
+              run_alias: run.guid,
+              contest_alias: payload.contest.alias,
+              problem_alias: null,
+              username: run.username,
+            };
+            let message = T.runDisqualifyConfirm;
+            if (disqualificationType === DisqualificationType.ByGUID) {
+              request.contest_alias = null;
+            } else if (disqualificationType === DisqualificationType.ByUser) {
+              request.run_alias = null;
+              message = T.runDisqualifyByUserConfirm;
+            } else if (
+              disqualificationType === DisqualificationType.ByProblem
+            ) {
+              request.run_alias = null;
+              request.problem_alias = run.alias;
+              message = T.runDisqualifyByProblemConfirm;
+            }
+            if (!window.confirm(message)) {
               return;
             }
-            api.Run.disqualify({ run_alias: run.guid })
-              .then(() => {
-                run.type = 'disqualified';
-                updateRunFallback({ run });
+            api.Run.disqualify(request)
+              .then(({ runs }) => {
+                const filteredRuns = runsStore.state.runs.filter(
+                  (filteredRun) =>
+                    runs.some(
+                      (disqualifiedRun) =>
+                        disqualifiedRun.guid === filteredRun.guid,
+                    ),
+                );
+                for (const disqualifiedRun of filteredRuns) {
+                  disqualifiedRun.type = 'disqualified';
+                  updateRunFallback({ run: disqualifiedRun });
+                }
               })
               .catch(ui.ignoreError);
           },

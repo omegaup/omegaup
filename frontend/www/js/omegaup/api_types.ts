@@ -2311,8 +2311,26 @@ export namespace types {
     export function UserDependentsPayload(
       elementId: string = 'payload',
     ): types.UserDependentsPayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
+      return ((x) => {
+        x.dependents = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (
+              typeof x.parent_email_verification_deadline !== 'undefined' &&
+              x.parent_email_verification_deadline !== null
+            )
+              x.parent_email_verification_deadline = ((x: number) =>
+                new Date(x * 1000))(x.parent_email_verification_deadline);
+            return x;
+          });
+        })(x.dependents);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -2445,8 +2463,27 @@ export namespace types {
     export function UserRankTablePayload(
       elementId: string = 'payload',
     ): types.UserRankTablePayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
+      return ((x) => {
+        if (typeof x.lastUpdated !== 'undefined' && x.lastUpdated !== null)
+          x.lastUpdated = ((x: number) => new Date(x * 1000))(x.lastUpdated);
+        x.ranking = ((x) => {
+          x.rank = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (typeof x.timestamp !== 'undefined' && x.timestamp !== null)
+                x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+              return x;
+            });
+          })(x.rank);
+          return x;
+        })(x.ranking);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -2942,6 +2979,12 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ContestCertificatesAdminDetails {
+    certificateCutoff?: number;
+    certificatesStatus: string;
+    isCertificateGenerator: boolean;
+  }
+
   export interface ContestDetails {
     admin: boolean;
     admission_mode: string;
@@ -3002,6 +3045,7 @@ export namespace types {
 
   export interface ContestEditPayload {
     admins: types.ContestAdmin[];
+    certificatesDetails: types.ContestCertificatesAdminDetails;
     details: types.ContestAdminDetails;
     group_admins: types.ContestGroupAdmin[];
     groups: types.ContestGroup[];
@@ -3028,6 +3072,7 @@ export namespace types {
     needsBasicInformation: boolean;
     privacyStatement: types.PrivacyStatement;
     requestsUserInformation: string;
+    shouldShowModalToLoginWithRegisteredIdentity: boolean;
   }
 
   export interface ContestList {
@@ -3042,7 +3087,7 @@ export namespace types {
     contest_id: number;
     contestants: number;
     description: string;
-    duration?: number;
+    duration_minutes?: number;
     finish_time: Date;
     last_updated: Date;
     organizer: string;
@@ -3116,6 +3161,7 @@ export namespace types {
     default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
+    extra_note?: string;
     feedback: string;
     finish_time: Date;
     languages: string;
@@ -3261,6 +3307,8 @@ export namespace types {
 
   export interface CourseClarificationsPayload {
     clarifications: types.Clarification[];
+    is_admin: boolean;
+    is_teaching_assistant: boolean;
     length: number;
     page: number;
     pagerItems: types.PageItem[];
@@ -3282,6 +3330,7 @@ export namespace types {
     finish_time?: Date;
     is_admin: boolean;
     is_curator: boolean;
+    is_teaching_assistant: boolean;
     languages?: string[];
     level?: string;
     name: string;
@@ -4017,6 +4066,7 @@ export namespace types {
   export interface ProblemListItem {
     accepted: number;
     alias: string;
+    can_be_removed?: boolean;
     difficulty?: number;
     difficulty_histogram: number[];
     points: number;
@@ -4250,6 +4300,7 @@ export namespace types {
     status_memory?: string;
     status_runtime?: string;
     submit_delay: number;
+    suggestions?: number;
     time: Date;
     type?: string;
     username: string;
@@ -4719,8 +4770,16 @@ export namespace types {
     [key: string]: types.ContestListItem[];
   }
 
+  export interface UserDependent {
+    classname: string;
+    name?: string;
+    parent_email_verification_deadline?: Date;
+    parent_verified?: boolean;
+    username: string;
+  }
+
   export interface UserDependentsPayload {
-    dependents: { email?: string; name?: string; username: string }[];
+    dependents: types.UserDependent[];
   }
 
   export interface UserDetailsPayload {
@@ -4828,6 +4887,7 @@ export namespace types {
       problems_solved: number;
       ranking?: number;
       score: number;
+      timestamp?: Date;
       user_id: number;
       username: string;
     }[];
@@ -4846,6 +4906,7 @@ export namespace types {
     filter: string;
     isIndex: boolean;
     isLogged: boolean;
+    lastUpdated?: Date;
     length: number;
     page: number;
     pagerItems: types.PageItem[];
@@ -4864,6 +4925,7 @@ export namespace types {
 
   export interface VerificationParentalTokenDetailsPayload {
     hasParentalVerificationToken: boolean;
+    message: string;
   }
 }
 
@@ -5572,7 +5634,9 @@ export namespace messages {
   export type _RunDetailsServerResponse = any;
   export type RunDetailsResponse = types.RunDetails;
   export type RunDisqualifyRequest = { [key: string]: any };
-  export type RunDisqualifyResponse = {};
+  export type RunDisqualifyResponse = {
+    runs: { guid?: string; username?: string }[];
+  };
   export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
   export type _RunGetSubmissionFeedbackServerResponse = any;
   export type RunGetSubmissionFeedbackResponse = types.SubmissionFeedback[];
@@ -5631,6 +5695,9 @@ export namespace messages {
   };
 
   // Submission
+  export type SubmissionListRequest = { [key: string]: any };
+  export type _SubmissionListServerResponse = any;
+  export type SubmissionListResponse = { submissions: types.Submission[] };
   export type SubmissionSetFeedbackRequest = { [key: string]: any };
   export type SubmissionSetFeedbackResponse = {
     submissionFeedback?: dao.SubmissionFeedback;
@@ -6414,6 +6481,9 @@ export namespace controllers {
   }
 
   export interface Submission {
+    list: (
+      params?: messages.SubmissionListRequest,
+    ) => Promise<messages.SubmissionListResponse>;
     setFeedback: (
       params?: messages.SubmissionSetFeedbackRequest,
     ) => Promise<messages.SubmissionSetFeedbackResponse>;

@@ -238,6 +238,7 @@
                   :username="run.username"
                   :country="run.country_id"
                   :linkify="true"
+                  :href="'#runs'"
                   :emit-click-event="true"
                   @click="
                     (username) =>
@@ -268,12 +269,14 @@
                 </a>
               </td>
               <td v-if="showProblem" class="text-break-all">
+                <a href="#runs" @click="setFilterProblem(run.alias)">{{
+                  run.alias
+                }}</a>
                 <a
-                  href="#runs"
-                  @click.prevent="filterProblem.key = run.alias"
-                  >{{ run.alias }}</a
+                  problem-navigation-button
+                  :href="`/arena/problem/${run.alias}/`"
+                  class="ml-2"
                 >
-                <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
               </td>
@@ -332,7 +335,7 @@
                 <div class="dropdown">
                   <button
                     data-runs-actions-button
-                    class="btn-secondary dropdown-toggle"
+                    class="btn btn-secondary dropdown-toggle"
                     type="button"
                     data-toggle="dropdown"
                     aria-haspopup="true"
@@ -360,14 +363,48 @@
                     </button>
                     <template v-if="showDisqualify">
                       <div class="dropdown-divider"></div>
-                      <button
-                        v-if="run.type === 'normal'"
-                        :data-actions-disqualify="run.guid"
-                        class="btn-link dropdown-item"
-                        @click="$emit('disqualify', run)"
-                      >
-                        {{ T.arenaRunsActionsDisqualify }}
-                      </button>
+                      <template v-if="run.type === 'normal'">
+                        <button
+                          :data-actions-disqualify-by-guid="run.guid"
+                          class="btn-link dropdown-item"
+                          @click="
+                            $emit('disqualify', {
+                              run,
+                              disqualificationType: DisqualificationType.ByGUID,
+                            })
+                          "
+                        >
+                          {{ T.arenaRunsActionsDisqualifyByGUID }}
+                        </button>
+                        <template v-if="inContest">
+                          <button
+                            :data-actions-disqualify-by-problem="run.guid"
+                            class="btn-link dropdown-item"
+                            @click="
+                              $emit('disqualify', {
+                                run,
+                                disqualificationType:
+                                  DisqualificationType.ByProblem,
+                              })
+                            "
+                          >
+                            {{ T.arenaRunsActionsDisqualifyByProblem }}
+                          </button>
+                          <button
+                            :data-actions-disqualify-by-user="run.guid"
+                            class="btn-link dropdown-item"
+                            @click="
+                              $emit('disqualify', {
+                                run,
+                                disqualificationType:
+                                  DisqualificationType.ByUser,
+                              })
+                            "
+                          >
+                            {{ T.arenaRunsActionsDisqualifyByUser }}
+                          </button>
+                        </template>
+                      </template>
                       <button
                         v-else-if="run.type === 'disqualified'"
                         :data-actions-requalify="run.guid"
@@ -437,6 +474,16 @@ declare global {
   }
 }
 
+export enum DisqualificationType {
+  ByGUID,
+  ByProblem,
+  ByUser,
+  ByUsers,
+  ByUsersAndProblem,
+  ByUserAndProblems,
+  ByUsersAndProblems,
+}
+
 export enum PopupDisplayed {
   None,
   RunSubmit,
@@ -481,10 +528,12 @@ export default class Runs extends Vue {
   @Prop() totalRuns!: number;
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
+  @Prop({ default: false }) inContest!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
+  DisqualificationType = DisqualificationType;
 
   filterLanguage: string = '';
   filterOffset: number = 0;
@@ -647,6 +696,15 @@ export default class Runs extends Vue {
     if (run.type == 'disqualified') return 'status-disqualified';
     if (run.verdict == 'AC') {
       return 'status-ac';
+    }
+    if (run.verdict == 'TLE') {
+      return 'status-tle';
+    }
+    if (run.verdict == 'MLE') {
+      return 'status-mle';
+    }
+    if (run.verdict == 'WA') {
+      return 'status-wa';
     }
     if (run.verdict == 'CE') {
       return 'status-ce';
@@ -828,6 +886,10 @@ export default class Runs extends Vue {
     }
     this.$emit('update-search-result-users', { query });
   }
+
+  setFilterProblem(problemAlias: string): void {
+    this.filterProblem = { key: problemAlias, value: problemAlias };
+  }
 }
 </script>
 
@@ -883,6 +945,18 @@ export default class Runs extends Vue {
 }
 .status-ac {
   background: var(--arena-runs-table-status-ac-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+.status-wa {
+  background: var(--arena-runs-table-status-wa-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+.status-mle {
+  background: var(--arena-runs-table-status-mle-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+.status-tle {
+  background: var(--arena-runs-table-status-tle-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
 }
 .status-ce {

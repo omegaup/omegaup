@@ -18,7 +18,7 @@ describe('Group Test', () => {
       groupDescription: 'group description',
     };
 
-    loginPage.giveAdminPrivilage(
+    loginPage.giveAdminPrivilege(
       'GroupIdentityCreator',
       loginOptions[0].username,
     );
@@ -37,7 +37,7 @@ describe('Group Test', () => {
       noOfContestants: '2',
     };
 
-    loginPage.giveAdminPrivilage(
+    loginPage.giveAdminPrivilege(
       'GroupIdentityCreator',
       loginOptions[0].username,
     );

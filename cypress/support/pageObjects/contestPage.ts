@@ -1,14 +1,16 @@
 import 'cypress-file-upload';
 import 'cypress-wait-until';
 import { v4 as uuid } from 'uuid';
+import { problemPage } from './problemPage';
 
 import {
   ContestOptions,
   GroupOptions,
   LoginOptions,
   ProblemOptions,
+  RunOptions,
 } from '../types';
-import { addSubtractDaysToDate, getISODateTime } from '../commands';
+import { addSubtractDateTime, getISODateTime } from '../commands';
 
 enum ScoreMode {
   AllOrNothing = 'all_or_nothing',
@@ -70,7 +72,6 @@ export class ContestPage {
   // FIXME: When trying to bulk users, cypress is not able to find the results table
   // TODO: Replace multiuser add for courses/contests
   addStudentsBulk(users: Array<string>): void {
-    cy.get('a[data-nav-contest-edit]').click();
     cy.get('a[data-nav-contestant]').click();
 
     cy.get('textarea[data-contestant-names]').type(users.join(', '));
@@ -144,8 +145,8 @@ export class ContestPage {
     cy.log('Contest Page - Create Contest');
     cy.log(JSON.stringify(contestOptions));
     cy.createContest(contestOptions, shouldShowIntro);
-
     cy.location('href').should('include', contestOptions.contestAlias);
+    cy.get('a[data-contest-new-form]').trigger('click');
     cy.get('[name="title"]').should('have.value', contestOptions.contestAlias);
     cy.get('[name="alias"]').should('have.value', contestOptions.contestAlias);
     cy.get('[name="description"]').should(
@@ -172,63 +173,50 @@ export class ContestPage {
   generateContestOptions(
     loginOption: LoginOptions,
     firstTimeVisited: boolean = true,
+    numberOfProblems: number = 1,
   ): ContestOptions {
+    const problems = problemPage.generateProblemOptions(numberOfProblems);
+    const contestProblems: ProblemOptions[] = [];
+    const contestRuns: RunOptions[] = [];
+
+    problems.forEach((problem: ProblemOptions) => {
+      problem.firstTimeVisited = firstTimeVisited;
+
+      cy.login(loginOption);
+      cy.createProblem(problem);
+      cy.logout();
+      contestProblems.push({
+        problemAlias: problem.problemAlias,
+        tag: problem.tag,
+        autoCompleteTextTag: problem.autoCompleteTextTag,
+        problemLevelIndex: problem.problemLevelIndex,
+      });
+      contestRuns.push({
+        problemAlias: problem.problemAlias,
+        fixturePath: 'main.cpp',
+        language: 'cpp11-gcc',
+        valid: true,
+        status: 'AC',
+      });
+      firstTimeVisited = false;
+    });
+
     const now = new Date();
-    const problem = this.generateProblemOptions(1);
-
-    problem[0].firstTimeVisited = firstTimeVisited;
-
-    cy.login(loginOption);
-    cy.createProblem(problem[0]);
-    cy.logout();
-
     const contestOptions: ContestOptions = {
       contestAlias: 'contest' + uuid().slice(0, 5),
       description: 'Test Description',
-      startDate: addSubtractDaysToDate(now, { days: -1 }),
-      endDate: addSubtractDaysToDate(now, { days: 2 }),
+      startDate: now,
+      endDate: addSubtractDateTime(now, { days: 2 }),
       showScoreboard: true,
       basicInformation: false,
       scoreMode: ScoreMode.Partial,
       requestParticipantInformation: 'no',
       admissionMode: 'public',
-      problems: [
-        {
-          problemAlias: problem[0].problemAlias,
-          tag: problem[0].tag,
-          autoCompleteTextTag: problem[0].autoCompleteTextTag,
-          problemLevelIndex: problem[0].problemLevelIndex,
-        },
-      ],
-      runs: [
-        {
-          problemAlias: problem[0].problemAlias,
-          fixturePath: 'main.cpp',
-          language: 'cpp11-gcc',
-          valid: true,
-          status: 'AC',
-        },
-      ],
+      problems: contestProblems,
+      runs: contestRuns,
     };
 
     return contestOptions;
-  }
-
-  generateProblemOptions(noOfProblems: number): ProblemOptions[] {
-    const problems: ProblemOptions[] = [];
-
-    for (let i = 0; i < noOfProblems; i++) {
-      const problemOptions: ProblemOptions = {
-        problemAlias: uuid().slice(0, 10),
-        tag: 'Recursion',
-        autoCompleteTextTag: 'recur',
-        problemLevelIndex: 0,
-      };
-
-      problems.push(problemOptions);
-    }
-
-    return problems;
   }
 
   setPasswordForIdentity(identityName: string, password: string): void {

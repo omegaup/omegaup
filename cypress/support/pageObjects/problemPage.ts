@@ -1,4 +1,5 @@
-import { RunOptions } from '../types';
+import { ProblemOptions, RunOptions } from '../types';
+import { v4 as uuid } from 'uuid';
 
 export class ProblemPage {
   navigateToAllProblemsTab(): void {
@@ -30,7 +31,7 @@ export class ProblemPage {
     cy.get('[data-new-run]').click();
     cy.get('[name="language"]').select(runOptions.language);
     cy.fixture(runOptions.fixturePath).then((fileContent) => {
-      cy.get('.CodeMirror-line').type(fileContent);
+      cy.get('.CodeMirror-line').first().type(fileContent);
       cy.get('[data-submit-run]').click();
     });
 
@@ -45,7 +46,7 @@ export class ProblemPage {
   }
 
   verifySubmission(username: string): void {
-    cy.get('a[href="#runs"]').click();
+    cy.get('a.nav-link[href="#runs"]').click();
     cy.get(`[data-username=${username}]`).should('be.visible');
     cy.get('[data-run-status]').should('contain', 'AC');
   }
@@ -85,6 +86,23 @@ export class ProblemPage {
     );
     cy.get('[data-filter-submit-button]').click();
     cy.get('[data-problem-title-list]').should('not.exist');
+  }
+
+  generateProblemOptions(noOfProblems: number): ProblemOptions[] {
+    const problems: ProblemOptions[] = [];
+
+    for (let i = 0; i < noOfProblems; i++) {
+      const problemOptions: ProblemOptions = {
+        problemAlias: uuid().slice(0, 10),
+        tag: 'Recursion',
+        autoCompleteTextTag: 'recur',
+        problemLevelIndex: 0,
+      };
+
+      problems.push(problemOptions);
+    }
+
+    return problems;
   }
 }
 

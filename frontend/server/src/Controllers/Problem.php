@@ -21,9 +21,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ListItem=array{key: string, value: string}
- * @psalm-type ProblemListItem=array{accepted: int, alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}
+ * @psalm-type ProblemListItem=array{accepted: int, alias: string, can_be_removed?: bool, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}
  * @psalm-type Statements=array<string, string>
- * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
+ * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type ArenaProblemDetails=array{accepts_submissions: bool, alias: string, commit: string, input_limit: int, languages: list<string>, letter?: string, points: float, problem_id?: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>,  settings?: ProblemSettingsDistrib, source?: string, statement?: ProblemStatement, title: string, visibility: int}
  * @psalm-type BestSolvers=array{classname: string, language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ProblemCasesContents=array<string, array{contestantOutput?: string, in: string, out: string}>
@@ -2520,7 +2520,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param bool|null $show_solvers
      * @omegaup-request-param null|string $statement_type
      */
-    public static function apiDetails(\OmegaUp\Request $r): array {
+    public static function apiDetails(\OmegaUp\Request $r) {
         $showSolvers = $r->ensureOptionalBool('show_solvers') ?? false;
         $preventProblemsetOpen = $r->ensureOptionalBool(
             'prevent_problemset_open'
@@ -2620,6 +2620,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         bool $preventProblemsetOpen,
         ?string $contestAlias = null
     ): ?array {
+        if (is_null($problem->problem_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
         // Get the expected commit version.
         $commit = $problem->commit;
         $version = strval($problem->current_version);
@@ -2664,7 +2667,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         // Add the problem to the response
-        $response['problem_id'] = intval($problem->problem_id);
+        $response['problem_id'] = $problem->problem_id;
         $response['title'] = strval($problem->title);
         $response['alias'] = strval($problem->alias);
         $response['input_limit'] = $problem->input_limit;
@@ -2737,11 +2740,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             unset($response['source']);
         }
 
-        $problemsetId = !is_null(
-            $problemset
-        ) ? intval(
-            $problemset->problemset_id
-        ) : null;
+        $problemsetId = $problemset?->problemset_id ?? null;
 
         $isPracticeMode = false;
         $container = null;
@@ -2803,16 +2802,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         } elseif ($showSolvers) {
             $response['solvers'] = \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
-                intval($problem->problem_id)
+                $problem->problem_id
             );
         }
 
-        if (!is_null($loggedIdentity)) {
+        if (
+            !is_null(
+                $loggedIdentity
+            ) && !is_null(
+                $loggedIdentity->identity_id
+            )
+        ) {
             // Get all the available runs done by the current_user
             $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
-                intval($problem->problem_id),
+                $problem->problem_id,
                 $isPracticeMode ? null : $problemsetId,
-                intval($loggedIdentity->identity_id)
+                $loggedIdentity->identity_id
             );
 
             // Add each filtered run to an array
@@ -2826,15 +2831,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $response['runs'] = $results;
 
             \OmegaUp\DAO\ProblemViewed::MarkProblemViewed(
-                intval($loggedIdentity->identity_id),
-                intval($problem->problem_id)
+                $loggedIdentity->identity_id,
+                $problem->problem_id
             );
             if ($container instanceof \OmegaUp\DAO\VO\Contests) {
                 $lastRunTime = null;
 
-                if (($n = count($runsArray)) > 0) {
-                    $lastRun = $runsArray[$n - 1];
-                    $lastRunTime = $lastRun['time'];
+                if (count($runsArray) > 0) {
+                    $lastRunTime = max(
+                        array_map(
+                            fn($run) => $run['time'],
+                            $runsArray
+                        )
+                    );
                 }
                 $response['nextSubmissionTimestamp'] = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
                     $container,
@@ -2844,8 +2853,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
             // Fill nomination status
             $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
-                intval($problem->problem_id),
-                intval($loggedIdentity->user_id)
+                $problem->problem_id,
+                $loggedIdentity->user_id
             );
             $response['nominationStatus'] = [
                 'alreadyReviewed' => \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
@@ -3423,7 +3432,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ?string $language = null,
         ?int $identityId = null,
         ?int $offset = 0,
-        ?int $rowCount = 100
+        ?int $rowCount = 100,
+        ?string $execution = null,
+        ?string $output = null,
     ): array {
         // Get our runs
         [
@@ -3438,6 +3449,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             identityId: $identityId,
             offset: $offset,
             rowCount: $rowCount,
+            execution: $execution,
+            output: $output,
         );
 
         $allRuns = [];
@@ -3464,6 +3477,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $status
      * @omegaup-request-param null|string $username
      * @omegaup-request-param null|string $verdict
+     * @omegaup-request-param null|string $execution
+     * @omegaup-request-param null|string $output
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
@@ -3512,7 +3527,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $r->ensureOptionalString('language'),
                 !is_null($identity) ? intval($identity->identity_id) : null,
                 max($r->ensureOptionalInt('offset') ?? 0, 0),
-                $r->ensureOptionalInt('rowcount') ?? 100
+                $r->ensureOptionalInt('rowcount') ?? 100,
+                $r->ensureOptionalString('execution'),
+                $r->ensureOptionalString('output')
             );
         }
         // Get all the available runs
@@ -4176,6 +4193,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 public: false,
                 showUserTags: $problem->allow_user_add_tags
             );
+            $problemArray['can_be_removed'] = !\OmegaUp\DAO\Problems::hasSubmissionsOrHasBeenUsedInCoursesOrContests(
+                $problem
+            );
             $addedProblems[] = $problemArray;
         }
 
@@ -4255,6 +4275,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problem,
                 public: false,
                 showUserTags: $problem->allow_user_add_tags
+            );
+            $problemArray['can_be_removed'] = !\OmegaUp\DAO\Problems::hasSubmissionsOrHasBeenUsedInCoursesOrContests(
+                $problem
             );
             $addedProblems[] = $problemArray;
         }
@@ -4688,7 +4711,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         if (
             is_null($r->identity)
-            || is_null($r->identity->user_id)
             || is_null($problem->problem_id)
         ) {
             return $response;
@@ -4780,9 +4802,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $lastRunTime = null;
 
-        if (($n = count($runsPayload)) > 0) {
-            $lastRun = $runsPayload[$n - 1];
-            $lastRunTime = $lastRun['time'];
+        if (count($runsPayload) > 0) {
+            $lastRunTime = max(
+                array_map(
+                    fn($run) => $run['time'],
+                    $runsPayload
+                )
+            );
         }
 
         $nextSubmissionTimestamp = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
@@ -5906,11 +5932,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ];
             return $response;
         }
-        if (!\OmegaUp\Validators::alias($name)) {
+        try {
+            \OmegaUp\Validators::alias($name);
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $response['templateProperties']['payload']['error'] = [
-                'description' => \OmegaUp\Translations::getInstance()->get(
-                    'parameterInvalidAlias'
-                ),
+                'description' => $e->getErrorMessage(),
                 'field' => 'name',
             ];
             return $response;

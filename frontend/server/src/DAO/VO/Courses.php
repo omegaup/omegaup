@@ -34,6 +34,8 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         'languages' => true,
         'archived' => true,
         'minimum_progress_for_certificate' => true,
+        'certificates_status' => true,
+        'recommended' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -150,6 +152,16 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         if (isset($data['minimum_progress_for_certificate'])) {
             $this->minimum_progress_for_certificate = intval(
                 $data['minimum_progress_for_certificate']
+            );
+        }
+        if (isset($data['certificates_status'])) {
+            $this->certificates_status = is_scalar(
+                $data['certificates_status']
+            ) ? strval($data['certificates_status']) : '';
+        }
+        if (isset($data['recommended'])) {
+            $this->recommended = boolval(
+                $data['recommended']
             );
         }
     }
@@ -281,4 +293,18 @@ class Courses extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $minimum_progress_for_certificate = null;
+
+    /**
+     * Estado de la petición de generar diplomas
+     *
+     * @var string
+     */
+    public $certificates_status = 'uninitiated';
+
+    /**
+     * Mostrar el curso en la lista de cursos públicos, los cursos que no tengan la bandera encendida pueden ser cursos públicos pero no se mostrarán en la lista.
+     *
+     * @var bool
+     */
+    public $recommended = false;
 }

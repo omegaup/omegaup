@@ -196,6 +196,7 @@
               <th v-if="showUser">{{ T.contestParticipant }}</th>
               <th v-if="showContest">{{ T.wordsContest }}</th>
               <th v-if="showProblem">{{ T.wordsProblem }}</th>
+              <th hidden>{{ T.wordsStatus }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPoints }}</th>
               <th v-if="showPoints" class="numeric">{{ T.wordsPenalty }}</th>
               <th v-if="!showPoints" class="numeric">
@@ -304,6 +305,25 @@
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
               </td>
+              <td
+                :class="statusClass(run)"
+                data-run-status
+                class="text-center opacity-4 font-weight-bold"
+                hidden
+              >
+                <span class="mr-1">{{ status(run) }}</span>
+                <button
+                  v-if="!!statusHelp(run)"
+                  type="button"
+                  :data-content="statusHelp(run)"
+                  data-toggle="popover"
+                  data-trigger="focus"
+                  class="btn-outline-dark btn-sm"
+                  @click="showVerdictHelp"
+                >
+                  <font-awesome-icon :icon="['fas', 'question-circle']" />
+                </button>
+              </td>
               <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
               <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
               <td
@@ -352,10 +372,15 @@
                   @click="onRunDetails(run)"
                 >
                   <font-awesome-icon :icon="['fas', 'search-plus']" />
+                  <span
+                    v-if="run.suggestions && run.suggestions > 0"
+                    class="position-absolute badge badge-danger"
+                    >{{ run.suggestions }}
+                  </span>
                 </button>
                 <button
                   v-if="requestFeedback"
-                  class="details btn-outline-dark btn-sm"
+                  class="details btn-outline-dark btn-sm ml-1"
                   @click="$emit('request-feedback', run.guid)"
                 >
                   <font-awesome-icon
@@ -368,10 +393,25 @@
                 v-else-if="showDetails || showDisqualify || showRejudge"
                 :data-actions="run.guid"
               >
-                <div class="dropdown">
+                <div class="d-inline-block mr-2">
+                  <button
+                    class="details btn-outline-dark btn-sm"
+                    data-runs-show-details-button
+                    :data-run-details="run.guid"
+                    @click="onRunDetails(run)"
+                  >
+                    <font-awesome-icon :icon="['fas', 'search-plus']" />
+                    <span
+                      v-if="run.suggestions && run.suggestions > 0"
+                      class="position-absolute badge badge-danger"
+                      >{{ run.suggestions }}
+                    </span>
+                  </button>
+                </div>
+                <div class="dropdown d-inline-block">
                   <button
                     data-runs-actions-button
-                    class="btn-secondary dropdown-toggle"
+                    class="btn btn-secondary dropdown-toggle"
                     type="button"
                     data-toggle="dropdown"
                     aria-haspopup="true"
@@ -380,15 +420,6 @@
                     {{ T.arenaRunsActions }}
                   </button>
                   <div class="dropdown-menu">
-                    <button
-                      v-if="showDetails"
-                      data-runs-show-details-button
-                      :data-run-details="run.guid"
-                      class="btn-link dropdown-item"
-                      @click="onRunDetails(run)"
-                    >
-                      {{ T.arenaRunsActionsDetails }}
-                    </button>
                     <button
                       v-if="showRejudge"
                       :data-actions-rejudge="run.guid"
@@ -399,14 +430,21 @@
                     </button>
                     <template v-if="showDisqualify">
                       <div class="dropdown-divider"></div>
-                      <button
-                        v-if="run.type === 'normal'"
-                        :data-actions-disqualify="run.guid"
-                        class="btn-link dropdown-item"
-                        @click="$emit('disqualify', run)"
-                      >
-                        {{ T.arenaRunsActionsDisqualify }}
-                      </button>
+                      <template v-if="run.type === 'normal'">
+                        <button
+                          :data-actions-disqualify="run.guid"
+                          class="btn-link dropdown-item"
+                          @click="
+                            $emit('disqualify', {
+                              run,
+                              disqualificationType: DisqualificationType.ByGUID,
+                            })
+                          "
+                        >
+                          {{ T.arenaRunsActionsDisqualifyByGUID }}
+                        </button>
+                      </template>
+
                       <button
                         v-else-if="run.type === 'disqualified'"
                         :data-actions-requalify="run.guid"
@@ -457,6 +495,7 @@ import * as time from '../../time';
 import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import arena_RunDetailsPopup from './RunDetailsPopup.vue';
+import { DisqualificationType } from './Runs.vue';
 import omegaup_Overlay from '../Overlay.vue';
 
 import { PaginationPlugin } from 'bootstrap-vue';
@@ -547,7 +586,7 @@ export enum PopupDisplayed {
     'omegaup-user-username': user_Username,
   },
 })
-export default class Runs extends Vue {
+export default class RunsForCourses extends Vue {
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: true }) isProblemsetOpened!: boolean;
   @Prop({ default: false }) showContest!: boolean;
@@ -580,6 +619,7 @@ export default class Runs extends Vue {
   PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
+  DisqualificationType = DisqualificationType;
 
   filterLanguage: string = '';
   filterOffset: number = 0;
@@ -758,6 +798,50 @@ export default class Runs extends Vue {
     return `${(run.runtime / 1000).toFixed(2)} s`;
   }
 
+  showVerdictHelp(ev: Event): void {
+    $(ev.target as HTMLElement).popover('show');
+  }
+
+  statusClass(run: types.Run): string {
+    if (run.status != 'ready') return '';
+    if (run.type == 'disqualified') return 'status-disqualified';
+    if (run.verdict == 'AC') {
+      return 'status-ac';
+    }
+    if (run.verdict == 'CE') {
+      return 'status-ce';
+    }
+    if (run.verdict == 'JE' || run.verdict == 'VE') {
+      return 'status-je-ve';
+    }
+    return '';
+  }
+
+  status(run: types.Run): string {
+    if (run.type == 'disqualified') return T.arenaRunsActionsDisqualified;
+
+    return run.status == 'ready' ? run.verdict : run.status;
+  }
+
+  statusHelp(run: types.Run): string {
+    if (run.status != 'ready' || run.verdict == 'AC') {
+      return '';
+    }
+
+    if (run.language == 'kj' || run.language == 'kp') {
+      if (run.verdict == 'RTE' || run.verdict == 'RE') {
+        return T.verdictHelpKarelRTE;
+      } else if (run.verdict == 'TLE' || run.verdict == 'TO') {
+        return T.verdictHelpKarelTLE;
+      }
+    }
+    if (run.type == 'disqualified') return T.verdictHelpDisqualified;
+    const verdict = T[`verdict${run.verdict}`];
+    const verdictHelp = T[`verdictHelp${run.verdict}`];
+
+    return `${verdict}: ${verdictHelp}`;
+  }
+
   execution(run: types.Run): string {
     if (run.time < this.newFieldsLaunchDate) {
       return T.runDetailsNotAvailable;
@@ -828,7 +912,18 @@ export default class Runs extends Vue {
     if (scorePercentage !== '100.00') {
       return '';
     }
-
+    if (run.verdict == 'AC') {
+      return 'status-ac';
+    }
+    if (run.verdict == 'TLE') {
+      return 'status-tle';
+    }
+    if (run.verdict == 'MLE') {
+      return 'status-mle';
+    }
+    if (run.verdict == 'WA') {
+      return 'status-wa';
+    }
     return 'status-ac';
   }
 
@@ -978,10 +1073,10 @@ export default class Runs extends Vue {
       case 'contest':
         this.filterContest = '';
         break;
-      case 'Execution':
+      case 'execution':
         this.filterExecution = '';
         break;
-      case 'Output':
+      case 'output':
         this.filterOutput = '';
     }
     this.filters = this.filters.filter((item) => item.name !== filter);
@@ -1046,14 +1141,32 @@ export default class Runs extends Vue {
   background: var(--arena-runs-table-status-disqualified-background-color);
   color: var(--arena-runs-table-status-disqualified-font-color);
 }
+
 .status-je-ve {
   background: var(--arena-runs-table-status-je-ve-background-color);
   color: var(--arena-runs-table-status-je-ve-font-color);
 }
+
 .status-ac {
   background: var(--arena-runs-table-status-ac-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
 }
+
+.status-wa {
+  background: var(--arena-runs-table-status-wa-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+
+.status-mle {
+  background: var(--arena-runs-table-status-mle-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+
+.status-tle {
+  background: var(--arena-runs-table-status-tle-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+
 .status-ce {
   background: var(--arena-runs-table-status-ce-background-color);
   color: var(--arena-runs-table-status-ce-font-color);

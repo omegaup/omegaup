@@ -117,7 +117,7 @@
           <template #popup>
             <omegaup-arena-runsubmit-popup
               v-show="currentPopupDisplayed === PopupDisplayed.RunSubmit"
-              :preferred-language="problem.preferred_language"
+              :preferred-language="preferredLanguage"
               :languages="filteredLanguages"
               :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
               @dismiss="onPopupDismissed"
@@ -184,6 +184,7 @@
               :problem="problem"
               :can-submit="user.loggedIn && !inContestOrCourse"
               :accepted-languages="filteredLanguages"
+              :preferred-language="preferredLanguage"
             ></omegaup-arena-ephemeral-grader>
           </div>
           <div class="bg-white text-center p-4 d-sm-none border">
@@ -481,7 +482,7 @@ export default class ProblemDetails extends Vue {
   feedbackMap!: Map<number, ArenaCourseFeedback>;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
-  @Prop({ default: false }) useNewVerdictTable!: boolean;
+  @Prop({ default: true }) useNewVerdictTable!: boolean;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
@@ -520,6 +521,18 @@ export default class ProblemDetails extends Vue {
       },
     ];
     return tabs.filter((tab) => tab.visible);
+  }
+
+  get preferredLanguage(): null | string {
+    if (!(this.runs?.length > 0)) {
+      return this.problem.preferred_language ?? null;
+    }
+    const mostRecentRun = this.runs.reduce(function (prev, current) {
+      return prev && prev.time.getTime() > current.time.getTime()
+        ? prev
+        : current;
+    });
+    return mostRecentRun.language;
   }
 
   get clarificationsCount(): string {

@@ -37,6 +37,7 @@ describe('Edit.vue', () => {
           },
         },
         initialLanguage: 'es',
+        initialTab: 'edit',
       },
     });
 
@@ -48,12 +49,17 @@ describe('Edit.vue', () => {
     await wrapper.find('a[data-tab-solution]').trigger('click');
     await wrapper.find('a[data-tab-admins]').trigger('click');
     await wrapper.find('a[data-tab-tags]').trigger('click');
+    await wrapper.find('a[data-tab-edit]').trigger('click');
     await wrapper.find('a[data-tab-download]').trigger('click');
     expect(wrapper.find('.card-body .form .form-group button').text()).toBe(
       T.wordsDownload,
     );
     await wrapper.find('a[data-tab-delete]').trigger('click');
     expect(wrapper.find('.alert-heading').text()).toBe(T.wordsDangerZone);
-    await wrapper.find('a[data-tab-edit]').trigger('click');
+
+    const deleteModal = wrapper.find('b-modal-stub');
+    deleteModal.vm.$emit('ok');
+    expect(wrapper.emitted('remove')).toBeDefined();
+    expect(wrapper.emitted('remove')).toEqual([['problem-alias']]);
   });
 });

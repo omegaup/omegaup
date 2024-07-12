@@ -2,7 +2,7 @@
   <div class="course-edit">
     <div class="page-header">
       <h1>
-        {{ T.wordsEditCourse }}
+        {{ readOnly ? T.omegaupTitleCourseDetails : T.wordsEditCourse }}
         <span
           data-course-name
           :class="{ 'text-secondary': data.course.archived }"
@@ -16,7 +16,7 @@
         </small>
       </h1>
     </div>
-    <ul class="nav nav-pills mt-4">
+    <ul v-if="!readOnly" class="nav nav-pills mt-4">
       <li class="nav-item" role="presentation">
         <a
           href="#course"
@@ -96,6 +96,7 @@
           :course="data.course"
           :all-languages="data.allLanguages"
           :search-result-schools="searchResultSchools"
+          :read-only="readOnly"
           @emit-cancel="onCancel"
           @submit="(request) => $emit('submit-edit-course', request)"
           @update-search-result-schools="
@@ -243,6 +244,37 @@
             "
           ></omegaup-common-groupadmins>
         </div>
+        <div class="col-md-6">
+          <omegaup-common-teaching-assistants
+            :teaching-assistants="data.teachingAssistants"
+            :search-result-users="searchResultUsers"
+            @add-teaching-assistant="
+              (username) => $emit('add-teaching-assistant', username)
+            "
+            @remove-teaching-assistant="
+              (username) => $emit('remove-teaching-assistant', username)
+            "
+            @update-search-result-users="
+              (query) => $emit('update-search-result-users', query)
+            "
+          ></omegaup-common-teaching-assistants>
+        </div>
+        <div class="col-md-6">
+          <omegaup-common-group-teaching-assistants
+            :group-teaching-assistants="data.groupsTeachingAssistants"
+            :search-result-groups="searchResultGroups"
+            @add-group-teaching-assistant="
+              (groupAlias) => $emit('add-group-teaching-assistant', groupAlias)
+            "
+            @remove-group-teaching-assistant="
+              (groupAlias) =>
+                $emit('remove-group-teaching-assistant', groupAlias)
+            "
+            @update-search-result-groups="
+              (query) => $emit('update-search-result-groups', query)
+            "
+          ></omegaup-common-group-teaching-assistants>
+        </div>
       </div>
 
       <div v-if="showTab === 'clone'" class="tab-pane active" role="tabpanel">
@@ -292,6 +324,8 @@ import course_AdmissionMode from './AdmissionMode.vue';
 import course_AddStudents from './AddStudents.vue';
 import common_Admins from '../common/Admins.vue';
 import common_GroupAdmins from '../common/GroupAdmins.vue';
+import common_TeachingAssistants from '../common/TeachingAssistants.vue';
+import common_GroupTeachingAssistants from '../common/GroupTeachingAssistants.vue';
 import course_Clone from './Clone.vue';
 import course_GenerateLinkClone from './GenerateLinkClone.vue';
 import T from '../../lang';
@@ -340,6 +374,8 @@ const emptyAssignment: types.CourseAssignment = {
     'omegaup-course-add-students': course_AddStudents,
     'omegaup-common-admins': common_Admins,
     'omegaup-common-groupadmins': common_GroupAdmins,
+    'omegaup-common-teaching-assistants': common_TeachingAssistants,
+    'omegaup-common-group-teaching-assistants': common_GroupTeachingAssistants,
     'omegaup-course-clone': course_Clone,
     'omegaup-course-generate-link-clone': course_GenerateLinkClone,
   },
@@ -352,7 +388,10 @@ export default class CourseEdit extends Vue {
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() searchResultGroups!: types.ListItem[];
+  @Prop() searchResultTeachingAssistants!: types.ListItem[];
+  @Prop() searchResultGroupsTeachingAssistants!: types.ListItem[];
   @Prop() searchResultSchools!: types.SchoolListItem[];
+  @Prop() readOnly!: boolean;
 
   T = T;
   showTab = this.initialTab;

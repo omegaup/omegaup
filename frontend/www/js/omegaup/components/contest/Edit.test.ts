@@ -37,24 +37,34 @@ describe('Edit.vue', () => {
     title: 'contest test',
   };
 
+  const certificatesDetails: types.ContestCertificatesAdminDetails = {
+    certificateCutoff: 3,
+    certificatesStatus: 'uninitiated',
+    isCertificateGenerator: true,
+  };
+
   const propsData: {
     admins: types.ContestAdmin[];
     details: types.ContestAdminDetails;
+    initialTab: string;
     groups: types.ContestGroup[];
     groupAdmins: types.ContestGroupAdmin[];
     problems: types.ProblemsetProblemWithVersions[];
     requests: types.ContestRequest[];
     users: types.ContestUser[];
     originalContestAdmissionMode: null | string;
+    certificatesDetails: types.ContestCertificatesAdminDetails;
   } = {
     admins: [],
     details,
+    initialTab: 'clone',
     groupAdmins: [],
     groups: [],
     problems: [],
     requests: [],
     users: [],
     originalContestAdmissionMode: null,
+    certificatesDetails,
   };
   it('Should handle a normal contest', () => {
     const wrapper = shallowMount(contest_Edit, {
@@ -63,11 +73,12 @@ describe('Edit.vue', () => {
 
     expect(wrapper.text()).toContain(T.contestDetailsGoToContest);
 
-    expect(wrapper.vm.showTab).toBe('new_form');
+    expect(wrapper.vm.showTab).toBe('clone');
   });
 
   it('Should handle a virtual contest', () => {
     propsData.details.rerun_id = 2;
+    propsData.initialTab = '';
     const wrapper = shallowMount(contest_Edit, {
       propsData,
     });
@@ -77,6 +88,7 @@ describe('Edit.vue', () => {
 
   it('Should handle a virtual contest from an original private contest', () => {
     propsData.details.rerun_id = 2;
+    propsData.initialTab = '';
     propsData.originalContestAdmissionMode = 'private';
     const wrapper = shallowMount(contest_Edit, {
       propsData,

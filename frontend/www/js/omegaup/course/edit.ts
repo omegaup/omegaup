@@ -78,11 +78,14 @@ OmegaUp.on('ready', () => {
           })
           .catch(ui.apiError);
       },
-      refreshCourseAdmins: (): void => {
+      refreshCourseAdminsAndTeachingAssistants: (): void => {
         api.Course.admins({ course_alias: courseAlias })
           .then((response) => {
             courseEdit.data.admins = response.admins;
             courseEdit.data.groupsAdmins = response.group_admins;
+            courseEdit.data.teachingAssistants = response.teaching_assistants;
+            courseEdit.data.groupsTeachingAssistants =
+              response.group_teaching_assistants;
           })
           .catch(ui.apiError);
       },
@@ -115,6 +118,7 @@ OmegaUp.on('ready', () => {
           searchResultProblems: this.searchResultProblems,
           searchResultGroups: this.searchResultGroups,
           searchResultSchools: this.searchResultSchools,
+          readOnly: !this.data.course.is_admin && !this.data.course.is_curator,
         },
         on: {
           'update-search-result-groups': (query: string) => {
@@ -462,7 +466,18 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.adminAdded);
-                this.refreshCourseAdmins();
+                this.refreshCourseAdminsAndTeachingAssistants();
+              })
+              .catch(ui.apiError);
+          },
+          'add-teaching-assistant': (username: string) => {
+            api.Course.addTeachingAssistant({
+              course_alias: courseAlias,
+              usernameOrEmail: username,
+            })
+              .then(() => {
+                ui.success(T.courseEditTeachingAssistantAddedSuccesfully);
+                this.refreshCourseAdminsAndTeachingAssistants();
               })
               .catch(ui.apiError);
           },
@@ -472,8 +487,19 @@ OmegaUp.on('ready', () => {
               usernameOrEmail: username,
             })
               .then(() => {
-                this.refreshCourseAdmins();
+                this.refreshCourseAdminsAndTeachingAssistants();
                 ui.success(T.adminRemoved);
+              })
+              .catch(ui.apiError);
+          },
+          'remove-teaching-assistant': (username: string) => {
+            api.Course.removeTeachingAssistant({
+              course_alias: courseAlias,
+              usernameOrEmail: username,
+            })
+              .then(() => {
+                this.refreshCourseAdminsAndTeachingAssistants();
+                ui.success(T.courseEditTeachingAssistantRemovedSuccesfully);
               })
               .catch(ui.apiError);
           },
@@ -484,7 +510,18 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.groupAdminAdded);
-                this.refreshCourseAdmins();
+                this.refreshCourseAdminsAndTeachingAssistants();
+              })
+              .catch(ui.apiError);
+          },
+          'add-group-teaching-assistant': (groupAlias: string) => {
+            api.Course.addGroupTeachingAssistant({
+              course_alias: courseAlias,
+              group: groupAlias,
+            })
+              .then(() => {
+                ui.success(T.courseEditGroupTeachingAssistantAdded);
+                this.refreshCourseAdminsAndTeachingAssistants();
               })
               .catch(ui.apiError);
           },
@@ -494,8 +531,19 @@ OmegaUp.on('ready', () => {
               group: groupAlias,
             })
               .then(() => {
-                this.refreshCourseAdmins();
+                this.refreshCourseAdminsAndTeachingAssistants();
                 ui.success(T.groupAdminRemoved);
+              })
+              .catch(ui.apiError);
+          },
+          'remove-group-teaching-assistant': (groupAlias: string) => {
+            api.Course.removeGroupTeachingAssistant({
+              course_alias: courseAlias,
+              group: groupAlias,
+            })
+              .then(() => {
+                this.refreshCourseAdminsAndTeachingAssistants();
+                ui.success(T.courseEditGroupTeachingAssistantRemoved);
               })
               .catch(ui.apiError);
           },

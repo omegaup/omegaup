@@ -57,8 +57,10 @@ abstract class UserRank {
                     `school_id`,
                     `author_score`,
                     `author_ranking`,
-                    `classname`
+                    `classname`,
+                    `timestamp`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -97,6 +99,9 @@ abstract class UserRank {
                 null
             ),
             $User_Rank->classname,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $User_Rank->timestamp
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -126,7 +131,8 @@ abstract class UserRank {
                 `school_id` = ?,
                 `author_score` = ?,
                 `author_ranking` = ?,
-                `classname` = ?
+                `classname` = ?,
+                `timestamp` = ?
             WHERE
                 (
                     `user_id` = ?
@@ -155,6 +161,9 @@ abstract class UserRank {
                 intval($User_Rank->author_ranking)
             ),
             $User_Rank->classname,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $User_Rank->timestamp
+            ),
             (
                 is_null($User_Rank->user_id) ?
                 null :
@@ -191,7 +200,8 @@ abstract class UserRank {
                 `User_Rank`.`school_id`,
                 `User_Rank`.`author_score`,
                 `User_Rank`.`author_ranking`,
-                `User_Rank`.`classname`
+                `User_Rank`.`classname`,
+                `User_Rank`.`timestamp`
             FROM
                 `User_Rank`
             WHERE
@@ -313,7 +323,8 @@ abstract class UserRank {
                 `User_Rank`.`school_id`,
                 `User_Rank`.`author_score`,
                 `User_Rank`.`author_ranking`,
-                `User_Rank`.`classname`
+                `User_Rank`.`classname`,
+                `User_Rank`.`timestamp`
             FROM
                 `User_Rank`
         ';
@@ -375,8 +386,10 @@ abstract class UserRank {
                     `school_id`,
                     `author_score`,
                     `author_ranking`,
-                    `classname`
+                    `classname`,
+                    `timestamp`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -419,6 +432,9 @@ abstract class UserRank {
                 intval($User_Rank->author_ranking)
             ),
             $User_Rank->classname,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $User_Rank->timestamp
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

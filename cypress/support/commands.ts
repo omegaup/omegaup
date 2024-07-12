@@ -166,7 +166,7 @@ Cypress.Commands.add(
     cy.get('[data-new-run]').click();
     cy.get('[name="language"]').select(language);
     cy.fixture(fixturePath).then((fileContent) => {
-      cy.get('.CodeMirror-line').type(fileContent);
+      cy.get('.CodeMirror-line').first().type(fileContent);
       cy.get('[data-submit-run]').click();
     });
   },
@@ -225,11 +225,8 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('addProblemsToContest', ({ contestAlias, problems }) => {
-  cy.log(`Adding problems to contest ${contestAlias}`);
   cy.visit(`contest/${contestAlias}/edit/`);
-  cy.get('a[data-nav-contest-edit]').click();
-  cy.get('a.dropdown-item.problems').click();
-  cy.waitUntil(() => cy.get('.tags-input').should('be.visible'));
+  cy.get('a.nav-link.problems').click();
 
   cy.intercept({
     method: 'POST',
@@ -265,8 +262,7 @@ Cypress.Commands.add(
   'changeAdmissionModeContest',
   ({ contestAlias, admissionMode }) => {
     cy.visit(`contest/${contestAlias}/edit/`);
-    cy.get('a[data-nav-contest-edit]').click();
-    cy.get('a.dropdown-item.admission-mode').click();
+    cy.get('a.nav-link.admission-mode').click();
     cy.get('select[name="admission-mode"]').select(admissionMode); // private | registration | public
     cy.get('.change-admission-mode').click();
   },
@@ -279,17 +275,17 @@ Cypress.Commands.add('enterContest', ({ contestAlias }) => {
 
 Cypress.Commands.add(
   'createRunsInsideContest',
-  ({ contestAlias, problems, runs }) => {
-    const problem = problems[0];
-    if (!problem) {
-      return;
-    }
-    cy.visit(`/arena/${contestAlias}/#problems`);
-    cy.get(`a[data-problem="${problem.problemAlias}"]`).click();
-
+  ({ contestAlias, problems, runs, statusCheck = false }) => {
     for (const idx in runs) {
+      const problem = problems[idx];
+      if (!problem) {
+        return;
+      }
+      cy.visit(`/arena/${contestAlias}/#problems`);
+      cy.get(`a[data-problem="${problem.problemAlias}"]`).click();
+
       // Mocking date just a few seconds after to allow create new run
-      cy.clock(new Date(), ['Date']).then((clock) => clock.tick(3000));
+      cy.clock(new Date(), ['Date']).then((clock) => clock.tick(9000));
       cy.get('[data-new-run]').click();
       cy.get('[name="language"]').select(runs[idx].language);
 
@@ -297,7 +293,7 @@ Cypress.Commands.add(
       if (!runs[idx].valid) {
         cy.log('Only the first submission is created because of validations');
         cy.fixture(runs[idx].fixturePath).then((fileContent) => {
-          cy.get('.CodeMirror-line').type(fileContent);
+          cy.get('.CodeMirror-line').first().type(fileContent);
           cy.get('[data-submit-run]').should('be.disabled');
         });
         break;
@@ -306,28 +302,23 @@ Cypress.Commands.add(
       cy.intercept({ method: 'POST', url: '/api/run/create/' }).as('runCreate');
 
       cy.fixture(runs[idx].fixturePath).then((fileContent) => {
-        cy.get('.CodeMirror-line').type(fileContent);
+        cy.get('.CodeMirror-line').first().type(fileContent);
         cy.get('[data-submit-run]').click();
       });
 
-      cy.wait(['@runCreate'], { timeout: MAX_TIMEOUT_TO_WAIT })
+      if (statusCheck) {
+        continue;
+      }
+      const expectedStatus: Status = runs[idx].status;
+      cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
+
+      cy.wait(['@runStatus'], { timeout: 10000 })
         .its('response.statusCode')
         .should('eq', 200);
-
-      cy.waitUntil(() =>
-        cy.get('[data-run-status] > span').should('be.visible'),
-      );
-
-      const expectedStatus: Status = runs[idx].status;
-
-      cy.waitUntil(
-        () =>
-          cy
-            .get('[data-run-status] > span')
-            .first()
-            .should('have.text', expectedStatus),
-        { timeout: MAX_TIMEOUT_TO_WAIT },
-      );
+      cy.get('[data-run-status] > span')
+        .first()
+        .should('have.text', expectedStatus);
+      statusCheck = true;
     }
   },
 );
@@ -356,17 +347,27 @@ export const getISODateTime = (date: Date) => {
 /**
  * Return a date relative to another date
  * @param date original Date object
- * @param days number of days to add to the date
+ * @param object number of days, hours, minutes or seconds to add to the date
  * @returns Date Relative Date Object
  */
-export const addSubtractDaysToDate = (
+export const addSubtractDateTime = (
   date: Date,
-  { days }: { days: number },
+  {
+    days = 0,
+    hours = 0,
+    minutes = 0,
+    seconds = 0,
+  }: {
+    days?: number;
+    hours?: number;
+    minutes?: number;
+    seconds?: number;
+  },
 ): Date => {
-  if (days == 0) return date;
-  if (days < 0) {
-    return new Date(date.getTime() - 24 * 3600 * 1000);
-  }
-
-  return new Date(date.getTime() + 24 * 3600 * 1000);
+  const newDate = new Date(date.getTime());
+  newDate.setDate(newDate.getDate() + days);
+  newDate.setHours(newDate.getHours() + hours);
+  newDate.setMinutes(newDate.getMinutes() + minutes);
+  newDate.setSeconds(newDate.getSeconds() + seconds);
+  return newDate;
 };

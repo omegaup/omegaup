@@ -162,38 +162,31 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
      */
     final public static function isInsideSubmissionGap(
         \OmegaUp\DAO\VO\Submissions $submission,
-        ?int $problemsetId,
-        ?\OmegaUp\DAO\VO\Contests $contest,
         int $problemId,
-        int $identityId
+        int $identityId,
+        ?\OmegaUp\DAO\VO\Contests $contest = null
     ): bool {
+        $problemsetId = $contest?->problemset_id;
         // Acquire row-level locks using `FOR UPDATE` so that multiple
         // concurrent queries cannot all obtain the same submission time and
         // incorrectly insert several submissions, thinking that they were all
         // within the submission gap.
-        if (is_null($problemsetId)) {
-            $sql = '
-                SELECT
-                    MAX(s.time)
-                FROM
-                    Submissions s
-                WHERE
-                    s.identity_id = ? AND s.problem_id = ?
-                FOR UPDATE;
-            ';
-            $val = [$identityId, $problemId];
-        } else {
-            $sql = '
-                SELECT
-                    MAX(s.time)
-                FROM
-                    Submissions s
-                WHERE
-                    s.identity_id = ? AND s.problem_id = ? AND s.problemset_id = ?
-                FOR UPDATE;
-            ';
-            $val = [$identityId, $problemId, $problemsetId];
+        $problemsetIdFilter = '';
+        $val = [$identityId, $problemId];
+
+        if (!is_null($problemsetId)) {
+            $problemsetIdFilter = 'AND s.problemset_id = ?';
+            $val[] = $problemsetId;
         }
+
+        $sql = "SELECT
+                    MAX(s.time)
+                FROM
+                    Submissions s
+                WHERE
+                    s.identity_id = ? AND s.problem_id = ? {$problemsetIdFilter}
+                FOR UPDATE;
+        ";
 
         /** @var \OmegaUp\Timestamp|null */
         $lastRunTime = \OmegaUp\MySQLConnection::getInstance()->GetOne(
@@ -237,10 +230,12 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     }
 
     /**
-     * @return list<array{alias: string, classname: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}>
+     * @return list<array{alias: string, classname: string, guid: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}>
      */
     public static function getLatestSubmissions(
         int $identityId = null,
+        ?int $page = 1,
+        int $rowsPerPage = 100,
     ): array {
         if (is_null($identityId)) {
             $indexHint = 'USE INDEX(PRIMARY)';
@@ -251,6 +246,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             SELECT
                 s.`time`,
                 i.username,
+                s.guid,
                 s.school_id,
                 sc.name as school_name,
                 p.alias,
@@ -306,10 +302,12 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         $sql .= '
             ORDER BY
                 s.submission_id DESC
-            LIMIT 0, 100;
+            LIMIT ?, ?;
         ';
+        $params[] = max(0, $page - 1) * $rowsPerPage;
+        $params[] = intval($rowsPerPage);
 
-        /** @var list<array{alias: string, classname: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, guid: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
@@ -364,5 +362,53 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 $courseAlias
             ]
         );
+    }
+
+    /**
+     * @return list<\OmegaUp\DAO\VO\Submissions>
+     */
+    public static function getAllSubmissionsByUserContest(
+        string $username,
+        string $contestAlias,
+        ?string $problemAlias
+    ) {
+        $fields =  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Submissions::FIELD_NAMES,
+            's'
+        );
+        $clause = '';
+        $params = [
+            $username,
+            $contestAlias,
+        ];
+        if (!is_null($problemAlias)) {
+            $clause = 'AND p.alias = ?';
+            $params[] = $problemAlias;
+        }
+        $sql = "SELECT
+                    {$fields}
+                FROM
+                    Submissions s
+                INNER JOIN
+                    Identities i ON i.identity_id = s.identity_id
+                INNER JOIN
+                    Problems p ON p.problem_id = s.problem_id
+                INNER JOIN
+                    Problemsets ps ON ps.problemset_id = s.problemset_id
+                INNER JOIN
+                    Contests c ON c.contest_id = ps.contest_id
+                WHERE
+                    current_run_id IS NOT NULL
+                    AND username = ?
+                    AND c.alias = ?
+                    {$clause}";
+
+        /** @var list<array{current_run_id: int|null, guid: string, identity_id: int, language: string, problem_id: int, problemset_id: int|null, school_id: int|null, status: string, submission_id: int, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, verdict: string}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+        $submissions = [];
+        foreach ($rs as $submission) {
+            $submissions[] = new \OmegaUp\DAO\VO\Submissions($submission);
+        }
+        return $submissions;
     }
 }

@@ -8,7 +8,7 @@
     <template v-if="linkify">
       <a
         v-if="emitClickEvent"
-        href="#"
+        :href="href"
         :class="classname"
         :title="username"
         @click="$emit('click', username)"
@@ -44,6 +44,7 @@ export default class Username extends Vue {
   @Prop({ default: null }) name!: string;
   @Prop() classname!: string;
   @Prop() linkify!: boolean;
+  @Prop({ default: '#' }) href!: string;
   @Prop() country!: string;
   @Prop({ default: false }) emitClickEvent!: boolean;
 
@@ -58,6 +59,11 @@ export default class Username extends Vue {
 
 <style lang="scss" scope>
 @import '../../../../sass/main.scss';
+
+span {
+  text-wrap: balance;
+}
+
 .user-rank-unranked,
 .user-rank-beginner,
 .user-rank-specialist,

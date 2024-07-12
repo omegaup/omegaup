@@ -3,6 +3,7 @@ import { LoginOptions, RunOptions } from '../support/types';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { coursePage } from '../support/pageObjects/coursePage';
 import { contestPage } from '../support/pageObjects/contestPage';
+import { problemPage } from '../support/pageObjects/problemPage';
 
 describe('Basic Commands Test', () => {
   beforeEach(() => {
@@ -75,16 +76,15 @@ describe('Basic Commands Test', () => {
 
   it('Should create a problem', () => {
     const loginOptions = loginPage.registerMultipleUsers(1);
-    const problemOptions = contestPage.generateProblemOptions(1);
+    const problemOptions = problemPage.generateProblemOptions(1);
     cy.login(loginOptions[0]);
     cy.createProblem(problemOptions[0]);
-    coursePage.verifyProblem(problemOptions[0]);
     coursePage.verifyProblem(problemOptions[0]);
     cy.logout();
   });
 
   it('Should make a run of a problem', () => {
-    const problemOptions = contestPage.generateProblemOptions(1)[0];
+    const problemOptions = problemPage.generateProblemOptions(1)[0];
 
     const runOptions: RunOptions = {
       problemAlias: problemOptions.problemAlias,
@@ -106,7 +106,7 @@ describe('Basic Commands Test', () => {
     const contestOptions = contestPage.generateContestOptions(loginOptions[0]);
     const users = [loginOptions[1].username];
 
-    loginPage.giveAdminPrivilage(
+    loginPage.giveAdminPrivilege(
       'GroupIdentityCreator',
       loginOptions[0].username,
     );
