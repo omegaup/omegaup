@@ -5,6 +5,7 @@
 import JSZip from 'jszip';
 import Vue from 'vue';
 import pako from 'pako';
+import GoldenLayout from 'golden-layout';
 
 import * as Util from '../grader/util';
 import CaseSelectorComponent from '../grader/CaseSelectorComponent.vue';
@@ -13,8 +14,6 @@ import MonacoEditorComponent from '../grader/MonacoEditorComponent.vue';
 import SettingsComponent from '../grader/SettingsComponent.vue';
 import TextEditorComponent from '../grader/TextEditorComponent.vue';
 import ZipViewerComponent from '../grader/ZipViewerComponent.vue';
-
-// imports from new files
 import store from '../grader/GraderStore';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
