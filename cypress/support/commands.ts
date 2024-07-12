@@ -306,11 +306,19 @@ Cypress.Commands.add(
         cy.get('[data-submit-run]').click();
       });
 
+      // Wait until the run is created
+      cy.wait(['@runCreate'], { timeout: 10000 });
+
       if (statusCheck) {
         continue;
       }
+
+      // Check the status of the run
       const expectedStatus: Status = runs[idx].status;
-      cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
+      cy.intercept({
+        method: 'POST',
+        url: '/api/problemset/scoreboardEvents/',
+      }).as('runStatus');
 
       cy.wait(['@runStatus'], { timeout: 10000 })
         .its('response.statusCode')

@@ -133,7 +133,7 @@ describe('Basic Commands Test', () => {
   });
 
   // FIXME: @tech-debt Remove `only` when this test is fixed
-  it.only('Should create two contests and merge their scoreboard', () => {
+  it('Should create two contests and merge their scoreboard', () => {
     cy.log('Should create two contests and merge their scoreboard');
     const loginOptions = loginPage.registerMultipleUsers(4);
     const contestOptions1 = contestPage.generateContestOptions(loginOptions[1]);
