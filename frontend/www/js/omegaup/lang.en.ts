@@ -1814,6 +1814,7 @@ const translations: { [key: string]: string; } = {
   wordsDuration: "Length",
   wordsEdit: "Edit",
   wordsEditCourse: "Edit course",
+  wordsEmpty: "Empty",
   wordsEmptyAddStudentInput: "The input field is empty, please type a account name",
   wordsEnable: "Enable",
   wordsEndTime: "End",

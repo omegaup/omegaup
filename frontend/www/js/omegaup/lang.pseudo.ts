@@ -1814,6 +1814,7 @@ const translations: { [key: string]: string; } = {
   wordsDuration: "(L3ng7h)",
   wordsEdit: "(Edi7)",
   wordsEditCourse: "(Edi7 c0ur53)",
+  wordsEmpty: "(Emp7y)",
   wordsEmptyAddStudentInput: "(Th3 inpu7 fi31d i5 3mp7y, p13a53 7yp3 a acc0un7 nam3)",
   wordsEnable: "(Enab13)",
   wordsEndTime: "(End)",
