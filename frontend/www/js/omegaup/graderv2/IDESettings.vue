@@ -93,10 +93,12 @@
     <div class="form-row">
       <div class="form-group col-md-4">
         <label for="inputInteractive">{{ T.settingsInteractive }}</label>
-        <select v-model="interactive" class="form-control">
-          <option :value="false">{{ T.wordsNo }}</option>
-          <option :value="true">{{ T.wordsYes }}</option>
-        </select>
+        <omegaup-radio-swtich
+          :value.sync="interactive"
+          :selected-value="interactive"
+          :name="'interactive'"
+        >
+        </omegaup-radio-swtich>
       </div>
       <div v-if="interactive" class="form-group col-md-4">
         <label for="inputInteractiveModuleName">{{
@@ -117,9 +119,14 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import RadioSwitch from '../components/RadioSwitch.vue';
 import T from '../lang';
 
-@Component
+@Component({
+  components: {
+    'omegaup-radio-switch': RadioSwitch,
+  },
+})
 export default class IDESettings extends Vue {
   @Prop({ required: true }) store!: any;
   @Prop({ required: true }) storeMapping!: any;
