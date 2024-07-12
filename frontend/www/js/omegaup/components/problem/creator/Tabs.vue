@@ -31,7 +31,7 @@
     </b-tab>
     <b-tab>
       <template #title>
-        <BIconArrowUpRight class="mr-1" />
+        <BIconFileEarmarkCheck class="mr-1" />
         <span name="solution" data-tab> {{ T.problemCreatorSolution }}</span>
       </template>
       <omegaup-problem-creator-solution-tab

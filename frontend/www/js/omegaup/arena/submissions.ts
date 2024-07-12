@@ -69,7 +69,7 @@ export function submitRunFailed({
   errorname: string;
   run: types.Run;
 }): void {
-  ui.error(error ?? run);
+  alert(error ?? run);
   if (errorname) {
     ui.reportEvent('submission', 'submit-fail', errorname);
   }
