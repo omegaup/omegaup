@@ -76,7 +76,6 @@ export class ContestPage {
 
     cy.get('textarea[data-contestant-names]').type(users.join(', '));
     cy.clock().tick(1000);
-    // cy.wait(1000); // Wait for the textarea to be updated
     cy.get('.user-add-bulk').click();
     cy.waitUntil(() =>
       cy.get('[data-uploaded-contestants]').should('be.visible'),
