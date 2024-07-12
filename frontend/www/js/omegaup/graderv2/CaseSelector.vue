@@ -13,8 +13,7 @@
           class="list-group-item list-group-item-action disabled"
           type="button"
         >
-          <!-- TODO: use the empty word translation after the other components merge -->
-          <em>Empty</em>
+          <em>{{ T.wordsEmpty }}</em>
         </button>
         <template v-for="group in groups" v-else :title="name">
           <div
