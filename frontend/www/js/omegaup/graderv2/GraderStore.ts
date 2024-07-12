@@ -51,13 +51,16 @@ export interface GraderStore {
   showSubmitButton: boolean;
   updatingSettings: boolean;
 }
-// this type does not exist in types
 export interface SettingsCase {
   Name: string;
-  Cases: { Name: string; Weight: number }[];
   Weight: number;
 }
-
+// this type does not exist in types
+export interface SettingsCasesGroup {
+  Name: string;
+  Cases: SettingsCase[];
+  Weight: number;
+}
 const languageSelectElement = document.getElementById(
   'language',
 ) as HTMLSelectElement;
@@ -184,7 +187,7 @@ const storeOptions: StoreOptions<GraderStore> = {
     settingsCases(state: GraderStore) {
       // resultMap type is not present in types
       const resultMap: {
-        [key: string]: SettingsCase;
+        [key: string]: SettingsCasesGroup;
       } = {};
       for (const caseName in state.request.input.cases) {
         if (
@@ -209,11 +212,11 @@ const storeOptions: StoreOptions<GraderStore> = {
         resultMap[tokens[0]].Weight +=
           state.request.input.cases[caseName].weight || 0;
       }
-      const result: SettingsCase[] = [];
+      const result: SettingsCasesGroup[] = [];
       for (const groupName in resultMap) {
         if (!Object.prototype.hasOwnProperty.call(resultMap, groupName))
           continue;
-        resultMap[groupName].Cases.sort((a: any, b: any) => {
+        resultMap[groupName].Cases.sort((a: SettingsCase, b: SettingsCase) => {
           if (a.Name < b.Name) return -1;
           if (a.Name > b.Name) return 1;
           return 0;
@@ -399,7 +402,7 @@ const storeOptions: StoreOptions<GraderStore> = {
     clearOutputs(state: GraderStore) {
       Vue.set(state, 'outputs', {});
     },
-    output(state: GraderStore, payload: { name: CaseKey; contents: any }) {
+    output(state: GraderStore, payload: { name: CaseKey; contents: string }) {
       Vue.set(state.outputs, payload.name, payload.contents);
     },
     'request.input.validator.custom_validator.source'(
@@ -594,7 +597,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       Vue.delete(state.request.input.cases, name);
       state.dirty = true;
     },
-    limits(state: GraderStore, limits: types.LimitsSettings) {
+    limits(_state: GraderStore, limits: types.LimitsSettings) {
       store.commit(
         'MemoryLimit',
         Util.parseDuration(limits.MemoryLimit) * 1024,
