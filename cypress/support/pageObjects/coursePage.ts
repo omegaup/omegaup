@@ -280,7 +280,6 @@ export class CoursePage {
     cy.get('[data-notification-list]')
       .contains(problemAlias)
       .then((element) => {
-        console.log(element);
         cy.wrap(element).should('have.length', 1);
         cy.wrap(element).click({ force: true });
     });

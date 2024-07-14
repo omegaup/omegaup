@@ -282,7 +282,7 @@ describe('Course Test', () => {
     const suggestions: { line: number; text: string; }[] = [
       { line: 1, text: 'Solution is not optimal' },
       { line: 3, text: 'This code could be improved' },
-      { line: 5, text: 'This line could be removeds' },
+      { line: 5, text: 'This line could be removed' },
     ]
     coursePage.leaveFeedbackOnSolution(suggestions);
     cy.logout();
