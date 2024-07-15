@@ -64,7 +64,7 @@ import { omegaup } from '../../../../omegaup';
 import * as ui from '../../../../ui';
 import T from '../../../../lang';
 import creator_CodeView from '../../../arena/CodeView.vue';
-import { LanguageInfo, supportedLanguages } from '../../../../grader/util';
+import { LanguageInfo, supportedLanguages } from '../../../../graderv2/util';
 
 @Component({
   components: {
