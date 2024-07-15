@@ -3279,7 +3279,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Request feedback
+     * Request feedback and its corresponding notification
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -3362,8 +3362,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Submission::createOrUpdateFeedback(
             $r->identity,
             $submission,
-            $course,
-            $courseSubmissionInfo,
             $feedback
         );
 
