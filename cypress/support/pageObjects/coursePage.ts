@@ -287,7 +287,7 @@ export class CoursePage {
       'contain',
       feedback,
     );
-    cy.get('.CodeMirror-lines').should('be.visible');
+    cy.get('.CodeMirror-lines', { timeout: 10000 }).should('be.visible');
     cy.get('.CodeMirror-line').then((rawHTMLElements) => {
       const userCode: Array<string> = [];
       Cypress.$.makeArray(rawHTMLElements).forEach((element) => {
