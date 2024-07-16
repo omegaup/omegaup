@@ -93,12 +93,12 @@
     <div class="form-row">
       <div class="form-group col-md-4">
         <label for="inputInteractive">{{ T.settingsInteractive }}</label>
-        <omegaup-radio-swtich
+        <omegaup-radio-switch
           :value.sync="interactive"
           :selected-value="interactive"
-          :name="'interactive'"
+          name="interactive"
         >
-        </omegaup-radio-swtich>
+        </omegaup-radio-switch>
       </div>
       <div v-if="interactive" class="form-group col-md-4">
         <label for="inputInteractiveModuleName">{{
