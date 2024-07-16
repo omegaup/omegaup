@@ -217,7 +217,7 @@ export class CoursePage {
     cy.get('[data-clarification-answer-text]').should('contain', answer);
   }
 
-  leaveFeedbackOnSolution(feedback: string): void {
+  leaveFeedbackOnSolution(feedbacks: { line: number, text: string }[]): void {
     cy.get('[data-course-submisson-button]').click();
     cy.get('[data-runs-actions-button]').click();
     cy.get('[data-runs-show-details-button]').click();
@@ -227,28 +227,40 @@ export class CoursePage {
       .then((editor) => {
         cy.wrap(editor).should('be.visible');
 
-        const gutter = editor.find('.CodeMirror-gutters .CodeMirror-linenumbers');
+        feedbacks.forEach(({ line, text }) => {
+          const gutterLines = editor.find('.CodeMirror-gutter-wrapper .CodeMirror-linenumber');
 
-        expect(gutter.length).to.be.greaterThan(0);
+          // Ensure we have enough gutters
+          expect(gutterLines.length).to.be.greaterThan(line);
 
-        gutter[0].scrollIntoView();
+          const gutter = gutterLines[line];
+          cy.wrap(gutter).scrollIntoView();
+          cy.wrap(gutter).click({ force: true });
 
-        cy.wrap(gutter.first()).click({ force: true });
+          cy.waitUntil(() =>
+            cy.get('.card-body > textarea').should('be.visible'),
+          );
 
-        cy.get('.card-body > textarea').type(feedback);
+          cy.get('.card-body > textarea').type(text);
 
-        cy.get('[data-button-submit]').click();
-        cy.get('.card-body [data-markdown-statement]').should('contain', feedback);
+          cy.get('[data-button-submit]').click();
+          cy.get('.card-body [data-markdown-statement]').should(
+            'contain',
+            text,
+          );
+        });
+
         cy.get('[data-button-send-feedback]').click();
 
         cy.get('[data-runs-actions-button]').click();
-
         cy.get('[data-runs-show-details-button]').click();
 
-        cy.get('.CodeMirror-linewidget [data-markdown-statement]').should(
-          'contain',
-          feedback,
-        );
+        feedbacks.forEach(({ text }) => {
+          cy.get('.CodeMirror-linewidget [data-markdown-statement]').should(
+            'contain',
+            text,
+          );
+        });
         cy.get('[data-overlay-popup] button.close')
           .should('be.visible')
           .first()
@@ -256,9 +268,21 @@ export class CoursePage {
     });
   }
 
-  verifyFeedback(feedback: string): void {
+  verifyFeedback({
+    feedback,
+    problemAlias,
+  }: {
+    feedback: string;
+    problemAlias: string;
+  }): void {
     cy.get('.notification-toggle').last().click();
-    cy.get('[data-notification-list]').filter(':visible').first().click();
+
+    cy.get('[data-notification-list]')
+      .contains(problemAlias)
+      .then((element) => {
+        cy.wrap(element).should('have.length', 1);
+        cy.wrap(element).click({ force: true });
+    });
     cy.get('.CodeMirror-linewidget [data-markdown-statement]').should(
       'contain',
       feedback,

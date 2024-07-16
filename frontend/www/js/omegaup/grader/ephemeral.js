@@ -13,17 +13,12 @@ import TextEditorComponent from './TextEditorComponent.vue';
 import ZipViewerComponent from './ZipViewerComponent.vue';
 
 // imports from new files
-import * as Templates from './GraderTemplates';
 import store from './GraderStore';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
 const theme = document.getElementById('theme').value;
 let isInitialised = false;
 
-const originalInteractiveTemplates = {
-  ...Templates.originalInteractiveTemplates,
-};
-const interactiveTemplates = { ...originalInteractiveTemplates };
 const languageExtensionMapping = Object.fromEntries(
   Object.entries(Util.supportedLanguages).map(([key, value]) => [
     key,
@@ -233,49 +228,6 @@ const goldenLayoutSettings = {
     },
   ],
 };
-const validatorSettings = {
-  type: 'component',
-  componentName: 'monaco-editor-component',
-  componentState: {
-    storeMapping: {
-      contents: 'request.input.validator.custom_validator.source',
-      language: 'request.input.validator.custom_validator.language',
-    },
-    initialModule: 'validator',
-    theme,
-  },
-  id: 'validator',
-  isClosable: false,
-};
-const interactiveIdlSettings = {
-  type: 'component',
-  componentName: 'monaco-editor-component',
-  componentState: {
-    storeMapping: {
-      contents: 'request.input.interactive.idl',
-      module: 'request.input.interactive.module_name',
-    },
-    initialLanguage: 'idl',
-    readOnly: isEmbedded,
-    theme,
-  },
-  id: 'interactive-idl',
-  isClosable: false,
-};
-const interactiveMainSourceSettings = {
-  type: 'component',
-  componentName: 'monaco-editor-component',
-  componentState: {
-    storeMapping: {
-      contents: 'request.input.interactive.main_source',
-      language: 'request.input.interactive.language',
-    },
-    initialModule: 'Main',
-    theme,
-  },
-  id: 'interactive-main-source',
-  isClosable: false,
-};
 
 // eslint-disable-next-line no-undef
 const layout = new GoldenLayout(
@@ -361,57 +313,6 @@ RegisterVueComponent(
 
 function initialize() {
   layout.init();
-
-  // is custome validator this like another mode other than
-  // interactive and non interactive problems?
-  let sourceAndSettings = layout.root.getItemsById('source-and-settings')[0];
-  if (store.getters.isCustomValidator) {
-    const activeContentItem = sourceAndSettings.getActiveContentItem();
-    sourceAndSettings.addChild(validatorSettings);
-    if (activeContentItem) {
-      sourceAndSettings.setActiveContentItem(activeContentItem);
-    }
-  }
-  store.watch(
-    Object.getOwnPropertyDescriptor(store.getters, 'isCustomValidator').get,
-    function (value) {
-      if (value) {
-        const activeContentItem = sourceAndSettings.getActiveContentItem();
-        sourceAndSettings.addChild(validatorSettings);
-        if (activeContentItem) {
-          sourceAndSettings.setActiveContentItem(activeContentItem);
-        }
-      } else {
-        layout.root.getItemsById(validatorSettings.id)[0].remove();
-      }
-    },
-  );
-  if (store.getters.isInteractive) {
-    const activeContentItem = sourceAndSettings.getActiveContentItem();
-    sourceAndSettings.addChild(interactiveIdlSettings);
-    sourceAndSettings.addChild(interactiveMainSourceSettings);
-    if (activeContentItem) {
-      sourceAndSettings.setActiveContentItem(activeContentItem);
-    }
-  }
-  // if we load an interactive problem from a list like a course or
-  // a contest make sure to change to interactive settings
-  store.watch(
-    Object.getOwnPropertyDescriptor(store.getters, 'isInteractive').get,
-    function (value) {
-      if (value) {
-        const activeContentItem = sourceAndSettings.getActiveContentItem();
-        sourceAndSettings.addChild(interactiveIdlSettings);
-        sourceAndSettings.addChild(interactiveMainSourceSettings);
-        if (activeContentItem) {
-          sourceAndSettings.setActiveContentItem(activeContentItem);
-        }
-      } else {
-        layout.root.getItemsById(interactiveIdlSettings.id)[0].remove();
-        layout.root.getItemsById(interactiveMainSourceSettings.id)[0].remove();
-      }
-    },
-  );
 
   if (isEmbedded) {
     // Embedded layout should not be able to modify the settings.
@@ -633,9 +534,10 @@ document.getElementById('upload').addEventListener('change', (e) => {
               .file(fileName)
               .async('string')
               .then((value) => {
-                store.commit('Interactive', true);
-                store.commit('InteractiveModuleName', moduleName);
-                store.commit('request.input.interactive.idl', value);
+                store.commit('Interactive', {
+                  idl: value,
+                  module_name: moduleName,
+                });
               })
               .catch(Util.asyncError);
           } else if (fileName.startsWith('interactive/Main.')) {
@@ -651,9 +553,10 @@ document.getElementById('upload').addEventListener('change', (e) => {
               .file(fileName)
               .async('string')
               .then((value) => {
-                store.commit('Interactive', true);
-                store.commit('InteractiveLanguage', extension);
-                store.commit('request.input.interactive.main_source', value);
+                store.commit('Interactive', {
+                  language: extension,
+                  main_source: value,
+                });
               })
               .catch(Util.asyncError);
           }
@@ -901,24 +804,9 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
   if (!settings || !alias) {
     return;
   }
-  // this will get saved in session storage when setting alias
-  if (settings.interactive) {
-    for (let language in settings.interactive.templates) {
-      if (
-        Object.prototype.hasOwnProperty.call(
-          settings.interactive.templates,
-          language,
-        )
-      ) {
-        interactiveTemplates[language] =
-          settings.interactive.templates[language];
-      } else {
-        interactiveTemplates[language] = originalInteractiveTemplates[language];
-      }
-    }
-  }
   store.commit('updatingSettings', true);
 
+  store.commit('Interactive', settings.interactive);
   store.commit('alias', alias);
   store.commit('languages', languages);
   store.commit('showSubmitButton', showSubmitButton);
@@ -926,29 +814,6 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
   store.commit('Validator', settings.validator.name);
   store.commit('Tolerance', settings.validator.tolerance);
 
-  for (let name in store.state.request.input.cases) {
-    store.commit('removeCase', name);
-  }
-  // create sample case if there are no cases for the problem
-  if (!Object.keys(settings.cases).length) {
-    store.commit('createCase', {
-      name: 'sample',
-      in: '1 2\n',
-      out: '3\n',
-      weight: 1,
-    });
-  }
-  // if the problem is interactive, we need to init remaining settings
-  store.commit('Interactive', !!settings.interactive);
-  if (settings.interactive) {
-    store.commit('InteractiveLanguage', settings.interactive.language);
-    store.commit('InteractiveModuleName', settings.interactive.module_name);
-    store.commit('request.input.interactive.idl', settings.interactive.idl);
-    store.commit(
-      'request.input.interactive.main_source',
-      settings.interactive.main_source,
-    );
-  }
   // create cases for current problem
   for (let caseName in settings.cases) {
     if (!Object.prototype.hasOwnProperty.call(settings.cases, caseName))
@@ -960,6 +825,12 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
       in: caseData['in'],
       out: caseData['out'],
     });
+  }
+  // delete cases that are not in settings cases
+  for (let caseName of Object.keys(store.state.request.input.cases)) {
+    if (Object.prototype.hasOwnProperty.call(settings.cases, caseName))
+      continue;
+    store.commit('removeCase', caseName);
   }
   // Given that the current case will change several times, schedule the
   // flag to avoid swapping into the cases view for the next tick.
