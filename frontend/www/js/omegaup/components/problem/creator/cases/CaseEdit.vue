@@ -43,7 +43,7 @@
     <hr class="border-top my-2" />
     <div>
       <table class="table">
-        <tbody v-sortable="{ onUpdate: updateLinesOrder }">
+        <tbody>
           <tr v-for="line in getLinesFromSelectedCase">
             <td>
               <b-container fluid class="bg-light">
