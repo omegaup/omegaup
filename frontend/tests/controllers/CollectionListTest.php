@@ -174,7 +174,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'nomination' => 'quality_tag',
                 'contents' => json_encode([
                     'quality_seal' => true,
-                    'tag' => $problemTags['level'],
+                    'tag' => $problemTags['tags'][0],
                 ]),
             ]));
         }
