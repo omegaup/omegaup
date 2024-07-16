@@ -13,7 +13,7 @@ class Notification extends \OmegaUp\Controllers\Controller {
      * Creates a new notification for an arbitrary request for access from a
      * contest user
      */
-    public static function createForArbitrateRequest(
+    public static function createForCourseAccessRequest(
         \OmegaUp\DAO\VO\Contests $contest,
         int $userId,
         bool $isAccepted

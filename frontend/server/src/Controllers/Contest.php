@@ -4658,7 +4658,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             return $response;
         }
 
-        \OmegaUp\Controllers\Notification::createForArbitrateRequest(
+        \OmegaUp\Controllers\Notification::createForCourseAccessRequest(
             $contest,
             $targetIdentity->user_id,
             $request->accepted
