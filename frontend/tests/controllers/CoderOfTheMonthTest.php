@@ -28,20 +28,23 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $runCreationDate = date('Y-m-d', \OmegaUp\Time::get());
         }
         $contest = \OmegaUp\Test\Factories\Contest::createContest();
-        $problem = \OmegaUp\Test\Factories\Problem::createProblem(
-            new \OmegaUp\Test\Factories\ProblemParams([
-                'quality_seal' => $quality,
-            ])
-        );
-        \OmegaUp\Test\Factories\Contest::addProblemToContest(
-            $problem,
-            $contest
-        );
+        $problems = [];
+        foreach (range(0, $numRuns - 1) as $index) {
+            $problems[$index] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'quality_seal' => $quality,
+                ])
+            );
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
+                $problems[$index],
+                $contest
+            );
+        }
         \OmegaUp\Test\Factories\Contest::addUser($contest, $identity);
 
-        foreach (range(0, $numRuns - 1) as $_) {
+        foreach (range(0, $numRuns - 1) as $index) {
             $runData = \OmegaUp\Test\Factories\Run::createRun(
-                $problem,
+                $problems[$index],
                 $contest,
                 $identity
             );
@@ -152,7 +155,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // First user solves two problems, second user solves just one, third
         // solves same problems than first.
-        $runCreationDate = self::setFirstDayOfTheMonth();
+        $runCreationDate = self::setFirstDayOfTheLastMonth();
 
         $this->createRuns($identity, $runCreationDate, numRuns: 1);
         $this->createRuns($identity, $runCreationDate, numRuns: 1);
@@ -167,7 +170,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $identity->username,
             $response['coderinfo']['username']
         );
-        $this->assertFalse(array_key_exists('email', $response['coderinfo']));
+        $this->assertArrayNotHasKey('email', $response['coderinfo']);
 
         // Calling API again to verify response is the same that in first time
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
@@ -225,7 +228,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // First user solves two problems, second user solves just one, third
         // solves same problems than first.
-        $runCreationDate = self::setFirstDayOfTheMonth();
+        $runCreationDate = self::setFirstDayOfTheLastMonth();
 
         $this->createRuns($identity, $runCreationDate, numRuns: 1);
         $this->createRuns($identity, $runCreationDate, numRuns: 1);
@@ -254,7 +257,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $identity->username,
             $response['coderinfo']['username']
         );
-        $this->assertFalse(array_key_exists('email', $response['coderinfo']));
+        $this->assertArrayNotHasKey('email', $response['coderinfo']);
 
         // Calling API again to verify response is the same that in first time
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
@@ -864,7 +867,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // First user solves two problems, second user solves just one, third
         // solves same problems than first.
-        $runCreationDate = self::setFirstDayOfTheMonth();
+        $runCreationDate = self::setFirstDayOfTheLastMonth();
 
         $this->createRuns($user1, $runCreationDate, numRuns: 1);
         $this->createRuns($user1, $runCreationDate, numRuns: 1);
@@ -965,7 +968,102 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    private static function setFirstDayOfTheMonth() {
+    /**
+     * Test the behavior of the API when there are nore than one codersin the
+     * first place of the ranking through the month
+     *
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testMultipleCodersOfTheMonth(string $category) {
+        $gender = $category == 'all' ? 'male' : 'female';
+        // Create a submissions mapping for different users
+        $submissionsMapping = [
+            [
+                ['username' => 'user1', 'numRuns' => 2, 'problemsSolved' => 2, 'cumulativePoints' => 200, 'expectedPosition' => 3],
+                ['username' => 'user2', 'numRuns' => 3, 'problemsSolved' => 3, 'cumulativePoints' => 300, 'expectedPosition' => 2],
+                ['username' => 'user3', 'numRuns' => 4, 'problemsSolved' => 4, 'cumulativePoints' => 400, 'expectedPosition' => 1],
+                ['username' => 'user4', 'numRuns' => 6, 'problemsSolved' => 6, 'cumulativePoints' => 600, 'expectedPosition' => 0],
+                ['username' => 'user5', 'numRuns' => 1, 'problemsSolved' => 1, 'cumulativePoints' => 100, 'expectedPosition' => 4],
+            ],
+            [
+                ['username' => 'user1', 'numRuns' => 4, 'problemsSolved' => 6, 'cumulativePoints' => 600,  'expectedPosition' => 1],
+                ['username' => 'user2', 'numRuns' => 1, 'problemsSolved' => 4, 'cumulativePoints' => 400,  'expectedPosition' => 3],
+                ['username' => 'user3', 'numRuns' => 1, 'problemsSolved' => 5, 'cumulativePoints' => 500,  'expectedPosition' => 2],
+                ['username' => 'user4', 'numRuns' => 2, 'problemsSolved' => 8, 'cumulativePoints' => 800,  'expectedPosition' => 0],
+                ['username' => 'user5', 'numRuns' => 2, 'problemsSolved' => 3, 'cumulativePoints' => 300,  'expectedPosition' => 4],
+            ],
+            [
+                ['username' => 'user1', 'numRuns' => 1, 'problemsSolved' => 7, 'cumulativePoints' => 700,  'expectedPosition' => 1],
+                ['username' => 'user2', 'numRuns' => 2, 'problemsSolved' => 6, 'cumulativePoints' => 600,  'expectedPosition' => 3],
+                ['username' => 'user3', 'numRuns' => 0, 'problemsSolved' => 5, 'cumulativePoints' => 700,  'expectedPosition' => 2],
+                ['username' => 'user4', 'numRuns' => 3, 'problemsSolved' => 11, 'cumulativePoints' => 1100, 'expectedPosition' => 0],
+                ['username' => 'user5', 'numRuns' => 1, 'problemsSolved' => 2, 'cumulativePoints' => 400,  'expectedPosition' => 4],
+            ],
+            [
+                ['username' => 'user1', 'numRuns' => 1, 'problemsSolved' => 8, 'cumulativePoints' => 800,  'expectedPosition' => 4],
+                ['username' => 'user2', 'numRuns' => 4, 'problemsSolved' => 10, 'cumulativePoints' => 1000, 'expectedPosition' => 2],
+                ['username' => 'user3', 'numRuns' => 4, 'problemsSolved' => 9, 'cumulativePoints' => 1100,  'expectedPosition' => 1],
+                ['username' => 'user4', 'numRuns' => 1, 'problemsSolved' => 12, 'cumulativePoints' => 1200, 'expectedPosition' => 0],
+                ['username' => 'user5', 'numRuns' => 5, 'problemsSolved' => 7, 'cumulativePoints' => 900,  'expectedPosition' => 3],
+            ],
+            [
+                ['username' => 'user1', 'numRuns' => 1, 'problemsSolved' => 9, 'cumulativePoints' => 900,  'expectedPosition' => 4],
+                ['username' => 'user2', 'numRuns' => 0, 'problemsSolved' => 10, 'cumulativePoints' => 1000, 'expectedPosition' => 3],
+                ['username' => 'user3', 'numRuns' => 2, 'problemsSolved' => 11, 'cumulativePoints' => 1100, 'expectedPosition' => 2],
+                ['username' => 'user4', 'numRuns' => 0, 'problemsSolved' => 12, 'cumulativePoints' => 1200, 'expectedPosition' => 1],
+                ['username' => 'user5', 'numRuns' => 6, 'problemsSolved' => 13, 'cumulativePoints' => 1300, 'expectedPosition' => 0],
+            ],
+        ];
+
+        foreach ($submissionsMapping[0] as $index => $user) {
+            [
+                'identity' => $identity[$index],
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams(
+                    ['username' => $user['username']]
+                )
+            );
+            self::updateIdentity($identity[$index], $gender);
+        }
+        $runCreationDate = self::setFirstDayOfTheCurrentMonth();
+        foreach ($submissionsMapping as $submissions) {
+            foreach ($submissions as $index => $submission) {
+                $this->createRuns(
+                    $identity[$index],
+                    $runCreationDate,
+                    $submission['numRuns']
+                );
+            }
+            $runCreationDate = date(
+                'Y-m-d',
+                strtotime(
+                    $runCreationDate . ' +1 day'
+                )
+            );
+
+            \OmegaUp\Test\Utils::runUpdateRanks();
+            $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'category' => $category,
+                ])
+            )['templateProperties']['payload'];
+
+            foreach ($response['candidatesToCoderOfTheMonth'] as $index => $candidate) {
+                $expectedCandidates = array_filter(
+                    $submissions,
+                    fn($element) => $element['expectedPosition'] === $index
+                );
+                $expectedCandidate = array_pop($expectedCandidates);
+                $this->assertSame(
+                    $expectedCandidate['username'],
+                    $candidate['username'],
+                    "Failed in the iteration for the day {$runCreationDate}, user {$candidate['username']}"
+                );
+            }
+        }
+    }
+
+    private static function setFirstDayOfTheLastMonth() {
         return (new DateTimeImmutable(
             date(
                 'Y-m-d',
@@ -973,6 +1071,19 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             )
         ))->modify(
             'first day of last month'
+        )->format(
+            'Y-m-d'
+        );
+    }
+
+    private static function setFirstDayOfTheCurrentMonth() {
+        return (new DateTimeImmutable(
+            date(
+                'Y-m-d',
+                \OmegaUp\Time::get()
+            )
+        ))->modify(
+            'first day of this month'
         )->format(
             'Y-m-d'
         );
