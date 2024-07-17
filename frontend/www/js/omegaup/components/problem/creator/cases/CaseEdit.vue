@@ -93,11 +93,13 @@
                       variant="light"
                     >
                       <b-dropdown-item
-                        v-for="lineoption in lineOptions"
-                        :key="lineoption.kind"
-                        @click="line.data.kind = lineoption.kind"
+                        v-for="lineKindoption in lineKindOptions"
+                        :key="lineKindoption.kind"
+                        @click="
+                          editLineKind([line.lineID, lineKindoption.kind])
+                        "
                       >
-                        {{ lineoption.type }}
+                        {{ lineKindoption.type }}
                       </b-dropdown-item>
                     </b-dropdown>
                     <b-button
@@ -109,9 +111,151 @@
                       type="button"
                       :title="T.problemCreatorLineEdit"
                       variant="light"
+                      @click="editModalState(line.data.kind)"
                     >
                       <BIconPencilSquare variant="info" font-scale="1.20" />
                     </b-button>
+                    <b-modal
+                      v-if="line.data.kind === 'array'"
+                      v-model="arrayModalEdit"
+                      :title="T.arrayEditTitle"
+                      :ok-title="T.arrayModalSave"
+                      ok-variant="success"
+                      :cancel-title="T.arrayModalBack"
+                      cancel-variant="danger"
+                      @ok="
+                        editLineValue([line.lineID, arrayModalEditArray]);
+                        arrayModalEditArray = '';
+                      "
+                    >
+                      <b-container>
+                        <b-row class="mb-4">
+                          <b-col>
+                            {{ T.arrayModalSize }}
+                            <b-form-input v-model="line.data.size" />
+                          </b-col>
+                          <b-col>
+                            {{ T.arrayModalMinimum }}
+                            <b-form-input v-model="line.data.min" />
+                          </b-col>
+                          <b-col>
+                            {{ T.arrayModalMaximum }}
+                            <b-form-input v-model="line.data.max" />
+                          </b-col>
+                        </b-row>
+                        <b-row class="mt-2 mb-4">
+                          <b-col>
+                            <b-form-checkbox v-model="line.data.distinct">
+                              {{ T.arrayModalDistinctValues }}
+                            </b-form-checkbox>
+                          </b-col>
+                        </b-row>
+                        <b-row class="mt-4">
+                          <b-col>
+                            <b-button
+                              variant="primary"
+                              @click="
+                                arrayModalEditArray = getArrayContent(
+                                  line.data.size,
+                                  line.data.min,
+                                  line.data.max,
+                                  line.data.distinct,
+                                )
+                              "
+                              >{{ T.arrayModalGenerate }}</b-button
+                            >
+                          </b-col>
+                        </b-row>
+                        <hr />
+                        {{ T.arrayModalGeneratedArray }}
+                        <b-form-input
+                          v-model="arrayModalEditArray"
+                          class="w-100"
+                        />
+                      </b-container>
+                    </b-modal>
+                    <b-modal
+                      v-if="line.data.kind === 'matrix'"
+                      v-model="matrixModalEdit"
+                      :title="T.matrixEditTitle"
+                      :ok-title="T.matrixModalSave"
+                      ok-variant="success"
+                      :cancel-title="T.matrixModalBack"
+                      cancel-variant="danger"
+                      @ok="
+                        editLineValue([line.lineID, matrixModalEditArray]);
+                        matrixModalEditArray = '';
+                      "
+                    >
+                      <b-container>
+                        <b-row class="mb-4">
+                          <b-col>
+                            {{ T.matrixModalRows }}
+                            <b-form-input v-model="line.data.rows" />
+                          </b-col>
+                          <b-col>
+                            {{ T.matrixModalColumns }}
+                            <b-form-input v-model="line.data.cols" />
+                          </b-col>
+                          <b-col>
+                            {{ T.matrixModalMinimum }}
+                            <b-form-input v-model="line.data.min" />
+                          </b-col>
+                          <b-col>
+                            {{ T.matrixModalMaximum }}
+                            <b-form-input v-model="line.data.max" />
+                          </b-col>
+                        </b-row>
+                        <b-row class="mt-2 mb-4">
+                          <b-col>
+                            <div class="mb-1 font-weight-bold">Distinct</div>
+                            <b-dropdown
+                              :text="
+                                getDistinctNameFromType(line.data.distinct)
+                              "
+                              variant="light"
+                            >
+                              <b-dropdown-header>
+                                {{ T.matrixModalDistinctHeader }}
+                              </b-dropdown-header>
+                              <b-dropdown-item
+                                v-for="matrixDistinctOption in matrixDistinctOptions"
+                                :key="matrixDistinctOption.distinctType"
+                                @click="
+                                  line.data.distinct =
+                                    matrixDistinctOption.distinctType
+                                "
+                              >
+                                {{ matrixDistinctOption.type }}
+                              </b-dropdown-item>
+                            </b-dropdown>
+                          </b-col>
+                        </b-row>
+                        <b-row class="mt-4">
+                          <b-col>
+                            <b-button
+                              variant="primary"
+                              @click="
+                                matrixModalEditArray = getMatrixContent(
+                                  line.data.rows,
+                                  line.data.cols,
+                                  line.data.min,
+                                  line.data.max,
+                                  line.data.distinct,
+                                )
+                              "
+                              >{{ T.matrixModalGenerate }}</b-button
+                            >
+                          </b-col>
+                        </b-row>
+                        <hr />
+                        {{ T.matrixModalGeneratedArray }}
+                        <b-form-textarea
+                          v-model="matrixModalEditArray"
+                          class="w-100"
+                        />
+                      </b-container>
+                    </b-modal>
                   </b-col>
                   <b-col cols="1">
                     <b-button
@@ -158,6 +302,7 @@ import {
   CaseLineKind,
   CaseLine,
   LineID,
+  MatrixDistinctType,
 } from '@/js/omegaup/problem/creator/types';
 import {
   FontAwesomeIcon,
@@ -185,11 +330,26 @@ const casesStore = namespace('casesStore');
 export default class CaseEdit extends Vue {
   T = T;
 
+  arrayModalEdit: boolean = false;
+  matrixModalEdit: boolean = false;
+
+  arrayModalEditArray: string = '';
+  matrixModalEditArray: string = '';
+
   @casesStore.State('groups') groups!: Group[];
   @casesStore.Getter('getSelectedCase') getSelectedCase!: Case;
   @casesStore.Getter('getLinesFromSelectedCase')
   getLinesFromSelectedCase!: CaseLine[];
   @casesStore.Getter('getSelectedGroup') getSelectedGroup!: Group;
+
+  @casesStore.Mutation('editLineKind') editLineKind!: ([lineID, kind]: [
+    LineID,
+    CaseLineKind,
+  ]) => void;
+  @casesStore.Mutation('editLineValue') editLineValue!: ([lineID, value]: [
+    LineID,
+    string,
+  ]) => void;
 
   @casesStore.Action('addNewLine') addNewLine!: () => void;
   @casesStore.Action('deleteLine') deleteLine!: (line: LineID) => void;
@@ -201,7 +361,7 @@ export default class CaseEdit extends Vue {
     this.sortLines([event.oldIndex, event.newIndex]);
   }
 
-  lineOptions: {
+  lineKindOptions: {
     type: string;
     kind: CaseLineKind;
   }[] = [
@@ -211,8 +371,160 @@ export default class CaseEdit extends Vue {
     { type: T.problemCreatorLineMatrix, kind: 'matrix' },
   ];
 
+  matrixDistinctOptions: {
+    type: string;
+    distinctType: MatrixDistinctType;
+  }[] = [
+    { type: T.matrixModalDistinctNone, distinctType: 'none' },
+    { type: T.matrixModalDistinctRow, distinctType: 'rows' },
+    { type: T.matrixModalDistinctColumn, distinctType: 'cols' },
+    { type: T.matrixModalDistinctAll, distinctType: 'both' },
+  ];
+
+  editModalState(kind: CaseLineKind) {
+    if (kind === 'array') {
+      this.matrixModalEdit = false;
+      this.arrayModalEdit = true;
+    } else if (kind === 'matrix') {
+      this.arrayModalEdit = false;
+      this.matrixModalEdit = true;
+    }
+  }
+
   getLineNameFromKind(kind: CaseLineKind) {
-    return this.lineOptions.find((line) => line.kind === kind)?.type;
+    return this.lineKindOptions.find((row) => row.kind === kind)?.type;
+  }
+
+  getDistinctNameFromType(distinctype: MatrixDistinctType) {
+    return this.matrixDistinctOptions.find(
+      (row) => row.distinctType === distinctype,
+    )?.type;
+  }
+
+  getArrayContent(
+    size: number,
+    low: number = 0,
+    high: number = 0,
+    distinct: boolean = false,
+  ) {
+    if (distinct && high - low + 1 < size) {
+      return '';
+    }
+    let generatedArray: number[] | Set<number>;
+    if (distinct) {
+      generatedArray = new Set<number>();
+      while (generatedArray.size < size) {
+        generatedArray.add(
+          Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
+        );
+      }
+    } else {
+      generatedArray = [];
+      while (generatedArray.length < size) {
+        generatedArray.push(
+          Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
+        );
+      }
+    }
+    return [...generatedArray].join(' ');
+  }
+
+  getMatrixContent(
+    rows: number,
+    columns: number,
+    low: number = 0,
+    high: number = 100,
+    distinct: MatrixDistinctType = 'none',
+  ) {
+    if (distinct === 'both' && high - low + 1 < rows * columns) {
+      return '';
+    }
+    if (distinct === 'rows' && high - low + 1 < columns) {
+      return '';
+    }
+    if (distinct === 'cols' && high - low + 1 < rows) {
+      return '';
+    }
+    let matrix = [];
+    if (distinct === 'none') {
+      const generatedArray: number[] = [];
+      while (generatedArray.length < rows * columns) {
+        generatedArray.push(
+          Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
+        );
+      }
+
+      let index = 0;
+
+      for (let i = 0; i < rows; i++) {
+        let row = [];
+        for (let j = 0; j < columns; j++) {
+          row.push(generatedArray[index]);
+          index++;
+        }
+        matrix.push(row);
+      }
+
+      return matrix.map((row) => row.join(' ')).join('\n');
+    }
+    if (distinct === 'both') {
+      const generatedArray: Set<number> = new Set<number>();
+      while (generatedArray.size < rows * columns) {
+        generatedArray.add(
+          Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
+        );
+      }
+
+      const generatedArrayList: number[] = Array.from(generatedArray);
+      let index = 0;
+
+      for (let i = 0; i < rows; i++) {
+        let row = [];
+        for (let j = 0; j < columns; j++) {
+          row.push(generatedArrayList[index]);
+          index++;
+        }
+        matrix.push(row);
+      }
+      return matrix.map((row) => row.join(' ')).join('\n');
+    }
+    if (distinct === 'rows') {
+      const generatedRows: Set<number>[] = Array.from(
+        { length: rows },
+        () => new Set<number>(),
+      );
+      for (let i = 0; i < rows; i++) {
+        while (generatedRows[i].size < columns) {
+          generatedRows[i].add(
+            Number(low.toString()) +
+              Math.floor(Math.random() * (high - low + 1)),
+          );
+        }
+      }
+      return generatedRows.map((row) => [...row].join(' ')).join('\n');
+    }
+    if (distinct === 'cols') {
+      const generatedColumns: Set<number>[] = Array.from(
+        { length: columns },
+        () => new Set<number>(),
+      );
+      for (let i = 0; i < columns; i++) {
+        while (generatedColumns[i].size < rows) {
+          generatedColumns[i].add(
+            Number(low.toString()) +
+              Math.floor(Math.random() * (high - low + 1)),
+          );
+        }
+      }
+      const generatedColumnsList: number[][] = generatedColumns.map((column) =>
+        Array.from(column),
+      );
+      const transposedColumnsList: number[][] = generatedColumnsList[0].map(
+        (_, rowIndex) => generatedColumnsList.map((column) => column[rowIndex]),
+      );
+      return transposedColumnsList.map((row) => row.join(' ')).join('\n');
+    }
+    return '';
   }
 }
 </script>

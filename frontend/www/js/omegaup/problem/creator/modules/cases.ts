@@ -8,6 +8,7 @@ import {
   LineID,
   CaseRequest,
   MultipleCaseAddRequest,
+  CaseLineKind,
 } from '../types';
 import { Module } from 'vuex';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
@@ -224,6 +225,68 @@ export const casesStore: Module<CasesState, RootState> = {
       state.layout = state.layout.filter(
         (line) => line.lineID !== lineIDToBeDeleted,
       );
+    },
+    editLineValue(state, [lineID, value]: [LineID, string]) {
+      const selectedGroup = state.groups.find(
+        (group) => group.groupID === state.selected.groupID,
+      );
+      if (selectedGroup === undefined) return;
+      const selectedCase = selectedGroup.cases.find(
+        (_case) => _case.caseID === state.selected.caseID,
+      );
+      if (selectedCase === undefined) return;
+      const selectedLine = selectedCase.lines.find(
+        (_line) => _line.lineID === lineID,
+      );
+      if (selectedLine === undefined) return;
+      selectedLine.data.value = value;
+    },
+    editLineKind(state, [lineID, kind]: [LineID, CaseLineKind]) {
+      const selectedGroup = state.groups.find(
+        (group) => group.groupID === state.selected.groupID,
+      );
+      if (selectedGroup === undefined) return;
+      const selectedCase = selectedGroup.cases.find(
+        (_case) => _case.caseID === state.selected.caseID,
+      );
+      if (selectedCase === undefined) return;
+      const selectedLine = selectedCase.lines.find(
+        (_line) => _line.lineID === lineID,
+      );
+      if (selectedLine === undefined) return;
+      selectedLine.data = (() => {
+        switch (kind) {
+          case 'line':
+            return {
+              kind: 'line',
+              value: '',
+            };
+          case 'multiline':
+            return {
+              kind: 'multiline',
+              value: '',
+            };
+          case 'array':
+            return {
+              kind: 'array',
+              size: 10,
+              min: 0,
+              max: 100,
+              distinct: false,
+              value: '',
+            };
+          case 'matrix':
+            return {
+              kind: 'matrix',
+              rows: 3,
+              cols: 3,
+              min: 0,
+              max: 100,
+              distinct: 'none',
+              value: '',
+            };
+        }
+      })();
     },
     sortLines(state, exchangePair: [number, number]) {
       const selectedGroup = state.groups.find(
