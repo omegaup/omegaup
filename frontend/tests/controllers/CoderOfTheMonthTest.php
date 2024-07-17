@@ -969,8 +969,8 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test the behavior of the API when there are nore than one codersin the
-     * first place of the ranking through the month
+     * Test the API behavior when there is more than one candidate for Coder of
+     * the Month during the first days of the current month
      *
      * @dataProvider coderOfTheMonthCategoryProvider
      */
