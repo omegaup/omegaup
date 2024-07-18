@@ -11,7 +11,9 @@
         >
           <b-form-input
             v-model="multipleCasesPrefix"
+            lazy-formatter
             :formatter="formatter"
+            name="multiple-cases-prefix"
             autocomplete="off"
           />
         </b-form-group>
@@ -24,7 +26,9 @@
         >
           <b-form-input
             v-model="multipleCasesSuffix"
+            lazy-formatter
             :formatter="formatter"
+            name="multiple-cases-suffix"
             autocomplete="off"
           />
         </b-form-group>
@@ -37,13 +41,19 @@
     >
       <b-form-input
         v-model="multipleCasesCount"
+        lazy-formatter
         :formatter="numberFormatter"
+        name="multiple-cases-count"
         type="number"
         number
       />
     </b-form-group>
     <b-form-group :label="T.problemCreatorGroupName" label-for="case-group">
-      <b-form-select v-model="multipleCasesGroup" />
+      <b-form-select
+        v-model="multipleCasesGroup"
+        :options="options"
+        name="multiple-cases-group"
+      />
     </b-form-group>
   </div>
 </template>
@@ -52,7 +62,10 @@
 import { GroupID } from '../../../../problem/creator/types';
 import { NIL } from 'uuid';
 import { Component, Vue } from 'vue-property-decorator';
+import { namespace } from 'vuex-class';
 import T from '../../../../lang';
+
+const casesStore = namespace('casesStore');
 
 @Component
 export default class MultipleCasesInput extends Vue {
@@ -63,8 +76,25 @@ export default class MultipleCasesInput extends Vue {
 
   T = T;
 
+  @casesStore.Getter('getGroupIdsAndNames') storedGroups!: {
+    value: string;
+    text: string;
+  }[];
+
+  get options() {
+    const noGroup = { value: NIL, text: T.problemCreatorNoGroup };
+    if (!this.storedGroups) {
+      return [noGroup];
+    }
+    return [noGroup, ...this.storedGroups];
+  }
+
   get caseNamePreview() {
-    return `${this.multipleCasesPrefix}1${this.multipleCasesSuffix}, ${this.multipleCasesPrefix}2${this.multipleCasesSuffix}...`;
+    return `${this.formatter(this.multipleCasesPrefix)}1${this.formatter(
+      this.multipleCasesSuffix,
+    )}, ${this.formatter(this.multipleCasesPrefix)}2${this.formatter(
+      this.multipleCasesSuffix,
+    )}...`;
   }
 
   // Ensure that the prefix and suffix always contain alpha-numeric characters in addition to _ and -
@@ -72,7 +102,7 @@ export default class MultipleCasesInput extends Vue {
     return text.toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '');
   }
 
-  // Ensures the numebr is always above 1
+  // Ensures the number is always above 1
   numberFormatter(number: number) {
     return Math.max(number, 1);
   }

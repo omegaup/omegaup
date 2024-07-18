@@ -1,6 +1,7 @@
 import 'cypress-file-upload';
 import 'cypress-wait-until';
 import { v4 as uuid } from 'uuid';
+import { problemPage } from './problemPage';
 
 import {
   ContestOptions,
@@ -160,11 +161,11 @@ export class ContestPage {
     firstTimeVisited: boolean = true,
     numberOfProblems: number = 1,
   ): ContestOptions {
-    const problems = this.generateProblemOptions(numberOfProblems);
+    const problems = problemPage.generateProblemOptions(numberOfProblems);
     const contestProblems: ProblemOptions[] = [];
     const contestRuns: RunOptions[] = [];
 
-    problems.forEach( (problem) => {
+    problems.forEach( (problem: ProblemOptions) => {
       problem.firstTimeVisited = firstTimeVisited;
 
       cy.login(loginOption);
@@ -202,23 +203,6 @@ export class ContestPage {
     };
 
     return contestOptions;
-  }
-
-  generateProblemOptions(noOfProblems: number): ProblemOptions[] {
-    const problems: ProblemOptions[] = [];
-
-    for (let i = 0; i < noOfProblems; i++) {
-      const problemOptions: ProblemOptions = {
-        problemAlias: uuid().slice(0, 10),
-        tag: 'Recursion',
-        autoCompleteTextTag: 'recur',
-        problemLevelIndex: 0,
-      };
-
-      problems.push(problemOptions);
-    }
-
-    return problems;
   }
 
   setPasswordForIdentity(identityName: string, password: string): void {
