@@ -20,7 +20,10 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         string $runCreationDate = null,
         int $numRuns = 5,
         bool $quality = true
-    ) {
+    ): void {
+        if ($numRuns < 1) {
+            return;
+        }
         if (!$identity) {
             ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         }
@@ -977,41 +980,63 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     public function testMultipleCodersOfTheMonth(string $category) {
         $gender = $category == 'all' ? 'male' : 'female';
         // Create a submissions mapping for different users
+        // Add random number of runs for 5 users in 8 days
         $submissionsMapping = [
-            [
-                ['username' => 'user1', 'numRuns' => 2, 'problemsSolved' => 2, 'cumulativePoints' => 200, 'expectedPosition' => 3],
-                ['username' => 'user2', 'numRuns' => 3, 'problemsSolved' => 3, 'cumulativePoints' => 300, 'expectedPosition' => 2],
-                ['username' => 'user3', 'numRuns' => 4, 'problemsSolved' => 4, 'cumulativePoints' => 400, 'expectedPosition' => 1],
-                ['username' => 'user4', 'numRuns' => 6, 'problemsSolved' => 6, 'cumulativePoints' => 600, 'expectedPosition' => 0],
-                ['username' => 'user5', 'numRuns' => 1, 'problemsSolved' => 1, 'cumulativePoints' => 100, 'expectedPosition' => 4],
+            0 => [
+                ['username' => 'user_01', 'numRuns' => 2, 'expectedPosition' => 3],
+                ['username' => 'user_02', 'numRuns' => 3, 'expectedPosition' => 2],
+                ['username' => 'user_03', 'numRuns' => 4, 'expectedPosition' => 1],
+                ['username' => 'user_04', 'numRuns' => 6, 'expectedPosition' => 0],
+                ['username' => 'user_05', 'numRuns' => 1, 'expectedPosition' => 4],
             ],
-            [
-                ['username' => 'user1', 'numRuns' => 4, 'problemsSolved' => 6, 'cumulativePoints' => 600,  'expectedPosition' => 1],
-                ['username' => 'user2', 'numRuns' => 1, 'problemsSolved' => 4, 'cumulativePoints' => 400,  'expectedPosition' => 3],
-                ['username' => 'user3', 'numRuns' => 1, 'problemsSolved' => 5, 'cumulativePoints' => 500,  'expectedPosition' => 2],
-                ['username' => 'user4', 'numRuns' => 2, 'problemsSolved' => 8, 'cumulativePoints' => 800,  'expectedPosition' => 0],
-                ['username' => 'user5', 'numRuns' => 2, 'problemsSolved' => 3, 'cumulativePoints' => 300,  'expectedPosition' => 4],
+            1 => [
+                ['username' => 'user_01', 'numRuns' => 4, 'expectedPosition' => 1],
+                ['username' => 'user_02', 'numRuns' => 1, 'expectedPosition' => 3],
+                ['username' => 'user_03', 'numRuns' => 1, 'expectedPosition' => 2],
+                ['username' => 'user_04', 'numRuns' => 2, 'expectedPosition' => 0],
+                ['username' => 'user_05', 'numRuns' => 0, 'expectedPosition' => 4],
             ],
-            [
-                ['username' => 'user1', 'numRuns' => 1, 'problemsSolved' => 7, 'cumulativePoints' => 700,  'expectedPosition' => 1],
-                ['username' => 'user2', 'numRuns' => 2, 'problemsSolved' => 6, 'cumulativePoints' => 600,  'expectedPosition' => 3],
-                ['username' => 'user3', 'numRuns' => 0, 'problemsSolved' => 5, 'cumulativePoints' => 700,  'expectedPosition' => 2],
-                ['username' => 'user4', 'numRuns' => 3, 'problemsSolved' => 11, 'cumulativePoints' => 1100, 'expectedPosition' => 0],
-                ['username' => 'user5', 'numRuns' => 1, 'problemsSolved' => 2, 'cumulativePoints' => 400,  'expectedPosition' => 4],
+            2 => [
+                ['username' => 'user_01', 'numRuns' => 1, 'expectedPosition' => 1],
+                ['username' => 'user_02', 'numRuns' => 2, 'expectedPosition' => 2],
+                ['username' => 'user_03', 'numRuns' => 0, 'expectedPosition' => 3],
+                ['username' => 'user_04', 'numRuns' => 3, 'expectedPosition' => 0],
+                ['username' => 'user_05', 'numRuns' => 1, 'expectedPosition' => 4],
             ],
-            [
-                ['username' => 'user1', 'numRuns' => 1, 'problemsSolved' => 8, 'cumulativePoints' => 800,  'expectedPosition' => 4],
-                ['username' => 'user2', 'numRuns' => 4, 'problemsSolved' => 10, 'cumulativePoints' => 1000, 'expectedPosition' => 2],
-                ['username' => 'user3', 'numRuns' => 4, 'problemsSolved' => 9, 'cumulativePoints' => 1100,  'expectedPosition' => 1],
-                ['username' => 'user4', 'numRuns' => 1, 'problemsSolved' => 12, 'cumulativePoints' => 1200, 'expectedPosition' => 0],
-                ['username' => 'user5', 'numRuns' => 5, 'problemsSolved' => 7, 'cumulativePoints' => 900,  'expectedPosition' => 3],
+            3 => [
+                ['username' => 'user_01', 'numRuns' => 1, 'expectedPosition' => 3],
+                ['username' => 'user_02', 'numRuns' => 4, 'expectedPosition' => 1],
+                ['username' => 'user_03', 'numRuns' => 4, 'expectedPosition' => 2],
+                ['username' => 'user_04', 'numRuns' => 1, 'expectedPosition' => 0],
+                ['username' => 'user_05', 'numRuns' => 5, 'expectedPosition' => 4],
             ],
-            [
-                ['username' => 'user1', 'numRuns' => 1, 'problemsSolved' => 9, 'cumulativePoints' => 900,  'expectedPosition' => 4],
-                ['username' => 'user2', 'numRuns' => 0, 'problemsSolved' => 10, 'cumulativePoints' => 1000, 'expectedPosition' => 3],
-                ['username' => 'user3', 'numRuns' => 2, 'problemsSolved' => 11, 'cumulativePoints' => 1100, 'expectedPosition' => 2],
-                ['username' => 'user4', 'numRuns' => 0, 'problemsSolved' => 12, 'cumulativePoints' => 1200, 'expectedPosition' => 1],
-                ['username' => 'user5', 'numRuns' => 6, 'problemsSolved' => 13, 'cumulativePoints' => 1300, 'expectedPosition' => 0],
+            4 => [
+                ['username' => 'user_01', 'numRuns' => 1, 'expectedPosition' => 4],
+                ['username' => 'user_02', 'numRuns' => 0, 'expectedPosition' => 3],
+                ['username' => 'user_03', 'numRuns' => 2, 'expectedPosition' => 2],
+                ['username' => 'user_04', 'numRuns' => 0, 'expectedPosition' => 1],
+                ['username' => 'user_05', 'numRuns' => 6, 'expectedPosition' => 0],
+            ],
+            5 => [
+                ['username' => 'user_01', 'numRuns' => 3, 'expectedPosition' => 2],
+                ['username' => 'user_02', 'numRuns' => 2, 'expectedPosition' => 3],
+                ['username' => 'user_03', 'numRuns' => 0, 'expectedPosition' => 4],
+                ['username' => 'user_04', 'numRuns' => 2, 'expectedPosition' => 0],
+                ['username' => 'user_05', 'numRuns' => 1, 'expectedPosition' => 1],
+            ],
+            6 => [
+                ['username' => 'user_01', 'numRuns' => 3, 'expectedPosition' => 1],
+                ['username' => 'user_02', 'numRuns' => 2, 'expectedPosition' => 2],
+                ['username' => 'user_03', 'numRuns' => 1, 'expectedPosition' => 4],
+                ['username' => 'user_04', 'numRuns' => 3, 'expectedPosition' => 0],
+                ['username' => 'user_05', 'numRuns' => 0, 'expectedPosition' => 3],
+            ],
+            7 => [
+                ['username' => 'user_01', 'numRuns' => 1, 'expectedPosition' => 2],
+                ['username' => 'user_02', 'numRuns' => 1, 'expectedPosition' => 3],
+                ['username' => 'user_03', 'numRuns' => 3, 'expectedPosition' => 4],
+                ['username' => 'user_04', 'numRuns' => 2, 'expectedPosition' => 0],
+                ['username' => 'user_05', 'numRuns' => 4, 'expectedPosition' => 1],
             ],
         ];
 
