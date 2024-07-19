@@ -21,7 +21,7 @@
           {{ T.problemCreatorGenerateProblem }}</span
         >
       </b-button>
-      <b-button variant="warning" size="sm" @click="createNewProblem()">
+      <b-button variant="warning" size="sm" @click="createNewProblem">
         <BIconPlus class="mr-1" />
         <span class="d-none d-md-inline">
           {{ T.problemCreatorNewProblem }}</span
