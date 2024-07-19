@@ -24,8 +24,22 @@ else
         ARGS="$@"
 fi
 
+# Path to the general query log file
+GENERAL_LOG_FILE="/var/log/omegaup/mysql_general.log"
+
+# Create the log file and set permissions
+touch ${GENERAL_LOG_FILE}
+chmod 666 ${GENERAL_LOG_FILE}
+
+# Enable General Query Log
+mysql -e "SET GLOBAL general_log = 'ON';"
+mysql -e "SET GLOBAL general_log_file = '${GENERAL_LOG_FILE}';"
+
 exec "${OMEGAUP_ROOT}/vendor/bin/phpunit" \
 	--bootstrap "${OMEGAUP_ROOT}/frontend/tests/bootstrap.php" \
 	--configuration="${OMEGAUP_ROOT}/frontend/tests/phpunit.xml" \
 	--coverage-clover="${OMEGAUP_ROOT}/coverage.xml" \
 	"${ARGS[@]}"
+
+# Disable General Query Log
+mysql -e "SET GLOBAL general_log = 'OFF';"
