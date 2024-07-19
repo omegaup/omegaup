@@ -141,4 +141,220 @@ describe('CaseEdit.vue', () => {
     const formInputsUpdated = wrapper.findAll('input');
     expect(formInputsUpdated.length).toBe(0);
   });
+
+  it('Should generate arrays and matrices', async () => {
+    const wrapper = mount(CaseEdit, { localVue, store: store });
+
+    const arrSize = 10;
+    const arrlow = 0;
+    const arrHigh = 9;
+
+    let array = wrapper.vm
+      .getArrayContent(arrSize, arrlow, arrHigh, false)
+      .split(' ')
+      .map(Number);
+
+    expect(array.length).toBe(arrSize);
+    expect(array.every((num) => num >= arrlow && num <= arrHigh)).toBe(true);
+
+    array = wrapper.vm
+      .getArrayContent(arrSize, arrlow, arrHigh, true)
+      .split(' ')
+      .map(Number);
+
+    expect(array.length).toBe(arrSize);
+    expect(array.every((num) => num >= arrlow && num <= arrHigh));
+    expect(new Set(array).size).toBe(arrSize);
+
+    const emptyArray = wrapper.vm.getArrayContent(
+      arrSize,
+      arrlow,
+      arrHigh - 1,
+      true,
+    );
+
+    expect(emptyArray).toBe('');
+
+    const matrixRows = 10;
+    const matrixColumns = 9;
+    const matrixLow = 0;
+    const matrixHigh = 89;
+
+    let matrix = wrapper.vm
+      .getMatrixContent(
+        matrixRows,
+        matrixColumns,
+        matrixLow,
+        matrixHigh,
+        'none',
+      )
+      .trim()
+      .split('\n')
+      .map((row) => row.trim().split(' ').map(Number));
+
+    expect(matrix.length).toBe(matrixRows);
+    expect(matrix[0].length).toBe(matrixColumns);
+    expect(
+      matrix.every((row) =>
+        row.every((num) => num >= matrixLow && num <= matrixHigh),
+      ),
+    ).toBe(true);
+
+    matrix = wrapper.vm
+      .getMatrixContent(
+        matrixRows,
+        matrixColumns,
+        matrixLow,
+        matrixHigh,
+        'rows',
+      )
+      .trim()
+      .split('\n')
+      .map((row) => row.trim().split(' ').map(Number));
+
+    expect(matrix.length).toBe(matrixRows);
+    expect(matrix[0].length).toBe(matrixColumns);
+    expect(
+      matrix.every((row) =>
+        row.every((num) => num >= matrixLow && num <= matrixHigh),
+      ),
+    ).toBe(true);
+    expect(matrix.every((row) => new Set(row).size === matrixColumns)).toBe(
+      true,
+    );
+
+    matrix = wrapper.vm
+      .getMatrixContent(
+        matrixRows,
+        matrixColumns,
+        matrixLow,
+        matrixHigh,
+        'cols',
+      )
+      .trim()
+      .split('\n')
+      .map((row) => row.trim().split(' ').map(Number));
+
+    expect(matrix.length).toBe(matrixRows);
+    expect(matrix[0].length).toBe(matrixColumns);
+    expect(
+      matrix.every((row) =>
+        row.every((num) => num >= matrixLow && num <= matrixHigh),
+      ),
+    ).toBe(true);
+    expect(
+      matrix[0]
+        .map((_, colIndex) => matrix.map((row) => row[colIndex]))
+        .every((row) => new Set(row).size === matrixRows),
+    ).toBe(true);
+
+    matrix = wrapper.vm
+      .getMatrixContent(
+        matrixRows,
+        matrixColumns,
+        matrixLow,
+        matrixHigh,
+        'both',
+      )
+      .trim()
+      .split('\n')
+      .map((row) => row.trim().split(' ').map(Number));
+
+    expect(matrix.length).toBe(matrixRows);
+    expect(matrix[0].length).toBe(matrixColumns);
+    expect(
+      matrix.every((row) =>
+        row.every((num) => num >= matrixLow && num <= matrixHigh),
+      ),
+    ).toBe(true);
+    expect(matrix.every((row) => new Set(row).size === matrixColumns)).toBe(
+      true,
+    );
+    expect(
+      matrix[0]
+        .map((_, colIndex) => matrix.map((row) => row[colIndex]))
+        .every((row) => new Set(row).size === matrixRows),
+    ).toBe(true);
+
+    let emptyMatrix = wrapper.vm.getMatrixContent(
+      matrixRows,
+      matrixColumns,
+      matrixLow,
+      matrixLow + matrixColumns - 2,
+      'rows',
+    );
+
+    expect(emptyMatrix).toBe('');
+
+    emptyMatrix = wrapper.vm.getMatrixContent(
+      matrixRows,
+      matrixColumns,
+      matrixLow,
+      matrixLow + matrixRows - 2,
+      'cols',
+    );
+
+    expect(emptyMatrix).toBe('');
+
+    emptyMatrix = wrapper.vm.getMatrixContent(
+      matrixRows,
+      matrixColumns,
+      matrixLow,
+      matrixHigh - 1,
+      'both',
+    );
+
+    expect(emptyMatrix).toBe('');
+
+    const groupID = newGroup.groupID;
+    const caseID = newCase.caseID;
+    store.commit('casesStore/setSelected', {
+      groupID,
+      caseID,
+    });
+    await Vue.nextTick();
+
+    expect(wrapper.text()).toContain(newCase.name);
+    expect(wrapper.text()).toContain(newGroup.name);
+
+    wrapper.vm.addNewLine();
+    await Vue.nextTick();
+
+    const dropdowns = wrapper.findAll('a.dropdown-item');
+    expect(dropdowns.length).toBe(4);
+
+    await dropdowns.at(2).trigger('click');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('array');
+
+    const editSVG = wrapper.find('svg.bi-pencil-square');
+    expect(editSVG.exists()).toBe(true);
+
+    const editIcon = wrapper.find('button[title="Editar"]');
+    await editIcon.trigger('click');
+
+    const modalBody = wrapper.find('div.modal-body');
+    
+    const modalInputs = modalBody.findAll('input');
+    expect(modalInputs.length).toBe(5);
+
+    const modalButtons = modalBody.findAll('button');
+    expect(modalButtons.length).toBe(1);
+
+    const mockGenerate = jest.spyOn(wrapper.vm, 'getArrayContent');
+
+    await modalButtons.at(0).trigger('click');
+    expect(mockGenerate).toHaveBeenCalledWith(10, 0, 100, false);
+    
+    await modalInputs.at(0).setValue(5);
+    await modalInputs.at(1).setValue(10);
+    await modalInputs.at(2).setValue(20);
+    await modalInputs.at(3).setChecked(true);
+
+    await modalButtons.at(0).trigger('click');
+    expect(mockGenerate).toHaveBeenCalledWith(5, 10, 20, true);
+
+
+    await dropdowns.at(3).trigger('click');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
+  });
 });

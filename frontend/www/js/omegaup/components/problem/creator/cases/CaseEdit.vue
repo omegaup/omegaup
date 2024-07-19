@@ -118,6 +118,7 @@
                     <b-modal
                       v-if="line.data.kind === 'array'"
                       v-model="arrayModalEdit"
+                      :static="true"
                       :title="T.arrayEditTitle"
                       :ok-title="T.arrayModalSave"
                       ok-variant="success"
@@ -132,15 +133,15 @@
                         <b-row class="mb-4">
                           <b-col>
                             {{ T.arrayModalSize }}
-                            <b-form-input v-model="line.data.size" />
+                            <b-form-input type="number" v-model="line.data.size" />
                           </b-col>
                           <b-col>
                             {{ T.arrayModalMinimum }}
-                            <b-form-input v-model="line.data.min" />
+                            <b-form-input type="number" v-model="line.data.min" />
                           </b-col>
                           <b-col>
                             {{ T.arrayModalMaximum }}
-                            <b-form-input v-model="line.data.max" />
+                            <b-form-input type="number" v-model="line.data.max" />
                           </b-col>
                         </b-row>
                         <b-row class="mt-2 mb-4">
@@ -156,9 +157,9 @@
                               variant="primary"
                               @click="
                                 arrayModalEditArray = getArrayContent(
-                                  line.data.size,
-                                  line.data.min,
-                                  line.data.max,
+                                  Number(line.data.size),
+                                  Number(line.data.min),
+                                  Number(line.data.max),
                                   line.data.distinct,
                                 )
                               "
@@ -237,10 +238,10 @@
                               variant="primary"
                               @click="
                                 matrixModalEditArray = getMatrixContent(
-                                  line.data.rows,
-                                  line.data.cols,
-                                  line.data.min,
-                                  line.data.max,
+                                  Number(line.data.rows),
+                                  Number(line.data.cols),
+                                  Number(line.data.min),
+                                  Number(line.data.max),
                                   line.data.distinct,
                                 )
                               "
