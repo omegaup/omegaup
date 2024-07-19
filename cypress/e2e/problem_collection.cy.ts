@@ -50,10 +50,7 @@ describe('Problem Collection Test', () => {
     cy.logout();
   });
 
-  // Unskip this test when the following issue is fixed
-  // https://github.com/omegaup/omegaup/issues/7218
-
-  it.skip('Should add additional tags to a problem as admin', () => {
+  it('Should add additional tags to a problem as admin', () => {
     const loginOptions = loginPage.registerMultipleUsers(1);
     const problemOptions = problemPage.generateProblemOptions(1);
     problemOptions[0].problemLevelIndex = 5;
@@ -119,14 +116,14 @@ describe('Problem Collection Test', () => {
 
     // Verify that the problems are displayed
     problemOptions.forEach((problem) => {
-      profilePage.verifyProblemVisibility(problem.problemAlias);
+      profilePage.verifyProblemIsVisible(problem.problemAlias);
     });
 
     // Delete single problem
     profilePage.deleteProblem(problemOptions[0].problemAlias);
 
     // Problem 0 should not be visible
-    profilePage.verifyProblemVisibility(problemOptions[0].problemAlias, false);
+    profilePage.verifyProblemIsNotVisible(problemOptions[0].problemAlias);
 
     // Delete problems in batch
     const problemAliases = problemOptions
@@ -136,7 +133,7 @@ describe('Problem Collection Test', () => {
 
     // None of the problems should be visible
     problemOptions.forEach((problem) => {
-      profilePage.verifyProblemVisibility(problem.problemAlias, false);
+      profilePage.verifyProblemIsNotVisible(problem.problemAlias);
     });
 
     cy.logout();

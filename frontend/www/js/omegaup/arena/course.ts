@@ -455,45 +455,29 @@ OmegaUp.on('ready', async () => {
             feedbackList: { lineNumber: number; feedback: string }[];
             guid: string;
           }) => {
-            Promise.allSettled(
-              feedbackList.map(
-                (feedback: { lineNumber: number; feedback: string }) =>
-                  api.Submission.setFeedback({
-                    guid,
-                    course_alias: payload.courseDetails.alias,
-                    assignment_alias: payload.currentAssignment.alias,
-                    feedback: feedback.feedback,
-                    range_bytes_start: feedback.lineNumber,
-                  }).catch(() => feedback),
-              ),
-            )
-              .then((results) => {
-                const feedbackWithError: string[] = results
-                  .filter(
-                    (result): result is PromiseRejectedResult =>
-                      result.status === 'rejected',
-                  )
-                  .map((result) => result.reason);
-                if (!feedbackWithError.length) {
-                  ui.success(T.feedbackSuccesfullyAdded);
-                  resetHash('runs', null);
-                  api.Run.getSubmissionFeedback({
-                    run_alias: guid,
-                  }).then((response) => {
-                    component.feedbackMap.forEach((feedback) => {
-                      feedback.submissionFeedbackId = response.find(
-                        (fb) => fb.range_bytes_start == feedback.lineNumber,
-                      )?.submission_feedback_id;
-                      feedback.status = FeedbackStatus.Saved;
-                    });
+            api.Submission.setFeedbackList({
+              guid,
+              course_alias: payload.courseDetails.alias,
+              assignment_alias: payload.currentAssignment.alias,
+              feedback_list: JSON.stringify(feedbackList),
+            })
+              .then(() => {
+                ui.success(T.feedbackSuccesfullyAdded);
+                resetHash('runs', null);
+                api.Run.getSubmissionFeedback({
+                  run_alias: guid,
+                }).then((response) => {
+                  component.feedbackMap.forEach((feedback) => {
+                    feedback.submissionFeedbackId = response.find(
+                      (fb) => fb.range_bytes_start == feedback.lineNumber,
+                    )?.submission_feedback_id;
+                    feedback.status = FeedbackStatus.Saved;
                   });
+                });
 
-                  component.currentPopupDisplayed = PopupDisplayed.None;
-                } else {
-                  ui.error('There was an error');
-                }
+                component.currentPopupDisplayed = PopupDisplayed.None;
               })
-              .catch(ui.ignoreError);
+              .catch(ui.apiError);
           },
           'submit-feedback-thread': ({
             feedback,
