@@ -333,7 +333,7 @@ describe('CaseEdit.vue', () => {
     await editIcon.trigger('click');
 
     const modalBody = wrapper.find('div.modal-body');
-    
+
     const modalInputs = modalBody.findAll('input');
     expect(modalInputs.length).toBe(5);
 
@@ -344,7 +344,7 @@ describe('CaseEdit.vue', () => {
 
     await modalButtons.at(0).trigger('click');
     expect(mockGenerate).toHaveBeenCalledWith(10, 0, 100, false);
-    
+
     await modalInputs.at(0).setValue(5);
     await modalInputs.at(1).setValue(10);
     await modalInputs.at(2).setValue(20);
@@ -352,7 +352,6 @@ describe('CaseEdit.vue', () => {
 
     await modalButtons.at(0).trigger('click');
     expect(mockGenerate).toHaveBeenCalledWith(5, 10, 20, true);
-
 
     await dropdowns.at(3).trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');

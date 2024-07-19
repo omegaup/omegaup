@@ -133,15 +133,24 @@
                         <b-row class="mb-4">
                           <b-col>
                             {{ T.arrayModalSize }}
-                            <b-form-input type="number" v-model="line.data.size" />
+                            <b-form-input
+                              v-model="line.data.size"
+                              type="number"
+                            />
                           </b-col>
                           <b-col>
                             {{ T.arrayModalMinimum }}
-                            <b-form-input type="number" v-model="line.data.min" />
+                            <b-form-input
+                              v-model="line.data.min"
+                              type="number"
+                            />
                           </b-col>
                           <b-col>
                             {{ T.arrayModalMaximum }}
-                            <b-form-input type="number" v-model="line.data.max" />
+                            <b-form-input
+                              v-model="line.data.max"
+                              type="number"
+                            />
                           </b-col>
                         </b-row>
                         <b-row class="mt-2 mb-4">
