@@ -225,19 +225,6 @@ export const casesStore: Module<CasesState, RootState> = {
         (line) => line.lineID !== lineIDToBeDeleted,
       );
     },
-    sortLines(state, exchangePair: [number, number]) {
-      const selectedGroup = state.groups.find(
-        (group) => group.groupID === state.selected.groupID,
-      );
-      if (selectedGroup === undefined) return;
-      const selectedCase = selectedGroup.cases.find(
-        (_case) => _case.caseID === state.selected.caseID,
-      );
-      if (selectedCase === undefined) return;
-      const [oldIndex, newIndex] = exchangePair;
-      const selectedLines: CaseLine[] = selectedCase.lines;
-      selectedLines.splice(newIndex, 0, selectedLines.splice(oldIndex, 1)[0]);
-    },
     setLayout(state, layoutLines: CaseLine[]) {
       state.layout = layoutLines;
     },
@@ -327,9 +314,6 @@ export const casesStore: Module<CasesState, RootState> = {
       selectedCase.lines = selectedCase.lines.filter(
         (line) => line.lineID !== lineIDToBeDeleted,
       );
-    },
-    sortLines({ commit }, exchangePair: [number, number]) {
-      commit('sortLines', exchangePair);
     },
   },
   getters: {
