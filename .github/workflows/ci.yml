@@ -124,6 +124,13 @@ jobs:
             validate --all < /dev/null
 
       - name: Run tests
+        env:
+          MYSQL_ROOT_PASSWORD:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_USER: omegaup
+          MYSQL_PASSWORD: omegaup
+          MYSQL_DATABASE: omegaup-test
+          MYSQL_TCP_PORT: 13306
         timeout-minutes: 20
         run: ./stuff/mysql_types.sh
 

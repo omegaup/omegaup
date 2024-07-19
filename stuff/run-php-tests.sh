@@ -35,8 +35,8 @@ touch ${GENERAL_LOG_FILE}
 chmod 666 ${GENERAL_LOG_FILE}
 
 # Enable General Query Log
-mysql -uroot -e "SET GLOBAL general_log = 'ON';"
-mysql -urrot -e "SET GLOBAL general_log_file = '${GENERAL_LOG_FILE}';"
+mysql -h localhost -P 13306 -uroot -e "SET GLOBAL general_log = 'ON';"
+mysql -h localhost -P 13306 -urrot -e "SET GLOBAL general_log_file = '${GENERAL_LOG_FILE}';"
 
 exec "${OMEGAUP_ROOT}/vendor/bin/phpunit" \
 	--bootstrap "${OMEGAUP_ROOT}/frontend/tests/bootstrap.php" \
