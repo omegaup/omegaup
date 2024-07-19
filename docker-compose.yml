@@ -113,13 +113,19 @@ services:
       MYSQL_ROOT_PASSWORD: 'omegaup'
       MYSQL_TCP_PORT: 13306
     command:
-      - --max_execution_time=30000
-      - --lock_wait_timeout=10
-      - --wait_timeout=20
+      [
+        "mysqld",
+        "--max_execution_time=30000",
+        "--lock_wait_timeout=10",
+        "--wait_timeout=20",
+        "--general_log=1",
+        "--general_log_file=/var/log/omegaup/mysql_general.log"
+      ]
     expose:
       - '13306'
     volumes:
       - 'dbdata:/var/lib/mysql'
+      - ./mysql-logs:/var/log/omegaup
     ports:
       - target: 13306
         published: 13306
