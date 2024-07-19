@@ -25,9 +25,12 @@ else
 fi
 
 # Path to the general query log file
-GENERAL_LOG_FILE="/var/log/omegaup/mysql_general.log"
+GENERAL_LOG_DIRECTORY="/var/log/omegaup"
+GENERAL_LOG_FILE="${GENERAL_LOG_DIRECTORY}/mysql.log"
 
 # Create the log file and set permissions
+mkdir -p ${GENERAL_LOG_DIRECTORY}
+chmod 755 ${GENERAL_LOG_DIRECTORY}
 touch ${GENERAL_LOG_FILE}
 chmod 666 ${GENERAL_LOG_FILE}
 
