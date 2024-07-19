@@ -45,7 +45,7 @@
             }"
             @click="selectCase(item.name)"
           >
-            <div class="case-item">
+            <div class="text-truncate">
               <span
                 class="verdict"
                 :class="verdictClass(item.name)"
@@ -265,12 +265,6 @@ div.summary {
   padding: 0.25em;
 }
 
-div.case-item {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 span.verdict {
   display: inline-block;
   float: left;
@@ -287,12 +281,6 @@ span.verdict span.score {
 div.filenames {
   overflow-y: auto;
   flex: 1;
-}
-
-a.list-group-item {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 input[type='number'].case-weight {
