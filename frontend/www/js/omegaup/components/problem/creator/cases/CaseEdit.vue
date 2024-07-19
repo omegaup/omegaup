@@ -211,7 +211,7 @@ export default class CaseEdit extends Vue {
 
   get getEditIconDisplay() {
     return (line: CaseLine) => {
-      if (line.data.kind === 'multiline' || line.data.kind === 'matrix') {
+      if (line.data.kind === 'array' || line.data.kind === 'matrix') {
         return this.EditIconDisplayOption.EDIT_ICON;
       }
     };
