@@ -35,8 +35,8 @@ touch ${GENERAL_LOG_FILE}
 chmod 666 ${GENERAL_LOG_FILE}
 
 # Enable General Query Log
-mysql -e "SET GLOBAL general_log = 'ON';"
-mysql -e "SET GLOBAL general_log_file = '${GENERAL_LOG_FILE}';"
+mysql -uroot -e "SET GLOBAL general_log = 'ON';"
+mysql -urrot -e "SET GLOBAL general_log_file = '${GENERAL_LOG_FILE}';"
 
 exec "${OMEGAUP_ROOT}/vendor/bin/phpunit" \
 	--bootstrap "${OMEGAUP_ROOT}/frontend/tests/bootstrap.php" \
@@ -45,4 +45,4 @@ exec "${OMEGAUP_ROOT}/vendor/bin/phpunit" \
 	"${ARGS[@]}"
 
 # Disable General Query Log
-mysql -e "SET GLOBAL general_log = 'OFF';"
+mysql -uroot -e "SET GLOBAL general_log = 'OFF';"
