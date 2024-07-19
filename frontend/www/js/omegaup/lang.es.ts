@@ -1825,6 +1825,7 @@ const translations: { [key: string]: string; } = {
   wordsDuration: "Duraci\u00f3n",
   wordsEdit: "Editar",
   wordsEditCourse: "Editar curso",
+  wordsEmpty: "Vac\u00edo",
   wordsEmptyAddStudentInput: "El campo est\u00e1 vac\u00edo, por favor ingrese un nombre de cuenta",
   wordsEnable: "Habilitar",
   wordsEndTime: "Fin",
