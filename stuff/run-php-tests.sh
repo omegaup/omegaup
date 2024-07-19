@@ -25,7 +25,7 @@ else
 fi
 
 # Path to the general query log file
-GENERAL_LOG_DIRECTORY="/tmp"
+GENERAL_LOG_DIRECTORY="/tmp/omegaup"
 GENERAL_LOG_FILE="${GENERAL_LOG_DIRECTORY}/general_mysql.log"
 
 # Create the log file and set permissions
