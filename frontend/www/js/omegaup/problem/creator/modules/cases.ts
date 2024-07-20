@@ -255,7 +255,7 @@ export const casesStore: Module<CasesState, RootState> = {
       const selectedLine = selectedCase.lines.find(
         (_line) => _line.lineID === lineID,
       );
-      const defaultMatrixDistinctType: MatrixDistinctType = 'none'
+      const defaultMatrixDistinctType: MatrixDistinctType = 'none';
       if (selectedLine === undefined) return;
       const lineData: CaseLineData = (() => {
         switch (_kind) {
