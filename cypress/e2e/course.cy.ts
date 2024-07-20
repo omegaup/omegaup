@@ -279,11 +279,19 @@ describe('Course Test', () => {
 
     cy.login(loginOptions[1]);
     coursePage.enterCourseAssignmentPage(courseOptions.courseAlias);
-    coursePage.leaveFeedbackOnSolution('Solution is not optimal');
+    const suggestions: { line: number; text: string; }[] = [
+      { line: 1, text: 'Solution is not optimal' },
+      { line: 3, text: 'This code could be improved' },
+      { line: 5, text: 'This line could be removed' },
+    ]
+    coursePage.leaveFeedbackOnSolution(suggestions);
     cy.logout();
 
     cy.login(loginOptions[0]);
-    coursePage.verifyFeedback('Solution is not optimal');
+    coursePage.verifyFeedback({
+      feedback: suggestions[0].text,
+      problemAlias: runOptions.problemAlias,
+    });
     cy.logout();
   });
 

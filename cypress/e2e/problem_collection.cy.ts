@@ -50,10 +50,7 @@ describe('Problem Collection Test', () => {
     cy.logout();
   });
 
-  // Unskip this test when the following issue is fixed
-  // https://github.com/omegaup/omegaup/issues/7218
-
-  it.skip('Should add additional tags to a problem as admin', () => {
+  it('Should add additional tags to a problem as admin', () => {
     const loginOptions = loginPage.registerMultipleUsers(1);
     const problemOptions = problemPage.generateProblemOptions(1);
     problemOptions[0].problemLevelIndex = 5;

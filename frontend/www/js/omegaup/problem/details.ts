@@ -197,10 +197,16 @@ OmegaUp.on('ready', async () => {
                 });
               });
           },
-          'submit-reviewer': (tag: string, qualitySeal: boolean) => {
+          'rate-problem-as-reviewer': ({
+            tags,
+            qualitySeal,
+          }: {
+            tags: string[];
+            qualitySeal: boolean;
+          }) => {
             const contents: { quality_seal?: boolean; tag?: string } = {};
-            if (tag) {
-              contents.tag = tag;
+            if (tags) {
+              contents.tag = tags[0];
             }
             contents.quality_seal = qualitySeal;
             api.QualityNomination.create({
