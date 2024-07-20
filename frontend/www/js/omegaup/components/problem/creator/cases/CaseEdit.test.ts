@@ -365,9 +365,9 @@ describe('CaseEdit.vue', () => {
       (modalBody.findAll('input').at(4).element as HTMLInputElement).value,
     ).toBe('10 10 10 10 10');
 
-    const modalFooter = wrapper.find('footer.modal-footer');
+    let modalFooter = wrapper.find('footer.modal-footer');
 
-    const footerButtons = modalFooter.findAll('button');
+    let footerButtons = modalFooter.findAll('button');
     expect(footerButtons.length).toBe(2);
 
     await footerButtons.at(1).trigger('click');
@@ -394,6 +394,7 @@ describe('CaseEdit.vue', () => {
 
     await modalButtons.at(1).trigger('click');
     expect(mockGenerateMatrix).toHaveBeenCalledWith(3, 3, 0, 100, 'none');
+    mockGenerateMatrix.mockRestore();
 
     await modalInputs.at(0).setValue(3);
     await modalInputs.at(1).setValue(3);
@@ -401,11 +402,22 @@ describe('CaseEdit.vue', () => {
     await modalInputs.at(3).setValue(20);
 
     await modalButtons.at(1).trigger('click');
-    expect(mockGenerateMatrix).toHaveBeenCalledWith(3, 3, 20, 20, 'none');
-    mockGenerateMatrix.mockRestore();
-
     expect(
       (modalBody.findAll('textarea').at(0).element as HTMLInputElement).value,
     ).toBe('20 20 20\n20 20 20\n20 20 20');
+
+    modalFooter = wrapper.find('footer.modal-footer');
+
+    footerButtons = modalFooter.findAll('button');
+    expect(footerButtons.length).toBe(2);
+
+    wrapper.vm.editLineValue([
+      wrapper.vm.getLinesFromSelectedCase[0].lineID,
+      wrapper.vm.matrixModalEditArray,
+    ]);
+
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.value).toBe(
+      '20 20 20\n20 20 20\n20 20 20',
+    );
   });
 });
