@@ -223,7 +223,9 @@
                         </b-row>
                         <b-row class="mt-2 mb-4">
                           <b-col class="text-left">
-                            <div class="mb-1 font-weight-bold">Distinct</div>
+                            <div class="mb-1 font-weight-bold">
+                              {{ T.matrixModalDistinct }}
+                            </div>
                             <b-dropdown
                               :text="
                                 getDistinctNameFromType(line.data.distinct)
