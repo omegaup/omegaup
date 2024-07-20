@@ -241,7 +241,7 @@ export const casesStore: Module<CasesState, RootState> = {
       if (selectedLine === undefined) return;
       selectedLine.data.value = value;
     },
-    editLineKind(state, [lineID, kind]: [LineID, CaseLineKind]) {
+    editLineKind(state, [lineID, _kind]: [LineID, CaseLineKind]) {
       const selectedGroup = state.groups.find(
         (group) => group.groupID === state.selected.groupID,
       );
@@ -255,7 +255,7 @@ export const casesStore: Module<CasesState, RootState> = {
       );
       if (selectedLine === undefined) return;
       selectedLine.data = (() => {
-        switch (kind) {
+        switch (_kind) {
           case 'line':
             return {
               kind: 'line',
