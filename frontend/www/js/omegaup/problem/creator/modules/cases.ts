@@ -10,6 +10,7 @@ import {
   MultipleCaseAddRequest,
   CaseLineKind,
   CaseLineData,
+  MatrixDistinctType,
 } from '../types';
 import { Module } from 'vuex';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
@@ -254,6 +255,7 @@ export const casesStore: Module<CasesState, RootState> = {
       const selectedLine = selectedCase.lines.find(
         (_line) => _line.lineID === lineID,
       );
+      const defaultMatrixDistinctType: MatrixDistinctType = 'none'
       if (selectedLine === undefined) return;
       const lineData: CaseLineData = (() => {
         switch (_kind) {
@@ -283,7 +285,7 @@ export const casesStore: Module<CasesState, RootState> = {
               cols: 3,
               min: 0,
               max: 100,
-              distinct: 'none',
+              distinct: defaultMatrixDistinctType,
               value: '',
             };
         }
