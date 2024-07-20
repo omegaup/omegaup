@@ -329,15 +329,15 @@ describe('CaseEdit.vue', () => {
     const editSVG = wrapper.find('svg.bi-pencil-square');
     expect(editSVG.exists()).toBe(true);
 
-    const editIcon = wrapper.find('button[title="Editar"]');
+    let editIcon = wrapper.find('button[title="Editar"]');
     await editIcon.trigger('click');
 
-    const modalBody = wrapper.find('div.modal-body');
+    let modalBody = wrapper.find('div.modal-body');
 
-    const modalInputs = modalBody.findAll('input');
+    let modalInputs = modalBody.findAll('input');
     expect(modalInputs.length).toBe(5);
 
-    const modalButtons = modalBody.findAll('button');
+    let modalButtons = modalBody.findAll('button');
     expect(modalButtons.length).toBe(1);
 
     const mockGenerate = jest.spyOn(wrapper.vm, 'getArrayContent');
@@ -352,8 +352,60 @@ describe('CaseEdit.vue', () => {
 
     await modalButtons.at(0).trigger('click');
     expect(mockGenerate).toHaveBeenCalledWith(5, 10, 20, true);
+    mockGenerate.mockRestore();
+
+    await modalInputs.at(0).setValue(5);
+    await modalInputs.at(1).setValue(10);
+    await modalInputs.at(2).setValue(10);
+    await modalInputs.at(3).setChecked(false);
+
+    await modalButtons.at(0).trigger('click');
+
+    expect(
+      (modalBody.findAll('input').at(4).element as HTMLInputElement).value,
+    ).toBe('10 10 10 10 10');
+
+    const modalFooter = wrapper.find('footer.modal-footer');
+
+    const footerButtons = modalFooter.findAll('button');
+    expect(footerButtons.length).toBe(2);
+
+    await footerButtons.at(1).trigger('click');
+
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.value).toBe(
+      '10 10 10 10 10',
+    );
 
     await dropdowns.at(3).trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
+
+    editIcon = wrapper.find('button[title="Editar"]');
+    await editIcon.trigger('click');
+
+    modalBody = wrapper.find('div.modal-body');
+
+    modalInputs = modalBody.findAll('input');
+    expect(modalInputs.length).toBe(4);
+
+    modalButtons = modalBody.findAll('button');
+    expect(modalButtons.length).toBe(2);
+
+    const mockGenerateMatrix = jest.spyOn(wrapper.vm, 'getMatrixContent');
+
+    await modalButtons.at(1).trigger('click');
+    expect(mockGenerateMatrix).toHaveBeenCalledWith(3, 3, 0, 100, 'none');
+
+    await modalInputs.at(0).setValue(3);
+    await modalInputs.at(1).setValue(3);
+    await modalInputs.at(2).setValue(20);
+    await modalInputs.at(3).setValue(20);
+
+    await modalButtons.at(1).trigger('click');
+    expect(mockGenerateMatrix).toHaveBeenCalledWith(3, 3, 20, 20, 'none');
+    mockGenerateMatrix.mockRestore();
+
+    expect(
+      (modalBody.findAll('textarea').at(0).element as HTMLInputElement).value,
+    ).toBe('20 20 20\n20 20 20\n20 20 20');
   });
 });

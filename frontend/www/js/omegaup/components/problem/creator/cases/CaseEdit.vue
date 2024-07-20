@@ -118,12 +118,13 @@
                     <b-modal
                       v-if="line.data.kind === 'array'"
                       v-model="arrayModalEdit"
-                      :static="true"
                       :title="T.arrayEditTitle"
                       :ok-title="T.arrayModalSave"
                       ok-variant="success"
                       :cancel-title="T.arrayModalBack"
                       cancel-variant="danger"
+                      static
+                      lazy
                       @ok="
                         editLineValue([line.lineID, arrayModalEditArray]);
                         arrayModalEditArray = '';
@@ -131,21 +132,21 @@
                     >
                       <b-container>
                         <b-row class="mb-4">
-                          <b-col>
+                          <b-col class="text-left">
                             {{ T.arrayModalSize }}
                             <b-form-input
                               v-model="line.data.size"
                               type="number"
                             />
                           </b-col>
-                          <b-col>
+                          <b-col class="text-left">
                             {{ T.arrayModalMinimum }}
                             <b-form-input
                               v-model="line.data.min"
                               type="number"
                             />
                           </b-col>
-                          <b-col>
+                          <b-col class="text-left">
                             {{ T.arrayModalMaximum }}
                             <b-form-input
                               v-model="line.data.max"
@@ -154,14 +155,14 @@
                           </b-col>
                         </b-row>
                         <b-row class="mt-2 mb-4">
-                          <b-col>
+                          <b-col class="text-left">
                             <b-form-checkbox v-model="line.data.distinct">
                               {{ T.arrayModalDistinctValues }}
                             </b-form-checkbox>
                           </b-col>
                         </b-row>
                         <b-row class="mt-4">
-                          <b-col>
+                          <b-col class="text-left">
                             <b-button
                               variant="primary"
                               @click="
@@ -177,7 +178,9 @@
                           </b-col>
                         </b-row>
                         <hr />
-                        {{ T.arrayModalGeneratedArray }}
+                        <div class="text-left">
+                          {{ T.arrayModalGeneratedArray }}
+                        </div>
                         <b-form-input
                           v-model="arrayModalEditArray"
                           class="w-100"
@@ -192,6 +195,8 @@
                       ok-variant="success"
                       :cancel-title="T.matrixModalBack"
                       cancel-variant="danger"
+                      static
+                      lazy
                       @ok="
                         editLineValue([line.lineID, matrixModalEditArray]);
                         matrixModalEditArray = '';
@@ -199,7 +204,7 @@
                     >
                       <b-container>
                         <b-row class="mb-4">
-                          <b-col>
+                          <b-col class="text-left">
                             {{ T.matrixModalRows }}
                             <b-form-input v-model="line.data.rows" />
                           </b-col>
@@ -207,7 +212,7 @@
                             {{ T.matrixModalColumns }}
                             <b-form-input v-model="line.data.cols" />
                           </b-col>
-                          <b-col>
+                          <b-col class="text-left">
                             {{ T.matrixModalMinimum }}
                             <b-form-input v-model="line.data.min" />
                           </b-col>
@@ -217,7 +222,7 @@
                           </b-col>
                         </b-row>
                         <b-row class="mt-2 mb-4">
-                          <b-col>
+                          <b-col class="text-left">
                             <div class="mb-1 font-weight-bold">Distinct</div>
                             <b-dropdown
                               :text="
@@ -242,7 +247,7 @@
                           </b-col>
                         </b-row>
                         <b-row class="mt-4">
-                          <b-col>
+                          <b-col class="text-left">
                             <b-button
                               variant="primary"
                               @click="
@@ -259,7 +264,9 @@
                           </b-col>
                         </b-row>
                         <hr />
-                        {{ T.matrixModalGeneratedArray }}
+                        <div class="text-left">
+                          {{ T.matrixModalGeneratedArray }}
+                        </div>
                         <b-form-textarea
                           v-model="matrixModalEditArray"
                           class="w-100"
